@@ -177,6 +177,8 @@ public class MapViewManager extends NavigatedViewManager {
     /** The name of the display projection we are currently using */
     private String mainProjectionName = null;
 
+    private String defaultProjectionName = null;
+
 
     /** Keep track of the projections we have used */
     private ArrayList projectionHistory = new ArrayList();
@@ -251,6 +253,8 @@ public class MapViewManager extends NavigatedViewManager {
     private boolean defaultGlobeBackground = false;
 
     private double displayProjectionZoom = 0;
+
+    private boolean doNotSetProjection = false;
 
     /**
      *  Default constructor
@@ -355,6 +359,7 @@ public class MapViewManager extends NavigatedViewManager {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
                 if(initLatLonBounds!=null) {
+		    doNotSetProjection = true;
                     mainProjection = ucar.visad.Util.makeMapProjection(initLatLonBounds.getY()-initLatLonBounds.getHeight(),
                                                                        initLatLonBounds.getX(),
                                                                        initLatLonBounds.getY(),
@@ -362,7 +367,18 @@ public class MapViewManager extends NavigatedViewManager {
 
                     
 		} else {
-		    ProjectionImpl dfltProjection = getDefaultProjection();
+		    ProjectionImpl dfltProjection = null;
+		    if(defaultProjectionName!=null) {
+			dfltProjection = 
+			    getIdv().getIdvProjectionManager().findProjectionByName(defaultProjectionName);
+			if(dfltProjection!=null) {
+			    doNotSetProjection = true;
+			}
+		    }
+
+		    if(dfltProjection==null) {
+			dfltProjection = getDefaultProjection();
+		    }
 		    mainProjection =
 			new ProjectionCoordinateSystem(dfltProjection);
 		}
@@ -400,6 +416,13 @@ public class MapViewManager extends NavigatedViewManager {
 
             navDisplay = mapDisplay;
             navDisplay.setPerspectiveView(getPerspectiveView());
+
+	    if(defaultProjectionName!=null && displayProjectionZoom!=0) {
+		navDisplay.zoom(displayProjectionZoom);
+	    }
+	    defaultProjectionName = null;
+	    initLatLonBounds = null;
+
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
         }
 
@@ -955,7 +978,7 @@ public class MapViewManager extends NavigatedViewManager {
             getMapDisplay().zoom(displayProjectionZoom);
         }
 
-        if(initLatLonBounds!=null) {
+        if(doNotSetProjection) {
             return;
         }
 
@@ -1271,7 +1294,7 @@ public class MapViewManager extends NavigatedViewManager {
                                   GuiUtils.left(getUseGlobeDisplay()
                     ? GuiUtils.filler()
                     : (JComponent) addressReprojectCbx));
-            System.out.println ("{" + GeoUtils.lastAddress+"}  -ll {" + llp.getLatitude()+","+llp.getLongitude()+"}");
+	    //            System.out.println ("{" + GeoUtils.lastAddress+"}  -ll {" + llp.getLatitude()+","+llp.getLongitude()+"}");
             getIdvUIManager().showNormalCursor();
             if (llp == null) {
                 return;
@@ -1699,6 +1722,28 @@ public class MapViewManager extends NavigatedViewManager {
         mainProjectionName = projectionName;
     }
 
+/**
+Set the DfltProjectionName property.
+
+@param value The new value for DfltProjectionName
+**/
+public void setDefaultProjectionName (String value) {
+	this.defaultProjectionName = value;
+}
+
+/**
+Get the DfltProjectionName property.
+
+@return The DfltProjectionName
+**/
+public String getDefaultProjectionName () {
+	return this.defaultProjectionName;
+}
+
+
+
+
+
     /**
      * Add the projection and the given name into the history list. Add a menu item
      * into the history menu.
@@ -1811,7 +1856,7 @@ public class MapViewManager extends NavigatedViewManager {
             if(!getUseProjectionFromData()) {
                 return false;
             }
-            if(initLatLonBounds!=null) {
+	    if(doNotSetProjection) {
                 return false;
             }
         }
@@ -2423,7 +2468,10 @@ public class MapViewManager extends NavigatedViewManager {
         if (mp == null) {
             return false;
         }
-        if(initLatLonBounds!=null) return false;
+	if(doNotSetProjection) {
+	    return false;
+	}
+
         Rectangle2D rect = mp.getDefaultMapArea();
         if ((rect.getWidth() == 0) || (rect.getHeight() == 0)) {
             return false;

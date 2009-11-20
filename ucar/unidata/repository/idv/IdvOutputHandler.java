@@ -36,6 +36,8 @@ import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
 import ucar.nc2.dt.TypedDatasetFactory;
 
+import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.projection.*;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 
@@ -159,13 +161,14 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-    public static final String ARG_VIEW_GLOBE = "view.globe";
+    public static final String ARG_VIEW_GLOBE = "globe";
+    public static final String ARG_VIEW_PROJECTION = "proj";
 
-    public static final String ARG_VIEW_VIEWPOINT = "view.viewpoint";
+    public static final String ARG_VIEW_VIEWPOINT = "viewpoint";
 
-    public static final String ARG_VIEW_BOUNDS = "view.bounds";
-    public static final String ARG_VIEW_JUSTCLIP = "view.justclip";
-    public static final String ARG_VIEW_BACKGROUNDIMAGE = "view.backgroundimage";
+    public static final String ARG_VIEW_BOUNDS = "bounds";
+    public static final String ARG_VIEW_JUSTCLIP = "justclip";
+    public static final String ARG_VIEW_BACKGROUNDIMAGE = "backgroundimage";
 
 
 
@@ -202,17 +205,17 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_COLORTABLE = "display_colortable";
 
     /** _more_          */
-    public static final String ARG_STRIDE = "spatial_stride";
+    public static final String ARG_STRIDE = "stride";
 
 
     /** _more_          */
-    public static final String ARG_FLOW_SCALE = "flow_scale";
+    public static final String ARG_FLOW_SCALE = "f_scale";
 
     /** _more_          */
-    public static final String ARG_FLOW_DENSITY = "flow_density";
+    public static final String ARG_FLOW_DENSITY = "f_density";
 
     /** _more_          */
-    public static final String ARG_FLOW_SKIP = "flow_skip";
+    public static final String ARG_FLOW_SKIP = "f_skip";
 
     /** _more_          */
     public static final String ARG_DISPLAYUNIT = "display_unit";
@@ -220,42 +223,42 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_          */
     public static final String ARG_ISOSURFACEVALUE = "iso_value";
 
-    public static final String ARG_CONTOUR_WIDTH = "contour_width";
+    public static final String ARG_CONTOUR_WIDTH = "c_width";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_MIN = "contour_min";
+    public static final String ARG_CONTOUR_MIN = "c_min";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_MAX = "contour_max";
+    public static final String ARG_CONTOUR_MAX = "c_max";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_INTERVAL = "contour_interval";
+    public static final String ARG_CONTOUR_INTERVAL = "c_interval";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_BASE = "contour_base";
+    public static final String ARG_CONTOUR_BASE = "c_base";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_DASHED = "contour_dashed";
+    public static final String ARG_CONTOUR_DASHED = "c_dashed";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_LABELS = "contour_labels";
-
-
-    /** _more_          */
-    public static final String ARG_SCALE_VISIBLE = "scale_visible";
-
-    /** _more_          */
-    public static final String ARG_SCALE_ORIENTATION = "scale_orientation";
-
-    /** _more_          */
-    public static final String ARG_SCALE_PLACEMENT = "scale_placement";
+    public static final String ARG_CONTOUR_LABELS = "c_labels";
 
 
     /** _more_          */
-    public static final String ARG_RANGE_MIN = "range_min";
+    public static final String ARG_SCALE_VISIBLE = "s_visible";
 
     /** _more_          */
-    public static final String ARG_RANGE_MAX = "range_max";
+    public static final String ARG_SCALE_ORIENTATION = "s_orientation";
+
+    /** _more_          */
+    public static final String ARG_SCALE_PLACEMENT = "s_placement";
+
+
+    /** _more_          */
+    public static final String ARG_RANGE_MIN = "r_min";
+
+    /** _more_          */
+    public static final String ARG_RANGE_MAX = "r_max";
 
     /** _more_          */
     public static final String ARG_DISPLAY = "display_type";
@@ -277,7 +280,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_CLIP = "clip";
 
     /** _more_          */
-    public static final String ARG_VIEW_BACKGROUND = "view_background";
+    public static final String ARG_VIEW_BACKGROUND = "background";
 
     /** _more_          */
     public static final String ARG_LEVELS = "levels";
@@ -729,6 +732,43 @@ public class IdvOutputHandler extends OutputHandler {
                                         htmlCheckbox(request,ARG_VIEW_GLOBE, 
                                                      false) + HtmlUtil.space(2) +viewPointHtml));
                                         
+
+	List projectionOptions = new ArrayList();
+	projectionOptions.add(new TwoFacedObject("--none--", ""));
+	List projections = idvServer.getIdv().getIdvProjectionManager().getProjections();
+	
+	Hashtable<String,List> projCatMap = new Hashtable<String,List>();
+	List<String> projCats = new ArrayList<String>();
+        for (int i = 0; i < projections.size();i++) {
+            ProjectionImpl proj = (ProjectionImpl) projections.get(i);
+	    String name = proj.getName();
+	    List<String>toks = StringUtil.split(name, ">",true,true);
+	    String cat;
+	    String label;
+	    if(toks.size()<=1) {
+		cat = "Misc";
+		label = name;
+	    } else {
+		label = toks.remove(toks.size()-1);
+		cat = StringUtil.join(">", toks);
+	    }
+	    List tfos = projCatMap.get(cat);
+	    if(tfos==null) {
+		projCatMap.put(cat, tfos = new ArrayList());
+		projCats.add(cat);
+	    }
+	    tfos.add(new TwoFacedObject(HtmlUtil.space(4) +label, name));
+	}
+
+	for(String projCat: projCats) {
+	    projectionOptions.add(new TwoFacedObject(projCat, ""));
+	    projectionOptions.addAll(projCatMap.get(projCat));
+	}
+	
+        basic.append(HtmlUtil.formEntry(msgLabel("Projection"),
+                                        htmlSelect(request,ARG_VIEW_PROJECTION,projectionOptions))); 
+
+
 
         basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
                                         htmlCheckbox(request,ARG_CLIP, 
@@ -1519,6 +1559,11 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
         StringBuffer viewProps = new StringBuffer();
+	if(request.defined(ARG_VIEW_PROJECTION)) {
+	    viewProps.append(makeProperty( "defaultProjectionName",request.getString(ARG_VIEW_PROJECTION,"")));
+	    
+	}
+
         viewProps.append(makeProperty( "wireframe","false"));
         viewProps.append("\n");
         //	viewProps.append(makeProperty( "wireframe","true"));
@@ -1675,6 +1720,7 @@ public class IdvOutputHandler extends OutputHandler {
             if(param.length()==0) continue;
             displayIdx++;
 
+	    if(!request.defined(ARG_DISPLAY + displayIdx)) continue;
             String display = request.getString(ARG_DISPLAY + displayIdx, "");
 
             StringBuffer propSB = new StringBuffer();
