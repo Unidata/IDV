@@ -246,6 +246,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_DISPLAY = "display";
 
+    public static final String TAG_DATASOURCE = "datasource";
+
     /** isl tag */
     public static final String TAG_MATTE = "matte";
 
