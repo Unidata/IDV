@@ -197,71 +197,71 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_POINT_DOANIMATION = "doanimation";
 
     /** _more_          */
-    public static final String ARG_DISPLAYLISTLABEL = "display_list_label";
+    public static final String ARG_DISPLAYLISTLABEL = "dll";
 
-    public static final String ARG_DISPLAYCOLOR = "display_color";
+    public static final String ARG_DISPLAYCOLOR = "clr";
 
     /** _more_          */
-    public static final String ARG_COLORTABLE = "display_colortable";
+    public static final String ARG_COLORTABLE = "ct";
 
     /** _more_          */
     public static final String ARG_STRIDE = "stride";
 
 
     /** _more_          */
-    public static final String ARG_FLOW_SCALE = "f_scale";
+    public static final String ARG_FLOW_SCALE = "f_s";
 
     /** _more_          */
-    public static final String ARG_FLOW_DENSITY = "f_density";
+    public static final String ARG_FLOW_DENSITY = "f_d";
 
     /** _more_          */
-    public static final String ARG_FLOW_SKIP = "f_skip";
+    public static final String ARG_FLOW_SKIP = "f_sk";
 
     /** _more_          */
-    public static final String ARG_DISPLAYUNIT = "display_unit";
+    public static final String ARG_DISPLAYUNIT = "unit";
 
     /** _more_          */
     public static final String ARG_ISOSURFACEVALUE = "iso_value";
 
-    public static final String ARG_CONTOUR_WIDTH = "c_width";
+    public static final String ARG_CONTOUR_WIDTH = "c_w";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_MIN = "c_min";
+    public static final String ARG_CONTOUR_MIN = "c_mn";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_MAX = "c_max";
+    public static final String ARG_CONTOUR_MAX = "c_mx";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_INTERVAL = "c_interval";
+    public static final String ARG_CONTOUR_INTERVAL = "c_int";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_BASE = "c_base";
+    public static final String ARG_CONTOUR_BASE = "c_b";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_DASHED = "c_dashed";
+    public static final String ARG_CONTOUR_DASHED = "c_d";
 
     /** _more_          */
-    public static final String ARG_CONTOUR_LABELS = "c_labels";
-
-
-    /** _more_          */
-    public static final String ARG_SCALE_VISIBLE = "s_visible";
-
-    /** _more_          */
-    public static final String ARG_SCALE_ORIENTATION = "s_orientation";
-
-    /** _more_          */
-    public static final String ARG_SCALE_PLACEMENT = "s_placement";
+    public static final String ARG_CONTOUR_LABELS = "c_l";
 
 
     /** _more_          */
-    public static final String ARG_RANGE_MIN = "r_min";
+    public static final String ARG_SCALE_VISIBLE = "s_v";
 
     /** _more_          */
-    public static final String ARG_RANGE_MAX = "r_max";
+    public static final String ARG_SCALE_ORIENTATION = "s_o";
 
     /** _more_          */
-    public static final String ARG_DISPLAY = "display_type";
+    public static final String ARG_SCALE_PLACEMENT = "s_p";
+
+
+    /** _more_          */
+    public static final String ARG_RANGE_MIN = "r_mn";
+
+    /** _more_          */
+    public static final String ARG_RANGE_MAX = "r_mx";
+
+    /** _more_          */
+    public static final String ARG_DISPLAY = "dsp";
 
     /** _more_          */
     public static final String ARG_ACTION = "action";
@@ -280,7 +280,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_CLIP = "clip";
 
     /** _more_          */
-    public static final String ARG_VIEW_BACKGROUND = "background";
+    public static final String ARG_VIEW_BACKGROUND = "bg";
 
     /** _more_          */
     public static final String ARG_LEVELS = "levels";
@@ -597,6 +597,7 @@ public class IdvOutputHandler extends OutputHandler {
 							     dataset, entry.getName(), path);
 
         try {
+            System.err.println("action:"+ action);
             if (action.equals(ACTION_GRID_MAKEINITFORM)) {
                 return outputGridInitForm(request, entry, dataSource);
             } else if (action.equals(ACTION_GRID_MAKEFORM)) {
@@ -1407,6 +1408,8 @@ public class IdvOutputHandler extends OutputHandler {
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
+
+
         String args = request.getUrlArgs(exceptArgs, null);
         url = url + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE + "&"
 	    + args;
@@ -1417,7 +1420,10 @@ public class IdvOutputHandler extends OutputHandler {
 	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
         boolean showForm = true;
+        
         if(product.equals(PRODUCT_IMAGE)) {
+            System.err.println ("url length:" + url.length());
+            System.err.println (url);
             sb.append(HtmlUtil.img(url, "Image is being processed...",
                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
                                                  request.getString(ARG_IMAGE_WIDTH,
@@ -1468,10 +1474,14 @@ public class IdvOutputHandler extends OutputHandler {
                                   GeoGridDataSource dataSource)
 	throws Exception {
 
+        System.err.println("calling ggi");
 	Object fileOrResult = generateGridImage(request, entry, dataSource);
-	if(fileOrResult instanceof Result) 
+	if(fileOrResult instanceof Result) {
+            System.err.println("got a result back");
 	    return (Result) fileOrResult;
+        }
 	File imageFile = (File) fileOrResult;
+        System.err.println("got a File");
         String extension = IOUtil.getFileExtension(imageFile.toString());
         return new Result("",
                           getStorageManager().getFileInputStream(imageFile),
@@ -1967,7 +1977,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
-	//        System.err.println(isl);
+        System.err.println(isl);
 
         long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl, props);

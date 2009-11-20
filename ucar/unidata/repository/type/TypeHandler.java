@@ -1909,7 +1909,7 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
-	    String mapSelector = getRepository().makeMapSelector(request, ARG_AREA,true);
+	    String mapSelector = getRepository().makeMapSelector(request, ARG_AREA,true,"","");
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     mapSelector));
             advancedSB.append("\n");
