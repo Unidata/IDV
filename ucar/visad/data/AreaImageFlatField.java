@@ -126,6 +126,29 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
+
+    /**
+     * ctor
+     *
+     * @param floats The values
+     * @param type Function type
+     * @param domainSet Domain
+     * @param rangeCoordSys  range CoordSystem
+     * @param rangeSets range sets
+     * @param units units
+     *
+     * @throws VisADException On badness
+     */
+    public AreaImageFlatField(FunctionType type, Set domainSet,
+                              CoordinateSystem rangeCoordSys,
+                              Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
+            throws VisADException {
+        super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
+        this.readLabel  =readLabel;
+    }
+
+
+
     /**
      * Clone this object
      *
@@ -154,27 +177,28 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
-    /**
-     * ctor
-     *
-     * @param floats The values
-     * @param type Function type
-     * @param domainSet Domain
-     * @param rangeCoordSys  range CoordSystem
-     * @param rangeSets range sets
-     * @param units units
-     *
-     * @throws VisADException On badness
-     */
-    public AreaImageFlatField(FunctionType type, Set domainSet,
-                              CoordinateSystem rangeCoordSys,
-                              Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
-            throws VisADException {
-        super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
-        this.readLabel  =readLabel;
+    public static AreaImageFlatField createImmediate(AddeImageDescriptor aid, String readLabel) 
+        throws VisADException, RemoteException, IOException {
+        AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
+        visad.meteorology.SingleBandedImageImpl ff   = (visad.meteorology.SingleBandedImageImpl)aa.getImage();
+        //Uggh, make a copy for now
+        float[][]samples  = ff.unpackFloats();
+        FunctionType type = (FunctionType) ff.getType();
+        Set domainSet = ff.getDomainSet();
+        CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
+        Set[] rangeSets = ff.getRangeSets();
+        Unit[] units = ff.getRangeUnits()[0];
+        AreaImageFlatField aiff= new AreaImageFlatField(type, domainSet,
+                                      rangeCoordSys,
+                                      rangeSets, units, samples,  readLabel);
+
+        //        aiff.bandIndices = bandIndices;
+        //        aiff.aid         = aid;
+        //        cs.aiff          = aiff;
+        aiff.startTime   = ff.getStartTime();
+        return aiff;
+
     }
-
-
 
 
     /**
@@ -193,10 +217,14 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     public static AreaImageFlatField create(AddeImageDescriptor aid,
                                             AreaDirectory areaDirectory,
-                                            boolean shouldCache,
                                             String cacheFile,
-                                            long cacheClearDelay, String readLabel)
-            throws VisADException, RemoteException {
+                                            String readLabel)
+        throws VisADException, RemoteException, IOException {
+
+        if(true) {
+            return createImmediate(aid, readLabel);
+        }
+
 
         //        int nLines = aid.getImageInfo().getLines();
         //        int nEles  = aid.getImageInfo().getElements();
@@ -445,14 +473,17 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
 
 
-            /*
+            /*            if(true) {
+
+
               AreaAdapter aa = new AreaAdapter(aid.getImageInfo().makeAddeUrl(), false);
               visad.meteorology.SingleBandedImage ff = aa.getImage();
-
-
               float[][]samples = ff.getFloats(false);
               areaFile = aa.getAreaFile();
-            */
+              return samples;
+              }*/
+
+
             haveReadData = true;
 
 
