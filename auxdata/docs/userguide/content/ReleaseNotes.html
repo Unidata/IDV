@@ -11,152 +11,68 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.6u2 release.
+The items below reflect changes since the 2.7u2 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="Last version to support Java 5" id="jdk6">
-This will be the last version of IDV that will run under
-Java 5 (aka Java 1.5).  The next release will be compiled
-under Java 6. This means that some Mac OS-X systems will not
-not be able to run future versions if they do not support
-Java 6.
+<faqitem q="IDV <%idv.version%> requires Java 6 (aka 1.6)" id="jdk6">
+This version requires Java 6 or later.  For most operating systems, 
+Java 6 or higher has been the default for several years. On Mac OS-X, 
+Java 5 is the default except for the new Snow Leopard (10.6) release.
+For information on upgrading Mac OS-X to Java 6, see the 
+<a href="Systems.html">System Requirements</a>.
 </faqitem>
 
-<faqitem q="Use of non-alpha netCDF 4.0 library" id="nj4">
-The netCDF-Java 4.0 library has moved from alpha to production
-and that version is included in the IDV (ncIdv.jar).  
+<faqitem q="Use of netCDF 4.1 library" id="nj4">
+The version of netCDF-Java has been updated to 4.1.
 </faqitem>
 
-<faqitem q="Parallel Data Reading and Rendering" id="multi-threading">
-With multiple core machines becoming ubiquitous, the IDV can now take
-advantage of using multiple processors for data reading and display.
-If you are running the IDV on a multi-core machine you can configure 
-the IDV to render individual time steps in parallel. You can also do 
-remote data reads in parallel. This typically results in a 50% reduction 
-in overall data readings and rendering time.  See the 
-<a href="misc/PerformanceTuning.html">Performance Tuning</a>
-page for more information.
+<faqitem q="Data caching" id="datacache">
+A new scheme for data caching has been instituted.  Details will follow
+in the <a href="misc/PerformanceTuning.html">Performance Tuning</a>
+page.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
-<faqitem q="Fast Rendering by default" id="fastrender">
-The default for fast rendering has been changed to be on by default.
-This results in faster display and less memory use.  However, if you
-display data in a non-native projection, you may see that the data
-does not display correctly.   If that happens, you can turn off
-the Use Fast Rendering setting through the [ug::menu Edit Properties]
-menu in the display control.
-</faqitem>
 
-<faqitem q="New display for RHI data" id="rhicontrol">
-Radar RHI sweeps in DORADE and UF format can not be displayed
-in the <a href="controls/RadarRhiControl.html">Radar RHI control</a>.
-This provides a view in the 3D window as well as the control window.
-</faqitem>
-
-<faqitem q="3D Hodograph and Table Readout of Soundings" id="hodograph">
-The sounding display (e.g.SkewT) has been modified to include
-a 3D Hodograph and a table readout.  The data in the table can be 
-exported to a text file for import into other applications.
-</faqitem>
-
-<faqitem q="Point Volume Display" id="pointvolume">
-A new display for quickly showing a volume as points was added
-in the 2.7u2 release.  This display will show the individual grid
-points.  The size, color and data range can be changed through 
-the display control.
+<faqitem q="Radar cross section display" id="radarxs">
+A radar cross section control has been added in this release.  This
+control allows users to create arbitrary cross sections through radar
+volume data.  Details are in the 
+<a href="controls/RadarCrossSectionControl.html">
+Radar Cross Section Control</a> section of this guide.  
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
-<faqitem q="UF Radar data reading" id="uf_radar">
-Preliminary work has been done on reading Universal Format (UF)
-radar data in the IDV.  We have tested on samples that we have
-available, but if IDV users find it does not work with their
-UF files, please send samples to Unidata IDV support.
+<faqitem q="Lightning data from native and GEMPAK files" id="lightning">
+USPLN and NLDN lightning data stored in native or GEMPAK format can now be
+read in as point data.  Several new lightning layout models have been 
+added to the system list.
 </faqitem>
 
-<faqitem q="First guess grid for Objective Analysis" id="oa_grid">
-Users can now input a first guess field for the Barnes objective
-analysis of point data.  When you load in point data, a new
-set of choices (<i>Gridded Fields (with first guess)</i>) is available.
-When you select one of these choices, you will be prompted for
-the grid you wish to use.
+<faqitem q="Ship/Buoy data" id="shipbuoy">
+Ship and buoy data are now available through the ADDE point obs chooser.
 </faqitem>
 
-<faqitem q="Export data to netCDF" id="cf_export">
-The &quot;Export Displayed Data...&quot; facility has been
-upgraded for gridded data.  The output from gridded volume and plan
-view displays is now CF compliant and can be read back into
-the IDV.  Work is still in progress for exporting cross section,
-radar and other types of displays.  A new Formula 
-[ug::menu Export {Export Grid/Image to netCDF}] has been
-added so users can export calculated fields to a netCDf file.
+<faqitem q="New default background image layers" id="bkgimages">
+Serveral new background image layers have been added to the Background
+Images control.
 </faqitem>
 
-<faqitem q="Import of text point data" id="text_poitn">
-The Text Point Data import has been improved in this version.
-The metadata interface has been improved to allow skipping over
-header lines and automatically importing the field names from
-a header into the metadata fields.  Support for opening multiple files
-at once was added in 2.7u2.  A plugin for NAPLN Text Lightning data 
-is available through the Plugin Manager.
+<faqitem q="Globe display improvements" id="globe">
+Several imrovements have been added to the Globe display.  You
+can now zoom in without going through the clipping plane.  You can
+spin the globe with a mouse flick and control the rate of rotation.
+There are predefined viewpoints available through the Projections menu.
 </faqitem>
-
 
 <faqitem cat="User Interface Changes"></faqitem>
-
-<faqitem q="Color Table Editor" id="color_table_ui">
-The behavior of the Color Table Editor has been changed in this
-version.  Previously, the breakpoints were overloaded to be
-an indication of a point and also used to paint in the edit mode.
-Since the painting action would change the value of the breakpoint,
-the new color table model uses the breakpoints only as markers.
-Painting is done with a dragging motion on the color bar now.
-For more information, see the <a href="tools/ColorTableEditor.html">
-Color Table Editor</a> section of the User's Guide.
-</faqitem>
-
-<faqitem q="New Display Settings widget" id="displaysettings">
-The display settings user interface has been reworked to allow
-easier creation and application of Display Settings.  See the
-<a href="tools/DisplaySettings.html">section</a> in the User's
-Guide on using this tool.
-</faqitem>
-
-<faqitem q="Data Chooser Changes" id="datachoosers">
-The layout of the <a href="data/choosers/index.html">
-Data Chooser</a> has been changed.  The buttons for selecting
-the individual choosers have been replaced by a tree view of 
-the choosers.  The layout of the individual choosers has 
-been made more consistent.
-</faqitem>
-
 
 <faqitem q="Known Problems" id="knownproblems">
 For a list of outstanding known problems, see the 
 <a href="Bugs.html">Known Problems</a> page.<p>
-Bugs fixed in this update:
-<ul>
-<li>2.7 unable to read WRF ARW output
-<li>Exception when sharing probe positions
-<li>Unable to read in saved text point data source
-<li>Updated web cam links and locations
-<li>Updated to netCDF-Java 4.0.48.2
-<li>Fix gate size problem when loading multiple Level III/TDWR products
-<li>Fix problem with missing values in grib data
-<li>Font size not getting applied in Layout Model
-<li>Unable to read in CLASS netCDF images
-<li>Lat/lon widget in Image chooser doesn't handle regional number formatting
-<li>Clearing spatial subset in the Data Subset panel does not override data source setting.
-<li>AVN grid (-30 to 330) was not displaying correctly
-<li>Color Table Editor issued discovered during workshop.
-<li>Add icons to menus
-<li>Space in extra attributes in Text Point metadata editor caused problems.
-<li>Some control guis not left justified.
-</ul>
 </faqitem>
 
 </faq>
