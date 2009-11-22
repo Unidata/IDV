@@ -1066,7 +1066,7 @@ public abstract class XmlUtil {
      * @throws Exception _more_
      */
     public static Element create(Document doc, String tag) throws Exception {
-        return create(doc, tag, null);
+        return create(doc, tag, (String[])null);
     }
 
 
@@ -1111,6 +1111,13 @@ public abstract class XmlUtil {
             setAttributes(child, Misc.listToStringArray(attrs));
         }
         return child;
+    }
+
+
+    public static Element create(Document doc, String tag, 
+                                 String[] attrs)
+            throws Exception {
+	return create(doc, tag, (Element)null, attrs);
     }
 
 
