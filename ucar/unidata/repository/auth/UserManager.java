@@ -2457,8 +2457,8 @@ public class UserManager extends RepositoryManager {
                        || output.equals(OUTPUT_FAVORITE);
             }
 
-            public Result outputGroup(Request request, OutputType outputType, Group group,
-                                      List<Group> subGroups,
+            public Result outputGroup(Request request, OutputType outputType,
+                                      Group group, List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
                 OutputType output = request.getOutput();

@@ -457,8 +457,13 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean returnToEditForm() {
-	return false;
+        return false;
     }
 
     /**
@@ -1593,22 +1598,21 @@ public class TypeHandler extends RepositoryManager {
                 }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
-            String mapSelector = getRepository().makeMapSelector(ARG_AREA, true,
-								 ((entry != null) && entry.hasSouth())
-								 ? ""+entry.getSouth()
-								 : "", ((entry != null)
-										&& entry.hasNorth())
-								 ? ""+entry.getNorth()
-								 : "", ((entry != null) && entry.hasEast())
-								 ? ""+entry.getEast()
-								 : "", ((entry != null)
-										&& entry.hasWest())
-								 ? ""+entry.getWest()
-								 : "");
+            String mapSelector = getRepository().makeMapSelector(ARG_AREA,
+                                     true,
+                                     ((entry != null) && entry.hasSouth())
+                                     ? "" + entry.getSouth()
+                                     : "", ((entry != null)
+                                            && entry.hasNorth())
+                                           ? "" + entry.getNorth()
+                                           : "", ((entry != null)
+                                               && entry.hasEast())
+                    ? "" + entry.getEast()
+                    : "", ((entry != null) && entry.hasWest())
+                          ? "" + entry.getWest()
+                          : "");
 
-            sb.append(
-                HtmlUtil.formEntry(
-				   "Location:",mapSelector));
+            sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
         }
 
@@ -1815,17 +1819,17 @@ public class TypeHandler extends RepositoryManager {
 
 
         /**
-        List<Group> collectionGroups =
-            getEntryManager().getTopGroups(request);
-        List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
-        collections.add(new TwoFacedObject("All", ""));
-        for (Group group : collectionGroups) {
-            collections.add(new TwoFacedObject(group.getLabel(),
-                    group.getId()));
-
-        }
-
-
+         * List<Group> collectionGroups =
+         *   getEntryManager().getTopGroups(request);
+         * List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
+         * collections.add(new TwoFacedObject("All", ""));
+         * for (Group group : collectionGroups) {
+         *   collections.add(new TwoFacedObject(group.getLabel(),
+         *           group.getId()));
+         *
+         * }
+         *
+         *
          * Entry collection = request.getCollectionEntry();
          * String collectionSelect = HtmlUtil.select(ARG_COLLECTION,
          *                             collections, ((collection != null)
@@ -1913,7 +1917,8 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
-	    String mapSelector = getRepository().makeMapSelector(request, ARG_AREA,true,"","");
+            String mapSelector = getRepository().makeMapSelector(request,
+                                     ARG_AREA, true, "", "");
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     mapSelector));
             advancedSB.append("\n");

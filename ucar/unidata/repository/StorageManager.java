@@ -522,10 +522,17 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     public File getThumbDir(String file) {
-        File f =  getTmpDirFile(getThumbDir(), file);
-	IOUtil.makeDirRecursive(f);
-	return f;
+        File f = getTmpDirFile(getThumbDir(), file);
+        IOUtil.makeDirRecursive(f);
+        return f;
     }
 
 
@@ -705,6 +712,13 @@ public class StorageManager extends RepositoryManager {
         return dir;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public String getDir(String name) {
         String dir = IOUtil.joinDir(getRepositoryDir(), name);
         IOUtil.makeDirRecursive(new File(dir));
@@ -982,7 +996,7 @@ public class StorageManager extends RepositoryManager {
 
         File newFile = new File(IOUtil.joinDir(storageDir, targetName));
         IOUtil.copyFile(original, newFile);
-	IOUtil.close(original);
+        IOUtil.close(original);
         return newFile;
     }
 
@@ -1332,12 +1346,12 @@ public class StorageManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public String readSystemResource(String path) throws Exception {
-	InputStream stream = getInputStream(path);
-	try {
-	    return IOUtil.readInputStream(stream);
-	} finally {
-	    IOUtil.close(stream);
-	}
+        InputStream stream = getInputStream(path);
+        try {
+            return IOUtil.readInputStream(stream);
+        } finally {
+            IOUtil.close(stream);
+        }
     }
 
 

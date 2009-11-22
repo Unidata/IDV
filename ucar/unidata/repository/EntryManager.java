@@ -269,6 +269,11 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     protected void removeFromCache(String id) {
         synchronized (MUTEX_ENTRY) {
             entryCache.remove(id);
@@ -484,8 +489,8 @@ return new Result(title, sb);
             throws Exception {
         if (result.getShouldDecorate()) {
             //            if(entry.getDescription().indexOf("<noentryheader>")>=0) return result;
-	    //            String output = request.getString(ARG_OUTPUT, (String) "");
-	    //            request.put(ARG_OUTPUT, output);
+            //            String output = request.getString(ARG_OUTPUT, (String) "");
+            //            request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
             if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
@@ -511,27 +516,34 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request, Entry entry)
-	throws Exception {
+            throws Exception {
         Result result = null;
-	OutputHandler outputHandler = getRepository().getOutputHandler(request);
-	if(outputHandler.getMaxConnections()>0) {
-	    if(outputHandler.getNumberOfConnections()>=outputHandler.getMaxConnections()) {
+        OutputHandler outputHandler =
+            getRepository().getOutputHandler(request);
+        if (outputHandler.getMaxConnections() > 0) {
+            if (outputHandler.getNumberOfConnections()
+                    >= outputHandler.getMaxConnections()) {
 
-		return new Result("Connection error", new StringBuffer("Unable to process request at this time"));
-	    }
-	}
-	outputHandler.incrNumberOfConnections();
-	OutputType  outputType = request.getOutput();
-	outputType.incrNumberOfCalls();
-	try {
-	    if (entry.isGroup()) {
-		result = processGroupShow(request, outputHandler, outputType, (Group) entry);
-	    } else {
-		result = outputHandler.outputEntry(request,  outputType, entry);
-	    }
-	} finally {
-	    outputHandler.decrNumberOfConnections();
-	}
+                return new Result(
+                    "Connection error",
+                    new StringBuffer(
+                        "Unable to process request at this time"));
+            }
+        }
+        outputHandler.incrNumberOfConnections();
+        OutputType outputType = request.getOutput();
+        outputType.incrNumberOfCalls();
+        try {
+            if (entry.isGroup()) {
+                result = processGroupShow(request, outputHandler, outputType,
+                                          (Group) entry);
+            } else {
+                result = outputHandler.outputEntry(request, outputType,
+                        entry);
+            }
+        } finally {
+            outputHandler.decrNumberOfConnections();
+        }
 
         return result;
     }
@@ -541,15 +553,19 @@ return new Result(title, sb);
      * _more_
      *
      * @param request _more_
+     * @param outputHandler _more_
+     * @param outputType _more_
      * @param group _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private Result processGroupShow(Request request, OutputHandler outputHandler, OutputType  outputType, Group group)
+    private Result processGroupShow(Request request,
+                                    OutputHandler outputHandler,
+                                    OutputType outputType, Group group)
             throws Exception {
-        boolean doLatest = request.get(ARG_LATEST, false);
+        boolean      doLatest    = request.get(ARG_LATEST, false);
 
         TypeHandler  typeHandler = getRepository().getTypeHandler(request);
         List<Clause> where       = typeHandler.assembleWhereClause(request);
@@ -579,15 +595,16 @@ return new Result(title, sb);
         if (doLatest) {
             if (entries.size() > 0) {
                 entries = sortEntriesOnDate(entries, true);
-                return outputHandler.outputEntry(request, outputType, entries.get(0));
+                return outputHandler.outputEntry(request, outputType,
+                        entries.get(0));
             }
         }
 
         group.setSubEntries(entries);
         group.setSubGroups(subGroups);
 
-        Result result = outputHandler.outputGroup(request, outputType, group, subGroups,
-                            entries);
+        Result result = outputHandler.outputGroup(request, outputType, group,
+                            subGroups, entries);
 
         return result;
     }
@@ -1039,8 +1056,8 @@ return new Result(title, sb);
                                     parentGroup));
                         }
                     } finally {
-			IOUtil.close(toStream);
-			IOUtil.close(fromStream);
+                        IOUtil.close(toStream);
+                        IOUtil.close(fromStream);
                     }
                 }
             }
@@ -1057,58 +1074,60 @@ return new Result(title, sb);
             } else {
                 isLocalFile = false;
                 Hashtable<String, Group> nameToGroup = new Hashtable<String,
-		    Group>();
-		FileInputStream fis = getStorageManager().getFileInputStream(resource);
-		FileOutputStream fos =null;
-                ZipInputStream zin = new ZipInputStream(fis);
-                ZipEntry ze = null;
-		try {
-		    while ((ze = zin.getNextEntry()) != null) {
-			if (ze.isDirectory()) {
-			    continue;
-			}
-			String path = ze.getName();
-			String name = IOUtil.getFileTail(path);
-			if (name.equals("MANIFEST.MF")) {
-			    continue;
-			}
-			Group parent = parentGroup;
-			if (request.get(ARG_FILE_PRESERVEDIRECTORY, false)) {
-			    List<String> toks = StringUtil.split(path, "/", true,
-								 true);
-			    String ancestors = "";
-			    if (toks.size() > 1) {
-				toks.remove(toks.size() - 1);
-			    }
-			    for (String parentName : toks) {
-				ancestors = ancestors + "/" + parentName;
-				Group group = nameToGroup.get(ancestors);
-				if (group == null) {
-				    Request tmpRequest =
-					getRepository().getTmpRequest();
-				    tmpRequest.setUser(user);
-				    group = findGroupUnder(tmpRequest, parent,
-							   parentName, user);
-				    nameToGroup.put(ancestors, group);
-				}
-				parent = group;
-			    }
-			}
-			File f = getStorageManager().getTmpFile(request, name);
-			fos = getStorageManager().getFileOutputStream(f);
-			try {
-			    IOUtil.writeTo(zin, fos);
-			} finally {
-			    IOUtil.close(fos);
-			}
-			parents.add(parent);
-			resources.add(f.toString());
-			origNames.add(name);
-		    }
-		} finally {
-		    IOUtil.close(fis);
-		    IOUtil.close(zin);
-		}
+                                                           Group>();
+                FileInputStream fis =
+                    getStorageManager().getFileInputStream(resource);
+                FileOutputStream fos = null;
+                ZipInputStream   zin = new ZipInputStream(fis);
+                ZipEntry         ze  = null;
+                try {
+                    while ((ze = zin.getNextEntry()) != null) {
+                        if (ze.isDirectory()) {
+                            continue;
+                        }
+                        String path = ze.getName();
+                        String name = IOUtil.getFileTail(path);
+                        if (name.equals("MANIFEST.MF")) {
+                            continue;
+                        }
+                        Group parent = parentGroup;
+                        if (request.get(ARG_FILE_PRESERVEDIRECTORY, false)) {
+                            List<String> toks = StringUtil.split(path, "/",
+                                                    true, true);
+                            String ancestors = "";
+                            if (toks.size() > 1) {
+                                toks.remove(toks.size() - 1);
+                            }
+                            for (String parentName : toks) {
+                                ancestors = ancestors + "/" + parentName;
+                                Group group = nameToGroup.get(ancestors);
+                                if (group == null) {
+                                    Request tmpRequest =
+                                        getRepository().getTmpRequest();
+                                    tmpRequest.setUser(user);
+                                    group = findGroupUnder(tmpRequest,
+                                            parent, parentName, user);
+                                    nameToGroup.put(ancestors, group);
+                                }
+                                parent = group;
+                            }
+                        }
+                        File f = getStorageManager().getTmpFile(request,
+                                     name);
+                        fos = getStorageManager().getFileOutputStream(f);
+                        try {
+                            IOUtil.writeTo(zin, fos);
+                        } finally {
+                            IOUtil.close(fos);
+                        }
+                        parents.add(parent);
+                        resources.add(f.toString());
+                        origNames.add(name);
+                    }
+                } finally {
+                    IOUtil.close(fis);
+                    IOUtil.close(zin);
+                }
             }
 
             if (request.exists(ARG_CANCEL)) {
@@ -1316,13 +1335,13 @@ return new Result(title, sb);
 
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
-	    if(typeHandler.returnToEditForm()) {
-		return new Result(
-				  request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
-	    } else {
-		return new Result(
-				  request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
-	    }
+            if (typeHandler.returnToEditForm()) {
+                return new Result(
+                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+            } else {
+                return new Result(
+                    request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+            }
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(
@@ -1828,7 +1847,7 @@ return new Result(title, sb);
             for (int i = found.size() - 1; i >= 0; i--) {
                 String[] tuple = found.get(i);
                 String   id    = tuple[0];
-		removeFromCache(id);
+                removeFromCache(id);
                 allIds.add(id);
                 deleteCnt++;
                 totalDeleteCnt++;
@@ -2277,8 +2296,8 @@ return new Result(title, sb);
         entries = getAccessManager().filterEntries(request, entries);
 
         return getRepository().getOutputHandler(request).outputGroup(request,
-								     request.getOutput(),
-								     getDummyGroup(), new ArrayList<Group>(), entries);
+                request.getOutput(), getDummyGroup(), new ArrayList<Group>(),
+                entries);
 
     }
 
@@ -2802,10 +2821,10 @@ return new Result(title, sb);
         if (file == null) {
             throw new IllegalArgumentException("No file argument given");
         }
-        String    entriesXml        = null;
-        Hashtable origFileToStorage = new Hashtable();
+        String      entriesXml        = null;
+        Hashtable   origFileToStorage = new Hashtable();
 
-	InputStream fis = getStorageManager().getFileInputStream(file);
+        InputStream fis = getStorageManager().getFileInputStream(file);
         try {
             if (file.endsWith(".zip")) {
                 ZipInputStream zin = new ZipInputStream(fis);
@@ -3782,7 +3801,7 @@ return new Result(title, sb);
             getRepository().getOutputHandler(request);
         if ( !entry.isTopGroup()) {
             links.addAll(outputHandler.getNextPrevLinks(request, entry,
-							request.getOutput()));
+                    request.getOutput()));
         }
         return links;
     }
@@ -4303,7 +4322,7 @@ return new Result(title, sb);
      * _more_
      *
      * @param request _more_
-    *
+     *
      * @return _more_
      *
      * @throws Exception _more_
@@ -4486,23 +4505,23 @@ return new Result(title, sb);
             } else {
                 Statement entryStmt =
                     getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-						Tables.ENTRIES.NAME,
-						Clause.eq(Tables.ENTRIES.COL_ID, entryId));
+                        Tables.ENTRIES.NAME,
+                        Clause.eq(Tables.ENTRIES.COL_ID, entryId));
 
-		try {
-		    ResultSet results = entryStmt.getResultSet();
-		    if ( !results.next()) {
-			return null;
-		    }
+                try {
+                    ResultSet results = entryStmt.getResultSet();
+                    if ( !results.next()) {
+                        return null;
+                    }
 
-		    String entryType = results.getString(2);
-		    TypeHandler typeHandler =
-			getRepository().getTypeHandler(entryType);
-		    entry = typeHandler.getEntry(results, abbreviated);
-		    checkEntryFileTime(entry);
-		} finally {
+                    String entryType = results.getString(2);
+                    TypeHandler typeHandler =
+                        getRepository().getTypeHandler(entryType);
+                    entry = typeHandler.getEntry(results, abbreviated);
+                    checkEntryFileTime(entry);
+                } finally {
                     getDatabaseManager().closeAndReleaseConnection(entryStmt);
-		}
+                }
             }
         } catch (Exception exc) {
             logError("creating entry:" + entryId, exc);
@@ -4693,12 +4712,27 @@ return new Result(title, sb);
     }
 
 
-    public Entry addFileEntry(Request request, File newFile, Group group, String name, User user) throws Exception { 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param newFile _more_
+     * @param group _more_
+     * @param name _more_
+     * @param user _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry addFileEntry(Request request, File newFile, Group group,
+                              String name, User user)
+            throws Exception {
 
-	if ( !getRepository().getAccessManager().canDoAction(request, group,
-							     Permission.ACTION_NEW)) {
-	    throw new AccessException("Cannot add to group", request);
-	}
+        if ( !getRepository().getAccessManager().canDoAction(request, group,
+                Permission.ACTION_NEW)) {
+            throw new AccessException("Cannot add to group", request);
+        }
 
         TypeHandler typeHandler =
             getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
@@ -4712,7 +4746,7 @@ return new Result(title, sb);
         List<Entry> newEntries = new ArrayList<Entry>();
         newEntries.add(entry);
         insertEntries(newEntries, true, true);
-	return entry;
+        return entry;
     }
 
 
@@ -5675,25 +5709,25 @@ return new Result(title, sb);
     public Group findGroupUnder(Request request, Group group, String name,
                                 User user)
             throws Exception {
-	//        synchronized (MUTEX_ENTRY) {
-            List<String> toks = (List<String>) StringUtil.split(name,
-                                    Group.PATHDELIMITER, true, true);
+        //        synchronized (MUTEX_ENTRY) {
+        List<String> toks = (List<String>) StringUtil.split(name,
+                                Group.PATHDELIMITER, true, true);
 
-            for (String tok : toks) {
-                Group theChild = null;
-                for (Entry child : getChildrenGroups(request, group)) {
-                    if (child.isGroup() && child.getName().equals(tok)) {
-                        theChild = (Group) child;
-                        break;
-                    }
+        for (String tok : toks) {
+            Group theChild = null;
+            for (Entry child : getChildrenGroups(request, group)) {
+                if (child.isGroup() && child.getName().equals(tok)) {
+                    theChild = (Group) child;
+                    break;
                 }
-                if (theChild == null) {
-                    theChild = makeNewGroup(group, tok, user);
-                }
-                group = theChild;
             }
-            return group;
-	    //        }
+            if (theChild == null) {
+                theChild = makeNewGroup(group, tok, user);
+            }
+            group = theChild;
+        }
+        return group;
+        //        }
     }
 
 
@@ -5812,16 +5846,17 @@ return new Result(title, sb);
 
                     if (childName.equals(tok)) {
                         matched.add(child);
-                    } else if (StringUtil.stringMatch(childName, tok,
-                            false, true)) {
+                    } else if (StringUtil.stringMatch(childName, tok, false,
+                            true)) {
                         matched.add(child);
                     } else {
-                        if(child.isFile()) {
-                            childName = getStorageManager().getFileTail(child);
+                        if (child.isFile()) {
+                            childName =
+                                getStorageManager().getFileTail(child);
                             if (childName.equals(tok)) {
                                 matched.add(child);
                             } else if (StringUtil.stringMatch(childName, tok,
-                                                              false, true)) {
+                                    false, true)) {
                                 matched.add(child);
                             }
                         }
@@ -5854,65 +5889,63 @@ return new Result(title, sb);
                                     boolean createIfNeeded, boolean isGroup,
                                     boolean isTop)
             throws Exception {
-	//        synchronized (MUTEX_ENTRY) {
-            String topGroupName = ((topGroup != null)
-                                   ? topGroup.getName()
-                                   : GROUP_TOP);
-            if ( !name.equals(topGroupName)
-                    && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
-                name = topGroupName + Group.PATHDELIMITER + name;
-            }
-            Entry entry = null;
+        //        synchronized (MUTEX_ENTRY) {
+        String topGroupName = ((topGroup != null)
+                               ? topGroup.getName()
+                               : GROUP_TOP);
+        if ( !name.equals(topGroupName)
+                && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
+            name = topGroupName + Group.PATHDELIMITER + name;
+        }
+        Entry entry = null;
 
-            List<String> toks = (List<String>) StringUtil.split(name,
-                                    Group.PATHDELIMITER, true, true);
-            Group  parent = null;
-            String lastName;
-            if ((toks.size() == 0) || (toks.size() == 1)) {
-                lastName = name;
-            } else {
-                lastName = toks.get(toks.size() - 1);
-                toks.remove(toks.size() - 1);
-                parent =
-                    findGroupFromName(StringUtil.join(Group.PATHDELIMITER,
-                        toks), user, createIfNeeded);
-                if (parent == null) {
-                    if ( !isTop) {
-                        return null;
-                    }
-                    return getTopGroup();
-                } else {}
-            }
-            List<Clause> clauses = new ArrayList<Clause>();
-            //            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
-            //                                  TypeHandler.TYPE_GROUP));
-            if (parent != null) {
-                clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                                      parent.getId()));
-            } else {
-                clauses.add(
-                    Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
-            }
-
-            clauses.add(Clause.eq(Tables.ENTRIES.COL_NAME, lastName));
-            Statement statement =
-                getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                                            Tables.ENTRIES.NAME, clauses);
-
-
-            List<Entry> entries = readEntries(statement);
-            getDatabaseManager().closeAndReleaseConnection(statement);
-
-            if (entries.size() > 0) {
-                entry = entries.get(0);
-            } else {
-                if ( !createIfNeeded) {
+        List<String> toks = (List<String>) StringUtil.split(name,
+                                Group.PATHDELIMITER, true, true);
+        Group  parent = null;
+        String lastName;
+        if ((toks.size() == 0) || (toks.size() == 1)) {
+            lastName = name;
+        } else {
+            lastName = toks.get(toks.size() - 1);
+            toks.remove(toks.size() - 1);
+            parent = findGroupFromName(StringUtil.join(Group.PATHDELIMITER,
+                    toks), user, createIfNeeded);
+            if (parent == null) {
+                if ( !isTop) {
                     return null;
                 }
-                return makeNewGroup(parent, lastName, user);
+                return getTopGroup();
+            } else {}
+        }
+        List<Clause> clauses = new ArrayList<Clause>();
+        //            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
+        //                                  TypeHandler.TYPE_GROUP));
+        if (parent != null) {
+            clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                  parent.getId()));
+        } else {
+            clauses.add(Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
+        }
+
+        clauses.add(Clause.eq(Tables.ENTRIES.COL_NAME, lastName));
+        Statement statement =
+            getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                        Tables.ENTRIES.NAME, clauses);
+
+
+        List<Entry> entries = readEntries(statement);
+        getDatabaseManager().closeAndReleaseConnection(statement);
+
+        if (entries.size() > 0) {
+            entry = entries.get(0);
+        } else {
+            if ( !createIfNeeded) {
+                return null;
             }
-            return entry;
-	    //        }
+            return makeNewGroup(parent, lastName, user);
+        }
+        return entry;
+        //        }
     }
 
 
@@ -5970,22 +6003,22 @@ return new Result(title, sb);
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template, String type)
             throws Exception {
-	//        synchronized (MUTEX_ENTRY) {
-            TypeHandler typeHandler = getRepository().getTypeHandler(type);
-            Group       group = new Group(getGroupId(parent), typeHandler);
-            if (template != null) {
-                group.initWith(template);
-                getRepository().getMetadataManager().newEntry(group);
-            } else {
-                group.setName(name);
-                group.setDate(new Date().getTime());
-            }
-            group.setParentGroup(parent);
-            group.setUser(user);
-            addNewEntry(group);
-            cacheEntry(group);
-            return group;
-	    //        }
+        //        synchronized (MUTEX_ENTRY) {
+        TypeHandler typeHandler = getRepository().getTypeHandler(type);
+        Group       group       = new Group(getGroupId(parent), typeHandler);
+        if (template != null) {
+            group.initWith(template);
+            getRepository().getMetadataManager().newEntry(group);
+        } else {
+            group.setName(name);
+            group.setDate(new Date().getTime());
+        }
+        group.setParentGroup(parent);
+        group.setUser(user);
+        addNewEntry(group);
+        cacheEntry(group);
+        return group;
+        //        }
     }
 
 
@@ -6126,7 +6159,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public List<Group> getTopGroups(Request request) throws Exception {
-	List<Group> topGroups =null;
+        List<Group> topGroups = null;
 
         Statement statement = getDatabaseManager().select(
                                   Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
@@ -6156,7 +6189,7 @@ return new Result(title, sb);
         //For now don't check for access control
         //        return topGroups = new ArrayList<Group>(
         //            toGroupList(getAccessManager().filterEntries(request, groups)));
-        return  new ArrayList<Group>(groups);
+        return new ArrayList<Group>(groups);
     }
 
     /**
@@ -6192,21 +6225,21 @@ return new Result(title, sb);
         List<Entry>      entries = new ArrayList<Entry>();
         //        TypeHandler typeHandler =
         //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
-	try {
-	    while ((results = iter.next()) != null) {
-		while (results.next()) {
-		    String entryType = results.getString(2);
-		    TypeHandler typeHandler =
-			getRepository().getTypeHandler(entryType);
-		    Entry entry = (Entry) typeHandler.getEntry(results);
-		    entries.add(entry);
-		    cacheEntry(entry);
-		}
-	    }
-	} catch(Exception exc) {
-	    getDatabaseManager().closeAndReleaseConnection(statement);
-	    throw exc;
-	}
+        try {
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    String entryType = results.getString(2);
+                    TypeHandler typeHandler =
+                        getRepository().getTypeHandler(entryType);
+                    Entry entry = (Entry) typeHandler.getEntry(results);
+                    entries.add(entry);
+                    cacheEntry(entry);
+                }
+            }
+        } catch (Exception exc) {
+            getDatabaseManager().closeAndReleaseConnection(statement);
+            throw exc;
+        }
 
         for (Entry entry : entries) {
             if (entry.getParentGroupId() != null) {

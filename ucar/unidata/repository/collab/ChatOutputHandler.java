@@ -22,6 +22,10 @@
 package ucar.unidata.repository.collab;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
@@ -68,9 +72,6 @@ import java.util.regex.*;
 
 import java.util.zip.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  *
@@ -80,7 +81,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ChatOutputHandler extends OutputHandler {
 
-    private final Logger LOG = LoggerFactory.getLogger(ChatOutputHandler.class);
+    /** _more_          */
+    private final Logger LOG =
+        LoggerFactory.getLogger(ChatOutputHandler.class);
 
 
     /** _more_ */
@@ -180,13 +183,23 @@ public class ChatOutputHandler extends OutputHandler {
         }
 
 
-	public void logError(String message) {
-	    LOG.error(message);        
-	}
+        /**
+         * _more_
+         *
+         * @param message _more_
+         */
+        public void logError(String message) {
+            LOG.error(message);
+        }
 
-	public void logMessage(String message) {
-	    LOG.info(message);        
-	}
+        /**
+         * _more_
+         *
+         * @param message _more_
+         */
+        public void logMessage(String message) {
+            LOG.info(message);
+        }
 
 
         /**
@@ -292,7 +305,7 @@ public class ChatOutputHandler extends OutputHandler {
                 handleMessage(type, node, s);
             } catch (Exception exc) {
                 try {
-		    LOG.error("Error handling chat message", exc);
+                    LOG.error("Error handling chat message", exc);
                     writeError("An error has occurred:" + exc);
                 } catch (Exception ignore) {}
             }
@@ -509,7 +522,7 @@ public class ChatOutputHandler extends OutputHandler {
                 Misc.run(connection);
             }
         } catch (Exception exc) {
-	    LOG.error("Chat handling socket on port:" +getChatPort(),exc);
+            LOG.error("Chat handling socket on port:" + getChatPort(), exc);
         }
     }
 
@@ -551,6 +564,7 @@ public class ChatOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -559,8 +573,9 @@ public class ChatOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         return outputEntry(request, outputType, group);
     }
@@ -569,17 +584,20 @@ public class ChatOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         String chatAppletTemplate =
             getRepository().getResource(PROP_HTML_CHATAPPLET);
 
-        String     params = "";
+        String params = "";
         chatAppletTemplate = chatAppletTemplate.replace("${root}",
                 getRepository().getUrlBase());
         if (entry.getResource().isImage()) {

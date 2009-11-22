@@ -260,13 +260,16 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
 
         if ( !getAccessManager().canDoAction(request, entry,
                                              Permission.ACTION_EDIT)) {
@@ -406,6 +409,7 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -414,8 +418,9 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         Result result = makeResult(request, group, entries);
         addLinks(request, result, new State(group, subGroups, entries));

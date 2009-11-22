@@ -155,13 +155,16 @@ public class WgetOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         return outputGroup(request, outputType, null, null,
                            (List<Entry>) Misc.newList(entry));
     }
@@ -171,6 +174,7 @@ public class WgetOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -179,8 +183,9 @@ public class WgetOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         for (Entry entry : entries) {

@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.xml;
 
 
@@ -57,8 +58,8 @@ import java.security.SignatureException;
 
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.crypto.Mac;
@@ -857,7 +858,7 @@ public abstract class XmlUtil {
     public static List findChildren(Node parent, String tag) {
         ArrayList found    = new ArrayList();
         NodeList  children = parent.getChildNodes();
-        boolean doAll = ((tag == null) || tag.equals("*"));
+        boolean   doAll    = ((tag == null) || tag.equals("*"));
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (doAll || child.getNodeName().equals(tag)) {
@@ -1066,7 +1067,7 @@ public abstract class XmlUtil {
      * @throws Exception _more_
      */
     public static Element create(Document doc, String tag) throws Exception {
-        return create(doc, tag, (String[])null);
+        return create(doc, tag, (String[]) null);
     }
 
 
@@ -1114,10 +1115,20 @@ public abstract class XmlUtil {
     }
 
 
-    public static Element create(Document doc, String tag, 
-                                 String[] attrs)
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, String[] attrs)
             throws Exception {
-	return create(doc, tag, (Element)null, attrs);
+        return create(doc, tag, (Element) null, attrs);
     }
 
 
@@ -1159,9 +1170,9 @@ public abstract class XmlUtil {
     public static Element create(Document doc, String tag, Element parent,
                                  String text, String[] attrs)
             throws Exception {
-        Element child    = create(doc, tag, parent, attrs);
-        if(text!=null) {
-            Text    textNode = doc.createTextNode(text);
+        Element child = create(doc, tag, parent, attrs);
+        if (text != null) {
+            Text textNode = doc.createTextNode(text);
             child.appendChild(textNode);
         }
         return child;
@@ -1191,7 +1202,6 @@ public abstract class XmlUtil {
     /**
      * _more_
      *
-     * @param doc _more_
      * @param tag _more_
      * @param parent _more_
      * @param attrs _more_
@@ -1200,35 +1210,32 @@ public abstract class XmlUtil {
      *
      * @throws Exception _more_
      */
-    public static Element create(String tag, Element parent,
+    public static Element create(String tag, Element parent, String[] attrs)
+            throws Exception {
+        return create(parent.getOwnerDocument(), tag, parent, attrs);
+    }
+
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     * @param parent _more_
+     * @param text _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent, String text,
                                  String[] attrs)
             throws Exception {
-	return create(parent.getOwnerDocument(), tag, parent, attrs);
+        return create(parent.getOwnerDocument(), tag, parent, text, attrs);
     }
 
     /**
      * _more_
      *
-     * @param doc _more_
-     * @param tag _more_
-     * @param parent _more_
-     * @param text _more_
-     * @param attrs _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public static Element create(String tag, Element parent,
-                                 String text, String[] attrs)
-            throws Exception {
-	return create(parent.getOwnerDocument(), tag, parent, text, attrs);
-    }
-
-    /**
-     * _more_
-     *
-     * @param doc _more_
      * @param tag _more_
      * @param parent _more_
      * @param text _more_
@@ -1237,10 +1244,9 @@ public abstract class XmlUtil {
      *
      * @throws Exception _more_
      */
-    public static Element create(String tag, Element parent,
-                                 String text)
+    public static Element create(String tag, Element parent, String text)
             throws Exception {
-	return create(parent.getOwnerDocument(),tag,parent,text);
+        return create(parent.getOwnerDocument(), tag, parent, text);
     }
 
 
@@ -1592,13 +1598,22 @@ public abstract class XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param childTag _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public static double getGrandChildValue(Node parent, String childTag,
-                                           double dflt) {
+                                            double dflt) {
         String text = getGrandChildText(parent, childTag);
         if (text == null) {
             return dflt;
         }
-	text = text.trim();
+        text = text.trim();
         if (text.length() == 0) {
             return dflt;
         }
@@ -1915,6 +1930,7 @@ public abstract class XmlUtil {
                                  String currentTab, String tabSpacing,
                                  String newLine, boolean prettifyAttrs,
                                  boolean recurse) {
+
         int type = node.getNodeType();
 
         switch (type) {
@@ -1997,7 +2013,9 @@ public abstract class XmlUtil {
           case Node.TEXT_NODE : {
               //Trim whitespace
               String v = node.getNodeValue();
-              if(v==null) break;
+              if (v == null) {
+                  break;
+              }
               xml.append(encodeString(v));
               break;
           }
@@ -2013,55 +2031,73 @@ public abstract class XmlUtil {
           }
         }
 
+
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param html _more_
+     * @param node _more_
+     */
     public static void toHtml(StringBuffer html, Node node) {
         switch (node.getNodeType()) {
+
           case Node.ELEMENT_NODE : {
               NodeList children    = node.getChildNodes();
               int      numChildren = children.getLength();
-              html.append("<b>"+node.getNodeName().replace("_", " ")+"</b>");
+              html.append("<b>" + node.getNodeName().replace("_", " ")
+                          + "</b>");
               html.append(": ");
 
               for (int i = 0; i < numChildren; i++) {
                   Node child = children.item(i);
-                  if(((child.getNodeType() == Node.TEXT_NODE)
-                             || (child.getNodeType()
-                                 == Node.CDATA_SECTION_NODE))) {
+                  if (((child.getNodeType() == Node.TEXT_NODE)
+                          || (child.getNodeType()
+                              == Node.CDATA_SECTION_NODE))) {
                       String v = child.getNodeValue();
-                      if(v==null) continue;
-                      if(v.trim().length()==0) continue;
+                      if (v == null) {
+                          continue;
+                      }
+                      if (v.trim().length() == 0) {
+                          continue;
+                      }
                       html.append(v);
                       html.append(" ");
                   }
               }
-              boolean didone = false;
-              NamedNodeMap nnm     = node.getAttributes();
+              boolean      didone = false;
+              NamedNodeMap nnm    = node.getAttributes();
               if (nnm != null) {
                   for (int i = 0; i < nnm.getLength(); i++) {
-                      Attr attr = (Attr) nnm.item(i);
-                      String attrName=  attr.getNodeName();
-                      if(attrName.startsWith("xmlns") ||
-                         attrName.startsWith("xsi:")) continue;
-                      if(!didone) {
-                          html.append("<ul>");
-                          didone  = true;
+                      Attr   attr     = (Attr) nnm.item(i);
+                      String attrName = attr.getNodeName();
+                      if (attrName.startsWith("xmlns")
+                              || attrName.startsWith("xsi:")) {
+                          continue;
                       }
-                      html.append(attrName.replace("_", " ")+"="+ attr.getNodeValue());
+                      if ( !didone) {
+                          html.append("<ul>");
+                          didone = true;
+                      }
+                      html.append(attrName.replace("_", " ") + "="
+                                  + attr.getNodeValue());
                       html.append("<br>\n");
-                 }
+                  }
               }
-              int      cnt         = 0;
+              int cnt = 0;
               for (int i = 0; i < numChildren; i++) {
                   Node child = children.item(i);
-                  if(((child.getNodeType() == Node.TEXT_NODE)
-                             || (child.getNodeType()
-                                 == Node.CDATA_SECTION_NODE))) continue;
-                  if(!didone) {
+                  if (((child.getNodeType() == Node.TEXT_NODE)
+                          || (child.getNodeType()
+                              == Node.CDATA_SECTION_NODE))) {
+                      continue;
+                  }
+                  if ( !didone) {
                       html.append("<ul>");
-                      didone  = true;
+                      didone = true;
                   }
                   if (cnt > 0) {
                       html.append("<br>");
@@ -2069,8 +2105,9 @@ public abstract class XmlUtil {
                   toHtml(html, child);
                   cnt++;
               }
-              if(didone)
+              if (didone) {
                   html.append("</ul>");
+              }
               break;
           }
         }
@@ -2249,106 +2286,127 @@ public abstract class XmlUtil {
         if(true) return;
         */
 
-	boolean doFormat = true;
+        boolean doFormat = true;
         for (int i = 0; i < args.length; i++) {
-	    if(args[i].equals("-format")) {
-		doFormat = true;
-		continue;
-	    }  
-	    if(args[i].equals("-printtags")) {
-		doFormat = false;
-		continue;
-	    }  
-	    if(doFormat) {
-		format(args[i]);
-	    } else {
-		printTags(args[i]);
-	    }
+            if (args[i].equals("-format")) {
+                doFormat = true;
+                continue;
+            }
+            if (args[i].equals("-printtags")) {
+                doFormat = false;
+                continue;
+            }
+            if (doFormat) {
+                format(args[i]);
+            } else {
+                printTags(args[i]);
+            }
         }
     }
 
-    private static void printTags(Element node, HashSet<String> seen, StringBuffer tagBuff, StringBuffer attrBuff) {
-	String tagName = node.getTagName();
-	if(!seen.contains("tag:" +tagName)) {
-	    seen.add("tag:"+tagName);
-	    String tmp = tagName.replace(":","_").toUpperCase();
-	    tagBuff.append("public static final String TAG_" + tmp +" = \"" + tagName+"\";\n");
-	}
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param seen _more_
+     * @param tagBuff _more_
+     * @param attrBuff _more_
+     */
+    private static void printTags(Element node, HashSet<String> seen,
+                                  StringBuffer tagBuff,
+                                  StringBuffer attrBuff) {
+        String tagName = node.getTagName();
+        if ( !seen.contains("tag:" + tagName)) {
+            seen.add("tag:" + tagName);
+            String tmp = tagName.replace(":", "_").toUpperCase();
+            tagBuff.append("public static final String TAG_" + tmp + " = \""
+                           + tagName + "\";\n");
+        }
         NamedNodeMap nnm = node.getAttributes();
         if (nnm != null) {
-	    for (int i = 0; i < nnm.getLength(); i++) {
-		Attr attr = (Attr) nnm.item(i);
-		String attrName = attr.getName();
-		if(attrName.indexOf(":")<0 && !seen.contains("attr:" +attrName)) {
-		    seen.add("attr:"+attrName);
-		    attrBuff.append("public static final String ATTR_" + attrName.toUpperCase() +" = \"" + attrName+"\";\n");
-		}
-	    }
-	}
+            for (int i = 0; i < nnm.getLength(); i++) {
+                Attr   attr     = (Attr) nnm.item(i);
+                String attrName = attr.getName();
+                if ((attrName.indexOf(":") < 0)
+                        && !seen.contains("attr:" + attrName)) {
+                    seen.add("attr:" + attrName);
+                    attrBuff.append("public static final String ATTR_"
+                                    + attrName.toUpperCase() + " = \""
+                                    + attrName + "\";\n");
+                }
+            }
+        }
 
         NodeList elements = getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-	    printTags(child, seen, tagBuff, attrBuff);
-	}
+            printTags(child, seen, tagBuff, attrBuff);
+        }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     private static void printTags(String f) {
-	try {
-	    String       xml = IOUtil.readContents(f,
-						   XmlUtil.class);
-	    Element root      = getRoot(xml);
-	    StringBuffer tagBuff = new StringBuffer();
-	    StringBuffer attrBuff = new StringBuffer();
-	    printTags(root, new HashSet<String>(), tagBuff, attrBuff);
-	    System.out.println(tagBuff);
-	    System.out.println(attrBuff);
-	} catch (Exception exc) {
-	    System.err.println("Error processing:" + f);
-	    exc.printStackTrace();
-	}
+        try {
+            String       xml      = IOUtil.readContents(f, XmlUtil.class);
+            Element      root     = getRoot(xml);
+            StringBuffer tagBuff  = new StringBuffer();
+            StringBuffer attrBuff = new StringBuffer();
+            printTags(root, new HashSet<String>(), tagBuff, attrBuff);
+            System.out.println(tagBuff);
+            System.out.println(attrBuff);
+        } catch (Exception exc) {
+            System.err.println("Error processing:" + f);
+            exc.printStackTrace();
+        }
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     private static void format(String f) {
-	try {
-	    String       xml = IOUtil.readContents(f,
-						   XmlUtil.class);
-	    String       origXml = xml;
-	    StringBuffer buff    = new StringBuffer();
-	    //Replace comments with special CDATA 
-	    while (true) {
-		int idx1 = xml.indexOf("<!--");
-		if (idx1 < 0) {
-		    buff.append(xml);
-		    break;
-		}
-		int idx2 = xml.indexOf("-->");
-		if ((idx2 < 0) || (idx2 < idx1)) {
-		    buff.append(xml);
-		    break;
-		}
-		buff.append(xml.substring(0, idx1));
-		String commentBlock = xml.substring(idx1 + 4, idx2);
-		xml = xml.substring(idx2 + 3);
-		buff.append("<![CDATA[XmlUtil.COMMENT:" + commentBlock
-			    + "]]>");
-	    }
+        try {
+            String       xml     = IOUtil.readContents(f, XmlUtil.class);
+            String       origXml = xml;
+            StringBuffer buff    = new StringBuffer();
+            //Replace comments with special CDATA 
+            while (true) {
+                int idx1 = xml.indexOf("<!--");
+                if (idx1 < 0) {
+                    buff.append(xml);
+                    break;
+                }
+                int idx2 = xml.indexOf("-->");
+                if ((idx2 < 0) || (idx2 < idx1)) {
+                    buff.append(xml);
+                    break;
+                }
+                buff.append(xml.substring(0, idx1));
+                String commentBlock = xml.substring(idx1 + 4, idx2);
+                xml = xml.substring(idx2 + 3);
+                buff.append("<![CDATA[XmlUtil.COMMENT:" + commentBlock
+                            + "]]>");
+            }
 
-	    Element root      = getRoot(buff.toString());
-	    String  xmlString = toStringWithHeader(root, "  ", "\n",
-						   true);
+            Element root      = getRoot(buff.toString());
+            String  xmlString = toStringWithHeader(root, "  ", "\n", true);
 
-	    //                String  xmlString = toStringWithHeader(root, "", "",
-	    //                                        false);
-	    IOUtil.writeFile(new java.io.File(f), xmlString);
-	} catch (Exception exc) {
-	    System.err.println("Error processing:" + f);
-	    exc.printStackTrace();
-	}
+            //                String  xmlString = toStringWithHeader(root, "", "",
+            //                                        false);
+            IOUtil.writeFile(new java.io.File(f), xmlString);
+        } catch (Exception exc) {
+            System.err.println("Error processing:" + f);
+            exc.printStackTrace();
+        }
     }
 
     /** sha algorithm to use */

@@ -226,48 +226,65 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private TemporaryDir nj22Dir;
 
+    /** _more_          */
     private TemporaryDir dataCacheDir;
 
 
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??
 
-    Counter ncCounter  = new Counter();
+    /** _more_          */
+    Counter ncCounter = new Counter();
 
-    Counter ncCreateCounter  = new Counter();
-    Counter ncRemoveCounter  = new Counter();
+    /** _more_          */
+    Counter ncCreateCounter = new Counter();
 
-    Counter ncGetCounter  = new Counter();
-    Counter ncPutCounter  = new Counter();
+    /** _more_          */
+    Counter ncRemoveCounter = new Counter();
 
-    Counter extCounter  = new Counter();
-    Counter opendapCounter  = new Counter();
+    /** _more_          */
+    Counter ncGetCounter = new Counter();
+
+    /** _more_          */
+    Counter ncPutCounter = new Counter();
+
+    /** _more_          */
+    Counter extCounter = new Counter();
+
+    /** _more_          */
+    Counter opendapCounter = new Counter();
 
 
-    Counter gridOpenCounter  = new Counter();
-    Counter gridCloseCounter  = new Counter();
+    /** _more_          */
+    Counter gridOpenCounter = new Counter();
+
+    /** _more_          */
+    Counter gridCloseCounter = new Counter();
 
 
-    Counter pointOpenCounter  = new Counter();
-    Counter pointCloseCounter  = new Counter();
+    /** _more_          */
+    Counter pointOpenCounter = new Counter();
+
+    /** _more_          */
+    Counter pointCloseCounter = new Counter();
 
     /** _more_ */
     private Pool<String, NetcdfDataset> ncFilePool = new Pool<String,
                                                          NetcdfDataset>(10) {
         protected void removeValue(String key, NetcdfDataset dataset) {
             try {
-                super.removeValue(key,dataset);
+                super.removeValue(key, dataset);
                 ncRemoveCounter.incr();
                 dataset.close();
             } catch (Exception exc) {
-                System.err.println ("Error closing:"  + key);
+                System.err.println("Error closing:" + key);
                 exc.printStackTrace();
             }
         }
 
         public synchronized void put(String key, NetcdfDataset file) {
-                ncPutCounter.incr();
-                super.put(key, file);
+            ncPutCounter.incr();
+            super.put(key, file);
         }
 
         protected NetcdfDataset getFromPool(List<NetcdfDataset> list) {
@@ -285,7 +302,7 @@ public class DataOutputHandler extends OutputHandler {
         protected NetcdfDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir, null);
-                NetcdfDataset dataset =  NetcdfDataset.openDataset(path);
+                NetcdfDataset dataset = NetcdfDataset.openDataset(path);
                 ncCreateCounter.incr();
                 return dataset;
             } catch (Exception exc) {
@@ -300,7 +317,7 @@ public class DataOutputHandler extends OutputHandler {
                                                      GridDataset>(10) {
         protected void removeValue(String key, GridDataset dataset) {
             try {
-                super.removeValue(key,dataset);
+                super.removeValue(key, dataset);
                 gridCloseCounter.incr();
                 dataset.close();
             } catch (Exception exc) {}
@@ -322,7 +339,7 @@ public class DataOutputHandler extends OutputHandler {
             try {
                 getStorageManager().dirTouched(nj22Dir, null);
                 gridOpenCounter.incr();
-               
+
                 GridDataset gds = GridDataset.open(path);
                 if (gds.getGrids().iterator().hasNext()) {
                     return gds;
@@ -344,7 +361,7 @@ public class DataOutputHandler extends OutputHandler {
         new Pool<String, FeatureDatasetPoint>(10) {
         protected void removeValue(String key, FeatureDatasetPoint dataset) {
             try {
-                super.removeValue(key,dataset);
+                super.removeValue(key, dataset);
                 dataset.close();
             } catch (Exception exc) {}
         }
@@ -385,7 +402,7 @@ public class DataOutputHandler extends OutputHandler {
         new Pool<String, TrajectoryObsDataset>(10) {
         protected void removeValue(String key, TrajectoryObsDataset dataset) {
             try {
-                super.removeValue(key,dataset);
+                super.removeValue(key, dataset);
                 dataset.close();
             } catch (Exception exc) {}
         }
@@ -444,16 +461,17 @@ public class DataOutputHandler extends OutputHandler {
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
         ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
 
-        dataCacheDir = 
-            getRepository().getStorageManager().makeTemporaryDir("visaddatacache");
+        dataCacheDir = getRepository().getStorageManager().makeTemporaryDir(
+            "visaddatacache");
         dataCacheDir.setMaxFiles(2000);
 
         NetcdfDataset.disableNetcdfFileCache();
-        
+
 
         visad.SampledSet.setCacheSizeThreshold(10000);
         visad.util.ThreadManager.setGlobalMaxThreads(4);
-        visad.data.DataCacheManager.getCacheManager().setCacheDir(dataCacheDir.getDir());
+        visad.data.DataCacheManager.getCacheManager().setCacheDir(
+            dataCacheDir.getDir());
         visad.data.DataCacheManager.getCacheManager().setMemoryPercent(0.1);
 
         addType(OUTPUT_OPENDAP);
@@ -468,25 +486,32 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     public void getSystemStats(StringBuffer sb) {
-	super.getSystemStats(sb);
+        super.getSystemStats(sb);
         StringBuffer poolStats = new StringBuffer("<pre>");
         ncFilePool.getStats(poolStats);
         poolStats.append("</pre>");
-	sb.append(HtmlUtil.formEntryTop(msgLabel("Data Cache Size"),
-                                        msgLabel("NC File Pool") + ncFilePool.getSize() +
-                                        " have ncfile cache:" + (NetcdfDataset.getNetcdfFileCache()!=null) +" " +
-                                        " Count:  Create:" + ncCreateCounter.getCount() +  
-                                        " Remove:" +ncRemoveCounter.getCount() +  
-                                        "<br>" +
-                                        " Get:" +ncGetCounter.getCount() +  
-                                        " Put:" +ncPutCounter.getCount() +  "<br>" +
-                                        " Ext Count:" + extCounter.getCount() + 
-                                        " Dap Count:" + opendapCounter.getCount() + 
-                                        poolStats +HtmlUtil.br() +
-				     msgLabel("Grid Pool") + gridPool.getSize() +HtmlUtil.br() +
-				     msgLabel("Point Pool") + pointPool.getSize() +HtmlUtil.br() +
-				     msgLabel("Trajectory Pool") + trajectoryPool.getSize() +HtmlUtil.br()));
+        sb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Data Cache Size"),
+                msgLabel("NC File Pool") + ncFilePool.getSize()
+                + " have ncfile cache:"
+                + (NetcdfDataset.getNetcdfFileCache() != null) + " "
+                + " Count:  Create:" + ncCreateCounter.getCount()
+                + " Remove:" + ncRemoveCounter.getCount() + "<br>" + " Get:"
+                + ncGetCounter.getCount() + " Put:" + ncPutCounter.getCount()
+                + "<br>" + " Ext Count:" + extCounter.getCount()
+                + " Dap Count:" + opendapCounter.getCount() + poolStats
+                + HtmlUtil.br() + msgLabel("Grid Pool") + gridPool.getSize()
+                + HtmlUtil.br() + msgLabel("Point Pool")
+                + pointPool.getSize() + HtmlUtil.br()
+                + msgLabel("Trajectory Pool") + trajectoryPool.getSize()
+                + HtmlUtil.br()));
 
     }
 
@@ -617,7 +642,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-   public String getOpendapUrl(Entry entry) {
+    public String getOpendapUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
                + ":" + Request.encodeEmbedded(entry.getId()) + "/"
@@ -1074,7 +1099,7 @@ public class DataOutputHandler extends OutputHandler {
      * @param path _more_
      * @param ncd _more_
      */
-    public void returnPointDataset(String path, FeatureDatasetPoint  ncd) {
+    public void returnPointDataset(String path, FeatureDatasetPoint ncd) {
         pointPool.put(path, ncd);
     }
 
@@ -1974,13 +1999,15 @@ public class DataOutputHandler extends OutputHandler {
      * Serve up the entry
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception On badness
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry)
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
             throws Exception {
 
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
@@ -2037,7 +2064,8 @@ public class DataOutputHandler extends OutputHandler {
             return result;
         }
 
-        throw new IllegalArgumentException("Unknown output type:" + outputType);
+        throw new IllegalArgumentException("Unknown output type:"
+                                           + outputType);
     }
 
 
@@ -2111,44 +2139,45 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public synchronized Result outputOpendap(final Request request, final Entry entry)
-        throws Exception {
+    public synchronized Result outputOpendap(final Request request,
+                                             final Entry entry)
+            throws Exception {
         String        location  = getPath(entry);
         NetcdfDataset ncDataset = ncFilePool.get(location);
         opendapCounter.incr();
         //        try {
-            //Bridge the ramadda servlet to the opendap servlet
-            NcDODSServlet servlet = new NcDODSServlet(request, entry, ncDataset) {
-                    public ServletConfig getServletConfig() {
-                        return request.getHttpServlet().getServletConfig();
-                    }
-                    public ServletContext getServletContext() {
-                        return request.getHttpServlet().getServletContext();
-                    }
-                    public String getServletInfo() {
-                        return request.getHttpServlet().getServletInfo();
-                    }
-                    public Enumeration getInitParameterNames() {
-                        return request.getHttpServlet().getInitParameterNames();
-                    }
-                };
-
-            if ((request.getHttpServlet() != null)
-                && (request.getHttpServlet().getServletConfig() != null)) {
-                servlet.init(request.getHttpServlet().getServletConfig());
+        //Bridge the ramadda servlet to the opendap servlet
+        NcDODSServlet servlet = new NcDODSServlet(request, entry, ncDataset) {
+            public ServletConfig getServletConfig() {
+                return request.getHttpServlet().getServletConfig();
             }
+            public ServletContext getServletContext() {
+                return request.getHttpServlet().getServletContext();
+            }
+            public String getServletInfo() {
+                return request.getHttpServlet().getServletInfo();
+            }
+            public Enumeration getInitParameterNames() {
+                return request.getHttpServlet().getInitParameterNames();
+            }
+        };
+
+        if ((request.getHttpServlet() != null)
+                && (request.getHttpServlet().getServletConfig() != null)) {
+            servlet.init(request.getHttpServlet().getServletConfig());
+        }
 
 
-            servlet.doGet(request.getHttpServletRequest(),
-                          request.getHttpServletResponse());
-            //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
-            Result result = new Result("");
-            result.setNeedToWrite(false);
-            opendapCounter.decr();
-            ncFilePool.put(location, ncDataset);
-            return result;
-            //        } finally {
-            //        }
+        servlet.doGet(request.getHttpServletRequest(),
+                      request.getHttpServletResponse());
+        //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
+        Result result = new Result("");
+        result.setNeedToWrite(false);
+        opendapCounter.decr();
+        ncFilePool.put(location, ncDataset);
+        return result;
+        //        } finally {
+        //        }
 
     }
 

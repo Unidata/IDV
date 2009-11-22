@@ -80,9 +80,10 @@ import java.util.zip.*;
 public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRAPH =
-        new OutputType("Graph", "graph.graph", OutputType.TYPE_HTML, "",
-                       ICON_GRAPH);
+    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
+                                                      "graph.graph",
+                                                      OutputType.TYPE_HTML,
+                                                      "", ICON_GRAPH);
 
 
 
@@ -126,13 +127,16 @@ public class GraphOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, (String) null);
@@ -159,6 +163,7 @@ public class GraphOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -167,8 +172,9 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         return outputEntry(request, outputType, group);
     }
@@ -327,31 +333,33 @@ public class GraphOutputHandler extends OutputHandler {
                                      Tables.ENTRIES.COL_RESOURCE), Clause.eq(
                                          Tables.ENTRIES.COL_ID, id), "");
 
-	    try {
-            ResultSet results = stmt.getResultSet();
-            if ( !results.next()) {
+            try {
+                ResultSet results = stmt.getResultSet();
+                if ( !results.next()) {
+                    getDatabaseManager().closeAndReleaseConnection(stmt);
+                    throw new IllegalArgumentException("Unknown entry id:"
+                            + id);
+                }
+                String parentId = results.getString(4);
+                sb.append(getEntryNodeXml(request, results));
+                getAssociationsGraph(request, id, sb);
+
+                Group group = getEntryManager().findGroup(request, parentId);
+                sb.append(
+                    XmlUtil.tag(
+                        TAG_NODE,
+                        XmlUtil.attrs(
+                            ATTR_TYPE, NODETYPE_GROUP, ATTR_ID,
+                            group.getId(), ATTR_TOOLTIP, group.getName(),
+                            ATTR_TITLE, getGraphNodeTitle(group.getName()))));
+                sb.append(XmlUtil.tag(TAG_EDGE,
+                                      XmlUtil.attrs(ATTR_TYPE, "groupedby",
+                                          ATTR_FROM, group.getId(), ATTR_TO,
+                                          results.getString(1))));
+
+            } finally {
                 getDatabaseManager().closeAndReleaseConnection(stmt);
-                throw new IllegalArgumentException("Unknown entry id:" + id);
             }
-	    String parentId = results.getString(4);
-            sb.append(getEntryNodeXml(request, results));
-            getAssociationsGraph(request, id, sb);
-
-            Group group = getEntryManager().findGroup(request,
-                              parentId);
-            sb.append(XmlUtil.tag(TAG_NODE,
-                                  XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
-                                      ATTR_ID, group.getId(), ATTR_TOOLTIP,
-                                      group.getName(), ATTR_TITLE,
-                                      getGraphNodeTitle(group.getName()))));
-            sb.append(XmlUtil.tag(TAG_EDGE,
-                                  XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                      ATTR_FROM, group.getId(), ATTR_TO,
-                                      results.getString(1))));
-
-	    } finally {
-		getDatabaseManager().closeAndReleaseConnection(stmt);
-	    }
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
 

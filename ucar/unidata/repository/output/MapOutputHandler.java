@@ -128,13 +128,16 @@ public class MapOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
         StringBuffer sb = new StringBuffer();
@@ -148,6 +151,7 @@ public class MapOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -156,8 +160,9 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);

@@ -717,7 +717,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getUrlArgs(Hashtable exceptArgs, Hashtable exceptValues) {
-	return getUrlArgs(exceptArgs, exceptValues,null);
+        return getUrlArgs(exceptArgs, exceptValues, null);
     }
 
 
@@ -727,10 +727,12 @@ public class Request implements Constants {
      *
      * @param exceptArgs _more_
      * @param exceptValues _more_
+     * @param exceptArgsPattern _more_
      *
      * @return _more_
      */
-    public String getUrlArgs(Hashtable exceptArgs, Hashtable exceptValues, String exceptArgsPattern) {
+    public String getUrlArgs(Hashtable exceptArgs, Hashtable exceptValues,
+                             String exceptArgsPattern) {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
@@ -739,10 +741,11 @@ public class Request implements Constants {
                 continue;
             }
 
-	    if(exceptArgsPattern!=null && arg.matches(exceptArgsPattern)) {
-		continue;
-	    }
-	    //	    System.out.println(arg+":" + exceptArgsPattern+":");
+            if ((exceptArgsPattern != null)
+                    && arg.matches(exceptArgsPattern)) {
+                continue;
+            }
+            //      System.out.println(arg+":" + exceptArgsPattern+":");
 
             Object value = parameters.get(arg);
             if ((exceptValues != null) && (exceptValues.get(value) != null)) {
@@ -766,7 +769,7 @@ public class Request implements Constants {
                 continue;
             }
             String svalue = value.toString();
-           if (svalue.length() == 0) {
+            if (svalue.length() == 0) {
                 continue;
             }
             if (cnt++ > 0) {
@@ -1292,13 +1295,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public OutputType getOutput(String dflt) {
-	String typeId = getString(ARG_OUTPUT, dflt);
-	OutputType outputType = repository.findOutputType(typeId);
-	if(outputType!=null) {
-	    return outputType;
-	}
-        return new OutputType(typeId,
-                              OutputType.TYPE_NONHTML);
+        String     typeId     = getString(ARG_OUTPUT, dflt);
+        OutputType outputType = repository.findOutputType(typeId);
+        if (outputType != null) {
+            return outputType;
+        }
+        return new OutputType(typeId, OutputType.TYPE_NONHTML);
     }
 
 

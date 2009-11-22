@@ -42,14 +42,14 @@ import java.util.List;
 
 
 /**
- * 
- * 
+ *
+ *
  *  @author IDV Development Team
  *  @version $Revision: 1.3 $
  */
 public class LogManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     private final Logger LOG = LoggerFactory.getLogger(LogManager.class);
 
 
@@ -224,12 +224,13 @@ public class LogManager extends RepositoryManager {
 
 
         if (thr != null) {
-	    if(thr instanceof RepositoryUtil.MissingEntryException || thr instanceof AccessException) {
-		log.error(message + " " + thr);
-	    } else {
-		log.error(message + "\n<stack>\n" + thr + "\n"
-			  + LogUtil.getStackTrace(thr) + "\n</stack>");
-	    }
+            if ((thr instanceof RepositoryUtil.MissingEntryException)
+                    || (thr instanceof AccessException)) {
+                log.error(message + " " + thr);
+            } else {
+                log.error(message + "\n<stack>\n" + thr + "\n"
+                          + LogUtil.getStackTrace(thr) + "\n</stack>");
+            }
         }
 
     }

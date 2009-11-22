@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.data;
 
 
@@ -53,76 +52,76 @@ import java.util.List;
  */
 public class LasOutputHandler extends OutputHandler {
 
-    /** netcdf standard name     */
+    /** netcdf standard name */
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_LASDATA = "lasdata";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_INSTITUTION = "institution";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_OPERATIONS = "operations";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_SHADE = "shade";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_ARG = "arg";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_DATASETS = "datasets";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_VARIABLES = "variables";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_LINK = "link";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_COMPOSITE = "composite";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_GRIDS = "grids";
 
-    /** las xml tag          */
+    /** las xml tag */
     public static final String TAG_AXES = "axes";
 
-    /** las xml          */
+    /** las xml */
     public static final String ATTR_NAME = "name";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_URL = "url";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_CLASS = "class";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_METHOD = "method";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_TYPE = "type";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_DOC = "doc";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_UNITS = "units";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_MATCH = "match";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_JS = "js";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_SIZE = "size";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_START = "start";
 
-    /** las xml attribute name          */
+    /** las xml attribute name */
     public static final String ATTR_STEP = "step";
 
 
@@ -197,6 +196,7 @@ public class LasOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -205,8 +205,9 @@ public class LasOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
 
         return outputLas(request, entries);
@@ -217,13 +218,15 @@ public class LasOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry)
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
@@ -246,7 +249,7 @@ public class LasOutputHandler extends OutputHandler {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         Document          doc               = XmlUtil.makeDocument();
 
-	//create the root element
+        //create the root element
         Element root = XmlUtil.create(doc, TAG_LASDATA, null,
                                       new String[] {});
 
@@ -256,10 +259,10 @@ public class LasOutputHandler extends OutputHandler {
 
         Element datasetsNode = XmlUtil.create(TAG_DATASETS, root);
 
-	//Loop on the entries
+        //Loop on the entries
         for (Entry entry : entries) {
             if ( !dataOutputHandler.canLoadAsGrid(entry)) {
-		//not a grid
+                //not a grid
                 continue;
             }
 
@@ -270,7 +273,7 @@ public class LasOutputHandler extends OutputHandler {
             String tagName = "data_" + getTagName(id);
 
             XmlUtil.create(tagName, datasetsNode);
- 
+
             Element entryNode = XmlUtil.create(tagName, datasetsNode,
                                     new String[] {
                 ATTR_NAME, entry.getName(), ATTR_URL,
@@ -286,13 +289,13 @@ public class LasOutputHandler extends OutputHandler {
 
             Element variablesNode = XmlUtil.create(TAG_VARIABLES, entryNode);
 
-	    //Get the netcdf dataset from the dataoutputhandler
-            String path           = dataOutputHandler.getPath(entry);
+            //Get the netcdf dataset from the dataoutputhandler
+            String path = dataOutputHandler.getPath(entry);
             NetcdfDataset dataset = dataOutputHandler.getNetcdfDataset(entry,
                                         path);
             try {
                 //TODO: determine which variables are the actual data variables
-		//and add in the axis information
+                //and add in the axis information
                 for (Variable var : dataset.getVariables()) {
                     if (var instanceof CoordinateAxis) {
                         CoordinateAxis ca       = (CoordinateAxis) var;
@@ -309,7 +312,7 @@ public class LasOutputHandler extends OutputHandler {
                         continue;
                     }
 
-		    
+
                     //<variables>     <airt name="Air Temperature" units="DEG C">
                     String varName = var.getShortName();
                     ucar.nc2.Attribute att =

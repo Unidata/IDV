@@ -77,8 +77,9 @@ import java.util.zip.*;
  */
 public class ZipOutputHandler extends OutputHandler {
 
-    /** _more_          */
-    private final Logger LOG = LoggerFactory.getLogger(ZipOutputHandler.class);
+    /** _more_ */
+    private final Logger LOG =
+        LoggerFactory.getLogger(ZipOutputHandler.class);
 
 
     /** _more_ */
@@ -88,7 +89,7 @@ public class ZipOutputHandler extends OutputHandler {
                                                     ICON_ZIP);
 
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_ZIPTREE =
         new OutputType("Zip Tree", "zip.tree", OutputType.TYPE_FILE, "",
                        ICON_ZIP);
@@ -193,13 +194,16 @@ public class ZipOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         return toZip(request, "", entries, false);
@@ -210,6 +214,7 @@ public class ZipOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -218,8 +223,9 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_ZIPTREE)) {
@@ -286,14 +292,15 @@ public class ZipOutputHandler extends OutputHandler {
         Result result = new Result();
         result.setNeedToWrite(false);
 
-	if(recurse) {
-	    System.err.println("ZIP LOG");
-	}
+        if (recurse) {
+            System.err.println("ZIP LOG");
+        }
 
-        boolean         ok   = true;
+        boolean ok = true;
         //First recurse down without a zos to check the size
         try {
-            processZip(request, entries, recurse, null, prefix, 0, new int[]{0});
+            processZip(request, entries, recurse, null, prefix, 0,
+                       new int[] { 0 });
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -310,12 +317,13 @@ public class ZipOutputHandler extends OutputHandler {
         ZipOutputStream zos  = new ZipOutputStream(os);
         Hashtable       seen = new Hashtable();
         try {
-            processZip(request, entries, recurse, zos, prefix, 0, new int[]{0});
+            processZip(request, entries, recurse, zos, prefix, 0,
+                       new int[] { 0 });
         } catch (IllegalArgumentException iae) {
             ok = false;
-        } finally  {
-	    IOUtil.close(zos);
-	}
+        } finally {
+            IOUtil.close(zos);
+        }
         if (doingFile) {
             os.close();
             return new Result(
@@ -337,6 +345,7 @@ public class ZipOutputHandler extends OutputHandler {
      * @param zos _more_
      * @param prefix _more_
      * @param sizeSoFar _more_
+     * @param counter _more_
      *
      * @return _more_
      *
@@ -344,7 +353,7 @@ public class ZipOutputHandler extends OutputHandler {
      */
     protected long processZip(Request request, List<Entry> entries,
                               boolean recurse, ZipOutputStream zos,
-                              String prefix, long sizeSoFar, int[]counter)
+                              String prefix, long sizeSoFar, int[] counter)
             throws Exception {
         long      sizeProcessed = 0;
         Hashtable seen          = new Hashtable();
@@ -360,13 +369,14 @@ public class ZipOutputHandler extends OutputHandler {
                             2000);
         }
         for (Entry entry : entries) {
-	    counter[0]++;
-	    //We are getting some weirdness in the database connections so lets
-	    //sleep a bit every 100 entries we see
-	    if(counter[0]%100==0) {
-                System.err.println("zip count:" + counter[0]+ " " + new Date());
-		Misc.sleep(10);
-	    }
+            counter[0]++;
+            //We are getting some weirdness in the database connections so lets
+            //sleep a bit every 100 entries we see
+            if (counter[0] % 100 == 0) {
+                System.err.println("zip count:" + counter[0] + " "
+                                   + new Date());
+                Misc.sleep(10);
+            }
             if (entry.isGroup() && recurse) {
                 Group group = (Group) entry;
                 List<Entry> children = getEntryManager().getChildren(request,
@@ -376,7 +386,8 @@ public class ZipOutputHandler extends OutputHandler {
                     path = prefix + "/" + path;
                 }
                 sizeProcessed += processZip(request, children, recurse, zos,
-                                            path, sizeProcessed + sizeSoFar,counter);
+                                            path, sizeProcessed + sizeSoFar,
+                                            counter);
             }
             if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
@@ -401,7 +412,7 @@ public class ZipOutputHandler extends OutputHandler {
             }
 
 
-            if(zos!=null) {
+            if (zos != null) {
                 zos.putNextEntry(new ZipEntry(name));
                 InputStream fis =
                     getStorageManager().getFileInputStream(path);
@@ -409,7 +420,7 @@ public class ZipOutputHandler extends OutputHandler {
                     IOUtil.writeTo(fis, zos);
                     zos.closeEntry();
                 } finally {
-		    IOUtil.close(fis);
+                    IOUtil.close(fis);
                     zos.closeEntry();
                 }
             }

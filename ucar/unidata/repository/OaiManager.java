@@ -388,7 +388,7 @@ public class OaiManager extends RepositoryManager {
      */
     private Element getRoot(Request request) throws Exception {
         Document doc  = XmlUtil.makeDocument();
-        Element  root = XmlUtil.create(doc, TAG_OAI_PMH, null);
+        Element  root = XmlUtil.create(doc, TAG_OAI_PMH, (String[])null);
         XmlUtil.setAttributes(root, new String[] {
             ATTR_XMLNS, "http://www.openarchives.org/OAI/2.0/",
             ATTR_XMLNS_XSI, "http://www.w3.org/2001/XMLSchema-instance",

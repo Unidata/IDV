@@ -26,6 +26,12 @@ package ucar.unidata.repository;
 import org.apache.commons.dbcp.BasicDataSource;
 
 
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.type.*;
@@ -86,20 +92,16 @@ import java.util.TimeZone;
 import javax.sql.DataSource;
 
 
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DatabaseManager extends RepositoryManager implements SqlUtil.ConnectionManager {
+public class DatabaseManager extends RepositoryManager implements SqlUtil
+    .ConnectionManager {
 
+    /** _more_          */
     private final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
 
 
@@ -130,9 +132,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /** _more_ */
     private List<String> scourMessages = new ArrayList<String>();
 
+    /** _more_          */
     private int totalScours = 0;
 
+    /** _more_          */
     private boolean runningCheckConnections = false;
+
+    /** _more_          */
     private boolean haveInitialized = false;
 
 
@@ -179,30 +185,32 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * _more_
      */
     public void checkConnections() {
-	if(runningCheckConnections) return;
-	runningCheckConnections = true;
+        if (runningCheckConnections) {
+            return;
+        }
+        runningCheckConnections = true;
         while (true) {
             try {
                 Misc.sleep(5000);
                 long now = System.currentTimeMillis();
-		//Scour after 5 minutes
+                //Scour after 5 minutes
                 int seconds =
                     getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,
                         300);
                 for (ConnectionInfo info : getConnectionInfos()) {
                     //If a connection has been out for more than seconds then close it
                     if (now - info.time > seconds * 1000) {
-			getLogManager().logError("SCOURED @" + new Date()
-				 + " info.date: " + new Date(info.time)
-				 + " info.id: " + info.myCnt + "<br>"
-				 + "  msg:" + info.msg + "  Where:"
-				 + info.where);
+                        getLogManager().logError("SCOURED @" + new Date()
+                                + " info.date: " + new Date(info.time)
+                                + " info.id: " + info.myCnt + "<br>"
+                                + "  msg:" + info.msg + "  Where:"
+                                + info.where);
 
                         synchronized (scourMessages) {
                             while (scourMessages.size() > 100) {
                                 scourMessages.remove(0);
                             }
-			    totalScours++;
+                            totalScours++;
                             scourMessages.add("SCOURED @" + new Date()
                                     + " info.date: " + new Date(info.time)
                                     + " info.id: " + info.myCnt + "<br>"
@@ -213,7 +221,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                     }
                 }
             } catch (Exception exc) {
-                getLogManager().logError("CONNECTION: Error checking connection", exc);
+                getLogManager().logError(
+                    "CONNECTION: Error checking connection", exc);
             }
         }
     }
@@ -226,8 +235,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @throws Exception _more_
      */
     public void init() throws Exception {
-	if(haveInitialized) return;
-	haveInitialized = true;	
+        if (haveInitialized) {
+            return;
+        }
+        haveInitialized = true;
         SqlUtil.setConnectionManager(this);
         dataSource = doMakeDataSource();
 
@@ -243,16 +254,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     }
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void reInitialize() throws Exception {
-	if(dataSource!=null) {
-	    BasicDataSource bds   = (BasicDataSource) dataSource;
-	    try {
-		bds.close();
-	    } catch(Exception exc) {
-		logError("Closing data source", exc);
-	    }
-	    dataSource = doMakeDataSource();
-	}
+        if (dataSource != null) {
+            BasicDataSource bds = (BasicDataSource) dataSource;
+            try {
+                bds.close();
+            } catch (Exception exc) {
+                logError("Closing data source", exc);
+            }
+            dataSource = doMakeDataSource();
+        }
     }
 
 
@@ -288,8 +304,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @throws Exception _more_
      */
     private DataSource doMakeDataSource() throws Exception {
-	scourMessages = new ArrayList<String>();
-	totalScours = 0;
+        scourMessages = new ArrayList<String>();
+        totalScours   = 0;
 
         BasicDataSource ds = new BasicDataSource();
 
@@ -359,8 +375,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
         StringBuffer msgb = new StringBuffer();
         synchronized (scourMessages) {
-	    if(totalScours>0) 
-		msgb.append("Total scours:" + totalScours+HtmlUtil.p());
+            if (totalScours > 0) {
+                msgb.append("Total scours:" + totalScours + HtmlUtil.p());
+            }
             for (String msg : scourMessages) {
                 msgb.append("<pre>" + msg + "</pre>");
                 msgb.append("<hr>");
@@ -431,14 +448,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     private static class ConnectionInfo {
 
-        /** _more_          */
+        /** _more_ */
         static int cnt = 0;
 
-        /** _more_          */
+        /** _more_ */
         int myCnt = cnt++;
 
 
-        /** _more_          */
+        /** _more_ */
         Connection connection;
 
         /** _more_ */
@@ -649,21 +666,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @param connection _more_
      */
     public void closeConnection(Connection connection) {
-	try {
-	    synchronized (connectionMap) {
-		connectionMap.remove(connection);
-	    }
-	    try {
-		connection.setAutoCommit(true);
-	    } catch(Exception ignore) {}
+        try {
+            synchronized (connectionMap) {
+                connectionMap.remove(connection);
+            }
+            try {
+                connection.setAutoCommit(true);
+            } catch (Exception ignore) {}
 
-	    try {
-		connection.close();
-	    } catch(Exception ignore) {}
+            try {
+                connection.close();
+            } catch (Exception ignore) {}
 
-	} catch(Exception exc) {
-	    getLogManager().logError("Closing connections", exc);
-	}
+        } catch (Exception exc) {
+            getLogManager().logError("Closing connections", exc);
+        }
     }
 
 
@@ -705,7 +722,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         if (connection != null) {
             closeConnection(connection);
         } else {
-	    getLogManager().logError("CONNECTION: Tried to close a statement with no connection",new IllegalArgumentException());
+            getLogManager().logError(
+                "CONNECTION: Tried to close a statement with no connection",
+                new IllegalArgumentException());
         }
     }
 

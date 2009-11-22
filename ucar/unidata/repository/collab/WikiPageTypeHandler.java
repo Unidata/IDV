@@ -111,7 +111,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
         }
         Result result = getRepository().getOutputHandler(
                             WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(
-									   request, request.getOutput(), entry);
+                            request, request.getOutput(), entry);
         return result;
     }
 

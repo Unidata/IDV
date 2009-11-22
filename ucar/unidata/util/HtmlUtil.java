@@ -28,12 +28,13 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.awt.Color;
+
 import java.lang.reflect.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -47,19 +48,20 @@ public class HtmlUtil {
 
     //j-
 
+    /** _more_          */
     public static final String HTTP_USER_AGENT = "User-Agent";
 
-    /** _more_          */
+    /** _more_ */
     public static final String HTTP_CONTENT_LENGTH = "Content-Length";
 
-    /** _more_          */
+    /** _more_ */
     public static final String HTTP_CONTENT_DESCRIPTION =
         "Content-Description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String HTTP_WWW_AUTHENTICATE = "WWW-Authenticate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String HTTP_SET_COOKIE = "Set-Cookie";
 
 
@@ -242,6 +244,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_METHOD = "method";
 
+    /** _more_          */
     public static final String ATTR_MULTIPLE = "multiple";
 
     /** _more_ */
@@ -739,7 +742,9 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String space(int cnt) {
-        if(cnt==1) return " ";
+        if (cnt == 1) {
+            return " ";
+        }
         String s = "";
         while (cnt-- > 0) {
             s = s + ENTITY_NBSP;
@@ -1273,8 +1278,16 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String makeLatLonInput(String arg, String value) {
-	return  input(arg, value, attrs(ATTR_SIZE,"5") + id(arg));
+        return input(arg, value, attrs(ATTR_SIZE, "5") + id(arg));
     }
 
 
@@ -1293,17 +1306,14 @@ public class HtmlUtil {
                                        String north, String east,
                                        String west) {
         //TODO: Clean this up
-        return table(
-            "<tr><td colspan=\"2\" align=\"center\">"
-            +makeLatLonInput(baseName + "_north", north)
-	    + "</td></tr>"
-	    + "<tr><td>"
-	    + makeLatLonInput(baseName + "_west", west)
-	    + "</td><td>"
-	    + makeLatLonInput(baseName + "_east", east)
-	    + "</tr>"
-	    + "<tr><td colspan=\"2\" align=\"center\">"
-	    + makeLatLonInput(baseName + "_south", south));
+        return table("<tr><td colspan=\"2\" align=\"center\">"
+                     + makeLatLonInput(baseName + "_north", north)
+                     + "</td></tr>" + "<tr><td>"
+                     + makeLatLonInput(baseName + "_west", west)
+                     + "</td><td>"
+                     + makeLatLonInput(baseName + "_east", east) + "</tr>"
+                     + "<tr><td colspan=\"2\" align=\"center\">"
+                     + makeLatLonInput(baseName + "_south", south));
     }
 
     /**
@@ -1320,7 +1330,8 @@ public class HtmlUtil {
     public static String makeLatLonBox(String baseName, double south,
                                        double north, double east,
                                        double west) {
-	return makeLatLonBox(baseName, toString(south), toString(north),toString(east),toString(west));
+        return makeLatLonBox(baseName, toString(south), toString(north),
+                             toString(east), toString(west));
     }
 
     /**
@@ -1534,9 +1545,9 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name,ATTR_VALUE,name)
-                   + attrs(ATTR_BORDER, "0", ATTR_SRC, img, ATTR_TYPE,
-                           TYPE_IMAGE));
+                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name,
+                         ATTR_VALUE, name) + attrs(ATTR_BORDER, "0",
+                             ATTR_SRC, img, ATTR_TYPE, TYPE_IMAGE));
 
     }
 
@@ -1552,9 +1563,10 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name, String alt) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,ATTR_VALUE,name)
-                   + attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_TITLE, alt,
-                           ATTR_ALT, alt, ATTR_TYPE, TYPE_IMAGE));
+                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,
+                         ATTR_VALUE, name) + attrs(ATTR_CLASS,
+                             CLASS_SUBMITIMAGE, ATTR_TITLE, alt, ATTR_ALT,
+                             alt, ATTR_TYPE, TYPE_IMAGE));
     }
 
 
@@ -1685,17 +1697,17 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String input(String name, Object value, String extra) {
-        if(extra.length()==0) 
+        if (extra.length() == 0) {
             return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
-                         ATTR_VALUE, ((value == null)
-                                      ? ""
-                                      : value.toString())) + " " + extra);
+                       attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
+                             ATTR_VALUE, ((value == null)
+                                          ? ""
+                                          : value.toString())) + " " + extra);
+        }
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name,
-                         ATTR_VALUE, ((value == null)
-                                      ? ""
-                                      : value.toString())) + " " + extra);
+                   attrs(ATTR_NAME, name, ATTR_VALUE, ((value == null)
+                ? ""
+                : value.toString())) + " " + extra);
     }
 
 
@@ -1887,9 +1899,8 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String select(String name, List values,
-                                List selected, String extra,
-                                int maxLength) {
+    public static String select(String name, List values, List selected,
+                                String extra, int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append(open(TAG_SELECT,
                        attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)
@@ -1919,8 +1930,9 @@ public class HtmlUtil {
             }
 
             String selectedAttr = "";
-            if (selected != null && (selected.contains(value) || selected.contains(obj))) {
-                if(!seenSelected.contains(value)) {
+            if ((selected != null)
+                    && (selected.contains(value) || selected.contains(obj))) {
+                if ( !seenSelected.contains(value)) {
                     selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
                     seenSelected.add(value);
                 }
@@ -1941,30 +1953,41 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param selected _more_
+     *
+     * @return _more_
+     */
     public static String colorSelect(String name, String selected) {
         StringBuffer sb = new StringBuffer();
         sb.append(open(TAG_SELECT,
                        attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)));
-	String value;
-	value = "none";
-	sb.append(tag(TAG_OPTION,
-		      attrs(ATTR_TITLE, value, ATTR_VALUE,
-			    ""), value));
+        String value;
+        value = "none";
+        sb.append(tag(TAG_OPTION, attrs(ATTR_TITLE, value, ATTR_VALUE, ""),
+                      value));
 
-	for(int i=0;i< GuiUtils.COLORS.length;i++) {
-	    Color c = GuiUtils.COLORS[i];
-	    String label = GuiUtils.COLORNAMES[i];
-	    value = StringUtil.toHexString(c);
-	    String selectedAttr = "";
-	    if(Misc.equals(value, selected)) 
+        for (int i = 0; i < GuiUtils.COLORS.length; i++) {
+            Color  c     = GuiUtils.COLORS[i];
+            String label = GuiUtils.COLORNAMES[i];
+            value = StringUtil.toHexString(c);
+            String selectedAttr = "";
+            if (Misc.equals(value, selected)) {
                 selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
-	    String textColor = "";
-	    if(c.equals(Color.black))
-		textColor = "color:#FFFFFF;";
+            }
+            String textColor = "";
+            if (c.equals(Color.black)) {
+                textColor = "color:#FFFFFF;";
+            }
             sb.append(tag(TAG_OPTION,
                           selectedAttr
-                          + attrs(ATTR_TITLE, value, ATTR_VALUE,
-                                  value, ATTR_STYLE, "background-color:" + value+";" +textColor), label));
+                          + attrs(ATTR_TITLE, value, ATTR_VALUE, value,
+                                  ATTR_STYLE,
+                                  "background-color:" + value + ";"
+                                  + textColor), label));
         }
         sb.append(close(TAG_SELECT));
         return sb.toString();
@@ -2010,6 +2033,14 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param html _more_
+     * @param space _more_
+     *
+     * @return _more_
+     */
     public static String insetLeft(String html, int space) {
         return div(html, style("margin-left:" + space + "px;"));
     }
@@ -2116,8 +2147,17 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param columns _more_
+     * @param spacing _more_
+     *
+     * @return _more_
+     */
     public static String table(Object[] columns, int spacing) {
-        return table(row(cols(columns), attr(ATTR_VALIGN, VALUE_TOP)), attrs(ATTR_CELLSPACING,""+spacing));
+        return table(row(cols(columns), attr(ATTR_VALIGN, VALUE_TOP)),
+                     attrs(ATTR_CELLSPACING, "" + spacing));
     }
 
 
@@ -2917,6 +2957,13 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String urlEncode(String s) {
         try {
             return java.net.URLEncoder.encode(s, "UTF-8");
@@ -2959,12 +3006,14 @@ public class HtmlUtil {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        for(String a: args) {
-            System.err.println(a+":" + entityEncode(a));
-            System.err.println(a+":" +urlEncode(a));
+        for (String a : args) {
+            System.err.println(a + ":" + entityEncode(a));
+            System.err.println(a + ":" + urlEncode(a));
         }
-        if(true) return;
- 
+        if (true) {
+            return;
+        }
+
 
         System.err.println(java.net.URLEncoder.encode("&", "UTF-8"));
         System.err.println(java.net.URLEncoder.encode("?", "UTF-8"));

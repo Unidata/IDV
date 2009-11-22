@@ -117,6 +117,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_PUBLISH = "ramadda.icon.publish";
 
+    /** _more_          */
     public static final String ICON_PLANVIEW = "ramadda.icon.planview";
 
     /** _more_ */
@@ -292,7 +293,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_ZIPTREE = "ramadda.icon.ziptree";
 
 
@@ -771,7 +772,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MINLON = "minlon";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_MONITOR_ENABLE_EXEC =
         "ramadda.monitor.enable.exec";
 
@@ -1162,10 +1163,10 @@ public interface Constants {
     public static final String TAG_TYPES = "types";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FTP_PORT = "ramadda.ftp.port";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FTP_PASSIVEPORTS =
         "ramadda.ftp.passiveports";
 
@@ -1181,8 +1182,8 @@ public interface Constants {
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
 
-    public static final String PROP_ACCESS_NOBOTS =
-        "ramadda.access.nobots";
+    /** _more_          */
+    public static final String PROP_ACCESS_NOBOTS = "ramadda.access.nobots";
 
     /** _more_ */
 
@@ -1437,11 +1438,11 @@ public interface Constants {
     public static final String PROP_CACHE_MAXSIZEGB =
         "ramadda.cache.maxsizegb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB =
         "ramadda.zip.registered.maxsizemb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB =
         "ramadda.zip.anonymous.maxsizemb";
 
@@ -1623,10 +1624,10 @@ public interface Constants {
     public static final String SERVICE_FILE = "file";
 
 
-    /** _more_          */
+    /** _more_ */
     public static long MEGA = 1000000;
 
-    /** _more_          */
+    /** _more_ */
     public static long GIGA = MEGA * 1000;
 
 

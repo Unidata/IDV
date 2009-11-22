@@ -1,5 +1,5 @@
 /**
-*
+ *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -39,8 +39,6 @@ import ucar.unidata.repository.type.*;
 
 import ucar.unidata.repository.util.*;
 
-import ucar.unidata.util.Counter;
-
 
 
 
@@ -53,6 +51,8 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.Cache;
+
+import ucar.unidata.util.Counter;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -257,6 +257,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        ICON_MOVE);
 
 
+    /** _more_          */
     private Counter numberOfCurrentRequests = new Counter();
 
     /** _more_ */
@@ -312,7 +313,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
-    private Hashtable<String, OutputType> outputTypeMap = new Hashtable<String,OutputType>();
+    /** _more_          */
+    private Hashtable<String, OutputType> outputTypeMap =
+        new Hashtable<String, OutputType>();
 
     /** _more_ */
     private List<Class> entryMonitorClasses = new ArrayList<Class>();
@@ -351,6 +354,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> pythonLibs = new ArrayList<String>();
 
+    /** _more_          */
     private List<String> pluginPropertyFiles = new ArrayList<String>();
 
 
@@ -415,7 +419,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private DatabaseManager databaseManager;
 
-    /** _more_          */
+    /** _more_ */
     private FtpManager ftpManager;
 
     /** _more_ */
@@ -693,31 +697,37 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected void init(Properties properties) throws Exception {
 
 
-	/*
+        /*
         final PrintStream oldErr = System.err;
         final PrintStream oldOut = System.out;
         System.setErr(new PrintStream(oldOut){
                 public void     println(String x) {
-		    if(x.indexOf("Got")>=0) {
+                    if(x.indexOf("Got")>=0) {
                         Misc.printStack("got it");
-		    }
+                    }
                     oldErr.println(x);
                 }
             });
-	*/
+        */
 
         initProperties(properties);
         initServer();
         getLogManager().logInfoAndPrint("RAMADDA started");
     }
 
+    /**
+     * _more_
+     *
+     * @param properties _more_
+     * @param path _more_
+     *
+     * @throws Exception _more_
+     */
     private void load(Properties properties, String path) throws Exception {
-	InputStream inputStream =  IOUtil.getInputStream(
-							 path,
-							 getClass());
+        InputStream inputStream = IOUtil.getInputStream(path, getClass());
         properties.load(inputStream);
-	IOUtil.close(inputStream);
-    } 
+        IOUtil.close(inputStream);
+    }
 
     /**
      * _more_
@@ -741,9 +751,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
          */
 
         properties = new Properties();
-        load(properties, "/ucar/unidata/repository/resources/repository.properties");
+        load(properties,
+             "/ucar/unidata/repository/resources/repository.properties");
         try {
-            load(properties,"/ucar/unidata/repository/resources/build.properties");
+            load(properties,
+                 "/ucar/unidata/repository/resources/build.properties");
         } catch (Exception exc) {}
 
         for (int i = 0; i < args.length; i++) {
@@ -751,7 +763,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 continue;
             }
             if (args[i].endsWith(".properties")) {
-                load(cmdLineProperties,args[i]);
+                load(cmdLineProperties, args[i]);
             } else if (args[i].equals("-dump")) {
                 dumpFile = args[i + 1];
                 i++;
@@ -799,7 +811,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 IOUtil.joinDir(getStorageManager().getRepositoryDir(),
                                "repository.properties");
             if (new File(localPropertyFile).exists()) {
-                load(properties,localPropertyFile);
+                load(properties, localPropertyFile);
             }
 
             File[] localFiles =
@@ -811,7 +823,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (f.getName().equals("repository.properties")) {
                     continue;
                 }
-                load(properties,f.toString());
+                load(properties, f.toString());
             }
 
         } catch (Exception exc) {}
@@ -822,8 +834,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         initPlugins();
 
-        for(String f: pluginPropertyFiles) {
-            load(properties,f);
+        for (String f : pluginPropertyFiles) {
+            load(properties, f);
         }
 
 
@@ -851,7 +863,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         mimeTypes = new Properties();
         for (String path : getResourcePaths(PROP_HTML_MIMEPROPERTIES)) {
             try {
-                load(mimeTypes,path);
+                load(mimeTypes, path);
             } catch (Exception exc) {
                 //noop
             }
@@ -927,8 +939,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
-	//Do this in a thread because (on macs) it hangs sometimes)
-	Misc.run(this,"getFtpManager");
+        //Do this in a thread because (on macs) it hangs sometimes)
+        Misc.run(this, "getFtpManager");
     }
 
 
@@ -1565,7 +1577,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     //                    }
                 }
             } else {
-                checkFile(pluginFile,true);
+                checkFile(pluginFile, true);
             }
         }
     }
@@ -1582,6 +1594,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return checkFile(file, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param fromPlugin _more_
+     *
+     * @return _more_
+     */
     protected boolean checkFile(String file, boolean fromPlugin) {
         if (file.indexOf("api.xml") >= 0) {
             apiDefFiles.add(file);
@@ -1594,8 +1614,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             metadataDefFiles.add(file);
         } else if (file.endsWith(".py")) {
             pythonLibs.add(file);
-        } else if(file.endsWith(".properties")) {
-            if(fromPlugin) {
+        } else if (file.endsWith(".properties")) {
+            if (fromPlugin) {
                 pluginPropertyFiles.add(file);
             }
         } else {
@@ -1875,13 +1895,27 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public void addOutputType(OutputType type) {
-	outputTypeMap.put(type.getId(), type);
+        outputTypeMap.put(type.getId(), type);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public OutputType findOutputType(String id) {
-	if(id == null || id.length()==0) return OutputHandler.OUTPUT_HTML;
-	return 	outputTypeMap.get(id);
+        if ((id == null) || (id.length() == 0)) {
+            return OutputHandler.OUTPUT_HTML;
+        }
+        return outputTypeMap.get(id);
     }
 
 
@@ -1970,8 +2004,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
-		    OutputHandler outputHandler = (OutputHandler) ctor.newInstance(new Object[] { this,
-												  node });
+                    OutputHandler outputHandler =
+                        (OutputHandler) ctor.newInstance(new Object[] { this,
+                            node });
                     addOutputHandler(outputHandler);
 
 
@@ -2054,8 +2089,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
 
 
-            public Result outputGroup(Request request, OutputType outputType, Group group,
-                                      List<Group> subGroups,
+            public Result outputGroup(Request request, OutputType outputType,
+                                      Group group, List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
 
@@ -2112,7 +2147,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 links.add(makeLink(request, state.getEntry(), OUTPUT_COPY));
             }
 
-            public Result outputEntry(Request request, OutputType outputType, Entry entry)
+            public Result outputEntry(Request request, OutputType outputType,
+                                      Entry entry)
                     throws Exception {
                 if (request.getUser().getAnonymous()) {
                     return new Result("", "");
@@ -2121,8 +2157,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         entry.getId()));
             }
 
-            public Result outputGroup(Request request, OutputType outputType, Group group,
-                                      List<Group> subGroups,
+            public Result outputGroup(Request request, OutputType outputType,
+                                      Group group, List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
                 if (request.getUser().getAnonymous()) {
@@ -2181,8 +2217,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Counter getNumberOfCurrentRequests() {
-	return numberOfCurrentRequests;
+        return numberOfCurrentRequests;
     }
 
     /**
@@ -2195,23 +2236,32 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
-	numberOfCurrentRequests.incr(request.getRequestPath());
-	try {
-	    return handleRequestInner(request);
-	} finally {
-	    numberOfCurrentRequests.decr(request.getRequestPath());
-	}
+        numberOfCurrentRequests.incr(request.getRequestPath());
+        try {
+            return handleRequestInner(request);
+        } finally {
+            numberOfCurrentRequests.decr(request.getRequestPath());
+        }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result handleRequestInner(Request request) throws Exception {
 
         long   t1 = System.currentTimeMillis();
         Result result;
-	if(getProperty(PROP_ACCESS_NOBOTS,false)) {
-	    if(request.isSpider()) {
-		return new Result("", new StringBuffer("no bots for now"));
-	    }
+        if (getProperty(PROP_ACCESS_NOBOTS, false)) {
+            if (request.isSpider()) {
+                return new Result("", new StringBuffer("no bots for now"));
+            }
         }
 
         //        System.err.println("request:" + request);
@@ -2449,7 +2499,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         //        System.out.println(absoluteUrl(request.getUrl()));
 
         request.setApiMethod(apiMethod);
-	apiMethod.incrNumberOfCalls();
+        apiMethod.incrNumberOfCalls();
 
         String userAgent = request.getHeaderArg("User-Agent");
         if (userAgent == null) {
@@ -2582,10 +2632,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
             root = getStorageManager().localizePath(root);
             String fullPath = root + path;
             try {
-                InputStream inputStream = getStorageManager().getInputStream(fullPath);
+                InputStream inputStream =
+                    getStorageManager().getInputStream(fullPath);
                 if (path.endsWith(".js") || path.endsWith(".css")) {
                     String js = IOUtil.readInputStream(inputStream);
-                    js = js.replace("${urlroot}", getUrlBase());
+                    js          = js.replace("${urlroot}", getUrlBase());
                     inputStream = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, inputStream, type);
@@ -2873,8 +2924,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private boolean trackMsg = false;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getRepositoryName() {
-	return getProperty(PROP_REPOSITORY_NAME, "Repository");
+        return getProperty(PROP_REPOSITORY_NAME, "Repository");
     }
 
 
@@ -3110,7 +3166,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String prop = null;
         if ( !cacheResources()) {
             try {
-                load(properties,"/ucar/unidata/repository/resources/repository.properties");
+                load(properties,
+                     "/ucar/unidata/repository/resources/repository.properties");
             } catch (Exception exc) {}
         }
 
@@ -3786,73 +3843,131 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return getProperty(PROP_REPOSITORY_DESCRIPTION, "");
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getMapUrl() {
-	return getUrlBase()+ "/images/caida.jpg";
+        return getUrlBase() + "/images/caida.jpg";
     }
 
-    public String makeMapSelector(Request request, String arg, boolean popup, String extraLeft, String extraTop) {
-	return makeMapSelector(arg, popup,extraLeft, extraTop, request.getString(arg+"_south",""),
-					 request.getString(arg+"_north",""),
-					 request.getString(arg+"_east",""),
-					 request.getString(arg+"_west",""));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param arg _more_
+     * @param popup _more_
+     * @param extraLeft _more_
+     * @param extraTop _more_
+     *
+     * @return _more_
+     */
+    public String makeMapSelector(Request request, String arg, boolean popup,
+                                  String extraLeft, String extraTop) {
+        return makeMapSelector(arg, popup, extraLeft, extraTop,
+                               request.getString(arg + "_south", ""),
+                               request.getString(arg + "_north", ""),
+                               request.getString(arg + "_east", ""),
+                               request.getString(arg + "_west", ""));
     }
 
-    
-    public String makeMapSelector(String arg, boolean popup, 
-				  String south, String north, String east, String west) {
-	return makeMapSelector(arg, popup, "","", south, north, east, west);
+
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param popup _more_
+     * @param south _more_
+     * @param north _more_
+     * @param east _more_
+     * @param west _more_
+     *
+     * @return _more_
+     */
+    public String makeMapSelector(String arg, boolean popup, String south,
+                                  String north, String east, String west) {
+        return makeMapSelector(arg, popup, "", "", south, north, east, west);
     }
 
-    public String makeMapSelector(String arg, boolean popup, String extraLeft, String extraTop,
-				  String south, String north, String east, String west) {
-	StringBuffer sb = new StringBuffer();
-	
-	String llb = HtmlUtil.makeLatLonBox(arg,south, north, east,west);
-	if(extraLeft!=null && extraLeft.length()>0) 
-	    llb = llb +HtmlUtil.br() + extraLeft;
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param popup _more_
+     * @param extraLeft _more_
+     * @param extraTop _more_
+     * @param south _more_
+     * @param north _more_
+     * @param east _more_
+     * @param west _more_
+     *
+     * @return _more_
+     */
+    public String makeMapSelector(String arg, boolean popup,
+                                  String extraLeft, String extraTop,
+                                  String south, String north, String east,
+                                  String west) {
+        StringBuffer sb = new StringBuffer();
 
-	String imageId = arg+"_bbox_image";
+        String llb = HtmlUtil.makeLatLonBox(arg, south, north, east, west);
+        if ((extraLeft != null) && (extraLeft.length() > 0)) {
+            llb = llb + HtmlUtil.br() + extraLeft;
+        }
 
-	String clickParams ="event," + HtmlUtil.squote(imageId) +  "," +
-	    HtmlUtil.squote(arg)+"," + (popup?"1":"0");
-	String initParams =
-	    HtmlUtil.squote(imageId) +","+HtmlUtil.squote(arg)+"," + (popup?"1":"0");
+        String imageId = arg + "_bbox_image";
 
-
-	String onClickCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
-							      clickParams));
-	String bboxDiv = HtmlUtil.div("",
-				      HtmlUtil.cssClass("latlon_box") +
-				      onClickCall +
-				      HtmlUtil.id(arg+"_bbox_div"));
-
-	StringBuffer imageHtml = new StringBuffer();
-	String nextMapLink = HtmlUtil.mouseClickHref(HtmlUtil.call("cycleMap", HtmlUtil.squote(imageId)),
-						     HtmlUtil.img(iconUrl(ICON_MAP), " View another map",""));
-	imageHtml.append(bboxDiv);
-	imageHtml.append(HtmlUtil.table(new Object[]{HtmlUtil.img(getMapUrl(),"",
-					HtmlUtil.id(imageId) + onClickCall +
-								  HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup?"800":"1000"))),
-						     nextMapLink}));
+        String clickParams = "event," + HtmlUtil.squote(imageId) + ","
+                             + HtmlUtil.squote(arg) + "," + (popup
+                ? "1"
+                : "0");
+        String initParams = HtmlUtil.squote(imageId) + ","
+                            + HtmlUtil.squote(arg) + "," + (popup
+                ? "1"
+                : "0");
 
 
-	String rightSide=null;
-	String clearLink =HtmlUtil.mouseClickHref(HtmlUtil.call("bboxClear", HtmlUtil.squote(arg)), msg("Clear"));
-	String updateLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxInit",initParams), msg("Update Map"));
+        String onClickCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
+                                 clickParams));
+        String bboxDiv = HtmlUtil.div("",
+                                      HtmlUtil.cssClass("latlon_box")
+                                      + onClickCall
+                                      + HtmlUtil.id(arg + "_bbox_div"));
 
-	if(popup) {
-	    rightSide =
-		makeStickyPopup(
-				msg("Select"),
-				imageHtml.toString(),
-				HtmlUtil.call("bboxInit",initParams)) 
-		+HtmlUtil.space(2) + clearLink +HtmlUtil.space(2) + updateLink +HtmlUtil.space(2) + extraTop;
-	} else {
-	    rightSide = clearLink +HtmlUtil.space(2) + updateLink +HtmlUtil.br() +
-		imageHtml;
-	}
+        StringBuffer imageHtml = new StringBuffer();
+        String nextMapLink =
+            HtmlUtil.mouseClickHref(HtmlUtil.call("cycleMap",
+                HtmlUtil.squote(imageId)), HtmlUtil.img(iconUrl(ICON_MAP),
+                    " View another map", ""));
+        imageHtml.append(bboxDiv);
+        imageHtml.append(HtmlUtil.table(new Object[] {
+            HtmlUtil.img(getMapUrl(), "",
+                         HtmlUtil.id(imageId) + onClickCall
+                         + HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup
+                ? "800"
+                : "1000"))), nextMapLink }));
 
-	return HtmlUtil.table(new Object[]{llb, rightSide});
+
+        String rightSide = null;
+        String clearLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxClear",
+                               HtmlUtil.squote(arg)), msg("Clear"));
+        String updateLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxInit",
+                                initParams), msg("Update Map"));
+
+        if (popup) {
+            rightSide =
+                makeStickyPopup(msg("Select"), imageHtml.toString(),
+                                HtmlUtil.call("bboxInit",
+                                    initParams)) + HtmlUtil.space(2)
+                                        + clearLink + HtmlUtil.space(2)
+                                        + updateLink + HtmlUtil.space(2)
+                                        + extraTop;
+        } else {
+            rightSide = clearLink + HtmlUtil.space(2) + updateLink
+                        + HtmlUtil.br() + imageHtml;
+        }
+
+        return HtmlUtil.table(new Object[] { llb, rightSide });
 
     }
 
@@ -5272,16 +5387,27 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    public String makeStickyPopup(String link, String innerContents, String initCall) {
-	boolean alignLeft  =true;
-        String compId   = "menu_" + HtmlUtil.blockCnt++;
-        String linkId   = "menulink_" + HtmlUtil.blockCnt++;
-        String contents = makeStickyPopupDiv(innerContents, compId);
-        String onClick = HtmlUtil.onMouseClick(HtmlUtil.call("showStickyPopup",
-                             HtmlUtil.comma(new String[] { "event",
+    /**
+     * _more_
+     *
+     * @param link _more_
+     * @param innerContents _more_
+     * @param initCall _more_
+     *
+     * @return _more_
+     */
+    public String makeStickyPopup(String link, String innerContents,
+                                  String initCall) {
+        boolean alignLeft = true;
+        String  compId    = "menu_" + HtmlUtil.blockCnt++;
+        String  linkId    = "menulink_" + HtmlUtil.blockCnt++;
+        String  contents  = makeStickyPopupDiv(innerContents, compId);
+        String onClick =
+            HtmlUtil.onMouseClick(HtmlUtil.call("showStickyPopup",
+                HtmlUtil.comma(new String[] { "event",
                 HtmlUtil.squote(linkId), HtmlUtil.squote(compId), (alignLeft
                 ? "1"
-								   : "0") })) + initCall);
+                : "0") })) + initCall);
         String href = HtmlUtil.href("javascript:noop();", link,
                                     onClick + HtmlUtil.id(linkId));
         return href + contents;
@@ -5300,10 +5426,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String makeStickyPopupDiv(String contents, String compId) {
         StringBuffer menu = new StringBuffer();
-	String cLink =
-	    HtmlUtil.jsLink(HtmlUtil.onMouseClick(HtmlUtil.call("hide", HtmlUtil.squote(compId))),
-			    HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
-	contents = cLink + HtmlUtil.br() + contents;
+        String cLink =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick(HtmlUtil.call("hide",
+                HtmlUtil.squote(compId))), HtmlUtil.img(iconUrl(ICON_CLOSE)),
+                                           "");
+        contents = cLink + HtmlUtil.br() + contents;
 
         menu.append(HtmlUtil.div(contents,
                                  HtmlUtil.id(compId)

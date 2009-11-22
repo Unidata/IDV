@@ -137,6 +137,7 @@ public class ExampleOutputHandler extends OutputHandler {
      * Output a group. We break apart the children groups from the children entries
      *
      * @param request The request
+     * @param outputType _more_
      * @param group The group
      * @param subGroups Children groups
      * @param entries Children entries
@@ -145,8 +146,9 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    public Result outputGroup(Request request, OutputType outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
             throws Exception {
 
         //Here output should be example1
@@ -196,13 +198,16 @@ public class ExampleOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
 
         //Check if we are doing example3
         if (outputType.equals(OUTPUT_EXAMPLE3)) {

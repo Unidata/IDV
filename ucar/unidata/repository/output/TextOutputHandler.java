@@ -156,13 +156,16 @@ public class TextOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             throw new AccessException("Cannot access data", request);

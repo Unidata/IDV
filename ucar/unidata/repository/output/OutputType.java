@@ -28,6 +28,7 @@ import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.util.Counter;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -37,7 +38,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.util.Counter;
 
 
 import java.io.*;
@@ -135,6 +135,7 @@ public class OutputType {
     /** _more_ */
     private int type = TYPE_HTML;
 
+    /** _more_          */
     private Counter numberOfCalls = new Counter();
 
 
@@ -421,12 +422,20 @@ public class OutputType {
         return isType(TYPE_VIEW);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getNumberOfCalls() {
-	return numberOfCalls.getCount();
+        return numberOfCalls.getCount();
     }
 
+    /**
+     * _more_
+     */
     public void incrNumberOfCalls() {
-	numberOfCalls.incr();
+        numberOfCalls.incr();
     }
 
 

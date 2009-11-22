@@ -27,6 +27,7 @@ import org.apache.ftpserver.ftplet.*;
 import org.apache.ftpserver.listener.*;
 import org.apache.ftpserver.usermanager.*;
 import org.apache.ftpserver.usermanager.impl.*;
+import org.apache.log4j.config.PropertyPrinter;
 
 import ucar.unidata.repository.Constants;
 import ucar.unidata.repository.Entry;
@@ -44,10 +45,10 @@ import ucar.unidata.repository.Result;
 import ucar.unidata.repository.auth.Permission;
 import ucar.unidata.repository.auth.UserManager;
 import ucar.unidata.repository.type.TypeHandler;
+import ucar.unidata.util.IOUtil;
 
 
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.IOUtil;
 
 import java.io.*;
 
@@ -65,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
-import org.apache.log4j.config.PropertyPrinter;
 
 
 /**
@@ -77,100 +77,100 @@ import org.apache.log4j.config.PropertyPrinter;
 
 public class RepositoryFtplet extends DefaultFtplet {
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_ABOR = "ABOR";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_CWD = "CWD";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_DELE = "DELE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_LIST = "LIST";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_MDTM = "MDTM";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_MKD = "MKD";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_NLST = "NLST";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_PASS = "PASS";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_PASV = "PASV";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_PORT = "PORT";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_PWD = "PWD";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_QUIT = "QUIT";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_RETR = "RETR";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_RMD = "RMD";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_RNFR = "RNFR";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_RNTO = "RNTO";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_SITE = "SITE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_SIZE = "SIZE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_STOR = "STOR";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_TYPE = "TYPE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_USER = "USER";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_ACCT = "ACCT";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_APPE = "APPE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_CDUP = "CDUP";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_HELP = "HELP";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_MODE = "MODE";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_NOOP = "NOOP";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_REIN = "REIN";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_STAT = "STAT";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_STOU = "STOU";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_STRU = "STRU";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_SYST = "SYST";
 
 
@@ -178,13 +178,13 @@ public class RepositoryFtplet extends DefaultFtplet {
     /** _more_ */
     public static final String PROP_ENTRYID = "ramadda.entryid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String NL = "\r\n";
 
     /** _more_ */
     FtpManager ftpManager;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat sdf;
 
     /**
@@ -227,7 +227,8 @@ public class RepositoryFtplet extends DefaultFtplet {
         return super.afterCommand(session, ftpRequest, reply);
     }
 
-    boolean didit  =false;
+    /** _more_          */
+    boolean didit = false;
 
     /**
      * _more_
@@ -244,9 +245,9 @@ public class RepositoryFtplet extends DefaultFtplet {
                                       FtpRequest ftpRequest)
             throws FtpException, IOException {
         try {
-            if(!didit) {
+            if ( !didit) {
                 didit = true;
-                PrintWriter pw = new PrintWriter(System.err);
+                PrintWriter     pw = new PrintWriter(System.err);
                 PropertyPrinter pp = new PropertyPrinter(pw);
                 pp.print(pw);
             }
@@ -618,17 +619,18 @@ public class RepositoryFtplet extends DefaultFtplet {
             getRepository().getStorageManager().getTmpFile(request, name);
         FileOutputStream fos =
             getRepository().getStorageManager().getFileOutputStream(newFile);
-	try {
-	    session.getDataConnection().openConnection().transferFromClient(
-									    session, fos);
-	} finally {
-	    IOUtil.close(fos);
-	}
+        try {
+            session.getDataConnection().openConnection().transferFromClient(
+                session, fos);
+        } finally {
+            IOUtil.close(fos);
+        }
 
         newFile = getRepository().getStorageManager().moveToStorage(request,
                 newFile);
 
-	Entry entry = getEntryManager().addFileEntry(request, newFile, group, name, request.getUser());
+        Entry entry = getEntryManager().addFileEntry(request, newFile, group,
+                          name, request.getUser());
 
 
         session.write(
@@ -792,37 +794,39 @@ public class RepositoryFtplet extends DefaultFtplet {
 
         InputStream inputStream = null;
 
-	try {
-	    if (outputType != null) {
-		request.put(Constants.ARG_OUTPUT, outputType);
-		Result result = getEntryManager().processEntryShow(request,
-								   entry);
-		byte[] contents = result.getContent();
-		inputStream = new ByteArrayInputStream(contents);
-	    } else {
-		if ( !entry.isFile()) {
-		    return handleError(session, ftpRequest, "Not a file: " + entryName);
-		}
-		File file = entry.getFile();
-		inputStream =
-		    getRepository().getStorageManager().getFileInputStream(file);
-	    }
+        try {
+            if (outputType != null) {
+                request.put(Constants.ARG_OUTPUT, outputType);
+                Result result = getEntryManager().processEntryShow(request,
+                                    entry);
+                byte[] contents = result.getContent();
+                inputStream = new ByteArrayInputStream(contents);
+            } else {
+                if ( !entry.isFile()) {
+                    return handleError(session, ftpRequest,
+                                       "Not a file: " + entryName);
+                }
+                File file = entry.getFile();
+                inputStream =
+                    getRepository().getStorageManager().getFileInputStream(
+                        file);
+            }
 
-	    session.write(
-			  new DefaultFtpReply(
-					      FtpReply.REPLY_150_FILE_STATUS_OKAY,
-					      "Opening binary mode connect."));
-	    session.getDataConnection().openConnection().transferToClient(
-									  session, inputStream);
-	    session.write(
-			  new DefaultFtpReply(
-					      FtpReply.REPLY_226_CLOSING_DATA_CONNECTION,
-					      "Closing data connection."));
+            session.write(
+                new DefaultFtpReply(
+                    FtpReply.REPLY_150_FILE_STATUS_OKAY,
+                    "Opening binary mode connect."));
+            session.getDataConnection().openConnection().transferToClient(
+                session, inputStream);
+            session.write(
+                new DefaultFtpReply(
+                    FtpReply.REPLY_226_CLOSING_DATA_CONNECTION,
+                    "Closing data connection."));
 
-	    session.getDataConnection().closeDataConnection();
-	} finally {
-	    IOUtil.close(inputStream);
-	}
+            session.getDataConnection().closeDataConnection();
+        } finally {
+            IOUtil.close(inputStream);
+        }
 
         return FtpletResult.SKIP;
     }
@@ -830,13 +834,25 @@ public class RepositoryFtplet extends DefaultFtplet {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param session _more_
+     * @param ftpRequest _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public FtpletResult handleSize(Request request, Group group,
                                    FtpSession session, FtpRequest ftpRequest)
             throws Exception {
 
-        String entryName  = ftpRequest.getArgument();
-        Entry entry = findEntry(request, group, entryName);
-        ftpManager.logInfo("Group:" + group.getName() +" name:" + entryName);
+        String entryName = ftpRequest.getArgument();
+        Entry  entry     = findEntry(request, group, entryName);
+        ftpManager.logInfo("Group:" + group.getName() + " name:" + entryName);
         if (entry == null) {
             return handleError(session, ftpRequest,
                                "Not a valid file:"
@@ -854,13 +870,14 @@ public class RepositoryFtplet extends DefaultFtplet {
         }
 
         if ( !entry.isFile()) {
-            return handleError(session, ftpRequest, "Not a file: " + entryName);
+            return handleError(session, ftpRequest,
+                               "Not a file: " + entryName);
         }
-        
+
         session.write(
             new DefaultFtpReply(
                 FtpReply.REPLY_250_REQUESTED_FILE_ACTION_OKAY,
-                ""+entry.getFile().length()));
+                "" + entry.getFile().length()));
         return FtpletResult.SKIP;
 
     }
@@ -921,8 +938,8 @@ public class RepositoryFtplet extends DefaultFtplet {
             }
             //            getRepository().getLogManager().logInfo("ftp: calling findEntryFrom name");
 
-            result  =  getEntryManager().findDescendants(request, getEntryManager().getTopGroup(),
-                                                          name);
+            result = getEntryManager().findDescendants(request,
+                    getEntryManager().getTopGroup(), name);
 
             return result;
         } else {

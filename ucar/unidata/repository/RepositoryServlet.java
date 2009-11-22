@@ -254,7 +254,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
      */
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
-	throws IOException, ServletException {
+            throws IOException, ServletException {
 
         // there can be only one
         if (repository == null) {
@@ -272,113 +272,123 @@ public class RepositoryServlet extends HttpServlet implements Constants {
         RequestHandler handler          = new RequestHandler(request);
         Result         repositoryResult = null;
 
-	try {
+        try {
 
-	    try {
-		// need to support HTTP HEAD request since we are overriding HttpServlet doGet   
-		if (request.getMethod().equals("HEAD")) {
-		    //                System.err.println("head:" +  request.getRequestURI());
-		    //                return;
-		}
+            try {
+                // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
+                if (request.getMethod().equals("HEAD")) {
+                    //                System.err.println("head:" +  request.getRequestURI());
+                    //                return;
+                }
 
-		// create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
+                // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
 
-		Request repositoryRequest = new Request(repository,
-							request.getRequestURI(),
-							handler.formArgs, request,
-							response, this);
-		//            System.err.println ("request:" +   request.getRequestURI());
-		repositoryRequest.setProtocol(request.getProtocol());
-		repositoryRequest.setSecure(request.isSecure());
-		repositoryRequest.setIp(request.getRemoteAddr());
-		repositoryRequest.setOutputStream(response.getOutputStream());
-		repositoryRequest.setFileUploads(handler.fileUploads);
-		repositoryRequest.setHttpHeaderArgs(handler.httpArgs);
-		// create a ucar.unidata.repository.Result object and transpose the relevant info into a HttpServletResponse object
-		repositoryResult = repository.handleRequest(repositoryRequest);
-	    } catch (Throwable e) {
-		e = LogUtil.getInnerException(e);
-		logException(e, request);
-		response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-				   e.getMessage());
-	    }
-	    if (repositoryResult == null) {
-		response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-				   "Unknown request:" + request.getRequestURI());
-		return;
-	    }
+                Request repositoryRequest = new Request(repository,
+                                                request.getRequestURI(),
+                                                handler.formArgs, request,
+                                                response, this);
+                //            System.err.println ("request:" +   request.getRequestURI());
+                repositoryRequest.setProtocol(request.getProtocol());
+                repositoryRequest.setSecure(request.isSecure());
+                repositoryRequest.setIp(request.getRemoteAddr());
+                repositoryRequest.setOutputStream(response.getOutputStream());
+                repositoryRequest.setFileUploads(handler.fileUploads);
+                repositoryRequest.setHttpHeaderArgs(handler.httpArgs);
+                // create a ucar.unidata.repository.Result object and transpose the relevant info into a HttpServletResponse object
+                repositoryResult =
+                    repository.handleRequest(repositoryRequest);
+            } catch (Throwable e) {
+                e = LogUtil.getInnerException(e);
+                logException(e, request);
+                response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+            }
+            if (repositoryResult == null) {
+                response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                                   "Unknown request:"
+                                   + request.getRequestURI());
+                return;
+            }
 
-	    if (repositoryResult.getNeedToWrite()) {
-		List<String> args = repositoryResult.getHttpHeaderArgs();
-		if (args != null) {
-		    for (int i = 0; i < args.size(); i += 2) {
-			String name  = args.get(i);
-			String value = args.get(i + 1);
-			response.setHeader(name, value);
-		    }
-		}
+            if (repositoryResult.getNeedToWrite()) {
+                List<String> args = repositoryResult.getHttpHeaderArgs();
+                if (args != null) {
+                    for (int i = 0; i < args.size(); i += 2) {
+                        String name  = args.get(i);
+                        String value = args.get(i + 1);
+                        response.setHeader(name, value);
+                    }
+                }
 
-		Date lastModified = repositoryResult.getLastModified();
-		if (lastModified != null) {
-		    response.addDateHeader("Last-Modified",
-					   lastModified.getTime());
-		}
+                Date lastModified = repositoryResult.getLastModified();
+                if (lastModified != null) {
+                    response.addDateHeader("Last-Modified",
+                                           lastModified.getTime());
+                }
 
-		if (repositoryResult.getCacheOk()) {
-		    response.setHeader("Cache-Control", "public,max-age=259200");
-		    response.setHeader("Expires",
-				       "Tue, 08 Jan 2019 07:41:19 GMT");
-		    if (lastModified == null) {
-			response.setHeader("Last-Modified",
-					   "Tue, 20 Jan 2009 01:45:54 GMT");
-		    }
-		}
+                if (repositoryResult.getCacheOk()) {
+                    response.setHeader("Cache-Control",
+                                       "public,max-age=259200");
+                    response.setHeader("Expires",
+                                       "Tue, 08 Jan 2019 07:41:19 GMT");
+                    if (lastModified == null) {
+                        response.setHeader("Last-Modified",
+                                           "Tue, 20 Jan 2009 01:45:54 GMT");
+                    }
+                }
 
-		if (repositoryResult.getRedirectUrl() != null) {
-		    try {
-			response.sendRedirect(repositoryResult.getRedirectUrl());
-		    } catch (Exception e) {
-			logException(e, request);
-		    }
-		} else if (repositoryResult.getInputStream() != null) {
-		    try {
-			response.setStatus(repositoryResult.getResponseCode());
-			response.setContentType(repositoryResult.getMimeType());
-			OutputStream output = response.getOutputStream();
-			try {
-			    IOUtil.writeTo(repositoryResult.getInputStream(), output);
-			} finally {
-			    IOUtil.close(output);
-			}
-		    } catch (IOException e) {
-			//We'll ignore any ioexception
-		    } catch (Exception e) {
-			logException(e, request);
-		    } finally {
-			IOUtil.close(repositoryResult.getInputStream());
-		    }
-		} else {
-		    try {
-			response.setStatus(repositoryResult.getResponseCode());
-			response.setContentType(repositoryResult.getMimeType());
-			OutputStream output = response.getOutputStream();
-			try {
-			    output.write(repositoryResult.getContent());
-			} finally {
-			    IOUtil.close(output);
-			}
-		    } catch (Exception e) {
-			logException(e, request);
-		    }
-		}
-	    }
+                if (repositoryResult.getRedirectUrl() != null) {
+                    try {
+                        response.sendRedirect(
+                            repositoryResult.getRedirectUrl());
+                    } catch (Exception e) {
+                        logException(e, request);
+                    }
+                } else if (repositoryResult.getInputStream() != null) {
+                    try {
+                        response.setStatus(
+                            repositoryResult.getResponseCode());
+                        response.setContentType(
+                            repositoryResult.getMimeType());
+                        OutputStream output = response.getOutputStream();
+                        try {
+                            IOUtil.writeTo(repositoryResult.getInputStream(),
+                                           output);
+                        } finally {
+                            IOUtil.close(output);
+                        }
+                    } catch (IOException e) {
+                        //We'll ignore any ioexception
+                    } catch (Exception e) {
+                        logException(e, request);
+                    } finally {
+                        IOUtil.close(repositoryResult.getInputStream());
+                    }
+                } else {
+                    try {
+                        response.setStatus(
+                            repositoryResult.getResponseCode());
+                        response.setContentType(
+                            repositoryResult.getMimeType());
+                        OutputStream output = response.getOutputStream();
+                        try {
+                            output.write(repositoryResult.getContent());
+                        } finally {
+                            IOUtil.close(output);
+                        }
+                    } catch (Exception e) {
+                        logException(e, request);
+                    }
+                }
+            }
 
 
-	} finally {
-	    if(repositoryResult!=null && repositoryResult.getInputStream()!=null) {
-		IOUtil.close(repositoryResult.getInputStream());
-	    }
-	}
+        } finally {
+            if ((repositoryResult != null)
+                    && (repositoryResult.getInputStream() != null)) {
+                IOUtil.close(repositoryResult.getInputStream());
+            }
+        }
 
     }
 
@@ -545,11 +555,11 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 OutputStream outputStream =
                     repository.getStorageManager().getFileOutputStream(
                         uploadedFile);
-		try {
-		    IOUtil.writeTo(inputStream, outputStream);
-		} finally {
-		    IOUtil.close(outputStream);
-		}
+                try {
+                    IOUtil.writeTo(inputStream, outputStream);
+                } finally {
+                    IOUtil.close(outputStream);
+                }
                 //                item.write(uploadedFile);
             } catch (Exception e) {
                 logException(e, request);

@@ -81,6 +81,7 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager implements WikiUtil
     .WikiPageHandler {
 
+    /** _more_          */
     public static final String ATTR_MAXCONNECTIONS = "maxconnections";
 
     /** _more_ */
@@ -99,13 +100,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     private List<OutputType> types = new ArrayList<OutputType>();
 
-    private Hashtable<String, OutputType> typeMap = new Hashtable<String,OutputType>();
+    /** _more_          */
+    private Hashtable<String, OutputType> typeMap = new Hashtable<String,
+                                                        OutputType>();
 
 
+    /** _more_          */
     private int maxConnections = -1;
 
+    /** _more_          */
     private int numberOfConnections = 0;
 
+    /** _more_          */
     private int totalCalls = 0;
 
     /**
@@ -131,7 +137,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @return _more_
      */
     public OutputType findOutputType(String id) {
-	return 	typeMap.get(id);
+        return typeMap.get(id);
     }
 
 
@@ -146,7 +152,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             throws Exception {
         this(repository,
              XmlUtil.getAttribute(element, ATTR_NAME, (String) null));
-	maxConnections = XmlUtil.getAttribute(element, ATTR_MAXCONNECTIONS,maxConnections);
+        maxConnections = XmlUtil.getAttribute(element, ATTR_MAXCONNECTIONS,
+                maxConnections);
 
 
     }
@@ -183,8 +190,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public void addType(OutputType type) {
         type.setGroupName(name);
         types.add(type);
-	typeMap.put(type.getId(), type);
-	repository.addOutputType(type);
+        typeMap.put(type.getId(), type);
+        repository.addOutputType(type);
     }
 
     /**
@@ -334,19 +341,27 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     public void getSystemStats(StringBuffer sb) {
-	if(totalCalls>0) {
-	    StringBuffer stats = new StringBuffer();
-	    for(OutputType outputType: types) {
-		if(outputType.getNumberOfCalls()>0) {
-		    stats.append(outputType.getLabel()+ " #" + msgLabel("calls")+outputType.getNumberOfCalls()+HtmlUtil.br());
-		}
-	    }
+        if (totalCalls > 0) {
+            StringBuffer stats = new StringBuffer();
+            for (OutputType outputType : types) {
+                if (outputType.getNumberOfCalls() > 0) {
+                    stats.append(outputType.getLabel() + " #"
+                                 + msgLabel("calls")
+                                 + outputType.getNumberOfCalls()
+                                 + HtmlUtil.br());
+                }
+            }
 
-	    sb.append(HtmlUtil.formEntryTop(msgLabel(name),
-					    stats.toString()));
+            sb.append(HtmlUtil.formEntryTop(msgLabel(name),
+                                            stats.toString()));
 
-	}
+        }
     }
 
 
@@ -635,18 +650,44 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType  outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return outputGroup(request, outputType, getEntryManager().getDummyGroup(),
+        return outputGroup(request, outputType,
+                           getEntryManager().getDummyGroup(),
                            new ArrayList<Group>(), entries);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param outputType _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputGroup(Request request, OutputType outputType,
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
+            throws Exception {
+        return notImplemented("outputGroup");
+    }
+
 
 
     /**
@@ -661,23 +702,27 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, OutputType  outputType, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public final Result xoutputGroup(Request request, Group group,
+                                     List<Group> subGroups,
+                                     List<Entry> entries)
             throws Exception {
-        return notImplemented("outputGroup");
+        return null;
     }
 
 
-
-    public final Result xoutputGroup(Request request,  Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public final Result xoutputEntry(Request request, Entry entry)
             throws Exception {
-	return null;
-    }
-
-
-    public final Result xoutputEntry(Request request, Entry entry) throws Exception {
-	return null;
+        return null;
     }
 
 
@@ -2466,51 +2511,59 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
     /**
-       Set the MaxConnections property.
-
-       @param value The new value for MaxConnections
-    **/
-    public void setMaxConnections (int value) {
-	this.maxConnections = value;
+     *  Set the MaxConnections property.
+     *
+     *  @param value The new value for MaxConnections
+     */
+    public void setMaxConnections(int value) {
+        this.maxConnections = value;
     }
 
     /**
-       Get the MaxConnections property.
-
-       @return The MaxConnections
-    **/
-    public int getMaxConnections () {
-	return this.maxConnections;
+     *  Get the MaxConnections property.
+     *
+     *  @return The MaxConnections
+     */
+    public int getMaxConnections() {
+        return this.maxConnections;
     }
 
     /**
-       Set the NumberOfConnections property.
-
-       @param value The new value for NumberOfConnections
-    **/
-    public void setNumberOfConnections (int value) {
-	this.numberOfConnections = value;
+     *  Set the NumberOfConnections property.
+     *
+     *  @param value The new value for NumberOfConnections
+     */
+    public void setNumberOfConnections(int value) {
+        this.numberOfConnections = value;
     }
 
     /**
-       Get the NumberOfConnections property.
-
-       @return The NumberOfConnections
-    **/
-    public int getNumberOfConnections () {
-	return this.numberOfConnections;
+     *  Get the NumberOfConnections property.
+     *
+     *  @return The NumberOfConnections
+     */
+    public int getNumberOfConnections() {
+        return this.numberOfConnections;
     }
 
+    /**
+     * _more_
+     */
     public void incrNumberOfConnections() {
-	numberOfConnections++;
-	totalCalls++;
+        numberOfConnections++;
+        totalCalls++;
     }
 
 
 
+    /**
+     * _more_
+     */
     public void decrNumberOfConnections() {
-	numberOfConnections--;
-	if(numberOfConnections<0) numberOfConnections= 0;
+        numberOfConnections--;
+        if (numberOfConnections < 0) {
+            numberOfConnections = 0;
+        }
     }
 
 }

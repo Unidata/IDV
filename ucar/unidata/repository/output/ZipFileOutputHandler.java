@@ -140,51 +140,54 @@ public class ZipFileOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entry _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType,
+                              Entry entry)
+            throws Exception {
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             throw new AccessException("Cannot access data", request);
         }
         StringBuffer sb = new StringBuffer();
 
-	FileInputStream fis =  getStorageManager().getFileInputStream(
-								      entry.getResource().getPath());
-	ZipInputStream zin = new ZipInputStream(fis);
-	try {
+        FileInputStream fis = getStorageManager().getFileInputStream(
+                                  entry.getResource().getPath());
+        ZipInputStream zin = new ZipInputStream(fis);
+        try {
 
-        ZipEntry ze = null;
-        sb.append("<ul>");
-        String fileToFetch = request.getString(ARG_FILE, null);
-        while ((ze = zin.getNextEntry()) != null) {
-            if (ze.isDirectory()) {
-                continue;
-            }
-            String path = ze.getName();
-            if ((fileToFetch != null) && path.equals(fileToFetch)) {
-                String type = getRepository().getMimeTypeFromSuffix(
-                                  IOUtil.getFileExtension(path));
-                return new Result("", zin, type);
-            }
-            //            if(path.endsWith("MANIFEST.MF")) continue;
-            sb.append("<li>");
-            String name = IOUtil.getFileTail(path);
-            String url  = getRepository().URL_ENTRY_SHOW + "/" + name;
+            ZipEntry ze = null;
+            sb.append("<ul>");
+            String fileToFetch = request.getString(ARG_FILE, null);
+            while ((ze = zin.getNextEntry()) != null) {
+                if (ze.isDirectory()) {
+                    continue;
+                }
+                String path = ze.getName();
+                if ((fileToFetch != null) && path.equals(fileToFetch)) {
+                    String type = getRepository().getMimeTypeFromSuffix(
+                                      IOUtil.getFileExtension(path));
+                    return new Result("", zin, type);
+                }
+                //            if(path.endsWith("MANIFEST.MF")) continue;
+                sb.append("<li>");
+                String name = IOUtil.getFileTail(path);
+                String url  = getRepository().URL_ENTRY_SHOW + "/" + name;
 
-            url = HtmlUtil.url(url, ARG_ENTRYID, entry.getId(), ARG_FILE,
-                               path, ARG_OUTPUT, OUTPUT_LIST.getId());
-            sb.append(HtmlUtil.href(url, path));
+                url = HtmlUtil.url(url, ARG_ENTRYID, entry.getId(), ARG_FILE,
+                                   path, ARG_OUTPUT, OUTPUT_LIST.getId());
+                sb.append(HtmlUtil.href(url, path));
+            }
+            sb.append("</ul>");
+        } finally {
+            IOUtil.close(zin);
+            IOUtil.close(fis);
         }
-        sb.append("</ul>");
-	} finally {
-	    IOUtil.close(zin);
-	    IOUtil.close(fis);
-	}
         return makeLinksResult(request, msg("Zip File Listing"), sb,
                                new State(entry));
     }

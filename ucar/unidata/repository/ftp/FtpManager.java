@@ -66,20 +66,20 @@ import java.util.TimeZone;
  */
 public class FtpManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String DFLT_PASSIVE_PORTS = "44001-44099";
 
-    /** _more_          */
+    /** _more_ */
     private final Logger LOG =
         LoggerFactory.getLogger("org.apache.ftpserver");
 
-    /** _more_          */
+    /** _more_ */
     private FtpServer server;
 
-    /** _more_          */
+    /** _more_ */
     private int port = -1;
 
-    /** _more_          */
+    /** _more_ */
     private String passivePorts;
 
     /**

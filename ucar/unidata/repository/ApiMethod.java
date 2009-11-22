@@ -22,6 +22,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.repository.auth.*;
+import ucar.unidata.util.Counter;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 
 import java.util.Hashtable;
 import java.util.List;
-import ucar.unidata.util.Counter;
 
 
 /**
@@ -132,7 +132,8 @@ public class ApiMethod {
     /** _more_ */
     private boolean handlesHead = false;
 
-    private Counter numberOfCalls=new Counter();
+    /** _more_          */
+    private Counter numberOfCalls = new Counter();
 
 
     /**
@@ -433,12 +434,20 @@ public class ApiMethod {
         return this.authMethod;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getNumberOfCalls() {
-	return numberOfCalls.getCount();
+        return numberOfCalls.getCount();
     }
 
+    /**
+     * _more_
+     */
     public void incrNumberOfCalls() {
-	numberOfCalls.incr();
+        numberOfCalls.incr();
     }
 
 

@@ -320,84 +320,87 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     private void getErrorLog(Request request, StringBuffer sb, File logFile)
-	throws Exception {
+            throws Exception {
         FileInputStream fis = getStorageManager().getFileInputStream(logFile);
-	try {
-	    String          log      = request.getString(ARG_LOG, "error");
-	    int             numBytes = request.get(ARG_BYTES, 10000);
-	    if (numBytes < 0) {
-		numBytes = 100;
-	    }
-	    long length = logFile.length();
-	    long offset = length - numBytes;
-	    if (numBytes < length) {
-		sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-						     ARG_LOG, log, ARG_BYTES, numBytes + 2000), "More..."));
-	    }
-	    sb.append(HtmlUtil.space(2));
-	    sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-						 ARG_LOG, log, ARG_BYTES,
-						 numBytes - 2000), "Less..."));
+        try {
+            String log      = request.getString(ARG_LOG, "error");
+            int    numBytes = request.get(ARG_BYTES, 10000);
+            if (numBytes < 0) {
+                numBytes = 100;
+            }
+            long length = logFile.length();
+            long offset = length - numBytes;
+            if (numBytes < length) {
+                sb.append(
+                    HtmlUtil.href(
+                        HtmlUtil.url(
+                            URL_ADMIN_LOG.toString(), ARG_LOG, log,
+                            ARG_BYTES, numBytes + 2000), "More..."));
+            }
+            sb.append(HtmlUtil.space(2));
+            sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                    ARG_LOG, log, ARG_BYTES, numBytes - 2000), "Less..."));
 
-	    sb.append(HtmlUtil.br());
-	    if (offset > 0) {
-		fis.skip(offset);
-	    } else {
-		numBytes = (int) length;
-	    }
-	    byte[] bytes = new byte[numBytes];
-	    fis.read(bytes);
-	    String       logString    = new String(bytes);
-	    boolean      didOne       = false;
-	    StringBuffer stackSB      = null;
-	    boolean      lastOneBlank = false;
-	    for (String line : StringUtil.split(logString, "\n", false, false)) {
-		if ( !didOne) {
-		    didOne = true;
-		    continue;
-		}
-		line = line.trim();
-		if (line.length() == 0) {
-		    if (lastOneBlank) {
-			continue;
-		    }
-		    lastOneBlank = true;
-		} else {
-		    lastOneBlank = false;
-		}
-		if (line.startsWith("</stack>") && (stackSB != null)) {
-		    sb.append(
-			      HtmlUtil.insetLeft(
-						 HtmlUtil.makeShowHideBlock(
-									    "Stack trace",
-									    HtmlUtil.div(
-											 stackSB.toString(),
-											 HtmlUtil.cssClass("stack")), false), 10));
-		    sb.append("<br>");
-		    stackSB = null;
-		} else if (stackSB != null) {
-		    line = HtmlUtil.entityEncode(line);
-		    stackSB.append(line);
-		    stackSB.append("<br>");
-		} else if (line.startsWith("<stack>")) {
-		    stackSB = new StringBuffer();
-		} else {
-		    line = HtmlUtil.entityEncode(line);
-		    sb.append(line);
-		    sb.append("<br>");
-		    sb.append("\n");
-		}
-	    }
-	    if (stackSB != null) {
-		sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
-						     HtmlUtil.div(stackSB.toString(),
-								  HtmlUtil.cssClass("stack")), false));
-	    }
+            sb.append(HtmlUtil.br());
+            if (offset > 0) {
+                fis.skip(offset);
+            } else {
+                numBytes = (int) length;
+            }
+            byte[] bytes = new byte[numBytes];
+            fis.read(bytes);
+            String       logString    = new String(bytes);
+            boolean      didOne       = false;
+            StringBuffer stackSB      = null;
+            boolean      lastOneBlank = false;
+            for (String line : StringUtil.split(logString, "\n", false,
+                    false)) {
+                if ( !didOne) {
+                    didOne = true;
+                    continue;
+                }
+                line = line.trim();
+                if (line.length() == 0) {
+                    if (lastOneBlank) {
+                        continue;
+                    }
+                    lastOneBlank = true;
+                } else {
+                    lastOneBlank = false;
+                }
+                if (line.startsWith("</stack>") && (stackSB != null)) {
+                    sb.append(
+                        HtmlUtil.insetLeft(
+                            HtmlUtil.makeShowHideBlock(
+                                "Stack trace",
+                                HtmlUtil.div(
+                                    stackSB.toString(),
+                                    HtmlUtil.cssClass("stack")), false), 10));
+                    sb.append("<br>");
+                    stackSB = null;
+                } else if (stackSB != null) {
+                    line = HtmlUtil.entityEncode(line);
+                    stackSB.append(line);
+                    stackSB.append("<br>");
+                } else if (line.startsWith("<stack>")) {
+                    stackSB = new StringBuffer();
+                } else {
+                    line = HtmlUtil.entityEncode(line);
+                    sb.append(line);
+                    sb.append("<br>");
+                    sb.append("\n");
+                }
+            }
+            if (stackSB != null) {
+                sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
+                        HtmlUtil.div(stackSB.toString(),
+                                     HtmlUtil.cssClass("stack")), false));
+            }
 
-	    //        sb.append("</pre>");
-	} finally {
-	    IOUtil.close(fis);
-	}
+            //        sb.append("</pre>");
+        } finally {
+            IOUtil.close(fis);
+        }
     }
 
 
@@ -907,7 +910,7 @@ public class Admin extends RepositoryManager {
         getDatabaseManager().makeDatabaseCopy(bos, true);
 
         IOUtil.close(bos);
-	IOUtil.close(fos);
+        IOUtil.close(fos);
         FileInputStream is = new FileInputStream(tmp);
         return new Result("", is, "text/sql");
     }
@@ -1142,14 +1145,12 @@ public class Admin extends RepositoryManager {
                         PROP_ACCESS_REQUIRELOGIN, false)) + HtmlUtil.space(2)
                             + msg("Require login to access the site")));
 
-        asb.append(
-            HtmlUtil.formEntry(
-                "",
-                HtmlUtil.checkbox(
-                    PROP_ACCESS_NOBOTS, "true",
-                    getProperty(
-                        PROP_ACCESS_NOBOTS, false)) + HtmlUtil.space(2)
-                            + msg("Disallow robots")));
+        asb.append(HtmlUtil.formEntry("",
+                                      HtmlUtil.checkbox(PROP_ACCESS_NOBOTS,
+                                          "true",
+                                          getProperty(PROP_ACCESS_NOBOTS,
+                                              false)) + HtmlUtil.space(2)
+                                                  + msg("Disallow robots")));
 
 
 
@@ -1506,8 +1507,7 @@ public class Admin extends RepositoryManager {
                                     request.get(PROP_ACCESS_REQUIRELOGIN,
                                         false));
         getRepository().writeGlobal(PROP_ACCESS_NOBOTS,
-                                    request.get(PROP_ACCESS_NOBOTS,
-                                        false));
+                                    request.get(PROP_ACCESS_NOBOTS, false));
 
 
         return new Result(request.url(URL_ADMIN_SETTINGS));
@@ -1637,58 +1637,58 @@ public class Admin extends RepositoryManager {
         statusSB.append(HtmlUtil.formEntry(msgLabel("Used Memory"),
                                            fmt.format(usedMemory) + " (MB)"));
 
-        long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-	Counter  counter = getRepository().getNumberOfCurrentRequests();
-        statusSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Up Time"),
-                fmt.format((double) (uptime / 1000 / 60)) + " "+
-                msg("minutes")));
+        long    uptime  = ManagementFactory.getRuntimeMXBean().getUptime();
+        Counter counter = getRepository().getNumberOfCurrentRequests();
+        statusSB.append(HtmlUtil.formEntry(msgLabel("Up Time"),
+                                           fmt.format((double) (uptime / 1000
+                                               / 60)) + " "
+                                                   + msg("minutes")));
 
-        statusSB.append(
-            HtmlUtil.formEntry(
-			       msgLabel("Total # Requests"),
-			       getLogManager().getRequestCount()+""));
+        statusSB.append(HtmlUtil.formEntry(msgLabel("Total # Requests"),
+                                           getLogManager().getRequestCount()
+                                           + ""));
         statusSB.append(
             HtmlUtil.formEntryTop(
-			       msgLabel("# Active Requests"),
-			       counter.getCount()+ 
-			       HtmlUtil.space(2)		 +
-			       HtmlUtil.makeShowHideBlock(msg("List"),
-							  StringUtil.join("<br>", counter.getMessages()),false)));
+                msgLabel("# Active Requests"),
+                counter.getCount() + HtmlUtil.space(2)
+                + HtmlUtil.makeShowHideBlock(
+                    msg("List"),
+                    StringUtil.join("<br>", counter.getMessages()), false)));
 
 
         getEntryManager().addStatusInfo(statusSB);
         statusSB.append(HtmlUtil.formTableClose());
 
-	StringBuffer outputSB = new StringBuffer();
+        StringBuffer outputSB = new StringBuffer();
         outputSB.append(HtmlUtil.formTable());
         List<OutputHandler> outputHandlers =
             getRepository().getOutputHandlers();
 
         for (OutputHandler outputHandler : outputHandlers) {
-	    outputHandler.getSystemStats(outputSB);
-	}
+            outputHandler.getSystemStats(outputSB);
+        }
         outputSB.append(HtmlUtil.formTableClose());
 
 
-	StringBuffer apiSB = new StringBuffer();
-	List<Object[]> tuples = new ArrayList<Object[]>();
+        StringBuffer   apiSB  = new StringBuffer();
+        List<Object[]> tuples = new ArrayList<Object[]>();
         apiSB.append(HtmlUtil.formTable());
-	for(ApiMethod apiMethod: getRepository().getApiMethods()) {
-	    if(apiMethod.getNumberOfCalls()<1) continue;
-	    tuples.add(new Object[]{new Integer(apiMethod.getNumberOfCalls()),
-				    apiMethod});
+        for (ApiMethod apiMethod : getRepository().getApiMethods()) {
+            if (apiMethod.getNumberOfCalls() < 1) {
+                continue;
+            }
+            tuples.add(new Object[] {
+                new Integer(apiMethod.getNumberOfCalls()),
+                apiMethod });
 
-	}
-	tuples = (List<Object[]>)Misc.sortTuples(tuples, false);
-	for(Object[]tuple: tuples) {
-	    ApiMethod apiMethod = (ApiMethod) tuple[1];
-	    apiSB.append(
-			 HtmlUtil.formEntry(apiMethod.getName(),
-					    "#" +msgLabel("calls")+
-					    apiMethod.getNumberOfCalls()));
-	}
+        }
+        tuples = (List<Object[]>) Misc.sortTuples(tuples, false);
+        for (Object[] tuple : tuples) {
+            ApiMethod apiMethod = (ApiMethod) tuple[1];
+            apiSB.append(HtmlUtil.formEntry(apiMethod.getName(),
+                                            "#" + msgLabel("calls")
+                                            + apiMethod.getNumberOfCalls()));
+        }
 
 
         apiSB.append(HtmlUtil.formTableClose());
@@ -1703,8 +1703,8 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.makeShowHideBlock(msg("System Status"),
                                              statusSB.toString(), true));
 
-        sb.append(HtmlUtil.makeShowHideBlock(msg("API"),
-                                             apiSB.toString(), false));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("API"), apiSB.toString(),
+                                             false));
 
         sb.append(HtmlUtil.makeShowHideBlock(msg("Output Handlers"),
                                              outputSB.toString(), false));
@@ -1924,10 +1924,10 @@ public class Admin extends RepositoryManager {
             cleanupTS++;
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_START)) {
-	    Misc.run(this, "runDatabaseCleanUp", request);
+            Misc.run(this, "runDatabaseCleanUp", request);
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_NEWDB)) {
-	    getDatabaseManager().reInitialize();
+            getDatabaseManager().reInitialize();
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_CLEARCACHE)) {
             getRepository().clearAllCaches();
@@ -1948,7 +1948,9 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.submit(msg("Clear cache"), ACTION_CLEARCACHE));
 
             sb.append("<p>");
-            sb.append(HtmlUtil.submit(msg("Reinitialize Database Connection"), ACTION_NEWDB));
+            sb.append(
+                HtmlUtil.submit(
+                    msg("Reinitialize Database Connection"), ACTION_NEWDB));
 
         }
         sb.append("</form>");
