@@ -1316,8 +1316,13 @@ return new Result(title, sb);
 
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
-            return new Result(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+	    if(typeHandler.returnToEditForm()) {
+		return new Result(
+				  request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+	    } else {
+		return new Result(
+				  request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+	    }
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(

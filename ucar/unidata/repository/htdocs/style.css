@@ -37,7 +37,7 @@ body {
 
 
 .plain {
-    font-size:10px;
+    font-size:11px;
     font-weight: normal;
 }
 
@@ -99,7 +99,6 @@ a:hover {
 
 .entryrowlabel {
     font-style:italic;
-    font-size:70%;
 }
 
 .entryrow {
@@ -141,8 +140,7 @@ a.header  {
 
 
 .entrylistform {
-  font-size: 10pt;
-	
+  font-size: 11px;
 }
 
 .stack {
@@ -432,7 +430,7 @@ a.header-left  {
 
 
 .pagesubsubtitle {
-    font-size: 11pt;
+    font-size: 10pt;
     font-weight: bold;
     color: #8080C0;
     margin-top: 5;
@@ -590,6 +588,7 @@ a.header-left  {
 
 
 td {
+   font-size:11px;
    font-weight: normal;
 }
 
@@ -1001,6 +1000,7 @@ form {
 }
 
 .formlabel {
+  font-size: 11px;
   font-weight: bold;
 }
 

@@ -287,6 +287,11 @@ public class EmailListTypeHandler extends GenericTypeHandler {
     }
 
 
+    public void addToEntryForm(Request request, StringBuffer sb, Entry entry)
+            throws Exception {
+
+    }
+
 
 
 }

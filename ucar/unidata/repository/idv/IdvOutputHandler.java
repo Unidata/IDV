@@ -597,7 +597,6 @@ public class IdvOutputHandler extends OutputHandler {
 							     dataset, entry.getName(), path);
 
         try {
-            System.err.println("action:"+ action);
             if (action.equals(ACTION_GRID_MAKEINITFORM)) {
                 return outputGridInitForm(request, entry, dataSource);
             } else if (action.equals(ACTION_GRID_MAKEFORM)) {
@@ -934,7 +933,6 @@ public class IdvOutputHandler extends OutputHandler {
                 if ( !okControls.contains(controlId)) {
                     continue;
                 }
-                //              System.out.println (controlId +"  " + controlDescriptor.getLabel());
                 displays.add(new TwoFacedObject(controlDescriptor.getLabel(),
 						controlId));
             }
@@ -1410,7 +1408,7 @@ public class IdvOutputHandler extends OutputHandler {
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
 
 
-        String args = request.getUrlArgs(exceptArgs, null);
+        String args = request.getUrlArgs(exceptArgs, null,".*_dflt");
         url = url + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE + "&"
 	    + args;
 
@@ -1422,8 +1420,6 @@ public class IdvOutputHandler extends OutputHandler {
         boolean showForm = true;
         
         if(product.equals(PRODUCT_IMAGE)) {
-            System.err.println ("url length:" + url.length());
-            System.err.println (url);
             sb.append(HtmlUtil.img(url, "Image is being processed...",
                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
                                                  request.getString(ARG_IMAGE_WIDTH,
@@ -1474,14 +1470,11 @@ public class IdvOutputHandler extends OutputHandler {
                                   GeoGridDataSource dataSource)
 	throws Exception {
 
-        System.err.println("calling ggi");
 	Object fileOrResult = generateGridImage(request, entry, dataSource);
 	if(fileOrResult instanceof Result) {
-            System.err.println("got a result back");
 	    return (Result) fileOrResult;
         }
 	File imageFile = (File) fileOrResult;
-        System.err.println("got a File");
         String extension = IOUtil.getFileExtension(imageFile.toString());
         return new Result("",
                           getStorageManager().getFileInputStream(imageFile),
@@ -1560,7 +1553,6 @@ public class IdvOutputHandler extends OutputHandler {
 	}
 
 	if(!forIsl && imageFile.exists()) {
-	    //	  System.err.println("In cache");
 	  return imageFile;
 	}
 
@@ -1577,8 +1569,6 @@ public class IdvOutputHandler extends OutputHandler {
         viewProps.append(makeProperty( "wireframe","false"));
         viewProps.append("\n");
         //	viewProps.append(makeProperty( "wireframe","true"));
-
-
 
 
         if(request.get(ARG_VIEW_GLOBE, false)) {
@@ -1636,32 +1626,16 @@ public class IdvOutputHandler extends OutputHandler {
 	    double bwidth = Math.abs(east-west);
 	    double bheight = Math.abs(north-south);
 
-
-	    //view.bounds_north=41.849999999999994&view.bounds_west=-117&view.bounds_east=-97.64999999999999&view.bounds_south=27.000000000000007
-
-	    //	    System.err.println("WEST:" + request.getString(ARG_VIEW_BOUNDS+"_west",""));
-	    //	    System.err.println(request);
-
 	    if(!request.get(ARG_VIEW_JUSTCLIP,false)) {
-		viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
-		viewProps.append("\n");
+		if(!request.defined(ARG_VIEW_PROJECTION)) {
+		    viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
+		    viewProps.append("\n");
+		}
 	    }
 	    dataSourceProps.append(makeProperty("defaultSelectionBounds", west+","+north+","+bwidth+","+bheight));
             dataSourceProps.append("\n");
 
 	    height = (int)(width*bheight/bwidth); 
-
-            /*
-            clip = XmlUtil.tag("clip", XmlUtil.attrs(
-		    ImageGenerator.ATTR_NORTH,
-		    ""+north,
-		    ImageGenerator.ATTR_SOUTH,
-		    ""+south,
-		    ImageGenerator.ATTR_EAST,
-		    ""+east,
-		    ImageGenerator.ATTR_WEST,
-		    ""+west
-		    ));*/
 	} 
 
 
@@ -1909,7 +1883,6 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-	    //            System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
                                        ImageGenerator.ATTR_PARAM,
                                        param));
@@ -1948,7 +1921,6 @@ public class IdvOutputHandler extends OutputHandler {
 	isl.append("<pause/>\n");
 
 
-        //        System.err.println (isl);
 
         if ( !forIsl) {
             isl.append(XmlUtil.tag((multipleTimes
@@ -1977,7 +1949,6 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
-        System.err.println(isl);
 
         long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl, props);
@@ -2212,7 +2183,9 @@ public class IdvOutputHandler extends OutputHandler {
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
-        String args = request.getUrlArgs(exceptArgs, null);
+        String args = request.getUrlArgs(exceptArgs, null,".*_dflt");
+
+
         url = url + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE + "&"
 	    + args;
         islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE

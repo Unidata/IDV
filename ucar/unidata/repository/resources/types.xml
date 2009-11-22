@@ -40,6 +40,18 @@
   </type>
 
 
+  <type name="slideshow"  description="Slide Show" handler="ucar.unidata.repository.collab.SlideshowTypeHandler">
+     <property name="icon" value="/icons/slideshow.jpg"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.description" value="false"/>
+     <property name="form.show.datatype" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+     <column name="properties" type="clob" size="512000" label="" cansearch="false" showinhtml="false"/>
+</type>
+
+
+
   <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
@@ -81,6 +93,7 @@
      <property name="form.show.datatype" value="false"/>
      <column name="properties" type="clob" size="256000" label="" cansearch="false" showinhtml="false"/>
 </type>
+
 
 
 

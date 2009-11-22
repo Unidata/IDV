@@ -457,6 +457,10 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
+    public boolean returnToEditForm() {
+	return false;
+    }
+
     /**
      * _more_
      *

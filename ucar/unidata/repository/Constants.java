@@ -180,6 +180,9 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_LCURVE = "ramadda.icon.lcurve";
 
+
+
+
     /** _more_ */
     public static final String ICON_SYNTH_FILE = "ramadda.icon.synthfile";
 
