@@ -6439,6 +6439,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         hasBeenRemoved = true;
 
+
+
         if (componentHolder != null) {
             componentHolder.removeDisplayControl(this);
             componentHolder = null;
@@ -6495,6 +6497,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         removeDisplayables();
         disposeOfWindow();
         removeSharable();
+
+        if(animationWidget!=null) {
+            animationWidget.destroy();
+            animationWidget = null;
+        }
+
+
         if (sharables != null) {
             for (int i = 0, n = sharables.size(); i < n; i++) {
                 ((SharableImpl) sharables.get(i)).removeSharable();

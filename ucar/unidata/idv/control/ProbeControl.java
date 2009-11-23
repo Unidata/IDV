@@ -1011,6 +1011,7 @@ public class ProbeControl extends DisplayControlImpl {
     public void doRemove() throws RemoteException, VisADException {
         probe      = null;
         tableModel = null;
+        infos= null;
         super.doRemove();
     }
 
@@ -1394,11 +1395,9 @@ public class ProbeControl extends DisplayControlImpl {
 
         paramsTable = new JTable(tableModel);
 
-
         paramsTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-
                     removeField(paramsTable.getSelectedRow());
                 }
             }
