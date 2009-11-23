@@ -458,7 +458,7 @@ public class MetadataTypeBase extends RepositoryManager {
                               Metadata metadata, MetadataElement element,
                               boolean forLink) {
         File f = getFile(entry, metadata, element);
-        if (f == null) {
+        if (f == null ||!f.exists()|| f.isDirectory()) {
             return null;
         }
 
@@ -476,7 +476,7 @@ public class MetadataTypeBase extends RepositoryManager {
                              element.getIndex() + "", ARG_ENTRYID,
                              metadata.getEntryId(), ARG_METADATA_ID,
                              metadata.getId(), ARG_THUMBNAIL,
-                             "" + forLink), msg("Click to enlarge"), extra);
+						   "" + forLink), (forLink?msg("Click to enlarge"):""), extra);
 
             if (forLink) {
                 String bigimg = HtmlUtil.img(HtmlUtil.url(path, ARG_ELEMENT,
@@ -492,12 +492,11 @@ public class MetadataTypeBase extends RepositoryManager {
                                              ARG_METADATA_ID,
                                              metadata.getId());
 
-
-                //                System.err.println(imgUrl);
-                //img =  HtmlUtil.href(imgUrl,img," dojoType=\"dojox.image.Lightbox\" ");
                 img = handler.getRepository().makePopupLink(img, bigimg,
                         true, false);
-            }
+            } else {
+		img = img +"\n<br>\n<b>" + tail+"</b>\n";
+	    }
             return img;
         } else if (f.exists()) {
             String name = getStorageManager().getFileTail(f.getName());
@@ -507,6 +506,16 @@ public class MetadataTypeBase extends RepositoryManager {
                     metadata.getId()), name);
         }
         return "";
+    }
+
+
+    public File getFile(Entry entry, Metadata metadata, int attr) {
+	String filename  =  metadata.getAttr(attr);
+	if(filename == null || filename.trim().length()==0) return null;
+	return  new File(
+			 IOUtil.joinDir(
+					getStorageManager().getEntryDir(
+									metadata.getEntryId(), false),filename));
     }
 
 
@@ -523,15 +532,12 @@ public class MetadataTypeBase extends RepositoryManager {
                         MetadataElement element) {
         File f;
         if ( !entry.getIsLocalFile()) {
-            f = new File(
-                IOUtil.joinDir(
-                    getStorageManager().getEntryDir(
-                        metadata.getEntryId(), false), metadata.getAttr(
-                        element.getIndex())));
+	    f = getFile(entry, metadata, element.getIndex());
         } else {
             f = new File(metadata.getAttr(element.getIndex()));
         }
-        if ( !f.exists()) {
+
+        if (f==null || !f.exists()) {
             return null;
         }
         return f;

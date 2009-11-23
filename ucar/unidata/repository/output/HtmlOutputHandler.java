@@ -817,7 +817,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (wikiTemplate != null) {
-            sb.append(wikifyEntry(request, group, wikiTemplate, subGroups,
+            sb.append(wikifyEntry(request, group, wikiTemplate, true, subGroups,
                                   entries));
         } else {
             List<Entry> allEntries = new ArrayList<Entry>();

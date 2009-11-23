@@ -2742,12 +2742,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        String jsContent =
-            HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip-outer\" ")
-            + HtmlUtil.div("", " id=\"popupdiv\" class=\"tooltip-outer\" ")
-            + HtmlUtil.div("", " id=\"output\"")
-            + HtmlUtil.div("", " id=\"selectdiv\" class=\"selectdiv\" ")
-            + HtmlUtil.div("", " id=\"floatdiv\" class=\"floatdiv\" ");
+        String jsContent = getTemplateJavascriptContent();
+
 
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
@@ -2873,8 +2869,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         html = translate(request, html);
 
+
         result.setContent(html.getBytes());
 
+    }
+
+
+    public String getTemplateJavascriptContent() {
+	return 
+            HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip-outer\" ")
+            + HtmlUtil.div("", " id=\"popupdiv\" class=\"tooltip-outer\" ")
+            + HtmlUtil.div("", " id=\"output\"")
+            + HtmlUtil.div("", " id=\"selectdiv\" class=\"selectdiv\" ")
+            + HtmlUtil.div("", " id=\"floatdiv\" class=\"floatdiv\" ");
     }
 
 

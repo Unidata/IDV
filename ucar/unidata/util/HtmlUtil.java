@@ -934,6 +934,29 @@ public class HtmlUtil {
 
 
 
+    public static String h1(String content) {
+        return tag(TAG_H1, "", content);
+    }
+
+    public static String h2(String content) {
+        return tag(TAG_H2, "", content);
+    }
+
+    public static String h3(String content) {
+        return tag(TAG_H3, "", content);
+    }
+
+
+    public static String ul() {
+	return open(TAG_UL,"");
+    }
+
+
+
+    public static String p(String content) {
+        return tag(TAG_P, "", content);
+    }
+
 
 
     /**

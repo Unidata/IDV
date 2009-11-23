@@ -53,6 +53,10 @@ public class WikiUtil {
 
     private List floatBoxes = new ArrayList();
 
+    private boolean makeHeadings = true;
+    private boolean replaceNewlineWithP = true;
+
+
     /**
      * _more_
      */
@@ -65,6 +69,14 @@ public class WikiUtil {
      */
     public WikiUtil(Hashtable properties) {
         this.properties = properties;
+    }
+
+    public void removeProperty(Object key) {
+        if (properties == null) {
+            properties = new Hashtable();
+        }
+        properties.remove(key);
+
     }
 
     /**
@@ -215,9 +227,10 @@ public class WikiUtil {
 
         s = s.replace("\\\\[", "_BRACKETOPEN_");
 
-        s = s.replaceAll("\r\n\r\n", "\n<p>\n");
+	if(getReplaceNewlineWithP()) {
+	    s = s.replaceAll("\r\n\r\n", "\n<p>\n");
+	}
         //        s = s.replaceAll("\r\r","<p>");
-
         //        System.err.println (s);
         s = s.replaceAll("'''''([^']+)'''''", "<b><i>$1</i></b>");
         s = s.replaceAll("'''([^']+)'''", "<b>$1</b>");
@@ -339,6 +352,7 @@ public class WikiUtil {
                 }
                 buff.append("<li> ");
                 buff.append(tline);
+                buff.append("</li> ");
                 buff.append("\n");
                 continue;
             }
@@ -456,19 +470,21 @@ public class WikiUtil {
         //        s = s.replaceAll("(\n\r)+","<br>\n");
         //        s = s.replaceAll("\n+","<br>\n");
 
-        if (headings.size() >= 4) {
-            StringBuffer toc = new StringBuffer();
-            makeHeadings(headings, toc, -1, "");
-            String block = HtmlUtil.makeShowHideBlock("Contents",
-                                                      toc.toString(), true,
-                                                      HtmlUtil.cssClass("wiki-tocheader"),
-                                                      HtmlUtil.cssClass("wiki-toc"));
-            floatBoxes.add(block);
+	if(getMakeHeadings()) {
+	    if (headings.size() >= 4) {
+		StringBuffer toc = new StringBuffer();
+		makeHeadings(headings, toc, -1, "");
+		String block = HtmlUtil.makeShowHideBlock("Contents",
+							  toc.toString(), true,
+							  HtmlUtil.cssClass("wiki-tocheader"),
+							  HtmlUtil.cssClass("wiki-toc"));
+		floatBoxes.add(block);
 
-            String blocks =                 "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>" +
-                StringUtil.join("<br>", floatBoxes) + "</td></tr></table>";
-            s = blocks + s;
-        }
+		String blocks =                 "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>" +
+		    StringUtil.join("<br>", floatBoxes) + "</td></tr></table>";
+		s = blocks + s;
+	    }
+	}
 
         if(categoryLinks.size()>0) {
             s = s + HtmlUtil.div("<b>Categories:</b> " + StringUtil.join("&nbsp;|&nbsp; ", categoryLinks),HtmlUtil.cssClass("wiki-categories"));
@@ -538,6 +554,45 @@ public class WikiUtil {
             exc.printStackTrace();
         }
     }
+
+/**
+Set the MakeHeadings property.
+
+@param value The new value for MakeHeadings
+**/
+public void setMakeHeadings (boolean value) {
+	this.makeHeadings = value;
+}
+
+/**
+Get the MakeHeadings property.
+
+@return The MakeHeadings
+**/
+public boolean getMakeHeadings () {
+	return this.makeHeadings;
+}
+
+
+/**
+Set the ReplaceNewlineWithP property.
+
+@param value The new value for ReplaceNewlineWithP
+**/
+public void setReplaceNewlineWithP (boolean value) {
+	this.replaceNewlineWithP = value;
+}
+
+/**
+Get the ReplaceNewlineWithP property.
+
+@return The ReplaceNewlineWithP
+**/
+public boolean getReplaceNewlineWithP () {
+	return this.replaceNewlineWithP;
+}
+
+
 
 }
 

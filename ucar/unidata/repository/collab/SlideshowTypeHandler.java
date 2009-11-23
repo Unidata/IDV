@@ -300,7 +300,7 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
                 String contents = XmlUtil.getGrandChildText(node,
                                       TAG_CONTENT, "");
                 String note = XmlUtil.getGrandChildText(node, TAG_NOTE, "");
-                String slideBlock = getSlideEdit(request, cnt, title, type,
+                String slideBlock = getSlideEdit(request, entry, cnt, title, type,
                                         contents, note);
                 String hdr = msg("Slide") + " #" + cnt + " " + title;
                 String editForm =
@@ -319,7 +319,7 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
             String title    = "";
             String type     = TYPE_PLAIN;
             String contents = "";
-            String slideBlock = getSlideEdit(request, cnt, title, type,
+            String slideBlock = getSlideEdit(request, entry, cnt, title, type,
                                              contents, "");
             String hdr = msg("New Slide");
             String editForm = HtmlUtil.insetLeft(makeCommands(cnt, false,
@@ -380,8 +380,8 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
      *
      * @return _more_
      */
-    private String getSlideEdit(Request request, int i, String title,
-                                String type, String contents, String note) {
+    private String getSlideEdit(Request request, Entry entry, int i, String title,
+                                String type, String contents, String note) throws Exception {
         StringBuffer slideBlock = new StringBuffer();
         slideBlock.append(HtmlUtil.hidden(ARG_SLIDE_ID + i, "" + i));
         slideBlock.append(msgLabel("Title"));
@@ -392,10 +392,14 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
         slideBlock.append(msgLabel("Type"));
         slideBlock.append(HtmlUtil.select(ARG_SLIDE_TYPE + i, types, type));
         slideBlock.append(HtmlUtil.br());
-        slideBlock.append(msgLabel("Slide Contents"));
-        slideBlock.append(HtmlUtil.br());
+	//        slideBlock.append(msgLabel("Slide Contents"));
+	//        slideBlock.append(HtmlUtil.br());
+	slideBlock.append(getRepository().getHtmlOutputHandler()
+			  .makeWikiEditBar(request, entry,
+					   ARG_SLIDE_CONTENT+i));
+	slideBlock.append(HtmlUtil.br());
         slideBlock.append(HtmlUtil.textArea(ARG_SLIDE_CONTENT + i, contents,
-                                            15, 80));
+                                            15, 80,HtmlUtil.id(ARG_SLIDE_CONTENT+i)));
         slideBlock.append(HtmlUtil.br());
         slideBlock.append(msgLabel("Note"));
         slideBlock.append(HtmlUtil.br());
@@ -583,8 +587,16 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
                 "/ucar/unidata/repository/htdocs/slideshow/template.html");
 
         if (root != null) {
+            WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
+                                    OutputHandler.PROP_REQUEST,
+                                    request, OutputHandler.PROP_ENTRY,
+                                    entry }));
+	    wikiUtil.setMakeHeadings(false);
+	    wikiUtil.setReplaceNewlineWithP(false);
             NodeList children = XmlUtil.getElements(root);
             for (int i = 0; i < children.getLength(); i++) {
+		wikiUtil.removeProperty("image.class");
+		String imageClass = (String)wikiUtil.getProperty("image.class");
                 Element node = (Element) children.item(i);
                 if ( !XmlUtil.getAttribute(node, ATTR_SLIDE_VISIBLE, true)) {
                     continue;
@@ -599,30 +611,47 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
                 sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,
                                         HtmlUtil.cssClass(CLASS_SLIDE)));
                 sb.append("\n");
-                sb.append(HtmlUtil.tag(HtmlUtil.TAG_H1, "", title));
+		if(title.length()>0) {
+		    sb.append(HtmlUtil.h1(title));
+		}
                 sb.append("\n");
+		if (type.equals(TYPE_INCREMENTAL) ||
+		    type.equals(TYPE_INCREMENTALSHOWFIRST)) {
+		    wikiUtil.putProperty("image.class", "incremental");
+		}
+		contents = getRepository().getHtmlOutputHandler().wikifyEntry(request, entry,wikiUtil, contents, false, null,null);
                 if (type.equals(TYPE_PLAIN)) {
-                    sb.append(HtmlUtil.open(HtmlUtil.TAG_P));
-                    sb.append(contents);
-                    sb.append(HtmlUtil.close(HtmlUtil.TAG_P));
+                    sb.append(HtmlUtil.p(contents));
                     sb.append("\n");
                 } else {
+		    boolean hasUl = contents.indexOf("<ul>")>=0;
+		    hasUl = true;
                     if (type.equals(TYPE_LIST)) {
-                        sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
+			if(!hasUl)
+			    sb.append(HtmlUtil.ul());
                     } else if (type.equals(TYPE_INCREMENTAL)) {
-                        sb.append(HtmlUtil.open(HtmlUtil.TAG_UL,
-                                HtmlUtil.cssClass(CLASS_INCREMENTAL)));
+			if(!hasUl)
+			    sb.append(HtmlUtil.open(HtmlUtil.TAG_UL,
+						    HtmlUtil.cssClass(CLASS_INCREMENTAL)));
+			else
+			    contents  =contents.replace("<ul>",HtmlUtil.open(HtmlUtil.TAG_UL,
+									     HtmlUtil.cssClass(CLASS_INCREMENTAL)));
                     } else {
-                        sb.append(
+			String ul = 
                             HtmlUtil.open(
                                 HtmlUtil.TAG_UL,
                                 HtmlUtil.cssClass(
-                                    CLASS_INCREMENTAL_SHOWFIRST)));
+                                    CLASS_INCREMENTAL_SHOWFIRST));
+			if(!hasUl)
+			    sb.append(ul);
+			else
+			    contents  =contents.replace("<ul>",ul);
                     }
                     sb.append("\n");
                     sb.append(contents);
                     sb.append("\n");
-                    sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
+		    if(!hasUl)
+			sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
                     sb.append("\n");
                 }
                 if (note.trim().length() > 0) {
@@ -651,8 +680,10 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
         template = template.replace("${title}", entry.getName());
         template = template.replace("${header}", header);
         template = template.replace("${footer}", footer);
-        template = template.replace("${content}", sb.toString());
+	String jsContent = getRepository().getTemplateJavascriptContent();
+        template = template.replace("${content}", sb.toString()+jsContent);
 
+	template = getRepository().translate(request, template);
 
         Result result = new Result("", new StringBuffer(template));
         result.setShouldDecorate(false);

@@ -174,7 +174,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                     request, OutputHandler.PROP_ENTRY,
                                     entry }));
             getRepository().getHtmlOutputHandler().wikifyEntry(request,
-                    entry, wikiUtil, newText, null, null);
+							       entry, wikiUtil, newText, true, null, null);
 
             List categories = (List) wikiUtil.getProperty("wikicategories");
             if (categories == null) {

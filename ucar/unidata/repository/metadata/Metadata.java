@@ -867,6 +867,7 @@ public class Metadata implements Constants {
                     for (int j = 0; j < elements.size(); j++) {
                         Element extraNode = (Element) elements.get(j);
                         int index = XmlUtil.getAttribute(extraNode,
+
                                         ATTR_INDEX, -1);
                         String text = XmlUtil.getChildText(extraNode);
                         if (text == null) {

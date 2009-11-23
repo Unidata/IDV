@@ -36,6 +36,9 @@ var isGe = navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.inde
 
 function hasClass(object, className) {
 	if (!object.className) return false;
+	//jeffmc:
+	if(!object.className.search) return false;
+
 	return (object.className.search('(^|\\s)' + className + '(\\s|$)') != -1);
 }
 
@@ -781,7 +784,7 @@ function startup() {
 	}
 	document.onkeyup = keys;
 	document.onkeypress = trap;
-	document.onclick = clicker;
+	//jeffmc	document.onclick = clicker;
 }
 
 window.onload = startup;

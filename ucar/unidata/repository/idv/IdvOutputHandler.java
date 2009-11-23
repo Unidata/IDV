@@ -66,6 +66,9 @@ import ucar.unidata.idv.ViewState;
 import ucar.unidata.idv.ui.ImageGenerator;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.util.*;
+import ucar.unidata.repository.auth.*;
+import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.output.*;
@@ -132,10 +135,16 @@ import java.util.Properties;
  */
 public class IdvOutputHandler extends OutputHandler {
 
+    public static final String METADATA_TYPE_VISUALIZATION = "data.visualization";
 
     /** _more_          */
     public static final String ARG_PRODUCT = "product";
 
+    public static final String ARG_SAVE_STATE = "save.state";
+    public static final String ARG_SAVE_ATTACH = "save.attach";
+    public static final String ARG_SAVE_NAME = "save.name";
+
+    public static final String ARG_PREDEFINED = "predefined";
 
     /** _more_          */
     public static final String PRODUCT_IMAGE = "product.image";
@@ -343,6 +352,7 @@ public class IdvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ACTION_GRID_MAKEFORM = "action.grid.makeform";
+
 
     /** _more_ */
     public static final String ACTION_GRID_MAKEPAGE = "action.grid.makepage";
@@ -695,11 +705,11 @@ public class IdvOutputHandler extends OutputHandler {
         boolean value = dflt;
         if (request.exists(arg)) {
             value = request.get(arg, dflt);
-        } else if (request.exists(arg + "_dflt")) {
+        } else if (request.exists(arg + "_gvdflt")) {
             value = false;
         }
         return HtmlUtil.checkbox(arg, "true", value)
-               + HtmlUtil.hidden(arg + "_dflt", "" + value);
+               + HtmlUtil.hidden(arg + "_gvdflt", "" + value);
     }
 
 
@@ -1234,9 +1244,8 @@ public class IdvOutputHandler extends OutputHandler {
                             dfltColorTable.getName());
             }
 
-            ctsb.append(HtmlUtil.hidden(ARG_COLORTABLE + displayIdx, "",
-                                        HtmlUtil.id("" + ARG_COLORTABLE
-                                            + displayIdx)));
+            ctsb.append(HtmlUtil.hidden(ARG_COLORTABLE + displayIdx, request.getString(ARG_COLORTABLE+displayIdx,""),
+                                        HtmlUtil.id(ARG_COLORTABLE + displayIdx)));
             ctsb.append(HtmlUtil.br());
             String ctDiv = "-default-";
             if (request.defined(ARG_COLORTABLE + displayIdx)) {
@@ -1415,6 +1424,27 @@ public class IdvOutputHandler extends OutputHandler {
                     htmlInput(request, ARG_PUBLISH_NAME, "", 30)));
 
             publishSB.append(HtmlUtil.formTableClose());
+
+
+            if (getAccessManager().canDoAction(request, entry,
+					       Permission.ACTION_EDIT)) {
+
+		publishSB.append(HtmlUtil.p());
+		publishSB.append(msg("Or save these settings"));
+		publishSB.append(HtmlUtil.br());
+		publishSB.append(msgLabel("Settings name"));
+		publishSB.append(HtmlUtil.input(ARG_SAVE_NAME, ""));
+		publishSB.append(HtmlUtil.br());
+		publishSB.append(HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false));
+		publishSB.append(HtmlUtil.space(2));
+		publishSB.append(msg("Attach image"));
+		publishSB.append(HtmlUtil.br());
+		publishSB.append(HtmlUtil.submit(msg("Save settings"),ARG_SAVE_STATE));
+		
+	    }
+
+
+
             tabLabels.add(msg("Publish"));
             tabContents.add(publishSB.toString());
         }
@@ -1497,6 +1527,32 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.insetLeft(fields.toString(), 10));
         sb.append(HtmlUtil.submit(msg("Make image"), ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
+
+
+
+        List<Metadata> metadataList =
+            getMetadataManager().findMetadata(entry,
+					      METADATA_TYPE_VISUALIZATION, false);
+        if (metadataList != null && metadataList.size()>0) {
+	    sb.append(HtmlUtil.p());
+	    sb.append(msg("Or select predefined visualizations"));
+	    sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
+	    MetadataType metadataType = getMetadataManager().findType(METADATA_TYPE_VISUALIZATION);
+	    for (Metadata metadata : metadataList) {
+		String    url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW.toString(),
+					     new String[]{
+						 ARG_ENTRYID, entry.getId(),
+						 ARG_OUTPUT, OUTPUT_IDV_GRID.toString(),
+						 ARG_ACTION, ACTION_GRID_MAKEPAGE,
+						 ARG_PREDEFINED, metadata.getId()});
+		sb.append(HtmlUtil.li(HtmlUtil.href(url,metadata.getAttr1()),""));
+		metadataType.decorateEntry(request, entry,  sb,
+					   metadata, true,true);
+	    }
+	    sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
+        }
+
+
         return new Result("Grid Displays", sb);
     }
 
@@ -1605,8 +1661,54 @@ public class IdvOutputHandler extends OutputHandler {
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, newEntry));
         }
 
-        String baseName = IOUtil.stripExtension(entry.getName());
-        String product  = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
+
+	if(request.defined(ARG_PREDEFINED)) {
+	    List<Metadata> metadataList =
+		getMetadataManager().findMetadata(entry,
+						  METADATA_TYPE_VISUALIZATION, false);
+	    String args = null;
+	    if (metadataList != null && metadataList.size()>0) {
+		for (Metadata metadata : metadataList) {
+		    if(metadata.getId().equals(request.getString(ARG_PREDEFINED,""))) {
+			args = metadata.getAttr2();
+			break;
+		    }
+		}
+	    }
+	    if(args!=null) {
+		Hashtable urlArgs  =new Hashtable();
+		for(String pair: StringUtil.split(args,"&",true,true)) {
+		    List<String> toks = StringUtil.splitUpTo(pair,"=",2);
+		    if(toks == null || toks.size()!=2) continue;
+		    String name  = java.net.URLDecoder.decode(toks.get(0), "UTF-8");
+		    String value = java.net.URLDecoder.decode(toks.get(1), "UTF-8");
+		    Object o = urlArgs.get(name);
+		    if(o==null) {
+			urlArgs.put(name,value);
+		    } else if(o instanceof List) {
+			((List)o).add(value);
+		    } else {
+			List l  =new ArrayList();
+			l.add(o);
+			l.add(value);
+			urlArgs.put(name,l);
+		    }
+		}
+		for (Enumeration keys =
+			 urlArgs.keys(); keys.hasMoreElements(); ) {
+		    String arg   = (String) keys.nextElement();
+		    Object value = urlArgs.get(arg);
+		    request.put(arg,value);
+		}
+		request.remove(ARG_SAVE_STATE);
+
+	    }
+        }
+
+
+
+        String baseName = IOUtil.stripExtension(entry.getName());        
+	String product  = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
         String url      = getRepository().URL_ENTRY_SHOW.getFullUrl();
 
 
@@ -1622,13 +1724,51 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
+
         Hashtable exceptArgs = new Hashtable();
+	exceptArgs.put(ARG_SAVE_STATE,ARG_SAVE_STATE);
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
 
-
-        String args = request.getUrlArgs(exceptArgs, null, ".*_dflt");
+        String args = request.getUrlArgs(exceptArgs, null, ".*_gvdflt");
         url = url + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE + "&"
               + args;
+
+
+
+	if(request.defined(ARG_SAVE_STATE)) {
+            if (!getAccessManager().canDoAction(request, entry,
+					       Permission.ACTION_EDIT)) {
+		throw new AccessException("No access",request);
+	    }
+	    
+	    String fileName = "";
+	    if(request.get(ARG_SAVE_ATTACH,false)) {
+		Object fileOrResult = generateGridImage(request, entry, dataSource);
+		if (fileOrResult instanceof Result) {
+		    throw new IllegalArgumentException("You need to specify an image or movie product");
+		}
+	    
+		File   imageFile = (File) fileOrResult;
+
+		fileName = getStorageManager().copyToEntryDir(entry,
+							      imageFile).getName();
+	    }
+
+	    Metadata metadata =
+		new Metadata(getRepository().getGUID(),
+			     entry.getId(),
+			     METADATA_TYPE_VISUALIZATION, false,
+			     request.getString(ARG_SAVE_NAME,""),
+			     args,fileName,"","");
+	    getMetadataManager().insertMetadata(metadata);
+	    entry.addMetadata(metadata);
+            return new Result(
+			      request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT, OUTPUT_IDV_GRID.toString()));
+
+	}
+
+
+
 
         islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
                  + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
@@ -1688,6 +1828,7 @@ public class IdvOutputHandler extends OutputHandler {
     public Result outputGridImage(final Request request, Entry entry,
                                   GeoGridDataSource dataSource)
             throws Exception {
+
 
         Object fileOrResult = generateGridImage(request, entry, dataSource);
         if (fileOrResult instanceof Result) {
@@ -2445,7 +2586,7 @@ public class IdvOutputHandler extends OutputHandler {
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
-        String args = request.getUrlArgs(exceptArgs, null, ".*_dflt");
+        String args = request.getUrlArgs(exceptArgs, null, ".*_gvdflt");
 
 
         url = url + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE + "&"

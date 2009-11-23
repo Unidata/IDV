@@ -1711,7 +1711,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public String getWikiImage(Request request, String url, Entry entry,
+    public String getWikiImage(WikiUtil wikiUtil, Request request, String url, Entry entry,
                                Hashtable props)
             throws Exception {
         String width = (String) props.get(HtmlUtil.ATTR_WIDTH);
@@ -1720,6 +1720,30 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         if (width != null) {
             extra = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, width);
         }
+	if(wikiUtil!=null) {
+	    String imageClass = (String)wikiUtil.getProperty("image.class");
+	    if(imageClass!=null) {
+		extra = extra +HtmlUtil.cssClass(imageClass);
+	    }
+	}
+
+
+	String style="";
+
+	String left = (String)props.get("left");
+	if(left!=null)
+	    style = style+" left: " + left +";";
+
+	String top = (String)props.get("top");
+	if(top!=null)
+	    style = style+" top: " + top +";";
+
+	if(style.length()>0) {
+	    extra = extra +" style=\"position:absolute; " + style +"\" ";
+	}
+
+
+	
         String  img  = HtmlUtil.img(url, entry.getName(), extra);
         boolean link = Misc.equals("true", props.get("link"));
         if (link) {
@@ -1794,7 +1818,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if ( !entry.getResource().isImage()) {
                 return msg("Not an image");
             }
-            return getWikiImage(request, getImageUrl(request, entry), entry,
+            return getWikiImage(wikiUtil, request, getImageUrl(request, entry), entry,
                                 props);
         }
 
@@ -1823,7 +1847,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if ( !srcEntry.getResource().isImage()) {
                 return msg("Not an image");
             }
-            return getWikiImage(request, getImageUrl(request, srcEntry),
+            return getWikiImage(wikiUtil, request, getImageUrl(request, srcEntry),
                                 srcEntry, props);
         }
 
@@ -1834,7 +1858,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             String url = metadataType.getImageUrl(request, srcEntry,
                              metadata, attachment);
             if (url != null) {
-                return getWikiImage(request, url, srcEntry, props);
+                return getWikiImage(wikiUtil, request, url, srcEntry, props);
             }
         }
 
@@ -2027,7 +2051,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
 
 
-
             String include = getWikiInclude(wikiUtil, request, importEntry,
                                             tag, props);
             if (include != null) {
@@ -2081,8 +2104,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 title         = Misc.getProperty(props, "title", title);
             }
 
+	    boolean inBlock      = Misc.getProperty(props, "showhide", true);
             boolean open = Misc.getProperty(props, "open", true);
-            if (title != null) {
+
+            if (inBlock && title != null) {
                 return HtmlUtil.makeShowHideBlock(title, propertyValue, open,
                         HtmlUtil.cssClass("wiki-tocheader"),
                         HtmlUtil.cssClass("wiki-toc"));
@@ -2414,7 +2439,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public String wikifyEntry(Request request, Entry entry,
                               String wikiContent)
             throws Exception {
-        return wikifyEntry(request, entry, wikiContent, null, null);
+        return wikifyEntry(request, entry, wikiContent, true, null, null);
     }
 
 
@@ -2432,13 +2457,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public String wikifyEntry(Request request, Entry entry,
-                              String wikiContent, List<Group> subGroups,
+                              String wikiContent, boolean wrapInDiv, List<Group> subGroups,
                               List<Entry> subEntries)
             throws Exception {
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
-        return wikifyEntry(request, entry, wikiUtil, wikiContent, subGroups,
+        return wikifyEntry(request, entry, wikiUtil, wikiContent, wrapInDiv, subGroups,
                            subEntries);
     }
 
@@ -2459,6 +2484,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String wikifyEntry(Request request, Entry entry,
                               WikiUtil wikiUtil, String wikiContent,
+			      boolean wrapInDiv,
                               List<Group> subGroups, List<Entry> subEntries)
             throws Exception {
         List children = new ArrayList();
@@ -2478,6 +2504,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         //TODO: We need to keep track of what is getting called so we prevent
         //infinite loops
         String content = wikiUtil.wikify(wikiContent, this);
+	if(!wrapInDiv) return content;
         return HtmlUtil.div(content, HtmlUtil.cssClass("wikicontent"));
 
     }

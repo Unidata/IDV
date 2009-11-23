@@ -405,13 +405,20 @@ public class MetadataType extends MetadataTypeBase {
     public void decorateEntry(Request request, Entry entry, StringBuffer sb,
                               Metadata metadata, boolean forLink)
             throws Exception {
+	decorateEntry(request, entry, sb, metadata, forLink, false);
+    }
+
+    public void decorateEntry(Request request, Entry entry, StringBuffer sb,
+                              Metadata metadata, boolean forLink, boolean isThumbnail)
+            throws Exception {
         for (MetadataElement element : getChildren()) {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
-            if (element.getThumbnail()) {
+            if (element.getThumbnail() || isThumbnail) {
                 String html = getFileHtml(request, entry, metadata, element,
                                           forLink);
+
                 if (html != null) {
                     sb.append(HtmlUtil.space(1));
                     sb.append(html);
