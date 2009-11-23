@@ -2609,6 +2609,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String path = request.getRequestPath();
         //        System.err.println("path:" + path);
         if ( !path.startsWith(getUrlBase())) {
+	    path = getUrlBase()+path;
+	}
+
+        if ( !path.startsWith(getUrlBase())) {
             getLogManager().log(request,
                                 "Unknown request" + " \"" + path + "\"");
             Result result =
@@ -3856,7 +3860,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getMapUrl() {
-        return getUrlBase() + "/images/caida.jpg";
+        return getUrlBase() + "/images/maps/caida.jpg";
     }
 
     /**
@@ -3944,7 +3948,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         StringBuffer imageHtml = new StringBuffer();
         String nextMapLink =
             HtmlUtil.mouseClickHref(HtmlUtil.call("cycleMap",
-                HtmlUtil.squote(imageId)), HtmlUtil.img(iconUrl(ICON_MAP),
+						  initParams), HtmlUtil.img(iconUrl(ICON_MAP),
                     " View another map", ""));
         imageHtml.append(bboxDiv);
         imageHtml.append(HtmlUtil.table(new Object[] {
@@ -3952,7 +3956,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                          HtmlUtil.id(imageId) + onClickCall
                          + HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup
                 ? "800"
-                : "1000"))), nextMapLink }));
+                : "800"))), nextMapLink }));
 
 
         String rightSide = null;

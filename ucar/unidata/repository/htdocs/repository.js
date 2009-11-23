@@ -1500,14 +1500,15 @@ function bboxClear(argBase) {
     }
 }
 
+
 function bboxInit(imgId, argBase, absolute) { 
     var image = util.getDomObject(imgId);
     if(!image) {
 	return;
     }
 
-    imgWidth = image.obj.width;
-    imgHeight = image.obj.height;
+    imageWidth = image.obj.width;
+    imageHeight = image.obj.height;
 
     var    fldNorth= util.getDomObject(argBase+"_north");
     var    fldSouth= util.getDomObject(argBase+"_south");
@@ -1540,12 +1541,22 @@ function bboxInit(imgId, argBase, absolute) {
     lat2 = parseFloat(fldSouth.obj.value);
     lon2 = parseFloat(fldEast.obj.value);
 
-    //    (-120+180)*600/360
-    ix1 = (lon1+180)*imgWidth/360;
-    iy1 = -(lat1-90)*imgHeight/180;
+    initMaps();
+    var map = mapImages[mapIdx];
 
-    ix2 = (lon2+180)*imgWidth/360;
-    iy2 = -(lat2-90)*imgHeight/180;
+
+    //    var north =  map.originLat-y1/imageHeight*map.height;
+    //    var west =  map.originLon  + x1/imageWidth*map.width;
+
+    iy1 = imageHeight*(map.originLat - lat1)/map.height;
+    iy2 = imageHeight*(map.originLat - lat2)/map.height;
+
+
+    ix1 = imageWidth*(lon1-map.originLon)/map.width;
+    ix2 = imageWidth*(lon2-map.originLon)/map.width;
+
+
+
 
 
     var  imageLeft =  util.getLeft(image.obj);
@@ -1617,10 +1628,15 @@ function bboxClick(event, imgId, argBase,absolute) {
 
     //    alert(x1 +"/" + y1 + "   " + x2 +"/" + y2);
 
-    var north =  90-y1/imageHeight*180;
-    var south =  90-y2/imageHeight*180;
-    var west =  -180 + x1/imageWidth*360;
-    var east =  -180 + x2/imageWidth*360;
+    initMaps();
+    var map = mapImages[mapIdx];
+
+
+    var north =  map.originLat-y1/imageHeight*map.height;
+    var south =  map.originLat-y2/imageHeight*map.height;
+    var west =  map.originLon  + x1/imageWidth*map.width;
+    var east =  map.originLon + x2/imageWidth*map.width;
+    //    alert(north + " " + map.originLat + " " + y1 + " " + (y1/imageHeight) + " " + map.height);
 
 
     var    fldNorth= util.getDomObject(argBase+"_north");
@@ -1655,22 +1671,42 @@ function bboxClick(event, imgId, argBase,absolute) {
 var mapImages;
 var mapIdx=0;
 
+function Map(url, ulLon, ulLat, lrLon, lrLat) {
+    this.url=url;
+    this.originLon = ulLon;
+    this.originLat = ulLat;
+    this.width = lrLon-ulLon;
+    this.height  =ulLat-lrLat;
+}
+
+
+
 function initMaps() {
     if(mapImages) return;
     mapImages= new Array();
-    mapImages[mapImages.length] = "${urlroot}/images/caida.jpg";
-    mapImages[mapImages.length] = "${urlroot}/images/usgstopo.jpg";
-    mapImages[mapImages.length] = "${urlroot}/images/worldday.jpg";
+    /*
+<north>51.126121520996094</north>
+<south>18.237728118896484</south>
+<east>-65.26223754882812</east>
+<west>-126.57781982421875</west>
+    */
+
+    mapImages[mapImages.length] = new Map("${urlroot}/images/maps/caida.jpg",-180,90,180,-90);
+
+    mapImages[mapImages.length] = new Map("${urlroot}/images/maps/conus.png",-126.57781982421875,51.126121520996094,-65.26223754882812,18.237728118896484);
+    mapImages[mapImages.length] = new Map("${urlroot}/images/maps/usgstopo.jpg",-180,90,180,-90);
+    mapImages[mapImages.length] = new Map("${urlroot}/images/maps/worldday.jpg",-180,90,180,-90);
     mapIdx=0;
 }
 
-function cycleMap(id) {
-    var mapImg = util.getDomObject(id);
+function cycleMap(imgId, argBase, absolute) {
+    var mapImg = util.getDomObject(imgId);
     if(!mapImg) return;
     initMaps();
     mapIdx++;
     if(mapIdx >= mapImages.length) mapIdx=0;
-    mapImg.obj.src = mapImages[mapIdx];
+    mapImg.obj.src = mapImages[mapIdx].url;
+    bboxInit(imgId, argBase, absolute);
 }
 
 

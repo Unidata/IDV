@@ -347,19 +347,19 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String ACTION_GRID_MAKEINITFORM =
-        "action.grid.makeinitform";
+    public static final String ACTION_MAKEINITFORM =
+        "action.makeinitform";
 
     /** _more_ */
-    public static final String ACTION_GRID_MAKEFORM = "action.grid.makeform";
+    public static final String ACTION_MAKEFORM = "action.makeform";
 
 
     /** _more_ */
-    public static final String ACTION_GRID_MAKEPAGE = "action.grid.makepage";
+    public static final String ACTION_MAKEPAGE = "action.makepage";
 
     /** _more_ */
-    public static final String ACTION_GRID_MAKEIMAGE =
-        "action.grid.makeimage";
+    public static final String ACTION_MAKEIMAGE =
+        "action.makeimage";
 
 
     /** _more_ */
@@ -632,7 +632,7 @@ public class IdvOutputHandler extends OutputHandler {
             throws Exception {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         String action = request.getString(ARG_ACTION,
-                                          ACTION_GRID_MAKEINITFORM);
+                                          ACTION_MAKEINITFORM);
         String path = dataOutputHandler.getPath(entry);
         if (path == null) {
             StringBuffer sb = new StringBuffer();
@@ -641,19 +641,17 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         GridDataset dataset = dataOutputHandler.getGridDataset(entry, path);
-
-
         DataSourceDescriptor descriptor =
             idvServer.getIdv().getDataManager().getDescriptor("File.Grid");
-        GeoGridDataSource dataSource = new GeoGridDataSource(descriptor,
+        DataSource dataSource = new GeoGridDataSource(descriptor,
                                            dataset, entry.getName(), path);
 
         try {
-            if (action.equals(ACTION_GRID_MAKEINITFORM)) {
+            if (action.equals(ACTION_MAKEINITFORM)) {
                 return outputGridInitForm(request, entry, dataSource);
-            } else if (action.equals(ACTION_GRID_MAKEFORM)) {
+            } else if (action.equals(ACTION_MAKEFORM)) {
                 return outputGridForm(request, entry, dataSource);
-            } else if (action.equals(ACTION_GRID_MAKEPAGE)) {
+            } else if (action.equals(ACTION_MAKEPAGE)) {
                 return outputGridPage(request, entry, dataSource);
             } else {
                 return outputGridImage(request, entry, dataSource);
@@ -679,14 +677,10 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Result outputGridForm(final Request request, Entry entry,
-                                  GeoGridDataSource dataSource)
+                                  DataSource dataSource)
             throws Exception {
-
         StringBuffer sb = new StringBuffer();
         makeGridForm(request, sb, entry, dataSource);
-
-
-
         return new Result("Grid Displays", sb);
     }
 
@@ -804,7 +798,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private void makeGridForm(Request request, StringBuffer sb, Entry entry,
-                              GeoGridDataSource dataSource)
+                              DataSource dataSource)
             throws Exception {
 
         String formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
@@ -813,21 +807,7 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_IDV_GRID));
-        sb.append(HtmlUtil.hidden(ARG_ACTION, ACTION_GRID_MAKEPAGE));
-
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX1, "",
-                                  HtmlUtil.SIZE_3
-                                  + HtmlUtil.id(ARG_IMAGE_CROPX1)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY1, "",
-                                  HtmlUtil.SIZE_3
-                                  + HtmlUtil.id(ARG_IMAGE_CROPY1)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX2, "",
-                                  HtmlUtil.SIZE_3
-                                  + HtmlUtil.id(ARG_IMAGE_CROPX2)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY2, "",
-                                  HtmlUtil.SIZE_3
-                                  + HtmlUtil.id(ARG_IMAGE_CROPY2)));
-
+        sb.append(HtmlUtil.hidden(ARG_ACTION, ACTION_MAKEPAGE));
 
         StringBuffer basic = new StringBuffer();
         basic.append(HtmlUtil.formTable());
@@ -853,6 +833,14 @@ public class IdvOutputHandler extends OutputHandler {
                             + htmlSelect(request, ARG_VIEW_VIEWPOINT,
                                          viewPoints);
         }
+
+        basic.append(HtmlUtil.formEntry(msgLabel("Image Size"),
+                                         htmlInput(request, ARG_IMAGE_WIDTH,
+						   "600") +HtmlUtil.space(1) + "X" + HtmlUtil.space(1) +
+                                         htmlInput(request, ARG_IMAGE_HEIGHT,
+						   "400")));
+
+
 
         basic.append(HtmlUtil.formEntry(msgLabel("Make globe"),
                                         htmlCheckbox(request, ARG_VIEW_GLOBE,
@@ -900,21 +888,13 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-        basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
+	/*
+	  basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
                                         htmlCheckbox(request, ARG_CLIP,
                                             false)));
+	*/
 
 
-
-
-        basic.append(HtmlUtil.formEntry(msgLabel("Width"),
-                                        htmlInput(request, ARG_IMAGE_WIDTH,
-                                            "600")));
-
-
-        basic.append(HtmlUtil.formEntry(msgLabel("Height"),
-                                        htmlInput(request, ARG_IMAGE_HEIGHT,
-                                            "400")));
 
 
 
@@ -1412,10 +1392,12 @@ public class IdvOutputHandler extends OutputHandler {
                                              "",
                                              HtmlUtil.id(ARG_PUBLISH_ENTRY
                                                  + "_hidden")));
+	    publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Select a group to publish the product to"),2)));
+
             String select = OutputHandler.getSelect(request,
                                 ARG_PUBLISH_ENTRY, "Select group", false,
                                 null, entry);
-            publishSB.append(HtmlUtil.formEntry(msgLabel("Save image to"),
+            publishSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                     HtmlUtil.disabledInput(ARG_PUBLISH_ENTRY, "",
                                            HtmlUtil.id(ARG_PUBLISH_ENTRY)
                                            + HtmlUtil.SIZE_60) + select));
@@ -1423,26 +1405,20 @@ public class IdvOutputHandler extends OutputHandler {
             publishSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     htmlInput(request, ARG_PUBLISH_NAME, "", 30)));
 
-            publishSB.append(HtmlUtil.formTableClose());
-
 
             if (getAccessManager().canDoAction(request, entry,
 					       Permission.ACTION_EDIT)) {
 
-		publishSB.append(HtmlUtil.p());
-		publishSB.append(msg("Or save these settings"));
-		publishSB.append(HtmlUtil.br());
-		publishSB.append(msgLabel("Settings name"));
-		publishSB.append(HtmlUtil.input(ARG_SAVE_NAME, ""));
-		publishSB.append(HtmlUtil.br());
-		publishSB.append(HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false));
-		publishSB.append(HtmlUtil.space(2));
-		publishSB.append(msg("Attach image"));
-		publishSB.append(HtmlUtil.br());
-		publishSB.append(HtmlUtil.submit(msg("Save settings"),ARG_SAVE_STATE));
+		publishSB.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.p(),2)));
+		publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Or save these settings"),2)));
+		publishSB.append(HtmlUtil.formEntry(msgLabel("Settings name"),
+						    HtmlUtil.input(ARG_SAVE_NAME, "",30)));
+		publishSB.append(HtmlUtil.formEntry(msg("Attach image"),
+						    HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false)));
+		publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Save settings"),ARG_SAVE_STATE)));
 		
 	    }
-
+            publishSB.append(HtmlUtil.formTableClose());
 
 
             tabLabels.add(msg("Publish"));
@@ -1471,7 +1447,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Result outputGridInitForm(final Request request, Entry entry,
-                                      GeoGridDataSource dataSource)
+                                      DataSource dataSource)
             throws Exception {
         StringBuffer sb      = new StringBuffer();
 
@@ -1479,7 +1455,7 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.form(formUrl, ""));
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_IDV_GRID));
-        sb.append(HtmlUtil.hidden(ARG_ACTION, ACTION_GRID_MAKEFORM));
+        sb.append(HtmlUtil.hidden(ARG_ACTION, ACTION_MAKEFORM));
 
 
         List<DataChoice> choices =
@@ -1535,7 +1511,7 @@ public class IdvOutputHandler extends OutputHandler {
 					      METADATA_TYPE_VISUALIZATION, false);
         if (metadataList != null && metadataList.size()>0) {
 	    sb.append(HtmlUtil.p());
-	    sb.append(msg("Or select predefined visualizations"));
+	    sb.append(msgHeader("Or select a predefined visualization"));
 	    sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
 	    MetadataType metadataType = getMetadataManager().findType(METADATA_TYPE_VISUALIZATION);
 	    for (Metadata metadata : metadataList) {
@@ -1543,7 +1519,7 @@ public class IdvOutputHandler extends OutputHandler {
 					     new String[]{
 						 ARG_ENTRYID, entry.getId(),
 						 ARG_OUTPUT, OUTPUT_IDV_GRID.toString(),
-						 ARG_ACTION, ACTION_GRID_MAKEPAGE,
+						 ARG_ACTION, ACTION_MAKEPAGE,
 						 ARG_PREDEFINED, metadata.getId()});
 		sb.append(HtmlUtil.li(HtmlUtil.href(url,metadata.getAttr1()),""));
 		metadataType.decorateEntry(request, entry,  sb,
@@ -1626,7 +1602,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Result outputGridPage(final Request request, Entry entry,
-                                  GeoGridDataSource dataSource)
+                                  DataSource dataSource)
             throws Exception {
         StringBuffer sb = new StringBuffer();
 
@@ -1706,7 +1682,6 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
-
         String baseName = IOUtil.stripExtension(entry.getName());        
 	String product  = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
         String url      = getRepository().URL_ENTRY_SHOW.getFullUrl();
@@ -1730,7 +1705,7 @@ public class IdvOutputHandler extends OutputHandler {
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
 
         String args = request.getUrlArgs(exceptArgs, null, ".*_gvdflt");
-        url = url + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE + "&"
+        url = url + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&"
               + args;
 
 
@@ -1767,12 +1742,9 @@ public class IdvOutputHandler extends OutputHandler {
 
 	}
 
-
-
-
-        islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
+        islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE
                  + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
-        jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
+        jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE
                   + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
         boolean showForm = true;
@@ -1826,7 +1798,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGridImage(final Request request, Entry entry,
-                                  GeoGridDataSource dataSource)
+                                  DataSource dataSource)
             throws Exception {
 
 
@@ -1853,7 +1825,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Object generateGridImage(Request request, Entry entry,
-                                     GeoGridDataSource dataSource)
+                                     DataSource dataSource)
             throws Exception {
 
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
@@ -2564,14 +2536,11 @@ public class IdvOutputHandler extends OutputHandler {
                                              ARG_POINT_DOANIMATION, false)));
 
 
-        formSB.append(HtmlUtil.formEntry(msgLabel("Width"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Image Size"),
                                          htmlInput(request, ARG_IMAGE_WIDTH,
-                                             "600")));
-
-        formSB.append(HtmlUtil.formEntry(msgLabel("Height"),
+						   "600") +HtmlUtil.space(1) + "X" + HtmlUtil.space(1) +
                                          htmlInput(request, ARG_IMAGE_HEIGHT,
-                                             "400")));
-
+						   "400")));
 
 
         formSB.append(HtmlUtil.formTableClose());

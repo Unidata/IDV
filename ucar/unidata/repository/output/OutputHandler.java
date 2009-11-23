@@ -1346,6 +1346,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         if (rowId == null) {
             rowId = "entryrow_" + (HtmlUtil.blockCnt++);
         }
+
         sb.append(
             HtmlUtil.open(
                 HtmlUtil.TAG_DIV,
@@ -1360,6 +1361,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             "<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
         sb.append(extra);
         sb.append(link.getLink());
+
+	String desc = entry.getDescription();
+	StringBuffer descSB = new StringBuffer();
+	String toggleJS = HtmlUtil.makeToggleBlock(desc,
+						   descSB, false);
+	sb.append(descSB);
+
         sb.append("</td><td align=right class=entryrowlabel>");
         StringBuffer extraAlt  = new StringBuffer();
         String       userLabel = "";
@@ -1377,6 +1385,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 getEntryManager().getTimezone(entry), extraAlt.toString()));
         sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
+	//	sb.append(HtmlUtil.jsLink(toggleJS,"X"));
         /*        String userSearchLink =
             HtmlUtil.href(
                 HtmlUtil.url(
