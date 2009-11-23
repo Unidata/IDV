@@ -43,7 +43,7 @@
   <type name="slideshow"  description="Slide Show" handler="ucar.unidata.repository.collab.SlideshowTypeHandler">
      <property name="icon" value="/icons/slideshow.jpg"/>
      <property name="form.show.date" value="false"/>
-     <property name="form.show.description" value="false"/>
+     <property name="form.show.description" value="true"/>
      <property name="form.show.datatype" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.resource" value="false"/>

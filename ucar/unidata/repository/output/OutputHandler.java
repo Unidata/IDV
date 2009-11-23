@@ -1362,11 +1362,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         sb.append(extra);
         sb.append(link.getLink());
 
+        /*
 	String desc = entry.getDescription();
 	StringBuffer descSB = new StringBuffer();
 	String toggleJS = HtmlUtil.makeToggleBlock(desc,
 						   descSB, false);
 	sb.append(descSB);
+        */
 
         sb.append("</td><td align=right class=entryrowlabel>");
         StringBuffer extraAlt  = new StringBuffer();

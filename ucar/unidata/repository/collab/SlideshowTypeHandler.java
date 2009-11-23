@@ -592,7 +592,7 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
                                     request, OutputHandler.PROP_ENTRY,
                                     entry }));
 	    wikiUtil.setMakeHeadings(false);
-	    wikiUtil.setReplaceNewlineWithP(false);
+            //	    wikiUtil.setReplaceNewlineWithP(false);
             NodeList children = XmlUtil.getElements(root);
             for (int i = 0; i < children.getLength(); i++) {
 		wikiUtil.removeProperty("image.class");
