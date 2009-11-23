@@ -1710,6 +1710,11 @@ public class HtmlUtil {
         return input(name, value, "");
     }
 
+    public static String input(String name, Object value, int size) {
+	return input(name,value,attrs(ATTR_SIZE, ""+size));
+    }
+
+
     /**
      * _more_
      *
@@ -2883,6 +2888,31 @@ public class HtmlUtil {
         sb.append(close(TAG_DIV));
         return sb.toString();
     }
+
+
+    public static String makeToggleBlock(String content,
+					 StringBuffer contentSB,
+					 boolean visible) {
+	String blockExtra = "";
+        String       id  = "block_" + (blockCnt++);
+        StringBuffer sb  = contentSB;
+        String       img = "";
+	String js = HtmlUtil.onMouseClick(call("toggleBlockVisibility",
+					       squote(id) + "," + squote(id + "img") +
+					       "," + squote("") + "," + squote("")));
+        sb.append("<div " + HtmlUtil.cssClass("hideshowblock")
+                  + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:block;visibility:visible") + ">");
+        if ( !visible) {
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",
+                    HtmlUtil.squote(id))));
+        }
+        sb.append(content.toString());
+        sb.append(close(TAG_DIV));
+        return js;
+    }
+
+
 
 
 
