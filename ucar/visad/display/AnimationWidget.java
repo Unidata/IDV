@@ -161,18 +161,18 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     private AnimationInfo animationInfo;
 
     /** Indicator (currently a JComboBox) */
-    private JComboBox indicator = null;
+    private JComboBox timesCbx = null;
 
-    private boolean indicatorVisible = true;
+    private boolean timesCbxVisible = true;
 
-    /** mutex  for accessing the indicator */
-    private Object indicatorMutex;
+    /** mutex  for accessing the timesCbx */
+    private Object timesCbxMutex;
 
     /** Times array from current animation set */
     private DateTime[] timesArray;
 
-    /** flag for whether to ingnore indicator events or not */
-    private boolean ignoreIndicatorEvents = false;
+    /** flag for whether to ingnore timesCbx events or not */
+    private boolean ignoreTimesCbxEvents = false;
 
 
 
@@ -229,7 +229,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         // Initialize sharing to true
         super("AnimationWidget", true);
-        indicator   = new JComboBox() {
+        timesCbx   = new JComboBox() {
                 public String getToolTipText(MouseEvent event) {
                     if (boxPanel != null) {
                         return boxPanel.getToolTipText();
@@ -237,19 +237,19 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                     return " ";
                 }
             };
-        indicator.setToolTipText("");
-        indicatorMutex = indicator.getTreeLock();
-        indicator.setFont(new Font("Dialog", Font.PLAIN, 9));
-        indicator.setLightWeightPopupEnabled(false);
+        timesCbx.setToolTipText("");
+        timesCbxMutex = timesCbx.getTreeLock();
+        timesCbx.setFont(new Font("Dialog", Font.PLAIN, 9));
+        timesCbx.setLightWeightPopupEnabled(false);
         // set to non-visible until items are added
-        indicator.setVisible(false);
-        indicator.addActionListener(new ActionListener() {
+        timesCbx.setVisible(false);
+        timesCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if ( !ignoreIndicatorEvents && (anime != null)) {
-                    debug("got indicator event");
-                    setTimeFromUser((Real) indicator.getSelectedItem());
+                if ( !ignoreTimesCbxEvents && (anime != null)) {
+                    debug("got timesCbx event");
+                    setTimeFromUser((Real) timesCbx.getSelectedItem());
                     if (boxPanel != null) {
-                        boxPanel.setOnIndex(indicator.getSelectedIndex());
+                        boxPanel.setOnIndex(timesCbx.getSelectedIndex());
                     }
                 }
             }
@@ -275,9 +275,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
 
     public void showDateBox(boolean v) {
-        indicatorVisible = v;
-        if(indicator!=null) {
-            indicator.setVisible(v);
+        timesCbxVisible = v;
+        if(timesCbx!=null) {
+            timesCbx.setVisible(v);
         }
     }
 
@@ -339,10 +339,10 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /**
      * Get the component used to display the time step value.
      *
-     * @return indicator component
+     * @return timesCbx component
      */
     public Component getIndicatorComponent() {
-        return indicator;
+        return timesCbx;
     }
 
 
@@ -425,7 +425,10 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             }
         };
         List buttonList = new ArrayList();
-        buttonList.add(GuiUtils.inset(indicator, new Insets(0, 0, 0, 2)));
+        buttonList.add(timesCbx);
+        Dimension preferredSize = timesCbx.getPreferredSize();
+        JComponent filler = GuiUtils.filler(3, (preferredSize!=null?preferredSize.height+1:20));
+        buttonList.add(filler);
         String[][] buttonInfo = {
             { "Go to first frame", CMD_BEGINNING, getIcon("Rewind") },
             { "One frame back", CMD_BACKWARD, getIcon("StepBack") },
@@ -461,7 +464,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             }
         }
         boxPanel.addKeyListener(listener);
-        if ( !getBoxPanelVisible()) {
+        if (!getBoxPanelVisible()) {
             boxPanel.setVisible(false);
         }
         contents = GuiUtils.doLayout(new Component[] { boxPanel, contents },
@@ -997,18 +1000,18 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                                           : -1);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    boolean oldValue = ignoreIndicatorEvents;
+                    boolean oldValue = ignoreTimesCbxEvents;
                     try {
-                        ignoreIndicatorEvents = true;
-                        //                        synchronized (indicatorMutex) {
-                        indicator.setSelectedItem(theDateTime);
+                        ignoreTimesCbxEvents = true;
+                        //                        synchronized (timesCbxMutex) {
+                        timesCbx.setSelectedItem(theDateTime);
                         //                        }
                         if ((boxPanel != null) && (theIndex >= 0)) {
                             boxPanel.setOnIndex(theIndex);
                         }
-                        indicator.repaint();
+                        timesCbx.repaint();
                     } finally {
-                        ignoreIndicatorEvents = oldValue;
+                        ignoreTimesCbxEvents = oldValue;
                     }
                 }
             });
@@ -1128,21 +1131,20 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                boolean oldValue = ignoreIndicatorEvents;
+                boolean oldValue = ignoreTimesCbxEvents;
                 try {
-                    ignoreIndicatorEvents = true;
-                    //        synchronized (indicatorMutex) {
-                    GuiUtils.setListData(indicator, timesArray);
+                    ignoreTimesCbxEvents = true;
+                    //        synchronized (timesCbxMutex) {
+                    GuiUtils.setListData(timesCbx, timesArray);
                     //        }
-
-                    //        synchronized (indicatorMutex) {
-                    indicator.setVisible(indicatorVisible &&
+                    //        synchronized (timesCbxMutex) {
+                    timesCbx.setVisible(timesCbxVisible &&
                                          (timesArray != null)
-                                         && (indicator.getItemCount() > 0));
+                                         && (timesCbx.getItemCount() > 0));
                     //        }
                     updateRunButton();
                 } finally {
-                    ignoreIndicatorEvents = oldValue;
+                    ignoreTimesCbxEvents = oldValue;
                 }
             }
         });
