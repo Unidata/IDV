@@ -1446,7 +1446,7 @@ public class SqlUtil {
         if(connectionManager!=null) {
             connectionManager.closeStatement(stmt);
         } else {
-            close(stmt);
+            stmt.close();
         }
     }
 
