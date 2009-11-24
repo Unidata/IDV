@@ -545,6 +545,8 @@ public class TDSRadarChooser extends TimesChooser {
                 StationImpl stn = (StationImpl) tdsStations.get(i);
                 // thredds.catalog.query.Location loc = stn.getLocation();
                 //TODO: need better station  need to switch lat lon
+                //                System.out.println("\"" + stn.getName() +"\",");
+
                 NamedStationImpl station =
                     new NamedStationImpl(stn.getName(), stn.getName(),
                                          stn.getLatitude(),
@@ -851,7 +853,7 @@ public class TDSRadarChooser extends TimesChooser {
                     DateUnit.getStandardOrISO((String) timeSpan.get(0));
                 Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
                 dateSelection.setStartMode(DateSelection.TIMEMODE_DATA);
-                dateSelection.setStartMode(DateSelection.TIMEMODE_DATA);
+                dateSelection.setEndMode(DateSelection.TIMEMODE_DATA);
                 dateSelection.setCount(count);
             }
             makeDataSource(radarQuery, "FILE.RADAR", ht);
