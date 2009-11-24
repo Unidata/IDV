@@ -242,8 +242,8 @@ public class CDMRadarDataSource extends RadarDataSource {
                    !dateSelection.hasInterval()) {
                     //The maximum time between radar scans
                     long maxIntervalMinutes  = 10;
-                    //Add in a factor of 5 fudge factor
-                    long minutesOffset = dateSelection.getCount() * maxIntervalMinutes * 5;
+                    //Add in a factor of 20 fudge factor
+                    long minutesOffset = dateSelection.getCount() * maxIntervalMinutes * 20;
                     fromDate = new Date(toDate.getTime()-1000*minutesOffset*60);
                 }
 
