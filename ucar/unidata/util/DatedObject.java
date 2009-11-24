@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -157,7 +158,8 @@ public class DatedObject implements DatedThing {
      *
      * @return sorted list
      */
-    public static List sort(List datedThings, final boolean ascending) {
+    public static List<DatedThing> sort(List datedThings,
+                                        final boolean ascending) {
         Comparator comp = new Comparator() {
             public int compare(Object o1, Object o2) {
                 DatedThing a1     = (DatedThing) o1;
@@ -178,7 +180,7 @@ public class DatedObject implements DatedThing {
         List result = Arrays.asList(array);
         datedThings = new ArrayList();
         datedThings.addAll(result);
-        return datedThings;
+        return (List<DatedThing>) datedThings;
     }
 
     /**
