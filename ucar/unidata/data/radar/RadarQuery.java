@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.radar;
 
 
@@ -115,8 +116,55 @@ public class RadarQuery {
      * @return The Station
      */
     public String getStation() {
+        //Uncomment this if you want to do a server stress test
+        /*
+        if(stationName ==  null) {
+            stationName = stations[nextStation++];
+            if(nextStation>= stations.length)
+                nextStation = 0;
+        }
+        System.err.println("station:" + stationName);
+        return stationName;
+        */
         return station;
     }
+
+    /** _more_          */
+    private static int nextStation = 0;
+
+    /** _more_          */
+    private int stationIdx = -1;
+
+    /** _more_          */
+    private String stationName = null;
+
+
+    /** _more_          */
+    private static String[] stations = {
+        "KTYX", "KPAH", "KFDR", "KAMA", "KFDX", "KICX", "KCLX", "KATX",
+        "KBHX", "KJKL", "KMVX", "KGRB", "KMOB", "KVWX", "KHDX", "KGRK",
+        "KLSX", "KSFX", "KICT", "KDIX", "KGRR", "KRIW", "KFSD", "KILN",
+        "KUDX", "KGLD", "KMUX", "KILX", "KCLE", "KESX", "KPBZ", "KLCH",
+        "NOP3", "KCBW", "KLTX", "KCBX", "KFCX", "KBYX", "KGSP", "KDFX",
+        "KBOX", "KNQA", "KARX", "KTWX", "KDOX", "KDYX", "KDDC", "KGJX",
+        "KMPX", "KSHV", "KAKQ", "KHNX", "KCCX", "KABX", "KRAX", "KABR",
+        "KDGX", "KOHX", "KCRP", "KSGF", "KSOX", "KBIS", "KRGX", "KYUX",
+        "KBRO", "KLNX", "KTBW", "KEAX", "KLVX", "KFFC", "KMHX", "KJGX",
+        "KMAF", "KIWX", "KMRX", "KDAX", "KOAX", "KEMX", "KLWX", "KCXX",
+        "KBLX", "KSRX", "KDVN", "KSJT", "KEVX", "KMAX", "KIWA", "KDMX",
+        "KLOT", "KMQT", "KGWX", "KVTX", "KFWS", "KPUX", "KBBX", "KBUF",
+        "TJUA", "KENX", "KHGX", "KGGW", "KEWX", "KAPX", "KCYS", "KOTX",
+        "KTLH", "KLZK", "KMTX", "KDLH", "KUEX", "KOKX", "KDTX", "KFSX",
+        "KTLX", "KRLX", "KLBB", "KFTG", "KHTX", "KIND", "KBGM", "KLIX",
+        "KGYX", "KTFX", "KINX", "KMSX", "KAMX", "KMLB", "KCAE", "KVNX",
+        "KNKX", "KBMX", "KEPZ", "KRTX", "KJAX", "KPDT", "KLRX", "KMKX"
+    };
+
+
+
+
+
+
 
     /**
      * Set the Product property.
