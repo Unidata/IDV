@@ -39,6 +39,7 @@ import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -218,23 +219,38 @@ public class CDMRadarDataSource extends RadarDataSource {
             if (query == null) {
                 return;
             }
-            List times = query.getDateSelection().getTimes();
+            DateSelection dateSelection = query.getDateSelection();
+            List times = dateSelection.getTimes();
             List         urls   = new ArrayList();
             StringBuffer errlog = new StringBuffer();
+
 
             TDSRadarDatasetCollection collection =
                 TDSRadarDatasetCollection.factory("test",
                     query.getCollectionUrl(), errlog);
+
             if ((times == null) || (times.size() == 0)) {
                 List allTimes = new ArrayList();
                 List timeSpan = collection.getRadarTimeSpan();
                 Date fromDate =
                     DateUnit.getStandardOrISO((String) timeSpan.get(0));
-                Date toDate =
-                    DateUnit.getStandardOrISO((String) timeSpan.get(1));
+                Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
+                                   
+                //If we are doing relative times then make a smaller range
+                if(dateSelection.getStartMode() == DateSelection.TIMEMODE_DATA &&
+                   dateSelection.getEndMode() == DateSelection.TIMEMODE_DATA &&
+                   !dateSelection.hasInterval()) {
+                    //The maximum time between radar scans
+                    long maxIntervalMinutes  = 10;
+                    //Add in a factor of 5 fudge factor
+                    long minutesOffset = dateSelection.getCount() * maxIntervalMinutes * 5;
+                    fromDate = new Date(toDate.getTime()-1000*minutesOffset*60);
+                }
+
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
                         query.getProduct(), fromDate, toDate);
+
                 /*
                 if(collectionTimes.size() == 0)  {
                     List collectionTimes =
@@ -256,8 +272,12 @@ public class CDMRadarDataSource extends RadarDataSource {
                     }
                     allTimes.add(new DatedObject(date));
                 }
+
                 times = DatedObject.unwrap(
                     query.getDateSelection().apply(allTimes));
+                //  System.err.println("Query date range:" + fromDate + " -- " + toDate);
+                //  System.err.println("Collection times:" + collectionTimes);
+                //  System.err.println("Selected times:" + times);
             }
 
             for (int i = 0; i < times.size(); i++) {
@@ -273,6 +293,10 @@ public class CDMRadarDataSource extends RadarDataSource {
             logException("Creating urls to radar data", excp);
         }
     }
+
+
+
+
 
 
     /**
