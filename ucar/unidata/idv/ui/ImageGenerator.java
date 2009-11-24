@@ -140,6 +140,10 @@ public class ImageGenerator extends IdvManager {
     /** macro property */
     public static final String PROP_LOOPINDEX = "loopindex";
 
+    public static final String PROP_LOOPINDEX_PAD2 = "loopindex_pad2";
+    public static final String PROP_LOOPINDEX_PAD3 = "loopindex_pad3";
+    public static final String PROP_LOOPINDEX_PAD4 = "loopindex_pad4";
+
 
 
 
@@ -3166,6 +3170,10 @@ public class ImageGenerator extends IdvManager {
         props.putAll(getAllProperties());
 
         putIndex(props, PROP_LOOPINDEX, currentLoopIndex);
+        props.put(PROP_LOOPINDEX_PAD2, StringUtil.padLeft(""+currentLoopIndex,2,"0"));
+        props.put(PROP_LOOPINDEX_PAD3, StringUtil.padLeft(""+currentLoopIndex,3,"0"));
+        props.put(PROP_LOOPINDEX_PAD4, StringUtil.padLeft(""+currentLoopIndex,4,"0"));
+
         Date now = new Date(Misc.getCurrentTime());
 
 
