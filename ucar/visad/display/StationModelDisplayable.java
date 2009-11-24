@@ -597,8 +597,8 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    private synchronized FieldImpl makeNewDataWithShapes(FieldImpl data)
-            throws VisADException, RemoteException {
+    private  FieldImpl makeNewDataWithShapes(FieldImpl data)
+	throws VisADException, RemoteException {
 
         if (data == null) {
             return null;
@@ -610,7 +610,7 @@ public class StationModelDisplayable extends DisplayableData {
             double[] aspect = master.getDisplayAspect();
             if ((aspect != null) && (aspect.length > 2)) {
                 displayScaleFactor = new double[] { 1.0 / aspect[0],
-                        1.0 / aspect[1], 1.0 / aspect[2] };
+						    1.0 / aspect[1], 1.0 / aspect[2] };
             }
         }
 
@@ -619,8 +619,8 @@ public class StationModelDisplayable extends DisplayableData {
             currentRotation = master.getRotation();
             double[] m =
                 master.getMouseBehavior().make_matrix(currentRotation[0],
-                    currentRotation[1], currentRotation[2], 1.0, 0.0, 0.0,
-                    0.0);
+						      currentRotation[1], currentRotation[2], 1.0, 0.0, 0.0,
+						      0.0);
 
             transform = new Transform3D(m);
             transform.invert();
@@ -629,55 +629,52 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
 
+	haveNotified = null;
+	isTimeSequence =
+	    ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
+	int numTimes = 0;
+	shapeIndex  = 0;
+	shapeList   = new Vector();
+	nameToIndex = new Hashtable();
+	try {
+	    if (isTimeSequence) {
+		boolean haveChecked = false;
+		Set     timeSet     = data.getDomainSet();
+		for (int i = 0; i < timeSet.getLength(); i++) {
+		    FieldImpl shapeFI = makeShapesFromPointObsField(
+								    (FieldImpl) data.getSample(
+											       i));
+		    if (shapeFI == null) {
+			continue;
+		    }
+		    if (newFI == null) {  // first time through
+			FunctionType functionType =
+			    new FunctionType(((FunctionType) data
+					      .getType()).getDomain(), shapeFI
+					     .getType());
+			newFI = new FieldImpl(functionType, timeSet);
+		    }
+		    newFI.setSample(i, shapeFI, false, !haveChecked);
+		    if ( !haveChecked) {
+			haveChecked = true;
+		    }
+		}  // end isSequence
+	    } else {
+		newFI = makeShapesFromPointObsField(data);
+	    }      // end single time 
+	} catch (Exception exc) {
+	    logException("making shapes", exc);
+	    return null;
+	}
 
-        synchronized (SHAPES_MUTEX) {
-            haveNotified = null;
-            isTimeSequence =
-                ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
-            int numTimes = 0;
-            shapeIndex  = 0;
-            shapeList   = new Vector();
-            nameToIndex = new Hashtable();
-            try {
-                if (isTimeSequence) {
-                    boolean haveChecked = false;
-                    Set     timeSet     = data.getDomainSet();
-                    for (int i = 0; i < timeSet.getLength(); i++) {
-                        FieldImpl shapeFI = makeShapesFromPointObsField(
-                                                (FieldImpl) data.getSample(
-                                                    i));
-                        if (shapeFI == null) {
-                            continue;
-                        }
-                        if (newFI == null) {  // first time through
-                            FunctionType functionType =
-                                new FunctionType(((FunctionType) data
-                                    .getType()).getDomain(), shapeFI
-                                        .getType());
-                            newFI = new FieldImpl(functionType, timeSet);
-                        }
-                        newFI.setSample(i, shapeFI, false, !haveChecked);
-                        if ( !haveChecked) {
-                            haveChecked = true;
-                        }
-                    }  // end isSequence
-                } else {
-                    newFI = makeShapesFromPointObsField(data);
-                }      // end single time 
-            } catch (Exception exc) {
-                logException("making shapes", exc);
-                return null;
-            }
-
-            try {
-                shapes = new VisADGeometryArray[shapeList.size()];
-                shapes = (VisADGeometryArray[]) shapeList.toArray(shapes);
-                setShapesInControl(shapes);
-            } catch (Exception t) {
-                throw new VisADException(
-                    "Unable to covert vector to VisADGeometry array");
-            }
-        }
+	try {
+	    shapes = new VisADGeometryArray[shapeList.size()];
+	    shapes = (VisADGeometryArray[]) shapeList.toArray(shapes);
+	    setShapesInControl(shapes);
+	} catch (Exception t) {
+	    throw new VisADException(
+				     "Unable to covert vector to VisADGeometry array");
+	}
         return newFI;
     }
 
