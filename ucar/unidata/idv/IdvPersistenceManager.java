@@ -2272,12 +2272,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 	    }
         }
 
-
         List filesToEmbed = new ArrayList();
         for (int i = 0; i < fileDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) fileDataSources.get(i);
-            if ( !dsc.cbx.isSelected()) {
+            if (!allCbx.isSelected() &&  !dsc.cbx.isSelected()) {
                 continue;
             }
             DataSource dataSource    = dsc.dataSource;
@@ -3657,7 +3656,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     displaysThreadManager.runSequentially();
                     //                    displaysThreadManager.runInParallel();
                     long tt2 = System.currentTimeMillis();
-                    //                    System.err.println ("time to init displays:" + (tt2-tt1));
+		    //		    System.err.println ("time to init displays:" + (tt2-tt1));
                     //                    displaysThreadManager.clearTimes();
                     Trace.call2("Decode.init displays");
                 }
