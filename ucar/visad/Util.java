@@ -2511,6 +2511,10 @@ public final class Util {
         if (index >= 0) {
             name = name.substring(0, index);
         }
+        index = name.indexOf("_unitsuffix_");
+        if (index >= 0) {
+            name = name.substring(0, index);
+        }
         name = ucar.unidata.util.StringUtil.replace(name, TEXT_IDENTIFIER,
                 "");
         return name;
