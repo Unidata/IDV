@@ -83,6 +83,9 @@ public class PropertiesDialog implements ActionListener {
     /** The symbol we represent */
     private MetSymbol symbol;
 
+    private List<MetSymbol> selected;
+
+
     /** The canvas */
     private StationModelCanvas canvas;
 
@@ -103,8 +106,6 @@ public class PropertiesDialog implements ActionListener {
 
     /** Shows the color */
     private GuiUtils.ColorSwatch fgColorSwatch;
-
-
 
     /** Holds the scale by scale min */
     private JTextField scaleMinFld;
@@ -206,6 +207,18 @@ public class PropertiesDialog implements ActionListener {
         this.canvas = canvas;
     }
 
+
+    public PropertiesDialog(List<MetSymbol> selected, StationModelCanvas canvas) {
+	this.selected = selected;
+        this.symbol = selected.get(0);
+        this.canvas = canvas;
+    }
+
+
+    public boolean doMultiple() {
+	return selected !=null;
+    }
+
     /**
      * Close the dialog
      */
@@ -281,24 +294,22 @@ public class PropertiesDialog implements ActionListener {
             }
         }
 
+	if(!doMultiple()) {
+	    doApply(symbol);
+	}  else {
+	    for(MetSymbol selectedSymbol: selected) {
+		doApply(selectedSymbol);
+	    }
+	}
+    }
 
-        symbol.applyProperties();
-
-        symbol.setActive(shownCheckbox.isSelected());
-        String[] descrs  = symbol.getParamDescs();
-        String[] ids     = symbol.getParamIds();
-        boolean  doUnits = symbol.showDisplayUnitInProperties();
-        boolean  doFont  = (symbol instanceof TextSymbol);
-
-        if (colorParamFld != null) {
-            what = "Color by properties";
-            symbol.setColorParam(getParam(colorParamFld));
-            symbol.setColorMappings(ColorMap.applyProperties(colorMappings));
-        }
+    protected void doApplyColorSettings(MetSymbol symbol) throws Exception {
         if (symbol.shouldShowColorTableGui()) {
+	    if(!doMultiple()) {
+		symbol.setColorTableParam(getParam(colorTableParamFld));
+	    }
             what = "Color table properties";
             symbol.setColorTable(tmpColorTable);
-            symbol.setColorTableParam(getParam(colorTableParamFld));
             what = "color table minimum range";
             symbol.getColorTableRange().setMin(
                 Misc.parseNumber(colorMinFld.getText()));
@@ -315,6 +326,41 @@ public class PropertiesDialog implements ActionListener {
             symbol.setColorTableUnitName(tmpUnitName);
         }
 
+
+	if(doMultiple()) {
+	    return;
+	}
+
+        if (colorParamFld != null) {
+            what = "Color by properties";
+            symbol.setColorParam(getParam(colorParamFld));
+            symbol.setColorMappings(ColorMap.applyProperties(colorMappings));
+        }
+
+
+
+    }
+
+    protected void doApply(MetSymbol symbol) throws Exception {
+
+
+	doApplyColorSettings(symbol);
+
+	if(doMultiple()) {
+	    return;
+	}
+
+        String[] descrs  = symbol.getParamDescs();
+        String[] ids     = symbol.getParamIds();
+        boolean  doUnits = symbol.showDisplayUnitInProperties();
+        boolean  doFont  = (symbol instanceof TextSymbol);
+
+
+
+	if(!doMultiple()) {
+	    symbol.applyProperties();
+	    symbol.setActive(shownCheckbox.isSelected());
+	}
 
         what = "scale field";
         symbol.setScale(Misc.parseNumber(scaleFld.getText()));
@@ -605,12 +651,13 @@ public class PropertiesDialog implements ActionListener {
         comps.add(GuiUtils.left(scaleFld));
 
 
-        GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        tabbedPane.add("Display",
-                       GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
-                           GuiUtils.WT_N, GuiUtils.WT_N)));
 
-
+	if(!doMultiple()) {
+	    GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+	    tabbedPane.add("Display",
+			   GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
+							      GuiUtils.WT_N, GuiUtils.WT_N)));
+	}
 
 
         if (symbol.shouldShowColorTableGui()) {
@@ -618,7 +665,6 @@ public class PropertiesDialog implements ActionListener {
             tabbedPane.add("Color By", colorTabbedPane);
 
             comps = new ArrayList();
-
 
             colorUnitFld =
                 GuiUtils.getEditableBox(canvas.getDefaultUnitList(),
@@ -649,10 +695,12 @@ public class PropertiesDialog implements ActionListener {
                 Misc.format(symbol.getColorTableRange().getMax()));
             setTmpColorTable(symbol.getColorTable());
             colorTableParamFld.setText(symbol.getColorTableParam());
-            comps.add(GuiUtils.rLabel("Map Value of:"));
-            comps.add(GuiUtils.left(colorTableParamFld));
-            comps.add(new JLabel(""));
-            comps.add(new JLabel("Into:"));
+	    if(!doMultiple()) {
+		comps.add(GuiUtils.rLabel("Map Value of:"));
+		comps.add(GuiUtils.left(colorTableParamFld));
+		comps.add(new JLabel(""));
+		comps.add(new JLabel("Into:"));
+	    }
             comps.add(GuiUtils.rLabel("Data Range:"));
             rightComps = new ArrayList();
             rightComps.add(colorMinFld);
@@ -678,8 +726,10 @@ public class PropertiesDialog implements ActionListener {
             colorParamFld.setToolTipText("<html>Parameter name to color by.<br>Right mouse to use aliases or current fields</html>");
             colorParamFld.setText(symbol.getColorParam());
 
-            comps.add(GuiUtils.rLabel("Get Color From:"));
-            comps.add(GuiUtils.left(colorParamFld));
+	    if(!doMultiple()) {
+		comps.add(GuiUtils.rLabel("Get Color From:"));
+		comps.add(GuiUtils.left(colorParamFld));
+	    }
 
 
             mappingHolder = new JPanel(new BorderLayout());
@@ -691,11 +741,12 @@ public class PropertiesDialog implements ActionListener {
 
             comps.add(GuiUtils.top(GuiUtils.rLabel("Color Mapping:")));
             comps.add(mappingScroller);
-            GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            colorTabbedPane.add("Color From Parameter",
-                                GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
-                                    GuiUtils.WT_N, GuiUtils.WT_N)));
-
+	    if(!doMultiple()) {
+		GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+		colorTabbedPane.add("Color From Parameter",
+				    GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
+								       GuiUtils.WT_N, GuiUtils.WT_N)));
+	    }
 
         }
 
@@ -744,14 +795,16 @@ public class PropertiesDialog implements ActionListener {
             comps.add(GuiUtils.left(GuiUtils.hbox(rightComps, 5)));
 
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            tabbedPane.add("Scale Size",
-                           GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
-                               GuiUtils.WT_N, GuiUtils.WT_N)));
+	    if(!doMultiple()) {
+		tabbedPane.add("Scale Size",
+			       GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
+								  GuiUtils.WT_N, GuiUtils.WT_N)));
 
+	    }
         }
 
-
-        if (symbol.shouldShowRotateGui()) {
+	
+        if (!doMultiple() && symbol.shouldShowRotateGui()) {
             JTabbedPane rotateTab = new JTabbedPane();
             tabbedPane.add("Rotate", rotateTab);
             rotateZGui = new RotateGui(symbol.getRotateZInfo());
@@ -769,7 +822,9 @@ public class PropertiesDialog implements ActionListener {
         }
 
 
-        symbol.addPropertyTabs(tabbedPane);
+	if(!doMultiple()) {
+	    symbol.addPropertyTabs(tabbedPane);
+	}
 
 
 
@@ -795,8 +850,13 @@ public class PropertiesDialog implements ActionListener {
      * Se tthe title on the dialog window
      */
     private void setDialogTitle() {
-        dialog.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor - Properties Dialog - "
-                        + symbol.getLabel());
+	if(!doMultiple()) {
+	    dialog.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor - Properties Dialog - "
+			    + symbol.getLabel());
+	} else {
+	    dialog.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor - Properties Dialog - Serlected");
+
+	}
     }
 
     /**

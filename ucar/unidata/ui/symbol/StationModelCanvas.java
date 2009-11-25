@@ -369,9 +369,22 @@ public class StationModelCanvas extends EditCanvas {
     public JMenu makeEditMenu(JMenu editMenu) {
         editMenu.add(GuiUtils.makeDynamicMenu("Symbols", this,
                 "initSymbolsMenu"));
+	editMenu.add(GuiUtils.makeMenuItem("Set properties on selected", this, "setPropertiesOnSelected"));
         editMenu.addSeparator();
         return super.makeEditMenu(editMenu);
     }
+
+    public void setPropertiesOnSelected() {
+	List selected = getSelection();
+	if(selected == null || selected.size()==0) {
+	    GuiUtils.showOkDialog(null,"Set range on selected", new JLabel("No shapes are selected"),null);
+	    return;
+	}
+	PropertiesDialog propertiesDialog = new PropertiesDialog(selected, this);
+        propertiesDialog.show();
+    }
+
+
 
     private MetSymbol highlightedMetSymbol;
 
