@@ -1,6 +1,6 @@
 
 body {
-   font-size: 11pt;
+   font-size: 12pt;
    font-family: Arial, Helvetica, sans-serif;       
    color: black;
    margin: 0px;
@@ -37,7 +37,7 @@ body {
 
 
 .plain {
-    font-size:11px;
+    font-size:12px;
     font-weight: normal;
 }
 
@@ -430,7 +430,7 @@ a.header-left  {
 
 
 .pagesubsubtitle {
-    font-size: 10pt;
+    font-size: 12pt;
     font-weight: bold;
     color: #8080C0;
     margin-top: 5;
@@ -588,7 +588,7 @@ a.header-left  {
 
 
 td {
-   font-size:11px;
+   font-size:12px;
    font-weight: normal;
 }
 
@@ -912,7 +912,6 @@ code.menu {
 .entryheader {
    font-weight: bold;
    font-size: 12pt;
-   xfont-size: 110%;
    color: #9C9C9C;
    border-bottom : 1px #666666 solid;
    margin-bottom:5px;
