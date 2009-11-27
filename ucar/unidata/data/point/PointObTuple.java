@@ -95,13 +95,18 @@ public class PointObTuple extends Tuple implements PointOb {
         return data;
     }
 
+    public boolean isMissing() {
+	return location==null || dateTime == null || data == null;
+    }
+
+
 
     /**
      * Create, if needed, and return the component array.
      *
      * @return components
      */
-    public Data[] getComponents() {
+    public Data[] getComponents(boolean copy) {
         //Create the array and populate it if needed
         if (components == null) {
             components    = new Data[3];

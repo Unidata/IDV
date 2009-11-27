@@ -1155,13 +1155,11 @@ public class PointObFactory {
         List shortNamesList = new ArrayList();
 
         log_.debug("number of data variables = " + numVars);
+
         boolean[]    isVarNumeric = new boolean[numVars];
         boolean      allReals     = true;
         ScalarType[] types        = new ScalarType[numVars];
         Unit[]       varUnits     = new Unit[numVars];
-
-
-
         List         numericTypes = new ArrayList();
         List         numericUnits = new ArrayList();
         List         stringTypes  = new ArrayList();
@@ -1274,6 +1272,7 @@ public class PointObFactory {
         //        Trace.call1("loop-3");
         int size = pos.size();
 
+	Data[] prototype = null;
         for (int i = 0; i < size; i++) {
             PointObsDatatype po = (PointObsDatatype) pos.get(i);
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -1307,11 +1306,14 @@ public class PointObFactory {
 
             Tuple tuple = (allReals
                            ? (Tuple) new DoubleTuple(
-                               (RealTupleType) allTupleType, realArray,
+						     (RealTupleType) allTupleType, prototype, realArray,
                                allUnits)
-                           : new DoubleStringTuple(allTupleType, realArray,
+                           : new DoubleStringTuple(allTupleType, prototype, realArray,
                                stringArray, allUnits));
 
+	    if(prototype==null) {
+		prototype = tuple.getComponents();
+	    }
 
             if (finalTT == null) {
                 pot = new PointObTuple(elt, (DateTime) times.get(i), tuple);
@@ -1458,8 +1460,6 @@ public class PointObFactory {
         boolean          allReals     = true;
         ScalarType[]     types        = new ScalarType[numVars];
         Unit[]           varUnits     = new Unit[numVars];
-
-
 
         List<ScalarType> numericTypes = new ArrayList<ScalarType>();
         List<Unit>       numericUnits = new ArrayList<Unit>();

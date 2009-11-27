@@ -499,9 +499,20 @@ public class TextPointDataSource extends PointDataSource {
             throws Exception {
 
 
-
         FieldImpl obs = null;
         //        FieldImpl obs = (FieldImpl) getCache (source);
+
+	final List<Tuple> pointTuples = new ArrayList<Tuple>();
+	TextAdapter.StreamProcessor streamProcessorToUse = streamProcessor;
+	if(streamProcessorToUse==null) {
+	    streamProcessorToUse =  new TextAdapter.StreamProcessor() {
+		public void processTuple(Tuple tuple) {
+		    pointTuples.add(tuple);
+		}
+	    };
+	}
+
+
         if (obs == null) {
             TextAdapter ta = null;
             try {
@@ -540,7 +551,7 @@ public class TextPointDataSource extends PointDataSource {
 
                 ta = new TextAdapter(getInputStream(contents), delimiter,
                                      map, params, dataProperties, sampleIt,
-                                     skipPattern, streamProcessor);
+                                     skipPattern, streamProcessorToUse);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -557,7 +568,7 @@ public class TextPointDataSource extends PointDataSource {
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
                                      map, params, dataProperties, sampleIt,
-                                     skipPattern, streamProcessor);
+                                     skipPattern, streamProcessorToUse);
             }
             try {
                 Data d = ta.getData();
@@ -565,10 +576,20 @@ public class TextPointDataSource extends PointDataSource {
                     if (streamProcessor != null) {
                         return null;
                     }
-                    throw new IllegalArgumentException(
-                        "Could not create point data");
+                    if (streamProcessorToUse == null) {
+			throw new IllegalArgumentException(
+							   "Could not create point data");
+		    }
                 }
-                obs = makePointObs(d, trackParam);
+
+		long t1 = System.currentTimeMillis();
+		if(streamProcessorToUse!=null) {
+		    obs = makePointObs(pointTuples, trackParam);
+		} else {
+		    obs = makePointObs(d, trackParam);
+		}
+		long t2 = System.currentTimeMillis();
+		//		System.err.println ("makePointObs sample = " + sampleIt +" time: " + (t2-t1));
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
                 }
@@ -1510,7 +1531,6 @@ public class TextPointDataSource extends PointDataSource {
             //System.out.println("type = " + type);
             //System.out.println(indexSet.getLength() + " obs");
             long    mil2     = System.currentTimeMillis();
-            boolean allReals = (type instanceof RealTupleType);
 
 	    //The default time to use is now
 	    Real dfltTime = new DateTime(new java.util.Date());
@@ -1585,11 +1605,123 @@ public class TextPointDataSource extends PointDataSource {
             int       numObs = indexSet.getLength();
             PointOb[] obs    = new PointObTuple[numObs];
             List      times  = new ArrayList();
+	    List      locations = new ArrayList();
             List      tuples = new ArrayList();
+
+	    List<double[]> reals = new ArrayList<double[]>();
+	    List<String[]> strings = new ArrayList<String[]>();
+	    boolean[]    isVarNumeric = null;
+	    boolean      allReals     = true;
+	    ScalarType[] types;
+	    Unit[]       varUnits;
+	    List         numericTypes = new ArrayList();
+	    List         numericUnits = new ArrayList();
+	    List         stringTypes  = new ArrayList();
+	    int numReals = 0;
+	    int numStrings = 0;
+
+	    TupleType allTupleType = null;
+	    Unit[] allUnits = null;
+	    Data[] prototype = null;
+
             for (int i = 0; i < numObs; i++) {
                 Tuple  ob        = (Tuple) recNumObs.getSample(i);
-                Data[] tupleData = ob.getComponents();
-                tuples.add(tupleData);
+                Data[] tupleData = ob.getComponents(false);
+		if(isVarNumeric==null) {
+		    if (numNotRequired > 0) {
+			isVarNumeric  = new boolean[numNotRequired];
+			types = new ScalarType[numNotRequired];
+			varUnits = new Unit[numNotRequired];
+			for (int varIdx = 0; varIdx < numNotRequired; varIdx++) {
+			    Data d = tupleData[notReqIndices[varIdx]];
+			    types[varIdx] = (ScalarType)d.getType();
+			    if(d instanceof Real) {
+				numReals++;
+				isVarNumeric[varIdx] = true;
+				numericTypes.add(d.getType());
+				varUnits[varIdx] = ((RealType)d.getType()).getDefaultUnit();
+				varNames.add(((RealType) d.getType()).getName());
+				numericUnits.add(varUnits[varIdx]);
+			    } else {
+				numStrings++;
+				isVarNumeric[varIdx] = false;
+				allReals = false;
+				stringTypes.add(d.getType());
+			    }
+			} 
+		    } else {
+			isVarNumeric  = new boolean[]{true};
+			types = new ScalarType[1];
+			varUnits = new Unit[1];
+			numReals = 1;
+			varNames.add(((RealType) dfltReal.getType()).getName());
+			numericTypes.add(dfltReal.getType());
+			varUnits[0] = ((RealType)dfltReal.getType()).getDefaultUnit();
+			numericUnits.add(varUnits[0]);
+		    }
+
+		    allTupleType = allReals
+			? new RealTupleType(
+					    (RealType[]) numericTypes.toArray(
+									      new RealType[numericTypes.size()]))
+			: DoubleStringTuple.makeTupleType(
+							  numericTypes, stringTypes);
+		    allUnits = (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+                }
+
+
+		double[] realArray   = new double[numReals];
+		String[] stringArray = ((numStrings == 0)
+					? null
+					: new String[numStrings]);
+
+		int stringCnt = 0;
+		int realCnt   = 0;
+		if (numNotRequired > 0) {
+		    for (int varIdx = 0; varIdx < numNotRequired; varIdx++) {
+			Data d = tupleData[notReqIndices[varIdx]];
+			if ( !isVarNumeric[varIdx]) {
+			    stringArray[stringCnt++] = ((Text) d).getValue();
+			} else {
+			    realArray[realCnt++] = ((Real) d).getValue();
+			}
+		    }
+		} else {
+		    realArray[0] = 0;
+		}
+
+		Tuple tuple = (allReals
+			       ? (Tuple) new DoubleTuple(
+							 (RealTupleType) allTupleType, prototype,realArray,
+							 allUnits)
+			       : new DoubleStringTuple(allTupleType, prototype,realArray,
+						       stringArray, allUnits));
+		if(prototype == null) {
+		    prototype = tuple.getComponents();
+		}
+
+		tuples.add(tuple);
+		
+		Real lat = (Real) tupleData[latIndex];
+		Real lon = (Real) tupleData[lonIndex];
+		Real alt = (altIndex != -1)
+		    ? (Real) tupleData[altIndex]
+		    : dfltAlt;
+
+		if(!lat.getType().equals(RealType.Latitude)) {
+		    lat = new Real(RealType.Latitude,lat.getValue(RealType.Latitude.getDefaultUnit()) );
+		}
+
+		if(!lon.getType().equals(RealType.Longitude)) {
+		    lon = new Real(RealType.Longitude,lon.getValue(RealType.Longitude.getDefaultUnit()) );
+		}
+
+		if(altIndex>=0 && !alt.getType().equals(RealType.Altitude)) {
+		    alt = new Real(RealType.Altitude,alt.getValue(RealType.Altitude.getDefaultUnit()) );
+		}
+		
+                locations.add(new EarthLocationLite(lat,lon,alt));
+
                 // get DateTime.  Must have valid time unit.  If not assume
                 // seconds since epoch.  Maybe we should throw an error?
                 Real timeVal = (timeIndex==-1?dfltTime:(Real) tupleData[timeIndex]);
@@ -1598,7 +1730,7 @@ public class TextPointDataSource extends PointDataSource {
                 } else {  // assume seconds since epoch
                     times.add(new DateTime(timeVal.getValue()));
                 }
-            }
+	    }
 
 
             if (trackParam != null) {
@@ -1617,6 +1749,7 @@ public class TextPointDataSource extends PointDataSource {
                         throw new IllegalArgumentException(
                             "Can't find group param: " + groupVarName);
                     }
+		    //TODO:
                     List      names = new ArrayList();
                     Hashtable seen  = new Hashtable();
                     for (int i = 0; i < numObs; i++) {
@@ -1682,12 +1815,217 @@ public class TextPointDataSource extends PointDataSource {
                                             getBinWidth());
 
 
+
+
             for (int i = 0; i < numObs; i++) {
                 DateTime dateTime  = (DateTime) times.get(i);
-                Data[]   tupleData = (Data[]) tuples.get(i);
-                //Clear the garbage
-                tuples.set(i, null);
-                // get location
+		Data rest = (Data)tuples.get(i);
+		EarthLocationLite location = (EarthLocationLite) locations.get(i);
+                if (finalTT == null) {
+                    PointObTuple pot = new PointObTuple(location, dateTime,
+                                           rest);
+                    obs[i]  = pot;
+                    finalTT = Tuple.buildTupleType(pot.getComponents());
+                } else {
+                    obs[i] = new PointObTuple(location, dateTime, rest,
+                            finalTT, false);
+
+                }
+            }
+            retField = new FieldImpl(
+                new FunctionType(
+                    ((SetType) indexSet.getType()).getDomain(),
+                    obs[0].getType()), indexSet);
+            retField.setSamples(obs, false, false);
+        } catch (RemoteException re) {
+            throw new VisADException("got RemoteException " + re);
+        }
+        //System.out.println("Making point obs took " + (System.currentTimeMillis() - millis));
+        return retField;
+    }
+
+
+
+
+
+    private FieldImpl makePointObs(List<Tuple> pointTuples, String trackParam)
+            throws VisADException {
+
+	if(pointTuples.size() == 0) return null;
+        varNames = new ArrayList();
+        FieldImpl retField = null;
+        try {
+	    Tuple input = pointTuples.get(0);
+            TupleType    type = (TupleType)input.getType();
+	    //The default time to use is now
+	    Real dfltTime = new DateTime(new java.util.Date());
+            // check for time 
+            int timeIndex = -1;
+            for (int i = 0; i < timeVars.length; i++) {
+                timeIndex = type.getIndex(timeVars[i]);
+                if (timeIndex > -1) {
+                    break;
+                }
+            }
+
+            if (timeIndex == -1) {
+		//jeffmc, time change                throw new IllegalArgumentException("can't find DateTime components");
+            }
+
+            Real      dfltAlt          = new Real(RealType.Altitude, 1);
+            Real      dfltReal         = getDefaultValue();
+
+
+            TupleType finalTT          = null;
+            TupleType dataTupleType    = null;
+            Unit[]    dataUnits        = null;
+
+
+            int[]     latLonAltIndices = findLatLonAltIndices(type);
+            int       latIndex         = latLonAltIndices[0];
+            int       lonIndex         = latLonAltIndices[1];
+            int       altIndex         = latLonAltIndices[2];
+
+            if (altIndex >= 0) {
+                varNames.add("Altitude");
+            }
+            int trackParamIndex = -1;
+            if (trackParam != null) {
+                if (trackParam.equals("Altitude")) {
+                    trackParamIndex = altIndex;
+                } else if (trackParam.equals("Default")) {}
+                else {
+                    trackParamIndex = type.getIndex(trackParam);
+                    if (trackParamIndex == -1) {
+                        throw new IllegalArgumentException(
+                            "Can't find track param");
+                    }
+                }
+            }
+
+
+
+            //if (altIndex == -1) altIndex = type.getIndex("elev");
+            if ((latIndex == -1) || (lonIndex == -1)) {
+                throw new IllegalArgumentException("can't find lat/lon");
+            }
+
+            int numVars        = type.getDimension();
+            int numNotRequired = numVars - ((altIndex != -1)
+                                            ? 4
+                                            : 3);
+            //System.out.println("Of " + numVars + " vars, " + numNotRequired + 
+            //                   " are not required");
+
+            int[] notReqIndices = new int[numNotRequired];
+
+            int   l             = 0;
+            for (int i = 0; i < numVars; i++) {
+                if ((i != timeIndex) && (i != latIndex) && (i != lonIndex)
+                        && (i != altIndex)) {
+                    notReqIndices[l++] = i;
+                }
+            }
+
+            int       numObs = pointTuples.size();
+            PointOb[] obs    = new PointObTuple[numObs];
+            List      times  = new ArrayList();
+	    List      locations = new ArrayList();
+            List      tuples = new ArrayList();
+
+	    List<double[]> reals = new ArrayList<double[]>();
+	    List<String[]> strings = new ArrayList<String[]>();
+	    boolean[]    isVarNumeric = null;
+	    boolean      allReals     = true;
+	    ScalarType[] types;
+	    Unit[]       varUnits;
+	    List         numericTypes = new ArrayList();
+	    List         numericUnits = new ArrayList();
+	    List         stringTypes  = new ArrayList();
+	    int numReals = 0;
+	    int numStrings = 0;
+
+	    TupleType allTupleType = null;
+	    Unit[] allUnits = null;
+	    Data[] prototype = null;
+
+            for (int i = 0; i < pointTuples.size(); i++) {
+                Tuple  ob        = pointTuples.get(i);
+                Data[] tupleData = ob.getComponents(false);
+		if(isVarNumeric==null) {
+		    if (numNotRequired > 0) {
+			isVarNumeric  = new boolean[numNotRequired];
+			types = new ScalarType[numNotRequired];
+			varUnits = new Unit[numNotRequired];
+			for (int varIdx = 0; varIdx < numNotRequired; varIdx++) {
+			    Data d = tupleData[notReqIndices[varIdx]];
+			    types[varIdx] = (ScalarType)d.getType();
+			    if(d instanceof Real) {
+				numReals++;
+				isVarNumeric[varIdx] = true;
+				numericTypes.add(d.getType());
+				varUnits[varIdx] = ((RealType)d.getType()).getDefaultUnit();
+				varNames.add(((RealType) d.getType()).getName());
+				numericUnits.add(varUnits[varIdx]);
+			    } else {
+				numStrings++;
+				isVarNumeric[varIdx] = false;
+				allReals = false;
+				stringTypes.add(d.getType());
+			    }
+			} 
+		    } else {
+			isVarNumeric  = new boolean[]{true};
+			types = new ScalarType[1];
+			varUnits = new Unit[1];
+			numReals = 1;
+			varNames.add(((RealType) dfltReal.getType()).getName());
+			numericTypes.add(dfltReal.getType());
+			varUnits[0] = ((RealType)dfltReal.getType()).getDefaultUnit();
+			numericUnits.add(varUnits[0]);
+		    }
+
+		    allTupleType = allReals
+			? new RealTupleType(
+					    (RealType[]) numericTypes.toArray(
+									      new RealType[numericTypes.size()]))
+			: DoubleStringTuple.makeTupleType(
+							  numericTypes, stringTypes);
+		    allUnits = (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+                }
+
+
+		double[] realArray   = new double[numReals];
+		String[] stringArray = ((numStrings == 0)
+					? null
+					: new String[numStrings]);
+
+		int stringCnt = 0;
+		int realCnt   = 0;
+		if (numNotRequired > 0) {
+		    for (int varIdx = 0; varIdx < numNotRequired; varIdx++) {
+			Data d = tupleData[notReqIndices[varIdx]];
+			if ( !isVarNumeric[varIdx]) {
+			    stringArray[stringCnt++] = ((Text) d).getValue();
+			} else {
+			    realArray[realCnt++] = ((Real) d).getValue();
+			}
+		    }
+		} else {
+		    realArray[0] = 0;
+		}
+
+		Tuple tuple = (allReals
+			       ? (Tuple) new DoubleTuple(
+							 (RealTupleType) allTupleType, prototype,realArray,
+							 allUnits)
+			       : new DoubleStringTuple(allTupleType, prototype,realArray,
+						       stringArray, allUnits));
+		if(prototype == null) {
+		    prototype = tuple.getComponents();
+		}
+
+		tuples.add(tuple);
 		
 		Real lat = (Real) tupleData[latIndex];
 		Real lon = (Real) tupleData[lonIndex];
@@ -1706,59 +2044,108 @@ public class TextPointDataSource extends PointDataSource {
 		if(altIndex>=0 && !alt.getType().equals(RealType.Altitude)) {
 		    alt = new Real(RealType.Altitude,alt.getValue(RealType.Altitude.getDefaultUnit()) );
 		}
-
 		
-                EarthLocation location =  new EarthLocationLite(lat,lon,alt);
+                locations.add(new EarthLocationLite(lat,lon,alt));
 
-
-
-                // now make data
-                Data[] others;
-                if (numNotRequired > 0) {
-                    others = (allReals == true)
-                             ? new Real[numNotRequired]
-                             : new Data[numNotRequired];
-                    for (int j = 0; j < numNotRequired; j++) {
-                        others[j] = (allReals == true)
-                                    ? (Real) tupleData[notReqIndices[j]]
-                                    : (Data) tupleData[notReqIndices[j]];
-                        //if (i == 0) {
-                        //    System.err.println("name:" + others[j].getType());
-                        //}
-                    }
-                } else {
-                    others = new Real[] { dfltReal };
+                // get DateTime.  Must have valid time unit.  If not assume
+                // seconds since epoch.  Maybe we should throw an error?
+                Real timeVal = (timeIndex==-1?dfltTime:(Real) tupleData[timeIndex]);
+                if (timeVal.getUnit() != null) {
+                    times.add(new DateTime(timeVal));
+                } else {  // assume seconds since epoch
+                    times.add(new DateTime(timeVal.getValue()));
                 }
+	    }
 
 
-                if (i == 0) {
-                    for (int otherIdx = 0; otherIdx < others.length;
-                            otherIdx++) {
-                        if (others[otherIdx] instanceof Real) {
-                            Real r = (Real) others[otherIdx];
-                            varNames.add(((RealType) r.getType()).getName());
+            if (trackParam != null) {
+                if ((groupVarName != null) && (groupVarName.length() > 0)) {
+                    int groupParamIndex = -1;
+                    for (int typeIdx = 0; typeIdx < type.getDimension();
+                            typeIdx++) {
+                        String ts = type.getComponent(typeIdx).toString();
+                        if (ts.equals(groupVarName)
+                                || ts.equals(groupVarName + "(Text)")) {
+                            groupParamIndex = typeIdx;
+                            break;
                         }
                     }
-                }
-
-
-                if (dataTupleType == null) {
-                    Tuple tmp = (allReals == true)
-                                ? new RealTuple((Real[]) others)
-                                : new Tuple(others, false);
-                    dataTupleType = (TupleType) tmp.getType();
-                    if (allReals) {
-                        dataUnits = ((RealTuple) tmp).getTupleUnits();
+                    if (groupParamIndex == -1) {
+                        throw new IllegalArgumentException(
+                            "Can't find group param: " + groupVarName);
                     }
+		    //TODO:
+                    List      names = new ArrayList();
+                    Hashtable seen  = new Hashtable();
+                    for (int i = 0; i < numObs; i++) {
+                        Data[] tupleData = (Data[]) tuples.get(i);
+                        String v = tupleData[groupParamIndex].toString();
+                        List   dataList  = (List) seen.get(v);
+                        List   timeList  = (List) seen.get(v + "_timelist");
+                        if (dataList == null) {
+                            names.add(v);
+                            dataList = new ArrayList();
+                            timeList = new ArrayList();
+                            seen.put(v, dataList);
+                            seen.put(v + "_timelist", timeList);
+                        }
+                        timeList.add(times.get(i));
+                        dataList.add(tupleData);
+                    }
+                    List     tracks    = new ArrayList();
+                    MathType trackType = null;
+                    for (int nameIdx = 0; nameIdx < names.size(); nameIdx++) {
+                        String name     = (String) names.get(nameIdx);
+                        List   dataList = (List) seen.get(name);
+                        List timeList   = (List) seen.get(name + "_timelist");
+                        FieldImpl track = makeTrack(trackParamIndex,
+                                              latIndex, lonIndex, altIndex,
+                                              timeList, dataList);
+                        if (trackType == null) {
+                            trackType = track.getType();
+                        }
+                        tracks.add(track);
+                    }
+                    TextType textType = TextType.getTextType(groupVarName
+                                            + "_type");
+                    TupleType tt = new TupleType(new MathType[] { textType,
+                            trackType });
+                    Data[] tracksData = new Data[tracks.size()];
+                    for (int i = 0; i < tracks.size(); i++) {
+                        String name = (String) names.get(i);
+                        Data   d    = (Data) tracks.get(i);
+                        tracksData[i] = new Tuple(tt,
+                                new Data[] { new Text(textType, name),
+                                             d });
+                    }
+
+                    RealType indexType = RealType.getRealType("index");
+                    Set domain = new Linear1DSet(indexType, 0,
+                                     tracks.size() - 1, tracks.size());
+                    FunctionType aggregateType = new FunctionType(indexType,
+                                                     tt);
+                    FieldImpl aggregateField = new FieldImpl(aggregateType,
+                                                   domain);
+                    aggregateField.setSamples(tracksData, false);
+                    return aggregateField;
                 }
 
+                return makeTrack(trackParamIndex, latIndex, lonIndex,
+                                 altIndex, times, tuples);
+            }
 
-                Data rest = (allReals == true)
-                            ? new RealTuple((RealTupleType) dataTupleType,
-                                            (Real[]) others, null, dataUnits,
-                                            false)
-                            : new Tuple(dataTupleType, others, false, false);
 
+
+            times = PointObFactory.binTimes(times, getBinRoundTo(),
+                                            getBinWidth());
+
+
+
+
+            for (int i = 0; i < numObs; i++) {
+                DateTime dateTime  = (DateTime) times.get(i);
+		Data rest = (Data)tuples.get(i);
+		EarthLocationLite location = (EarthLocationLite) locations.get(i);
                 if (finalTT == null) {
                     PointObTuple pot = new PointObTuple(location, dateTime,
                                            rest);
@@ -1770,7 +2157,9 @@ public class TextPointDataSource extends PointDataSource {
 
                 }
             }
-            retField = new FieldImpl(
+	    Integer1DSet indexSet =
+		new Integer1DSet(RealType.getRealType("index"), obs.length);
+	    retField = new FieldImpl(
                 new FunctionType(
                     ((SetType) indexSet.getType()).getDomain(),
                     obs[0].getType()), indexSet);
@@ -1942,15 +2331,63 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception On badness
      */
     public static void main2(String[] args) throws Exception {
+	String contents = IOUtil.readContents(args[0],
+					      TextPointDataSource.class);
+
+
+	TextAdapter.StreamProcessor streamProcessor = new TextAdapter.StreamProcessor() {
+		public void processTuple(Tuple tuple) {
+		}
+	    };
+
+        long total = 0;
+	int cnt = 10;
+        for (int i = 0; i <= cnt; i++) {
+            long        t1 = System.currentTimeMillis();
+	    if(true) {
+		TextPointDataSource dataSource =
+		    new TextPointDataSource(new DataSourceDescriptor(), args[0],
+					    new Hashtable());
+
+		FieldImpl field = dataSource.makeObs(contents, ",", null,
+						     null, null, false, false);
+
+	    } else {
+		//original time: 1680
+		//		streamProcessor = null;
+                TextAdapter ta = new TextAdapter(new ByteArrayInputStream(contents.getBytes()), ",",
+						 null, null, new Hashtable(),false, null,
+						 streamProcessor);
+		
+
+		ta.getData();
+	    }
+
+            long        t2 = System.currentTimeMillis();
+            if (i != 0) {
+                total += (t2 - t1);
+            }
+        }
+        System.err.println("avg:" + (total / cnt));
+
+    /*
+
+
+	long total = 0;
         try {
-            for (int i = 0; i < 1; i++) {
+	    int cnt = 20;
+            for (int i = 0; i <= 20; i++) {
+		long        t1 = System.currentTimeMillis();
                 TextPointDataSource tpds = new TextPointDataSource();
                 //            long m1 =  Misc.gc();
                 Data data = tpds.test(args[0]);
 
-                //            long m2 =   Misc.gc();
-                //            System.err.println ("memory:" + (m2-m1));
+		long        t2 = System.currentTimeMillis();
+		if (i != 0) {
+		    total += (t2 - t1);
+		}
             }
+	    System.err.println("avg:" + (total / cnt));
         } catch (Exception exc) {
             System.err.println("err:" + exc);
             exc.printStackTrace();
@@ -1960,7 +2397,7 @@ public class TextPointDataSource extends PointDataSource {
         }
 
 
-        long total = 0;
+
         for (int i = 0; i < 5; i++) {
             java.net.URL url = IOUtil.getURL(args[0],
                                              TextPointDataSource.class);
@@ -1978,9 +2415,9 @@ public class TextPointDataSource extends PointDataSource {
         }
         System.err.println("avg:" + (total / 4));
         //putCache (source, obs);
-    }
 
-
+	*/
+}
 
 
 
@@ -2003,6 +2440,11 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception on badness
      */
     public static void main(String[] args) throws Exception {
+	if(true) {
+	    main2(args);
+	    return;
+	    
+	}
 
         if (args.length == 0) {
             usage();
