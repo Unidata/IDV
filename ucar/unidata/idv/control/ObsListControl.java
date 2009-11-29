@@ -696,9 +696,12 @@ public class ObsListControl extends ObsDisplayControl {
         Tuple t = (Tuple) ob.getData();
         for (int i = 0; i < t.getDimension(); i++) {
             Scalar s = (Scalar) t.getComponent(i);
-            nameToDescription.put(
-                Util.cleanTypeName(s.getType().prettyString()),
-                makeDescription(s));
+	    String cleanName = Util.cleanTypeName(s.getType().prettyString());
+	    if(nameToDescription.get(cleanName) == null) {
+		nameToDescription.put(
+				      cleanName,
+				      makeDescription(s));
+	    }
         }
 
     }
@@ -751,7 +754,6 @@ public class ObsListControl extends ObsDisplayControl {
             names[i] = removeUnitString(sorter.getColumnName(i));
             //    System.err.println("names[i]=" + names[i]);
             String desc = (String) nameToDescription.get(names[i]);
-
             if (names[i].equals(LABEL_TIME)) {
                 names[i] = RealType.Time.getName();
             } else if (desc == null) {
