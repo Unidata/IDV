@@ -502,12 +502,12 @@ public class TextPointDataSource extends PointDataSource {
         FieldImpl obs = null;
         //        FieldImpl obs = (FieldImpl) getCache (source);
 
-	final List<Tuple> pointTuples = new ArrayList<Tuple>();
+	final List<Data[]> pointValues = new ArrayList<Data[]>();
 	TextAdapter.StreamProcessor streamProcessorToUse = streamProcessor;
 	if(streamProcessorToUse==null) {
 	    streamProcessorToUse =  new TextAdapter.StreamProcessor() {
-		public void processTuple(Tuple tuple) {
-		    pointTuples.add(tuple);
+		public void processValues(Data[]values) {
+		    pointValues.add(values);
 		}
 	    };
 	}
@@ -549,9 +549,13 @@ public class TextPointDataSource extends PointDataSource {
                     applySavedMetaData(metadata);
                 }
 
-                ta = new TextAdapter(getInputStream(contents), delimiter,
+		InputStream inputStream = getInputStream(contents);
+		long t1 = System.currentTimeMillis();
+                ta = new TextAdapter(inputStream, delimiter,
                                      map, params, dataProperties, sampleIt,
                                      skipPattern, streamProcessorToUse);
+		long t2 = System.currentTimeMillis();
+		//		System.err.println("Time:" + (t2-t1) +"  sampling:" + sampleIt); 
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -580,11 +584,12 @@ public class TextPointDataSource extends PointDataSource {
 			throw new IllegalArgumentException(
 							   "Could not create point data");
 		    }
+		    //		    return null;
                 }
 
 		long t1 = System.currentTimeMillis();
 		if(streamProcessorToUse!=null) {
-		    obs = makePointObs(pointTuples, trackParam);
+		    obs = makePointObs(pointValues, trackParam);
 		} else {
 		    obs = makePointObs(d, trackParam);
 		}
@@ -1368,7 +1373,7 @@ public class TextPointDataSource extends PointDataSource {
      */
     private FieldImpl makeTrack(int trackParamIndex, int latIndex,
                                 int lonIndex, int altIndex, List times,
-                                List tuples)
+                                List<Data[]> pointData)
             throws VisADException, RemoteException {
         float[] lats = new float[times.size()];
         float[] lons = new float[times.size()];
@@ -1378,7 +1383,7 @@ public class TextPointDataSource extends PointDataSource {
 
         Real paramSample;
         if (trackParamIndex >= 0) {
-            paramSample = (Real) ((Data[]) tuples.get(0))[trackParamIndex];
+            paramSample = (Real) (pointData.get(0)[trackParamIndex]);
         } else {
             paramSample = getDefaultValue();
         }
@@ -1392,15 +1397,12 @@ public class TextPointDataSource extends PointDataSource {
         int        numObs       = times.size();
         for (int i = 0; i < numObs; i++) {
             DateTime dateTime = (DateTime) times.get(i);
+            Data[] tupleData =  pointData.get(i);
             Real     value    = ((trackParamIndex >= 0)
-                                 ? (Real) ((Data[]) tuples.get(
-                                     i))[trackParamIndex]
+                                 ? (Real) tupleData[trackParamIndex]
                                  : getDefaultValue());
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
-            Data[] tupleData = (Data[]) tuples.get(i);
-            //Clear the garbage
-            tuples.set(i, null);
             lats[i] = (float) ((Real) tupleData[latIndex]).getValue();
             lons[i] = (float) ((Real) tupleData[lonIndex]).getValue();
             if (altIndex >= 0) {
@@ -1627,6 +1629,21 @@ public class TextPointDataSource extends PointDataSource {
             for (int i = 0; i < numObs; i++) {
                 Tuple  ob        = (Tuple) recNumObs.getSample(i);
                 Data[] tupleData = ob.getComponents(false);
+
+
+                // get DateTime.  Must have valid time unit.  If not assume
+                // seconds since epoch.  Maybe we should throw an error?
+                Real timeVal = (timeIndex==-1?dfltTime:(Real) tupleData[timeIndex]);
+                if (timeVal.getUnit() != null) {
+                    times.add(new DateTime(timeVal));
+                } else {  // assume seconds since epoch
+                    times.add(new DateTime(timeVal.getValue()));
+                }
+
+		if (trackParam != null) {
+		    continue;
+		}
+
 		if(isVarNumeric==null) {
 		    if (numNotRequired > 0) {
 			isVarNumeric  = new boolean[numNotRequired];
@@ -1722,17 +1739,10 @@ public class TextPointDataSource extends PointDataSource {
 		
                 locations.add(new EarthLocationLite(lat,lon,alt));
 
-                // get DateTime.  Must have valid time unit.  If not assume
-                // seconds since epoch.  Maybe we should throw an error?
-                Real timeVal = (timeIndex==-1?dfltTime:(Real) tupleData[timeIndex]);
-                if (timeVal.getUnit() != null) {
-                    times.add(new DateTime(timeVal));
-                } else {  // assume seconds since epoch
-                    times.add(new DateTime(timeVal.getValue()));
-                }
 	    }
 
 
+	    
             if (trackParam != null) {
                 if ((groupVarName != null) && (groupVarName.length() > 0)) {
                     int groupParamIndex = -1;
@@ -1749,7 +1759,6 @@ public class TextPointDataSource extends PointDataSource {
                         throw new IllegalArgumentException(
                             "Can't find group param: " + groupVarName);
                     }
-		    //TODO:
                     List      names = new ArrayList();
                     Hashtable seen  = new Hashtable();
                     for (int i = 0; i < numObs; i++) {
@@ -1759,7 +1768,7 @@ public class TextPointDataSource extends PointDataSource {
                         List   timeList  = (List) seen.get(v + "_timelist");
                         if (dataList == null) {
                             names.add(v);
-                            dataList = new ArrayList();
+                            dataList = new ArrayList<Data[]>();
                             timeList = new ArrayList();
                             seen.put(v, dataList);
                             seen.put(v + "_timelist", timeList);
@@ -1771,7 +1780,7 @@ public class TextPointDataSource extends PointDataSource {
                     MathType trackType = null;
                     for (int nameIdx = 0; nameIdx < names.size(); nameIdx++) {
                         String name     = (String) names.get(nameIdx);
-                        List   dataList = (List) seen.get(name);
+                        List<Data[]>   dataList = (List<Data[]>) seen.get(name);
                         List timeList   = (List) seen.get(name + "_timelist");
                         FieldImpl track = makeTrack(trackParamIndex,
                                               latIndex, lonIndex, altIndex,
@@ -1808,6 +1817,15 @@ public class TextPointDataSource extends PointDataSource {
                 return makeTrack(trackParamIndex, latIndex, lonIndex,
                                  altIndex, times, tuples);
             }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1848,15 +1866,15 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
-    private FieldImpl makePointObs(List<Tuple> pointTuples, String trackParam)
+    private FieldImpl makePointObs(List<Data[]> pointData, String trackParam)
             throws VisADException {
 
-	if(pointTuples.size() == 0) return null;
+	if(pointData.size() == 0) return null;
         varNames = new ArrayList();
         FieldImpl retField = null;
         try {
-	    Tuple input = pointTuples.get(0);
-            TupleType    type = (TupleType)input.getType();
+	    Data[] input = pointData.get(0);
+            TupleType    type = Tuple.buildTupleType(input);
 	    //The default time to use is now
 	    Real dfltTime = new DateTime(new java.util.Date());
             // check for time 
@@ -1927,7 +1945,7 @@ public class TextPointDataSource extends PointDataSource {
                 }
             }
 
-            int       numObs = pointTuples.size();
+            int       numObs = pointData.size();
             PointOb[] obs    = new PointObTuple[numObs];
             List      times  = new ArrayList();
 	    List      locations = new ArrayList();
@@ -1949,9 +1967,9 @@ public class TextPointDataSource extends PointDataSource {
 	    Unit[] allUnits = null;
 	    Data[] prototype = null;
 
-            for (int i = 0; i < pointTuples.size(); i++) {
-                Tuple  ob        = pointTuples.get(i);
-                Data[] tupleData = ob.getComponents(false);
+            for (int i = 0; i < pointData.size(); i++) {
+                Data[] tupleData =  pointData.get(i);
+
 		if(isVarNumeric==null) {
 		    if (numNotRequired > 0) {
 			isVarNumeric  = new boolean[numNotRequired];
@@ -2078,7 +2096,7 @@ public class TextPointDataSource extends PointDataSource {
                     List      names = new ArrayList();
                     Hashtable seen  = new Hashtable();
                     for (int i = 0; i < numObs; i++) {
-                        Data[] tupleData = (Data[]) tuples.get(i);
+                        Data[] tupleData = (Data[]) pointData.get(i);
                         String v = tupleData[groupParamIndex].toString();
                         List   dataList  = (List) seen.get(v);
                         List   timeList  = (List) seen.get(v + "_timelist");
@@ -2096,7 +2114,7 @@ public class TextPointDataSource extends PointDataSource {
                     MathType trackType = null;
                     for (int nameIdx = 0; nameIdx < names.size(); nameIdx++) {
                         String name     = (String) names.get(nameIdx);
-                        List   dataList = (List) seen.get(name);
+                        List<Data[]>   dataList = (List<Data[]>) seen.get(name);
                         List timeList   = (List) seen.get(name + "_timelist");
                         FieldImpl track = makeTrack(trackParamIndex,
                                               latIndex, lonIndex, altIndex,
@@ -2131,7 +2149,7 @@ public class TextPointDataSource extends PointDataSource {
                 }
 
                 return makeTrack(trackParamIndex, latIndex, lonIndex,
-                                 altIndex, times, tuples);
+                                 altIndex, times, pointData);
             }
 
 
@@ -2334,17 +2352,19 @@ public class TextPointDataSource extends PointDataSource {
 	String contents = IOUtil.readContents(args[0],
 					      TextPointDataSource.class);
 
-
+	final int[] obcnt = {0};
 	TextAdapter.StreamProcessor streamProcessor = new TextAdapter.StreamProcessor() {
-		public void processTuple(Tuple tuple) {
+		public void processValues(Data[] tuple) {
+		    obcnt[0]++;
 		}
 	    };
 
         long total = 0;
-	int cnt = 10;
+	int cnt = 5;
         for (int i = 0; i <= cnt; i++) {
             long        t1 = System.currentTimeMillis();
 	    if(true) {
+		obcnt[0]=0;
 		TextPointDataSource dataSource =
 		    new TextPointDataSource(new DataSourceDescriptor(), args[0],
 					    new Hashtable());
@@ -2353,8 +2373,6 @@ public class TextPointDataSource extends PointDataSource {
 						     null, null, false, false);
 
 	    } else {
-		//original time: 1680
-		//		streamProcessor = null;
                 TextAdapter ta = new TextAdapter(new ByteArrayInputStream(contents.getBytes()), ",",
 						 null, null, new Hashtable(),false, null,
 						 streamProcessor);
@@ -2362,6 +2380,7 @@ public class TextPointDataSource extends PointDataSource {
 
 		ta.getData();
 	    }
+
 
             long        t2 = System.currentTimeMillis();
             if (i != 0) {
@@ -2567,11 +2586,10 @@ public class TextPointDataSource extends PointDataSource {
                 final int[][]lengths = {null};
                 dataSource.setStreamProcessor(
                     new TextAdapter.StreamProcessor() {
-                        public void processTuple(Tuple tuple) {
+                        public void processValues(Data[] data) {
                             tupleCnt[0]++;
                             if(tupleCnt[0]%10000 == 0)
                                 System.err.println("   " + tupleCnt[0]);
-                            Data[]  data  = tuple.getComponents();
                             if(lengths[0]==null) {
                                 lengths[0] = new int[data.length];
                                 for(int i=0;i<lengths[0].length;i++) lengths[0][i]=2;
@@ -2596,19 +2614,17 @@ public class TextPointDataSource extends PointDataSource {
                     int      timeIndex = -1;
                     double[] dvals;
                     String[] svals;
-                    public void processTuple(Tuple tuple) {
+                    public void processValues(Data [] data) {
                         try {
-                            Data[]  data  = tuple.getComponents();
                             boolean first = false;
                             if (writer[0] == null) {
                                 first = true;
-                                TupleType type  = (TupleType) tuple.getType();
+                                TupleType type  = Tuple.buildTupleType(data);
                                 int[] latLonAlt = findLatLonAltIndices(type);
                                 latIndex = latLonAlt[0];
                                 lonIndex = latLonAlt[1];
                                 altIndex = latLonAlt[2];
                                 String altUnit = "meters";
-                                //                                    System.err.println ("tuple:" + tuple);
                                 timeIndex = type.getIndex(RealType.Time);
                                 if (timeIndex < 0) {}
 				//TODO: handle when there is no time
@@ -2616,7 +2632,7 @@ public class TextPointDataSource extends PointDataSource {
 				    throw new IllegalArgumentException("Could not find time index");
                                 }
                                 writer[0] = PointObFactory.makeWriter(dos,
-                                        tuple, new int[] { latIndex,
+								      type, new int[] { latIndex,
                                         lonIndex, altIndex, timeIndex }, 200,
                                                                       altUnit, tupleCnt[0],lengths[0]);
 

@@ -71,6 +71,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -949,7 +950,9 @@ public class TrackDataSource extends FilesDataSource {
         try {
             List datas = new ArrayList(adapters.size());
             for (int i = 0; i < adapters.size(); i++) {
-                Data data = ((TrackAdapter) adapters.get(i)).getPointObTrack(
+		TrackAdapter adapter = (TrackAdapter) adapters.get(i);
+		System.err.println ("calling getPointObTrack " + adapter.getClass().getName());
+                Data data = adapter.getPointObTrack(
                                 getTrackId(dc), range);
                 if (data == null) {
                     return null;
@@ -1355,10 +1358,19 @@ public class TrackDataSource extends FilesDataSource {
         TrackInfo     trackInfo  = (TrackInfo) trackInfos.get(0);
         List<VarInfo> vars       = trackInfo.getVariables();
 
+	HashSet skipVars =  new HashSet();
+
+	skipVars.add("time");
+	skipVars.add("latitude");
+	skipVars.add("longitude");
+	skipVars.add("altitude");
+
         List          labels     = new ArrayList();
         List          ids        = new ArrayList();
         Hashtable     currentMap = new Hashtable();
         for (VarInfo varInfo : vars) {
+	    String name = varInfo.getName();
+	    if(skipVars.contains(name.toLowerCase())) continue;
             labels.add(varInfo.getDescription() + "  (" + varInfo.getName()
                        + ")");
             ids.add(varInfo.getName());

@@ -452,7 +452,8 @@ public class CdmTrackInfo extends TrackInfo {
 
         timeVals = CommonUnit.secondsSinceTheEpoch.toThis(timeVals,
                 getTimeUnit());
-        List    varsToUse  = getVarsToUse();
+        List<VarInfo>    varsToUse  = getVarsToUse();
+
         int     numReals   = countReals(varsToUse);
         int     numStrings = varsToUse.size() - numReals;
         boolean allReals   = numStrings == 0;
@@ -519,7 +520,7 @@ public class CdmTrackInfo extends TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                VarInfo var = (VarInfo) varsToUse.get(varIdx);
+                VarInfo var =  varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
                     float[] fvalues = getFloatData(range, var.getShortName());
                     if (var.getRealType() == null) {

@@ -443,7 +443,6 @@ public abstract class TrackInfo {
     public synchronized FieldImpl getPointObTrack(Range range)
             throws Exception {
 
-
         //        Trace.startTrace();
         Trace.call1("TrackAdapter.getPointObTrack");
         Object loadId = JobManager.getManager().startLoad("TrackAdapter");
@@ -461,14 +460,15 @@ public abstract class TrackInfo {
 
         timeVals = CommonUnit.secondsSinceTheEpoch.toThis(timeVals,
                 getTimeUnit());
-        List    varsToUse  = getVarsToUse();
+        List<VarInfo>    varsToUse  = getVarsToUse();
         int     numReals   = countReals(varsToUse);
         int     numStrings = varsToUse.size() - numReals;
         boolean allReals   = numStrings == 0;
         int     numVars    = varsToUse.size();
         Unit[]  units      = new Unit[numVars];
+
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
-            VarInfo var = (VarInfo) varsToUse.get(varIdx);
+            VarInfo var =  varsToUse.get(varIdx);
             units[varIdx] = var.getUnit();
         }
 
@@ -528,7 +528,7 @@ public abstract class TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                VarInfo var = (VarInfo) varsToUse.get(varIdx);
+                VarInfo var =  varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
                     float[] fvalues = getFloatData(range, var.getShortName());
                     if (var.getRealType() == null) {
@@ -793,8 +793,8 @@ public abstract class TrackInfo {
      *
      * @return List of vars
      */
-    protected List getVarsToUse() {
-        List varsToUse = new ArrayList();
+    protected List<VarInfo> getVarsToUse() {
+        List<VarInfo> varsToUse = new ArrayList<VarInfo>();
         for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
             VarInfo var = (VarInfo) variables.get(varIdx);
             if (includeInPointData(var.getShortName())) {
