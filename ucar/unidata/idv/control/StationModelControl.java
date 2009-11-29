@@ -485,6 +485,13 @@ public class StationModelControl extends ObsDisplayControl {
 
 
     /**
+     */
+    protected void doInitialUpdateLegendAndList() {
+	//We don't do this
+    }
+
+
+    /**
      * Initialize the displayable with another
      *
      * @param myDisplay  the display

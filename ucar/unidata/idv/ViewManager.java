@@ -4012,6 +4012,39 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+
+    public void addDisplayInfos(List<DisplayInfo> displayInfos)
+	throws RemoteException, VisADException {
+        if (getIsDestroyed()) {
+            return;
+        }
+
+	
+	setMasterInactive();
+	try {
+	    if (master != null) {
+		for(DisplayInfo info: displayInfos) {
+		    info.setDisplayableAdded(addDisplayInfo(info));
+		}
+	    }
+
+
+	    if (shouldDoThingsRightAway()) {
+		fillLegends();
+		updateTimelines(true);
+		if ( !getStateManager().isLoadingXml()) {
+		    toFront();
+		}
+	    } else {
+		dirty = true;
+	    }
+
+	} finally {
+	    setMasterActive();
+	}
+    }
+
+
     /**
      *  Add the DisplayInfo to the list of DisplayInfo-s
      *  If I have a {@link ucar.visad.display.DisplayMaster}
@@ -4027,7 +4060,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
-
         if (getIsDestroyed()) {
             return false;
         }
@@ -4045,18 +4077,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 dirty = true;
             }
         }
-
-
-        if (shouldDoThingsRightAway()) {
-            fillLegends();
-            updateTimelines(true);
-            if ( !getStateManager().isLoadingXml()) {
-                toFront();
-            }
-        } else {
-            dirty = true;
-        }
-
 
         return true;
     }

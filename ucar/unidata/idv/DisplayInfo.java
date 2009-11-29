@@ -168,6 +168,9 @@ public class DisplayInfo {
         return isDisplayableAdded;
     }
 
+    public void setDisplayableAdded(boolean v) {
+	isDisplayableAdded = v;
+    }
 
     /**
      * Move the displayable to the newViewManager

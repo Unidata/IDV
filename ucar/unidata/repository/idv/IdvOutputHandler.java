@@ -140,7 +140,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_          */
     public static final String ARG_PRODUCT = "product";
 
-    public static final String ARG_SAVE_STATE = "save.state";
+    public static final String ARG_SUBMIT_SAVE = "submit.save";
     public static final String ARG_SAVE_ATTACH = "save.attach";
     public static final String ARG_SAVE_NAME = "save.name";
 
@@ -149,29 +149,25 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_          */
     public static final String PRODUCT_IMAGE = "product.image";
 
+
     /** _more_          */
     public static final String PRODUCT_MOV = "product.mov";
 
     /** _more_          */
     public static final String PRODUCT_KMZ = "product.kmz";
 
+    public static final String PRODUCT_IDV = "product.idv";
+
+    public static final String PRODUCT_ISL = "product.isl";
+
     /** _more_          */
-    private static TwoFacedObject[] products = { new TwoFacedObject("Image",
-                                                   PRODUCT_IMAGE),
-            new TwoFacedObject("Quicktime Movie", PRODUCT_MOV),
-            new TwoFacedObject("Google Earth KMZ", PRODUCT_KMZ) };
+    private static TwoFacedObject[] products = { new TwoFacedObject("Image",  PRODUCT_IMAGE),
+						 new TwoFacedObject("Quicktime Movie", PRODUCT_MOV),
+						 new TwoFacedObject("Google Earth KMZ", PRODUCT_KMZ)};
 
-    /** _more_ */
-    public static final String ARG_IMAGE_CROPX1 = "x1";
 
-    /** _more_ */
-    public static final String ARG_IMAGE_CROPY1 = "y1";
 
-    /** _more_ */
-    public static final String ARG_IMAGE_CROPX2 = "x2";
-
-    /** _more_ */
-    public static final String ARG_IMAGE_CROPY2 = "y2";
+    public static final String ARG_SUBMIT_PUBLISH = "submit.publish";
 
     /** _more_          */
     public static final String ARG_PUBLISH_ENTRY = "publish.entry";
@@ -334,7 +330,19 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_IMAGE_HEIGHT = "height";
 
 
+    private static final String[] NOTARGS = {
+	ARG_SUBMIT_SAVE,
+	ARG_SUBMIT_PUBLISH,
+	ARG_PUBLISH_NAME,
+	ARG_PUBLISH_ENTRY,
+	ARG_PUBLISH_ENTRY+"_hidden",
+	ARG_PUBLISH_DESCRIPTION,
+	ARG_SAVE_ATTACH,
+	ARG_SAVE_NAME,
+	ARG_ACTION
+    };
 
+    private Hashtable exceptArgs = new Hashtable();
 
     /** _more_          */
     private Properties valueToAbbrev;
@@ -456,6 +464,10 @@ public class IdvOutputHandler extends OutputHandler {
         okControls.add("pointvolumerender");
         addType(OUTPUT_IDV_GRID);
         addType(OUTPUT_IDV_POINT);
+	for(String notArg: NOTARGS) {
+	    exceptArgs.put(notArg,"");
+	}
+
         valueToAbbrev = new Properties();
         keyToAbbrev   = new Properties();
         try {
@@ -1405,6 +1417,7 @@ public class IdvOutputHandler extends OutputHandler {
             publishSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     htmlInput(request, ARG_PUBLISH_NAME, "", 30)));
 
+	    publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Publish image"),ARG_SUBMIT_PUBLISH)));
 
             if (getAccessManager().canDoAction(request, entry,
 					       Permission.ACTION_EDIT)) {
@@ -1415,7 +1428,7 @@ public class IdvOutputHandler extends OutputHandler {
 						    HtmlUtil.input(ARG_SAVE_NAME, "",30)));
 		publishSB.append(HtmlUtil.formEntry(msg("Attach image"),
 						    HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false)));
-		publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Save settings"),ARG_SAVE_STATE)));
+		publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Save settings"),ARG_SUBMIT_SAVE)));
 		
 	    }
             publishSB.append(HtmlUtil.formTableClose());
@@ -1548,6 +1561,8 @@ public class IdvOutputHandler extends OutputHandler {
         requestArgs.remove(ARG_SUBMIT);
         requestArgs.remove(ARG_OUTPUT);
         requestArgs.remove(ARG_PUBLISH_ENTRY);
+        requestArgs.remove(ARG_SUBMIT_PUBLISH);
+        requestArgs.remove(ARG_SUBMIT_SAVE);
         requestArgs.remove(ARG_PUBLISH_ENTRY + "_hidden");
         requestArgs.remove(ARG_PUBLISH_NAME);
 
@@ -1606,7 +1621,7 @@ public class IdvOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
 
-        if (request.defined(ARG_PUBLISH_ENTRY + "_hidden")) {
+        if (request.exists(ARG_SUBMIT_PUBLISH) && request.defined(ARG_PUBLISH_ENTRY + "_hidden")) {
             Group parent = getEntryManager().findGroup(request,
                                request.getString(ARG_PUBLISH_ENTRY
                                    + "_hidden", ""));
@@ -1676,8 +1691,7 @@ public class IdvOutputHandler extends OutputHandler {
 		    Object value = urlArgs.get(arg);
 		    request.put(arg,value);
 		}
-		request.remove(ARG_SAVE_STATE);
-
+		request.remove(ARG_SUBMIT_SAVE);
 	    }
         }
 
@@ -1700,9 +1714,6 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-        Hashtable exceptArgs = new Hashtable();
-	exceptArgs.put(ARG_SAVE_STATE,ARG_SAVE_STATE);
-        exceptArgs.put(ARG_ACTION, ARG_ACTION);
 
         String args = request.getUrlArgs(exceptArgs, null, ".*_gvdflt");
         url = url + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&"
@@ -1710,7 +1721,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-	if(request.defined(ARG_SAVE_STATE)) {
+	if(request.defined(ARG_SUBMIT_SAVE)) {
             if (!getAccessManager().canDoAction(request, entry,
 					       Permission.ACTION_EDIT)) {
 		throw new AccessException("No access",request);
@@ -1767,14 +1778,15 @@ public class IdvOutputHandler extends OutputHandler {
 
 
         StringBuffer formSB = new StringBuffer();
-        formSB.append(HtmlUtil.href(jnlpUrl, msg("Launch in the IDV")));
-        formSB.append(HtmlUtil.br());
-        formSB.append(HtmlUtil.href(islUrl, msg("Download IDV ISL script")));
         makeGridForm(request, formSB, entry, dataSource);
-
         sb.append(HtmlUtil.div("",
                                HtmlUtil.cssClass("image_edit_box")
                                + HtmlUtil.id("image_edit_box")));
+
+        formSB.append(HtmlUtil.space(2));
+        formSB.append(HtmlUtil.href(jnlpUrl, msg("Launch in the IDV")));
+        formSB.append(HtmlUtil.space(2));
+        formSB.append(HtmlUtil.href(islUrl, msg("Download IDV ISL script")));
 
 
         sb.append("\n");
@@ -1837,6 +1849,8 @@ public class IdvOutputHandler extends OutputHandler {
 
         String  id     = entry.getId();
 
+        String  product       = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
+	
         boolean forIsl = request.getString(ARG_TARGET, "").equals(TARGET_ISL);
         boolean forJnlp = request.getString(ARG_TARGET,
                                             "").equals(TARGET_JNLP);
@@ -1852,6 +1866,7 @@ public class IdvOutputHandler extends OutputHandler {
         for (Enumeration keys =
                 requestArgs.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
+	    if(exceptArgs.get(arg)!=null) continue;
             Object value = requestArgs.get(arg);
             String s     = value.toString();
             if (s.trim().length() == 0) {
@@ -1864,24 +1879,14 @@ public class IdvOutputHandler extends OutputHandler {
         for (String arg : argList) {
             Object value     = requestArgs.get(arg);
             String s         = value.toString();
-            String shortName = (String) keyToAbbrev.get(arg);
-            if (shortName != null) {
-                fileKey.append(shortName);
-            } else {
-                fileKey.append(arg);
-            }
+	    fileKey.append(arg);
             fileKey.append("=");
-            String shortValue = (String) valueToAbbrev.get(s);
-            if (shortValue != null) {
-                fileKey.append(shortValue);
-            } else {
-                fileKey.append(s);
-            }
+	    fileKey.append(s);
             fileKey.append(";");
         }
 
+	//	System.err.println ("fileKey: " + fileKey);
         boolean multipleTimes = false;
-        String  product       = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
         String  suffix        = ".gif";
         if (product.equals(PRODUCT_IMAGE)) {
             suffix = ".gif";
@@ -1904,6 +1909,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         if ( !forIsl && imageFile.exists()) {
+	    //	    System.err.println ("got  file");
             return imageFile;
         }
 
@@ -2571,16 +2577,13 @@ public class IdvOutputHandler extends OutputHandler {
                                     HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
                                         request.getString(ARG_IMAGE_WIDTH,
                                             "400"))));
-        imageSB.append(HtmlUtil.br());
-        imageSB.append(HtmlUtil.href(jnlpUrl, msg("Launch in the IDV")));
-        imageSB.append(HtmlUtil.br());
-        imageSB.append(HtmlUtil.href(islUrl, msg("Download IDV ISL script")));
 
         if ( !request.exists(ARG_SUBMIT)) {
             sb.append(formSB);
         } else {
             sb.append(HtmlUtil.table(new Object[] { imageSB, formSB }, 10));
         }
+
 
 
         return new Result("Point Display", sb);

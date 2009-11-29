@@ -1097,17 +1097,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-
-
         initializationDone = true;
         if (animationWidget != null) {
             animationWidget.setSharing(animationInfo.getShared());
         }
-        updateLegendAndList();
+
+	doInitialUpdateLegendAndList();
 
 
     }
 
+
+    protected void doInitialUpdateLegendAndList() {
+        updateLegendAndList();
+    }
 
     /**
      * Add to the control context
@@ -6259,9 +6262,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
             boolean addOk = true;
+	    Hashtable<ViewManager,List<DisplayInfo>> vmMap = new Hashtable<ViewManager,List<DisplayInfo>>();
+	    List<ViewManager> vms = new ArrayList<ViewManager>();
             for (int i = 0, n = v.size(); i < n; i++) {
                 DisplayInfo info = (DisplayInfo) v.get(i);
-                info.addDisplayable();
+		ViewManager vm  = info.getViewManager();
+		if(vm == null) continue;
+		List<DisplayInfo> infos = vmMap.get(vm);
+		if(infos == null) {
+		    vmMap.put(vm, infos = new ArrayList<DisplayInfo>());
+		    vms.add(vm);
+		}
+		infos.add(info);
+	    }
+	    for(ViewManager vm: vms) {
+		List<DisplayInfo> infos  = vmMap.get(vm);
+		vm.addDisplayInfos(infos);
+	    }
+
+            for (int i = 0, n = v.size(); i < n; i++) {
+                DisplayInfo info = (DisplayInfo) v.get(i);
                 if ( !info.getDisplayableAdded()) {
                     removeDisplayInfo(info);
                     addOk = false;

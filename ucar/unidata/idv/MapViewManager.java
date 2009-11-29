@@ -1894,14 +1894,9 @@ public String getDefaultProjectionName () {
                 }
                 try {
                     actuallyChangedProjection = true;
-                    if (false && maintainViewpoint) {
-			System.err.println("zooming");
-			getMapDisplay().zoom(2.0);
-			Misc.sleep(5000);
-		    } else {
-			getMapDisplay().setMapProjection(mainProjection);
-			setAspectRatio(getMapDisplay().getDisplayAspect());
-		    }
+		    getMapDisplay().setMapProjection(mainProjection);
+		    setAspectRatio(getMapDisplay().getDisplayAspect());
+
 
                     // override the aspect ratio
                     //if (getAspectRatio() != null) {
@@ -2205,15 +2200,17 @@ public String getDefaultProjectionName () {
      * @throws RemoteException
      * @throws VisADException
      */
-    public boolean addDisplayInfo(DisplayInfo displayInfo)
+    public void  addDisplayInfos(List<DisplayInfo> displayInfos)
             throws RemoteException, VisADException {
 
         if (getIsDestroyed()) {
-            return false;
+            return;
         }
 
+	if(displayInfos.size()==0) return;
+
         //Check if we are adding a default map.
-        DisplayControl display = displayInfo.getDisplayControl();
+        DisplayControl display = displayInfos.get(0).getDisplayControl();
         if ((display instanceof MapDisplayControl)
                 && ((MapDisplayControl) display).getIsDefaultMap()) {
             MapDisplayControl defaultMap = findDefaultMap();
@@ -2221,20 +2218,12 @@ public String getDefaultProjectionName () {
                 defaultMap.loadNewMap((MapDisplayControl) display);
                 //This rebuilds the legends, etc.
                 displayControlChanged(defaultMap);
-                return false;
+                return;
             }
         }
 
-
+	super.addDisplayInfos(displayInfos);
         displayDataChanged(display,true);
-
-        if ( !super.addDisplayInfo(displayInfo)) {
-            return false;
-        }
-
-
-
-        return true;
     }
 
     /**

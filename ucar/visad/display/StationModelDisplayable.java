@@ -396,17 +396,21 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws RemoteException unable to create specified remote objects
      */
     public void setStationData(FieldImpl stationData)
-            throws VisADException, RemoteException {
+	throws VisADException, RemoteException {
 
         synchronized (DATA_MUTEX) {
-            Data d = makeNewDataWithShapes(stationData);
-            if ((d != null) && !d.isMissing()) {
-		setDisplayInactive();
-                setData(d);
+	    setDisplayInactive();
+	    try {
+		Data d = makeNewDataWithShapes(stationData);
+		if ((d != null) && !d.isMissing()) {
+		    setData(d);
+		
+		} else {
+		    setData(new Real(0));
+		}
+	    } finally {
 		setDisplayActive();
-            } else {
-                setData(new Real(0));
-            }
+	    } 
             this.stationData = stationData;  // hold around for posterity
         }
     }
