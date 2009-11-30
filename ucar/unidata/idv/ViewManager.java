@@ -460,7 +460,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** This is the split pane that holds the side legend */
     private JSplitPane mainSplitPane;
 
-
+    /** The last split pane divider location when we do the float/embed */
+    private int lastDividerLoc=-1;
 
     /** _more_          */
     private int splitPaneLocation = -1;
@@ -1016,6 +1017,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+
     /**
      * Place the side legend where it belongs
      */
@@ -1024,42 +1026,39 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sideLegend.unFloatLegend();
             sideLegendContainer.removeAll();
             sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
+            sideLegendContainer.repaint();
+            if(lastDividerLoc>=0) {
+                mainSplitPane.setDividerLocation(lastDividerLoc);
+            } else {
+                mainSplitPane.resetToPreferredSizes();
+            }
         } else if (legendState.equals(IdvLegend.STATE_FLOAT)) {
+            lastDividerLoc = mainSplitPane.getDividerLocation();
             sideLegendContainer.removeAll();
+            sideLegendContainer.repaint();
             sideLegend.floatLegend();
+            if(legendOnLeft) {
+                mainSplitPane.setDividerLocation(0);
+            } else {
+                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
+
+            }
         } else if (legendState.equals(IdvLegend.STATE_HIDDEN)) {
+            lastDividerLoc = mainSplitPane.getDividerLocation();
             sideLegendContainer.removeAll();
+            sideLegendContainer.repaint();
             sideLegend.unFloatLegend();
             sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
-        }
-        adjustSplitPane();
-
-    }
-
-
-
-    /**
-     * set the state of the main split pane
-     *
-     */
-    protected void adjustSplitPane() {
-        //SPLIT
-        if (true) {
-            return;
-        }
-        //        centerPanelWrapper.removeAll();
-        if (legendState.equals(IdvLegend.STATE_DOCKED)) {
-            mainSplitPane.resetToPreferredSizes();
-        } else {
-            if (legendOnLeft) {
-                mainSplitPane.setDividerLocation(0.0);
-                mainSplitPane.setResizeWeight(0.0);
+            if(legendOnLeft) {
+                mainSplitPane.setDividerLocation(0);
             } else {
-                mainSplitPane.setDividerLocation(1.0);
-                mainSplitPane.setResizeWeight(1.0);
+                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
             }
         }
     }
+
+
+
 
 
 
