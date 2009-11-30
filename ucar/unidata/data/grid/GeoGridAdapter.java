@@ -393,7 +393,7 @@ public class GeoGridAdapter {
                              : (Object) new ObjectPair(gcs,
                                  new Integer(timeIndex));
         timeStepKey = Misc.newList(timeStepKey, extraCacheKey);
-        GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey);
+        GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey, true);
         if (domainSet != null) {
             return domainSet;
         }
@@ -404,7 +404,7 @@ public class GeoGridAdapter {
 
 
         float[][] refVals      = null;
-        Object[]  cachedPair   = (Object[]) dataSource.getCache(domainSetKey);
+        Object[]  cachedPair   = (Object[]) dataSource.getCache(domainSetKey, true);
         if (cachedPair != null) {
             domainSet = (GriddedSet) cachedPair[0];
             refVals   = (float[][]) cachedPair[1];
@@ -433,7 +433,7 @@ public class GeoGridAdapter {
 
             }
             dataSource.putCache(domainSetKey, new Object[] { domainSet,
-                    refVals });
+                    refVals }, true);
         }
 
         CoordinateSystem cs = domainSet.getCoordinateSystem();
@@ -447,7 +447,7 @@ public class GeoGridAdapter {
         }
 
 
-        dataSource.putCache(timeStepKey, domainSet);
+        dataSource.putCache(timeStepKey, domainSet, true);
 
         log_.debug("DomainSet = " + domainSet);
         return domainSet;
@@ -685,7 +685,7 @@ public class GeoGridAdapter {
         Object domainTemplateKey = Misc.newList(gcs, "DomainType",
                                        extraCacheKey);
         RealTupleType cachedDomainTemplate =
-            (RealTupleType) dataSource.getCache(domainTemplateKey);
+            (RealTupleType) dataSource.getCache(domainTemplateKey, true);
 
         if (cachedDomainTemplate != null) {
             Trace.msg("GeoGridAdapter:using cached domain template:"
@@ -694,7 +694,7 @@ public class GeoGridAdapter {
         } else {
             Trace.msg("GeoGridAdapter:using new domain template:"
                       + domainTemplate);
-            dataSource.putCache(domainTemplateKey, domainTemplate);
+            dataSource.putCache(domainTemplateKey, domainTemplate, true);
         }
 
 

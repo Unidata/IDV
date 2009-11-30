@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -86,7 +87,7 @@ public class CacheManager {
     private static long currentCacheSize = -1;
 
 
-    /** List of action listeners to notify when we clear the cache      */
+    /** List of action listeners to notify when we clear the cache */
     private static List cacheListeners = new ArrayList();
 
     /**
@@ -107,8 +108,13 @@ public class CacheManager {
         }
     }
 
+    /**
+     * Get whether we are caching or not
+     *
+     * @return true if caching
+     */
     public static boolean getDoCache() {
-	return doCache;
+        return doCache;
     }
 
     /**
@@ -262,7 +268,9 @@ public class CacheManager {
      */
     public static void putCachedFile(String group, String id, byte[] bytes) {
         try {
-	    if(!doCache) return;
+            if ( !doCache) {
+                return;
+            }
             File f = getCacheGroupDir(group);
             if (f == null) {
                 return;
@@ -355,12 +363,24 @@ public class CacheManager {
      * @param value   value for key
      */
     public static void put(Object owner, Object key, Object value) {
+        put(owner, key, value, false);
+    }
+
+    /**
+     * Put an object in the cache
+     *
+     * @param owner   owner of the object
+     * @param key     key for the cached object
+     * @param value   value for key
+     * @param force   true to cache even if doCache is false
+     */
+    public static void put(Object owner, Object key, Object value,
+                           boolean force) {
         synchronized (MUTEX) {
-            if ( !doCache) {
-                return;
+            if (doCache || force) {
+                Hashtable ht = findOrCreate(owner);
+                ht.put(key, value);
             }
-            Hashtable ht = findOrCreate(owner);
-            ht.put(key, value);
         }
     }
 
@@ -443,15 +463,28 @@ public class CacheManager {
      * @return  the cached object
      */
     public static Object get(Object owner, Object key) {
+        return get(owner, key, false);
+    }
+
+    /**
+     * Get the cached object.
+     *
+     * @param owner    cache owner
+     * @param key      key within the cache
+     * @param force    true to force a lookup
+     * @return  the cached object
+     */
+    public static Object get(Object owner, Object key, boolean force) {
         synchronized (MUTEX) {
-            if ( !doCache) {
+            if (doCache || force) {
+                Hashtable ht = find(owner);
+                if (ht == null) {
+                    return null;
+                }
+                return ht.get(key);
+            } else {
                 return null;
             }
-            Hashtable ht = find(owner);
-            if (ht == null) {
-                return null;
-            }
-            return ht.get(key);
         }
     }
 

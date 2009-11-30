@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data;
 
 
@@ -35,10 +34,10 @@ import ucar.unidata.collab.SharableImpl;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.idv.DisplayControl;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.DisplayControl;
 
 import ucar.unidata.idv.chooser.*;
 
@@ -73,7 +72,6 @@ import visad.DataReferenceImpl;
 import visad.DateTime;
 import visad.VisADException;
 
-import java.lang.reflect.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -81,6 +79,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.io.*;
+
+import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
 
@@ -165,6 +165,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** name of the DataSource */
     private String name = "";
 
+    /** have we ever changed the name */
     private boolean everChangedName = false;
 
     /** The description of this DataSource */
@@ -302,7 +303,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (this.properties == null) {
             this.properties = new Hashtable();
         }
-	//	System.err.println("properties:" + this.properties);
+        //      System.err.println("properties:" + this.properties);
         if ((descriptor != null) && (descriptor.getProperties() != null)) {
             this.properties.putAll(descriptor.getProperties());
         }
@@ -330,22 +331,33 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+    /**
+     * Reload data
+     *
+     * @param object the object
+     * @param properties  the properties
+     */
     public void reloadData(Object object, Hashtable properties) {
-	System.err.println ("Reload data:" + object);
+        System.err.println("Reload data:" + object);
     }
 
 
+    /**
+     * Reload properties
+     *
+     * @param newProperties new properties
+     */
     public void reloadProperties(Hashtable newProperties) {
-	properties = newProperties;
-	if(!everChangedName) {
-	    String v = (String)newProperties.get(PROP_TITLE);
-	    if(v!=null) {
-		setName(v);
-		if(nameFld!=null) {
-		    nameFld.setText(v);
-		}
-	    }
-	}
+        properties = newProperties;
+        if ( !everChangedName) {
+            String v = (String) newProperties.get(PROP_TITLE);
+            if (v != null) {
+                setName(v);
+                if (nameFld != null) {
+                    nameFld.setText(v);
+                }
+            }
+        }
     }
 
 
@@ -386,20 +398,28 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+    /**
+     * Get the IDV
+     *
+     * @return the  IDV
+     */
     public IntegratedDataViewer getIdv() {
-	if(getDataContext()==null) return null;
-	return getDataContext().getIdv();
+        if (getDataContext() == null) {
+            return null;
+        }
+        return getDataContext().getIdv();
     }
 
     /**
      * Check to see if there is a field maskfile defined. If so load it in.
      */
     protected void loadFieldMask() {
-	if(getIdv() == null) return;
+        if (getIdv() == null) {
+            return;
+        }
 
-        String maskFile =
-            getIdv().getProperty(getClass().getName()
-                + ".maskfile", (String) null);
+        String maskFile = getIdv().getProperty(getClass().getName()
+                              + ".maskfile", (String) null);
         if (maskFile != null) {
             loadFieldMask(maskFile);
         }
@@ -484,7 +504,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         Hashtable  catMap             = new Hashtable();
         Hashtable  currentDataChoices = new Hashtable();
 
-        List       displays = getIdv().getDisplayControls();
+        List       displays           = getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -635,8 +655,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
             IOUtil.writeJarFile(jarFile, files);
             if (installCbx.isSelected()) {
-                getIdv().getPluginManager()
-                    .installPluginFromFile(jarFile);
+                getIdv().getPluginManager().installPluginFromFile(jarFile);
             }
         } catch (Exception exc) {
             logException("Writing field mask file", exc);
@@ -1074,13 +1093,24 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * Put an object in the cache.
+     * Put an object in the cache if caching is enabled.
      *
      * @param key     cache key
      * @param value   associated key value
      */
     public void putCache(Object key, Object value) {
-        CacheManager.put(dataCacheKey, key, value);
+        putCache(key, value, false);
+    }
+
+    /**
+     * Put an object in the cache.
+     *
+     * @param key     cache key
+     * @param value   associated key value
+     * @param force   force a cache
+     */
+    public void putCache(Object key, Object value, boolean force) {
+        CacheManager.put(dataCacheKey, key, value, force);
     }
 
     /**
@@ -1090,7 +1120,18 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the key value, or <code>null</code>
      */
     public Object getCache(Object key) {
-        return CacheManager.get(dataCacheKey, key);
+        return getCache(key, false);
+    }
+
+    /**
+     * Get an Object from the cache.
+     *
+     * @param key   key for the object
+     * @param force   force a lookup even if not caching
+     * @return  the key value, or <code>null</code>
+     */
+    public Object getCache(Object key, boolean force) {
+        return CacheManager.get(dataCacheKey, key, force);
     }
 
     /**
@@ -1551,8 +1592,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
                 DataChoice dataChoice = (DataChoice) choices.get(cIdx);
                 getIdv().doMakeControl(
-                    dataChoice,
-                    getIdv().getControlDescriptor(displayType),
+                    dataChoice, getIdv().getControlDescriptor(displayType),
                     (String) null);
                 //For now break after the first one
                 //so we don't keep adding displays
@@ -1772,10 +1812,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @param dataChoices base list of choices
      */
     protected void makeDerivedDataChoices(List dataChoices) {
-	if(getIdv() == null) return;
-        List derivedList =
-            getIdv().getDerivedDataChoices(this,
-                dataChoices);
+        if (getIdv() == null) {
+            return;
+        }
+        List derivedList = getIdv().getDerivedDataChoices(this, dataChoices);
         if (derivedList != null) {
             dataChoices.addAll(derivedList);
         }
@@ -2806,7 +2846,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
 
-	//Don't have this in the properties anymore
+        //Don't have this in the properties anymore
         if (false && canCacheDataToDisk()) {
             comps.add(GuiUtils.filler());
             comps.add(getPropertiesHeader("Caching"));
@@ -2957,7 +2997,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
-	addReloadTab(tabbedPane);
+        addReloadTab(tabbedPane);
 
 
         detailsEditor = new JEditorPane();
@@ -2978,27 +3018,35 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * Add a reload tab
+     *
+     * @param tabbedPane the reload tab
+     */
     protected void addReloadTab(JTabbedPane tabbedPane) {
-	try {
-	    String chooserClassName = (String)getProperty(IdvChooser.PROP_CHOOSERCLASSNAME);
-	    if(chooserClassName!=null) {
-		IdvChooser chooser = null;
-		Class theClass = Misc.findClass(chooserClassName);
-		Class[] paramTypes = new Class[] { IdvChooserManager.class,
-						   Element.class };
-		Object[]    args = new Object[] {getIdv().getIdvChooserManager(), null};
-		Constructor ctor = Misc.findConstructor(theClass, paramTypes);
-		if (ctor != null) {
-		    chooser = (IdvChooser) ctor.newInstance(args);
-		    chooser.setDataSource(this);
-		    tabbedPane.add("Reload Data", chooser.getContents());
-		} else {
-		    //		    System.err.println ("no ctor:" + chooserClassName);
-		}
-	    }
-	} catch(Exception exc) {
-	    exc.printStackTrace();
-	}
+        try {
+            String chooserClassName =
+                (String) getProperty(IdvChooser.PROP_CHOOSERCLASSNAME);
+            if (chooserClassName != null) {
+                IdvChooser chooser  = null;
+                Class      theClass = Misc.findClass(chooserClassName);
+                Class[] paramTypes = new Class[] { IdvChooserManager.class,
+                        Element.class };
+                Object[] args = new Object[] {
+                                    getIdv().getIdvChooserManager(),
+                                    null };
+                Constructor ctor = Misc.findConstructor(theClass, paramTypes);
+                if (ctor != null) {
+                    chooser = (IdvChooser) ctor.newInstance(args);
+                    chooser.setDataSource(this);
+                    tabbedPane.add("Reload Data", chooser.getContents());
+                } else {
+                    //              System.err.println ("no ctor:" + chooserClassName);
+                }
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
 
     }
 
@@ -3128,10 +3176,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public boolean applyProperties() {
         String newName = nameFld.getText().trim();
-	if(!Misc.equals(newName, name.trim())) {
-	    System.err.println("newName:"+newName +": name:" + name);
-	    everChangedName = true;
-	}
+        if ( !Misc.equals(newName, name.trim())) {
+            System.err.println("newName:" + newName + ": name:" + name);
+            everChangedName = true;
+        }
         setName(newName);
         if (properties != null) {
             properties.put(PROP_TITLE, newName);
@@ -3141,8 +3189,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         setAlias(aliasFld.getText().trim());
         if (dsw != null) {
             setDateTimeSelection(dsw.getSelectedDateTimes());
-            getIdv().getIdvUIManager().dataSourceTimeChanged(
-                this);
+            getIdv().getIdvUIManager().dataSourceTimeChanged(this);
         }
 
         if (geoSelectionPanel != null) {
@@ -3203,8 +3250,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (canChangeData()) {
             a = new AbstractAction("Change Data") {
                 public void actionPerformed(ActionEvent ae) {
-                    Misc.run(getIdv().getIdvUIManager(),
-                             "changeState", DataSourceImpl.this);
+                    Misc.run(getIdv().getIdvUIManager(), "changeState",
+                             DataSourceImpl.this);
                 }
             };
             actions.add(a);
@@ -3269,17 +3316,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if ( !canPoll()) {
             return;
         }
-	if(descriptor==null) return;
-	
-	PollingInfo pollingInfo = getPollingInfo();
-	if(pollingInfo!=null) {
-	    if (pollingInfo.getFilePattern() == null) {
-		pollingInfo.setFilePattern(descriptor.getPatterns());
-	    }
-	    if (pollingInfo.getIsActive()) {
-		startPolling();
-	    }
-	}
+        if (descriptor == null) {
+            return;
+        }
+
+        PollingInfo pollingInfo = getPollingInfo();
+        if (pollingInfo != null) {
+            if (pollingInfo.getFilePattern() == null) {
+                pollingInfo.setFilePattern(descriptor.getPatterns());
+            }
+            if (pollingInfo.getIsActive()) {
+                startPolling();
+            }
+        }
     }
 
 
@@ -3662,7 +3711,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public static String getNameForDataSource(DataSource ds, int length,
             boolean alwaysDoIt) {
         String name = ds.toString();
-        if(name == null) name = "";
+        if (name == null) {
+            name = "";
+        }
         if (name.length() < length) {
             return name;
         }
@@ -3730,8 +3781,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
                 String uniqueName = "data_" + Misc.getUniqueId();
                 String tmp =
-                    IOUtil.joinDir(getIdv().getDataManager()
-                        .getDataCacheDirectory(), uniqueName);
+                    IOUtil.joinDir(
+                        getIdv().getDataManager().getDataCacheDirectory(),
+                        uniqueName);
                 IOUtil.makeDir(tmp);
                 try {
                     new File(tmp).deleteOnExit();
@@ -3845,23 +3897,23 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
-/**
-Set the EverChangedName property.
+    /**
+     * Set the EverChangedName property.
+     *
+     * @param value The new value for EverChangedName
+     */
+    public void setEverChangedName(boolean value) {
+        this.everChangedName = value;
+    }
 
-@param value The new value for EverChangedName
-**/
-public void setEverChangedName (boolean value) {
-	this.everChangedName = value;
-}
-
-/**
-Get the EverChangedName property.
-
-@return The EverChangedName
-**/
-public boolean getEverChangedName () {
-	return this.everChangedName;
-}
+    /**
+     * Get the EverChangedName property.
+     *
+     * @return The EverChangedName
+     */
+    public boolean getEverChangedName() {
+        return this.everChangedName;
+    }
 
 
 
