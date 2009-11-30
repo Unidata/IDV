@@ -50,6 +50,7 @@ import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -816,7 +817,7 @@ public class DisplayConventions extends IdvManager {
             if (unitList == null) {
                 getDefaultUnitList();
             }
-            if ( !unitList.contains(selected)) {
+            if (!Misc.containsString(selected.toString(), unitList, true) && !unitList.contains(selected)) {
                 unitList.add(selected);
                 getStore().put(PREF_UNITLIST, unitList);
                 getStore().save();
@@ -843,6 +844,19 @@ public class DisplayConventions extends IdvManager {
                 unitList = new ArrayList();
                 unitList.add(new TwoFacedObject("Default", null));
             }
+            HashSet<String> seenName = new HashSet<String>();
+            List tmp  =new ArrayList();
+            for(Object o: unitList) {
+                String s = o.toString().toLowerCase();
+                if(seenName.contains(s)) continue;
+                if(tmp.contains(o)) continue;
+                tmp.add(o);
+                seenName.add(s);
+            }
+            System.err.println("Unit list:" + unitList);
+            unitList = tmp;
+
+
             String[] names = {
                 //Temperature
                 "Celsius", "Fahrenheit", "Kelvin",
@@ -857,12 +871,14 @@ public class DisplayConventions extends IdvManager {
                 try {
                     TwoFacedObject tfo = new TwoFacedObject(names[i],
                                              Util.parseUnit(names[i]));
-                    if ( !unitList.contains(tfo)) {
+                    if (!unitList.contains(tfo) && !seenName.contains(tfo.toString().toLowerCase())) {
+                        System.err.println("adding: " + tfo);
                         unitList.add(tfo);
                     }
 
                 } catch (Exception exc) {}
             }
+
             return unitList;
         }
     }
