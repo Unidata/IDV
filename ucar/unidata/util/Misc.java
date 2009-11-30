@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -246,17 +247,17 @@ public class Misc {
     /**
      * Reverse an array
      *
-     * @param fromArray   array to reverse
-     * @param toArray     reversed array
+     *
+     * @param l The list
      *
      * @return reversed array
      */
     public static List reverseList(List l) {
-	ArrayList l2  = new ArrayList();
-	for(Object o: l) {
-	    l2.add(0, o);
-	}
-	return l2;
+        ArrayList l2 = new ArrayList();
+        for (Object o : l) {
+            l2.add(0, o);
+        }
+        return l2;
     }
 
 
@@ -450,23 +451,21 @@ public class Misc {
                 argument = new Float(value);
             } else if (paramType.equals(Boolean.TYPE)) {
                 argument = new Boolean(value);
-	    } else if(paramType.equals(Rectangle2D.Float.class)) {
-		String[]toks = StringUtil.split(value, ",",4);
-		argument = new Rectangle2D.Float(
-						 Float.parseFloat(toks[0]),
-						 Float.parseFloat(toks[1]),
-						 Float.parseFloat(toks[2]),
-						 Float.parseFloat(toks[3]));
+            } else if (paramType.equals(Rectangle2D.Float.class)) {
+                String[] toks = StringUtil.split(value, ",", 4);
+                argument = new Rectangle2D.Float(Float.parseFloat(toks[0]),
+                        Float.parseFloat(toks[1]), Float.parseFloat(toks[2]),
+                        Float.parseFloat(toks[3]));
 
-	    } else if(paramType.equals(Rectangle2D.Double.class)) {
-		String[]toks = StringUtil.split(value, ",",4);
-		argument = new Rectangle2D.Double(
-						 Double.parseDouble(toks[0]),
-						 Double.parseDouble(toks[1]),
-						 Double.parseDouble(toks[2]),
-						 Double.parseDouble(toks[3]));
-            } else if(paramType.equals(Color.class)) {
-                argument  =GuiUtils.decodeColor(value,Color.white);
+            } else if (paramType.equals(Rectangle2D.Double.class)) {
+                String[] toks = StringUtil.split(value, ",", 4);
+                argument =
+                    new Rectangle2D.Double(Double.parseDouble(toks[0]),
+                                           Double.parseDouble(toks[1]),
+                                           Double.parseDouble(toks[2]),
+                                           Double.parseDouble(toks[3]));
+            } else if (paramType.equals(Color.class)) {
+                argument = GuiUtils.decodeColor(value, Color.white);
             } else if (paramType.equals(Dimension.class)) {
                 int idx = value.indexOf(":");
                 if (idx >= 0) {
@@ -2402,20 +2401,24 @@ public class Misc {
      *
      * @param values values to average
      *
-     * @return the average. 
+     * @return the average.
      */
     public static float getAverage(float[] values) {
-        if(values == null || values.length==0) return Float.NaN;
+        if ((values == null) || (values.length == 0)) {
+            return Float.NaN;
+        }
         int   size  = values.length;
         int   total = 0;
         float all   = 0;
         for (int i = 0; i < size; i++) {
-            if (values[i] ==values[i]) {
+            if (values[i] == values[i]) {
                 total++;
                 all = all + values[i];
             }
         }
-        if(total==0) return Float.NaN;
+        if (total == 0) {
+            return Float.NaN;
+        }
         return (float) all / total;
     }
 
@@ -2754,6 +2757,36 @@ public class Misc {
         }
     }
 
+
+
+
+    /**
+     * _more_
+     *
+     * @param string _more_
+     * @param objects _more_
+     * @param lowerCase _more_
+     *
+     * @return _more_
+     */
+    public static boolean containsString(String string, List objects,
+                                         boolean lowerCase) {
+        if (lowerCase) {
+            string = string.toLowerCase();
+        }
+        for (Object o : objects) {
+            if (lowerCase) {
+                if (Misc.equals(string, o.toString().toLowerCase())) {
+                    return true;
+                }
+            } else {
+                if (Misc.equals(string, o.toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
 
@@ -4376,7 +4409,7 @@ public class Misc {
     }
 
 
-    /**
+    /*
      * Unpack an array of packed integers
      *
      * @param sourceValues  packed integer array
@@ -4418,6 +4451,9 @@ public class Misc {
      *   return dest;
      * }
      */
+
+
+
 
 
 
@@ -4496,25 +4532,27 @@ public class Misc {
      * @param args _more_
      */
     public static void main(String[] args) {
-	long t1 = System.currentTimeMillis();
-	double d=0;
+        long   t1 = System.currentTimeMillis();
+        double d  = 0;
 
-	for(int i=0;i<10000000;i++) {
-	    d = new Double("2.3").doubleValue();
-	    //	    d = Double.parseDouble("2.3");
-	}
+        for (int i = 0; i < 10000000; i++) {
+            d = new Double("2.3").doubleValue();
+            //      d = Double.parseDouble("2.3");
+        }
         long t2 = System.currentTimeMillis();
 
 
         long t3 = System.currentTimeMillis();
 
-	System.err.println("time 1:" + (t2 - t1));
+        System.err.println("time 1:" + (t2 - t1));
 
-	if(true) return;
+        if (true) {
+            return;
+        }
 
 
 
-	/*
+        /*
 
         List<String> test = new ArrayList<String>();
 
@@ -4549,7 +4587,7 @@ public class Misc {
         System.err.println("time 3:" + (t2 - t1));
 
 
-	*/
+        */
 
     }
 
