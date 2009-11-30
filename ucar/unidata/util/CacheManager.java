@@ -107,6 +107,10 @@ public class CacheManager {
         }
     }
 
+    public static boolean getDoCache() {
+	return doCache;
+    }
+
     /**
      * set the cache dir
      *
@@ -258,6 +262,7 @@ public class CacheManager {
      */
     public static void putCachedFile(String group, String id, byte[] bytes) {
         try {
+	    if(!doCache) return;
             File f = getCacheGroupDir(group);
             if (f == null) {
                 return;

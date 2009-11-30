@@ -51,6 +51,7 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.Cache;
+import ucar.unidata.util.CacheManager;
 
 import ucar.unidata.util.Counter;
 import ucar.unidata.util.DateUtil;
@@ -710,6 +711,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             });
         */
 
+	CacheManager.setDoCache(false);
         initProperties(properties);
         initServer();
         getLogManager().logInfoAndPrint("RAMADDA started");

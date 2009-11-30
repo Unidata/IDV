@@ -6219,13 +6219,11 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private List<Entry> readEntries(Statement statement) throws Exception {
-        ResultSet        results;
-        SqlUtil.Iterator iter    =
-            getDatabaseManager().getIterator(statement);
         List<Entry>      entries = new ArrayList<Entry>();
-        //        TypeHandler typeHandler =
-        //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
         try {
+	    SqlUtil.Iterator iter    =
+		getDatabaseManager().getIterator(statement);
+	    ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     String entryType = results.getString(2);
@@ -6236,9 +6234,8 @@ return new Result(title, sb);
                     cacheEntry(entry);
                 }
             }
-        } catch (Exception exc) {
+        } finally {
             getDatabaseManager().closeAndReleaseConnection(statement);
-            throw exc;
         }
 
         for (Entry entry : entries) {

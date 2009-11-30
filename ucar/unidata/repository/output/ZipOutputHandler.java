@@ -292,9 +292,6 @@ public class ZipOutputHandler extends OutputHandler {
         Result result = new Result();
         result.setNeedToWrite(false);
 
-        if (recurse) {
-            System.err.println("ZIP LOG");
-        }
 
         boolean ok = true;
         //First recurse down without a zos to check the size

@@ -1098,6 +1098,8 @@ public class GuiUtils extends LayoutUtil {
      */
     public static Image getImage(String file, Class c, boolean cache,
                                  boolean returnNullIfNotFound) {
+	if(!CacheManager.getDoCache()) cache  = false;
+
         if (file == null) {
             return null;
         }
