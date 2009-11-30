@@ -801,6 +801,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setMapProjection(new ProjectionCoordinateSystem(projection));
     }
 
+
+
+
+
     /**
      * Define the map projection using a MapProjection type CoordinateSystem
      *
@@ -1431,6 +1435,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;
 
+        private CoordinateSystem theCoordinateSystem;
+
         /** index of the latitude coordinate */
         private final int latIndex;
 
@@ -1469,6 +1475,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                   new Unit[] { CommonUnit.degree,
                                CommonUnit.degree, null });
             this.mapProjection = mapProjection;
+            this.theCoordinateSystem = new CachingCoordinateSystem(this.mapProjection);
             latIndex           = mapProjection.getLatitudeIndex();
             lonIndex           = mapProjection.getLongitudeIndex();
             if (mapProjection.isXYOrder()) {
@@ -1533,7 +1540,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
-            t2 = mapProjection.fromReference(t2);
+            t2 = theCoordinateSystem.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
@@ -1614,7 +1621,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
 	    //            call1("mapProjection.fromReference", numpoints);
 	    //	    Trace.msg("MapProjectionDisplay. class=" + mapProjection.getClass().getName());
-            t2 = mapProjection.fromReference(t2);
+            t2 = theCoordinateSystem.fromReference(t2);
 	    //            call2("mapProjection.fromReference", numpoints);
 
             if (t2 == null) {
@@ -1667,7 +1674,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             double[][] t2 = new double[][] {
                 xyz[xIndex], xyz[yIndex]
             };
-            t2 = mapProjection.toReference(t2);
+            t2 = theCoordinateSystem.toReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
@@ -1711,7 +1718,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             float[][] t2 = new float[][] {
                 xyz[xIndex], xyz[yIndex]
             };
-            t2 = mapProjection.toReference(t2);
+            t2 = theCoordinateSystem.toReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
@@ -1928,5 +1935,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         System.out.println(navDisplay.getSpatialCoordinates(el));
             */
     }
+
+
+
+
 }
 
