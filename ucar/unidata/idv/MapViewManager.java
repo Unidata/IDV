@@ -2222,8 +2222,11 @@ public String getDefaultProjectionName () {
             }
         }
 
-	super.addDisplayInfos(displayInfos);
         displayDataChanged(display,true);
+
+
+	super.addDisplayInfos(displayInfos);
+
     }
 
     /**
