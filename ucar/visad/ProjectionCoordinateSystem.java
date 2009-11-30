@@ -140,6 +140,22 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
         return projection;
     }
 
+    public static boolean debug =  false;
+    private void debug(String what, double[][] array, long t1, long t2) {
+	if(debug && array[0].length>100) {
+	    System.err.println(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
+	    ucar.unidata.util.Misc.printStack(what);
+	}
+    }
+
+    private void debug(String what, float[][] array, long t1, long t2) {
+	if(debug && array[0].length>100) {
+	    //	    System.err.println(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
+	    ucar.unidata.util.Misc.printStack(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
+	}
+    }
+
+
     /**
      * Convert world coordinates to lat/lon.  Input coords are in km.
      *
@@ -150,7 +166,11 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      * @throws VisADException  world coordinate array length != 2
      */
     public double[][] toReference(double[][] world) throws VisADException {
-        return projection.projToLatLon(world, world);
+	long t1 = System.currentTimeMillis();
+        double[][]result = projection.projToLatLon(world, world);
+	long t2 = System.currentTimeMillis();
+	debug("toReference(double)",result, t1,t2);
+	return result;
     }
 
 
@@ -164,8 +184,12 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      */
 
     public double[][] fromReference(double[][] latlon) throws VisADException {
-        return projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
-                                       getLongitudeIndex());
+	long t1 = System.currentTimeMillis();
+        double[][]result =projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
+						  getLongitudeIndex());
+	long t2 = System.currentTimeMillis();
+	debug("fromReference(double)",result, t1,t2);
+	return result;
     }
 
 
@@ -180,7 +204,11 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      * @throws VisADException  world coordinate array length != 2
      */
     public float[][] toReference(float[][] world) throws VisADException {
-        return projection.projToLatLon(world, world);
+	long t1 = System.currentTimeMillis();
+        float[][] result = projection.projToLatLon(world, world);
+	long t2 = System.currentTimeMillis();
+	debug("toReference(float)",result, t1,t2);
+	return result;
     }
 
 
@@ -195,13 +223,16 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      */
 
     public float[][] fromReference(float[][] latlon) throws VisADException {
-
         ucar.unidata.util.Trace.msg(
             "ProjectionCoordinateSystem.fromReference "
             + projection.getClass().getName());
 
-        return projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
+	long t1 = System.currentTimeMillis();
+        float[][] result = projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
                                        getLongitudeIndex());
+	long t2 = System.currentTimeMillis();
+	debug("fromReference(float)",result, t1,t2);
+	return result;
     }
 
 
