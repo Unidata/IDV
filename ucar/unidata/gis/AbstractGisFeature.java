@@ -42,7 +42,10 @@ import visad.VisADException;
 
 import java.awt.Shape;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -208,6 +211,12 @@ public abstract class AbstractGisFeature implements GisFeature {
     }
 
 
+    private int pointCnt = 0;
+
+    public int getPointCount() {
+	return pointCnt;
+    }
+
     /**
      * Convert a GisFeature to a visad.SampledSet, which is either a
      * single Gridded2DSet (if there is only one part to the feature)
@@ -217,15 +226,28 @@ public abstract class AbstractGisFeature implements GisFeature {
      *
      * @return UnionSet of Gridded2DSet corresponding to this feature.
      */
+
     public SampledSet getMapLines() {
+	return getMapLines(null);
+    }
+
+    /**
+     * Convert a GisFeature to a visad.SampledSet, which is either a
+     * single Gridded2DSet (if there is only one part to the feature)
+     * or a UnionSet of Gridded2DSet (if there are multiple parts).
+     * Each Gridded2DSet is a sequence of line segments that is
+     * supposed to be drawn as a continuous line.
+     *
+     * @return UnionSet of Gridded2DSet corresponding to this feature.
+     */
+    public SampledSet getMapLines(Rectangle2D bbox) {
+	pointCnt = 0;
         if ((getNumParts() == 0) || (getNumPoints() == 0)) {
             return null;
         }
         SampledSet     maplines    = null;
-        float          lalo[][]    = new float[2][getNumPoints()];
-        Gridded2DSet[] latLonLines = new Gridded2DSet[getNumParts()];
+	List<Gridded2DSet> lines = new ArrayList<Gridded2DSet>();
 
-        int            iP          = 0;  // part counter
         try {
             RealTupleType coordMathType = RealTupleType.SpatialEarth2DTuple;
             java.util.Iterator pi = getGisParts();
@@ -234,16 +256,31 @@ public abstract class AbstractGisFeature implements GisFeature {
                 int       np   = gp.getNumPoints();
                 double[]  xx   = gp.getX();
                 double[]  yy   = gp.getY();
+		if(bbox!=null) {
+		    boolean inBox = false;
+		    for(int i=0;i<np;i++) {
+			if(bbox.contains(xx[i],yy[i])) {
+			    inBox = true;
+			    break;
+			} 
+		    }
+		    if(!inBox) continue;
+		}
+
+		pointCnt +=np;
                 float[][] part = new float[2][np];
                 for (int i = 0; i < np; i++) {
                     part[0][i] = (float) xx[i];
                     part[1][i] = (float) yy[i];
                 }
-                latLonLines[iP++] = new MapSet(coordMathType, part, np,
-                        (CoordinateSystem) null, (Unit[]) null,
-                        (ErrorEstimate[]) null, false);  // no copy
+                lines.add(new MapSet(coordMathType, part, np,
+				     (CoordinateSystem) null, (Unit[]) null,
+				     (ErrorEstimate[]) null, false));  
             }
-            if (iP > 1) {
+
+	    if(lines.size()==0) return null;
+	    Gridded2DSet[] latLonLines = (Gridded2DSet[]) lines.toArray(new Gridded2DSet[lines.size()]);
+            if (latLonLines.length > 1) {
                 maplines = new UnionSet(coordMathType, latLonLines,
                                         (CoordinateSystem) null,
                                         (Unit[]) null,

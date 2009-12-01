@@ -132,7 +132,7 @@ public class EsriShapefile {
     private int fileShapeType;  // not used here
 
     /** EsriFeatures as List */
-    private ArrayList features;  // EsriFeatures in List
+    private ArrayList<GisFeature> features;  // EsriFeatures in List
 
     /** bounds from shapefile */
     private Rectangle2D listBounds;  // bounds from shapefile
@@ -162,7 +162,6 @@ public class EsriShapefile {
 
 
 
-
     /**
      *
      * Read an ESRI shapefile and extract all features into
@@ -179,7 +178,7 @@ public class EsriShapefile {
 
     /**
      *
-     * Read an ESRI shapefile from a URL and extract all features into
+        * Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure.
      *
      * @param url URL of ESRI shapefile
@@ -427,16 +426,16 @@ public class EsriShapefile {
         version       = readLEInt();
         fileShapeType = readLEInt();
         listBounds    = readBoundingBox();
-
+	//	bBox = null;
         // if no bounds specified, use shapefile bounds
         if (bBox == null) {
             bBox = listBounds;
         }
 
-        double xu = bBox.getMaxX();
-        double yu = bBox.getMaxY();
-        double xl = bBox.getMinX();
-        double yl = bBox.getMinY();
+        double xu = listBounds.getMaxX();
+        double yu = listBounds.getMaxY();
+        double xl = listBounds.getMinX();
+        double yl = listBounds.getMinY();
         double w  = 1000;  // for resolution, just assume 1000x1000 display
         double h  = 1000;
         resolution = 1.0
@@ -444,11 +443,14 @@ public class EsriShapefile {
                         * Math.min(Math.abs(xu - xl) / w,
                                    Math.abs(yu - yl) / h));
 
+	//	System.err.println("coarseness:" + coarseness +" resolution:" + resolution);
+
         skipBytes(32);  // skip to start of first record header
 
         /* Read through file, filtering out features that don't
            intersect bounding box. */
-        features = new ArrayList();
+        features = new ArrayList<GisFeature>();
+
 
         while (bytesSeen < fileBytes) {
             GisFeature  gf       = nextFeature();
@@ -457,6 +459,7 @@ public class EsriShapefile {
                     || (gfBounds.getHeight() == 0)
                     || gfBounds.intersects(bBox)) {
                 features.add(gf);
+		//		if(features.size()>10) break;
             }
         }
         //      System.err.println ("features:" + features.size());
