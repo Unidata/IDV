@@ -50,10 +50,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
-
 import java.sql.Statement;
 
 
@@ -229,25 +227,30 @@ public class SessionManager extends RepositoryManager {
         Session session = sessionMap.get(sessionId);
         if (session == null) {
             Statement stmt = getDatabaseManager().select(
-                                 Tables.SESSIONS.COLUMNS,
-                                 Tables.SESSIONS.NAME,
-                                 Clause.eq(
-                                     Tables.SESSIONS.COL_SESSION_ID,
-                                     sessionId));
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
-            ResultSet        results;
-            //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    session = makeSession(results);
-                    session.setLastActivity(new Date());
-                    //Remove it from the DB and then readd it so we update the lastActivity
-                    removeSession(session.getId());
-                    addSession(session);
-                    sessionMap.put(sessionId, session);
-                    break;
-                }
-            }
+							 Tables.SESSIONS.COLUMNS,
+							 Tables.SESSIONS.NAME,
+							 Clause.eq(
+								   Tables.SESSIONS.COL_SESSION_ID,
+								   sessionId));
+	    try {
+		SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+		ResultSet        results;
+		//COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
+		boolean ok = true;
+		while ((results = iter.next()) != null && ok) {
+		    while (results.next() && ok) {
+			session = makeSession(results);
+			session.setLastActivity(new Date());
+			//Remove it from the DB and then readd it so we update the lastActivity
+			removeSession(session.getId());
+			addSession(session);
+			sessionMap.put(sessionId, session);
+			ok  = false;
+		    }
+		}
+	    } finally {
+		getDatabaseManager().closeAndReleaseConnection(stmt);
+	    }
         }
         return session;
     }
