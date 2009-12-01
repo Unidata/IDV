@@ -406,11 +406,41 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
     }
 
     /**
+     * Collect the time animation set from the displayables.
+     * If none found then return null.
+     *
+     * @return Animation set
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Set getDataTimeSet() throws RemoteException, VisADException {
+        Set  aniSet = null;
+        int            index   = getSelectedStationIndex();
+        List<DateTime> times   = stationsTimes.get(stations.get(index));
+        aniSet = Util.makeTimeSet(times);
+
+        return aniSet;
+    }
+
+    /**
+     * Get the DisplayListTemplate property.
+     *
+     * @return The DisplayListTemplate
+     */
+    public String getDisplayListTemplate() {
+        int            index   = getSelectedStationIndex();
+        String template = (String) stations.get(index) + " " + MACRO_TIMESTAMP;
+        return template;
+    }
+
+    /**
      * Add the data to the in display legend
      *
      * @return the data for the display list displayable
      */
-    protected Data getDisplayListData() {
+
+    protected Data getDisplayListDataOld() {
         Data           data    = null;
         int            timeIdx = getCurrentIdx();
         int            index   = getSelectedStationIndex();
