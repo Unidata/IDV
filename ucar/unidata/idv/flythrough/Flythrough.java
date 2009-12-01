@@ -1107,7 +1107,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     }
                 }
 
-                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     List<FlythroughPoint> newPoints =
                         new ArrayList<FlythroughPoint>();
                     int[]                 rows = pointTable.getSelectedRows();

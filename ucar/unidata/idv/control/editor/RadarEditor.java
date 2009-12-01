@@ -301,7 +301,7 @@ public class RadarEditor extends DrawingControl {
             ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         actionList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == e.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     int[]        indices = actionList.getSelectedIndices();
                     List<Action> tmp     = actions;
                     actions = new ArrayList<Action>(tmp);

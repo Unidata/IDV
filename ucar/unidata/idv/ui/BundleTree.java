@@ -163,7 +163,7 @@ public class BundleTree extends DndTree {
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == e.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     deleteSelected();
                 } else if (e.getKeyCode() == e.VK_ENTER) {
                     SavedBundle bundle = findSelectedBundle();

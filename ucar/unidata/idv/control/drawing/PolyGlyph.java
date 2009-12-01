@@ -183,7 +183,7 @@ public class PolyGlyph extends LineGlyph {
         InputEvent inputEvent = event.getInputEvent();
         if ((inputEvent instanceof KeyEvent)) {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
-            if ((keyEvent.getKeyCode() == KeyEvent.VK_DELETE)) {
+	    if (GuiUtils.isDeleteEvent(keyEvent)) {
                 doDeletePoint(event);
                 return;
             }

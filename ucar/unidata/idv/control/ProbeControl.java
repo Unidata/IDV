@@ -1397,7 +1397,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         paramsTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     removeField(paramsTable.getSelectedRow());
                 }
             }

@@ -153,7 +153,7 @@ public class DisplayTree extends DndTree implements ActionListener {
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == e.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     deleteSelected();
                 }
             }

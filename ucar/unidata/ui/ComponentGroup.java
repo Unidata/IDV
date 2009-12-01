@@ -400,7 +400,8 @@ public class ComponentGroup extends ComponentHolder {
 
         displayList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if ((e.getKeyCode() == KeyEvent.VK_DELETE)
+
+                if(GuiUtils.isDeleteEvent(e)
                         && (displayList.getSelectedIndex() >= 0)) {
                     displayOrderChanged = true;
                     propertiesList.remove(displayList.getSelectedIndex());

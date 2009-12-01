@@ -401,7 +401,7 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
         }
         char key     = evt.getKeyChar();
         int  keyCode = evt.getKeyCode();
-        if (keyCode == KeyEvent.VK_DELETE) {
+	if (GuiUtils.isDeleteEvent(evt)) {
             doCut();
         }
 

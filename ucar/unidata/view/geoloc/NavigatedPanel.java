@@ -1385,7 +1385,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      */
     public void keyPressed(KeyEvent e) {
         if (selectRegionMode) {
-            if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+            if (GuiUtils.isDeleteEvent(e)) {
                 selectedRegion = null;
                 selectedRegionChanged();
                 repaint();
@@ -1775,7 +1775,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         selectRegionMode = value;
         if (value) {
             setToolTipText(
-                "<html>Drag to select region<br>Press 'Delete' to clear selected region<br>Press Control-R to reset selected region</html>");
+                "<html>Drag to select region<br>Press 'Delete' (or Control-D) to clear selected region<br>Press Control-R to reset selected region</html>");
         }
     }
 

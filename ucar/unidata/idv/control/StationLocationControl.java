@@ -2001,7 +2001,7 @@ public class StationLocationControl extends StationModelControl {
                     }
                     selected = stationTableNames.remove(index);
                     stationTableNames.add(index - 1, selected);
-                } else if (e.getKeyCode() == e.VK_DELETE) {
+                } else 	if (GuiUtils.isDeleteEvent(e)) {
                     stationTableNames.remove(selected);
                 } else {
                     return;

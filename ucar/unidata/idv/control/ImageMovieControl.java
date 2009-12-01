@@ -805,8 +805,8 @@ public class ImageMovieControl extends DisplayControlImpl {
         /*
         fileList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    int[] indices = fileList.getSelectedIndices();
+	    if (GuiUtils.isDeleteEvent(e)) {
+	    int[] indices = fileList.getSelectedIndices();
                     List  tmp     = new ArrayList(files);
                     for (int i = 0; i < indices.length; i++) {
                         tmp.set(indices[i], null);

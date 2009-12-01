@@ -264,7 +264,7 @@ public class AutoDisplayEditor extends IdvManager {
         tree.setShowsRootHandles(true);
         tree.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent event) {
-                if (event.getKeyCode() == event.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(event)) {
                     TreePath[] paths =
                         tree.getSelectionModel().getSelectionPaths();
                     if ((paths == null) || (paths.length == 0)) {

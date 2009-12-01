@@ -6735,6 +6735,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+
     /**
      * Is this running on a Mac?
      *
@@ -6746,6 +6747,11 @@ public class GuiUtils extends LayoutUtil {
             return true;
         }
         return false;
+    }
+
+    public static boolean isDeleteEvent(KeyEvent e) {
+	return  (e.getKeyCode() == KeyEvent.VK_DELETE || (GuiUtils.isMac() && e.getKeyCode()== 8) ||
+		 (e.getKeyCode() == KeyEvent.VK_D && e.isControlDown()));
     }
 
 

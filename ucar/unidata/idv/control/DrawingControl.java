@@ -963,7 +963,7 @@ public class DrawingControl extends DisplayControlImpl {
                         return;
                     }
 
-                    if (keyEvent.getKeyCode() == KeyEvent.VK_DELETE) {
+		    if (GuiUtils.isDeleteEvent(keyEvent)) {
                         if ((currentGlyph != null)
                                 && currentCmd.equals(CMD_STRETCH)) {
                             setSelection(currentGlyph);
@@ -2628,7 +2628,7 @@ public class DrawingControl extends DisplayControlImpl {
 
 
 
-                    if (ke.getKeyCode() == KeyEvent.VK_DELETE) {
+		    if (GuiUtils.isDeleteEvent(ke)) {
                         int[]   rows      = getSelectedRows();
                         List    tmpGlyphs = new ArrayList(glyphs);
                         boolean orig      = glyphTableModel.ignoreChanges;

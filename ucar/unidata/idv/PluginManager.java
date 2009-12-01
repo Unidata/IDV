@@ -1064,7 +1064,7 @@ public class PluginManager extends IdvManager {
             createList   = new JList();
             createList.addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == e.VK_DELETE) {
+		    if (GuiUtils.isDeleteEvent(e)) {
                         removeCreateFile();
                     }
                 }

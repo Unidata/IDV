@@ -478,8 +478,8 @@ public class TwoListPanel extends JPanel implements ActionListener {
 
         toList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent event) {
-                if ((event.getKeyCode() == KeyEvent.VK_DELETE)
-                        || (event.getKeyCode() == KeyEvent.VK_LEFT)) {
+		if (GuiUtils.isDeleteEvent(event) ||
+		    event.getKeyCode() == KeyEvent.VK_LEFT) {
                     removeEntry();
                 } else if ((event.getKeyCode() == KeyEvent.VK_UP)
                            && event.isShiftDown()) {

@@ -870,7 +870,7 @@ public class DataSelector extends DataSourceHolder {
             });
             dataTree.getTree().addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent event) {
-                    if (event.getKeyCode() == KeyEvent.VK_DELETE) {
+		    if (GuiUtils.isDeleteEvent(event)) {
                         dataSelector.getIdv().getIdvUIManager()
                             .deleteKeyPressed(dataTree);
                     }

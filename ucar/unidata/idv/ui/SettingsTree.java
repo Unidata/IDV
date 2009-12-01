@@ -157,7 +157,7 @@ public class SettingsTree extends DndTree {
         this.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 List selected = getSelectedSettings();
-                if (e.getKeyCode() == e.VK_DELETE) {
+		if (GuiUtils.isDeleteEvent(e)) {
                     deleteSettings(selected);
                 } else if ((e.getKeyCode() == e.VK_S) && e.isControlDown()
                            && (selected.size() > 0)) {

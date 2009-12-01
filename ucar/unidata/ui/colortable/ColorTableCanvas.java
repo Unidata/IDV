@@ -1141,7 +1141,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             addColor(false, 1);
         } else if (code == KeyEvent.VK_MINUS) {
             removeColor(false, 1);
-        } else if (code == KeyEvent.VK_DELETE) {
+	} else if(GuiUtils.isDeleteEvent(e)) {
             removeBreakpoint();
         } else if ((currentBP != null) && !currentBP.getLocked()
                    && (moveRight || moveLeft)) {

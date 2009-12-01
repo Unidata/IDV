@@ -400,7 +400,8 @@ public class ButtonTabbedPane extends JPanel {
         button.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 int code = e.getKeyCode();
-                if (deleteEnabled && (code == KeyEvent.VK_DELETE)) {
+
+                if (deleteEnabled && GuiUtils.isDeleteEvent(e)) {
                     remove(button, contents);
                 } else if (code == KeyEvent.VK_DOWN) {
                     int idx = buttonList.indexOf(button) + 1;
