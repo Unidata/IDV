@@ -3507,7 +3507,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         getVMManager().setDisplayMastersInactive();
 
         try {
-            List currentViewManagers = getVMManager().getViewManagers();
+            List<ViewManager> currentViewManagers = getVMManager().getViewManagers();
             List windows             = (List) ht.get(ID_WINDOWS);
             List newViewManagers     = (List) ht.get(ID_VIEWMANAGERS);
 
@@ -3558,7 +3558,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
 
 
-            //            System.err.println ("new windows:" + windows);
             if (newViewManagers != null) {
                 if (getArgsManager().getIsOffScreen()) {
                     Trace.call1("Decode.addViewManagers");
@@ -3582,15 +3581,14 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 for (int i = 0; i < newViewManagers.size(); i++) {
                     ViewManager viewManager =
                         (ViewManager) newViewManagers.get(i);
-                    if (viewManager.getViewDescriptor() == null) {
+                    if (shouldMerge && viewManager.getViewDescriptor() == null) {
                         for (int currentIdx = 0;
                                 currentIdx < currentViewManagers.size();
                                 currentIdx++) {
                             ViewManager vm =
                                 (ViewManager) currentViewManagers.get(
                                     currentIdx);
-                            if (vm.getClass().equals(
-                                    viewManager.getClass())) {
+                            if (vm.isCompatibleWith(viewManager)) {
                                 currentViewManagers.remove(currentIdx);
                                 vm.initWith(viewManager);
                                 viewManager = null;
@@ -3604,7 +3602,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         getIdvUIManager().createNewWindow(
                             Misc.newList(viewManager));
                     }
+                    if (shouldMerge) {
+                    }
                 }
+
             } else if (newViewManagers != null) {
                 //Add any remainders in
                 getVMManager().addViewManagers(newViewManagers);

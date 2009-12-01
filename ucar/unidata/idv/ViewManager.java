@@ -4280,8 +4280,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return _more_
      */
     public boolean isCompatibleWith(ViewManager vm) {
+        IdvWindow thisWindow = getDisplayWindow();
+        if(thisWindow!=null) {
+            //If this is being called it means the given vm is from an old bundle
+            //And we only want to be compatible with it if we are in the default window
+            String skin = thisWindow.getSkinPath();
+            if(skin!=null && !Misc.equals("/ucar/unidata/idv/resources/skins/skin.xml", skin)) return false;
+        }
         return getClass().equals(vm.getClass());
     }
+
 
     /**
      * _more_
@@ -4689,6 +4697,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return class ok
      */
     public boolean isClassOk(ViewDescriptor vd) {
+        if(vd==null) return false;
         List classNames = vd.getClassNames();
         if ((classNames == null) || (classNames.size() == 0)) {
             return true;

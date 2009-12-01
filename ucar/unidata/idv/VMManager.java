@@ -94,7 +94,7 @@ public class VMManager extends IdvManager {
 
 
     /** The list of all active view managers */
-    private List viewManagers = new ArrayList();
+    private List<ViewManager> viewManagers = new ArrayList<ViewManager>();
 
     /**
      *  List of TwoFacedObjects (name, viewmanager) for the named saved viewmanager states.
@@ -134,8 +134,8 @@ public class VMManager extends IdvManager {
      *
      * @return List of view managers.
      */
-    public List getViewManagers() {
-        return new ArrayList(viewManagers);
+    public List<ViewManager> getViewManagers() {
+        return new ArrayList<ViewManager>(viewManagers);
     }
 
     /**
@@ -202,7 +202,7 @@ public class VMManager extends IdvManager {
      */
     public void applyPreferences() {
         for (int i = 0; i < viewManagers.size(); i++) {
-            ((ViewManager) viewManagers.get(i)).applyPreferences();
+            viewManagers.get(i).applyPreferences();
         }
     }
 
