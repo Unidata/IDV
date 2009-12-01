@@ -740,10 +740,12 @@ public class DisplayConventions extends IdvManager {
                            : unit.toString());
         List   unitList = getDefaultUnitList();
         if (unit != null) {
+            String unitString = unit.toString();
             List tmpList = unitList;
             unitList = new ArrayList();
             for (int i = 0; i < tmpList.size(); i++) {
                 Object o       = tmpList.get(i);
+                if(o.toString().equals(unitString)) continue;
                 Unit   theUnit = null;
                 if ((o instanceof TwoFacedObject)) {
                     theUnit = (Unit) ((TwoFacedObject) o).getId();
@@ -757,14 +759,13 @@ public class DisplayConventions extends IdvManager {
                         continue;
                     }
 
-                    if ((unit != null) && unit.equals(theUnit)) {}
+                    if (unit.equals(theUnit)) {}
                 } else {
                     continue;
                 }
                 unitList.add(o);
             }
         }
-
         return GuiUtils.getEditableBox(unitList, current);
     }
 
@@ -853,9 +854,7 @@ public class DisplayConventions extends IdvManager {
                 tmp.add(o);
                 seenName.add(s);
             }
-            System.err.println("Unit list:" + unitList);
             unitList = tmp;
-
 
             String[] names = {
                 //Temperature
@@ -872,7 +871,6 @@ public class DisplayConventions extends IdvManager {
                     TwoFacedObject tfo = new TwoFacedObject(names[i],
                                              Util.parseUnit(names[i]));
                     if (!unitList.contains(tfo) && !seenName.contains(tfo.toString().toLowerCase())) {
-                        System.err.println("adding: " + tfo);
                         unitList.add(tfo);
                     }
 
