@@ -781,11 +781,13 @@ public class TDSRadarChooser extends TimesChooser {
                    selectedStation.getNamedLocation());
         } else {
             LogUtil.userMessage("No Station selected");
+            return;
         }
 
         if (isLevel3 && !haveSelectedProduct()) {
 
             LogUtil.userMessage("No Product selected");
+            return;
         }
 
         try {
