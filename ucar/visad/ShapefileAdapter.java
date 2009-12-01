@@ -277,6 +277,14 @@ public class ShapefileAdapter {
         readSource(filename, iStream, null, 0.0);
     }
 
+
+
+    public ShapefileAdapter(InputStream iStream, String filename, Rectangle2D dBox, double coarseness)
+            throws IOException, VisADException {
+	readSource(filename, iStream, dBox, coarseness);
+    }
+
+
     /**
      *
      * Read an ESRI shapefile and extract all features into an in-memory
@@ -310,7 +318,7 @@ public class ShapefileAdapter {
      * @throws VisADException
      */
     public ShapefileAdapter(EsriShapefile shapefile) throws VisADException {
-        mapLines = makeSet(doRead(shapefile));
+        mapLines = makeSet(doRead(shapefile,null));
     }
 
 
@@ -350,7 +358,7 @@ public class ShapefileAdapter {
                 } catch (java.net.MalformedURLException exc) {
                     iStream = new FileInputStream(name);
                 }
-                sets = doRead(new EsriShapefile(iStream, bBox, coarseness));
+                sets = doRead(new EsriShapefile(iStream, null, coarseness),bBox);
             }
             mapLines = makeSet(sets);
         } catch (Exception exc) {
@@ -587,15 +595,23 @@ public class ShapefileAdapter {
      *
      *     @return List of point sets
      */
-    private List doRead(EsriShapefile shapefile) {
+    private List doRead(EsriShapefile shapefile, Rectangle2D bbox) {
+
+
+
         this.shapefile = shapefile;
-        java.util.Iterator si = shapefile.getFeatures().iterator();
+	List features = shapefile.getFeatures();
+        java.util.Iterator si = features.iterator();
         dbFile = shapefile.getDbFile();
         List s0 = new ArrayList();
+
+
+	int pointCnt = 0;
         for (int i = 0; si.hasNext(); i++) {
             EsriShapefile.EsriFeature gf =
                 (EsriShapefile.EsriFeature) si.next();
-            SampledSet mapLines = gf.getMapLines();
+            SampledSet mapLines = gf.getMapLines(bbox);
+	    pointCnt+= gf.getPointCount();
             if (mapLines != null) {
                 s0.add(mapLines);
             }
