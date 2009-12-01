@@ -242,7 +242,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             }
 
             viewManager.toFront();
-            Misc.sleep(250);
+            Misc.sleep(1000);
 
             //capture the image of the rasters and write it into the graphics
             BufferedImage image = viewManager.getMaster().getImage(false);
@@ -261,6 +261,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             if (wasShowingScales) {
                 viewManager.setShowScales(true);
             }
+            Misc.sleep(500);
 
             //Render the scene graph
             SceneGraphRenderer renderer = new SceneGraphRenderer();
@@ -271,7 +272,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             renderer.plot(graphics, display,
                           viewManager.getDisplayCoordinateSystem(),
                           dim.width, dim.height);
-
+                          //viewManager.getBp(ViewManager.PREF_3DCLIP));
 
             //Reset all displays
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
