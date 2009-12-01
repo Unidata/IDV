@@ -29,7 +29,9 @@ import ucar.visad.data.MapSet;
 import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.shapefile.DbaseData;
 
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.CacheManager;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
@@ -38,9 +40,13 @@ import ucar.visad.ShapefileAdapter;
 import ucar.visad.MapFamily;
 
 
-
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import visad.*;
 
+
+import javax.swing.*;
+import java.awt.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -50,7 +56,11 @@ import java.net.URL;
 
 import java.rmi.RemoteException;
 
+
+import java.awt.geom.Rectangle2D;
+
 import java.util.ArrayList;
+import java.util.Vector;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -77,6 +87,10 @@ public class ShapeFileDataSource extends FilesDataSource {
     /** The data. We cache this here ourselves */
     private Data shapefileData;
 
+    double coarseness = 0;
+    double lastCoarseness = 0;
+
+    private JComboBox 	    coarsenessCbx;
 
     /**
      * Dummy constructor so this object can get unpersisted.
@@ -107,6 +121,46 @@ public class ShapeFileDataSource extends FilesDataSource {
         super.reloadData();
     }
 
+
+    public boolean canDoGeoSelection() {
+        return true;
+    }
+
+    protected boolean canDoGeoSelectionStride() {
+        return false;
+    }
+
+
+    protected JComponent doMakeGeoSubsetPropertiesComponent() {
+	JComponent comp = super.doMakeGeoSubsetPropertiesComponent();
+	if(coarsenessCbx==null) {
+	    Object selected = null;
+	    Vector items = new Vector();
+	    double[]values = new double[]{0,1,2,3,4,5,6,7,8,9};
+	    String[]names = new String[]{"Full resolution","........",".......","......",".....","....","...","..",".", "Really coarse"};
+	    for(int i=0;i<values.length;i++) {
+		TwoFacedObject tfo = new TwoFacedObject(names[i], new Double(values[i]));
+		if(values[i]==coarseness) selected = tfo;
+		items.add(tfo);
+	    }
+	    coarsenessCbx = new JComboBox(items);
+	    if(selected!=null)
+		coarsenessCbx.setSelectedItem(selected);
+	}
+	return  GuiUtils.topCenter(GuiUtils.vbox(new JLabel("Note: subsetting the map will invalidate any dbfile entries"),
+						 GuiUtils.left(GuiUtils.label("Resolution:", coarsenessCbx))),
+				   comp);
+    }
+
+
+    public boolean applyProperties() {
+	if(coarsenessCbx!=null) {
+	    TwoFacedObject tfo =  (TwoFacedObject)coarsenessCbx.getSelectedItem();
+	    coarseness = ((Double)tfo.getId()).doubleValue();
+	}
+	if(!super.applyProperties()) return false;
+	return true;
+    }
 
     /**
      * Is this data source capable of saving its data to local disk
@@ -216,6 +270,33 @@ public class ShapeFileDataSource extends FilesDataSource {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
+
+        GeoSelection    geoSelection = ((dataSelection != null)
+                                        ? dataSelection.getGeoSelection()
+                                        : null);
+        GeoLocationInfo bbox         = ((geoSelection == null)
+                                        ? null
+                                        : geoSelection.getBoundingBox());
+
+
+        LatLonRect      llr          = ((bbox != null)
+                                        ? bbox.getLatLonRect()
+                                        : null);
+
+	Rectangle2D  box = null;
+	if(llr!=null) {
+	    LatLonPointImpl ul = llr.getUpperLeftPoint();
+	    LatLonPointImpl lr = llr.getLowerRightPoint();
+	    box = new Rectangle2D.Double(ul.getLongitude(), ul.getLatitude()-llr.getHeight(), llr.getWidth(), llr.getHeight());
+	    shapefileData = null;
+	}
+
+	if(coarseness!=lastCoarseness) {
+	    shapefileData = null;
+	}
+	lastCoarseness = coarseness;
+
+
         String filename = (String) dataChoice.getId();
         byte[] bytes    = null;
         try {
@@ -253,10 +334,9 @@ public class ShapeFileDataSource extends FilesDataSource {
                     return null;
                 }
 
-
+		InputStream inputStream  = new ByteArrayInputStream(bytes, 0, bytes.length);
                 ShapefileAdapter sfa =
-                    new ShapefileAdapter(new ByteArrayInputStream(bytes, 0,
-                        bytes.length), filename);
+                    new ShapefileAdapter(inputStream, filename, box,coarseness);
 
 
                 dbFile = sfa.getDbFile();
@@ -381,6 +461,24 @@ public class ShapeFileDataSource extends FilesDataSource {
      */
     protected List doMakeDateTimes() {
         return new ArrayList();
+    }
+
+    /**
+       Set the Coarseness property.
+
+       @param value The new value for Coarseness
+    **/
+    public void setCoarseness (double value) {
+	this.coarseness = value;
+    }
+
+    /**
+       Get the Coarseness property.
+
+       @return The Coarseness
+    **/
+    public double getCoarseness () {
+	return this.coarseness;
     }
 
 
