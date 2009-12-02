@@ -23,8 +23,6 @@
 
 
 
-
-
 package ucar.unidata.data.imagery;
 
 
@@ -132,14 +130,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private List myDataChoices = new ArrayList();
 
 
-    /** _more_ */
+    /** current directories */
     private AreaDirectory[][] currentDirs;
 
-    /** _more_ */
+    /** timeMap */
     private Hashtable timeMap = new Hashtable();
 
 
-    /** _more_          */
+    /** mutex */
     private Object RANGEMUTEX = new Object();
 
     /**
@@ -201,10 +199,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Reload data
      *
-     * @param object _more_
-     * @param properties _more_
+     * @param object  the object to reload
+     * @param properties  the properties
      */
     public void reloadData(Object object, Hashtable properties) {
         if (object instanceof ImageDataset) {
@@ -244,10 +242,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Update the state
      *
-     * @param newObject _more_
-     * @param newProperties _more_
+     * @param newObject  the new object
+     * @param newProperties  the new properties
      */
     public void updateState(Object newObject, Hashtable newProperties) {
         super.updateState(newObject, newProperties);
@@ -915,7 +913,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
-    /** _more_ */
+    /** data ranges */
     private DataRange[] sampleRanges = null;
 
     /**
@@ -1078,8 +1076,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * Create the single image defined by the given dataChoice.
      *
      * @param aid AddeImageDescriptor
-     * @param fromSequence _more_
-     * @param readLabel _more_
+     * @param fromSequence from a sequence
+     * @param readLabel  the label
      *
      * @return The data.
      *
@@ -1224,7 +1222,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Reload the data
      */
     public void reloadData() {
         currentDirs = null;
@@ -1233,9 +1231,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Get whether we should cache to disk
      *
-     * @return _more_
+     * @return  true
      */
     public boolean getCacheDataToDisk() {
         return true;
@@ -1330,15 +1328,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
             if (getCacheDataToDisk() && anyRelative
                     && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
-                //System.err.println(biggestPosition.makeAddeUrl()
-                //                   + "\nfrom aid:" + biggestSource);
-                //System.err.println(biggestPosition.makeAddeUrl()
-                //                   + "\nfrom aii:" + biggestPosition.makeAddeUrl());
-                //                AreaDirectoryList adl =
-                //                    new AreaDirectoryList(biggestPosition.makeAddeUrl());
-                biggestSource = biggestSource.replace("imagedata",
-                        "imagedir");
-                AreaDirectoryList adl = new AreaDirectoryList(biggestSource);
+                /*
+                System.err.println(biggestPosition.makeAddeUrl()
+                                   + "\nfrom aid:" + biggestSource);
+                System.err.println(biggestPosition.makeAddeUrl()
+                                   + "\nfrom aii:" + biggestPosition.makeAddeUrl());
+                */
+                AreaDirectoryList adl =
+                    new AreaDirectoryList(biggestPosition.makeAddeUrl());
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDATA);
                 currentDirs = adl.getSortedDirs();
             } else {
