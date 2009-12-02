@@ -232,6 +232,7 @@ public class ZipOutputHandler extends OutputHandler {
             List<Entry> all = new ArrayList<Entry>();
             all.addAll(subGroups);
             all.addAll(entries);
+            getLogManager().logInfo("Doing zip tree");
             return toZip(request, group.getName(), all, true);
         } else {
             return toZip(request, group.getName(), entries, false);

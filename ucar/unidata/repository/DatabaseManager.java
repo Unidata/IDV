@@ -43,6 +43,7 @@ import ucar.unidata.repository.util.Log4jPrintWriter;
 import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
+import ucar.unidata.util.Counter;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -107,6 +108,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
     /** _more_ */
     private static final int TIMEOUT = 5000;
+
+    private Counter numberOfSelects = new Counter();
+
 
     /** _more_ */
     private String db;
@@ -356,6 +360,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                       + "<br>&nbsp;&nbsp;#idle:" + bds.getNumIdle()
                       + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
                       + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+
+        poolSB.append("<br># of open selects:" + numberOfSelects.getCount());
+        poolSB.append("<br>");
 
         long                 time            = System.currentTimeMillis();
         StringBuffer         openConnections = new StringBuffer();
@@ -722,9 +729,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         if (connection != null) {
             closeConnection(connection);
         } else {
-            getLogManager().logError(
-                "CONNECTION: Tried to close a statement with no connection",
-                new IllegalArgumentException());
+            //            getLogManager().logError(
+            //                "CONNECTION: Tried to close a statement with no connection",
+            //                new IllegalArgumentException());
         }
     }
 
@@ -1475,6 +1482,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
+
     /**
      * _more_
      *
@@ -1514,12 +1522,28 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 }
             });
         */
-        Statement statement = SqlUtil.select(getConnection(msg), what,
-                                             tables, clause, extra, max,
-                                             TIMEOUT);
 
-        done[0] = true;
-        return statement;
+        Connection connection = getConnection(msg);
+        try {
+            numberOfSelects.incr();
+            Statement statement = SqlUtil.select(connection, what,
+                                                 tables, clause, extra, max,
+                                                 TIMEOUT);
+
+            done[0] = true;
+            return statement;
+        } catch(Exception exc) {
+            logError("Error doing select \nwhat:" + what + "\ntables:" +
+                                           tables +
+                                           "\nclause:" + clause +
+                                           "\nextra:" + extra+
+                     "max:" + max,exc);
+            closeConnection(connection);
+            throw exc;
+        } finally {
+            numberOfSelects.decr();
+        }
+
     }
 
 
