@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.data;
 
 
@@ -28,7 +29,6 @@ import edu.wisc.ssec.mcidas.AREAnav;
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.AreaFileFactory;
-import visad.data.*;
 
 
 import ucar.ma2.Array;
@@ -53,6 +53,8 @@ import ucar.unidata.util.Trace;
 
 
 import visad.*;
+
+import visad.data.*;
 import visad.data.CachedFlatField;
 
 import visad.data.mcidas.AREACoordinateSystem;
@@ -88,20 +90,26 @@ public class MyAreaImageFlatField extends AreaImageFlatField {
     /**
      * ctor
      *
+     *
+     * @param aid _more_
      * @param floats The values
      * @param type Function type
      * @param domainSet Domain
      * @param rangeCoordSys  range CoordSystem
      * @param rangeSets range sets
      * @param units units
+     * @param readLabel _more_
      *
      * @throws VisADException On badness
      */
-    public MyAreaImageFlatField(AddeImageDescriptor aid, FunctionType type, Set domainSet,
-                              CoordinateSystem rangeCoordSys,
-                              Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
+    public MyAreaImageFlatField(AddeImageDescriptor aid, FunctionType type,
+                                Set domainSet,
+                                CoordinateSystem rangeCoordSys,
+                                Set[] rangeSets, Unit[] units,
+                                float[][] floats, String readLabel)
             throws VisADException {
-        super(aid, type, domainSet, rangeCoordSys, rangeSets, units, floats, readLabel);
+        super(aid, type, domainSet, rangeCoordSys, rangeSets, units, floats,
+              readLabel);
     }
 
 

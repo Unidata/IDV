@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.visad.data;
 
 
@@ -28,7 +30,6 @@ import edu.wisc.ssec.mcidas.AREAnav;
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.AreaFileFactory;
-import visad.data.*;
 
 
 import ucar.ma2.Array;
@@ -53,6 +54,8 @@ import ucar.unidata.util.Trace;
 
 
 import visad.*;
+
+import visad.data.*;
 import visad.data.CachedFlatField;
 
 import visad.data.mcidas.AREACoordinateSystem;
@@ -91,7 +94,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     private DateTime startTime;
 
 
-    /** _more_          */
+    /** _more_ */
     private AddeImageDescriptor aid;
 
     /** _more_ */
@@ -108,6 +111,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @param rangeCoordSysArray  rangeCoordSysArray
      * @param rangeSets range sets
      * @param units units
+     * @param readLabel _more_
      *
      * @throws VisADException On badness
      */
@@ -119,9 +123,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             throws VisADException {
         super(that, copy, type, domainSet, rangeCoordSys, rangeCoordSysArray,
               rangeSets, units);
-	this.aid = that.aid;
+        this.aid       = that.aid;
         this.domainSet = that.domainSet;
-        this.readLabel  = readLabel;
+        this.readLabel = readLabel;
     }
 
 
@@ -129,22 +133,26 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     /**
      * ctor
      *
+     *
+     * @param aid _more_
      * @param floats The values
      * @param type Function type
      * @param domainSet Domain
      * @param rangeCoordSys  range CoordSystem
      * @param rangeSets range sets
      * @param units units
+     * @param readLabel _more_
      *
      * @throws VisADException On badness
      */
-    public AreaImageFlatField(AddeImageDescriptor aid, FunctionType type, Set domainSet,
-                              CoordinateSystem rangeCoordSys,
-                              Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
+    public AreaImageFlatField(AddeImageDescriptor aid, FunctionType type,
+                              Set domainSet, CoordinateSystem rangeCoordSys,
+                              Set[] rangeSets, Unit[] units,
+                              float[][] floats, String readLabel)
             throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
-	this.aid = aid;
-        this.readLabel  =readLabel;
+        this.aid       = aid;
+        this.readLabel = readLabel;
     }
 
 
@@ -177,25 +185,39 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
-    public static AreaImageFlatField createImmediate(AddeImageDescriptor aid, String readLabel) 
-        throws VisADException, RemoteException, IOException {
+    /**
+     * _more_
+     *
+     * @param aid _more_
+     * @param readLabel _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static AreaImageFlatField createImmediate(AddeImageDescriptor aid,
+            String readLabel)
+            throws VisADException, RemoteException, IOException {
         AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
-        visad.meteorology.SingleBandedImageImpl ff   = (visad.meteorology.SingleBandedImageImpl)aa.getImage();
+        visad.meteorology.SingleBandedImageImpl ff =
+            (visad.meteorology.SingleBandedImageImpl) aa.getImage();
         //Uggh, make a copy for now
-        float[][]samples  = ff.unpackFloats();
-        FunctionType type = (FunctionType) ff.getType();
-        Set domainSet = ff.getDomainSet();
+        float[][]        samples       = ff.unpackFloats();
+        FunctionType     type          = (FunctionType) ff.getType();
+        Set              domainSet     = ff.getDomainSet();
         CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
-        Set[] rangeSets = ff.getRangeSets();
-        Unit[] units = ff.getRangeUnits()[0];
-        AreaImageFlatField aiff= new AreaImageFlatField(aid, type, domainSet,
-                                      rangeCoordSys,
-                                      rangeSets, units, samples,  readLabel);
+        Set[]            rangeSets     = ff.getRangeSets();
+        Unit[]           units         = ff.getRangeUnits()[0];
+        AreaImageFlatField aiff = new AreaImageFlatField(aid, type,
+                                      domainSet, rangeCoordSys, rangeSets,
+                                      units, samples, readLabel);
 
         //        aiff.bandIndices = bandIndices;
         //        aiff.aid         = aid;
         //        cs.aiff          = aiff;
-        aiff.startTime   = ff.getStartTime();
+        aiff.startTime = ff.getStartTime();
         return aiff;
 
     }
@@ -206,12 +228,13 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @param aid _more_
      * @param areaDirectory _more_
-     * @param shouldCache _more_
      * @param cacheFile _more_
-     * @param cacheClearDelay _more_
+     * @param readLabel _more_
      *
      * @return _more_
      *
+     *
+     * @throws IOException _more_
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
@@ -219,16 +242,20 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                             AreaDirectory areaDirectory,
                                             String cacheFile,
                                             String readLabel)
-        throws VisADException, RemoteException, IOException {
+            throws VisADException, RemoteException, IOException {
 
 
-	//        if(true) {
-	//            return createImmediate(aid, readLabel);
-	//        }
+        //        if(true) {
+        //            return createImmediate(aid, readLabel);
+        //        }
         //        int nLines = aid.getImageInfo().getLines();
         //        int nEles  = aid.getImageInfo().getElements();
-        int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():areaDirectory.getLines());
-        int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():areaDirectory.getElements());
+        int nLines = ((aid.getImageInfo() != null)
+                      ? aid.getImageInfo().getLines()
+                      : areaDirectory.getLines());
+        int nEles  = ((aid.getImageInfo() != null)
+                      ? aid.getImageInfo().getElements()
+                      : areaDirectory.getElements());
 
 
         // make the VisAD RealTypes for the dimension variables
@@ -272,7 +299,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             String unit = areaDirectory.getCalibrationUnitName();
             if (unit != null) {
                 String unitName = visad.jmet.MetUnits.makeSymbol(
-                        areaDirectory.getCalibrationUnitName());
+                                      areaDirectory.getCalibrationUnitName());
                 calUnit = visad.data.units.Parser.parse(unitName);
                 // can't clone BaseUnit
                 try {
@@ -343,10 +370,16 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
+    /**
+     * _more_
+     */
     private void checkReadData() {
-        if(!haveReadData) readData();
+        if ( !haveReadData) {
+            readData();
+        }
     }
 
+    /** _more_ */
     private boolean haveReadData = false;
 
     /** _more_ */
@@ -361,10 +394,18 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     /** _more_ */
     private int[] dir;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private String getDirNavAuxFile() {
-        String file = visad.data.DataCacheManager.getCacheManager().getCacheFile().toString();
-        if(file!=null)
+        String file =
+            visad.data.DataCacheManager.getCacheManager().getCacheFile()
+                .toString();
+        if (file != null) {
             return file + ".dirnavaux";
+        }
         return null;
     }
 
@@ -380,7 +421,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         checkReadData();
         String file = getDirNavAuxFile();
         if (dirNavAux == null) {
-            if (file != null && new File(file).exists()) {
+            if ((file != null) && new File(file).exists()) {
                 try {
                     FileInputStream istream = new FileInputStream(file);
                     BufferedInputStream bis =
@@ -393,8 +434,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                 }
             }
         }
-        int[][]tmp = dirNavAux;
-        if(file!=null) {
+        int[][] tmp = dirNavAux;
+        if (file != null) {
             dirNavAux = null;
         }
         return tmp;
@@ -446,8 +487,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             AREAnav anav = super.getAreaNav();
             if (anav == null) {
                 try {
-		    if(true)
-			throw new IllegalArgumentException("MyAreaCoordinateSystem.getAraNav: Should never get to this point"); 
+                    if (true) {
+                        throw new IllegalArgumentException(
+                            "MyAreaCoordinateSystem.getAraNav: Should never get to this point");
+                    }
                     int[][] dirNavAux = aiff.getDirNavAux();
                     init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
                 } catch (Exception exc) {
@@ -459,90 +502,114 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public CoordinateSystem getDomainCoordinateSystem() {
-	if(aid!=null)  {
-	    checkReadData();
-	}
-	CoordinateSystem cs =  super.getDomainCoordinateSystem();
-	return cs;
+        if (aid != null) {
+            checkReadData();
+        }
+        CoordinateSystem cs = super.getDomainCoordinateSystem();
+        return cs;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private float[][] readDataNewWay() throws Exception {
-	String url = aid.getImageInfo()!=null?
-	    aid.getImageInfo().makeAddeUrl():
-	    aid.getSource();
+        String url = (aid.getImageInfo() != null)
+                     ? aid.getImageInfo().makeAddeUrl()
+                     : aid.getSource();
         AreaAdapter aa = new AreaAdapter(url, false);
-        visad.meteorology.SingleBandedImageImpl ff   = (visad.meteorology.SingleBandedImageImpl)aa.getImage();
-        float[][]samples  = ff.getImageData();
-        FunctionType type = (FunctionType) ff.getType();
-        Set domainSet = ff.getDomainSet();
+        visad.meteorology.SingleBandedImageImpl ff =
+            (visad.meteorology.SingleBandedImageImpl) aa.getImage();
+        float[][]        samples       = ff.getImageData();
+        FunctionType     type          = (FunctionType) ff.getType();
+        Set              domainSet     = ff.getDomainSet();
         CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
-        Set[] rangeSets = ff.getRangeSets();
-        Unit[] units = ff.getRangeUnits()[0];
-	setDomain(domainSet, false);
-	return samples;
+        Set[]            rangeSets     = ff.getRangeSets();
+        Unit[]           units         = ff.getRangeUnits()[0];
+        setDomain(domainSet, false);
+        return samples;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private float[][] readDataOldWay() throws Exception {
-            long tt1 = System.currentTimeMillis();
-            AreaFile areaFile = AreaFileFactory.getAreaFileInstance(aid.getImageInfo()!=null?
-                                                                    aid.getImageInfo().makeAddeUrl():
-                                                                    aid.getSource());
-            long tt2 = System.currentTimeMillis();
+        long tt1 = System.currentTimeMillis();
+        AreaFile areaFile =
+            AreaFileFactory.getAreaFileInstance((aid.getImageInfo() != null)
+                ? aid.getImageInfo().makeAddeUrl()
+                : aid.getSource());
+        long tt2 = System.currentTimeMillis();
 
-            //            System.err.println("Time new areafile:" + (tt2-tt1));
-            long t1 = System.currentTimeMillis();
-            float[][][] flt_samples = areaFile.getFloatData();
-            long t2 = System.currentTimeMillis();
-            //            System.err.println("Time getfloatdata:" + (t2-t1));
-            //            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
-            //            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
-            int nLines = flt_samples[0].length;
-            int nEles = flt_samples[0][0].length;
-            float[][]   samples     = new float[1][nEles * nLines];
+        //            System.err.println("Time new areafile:" + (tt2-tt1));
+        long        t1          = System.currentTimeMillis();
+        float[][][] flt_samples = areaFile.getFloatData();
+        long        t2          = System.currentTimeMillis();
+        //            System.err.println("Time getfloatdata:" + (t2-t1));
+        //            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
+        //            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
+        int       nLines  = flt_samples[0].length;
+        int       nEles   = flt_samples[0][0].length;
+        float[][] samples = new float[1][nEles * nLines];
 
-            float calScale =
-                (1.0f
-                 / areaFile.getAreaDirectory().getCalibrationScaleFactor());
+        float calScale =
+            (1.0f / areaFile.getAreaDirectory().getCalibrationScaleFactor());
 
-            int bandIndex = bandIndices[0];
+        int bandIndex  = bandIndices[0];
 
-            int lineIdx=0; int elementIdx=0;
-            try {
-                for (lineIdx = 0; lineIdx < nLines; lineIdx++) {
-                    int sampleOffset = (nEles * lineIdx);
-                    float line[] = flt_samples[bandIndex][lineIdx];
-                    for (elementIdx = 0; elementIdx < nEles; elementIdx++) {
-                        float v = calScale * line[elementIdx];
-                        samples[0][elementIdx + sampleOffset] = v;
-                    }
+        int lineIdx    = 0;
+        int elementIdx = 0;
+        try {
+            for (lineIdx = 0; lineIdx < nLines; lineIdx++) {
+                int   sampleOffset = (nEles * lineIdx);
+                float line[]       = flt_samples[bandIndex][lineIdx];
+                for (elementIdx = 0; elementIdx < nEles; elementIdx++) {
+                    float v = calScale * line[elementIdx];
+                    samples[0][elementIdx + sampleOffset] = v;
                 }
-            } catch(ArrayIndexOutOfBoundsException aioe) {
-                System.err.println("error:" + aioe+"\n      band index:" + bandIndex+" neles:" + nEles +" nLines:" + nLines +"  flt:" + flt_samples.length +" X " + flt_samples[0].length +" X " + flt_samples[0][0].length +"   i:" + lineIdx +" elementIdx:" + elementIdx);
-                aioe.printStackTrace();
-                throw aioe;
             }
+        } catch (ArrayIndexOutOfBoundsException aioe) {
+            System.err.println("error:" + aioe + "\n      band index:"
+                               + bandIndex + " neles:" + nEles + " nLines:"
+                               + nLines + "  flt:" + flt_samples.length
+                               + " X " + flt_samples[0].length + " X "
+                               + flt_samples[0][0].length + "   i:" + lineIdx
+                               + " elementIdx:" + elementIdx);
+            aioe.printStackTrace();
+            throw aioe;
+        }
 
-            dirNavAux = new int[][] {
-                (int[]) areaFile.getAreaDirectory()
-                .getDirectoryBlock().clone(),
-                areaFile.getNav(), areaFile.getAux()
-            };
+        dirNavAux = new int[][] {
+            (int[]) areaFile.getAreaDirectory().getDirectoryBlock().clone(),
+            areaFile.getNav(), areaFile.getAux()
+        };
 
-            String file = getDirNavAuxFile();
-            if(file!=null) {
-                FileOutputStream fos = new FileOutputStream(file);
-                BufferedOutputStream bos = new BufferedOutputStream(fos,
-                                                                    100000);
-                ObjectOutputStream p = new ObjectOutputStream(bos);
-                p.writeObject(dirNavAux);
-                p.flush();
-                fos.close();
-            }
-            return samples;
+        String file = getDirNavAuxFile();
+        if (file != null) {
+            FileOutputStream     fos = new FileOutputStream(file);
+            BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
+            ObjectOutputStream   p   = new ObjectOutputStream(bos);
+            p.writeObject(dirNavAux);
+            p.flush();
+            fos.close();
+        }
+        return samples;
     }
 
     /**
@@ -555,10 +622,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             msg("Reading image data  " + readLabel);
             LogUtil.message(readLabel);
             ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
-	    //return readDataOldWay();
-	    float[][] results =  readDataNewWay();
+            //return readDataOldWay();
+            float[][] results = readDataNewWay();
             haveReadData = true;
-	    return results;
+            return results;
 
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);

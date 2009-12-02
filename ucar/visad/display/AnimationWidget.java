@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -71,10 +72,10 @@ import javax.swing.border.*;
  */
 public class AnimationWidget extends SharableImpl implements ActionListener {
 
-    /** _more_          */
+    /** _more_ */
     static int cnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     int mycnt = cnt++;
 
     /** Do we show the big icon */
@@ -163,6 +164,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** Indicator (currently a JComboBox) */
     private JComboBox timesCbx = null;
 
+    /** _more_          */
     private boolean timesCbxVisible = true;
 
     /** mutex  for accessing the timesCbx */
@@ -229,14 +231,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         // Initialize sharing to true
         super("AnimationWidget", true);
-        timesCbx   = new JComboBox() {
-                public String getToolTipText(MouseEvent event) {
-                    if (boxPanel != null) {
-                        return boxPanel.getToolTipText();
-                    }
-                    return " ";
+        timesCbx = new JComboBox() {
+            public String getToolTipText(MouseEvent event) {
+                if (boxPanel != null) {
+                    return boxPanel.getToolTipText();
                 }
-            };
+                return " ";
+            }
+        };
         timesCbx.setToolTipText("");
         timesCbxMutex = timesCbx.getTreeLock();
         timesCbx.setFont(new Font("Dialog", Font.PLAIN, 9));
@@ -274,9 +276,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void showDateBox(boolean v) {
         timesCbxVisible = v;
-        if(timesCbx!=null) {
+        if (timesCbx != null) {
             timesCbx.setVisible(v);
         }
     }
@@ -357,19 +364,19 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      */
     private String getIcon(String name) {
         /*
-        if(name.equals("Pause")) 
+        if(name.equals("Pause"))
             return "/auxdata/ui/icons/control_pause_blue.png";
-        if(name.equals("Play")) 
+        if(name.equals("Play"))
             return "/auxdata/ui/icons/control_play_blue.png";
-        if(name.equals("Rewind")) 
+        if(name.equals("Rewind"))
             return "/auxdata/ui/icons/control_rewind_blue.png";
-        if(name.equals("StepBack")) 
+        if(name.equals("StepBack"))
             return "/auxdata/ui/icons/control_start_blue.png";
-        if(name.equals("StepForward")) 
+        if(name.equals("StepForward"))
             return "/auxdata/ui/icons/control_end_blue.png";
-        if(name.equals("FastForward")) 
+        if(name.equals("FastForward"))
             return "/auxdata/ui/icons/control_fastforward_blue.png";
-        if(name.equals("Information")) 
+        if(name.equals("Information"))
             return "/auxdata/ui/icons/information.png";
         */
         return "/auxdata/ui/icons/" + name + (bigIcon
@@ -426,8 +433,10 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         };
         List buttonList = new ArrayList();
         buttonList.add(timesCbx);
-        Dimension preferredSize = timesCbx.getPreferredSize();
-        JComponent filler = GuiUtils.filler(3, (preferredSize!=null?preferredSize.height+1:20));
+        Dimension  preferredSize = timesCbx.getPreferredSize();
+        JComponent filler = GuiUtils.filler(3, ((preferredSize != null)
+                ? preferredSize.height + 1
+                : 20));
         buttonList.add(filler);
         String[][] buttonInfo = {
             { "Go to first frame", CMD_BEGINNING, getIcon("Rewind") },
@@ -448,7 +457,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             //            JComponent wrapper = GuiUtils.center(btn);
             //            wrapper.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             btn.setBorder(
-                          BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             buttonList.add(btn);
             //            buttonList.add(wrapper);
             if (i == 2) {
@@ -457,14 +466,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         }
 
         JComponent contents = GuiUtils.hflow(buttonList, 1, 0);
-        if(boxPanel == null) {
+        if (boxPanel == null) {
             boxPanel = new AnimationBoxPanel(this);
             if (timesArray != null) {
                 updateBoxPanel(timesArray);
             }
         }
         boxPanel.addKeyListener(listener);
-        if (!getBoxPanelVisible()) {
+        if ( !getBoxPanelVisible()) {
             boxPanel.setVisible(false);
         }
         contents = GuiUtils.doLayout(new Component[] { boxPanel, contents },
@@ -827,16 +836,16 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Share the value of the animation step.
      */
     protected void shareValue() {
-        Animation myAnimation = anime;
+        Animation     myAnimation     = anime;
         AnimationInfo myAnimationInfo = animationInfo;
-        if (myAnimation != null && myAnimationInfo!=null) {
+        if ((myAnimation != null) && (myAnimationInfo != null)) {
             if (myAnimation.getNumSteps() > 0) {
                 if (animationInfo.getShareIndex()) {
                     shareIndex();
-		} else {
-		    shareValue(myAnimation.getAniValue());
-		}
-	    }
+                } else {
+                    shareValue(myAnimation.getAniValue());
+                }
+            }
         }
     }
 
@@ -861,7 +870,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void stepForward() {
         if (anime != null) {
             anime.takeStepForward();
-        } 
+        }
         //shareIndex ();
         shareValue();
     }
@@ -984,7 +993,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     private void handleAnimationPropertyChange(PropertyChangeEvent evt) {
         //        System.err.println ("Handlechange:" +evt.getPropertyName());
         if (evt.getPropertyName().equals(Animation.ANI_VALUE)) {
-            debug("handleAnimationPropertyChange value :" + evt.getPropertyName());
+            debug("handleAnimationPropertyChange value :"
+                  + evt.getPropertyName());
             Real eventValue = (Real) evt.getNewValue();
             // if there's nothing to do, return;
             if ((eventValue == null) || eventValue.isMissing()) {
@@ -1142,9 +1152,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                     GuiUtils.setListData(timesCbx, timesArray);
                     //        }
                     //        synchronized (timesCbxMutex) {
-                    timesCbx.setVisible(timesCbxVisible &&
-                                         (timesArray != null)
-                                         && (timesCbx.getItemCount() > 0));
+                    timesCbx.setVisible(timesCbxVisible
+                                        && (timesArray != null)
+                                        && (timesCbx.getItemCount() > 0));
                     //        }
                     updateRunButton();
                 } finally {
@@ -1181,9 +1191,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void setBoxPanelVisible(boolean value) {
         boxPanelVisible = value;
         if (boxPanel != null) {
-            if(boxPanel.isVisible()!= boxPanelVisible) {
+            if (boxPanel.isVisible() != boxPanelVisible) {
                 boxPanel.setVisible(boxPanelVisible);
-                if(boxPanel.getParent()!=null) {
+                if (boxPanel.getParent() != null) {
                     boxPanel.getParent().doLayout();
                 }
             }
