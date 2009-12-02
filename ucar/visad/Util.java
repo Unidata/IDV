@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad;
 
 
@@ -34,16 +35,19 @@ import ucar.unidata.util.TwoFacedObject;
 
 
 import ucar.visad.data.*;
-import visad.data.CachedFlatField;
-import visad.data.DataRange;
+import ucar.visad.data.AreaImageFlatField;
 import ucar.visad.display.ColorScaleInfo;
 
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
 
+
 import visad.*;
 
 import visad.browser.Convert;
+
+import visad.data.CachedFlatField;
+import visad.data.DataRange;
 
 import visad.data.netcdf.Plain;
 
@@ -307,14 +311,14 @@ public final class Util {
      * @return cleaned up name
      */
     public static String cleanName(String name) {
-	name = name.replace('.', '_');
-	name = name.replace(",","_");
-	name = name.replace(' ', '_');
-	name = name.replace('(', '[');
-	name = name.replace(')', ']');
-	while(name.indexOf("__")>=0) {
-	    name = name.replace("__","_");
-	}
+        name = name.replace('.', '_');
+        name = name.replace(",", "_");
+        name = name.replace(' ', '_');
+        name = name.replace('(', '[');
+        name = name.replace(')', ']');
+        while (name.indexOf("__") >= 0) {
+            name = name.replace("__", "_");
+        }
         return name;
     }
 
@@ -381,7 +385,7 @@ public final class Util {
     public static Field ensureDomain(Field field, Set domain)
             throws UnimplementedException, VisADException, RemoteException {
 
-        Set oldDomain = field.getDomainSet();
+        Set oldDomain = getDomainSet(field);
 
         return oldDomain.equals(domain)
                ? field
@@ -414,10 +418,9 @@ public final class Util {
                ? convertDomain(field, newDomainType, coordinateSystem)
                : ((coordinateSystem == null)
                   || coordinateSystem.equals(
-                      field.getDomainSet().getCoordinateSystem()))
+                      getDomainSet(field).getCoordinateSystem()))
                  ? field
-                 : clone(field,
-                         clone(field.getDomainSet(), coordinateSystem));
+                 : clone(field, clone(getDomainSet(field), coordinateSystem));
     }
 
     /**
@@ -592,13 +595,12 @@ public final class Util {
         } else {
             FieldImpl fieldImpl = (FieldImpl) field;
 
-            newField =
-                new FieldImpl(
-                    new FunctionType(
-                        newDomainType,
-                        DataUtility.getRangeType(field)), convertDomain(
-                            (SampledSet) field.getDomainSet(), newDomainType,
-                            coordinateSystem));
+            newField = new FieldImpl(
+                new FunctionType(
+                    newDomainType, DataUtility.getRangeType(
+                        field)), convertDomain(
+                            (SampledSet) getDomainSet(
+                                field), newDomainType, coordinateSystem));
 
             if ( !fieldImpl.isMissing()) {
                 for (int i = fieldImpl.getLength(); --i >= 0; ) {
@@ -637,7 +639,7 @@ public final class Util {
             getRangeCoordinateSystems(field);
         Set[]      rangeSets  = field.getRangeSets();
         Unit[]     rangeUnits = getRangeUnits(field);
-        SampledSet oldDomain  = (SampledSet) field.getDomainSet();
+        SampledSet oldDomain  = (SampledSet) getDomainSet(field);
         RealTupleType oldDomainType =
             ((SetType) oldDomain.getType()).getDomain();
         ErrorEstimate[] oldErrors = oldDomain.getSetErrors();
@@ -1058,6 +1060,30 @@ public final class Util {
     }
 
     /**
+     * Utility method to get the domain set from the given field.
+     * This is a bit of a hack in that it checks if the field is a AreaImageFlatField. If it is then call a special getDomainSetNoRead method
+     *
+     * @param field The field
+     *
+     * @return Its domain set
+     */
+    public static Set getDomainSet(Field field) {
+        try {
+            if (field instanceof AreaImageFlatField) {
+                return ((AreaImageFlatField) field).getDomainSetNoRead();
+            }
+            return field.getDomainSet();
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+
+
+
+
+    /**
      * Clones a data object, replacing the MathType.  If the input data
      * object is a FlatField, then the actual range units of the clone may
      * differ from those of the input data object.<p>
@@ -1107,7 +1133,7 @@ public final class Util {
                 // if copy == true, new set will be created by ensureMathType
                 // because funcType.getDomain() is not a SetType
                 Set newDomain =
-                    (Set) ensureMathType(oldFlatField.getDomainSet(), (copy)
+                    (Set) ensureMathType(getDomainSet(oldFlatField), (copy)
                         ? (MathType) funcType.getDomain()
                         : (MathType) new SetType(funcType.getDomain()));
                 Set[] oldRangeSets = oldFlatField.getRangeSets();
@@ -1410,7 +1436,7 @@ public final class Util {
                 new FlatField(
                     new FunctionType(
                         DataUtility.getDomainType(flatField),
-                        realType), flatField.getDomainSet(),
+                        realType), getDomainSet(flatField),
                                    getRangeCoordinateSystem(flatField),
                                    getRangeCoordinateSystems(flatField),
                                    flatField.getRangeSets(),
@@ -1570,6 +1596,7 @@ public final class Util {
 
         return newValues;
     }
+
     /**
      * Indicates if an array is sorted.  The sense (increasing or decreasing)
      * is irrelevant and is non-strict.
@@ -1622,7 +1649,7 @@ public final class Util {
         if (values.length >= 3) {
             boolean increasing    = true;
             boolean haveDirection = false;
-            double   previous      = values[0];
+            double  previous      = values[0];
 
             for (int i = 1; i < values.length; ++i) {
                 double value = values[i];
@@ -1645,6 +1672,7 @@ public final class Util {
 
         return isSorted;
     }
+
     /**
      * Indicates if an array is strictly sorted.  The sense (increasing or
      * decreasing) is irrelevant.
@@ -1704,7 +1732,7 @@ public final class Util {
         if (values.length >= 2) {
             boolean increasing    = true;
             boolean haveDirection = false;
-            double   previous      = values[0];
+            double  previous      = values[0];
 
             for (int i = 1; i < values.length; ++i) {
                 double value = values[i];
@@ -2633,7 +2661,8 @@ public final class Util {
      *
      * @return earth location
      *
-     * @throws Throwable On badness
+     *
+     * @throws Exception _more_
      */
     public static EarthLocation makeEarthLocation(double lat, double lon)
             throws Exception {
@@ -2650,7 +2679,8 @@ public final class Util {
      *
      * @return earth location
      *
-     * @throws Throwable On badness
+     *
+     * @throws Exception _more_
      */
     public static EarthLocation makeEarthLocation(LatLonPoint llp)
             throws Exception {
@@ -2828,7 +2858,9 @@ public final class Util {
                                       boolean makeNansForAnyAlpha)
             throws IOException, VisADException {
 
-        return makeField(image, (makeNansForAnyAlpha?0f:-1f));
+        return makeField(image, (makeNansForAnyAlpha
+                                 ? 0f
+                                 : -1f));
     }
 
 
@@ -2845,10 +2877,9 @@ public final class Util {
      * @throws VisADException problem creating the FlatField
      */
 
-    public static FlatField makeField(Image image,
-                                      float alphaThreshold)
+    public static FlatField makeField(Image image, float alphaThreshold)
             throws IOException, VisADException {
-	return makeField(image, alphaThreshold, false);
+        return makeField(image, alphaThreshold, false);
     }
 
 
@@ -2859,15 +2890,15 @@ public final class Util {
      * @param  alphaThreshold If there is an alpha channel in the image then set the field value to nan
      * for any alhpa greater than the given threshold. Do nothing if threshold<0
      *   value and we turn the other values into nan-s
+     * @param makeAlpha _more_
      * @return a FlatField representation of the image
      *
      * @throws IOException  problem reading the image
      * @throws VisADException problem creating the FlatField
      */
 
-    public static FlatField makeField(Image image,
-                                      float alphaThreshold,
-				      boolean makeAlpha)
+    public static FlatField makeField(Image image, float alphaThreshold,
+                                      boolean makeAlpha)
             throws IOException, VisADException {
 
         if (image == null) {
@@ -2912,32 +2943,32 @@ public final class Util {
         float[]    red_pix   = new float[numPixels];
         float[]    green_pix = new float[numPixels];
         float[]    blue_pix  = new float[numPixels];
-        float[]    alpha_pix  = new float[numPixels];
+        float[]    alpha_pix = new float[numPixels];
 
-	boolean hasAlpha = cm.hasAlpha();
+        boolean    hasAlpha  = cm.hasAlpha();
 
         for (int i = 0; i < numPixels; i++) {
             red_pix[i]   = cm.getRed(words[i]);
             green_pix[i] = cm.getGreen(words[i]);
             blue_pix[i]  = cm.getBlue(words[i]);
-	    if (hasAlpha) {
-		alpha_pix[i] = cm.getAlpha(words[i]);
-	    } else {
-		alpha_pix[i] = 0f;
-	    }
+            if (hasAlpha) {
+                alpha_pix[i] = cm.getAlpha(words[i]);
+            } else {
+                alpha_pix[i] = 0f;
+            }
         }
 
         boolean opaque = true;
-        if (!makeAlpha&& alphaThreshold>=0) {
-            float   alphaValue;
+        if ( !makeAlpha && (alphaThreshold >= 0)) {
+            float alphaValue;
             for (int i = 0; i < numPixels; i++) {
                 if (hasAlpha) {
                     alphaValue = cm.getAlpha(words[i]);
                 } else {
                     alphaValue = 255.0f;
                 }
-		
-                if (alphaValue <alphaThreshold) {
+
+                if (alphaValue < alphaThreshold) {
                     red_pix[i]   = Float.NaN;
                     green_pix[i] = Float.NaN;
                     blue_pix[i]  = Float.NaN;
@@ -2949,16 +2980,17 @@ public final class Util {
         //System.out.println("opaque = " + opaque);
 
         // build FlatField
-        RealType      line              = RealType.getRealType("ImageLine");
-        RealType      element           =
-            RealType.getRealType("ImageElement");
-        RealType      c_red             = RealType.getRealType("Red");
-        RealType      c_green           = RealType.getRealType("Green");
-        RealType      c_blue            = RealType.getRealType("Blue");
-        RealType      c_alpha           = RealType.getRealType("Alpha");
+        RealType   line    = RealType.getRealType("ImageLine");
+        RealType   element = RealType.getRealType("ImageElement");
+        RealType   c_red   = RealType.getRealType("Red");
+        RealType   c_green = RealType.getRealType("Green");
+        RealType   c_blue  = RealType.getRealType("Blue");
+        RealType   c_alpha = RealType.getRealType("Alpha");
 
-        RealType[]    c_all = (makeAlpha?new RealType[] { c_red, c_green, c_blue,c_alpha }:
-			       new RealType[] { c_red, c_green, c_blue });
+        RealType[] c_all   = (makeAlpha
+                              ? new RealType[] { c_red, c_green, c_blue,
+                c_alpha }
+                              : new RealType[] { c_red, c_green, c_blue });
         RealTupleType radiance          = new RealTupleType(c_all);
 
         RealType[]    domain_components = { element, line };
@@ -2971,8 +3003,13 @@ public final class Util {
 
         FlatField    field      = new FlatField(image_type, domain_set);
 
-        float[][]    samples    = (makeAlpha?new float[][] {red_pix, green_pix, blue_pix,alpha_pix}:
-				   new float[][] {red_pix, green_pix, blue_pix});
+        float[][]    samples    = (makeAlpha
+                                   ? new float[][] {
+                  red_pix, green_pix, blue_pix, alpha_pix
+              }
+                                   : new float[][] {
+                  red_pix, green_pix, blue_pix
+              });
         try {
             field.setSamples(samples, false);
         } catch (RemoteException e) {
@@ -3001,11 +3038,24 @@ public final class Util {
     public static MapProjection makeMapProjection(double lat1, double lon1,
             double lat2, double lon2)
             throws VisADException {
-	return makeMapProjection(lat1,lon1,lat2,lon2,true);
+        return makeMapProjection(lat1, lon1, lat2, lon2, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param lat1 _more_
+     * @param lon1 _more_
+     * @param lat2 _more_
+     * @param lon2 _more_
+     * @param makeSquare _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public static MapProjection makeMapProjection(double lat1, double lon1,
-						  double lat2, double lon2, boolean makeSquare)
+            double lat2, double lon2, boolean makeSquare)
             throws VisADException {
 
         int lonMax = 180;
@@ -3022,19 +3072,19 @@ public final class Util {
         double degX = maxX - minX;
 
         double degY = maxY - minY;
-	if(makeSquare) {
-	    //Try to make the box square
-	
-	    if (degY > degX) {
-		double delta = degY - degX;
-		minX -= delta / 2;
-		maxX += delta / 2;
-	    } else if (degX > degY) {
-		double delta = degX - degY;
-		minY -= delta / 2;
-		maxY += delta / 2;
-	    }
-	}
+        if (makeSquare) {
+            //Try to make the box square
+
+            if (degY > degX) {
+                double delta = degY - degX;
+                minX -= delta / 2;
+                maxX += delta / 2;
+            } else if (degX > degY) {
+                double delta = degX - degY;
+                minY -= delta / 2;
+                maxY += delta / 2;
+            }
+        }
         minX = Math.max(lonMin, minX);
         maxX = Math.min(lonMax, maxX);
         minY = Math.max(-90, minY);
@@ -3091,7 +3141,7 @@ public final class Util {
         } else if (paramType.equals(Unit.class)) {
             argument = parseUnit(value.toString());
         } else if (paramType.equals(ColorScaleInfo.class)) {
-            argument = new ColorScaleInfo(value.toString(),true);
+            argument = new ColorScaleInfo(value.toString(), true);
         }
         if (argument != null) {
             method.invoke(object, new Object[] { argument });
@@ -3439,8 +3489,9 @@ public final class Util {
      *
      * @return Converted range
      */
-    public static Range convertRange(Range range, Unit rangeUnit, Unit outUnit) {
-        if ( range != null && !Misc.equals(rangeUnit, outUnit)) {
+    public static Range convertRange(Range range, Unit rangeUnit,
+                                     Unit outUnit) {
+        if ((range != null) && !Misc.equals(rangeUnit, outUnit)) {
             if ((rangeUnit != null) && (outUnit != null)) {
                 try {
                     range = new Range(outUnit.toThis(range.getMin(),
