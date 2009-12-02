@@ -97,11 +97,11 @@ public class MyAreaImageFlatField extends AreaImageFlatField {
      *
      * @throws VisADException On badness
      */
-    public MyAreaImageFlatField(FunctionType type, Set domainSet,
+    public MyAreaImageFlatField(AddeImageDescriptor aid, FunctionType type, Set domainSet,
                               CoordinateSystem rangeCoordSys,
                               Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
             throws VisADException {
-        super(type, domainSet, rangeCoordSys, rangeSets, units, floats, readLabel);
+        super(aid, type, domainSet, rangeCoordSys, rangeSets, units, floats, readLabel);
     }
 
 
