@@ -258,9 +258,11 @@
      fileselection="true"
      factory="ucar.unidata.data.gis.ShapeFileDataSource"
      label="Map files">
+<!--
     <property
        name="default_display"
        value="shapefilecontrol"/>
+-->
   </datasource>
 
   <datasource
