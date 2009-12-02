@@ -318,7 +318,10 @@ public class DataManager {
 				    "visad.actionimpl.tracetime",
 				    "visad.actionimpl.tracestack",
 				    "visad.cachingcoordinatesystem.debugtime",
-				    "visad.java3d.textureNpot"};
+				    "visad.java3d.textureNpot",
+                                    "visad.arraycache.enabled",
+                                    "visad.arraycache.lowerthreshold",
+                                    "visad.arraycache.upperthreshold"};
 
 
 	for(String visadProp: visadProperties) {
