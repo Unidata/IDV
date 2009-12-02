@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.visad.data;
 
 
@@ -85,7 +86,7 @@ import java.rmi.RemoteException;
 public class AreaImageFlatField extends CachedFlatField implements SingleBandedImage {
 
 
-    /** _more_          */
+    /** _more_ */
     private Object READMUTEX = new Object();
 
 
@@ -131,6 +132,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         this.aid       = that.aid;
         this.domainSet = that.domainSet;
         this.readLabel = readLabel;
+        if (that.haveReadData) {
+            setDomain(that.getDomainSet(), false);
+        }
+
     }
 
 
@@ -188,6 +193,19 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                       rangeSets, units, readLabel);
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     *
+     * @throws VisADException _more_
+     */
+    protected void readValuesFromParent(CachedFlatField parent)
+            throws VisADException {
+        setDomain(parent.getDomainSet(), false);
+    }
 
 
     /**
@@ -467,7 +485,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     public static class MyAREACoordinateSystem extends AREACoordinateSystem {
 
         /**
-         * _more_ 
+         * _more_
          *
          * @param dir _more_
          * @param nav _more_
@@ -536,7 +554,18 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aid != null) {
             checkReadData();
         }
-        return super.getDomainCoordinateSystem();
+        CoordinateSystem cs = super.getDomainCoordinateSystem();
+        return cs;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Set getDomainSetNoRead() {
+        return super.getDomainSet();
     }
 
 
@@ -559,10 +588,23 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * _more_
      *
      * @return _more_
+     */
+    public String toString() {
+        return "AreaImageFlatField #" + mycnt;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
      *
      * @throws Exception _more_
      */
     private float[][] readDataNewWay() throws Exception {
+
+        //        msg("readDataNewWay");
+        //        Misc.printStack(mycnt +"  readData",10);
         String url = (aid.getImageInfo() != null)
                      ? aid.getImageInfo().makeAddeUrl()
                      : aid.getSource();
@@ -661,8 +703,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                 if (haveReadData) {
                     System.err.println("DOING DOUBLE READ");
                 }
-
-                msg("Reading image data  " + readLabel);
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
