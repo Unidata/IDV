@@ -94,7 +94,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     private String readLabel = "";
 
     /** _more_ */
-    private GriddedSet domainSet;
+    private Set domainSet;
 
     /** _more_ */
     private DateTime startTime;
@@ -130,13 +130,12 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         super(that, copy, type, domainSet, rangeCoordSys, rangeCoordSysArray,
               rangeSets, units);
         this.aid       = that.aid;
-        this.domainSet = that.domainSet;
         this.readLabel = readLabel;
         if (that.haveReadData) {
-            setDomain(that.getDomainSet(), false);
+            setDomain(that.getDomainSet());
         }
-
     }
+
 
 
 
@@ -204,8 +203,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     protected void readValuesFromParent(CachedFlatField parent)
             throws VisADException {
-        setDomain(parent.getDomainSet(), false);
+        setDomain(parent.getDomainSet());
     }
+
+
 
 
     /**
@@ -551,13 +552,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @return _more_
      */
     public CoordinateSystem getDomainCoordinateSystem() {
-        if (aid != null) {
-            checkReadData();
-        }
-        CoordinateSystem cs = super.getDomainCoordinateSystem();
-        return cs;
+        return getDomainSet().getCoordinateSystem();
     }
-
 
     /**
      * _more_
@@ -569,6 +565,22 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
+    public int getLength() {
+        try {
+            return getDomainSet().getLength();
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    public Unit[] getDomainUnits() {
+        return getDomainSet().getSetUnits();
+    }
+
+    private void setDomain(Set domainSet) {
+        this.domainSet = domainSet;
+    }
+
 
     /**
      * _more_
@@ -579,18 +591,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aid != null) {
             checkReadData();
         }
+        if(domainSet!=null) 
+            return domainSet;
         return super.getDomainSet();
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String toString() {
-        return "AreaImageFlatField #" + mycnt;
     }
 
 
@@ -617,7 +620,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
         Set[]            rangeSets     = ff.getRangeSets();
         Unit[]           units         = ff.getRangeUnits()[0];
-        setDomain(domainSet, false);
+        setDomain(domainSet);
         return samples;
     }
 
