@@ -217,7 +217,7 @@ public class GridUtil {
             // find first non-missing grid
             if (isTimeSequence(grid)) {
                 try {
-                    Set timeDomain = grid.getDomainSet();
+                    Set timeDomain = Util.getDomainSet(grid);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         FieldImpl sample = (FieldImpl) grid.getSample(i);
                         if ( !sample.isMissing()) {
@@ -255,7 +255,7 @@ public class GridUtil {
                             ? (FlatField) fi.getSample(0)
                             : (FlatField) fi;
 
-            spatialDomain = (SampledSet) field.getDomainSet();
+            spatialDomain = (SampledSet) Util.getDomainSet(field);
         } catch (ClassCastException cce) {  //Misc.printStack("grid" + grid.getType(), 5);
             throw new IllegalArgumentException("not a known grid type "
                     + field.getDomainSet().getClass());
@@ -318,7 +318,7 @@ public class GridUtil {
 
             try {
 
-                Set sequenceSet = grid.getDomainSet();
+                Set sequenceSet = Util.getDomainSet(grid);
                 int numSteps    = sequenceSet.getLength();
                 MathType sequenceType =
                     ((SetType) sequenceSet.getType()).getDomain();
@@ -355,7 +355,7 @@ public class GridUtil {
                         fi = data;
                     } else {
                         if (hasInnerSteps) {
-                            Set innerSet = data.getDomainSet();
+                            Set innerSet = Util.getDomainSet(data);
                             fi = new FieldImpl(innerFieldType, innerSet);
                             for (int j = 0; j < innerSet.getLength(); j++) {
                                 FlatField dataFF =
@@ -443,7 +443,7 @@ public class GridUtil {
      * @see #isTimeSequence(FieldImpl)
      */
     public static boolean isSequence(FieldImpl grid) {
-        return ((grid.getDomainSet().getDimension() == 1)
+        return ((Util.getDomainSet(grid).getDimension() == 1)
                 && !(grid instanceof FlatField));
     }
 
@@ -478,7 +478,7 @@ public class GridUtil {
         if ( !isTimeSequence(grid)) {
             return null;
         }
-        return grid.getDomainSet();
+        return Util.getDomainSet(grid);
     }
 
 
@@ -708,7 +708,7 @@ public class GridUtil {
         if ( !isSequence(grid)) {
             throw new IllegalArgumentException("grid is not a sequence");
         }
-        return (RealType) ((SetType) grid.getDomainSet().getType())
+        return (RealType) ((SetType) Util.getDomainSet(grid).getType())
             .getDomain().getComponent(0);
     }
 
@@ -1378,7 +1378,7 @@ public class GridUtil {
             FieldImpl       newGrid      = (FieldImpl) grid.clone();
             float[][]       values       = null;
             float[][]       priorValues  = null;
-            Set             timeDomain   = newGrid.getDomainSet();
+            Set             timeDomain   = Util.getDomainSet(newGrid);
             int             numTimeSteps = timeDomain.getLength();
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
                     timeStepIdx++) {
@@ -1493,7 +1493,7 @@ public class GridUtil {
             final boolean doMax        = function.equals(FUNC_MAX);
             final boolean doMin        = function.equals(FUNC_MIN);
             float[][]     values       = null;
-            final Set     timeDomain   = grid.getDomainSet();
+            final Set     timeDomain   = Util.getDomainSet(grid);
             int           numTimeSteps = timeDomain.getLength();
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
                     timeStepIdx++) {
@@ -1684,7 +1684,7 @@ public class GridUtil {
             return;
         }
         float[][] values       = null;
-        final Set timeDomain   = grid.getDomainSet();
+        final Set timeDomain   = Util.getDomainSet(grid);
         int       numTimeSteps = timeDomain.getLength();
         for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
                 timeStepIdx++) {
@@ -2371,7 +2371,7 @@ public class GridUtil {
                     newType = new FunctionType(domRT,
                             new FunctionType(ffdomRT, newParam));
 
-                    Set timeDomain = grid.getDomainSet();
+                    Set timeDomain = Util.getDomainSet(grid);
                     newField = new FieldImpl(newType, timeDomain);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         newField.setSample(i, ((FlatField) grid.getSample(i,
@@ -2402,12 +2402,12 @@ public class GridUtil {
                     FunctionType indexRange = new FunctionType(indexdomRT,
                                                   paramRange);
                     newType = new FunctionType(timedomRT, indexRange);
-                    Set timeDomain = grid.getDomainSet();
+                    Set timeDomain = Util.getDomainSet(grid);
                     newField = new FieldImpl(newType, timeDomain);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         FieldImpl indexField = (FieldImpl) grid.getSample(i,
                                                    false);
-                        Set indexSet = indexField.getDomainSet();
+                        Set indexSet = Util.getDomainSet(indexField);
                         FieldImpl newIndexField = new FieldImpl(indexRange,
                                                       indexSet);
                         for (int j = 0; j < indexSet.getLength(); j++) {
@@ -2611,7 +2611,7 @@ public class GridUtil {
                     newType = new FunctionType(domRT,
                             new FunctionType(ffdomRT, newParam));
 
-                    Set timeDomain = grid.getDomainSet();
+                    Set timeDomain = Util.getDomainSet(grid);
                     newField = new FieldImpl(newType, timeDomain);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         newField.setSample(
@@ -2644,12 +2644,12 @@ public class GridUtil {
                     FunctionType indexRange = new FunctionType(indexdomRT,
                                                   paramRange);
                     newType = new FunctionType(timedomRT, indexRange);
-                    Set timeDomain = grid.getDomainSet();
+                    Set timeDomain = Util.getDomainSet(grid);
                     newField = new FieldImpl(newType, timeDomain);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         FieldImpl indexField = (FieldImpl) grid.getSample(i,
                                                    false);
-                        Set indexSet = indexField.getDomainSet();
+                        Set indexSet = Util.getDomainSet(indexField);
                         FieldImpl newIndexField = new FieldImpl(indexRange,
                                                       indexSet);
                         for (int j = 0; j < indexSet.getLength(); j++) {
@@ -2703,7 +2703,7 @@ public class GridUtil {
 
                 if (isSequence(grid)) {
 
-                    SampledSet   s       = (SampledSet) grid.getDomainSet();
+                    SampledSet   s       = (SampledSet) Util.getDomainSet(grid);
                     FunctionType newType = null;
                     Data         step1   = null;
 
@@ -2780,7 +2780,7 @@ public class GridUtil {
                             FieldImpl indexFI = (FieldImpl) grid.getSample(i,
                                                     false);
                             SampledSet domSet =
-                                (SampledSet) indexFI.getDomainSet();
+                                (SampledSet) Util.getDomainSet(indexFI);
                             FieldImpl tempFI = new FieldImpl(indexFIType,
                                                    domSet);
                             for (int j = 0; j < domSet.getLength(); j++) {
@@ -2824,7 +2824,7 @@ public class GridUtil {
             if ( !isSequence(grid)) {
                 extractedFI = (FlatField) grid.extract(paramType);
             } else {               // some sort of sequence - evaluate each
-                Set sequenceDomain = grid.getDomainSet();
+                Set sequenceDomain = Util.getDomainSet(grid);
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
                     Data sample = (FlatField) grid.extract(paramType);
                     if (i == 0) {  // set up the functiontype
@@ -3370,7 +3370,7 @@ public class GridUtil {
                 sampledFI.setSample(0, value, false);
             } else {  // some sort of sequence - evaluate each
                 //                System.err.println("is sequence");
-                Set sequenceDomain = grid.getDomainSet();
+                Set sequenceDomain = Util.getDomainSet(grid);
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
                     Data sample =
                         ((FlatField) grid.getSample(i)).evaluate(point,
@@ -3812,7 +3812,7 @@ public class GridUtil {
                 sampledFI = (FlatField) grid.resample(subDomain,
                         samplingMode, errorMode);
             } else {  // some sort of sequence - resample each
-                Set          sequenceDomain = grid.getDomainSet();
+                Set          sequenceDomain = Util.getDomainSet(grid);
                 FunctionType sampledType    = null;
                 Trace.call1("GridUtil.sampleLoop",
                             " Length: " + sequenceDomain.getLength());
@@ -3878,7 +3878,7 @@ public class GridUtil {
                 sampledFI.setSamples(getSubValues(getSpatialDomain(grid),
                         grid.getFloats(), skipx, skipy));
             } else {  // some sort of sequence - resample each
-                Set          sequenceDomain = grid.getDomainSet();
+                Set          sequenceDomain = Util.getDomainSet(grid);
                 SampledSet   ss             = getSpatialDomain(grid);
                 FunctionType sampledType    = null;
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
@@ -4319,7 +4319,7 @@ public class GridUtil {
                 result[i].max = Math.max(result[i].max, tmp[i].max);
             }
         } else {
-            int numTimes = (fieldImpl.getDomainSet()).getLength();
+            int numTimes = (Util.getDomainSet(fieldImpl)).getLength();
             for (int nn = 0; nn < numTimes; nn++) {
                 //FlatField   field = (FlatField) (fieldImpl.getSample(nn));
                 FlatField field = null;
@@ -5771,7 +5771,7 @@ public class GridUtil {
             throws VisADException, RemoteException {
         List<FieldStats> stats = new ArrayList<FieldStats>();
         if (GridUtil.isTimeSequence(field)) {
-            int       numTimes = field.getDomainSet().getLength();
+            int       numTimes = Util.getDomainSet(field).getLength();
             float[][] result   = new float[numTimes][];
             for (int timeStep = 0; timeStep < numTimes; timeStep++) {
                 stats.add(
@@ -5802,7 +5802,7 @@ public class GridUtil {
         int[][] indices = ((mapSets == null)
                            ? null
                            : GridUtil.findContainedIndices(
-                               (GriddedSet) field.getDomainSet(), mapSets));
+                               (GriddedSet) Util.getDomainSet(field), mapSets));
         float[]   mma    = { 0, 0, 0, 0 };
         float[][] values = field.getFloats(false);
         if (indices == null) {

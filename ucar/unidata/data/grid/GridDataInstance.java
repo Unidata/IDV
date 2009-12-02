@@ -221,7 +221,7 @@ public class GridDataInstance extends DataInstance {
             //System.out.println("   GridDataInstance: "+gridData.getDomainSet().getLength()
             //                 +" times");
 
-            SampledSet timeSet = (SampledSet) gridData.getDomainSet();
+            SampledSet timeSet = (SampledSet) Util.getDomainSet(gridData);
             if (timeSet instanceof Gridded1DSet) {
                 dateTimes = DateTime.timeSetToArray((Gridded1DSet) timeSet);
             } else {
@@ -261,14 +261,13 @@ public class GridDataInstance extends DataInstance {
             } else if (data instanceof FieldImpl) {
                 field = (FlatField) ((FieldImpl) data).getSample(0);
             }
-
         } else {
             field = (FlatField) gridData;
         }
 
-        is3D       = (field.getDomainSet().getManifoldDimension() == 3);
+        is3D       = (Util.getDomainSet(field).getManifoldDimension() == 3);
 
-        spatialSet = (SampledSet) field.getDomainSet();
+        spatialSet = (SampledSet) Util.getDomainSet(field);
         RealTupleType spatialType =
             ((SetType) spatialSet.getType()).getDomain();
         RealTupleType spatialReferenceType =
