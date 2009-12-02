@@ -328,6 +328,8 @@ public class DataManager {
 	    System.setProperty(visadProp,  dataContext.getIdv().getProperty(visadProp,"false"));
 	}
 
+        SampledSet.setCacheSizeThreshold(dataContext.getIdv().getProperty("visad.sampledset.cachesizethreshold", 10000));
+
 
         //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)
         //If in server mode then its expected that the server has done this configuration
@@ -351,7 +353,7 @@ public class DataManager {
             ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(
                 true);
 
-            SampledSet.setCacheSizeThreshold(10000);
+
             visad.data.DataCacheManager.getCacheManager().setCacheDir(
                 new File(getDataCacheDirectory()));
             visad.data.DataCacheManager.getCacheManager()
