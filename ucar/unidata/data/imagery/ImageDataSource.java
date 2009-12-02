@@ -51,7 +51,6 @@ import ucar.visad.data.AreaImageFlatField;
 import visad.*;
 
 import visad.data.DataRange;
-import visad.data.DataRange;
 
 import visad.data.mcidas.AreaAdapter;
 
@@ -138,6 +137,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
     /** _more_          */
     private Hashtable timeMap = new Hashtable();
 
+
+    private Object RANGEMUTEX = new Object();
     /**
      *  The parameterless constructor for unpersisting.
      */
@@ -935,22 +936,28 @@ public abstract class ImageDataSource extends DataSourceImpl {
     protected Data getDataInner(DataChoice dataChoice, DataCategory category,
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
-            throws VisADException, RemoteException {
+	throws VisADException, RemoteException {
         sampleRanges = null;
         //if ((dataChoice instanceof CompositeDataChoice) 
         //        && !(hasBandInfo(dataChoice))) {
-        if (dataChoice instanceof CompositeDataChoice) {
-            return makeImageSequence(myCompositeDataChoice, dataSelection);
-        } else if (hasBandInfo(dataChoice)) {
-            //List descriptors = getDescriptors(dataChoice, dataSelection);
-            //if ((descriptors != null) && (descriptors.size() == 1)) {
-            //    return (Data) makeImage(
-            //        (AddeImageDescriptor) descriptors.get(0));
-            //} else {
-            return makeImageSequence(dataChoice, dataSelection);
-            //}
-        }
+	//	System.err.println ("ImageDataSource.getDataInner");
+	    
+	try {
+	    if (dataChoice instanceof CompositeDataChoice) {
+		return makeImageSequence(myCompositeDataChoice, dataSelection);
+	    } else if (hasBandInfo(dataChoice)) {
+		//List descriptors = getDescriptors(dataChoice, dataSelection);
+		//if ((descriptors != null) && (descriptors.size() == 1)) {
+		//    return (Data) makeImage(
+		//        (AddeImageDescriptor) descriptors.get(0));
+		//} else {
+		return makeImageSequence(dataChoice, dataSelection);
+		//}
+	    }
 
+	} finally {
+	    //	    System.err.println ("ImageDataSource.getDataInner:done");
+	}
 
         return (Data) makeImage(dataChoice, dataSelection);
     }
@@ -1178,22 +1185,24 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                               filename,                                                                    
                                               readLabel);
                 result = aiff;
-                if (sampleRanges == null) {
-                    sampleRanges = aiff.getRanges(true);
-                    if ((sampleRanges != null) && (sampleRanges.length > 0)) {
-                        for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
-                                rangeIdx++) {
-                            DataRange r = sampleRanges[rangeIdx];
-                            if (Double.isInfinite(r.getMin())
+		synchronized(RANGEMUTEX) {
+		    if (sampleRanges == null) {
+			sampleRanges = aiff.getRanges(true);
+			if ((sampleRanges != null) && (sampleRanges.length > 0)) {
+			    for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
+				 rangeIdx++) {
+				DataRange r = sampleRanges[rangeIdx];
+				if (Double.isInfinite(r.getMin())
                                     || Double.isInfinite(r.getMax())) {
-                                sampleRanges = null;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    aiff.setSampleRanges(sampleRanges);
-                }
+				    sampleRanges = null;
+				    break;
+				}
+			    }
+			}
+		    } else {
+			aiff.setSampleRanges(sampleRanges);
+		    }
+		}
             } else {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
