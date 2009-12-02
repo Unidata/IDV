@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad.data;
 
 
@@ -82,6 +83,10 @@ import java.rmi.RemoteException;
  * @version $Revision: 1.7 $ $Date: 2007/08/08 17:14:56 $
  */
 public class AreaImageFlatField extends CachedFlatField implements SingleBandedImage {
+
+
+    /** _more_          */
+    private Object READMUTEX = new Object();
 
 
     /** _more_ */
@@ -362,8 +367,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                       rangeUnits, null, readLabel);
 
         aiff.bandIndices = bandIndices;
-        cs.aiff          = aiff;
-        aiff.startTime   = new DateTime(areaDirectory.getStartTime());
+        //        cs.aiff          = aiff;
+        aiff.startTime = new DateTime(areaDirectory.getStartTime());
         return aiff;
     }
 
@@ -374,8 +379,15 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * _more_
      */
     private void checkReadData() {
-        if ( !haveReadData) {
-            readData();
+        synchronized (READMUTEX) {
+            if ( !haveReadData) {
+                //Force the read
+                try {
+                    unpackFloats(false);
+                } catch (VisADException ve) {
+                    throw new RuntimeException(ve);
+                }
+            }
         }
     }
 
@@ -414,11 +426,12 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @return _more_
      */
+    /*
     protected int[][] getDirNavAux() {
         //        if (getParent() != null) {
         //            return ((AreaImageFlatField) getParent()).getDirNavAux();
         //        }
-        checkReadData();
+        //        checkReadData();
         String file = getDirNavAuxFile();
         if (dirNavAux == null) {
             if ((file != null) && new File(file).exists()) {
@@ -440,6 +453,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         }
         return tmp;
     }
+    */
 
 
 
@@ -452,8 +466,17 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     public static class MyAREACoordinateSystem extends AREACoordinateSystem {
 
-        /** _more_ */
-        AreaImageFlatField aiff;
+        /**
+         * _more_ 
+         *
+         * @param dir _more_
+         * @param nav _more_
+         * @param aux _more_
+         * @param useSpline _more_
+         *
+         * @throws VisADException _more_
+         */
+        //        AreaImageFlatField aiff;
 
         /**
          * _more_
@@ -491,8 +514,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                         throw new IllegalArgumentException(
                             "MyAreaCoordinateSystem.getAraNav: Should never get to this point");
                     }
-                    int[][] dirNavAux = aiff.getDirNavAux();
-                    init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
+                    //                    int[][] dirNavAux = aiff.getDirNavAux();
+                    //                    init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
                 } catch (Exception exc) {
                     System.err.println("error making making areanav:" + exc);
                     exc.printStackTrace();
@@ -501,6 +524,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             return super.getAreaNav();
         }
     }
+
+
 
     /**
      * _more_
@@ -511,8 +536,21 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aid != null) {
             checkReadData();
         }
-        CoordinateSystem cs = super.getDomainCoordinateSystem();
-        return cs;
+        return super.getDomainCoordinateSystem();
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Set getDomainSet() {
+        if (aid != null) {
+            checkReadData();
+        }
+        return super.getDomainSet();
     }
 
 
@@ -618,20 +656,28 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @return data
      */
     public float[][] readData() {
-        try {
-            msg("Reading image data  " + readLabel);
-            LogUtil.message(readLabel);
-            ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
-            //return readDataOldWay();
-            float[][] results = readDataNewWay();
-            haveReadData = true;
-            return results;
+        synchronized (READMUTEX) {
+            try {
+                if (haveReadData) {
+                    System.err.println("DOING DOUBLE READ");
+                }
 
-        } catch (Exception exc) {
-            throw new ucar.unidata.util.WrapperException(exc);
-        } finally {
-            ucar.unidata.data.DataSourceImpl.decrOutstandingGetDataCalls();
-            LogUtil.message("");
+                msg("Reading image data  " + readLabel);
+                LogUtil.message(readLabel);
+                ucar.unidata.data.DataSourceImpl
+                    .incrOutstandingGetDataCalls();
+                //return readDataOldWay();
+                float[][] results = readDataNewWay();
+                haveReadData = true;
+                return results;
+
+            } catch (Exception exc) {
+                throw new ucar.unidata.util.WrapperException(exc);
+            } finally {
+                ucar.unidata.data.DataSourceImpl
+                    .decrOutstandingGetDataCalls();
+                LogUtil.message("");
+            }
         }
     }
 
