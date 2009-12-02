@@ -314,8 +314,17 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-	System.setProperty("visad.java3d.imageByRef", "true");
-        //      System.setProperty("visad.java3d.textureNpot", "true");
+	String[] visadProperties = {"visad.java3d.imageByRef",
+				    "visad.actionimpl.tracetime",
+				    "visad.actionimpl.tracestack",
+				    "visad.cachingcoordinatesystem.debugtime",
+				    "visad.java3d.textureNpot"};
+
+
+	for(String visadProp: visadProperties) {
+	    System.setProperty(visadProp,  dataContext.getIdv().getProperty(visadProp,"false"));
+	}
+
 
         //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)
         //If in server mode then its expected that the server has done this configuration
