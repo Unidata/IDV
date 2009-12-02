@@ -4453,6 +4453,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public static String header(String h) {
+        return HtmlUtil.div(h, HtmlUtil.cssClass("pageheading"));
+    }
+
+
 
 
 

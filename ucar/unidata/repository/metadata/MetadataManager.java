@@ -845,7 +845,6 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-
         request.appendMessage(sb);
 
         Entry entry = getEntryManager().getEntry(request);

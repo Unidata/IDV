@@ -681,7 +681,7 @@ public class MetadataType extends MetadataTypeBase {
         sb.append(HtmlUtil.hidden(argtype, getId())
                   + HtmlUtil.hidden(argid, metadata.getId()));
 
-        if ( !forEdit) {
+        if (!forEdit&& entry!=null) {
             sb.append(HtmlUtil.formEntry("", submit + cancel));
         }
 

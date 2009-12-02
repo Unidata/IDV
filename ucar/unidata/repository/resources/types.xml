@@ -8,6 +8,16 @@
   </type>
 
 
+
+  <type name="testentry"  description="Test Entry">
+     <metadata id="enum_gcmdkeyword"/>
+     <metadata id="thredds.contributor"/>
+<!--
+     <metadata id="dif.personnel"/>
+-->
+  </type>
+
+
   <type name="contribution"  description="Contribution" >
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>

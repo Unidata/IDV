@@ -115,6 +115,8 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
+    public static final String TAG_METADATA = "metadata";
+
     /** _more_ */
     public static final String TAG_HANDLER = "handler";
 
@@ -161,7 +163,7 @@ public class TypeHandler extends RepositoryManager {
     private String displayTemplatePath;
 
 
-
+    private List<String> requiredMetadata = new ArrayList<String>();
 
     /**
      * _more_
@@ -183,6 +185,12 @@ public class TypeHandler extends RepositoryManager {
         this(repository);
         displayTemplatePath = XmlUtil.getAttribute(entryNode,
                 "displaytemplate", (String) null);
+
+        List metadataNodes = XmlUtil.findChildren(entryNode, TAG_METADATA);
+        for (int i= 0; i< metadataNodes.size(); i++) {
+            Element metadataNode = (Element) metadataNodes.get(i);
+            requiredMetadata.add(XmlUtil.getAttribute(metadataNode, ATTR_ID));
+        }
     }
 
     /**
@@ -573,6 +581,27 @@ public class TypeHandler extends RepositoryManager {
 
         return entry;
     }
+
+
+    public void applyNewForm(Request request, Entry entry) throws Exception {
+        Hashtable<String, Metadata> existingMetadata = new Hashtable<String, Metadata>();
+        List<Metadata> metadataList = new ArrayList<Metadata>();
+        for (String metadataId: requiredMetadata) {
+            for (MetadataHandler handler : getMetadataManager().getMetadataHandlers()) {
+                if (handler.canHandle(metadataId)) {
+                    handler.handleForm(request, entry, getRepository().getGUID(),
+                                       "",
+                                       existingMetadata,
+                                       metadataList, true);
+                    break;
+                }
+            }
+        }
+        System.err.println("Added:" + metadataList);
+    }
+
+
+
 
 
     /**
@@ -1614,6 +1643,19 @@ public class TypeHandler extends RepositoryManager {
 
             sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
+        }
+
+
+        if(entry == null) {
+            for (String metadataId: requiredMetadata) {
+                for (MetadataHandler handler : getMetadataManager().getMetadataHandlers()) {
+                    if (handler.canHandle(metadataId)) {
+                        handler.makeAddForm(request, null,
+                                            handler.findType(metadataId), sb);
+                        break;
+                    }
+                }
+            }
         }
 
 
