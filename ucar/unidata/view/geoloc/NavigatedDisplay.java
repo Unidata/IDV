@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -90,8 +91,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
 
 
+    /** _more_          */
     private double clipDistanceBack = CLIP_BACK_DEFAULT;
 
+    /** _more_          */
     private double clipDistanceFront = CLIP_FRONT_DEFAULT;
 
 
@@ -1087,6 +1090,26 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /**
      * _more_
      *
+     * @param p _more_
+     */
+    public void applyRotation(Point3d p) {
+        double[]      trans         = { 0.0, 0.0, 0.0 };
+        double[]      rot           = { 0.0, 0.0, 0.0 };
+        double[]      scale         = { 0.0, 0.0, 0.0 };
+
+        MouseBehavior mouseBehavior = getMouseBehavior();
+        mouseBehavior.instance_unmake_matrix(rot, scale, trans,
+                                             getProjectionMatrix());
+        double[] t = mouseBehavior.make_matrix(rot[0], rot[1], rot[2], 1, 1,
+                         1, 0, 0, 0);
+        Transform3D transform = new Transform3D(t);
+        transform.invert();
+        transform.transform(p);
+    }
+
+    /**
+     * _more_
+     *
      * @param myTimeStamp _more_
      * @param from _more_
      * @param to _more_
@@ -1117,9 +1140,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             MouseBehavior mouseBehavior = getMouseBehavior();
             mouseBehavior.instance_unmake_matrix(rot1, scale1, trans1, from);
             mouseBehavior.instance_unmake_matrix(rot2, scale2, trans2, to);
-
-
-
 
 
             Transform3D        t1          = new Transform3D(from);
@@ -2374,41 +2394,41 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-       Set the ClipDistanceBack property.
-
-       @param value The new value for ClipDistanceBack
-    **/
-    public void setClipDistanceBack (double value) {
-	this.clipDistanceBack = value;
+     *  Set the ClipDistanceBack property.
+     *
+     *  @param value The new value for ClipDistanceBack
+     */
+    public void setClipDistanceBack(double value) {
+        this.clipDistanceBack = value;
     }
 
     /**
-       Get the ClipDistanceBack property.
-
-       @return The ClipDistanceBack
-    **/
-    public double getClipDistanceBack () {
-	return this.clipDistanceBack;
+     *  Get the ClipDistanceBack property.
+     *
+     *  @return The ClipDistanceBack
+     */
+    public double getClipDistanceBack() {
+        return this.clipDistanceBack;
     }
 
     /**
-       Set the ClipDistanceFront property.
-
-       @param value The new value for ClipDistanceFront
-    **/
-    public void setClipDistanceFront (double value) {
-	this.clipDistanceFront = value;
+     *  Set the ClipDistanceFront property.
+     *
+     *  @param value The new value for ClipDistanceFront
+     */
+    public void setClipDistanceFront(double value) {
+        this.clipDistanceFront = value;
     }
 
 
 
     /**
-       Get the ClipDistanceFront property.
-
-       @return The ClipDistanceFront
-    **/
-    public double getClipDistanceFront () {
-	return this.clipDistanceFront;
+     *  Get the ClipDistanceFront property.
+     *
+     *  @return The ClipDistanceFront
+     */
+    public double getClipDistanceFront() {
+        return this.clipDistanceFront;
     }
 
 
