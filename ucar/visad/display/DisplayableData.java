@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -437,7 +438,7 @@ public class DisplayableData extends Displayable {
      * @throws VisADException     VisAD failure.
      * @throws RemoteException    Java RMI failure.
      */
-    protected final  void myRemoveDataReferences()
+    protected final void myRemoveDataReferences()
             throws VisADException, RemoteException {
         if (refAdded) {
             getDisplay().removeReference(reference);
@@ -541,9 +542,9 @@ public class DisplayableData extends Displayable {
         if ((changeListener != null) && (reference != null)) {
             changeListener.removeReference(reference);
         }
-        renderer       = null;
-        changeListener = null;
-        reference      = null;
+        renderer           = null;
+        changeListener     = null;
+        reference          = null;
         cachedAnimationSet = null;
         super.destroy();
     }
@@ -637,7 +638,9 @@ public class DisplayableData extends Displayable {
      * @throws RemoteException    Java RMI failure.
      */
     public boolean hasData() throws VisADException, RemoteException {
-        if(reference==null) return false;
+        if (reference == null) {
+            return false;
+        }
         return reference.getData() != null;
     }
 
@@ -674,14 +677,52 @@ public class DisplayableData extends Displayable {
             if (is2d) {
                 return new DirectManipulationRendererJ2D();
             } else {
-                return new DirectManipulationRendererJ3D();
+                return new DirectManipulationRendererJ3D() {
+                    public void addPoint(float[] x) throws VisADException {
+                        if (dragAdapter != null) {
+                            if ( !dragAdapter.handleAddPoint(x)) {
+                                return;
+                            }
+                        }
+                        super.addPoint(x);
+                    }
+
+                    public void constrainDragPoint(float[] x) {
+                        if (dragAdapter != null) {
+                            if ( !dragAdapter.constrainDragPoint(x)) {
+                                return;
+                            }
+                        }
+                    }
+
+                    public synchronized void drag_direct(VisADRay ray,
+                            boolean first, int mouseModifiers) {
+                        if (dragAdapter != null) {
+                            if ( !dragAdapter.handleDragDirect(ray, first,
+                                    mouseModifiers)) {
+                                return;
+                            }
+                        }
+                        super.drag_direct(ray, first, mouseModifiers);
+                    }
+                };
+
             }
+
         }
 
         return displayRenderer.makeDefaultRenderer();
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String showme() {
+        return getClass().getName();
+    }
 
     /**
      * Set the pickable property
@@ -717,6 +758,7 @@ public class DisplayableData extends Displayable {
      * instance does not support this type.
      *
      * @param  aniType          The type used for animation
+     * @param force _more_
      * @return                  The set of times from all data
      *                          May be <code>null</code>.
      * @throws VisADException   if a VisAD failure occurs.
@@ -725,7 +767,7 @@ public class DisplayableData extends Displayable {
      */
     public Set getAnimationSet(RealType aniType, boolean force)
             throws VisADException, RemoteException {
-        Set overrideSet = super.getAnimationSet(aniType,force);
+        Set overrideSet = super.getAnimationSet(aniType, force);
         if (overrideSet != null) {
             return overrideSet;
         }
@@ -817,6 +859,58 @@ public class DisplayableData extends Displayable {
      */
     public float getPointSize() {
         return myPointSize;
+    }
+
+
+    /** _more_          */
+    private DragAdapter dragAdapter;
+
+    /**
+     * _more_
+     *
+     * @param dragAdapter _more_
+     */
+    public void setDragAdapter(DragAdapter dragAdapter) {
+        this.dragAdapter = dragAdapter;
+    }
+
+    /**
+     * DragAdapter _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public interface DragAdapter {
+
+        /**
+         * _more_
+         *
+         * @param ray _more_
+         * @param first _more_
+         * @param mouseModifiers _more_
+         *
+         * @return _more_
+         */
+        public boolean handleDragDirect(VisADRay ray, boolean first,
+                                        int mouseModifiers);
+
+        /**
+         * _more_
+         *
+         * @param x _more_
+         *
+         * @return _more_
+         */
+        public boolean handleAddPoint(float[] x);
+
+        /**
+         * _more_
+         *
+         * @param x _more_
+         *
+         * @return _more_
+         */
+        public boolean constrainDragPoint(float[] x);
     }
 
 }

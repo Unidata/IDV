@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -53,6 +54,10 @@ public class LineProbe extends SelectorDisplayable {
 
     /** flag for whether we're in the process of setting the position */
     private volatile boolean settingPosition = false;
+
+    /** _more_          */
+    private RealTuple fixedEndPoint;
+
 
     /**
      * Default Constructor
@@ -109,24 +114,45 @@ public class LineProbe extends SelectorDisplayable {
      */
     public LineProbe(RealTuple position, Real constant)
             throws VisADException, RemoteException {
+        this(position, null, constant);
+    }
 
+    /**
+     * _more_
+     *
+     * @param position _more_
+     * @param fixedEndPoint _more_
+     * @param constant _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public LineProbe(RealTuple position, RealTuple fixedEndPoint,
+                     Real constant)
+            throws VisADException, RemoteException {
+
+        /*
         if ( !position.getType().equals(
                 RealTupleType.SpatialCartesian2DTuple)) {
             throw new VisADException("Can't yet handle "
                                      + position.getType());
         }
-
-        if ( !constant.getType().equals(RealType.ZAxis)) {
+        */
+        if ((constant != null)
+                && !constant.getType().equals(RealType.ZAxis)) {
             throw new VisADException("Can't yet handle constant "
                                      + constant.getType());
         }
 
-        this.constant = constant;
-        line          = new ProfileLine("ProbeLine");
-        point         = new SelectorPoint("Probe point", position);
+        this.fixedEndPoint = fixedEndPoint;
+        this.constant      = constant;
+        line               = new ProfileLine("ProbeLine");
+        point              = new SelectorPoint("Probe point", position);
 
-        point.addConstantMap(new ConstantMap(constant.getValue(),
-                                             Display.ZAxis));
+        if (constant != null) {
+            point.addConstantMap(new ConstantMap(constant.getValue(),
+                    Display.ZAxis));
+        }
         addDisplayable(point);
         addDisplayable(line);
         setPosition(position);
@@ -167,6 +193,18 @@ public class LineProbe extends SelectorDisplayable {
     public RealTuple getPosition() throws VisADException, RemoteException {
         return point.getPoint();
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public SelectorPoint getSelectorPoint() {
+        return point;
+    }
+
+
+
 
     /**
      * Set whether the marker should automatically resize as the
@@ -210,7 +248,6 @@ public class LineProbe extends SelectorDisplayable {
      *
      * @param position              The position of the probe.
      *
-     * @throws NullPointerException if the argument is <code>null</code>.
      * @throws VisADException       if <code>position.getType().equals(
      *                              RealTupleType.SpatialCartesian2DTuple)
      *                              </code> is false or if another VisAD failure
@@ -224,13 +261,16 @@ public class LineProbe extends SelectorDisplayable {
         settingPosition = true;
 
         try {
+            /*
             if ( !position.getType().equals(
                     RealTupleType.SpatialCartesian2DTuple)) {
                 throw new VisADException("Can't yet handle "
                                          + position.getType());
             }
+            */
 
-            if ( !constant.getType().equals(RealType.ZAxis)) {
+            if ((constant != null)
+                    && !constant.getType().equals(RealType.ZAxis)) {
                 throw new VisADException("Can't yet constant "
                                          + constant.getType());
             }
@@ -255,10 +295,21 @@ public class LineProbe extends SelectorDisplayable {
 
         lineVals[0][0] = (float) reals[0].getValue();
         lineVals[1][0] = (float) reals[1].getValue();
-        lineVals[2][0] = (float) constant.getValue();
-        lineVals[0][1] = lineVals[0][0];
-        lineVals[1][1] = lineVals[1][0];
-        lineVals[2][1] = -1;
+        if ((reals.length == 2) && (constant != null)) {
+            lineVals[2][0] = (float) constant.getValue();
+        } else if (reals.length == 3) {
+            lineVals[2][0] = (float) reals[2].getValue();
+        }
+        if (fixedEndPoint != null) {
+            Real[] pt = fixedEndPoint.getRealComponents();
+            lineVals[0][1] = (float) pt[0].getValue();
+            lineVals[1][1] = (float) pt[1].getValue();
+            lineVals[2][1] = (float) pt[2].getValue();
+        } else {
+            lineVals[0][1] = lineVals[0][0];
+            lineVals[1][1] = lineVals[1][0];
+            lineVals[2][1] = -1;
+        }
 
         Gridded3DSet lineData =
             new Gridded3DSet(RealTupleType.SpatialCartesian3DTuple, lineVals,

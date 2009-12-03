@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -153,6 +154,7 @@ public class SelectorPoint extends LineDrawing {
         setupShapeMap();
         markerValue = new Real(shapeType, 0);
         mySetData(thePoint, null);
+
     }
 
 
@@ -198,11 +200,21 @@ public class SelectorPoint extends LineDrawing {
      */
     public void setPoint(RealTuple value)
             throws VisADException, RemoteException {
+        System.err.println("selector:" + value);
         setPointWithTime(value, null);
     }
 
-    public void setPoint(RealTuple value,VisADGeometryArray marker)
-        throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     * @param marker _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setPoint(RealTuple value, VisADGeometryArray marker)
+            throws VisADException, RemoteException {
         this.marker = marker;
         if (shapeControl != null) {
             shapeControl.setShape(0, marker);
@@ -315,6 +327,14 @@ public class SelectorPoint extends LineDrawing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param newScale _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void setScale(float newScale)
             throws VisADException, RemoteException {
         if (shapeControl != null) {
@@ -407,7 +427,7 @@ public class SelectorPoint extends LineDrawing {
                 if (fixed[i]) {
                     if (v.getValue() != oldValues[i]) {
                         didChange = true;
-                        v  = v.cloneButValue(oldValues[i]);
+                        v         = v.cloneButValue(oldValues[i]);
                     }
                 }
             }

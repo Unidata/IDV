@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -85,8 +86,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public PointProbe(double x, double y,
-                      double z) throws VisADException, RemoteException {
+    public PointProbe(double x, double y, double z)
+            throws VisADException, RemoteException {
 
         this(new RealTuple(RealTupleType.SpatialCartesian3DTuple,
                            new double[] { x,
@@ -101,8 +102,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public PointProbe(RealTuple position) throws VisADException,
-            RemoteException {
+    public PointProbe(RealTuple position)
+            throws VisADException, RemoteException {
 
         point = new SelectorPoint("Probe point", position);
 
@@ -118,6 +119,15 @@ public class PointProbe extends SelectorDisplayable {
         });
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public SelectorPoint getSelectorPoint() {
+        return point;
+    }
 
     /**
      * Set if any of the axis movements are fixed
@@ -151,8 +161,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setMarker(VisADGeometryArray marker) throws VisADException,
-            RemoteException {
+    public void setMarker(VisADGeometryArray marker)
+            throws VisADException, RemoteException {
         point.setMarker(marker);
     }
 
@@ -165,8 +175,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setMarker(String marker) throws VisADException,
-            RemoteException {
+    public void setMarker(String marker)
+            throws VisADException, RemoteException {
         point.setMarker(marker);
     }
 
@@ -182,8 +192,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setAutoSize(boolean yesorno) throws VisADException,
-            RemoteException {
+    public void setAutoSize(boolean yesorno)
+            throws VisADException, RemoteException {
         point.setAutoSize(yesorno);
     }
 
@@ -207,8 +217,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setPosition(double x,
-                            double y) throws VisADException, RemoteException {
+    public void setPosition(double x, double y)
+            throws VisADException, RemoteException {
 
         setPosition(new RealTuple(RealTupleType.SpatialCartesian2DTuple,
                                   new double[] { x,
@@ -223,8 +233,8 @@ public class PointProbe extends SelectorDisplayable {
      * @throws RemoteException
      * @throws VisADException
      */
-    public void setPosition(RealTuple position) throws VisADException,
-            RemoteException {
+    public void setPosition(RealTuple position)
+            throws VisADException, RemoteException {
 
         settingPosition = true;
         try {
