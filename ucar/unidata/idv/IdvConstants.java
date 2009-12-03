@@ -313,6 +313,8 @@ public interface IdvConstants {
     public static final String ID_COMMANDSTORUN = "commandstorun";
 
 
+    public static final String PREF_LEGEND_SHOWICONS = "idv.legend.showicons";
+
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 

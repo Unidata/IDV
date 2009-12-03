@@ -377,6 +377,14 @@ public class VMManager extends IdvManager {
 
 
 
+    public void updateAllLegends() {
+        for (int i = 0; i < viewManagers.size(); i++) {
+            ViewManager vm = (ViewManager) viewManagers.get(i);
+            vm.fillLegends();
+        }
+    }
+
+
     /**
      *  Write the viewpoints list
      */

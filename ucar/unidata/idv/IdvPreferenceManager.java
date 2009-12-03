@@ -363,7 +363,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      * @param widgets The preference name to GUI widget map
      * @param store The store to put preferences in.
      */
-    protected static void applyWidgets(Hashtable widgets,
+    protected static  void applyWidgets(Hashtable widgets,
                                        XmlObjectStore store) {
         for (Enumeration keys = widgets.keys(); keys.hasMoreElements(); ) {
             String key    = (String) keys.nextElement();
@@ -412,6 +412,11 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 }
                 continue;
             }
+            
+
+
+
+
             if (widget instanceof JCheckBox) {
                 store.put(key, ((JCheckBox) widget).isSelected());
             } else if (widget instanceof JTextField) {
@@ -768,11 +773,18 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         PreferenceManager basicManager = new PreferenceManager() {
             public void applyPreference(XmlObjectStore theStore,
                                         Object data) {
+                boolean oldIconsValue = getStateManager().getPreferenceOrProperty(PREF_LEGEND_SHOWICONS, false);
                 getIdv().getArgsManager().sitePathFromArgs = null;
                 applyWidgets((Hashtable) data, theStore);
                 getIdv().getIdvUIManager().setDateFormat();
                 getIdv().initCacheManager();
                 applyEventPreferences(theStore);
+                boolean newIconsValue = getStateManager().getPreferenceOrProperty(PREF_LEGEND_SHOWICONS, false);
+                if(oldIconsValue!=newIconsValue) {
+                    getVMManager().updateAllLegends();
+                }
+
+
             }
         };
 
@@ -858,6 +870,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         Object[][] prefs3 = {
             { "Display Controls:", null },
             { "Show windows when they are created", PREF_SHOWCONTROLWINDOW },
+            {"Show icons in legend", PREF_LEGEND_SHOWICONS, Boolean.FALSE,
+             "<html>Show the toggle and delete icons in the legend"},
             { "Use Fast Rendering", PREF_FAST_RENDER, Boolean.TRUE,
               "<html>Turn this on for better performance at<br> the risk of having funky displays</html>" },
             { "Auto-select data when loading a template",
