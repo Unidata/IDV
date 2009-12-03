@@ -126,6 +126,11 @@ public class LegendPanel {
         innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
     }
 
+    public JComponent getExtraRight() {
+        return extraRight;
+    }
+
+
     /**
      * Set the top components
      *

@@ -181,6 +181,8 @@ public class SideLegend extends IdvLegend {
             categoryPanel.getContents().setVisible(true);
         }
 
+
+        boolean showIcons = viewManager.getIdv().getStateManager().getPreferenceOrProperty(IdvConstants.PREF_LEGEND_SHOWICONS, false);
         Hashtable seen = new Hashtable();
         for (int i = controls.size() - 1; i >= 0; i--) {
             final DisplayControl control  = (DisplayControl) controls.get(i);
@@ -217,16 +219,18 @@ public class SideLegend extends IdvLegend {
                     control.getLegendLabel(control.SIDE_LEGEND);
                 sideLegendLabel.setBorder(BorderFactory.createEmptyBorder(0,
                         5, 0, 3));
+                JComponent buttons = control.getLegendButtons(control.SIDE_LEGEND);
                 legendPanel = new DisplayControlLegendPanel(control,
                         sideLegendLabel, false,
                         GuiUtils.inset(visCbx, new Insets(0, 0, 0, 2)),
-                        control.getLegendButtons(control.SIDE_LEGEND));
+                        buttons);
 
                 JComponent controlLegend =
                     control.getLegendComponent(control.SIDE_LEGEND);
                 legendPanel.add(controlLegend, false);
                 control.putTransientProperty("SIDELEGEND", legendPanel);
             }
+            legendPanel.getExtraRight().setVisible(showIcons);
             categoryPanel.add(control, legendPanel.getContents());
         }
 
