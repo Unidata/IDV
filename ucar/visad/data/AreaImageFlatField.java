@@ -131,7 +131,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
               rangeSets, units);
         this.aid       = that.aid;
         this.readLabel = readLabel;
-        if (that.haveReadData) {
+        if (that.haveData()) {
             setDomain(that.getDomainSet());
         }
     }
@@ -393,13 +393,12 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
-
     /**
      * _more_
      */
     private void checkReadData() {
         synchronized (READMUTEX) {
-            if ( !haveReadData) {
+            if ( !haveData()) {
                 //Force the read
                 try {
                     unpackFloats(false);
@@ -410,8 +409,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         }
     }
 
-    /** _more_ */
-    private boolean haveReadData = false;
 
     /** _more_ */
     private int[][] dirNavAux;
@@ -425,20 +422,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     /** _more_ */
     private int[] dir;
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private String getDirNavAuxFile() {
-        String file =
-            visad.data.DataCacheManager.getCacheManager().getCacheFile()
-                .toString();
-        if (file != null) {
-            return file + ".dirnavaux";
-        }
-        return null;
-    }
 
     /**
      * _more_
@@ -474,75 +457,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
     */
 
-
-
-    /**
-     * Class MyAREACoordinateSystem _more_
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
-     */
-    public static class MyAREACoordinateSystem extends AREACoordinateSystem {
-
-        /**
-         * _more_
-         *
-         * @param dir _more_
-         * @param nav _more_
-         * @param aux _more_
-         * @param useSpline _more_
-         *
-         * @throws VisADException _more_
-         */
-        //        AreaImageFlatField aiff;
-
-        /**
-         * _more_
-         *
-         * @param dir _more_
-         * @param nav _more_
-         * @param aux _more_
-         * @param useSpline _more_
-         *
-         * @throws VisADException _more_
-         */
-        public MyAREACoordinateSystem(int[] dir, int[] nav, int[] aux,
-                                      boolean useSpline)
-                throws VisADException {
-            super(dir, nav, aux, useSpline);
-        }
-
-        /**
-         * _more_
-         *
-         * @throws VisADException _more_
-         */
-        public MyAREACoordinateSystem() throws VisADException {}
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        protected AREAnav getAreaNav() {
-            AREAnav anav = super.getAreaNav();
-            if (anav == null) {
-                try {
-                    if (true) {
-                        throw new IllegalArgumentException(
-                            "MyAreaCoordinateSystem.getAraNav: Should never get to this point");
-                    }
-                    //                    int[][] dirNavAux = aiff.getDirNavAux();
-                    //                    init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
-                } catch (Exception exc) {
-                    System.err.println("error making making areanav:" + exc);
-                    exc.printStackTrace();
-                }
-            }
-            return super.getAreaNav();
-        }
-    }
 
 
 
@@ -591,8 +505,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aid != null) {
             checkReadData();
         }
-        if(domainSet!=null) 
+        if(domainSet!=null)  {
             return domainSet;
+        }
         return super.getDomainSet();
     }
 
@@ -683,15 +598,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             areaFile.getNav(), areaFile.getAux()
         };
 
-        String file = getDirNavAuxFile();
-        if (file != null) {
-            FileOutputStream     fos = new FileOutputStream(file);
-            BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
-            ObjectOutputStream   p   = new ObjectOutputStream(bos);
-            p.writeObject(dirNavAux);
-            p.flush();
-            fos.close();
-        }
+
         return samples;
     }
 
@@ -703,17 +610,13 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     public float[][] readData() {
         synchronized (READMUTEX) {
             try {
-                if (haveReadData) {
+                if (haveData()) {
                     System.err.println("DOING DOUBLE READ");
                 }
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
-                //return readDataOldWay();
-                float[][] results = readDataNewWay();
-                haveReadData = true;
-                return results;
-
+                return  readDataNewWay();
             } catch (Exception exc) {
                 throw new ucar.unidata.util.WrapperException(exc);
             } finally {
@@ -781,6 +684,67 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     public boolean isNavigated() {
         return true;
     }
+
+
+
+
+    /**
+     * Class MyAREACoordinateSystem _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    public static class MyAREACoordinateSystem extends AREACoordinateSystem {
+
+        /**
+         * _more_
+         *
+         * @param dir _more_
+         * @param nav _more_
+         * @param aux _more_
+         * @param useSpline _more_
+         *
+         * @throws VisADException _more_
+         */
+        public MyAREACoordinateSystem(int[] dir, int[] nav, int[] aux,
+                                      boolean useSpline)
+                throws VisADException {
+            super(dir, nav, aux, useSpline);
+        }
+
+        /**
+         * _more_
+         *
+         * @throws VisADException _more_
+         */
+        public MyAREACoordinateSystem() throws VisADException {}
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        protected AREAnav getAreaNav() {
+            AREAnav anav = super.getAreaNav();
+            if (anav == null) {
+                try {
+                    if (true) {
+                        throw new IllegalArgumentException(
+                            "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
+                    }
+                    //                    int[][] dirNavAux = aiff.getDirNavAux();
+                    //                    init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
+                } catch (Exception exc) {
+                    System.err.println("error making making areanav:" + exc);
+                    exc.printStackTrace();
+                }
+            }
+            return super.getAreaNav();
+        }
+    }
+
+
 
 
 
