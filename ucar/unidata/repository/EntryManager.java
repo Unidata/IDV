@@ -4571,44 +4571,53 @@ return new Result(title, sb);
                                  searchCriteriaSB);
         int skipCnt = request.get(ARG_SKIP, 0);
 
+        SqlUtil.debug = false;
+        List<Entry>      entries = new ArrayList<Entry>();
+        List<Entry>      groups  = new ArrayList<Entry>();
+        boolean canDoSelectOffset   =
+            getDatabaseManager().canDoSelectOffset();
+        Hashtable        seen       = new Hashtable();
+        List<Entry>      allEntries = new ArrayList<Entry>();
+
+
         Statement statement =
             typeHandler.select(request, Tables.ENTRIES.COLUMNS, where,
                                getRepository().getQueryOrderAndLimit(request,
                                    false));
 
-
-        SqlUtil.debug = false;
-
-        List<Entry>      entries = new ArrayList<Entry>();
-        List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
-        boolean canDoSelectOffset   =
-            getDatabaseManager().canDoSelectOffset();
-        Hashtable        seen       = new Hashtable();
-        List<Entry>      allEntries = new ArrayList<Entry>();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                if ( !canDoSelectOffset && (skipCnt-- > 0)) {
-                    continue;
-                }
-                String id    = results.getString(1);
-                Entry  entry = getEntryFromCache(id);
-                if (entry == null) {
-                    //id,type,name,desc,group,user,file,createdata,fromdate,todate
-                    TypeHandler localTypeHandler =
-                        getRepository().getTypeHandler(results.getString(2));
-                    entry = localTypeHandler.getEntry(results);
-                    cacheEntry(entry);
-                }
-                if (seen.get(entry.getId()) != null) {
-                    continue;
-                }
-                seen.put(entry.getId(), BLANK);
-                allEntries.add(entry);
-            }
-        }
 
+        long t1 = System.currentTimeMillis();
+        try {
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    if ( !canDoSelectOffset && (skipCnt-- > 0)) {
+                        continue;
+                    }
+                    String id    = results.getString(1);
+                    Entry  entry = getEntryFromCache(id);
+                    if (entry == null) {
+                        //id,type,name,desc,group,user,file,createdata,fromdate,todate
+                        TypeHandler localTypeHandler =
+                            getRepository().getTypeHandler(results.getString(2));
+                        entry = localTypeHandler.getEntry(results);
+                        cacheEntry(entry);
+                    }
+                    if (seen.get(entry.getId()) != null) {
+                        continue;
+                    }
+                    seen.put(entry.getId(), BLANK);
+                    allEntries.add(entry);
+                }
+            }
+        } finally {
+            long t2 = System.currentTimeMillis();
+            if((t2-t1)>60*1000) {
+                getLogManager().logError("Select took a long time:" + (t2-t1));
+            }
+            getDatabaseManager().closeAndReleaseConnection(statement);
+        }
 
 
         for (Entry entry : allEntries) {

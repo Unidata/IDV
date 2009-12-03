@@ -128,8 +128,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     private DataSource dataSource;
 
     /** Keeps track of active connections */
-    private Hashtable<Connection, ConnectionInfo> connectionMap =
-        new Hashtable<Connection, ConnectionInfo>();
+    //    private Hashtable<Connection, ConnectionInfo> connectionMap =
+    //        new Hashtable<Connection, ConnectionInfo>();
+
+
+    private  final Object CONNECTION_MUTEX = new Object();
+
+    private List<ConnectionInfo> connectionInfos =
+        new ArrayList<ConnectionInfo>();
 
 
 
@@ -167,6 +173,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @return _more_
      */
     private List<ConnectionInfo> getConnectionInfos() {
+        synchronized(connectionInfos) {
+            return new ArrayList<ConnectionInfo>(connectionInfos);
+        }
+
+        /*
         Hashtable<Connection, ConnectionInfo> tmp = new Hashtable<Connection,
                                                         ConnectionInfo>();
         synchronized (connectionMap) {
@@ -179,7 +190,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             infos.add(info);
         }
         return infos;
-
+        */
     }
 
 
@@ -206,9 +217,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     if (now - info.time > seconds * 1000) {
                         getLogManager().logError("SCOURED @" + new Date()
                                 + " info.date: " + new Date(info.time)
-                                + " info.id: " + info.myCnt + "<br>"
-                                + "  msg:" + info.msg + "  Where:"
-                                + info.where);
+                                + " info.id: " + info.myCnt + "<stack>"
+                                + "  msg:" + info.msg + "<br>  Where:"
+                                + info.where+"</stack>");
 
                         synchronized (scourMessages) {
                             while (scourMessages.size() > 100) {
@@ -656,10 +667,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     private Connection getConnection(String msg) throws Exception {
-        Connection connection = dataSource.getConnection();
-        synchronized (connectionMap) {
-            connectionMap.put(connection,
-                              new ConnectionInfo(connection, msg));
+        Connection connection;
+        synchronized(CONNECTION_MUTEX) {
+            connection = dataSource.getConnection();
+        }
+        synchronized (connectionInfos) {
+            connectionInfos.add(new ConnectionInfo(connection, msg));
+            //            connectionMap.put(connection,
+            //                              new ConnectionInfo(connection, msg));
         }
         return connection;
     }
@@ -674,15 +689,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      */
     public void closeConnection(Connection connection) {
         try {
-            synchronized (connectionMap) {
-                connectionMap.remove(connection);
+            synchronized (connectionInfos) {
+                for(ConnectionInfo info: connectionInfos) {
+                    if(info.connection == connection) {
+                        connectionInfos.remove(info);
+                        break;
+                    }
+                }
+                //                connectionMap.remove(connection);
             }
             try {
                 connection.setAutoCommit(true);
-            } catch (Exception ignore) {}
+            } catch (Throwable ignore) {}
 
             try {
-                connection.close();
+                synchronized(CONNECTION_MUTEX) {
+                    connection.close();
+                }
             } catch (Exception ignore) {}
 
         } catch (Exception exc) {
