@@ -3603,10 +3603,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (legendType == SIDE_LEGEND) {
             if (sideLegendButtonPanel == null) {
-                DndImageButton dndBtn = new DndImageButton(this, "control");
-                sideLegendButtonPanel = GuiUtils.hbox(dndBtn,
+                //                DndImageButton dndBtn = new DndImageButton(this, "control");
+                sideLegendButtonPanel = GuiUtils.hbox(/*dndBtn,*/
                         makeLockButton(), makeRemoveButton(), 2);
-                dndBtn.setToolTipText("Click to drag-and-drop");
+                //                dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
             return sideLegendButtonPanel;
