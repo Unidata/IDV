@@ -7952,7 +7952,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             JComponent comp = (JComponent) comps.get(lblIdx);
             if (lblIdx == 0) {
                 comp.setToolTipText(
-                    "<html>Left click to show or hide the control window.<br>Right click to show menu.</html>");
+                    "<html>Click to show the control window.<br>Right click to show menu.<br>Click and drag to move display.</html>");
             } else {
                 comp.setToolTipText("<html>Right click to show menu.</html>");
             }
@@ -8072,7 +8072,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @author IDV Development Team
      * @version $Revision: 1.726 $
      */
-    public static class SideLegendLabel extends JLabel {
+    public static class SideLegendLabel extends DndImageButton  {
 
         /** The control */
         DisplayControlImpl myControl;
@@ -8097,7 +8097,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
          */
         public SideLegendLabel(DisplayControlImpl displayControl,
                                String text) {
-            super(text);
+            super(text, displayControl, "control");
             this.myControl = displayControl;
             //            setForeground(Color.blue);
 
