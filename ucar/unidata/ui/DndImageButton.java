@@ -57,6 +57,12 @@ public class DndImageButton extends JLabel implements DragSourceListener,
     private static String iconName = "/ucar/unidata/ui/images/dnd.gif";
     //    private static String iconName = "/auxdata/ui/icons/Move16.gif";
 
+    public DndImageButton(String label, Object data, String mimeType) {
+        super(label);
+        init(data, mimeType);
+    }
+
+
     /**
      * _more_
      *
@@ -78,6 +84,10 @@ public class DndImageButton extends JLabel implements DragSourceListener,
      */
     public DndImageButton(Object data, String mimeType, String icon) {
         super(GuiUtils.getImageIcon(icon, false));
+        init(data, mimeType);
+    }
+
+    private void init(Object data, String mimeType) {
         this.mimeType = mimeType;
         this.data     = data;
         dragSource    = new DragSource();
