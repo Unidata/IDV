@@ -137,9 +137,11 @@ public class GridMath {
         boolean   isVolume2 = GridUtil.isVolume(grid2);
         boolean   isSlice1  = !isVolume1 && is3D1;
         boolean   isSlice2  = !isVolume2 && is3D2;
+        boolean equalDomains = Misc.equals(GridUtil.getSpatialDomain(grid1),
+                                           GridUtil.getSpatialDomain(grid2));
+
         if (isSlice1 && isSlice2) {
-            if ( !Misc.equals(GridUtil.getSpatialDomain(grid1),
-                              GridUtil.getSpatialDomain(grid2))) {
+            if ( !equalDomains) {
                 a = GridUtil.make2DGridFromSlice(grid1, false);
                 b = GridUtil.make2DGridFromSlice(grid2, false);
             }
@@ -148,10 +150,21 @@ public class GridMath {
         } else if ( !is3D1 && isSlice2) {
             b = GridUtil.make2DGridFromSlice(grid2, false);
         }
-        int mode = (Misc.equals(GridUtil.getSpatialDomain(a),
-                                GridUtil.getSpatialDomain(b)))
-                   ? Data.NEAREST_NEIGHBOR
-                   : Data.WEIGHTED_AVERAGE;
+        int     mode      = (equalDomains)
+                            ? Data.NEAREST_NEIGHBOR
+                            : Data.WEIGHTED_AVERAGE;
+
+        boolean isLatLon1 = GridUtil.isLatLonOrder(a);
+        boolean isLatLon2 = GridUtil.isLatLonOrder(b);
+        if ( !(isLatLon1 == isLatLon2)) {
+            if (GridUtil.canSwapLatLon(a)) {
+                a = GridUtil.swapLatLon(a);
+            } else if (GridUtil.canSwapLatLon(b)) {
+                b = GridUtil.swapLatLon(b);
+            } else {
+                throw new VisADException("incompatible grid domains");
+            }
+        }
         return (FieldImpl) binary(a, b, op, mode, Data.NO_ERRORS);
     }
 
@@ -177,4 +190,6 @@ public class GridMath {
         } catch (RemoteException re) {}
         return null;
     }
+
 }
+

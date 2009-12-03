@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.grid;
 
 
@@ -708,8 +706,8 @@ public class GridUtil {
         if ( !isSequence(grid)) {
             throw new IllegalArgumentException("grid is not a sequence");
         }
-        return (RealType) ((SetType) Util.getDomainSet(grid).getType())
-            .getDomain().getComponent(0);
+        return (RealType) ((SetType) Util.getDomainSet(
+            grid).getType()).getDomain().getComponent(0);
     }
 
     /**
@@ -2230,14 +2228,14 @@ public class GridUtil {
     }
 
     /**
-     * _more_
+     * Print the type of the sample of a data object
      *
-     * @param field _more_
+     * @param field  the field
      *
-     * @return _more_
+     * @return  the data type
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException java RMI problem
+     * @throws VisADException   unable to get at data types
      */
     public static String printit(FieldImpl field)
             throws VisADException, RemoteException {
@@ -2703,7 +2701,7 @@ public class GridUtil {
 
                 if (isSequence(grid)) {
 
-                    SampledSet   s       = (SampledSet) Util.getDomainSet(grid);
+                    SampledSet   s = (SampledSet) Util.getDomainSet(grid);
                     FunctionType newType = null;
                     Data         step1   = null;
 
@@ -3450,7 +3448,9 @@ public class GridUtil {
         int lonindex = isLatLonOrder(domain)
                        ? 1
                        : 0;
-        int latindex = lonindex == 0 ? 1 : 0;
+        int latindex = (lonindex == 0)
+                       ? 1
+                       : 0;
 
         // check to see if domain really has lat/lon
         RealType lonType =
@@ -3459,8 +3459,8 @@ public class GridUtil {
         RealType latType =
             (RealType) ((SetType) domain.getType()).getDomain().getComponent(
                 latindex);
-        if ( !(lonType.equalsExceptNameButUnits(RealType.Longitude) &&
-               latType.equalsExceptNameButUnits(RealType.Latitude))) {
+        if ( !(lonType.equalsExceptNameButUnits(RealType.Longitude)
+                && latType.equalsExceptNameButUnits(RealType.Latitude))) {
             return lon;
         }
         if (lonUnit == null) {
@@ -4221,11 +4221,11 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make a range from a VisAD data range
      *
-     * @param range _more_
+     * @param range  the data range
      *
-     * @return _more_
+     * @return  range
      */
     public static Range makeRange(visad.data.DataRange range) {
         if (range == null) {
@@ -4236,11 +4236,11 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make an array of Ranges from an array of DataRanges
      *
-     * @param range _more_
+     * @param range  the DataRanges
      *
-     * @return _more_
+     * @return  the Ranges
      */
     public static Range[] makeRanges(visad.data.DataRange[] range) {
         if (range == null) {
@@ -4257,11 +4257,11 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make a DataRange from a Range
      *
-     * @param range _more_
+     * @param range  the Range
      *
-     * @return _more_
+     * @return  the DataRange
      */
     public static DataRange makeDataRange(Range range) {
         if (range == null) {
@@ -4272,11 +4272,11 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make an array of DataRanges from an array of Ranges
      *
-     * @param range _more_
+     * @param range  the Ranges
      *
-     * @return _more_
+     * @return DataRanges
      */
     public static DataRange[] makeDataRanges(Range[] range) {
         if (range == null) {
@@ -4666,7 +4666,7 @@ public class GridUtil {
 
         long            t1          = System.currentTimeMillis();
         int             numPolygons = allSets.size();
-        List            pts         = new ArrayList();
+        List<float[][]> pts         = new ArrayList<float[][]>();
         List<Integer>[] indexLists  = new List[numPolygons];
         float[]         lonLow      = new float[numPolygons];
         float[]         lonHi       = new float[numPolygons];
@@ -5756,15 +5756,15 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Find the min/max and average of a file inside the mapsets
      *
-     * @param field _more_
-     * @param mapSets _more_
+     * @param field   the field
+     * @param mapSets The map sets
      *
-     * @return _more_
+     * @return the list of FieldStats
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  problem getting the values
      */
     public static List<FieldStats> findMinMaxAverage(FieldImpl field,
             UnionSet mapSets)
@@ -5802,7 +5802,8 @@ public class GridUtil {
         int[][] indices = ((mapSets == null)
                            ? null
                            : GridUtil.findContainedIndices(
-                               (GriddedSet) Util.getDomainSet(field), mapSets));
+                               (GriddedSet) Util.getDomainSet(field),
+                               mapSets));
         float[]   mma    = { 0, 0, 0, 0 };
         float[][] values = field.getFloats(false);
         if (indices == null) {
@@ -5836,6 +5837,187 @@ public class GridUtil {
         }
         mma[3] = cnt;
         return new FieldStats(mma);
+    }
+
+    /**
+     * Can the lat/lons be swapped?
+     * @param grid to check
+     * @return true if 2D and no CS and either lat/lon or lon/lat
+     *
+     * @throws VisADException problem determining if we can swap
+     */
+    public static boolean canSwapLatLon(FieldImpl grid)
+            throws VisADException {
+
+        Set           domain    = GridUtil.getSpatialDomain(grid);
+
+        RealTupleType domainRef = ((SetType) domain.getType()).getDomain();
+        // can't do 3D grids right yet
+        if (domainRef.getDimension() > 2) {
+            return false;
+        }
+        if ( !(domainRef.equals(RealTupleType.SpatialEarth2DTuple)
+                || domainRef.equals(RealTupleType.LatitudeLongitudeTuple))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Swap the lat/lon coordinates of the grid.  Grid must be 2D and have
+     * no coordinate system
+     *
+     * @param grid   grid to swap
+     *
+     * @return lat/lon swapped grid
+     *
+     * @throws VisADException  VisAD problem
+     */
+    public static FieldImpl swapLatLon(FieldImpl grid) throws VisADException {
+        if ( !canSwapLatLon(grid)) {
+            throw new VisADException(
+                "can't swap lat/lon for this type of grid");
+        }
+        FieldImpl retField = null;
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+                SampledSet   timeSet = (SampledSet) GridUtil.getTimeSet(grid);
+                FunctionType retFieldType = null;
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    FlatField ff =
+                        swapLatLonFF((FlatField) grid.getSample(i));
+                    if (ff == null) {
+                        continue;
+                    }
+                    if (retFieldType == null) {
+                        retFieldType = new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            ff.getType());
+                        retField = new FieldImpl(retFieldType, timeSet);
+                    }
+                    retField.setSample(i, ff, false);
+                }
+            } else {
+                retField = swapLatLonFF((FlatField) grid);
+            }
+        } catch (RemoteException re) {}
+        return retField;
+    }
+
+    /**
+     * Swap the lat/lons
+     *
+     * @param grid   grid to swap
+     *
+     * @return lat/lon swapped grid
+     *
+     * @throws VisADException  VisAD problem
+     * @throws RemoteException  remote problem
+     */
+    private static FlatField swapLatLonFF(FlatField grid)
+            throws VisADException, RemoteException {
+
+        FlatField llGrid = null;
+        // check to make sure domains are compatible
+        Set llDomain = GridUtil.getSpatialDomain(grid);
+        //System.err.println("grid domain " +llDomain);
+
+        RealTupleType llRef = ((SetType) llDomain.getType()).getDomain();
+        //System.err.println("llRef = " + llRef);
+        if ( !(llRef.equals(RealTupleType.SpatialEarth2DTuple)
+                || llRef.equals(RealTupleType.LatitudeLongitudeTuple))) {
+            throw new VisADException(
+                "can't swap lat/lon for this type of grid");
+        }
+        RealTupleType newRef   = null;
+        Unit[]        setUnits = llDomain.getSetUnits();
+        if (llRef.equals(RealTupleType.SpatialEarth2DTuple)) {
+            newRef = RealTupleType.LatitudeLongitudeTuple;
+        } else {
+            newRef = RealTupleType.SpatialEarth2DTuple;
+        }
+        //System.err.println("new topoRef = " + newRef);
+        GriddedSet newSet     = null;
+        float[][]  newSamples = null;
+        if (llDomain instanceof Linear2DSet) {
+            //System.out.println("linear sets");
+            newSet = (llDomain instanceof LinearLatLonSet)
+                     ? new LinearLatLonSet(
+                         newRef,
+                         new Linear1DSet[] { ((Linear2DSet) llDomain).getY(),
+                                             ((Linear2DSet) llDomain)
+                                             .getX() }, (CoordinateSystem) null,
+                                                 new Unit[] { setUnits[1],
+                    setUnits[0] }, (ErrorEstimate[]) null)
+                     : new Linear2DSet(newRef,
+                                       new Linear1DSet[] {
+                                           ((Linear2DSet) llDomain).getY(),
+                                           ((Linear2DSet) llDomain)
+                                           .getX() }, (CoordinateSystem) null,
+                                               new Unit[] { setUnits[1],
+                    setUnits[0] }, (ErrorEstimate[]) null);
+            float[][] samples = grid.getFloats(false);
+            newSamples = new float[samples.length][samples[0].length];
+            int[] lengths = newSet.getLengths();
+            int   sizeX   = lengths[0];  // oldY
+            int   sizeY   = lengths[1];  // oldX
+            for (int i = 0; i < samples.length; i++) {
+                int l = 0;
+                for (int j = 0; j < sizeY; j++) {
+                    for (int k = 0; k < sizeX; k++) {
+                        //compute stride into 1D array of old structure
+                        int oldelem = j + k * sizeY;
+                        newSamples[i][l++] = samples[i][oldelem];
+                    }
+                }
+            }
+        }
+        /*
+        else {
+            throw new VisADException("can't swap lat/lon for gridded set (yet)");
+        }
+        */
+        else if (llDomain instanceof Gridded2DSet) {
+            // System.out.println("gridded2D sets");
+            int[]           lengths = ((GriddedSet) llDomain).getLengths();
+            ErrorEstimate[] errors  = ((GriddedSet) llDomain).getSetErrors();
+            float[][]       llVals  = llDomain.getSamples(true);
+            // do we need to do this?
+            /*
+            int   sizeX    = lengths[0];
+            int   sizeY    = lengths[1];
+            for (int i = 0; i < samples.length; i++) {
+                int l = 0;
+                for (int j = 0; j < sizeY; j++) {
+                    for (int k = 0; k < sizeX; k++) {
+                        //compute stride into 1D array of old structure
+                        int oldelem = j + k * sizeY;
+                        // do something here.
+                    }
+                }
+            }
+            */
+            newSet = new Gridded2DSet(newRef, new float[][] {
+                llVals[1], llVals[0]
+            }, lengths[1], lengths[0], (CoordinateSystem) null,
+               new Unit[] { setUnits[1],
+                            setUnits[0] }, new ErrorEstimate[] { errors[1],
+                    errors[0] });
+            newSamples = grid.getFloats(false);
+        } else {
+            throw new VisADException("can't swap lat/lon for "
+                                     + llDomain.getClass().getName());
+        }
+        if ((newSet != null) && (newSamples != null)) {
+            //System.out.println("newSet = " + newSet);
+            FunctionType newType =
+                new FunctionType(((SetType) newSet.getType()).getDomain(),
+                                 GridUtil.getParamType(grid));
+            llGrid = new FlatField(newType, newSet);
+            llGrid.setSamples(newSamples, false);
+        }
+
+        return llGrid;
     }
 
 }
