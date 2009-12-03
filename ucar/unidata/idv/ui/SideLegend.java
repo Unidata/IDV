@@ -182,7 +182,14 @@ public class SideLegend extends IdvLegend {
         }
 
 
-        boolean showIcons = viewManager.getIdv().getStateManager().getPreferenceOrProperty(IdvConstants.PREF_LEGEND_SHOWICONS, false);
+        boolean showIcons = true;
+        ViewManager vm = viewManager;
+        if(vm!=null) {
+            IntegratedDataViewer idv = vm.getIdv();
+            if(idv!=null) {
+                showIcons =idv.getStateManager().getPreferenceOrProperty(IdvConstants.PREF_LEGEND_SHOWICONS, false);
+            }
+        }
         Hashtable seen = new Hashtable();
         for (int i = controls.size() - 1; i >= 0; i--) {
             final DisplayControl control  = (DisplayControl) controls.get(i);
