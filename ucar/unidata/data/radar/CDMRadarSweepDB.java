@@ -101,23 +101,25 @@ public class CDMRadarSweepDB {
         for (i = 0; i < numberOfRay; i++) {
             float azi = 0.0f;
             //  try {
-            azi   = _azimuths[i];                   //s.getAzimuth(i);
-            iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
-            //  } catch (IOException e) {
-            //     e.printStackTrace();
-            //     iazim = 0;
-            //  }
-            if (iazim >= numberOfRay) {
-                iazim -= numberOfRay;
+            azi   = _azimuths[i];
+            if(!Float.isNaN(azi)) {
+                iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
+                //  } catch (IOException e) {
+                //     e.printStackTrace();
+                //     iazim = 0;
+                //  }
+                if (iazim >= numberOfRay) {
+                    iazim -= numberOfRay;
+                }
+
+                Ray r = new Ray();
+                r.index    = Integer.toString(iazim);
+                r.rayIndex = sIdx[i];
+                r.azimuth  = azi;
+
+                /*      fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num, ray->h.azimuth, iazim); */
+                sweepTableHash.put(r.index, r);
             }
-
-            Ray r = new Ray();
-            r.index    = Integer.toString(iazim);
-            r.rayIndex = sIdx[i];
-            r.azimuth  = azi;
-
-            /*      fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num, ray->h.azimuth, iazim); */
-            sweepTableHash.put(r.index, r);
         }
 
     }

@@ -1067,7 +1067,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         Trace.call2("   get cappi value");
 
-        int[]     sortedAzs  = QuickSort.sort(cappiAz);
+       // int[]     sortedAzs  = QuickSort.sort(cappiAz);
 
         float[][] domainVals = new float[2][numBin * numRay];
         float[][] signalVals = new float[1][numBin * numRay];
@@ -1077,7 +1077,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             for (int ri = 0; ri < numBin; ri++) {
                 domainVals[0][k] = (float) ranges[ri];
                 domainVals[1][k] = cappiAz[azi];
-                signalVals[0][k] = cappiValue[ri][sortedAzs[azi]];
+                signalVals[0][k] = cappiValue[ri][azi];
                 k++;
             }
         }
@@ -1403,7 +1403,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (r == null) {
             return 999;
         }
-        int rd = Integer.parseInt(r.index);  //.rayIndex;
+        int rd = r.rayIndex; //Integer.parseInt(r.index);  //.rayIndex;
         closestRay = theClosestHash(azimuths, ray_angle, rd, limit);
 
         /* Is closest ray within limit parameter ? If
