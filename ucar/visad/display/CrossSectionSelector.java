@@ -156,12 +156,15 @@ public class CrossSectionSelector extends SelectorDisplayable {
     public CrossSectionSelector(RealTuple startPoint, RealTuple endPoint, Color color)
             throws VisADException, RemoteException {
 
+        /*
         if ( !(startPoint.getType()
                 .equals(RealTupleType.SpatialCartesian2DTuple) && endPoint
                 .getType().equals(RealTupleType.SpatialCartesian2DTuple))) {
             throw new IllegalArgumentException(
                 "Start and end points must be in XY space");
-        }
+                }*/
+
+
         this.startPoint = startPoint;
         this.endPoint   = endPoint;
         midPoint        = calculateMidpoint();
@@ -177,6 +180,19 @@ public class CrossSectionSelector extends SelectorDisplayable {
         setColor(color);
         beenInitialized = true;
     }
+
+
+
+
+    public SelectorPoint setStartSelectorPoint() {
+        return startSp;
+    }
+
+
+    public SelectorPoint setEndSelectorPoint() {
+        return endSp;
+    }
+
 
 
     /**
@@ -247,6 +263,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
     private void setLineData() throws VisADException, RemoteException {
         RealTuple startRt = startSp.getPoint();
         RealTuple endRt   = endSp.getPoint();
+
         float[][] values  = new float[][] {
             { (float) ((Real) startRt.getComponent(0)).getValue(),
               (float) ((Real) endRt.getComponent(0)).getValue() },

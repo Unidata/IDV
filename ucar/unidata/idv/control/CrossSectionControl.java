@@ -429,7 +429,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         } else if (vm instanceof TransectViewManager) {
             xsDisplay.setAdjustFlow(false);
             setUseFastRendering(true);
-        }
+        } 
         loadDataFromLine();
         return true;
     }
@@ -519,19 +519,36 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             //then pass in false
             //to getXYPosition so we don't convert to display coords.
 
-            RealTuple start = (startCoord != null)
+            RealTuple start;
+            RealTuple end;
+
+
+            if(inGlobeDisplay()) {
+                start = (startCoord != null)
                               ? getXYPosition(startCoord.getX(),
                                   startCoord.getY(), 0.0, false)
                               : getXYPosition(sizeX / 10.0, sizeY / 2.0, 0.0,
                                   true);
 
-            //: getXYPosition(-1.0, 0, 0.0, false);
-            RealTuple end = (endCoord != null)
+                end = (endCoord != null)
                             ? getXYPosition(endCoord.getX(), endCoord.getY(),
                                             0.0, false)
                             : getXYPosition((sizeX - sizeX / 10.0),
                                             sizeY / 2.0, 0.0, true);
-            //: getXYPosition(1.0, 0, 0.0, false);
+            } else {
+                start = (startCoord != null)
+                              ? getXYPosition(startCoord.getX(),
+                                  startCoord.getY(), 0.0, false)
+                              : getXYPosition(sizeX / 10.0, sizeY / 2.0, 0.0,
+                                  true);
+
+                end = (endCoord != null)
+                            ? getXYPosition(endCoord.getX(), endCoord.getY(),
+                                            0.0, false)
+                            : getXYPosition((sizeX - sizeX / 10.0),
+                                            sizeY / 2.0, 0.0, true);
+            }
+
 
             csSelector.setPosition(start, end);
             //Now load the data
@@ -986,7 +1003,16 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         // z level at origin of grid
 
 
-        csSelector = new CrossSectionSelector();
+        if(inGlobeDisplay()) {
+            csSelector = new CrossSectionSelector(new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                           new double[]{ -1.0,
+                                         0.0,0 }), new RealTuple(
+                                             RealTupleType.SpatialCartesian3DTuple,
+                                             new double[]{ 1.0,
+                                                           0.0,0 }));
+        } else {
+            csSelector = new CrossSectionSelector();
+        }
         // move z level of line to near top of VisAD display box
         //csSelector.setZValue(.95f);
 
