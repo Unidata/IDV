@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -60,6 +61,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.ThreeDSize;
 
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.ShapeUtility;
 
@@ -96,6 +98,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+
+import javax.vecmath.Point3d;
 
 
 
@@ -155,6 +159,18 @@ public class ProbeControl extends DisplayControlImpl {
 
     /** Is the axis fixed */
     private boolean zFixed = false;
+
+
+
+    /** Not used for now */
+    private boolean updatePending = false;
+
+
+    /** _more_          */
+    private boolean keepProbeAtHeight = true;
+
+    /** _more_          */
+    private double probeRadius = 1.0;
 
 
     /** time label */
@@ -244,6 +260,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** Show sunrise/sunset display in time series */
     private boolean showSunriseSunset = false;
 
+    private RealTupleType globePositionType;
 
     /**
      * Cstr; sets flags; see init() for creation actions.
@@ -263,6 +280,7 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     public boolean init(List choices) throws VisADException, RemoteException {
+
         if ((_levels != null) && (infos.size() == 0)) {
             //We have legacy muli-list table state
             for (int i = 0; i < _levels.size(); i++) {
@@ -289,7 +307,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
-            if(info == null) {
+            if (info == null) {
                 return false;
             }
             if ( !checkIfDataOk(info.getDataInstance())) {
@@ -309,7 +327,33 @@ public class ProbeControl extends DisplayControlImpl {
         getInternalAnimation();
         aniWidget = getAnimationWidget().getContents();
 
-        probe     = new PointProbe(0.0, 0.0, 0.0);
+        if(inGlobeDisplay()) {
+            RealType[] components =
+                {RealType.XAxis, RealType.YAxis, RealType.ZAxis};
+            globePositionType =     new RealTupleType(components, null, null); 
+            probe     = new PointProbe(new RealTuple(
+                                                     globePositionType,
+                                                     new double[] {0,0,0}));
+            probe.getSelectorPoint().setDragAdapter(new DisplayableData.DragAdapter() {
+                    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
+                        return true;
+                    }
+                    public boolean constrainDragPoint(float[]x) {
+                        constrainGlobePoint(x);
+                        return true;
+                    }
+                    public boolean handleAddPoint(float[]x){
+                        return true;
+                    }
+
+                });
+
+
+        } else {
+            probe     = new PointProbe(0.0, 0.0, 0.0);
+        }
+
+
         if (marker != null) {
             probe.setMarker(
                 SelectorPoint.reduce(ShapeUtility.makeShape(marker)));
@@ -319,12 +363,14 @@ public class ProbeControl extends DisplayControlImpl {
         probe.setAutoSize(true);
         probe.setVisible(true);
         probe.addPropertyChangeListener(this);
+
+
         if (initPosition != null) {
             probe.setPosition(initPosition);
-        }
-        if (initLocation != null) {
+        } else if (initLocation != null) {
             setEarthLocation(initLocation);
         }
+
         addDisplayable(probe, FLAG_COLOR);
         setContents(doMakeContents());
         if (getPointSize() != 1.0f) {
@@ -344,14 +390,16 @@ public class ProbeControl extends DisplayControlImpl {
         try {
             super.initDone();
             if ((initPosition == null) && (initLocation == null)) {
-                double[] screenCenter = getScreenCenter();
-                probe.setPosition(
-                    new RealTuple(
-                        RealTupleType.SpatialCartesian3DTuple,
-                        new double[] { screenCenter[0],
-                                       screenCenter[1], 0.0 }));
-
-
+                if (inGlobeDisplay()) {
+                    resetProbePosition();
+                } else {
+                    double[] screenCenter = getScreenCenter();
+                    probe.setPosition(
+                        new RealTuple(
+                            RealTupleType.SpatialCartesian3DTuple,
+                            new double[] { screenCenter[0],
+                                           screenCenter[1], 0.0 }));
+                }
             }
             setTimesForAnimation();
             updatePosition();
@@ -361,52 +409,71 @@ public class ProbeControl extends DisplayControlImpl {
         }
     }
 
+    /** _more_          */
     private JSlider probeSizeSlider;
-    private GuiUtils.ColorSwatch probeColorSwatch;
-    private JComboBox 	shapeCbx;
 
+    /** _more_          */
+    private GuiUtils.ColorSwatch probeColorSwatch;
+
+    /** _more_          */
+    private JComboBox shapeCbx;
+
+    /**
+     * _more_
+     *
+     * @param jtp _more_
+     */
     protected void addPropertiesComponents(JTabbedPane jtp) {
         super.addPropertiesComponents(jtp);
-	List comps = new ArrayList();
-	comps.add(GuiUtils.rLabel("Size:"));
-	probeSizeSlider =   new JSlider(1, 2000, (int)(getPointSize()*100));
-	comps.add(probeSizeSlider);
-	probeColorSwatch = new GuiUtils.ColorSwatch(getColor(),"Probe Color");
-	comps.add(GuiUtils.rLabel("Color:"));
-	comps.add(GuiUtils.left(probeColorSwatch));
+        List comps = new ArrayList();
+        comps.add(GuiUtils.rLabel("Size:"));
+        probeSizeSlider = new JSlider(1, 2000, (int) (getPointSize() * 100));
+        comps.add(probeSizeSlider);
+        probeColorSwatch = new GuiUtils.ColorSwatch(getColor(),
+                "Probe Color");
+        comps.add(GuiUtils.rLabel("Color:"));
+        comps.add(GuiUtils.left(probeColorSwatch));
 
 
-	TwoFacedObject selected = null;
-	Vector shapes = new Vector();
+        TwoFacedObject selected = null;
+        Vector         shapes   = new Vector();
         for (int i = 0; i < ShapeUtility.SHAPES.length; i++) {
             TwoFacedObject tof = ShapeUtility.SHAPES[i];
             if (Misc.equals(tof.getId(), marker)) {
-		selected = tof;
+                selected = tof;
             }
-	    shapes.add(tof);
+            shapes.add(tof);
         }
-	shapeCbx = new JComboBox(shapes);
-	if(selected!=null)
-	    shapeCbx.setSelectedItem(selected);
-	comps.add(GuiUtils.rLabel("Shape:"));
-	comps.add(GuiUtils.left(shapeCbx));
+        shapeCbx = new JComboBox(shapes);
+        if (selected != null) {
+            shapeCbx.setSelectedItem(selected);
+        }
+        comps.add(GuiUtils.rLabel("Shape:"));
+        comps.add(GuiUtils.left(shapeCbx));
 
 
-	jtp.addTab("Probe", GuiUtils.top(GuiUtils.formLayout(comps)));
+        jtp.addTab("Probe", GuiUtils.top(GuiUtils.formLayout(comps)));
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean doApplyProperties() {
-	if(!super.doApplyProperties()) return false;
-	setPointSize((float)(probeSizeSlider.getValue()/100.0));
-	try {
-	    setColor(probeColorSwatch.getColor());
-	    TwoFacedObject tfo =  (TwoFacedObject)shapeCbx.getSelectedItem();
-	    setMarker(tfo.getId().toString());
-	} catch(Exception exc) {
-	    throw new RuntimeException(exc);
-	}
-	return true;
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        setPointSize((float) (probeSizeSlider.getValue() / 100.0));
+        try {
+            setColor(probeColorSwatch.getColor());
+            TwoFacedObject tfo = (TwoFacedObject) shapeCbx.getSelectedItem();
+            setMarker(tfo.getId().toString());
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+        return true;
 
     }
 
@@ -467,12 +534,18 @@ public class ProbeControl extends DisplayControlImpl {
         probeMenu.add(posMenu);
         posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position", this,
                                           "resetProbePosition"));
-        posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock X Axis", this,
-                "xFixed", null));
-        posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Y Axis", this,
-                "yFixed", null));
-        posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Z Axis", this,
-                "zFixed", null));
+        if (inGlobeDisplay()) {
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Keep probe at height",
+                    this, "keepProbeAtHeight", null));
+        } else {
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock X Axis", this,
+                    "xFixed", null));
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Y Axis", this,
+                    "yFixed", null));
+
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Z Axis", this,
+                    "zFixed", null));
+        }
         probeMenu.add(doMakeChangeColorMenu("Color"));
 
         JMenu sizeMenu = new JMenu("Size");
@@ -608,7 +681,22 @@ public class ProbeControl extends DisplayControlImpl {
      * Reset the position of the probe to the center.
      */
     public void resetProbePosition() {
-        resetProbePosition(0.0, 0.0, 0.0);
+        if (inGlobeDisplay()) {
+            try {
+                // This sets the probe position to be on the surface of the globe closest to the screen
+            Point3d          p          = new Point3d(0, 0, 1);
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+            navDisplay.applyRotation(p);
+            probe.setPosition(
+                new RealTuple(
+                              globePositionType, new double[] {p.x,p.y,p.z}));
+
+        } catch (Exception exc) {
+            logException("Resetting probe position", exc);
+        }
+        } else {
+            resetProbePosition(0.0, 0.0, 0.0);
+        }
     }
 
     /**
@@ -1011,7 +1099,7 @@ public class ProbeControl extends DisplayControlImpl {
     public void doRemove() throws RemoteException, VisADException {
         probe      = null;
         tableModel = null;
-        infos= null;
+        infos      = null;
         super.doRemove();
     }
 
@@ -1056,9 +1144,29 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
+    private void  constrainGlobePoint(float[] position) {
+        float x = position[0];
+        float y = position[1];
+        float z = position[2];
+        double length = new Point3d(0, 0,
+                                    0).distance(new Point3d(x, y, z));
 
-    /** Not used for now */
-    private boolean updatePending = false;
+
+        if (!keepProbeAtHeight) {
+            probeRadius = length;
+            return;
+        }
+
+        if (length != 0) {
+            double newx = x * (probeRadius / length);
+            double newy = y * (probeRadius / length);
+            double newz = z * (probeRadius / length);
+            position[0] = (float)newx;
+            position[1] = (float)newy;
+            position[2] = (float)newz;
+        }
+
+    }
 
 
     /**
@@ -1073,13 +1181,12 @@ public class ProbeControl extends DisplayControlImpl {
         if (evt.getPropertyName().equals(
                 SelectorDisplayable.PROPERTY_POSITION)) {
             try {
-                RealTuple position = getPosition();
                 if (updatePending) {
                     return;
                 }
+                RealTuple position = probe.getPosition();
                 updatePending = true;
-                updatePosition();
-                //                updatePosition(position);
+                updatePosition(position);
                 //                Misc.runInABit(1000,this,"updatePosition",null);
                 doShare(SHARE_POSITION, position);
             } catch (Exception exc) {
@@ -1397,7 +1504,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         paramsTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-		if (GuiUtils.isDeleteEvent(e)) {
+                if (GuiUtils.isDeleteEvent(e)) {
                     removeField(paramsTable.getSelectedRow());
                 }
             }
@@ -1836,7 +1943,7 @@ public class ProbeControl extends DisplayControlImpl {
         double[] positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                positionValues[1], positionValues[2] }, false);
+                                                           positionValues[1], positionValues[2]}, false);
         LatLonPoint llp = elt.getLatLonPoint();
         lastProbeAltitude = elt.getAltitude();
 
@@ -2091,10 +2198,14 @@ public class ProbeControl extends DisplayControlImpl {
             infos.add(info);
         }
         ProbeRowInfo info = (ProbeRowInfo) infos.get(row);
-        if(info == null) return null;
+        if (info == null) {
+            return null;
+        }
         if (andInitializeData && (info.getDataInstance() == null)) {
             List choices = getDataChoices();
-            if(choices==null) return null;
+            if (choices == null) {
+                return null;
+            }
             try {
                 DataChoice dc = (DataChoice) choices.get(row);
                 showWaitCursor();
@@ -2160,7 +2271,7 @@ public class ProbeControl extends DisplayControlImpl {
         double[]  positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                positionValues[1], positionValues[2] }, false);
+                                                           positionValues[1],positionValues[2]}, false);
         return elt;
     }
 
@@ -2293,6 +2404,7 @@ public class ProbeControl extends DisplayControlImpl {
      * @param elt The location
      * @param animationValue The time animation
      * @param animationStep Which step in the animation
+     * @param samples _more_
      *
      * @return List of html to display
      *
@@ -2969,6 +3081,46 @@ public class ProbeControl extends DisplayControlImpl {
     public boolean getShowSunriseSunset() {
         return showSunriseSunset;
     }
+
+
+
+    /**
+     * Set the KeepProbeAtHeight property.
+     *
+     * @param value The new value for KeepProbeAtHeight
+     */
+    public void setKeepProbeAtHeight(boolean value) {
+        keepProbeAtHeight = value;
+    }
+
+    /**
+     * Get the KeepProbeAtHeight property.
+     *
+     * @return The KeepProbeAtHeight
+     */
+    public boolean getKeepProbeAtHeight() {
+        return keepProbeAtHeight;
+    }
+
+    /**
+     * Set the ProbeRadius property.
+     *
+     * @param value The new value for ProbeRadius
+     */
+    public void setProbeRadius(double value) {
+        probeRadius = value;
+    }
+
+    /**
+     * Get the ProbeRadius property.
+     *
+     * @return The ProbeRadius
+     */
+    public double getProbeRadius() {
+        return probeRadius;
+    }
+
+
 
 
 

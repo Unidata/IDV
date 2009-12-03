@@ -64,6 +64,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import javax.vecmath.Point3d;
 
 /**
  * Given a VisAD Field, make a 2D plot of the range data against
@@ -695,6 +696,22 @@ public class VerticalProfileControl extends LineProbeControl {
             EarthLocationTuple elt =
                 (EarthLocationTuple) boxToEarth(new double[] { values[0],
                     values[1], 1.0 });
+            llp = elt.getLatLonPoint();
+        } else  if (rttype.equals(RealTupleType.SpatialCartesian3DTuple)) {
+            //If is a 3d point then we are probably in the globe view
+            double[] values = position.getValues();
+            double length = new Point3d(0, 0,
+                                        0).distance(new Point3d(values[0], values[1], values[2]));
+
+
+            if (length != 0) {
+                values[0]=  values[0]* (1 / length);
+                values[1] = values[1] * (1 / length);
+                values[2] = values[2] * (1 / length);
+            }
+            EarthLocationTuple elt =
+                (EarthLocationTuple) boxToEarth(new double[] { values[0],
+                    values[1], values[2] });
             llp = elt.getLatLonPoint();
         } else if (rttype.equals(RealTupleType.SpatialEarth2DTuple)) {
             Real[] reals = position.getRealComponents();

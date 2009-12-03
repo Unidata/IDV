@@ -35,11 +35,15 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.ShapeUtility;
+import ucar.visad.display.DisplayableData;
 import ucar.visad.display.LineProbe;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.SelectorPoint;
 
 import visad.*;
+
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -60,6 +64,7 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.vecmath.Point3d;
 
 
 
@@ -147,21 +152,41 @@ public abstract class LineProbeControl extends GridDisplayControl {
     public void doMakeProbe(Color probeColor, ViewDescriptor view)
             throws VisADException, RemoteException {
         probe = null;
-        if (getDisplayAltitudeType().equals(Display.Radius)) {
-            //      System.err.println("Probe 1");
-            probe = new LineProbe(
-                new RealTuple(
-                    RealTupleType.SpatialEarth2DTuple, new double[] { 0,
-                    0 }));
-        } else if (initPosition != null) {
-            //      System.err.println("Probe 2");
-            probe = new LineProbe(initPosition);
-        } else {
-            //      System.err.println("Probe 3");
-            probe = new LineProbe(getInitialLinePosition());
-            //            probe = new LineProbe(getGridCenterPosition());
+        RealTuple position1 = initPosition;
+        if(position1==null) {
+            position1 = getInitialLinePosition();
         }
+        if (inGlobeDisplay()) {
+            probe = new LineProbe(
+                                  position1, 
+                                  new RealTuple(
+                                                RealTupleType.SpatialCartesian3DTuple, new double[] { 0,
+                                                                                                      0,0 }),
+                                  null);
+        } else {
+            probe = new LineProbe(position1);
+        }
+
         initPosition = probe.getPosition();
+
+
+        if(inGlobeDisplay()) {
+            probe.getSelectorPoint().setDragAdapter(new DisplayableData.DragAdapter() {
+                    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
+                        return true;
+                    }
+                    public boolean constrainDragPoint(float[]x) {
+                        constrainGlobePoint(x);
+                        return true;
+                    }
+                    public boolean handleAddPoint(float[]x){
+                        return true;
+                    }
+
+                });
+
+        }
+
 
         // it is a little colored cube 8 pixels across
         probe.setColor(probeColor);
@@ -175,6 +200,29 @@ public abstract class LineProbeControl extends GridDisplayControl {
         probe.setAutoSize(true);
         addDisplayable(probe, view, FLAG_COLOR);
     }
+
+
+
+    private void  constrainGlobePoint(float[] position) {
+        float x = position[0];
+        float y = position[1];
+        float z = position[2];
+        double length = new Point3d(0, 0,
+                                    0).distance(new Point3d(x, y, z));
+
+
+        double probeRadius = 1.5;
+        if (length != 0) {
+            double newx = x * (probeRadius / length);
+            double newy = y * (probeRadius / length);
+            double newz = z * (probeRadius / length);
+            position[0] = (float)newx;
+            position[1] = (float)newy;
+            position[2] = (float)newz;
+        }
+
+    }
+
 
 
     /**
@@ -469,6 +517,16 @@ public abstract class LineProbeControl extends GridDisplayControl {
      */
     public RealTuple getInitialLinePosition()
             throws VisADException, RemoteException {
+
+        if(inGlobeDisplay()) {
+            Point3d          p          = new Point3d(0, 0, 1);
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+            navDisplay.applyRotation(p);
+            return 
+                new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                              new double[] {p.x,p.y,p.z});
+        }
+
         double[] center = getScreenCenter();
         return new RealTuple(RealTupleType.SpatialCartesian2DTuple,
                              new double[] { center[0],

@@ -43,6 +43,7 @@ import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridUtil;
 
+import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
@@ -9147,6 +9148,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("Handling the action:" + cmd, exc);
         }
     }
+
+
+    public boolean inGlobeDisplay() {
+        return (getNavigatedDisplay() instanceof GlobeDisplay);
+    }
+
 
 
     /**
