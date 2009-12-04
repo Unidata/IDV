@@ -1865,9 +1865,27 @@ public String getDefaultProjectionName () {
             return false;
         }
 
+
+        
+
+        if(getUseGlobeDisplay()) {
+            try {
+                LatLonPoint center = projection.getCenterLatLon();
+                getNavigatedDisplay().center(new EarthLocationTuple(center.getLatitude(), center.getLongitude(),new Real(RealType.Altitude, 0)),true);
+                return true;
+            } catch (Exception e) {
+                logException("setProjection", e);
+                return false;
+            }
+        }
+
+
+
+
         boolean actuallyChangedProjection = false;
 	double[] matrix = getDisplayMatrix();
         try {
+
             setMasterInactive();
             if (addToCommandHistory && (mainProjection != null)) {
                 addCommand(new ProjectionCommand(this, mainProjectionName,
@@ -2162,21 +2180,26 @@ public String getDefaultProjectionName () {
 
     public void displayDataChanged(DisplayControl display,boolean fromInitialLoad) {
         try {
-            if ( !getUseGlobeDisplay() && getUseProjectionFromData()
+            if (getUseProjectionFromData()
                  && !getStateManager().getProperty(
                                                    IdvConstants.PROP_LOADINGXML, false)) {
                 MapProjection mp = display.getDataProjection();
+
+                if(getUseGlobeDisplay()) {
+                    LatLonPoint center = mp.getCenterLatLon();
+                    getNavigatedDisplay().center(new EarthLocationTuple(center.getLatitude(), center.getLongitude(),new Real(RealType.Altitude, 0)),true);
+                    return;
+                }
+
+                
                 if (displayProjectionOk(mp)) {
                     if ((mainProjection == null)
                         || !mp.equals(mainProjection)) {
 			boolean maintainViewpoint = !fromInitialLoad;
-
                         setMapProjection(
                                          mp, true,
                                          getDisplayConventions().getMapProjectionLabel(
                                                                                        mp, display),true,true,maintainViewpoint);
-
-
                         if(displayProjectionZoom!=0) {
                             getMapDisplay().zoom(displayProjectionZoom);
                         }
@@ -2716,10 +2739,14 @@ public String getDefaultProjectionName () {
         projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Go to Address",
                 this, "goToAddress"), "/auxdata/ui/icons/house_go.png"));
 
+        
+        projMenu.addSeparator();
         if ( !getUseGlobeDisplay()) {
-            projMenu.addSeparator();
             createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(
                 "Automatically change the projection to the native data projection of new displays");
+        } else {
+            createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(
+                "Automatically change viewpoint to the native data projection of new displays");
         }
         createCBMI(projMenu, PREF_SHAREVIEWS);
         projMenu.add(GuiUtils.makeMenuItem("Set Share Group", this,
