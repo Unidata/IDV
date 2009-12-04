@@ -3626,5 +3626,36 @@ public final class Util {
         return tempT1;
     }
 
+    public static boolean isEarthCoordinates(RealTuple position) {
+        RealTupleType rttype = (RealTupleType) position.getType();
+        if (rttype.equals(RealTupleType.SpatialEarth2DTuple)) {
+            return true;
+        }
+        if (rttype.equals(RealTupleType.SpatialEarth3DTuple)) {
+            return true;
+        }
+        return false;
+
+    }
+
+
+    public static void setGlobeRadius(float[]position, float radius) {
+        float x = position[0];
+        float y = position[1];
+        float z = position[2];
+        double length = new Point3d(0, 0,
+                                    0).distance(new Point3d(x, y, z));
+        if (length != 0) {
+            double newx = x * (1.5 / length);
+            double newy = y * (1.5 / length);
+            double newz = z * (1.5 / length);
+            position[0] = (float)newx;
+            position[1] = (float)newy;
+            position[2] = (float)newz;
+        }
+    }
+
+
+
 }
 

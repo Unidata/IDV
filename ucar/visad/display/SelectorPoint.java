@@ -200,7 +200,6 @@ public class SelectorPoint extends LineDrawing {
      */
     public void setPoint(RealTuple value)
             throws VisADException, RemoteException {
-        System.err.println("selector:" + value);
         setPointWithTime(value, null);
     }
 
@@ -235,7 +234,7 @@ public class SelectorPoint extends LineDrawing {
     public void setPointWithTime(RealTuple value, List times)
             throws VisADException, RemoteException {
         if ( !(this.thePoint.getType().equals(value.getType()))) {
-            throw new VisADException("Invalid type for value");
+            throw new VisADException("Invalid type for value: mytype=" +this.thePoint.getType() +" new type=" + value.getType());
         }
         thePoint = value;
         mySetData(value, times);
@@ -253,7 +252,6 @@ public class SelectorPoint extends LineDrawing {
             throws VisADException, RemoteException {
 
         super(that);
-
         thePoint = that.getPoint();
         setData(that.getPoint());
     }

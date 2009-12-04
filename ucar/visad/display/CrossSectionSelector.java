@@ -94,7 +94,9 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
 
     /** RealTuple for zero */
-    private RealTuple ZERO;
+    private RealTuple ZERO2D;
+
+    private RealTuple ZERO3D;
 
     /** flag for whether the selector is moving */
     private boolean amMoving = false;
@@ -174,22 +176,24 @@ public class CrossSectionSelector extends SelectorDisplayable {
         midSp           = makeSelectorPoint(POINT_MID, "Middle", midPoint);
 
         line            = makeLine();
-        ZERO = new RealTuple(RealTupleType.SpatialEarth2DTuple,
+        ZERO2D = new RealTuple(RealTupleType.SpatialEarth2DTuple,
                              new double[]{ 0.0,
                                            0.0 });
+        ZERO3D = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                             new double[]{ 0.0,
+                                           0.0,0.0 });
         setColor(color);
         beenInitialized = true;
     }
 
 
 
-
-    public SelectorPoint setStartSelectorPoint() {
+    public SelectorPoint getStartSelectorPoint() {
         return startSp;
     }
 
 
-    public SelectorPoint setEndSelectorPoint() {
+    public SelectorPoint getEndSelectorPoint() {
         return endSp;
     }
 
@@ -330,7 +334,6 @@ public class CrossSectionSelector extends SelectorDisplayable {
      */
     public void setZValue(double zValue)
             throws VisADException, RemoteException {
-
         startSp.addConstantMap(new ConstantMap(zValue, Display.ZAxis));
         endSp.addConstantMap(new ConstantMap(zValue, Display.ZAxis));
         midSp.addConstantMap(new ConstantMap(zValue, Display.ZAxis));
@@ -686,7 +689,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
         }
 
         RealTuple delta = (RealTuple) midSp.getPoint().subtract(midPoint);
-        if ((delta.equals(ZERO))) {
+        if (delta.equals(ZERO2D)||delta.equals(ZERO3D)) {
             return;
         }
 
