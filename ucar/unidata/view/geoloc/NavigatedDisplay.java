@@ -1866,90 +1866,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void center(final EarthLocation el, boolean animated)
             throws VisADException, RemoteException {
-        centerAndZoomTo(el, null, animated);
-    }
-
-
-    /**
-     * Center and zoom to
-     *
-     * @param el   point to center to
-     * @param altitude altitude to zoom to
-     * @param animated true to do this as an animation instead of instantly
-     *
-     * @throws RemoteException  Problem with remote display
-     * @throws VisADException   Problem with local display
-     */
-    public void centerAndZoomTo(final EarthLocation el, Real altitude,
-                                boolean animated)
-            throws VisADException, RemoteException {
-
-
-        if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
-            return;
-        }
-
-        try {
-            MouseBehavior      mouseBehavior = getMouseBehavior();
-            java.awt.Rectangle screenBounds  = getScreenBounds();
-
-            double[]           currentMatrix = getProjectionMatrix();
-            double[]           trans         = { 0.0, 0.0, 0.0 };
-            double[]           rot           = { 0.0, 0.0, 0.0 };
-            double[]           scale         = { 0.0, 0.0, 0.0 };
-            double[]           xy            = getSpatialCoordinates(el,
-                                                   null);
-            double[] centerXY =
-                getSpatialCoordinatesFromScreen(screenBounds.width / 2,
-                    screenBounds.height / 2);
-
-
-            mouseBehavior.instance_unmake_matrix(rot, scale, trans,
-                    currentMatrix);
-
-            double[] translateMatrix = mouseBehavior.make_translate(scale[0]
-                                           * (centerXY[0] - xy[0]), scale[1]
-                                               * (centerXY[1] - xy[1]));
-            currentMatrix = mouseBehavior.multiply_matrix(translateMatrix,
-                    currentMatrix);
-
-
-            if (false && (altitude != null)) {
-                printMatrix("current", currentMatrix);
-                EarthLocationTuple altEl = new EarthLocationTuple(
-                                               0, 0,
-                                               altitude.getValue(
-                                                   CommonUnit.meter));
-                double[] altXYZ = getSpatialCoordinates(altEl,
-                                      new double[] { 0,
-                        0, 0 });
-                mouseBehavior.instance_unmake_matrix(rot, scale, trans,
-                        currentMatrix);
-                double[] altTrans = mouseBehavior.make_translate(0, 0,
-                                        -altXYZ[2]);
-                currentMatrix = mouseBehavior.multiply_matrix(altTrans,
-                        currentMatrix);
-                System.err.println("pt:" + altXYZ[2] + " trans:" + trans[2]);
-                printMatrix("trans", altTrans);
-                printMatrix("matrix", currentMatrix);
-
-
-            }
-            if ( !animated) {
-                setProjectionMatrix(currentMatrix);
-            } else {
-                final double[] to = currentMatrix;
-                Misc.run(new Runnable() {
-                    public void run() {
-                        animateMatrix(++animationTimeStamp,
-                                      getProjectionMatrix(), to, el);
-                    }
-                });
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        centerAndZoom(el, animated, 1.0);
     }
 
 
@@ -1967,6 +1884,26 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public void centerAndZoom(final EarthLocation el, boolean animated,
                               double zoomFactor)
             throws VisADException, RemoteException {
+        centerAndZoom(el, null, zoomFactor, true, true);
+    }
+
+
+    /**
+     * Move the center to the given earth location and zoom in
+     *
+     * @param el el to center on
+     * @param animated animate the move
+     * @param zoomFactor   factor to zoom
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public void centerAndZoom(final EarthLocation el, Real altitude,
+                              double zoomFactor, boolean animated, boolean northUp)
+            throws VisADException, RemoteException {
+
+        if(zoomFactor==0 || zoomFactor!=zoomFactor) zoomFactor = 1.0;
+
 
         if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
             return;

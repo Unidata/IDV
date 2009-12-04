@@ -20,25 +20,27 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
-
-
-import ucar.visad.ShapeUtility;
 
 
 
 import ucar.unidata.util.LogUtil;
 
-import java.awt.Color;
 
-import java.util.Iterator;
-
-import java.rmi.RemoteException;
+import ucar.visad.ShapeUtility;
 
 import visad.*;
 
-import java.beans.PropertyChangeListener;
+import java.awt.Color;
+
 import java.beans.PropertyChangeEvent;
+
+import java.beans.PropertyChangeListener;
+
+import java.rmi.RemoteException;
+
+import java.util.Iterator;
 
 
 /**
@@ -92,10 +94,13 @@ public class CrossSectionSelector extends SelectorDisplayable {
     /** mid point location */
     private RealTuple midPoint;
 
+    /** _more_          */
+    private RealTupleType tupleType;
 
     /** RealTuple for zero */
     private RealTuple ZERO2D;
 
+    /** _more_          */
     private RealTuple ZERO3D;
 
     /** flag for whether the selector is moving */
@@ -110,6 +115,9 @@ public class CrossSectionSelector extends SelectorDisplayable {
     /** mid point id */
     public static final int POINT_MID = 2;
 
+    /** _more_          */
+    private boolean interpolateLinePoints = false;
+
     /**
      * Construct a CrossSectionSelector with default.  Line will run
      * from (-1, 0) to (1,0) in (X,Y) space.
@@ -121,11 +129,11 @@ public class CrossSectionSelector extends SelectorDisplayable {
      */
     public CrossSectionSelector() throws VisADException, RemoteException {
         this(new RealTuple(RealTupleType.SpatialCartesian2DTuple,
-                           new double[]{ -1.0,
-                                         0.0 }), new RealTuple(
-                                             RealTupleType.SpatialCartesian2DTuple,
-                                             new double[]{ 1.0,
-                                                           0.0 }));
+                           new double[] { -1.0,
+                                          0.0 }), new RealTuple(
+                                          RealTupleType.SpatialCartesian2DTuple,
+                                          new double[] { 1.0,
+                0.0 }));
     }
 
     /**
@@ -155,18 +163,11 @@ public class CrossSectionSelector extends SelectorDisplayable {
      * @throws RemoteException  remote error
      * @throws IllegalArgumentException  wrong type for start and end
      */
-    public CrossSectionSelector(RealTuple startPoint, RealTuple endPoint, Color color)
+    public CrossSectionSelector(RealTuple startPoint, RealTuple endPoint,
+                                Color color)
             throws VisADException, RemoteException {
 
-        /*
-        if ( !(startPoint.getType()
-                .equals(RealTupleType.SpatialCartesian2DTuple) && endPoint
-                .getType().equals(RealTupleType.SpatialCartesian2DTuple))) {
-            throw new IllegalArgumentException(
-                "Start and end points must be in XY space");
-                }*/
-
-
+        this.tupleType  = (RealTupleType) startPoint.getType();
         this.startPoint = startPoint;
         this.endPoint   = endPoint;
         midPoint        = calculateMidpoint();
@@ -177,22 +178,32 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
         line            = makeLine();
         ZERO2D = new RealTuple(RealTupleType.SpatialEarth2DTuple,
-                             new double[]{ 0.0,
-                                           0.0 });
+                               new double[] { 0.0,
+                0.0 });
         ZERO3D = new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                             new double[]{ 0.0,
-                                           0.0,0.0 });
+                               new double[] { 0.0,
+                0.0, 0.0 });
         setColor(color);
         beenInitialized = true;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public SelectorPoint getStartSelectorPoint() {
         return startSp;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public SelectorPoint getEndSelectorPoint() {
         return endSp;
     }
@@ -265,19 +276,32 @@ public class CrossSectionSelector extends SelectorDisplayable {
      * @throws VisADException   problem creating VisAD object
      */
     private void setLineData() throws VisADException, RemoteException {
-        RealTuple startRt = startSp.getPoint();
-        RealTuple endRt   = endSp.getPoint();
+        RealTuple startRt   = startSp.getPoint();
+        RealTuple endRt     = endSp.getPoint();
 
-        float[][] values  = new float[][] {
-            { (float) ((Real) startRt.getComponent(0)).getValue(),
-              (float) ((Real) endRt.getComponent(0)).getValue() },
-            { (float) ((Real) startRt.getComponent(1)).getValue(),
-              (float) ((Real) endRt.getComponent(1)).getValue() }
-        };
-        Gridded2DSet lineData =
-            new Gridded2DSet(RealTupleType.SpatialCartesian2DTuple, values,
-                             2);
+        int       numPoints = (interpolateLinePoints
+                               ? 100
+                               : 2);
+        int       length    = startRt.getDimension();
+        float[][] values    = new float[length][numPoints];
+        for (int i = 0; i < length; i++) {
+            float start = (float) ((Real) startRt.getComponent(i)).getValue();
+            float end   = (float) ((Real) endRt.getComponent(i)).getValue();
+            values[i][0]             = start;
+            values[i][numPoints - 1] = end;
+            for (int j = 1; j < numPoints - 1; j++) {
+                double percent = j / (double) numPoints;
+                values[i][j] = start + (float) (percent * (end - start));
+            }
+        }
 
+
+        Data lineData;
+        if (length == 2) {
+            lineData = new Gridded2DSet(tupleType, values, numPoints);
+        } else {
+            lineData = new Gridded3DSet(tupleType, values, numPoints);
+        }
         if ( !lineData.equals(line.getData())) {
             line.setData(lineData);
         }
@@ -368,6 +392,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
             throws VisADException, RemoteException {
         return (RealTuple) startPoint.add(endPoint).divide(TWO);
     }
+
 
     /**
      * set whether the start point can be moved or not by user; true=yes
@@ -562,7 +587,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
      * @throws VisADException   bad point
      */
     public RealTuple[] getPosition() throws VisADException, RemoteException {
-        return new RealTuple[]{ getStartPoint(), getEndPoint() };
+        return new RealTuple[] { getStartPoint(), getEndPoint() };
     }
 
 
@@ -594,7 +619,8 @@ public class CrossSectionSelector extends SelectorDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    private SelectorPoint makeSelectorPoint(final int which, String name, RealTuple initialPoint)
+    private SelectorPoint makeSelectorPoint(final int which, String name,
+                                            RealTuple initialPoint)
             throws VisADException, RemoteException {
         VisADGeometryArray marker;
         if (which == POINT_START) {
@@ -610,7 +636,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
         SelectorPoint point = new SelectorPoint(name, marker, initialPoint);
         if (which == POINT_START) {
-            point.addConstantMaps(new ConstantMap[]{
+            point.addConstantMaps(new ConstantMap[] {
                 new ConstantMap(2.0f, Display.LineWidth) });
 
         }
@@ -689,7 +715,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
         }
 
         RealTuple delta = (RealTuple) midSp.getPoint().subtract(midPoint);
-        if (delta.equals(ZERO2D)||delta.equals(ZERO3D)) {
+        if (delta.equals(ZERO2D) || delta.equals(ZERO3D)) {
             return;
         }
 
@@ -800,9 +826,23 @@ public class CrossSectionSelector extends SelectorDisplayable {
         super.removePropertyChangeListener(PROPERTY_MIDPOINT, action);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setInterpolateLinePoints(boolean value)
+            throws VisADException, RemoteException {
+        interpolateLinePoints = value;
+        if (line != null) {
+            setLineData();
+        }
+    }
+
+
 }
-
-
-
-
 

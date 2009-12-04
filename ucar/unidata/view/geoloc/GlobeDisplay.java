@@ -778,40 +778,6 @@ public class GlobeDisplay extends NavigatedDisplay {
 
 
 
-    /**
-     * Center and Zoom
-     *
-     * @param el  earth location
-     * @param animated  true to animate  
-     * @param zoomFactor  zoom factor
-     *
-     * @throws  RemoteException        Couldn't create a remote object
-     * @throws  VisADException         Couldn't create necessary VisAD object
-     */
-    public void centerAndZoom(final EarthLocation el, boolean animated,
-                              double zoomFactor)
-            throws VisADException, RemoteException {
-        centerAndZoom(el, null, zoomFactor, animated);
-    }
-
-
-    /**
-     * Center and Zoom to a point
-     *
-     * @param el the earth location
-     * @param altitude  the altitude
-     * @param animated  true to animate
-     *
-     * @throws  RemoteException        Couldn't create a remote object
-     * @throws  VisADException         Couldn't create necessary VisAD object
-     */
-    public void centerAndZoomTo(final EarthLocation el, Real altitude,
-                                boolean animated)
-            throws VisADException, RemoteException {
-        centerAndZoom(el, altitude, Double.NaN, animated);
-    }
-
-
 
     /**
      * Center and zoom to a particular point
@@ -825,10 +791,11 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @throws  VisADException         Couldn't create necessary VisAD object
      */
     public void centerAndZoom(final EarthLocation el, Real altitude,
-                              double zoomFactor, boolean animated)
+                              double zoomFactor, boolean animated, boolean northUp)
             throws VisADException, RemoteException {
 
 
+        if(zoomFactor==0 || zoomFactor!=zoomFactor) zoomFactor  = 1.0;
         if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
             return;
         }
@@ -851,7 +818,7 @@ public class GlobeDisplay extends NavigatedDisplay {
                            rot2[2], 1.0, 0, 0, 0);
 
         Transform3D t2     = new Transform3D(xxx);
-        Vector3d    upVector    = new Vector3d(0,0,1);
+        Vector3d    upVector    = new Vector3d(0,0,(northUp?1:-1));
 
         //        t2.transform(v3d);
         //        System.err.println("v3d:" + v3d.x+"/"+v3d.y+"/"+v3d.z);

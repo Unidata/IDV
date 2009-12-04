@@ -244,8 +244,8 @@ public class EarthNavPanel extends JPanel implements MouseListener,
                 }
             } else {
                 Real alt = new Real(RealType.Altitude, 1000.0);
-                viewManager.getMapDisplay().centerAndZoomTo(
-                    GeoUtils.toEarthLocation(llp), alt, true);
+                viewManager.getMapDisplay().centerAndZoom(
+                                                          GeoUtils.toEarthLocation(llp), alt, 1.0, true,true);
                 ignoreChanges = true;
                 GeoUtils.initAddressBox(addressBox);
                 ignoreChanges = false;

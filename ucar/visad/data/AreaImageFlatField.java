@@ -399,6 +399,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                       domain_set, null, rangeSets,
                                       rangeUnits, null, readLabel);
 
+        //        cs.aiff = aiff;
+
         aiff.bandIndices = bandIndices;
         //        cs.aiff          = aiff;
         aiff.startTime = new DateTime(areaDirectory.getStartTime());
@@ -489,6 +491,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @return _more_
      */
     public Set getDomainSetNoRead() {
+        if(domainSet!=null) return domainSet;
         return super.getDomainSet();
     }
 
@@ -522,6 +525,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     private void setDomain(Set domainSet) {
         this.domainSet = domainSet;
+        msg("***** setDomain cs:" + domainSet.getCoordinateSystem().getClass().getName());
     }
 
 
@@ -530,11 +534,19 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @return _more_
      */
+    static int xcnt = 0;
+
+
     public Set getDomainSet() {
+        if(xcnt++ == 200) {
+            //            Misc.printStack("getDomainSet");
+        }
+
         if (aid != null) {
             checkReadData();
         }
         if (domainSet != null) {
+            //            msg("getDomainSet: " + domainSet.getClass().getName());
             return domainSet;
         }
         throw new IllegalStateException ("AreaImageFlatField.getDomainSet: domain set is null");
@@ -549,8 +561,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @throws Exception _more_
      */
     private float[][] readDataNewWay() throws Exception {
-
-        //        msg("readDataNewWay");
+        msg("readDataNewWay");
         //        Misc.printStack(mycnt +"  readData time: " + getStartTime(),15);
         String url = (aid.getImageInfo() != null)
                      ? aid.getImageInfo().makeAddeUrl()
@@ -726,6 +737,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     public static class MyAREACoordinateSystem extends AREACoordinateSystem {
 
+        //        AreaImageFlatField aiff;
+
         /**
          * _more_
          *
@@ -759,6 +772,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             if (anav == null) {
                 try {
                     if (true) {
+                        //                        System.err.println("getAreaNav bad cs aiff#:" + aiff.mycnt);
                         throw new IllegalArgumentException(
                             "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
                     }

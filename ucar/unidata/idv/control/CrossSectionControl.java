@@ -20,12 +20,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-
-import ucar.visad.Util;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
@@ -51,6 +50,8 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+
+import ucar.visad.Util;
 
 
 
@@ -117,7 +118,8 @@ import javax.vecmath.Point3d;
  * @version $Revision: 1.173 $
  */
 
-public abstract class CrossSectionControl extends GridDisplayControl implements DisplayableData.DragAdapter {
+public abstract class CrossSectionControl extends GridDisplayControl implements DisplayableData
+    .DragAdapter {
 
     /**
      * Identifier for sharing cross-section position
@@ -132,6 +134,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     /** the cross section selector */
     protected CrossSectionSelector csSelector;
+
+    /** _more_          */
+    private RealTuple initStartPoint;
+
+    /** _more_          */
+    private RealTuple initEndPoint;
 
     /** the control window's view manager */
     protected CrossSectionViewManager crossSectionView;
@@ -228,6 +236,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     /** auto scale checkbox */
     private JCheckBox autoscaleCbx;
+
+    /** _more_          */
+    private List levelsList;
+
 
     /**
      * Default constructor.  Sets the appropriate attribute flags.
@@ -366,11 +378,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         //Are we in 3d?
         displayIs3D = isDisplay3D();
+        levelsList  = dataChoice.getAllLevels(null);
+        System.err.println("levels:" + levelsList);
+        System.err.println("level[0]:"
+                           + levelsList.get(0).getClass().getName());
 
-
-
-        xsDisplay   = createXSDisplay();
-        vcsDisplay  = createVCSDisplay();
+        xsDisplay  = createXSDisplay();
+        vcsDisplay = createVCSDisplay();
 
         //Now set the data (which uses the displayables  above).
         if ( !setData(dataChoice)) {
@@ -433,7 +447,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         } else if (vm instanceof TransectViewManager) {
             xsDisplay.setAdjustFlow(false);
             setUseFastRendering(true);
-        } 
+        }
         loadDataFromLine();
         return true;
     }
@@ -466,13 +480,15 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @param el  earth location
      * @param animationValue  animation value
      * @param animationStep  animation step
+     * @param samples _more_
      *
      * @return the list of items
      *
      * @throws Exception    problem reading the data
      */
     public List getCursorReadoutInner(EarthLocation el, Real animationValue,
-                                      int animationStep,List<ReadoutInfo> samples)
+                                      int animationStep,
+                                      List<ReadoutInfo> samples)
             throws Exception {
         if ( !isInTransectView()) {
             return null;
@@ -522,45 +538,49 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     public void initDone() {
         super.initDone();
         try {
-            //If we have a startCoord/endCoord (i.e., from persistence) 
-            //then pass in false
-            //to getXYPosition so we don't convert to display coords.
+            RealTuple start = initStartPoint;
+            RealTuple end   = initEndPoint;
 
-            RealTuple start;
-            RealTuple end;
-
-
-            if(inGlobeDisplay()) {
-                start = (startCoord != null)
-                              ? getXYPosition(startCoord.getX(),
-                                  startCoord.getY(), 0.0, false)
-                              : getXYPosition(sizeX / 10.0, sizeY / 2.0, 0.0,
-                                  true);
-
-                end = (endCoord != null)
-                            ? getXYPosition(endCoord.getX(), endCoord.getY(),
-                                            0.0, false)
-                            : getXYPosition((sizeX - sizeX / 10.0),
-                                            sizeY / 2.0, 0.0, true);
-                if(csSelector!=null) {
-                    csSelector.getStartSelectorPoint().setDragAdapter(this);
-                    csSelector.getEndSelectorPoint().setDragAdapter(this);
+            if (csSelector != null) {
+                if (inGlobeDisplay()) {
+                    csSelector.setInterpolateLinePoints(true);
                 }
-            } else {
-                start = (startCoord != null)
-                              ? getXYPosition(startCoord.getX(),
-                                  startCoord.getY(), 0.0, false)
-                              : getXYPosition(sizeX / 10.0, sizeY / 2.0, 0.0,
-                                  true);
 
-                end = (endCoord != null)
-                            ? getXYPosition(endCoord.getX(), endCoord.getY(),
-                                            0.0, false)
-                            : getXYPosition((sizeX - sizeX / 10.0),
-                                            sizeY / 2.0, 0.0, true);
+                //Do we have old end points from bundles?
+                if ((startCoord != null) && (endCoord != null)) {
+                    EarthLocation startLoc = boxToEarth(new double[] {
+                                                 startCoord.getX(),
+                            startCoord.getY(), startCoord.getZ() });
+                    EarthLocation endLoc = boxToEarth(new double[] {
+                                               startCoord.getX(),
+                            startCoord.getY(), startCoord.getZ() });
+                    setPosition(startLoc, endLoc);
+                } else if (start == null) {
+                    RealTuple startXYZ = getXYPosition(sizeX / 10.0,
+                                             sizeY / 2.0, 0.0, true);
+                    RealTuple endXYZ = getXYPosition((sizeX - sizeX / 10.0),
+                                           sizeY / 2.0, 0.0, true);
+
+                    EarthLocation startLoc =
+                        boxToEarth(new double[] {
+                            ((Real) startXYZ.getComponent(0)).getValue(),
+                            ((Real) startXYZ.getComponent(1)).getValue(),
+                            getSelectorAltitude() });
+                    EarthLocation endLoc =
+                        boxToEarth(new double[] {
+                            ((Real) endXYZ.getComponent(0)).getValue(),
+                            ((Real) endXYZ.getComponent(1)).getValue(),
+                            getSelectorAltitude() });
+                    setPosition(startLoc, endLoc);
+                } else {
+                    csSelector.setPosition(start, end);
+                }
+
+                csSelector.getStartSelectorPoint().setDragAdapter(this);
+                csSelector.getEndSelectorPoint().setDragAdapter(this);
             }
 
-            csSelector.setPosition(start, end);
+
             //Now load the data
             reScale();
             loadDataFromLine();
@@ -574,16 +594,58 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
 
-    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
-        return true;
-    }
-    public boolean handleAddPoint(float[]x){
+    /**
+     * _more_
+     *
+     * @param ray _more_
+     * @param first _more_
+     * @param mouseModifiers _more_
+     *
+     * @return _more_
+     */
+    public boolean handleDragDirect(VisADRay ray, boolean first,
+                                    int mouseModifiers) {
         return true;
     }
 
-    public boolean constrainDragPoint(float[] position) {
-        Util.setGlobeRadius(position, 1.5f);
+    /**
+     * _more_
+     *
+     * @param x _more_
+     *
+     * @return _more_
+     */
+    public boolean handleAddPoint(float[] x) {
         return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @param position _more_
+     *
+     * @return _more_
+     */
+    public boolean constrainDragPoint(float[] position) {
+        try {
+            double altitude = getSelectorAltitude();
+            EarthLocation pt = boxToEarth(position[0], position[1],
+                                          position[2], false);
+            double[] xyz = earthToBox(
+                               new EarthLocationTuple(
+                                   pt.getLatitude().getValue(),
+                                   pt.getLongitude().getValue(), altitude));
+            if (inGlobeDisplay()) {
+                position[0] = (float) xyz[0];
+                position[1] = (float) xyz[1];
+                position[2] = (float) xyz[2];
+            } else {
+                position[2] = (float) xyz[2];
+            }
+            return true;
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
 
@@ -715,13 +777,15 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     private void setPositionFromWidget() {
         try {
-            setPosition(new EarthLocationTuple(new Real(RealType.Latitude,
-                    startLLW.getLat()), new Real(RealType.Longitude,
-                        startLLW.getLon()), new Real(RealType.Altitude,
-                            0)), new EarthLocationTuple(new Real(RealType
-                                .Latitude, endLLW.getLat()), new Real(RealType
-                                .Longitude, endLLW
-                                .getLon()), new Real(RealType.Altitude, 0)));
+            setPosition(
+                new EarthLocationTuple(
+                    new Real(RealType.Latitude, startLLW.getLat()), new Real(
+                        RealType.Longitude, startLLW.getLon()), new Real(
+                        RealType.Altitude, getSelectorAltitude())), new EarthLocationTuple(
+                            new Real(
+                                RealType.Latitude, endLLW.getLat()), new Real(
+                                RealType.Longitude, endLLW.getLon()), new Real(
+                                RealType.Altitude, getSelectorAltitude())));
 
         } catch (Exception exc) {
             logException("Error setting position ", exc);
@@ -983,14 +1047,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         startCoord = c;
     }
 
-    /**
-     * Get the starting coordinate of the cross section selector.
-     * Used by XML persistence.
-     * @return starting coordinate
-     */
-    public Coord getStartCoord() {
-        return startCoord;
-    }
 
     /**
      * Set the ending coordinate of the cross section selector.
@@ -1001,16 +1057,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         endCoord = c;
     }
 
-    /**
-     * Get the ending coordinate of the cross section selector.
-     * Used by XML persistence.
-     * @return ending  coordinate
-     */
-    public Coord getEndCoord() {
-        return endCoord;
-    }
-
-
 
     /**
      * Make a Selector line which shows and controls where cross section is
@@ -1020,26 +1066,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     protected void createCrossSectionSelector()
             throws VisADException, RemoteException {
+        csSelector = new CrossSectionSelector(
+            new RealTuple(
+                RealTupleType.SpatialEarth3DTuple, new double[] { -1.0,
+                0.0, 0.0 }), new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                           new double[] { 1.0,
+                0.0, 0 }));
 
-        // make the initial selector position across the middle of the grid from
-        // side to side; 1/10 of the width in from each end.
-        // (converts grid indices to VisAD internal coordinates)
-        // z level at origin of grid
-
-        if(inGlobeDisplay() || true) {
-            csSelector = new CrossSectionSelector(new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                           new double[]{ -1.0,
-                                         0.0,0.0 }), new RealTuple(
-                                             RealTupleType.SpatialCartesian3DTuple,
-                                             new double[]{ 1.0,
-                                                           0.0,0 }));
-        } else {
-            csSelector = new CrossSectionSelector();
-        }
-        // move z level of line to near top of VisAD display box
-        //csSelector.setZValue(.95f);
-
-    }  // end createCrossSectionSelector
+    }
 
 
 
@@ -1215,38 +1249,38 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /**
      * Set the position
      *
-     * @param startEl  starting point
-     * @param endEl    ending point
      *
+     *
+     * @param startLoc _more_
+     * @param endLoc _more_
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    private void setPosition(EarthLocation startEl, EarthLocation endEl)
+    private void setPosition(EarthLocation startLoc, EarthLocation endLoc)
             throws VisADException, RemoteException {
-        setSelectorPosition(earthToBox(startEl),
-                            earthToBox(endEl));
+        RealTuple start =
+            new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                          new double[] { startLoc.getLongitude().getValue(),
+                                         startLoc.getLatitude().getValue(),
+                                         getSelectorAltitude() });
+        RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                      new double[] {
+                                          endLoc.getLongitude().getValue(),
+                                          endLoc.getLatitude().getValue(),
+                                          getSelectorAltitude() });
+
+
+        csSelector.setPosition(start, end);
     }
 
 
-    private double getSelectorZ(double []xyz) {
-        //TODO: handle globe
-        return 0.95;
-    }
-
-
-
-    private void setSelectorPosition(double []startXYZ, double[]endXYZ) throws VisADException, RemoteException {
-        csSelector.setPosition(
-            new RealTuple(
-                RealTupleType.SpatialCartesian3DTuple,
-                new double[] { startXYZ[0],
-                               startXYZ[1], getSelectorZ(startXYZ) }), new RealTuple(
-                                   RealTupleType.SpatialCartesian3DTuple,
-                                   new double[] { endXYZ[0],
-                                                  endXYZ[1],getSelectorZ(endXYZ) }));
-
-
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public double getSelectorAltitude() {
+        return 16000;
     }
 
 
@@ -1397,16 +1431,19 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             double    y1    = ((Real) start.getComponent(1)).getValue();
             double    x2    = ((Real) end.getComponent(0)).getValue();
             double    y2    = ((Real) end.getComponent(1)).getValue();
-            double    z1    = start.getDimension()<3?0:((Real)start.getComponent(2)).getValue();
-            double    z2    = end.getDimension()<3?0:((Real)end.getComponent(2)).getValue();
-            startCoord = new Coord(x1, y1, z1);
-            endCoord   = new Coord(x2, y2, z2);
-            if(Util.isEarthCoordinates(start)) {
-                return new EarthLocation[]{new EarthLocationTuple(y1, x1,0),
-                                           new EarthLocationTuple(y2, x2,0)};
+            double    z1    = (start.getDimension() < 3)
+                              ? 0
+                              : ((Real) start.getComponent(2)).getValue();
+            double    z2    = (end.getDimension() < 3)
+                              ? 0
+                              : ((Real) end.getComponent(2)).getValue();
+            if (Util.isEarthCoordinates(start)) {
+                return new EarthLocation[] {
+                    new EarthLocationTuple(y1, x1, 0),
+                    new EarthLocationTuple(y2, x2, 0) };
             } else {
                 return new EarthLocation[] { boxToEarth(new double[] { x1, y1,
-                                                                       0.0 }), boxToEarth(new double[] { x2, y2, 0.0 }) };
+                        0.0 }), boxToEarth(new double[] { x2, y2, 0.0 }) };
             }
         }
         return null;
@@ -1430,10 +1467,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         endLocation   = elArray[1];
         LatLonPoint latlon1 = startLocation.getLatLonPoint();
         LatLonPoint latlon2 = endLocation.getLatLonPoint();
-        FieldImpl slice = 
-            getGridDataInstance().sliceAlongLatLonLine(latlon1, latlon2, 
-                              getSamplingModeValue( getObjectStore().get(
-                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+        FieldImpl slice =
+            getGridDataInstance().sliceAlongLatLonLine(latlon1, latlon2,
+                getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE,
+                    DEFAULT_SAMPLING_MODE)));
         loadData(slice);
     }
 
@@ -1578,7 +1615,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         if (GridUtil.isConstantSpatialDomain(xsectSequence)) {
             domainSet = (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
             GriddedSet newDomain = make2DDomainSet(domainSet);
-            if (newDomain == null) return null;
+            if (newDomain == null) {
+                return null;
+            }
             grid2D = GridUtil.setSpatialDomain(xsectSequence, newDomain);
         } else {
             Set          timeSet    = GridUtil.getTimeSet(xsectSequence);
@@ -2082,6 +2121,58 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     protected double getInitialZPosition() {
         return .95;
     }
+
+
+
+
+
+    /**
+     * Set the probe position property; used by XML persistence.
+     *
+     * @param p    probe position
+     */
+    public void setStartPoint(RealTuple p) {
+        initStartPoint = p;
+    }
+
+    /**
+     * Set the probe position property; used by XML persistence.
+     *
+     * @return  probe position - may be <code>null</code>.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public RealTuple getStartPoint() throws VisADException, RemoteException {
+        return ((csSelector != null)
+                ? csSelector.getStartPoint()
+                : null);
+    }
+
+    /**
+     * Set the probe position property; used by XML persistence.
+     *
+     * @param p    probe position
+     */
+    public void setEndPoint(RealTuple p) {
+        initEndPoint = p;
+    }
+
+    /**
+     * Set the probe position property; used by XML persistence.
+     *
+     * @return  probe position - may be <code>null</code>.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public RealTuple getEndPoint() throws VisADException, RemoteException {
+        return ((csSelector != null)
+                ? csSelector.getEndPoint()
+                : null);
+    }
+
+
 
 }
 
