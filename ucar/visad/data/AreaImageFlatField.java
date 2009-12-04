@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.visad.data;
 
 
@@ -274,14 +275,14 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         //        }
         //        int nLines = aid.getImageInfo().getLines();
         //        int nEles  = aid.getImageInfo().getElements();
-        AddeImageInfo aii = aid.getImageInfo();
+        AddeImageInfo aii    = aid.getImageInfo();
 
-        int nLines = (aii != null)
-                      ? aid.getImageInfo().getLines()
-                      : areaDirectory.getLines();
-        int nEles  = (aii != null)
-                      ? aid.getImageInfo().getElements()
-                      : areaDirectory.getElements();
+        int           nLines = (aii != null)
+                               ? aid.getImageInfo().getLines()
+                               : areaDirectory.getLines();
+        int           nEles  = (aii != null)
+                               ? aid.getImageInfo().getElements()
+                               : areaDirectory.getElements();
 
 
         // make the VisAD RealTypes for the dimension variables
@@ -291,13 +292,13 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
         // extract the number of bands (sensors) and make the VisAD type
         // we can only handle 1 so, we'll just use that.
-        int band       = 0;
+        int   band     = 0;
         int[] bandNums = new int[1];
-        int numBands = 1;
+        int   numBands = 1;
         if (aii != null) {
             String bandString = aii.getBand();
             if ((bandString != null) && !bandString.equals(aii.ALL)) {
-                 band = new Integer(bandString).intValue();
+                band = new Integer(bandString).intValue();
             }
             bandNums[0] = band;
         } else {
@@ -492,18 +493,33 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getLength() {
         try {
             return getDomainSet().getLength();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Unit[] getDomainUnits() {
         return getDomainSet().getSetUnits();
     }
 
+    /**
+     * _more_
+     *
+     * @param domainSet _more_
+     */
     private void setDomain(Set domainSet) {
         this.domainSet = domainSet;
     }
@@ -518,10 +534,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aid != null) {
             checkReadData();
         }
-        if(domainSet!=null)  {
+        if (domainSet != null) {
             return domainSet;
         }
-        return super.getDomainSet();
+        throw new IllegalStateException ("AreaImageFlatField.getDomainSet: domain set is null");
     }
 
 
@@ -535,7 +551,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     private float[][] readDataNewWay() throws Exception {
 
         //        msg("readDataNewWay");
-        //        Misc.printStack(mycnt +"  readData",10);
+        //        Misc.printStack(mycnt +"  readData time: " + getStartTime(),15);
         String url = (aid.getImageInfo() != null)
                      ? aid.getImageInfo().makeAddeUrl()
                      : aid.getSource();
@@ -629,7 +645,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
-                return  readDataNewWay();
+                return readDataNewWay();
             } catch (Exception exc) {
                 throw new ucar.unidata.util.WrapperException(exc);
             } finally {
