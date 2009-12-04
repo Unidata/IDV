@@ -1053,7 +1053,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                     int cutIdx =
                         Integer.parseInt(cutmap.get(swIndex).toString());
                     int rayIndx = rayIndex[cutIdx][a];
-                    if ((rayIndx == 999) || (rayIndx >= 360)) {
+                    if ((rayIndx == 999) || (rayIndx >= rayNum)) {
                         cappiValue[b][a] = Float.NaN;
                     } else {
                         float[] rdata = rayData[cutIdx][rayIndx];
