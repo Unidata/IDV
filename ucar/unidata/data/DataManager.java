@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -141,7 +142,7 @@ public class DataManager {
     /** The show in tree property */
     public static final String PROP_SHOW_IN_TREE = "show_in_tree";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_CACHE_PERCENT = "idv.data.cache.percent";
 
     /** bbox property */
@@ -314,21 +315,25 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-	String[] visadProperties = {"visad.java3d.imageByRef",
-				    "visad.actionimpl.tracetime",
-				    "visad.actionimpl.tracestack",
-				    "visad.cachingcoordinatesystem.debugtime",
-				    "visad.java3d.textureNpot",
-                                    "visad.arraycache.enabled",
-                                    "visad.arraycache.lowerthreshold",
-                                    "visad.arraycache.upperthreshold"};
+        String[] visadProperties = {
+            "visad.java3d.imageByRef", "visad.java3d.geometryByRef",
+            "visad.actionimpl.tracetime", "visad.actionimpl.tracestack",
+            "visad.cachingcoordinatesystem.debugtime",
+            "visad.java3d.textureNpot", "visad.arraycache.enabled",
+            "visad.arraycache.lowerthreshold",
+            "visad.arraycache.upperthreshold"
+        };
 
 
-	for(String visadProp: visadProperties) {
-	    System.setProperty(visadProp,  dataContext.getIdv().getProperty(visadProp,"false"));
-	}
+        for (String visadProp : visadProperties) {
+            System.setProperty(visadProp,
+                               dataContext.getIdv().getProperty(visadProp,
+                                   "false"));
+        }
 
-        SampledSet.setCacheSizeThreshold(dataContext.getIdv().getProperty("visad.sampledset.cachesizethreshold", 10000));
+        SampledSet.setCacheSizeThreshold(
+            dataContext.getIdv().getProperty(
+                "visad.sampledset.cachesizethreshold", 10000));
 
 
         //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)
