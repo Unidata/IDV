@@ -157,7 +157,7 @@ import javax.swing.text.JTextComponent;
 public abstract class DisplayControlImpl extends DisplayControlBase implements DisplayControl,
         ActionListener, ItemListener, DataChangeListener, HyperlinkListener,
         DisplayListener, PropertyChangeListener, ControlListener,
-        Prototypable {
+                                                                               Prototypable  {
 
     /** current version */
     private static final double CURRENT_VERSION = 2.2;

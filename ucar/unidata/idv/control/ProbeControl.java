@@ -112,7 +112,7 @@ import javax.vecmath.Point3d;
  * @author Unidata IDV developers
  * @version $Revision: 1.203 $
  */
-public class ProbeControl extends DisplayControlImpl {
+public class ProbeControl extends DisplayControlImpl implements DisplayableData.DragAdapter {
 
     /** ID for sharing position */
     public static final String SHARE_POSITION = "ProbeControl.SHARE_POSITION";
@@ -334,21 +334,7 @@ public class ProbeControl extends DisplayControlImpl {
             probe     = new PointProbe(new RealTuple(
                                                      globePositionType,
                                                      new double[] {0,0,0}));
-            probe.getSelectorPoint().setDragAdapter(new DisplayableData.DragAdapter() {
-                    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
-                        return true;
-                    }
-                    public boolean constrainDragPoint(float[]x) {
-                        constrainGlobePoint(x);
-                        return true;
-                    }
-                    public boolean handleAddPoint(float[]x){
-                        return true;
-                    }
-
-                });
-
-
+            probe.getSelectorPoint().setDragAdapter(this);
         } else {
             probe     = new PointProbe(0.0, 0.0, 0.0);
         }
@@ -1144,7 +1130,14 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
-    private void  constrainGlobePoint(float[] position) {
+    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
+        return true;
+    }
+    public boolean handleAddPoint(float[]x){
+        return true;
+    }
+
+    public boolean constrainDragPoint(float[]position) {
         float x = position[0];
         float y = position[1];
         float z = position[2];
@@ -1154,7 +1147,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         if (!keepProbeAtHeight) {
             probeRadius = length;
-            return;
+            return true;
         }
 
         if (length != 0) {
@@ -1165,7 +1158,7 @@ public class ProbeControl extends DisplayControlImpl {
             position[1] = (float)newy;
             position[2] = (float)newz;
         }
-
+        return true;
     }
 
 
