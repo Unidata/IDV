@@ -274,12 +274,14 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         //        }
         //        int nLines = aid.getImageInfo().getLines();
         //        int nEles  = aid.getImageInfo().getElements();
-        int nLines = ((aid.getImageInfo() != null)
+        AddeImageInfo aii = aid.getImageInfo();
+
+        int nLines = (aii != null)
                       ? aid.getImageInfo().getLines()
-                      : areaDirectory.getLines());
-        int nEles  = ((aid.getImageInfo() != null)
+                      : areaDirectory.getLines();
+        int nEles  = (aii != null)
                       ? aid.getImageInfo().getElements()
-                      : areaDirectory.getElements());
+                      : areaDirectory.getElements();
 
 
         // make the VisAD RealTypes for the dimension variables
@@ -288,9 +290,20 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
         // extract the number of bands (sensors) and make the VisAD type
+        // we can only handle 1 so, we'll just use that.
         int band       = 0;
-        int bandNums[] = areaDirectory.getBands();
-        int numBands = areaDirectory.getNumberOfBands();  // this might be different
+        int[] bandNums = new int[1];
+        int numBands = 1;
+        if (aii != null) {
+            String bandString = aii.getBand();
+            if ((bandString != null) && !bandString.equals(aii.ALL)) {
+                 band = new Integer(bandString).intValue();
+            }
+            bandNums[0] = band;
+        } else {
+            int[] allBands = areaDirectory.getBands();
+            bandNums[0] = allBands[0];
+        }
 
         // create indicies into the data structure for the bands
         int[] bandIndices = new int[numBands];
