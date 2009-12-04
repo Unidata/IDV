@@ -239,16 +239,10 @@ public class GlobeDisplay extends NavigatedDisplay {
                     //              System.err.println ("Samples == null");
                     return;
                 }
-                /*
-                System.out.println("bounds = " +
-                                     samples[1][0] + "," + samples[0][0] + "," +
-                           samples[1][1] + "," + samples[0][1]);
                 ProjectionRect rect =
                    new ProjectionRect(samples[1][0], samples[0][0],
                            samples[1][1], samples[0][1]);
-                System.out.println("rect = " + rect);
                 setMapArea(rect);
-                */
             }
         });
         setRubberBandBox(rubberBandBox);
@@ -519,7 +513,12 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @throws  RemoteException        Couldn't create a remote object
      */
     public void setMapArea(ProjectionRect mapArea)
-            throws VisADException, RemoteException {}
+            throws VisADException, RemoteException {
+
+        double centerLat =mapArea.getY() + mapArea.getHeight ()/2;        
+        double centerLon =mapArea.getX() + mapArea.getWidth ()/2;
+        centerAndZoom(new EarthLocationTuple(centerLat, centerLon, 0),true,2.0);
+    }
 
     /**
      * Define the map projection using a MapProjection type CoordinateSystem.
@@ -838,12 +837,12 @@ public class GlobeDisplay extends NavigatedDisplay {
         double[]      currentMatrix = getProjectionMatrix();
         double[]      trans         = { 0.0, 0.0, 0.0 };
         double[]      scale         = { 0.0, 0.0, 0.0 };
+        double[]      scaletmp         = { 0.0, 0.0, 0.0 };
         double[]      rot1          = { 0.0, 0.0, 0.0 };
         double[]      rot2          = { 0.0, 0.0, 0.0 };
 
         getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
                 currentMatrix);
-
 
         double[]    xy = getSpatialCoordinates(el, null);
 
@@ -852,23 +851,20 @@ public class GlobeDisplay extends NavigatedDisplay {
                            rot2[2], 1.0, 0, 0, 0);
 
         Transform3D t2     = new Transform3D(xxx);
-        Vector3d    upVector    = new Vector3d(0,-1,0);
+        Vector3d    upVector    = new Vector3d(0,0,1);
 
         //        t2.transform(v3d);
         //        System.err.println("v3d:" + v3d.x+"/"+v3d.y+"/"+v3d.z);
         t.lookAt(new Point3d(xy[0], xy[1], xy[2]), new Point3d(0, 0, 0), upVector);
         double[] m = new double[16];
         t.get(m);
-        getMouseBehavior().instance_unmake_matrix(rot1, scale, trans, m);
+        getMouseBehavior().instance_unmake_matrix(rot1, scaletmp, trans, m);
+        if(zoomFactor!=zoomFactor) zoomFactor = 1;
         m = getMouseBehavior().make_matrix(rot1[0], rot1[1], rot1[2],
-                                           ((zoomFactor == zoomFactor)
-                                            ? zoomFactor * scale[0]
-                                            : scale[0]), ((zoomFactor
-                                            == zoomFactor)
-                ? zoomFactor * scale[1]
-                : scale[1]), ((zoomFactor == zoomFactor)
-                              ? zoomFactor * scale[2]
-                              : scale[2]), trans[0], trans[1], trans[2]);
+                                           zoomFactor * scale[0], 
+                                           zoomFactor * scale[1],
+                                           zoomFactor * scale[2],
+                                           trans[0], trans[1], trans[2]);
 
         if ( !animated) {
             setProjectionMatrix(m);
