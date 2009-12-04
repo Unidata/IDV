@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad;
 
 
@@ -1069,6 +1070,25 @@ public final class Util {
      */
     public static Set getDomainSet(Field field) {
         try {
+            //            if (field instanceof AreaImageFlatField) {
+            //                return ((AreaImageFlatField) field).getDomainSetNoRead();
+            //            }
+            return field.getDomainSet();
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     *
+     * @return _more_
+     */
+    public static Set getDomainSetForClone(Field field) {
+        try {
             if (field instanceof AreaImageFlatField) {
                 return ((AreaImageFlatField) field).getDomainSetNoRead();
             }
@@ -1133,9 +1153,11 @@ public final class Util {
                 // if copy == true, new set will be created by ensureMathType
                 // because funcType.getDomain() is not a SetType
                 Set newDomain =
-                    (Set) ensureMathType(getDomainSet(oldFlatField), (copy)
-                        ? (MathType) funcType.getDomain()
-                        : (MathType) new SetType(funcType.getDomain()));
+                    (Set) ensureMathType(getDomainSetForClone(oldFlatField),
+                                         (copy)
+                                         ? (MathType) funcType.getDomain()
+                                         : (MathType) new SetType(
+                                             funcType.getDomain()));
                 Set[] oldRangeSets = oldFlatField.getRangeSets();
                 Unit[] oldUnits    = oldFlatField.getDefaultRangeUnits();
                 Unit[] newUnits = funcType.getFlatRange().getDefaultUnits();
@@ -3626,6 +3648,13 @@ public final class Util {
         return tempT1;
     }
 
+    /**
+     * _more_
+     *
+     * @param position _more_
+     *
+     * @return _more_
+     */
     public static boolean isEarthCoordinates(RealTuple position) {
         RealTupleType rttype = (RealTupleType) position.getType();
         if (rttype.equals(RealTupleType.SpatialEarth2DTuple)) {
@@ -3639,19 +3668,24 @@ public final class Util {
     }
 
 
-    public static void setGlobeRadius(float[]position, float radius) {
-        float x = position[0];
-        float y = position[1];
-        float z = position[2];
-        double length = new Point3d(0, 0,
-                                    0).distance(new Point3d(x, y, z));
+    /**
+     * _more_
+     *
+     * @param position _more_
+     * @param radius _more_
+     */
+    public static void setGlobeRadius(float[] position, float radius) {
+        float  x      = position[0];
+        float  y      = position[1];
+        float  z      = position[2];
+        double length = new Point3d(0, 0, 0).distance(new Point3d(x, y, z));
         if (length != 0) {
             double newx = x * (1.5 / length);
             double newy = y * (1.5 / length);
             double newz = z * (1.5 / length);
-            position[0] = (float)newx;
-            position[1] = (float)newy;
-            position[2] = (float)newz;
+            position[0] = (float) newx;
+            position[1] = (float) newy;
+            position[2] = (float) newz;
         }
     }
 
