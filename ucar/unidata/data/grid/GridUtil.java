@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -209,22 +210,18 @@ public class GridUtil {
      */
     public static SampledSet getSpatialDomain(FieldImpl grid)
             throws VisADException {
-        if (isConstantSpatialDomain(grid) || !isSequence(grid)) {
-            return getSpatialDomain(grid, 0);
-        } else {
-            // find first non-missing grid
-            if (isTimeSequence(grid)) {
-                try {
-                    Set timeDomain = Util.getDomainSet(grid);
-                    for (int i = 0; i < timeDomain.getLength(); i++) {
-                        FieldImpl sample = (FieldImpl) grid.getSample(i);
-                        if ( !sample.isMissing()) {
-                            return getSpatialDomain(grid, i);
-                        }
+        // find first non-missing grid
+        if (isTimeSequence(grid)) {
+            try {
+                Set timeDomain = Util.getDomainSet(grid);
+                for (int i = 0; i < timeDomain.getLength(); i++) {
+                    FieldImpl sample = (FieldImpl) grid.getSample(i);
+                    if ( !sample.isMissing()) {
+                        return getSpatialDomain(grid, i);
                     }
-                } catch (RemoteException excp) {
-                    throw new VisADException("RemoteException");
                 }
+            } catch (RemoteException excp) {
+                throw new VisADException("RemoteException");
             }
         }
         return getSpatialDomain(grid, 0);
@@ -253,7 +250,7 @@ public class GridUtil {
                             ? (FlatField) fi.getSample(0)
                             : (FlatField) fi;
 
-            spatialDomain = (SampledSet) Util.getDomainSet(field);
+            spatialDomain = (SampledSet) Util.getDomainSetForClone(field);
         } catch (ClassCastException cce) {  //Misc.printStack("grid" + grid.getType(), 5);
             throw new IllegalArgumentException("not a known grid type "
                     + field.getDomainSet().getClass());
