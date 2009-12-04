@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.imagery;
 
 
@@ -54,6 +55,7 @@ import visad.data.DataRange;
 import visad.data.mcidas.AreaAdapter;
 
 import visad.meteorology.ImageSequence;
+import visad.meteorology.ImageSequenceImpl;
 import visad.meteorology.ImageSequenceManager;
 import visad.meteorology.SingleBandedImage;
 
@@ -70,6 +72,7 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -80,6 +83,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -137,8 +141,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private Hashtable timeMap = new Hashtable();
 
 
-    /** mutex */
-    private Object RANGEMUTEX = new Object();
 
     /**
      *  The parameterless constructor for unpersisting.
@@ -913,8 +915,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
-    /** data ranges */
-    private DataRange[] sampleRanges = null;
 
     /**
      * Create the actual data represented by the given
@@ -938,7 +938,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
-        sampleRanges = null;
         //if ((dataChoice instanceof CompositeDataChoice) 
         //        && !(hasBandInfo(dataChoice))) {
         //      System.err.println ("ImageDataSource.getDataInner");
@@ -1185,26 +1184,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 AreaImageFlatField aiff = AreaImageFlatField.create(aid,
                                               areaDir, filename, readLabel);
                 result = aiff;
-                synchronized (RANGEMUTEX) {
-                    if (sampleRanges == null) {
-                        sampleRanges = aiff.getRanges(true);
-                        if ((sampleRanges != null)
-                                && (sampleRanges.length > 0)) {
-                            for (int rangeIdx = 0;
-                                    rangeIdx < sampleRanges.length;
-                                    rangeIdx++) {
-                                DataRange r = sampleRanges[rangeIdx];
-                                if (Double.isInfinite(r.getMin())
-                                        || Double.isInfinite(r.getMax())) {
-                                    sampleRanges = null;
-                                    break;
-                                }
-                            }
-                        }
-                    } else {
-                        aiff.setSampleRanges(sampleRanges);
-                    }
-                }
             } else {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
@@ -1402,7 +1381,51 @@ public abstract class ImageDataSource extends DataSourceImpl {
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
-            return sequenceManager.addImagesToSequence(images);
+
+            TreeMap imageMap = new TreeMap();
+            for (SingleBandedImage image : images) {
+                imageMap.put(image.getStartTime(), image);
+            }
+            List<SingleBandedImage> sortedImages =
+                (List<SingleBandedImage>) new ArrayList(imageMap.values());
+            if ((sortedImages.size() > 0)
+                    && (sortedImages.get(0) instanceof AreaImageFlatField)) {
+                DataRange[] sampleRanges = null;
+                for (SingleBandedImage sbi : sortedImages) {
+                    AreaImageFlatField aiff = (AreaImageFlatField) sbi;
+                    sampleRanges = aiff.getRanges(true);
+                    if ((sampleRanges != null) && (sampleRanges.length > 0)) {
+                        for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
+                                rangeIdx++) {
+                            DataRange r = sampleRanges[rangeIdx];
+                            if (Double.isInfinite(r.getMin())
+                                    || Double.isInfinite(r.getMax())) {
+                                sampleRanges = null;
+                                break;
+                            }
+                        }
+                    }
+                    if (sampleRanges != null) {
+                        break;
+                    }
+                }
+
+                if (sampleRanges != null) {
+                    for (SingleBandedImage sbi : sortedImages) {
+                        AreaImageFlatField aiff = (AreaImageFlatField) sbi;
+                        aiff.setSampleRanges(sampleRanges);
+                    }
+                }
+            }
+
+            SingleBandedImage[] imageArray =
+                (SingleBandedImage[]) sortedImages.toArray(
+                    new SingleBandedImage[sortedImages.size()]);
+            FunctionType imageFunction =
+                (FunctionType) imageArray[0].getType();
+            FunctionType ftype = new FunctionType(RealType.Time,
+                                     imageFunction);
+            return new ImageSequenceImpl(ftype, imageArray);
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
         }
