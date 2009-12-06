@@ -86,6 +86,9 @@ public class TextDisplayable extends LineDrawing {
     /** screen locked */
     private boolean screenLocked = false;
 
+    /** screen locked */
+    private boolean useSphere = false;
+
 
     /**
      * Default constructor
@@ -267,6 +270,31 @@ public class TextDisplayable extends LineDrawing {
 
 
     /**
+     * Set the whether we're on a sphere
+     * @param sphere  true if sphere
+     *
+     * @throws RemoteException   Java RMI error
+     * @throws VisADException    VisAD error
+     */
+    public void setSphere(boolean sphere)
+            throws VisADException, RemoteException {
+        if ((textControl != null) && (useSphere != sphere)) {
+            textControl.setSphere(sphere);
+        }
+        useSphere = sphere;
+    }
+
+    /**
+     * Get the sphere property
+     * @return true if sphere
+     */
+    public boolean getSphere() {
+        return useSphere;
+    }
+
+
+
+    /**
      * Set the justification for all labels
      * @param justification The justification
      *
@@ -438,6 +466,7 @@ public class TextDisplayable extends LineDrawing {
                         textControl.setRotation(rotation);
                         textControl.setCharacterRotation(characterRotation);
                         textControl.setFont(labelFont);
+                        textControl.setSphere(useSphere);
                     }
                 }
             }
