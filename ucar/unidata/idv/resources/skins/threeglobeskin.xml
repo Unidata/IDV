@@ -19,7 +19,6 @@
              place="North"/>
         </panel>
         <panel
-           bgcolor="blue"
            layout="grid"
            cols="3"
            place="Center">

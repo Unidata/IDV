@@ -23,7 +23,6 @@
 	   resizeweight="0.5"
            onetouchexpandable="true"
            orientation="h"
-           bgcolor="blue"
            layout="grid"
            cols="2"
            place="Center">
