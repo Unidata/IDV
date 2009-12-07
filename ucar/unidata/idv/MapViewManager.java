@@ -962,7 +962,6 @@ public class MapViewManager extends NavigatedViewManager {
     protected void initWithInner(ViewManager that, boolean ignoreWindow)
             throws VisADException, RemoteException {
 
-
         if(getInitViewStateName()!=null) {
             List vms = getIdv().getVMManager().getVMState();
             for (int i = 0; i < vms.size(); i++) {
@@ -1622,8 +1621,6 @@ public class MapViewManager extends NavigatedViewManager {
         }
     }
 
-
-
     /**
      * Class ProjectionCommand manages changes to the projection
      *
@@ -1640,13 +1637,14 @@ public class MapViewManager extends NavigatedViewManager {
         String oldName;
 
         /** old state */
-        MapProjection oldProjection;
+        String oldProjection;
 
         /** new state */
         String newName;
 
         /** new state */
-        MapProjection newProjection;
+        String newProjection;
+
 
         /**
          * ctor
@@ -1662,16 +1660,33 @@ public class MapViewManager extends NavigatedViewManager {
                                  MapProjection newProjection) {
             this.viewManager   = viewManager;
             this.oldName       = oldName;
-            this.oldProjection = oldProjection;
+            this.oldProjection = encode(oldProjection);
             this.newName       = newName;
-            this.newProjection = newProjection;
+            this.newProjection = encode(newProjection);
         }
+
+        private String encode(MapProjection projection) {
+            try {
+                return viewManager.getIdv().encodeObject(projection,false);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
+        private MapProjection decode(String xml) {
+            try {
+                return (MapProjection) viewManager.getIdv().decodeObject(xml);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
 
         /**
          * Redo
          */
         public void redoCommand() {
-            viewManager.setMapProjection(newProjection, true, newName, false,
+            viewManager.setMapProjection(decode(newProjection), true, newName, false,
                                          false);
         }
 
@@ -1679,7 +1694,7 @@ public class MapViewManager extends NavigatedViewManager {
          * Undo
          */
         public void undoCommand() {
-            viewManager.setMapProjection(oldProjection, true, oldName, false,
+            viewManager.setMapProjection(decode(oldProjection), true, oldName, false,
                                          false);
         }
     }
@@ -1715,7 +1730,6 @@ public class MapViewManager extends NavigatedViewManager {
      *
      * @param projection The new projection
      */
-
     public void setMainProjection(MapProjection projection) {
         mainProjection = projection;
     }
@@ -1770,15 +1784,15 @@ public String getDefaultProjectionName () {
      */
     private void addProjectionToHistory(MapProjection projection,
                                         String name) {
-        TwoFacedObject tfo = TwoFacedObject.findId(projection,
-                                 projectionHistory);
+        String encodedProjection = getIdv().encodeObject(projection,false);
+        TwoFacedObject tfo = TwoFacedObject.findId(encodedProjection, projectionHistory);
         if (tfo != null) {
             projectionHistory.remove(tfo);
             projectionHistory.add(0, tfo);
             return;
 
         }
-        tfo = new TwoFacedObject(name, projection);
+        tfo = new TwoFacedObject(name, encodedProjection);
         projectionHistory.add(0, tfo);
 
 
@@ -1906,7 +1920,7 @@ public String getDefaultProjectionName () {
             setMasterInactive();
             if (addToCommandHistory && (mainProjection != null)) {
                 addCommand(new ProjectionCommand(this, mainProjectionName,
-                        mainProjection, name, projection));
+                                                 mainProjection, name, projection));
             }
 
             if ( !Misc.equals(mainProjection, projection)) {
@@ -2674,7 +2688,13 @@ public String getDefaultProjectionName () {
             JMenuItem mi = new JMenuItem(tfo.toString());
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    setMapProjection((MapProjection) tfo.getId(), true);
+                    try {
+                        String encodedProjection = (String) tfo.getId();
+                        MapProjection mp = (MapProjection)getIdv().decodeObject(encodedProjection);
+                        setMapProjection(mp, true);
+                    } catch(Exception exc) {
+                        logException("Failed to instantiate the projection", exc);
+                    }
                 }
             });
             menu.add(mi);
