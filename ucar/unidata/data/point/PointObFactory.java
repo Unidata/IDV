@@ -553,7 +553,7 @@ public class PointObFactory {
      * _more_
      *
      * @param dos _more_
-     * @param tuple _more_
+     * @param type _more_
      * @param skipIndices _more_
      * @param defaultStringLength _more_
      * @param altUnit _more_
@@ -565,7 +565,8 @@ public class PointObFactory {
      * @throws Exception _more_
      */
     public static CFPointObWriter makeWriter(DataOutputStream dos,
-                                             TupleType type, int[] skipIndices,
+                                             TupleType type,
+                                             int[] skipIndices,
                                              int defaultStringLength,
                                              String altUnit, int cnt,
                                              int[] slengths)
@@ -855,7 +856,32 @@ public class PointObFactory {
             TupleType tupleType      = null;
             TupleType finalTupleType = null;
             Trace.call1("loop-2", " num vars: " + numNotRequired);
-            int cnt = 0;
+            int            cnt       = 0;
+            List<RealType> realTypes = new ArrayList<RealType>();
+            List<TextType> textTypes = new ArrayList<TextType>();
+            for (int j = 0; j < numNotRequired; j++) {
+                ScalarType stype =
+                    (ScalarType) type.getComponent(notReqIndices[j]);
+                if (stype instanceof TextType) {
+                    textTypes.add((TextType) stype);
+                } else {
+                    realTypes.add((RealType) stype);
+                }
+            }
+            if (allReals) {
+                tupleType = new RealTupleType(
+                    (RealType[]) realTypes.toArray(
+                        new RealType[realTypes.size()]));
+            } else {
+                tupleType = DoubleStringTuple.makeTupleType(realTypes,
+                        textTypes);
+            }
+            int    numDouble = realTypes.size();
+            int    numString = textTypes.size();
+            Real[] protos    = (numDouble > 0)
+                               ? new Real[numDouble]
+                               : null;
+            Unit[] realUnits = null;
 
             for (int i = 0; i < length; i++) {
                 DateTime dateTime = (DateTime) times.get(i);
@@ -869,27 +895,61 @@ public class PointObFactory {
                                           : new Real(RealType.Altitude, 0));
 
                 Tuple rest = null;
-                // now make data
-                Data[] others = (allReals == true)
-                                ? new Real[numNotRequired]
-                                : new Data[numNotRequired];
-                if (allReals) {
-                    for (int j = 0; j < numNotRequired; j++) {
-                        others[j] = (Real) ob.getComponent(notReqIndices[j]);
-                    }
-                } else {
-                    for (int j = 0; j < numNotRequired; j++) {
-                        others[j] = (Data) ob.getComponent(notReqIndices[j]);
-                    }
-                }
-                if (tupleType == null) {
-                    tupleType = Tuple.buildTupleType(others);
-                }
 
-                rest = ((allReals == true)
-                        ? new RealTuple((RealTupleType) tupleType,
-                                        (Real[]) others, null, null, false)
-                        : new Tuple(tupleType, others, false, false));
+                // now make data
+
+                if (allReals) {
+                    double[] obValues   = ((RealTuple) ob).getValues();
+                    double[] realValues = new double[numNotRequired];
+                    for (int j = 0; j < numNotRequired; j++) {
+                        realValues[j] = obValues[notReqIndices[j]];
+                    }
+                    if (realUnits == null) {  // only do this once
+                        protos = ob.getRealComponents();
+                        if (ob instanceof DoubleTuple) {
+                            realUnits = ((DoubleTuple) ob).getTupleUnits();
+                        } else {
+                            realUnits = new Unit[protos.length];
+                            for (int r = 0; r < protos.length; r++) {
+                                realUnits[r] = protos[r].getUnit();
+                            }
+                        }
+                    }
+
+                    rest = new DoubleTuple((RealTupleType) tupleType, protos,
+                                           realValues, realUnits);
+                } else {
+                    String[] strings = (numString > 0)
+                                       ? new String[numString]
+                                       : null;
+                    double[] values  = (numDouble > 0)
+                                       ? new double[numDouble]
+                                       : null;
+                    if (i == 0) {
+                        protos    = new Real[numDouble];
+                        realUnits = new Unit[numDouble];
+                    }
+                    int stringIdx = 0;
+                    int valIdx    = 0;
+                    for (int j = 0; j < numNotRequired; j++) {
+                        Scalar scalar =
+                            (Scalar) ob.getComponent(notReqIndices[j]);
+                        if (scalar instanceof Text) {
+                            strings[stringIdx++] = ((Text) scalar).getValue();
+                        } else {
+                            Real real = (Real) scalar;
+                            values[valIdx] = real.getValue();
+                            if (i == 0) {
+                                realUnits[j] = real.getUnit();
+                                protos[j]    = real;
+                            }
+                            valIdx++;
+                        }
+
+                    }
+                    rest = new DoubleStringTuple(tupleType, protos, values,
+                            strings, realUnits);
+                }
 
                 if (finalTupleType == null) {
                     PointObTuple pot = new PointObTuple(location, dateTime,
@@ -1269,9 +1329,9 @@ public class PointObFactory {
         PointOb[]               obs = new PointOb[pos.size()];
         //Make the obs
         //        Trace.call1("loop-3");
-        int size = pos.size();
+        int    size      = pos.size();
 
-	Data[] prototype = null;
+        Data[] prototype = null;
         for (int i = 0; i < size; i++) {
             PointObsDatatype po = (PointObsDatatype) pos.get(i);
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -1305,14 +1365,14 @@ public class PointObFactory {
 
             Tuple tuple = (allReals
                            ? (Tuple) new DoubleTuple(
-						     (RealTupleType) allTupleType, prototype, realArray,
-                               allUnits)
-                           : new DoubleStringTuple(allTupleType, prototype, realArray,
-                               stringArray, allUnits));
+                               (RealTupleType) allTupleType, prototype,
+                               realArray, allUnits)
+                           : new DoubleStringTuple(allTupleType, prototype,
+                               realArray, stringArray, allUnits));
 
-	    if(prototype==null) {
-		prototype = tuple.getComponents();
-	    }
+            if (prototype == null) {
+                prototype = tuple.getComponents();
+            }
 
             if (finalTT == null) {
                 pot = new PointObTuple(elt, (DateTime) times.get(i), tuple);
@@ -1363,7 +1423,7 @@ public class PointObFactory {
      * @param binRoundTo bin round to
      * @param binWidth time bin size
      * @param llr bounding box
-     * @param dateSelection _more_
+     * @param dateSelection  the date selection
      * @param sample If true then just sample the data, i.e., read the first ob
      *
      * @return The field
