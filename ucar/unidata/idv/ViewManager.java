@@ -707,6 +707,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public ViewManager(ViewContext viewContext) {
         this.idv = (IntegratedDataViewer) viewContext;
+        setHighlightBorder(getStore().get(PREF_BORDERCOLOR, Color.blue));
     }
 
 
@@ -753,7 +754,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             viewDescriptor = new ViewDescriptor();
         }
         addViewDescriptor(viewDescriptor);
-        borderHighlightColor = getStore().get(PREF_BORDERCOLOR, Color.blue);
+        setHighlightBorder(getStore().get(PREF_BORDERCOLOR, Color.blue));
     }
 
 
@@ -1725,6 +1726,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
         setIdv(idv);
+        setHighlightBorder(getStore().get(PREF_BORDERCOLOR, Color.blue));
         initBooleanProperties();
     }
 
@@ -1805,18 +1807,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     this.lights.add(new LightInfo(lightInfo));
                 }
             }
-
-            if (that.splitPaneLocation >= 0) {
-                //SPLIT
-                /*
-                this.splitPaneLocation = that.splitPaneLocation;
-                if(mainSplitPane!=null) {
-                    mainSplitPane.setDividerLocation(that.splitPaneLocation);
-                }
-                */
-            }
         }
 
+
+        //        if(true) return;
 
         if ((that.name != null) && (that.name.trim().length() > 0)) {
             setName(that.name);
@@ -1825,9 +1819,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if ( !ignoreWindow) {
             Rectangle bounds = that.windowBounds;
             if (bounds != null) {
+                //                System.err.println ("  vm.initWith-2" );
+                //                Misc.sleep(10000);
                 setWindowBounds(bounds);
+                //                System.err.println ("  vm.initWith-2 after" );
+                //                Misc.sleep(10000);
             }
         }
+
         if ((that.animationInfo != null) && (this.animationWidget != null)) {
             this.animationWidget.setProperties(that.animationInfo);
         }
@@ -2960,9 +2959,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         IdvWindow myWindow = getDisplayWindow();
         if ((myWindow != null) && (r != null)) {
             boolean wasVisible = myWindow.isVisible();
-            myWindow.setVisible(false);
+            //            myWindow.setVisible(false);
             myWindow.setBounds(r);
-            myWindow.setVisible(wasVisible);
+            //            myWindow.setVisible(wasVisible);
         }
     }
 
@@ -5013,7 +5012,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @throws RemoteException
      * @throws VisADException
      */
-
     public void displayChanged(DisplayEvent de)
             throws VisADException, RemoteException {
         int        eventId    = de.getId();
@@ -5022,6 +5020,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return;
         }
 
+        if (eventId == DisplayEvent.MOUSE_PRESSED) {
+            //            System.err.println (" mouse pressed");
+        }
 
 
         if (getIsShared() && !lastActive) {
