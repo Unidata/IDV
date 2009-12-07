@@ -798,7 +798,10 @@ public class ImageMovieControl extends DisplayControlImpl {
             }
         });
         previewPanel = new ImagePanel();
-        JPanel topPanel = GuiUtils.left(getAnimationWidget().getContents());
+        JComponent animContents = getAnimationWidget().getContents();
+        JPanel topPanel = GuiUtils.left(animContents);
+
+
         JPanel moviePanel = GuiUtils.topCenterBottom(topPanel,
                                 getImagePanel(), GuiUtils.left(descLabel));
         fileList = new JList();
@@ -1440,9 +1443,16 @@ public class ImageMovieControl extends DisplayControlImpl {
 
             //Make sure we create the animation before we call setAnimationSet
             getImagePanel().setFiles(files);
-            Animation animation = getInternalAnimation();
-            setAnimationSet(times);
-            animation.setCurrent(files.size() - 1);
+            GuiUtils.invokeInSwingThread(new Runnable() {
+                    public void run() {
+                        try {
+                            Animation animation = getInternalAnimation();
+                            setAnimationSet(times);
+                            animation.setCurrent(times.size() - 1);
+                        } catch(Exception exc) {
+                            logException("Setting animation times", exc);
+                        }
+                    }});
 
             String group = XmlUtil.getAttribute(imageSetRoot, ATTR_GROUP, "");
             String desc  = XmlUtil.getAttribute(imageSetRoot, ATTR_DESC, "");
