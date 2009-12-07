@@ -1391,9 +1391,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
             if ((sortedImages.size() > 0)
                     && (sortedImages.get(0) instanceof AreaImageFlatField)) {
                 DataRange[] sampleRanges = null;
+                Set domainSet = null;
                 for (SingleBandedImage sbi : sortedImages) {
                     AreaImageFlatField aiff = (AreaImageFlatField) sbi;
                     sampleRanges = aiff.getRanges(true);
+                    if(domainSet == null)
+                        domainSet = aiff.getDomainSet();
                     if ((sampleRanges != null) && (sampleRanges.length > 0)) {
                         for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
                                 rangeIdx++) {
@@ -1414,6 +1417,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     for (SingleBandedImage sbi : sortedImages) {
                         AreaImageFlatField aiff = (AreaImageFlatField) sbi;
                         aiff.setSampleRanges(sampleRanges);
+                        aiff.setDomainIfNeeded(domainSet);
                     }
                 }
             }
