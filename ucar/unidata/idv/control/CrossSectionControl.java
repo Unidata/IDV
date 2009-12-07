@@ -24,6 +24,9 @@
 package ucar.unidata.idv.control;
 
 
+import java.awt.geom.Rectangle2D;
+
+
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
@@ -379,10 +382,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         //Are we in 3d?
         displayIs3D = isDisplay3D();
         levelsList  = dataChoice.getAllLevels(null);
-        System.err.println("levels:" + levelsList);
-        System.err.println("level[0]:"
-                           + levelsList.get(0).getClass().getName());
-
         xsDisplay  = createXSDisplay();
         vcsDisplay = createVCSDisplay();
 
@@ -552,25 +551,25 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                                  startCoord.getX(),
                             startCoord.getY(), startCoord.getZ() });
                     EarthLocation endLoc = boxToEarth(new double[] {
-                                               startCoord.getX(),
-                            startCoord.getY(), startCoord.getZ() });
+                            endCoord.getX(),
+                            endCoord.getY(), endCoord.getZ() });
                     setPosition(startLoc, endLoc);
                 } else if (start == null) {
-                    RealTuple startXYZ = getXYPosition(sizeX / 10.0,
-                                             sizeY / 2.0, 0.0, true);
-                    RealTuple endXYZ = getXYPosition((sizeX - sizeX / 10.0),
-                                           sizeY / 2.0, 0.0, true);
+                    MapProjection mp = getDataProjection();
+                    Rectangle2D rect  = mp.getDefaultMapArea();
+                    LatLonPoint startLLP = mp.getLatLon(new double[][] { {rect.getX()}, {rect.getCenterY()}});
+                    LatLonPoint endLLP = mp.getLatLon(new double[][] { {rect.getX()+rect.getWidth()}, {rect.getCenterY()}});
 
-                    EarthLocation startLoc =
-                        boxToEarth(new double[] {
-                            ((Real) startXYZ.getComponent(0)).getValue(),
-                            ((Real) startXYZ.getComponent(1)).getValue(),
-                            getSelectorAltitude() });
-                    EarthLocation endLoc =
-                        boxToEarth(new double[] {
-                            ((Real) endXYZ.getComponent(0)).getValue(),
-                            ((Real) endXYZ.getComponent(1)).getValue(),
-                            getSelectorAltitude() });
+                    EarthLocation startLoc = new EarthLocationTuple(startLLP.getLatitude().getValue(),
+                                                                    startLLP.getLongitude().getValue(),
+                                                                     0);
+                    EarthLocation endLoc = new EarthLocationTuple(endLLP.getLatitude().getValue(),
+                                                                    endLLP.getLongitude().getValue(),
+                                                                     0);
+
+                    System.err.println(rect);
+                    System.err.println(startLoc);
+                    System.err.println(endLoc);
                     setPosition(startLoc, endLoc);
                 } else {
                     csSelector.setPosition(start, end);
