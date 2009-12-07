@@ -251,16 +251,17 @@ public class IdvWindow extends MultiFrame {
         }
     }
 
+
     /**
      * set the bounds of the window
      *
      * @param r window bounds
      */
     public void setWindowBounds(Rectangle r) {
-        boolean wasVisible = isVisible();
-        setVisible(false);
+        //        boolean wasVisible = isVisible();
+        //        setVisible(false);
         setBounds(r);
-        setVisible(wasVisible);
+        //        setVisible(wasVisible);
     }
 
 
