@@ -426,56 +426,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
-    /** _more_ */
-    private int[][] dirNavAux;
-
-    /** _more_ */
-    private int[] nav;
-
-    /** _more_ */
-    private int[] aux;
-
-    /** _more_ */
-    private int[] dir;
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    /*
-    protected int[][] getDirNavAux() {
-        //        if (getParent() != null) {
-        //            return ((AreaImageFlatField) getParent()).getDirNavAux();
-        //        }
-        //        checkReadData();
-        String file = getDirNavAuxFile();
-        if (dirNavAux == null) {
-            if ((file != null) && new File(file).exists()) {
-                try {
-                    FileInputStream istream = new FileInputStream(file);
-                    BufferedInputStream bis =
-                        new BufferedInputStream(istream, 1000000);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    dirNavAux = (int[][]) ois.readObject();
-                    ois.close();
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                }
-            }
-        }
-        int[][] tmp = dirNavAux;
-        if (file != null) {
-            dirNavAux = null;
-        }
-        return tmp;
-    }
-    */
-
-
-
-
     /**
      * _more_
      *
@@ -525,7 +475,13 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      */
     private void setDomain(Set domainSet) {
         this.domainSet = domainSet;
-        msg("***** setDomain cs:" + domainSet.getCoordinateSystem().getClass().getName());
+    }
+
+
+    public void setDomainIfNeeded(Set domainSet) {
+        if(!haveData() && this.domainSet==null) {
+            this.domainSet = domainSet;
+        }
     }
 
 
@@ -632,12 +588,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             aioe.printStackTrace();
             throw aioe;
         }
-
-        dirNavAux = new int[][] {
-            (int[]) areaFile.getAreaDirectory().getDirectoryBlock().clone(),
-            areaFile.getNav(), areaFile.getAux()
-        };
-
 
         return samples;
     }
@@ -771,13 +721,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             AREAnav anav = super.getAreaNav();
             if (anav == null) {
                 try {
-                    if (true) {
-                        //                        System.err.println("getAreaNav bad cs aiff#:" + aiff.mycnt);
-                        throw new IllegalArgumentException(
-                            "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
-                    }
-                    //                    int[][] dirNavAux = aiff.getDirNavAux();
-                    //                    init(dirNavAux[0], dirNavAux[1], dirNavAux[2], true);
+                    throw new IllegalArgumentException(
+                                                       "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
                 } catch (Exception exc) {
                     System.err.println("error making making areanav:" + exc);
                     exc.printStackTrace();
