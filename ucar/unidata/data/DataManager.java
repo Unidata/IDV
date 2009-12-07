@@ -319,9 +319,11 @@ public class DataManager {
             "visad.java3d.imageByRef", "visad.java3d.geometryByRef",
             "visad.actionimpl.tracetime", "visad.actionimpl.tracestack",
             "visad.cachingcoordinatesystem.debugtime",
-            "visad.java3d.textureNpot", "visad.arraycache.enabled",
-            "visad.arraycache.lowerthreshold",
-            "visad.arraycache.upperthreshold"
+            "visad.java3d.textureNpot", 
+            "visad.data.arraycache.enabled",
+            "visad.data.arraycache.lowerthreshold",
+            "visad.data.arraycache.upperthreshold",
+            "visad.data.arraycache.usedatacachemanager"
         };
 
 
