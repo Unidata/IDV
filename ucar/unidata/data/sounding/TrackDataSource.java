@@ -951,7 +951,6 @@ public class TrackDataSource extends FilesDataSource {
             List datas = new ArrayList(adapters.size());
             for (int i = 0; i < adapters.size(); i++) {
 		TrackAdapter adapter = (TrackAdapter) adapters.get(i);
-		System.err.println ("calling getPointObTrack " + adapter.getClass().getName());
                 Data data = adapter.getPointObTrack(
                                 getTrackId(dc), range);
                 if (data == null) {

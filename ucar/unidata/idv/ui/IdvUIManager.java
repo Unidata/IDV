@@ -3656,13 +3656,12 @@ public class IdvUIManager extends IdvManager {
         LogUtil.addMessageLogger(msgLabel);
         if (window != null) {
             window.setComponent(COMP_MESSAGELABEL, msgLabel);
-        }
-        if (window != null) {
             IdvXmlUi xmlUI = window.getXmlUI();
             if (xmlUI != null) {
                 xmlUI.addComponent(COMP_MESSAGELABEL, msgLabel);
             }
         }
+
 
         //        final JLabel waitLabel = new JLabel(window.getNormalIcon());
         JLabel waitLabel = new JLabel(IdvWindow.getNormalIcon());

@@ -1156,10 +1156,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                               : -1.0;
             displayAltitudeType = new DisplayRealType("ProjectionAlt"
                     + myInstance, true, -1.0, 1.0, defaultZ, null);
+
             displayTupleType = new DisplayTupleType(new DisplayRealType[] {
-                displayLatitudeType,
-                displayLongitudeType,
-                displayAltitudeType }, coordinateSystem);
+              displayLatitudeType,
+              displayLongitudeType,
+              displayAltitudeType }, coordinateSystem);
         }
         setSpatialScalarMaps();
     }
@@ -1430,7 +1431,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * lat/lon to Display.DisplaySpatialCartesianTuple (XYZ).
      * Altitude (z) values are held constant.
      */
-    protected class MapProjection3DAdapter extends CoordinateSystem {
+    protected  class MapProjection3DAdapter extends CoordinateSystem {
 
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;

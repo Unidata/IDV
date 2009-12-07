@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -244,6 +245,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /** tabbed pane for skewt, hodo and table */
     private JTabbedPane viewTabs;
 
+    /** _more_          */
+    private List<MyActionImpl> actions = new ArrayList<MyActionImpl>();
+
     /**
      *
      * Class ParcelModeInfo
@@ -414,189 +418,152 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         aeroDisplay.addPropertyChangeListener(this);
 
-        final DataReference profileTempRef =
-            aeroCellNet.getProfileTemperatureRef();
 
-        new ActionImpl("ProfileTemperature") {
+        actions.add(new MyActionImpl("ProfileTemperature", readoutTable,
+                                     aeroCellNet.getProfileTemperatureRef()) {
             public void doAction() {
                 try {
-                    readoutTable.setProfileTemperature(
-                        (Real) profileTempRef.getData());
+                    readoutTable.setProfileTemperature(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(profileTempRef);
+        });
 
-        final DataReference profileDewRef =
-            aeroCellNet.getProfileDewPointRef();
-
-        new ActionImpl("ProfileDewPoint") {
-
+        actions.add(new MyActionImpl("ProfileDewPoint", readoutTable,
+                                     aeroCellNet.getProfileDewPointRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setProfileDewPoint(
-                        (Real) profileDewRef.getData());
+                    readoutTable.setProfileDewPoint(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(profileDewRef);
+        });
 
-        final DataReference profileMixingRatioRef =
-            aeroCellNet.getProfileMixingRatioRef();
 
-        new ActionImpl("ProfileMixingRatio") {
-
+        actions.add(new MyActionImpl("ProfileMixingRatio", readoutTable,
+                                     aeroCellNet.getProfileMixingRatioRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setProfileMixingRatio(
-                        (Real) profileMixingRatioRef.getData());
+                    readoutTable.setProfileMixingRatio(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(profileMixingRatioRef);
+        });
 
         /*
-        final DataReference profileWindRef =
-            aeroCellNet.getProfileWindRef();
 
-        new ActionImpl("ProfileWind") {
-
+          actions.add(new MyActionImpl("ProfileWind", readoutTable, aeroCellNet.getProfileWindRef()) {
             public void doAction() {
 
                 try {
                     RealTuple spdDir =
                         PolarHorizontalWind.newRealTuple(
-                            (RealTuple) proWindAtPointPresRef.getData());
+                            (RealTuple) proWindAtPointPresRef.getReal());
                     readoutTable.setProfileWindSpeed((Real)spdDir.getComponent(0));
                     readoutTable.setProfileWindDirection((Real)spdDir.getComponent(1));
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(profileWindRef);
+        });
         */
 
-        final DataReference lclPressureRef = aeroCellNet.getLclPressureRef();
-
-        new ActionImpl("LclPressure") {
-
+        actions.add(new MyActionImpl("LclPressure", readoutTable,
+                                     aeroCellNet.getLclPressureRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLclPressure(
-                        (Real) lclPressureRef.getData());
+                    readoutTable.setLclPressure(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lclPressureRef);
+        });
 
-        final DataReference lclTemperatureRef =
-            aeroCellNet.getLclTemperatureRef();
 
-        new ActionImpl("LclTemperature") {
-
+        actions.add(new MyActionImpl("LclTemperature", readoutTable,
+                                     aeroCellNet.getLclTemperatureRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLclTemperature(
-                        (Real) lclTemperatureRef.getData());
+                    readoutTable.setLclTemperature(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lclTemperatureRef);
+        });
 
-        final DataReference capeRef = aeroCellNet.getCapeRef();
 
-        new ActionImpl("CAPE") {
-
+        actions.add(new MyActionImpl("CAPE", readoutTable,
+                                     aeroCellNet.getCapeRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setCape((Real) capeRef.getData());
+                    readoutTable.setCape(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(capeRef);
+        });
 
-        final DataReference lfcRef = aeroCellNet.getLfcRef();
-
-        new ActionImpl("LFC") {
-
+        actions.add(new MyActionImpl("LFC", readoutTable,
+                                     aeroCellNet.getLfcRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLfc((Real) lfcRef.getData());
+                    readoutTable.setLfc(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lfcRef);
+        });
 
-        final DataReference lfcTempRef = aeroCellNet.getLfcTemperatureRef();
 
-        new ActionImpl("LfcTemperature") {
-
+        actions.add(new MyActionImpl("LfcTemperature", readoutTable,
+                                     aeroCellNet.getLfcTemperatureRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLfcTemperature(
-                        (Real) lfcTempRef.getData());
+                    readoutTable.setLfcTemperature(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lfcTempRef);
+        });
 
-        final DataReference lnbRef = aeroCellNet.getLnbRef();
 
-        new ActionImpl("LNB") {
-
+        actions.add(new MyActionImpl("LNB", readoutTable,
+                                     aeroCellNet.getLnbRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLnb((Real) lnbRef.getData());
+                    readoutTable.setLnb(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lnbRef);
+        });
 
-        final DataReference lnbTempRef = aeroCellNet.getLnbTemperatureRef();
 
-        new ActionImpl("LnbTemperature") {
-
+        actions.add(new MyActionImpl("LnbTemperature", readoutTable,
+                                     aeroCellNet.getLnbTemperatureRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setLnbTemperature(
-                        (Real) lnbTempRef.getData());
+                    readoutTable.setLnbTemperature(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(lnbTempRef);
+        });
 
-        final DataReference cinRef = aeroCellNet.getCinRef();
-
-        new ActionImpl("CIN") {
-
+        actions.add(new MyActionImpl("CIN", readoutTable,
+                                     aeroCellNet.getCinRef()) {
             public void doAction() {
-
                 try {
-                    readoutTable.setCin((Real) cinRef.getData());
+                    readoutTable.setCin(getReal());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
-        }.addReference(cinRef);
+        });
+
 
         /*
          * Configure a computational network for evaluating the temperature,
@@ -624,48 +591,42 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             proEvalNet.add(proWindAtPointPres);
             proEvalNet.configure();
 
-            final DataReference proTempAtPointPresRef =
-                proTempAtPointPres.getOutputRef();
 
-            new ActionImpl("PointerProfileTemperature") {
 
+            actions.add(new MyActionImpl("PointerProfileTemperature",
+                                         readoutTable,
+                                         proTempAtPointPres.getOutputRef()) {
                 public void doAction() {
-
                     try {
-                        readoutTable.setProfileTemperature(
-                            (Real) proTempAtPointPresRef.getData());
+                        readoutTable.setProfileTemperature(getReal());
                     } catch (Exception ex) {
                         logException(ex);
                     }
                 }
-            }.addReference(proTempAtPointPresRef);
+            });
 
-            final DataReference proDewAtPointPresRef =
-                proDewAtPointPres.getOutputRef();
-
-            new ActionImpl("PointerProfileDewPoint") {
-
+            actions.add(new MyActionImpl("PointerProfileDewPoint",
+                                         readoutTable,
+                                         proDewAtPointPres.getOutputRef()) {
                 public void doAction() {
-
                     try {
-                        readoutTable.setProfileDewPoint(
-                            (Real) proDewAtPointPresRef.getData());
+                        readoutTable.setProfileDewPoint(getReal());
                     } catch (Exception ex) {
                         logException(ex);
                     }
                 }
-            }.addReference(proDewAtPointPresRef);
+            });
 
-            final DataReference proWindAtPointPresRef =
-                proWindAtPointPres.getOutputRef();
 
-            new ActionImpl("PointerProfileWind") {
 
+
+
+            actions.add(new MyActionImpl("PointerProfileWind", readoutTable,
+                                         proWindAtPointPres.getOutputRef()) {
                 public void doAction() {
-
                     try {
                         RealTuple spdDir =
-                            (RealTuple) proWindAtPointPresRef.getData();
+                            (RealTuple) getDataReference().getData();
                         if ( !(PolarHorizontalWind.getRealTupleType().equals(
                                 (RealTupleType) spdDir.getType()))) {
                             spdDir = PolarHorizontalWind.newRealTuple(spdDir);
@@ -678,7 +639,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                         logException(ex);
                     }
                 }
-            }.addReference(proWindAtPointPresRef);
+            });
         }
 
         readoutPanel = new JPanel();
@@ -802,7 +763,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             soundingView = null;
         }
         */
+
+        if (actions != null) {
+            for (MyActionImpl action : actions) {
+                action.doRemove();
+            }
+            actions = null;
+        }
+
+        soundingView    = null;
         aeroDisplay     = null;
+        hodoView        = null;
         hodoDisplay     = null;
         soundingTable   = null;
         headerLabel     = null;
@@ -889,6 +860,11 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         return spatialLociVisible;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getCurrentIdx() {
         return currIndex;
     }
@@ -1042,8 +1018,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 }
                 //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
             }
-            if(dewProfiles[i] == null)
+            if (dewProfiles[i] == null) {
                 haveDewpoints = false;
+            }
             if (showUVCbx != null) {
                 showUVCbx.setEnabled(haveWinds);
             }
@@ -1053,14 +1030,14 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 hodoDisplay.addProfile(i, windProfiles[i]);
             }
             if ( !haveWinds) {
-                if(haveDewpoints == false)
+                if (haveDewpoints == false) {
                     tableSoundings[i] = FieldImpl.combine(new Field[] {
-                        tempProfiles[i]
-                          }, true);
-                else
+                        tempProfiles[i] }, true);
+                } else {
                     tableSoundings[i] = FieldImpl.combine(new Field[] {
                         tempProfiles[i],
                         dewProfiles[i] }, true);
+                }
             } else {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
                     tempProfiles[i],
@@ -1068,7 +1045,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             }
         }
         for (int i = 0; i < n; i++) {
-           aeroDisplay.setProfileVisible(i, false);
+            aeroDisplay.setProfileVisible(i, false);
         }
         aeroDisplay.setProfileVisible(currIndex, true);
 
@@ -1792,5 +1769,81 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             soundingTable.setShowUVComps(show);
         }
     }
+
+
+
+
+
+
+    /**
+     * Class MyActionImpl _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    private static abstract class MyActionImpl extends ActionImpl {
+
+        /** _more_          */
+        public DataReference reference;
+
+        /** _more_          */
+        public AerologicalReadoutTable readoutTable;
+
+        /**
+         * _more_
+         *
+         * @param name _more_
+         * @param readoutTable _more_
+         * @param ref _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         * @throws visad.ReferenceException _more_
+         */
+        public MyActionImpl(String name,
+                            AerologicalReadoutTable readoutTable,
+                            DataReference ref)
+                throws visad.ReferenceException, RemoteException,
+                       VisADException {
+            super(name);
+            this.reference    = ref;
+            this.readoutTable = readoutTable;
+            addReference(ref);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        protected DataReference getDataReference() {
+            return reference;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        protected Real getReal() throws VisADException, RemoteException {
+            return (Real) reference.getData();
+        }
+
+        /**
+         * _more_
+         */
+        protected void doRemove() {
+            try {
+                removeReference(reference);
+            } catch (Exception exc) {}
+        }
+
+    }
+
+
+
 }
 

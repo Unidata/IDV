@@ -2030,11 +2030,9 @@ public class ImageGenerator extends IdvManager {
         }
 
         //One more pause for the display lists
-	debug("Updating view managers");
         updateViewManagers();
         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                                             getIdv().getIdvUIManager());
-	debug("Done updating view managers");
         return true;
     }
 

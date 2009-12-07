@@ -542,10 +542,16 @@ public class IdvWindow extends MultiFrame {
      */
     public void dispose() {
         RovingProgress progress =
-            (RovingProgress) getComponent(IdvUIManager.COMP_PROGRESSBAR);
+            (RovingProgress)           getComponent(IdvUIManager.COMP_PROGRESSBAR);
         if (progress != null) {
             progress.dispose();
         }
+
+        JComponent messageLogger = (JComponent)getComponent(IdvUIManager.COMP_MESSAGELABEL);
+        if(messageLogger!=null) {
+            LogUtil.removeMessageLogger(messageLogger);
+        }
+
 
         allWindows.remove(this);
         mainWindows.remove(this);

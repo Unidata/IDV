@@ -115,6 +115,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** Range for flow scale */
     private Range flowRange;
 
+    RangeDialog rangeDialog;
+
     /**
      * Create a new FlowPlanViewControl; set attribute flags
      */
@@ -337,13 +339,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
                                     getClass());
         editButton.setToolTipText("Range used for scaling the vector size");
-        final RangeDialog rd =
+        if(rangeDialog == null){
+            rangeDialog  =
             new RangeDialog(this, flowRange,
                             "Set the range of data for sizing vectors",
                             "setFlowRange");
+        }
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                rd.showDialog();
+                rangeDialog.showDialog();
                 setFlowRangeLabel();
             }
         });
@@ -788,6 +792,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void doRemove() throws RemoteException, VisADException {
         super.doRemove();
+        if(rangeDialog!=null) {
+            rangeDialog.destroy();
+            rangeDialog = null;
+        }
         if (barbSizeWidget != null) {
             barbSizeWidget.doRemove();
             barbSizeWidget = null;

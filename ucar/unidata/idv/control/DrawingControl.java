@@ -1422,6 +1422,7 @@ public class DrawingControl extends DisplayControlImpl {
      * Set the cursor depending on the current command.
      */
     private void setCursor() {
+        if(enabledCbx==null || currentCmd==null) return;
         if ( !enabledCbx.isSelected() || !canHandleEvents()) {
             clearCursor();
             return;

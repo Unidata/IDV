@@ -2050,6 +2050,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         return navToolBar;
     }
 
+
+
+    public  void destroy() {
+        if (navToolBar != null) {
+            navToolBar.destroy();
+            navToolBar = null;
+        }
+        super.destroy();
+    }
+
+
     /**
      * Does nothing when the cursor changes. This method is called when
      * the mouse button controlling the cursor readout is pressed.  Override

@@ -33,6 +33,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.Transect;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
@@ -96,6 +97,7 @@ import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -123,6 +125,8 @@ import javax.vecmath.Point3d;
 
 public abstract class CrossSectionControl extends GridDisplayControl implements DisplayableData
     .DragAdapter {
+
+    Date createDate = new Date();
 
     /**
      * Identifier for sharing cross-section position
@@ -249,7 +253,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public CrossSectionControl() {
         setAttributeFlags(FLAG_COLOR | FLAG_DATACONTROL | FLAG_DISPLAYUNIT);
+        System.err.println("new xs " + createDate.getTime());
     }
+
 
     /**
      * Create the <code>DisplayableData</code> that will be used
@@ -440,9 +446,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         createCrossSectionSelector();
         //Now create the selector (which needs the state from the setData call)
         if (vm instanceof MapViewManager) {
-            csSelector.setPointSize(getDisplayScale());
-            csSelector.setAutoSize(true);
-            addDisplayable(csSelector, getSelectorAttributeFlags());
+            if(csSelector!=null) {
+                csSelector.setPointSize(getDisplayScale());
+                csSelector.setAutoSize(true);
+                addDisplayable(csSelector, getSelectorAttributeFlags());
+            } else {
+                System.err.println("NO CS SELECTOR "  + getClass().getName());
+            }
         } else if (vm instanceof TransectViewManager) {
             xsDisplay.setAdjustFlow(false);
             setUseFastRendering(true);
@@ -618,6 +628,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         return true;
     }
 
+    public EarthLocation boxToEarth(RealTuple tuple) throws RemoteException, VisADException {
+        return        boxToEarth(((Real)tuple.getComponent(0)).getValue(),
+                                 ((Real)tuple.getComponent(1)).getValue(),
+                                 tuple.getDimension()>2?
+                                 ((Real)tuple.getComponent(2)).getValue():0);
+    }
+
+
     /**
      * _more_
      *
@@ -700,6 +718,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws VisADException On badness
      */
     public void doRemove() throws RemoteException, VisADException {
+        System.err.println("XS.doRemove " + createDate.getTime());
+
         if (viewContents != null) {
             Container parent = viewContents.getParent();
             if (parent != null) {
@@ -1065,13 +1085,29 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     protected void createCrossSectionSelector()
             throws VisADException, RemoteException {
+
         csSelector = new CrossSectionSelector(
             new RealTuple(
-                RealTupleType.SpatialEarth3DTuple, new double[] { -1.0,
-                0.0, 0.0 }), new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                                           new double[] { 1.0,
-                0.0, 0 }));
+                          RealTupleType.SpatialEarth3DTuple,
+                          new double[] { 0,0,0}),
 
+            new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                          new double[] { 0,0,0}));
+    }
+
+    protected void createCrossSectionSelector(EarthLocation loc1, EarthLocation loc2)
+            throws VisADException, RemoteException {
+        csSelector = new CrossSectionSelector(
+            new RealTuple(
+                          RealTupleType.SpatialEarth3DTuple,
+                          new double[] { loc1.getLongitude().getValue(),
+                                         loc2.getLatitude().getValue(),
+                                         0.0 }), 
+            new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                          new double[] { loc1.getLongitude().getValue(),
+                                         loc2.getLatitude().getValue(),
+                                         0 }));
+        
     }
 
 
@@ -1449,6 +1485,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
 
+
     /**
      * Create and loads a 2D FieldImpl from the existing getGridDataInstance()
      * at the position indicated by the controlling Selector line end points;
@@ -1462,14 +1499,20 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
 
         EarthLocation[] elArray = getLineCoords();
+        if(elArray==null) {
+            System.err.println (getClass().getName());
+        }
         startLocation = elArray[0];
         endLocation   = elArray[1];
         LatLonPoint latlon1 = startLocation.getLatLonPoint();
         LatLonPoint latlon2 = endLocation.getLatLonPoint();
+        GridDataInstance gdi = getGridDataInstance();
+        if(gdi==null)
+            System.err.println ("GDI IS NULL " + createDate.getTime());
         FieldImpl slice =
-            getGridDataInstance().sliceAlongLatLonLine(latlon1, latlon2,
-                getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE,
-                    DEFAULT_SAMPLING_MODE)));
+            gdi.sliceAlongLatLonLine(latlon1, latlon2,
+                                     getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE,
+                                                                               DEFAULT_SAMPLING_MODE)));
         loadData(slice);
     }
 

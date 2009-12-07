@@ -250,7 +250,6 @@ public class GridUtil {
                             ? (FlatField) fi.getSample(0)
                             : (FlatField) fi;
 
-            //            spatialDomain = (SampledSet) Util.getDomainSetForClone(field);
             spatialDomain = (SampledSet) Util.getDomainSet(field);
         } catch (ClassCastException cce) {  //Misc.printStack("grid" + grid.getType(), 5);
             throw new IllegalArgumentException("not a known grid type "
@@ -972,9 +971,6 @@ public class GridUtil {
             return grid;  // no-op
         }
         GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
-
-        System.err.println("GridUtil " +         domainSet.getCoordinateSystem().getClass().getName());
-
 
 
         GriddedSet subDomain = null;
@@ -3812,7 +3808,6 @@ public class GridUtil {
             }
 
             if ( !isSequence(grid)) {
-                System.err.println("Resampling:" + grid.getClass().getName());
                 sampledFI = (FlatField) grid.resample(subDomain,
                         samplingMode, errorMode);
             } else {  // some sort of sequence - resample each

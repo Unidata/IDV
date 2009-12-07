@@ -928,7 +928,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         if (currentBounds != null) {
             if ((currentBounds.getDegreesX() == 0.0)
                     || (currentBounds.getDegreesY() == 0.0)) {
-                System.err.println ("current bounds is bad");
+                //                System.err.println ("current bounds is bad");
                 return null;
             }
         }

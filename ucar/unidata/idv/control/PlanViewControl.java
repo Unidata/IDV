@@ -526,6 +526,13 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
 
+    public void doRemove() throws RemoteException, VisADException {
+        super.doRemove();
+        datachoice = null;
+        workingGrid = null;
+    }
+
+
     /**
      * Return whether the Data held by this display control contains multiple
      * fields (e.g., for the isosurface colored by another parameter

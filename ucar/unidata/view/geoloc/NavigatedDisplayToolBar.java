@@ -98,6 +98,10 @@ public class NavigatedDisplayToolBar extends JToolBar {
         makeToolBar();
     }
 
+    public  void destroy() {
+        navDisplay =null;
+    }
+
     /**
      * Set the navDisplay that this NavigatedDisplayToolBar controls.
      *

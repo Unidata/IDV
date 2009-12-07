@@ -832,6 +832,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private float pointSize = 1.0f;
 
 
+    private ProjectionControl projectionControlListeningTo;
+    private LocalDisplay displayControlListeningTo;
+
 
     /**
      * Default constructor. This is called when the control is
@@ -991,7 +994,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-
         //Check if we have been removed
         if (hasBeenRemoved) {
             return;
@@ -1060,8 +1062,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (shouldAddDisplayListener()) {
             NavigatedDisplay navDisplay = getNavigatedDisplay();
-            if (navDisplay != null) {
-                navDisplay.getDisplay().addDisplayListener(this);
+            if (navDisplay != null && displayControlListeningTo!=null) {
+                displayControlListeningTo=  navDisplay.getDisplay();
+                displayControlListeningTo.addDisplayListener(this);
             }
         }
 
@@ -1076,10 +1079,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 } catch (Exception exc) {
                     //noop here 
                 }
-                navDisplay.getDisplay().getProjectionControl()
-                    .addControlListener(this);
-                if ( !shouldAddDisplayListener()) {
-                    navDisplay.getDisplay().addDisplayListener(this);
+                projectionControlListeningTo = navDisplay.getDisplay().getProjectionControl();
+                projectionControlListeningTo.addControlListener(this);
+                if (displayControlListeningTo==null) {
+                    displayControlListeningTo=  navDisplay.getDisplay();
+                    displayControlListeningTo.addDisplayListener(this);
                 }
             }
         }
@@ -2404,8 +2408,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (shouldAddControlListener()) {
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
                 if (navDisplay != null) {
-                    navDisplay.getDisplay().getProjectionControl()
-                        .addControlListener(this);
+                    if(projectionControlListeningTo!=null) {
+                        projectionControlListeningTo.removeControlListener(this);
+                    }
+                    projectionControlListeningTo =  navDisplay.getDisplay().getProjectionControl();
+                    projectionControlListeningTo.addControlListener(this);
                 }
             }
         }
@@ -2447,6 +2454,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param event The event
      */
     public void controlChanged(ControlEvent event) {
+        //        if ( !getHaveInitialized()|| !getActive()) {
         if ( !getHaveInitialized()) {
             return;
         }
@@ -6461,7 +6469,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         hasBeenRemoved = true;
 
 
-
         if (componentHolder != null) {
             componentHolder.removeDisplayControl(this);
             componentHolder = null;
@@ -6475,25 +6482,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         firePropertyChangeEvent(new PropertyChangeEvent(this, PROP_REMOVED,
                 this, null));
         propertyChangeListeners = null;
-        if (shouldAddDisplayListener()) {
-            NavigatedDisplay navDisplay = getNavigatedDisplay();
-            if ((navDisplay != null) && (navDisplay.getDisplay() != null)) {
-                navDisplay.getDisplay().removeDisplayListener(this);
-            }
+
+        if (displayControlListeningTo!=null) {
+            displayControlListeningTo.removeDisplayListener(this);
+            displayControlListeningTo = null;
         }
 
 
-        if (shouldAddControlListener()) {
-            NavigatedDisplay navDisplay = getNavigatedDisplay();
-            if ((navDisplay != null) && (navDisplay.getDisplay() != null)) {
-                navDisplay.getDisplay().getProjectionControl()
-                    .removeControlListener(this);
-                if ( !shouldAddDisplayListener()) {
-                    navDisplay.getDisplay().removeDisplayListener(this);
-
-                }
-            }
+        if(projectionControlListeningTo!=null) {
+            projectionControlListeningTo.removeControlListener(this);
+            projectionControlListeningTo = null;
         }
+
+
 
 
         if ((myWindow != null) && (windowListener != null)) {

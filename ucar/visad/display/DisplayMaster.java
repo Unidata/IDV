@@ -458,7 +458,7 @@ abstract public class DisplayMaster {
      * try to use this instance after invoking this method.  Subclasses that
      * override this method should invoke <code>super.destroy()</code>.
      */
-    public synchronized void destroy() {
+    public  void destroy() {
 
         /**
          * Empty the jPanel because sometimes this DisplayMaster does not

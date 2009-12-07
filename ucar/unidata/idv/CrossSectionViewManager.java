@@ -324,8 +324,10 @@ public class CrossSectionViewManager extends ViewManager {
      * @param newTitle The new title
      */
     public void setNewDisplayTitle(String newTitle) {
-        csBorderTitle.setTitle(newTitle);
-        getContents().repaint();
+        if (csBorderTitle != null) {
+            csBorderTitle.setTitle(newTitle);
+            getContents().repaint();
+        }
     }
 
     /**

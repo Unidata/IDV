@@ -1217,16 +1217,19 @@ public class ImageMovieControl extends DisplayControlImpl {
      */
     private void setSelectedPoint() {
         imageLocation = null;
-        if (pointIndex >= 0) {
+        LatLonPoint[] tmpLatLons = latLons;
+        int tmpPointIndex = pointIndex;
+        if(tmpLatLons==null) return;
+        if (tmpPointIndex >= 0 && tmpPointIndex<tmpLatLons.length) {
             try {
-                imageLocation = latLons[pointIndex];
-                selectedPoint.setPoint((RealTuple) latLons[pointIndex]);
+                imageLocation = tmpLatLons[tmpPointIndex];
+                selectedPoint.setPoint((RealTuple) tmpLatLons[tmpPointIndex]);
             } catch (Exception exc) {
                 logException("Error setting indicator point", exc);
             }
             NamedStationImpl station =
                 (NamedStationImpl) elementToStation.get(
-                    pointNodes.get(pointIndex));
+                    pointNodes.get(tmpPointIndex));
             if ((station != null) && (stationMap != null)) {
                 stationMap.setSelectedStations(Misc.newList(station));
             }

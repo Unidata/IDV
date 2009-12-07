@@ -28,6 +28,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
+import visad.georef.EarthLocation;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
@@ -99,12 +100,10 @@ public class DataTransectControl extends CrossSectionControl {
             RangeAndBearingControl.makeDefaultLinePosition(
                 getNavigatedDisplay());
 
-        csSelector = new CrossSectionSelector(positions[0], positions[1],
-                Color.red);
-        // move z level of line to near top of VisAD display box
-        csSelector.setZValue(.95f);
-
-    }  // end createCrossSectionSelector
+        EarthLocation loc1 = boxToEarth(positions[0]);
+        EarthLocation loc2 = boxToEarth(positions[1]);
+        createCrossSectionSelector(loc1,loc2);
+    }
 
 
     /**

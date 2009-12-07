@@ -102,6 +102,13 @@ public class LogUtil {
     /** Used for buffering stderr/stdout */
     private static PrintStream originalOut;
 
+    /** The window the error console is in */
+    private static JFrame consoleWindow;
+
+    /** The text area that shows the errors in the error console */
+    private static JTextArea consoleText;
+
+
 
 
     /**
@@ -623,11 +630,6 @@ public class LogUtil {
         return Misc.getStackTrace(exc);
     }
 
-    /** The window the error console is in */
-    private static JFrame consoleWindow;
-
-    /** The text area that shows the errors in the error console */
-    private static JTextArea consoleText;
 
 
     /**
@@ -1188,7 +1190,7 @@ public class LogUtil {
 
 
     /**
-     * Holds components form the application GUIs that messages should be shown
+     * Holds components from the application GUIs that messages should be shown
      */
     private static ArrayList messageLogs = new ArrayList();
 
@@ -1204,6 +1206,7 @@ public class LogUtil {
      */
     public static void addMessageLogger(JTextArea t) {
         messageLogs.add(t);
+        //        Misc.printStack("LogUtil.addMessageLogger:" + messageLogs.size());
     }
 
     /**
@@ -1214,6 +1217,7 @@ public class LogUtil {
      */
     public static void addMessageLogger(JLabel t) {
         messageLogs.add(t);
+        //        Misc.printStack("LogUtil.addMessageLogger:" + messageLogs.size());
     }
 
     /**
@@ -1223,6 +1227,7 @@ public class LogUtil {
      */
     public static void removeMessageLogger(Object t) {
         messageLogs.remove(t);
+        //        System.err.println("remove message logs:" + messageLogs.size());
     }
 
 
@@ -1251,7 +1256,6 @@ public class LogUtil {
 
         msg               = Msg.msg(msg);
         lastMessageString = msg;
-
         for (int i = 0; i < messageLogs.size(); i++) {
             Object logger = messageLogs.get(i);
             if (logger instanceof JTextArea) {
