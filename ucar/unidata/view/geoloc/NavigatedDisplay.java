@@ -2081,6 +2081,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     protected void updateLocation(EarthLocation el)
             throws VisADException, RemoteException {
+        if (el == null) return;
         setCursorLatitude(el.getLatitude());
         setCursorLongitude(el.getLongitude());
         if (getDisplayMode() == MODE_3D) {
