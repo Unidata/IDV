@@ -55,12 +55,7 @@ import ucar.nc2.VariableSimpleIF;
 
 import ucar.nc2.constants.AxisType;
 import ucar.nc2.constants.FeatureType;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dataset.VariableDS;
-import ucar.nc2.dataset.VariableEnhanced;
-import ucar.nc2.dt.GridDatatype;
+
 
 //import ucar.nc2.dt.PointObsDataset;
 //import ucar.nc2.dt.PointObsDatatype;
