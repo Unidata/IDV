@@ -8492,6 +8492,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (didone) {
             sb.append("</ul>");
         }
+        if(dataSelection!=null) {
+            GeoSelection geoSelection = dataSelection.getGeoSelection();
+            if(geoSelection!=null) {
+                sb.append("Geo selection:" + geoSelection);
+                sb.append("<br>\n");
+            }
+            List times = dataSelection.getTimes();
+            if(times!=null && times.size()>0) {
+                sb.append("Selected times:" + StringUtil.join(" ", times));
+            }
+        }
+
+
         if (LogUtil.getDebugMode()) {
             getDebugDetails(sb);
         }
