@@ -528,9 +528,9 @@ public class IdvWindow extends MultiFrame {
     protected boolean doClose() {
         if (isAMainWindow && mainWindows.contains(this)
                 && (mainWindows.size() == 1)) {
-            if ( !idv.quit()) {
-                return false;
-            }
+            //            if ( !idv.quit()) {
+            //                return false;
+            //            }
         }
         dispose();
         return true;
@@ -564,11 +564,13 @@ public class IdvWindow extends MultiFrame {
         persistentComponents = null;
 
         destroyViewManagers();
-        if (xmlUI != null) {
-            //            xmlUI.dispose();
-        }
         viewManagers         = null;
         components           = null;
+        if (xmlUI != null) {
+            //This was commented out. Not sure why.
+            xmlUI.dispose();
+            xmlUI = null;
+        }
         super.dispose();
     }
 
@@ -581,9 +583,10 @@ public class IdvWindow extends MultiFrame {
             return;
         }
         //Not sure why we are returning here
-        if (true) {
-            return;
-        }
+        //        if (true) {
+        //            return;
+        //        }
+
         try {
             for (int i = 0; i < viewManagers.size(); i++) {
                 ((ViewManager) viewManagers.get(i)).destroy();
