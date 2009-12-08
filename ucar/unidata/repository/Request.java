@@ -292,14 +292,15 @@ public class Request implements Constants {
                 //A hack because the browser thinks this a zipped page
                 if (name.endsWith(".gz")) {
                     name = name.replace(".gz", "");
+                } else if (name.endsWith(".tgz")) {
+                    name = name.replace(".tgz", "");
                 }
-                url = url + "/" + name;
-
-                //                url = url + "/" + entry.getFullName();
             } catch (Exception ignore) {}
+            url = url + "/" + name;
         }
-        return checkUrl(url);
     }
+    return checkUrl(url);
+}
 
 
 
