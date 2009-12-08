@@ -528,9 +528,9 @@ public class IdvWindow extends MultiFrame {
     protected boolean doClose() {
         if (isAMainWindow && mainWindows.contains(this)
                 && (mainWindows.size() == 1)) {
-            //            if ( !idv.quit()) {
-            //                return false;
-            //            }
+            if ( !idv.quit()) {
+                return false;
+            }
         }
         dispose();
         return true;
