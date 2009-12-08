@@ -843,8 +843,8 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return the toolbar component
      */
     protected Component doMakeZoomPanToolBar(int orientation) {
-        JToolBar toolbar = new NavigatedDisplayToolBar(getNavigatedDisplay(),
-                               orientation, getToolbarsFloatable());
+        JToolBar toolbar = getNavigatedDisplay().getNavigationToolBar(
+                                                                      orientation, getToolbarsFloatable());
         return GuiUtils.top(toolbar);
     }
 
