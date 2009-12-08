@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -105,7 +106,7 @@ abstract public class DisplayMaster {
     /**
      * Whether or not this instance has been destroyed.
      */
-    private boolean isDestroyed = true;
+    private boolean isDestroyed = false;
 
     /**
      * The VisAD Display.
@@ -453,12 +454,26 @@ abstract public class DisplayMaster {
 
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getDestroyed() {
+        return isDestroyed;
+    }
+
+
+    /**
      * Destroys this instance, releasing any resources.  This method should be
      * invoked when this instance is no longer needed.  The client should not
      * try to use this instance after invoking this method.  Subclasses that
      * override this method should invoke <code>super.destroy()</code>.
      */
-    public  void destroy() {
+    public void destroy() {
+
+        if (isDestroyed) {
+            return;
+        }
 
         /**
          * Empty the jPanel because sometimes this DisplayMaster does not
@@ -1004,24 +1019,34 @@ abstract public class DisplayMaster {
         return display.getProjectionControl().getMatrix();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public double getScale() {
         double[] currentMatrix = getProjectionMatrix();
         double[] trans         = { 0.0, 0.0, 0.0 };
         double[] rot           = { 0.0, 0.0, 0.0 };
         double[] scale         = { 0.0, 0.0, 0.0 };
         getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                  currentMatrix);
+                currentMatrix);
 
         return scale[0];
     }
 
-    public double []getRotation() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public double[] getRotation() {
         double[] currentMatrix = getProjectionMatrix();
         double[] trans         = { 0.0, 0.0, 0.0 };
         double[] rot           = { 0.0, 0.0, 0.0 };
         double[] scale         = { 0.0, 0.0, 0.0 };
         getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                  currentMatrix);
+                currentMatrix);
 
         return rot;
     }
@@ -1075,8 +1100,7 @@ abstract public class DisplayMaster {
      *
      * @param behavior               The keyboard behavior to be added.
      */
-    public void addKeyboardBehavior(KeyboardBehavior behavior) {
-    }
+    public void addKeyboardBehavior(KeyboardBehavior behavior) {}
 
 
 
@@ -2022,7 +2046,7 @@ abstract public class DisplayMaster {
     public synchronized boolean ensureInactive() {
         boolean prev = active;
         try {
-            setActive(false);      
+            setActive(false);
         } catch (Exception ex) {}  // can't happen for setActive(false)
         return prev;
     }
