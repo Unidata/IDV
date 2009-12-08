@@ -1724,7 +1724,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @return Default z position
      */
     protected double getInitialZPosition() {
-        return 0.0;
+        return super.getInitialZPosition() + ZFUDGE;
     }
 
 

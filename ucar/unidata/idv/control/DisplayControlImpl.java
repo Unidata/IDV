@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -42,8 +44,6 @@ import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
@@ -91,6 +91,8 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+
+import ucar.unidata.view.geoloc.GlobeDisplay;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -157,7 +159,7 @@ import javax.swing.text.JTextComponent;
 public abstract class DisplayControlImpl extends DisplayControlBase implements DisplayControl,
         ActionListener, ItemListener, DataChangeListener, HyperlinkListener,
         DisplayListener, PropertyChangeListener, ControlListener,
-                                                                               Prototypable  {
+        Prototypable {
 
     /** current version */
     private static final double CURRENT_VERSION = 2.2;
@@ -165,6 +167,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** version */
     protected double version = 0;
 
+    /** fudge factor for the Z position */
+    protected static final double ZFUDGE = 0.005;
 
     /** all categories for this control */
     private static Hashtable allCategories = new Hashtable();
@@ -828,11 +832,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private JSlider textureSlider = null;
 
 
-    /** _more_ */
+    /** point size */
     private float pointSize = 1.0f;
 
 
+    /** the projection control we're listening to */
     private ProjectionControl projectionControlListeningTo;
+
+    /** the local display we are listening to */
     private LocalDisplay displayControlListeningTo;
 
 
@@ -1062,8 +1069,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (shouldAddDisplayListener()) {
             NavigatedDisplay navDisplay = getNavigatedDisplay();
-            if (navDisplay != null && displayControlListeningTo!=null) {
-                displayControlListeningTo=  navDisplay.getDisplay();
+            if ((navDisplay != null) && (displayControlListeningTo != null)) {
+                displayControlListeningTo = navDisplay.getDisplay();
                 displayControlListeningTo.addDisplayListener(this);
             }
         }
@@ -1079,10 +1086,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 } catch (Exception exc) {
                     //noop here 
                 }
-                projectionControlListeningTo = navDisplay.getDisplay().getProjectionControl();
+                projectionControlListeningTo =
+                    navDisplay.getDisplay().getProjectionControl();
                 projectionControlListeningTo.addControlListener(this);
-                if (displayControlListeningTo==null) {
-                    displayControlListeningTo=  navDisplay.getDisplay();
+                if (displayControlListeningTo == null) {
+                    displayControlListeningTo = navDisplay.getDisplay();
                     displayControlListeningTo.addDisplayListener(this);
                 }
             }
@@ -1107,12 +1115,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             animationWidget.setSharing(animationInfo.getShared());
         }
 
-	doInitialUpdateLegendAndList();
+        doInitialUpdateLegendAndList();
 
 
     }
 
 
+    /**
+     * Do the initial update legend and list
+     */
     protected void doInitialUpdateLegendAndList() {
         updateLegendAndList();
     }
@@ -1975,7 +1986,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if ( !fd.ok(FLAG_ZPOSITION)) {
                 continue;
             }
-            //      System.err.println("new z:" +   getVerticalValue(getZPosition()));
+            // System.err.println("new z:" +   getVerticalValue(getZPosition()));
             fd.displayable.setConstantPosition(
                 getVerticalValue(getZPosition()),
                 getNavigatedDisplay().getDisplayAltitudeType());
@@ -2408,10 +2419,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (shouldAddControlListener()) {
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
                 if (navDisplay != null) {
-                    if(projectionControlListeningTo!=null) {
-                        projectionControlListeningTo.removeControlListener(this);
+                    if (projectionControlListeningTo != null) {
+                        projectionControlListeningTo.removeControlListener(
+                            this);
                     }
-                    projectionControlListeningTo =  navDisplay.getDisplay().getProjectionControl();
+                    projectionControlListeningTo =
+                        navDisplay.getDisplay().getProjectionControl();
                     projectionControlListeningTo.addControlListener(this);
                 }
             }
@@ -3613,8 +3626,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (legendType == SIDE_LEGEND) {
             if (sideLegendButtonPanel == null) {
                 //                DndImageButton dndBtn = new DndImageButton(this, "control");
-                sideLegendButtonPanel = GuiUtils.hbox(/*dndBtn,*/
-                        makeLockButton(), makeRemoveButton(), 2);
+                sideLegendButtonPanel = GuiUtils.hbox(  /*dndBtn,*/
+                    makeLockButton(), makeRemoveButton(), 2);
                 //                dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
@@ -6271,23 +6284,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
             boolean addOk = true;
-	    Hashtable<ViewManager,List<DisplayInfo>> vmMap = new Hashtable<ViewManager,List<DisplayInfo>>();
-	    List<ViewManager> vms = new ArrayList<ViewManager>();
+            Hashtable<ViewManager, List<DisplayInfo>> vmMap =
+                new Hashtable<ViewManager, List<DisplayInfo>>();
+            List<ViewManager> vms = new ArrayList<ViewManager>();
             for (int i = 0, n = v.size(); i < n; i++) {
                 DisplayInfo info = (DisplayInfo) v.get(i);
-		ViewManager vm  = info.getViewManager();
-		if(vm == null) continue;
-		List<DisplayInfo> infos = vmMap.get(vm);
-		if(infos == null) {
-		    vmMap.put(vm, infos = new ArrayList<DisplayInfo>());
-		    vms.add(vm);
-		}
-		infos.add(info);
-	    }
-	    for(ViewManager vm: vms) {
-		List<DisplayInfo> infos  = vmMap.get(vm);
-		vm.addDisplayInfos(infos);
-	    }
+                ViewManager vm   = info.getViewManager();
+                if (vm == null) {
+                    continue;
+                }
+                List<DisplayInfo> infos = vmMap.get(vm);
+                if (infos == null) {
+                    vmMap.put(vm, infos = new ArrayList<DisplayInfo>());
+                    vms.add(vm);
+                }
+                infos.add(info);
+            }
+            for (ViewManager vm : vms) {
+                List<DisplayInfo> infos = vmMap.get(vm);
+                vm.addDisplayInfos(infos);
+            }
 
             for (int i = 0, n = v.size(); i < n; i++) {
                 DisplayInfo info = (DisplayInfo) v.get(i);
@@ -6483,13 +6499,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 this, null));
         propertyChangeListeners = null;
 
-        if (displayControlListeningTo!=null) {
+        if (displayControlListeningTo != null) {
             displayControlListeningTo.removeDisplayListener(this);
             displayControlListeningTo = null;
         }
 
 
-        if(projectionControlListeningTo!=null) {
+        if (projectionControlListeningTo != null) {
             projectionControlListeningTo.removeControlListener(this);
             projectionControlListeningTo = null;
         }
@@ -6520,7 +6536,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         disposeOfWindow();
         removeSharable();
 
-        if(animationWidget!=null) {
+        if (animationWidget != null) {
             animationWidget.destroy();
             animationWidget = null;
         }
@@ -6690,7 +6706,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param el   location of cursor
      * @param animationValue  animation value
      * @param animationStep  animation step
-     * @param samples _more_
+     * @param samples The list of samples returned
      *
      * @return list of strings for readout
      *
@@ -6721,7 +6737,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param el   location of cursor
      * @param animationValue  animation value
      * @param animationStep  animation step
-     * @param samples _more_
+     * @param samples The list of samples returned
      *
      * @return list of strings for readout
      *
@@ -6736,13 +6752,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * The getCursorReadout method that really does the work
      *
-     * @param el _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param el  the location
+     * @param animationValue the animation value
+     * @param animationStep  the animation step
      *
-     * @return _more_
+     * @return the list of readout strings
      */
     protected final List getCursorReadoutInner(EarthLocation el,
             Real animationValue, int animationStep) {
@@ -8074,7 +8090,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @author IDV Development Team
      * @version $Revision: 1.726 $
      */
-    public static class SideLegendLabel extends DndImageButton  {
+    public static class SideLegendLabel extends DndImageButton {
 
         /** The control */
         DisplayControlImpl myControl;
@@ -9151,6 +9167,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * Are we in a Globe display?
+     *
+     * @return  true if we're in the globe
+     */
     public boolean inGlobeDisplay() {
         return (getNavigatedDisplay() instanceof GlobeDisplay);
     }
@@ -10494,7 +10515,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return retVal;
     }
 
-
     /**
      * Get the ZPosition property.
      *
@@ -10770,9 +10790,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Get the initial fast rendering property
      *
-     * @return _more_
+     * @return the initial fast rendering property
      */
     protected boolean getInitialFastRendering() {
         return controlContext.getObjectStore().get(
@@ -11549,9 +11569,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Make the point size widget
      *
-     * @return _more_
+     * @return  the point size widget
      */
     public JComponent doMakePointSizeWidget() {
         final JTextField pointSizeFld = new JTextField("" + getPointSize(),
