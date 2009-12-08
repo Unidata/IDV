@@ -421,7 +421,7 @@ public class MapInfo {
         //        System.err.println ("CreateMap:" + source);
         SampledSet mapSet = (SampledSet) mapCache.get(source);
         if (mapSet != null) {
-            return mapSet;
+            return (SampledSet)mapSet.clone();
         }
 
         ucar.unidata.util.Trace.call1("create map", source);
@@ -467,7 +467,7 @@ public class MapInfo {
             mapCache.put(source, mapSet);
         }
         ucar.unidata.util.Trace.call2("create map");
-        return mapSet;
+        return (SampledSet)mapSet.clone();
     }
 
 
