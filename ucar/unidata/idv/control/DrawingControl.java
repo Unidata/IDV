@@ -180,7 +180,7 @@ public class DrawingControl extends DisplayControlImpl {
 
 
     /** The current coordinate type */
-    private int coordType = DrawingGlyph.COORD_LATLONALT;
+    private int coordType = DrawingGlyph.COORD_LATLON;
 
 
     /** The current line width */
