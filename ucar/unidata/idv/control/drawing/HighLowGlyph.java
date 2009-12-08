@@ -477,12 +477,14 @@ public class HighLowGlyph extends DrawingGlyph {
 
         textDisplayable.setData(getTimeField(theData1));
         pressureDisplayable.setData(getTimeField(theData2));
-        /*        textDisplayable.setConstantPosition(
-                                            control.getVerticalValue(getZPosition()),
-                                            control.getNavigatedDisplay().getDisplayAltitudeType());
+        /*
+        textDisplayable.setConstantPosition(
+            control.getVerticalValue(getZPosition()),
+            control.getNavigatedDisplay().getDisplayAltitudeType());
         pressureDisplayable.setConstantPosition(
-                                            control.getVerticalValue(getZPosition()),
-                                            control.getNavigatedDisplay().getDisplayAltitudeType());*/
+            control.getVerticalValue(getZPosition()),
+            control.getNavigatedDisplay().getDisplayAltitudeType());
+        */
 
     }
 

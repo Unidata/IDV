@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -31,11 +32,11 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 
 
 import ucar.unidata.idv.control.DrawingControl;
+import ucar.unidata.util.DateUtil;
 
 
 
 import ucar.unidata.util.FileManager;
-import ucar.unidata.util.DateUtil;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -131,7 +132,7 @@ public abstract class DrawingGlyph {
     /** xml attribute name */
     public static final String ATTR_TIMES = "times";
 
-    /** xml attribute for time format          */
+    /** xml attribute for time format */
     public static final String ATTR_TIMEFORMAT = "timeformat";
 
     /** xml attribute name */
@@ -324,6 +325,7 @@ public abstract class DrawingGlyph {
     /** Shows the color */
     private GuiUtils.ColorSwatch colorSwatch;
 
+    /** _more_          */
     private AbstractTableModel pointTableModel;
 
 
@@ -1237,7 +1239,7 @@ public abstract class DrawingGlyph {
         if (isInXYSpace()) {
             double[] point = control.toBox(event);
             if (isInFlatSpace()) {
-                point[IDX_Z] = zPosition;
+                point[IDX_Z] = control.getVerticalValue(zPosition);
             }
             return point;
         } else if (isInLatLonSpace()) {
@@ -1309,7 +1311,7 @@ public abstract class DrawingGlyph {
             tabbedPane.add("Properties", contents);
         }
 
-        tmpPoints = new ArrayList(points);
+        tmpPoints       = new ArrayList(points);
 
         pointTableModel = new AbstractTableModel() {
 
@@ -1418,12 +1420,13 @@ public abstract class DrawingGlyph {
 
 
         JTable pointTable = new JTable(pointTableModel);
-        
-        JButton writeBtn = GuiUtils.makeButton("Write Points", this, "writePoints");
+
+        JButton writeBtn = GuiUtils.makeButton("Write Points", this,
+                               "writePoints");
 
 
-        int    width      = 300;
-        int    height     = 200;
+        int width  = 300;
+        int height = 200;
         JScrollPane scroller = GuiUtils.makeScrollPane(pointTable, width,
                                    height);
         scroller.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -1431,7 +1434,9 @@ public abstract class DrawingGlyph {
         scroller.setMinimumSize(new Dimension(width, height));
 
 
-        tabbedPane.add("Points", GuiUtils.centerBottom(scroller,GuiUtils.left(writeBtn)));
+        tabbedPane.add("Points",
+                       GuiUtils.centerBottom(scroller,
+                                             GuiUtils.left(writeBtn)));
 
         jythonFld = new JTextField(control.getGlyphJython());
         JButton jythonBtn = GuiUtils.makeButton("Evaluate:", this,
@@ -1455,7 +1460,7 @@ public abstract class DrawingGlyph {
     public void writePoints() {
         String filename =
             FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
-                                                  FileManager.FILTER_XLS), FileManager.SUFFIX_CSV,null);
+                FileManager.FILTER_XLS), FileManager.SUFFIX_CSV, null);
 
         if (filename == null) {
             return;
@@ -2010,7 +2015,8 @@ public abstract class DrawingGlyph {
                     pts[IDX_X][i] = (float) point[IDX_X];
                     pts[IDX_Y][i] = (float) point[IDX_Y];
                     if (coordType == COORD_LATLON) {
-                        pts[IDX_Z][i] = (float) zPosition;
+                        pts[IDX_Z][i] =
+                            (float) control.getVerticalValue(zPosition);
                     }
                 } else {
                     pts[IDX_LAT][i] =
@@ -2130,7 +2136,8 @@ public abstract class DrawingGlyph {
                     pts[IDX_X][i] = (double) point[IDX_X];
                     pts[IDX_Y][i] = (double) point[IDX_Y];
                     if (coordType == COORD_LATLON) {
-                        pts[IDX_Z][i] = (double) zPosition;
+                        pts[IDX_Z][i] =
+                            (double) control.getVerticalValue(zPosition);
                     }
                 } else {
                     pts[IDX_LAT][i] =
@@ -2222,8 +2229,9 @@ public abstract class DrawingGlyph {
      */
     protected double getFixedAltitude()
             throws VisADException, RemoteException {
-        return control.boxToEarth(new double[] { 0.0, 0.0, zPosition },
-                                  false).getAltitude().getValue();
+        return control.boxToEarth(new double[] { 0.0, 0.0,
+                control.getVerticalValue(
+                    zPosition) }, false).getAltitude().getValue();
     }
 
     /**
@@ -2391,7 +2399,7 @@ public abstract class DrawingGlyph {
                 double lat = (double) pts[IDX_LAT][i];
                 double lon = (double) pts[IDX_LON][i];
                 double alt = (double) pts[IDX_ALT][i];
-                actualPoints.add(makePoint(lat,lon,alt));
+                actualPoints.add(makePoint(lat, lon, alt));
             }
         }
     }
@@ -3081,5 +3089,4 @@ public abstract class DrawingGlyph {
 
 
 }
-
 
