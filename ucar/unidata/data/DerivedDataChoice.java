@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -620,7 +621,7 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
-     * if the operand has a level property then set the level on the 
+     * if the operand has a level property then set the level on the
      * uber DataSelection
      *
      * @param dataChoice the data choice
@@ -735,80 +736,82 @@ public class DerivedDataChoice extends ListDataChoice {
         synchronized (interp) {
             //Bind the operand name to the appropriate values.
             List<String> setVariables = new ArrayList<String>();
-            for (int i = 0; i < ops.size(); i++) {
-                DataOperand op               = (DataOperand) ops.get(i);
-                String      cleanOperandName = op.makeLegalJython();
-                constructedCode = StringUtil.replace(constructedCode,
-                        op.getName(), cleanOperandName);
-                setVariables.add(cleanOperandName);
-                interp.set(cleanOperandName, op.getData());
-            }
-
-            //Check here because the hashCode/equals on this object
-            //that the cache manager uses to do lookups
-            //is set in the code above.
-            /*
-              for now don't do any caching
-            result = (Data) CacheManager.get (this, cacheKey);
-            */
-
-            interp.set("derivedDataChoice", this);
-            if (result == null) {
-                //Sometime we may want to do an exec here, instead of an eval.
-                //If we do the exec we need to have the contructed code
-                //have a "result=" in it and then we retrieve the
-                //value of "result" from the interpreter
-
-                PyObject pyResult     = interp.eval(constructedCode);
-
-                Object   resultObject = pyResult.__tojava__(visad.Data.class);
-                //Make sure we got the right kind of return value
-                if ((resultObject != null)
-                        && !(resultObject instanceof Data)) {
-                    resultObject = pyResult.__tojava__(DataChoice.class);
-                    //If we get back a data choice then we reset our expression to be
-                    //"bounddatachoice" and we add the data choice to our selves
-                    if (resultObject instanceof DataChoice) {
-                        DataChoice dataChoice = (DataChoice) resultObject;
-                        result = dataChoice.getData(incomingDataSelection);
-                        code                = "bounddatachoice";
-                        userSelectedChoices = new Hashtable();
-                        userSelectedChoices.put(code, dataChoice);
-                        childrenChoices = new ArrayList();
-                        childrenChoices.add(dataChoice);
-                    } else {
-                        throw new IllegalArgumentException(
-                            "Unknown return value type:"
-                            + resultObject.getClass().getName() + "\n Value="
-                            + resultObject + "\nCode:" + constructedCode);
-                    }
-                } else {
-                    result = (Data) resultObject;
+            try {
+                for (int i = 0; i < ops.size(); i++) {
+                    DataOperand op               = (DataOperand) ops.get(i);
+                    String      cleanOperandName = op.makeLegalJython();
+                    constructedCode = StringUtil.replace(constructedCode,
+                            op.getName(), cleanOperandName);
+                    setVariables.add(cleanOperandName);
+                    interp.set(cleanOperandName, op.getData());
                 }
-                //              System.err.println ("adding to cache:" + this);
+
+                //Check here because the hashCode/equals on this object
+                //that the cache manager uses to do lookups
+                //is set in the code above.
                 /*
                   for now don't do any caching
-                  CacheManager.put (this, cacheKey, result);
+                  result = (Data) CacheManager.get (this, cacheKey);
                 */
 
-            } else {
-                //              System.err.println ("had data in cache:" + this);
-            }
+                interp.set("derivedDataChoice", this);
+                if (result == null) {
+                    //Sometime we may want to do an exec here, instead of an eval.
+                    //If we do the exec we need to have the contructed code
+                    //have a "result=" in it and then we retrieve the
+                    //value of "result" from the interpreter
 
-            //Now, go thru each arg that we just set and clear it so we don't leak
-            interp.set("derivedDataChoice", null);
-            for (String varName : setVariables) {
-                interp.set(varName, null);
+                    PyObject pyResult = interp.eval(constructedCode);
+
+                    Object resultObject =
+                        pyResult.__tojava__(visad.Data.class);
+                    //Make sure we got the right kind of return value
+                    if ((resultObject != null)
+                            && !(resultObject instanceof Data)) {
+                        resultObject = pyResult.__tojava__(DataChoice.class);
+                        //If we get back a data choice then we reset our expression to be
+                        //"bounddatachoice" and we add the data choice to our selves
+                        if (resultObject instanceof DataChoice) {
+                            DataChoice dataChoice = (DataChoice) resultObject;
+                            result =
+                                dataChoice.getData(incomingDataSelection);
+                            code                = "bounddatachoice";
+                            userSelectedChoices = new Hashtable();
+                            userSelectedChoices.put(code, dataChoice);
+                            childrenChoices = new ArrayList();
+                            childrenChoices.add(dataChoice);
+                        } else {
+                            throw new IllegalArgumentException(
+                                "Unknown return value type:"
+                                + resultObject.getClass().getName()
+                                + "\n Value=" + resultObject + "\nCode:"
+                                + constructedCode);
+                        }
+                    } else {
+                        result = (Data) resultObject;
+                    }
+                    //              System.err.println ("adding to cache:" + this);
+                    /*
+                      for now don't do any caching
+                      CacheManager.put (this, cacheKey, result);
+                    */
+
+                } else {
+                    //              System.err.println ("had data in cache:" + this);
+                }
+
+            } finally {
+                //Now, go thru each arg that we just set and clear it so we don't leak
+                try {
+                    interp.set("derivedDataChoice", null);
+                } catch (Exception ignore) {}
+                try {
+                    for (String varName : setVariables) {
+                        interp.set(varName, null);
+                    }
+                } catch (Exception ignore) {}
             }
         }
-
-
-        //        System.err.println("user selected:" + userSelectedChoices);
-        //        System.err.println("children:" + childrenChoices);
-
-
-
-
         Trace.call2("DerivedData.getData");
         return result;
     }
