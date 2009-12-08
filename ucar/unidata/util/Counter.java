@@ -46,6 +46,10 @@ public class Counter {
 
     public Counter() {}
 
+    public String toString() {
+        return ""+count;
+    }
+
     public synchronized void incr(Object msg) {
 	count++;
 	messages.add(msg);
