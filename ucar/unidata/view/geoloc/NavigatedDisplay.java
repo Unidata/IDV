@@ -26,6 +26,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -91,10 +92,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
 
 
-    /** _more_          */
+    /** _more_ */
     private double clipDistanceBack = CLIP_BACK_DEFAULT;
 
-    /** _more_          */
+    /** _more_ */
     private double clipDistanceFront = CLIP_FRONT_DEFAULT;
 
 
@@ -1892,17 +1893,22 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * Move the center to the given earth location and zoom in
      *
      * @param el el to center on
+     * @param altitude _more_
      * @param animated animate the move
      * @param zoomFactor   factor to zoom
+     * @param northUp _more_
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
     public void centerAndZoom(final EarthLocation el, Real altitude,
-                              double zoomFactor, boolean animated, boolean northUp)
+                              double zoomFactor, boolean animated,
+                              boolean northUp)
             throws VisADException, RemoteException {
 
-        if(zoomFactor==0 || zoomFactor!=zoomFactor) zoomFactor = 1.0;
+        if ((zoomFactor == 0) || (zoomFactor != zoomFactor)) {
+            zoomFactor = 1.0;
+        }
 
 
         if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
@@ -2044,15 +2050,36 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @return  toolbar for navigating around the display
      */
     public NavigatedDisplayToolBar getNavigationToolBar() {
+        return getNavigationToolBar(JToolBar.HORIZONTAL, false);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param orientation _more_
+     * @param floatable _more_
+     *
+     * @return _more_
+     */
+    public NavigatedDisplayToolBar getNavigationToolBar(int orientation,
+            boolean floatable) {
+        if (getDestroyed()) {
+            return null;
+        }
         if (navToolBar == null) {
-            navToolBar = new NavigatedDisplayToolBar(this);
+            navToolBar = new NavigatedDisplayToolBar(this, orientation,
+                    floatable);
         }
         return navToolBar;
     }
 
 
-
-    public  void destroy() {
+    /**
+     * _more_
+     */
+    public void destroy() {
         if (navToolBar != null) {
             navToolBar.destroy();
             navToolBar = null;
@@ -2092,7 +2119,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     protected void updateLocation(EarthLocation el)
             throws VisADException, RemoteException {
-        if (el == null) return;
+        if (el == null) {
+            return;
+        }
         setCursorLatitude(el.getLatitude());
         setCursorLongitude(el.getLongitude());
         if (getDisplayMode() == MODE_3D) {
