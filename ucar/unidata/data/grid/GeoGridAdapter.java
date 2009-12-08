@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -58,8 +59,6 @@ import ucar.unidata.util.WrapperException;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;
 import ucar.visad.Util;
-
-import visad.data.CachedFlatField;
 import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
@@ -94,6 +93,8 @@ import visad.SetType;
 import visad.SingletonSet;
 import visad.Unit;
 import visad.VisADException;
+
+import visad.data.CachedFlatField;
 
 import visad.data.in.ArithProg;
 import visad.data.in.LonArithProg;
@@ -393,7 +394,8 @@ public class GeoGridAdapter {
                              : (Object) new ObjectPair(gcs,
                                  new Integer(timeIndex));
         timeStepKey = Misc.newList(timeStepKey, extraCacheKey);
-        GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey, true);
+        GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey,
+                                   true);
         if (domainSet != null) {
             return domainSet;
         }
@@ -404,7 +406,8 @@ public class GeoGridAdapter {
 
 
         float[][] refVals      = null;
-        Object[]  cachedPair   = (Object[]) dataSource.getCache(domainSetKey, true);
+        Object[] cachedPair = (Object[]) dataSource.getCache(domainSetKey,
+                                  true);
         if (cachedPair != null) {
             domainSet = (GriddedSet) cachedPair[0];
             refVals   = (float[][]) cachedPair[1];
@@ -840,7 +843,8 @@ public class GeoGridAdapter {
                             }
                         }
                     }
-                    Trace.call2("GeoGridAdapter:getCoordValue", " cnt=" + idx);
+                    Trace.call2("GeoGridAdapter:getCoordValue",
+                                " cnt=" + idx);
                     lengths = (sizeZ > 1)
                               ? new int[] { sizeX, sizeY, sizeZ }
                               : new int[] { sizeX, sizeY };
@@ -1120,8 +1124,8 @@ public class GeoGridAdapter {
     private CachedFlatField getFlatField(int timeIndex, String readLabel)
             throws VisADException {
 
-        String baseCacheKey =      "t_" + timeIndex;
-        List cacheKey = Misc.newList(baseCacheKey);
+        String baseCacheKey = "t_" + timeIndex;
+        List   cacheKey     = Misc.newList(baseCacheKey);
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
@@ -1366,7 +1370,7 @@ public class GeoGridAdapter {
                 }
 
             }
-            if (dataSource.getIdv() == null || dataSource.isLocalFile()) {
+            if ((dataSource.getIdv() == null) || dataSource.isLocalFile()) {
                 threadManager.runSequentially();
             } else {
                 threadManager
@@ -1444,7 +1448,8 @@ public class GeoGridAdapter {
                     for (int rangeIdx = 0; rangeIdx < sampleRanges[0].length;
                             rangeIdx++) {
                         Range r = sampleRanges[0][rangeIdx];
-                        if (Double.isInfinite(r.getMin())
+                        if ((r.getMin() == r.getMax())
+                                || Double.isInfinite(r.getMin())
                                 || Double.isInfinite(r.getMax())) {
                             sampleRanges[0] = null;
                             //                                        System.err.println("bad sample range");
