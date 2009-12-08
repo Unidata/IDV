@@ -512,7 +512,7 @@ public class GeoSelection {
      */
     public String toString() {
         return "x:" + xStride + " " + "y:" + yStride + " " + "z:" + zStride
-               + " " + boundingBox;
+               + " bbox:" + boundingBox;
     }
 
 
