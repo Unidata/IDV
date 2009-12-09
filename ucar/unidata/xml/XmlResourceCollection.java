@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.xml;
 
 
@@ -73,6 +74,15 @@ public class XmlResourceCollection extends ResourceCollection {
         this(id, id);
     }
 
+    /**
+     * copy ctor
+     *
+     * @param id new id
+     * @param that resourcecollection to copy from
+     */
+    public XmlResourceCollection(String id, XmlResourceCollection that) {
+        super(id, that);
+    }
 
     /**
      *  Construct a new object with the given id (The id is simply a name, not one of the resources)
