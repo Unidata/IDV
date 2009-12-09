@@ -302,7 +302,8 @@ public class DataOutputHandler extends OutputHandler {
         protected NetcdfDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir, null);
-                NetcdfDataset dataset = NetcdfDataset.openDataset(path);
+                //                NetcdfDataset dataset = NetcdfDataset.openDataset(path);
+                NetcdfDataset dataset = NetcdfDataset.openFile(path);
                 ncCreateCounter.incr();
                 return dataset;
             } catch (Exception exc) {
