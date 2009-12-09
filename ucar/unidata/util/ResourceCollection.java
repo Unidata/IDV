@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -135,6 +136,17 @@ public class ResourceCollection {
         }
     }
 
+
+    /**
+     * copy ctor
+     *
+     * @param id new id
+     * @param that resourcecollection to copy from
+     */
+    public ResourceCollection(String id, ResourceCollection that) {
+        this.id        = id;
+        this.resources = new ArrayList(that.resources);
+    }
 
 
     /**
@@ -274,12 +286,12 @@ public class ResourceCollection {
 
 
     /**
-     * _more_
+     * Get the named property from the given resource
      *
-     * @param name _more_
-     * @param resourceIdx _more_
+     * @param name property name
+     * @param resourceIdx which resource
      *
-     * @return _more_
+     * @return property value or null
      */
     public String getProperty(String name, int resourceIdx) {
         Resource resource = (Resource) resources.get(resourceIdx);
@@ -302,7 +314,7 @@ public class ResourceCollection {
         }
         String path = get(resourceIdx).toString();
         try {
-            path =  java.net.URLDecoder.decode(path, "UTF-8");
+            path = java.net.URLDecoder.decode(path, "UTF-8");
         } catch (java.io.UnsupportedEncodingException uee) {
             System.err.println("decoding error:" + uee);
         }
@@ -350,6 +362,17 @@ public class ResourceCollection {
         }
     }
 
+
+    /**
+     * Remove the index'th resource
+     *
+     * @param index the index to remove
+     */
+    public void removeResource(int index) {
+        resources.remove(index);
+    }
+
+
     /**
      * Add the resource. We create  a  new Resource
      *
@@ -379,8 +402,23 @@ public class ResourceCollection {
         addResourceAtStart(resourcePath, null);
     }
 
+
+    /**
+     * Add the given resource to the beginning of the list
+     *
+     * @param resourcePath resource path
+     * @param label label
+     */
     public void addResourceAtStart(String resourcePath, String label) {
-        Resource resource = new Resource(resourcePath,label, null);
+        addResourceAtStart(new Resource(resourcePath, label, null));
+    }
+
+    /**
+     * Add the given resource to the beginning of the list
+     *
+     * @param resource The resource
+     */
+    public void addResourceAtStart(Resource resource) {
         if (resources.size() == 0) {
             resources.add(resource);
         } else {
