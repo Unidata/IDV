@@ -33,13 +33,16 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 
+import ucar.visad.Util;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
 
 import visad.*;
+import visad.georef.EarthLocation;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -748,19 +751,29 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     ranges = GridUtil.getMinMax((FieldImpl) data);
                     double max      = Double.NEGATIVE_INFINITY;
                     double min      = Double.POSITIVE_INFINITY;
+                    int  startComp = 0;
                     int    numComps = getIsThreeComponents()
                                       ? 3
                                       : 2;
-                    for (int i = 0; i < numComps; i++) {
+                    boolean isCartesian = getGridDisplay().isCartesianWind();
+                    //System.out.println("control thinks cartesian is " + isCartesian);
+                    if (!isCartesian) {
+                        int speedIndex = getGridDisplay().getSpeedTypeIndex();
+                        if (speedIndex != -1) {
+                            startComp = speedIndex;
+                            numComps = startComp + 1;
+                        }
+                    }
+                    for (int i = startComp; i < numComps; i++) {
                         Range compRange = ranges[i];
                         max = Math.max(compRange.getMax(), max);
                         min = Math.min(compRange.getMin(), min);
                     }
-                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min) && isCartesian) {
                         max = Math.max(max, -min);
                         min = -max;
                     }
-                    // System.out.println("setFlowRange: " + min + " to " + max);
+                    //System.out.println("setFlowRange: " + min + " to " + max);
                     //getGridDisplay().setFlowRange(min,max);
                     setFlowRange(new Range(min, max));
                 } else {  // gotta set it to something
@@ -805,5 +818,92 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             skipFactorWidget = null;
         }
     }
+
+    /**
+     * Get the cursor data
+     *
+     * @param el  earth location
+     * @param animationValue   the animation value
+     * @param animationStep  the animation step
+     *
+     * @return  the list of readout data
+     *
+     * @throws Exception  problem getting the data
+     */
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
+            throws Exception {
+        if (currentSlice == null) {
+            return null;
+        }
+        List result = new ArrayList();
+        RealTuple r = GridUtil.sampleToRealTuple(
+                     currentSlice, el, animationValue,
+                     getSamplingModeValue(
+                         getObjectStore().get(
+                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+        if(r!=null) {
+            ReadoutInfo readoutInfo =  new ReadoutInfo(this, r, el, animationValue); 
+            readoutInfo.setUnit(getDisplayUnit());
+            readoutInfo.setRange(getRange());
+            samples.add(readoutInfo);
+        }
+
+        if ((r != null) && !Util.allMissing(r)) {
+
+            result.add("<tr><td>" + getMenuLabel()
+                       + ":</td><td  align=\"right\">"
+                       + formatForCursorReadout(r) + ((currentLevel != null)
+                    ? ("@" + currentLevel)
+                    : "") + "</td></tr>");
+        }
+        return result;
+    }
+
+    /**
+     * Format a real for the cursor readout
+     *
+     * @param r  the realtuple
+     *
+     * @return  the formatted string
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException  VisAD error
+     */
+    protected String formatForCursorReadout(RealTuple rt)
+            throws VisADException, RemoteException {
+        Unit   displayUnit = getDisplayUnit();
+        double value;
+        Unit   unit = null;
+        String result;
+        if (Util.allMissing(rt)) {
+            result = "missing";
+        } else {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i<rt.getDimension(); i++) {
+                Real r = (Real) rt.getComponent(i);
+                if (displayUnit != null) {
+                    value = r.getValue(displayUnit);
+                    unit  = displayUnit;
+                } else {
+                    value = r.getValue();
+                    unit  = r.getUnit();
+                }
+                builder.append(Misc.format(value));
+                if (i != rt.getDimension()-1) builder.append("/");
+            }
+            builder.append("[");
+            builder.append(unit);
+            builder.append("]");
+            result = builder.toString();
+            int length = result.length();
+            result = StringUtil.padLeft(result, 8 * (20 - length), "&nbsp;");
+        }
+
+        return result;
+    }
+
 }
 
