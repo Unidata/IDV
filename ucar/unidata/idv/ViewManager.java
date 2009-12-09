@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -461,9 +462,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private JSplitPane mainSplitPane;
 
     /** The last split pane divider location when we do the float/embed */
-    private int lastDividerLoc=-1;
+    private int lastDividerLoc = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int splitPaneLocation = -1;
 
 
@@ -585,13 +586,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** properties dialog */
     JDialog propertiesDialog;
 
-    /** _more_          */
+    /** _more_ */
     boolean propertiesDialogShown = false;
 
-    /** _more_          */
+    /** _more_ */
     JLabel matrixLabel;
 
-    /** _more_          */
+    /** _more_ */
     DecimalFormat fmt = new DecimalFormat("####0.0###");
 
     /** the view menu */
@@ -689,6 +690,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Vector Graphics renderer */
     private VectorGraphicsRenderer vectorRenderer;
 
+    /** _more_          */
     private String initViewStateName;
 
 
@@ -952,7 +954,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
-            legends.add(bottomLegend);
+            synchronized (legends) {
+                legends.add(bottomLegend);
+            }
             JComponent contents = bottomLegend.getContents();
             if (showControlLegend) {
                 centerPanel = GuiUtils.vsplit(centerPanel, contents, 1.0);
@@ -965,7 +969,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (sideLegend == null) {
             sideLegend = new SideLegend(this);
         }
-        legends.add(sideLegend);
+        synchronized (legends) {
+            legends.add(sideLegend);
+        }
         sideLegendComponent = getSideComponent(sideLegend.getContents());
         sideLegendContainer = new JPanel(new BorderLayout());
         sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
@@ -1028,7 +1034,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sideLegendContainer.removeAll();
             sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
             sideLegendContainer.repaint();
-            if(lastDividerLoc>=0) {
+            if (lastDividerLoc >= 0) {
                 mainSplitPane.setDividerLocation(lastDividerLoc);
             } else {
                 mainSplitPane.resetToPreferredSizes();
@@ -1038,10 +1044,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sideLegendContainer.removeAll();
             sideLegendContainer.repaint();
             sideLegend.floatLegend();
-            if(legendOnLeft) {
+            if (legendOnLeft) {
                 mainSplitPane.setDividerLocation(0);
             } else {
-                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
+                mainSplitPane.setDividerLocation(
+                    mainSplitPane.getBounds().width);
 
             }
         } else if (legendState.equals(IdvLegend.STATE_HIDDEN)) {
@@ -1050,10 +1057,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sideLegendContainer.repaint();
             sideLegend.unFloatLegend();
             sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
-            if(legendOnLeft) {
+            if (legendOnLeft) {
                 mainSplitPane.setDividerLocation(0);
             } else {
-                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
+                mainSplitPane.setDividerLocation(
+                    mainSplitPane.getBounds().width);
             }
         }
     }
@@ -1524,10 +1532,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private double[] lastMatrix;
 
-    /** _more_          */
+    /** _more_ */
     private List<TwoFacedObject> lastCoords;
 
     /**
@@ -1831,7 +1839,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.animationWidget.setProperties(that.animationInfo);
         }
 
-        if(initViewStateName==null) {
+        if (initViewStateName == null) {
             if (that.initMatrix != null) {
                 setDisplayMatrix(that.initMatrix);
             }
@@ -2366,9 +2374,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         continue;
                     }
 
-                    String                cat = control.getDisplayCategory();
-                    if(cat == null) cat = "Displays";
-                    List<TextDisplayable> l   = catMap.get(cat);
+                    String cat = control.getDisplayCategory();
+                    if (cat == null) {
+                        cat = "Displays";
+                    }
+                    List<TextDisplayable> l = catMap.get(cat);
                     if (l == null) {
                         l = new ArrayList<TextDisplayable>();
                         catMap.put(cat, l);
@@ -2997,6 +3007,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
         });
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List<IdvLegend> getLegends() {
+        if (legends == null) {
+            return new ArrayList<IdvLegend>();
+        }
+        synchronized (legends) {
+            return new ArrayList<IdvLegend>(legends);
+        }
+    }
+
 
     /**
      * Called when the window is closed. This method closes any open legends.
@@ -3005,7 +3029,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (legends == null) {
             return;
         }
-        for (IdvLegend legend : legends) {
+        for (IdvLegend legend : getLegends()) {
             legend.doClose();
         }
     }
@@ -3015,7 +3039,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Show (float) all legends
      */
     public void showLegend() {
-        for (IdvLegend legend : legends) {
+        for (IdvLegend legend : getLegends()) {
             legend.showLegend();
         }
     }
@@ -3746,7 +3770,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (legends == null) {
             return;
         }
-        for (IdvLegend legend : legends) {
+        for (IdvLegend legend : getLegends()) {
             legend.setColors(foreground, background);
         }
     }
@@ -3864,7 +3888,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         fillLegendsPending = false;
         updateDisplayList();
         synchronized (LEGENDMUTEX) {
-            for (IdvLegend legend : legends) {
+            for (IdvLegend legend : getLegends()) {
                 legend.fillLegend();
             }
         }
@@ -4011,35 +4035,43 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
+    /**
+     * _more_
+     *
+     * @param displayInfos _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void addDisplayInfos(List<DisplayInfo> displayInfos)
-	throws RemoteException, VisADException {
+            throws RemoteException, VisADException {
         if (getIsDestroyed()) {
             return;
         }
 
-	
-	setMasterInactive();
-	try {
-	    if (master != null) {
-		for(DisplayInfo info: displayInfos) {
-		    info.setDisplayableAdded(addDisplayInfo(info));
-		}
-	    }
+
+        setMasterInactive();
+        try {
+            if (master != null) {
+                for (DisplayInfo info : displayInfos) {
+                    info.setDisplayableAdded(addDisplayInfo(info));
+                }
+            }
 
 
-	    if (shouldDoThingsRightAway()) {
-		fillLegends();
-		updateTimelines(true);
-		if ( !getStateManager().isLoadingXml()) {
-		    toFront();
-		}
-	    } else {
-		dirty = true;
-	    }
+            if (shouldDoThingsRightAway()) {
+                fillLegends();
+                updateTimelines(true);
+                if ( !getStateManager().isLoadingXml()) {
+                    toFront();
+                }
+            } else {
+                dirty = true;
+            }
 
-	} finally {
-	    setMasterActive();
-	}
+        } finally {
+            setMasterActive();
+        }
     }
 
 
@@ -4280,11 +4312,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public boolean isCompatibleWith(ViewManager vm) {
         IdvWindow thisWindow = getDisplayWindow();
-        if(thisWindow!=null) {
+        if (thisWindow != null) {
             //If this is being called it means the given vm is from an old bundle
             //And we only want to be compatible with it if we are in the default window
             String skin = thisWindow.getSkinPath();
-            if(skin!=null && !Misc.equals("/ucar/unidata/idv/resources/skins/skin.xml", skin)) return false;
+            if ((skin != null)
+                    && !Misc.equals(
+                        "/ucar/unidata/idv/resources/skins/skin.xml", skin)) {
+                return false;
+            }
         }
         return getClass().equals(vm.getClass());
     }
@@ -4696,7 +4732,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return class ok
      */
     public boolean isClassOk(ViewDescriptor vd) {
-        if(vd==null) return false;
+        if (vd == null) {
+            return false;
+        }
         List classNames = vd.getClassNames();
         if ((classNames == null) || (classNames.size() == 0)) {
             return true;
@@ -6230,18 +6268,22 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (lastActive) {
             lastTimeActivated = System.currentTimeMillis();
         }
-        if ((innerContents != null) && (getVMManager() != null)) {
-            boolean haveMany =
-                getVMManager().haveMoreThanOneMainViewManager();
+        VMManager  vmManager = getVMManager();
+        JComponent contents  = innerContents;
+        if ((contents != null) && (vmManager != null)) {
+            boolean haveMany = vmManager.haveMoreThanOneMainViewManager();
             if (getIsShared()) {
                 if (haveMany && b) {
-                    innerContents.setBorder(getHighlightBorder());
+                    contents.setBorder(getHighlightBorder());
                 } else {
-                    innerContents.setBorder(getNormalBorder());
+                    contents.setBorder(getNormalBorder());
                 }
             }
         }
-        getIdvUIManager().viewManagerActiveChanged(this);
+        IdvUIManager idvUIManager = getIdvUIManager();
+        if (idvUIManager != null) {
+            idvUIManager.viewManagerActiveChanged(this);
+        }
     }
 
 
@@ -6921,10 +6963,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public void setInitViewStateName(String s) {
         initViewStateName = s;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getInitViewStateName() {
         return initViewStateName;
     }
