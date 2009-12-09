@@ -28,6 +28,7 @@ package ucar.visad.display;
 
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
@@ -519,7 +520,9 @@ abstract public class DisplayMaster {
         try {
             display.destroy();
         } catch (Exception e) {
-            throw new RuntimeException("DisplayMaster.destroy", e);
+            System.err.println("DisplayMaster.destroy:");
+            e.printStackTrace();
+            //            throw new WrapperException("DisplayMaster.destroy", e);
             //e.printStackTrace();
         }
 
