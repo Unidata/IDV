@@ -132,7 +132,7 @@ public class MapInfo {
     public static final String ATTR_VISIBLE = "visible";
 
     /** Static cache of the maps we have read in */
-    private static Hashtable mapCache = new Hashtable();
+    private static Hashtable<String,SampledSet> mapCache = new Hashtable<String,SampledSet>();
 
 
     /**
@@ -255,12 +255,6 @@ public class MapInfo {
                     break;
                 }
             }
-
-            //Make sure we have a mapPosition
-            if (Double.isNaN(mapPosition)) {
-                mapPosition = -.99;
-            }
-
         } catch (Exception exc) {
             LogUtil.printException(log_, "Creating xml", exc);
             return;
@@ -419,7 +413,7 @@ public class MapInfo {
     public static SampledSet createMapData(String source) {
 
         //        System.err.println ("CreateMap:" + source);
-        SampledSet mapSet = (SampledSet) mapCache.get(source);
+        SampledSet mapSet =  mapCache.get(source);
         if (mapSet != null) {
             return (SampledSet)mapSet.clone();
         }
