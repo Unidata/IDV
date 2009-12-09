@@ -498,6 +498,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             this.msg        = msg;
             where           = Misc.getStackTrace();
         }
+
+        public String toString(){
+            return "info:" + connection+" " ;
+        }
+
+
     }
 
 
@@ -690,11 +696,19 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     public void closeConnection(Connection connection) {
         try {
             synchronized (connectionInfos) {
+                boolean gotOne = false;
                 for(ConnectionInfo info: connectionInfos) {
-                    if(info.connection == connection) {
+                    //                    if(info.connection == connection) {
+                    if(info.connection == connection || info.connection.equals(connection)) {
                         connectionInfos.remove(info);
+                        gotOne = true;
                         break;
                     }
+                }
+                if(!gotOne) {
+                    //                    System.err.println("     failed to find connection infos.size:" + connectionInfos.size());
+                    //                    System.err.println("     connection:" + connection);
+                    //                    System.err.println("     infos:" + connectionInfos);
                 }
                 //                connectionMap.remove(connection);
             }
