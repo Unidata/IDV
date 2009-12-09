@@ -1505,14 +1505,11 @@ public class MapDisplayControl extends DisplayControlImpl {
                     // System.err.println("creating map:" + description + " from: " + source);
                     myMap = new MapLines("Map:" + source);
                     myMap.setMapLines(mapSet);
-                    myMap.setUseFastRendering(fastRendering);
                     //Set the colors, etc.
-                    stateChanged();
+                    applyStateToMap();
+
                     //Add in the map 
                     mapDisplayControl.mapsHolder.addDisplayable(myMap);
-                    //Since the stateChanged method calls checkVisiblity again 
-                    //we return here
-                    return;
                 }
                 myMap.setVisible(isVisible);
             } catch (Exception exc) {
