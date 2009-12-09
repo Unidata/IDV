@@ -3603,6 +3603,19 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                             Misc.newList(viewManager));
                     }
                     if (shouldMerge) {
+                        //Now get rid of any windows that are left over 
+                        for (int currentIdx = 0;
+                                currentIdx < currentViewManagers.size();
+                                currentIdx++) {
+                            ViewManager vm =
+                                (ViewManager) currentViewManagers.get(
+                                    currentIdx);
+                            IdvWindow window = vm.getDisplayWindow();
+                            if(window!=null && !window.getHasBeenDisposed() ) {
+                                window.dispose();
+                            }
+
+                        }
                     }
                 }
 

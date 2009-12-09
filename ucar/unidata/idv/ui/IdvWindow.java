@@ -74,6 +74,9 @@ public class IdvWindow extends MultiFrame {
     /** Are we currently in wait state */
     private static boolean waitState = false;
 
+
+    private  boolean hasBeenDisposed= false;
+
     /** The window contents */
     JComponent contents;
 
@@ -537,10 +540,17 @@ public class IdvWindow extends MultiFrame {
     }
 
 
+    public boolean getHasBeenDisposed()  {
+        return hasBeenDisposed;
+    }
+
+
     /**
      * Dispose of this window.
      */
     public void dispose() {
+        if(hasBeenDisposed) return;
+        hasBeenDisposed = true;
         RovingProgress progress =
             (RovingProgress)           getComponent(IdvUIManager.COMP_PROGRESSBAR);
         if (progress != null) {
