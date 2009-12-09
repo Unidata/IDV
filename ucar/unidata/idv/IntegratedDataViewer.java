@@ -1471,6 +1471,7 @@ Misc.run(new Runnable() {
             Runtime.getRuntime().gc();
         } catch (Throwable exc) {
             logException("removeAllDisplays", exc);
+            exc.printStackTrace();
         }
     }
 

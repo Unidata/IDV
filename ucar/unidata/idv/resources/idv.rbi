@@ -551,8 +551,6 @@
 <!-- Defines the set of system maps  -->
   <resources name="idv.resource.globemaps">
     <resource location="%USERPATH%/globemaps.xml"/>
-    <resource location="%SITEPATH%/globemaps.xml"/>
-    <resource location="%APPPATH%/globemaps.xml"/>
     <resource location="/auxdata/maps/globemaps.xml"/>
   </resources>
 

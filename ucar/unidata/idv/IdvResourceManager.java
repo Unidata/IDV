@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -1446,16 +1447,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
 
-
-    /**
-     * Remove any local maps.xml file
-     *
-     * @return Was there one removed
-     */
-    public boolean removeLocalMaps() {
-        return removeLocalMaps(false);
-    }
-
     /**
      * Remove any local maps.xml file
      *
@@ -1481,26 +1472,37 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /**
-     * Get the list of maps/descriptions from the maps resources.
+     * _more_
      *
-     * @return A list of MapData objects.
+     * @param forGlobe _more_
+     *
+     * @return _more_
      */
-    public List<MapData> getMaps() {
-        return getMaps(false);
+    public XmlResourceCollection getMapResources(boolean forGlobe) {
+        XmlResourceCollection mapResources   = getXmlResources(RSC_MAPS);
+        XmlResourceCollection globeResources = getXmlResources(RSC_GLOBEMAPS);
+        //If this is for the globe then clone the mapResources and swap out the first one which should be the writable
+        if (forGlobe && (globeResources.size() > 0)
+                && (mapResources.size() > 0)) {
+            mapResources = new XmlResourceCollection(RSC_GLOBEMAPS.id,
+                    mapResources);
+            Object firstGlobeResource = globeResources.get(0);
+            mapResources.removeResource(0);
+            mapResources.addResourceAtStart(firstGlobeResource.toString());
+        }
+
+        return mapResources;
     }
 
 
     /**
-     * Get the list of maps/descriptions from the maps resources.
+     * _more_
      *
-     *
-     * @param forGlobe if true then use the globemaps resource
-     * @return A list of MapData objects.
+     * @return _more_
      */
-    public List<MapData> getMaps(boolean forGlobe) {
-        MapInfo mapInfo = new MapInfo(getXmlResources(forGlobe
-                ? RSC_GLOBEMAPS
-                : RSC_MAPS), false, false);
+    public List<MapData> getMaps() {
+        MapInfo mapInfo = new MapInfo(getXmlResources(RSC_MAPS), false,
+                                      false);
         List<MapData> results = new ArrayList<MapData>();
         List          maps    = mapInfo.getMapDataList();
         Hashtable     seen    = new Hashtable();
@@ -1520,14 +1522,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     }
 
 
-    /**
-     * A utility to instantiate a MapInfo from the maps resources
-     *
-     * @return The MapInfo holding the map stuff.
-     */
-    public MapInfo createMapInfo() {
-        return createMapInfo(false);
-    }
+
 
     /**
      * A utility to instantiate a MapInfo from the maps resources
@@ -1537,23 +1532,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return The MapInfo holding the map stuff.
      */
     public MapInfo createMapInfo(boolean forGlobe) {
-        XmlResourceCollection maps = getXmlResources(forGlobe
-                ? RSC_GLOBEMAPS
-                : RSC_MAPS);
-        return new MapInfo(maps, true);
+        return new MapInfo(getMapResources(forGlobe), true);
     }
 
-
-
-    /**
-     * Write out the given maps xml to the writable resource
-     *
-     * @param mapsXml The maps xml
-     */
-
-    public void writeMapState(String mapsXml) {
-        writeMapState(mapsXml, false);
-    }
 
 
     /**

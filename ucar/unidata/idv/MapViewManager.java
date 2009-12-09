@@ -915,9 +915,7 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(customMapResources, true, true);
                     Trace.call2("checkDefaultMap-2");
                 } else {
-                    XmlResourceCollection xrc =
-                        getResourceManager().getXmlResources(
-                            getResourceManager().RSC_MAPS);
+                    XmlResourceCollection xrc = getResourceManager().getMapResources(getUseGlobeDisplay());
                     mapInfo = new MapInfo(xrc, false, true);
                 }
 

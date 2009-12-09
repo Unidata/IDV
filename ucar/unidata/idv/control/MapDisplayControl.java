@@ -408,7 +408,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             isDefaultMap        = true;
             setCanDoRemoveAll(false);
             MapInfo mapInfo =
-                getControlContext().getResourceManager().createMapInfo();
+                getControlContext().getResourceManager().createMapInfo(inGlobeDisplay());
             if (mapInfo.getJustLoadedLocalMaps()) {
                 ignoreNonVisibleMaps = false;
             }
@@ -615,7 +615,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         JMenu addMapMenu = new JMenu("Add System Map");
         items.add(addMapMenu);
 
-        List maps = getControlContext().getResourceManager().getMaps();
+        List maps = getControlContext().getResourceManager().getMaps(inGlobeDisplay());
         for (int i = 0; i < maps.size(); i++) {
             final MapData mapData = (MapData) maps.get(i);
             mi = new JMenuItem(mapData.getDescription());
@@ -663,7 +663,7 @@ public class MapDisplayControl extends DisplayControlImpl {
                         "Remove Default Maps",
                         "Are you sure you want to remove the default maps?")) {
                     if (getControlContext().getResourceManager()
-                            .removeLocalMaps()) {
+                            .removeLocalMaps(inGlobeDisplay())) {
                         LogUtil.userMessage(
                             "This will take effect when you run the IDV next");
                     } else {
@@ -788,7 +788,7 @@ public class MapDisplayControl extends DisplayControlImpl {
     private void saveAsPreference() {
         String xml = new MapInfo(mapStates, latState, lonState,
                                  (float) mapPosition).getXml();
-        getControlContext().getResourceManager().writeMapState(xml);
+        getControlContext().getResourceManager().writeMapState(xml,inGlobeDisplay());
     }
 
     /**
