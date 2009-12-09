@@ -22,11 +22,9 @@
 
 
 
+
 package ucar.unidata.idv;
 
-
-import ucar.unidata.idv.flythrough.Flythrough;
-import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.GeoLocationInfo;
@@ -41,6 +39,10 @@ import ucar.unidata.gis.maps.MapInfo;
 
 import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.idv.control.ZSlider;
+
+
+import ucar.unidata.idv.flythrough.Flythrough;
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 import ucar.unidata.idv.ui.*;
 
@@ -118,15 +120,33 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
-    public static final String PROP_CLIPDISTANCE_GLOBE_FRONT  = "idv.clipdistance.globe.front";
-    public static final String PROP_CLIPDISTANCE_GLOBE_BACK  = "idv.clipdistance.globe.back";
-    public static final String PROP_CLIPDISTANCE_MAP_FRONT  = "idv.clipdistance.map.front";
-    public static final String PROP_CLIPDISTANCE_MAP_BACK  = "idv.clipdistance.map.back";
+    /** _more_          */
+    public static final String PROP_CLIPDISTANCE_GLOBE_FRONT =
+        "idv.clipdistance.globe.front";
+
+    /** _more_          */
+    public static final String PROP_CLIPDISTANCE_GLOBE_BACK =
+        "idv.clipdistance.globe.back";
+
+    /** _more_          */
+    public static final String PROP_CLIPDISTANCE_MAP_FRONT =
+        "idv.clipdistance.map.front";
+
+    /** _more_          */
+    public static final String PROP_CLIPDISTANCE_MAP_BACK =
+        "idv.clipdistance.map.back";
 
 
+    /** _more_          */
     public static final String CMD_FLY_LEFT = "cmd.fly.left";
+
+    /** _more_          */
     public static final String CMD_FLY_RIGHT = "cmd.fly.right";
+
+    /** _more_          */
     public static final String CMD_FLY_FORWARD = "cmd.fly.forward";
+
+    /** _more_          */
     public static final String CMD_FLY_BACK = "cmd.fly.back";
 
     /** preference id for the list of addresses in the geocode dialog */
@@ -151,7 +171,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** Preference for  showing the pip */
     public static final String PREF_SHOWPIP = "View.ShowPip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_SHOWGLOBEBACKGROUND =
         "View.ShowGlobeBackground";
 
@@ -177,6 +197,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** The name of the display projection we are currently using */
     private String mainProjectionName = null;
 
+    /** _more_          */
     private String defaultProjectionName = null;
 
 
@@ -203,9 +224,11 @@ public class MapViewManager extends NavigatedViewManager {
 
     /** The map panel in the GUI */
     private PipPanel pipPanel;
-    private Object  PIP_MUTEX = new Object();
 
     /** _more_          */
+    private Object PIP_MUTEX = new Object();
+
+    /** _more_ */
     private JComponent pipPanelWrapper;
 
 
@@ -239,28 +262,37 @@ public class MapViewManager extends NavigatedViewManager {
     private ZSlider globeBackgroundLevelSlider;
 
 
-    /** _more_          */
+    /** _more_ */
     private Flythrough flythrough;
 
+    /** _more_          */
     private boolean showMaps = true;
 
+    /** _more_          */
     private String initMapPaths;
+
+    /** _more_          */
     private float initMapWidth = -1;
+
+    /** _more_          */
     private Color initMapColor = null;
 
+    /** _more_          */
     private Rectangle2D.Float initLatLonBounds;
 
+    /** _more_          */
     private boolean defaultGlobeBackground = false;
 
+    /** _more_          */
     private double displayProjectionZoom = 0;
 
+    /** _more_          */
     private boolean doNotSetProjection = false;
 
     /**
      *  Default constructor
      */
-    public MapViewManager() {
-    }
+    public MapViewManager() {}
 
 
     /**
@@ -351,37 +383,48 @@ public class MapViewManager extends NavigatedViewManager {
             GlobeDisplay globeDisplay =
                 new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
                                  dimension, null);
-            globeDisplay.setClipDistanceFront(getStateManager().getProperty(PROP_CLIPDISTANCE_GLOBE_FRONT,NavigatedDisplay.CLIP_FRONT_DEFAULT));
-            globeDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_GLOBE_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
+            globeDisplay.setClipDistanceFront(
+                getStateManager().getProperty(
+                    PROP_CLIPDISTANCE_GLOBE_FRONT,
+                    NavigatedDisplay.CLIP_FRONT_DEFAULT));
+            globeDisplay.setClipDistanceBack(
+                getStateManager().getProperty(
+                    PROP_CLIPDISTANCE_GLOBE_BACK,
+                    NavigatedDisplay.CLIP_BACK_DEFAULT));
             navDisplay = globeDisplay;
             setGlobeBackground(globeDisplay);
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
-                if(initLatLonBounds!=null) {
-		    doNotSetProjection = true;
-                    mainProjection = ucar.visad.Util.makeMapProjection(initLatLonBounds.getY()-initLatLonBounds.getHeight(),
-                                                                       initLatLonBounds.getX(),
-                                                                       initLatLonBounds.getY(),
-                                                                       initLatLonBounds.getX()+initLatLonBounds.getWidth(),false);
+                if (initLatLonBounds != null) {
+                    doNotSetProjection = true;
+                    mainProjection =
+                        ucar.visad.Util
+                            .makeMapProjection(initLatLonBounds.getY()
+                                - initLatLonBounds
+                                    .getHeight(), initLatLonBounds.getX(),
+                                        initLatLonBounds.getY(),
+                                        initLatLonBounds.getX()
+                                        + initLatLonBounds.getWidth(), false);
 
-                    
-		} else {
-		    ProjectionImpl dfltProjection = null;
-		    if(defaultProjectionName!=null) {
-			dfltProjection = 
-			    getIdv().getIdvProjectionManager().findProjectionByName(defaultProjectionName);
-			if(dfltProjection!=null) {
-			    doNotSetProjection = true;
-			}
-		    }
 
-		    if(dfltProjection==null) {
-			dfltProjection = getDefaultProjection();
-		    }
-		    mainProjection =
-			new ProjectionCoordinateSystem(dfltProjection);
-		}
+                } else {
+                    ProjectionImpl dfltProjection = null;
+                    if (defaultProjectionName != null) {
+                        dfltProjection =
+                            getIdv().getIdvProjectionManager()
+                                .findProjectionByName(defaultProjectionName);
+                        if (dfltProjection != null) {
+                            doNotSetProjection = true;
+                        }
+                    }
+
+                    if (dfltProjection == null) {
+                        dfltProjection = getDefaultProjection();
+                    }
+                    mainProjection =
+                        new ProjectionCoordinateSystem(dfltProjection);
+                }
             }
             if (isInteractive()) {
                 addProjectionToHistory(mainProjection, "Default");
@@ -392,24 +435,34 @@ public class MapViewManager extends NavigatedViewManager {
                     getIdv().getArgsManager().getIsOffScreen(), dimension);
             Trace.call2("MapViewManager.new MPD");
 
-            mapDisplay.setClipDistanceFront(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_FRONT,NavigatedDisplay.CLIP_FRONT_DEFAULT));
-            mapDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
+            mapDisplay.setClipDistanceFront(
+                getStateManager().getProperty(
+                    PROP_CLIPDISTANCE_MAP_FRONT,
+                    NavigatedDisplay.CLIP_FRONT_DEFAULT));
+            mapDisplay.setClipDistanceBack(
+                getStateManager().getProperty(
+                    PROP_CLIPDISTANCE_MAP_BACK,
+                    NavigatedDisplay.CLIP_BACK_DEFAULT));
 
 
-	    if(initLatLonBounds==null) {
-		double[] aspect = getAspectRatio();
-		if (aspect == null) {
-		    aspect = new double[] { 1.0, 1.0, 0.4 };
-		}
-		mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
-					    ? new double[] { aspect[0],
-							     aspect[1] }
-					    : aspect);
-	    } else {
+            if (initLatLonBounds == null) {
+                double[] aspect = getAspectRatio();
+                if (aspect == null) {
+                    aspect = new double[] { 1.0, 1.0, 0.4 };
+                }
+                mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
+                                            ? new double[] { aspect[0],
+                        aspect[1] }
+                                            : aspect);
+            } else {
                 //If we have a a latlonbounds then we want to display exactly that area
-                double[] aspect = new double[] { 1.0, initLatLonBounds.getHeight()/initLatLonBounds.getWidth(), 1.0 };
-                double[] scaleMatrix =mapDisplay.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                                aspect[0],aspect[1],1, 0.0, 0.0, 0.0);
+                double[] aspect = new double[] { 1.0,
+                        initLatLonBounds.getHeight()
+                        / initLatLonBounds.getWidth(),
+                        1.0 };
+                double[] scaleMatrix =
+                    mapDisplay.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                        aspect[0], aspect[1], 1, 0.0, 0.0, 0.0);
                 //                mapDisplay.setProjectionMatrix(scaleMatrix);
             }
 
@@ -417,11 +470,12 @@ public class MapViewManager extends NavigatedViewManager {
             navDisplay = mapDisplay;
             navDisplay.setPerspectiveView(getPerspectiveView());
 
-	    if(defaultProjectionName!=null && displayProjectionZoom!=0) {
-		navDisplay.zoom(displayProjectionZoom);
-	    }
-	    defaultProjectionName = null;
-	    initLatLonBounds = null;
+            if ((defaultProjectionName != null)
+                    && (displayProjectionZoom != 0)) {
+                navDisplay.zoom(displayProjectionZoom);
+            }
+            defaultProjectionName = null;
+            initLatLonBounds      = null;
 
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
         }
@@ -484,8 +538,9 @@ public class MapViewManager extends NavigatedViewManager {
             return;
         }
         super.init();
-        Trace.call1("MapViewManager.init checkDefaultMap", " showMap:" + showMaps);
-        
+        Trace.call1("MapViewManager.init checkDefaultMap",
+                    " showMap:" + showMaps);
+
         checkDefaultMap();
         Trace.call2("MapViewManager.init checkDefaultMap");
 
@@ -505,6 +560,9 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     */
     protected void initUI() {
         super.initUI();
         //Initialize the flythrough here
@@ -517,9 +575,12 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     */
     protected void fillLegends() {
         super.fillLegends();
-        if(flythrough!=null) {
+        if (flythrough != null) {
             flythrough.displayControlChanged();
         }
     }
@@ -546,9 +607,7 @@ public class MapViewManager extends NavigatedViewManager {
     /**
      * Handle the event
      *
-     * @param de The event
-     *
-     * @param event _more_
+     * @param event The event
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -561,7 +620,7 @@ public class MapViewManager extends NavigatedViewManager {
 
         checkPipPanel();
 
-        if(flythrough!=null) {
+        if (flythrough != null) {
             flythrough.displayChanged(event);
         }
 
@@ -578,17 +637,17 @@ public class MapViewManager extends NavigatedViewManager {
                 && (inputEvent instanceof KeyEvent)) {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
             if (keyEvent.isControlDown()
-                && ((keyEvent.getKeyCode() == KeyEvent.VK_N))) {
-                
-                EarthLocation center  = getScreenCenter();
+                    && ((keyEvent.getKeyCode() == KeyEvent.VK_N))) {
+
+                EarthLocation center = getScreenCenter();
                 getMapDisplay().centerAndZoom(center, null, 1.0, true, true);
                 return;
             }
 
             if (keyEvent.isControlDown()
-                && ((keyEvent.getKeyCode() == KeyEvent.VK_S))) {
-                
-                EarthLocation center  = getScreenCenter();
+                    && ((keyEvent.getKeyCode() == KeyEvent.VK_S))) {
+
+                EarthLocation center = getScreenCenter();
                 getMapDisplay().centerAndZoom(center, null, 1.0, true, false);
                 return;
             }
@@ -822,7 +881,9 @@ public class MapViewManager extends NavigatedViewManager {
      * Check for the default map
      */
     private void checkDefaultMap() {
-        if(!showMaps) return;
+        if ( !showMaps) {
+            return;
+        }
         MapDisplayControl defaultMap = findDefaultMap();
         if (defaultMap == null) {
             try {
@@ -861,20 +922,22 @@ public class MapViewManager extends NavigatedViewManager {
                 }
 
 
-                if(initMapPaths!=null) {
-                    for(MapData mapData: mapInfo.getMapDataList()) {
+                if (initMapPaths != null) {
+                    for (MapData mapData : mapInfo.getMapDataList()) {
                         mapData.setVisible(false);
-                        if(initMapWidth>0) {
+                        if (initMapWidth > 0) {
                             mapData.setLineWidth(initMapWidth);
                         }
-                        if(initMapColor!=null) {
+                        if (initMapColor != null) {
                             mapData.setColor(initMapColor);
                         }
                     }
-                    for(String mapPath: StringUtil.split(initMapPaths,",",true, true)) {
-                        for(MapData mapData: mapInfo.getMapDataList()) {
-                            if(Misc.equals(mapData.getSource(), mapPath)) 
+                    for (String mapPath : StringUtil.split(initMapPaths, ",",
+                            true, true)) {
+                        for (MapData mapData : mapInfo.getMapDataList()) {
+                            if (Misc.equals(mapData.getSource(), mapPath)) {
                                 mapData.setVisible(true);
+                            }
                         }
                     }
                 }
@@ -942,9 +1005,12 @@ public class MapViewManager extends NavigatedViewManager {
         super.initWith(viewState);
     }
 
+    /**
+     * _more_
+     */
     protected void animationTimeChanged() {
         super.animationTimeChanged();
-        if(flythrough!=null) {
+        if (flythrough != null) {
             flythrough.animationTimeChanged();
         }
     }
@@ -962,16 +1028,16 @@ public class MapViewManager extends NavigatedViewManager {
     protected void initWithInner(ViewManager that, boolean ignoreWindow)
             throws VisADException, RemoteException {
 
-        if(getInitViewStateName()!=null) {
+        if (getInitViewStateName() != null) {
             List vms = getIdv().getVMManager().getVMState();
             for (int i = 0; i < vms.size(); i++) {
                 ViewState viewState = (ViewState) vms.get(i);
-                if(viewState.getName().equals(getInitViewStateName())) {
-                    if(isCompatibleWith(viewState)) {
+                if (viewState.getName().equals(getInitViewStateName())) {
+                    if (isCompatibleWith(viewState)) {
                         try {
                             initWith(viewState);
                             break;
-                        } catch(Exception exc) {
+                        } catch (Exception exc) {
                             throw new RuntimeException(exc);
                         }
                     } else {
@@ -980,7 +1046,7 @@ public class MapViewManager extends NavigatedViewManager {
                     }
                 }
             }
-            
+
         }
 
 
@@ -990,11 +1056,11 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
 
-        if(displayProjectionZoom!=0) {
+        if (displayProjectionZoom != 0) {
             getMapDisplay().zoom(displayProjectionZoom);
         }
 
-        if(doNotSetProjection) {
+        if (doNotSetProjection) {
             return;
         }
 
@@ -1003,7 +1069,7 @@ public class MapViewManager extends NavigatedViewManager {
 
         MapViewManager mvm            = (MapViewManager) that;
         MapProjection  thatProjection = mvm.getMainProjection();
-        if(getInitViewStateName()==null) {
+        if (getInitViewStateName() == null) {
             this.setAspectRatio(that.getAspectRatio());
         }
 
@@ -1025,7 +1091,7 @@ public class MapViewManager extends NavigatedViewManager {
                                              mvm.mainProjectionName);
         }
 
-        if(getInitViewStateName()==null) {
+        if (getInitViewStateName() == null) {
             if ( !setProjection) {
                 if (getAspectRatio() != null) {
                     getMapDisplay().setDisplayAspect(getAspectRatio());
@@ -1229,7 +1295,8 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) },
             { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
-              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, defaultGlobeBackground)) }
+              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND,
+                                         defaultGlobeBackground)) }
         };
 
         Object[][] toolbarObjects = {
@@ -1310,7 +1377,7 @@ public class MapViewManager extends NavigatedViewManager {
                                   GuiUtils.left(getUseGlobeDisplay()
                     ? GuiUtils.filler()
                     : (JComponent) addressReprojectCbx));
-	    //            System.out.println ("{" + GeoUtils.lastAddress+"}  -ll {" + llp.getLatitude()+","+llp.getLongitude()+"}");
+            //            System.out.println ("{" + GeoUtils.lastAddress+"}  -ll {" + llp.getLatitude()+","+llp.getLongitude()+"}");
             getIdvUIManager().showNormalCursor();
             if (llp == null) {
                 return;
@@ -1665,18 +1732,32 @@ public class MapViewManager extends NavigatedViewManager {
             this.newProjection = encode(newProjection);
         }
 
+        /**
+         * _more_
+         *
+         * @param projection _more_
+         *
+         * @return _more_
+         */
         private String encode(MapProjection projection) {
             try {
-                return viewManager.getIdv().encodeObject(projection,false);
-            } catch(Exception exc) {
+                return viewManager.getIdv().encodeObject(projection, false);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
 
+        /**
+         * _more_
+         *
+         * @param xml _more_
+         *
+         * @return _more_
+         */
         private MapProjection decode(String xml) {
             try {
                 return (MapProjection) viewManager.getIdv().decodeObject(xml);
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -1686,16 +1767,16 @@ public class MapViewManager extends NavigatedViewManager {
          * Redo
          */
         public void redoCommand() {
-            viewManager.setMapProjection(decode(newProjection), true, newName, false,
-                                         false);
+            viewManager.setMapProjection(decode(newProjection), true,
+                                         newName, false, false);
         }
 
         /**
          * Undo
          */
         public void undoCommand() {
-            viewManager.setMapProjection(decode(oldProjection), true, oldName, false,
-                                         false);
+            viewManager.setMapProjection(decode(oldProjection), true,
+                                         oldName, false, false);
         }
     }
 
@@ -1753,23 +1834,23 @@ public class MapViewManager extends NavigatedViewManager {
         mainProjectionName = projectionName;
     }
 
-/**
-Set the DfltProjectionName property.
+    /**
+     * Set the DfltProjectionName property.
+     *
+     * @param value The new value for DfltProjectionName
+     */
+    public void setDefaultProjectionName(String value) {
+        this.defaultProjectionName = value;
+    }
 
-@param value The new value for DfltProjectionName
-**/
-public void setDefaultProjectionName (String value) {
-	this.defaultProjectionName = value;
-}
-
-/**
-Get the DfltProjectionName property.
-
-@return The DfltProjectionName
-**/
-public String getDefaultProjectionName () {
-	return this.defaultProjectionName;
-}
+    /**
+     * Get the DfltProjectionName property.
+     *
+     * @return The DfltProjectionName
+     */
+    public String getDefaultProjectionName() {
+        return this.defaultProjectionName;
+    }
 
 
 
@@ -1784,8 +1865,9 @@ public String getDefaultProjectionName () {
      */
     private void addProjectionToHistory(MapProjection projection,
                                         String name) {
-        String encodedProjection = getIdv().encodeObject(projection,false);
-        TwoFacedObject tfo = TwoFacedObject.findId(encodedProjection, projectionHistory);
+        String encodedProjection = getIdv().encodeObject(projection, false);
+        TwoFacedObject tfo = TwoFacedObject.findId(encodedProjection,
+                                 projectionHistory);
         if (tfo != null) {
             projectionHistory.remove(tfo);
             projectionHistory.add(0, tfo);
@@ -1884,10 +1966,10 @@ public String getDefaultProjectionName () {
         IdvUIManager.startTime = System.currentTimeMillis();
 
         if (checkDefault) {
-            if(!getUseProjectionFromData()) {
+            if ( !getUseProjectionFromData()) {
                 return false;
             }
-	    if(doNotSetProjection) {
+            if (doNotSetProjection) {
                 return false;
             }
         }
@@ -1897,12 +1979,15 @@ public String getDefaultProjectionName () {
         }
 
 
-        
 
-        if(getUseGlobeDisplay()) {
+
+        if (getUseGlobeDisplay()) {
             try {
                 LatLonPoint center = projection.getCenterLatLon();
-                getNavigatedDisplay().center(new EarthLocationTuple(center.getLatitude(), center.getLongitude(),new Real(RealType.Altitude, 0)),true);
+                getNavigatedDisplay().center(
+                    new EarthLocationTuple(
+                        center.getLatitude(), center.getLongitude(),
+                        new Real(RealType.Altitude, 0)), true);
                 return true;
             } catch (Exception e) {
                 logException("setProjection", e);
@@ -1913,14 +1998,14 @@ public String getDefaultProjectionName () {
 
 
 
-        boolean actuallyChangedProjection = false;
-	double[] matrix = getDisplayMatrix();
+        boolean  actuallyChangedProjection = false;
+        double[] matrix                    = getDisplayMatrix();
         try {
 
             setMasterInactive();
             if (addToCommandHistory && (mainProjection != null)) {
                 addCommand(new ProjectionCommand(this, mainProjectionName,
-                                                 mainProjection, name, projection));
+                        mainProjection, name, projection));
             }
 
             if ( !Misc.equals(mainProjection, projection)) {
@@ -1943,15 +2028,15 @@ public String getDefaultProjectionName () {
                 }
                 try {
                     actuallyChangedProjection = true;
-		    getMapDisplay().setMapProjection(mainProjection);
-		    setAspectRatio(getMapDisplay().getDisplayAspect());
+                    getMapDisplay().setMapProjection(mainProjection);
+                    setAspectRatio(getMapDisplay().getDisplayAspect());
 
 
                     // override the aspect ratio
                     //if (getAspectRatio() != null) {
-                       //getMapDisplay().setDisplayAspect(getAspectRatio());
+                    //getMapDisplay().setDisplayAspect(getAspectRatio());
                     //}
-		    setDisplayMatrix(matrix);
+                    setDisplayMatrix(matrix);
                 } catch (Exception e) {
                     logException("setProjection", e);
                 }
@@ -1961,7 +2046,8 @@ public String getDefaultProjectionName () {
             // if the projections are the same, reset to main view in case
             // they are zoomed/panned
             try {
-                if (!maintainViewpoint  && projection.equals(mainProjection)) {
+                if ( !maintainViewpoint
+                        && projection.equals(mainProjection)) {
                     getMaster().resetProjection();
                 }
             } catch (Exception e) {
@@ -1979,7 +2065,7 @@ public String getDefaultProjectionName () {
      */
     public void checkPipPanel() {
         try {
-            synchronized(PIP_MUTEX) {
+            synchronized (PIP_MUTEX) {
                 if (pipPanel == null) {
                     return;
                 }
@@ -2146,7 +2232,7 @@ public String getDefaultProjectionName () {
         if (flythrough != null) {
             try {
                 flythrough.destroy();
-            } catch(Exception ignore) {}
+            } catch (Exception ignore) {}
             flythrough = null;
         }
         super.destroy();
@@ -2204,34 +2290,49 @@ public String getDefaultProjectionName () {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param display _more_
+     */
     public void displayDataChanged(DisplayControl display) {
-	displayDataChanged(display, false);
+        displayDataChanged(display, false);
     }
 
 
-    public void displayDataChanged(DisplayControl display,boolean fromInitialLoad) {
+    /**
+     * _more_
+     *
+     * @param display _more_
+     * @param fromInitialLoad _more_
+     */
+    public void displayDataChanged(DisplayControl display,
+                                   boolean fromInitialLoad) {
         try {
             if (getUseProjectionFromData()
-                 && !getStateManager().getProperty(
-                                                   IdvConstants.PROP_LOADINGXML, false)) {
+                    && !getStateManager().getProperty(
+                        IdvConstants.PROP_LOADINGXML, false)) {
                 MapProjection mp = display.getDataProjection();
 
-                if(getUseGlobeDisplay()) {
+                if (getUseGlobeDisplay()) {
                     LatLonPoint center = mp.getCenterLatLon();
-                    getNavigatedDisplay().center(new EarthLocationTuple(center.getLatitude(), center.getLongitude(),new Real(RealType.Altitude, 0)),true);
+                    getNavigatedDisplay().center(
+                        new EarthLocationTuple(
+                            center.getLatitude(), center.getLongitude(),
+                            new Real(RealType.Altitude, 0)), true);
                     return;
                 }
 
-                
+
                 if (displayProjectionOk(mp)) {
                     if ((mainProjection == null)
-                        || !mp.equals(mainProjection)) {
-			boolean maintainViewpoint = !fromInitialLoad;
+                            || !mp.equals(mainProjection)) {
+                        boolean maintainViewpoint = !fromInitialLoad;
                         setMapProjection(
-                                         mp, true,
-                                         getDisplayConventions().getMapProjectionLabel(
-                                                                                       mp, display),true,true,maintainViewpoint);
-                        if(displayProjectionZoom!=0) {
+                            mp, true,
+                            getDisplayConventions().getMapProjectionLabel(
+                                mp, display), true, true, maintainViewpoint);
+                        if (displayProjectionZoom != 0) {
                             getMapDisplay().zoom(displayProjectionZoom);
                         }
                     }
@@ -2249,19 +2350,23 @@ public String getDefaultProjectionName () {
      * called by DisplayInfo.addDisplayable (), usually from control's init.
      *
      * @param displayInfo The new display info to add
+     *
+     * @param displayInfos _more_
      * @return True if the addiiton worked. false otherwise
      *
      * @throws RemoteException
      * @throws VisADException
      */
-    public void  addDisplayInfos(List<DisplayInfo> displayInfos)
+    public void addDisplayInfos(List<DisplayInfo> displayInfos)
             throws RemoteException, VisADException {
 
         if (getIsDestroyed()) {
             return;
         }
 
-	if(displayInfos.size()==0) return;
+        if (displayInfos.size() == 0) {
+            return;
+        }
 
         //Check if we are adding a default map.
         DisplayControl display = displayInfos.get(0).getDisplayControl();
@@ -2276,10 +2381,10 @@ public String getDefaultProjectionName () {
             }
         }
 
-        displayDataChanged(display,true);
+        displayDataChanged(display, true);
 
 
-	super.addDisplayInfos(displayInfos);
+        super.addDisplayInfos(displayInfos);
 
     }
 
@@ -2314,15 +2419,15 @@ public String getDefaultProjectionName () {
      */
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
-        if(cmd.equals(CMD_FLY_FORWARD) && flythrough!=null) {
+        if (cmd.equals(CMD_FLY_FORWARD) && (flythrough != null)) {
             flythrough.driveForward();
-        } else if(cmd.equals(CMD_FLY_BACK) && flythrough!=null) {
+        } else if (cmd.equals(CMD_FLY_BACK) && (flythrough != null)) {
             flythrough.driveBack();
-        } else if(cmd.equals(CMD_FLY_LEFT) && flythrough!=null) {
+        } else if (cmd.equals(CMD_FLY_LEFT) && (flythrough != null)) {
             flythrough.driveLeft();
-        } else if(cmd.equals(CMD_FLY_RIGHT) && flythrough!=null) {
+        } else if (cmd.equals(CMD_FLY_RIGHT) && (flythrough != null)) {
             flythrough.driveRight();
-        } else  if (cmd.equals(CMD_NAV_ZOOMIN)) {
+        } else if (cmd.equals(CMD_NAV_ZOOMIN)) {
             getMapDisplay().zoom(ZOOM_FACTOR);
         } else if (cmd.equals(CMD_NAV_ROTATELEFT)) {
             getMapDisplay().rotateZ(-5.0);
@@ -2514,9 +2619,9 @@ public String getDefaultProjectionName () {
         if (mp == null) {
             return false;
         }
-	if(doNotSetProjection) {
-	    return false;
-	}
+        if (doNotSetProjection) {
+            return false;
+        }
 
         Rectangle2D rect = mp.getDefaultMapArea();
         if ((rect.getWidth() == 0) || (rect.getHeight() == 0)) {
@@ -2690,10 +2795,13 @@ public String getDefaultProjectionName () {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         String encodedProjection = (String) tfo.getId();
-                        MapProjection mp = (MapProjection)getIdv().decodeObject(encodedProjection);
+                        MapProjection mp =
+                            (MapProjection) getIdv().decodeObject(
+                                encodedProjection);
                         setMapProjection(mp, true);
-                    } catch(Exception exc) {
-                        logException("Failed to instantiate the projection", exc);
+                    } catch (Exception exc) {
+                        logException("Failed to instantiate the projection",
+                                     exc);
                     }
                 }
             });
@@ -2776,7 +2884,7 @@ public String getDefaultProjectionName () {
         projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Go to Address",
                 this, "goToAddress"), "/auxdata/ui/icons/house_go.png"));
 
-        
+
         projMenu.addSeparator();
         if ( !getUseGlobeDisplay()) {
             createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(
@@ -2913,7 +3021,8 @@ public String getDefaultProjectionName () {
         if (useGlobeDisplay) {
             props.add(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
                                           "Show Globe Background",
-                                          "Show Globe Background", defaultGlobeBackground));
+                                          "Show Globe Background",
+                                          defaultGlobeBackground));
         }
     }
 
@@ -3080,15 +3189,17 @@ public String getDefaultProjectionName () {
 
 
     /**
-     * _more_
+     * Get the default map position from a property
      *
-     * @return _more_
+     * @return the value in the range of -1 to 1
      */
     public float getDefaultMapPosition() {
         if (getUseGlobeDisplay()) {
-            return (float)getStateManager().getProperty(IdvConstants.PROP_MAP_GLOBE_LEVEL,-0.0f);
+            return (float) getStateManager().getProperty(
+                IdvConstants.PROP_MAP_GLOBE_LEVEL, 0.005f);
         } else {
-            return (float)getStateManager().getProperty(IdvConstants.PROP_MAP_MAP_LEVEL, -0.99f);
+            return (float) getStateManager().getProperty(
+                IdvConstants.PROP_MAP_MAP_LEVEL, -0.99f);
         }
     }
 
@@ -3117,7 +3228,7 @@ public String getDefaultProjectionName () {
      *  @param value The new value for GlobeBackgroundShow
      */
     public void setGlobeBackgroundShow(boolean value) {
-        defaultGlobeBackground= value;
+        defaultGlobeBackground = value;
         setBp(PREF_SHOWGLOBEBACKGROUND, value);
     }
 
@@ -3175,20 +3286,20 @@ public String getDefaultProjectionName () {
 
 
     /**
-       Set the ShowMaps property.
-
-       @param value The new value for ShowMaps
-    **/
-    public void setShowMaps (boolean value) {
+     *  Set the ShowMaps property.
+     *
+     *  @param value The new value for ShowMaps
+     */
+    public void setShowMaps(boolean value) {
         this.showMaps = value;
     }
 
     /**
-       Get the ShowMaps property.
-
-       @return The ShowMaps
-    **/
-    public boolean getShowMaps () {
+     *  Get the ShowMaps property.
+     *
+     *  @return The ShowMaps
+     */
+    public boolean getShowMaps() {
         return this.showMaps;
     }
 
@@ -3197,95 +3308,95 @@ public String getDefaultProjectionName () {
 
 
     /**
-       Set the DisplayProjectionZoom property.
-
-       @param value The new value for DisplayProjectionZoom
-    **/
-    public void setDisplayProjectionZoom (double value) {
+     *  Set the DisplayProjectionZoom property.
+     *
+     *  @param value The new value for DisplayProjectionZoom
+     */
+    public void setDisplayProjectionZoom(double value) {
         this.displayProjectionZoom = value;
     }
 
     /**
-       Get the DisplayProjectionZoom property.
-
-       @return The DisplayProjectionZoom
-    **/
-    public double getDisplayProjectionZoom () {
+     *  Get the DisplayProjectionZoom property.
+     *
+     *  @return The DisplayProjectionZoom
+     */
+    public double getDisplayProjectionZoom() {
         return this.displayProjectionZoom;
     }
 
     /**
-       Set the InitMapPaths property.
-
-       @param value The new value for InitMapPaths
-    **/
-    public void setInitMapPaths (String value) {
+     *  Set the InitMapPaths property.
+     *
+     *  @param value The new value for InitMapPaths
+     */
+    public void setInitMapPaths(String value) {
         this.initMapPaths = value;
     }
 
     /**
-       Get the InitMapPaths property.
-
-       @return The InitMapPaths
-    **/
-    public String getInitMapPaths () {
+     *  Get the InitMapPaths property.
+     *
+     *  @return The InitMapPaths
+     */
+    public String getInitMapPaths() {
         return this.initMapPaths;
     }
 
 
-/**
-Set the InitMapWidth property.
-
-@param value The new value for InitMapWidth
-**/
-public void setInitMapWidth (float value) {
+    /**
+     * Set the InitMapWidth property.
+     *
+     * @param value The new value for InitMapWidth
+     */
+    public void setInitMapWidth(float value) {
         this.initMapWidth = value;
-}
+    }
 
-/**
-Get the InitMapWidth property.
-
-@return The InitMapWidth
-**/
-public float getInitMapWidth () {
+    /**
+     * Get the InitMapWidth property.
+     *
+     * @return The InitMapWidth
+     */
+    public float getInitMapWidth() {
         return this.initMapWidth;
-}
+    }
 
-/**
-Set the InitMapColor property.
-
-@param value The new value for InitMapColor
-**/
-public void setInitMapColor (Color value) {
+    /**
+     * Set the InitMapColor property.
+     *
+     * @param value The new value for InitMapColor
+     */
+    public void setInitMapColor(Color value) {
         this.initMapColor = value;
-}
+    }
 
-/**
-Get the InitMapColor property.
-
-@return The InitMapColor
-**/
-public Color getInitMapColor () {
+    /**
+     * Get the InitMapColor property.
+     *
+     * @return The InitMapColor
+     */
+    public Color getInitMapColor() {
         return this.initMapColor;
-}
+    }
 
-/**
-Set the InitLatLonBounds property.
-
-@param value The new value for InitLatLonBounds
-**/
-public void setInitLatLonBounds (Rectangle2D.Float value) {
+    /**
+     * Set the InitLatLonBounds property.
+     *
+     * @param value The new value for InitLatLonBounds
+     */
+    public void setInitLatLonBounds(Rectangle2D.Float value) {
         this.initLatLonBounds = value;
-}
+    }
 
-/**
-Get the InitLatLonBounds property.
-
-@return The InitLatLonBounds
-**/
-public Rectangle2D.Float getInitLatLonBounds () {
+    /**
+     * Get the InitLatLonBounds property.
+     *
+     * @return The InitLatLonBounds
+     */
+    public Rectangle2D.Float getInitLatLonBounds() {
         return this.initLatLonBounds;
-}
+    }
 
 
 
