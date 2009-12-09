@@ -1989,7 +1989,9 @@ public class ImageGenerator extends IdvManager {
         if (bundleFile != null) {
             debug("Loading bundle: " + bundleFile);
             if (bundleFile.endsWith(".jnlp")) {
-                getPersistenceManager().decodeJnlpFile(bundleFile);
+                String xml = getPersistenceManager().extractBundleFromJnlp(bundleFile);
+                getPersistenceManager().decodeXml(xml, false, bundleFile,
+                        null, false, true, bundleProperties, true, false);
             } else if (getArgsManager().isZidvFile(bundleFile)) {
                 Hashtable properties = new Hashtable();
                 boolean ask = getStore().get(PREF_ZIDV_ASK, true);
@@ -2001,7 +2003,7 @@ public class ImageGenerator extends IdvManager {
                 String xml = IOUtil.readContents(bundleFile);
                 xml = applyMacros(xml,null,false);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
-                        null, false, true, bundleProperties, false, false);
+                        null, false, true, bundleProperties, true, false);
                 //                getPersistenceManager().decodeXmlFile(bundleFile, false,
                 //                        timesList);
             }
@@ -2010,7 +2012,10 @@ public class ImageGenerator extends IdvManager {
             if (b64Bundle.length() == 0) {
                 return error("Could not bundle");
             }
-            getPersistenceManager().decodeBase64Bundle(b64Bundle);
+            String xml = new String(XmlUtil.decodeBase64(b64Bundle));
+            getPersistenceManager().decodeXml(xml, false, "",
+                                              null, false, true, bundleProperties, true, false);
+
         }
 
         if (applyMacros(node, ATTR_WAIT, true)) {

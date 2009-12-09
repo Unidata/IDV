@@ -2461,6 +2461,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
 
+
     /**
      * This converts the given base 64 encoded xml bundle into an
      * xml String and loads it in. It prints out UI messages and
@@ -2483,29 +2484,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param base64Bundle The base64 encoded xml bundle
      */
     public void decodeBase64Bundle(String base64Bundle) {
-        decodeBase64Bundle(base64Bundle, null);
-    }
-
-    /**
-     * This does the actual work of converting the given base 64 encoded
-     * bundle xml into a String and loading it in.
-     *
-     * @param base64Bundle The base64 encoded xml bundle
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
-     */
-    public void decodeBase64Bundle(String base64Bundle, List overrideTimes) {
         try {
             LogUtil.consoleMessage("Decoding a base 64 bundle\n");
             String xml = new String(XmlUtil.decodeBase64(base64Bundle));
-            if (getArgsManager().printJnlpBundles) {
-                System.out.println(xml);
-            }
             decodeXml(xml, false, null, true);
         } catch (Throwable exc) {
             logException("Decoding base 64 bundle", exc);
         }
     }
 
+
+    public void decodeJnlpFile(String filename) {
+        String xml = extractBundleFromJnlp(filename);
+        decodeXml(xml, false, null, true);
+    }
 
 
     /**
@@ -2516,9 +2508,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @param filename The name of the jnlp file.
      */
-    public void decodeJnlpFile(String filename) {
+    public String extractBundleFromJnlp(String filename) {
         try {
-            LogUtil.consoleMessage("Decode jnlp file\n");
             Element root = XmlUtil.getRoot(filename, getClass());
             if (root == null) {
                 throw new IllegalArgumentException(
@@ -2533,9 +2524,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     continue;
                 }
                 if (nextOneBundle) {
-                    LogUtil.consoleMessage("doing b64 bundle\n");
-                    decodeBase64Bundle(value);
-                    return;
+                    String xml =   new String(XmlUtil.decodeBase64(value));
+                    if (getArgsManager().printJnlpBundles) {
+                        System.out.println(xml);
+                    }
+                    return xml;
                 }
                 if (value.equals("-b64bundle")) {
                     nextOneBundle = true;
@@ -2545,7 +2538,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         } catch (Throwable exc) {
             logException("decoding jnlp file:" + filename, exc);
         }
+        return null;
     }
+
+
+
 
 
     /**
@@ -2650,7 +2647,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                ? label
                                : IOUtil.getFileTail(xmlFile));
         boolean shouldMerge = getStore().get(PREF_OPEN_MERGE, true);
-        boolean removeAll   = false;
+        boolean didRemoveAll   = false;
         if (checkToRemove) {
             //ok[0] == did the user press cancel, ok[1] = should we remove
             boolean[] ok =
@@ -2669,9 +2666,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 getIdv().removeAllDisplays();
                 //Then remove the data
                 getIdv().removeAllDataSources();
-                removeAll = true;
+                didRemoveAll = true;
             }
             shouldMerge = ok[2];
+        } else {
+            if(shouldMerge)  didRemoveAll   = true;
         }
 
 
@@ -2781,7 +2780,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             Trace.call1("Decode.decodeXml");
             decodeXml(bundleContents, false, xmlFile, name, true,
-                      shouldMerge, bundleProperties, removeAll,
+                      shouldMerge, bundleProperties, didRemoveAll,
                       letUserChangeData);
             Trace.call2("Decode.decodeXml");
             return true;
@@ -2817,6 +2816,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
 
+
     /**
      *  Using the XmlEncoder, decode the given xml string.
      *  This typically is a Hashtable, encoded by the doSave method,
@@ -2833,7 +2833,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param showDialog Should the dialog be shown
      * @param shouldMerge Should we merge the windows/views in the bundle into the existing windows
      * @param bundleProperties  set of properties
-     * @param removeAll Should we remove all data/displays
+     * @param didRemoveAll Should we remove all data/displays
      * @param letUserChangeData Should popup the data path dialog
      */
     public void decodeXml(final String xml, final boolean fromCollab,
@@ -2841,17 +2841,16 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                           final boolean showDialog,
                           final boolean shouldMerge,
                           final Hashtable bundleProperties,
-                          final boolean removeAll,
+                          final boolean didRemoveAll,
                           final boolean letUserChangeData) {
 
         Runnable runnable = new Runnable() {
             public void run() {
                 decodeXmlInner(xml, fromCollab, xmlFile, label, showDialog,
-                               shouldMerge, bundleProperties, removeAll,
+                               shouldMerge, bundleProperties, didRemoveAll,
                                letUserChangeData);
             }
         };
-
 
         if ( !getStateManager().getShouldLoadBundlesSynchronously()) {
             Misc.run(runnable);
@@ -3304,6 +3303,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
 
+
     /**
      * The given Hashtable contains the objects taht were saved
      * in the xml bundle file. The hashtable may contain
@@ -3329,6 +3329,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                          boolean didRemoveAll,
                                          boolean letUserChangeData)
             throws Exception {
+
 
 
         if ( !loadDialog.okToRun()) {
