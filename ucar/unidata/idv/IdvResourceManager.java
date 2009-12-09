@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -197,7 +198,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     /** viewpoints */
     public static final IdvResource RSC_VIEWPOINTS =
         new XmlIdvResource("idv.resource.viewpoints", "Viewpoints",
-                        "viewpoints\\.xml$", true);
+                           "viewpoints\\.xml$", true);
 
     /** Points to the projections */
     public static final IdvResource RSC_PROJECTIONS =
@@ -374,9 +375,16 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                            "(locations.*\\.xml$|locations.*\\.csv$)");
 
     /** Points to the maps */
+    public static final IdvResource RSC_GLOBEMAPS =
+        new XmlIdvResource("idv.resource.globemaps",
+                           "Maps for the globe displays", "globemaps\\.xml$");
+
+    /** Points to the maps */
     public static final IdvResource RSC_MAPS =
         new XmlIdvResource("idv.resource.maps", "Maps for the displays",
                            "maps\\.xml$");
+
+
 
     /** Points to the menu bar xml */
     public static final IdvResource RSC_MENUBAR =
@@ -417,21 +425,18 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
     /** Points to netcdf-Java config files */
     public static final IdvResource RSC_NJCONFIG =
-        new IdvResource("idv.resource.njconfig", 
-                         "NetCDF-Java Config",
-                         "nj.*Config\\.xml$");
+        new IdvResource("idv.resource.njconfig", "NetCDF-Java Config",
+                        "nj.*Config\\.xml$");
 
 
     /** Publishers */
     public static final IdvResource RSC_PUBLISHERS =
-        new XmlIdvResource("idv.resource.publishers",
-                           "Publishers",
+        new XmlIdvResource("idv.resource.publishers", "Publishers",
                            "publishers\\.xml$");
 
     /** Publishers */
     public static final IdvResource RSC_PUBLISHERTYPES =
-        new XmlIdvResource("idv.resource.publishertypes",
-                           "Publisher Types",
+        new XmlIdvResource("idv.resource.publishertypes", "Publisher Types",
                            "publishertypes\\.xml$");
 
 
@@ -998,8 +1003,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     for (int attrIdx = 0; attrIdx < nnm.getLength();
                             attrIdx++) {
                         Attr attr = (Attr) nnm.item(attrIdx);
-                        if (!attr.getNodeName().equals(ATTR_LOCATION) &&
-                            !attr.getNodeName().equals(ATTR_ID)) {
+                        if ( !attr.getNodeName().equals(ATTR_LOCATION)
+                                && !attr.getNodeName().equals(ATTR_ID)) {
                             if (nodeProperties == null) {
                                 nodeProperties = new Hashtable();
                             }
@@ -1273,15 +1278,15 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      */
     private void initResourceMacros() {
         macroNames = new String[] {
-            "USERPATH", "SITEPATH", "IDVPATH", "DATAPATH", "APPPATH", "USERHOME",
-            "VERSION", "VERSION.MAJOR", "VERSION.MINOR", "VERSION.REVISION"
+            "USERPATH", "SITEPATH", "IDVPATH", "DATAPATH", "APPPATH",
+            "USERHOME", "VERSION", "VERSION.MAJOR", "VERSION.MINOR",
+            "VERSION.REVISION"
         };
 
 
         macroValues = new String[] {
             getUserPath(), getSitePath(), getIdvResourcePath(),
-            getDataResourcePath(), getAppResourcePath(),
-            getUserHome(),
+            getDataResourcePath(), getAppResourcePath(), getUserHome(),
             getStateManager().getVersion(),
             getStateManager().getVersionMajor(),
             getStateManager().getVersionMinor(),
@@ -1448,8 +1453,20 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return Was there one removed
      */
     public boolean removeLocalMaps() {
-        ResourceCollection rc =
-            getResourceManager().getResources(IdvResourceManager.RSC_MAPS);
+        return removeLocalMaps(false);
+    }
+
+    /**
+     * Remove any local maps.xml file
+     *
+     *
+     * @param forGlobe if true then use the globemaps resource
+     * @return Was there one removed
+     */
+    public boolean removeLocalMaps(boolean forGlobe) {
+        ResourceCollection rc = getResourceManager().getResources(forGlobe
+                ? IdvResourceManager.RSC_GLOBEMAPS
+                : IdvResourceManager.RSC_MAPS);
         for (int i = 0; i < rc.size(); i++) {
             if (rc.isWritable(i)) {
                 File f = new File(rc.get(i).toString());
@@ -1469,11 +1486,24 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return A list of MapData objects.
      */
     public List<MapData> getMaps() {
-        MapInfo mapInfo = new MapInfo(getXmlResources(RSC_MAPS), false,
-                                      false);
-        List<MapData>      results = new ArrayList<MapData>();
-        List      maps    = mapInfo.getMapDataList();
-        Hashtable seen    = new Hashtable();
+        return getMaps(false);
+    }
+
+
+    /**
+     * Get the list of maps/descriptions from the maps resources.
+     *
+     *
+     * @param forGlobe if true then use the globemaps resource
+     * @return A list of MapData objects.
+     */
+    public List<MapData> getMaps(boolean forGlobe) {
+        MapInfo mapInfo = new MapInfo(getXmlResources(forGlobe
+                ? RSC_GLOBEMAPS
+                : RSC_MAPS), false, false);
+        List<MapData> results = new ArrayList<MapData>();
+        List          maps    = mapInfo.getMapDataList();
+        Hashtable     seen    = new Hashtable();
         for (int i = 0; i < maps.size(); i++) {
             MapData mapData = (MapData) maps.get(i);
             //Be unique on source---description
@@ -1496,9 +1526,23 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return The MapInfo holding the map stuff.
      */
     public MapInfo createMapInfo() {
-        XmlResourceCollection maps = getXmlResources(RSC_MAPS);
+        return createMapInfo(false);
+    }
+
+    /**
+     * A utility to instantiate a MapInfo from the maps resources
+     *
+     *
+     * @param forGlobe if true then use the globemaps resource
+     * @return The MapInfo holding the map stuff.
+     */
+    public MapInfo createMapInfo(boolean forGlobe) {
+        XmlResourceCollection maps = getXmlResources(forGlobe
+                ? RSC_GLOBEMAPS
+                : RSC_MAPS);
         return new MapInfo(maps, true);
     }
+
 
 
     /**
@@ -1508,8 +1552,22 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      */
 
     public void writeMapState(String mapsXml) {
+        writeMapState(mapsXml, false);
+    }
+
+
+    /**
+     * Write out the given maps xml to the writable resource
+     *
+     * @param mapsXml The maps xml
+     * @param forGlobe if true then use the globemaps resource
+     */
+
+    public void writeMapState(String mapsXml, boolean forGlobe) {
         try {
-            ResourceCollection mapResources = getResources(RSC_MAPS);
+            ResourceCollection mapResources = getResources(forGlobe
+                    ? RSC_GLOBEMAPS
+                    : RSC_MAPS);
             mapResources.writeWritableResource(mapsXml);
             mapResources.clearCache();
         } catch (Exception exc) {
@@ -1703,7 +1761,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     if (xml == null) {
                         continue;
                     }
-                    List<DisplaySetting> tmp = (List<DisplaySetting>) getIdv().decodeObject(xml);
+                    List<DisplaySetting> tmp =
+                        (List<DisplaySetting>) getIdv().decodeObject(xml);
                     if (tmp == null) {
                         continue;
                     }
@@ -1711,7 +1770,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     if (isLocal) {
                         localDisplaySettings = tmp;
                     }
-                    List<DisplaySetting> uniqueOnes = new ArrayList<DisplaySetting>();
+                    List<DisplaySetting> uniqueOnes =
+                        new ArrayList<DisplaySetting>();
                     for (int displaySettingIdx = 0;
                             displaySettingIdx < tmp.size();
                             displaySettingIdx++) {
@@ -1808,7 +1868,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @param displaySetting display setting
      */
     public void removeDisplaySetting(DisplaySetting displaySetting) {
-        removeDisplaySettings((List<DisplaySetting>)Misc.newList(displaySetting));
+        removeDisplaySettings(
+            (List<DisplaySetting>) Misc.newList(displaySetting));
     }
 
 
