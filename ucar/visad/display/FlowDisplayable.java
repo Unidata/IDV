@@ -372,6 +372,25 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     }
 
     /**
+     * Get the index of the speed type if this is not a cartesian wind
+     * @return the speed index or -1 if cartesian or not set
+     */
+    public int getSpeedTypeIndex() {
+        int index = -1;
+        if (!isCartesianWind() && flowYMap != null && flowRealTupleType != null){
+            RealType speedType = (RealType) flowYMap.getScalar();
+            RealType[] realTypes = flowRealTupleType.getRealComponents();
+            for (int i = 0; i < realTypes.length; i++) {
+                if (speedType.equals(realTypes[i])) {
+                    index = i;
+                }
+            }
+        }
+           
+        return index;
+    }
+
+    /**
      * Make ScalarMaps for flow, for 1st and 2nd components of wind
      * vector input data.
      * If data is of form u,v (both components have units convertible with m/s)
@@ -479,6 +498,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
             public void mapChanged(ScalarMapEvent event) {}  // ignore
         });
+        //System.out.println("FlowX = " + flowXMap);
+        //System.out.println("FlowY = " + flowYMap);
+        //System.out.println("isCartesian = " + isCartesian);
 
         ScalarMapSet maps = getScalarMapSet();  //new ScalarMapSet();
         maps.add(flowXMap);
@@ -528,7 +550,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 if (get3DFlow()) {
                     flowZMap.setRange(flowMinValue, flowMaxValue);
                 }
+            } /* else if (!isCartesianWind() && (flowYMap != null)) {
+                flowXMap.setRange(0, 360);
+                flowYMap.setRange(flowMinValue, flowMaxValue);
             }
+            */
         }
     }
 
