@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -66,8 +67,6 @@ import visad.georef.*;
 import java.awt.*;
 import java.awt.Container;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
 
 import java.net.URL;
 
@@ -76,6 +75,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 
 
@@ -89,7 +91,8 @@ import java.util.List;
 public class MapDisplayControl extends DisplayControlImpl {
 
 
-    public static final Color DEFAULT_MAP_COLOR = new Color(0,204,0);
+    /** _more_          */
+    public static final Color DEFAULT_MAP_COLOR = new Color(0, 204, 0);
 
 
     /** Where we put the map guis */
@@ -99,7 +102,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      * Set by the map xml, holds the level of the map used in the
      * positionSlider
      */
-    private double mapPosition = -.99;
+    private double mapPosition = Double.NaN;
 
 
     /**
@@ -203,13 +206,13 @@ public class MapDisplayControl extends DisplayControlImpl {
     /** instance for this instantiation */
     int mycnt = cnt++;
 
-    /** The link button     */
+    /** The link button */
     private JToggleButton applyToAllBtn;
 
-    /** Do we apply the changes to all the maps     */
+    /** Do we apply the changes to all the maps */
     private boolean applyChangesToAllMaps = false;
 
-    /** Are we currently updating the other maps    */
+    /** Are we currently updating the other maps */
     private boolean updatingOtherMapStates = false;
 
 
@@ -233,9 +236,11 @@ public class MapDisplayControl extends DisplayControlImpl {
     public MapDisplayControl(MapViewManager mapViewManager, MapInfo mapInfo) {
         super(mapViewManager.getIdv());
         setLockVisibilityToggle(true);
-        defaultViewManager  = mapViewManager;
+        defaultViewManager = mapViewManager;
         //        this.mapPosition    = mapInfo.getMapPosition();
-        this.mapPosition    = mapViewManager.getDefaultMapPosition();
+        this.mapPosition = getInitialZPosition();
+        //System.out.println("map pos = " + this.mapPosition + ", info: "
+        //                   + mapInfo.getMapPosition());
         this.defaultMapData = mapInfo.getMapDataList();
         this.defaultLatData = mapInfo.getLatData();
         this.defaultLonData = mapInfo.getLonData();
@@ -412,11 +417,11 @@ public class MapDisplayControl extends DisplayControlImpl {
             defaultLonData = mapInfo.getLonData();
             //            mapPosition    = mapInfo.getMapPosition();
 
-            MapViewManager mvm = getMapViewManager();
-            if(mvm!=null) {
-                this.mapPosition    = mvm.getDefaultMapPosition();
-            } else {
-            }
+            //MapViewManager mvm = getMapViewManager();
+            //if(mvm!=null) {
+            this.mapPosition = getInitialZPosition();
+            //} else {
+            //}
         }
 
 
@@ -464,6 +469,10 @@ public class MapDisplayControl extends DisplayControlImpl {
         //Now check for any persisted maps
         for (int i = 0; i < mapStates.size(); i++) {
             ((MapState) mapStates.get(i)).init(this);
+        }
+
+        if (Double.isNaN(mapPosition)) {
+            mapPosition = getInitialZPosition();
         }
 
         setSliderPosition();
@@ -536,7 +545,8 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @param description The description of the map
      */
     private void addMap(String mapPath, String description) {
-        addMap(new MapState(mapPath, description, DEFAULT_MAP_COLOR, 1.0f, 0));
+        addMap(new MapState(mapPath, description, DEFAULT_MAP_COLOR, 1.0f,
+                            0));
     }
 
 
@@ -692,8 +702,8 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     protected boolean selectMap() {
 
-        final JPanel colorButton = new GuiUtils.ColorSwatch(DEFAULT_MAP_COLOR,
-                                       "Set Map Line Color");
+        final JPanel colorButton =
+            new GuiUtils.ColorSwatch(DEFAULT_MAP_COLOR, "Set Map Line Color");
         colorButton.setToolTipText("Set the line color");
 
         final JTextField catFld = new JTextField("Maps", 20);
@@ -873,7 +883,10 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         JPanel displayPanel = GuiUtils.topCenter(llPanel, ( !useZPosition()
                 ? GuiUtils.filler()
-                                                            : GuiUtils.top(GuiUtils.leftCenter(new JLabel("Map Position:  "), makePositionSlider()))));
+                : GuiUtils.top(
+                    GuiUtils.leftCenter(
+                        new JLabel("Map Position:  "),
+                        makePositionSlider()))));
 
 
         applyToAllBtn =
@@ -914,25 +927,14 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     private void applyMapPosition() {
         try {
-            DisplayRealType drt = getDisplayAltitudeType();
-            if (drt == null) {
-                return;
+            //Misc.printStack("");
+            //System.out.println("pos = " + mapPosition + "," + getVerticalValue(mapPosition));
+            if (Double.isNaN(mapPosition)) {
+                mapPosition = getInitialZPosition();
             }
-            double[] range        = new double[2];
-            double   realPosition = 0;
-            if (drt.getRange(range)) {
-                // range is -1 to 1, need to normalize to display
-                double pcnt = (mapPosition - (-1)) / 2;
-                if ( !useZPosition()) {
-                    pcnt = .51;
-                }
-                realPosition = Math.min((range[0]
-                                         + (range[1] - range[0])
-                                           * pcnt), range[1]);
-            }
-
-            ConstantMap constantMap = new ConstantMap(realPosition, drt);
-            theHolder.addConstantMap(constantMap);
+            theHolder.setConstantPosition(
+                getVerticalValue(mapPosition),
+                getNavigatedDisplay().getDisplayAltitudeType());
         } catch (Exception exc) {
             logException("Setting map position", exc);
         }
@@ -947,11 +949,11 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     private JComponent makePositionSlider() {
         levelSlider = new ZSlider(mapPosition) {
-                public void valueHasBeenSet() {
-                    mapPosition = getValue();
-                    applyMapPosition();
-                }
-            };
+            public void valueHasBeenSet() {
+                mapPosition = getValue();
+                applyMapPosition();
+            }
+        };
         return levelSlider.getContents();
     }
 
@@ -1418,7 +1420,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         /** map panel */
         private MapPanel mapPanel;
 
-        /** A mutex    */
+        /** A mutex */
         private Object MAP_MUTEX = new Object();
 
         /**
@@ -1870,7 +1872,22 @@ public class MapDisplayControl extends DisplayControlImpl {
         return applyChangesToAllMaps;
     }
 
-
+    /**
+     * Get default z position to use
+     *
+     * @return Default z position
+     */
+    protected double getInitialZPosition() {
+        MapViewManager mvm = ((defaultViewManager != null)
+                              && (defaultViewManager
+                                  instanceof MapViewManager))
+                             ? (MapViewManager) defaultViewManager
+                             : getMapViewManager();
+        //System.out.println("mvm = " + mvm);
+        return (mvm != null)
+               ? mvm.getDefaultMapPosition()
+               : super.getInitialZPosition() + ZFUDGE;
+    }
 
 }
 
