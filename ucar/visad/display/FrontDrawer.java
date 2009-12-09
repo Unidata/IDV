@@ -1294,8 +1294,7 @@ public class FrontDrawer extends DisplayableData {
      */
     private void setupTypes() throws VisADException {
         if (curve_type == null) {
-            RealTupleType latlon = new RealTupleType(RealType.Latitude,
-                                       RealType.Longitude);
+            RealTupleType latlon = RealTupleType.LatitudeLongitudeTuple;
             curve_type = new SetType(latlon);
             // (front_index -> 
             //    ((Latitude, Longitude) -> (front_red, front_green, front_blue)))
