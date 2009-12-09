@@ -982,7 +982,7 @@
                                         <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
                                     </property>
                                     <property name="Visible">
-                                        <boolean>true</boolean>
+                                        <boolean>false</boolean>
                                     </property>
                                 </object>
                             </method>
@@ -1294,7 +1294,7 @@
                                         <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
                                     </property>
                                     <property name="Visible">
-                                        <boolean>true</boolean>
+                                        <boolean>false</boolean>
                                     </property>
                                 </object>
                             </method>
@@ -1576,7 +1576,7 @@
                                         <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
                                     </property>
                                     <property name="Visible">
-                                        <boolean>true</boolean>
+                                        <boolean>false</boolean>
                                     </property>
                                 </object>
                             </method>
@@ -1858,7 +1858,7 @@
                                         <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
                                     </property>
                                     <property name="Visible">
-                                        <boolean>true</boolean>
+                                        <boolean>false</boolean>
                                     </property>
                                 </object>
                             </method>
