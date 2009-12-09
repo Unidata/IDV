@@ -126,7 +126,6 @@ import javax.vecmath.Point3d;
 public abstract class CrossSectionControl extends GridDisplayControl implements DisplayableData
     .DragAdapter {
 
-    Date createDate = new Date();
 
     /**
      * Identifier for sharing cross-section position
@@ -253,7 +252,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public CrossSectionControl() {
         setAttributeFlags(FLAG_COLOR | FLAG_DATACONTROL | FLAG_DISPLAYUNIT);
-        System.err.println("new xs " + createDate.getTime());
     }
 
 
@@ -718,8 +716,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws VisADException On badness
      */
     public void doRemove() throws RemoteException, VisADException {
-        System.err.println("XS.doRemove " + createDate.getTime());
-
         if (viewContents != null) {
             Container parent = viewContents.getParent();
             if (parent != null) {
@@ -1507,8 +1503,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         LatLonPoint latlon1 = startLocation.getLatLonPoint();
         LatLonPoint latlon2 = endLocation.getLatLonPoint();
         GridDataInstance gdi = getGridDataInstance();
-        if(gdi==null)
-            System.err.println ("GDI IS NULL " + createDate.getTime());
         FieldImpl slice =
             gdi.sliceAlongLatLonLine(latlon1, latlon2,
                                      getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE,
