@@ -102,7 +102,7 @@ public class ZSlider {
      */
     private JComponent doMakeContents() {
         valueFld = new JTextField(format.format(zValue), 5);
-        valueFld.setToolTipText("Enter an exact value and hit return;");
+        valueFld.setToolTipText("Enter an exact value between -1 and 1 and hit return");
         valueFld.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (ignoreSliderEvents) {
