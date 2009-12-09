@@ -3531,6 +3531,30 @@ public final class Util {
 
 
     /**
+     * Check to see if a RealTuple is all missing data.  RealTuple.isMissing() 
+     * only checks if it has null components, not if each component is missing.
+     *
+     * @param rt   RealTuple in question
+     *
+     * @return true if RealTuple is null, isMissing() or all Real components
+     *              have NaN values
+     */
+    public static boolean allMissing(RealTuple rt) {
+        if (rt == null || rt.isMissing()) return true;
+        try {
+            // rt.isMissing protects against reals being null;
+            Data[] reals = rt.getComponents(false);
+            for (int i = 0; i < reals.length; i++) {
+                if (!reals[i].isMissing()) return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
      * Perform rotation about an arbitrary vector
      *
      * @param mouse  MouseBehavior for matrix manipulation
