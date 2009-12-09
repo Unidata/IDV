@@ -294,6 +294,7 @@ public class HighLowGlyph extends DrawingGlyph {
         textDisplayable.setFont(font1);
         textDisplayable.setTextSize(control.getDisplayScale()
                                     * (font1.getSize() / 12.0f));
+        textDisplayable.setSphere(control.inGlobeDisplay());
 
         addDisplayable(textDisplayable);
         if (isFrontDisplay()) {
@@ -314,6 +315,7 @@ public class HighLowGlyph extends DrawingGlyph {
         pressureDisplayable.setFont(font2);
         pressureDisplayable.setTextSize(control.getDisplayScale()
                                         * (font2.getSize() / 12.0f));
+        pressureDisplayable.setSphere(control.inGlobeDisplay());
 
 
         addDisplayable(pressureDisplayable);
