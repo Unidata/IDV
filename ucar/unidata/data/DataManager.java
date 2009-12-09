@@ -323,7 +323,8 @@ public class DataManager {
             "visad.data.arraycache.enabled",
             "visad.data.arraycache.lowerthreshold",
             "visad.data.arraycache.upperthreshold",
-            "visad.data.arraycache.usedatacachemanager"
+            "visad.data.arraycache.usedatacachemanager",
+            "visad.contourFillSingleValueAsTexture"
         };
 
 
