@@ -10825,9 +10825,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             for (int i = 0, n = displayList.size(); i < n; i++) {
                 DisplayInfo info = (DisplayInfo) displayList.get(i);
                 try {
-                    info.getDisplayable().setUseFastRendering(
-                        info.getViewManager().getUseFastRendering(
-                            useFastRendering));
+                    Displayable displayable = info.getDisplayable();
+                    if(displayable!=null) {
+                        displayable.setUseFastRendering(
+                                                        info.getViewManager().getUseFastRendering(
+                                                                                                  useFastRendering));
+                    }
                 } catch (Exception exc) {
                     logException("Setting fast rendering to: "
                                  + useFastRendering, exc);
