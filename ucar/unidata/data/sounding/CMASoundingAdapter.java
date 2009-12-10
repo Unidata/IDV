@@ -235,7 +235,13 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                     break;
                 }
             }
-
+            //last one
+            if ( currentIndex == lines.size()) {
+                    SoundingOb so = new SoundingOb(currentStation, dt);
+                    soundings.add(so);
+                    soundingLevels.add(levels);
+                    numFound++;
+            }
 
 
         }
@@ -461,7 +467,8 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         double lonvalue;
         double elevvalue;
         try {
-            wmoID = new Integer((int) getValue(toks.get(0))).toString();
+            //wmoID = new Integer((int) getValue(toks.get(0))).toString();
+            wmoID = toks.get(0);
             latvalue  = getValue(toks.get(1));
             lonvalue  = getValue(toks.get(2));
             elevvalue = getValue(toks.get(3));
