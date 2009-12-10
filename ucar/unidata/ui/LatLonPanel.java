@@ -154,7 +154,11 @@ public class LatLonPanel extends JPanel {
         colorButton.addPropertyChangeListener("background",
                 new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
+                if (ignoreEvents) {
+                    return;
+                }
                 Color c = ((JPanel) evt.getSource()).getBackground();
+
                 if (c != null) {
                     latLonData.setColor(c);
                 }
