@@ -1143,7 +1143,7 @@ public class StateManager extends IdvManager {
             try {
                 Properties props =
                     Misc.readProperties(getProperty(PROP_VERSIONFILE,
-                        "/ucar/unidata/idv/resources/version.properties"), null, getClass());
+                        "/ucar/unidata/idv/resources/build.properties"), null, getClass());
                 buildDate = Misc.getProperty(props, PROP_BUILD_DATE, "");
                 versionMajor = Misc.getProperty(props, PROP_VERSION_MAJOR,
                         "no_major");
