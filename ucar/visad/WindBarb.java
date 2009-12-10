@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad;
 
 
@@ -193,11 +194,12 @@ public class WindBarb {
                 int oldnt = numt[0];
                 //System.out.println("j = "+ j);
                 synchronized (sync) {
-                    float mbarb[] = makeBarb(south[j], spatial_values[0][j],
-                                             spatial_values[1][j],
-                                             spatial_values[2][j], scale,
-                                             pt_size, f0, f1, vx, vy, vz,
-                                             numv, tx, ty, tz, numt);
+                    float mbarb[] = makeBarbNew(south[j],
+                                        spatial_values[0][j],
+                                        spatial_values[1][j],
+                                        spatial_values[2][j], scale, pt_size,
+                                        f0, f1, vx, vy, vz, numv, tx, ty, tz,
+                                        numt);
 
                     //        ucar.unidata.util.Misc.printArray("mbarb = ", mbarb);
                 }
@@ -336,9 +338,10 @@ public class WindBarb {
      * @return
      */
     public static float[] makeBarb(boolean south, float x, float y, float z,
-                            float scale, float pt_size, float f0, float f1,
-                            float[] vx, float[] vy, float[] vz, int[] numv,
-                            float[] tx, float[] ty, float[] tz, int[] numt) {
+                                   float scale, float pt_size, float f0,
+                                   float f1, float[] vx, float[] vy,
+                                   float[] vz, int[] numv, float[] tx,
+                                   float[] ty, float[] tz, int[] numt) {
 
         float   wsp25, slant, barb, d, c195, s195;
         float   x0, y0;
@@ -490,7 +493,7 @@ public class WindBarb {
 
             //lengthen the pole to accomodate the 50 knot barbs
             if (nbarb50 > 0) {
-                 d = d + pt_size;
+                d = d + pt_size;
                 //x1 = (x + x0 * d);
                 //y1 = (y + y0 * d);
                 /* WLH 24 April 99
@@ -512,14 +515,14 @@ public class WindBarb {
                   s195 = (float) Math.sin(195 * Data.DEGREES_TO_RADIANS);
                   c195 = (float) Math.cos(195 * Data.DEGREES_TO_RADIANS);
             */
-            float flagSpace = .5f*pt_size;
-            float flagWidth = 1.75f*slant;
+            float flagSpace = .5f * pt_size;
+            float flagWidth = 1.75f * slant;
             for (int j = 0; j < nbarb50; j++) {
                 //d  = d + 0.6f * scale;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
-                x3 = (x + x0 * (d+flagWidth));
-                y3 = (y + y0 * (d+flagWidth));
+                x3 = (x + x0 * (d + flagWidth));
+                y3 = (y + y0 * (d + flagWidth));
                 /* WLH 5 Nov 99
                         if (south) {
                           x2 = (x3+barb*(x0*s195+y0*c195));
@@ -667,4 +670,287 @@ public class WindBarb {
         numt[0] = nt;
         return mbarb;
     }
+
+    /**
+     * Adapted from Don Murray's mind
+     *
+     * @param south      north or south orientation flag
+     * @param x          x value location
+     * @param y          y value location
+     * @param z          z value location
+     * @param scale      scale factor
+     * @param pt_size    spacing between barbs
+     * @param f0         u component
+     * @param f1         v component
+     * @param vx         x coordinate of VisADLineArrays
+     * @param vy         y coordinate of VisADLineArrays
+     * @param vz         z coordinate of VisADLineArrays
+     * @param numv       number of coordinates
+     * @param tx         x coordinate of VisADTriangleArrays (wind flags)
+     * @param ty         y coordinate of VisADTriangleArrays (wind flags)
+     * @param tz         z coordinate of VisADTriangleArrays (wind flags)
+     * @param numt       number of coordinates
+     * @return
+     */
+    public static float[] makeBarbNew(boolean south, float x, float y,
+                                      float z, float scale, float pt_size,
+                                      float f0, float f1, float[] vx,
+                                      float[] vy, float[] vz, int[] numv,
+                                      float[] tx, float[] ty, float[] tz,
+                                      int[] numt) {
+
+        float   wsp25, slant, barb, d, c195, s195;
+        float   x0, y0;
+        float   x1, y1, x2, y2, x3, y3;
+        int     nbarb50, nbarb10, nbarb5;
+
+        float[] mbarb = new float[4];
+        mbarb[0] = x;
+        mbarb[1] = y;
+        //    ucar.unidata.util.Misc.printArray("mbarb begin makebarb", mbarb);
+
+        // convert meters per second to knots
+        f0 *= (3600.0 / 1853.248);
+        f1 *= (3600.0 / 1853.248);
+
+        float wnd_spd = (float) Math.sqrt(f0 * f0 + f1 * f1);
+        //System.out.println("Speed = " + wnd_spd);
+        int lenv   = vx.length;
+        int lent   = tx.length;
+        int nv     = numv[0];
+        int nt     = numt[0];
+        int maxbas = 6;
+
+        //determine the initial (minimum) length of the flag pole
+        if (wnd_spd >= 2.5) {
+
+            wsp25 = (float) Math.max(wnd_spd + 2.5, 5.0);
+            slant = 0.15f * scale;  // amount of slant
+            barb  = 0.5f * scale;   // length of a barb;
+            // WLH 6 Aug 99 - barbs point the other way (duh)
+            x0 = -f0 / wnd_spd;
+            y0 = -f1 / wnd_spd;
+
+            //determine number of wind barbs needed for 10 and 50 kt winds
+            nbarb50 = (int) (wsp25 / 50.f);
+            nbarb10 = (int) ((wsp25 - (nbarb50 * 50.f)) / 10.f);
+            nbarb5 = (int) ((wsp25 - (nbarb50 * 50.f) - (nbarb10 * 10.f))
+                            / 5.f);
+            int nbas = nbarb50 * 2 + nbarb10 + nbarb5;
+            nbas = Math.max(nbas, maxbas);
+            //nbas = 6;
+            float barbSpace = .7f * pt_size;
+
+            //length of the flag pole
+            d        = nbas * pt_size;
+            x1       = (x + x0 * d);
+            y1       = (y + y0 * d);
+            mbarb[2] = x1;
+            mbarb[3] = y1;
+
+            float flagSpace = .3333f * barbSpace;
+            float flagWidth = 1.6666f * barbSpace;
+            float flagSlant = flagWidth - slant;
+            for (int j = 0; j < nbarb50; j++) {
+                x1 = (x + x0 * d);
+                y1 = (y + y0 * d);
+                x3 = (x + x0 * (d - flagWidth));
+                y3 = (y + y0 * (d - flagWidth));
+                if (south) {
+                    x2 = (x + x0 * (d - flagSlant) - y0 * barb);
+                    y2 = (y + y0 * (d - flagSlant) + x0 * barb);
+                } else {
+                    x2 = (x + x0 * (d - flagSlant) + y0 * barb);
+                    y2 = (y + y0 * (d - flagSlant) - x0 * barb);
+                }
+                // now lengthen the distance to the next position
+                d = d - flagWidth - flagSpace;
+
+                float[] xp = { x1, x2, x3 };
+                float[] yp = { y1, y2, y3 };
+
+                tx[nt] = x1;
+                ty[nt] = y1;
+                tz[nt] = z;
+                nt++;
+                tx[nt] = x2;
+                ty[nt] = y2;
+                tz[nt] = z;
+                nt++;
+                tx[nt] = x3;
+                ty[nt] = y3;
+                tz[nt] = z;
+                nt++;
+                /*
+                System.out.println("barb50 " + x1 + " " + y1 + "" + x2 + " " + y2 +
+                                 "  " + x3 + " " + y3);
+                */
+                //start location for the next barb
+                x1 = x3;
+                y1 = y3;
+            }
+            // add back a little
+            if (nbarb50 > 0) {
+                d = d - .5f * barbSpace;
+            }
+
+            //now plot any 10 kt wind barbs
+            for (int j = 0; j < nbarb10; j++) {
+                x1 = (x + x0 * d);
+                y1 = (y + y0 * d);
+                if (south) {
+                    x2 = (x + x0 * (d + slant) - y0 * barb);
+                    y2 = (y + y0 * (d + slant) + x0 * barb);
+                } else {
+                    x2 = (x + x0 * (d + slant) + y0 * barb);
+                    y2 = (y + y0 * (d + slant) - x0 * barb);
+                }
+                d      = d - barbSpace;
+
+                vx[nv] = x1;
+                vy[nv] = y1;
+                vz[nv] = z;
+                nv++;
+                vx[nv] = x2;
+                vy[nv] = y2;
+                vz[nv] = z;
+                nv++;
+                // System.out.println("barb10 " + j + " " + x1 + " " + y1 + "" + x2 + " " + y2);
+            }
+
+            //2.5 to 7.5 kt winds are plotted with the barb part way done the pole
+            if ((nbarb50 == 0) && (nbarb10 == 0)) {
+                d = d - barbSpace;
+            }
+            if (nbarb5 == 1) {
+                barb  = barb * 0.6f;
+                slant = slant * 0.6f;
+                x1    = (x + x0 * d);
+                y1    = (y + y0 * d);
+
+                if (south) {
+                    x2 = (x + x0 * (d + slant) - y0 * barb);
+                    y2 = (y + y0 * (d + slant) + x0 * barb);
+                } else {
+                    x2 = (x + x0 * (d + slant) + y0 * barb);
+                    y2 = (y + y0 * (d + slant) - x0 * barb);
+                }
+
+                vx[nv] = x1;
+                vy[nv] = y1;
+                vz[nv] = z;
+                nv++;
+                vx[nv] = x2;
+                vy[nv] = y2;
+                vz[nv] = z;
+                nv++;
+                // System.out.println("barb5 " + x1 + " " + y1 + "" + x2 + " " + y2);
+            }
+
+
+            // System.out.println("line " + x + " " + y + "" + x1 + " " + y1);
+
+            // WLH 24 April 99 - now plot the pole
+            vx[nv] = x;
+            vy[nv] = y;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = mbarb[2];
+            vy[nv] = mbarb[3];
+            vz[nv] = z;
+            nv++;
+
+
+        } else {  // if (wnd_spd < 2.5)
+
+            // wind < 2.5 kts.  Plot a circle
+            float rad = (0.7f * pt_size);
+
+            // draw 8 segment circle, center = (x, y), radius = rad
+            // 1st segment
+            vx[nv] = x - rad;
+            vy[nv] = y;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x - 0.7f * rad;
+            vy[nv] = y + 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            // 2nd segment
+            vx[nv] = x - 0.7f * rad;
+            vy[nv] = y + 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x;
+            vy[nv] = y + rad;
+            vz[nv] = z;
+            nv++;
+            // 3rd segment
+            vx[nv] = x;
+            vy[nv] = y + rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x + 0.7f * rad;
+            vy[nv] = y + 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            // 4th segment
+            vx[nv] = x + 0.7f * rad;
+            vy[nv] = y + 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x + rad;
+            vy[nv] = y;
+            vz[nv] = z;
+            nv++;
+            // 5th segment
+            vx[nv] = x + rad;
+            vy[nv] = y;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x + 0.7f * rad;
+            vy[nv] = y - 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            // 6th segment
+            vx[nv] = x + 0.7f * rad;
+            vy[nv] = y - 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x;
+            vy[nv] = y - rad;
+            vz[nv] = z;
+            nv++;
+            // 7th segment
+            vx[nv] = x;
+            vy[nv] = y - rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x - 0.7f * rad;
+            vy[nv] = y - 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            // 8th segment
+            vx[nv] = x - 0.7f * rad;
+            vy[nv] = y - 0.7f * rad;
+            vz[nv] = z;
+            nv++;
+            vx[nv] = x - rad;
+            vy[nv] = y;
+            vz[nv] = z;
+            nv++;
+            // System.out.println("circle " + x + " " + y + "" + rad);
+            // g.drawOval(x-rad,y-rad,2*rad,2*rad);
+
+            mbarb[2] = x;
+            mbarb[3] = y;
+        }
+        //    ucar.unidata.util.Misc.printArray("mbarb end makebarb", mbarb);
+
+        numv[0] = nv;
+        numt[0] = nt;
+        return mbarb;
+    }
+
 }
+
