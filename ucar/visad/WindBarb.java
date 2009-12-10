@@ -335,7 +335,7 @@ public class WindBarb {
      * @param numt       number of coordinates
      * @return
      */
-    static float[] makeBarb(boolean south, float x, float y, float z,
+    public static float[] makeBarb(boolean south, float x, float y, float z,
                             float scale, float pt_size, float f0, float f1,
                             float[] vx, float[] vy, float[] vz, int[] numv,
                             float[] tx, float[] ty, float[] tz, int[] numt) {
@@ -667,6 +667,4 @@ public class WindBarb {
         numt[0] = nt;
         return mbarb;
     }
-
 }
-
