@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -68,6 +69,9 @@ public class MultiFrame {
     /** mapping from windowlistener to internalframelistener */
     private Hashtable listeners = new Hashtable();
 
+    /** _more_          */
+    private List<WindowListener> frameListeners =
+        new ArrayList<WindowListener>();
 
     /**
      * Set the global desktopPane. This causes all default MultiFrames
@@ -128,7 +132,7 @@ public class MultiFrame {
     public void show() {
         if (frame != null) {
             frame.show();
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.show();
         }
     }
@@ -138,11 +142,25 @@ public class MultiFrame {
      * dispose of the component
      */
     public void dispose() {
+        if ((frame == null) && (internalFrame == null)) {
+            return;
+        }
         if (frame != null) {
+            if (frameListeners != null) {
+                for (WindowListener listener : frameListeners) {
+                    frame.removeWindowListener(listener);
+                }
+            }
             frame.dispose();
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.dispose();
         }
+
+        desktopPane    = null;
+        frame          = null;
+        internalFrame  = null;
+        listeners      = null;
+        frameListeners = null;
     }
 
 
@@ -154,7 +172,7 @@ public class MultiFrame {
     public void setVisible(boolean visible) {
         if (frame != null) {
             frame.setVisible(visible);
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.setVisible(visible);
         }
     }
@@ -167,8 +185,10 @@ public class MultiFrame {
     public Container getContentPane() {
         if (frame != null) {
             return frame.getContentPane();
-        } else {
+        } else if (internalFrame != null) {
             return internalFrame.getContentPane();
+        } else {
+            return null;
         }
     }
 
@@ -204,7 +224,7 @@ public class MultiFrame {
     public void setState(int state) {
         if (frame != null) {
             frame.setState(state);
-        } else {
+        } else if (internalFrame != null) {
             try {
                 if (state == Frame.NORMAL) {
                     internalFrame.setIcon(false);
@@ -225,7 +245,7 @@ public class MultiFrame {
     public void setTitle(String title) {
         if (frame != null) {
             frame.setTitle(title);
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.setTitle(title);
         }
     }
@@ -239,8 +259,10 @@ public class MultiFrame {
     public String getTitle() {
         if (frame != null) {
             return frame.getTitle();
-        } else {
+        } else if (internalFrame != null) {
             return internalFrame.getTitle();
+        } else {
+            return "";
         }
     }
 
@@ -272,8 +294,10 @@ public class MultiFrame {
     public Window getWindow() {
         if (frame != null) {
             return frame;
-        } else {
+        } else if (internalFrame != null) {
             return GuiUtils.getWindow(getComponent());
+        } else {
+            return null;
         }
 
     }
@@ -284,7 +308,7 @@ public class MultiFrame {
     public void pack() {
         if (frame != null) {
             frame.pack();
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.pack();
         }
     }
@@ -297,7 +321,7 @@ public class MultiFrame {
     public void setDefaultCloseOperation(int operation) {
         if (frame != null) {
             frame.setDefaultCloseOperation(operation);
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.setDefaultCloseOperation(operation);
         }
     }
@@ -313,8 +337,9 @@ public class MultiFrame {
      */
     public void addWindowListener(final WindowListener l) {
         if (frame != null) {
+            frameListeners.add(l);
             frame.addWindowListener(l);
-        } else {
+        } else if (internalFrame != null) {
             if (dummyWindow == null) {
                 dummyWindow = new JFrame();
             }
@@ -362,9 +387,10 @@ public class MultiFrame {
      */
     public void removeWindowListener(WindowListener l) {
         //TODO
-        if (frame != null) {
+        if ((frame != null) && (frameListeners != null)) {
             frame.removeWindowListener(l);
-        } else {
+            frameListeners.remove(l);
+        } else if ((listeners != null) && (internalFrame != null)) {
             InternalFrameListener listener =
                 (InternalFrameListener) listeners.get(l);
             if (listener != null) {
@@ -383,7 +409,7 @@ public class MultiFrame {
     public void setJMenuBar(JMenuBar menuBar) {
         if (frame != null) {
             frame.setJMenuBar(menuBar);
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.setJMenuBar(menuBar);
         }
     }
@@ -404,10 +430,10 @@ public class MultiFrame {
      */
     public void setBounds(Rectangle bounds) {
         if (frame != null) {
-            if(bounds!=null) {
+            if (bounds != null) {
                 GuiUtils.positionAndFitToScreen(frame, bounds);
             }
-        } else {
+        } else if (internalFrame != null) {
             internalFrame.setBounds(bounds);
         }
     }
@@ -420,7 +446,7 @@ public class MultiFrame {
     public void setIconImage(Image icon) {
         if (frame != null) {
             frame.setIconImage(icon);
-        } else {
+        } else if (internalFrame != null) {
             //            internalFrame.setFrameIcon(new ImageIcon(icon));
         }
     }
@@ -431,7 +457,7 @@ public class MultiFrame {
     public void toFront() {
         if (frame != null) {
             GuiUtils.toFront(frame);
-        } else {
+        } else if (internalFrame != null) {
             GuiUtils.toFront(getWindow());
             internalFrame.toFront();
         }
@@ -445,8 +471,10 @@ public class MultiFrame {
     public Component getComponent() {
         if (frame != null) {
             return frame;
-        } else {
+        } else if (internalFrame != null) {
             return internalFrame;
+        } else {
+            return new JPanel();
         }
     }
 
@@ -468,8 +496,10 @@ public class MultiFrame {
     public boolean isShowing() {
         if (frame != null) {
             return frame.isShowing();
-        } else {
+        } else if (internalFrame != null) {
             return getWindow().isShowing() && !internalFrame.isIcon();
+        } else {
+            return false;
         }
     }
 
@@ -492,7 +522,7 @@ public class MultiFrame {
     public void setLocation(int x, int y) {
         if (frame != null) {
             frame.setLocation(x, y);
-        } else {
+        } else if (internalFrame != null) {
             //TODO?
         }
     }
@@ -525,12 +555,12 @@ public class MultiFrame {
     public int getState() {
         if (frame != null) {
             return frame.getState();
+        } else if (internalFrame != null) {
+            if (internalFrame.isIcon()) {
+                return Frame.ICONIFIED;
+            }
         }
-        if (internalFrame.isIcon()) {
-            return Frame.ICONIFIED;
-        } else {
-            return Frame.NORMAL;
-        }
+        return Frame.NORMAL;
     }
 
 
