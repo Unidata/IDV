@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -31,6 +32,7 @@ import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
 
 
+import ucar.unidata.util.Disposable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -75,7 +77,11 @@ public class IdvWindow extends MultiFrame {
     private static boolean waitState = false;
 
 
-    private  boolean hasBeenDisposed= false;
+    /** _more_          */
+    private List<Disposable> disposables = new ArrayList<Disposable>();
+
+    /** _more_          */
+    private boolean hasBeenDisposed = false;
 
     /** The window contents */
     JComponent contents;
@@ -136,7 +142,7 @@ public class IdvWindow extends MultiFrame {
     /** The groups within this window */
     private Hashtable groups = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable persistentComponents = new Hashtable();
 
     /**
@@ -177,8 +183,8 @@ public class IdvWindow extends MultiFrame {
         addWindowListener(wa[0] = new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 if (doClose()) {
-                  removeWindowListener(wa[0]);
-                  lastActiveWindow = null;
+                    removeWindowListener(wa[0]);
+                    lastActiveWindow = null;
                 }
             }
             public void windowActivated(WindowEvent e) {
@@ -245,9 +251,11 @@ public class IdvWindow extends MultiFrame {
      */
     public void setContents(JComponent contents) {
         this.contents = contents;
-        if(contents == null) return;
+        if (contents == null) {
+            return;
+        }
         Container contentPane = getContentPane();
-        if(contentPane!=null) {
+        if (contentPane != null) {
             contentPane.removeAll();
             contentPane.add(contents);
             pack();
@@ -531,16 +539,21 @@ public class IdvWindow extends MultiFrame {
     protected boolean doClose() {
         if (isAMainWindow && mainWindows.contains(this)
                 && (mainWindows.size() == 1)) {
-            if ( !idv.quit()) {
-                return false;
-            }
+            //            if ( !idv.quit()) {
+            //                return false;
+            //            }
         }
         dispose();
         return true;
     }
 
 
-    public boolean getHasBeenDisposed()  {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getHasBeenDisposed() {
         return hasBeenDisposed;
     }
 
@@ -549,16 +562,32 @@ public class IdvWindow extends MultiFrame {
      * Dispose of this window.
      */
     public void dispose() {
-        if(hasBeenDisposed) return;
+        if (hasBeenDisposed) {
+            return;
+        }
         hasBeenDisposed = true;
+        idv.getIdvUIManager().removeWindow(this);
+
+        for (Disposable disposable : disposables) {
+            disposable.dispose();
+        }
+        disposables = null;
+
+
+        JMenuBar menuBar = (JMenuBar) getComponent(IdvUIManager.COMP_MENUBAR);
+        if (menuBar != null) {
+            GuiUtils.empty(menuBar);
+        }
+
         RovingProgress progress =
-            (RovingProgress)           getComponent(IdvUIManager.COMP_PROGRESSBAR);
+            (RovingProgress) getComponent(IdvUIManager.COMP_PROGRESSBAR);
         if (progress != null) {
             progress.dispose();
         }
 
-        JComponent messageLogger = (JComponent)getComponent(IdvUIManager.COMP_MESSAGELABEL);
-        if(messageLogger!=null) {
+        JComponent messageLogger =
+            (JComponent) getComponent(IdvUIManager.COMP_MESSAGELABEL);
+        if (messageLogger != null) {
             LogUtil.removeMessageLogger(messageLogger);
         }
 
@@ -566,16 +595,21 @@ public class IdvWindow extends MultiFrame {
         allWindows.remove(this);
         mainWindows.remove(this);
 
-        List groups =getComponentGroups();
-        for(int i=0;i<groups.size();i++) {
+        List groups = getComponentGroups();
+        for (int i = 0; i < groups.size(); i++) {
             ComponentGroup group = (ComponentGroup) groups.get(i);
             group.doRemove();
         }
-        persistentComponents = null;
 
         destroyViewManagers();
+
         viewManagers         = null;
         components           = null;
+        groups               = null;
+        persistentComponents = null;
+        contents             = null;
+
+
         if (xmlUI != null) {
             //This was commented out. Not sure why.
             xmlUI.dispose();
@@ -639,7 +673,14 @@ public class IdvWindow extends MultiFrame {
         components.put(componentName, component);
     }
 
-
+    /**
+     * _more_
+     *
+     * @param disposable _more_
+     */
+    public void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
 
     /**
      * _more_
@@ -648,7 +689,9 @@ public class IdvWindow extends MultiFrame {
      * @param object _more_
      */
     public void putPersistentComponent(Object key, Object object) {
-        if(persistentComponents == null) return;
+        if (persistentComponents == null) {
+            return;
+        }
         persistentComponents.put(key, object);
     }
 
@@ -660,20 +703,28 @@ public class IdvWindow extends MultiFrame {
      * @return _more_
      */
     public Object getPersistentComponent(Object key) {
-        if(persistentComponents == null) return null;
+        if (persistentComponents == null) {
+            return null;
+        }
         return persistentComponents.get(key);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<IdvComponentGroup> getComponentGroups() {
         List groups = new ArrayList<IdvComponentGroup>();
-        if(persistentComponents == null) return groups;
+        if (persistentComponents == null) {
+            return groups;
+        }
         Hashtable map = getPersistentComponents();
-        for (Enumeration keys =
-                 map.keys(); keys.hasMoreElements(); ) {
+        for (Enumeration keys = map.keys(); keys.hasMoreElements(); ) {
             Object key = keys.nextElement();
             Object obj = map.get(key);
             if (obj instanceof IdvComponentGroup) {
-                groups.add((IdvComponentGroup)obj);
+                groups.add((IdvComponentGroup) obj);
             }
         }
         return groups;

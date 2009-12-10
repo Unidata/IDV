@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -59,6 +60,7 @@ import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.Disposable;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -405,7 +407,7 @@ public class IdvUIManager extends IdvManager {
     /** The different menu ids */
     private Hashtable menuIds;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, ImageIcon> actionIcons;
 
 
@@ -1208,7 +1210,7 @@ public class IdvUIManager extends IdvManager {
      * @return true if running on Mac
      */
     public boolean isMac() {
-	return GuiUtils.isMac();
+        return GuiUtils.isMac();
     }
 
     /**
@@ -1782,25 +1784,93 @@ public class IdvUIManager extends IdvManager {
 
 
         for (Enumeration keys = menuMap.keys(); keys.hasMoreElements(); ) {
-            final String menuId = (String) keys.nextElement();
+            String menuId = (String) keys.nextElement();
             if ( !(menuMap.get(menuId) instanceof JMenu)) {
                 continue;
             }
-            final JMenu menu = (JMenu) menuMap.get(menuId);
-            menu.addMenuListener(new MenuListener() {
-                public void menuCanceled(MenuEvent e) {}
-
-                public void menuDeselected(MenuEvent e) {
-                    handleMenuDeSelected(menuId, menu, idvWindow);
-                }
-
-                public void menuSelected(MenuEvent e) {
-                    handleMenuSelected(menuId, menu, idvWindow);
-                }
-            });
+            JMenu menu = (JMenu) menuMap.get(menuId);
+            MyMenuListener menuListener = new MyMenuListener(this, idvWindow,
+                                              menu, menuId);
+            menu.addMenuListener(menuListener);
+            idvWindow.addDisposable(menuListener);
         }
 
+        idvWindow.setComponent(COMP_MENUBAR, menuBar);
+
         return menuBar;
+    }
+
+
+    /**
+     * Class MyMenuListener _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    private static class MyMenuListener implements MenuListener, Disposable {
+
+        /** _more_          */
+        IdvUIManager idvUIManager;
+
+        /** _more_          */
+        IdvWindow idvWindow;
+
+        /** _more_          */
+        JMenu menu;
+
+        /** _more_          */
+        String menuId;
+
+        /**
+         * _more_
+         *
+         * @param idvUIManager _more_
+         * @param idvWindow _more_
+         * @param menu _more_
+         * @param menuId _more_
+         */
+        public MyMenuListener(IdvUIManager idvUIManager, IdvWindow idvWindow,
+                              JMenu menu, String menuId) {
+            this.idvUIManager = idvUIManager;
+            this.idvWindow    = idvWindow;
+            this.menu         = menu;
+            this.menuId       = menuId;
+        }
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void menuCanceled(MenuEvent e) {}
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void menuDeselected(MenuEvent e) {
+            idvUIManager.handleMenuDeSelected(menuId, menu, idvWindow);
+        }
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void menuSelected(MenuEvent e) {
+            idvUIManager.handleMenuSelected(menuId, menu, idvWindow);
+        }
+
+        /**
+         * _more_
+         */
+        public void dispose() {
+            idvUIManager = null;
+            idvWindow    = null;
+            menu         = null;
+        }
+
     }
 
 
@@ -2698,28 +2768,26 @@ public class IdvUIManager extends IdvManager {
             getIdv().getControlDescriptor("locationcontrol");
 
         if (locationDescriptor == null) {
-	    return;
-	}
-	List<JMenuItem> stationMenuItems = null;
-	if(stationMenuItems==null) {
-	    List           stations = getIdv().getLocationList();
-	    ObjectListener listener = new ObjectListener(locationDescriptor) {
-		    public void actionPerformed(ActionEvent ae, Object obj) {
-			addStationDisplay((NamedStationTable) obj,
-					  (ControlDescriptor) theObject);
-		    }
-		};
-	    stationMenuItems = NamedStationTable.makeMenuItems(stations,
-							       listener);
-	}
-	if (makeNew) {
-	    displayMenu.add(
-			    GuiUtils.setIcon(
-					     GuiUtils.makeMenu("Locations", stationMenuItems),
-					     "/auxdata/ui/icons/world_loc.png"));
-	} else {
-	    GuiUtils.makeMenu(displayMenu, stationMenuItems);
-	}
+            return;
+        }
+        List<JMenuItem> stationMenuItems = null;
+        if (stationMenuItems == null) {
+            List           stations = getIdv().getLocationList();
+            ObjectListener listener = new ObjectListener(locationDescriptor) {
+                public void actionPerformed(ActionEvent ae, Object obj) {
+                    addStationDisplay((NamedStationTable) obj,
+                                      (ControlDescriptor) theObject);
+                }
+            };
+            stationMenuItems = NamedStationTable.makeMenuItems(stations,
+                    listener);
+        }
+        if (makeNew) {
+            displayMenu.add(GuiUtils.setIcon(GuiUtils.makeMenu("Locations",
+                    stationMenuItems), "/auxdata/ui/icons/world_loc.png"));
+        } else {
+            GuiUtils.makeMenu(displayMenu, stationMenuItems);
+        }
     }
 
 
@@ -3678,14 +3746,14 @@ public class IdvUIManager extends IdvManager {
         RovingProgress progress = doMakeRovingProgressBar();
         window.setComponent(COMP_PROGRESSBAR, progress);
 
-
-        //TODO: turn off the memory monitor  when this window is closed.
         MemoryMonitor mm = new MemoryMonitor(
                                80,
                                new Boolean(
                                    getStateManager().getPreferenceOrProperty(
                                        PROP_SHOWCLOCK,
                                        "true")).booleanValue());
+        window.addDisposable(mm);
+
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());
         Border paddedBorder =
             BorderFactory.createCompoundBorder(getStatusBorder(),
@@ -4274,12 +4342,12 @@ public class IdvUIManager extends IdvManager {
                 contents = (JComponent) xmlUI.getContents();
                 window.setXmlUI(xmlUI);
                 viewManagers = xmlUI.getViewManagers();
-		if(GuiUtils.doMacMenubar()) {
-		    JMenuBar menuBar = doMakeMenuBar();
-		    if (menuBar != null) {
-			window.setJMenuBar(menuBar);
-		    }
-		}
+                if (GuiUtils.doMacMenubar()) {
+                    JMenuBar menuBar = doMakeMenuBar();
+                    if (menuBar != null) {
+                        window.setJMenuBar(menuBar);
+                    }
+                }
             } else {
                 //Else call out to make the gui
                 if (viewManagers.size() == 0) {
