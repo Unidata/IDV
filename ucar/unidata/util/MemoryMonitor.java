@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -47,7 +48,7 @@ import javax.swing.event.*;
  * @author Unidata development team
  * @version %I%, %G%
  */
-public class MemoryMonitor extends JPanel implements Runnable {
+public class MemoryMonitor extends JPanel implements Runnable, Disposable {
 
 
     /** flag for running */
@@ -84,19 +85,19 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private static long lastTimeRanGC = -1;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean showClock = true;
 
-    /** _more_          */
+    /** _more_ */
     private static final Font clockFont = new Font("Dialog", Font.BOLD, 11);
 
-    /** _more_          */
+    /** _more_ */
     private static SimpleDateFormat clockFormat =
         new SimpleDateFormat("HH:mm:ss z");
 
 
 
-    /** _more_          */
+    /** _more_ */
     private String memoryLabel = "";
 
     /**
@@ -176,6 +177,14 @@ public class MemoryMonitor extends JPanel implements Runnable {
         label1.addMouseListener(ml);
         label2.addMouseListener(ml);
         start();
+    }
+
+    /**
+     * _more_
+     */
+    public void dispose() {
+        running = false;
+        GuiUtils.empty(this);
     }
 
     /**
