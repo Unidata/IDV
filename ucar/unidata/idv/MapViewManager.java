@@ -343,8 +343,11 @@ public class MapViewManager extends NavigatedViewManager {
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
 
+        StateManager stateManager = getStateManager();
+        IntegratedDataViewer idv = getIdv();
+        if(idv==null || stateManager == null) return null;
         boolean mode3d =
-            getStateManager().getProperty(IdvConstants.PROP_3DMODE, use3D);
+            stateManager.getProperty(IdvConstants.PROP_3DMODE, use3D);
         mode3d = getStore().get(PREF_DIMENSION, mode3d);
         // let property override the preference
         use3D = mode3d && use3D;
@@ -359,7 +362,7 @@ public class MapViewManager extends NavigatedViewManager {
         boolean useGlobe = getUseGlobeDisplay()
                            && (mode != NavigatedDisplay.MODE_2D);
 
-        Dimension dimension = getIdv().getStateManager().getViewSize();
+        Dimension dimension = stateManager.getViewSize();
         if (dimension == null) {
             if ((getFullScreenWidth() > 0) && (getFullScreenHeight() > 0)) {
                 dimension = new Dimension(getFullScreenWidth(),
@@ -381,7 +384,7 @@ public class MapViewManager extends NavigatedViewManager {
         if (useGlobe) {
             //TODO: Set the dimension
             GlobeDisplay globeDisplay =
-                new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
+                new GlobeDisplay(idv.getArgsManager().getIsOffScreen(),
                                  dimension, null);
             globeDisplay.setClipDistanceFront(
                 getStateManager().getProperty(
@@ -412,7 +415,7 @@ public class MapViewManager extends NavigatedViewManager {
                     ProjectionImpl dfltProjection = null;
                     if (defaultProjectionName != null) {
                         dfltProjection =
-                            getIdv().getIdvProjectionManager()
+                            idv.getIdvProjectionManager()
                                 .findProjectionByName(defaultProjectionName);
                         if (dfltProjection != null) {
                             doNotSetProjection = true;
@@ -432,7 +435,7 @@ public class MapViewManager extends NavigatedViewManager {
             Trace.call1("MapViewManager.new MPD");
             MapProjectionDisplay mapDisplay =
                 MapProjectionDisplay.getInstance(mainProjection, mode,
-                    getIdv().getArgsManager().getIsOffScreen(), dimension);
+                    idv.getArgsManager().getIsOffScreen(), dimension);
             Trace.call2("MapViewManager.new MPD");
 
             mapDisplay.setClipDistanceFront(

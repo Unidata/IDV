@@ -4867,6 +4867,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     //Use a local tmpMaster variable so we don't set the master member before we're ready to
                     DisplayMaster tmpMaster = doMakeDisplayMaster();
+                    if(tmpMaster == null) return null;
                     DisplayRenderer renderer =
                         tmpMaster.getDisplay().getDisplayRenderer();
                     if (renderer instanceof DisplayRendererJ3D) {
