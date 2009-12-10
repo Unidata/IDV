@@ -20,18 +20,24 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
+
+
+import ucar.unidata.util.Disposable;
+import ucar.unidata.util.GuiUtils;
 
 
 
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.GuiUtils;
-import java.text.SimpleDateFormat;
 
-import java.util.Date;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -43,7 +49,7 @@ import javax.swing.border.*;
  * @author MetApps Development Team
  * @version $Revision: 1.11 $ $Date: 2007/07/06 20:45:33 $
  */
-public class RovingProgress extends JPanel {
+public class RovingProgress extends JPanel implements Disposable {
 
     /** Default insets */
     public static final Insets DEFAULT_INSETS = new Insets(0, 0, 0, 0);
@@ -81,46 +87,69 @@ public class RovingProgress extends JPanel {
     /** for double buffering */
     private Dimension imageSize;
 
+    /** _more_          */
     private boolean showClock = false;
 
+    /** _more_          */
     private boolean clockRunning = false;
 
+    /** _more_          */
     private static final Font clockFont = new Font("Dialog", Font.BOLD, 11);
 
-    private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
+    /** _more_          */
+    private static SimpleDateFormat clockFormat =
+        new SimpleDateFormat("HH:mm:ss z");
 
+    /**
+     * _more_
+     *
+     * @param showClock _more_
+     */
     public RovingProgress(boolean showClock) {
-        this(null,null);
+        this(null, null);
         this.showClock = showClock;
-        if(showClock) {
+        if (showClock) {
             startClock();
         }
     }
 
 
+    /**
+     * _more_
+     */
     private void startClock() {
-        if(clockRunning) return;
+        if (clockRunning) {
+            return;
+        }
         Misc.run(new Runnable() {
-                public void run() {
-                    startClockInner();
-                }
-            });
+            public void run() {
+                startClockInner();
+            }
+        });
     }
 
+    /**
+     * _more_
+     */
     private void startClockInner() {
-        while(showClock) {
+        while (showClock) {
             repaint();
             Misc.sleep(1000);
         }
-        clockRunning =false;
+        clockRunning = false;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param showClock _more_
+     */
     public void setShowClock(boolean showClock) {
         this.showClock = showClock;
-        if(showClock) {
+        if (showClock) {
             startClock();
-        } 
+        }
     }
 
 
@@ -178,9 +207,14 @@ public class RovingProgress extends JPanel {
         repaint();
     }
 
+    /**
+     * _more_
+     */
     public void dispose() {
-        stop();
-        showClock =false;
+        currentRunnable = null;
+        running         = false;
+        showClock       = false;
+        GuiUtils.empty(this);
     }
 
 
@@ -282,12 +316,12 @@ public class RovingProgress extends JPanel {
         g.setColor(getBackground());
         g.fillRect(2, 2, b.width - 4, b.height - 4);
         if ( !isRunning()) {
-            if(showClock) {
+            if (showClock) {
                 g.setFont(clockFont);
                 g.setColor(Color.BLACK);
                 Date d = new Date();
                 clockFormat.setTimeZone(GuiUtils.getTimeZone());
-                g.drawString(clockFormat.format(d),3,b.height-5);
+                g.drawString(clockFormat.format(d), 3, b.height - 5);
             }
             return;
         }
