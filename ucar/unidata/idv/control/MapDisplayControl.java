@@ -614,8 +614,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         items.add(mi);
         JMenu addMapMenu = new JMenu("Add System Map");
         items.add(addMapMenu);
-
-        List maps = getControlContext().getResourceManager().getMaps(inGlobeDisplay());
+        List maps = getControlContext().getResourceManager().getMaps();
         for (int i = 0; i < maps.size(); i++) {
             final MapData mapData = (MapData) maps.get(i);
             mi = new JMenuItem(mapData.getDescription());
