@@ -21,7 +21,11 @@
  */
 
 
+
 package ucar.visad.display;
+
+
+import ucar.visad.WindBarb;
 
 
 import ucar.visad.quantities.CommonUnits;
@@ -73,7 +77,8 @@ public class WindBarbDisplayable extends FlowDisplayable {
         return (getDisplay().getDisplayRenderer()
                 instanceof DisplayRendererJ2D)
                ? (DataRenderer) new visad.bom.BarbRendererJ2D()
-               : (DataRenderer) new visad.bom.BarbRendererJ3D();
+        //: (DataRenderer) new visad.bom.BarbRendererJ3D();
+               : (DataRenderer) new MyBarbRenderer();
     }
 
     /**
@@ -121,5 +126,61 @@ public class WindBarbDisplayable extends FlowDisplayable {
         return false;
     }
 
+    /**
+     * Custom barb renderer
+     *
+     *
+     * @author IDV Development Team
+     */
+    protected static class MyBarbRenderer extends visad.bom.BarbRendererJ3D {
+
+        /**
+         * Ctor
+         */
+        public MyBarbRenderer() {
+            super();
+        }
+
+        /**
+         * Make the barb
+         *
+         * @param south true if southern hemisphere
+         * @param x  x position
+         * @param y  y position
+         * @param z  z position
+         * @param scale  scale factor
+         * @param pt_size  spacing
+         * @param f0  u component
+         * @param f1  v component
+         * @param vx  line x points
+         * @param vy  line y points
+         * @param vz  line z points
+         * @param numv  num line points
+         * @param tx triangle x points
+         * @param ty triangle y points
+         * @param tz triangle z points
+         * @param numt triangles
+         *
+         * @return stuff
+         */
+        public float[] makeVector(boolean south, float x, float y, float z,
+                                  float scale, float pt_size, float f0,
+                                  float f1, float[] vx, float[] vy,
+                                  float[] vz, int[] numv, float[] tx,
+                                  float[] ty, float[] tz, int[] numt) {
+            return WindBarb.makeBarb(south, x, y, z, scale, pt_size, f0, f1,
+                                     vx, vy, vz, numv, tx, ty, tz, numt);
+        }
+
+        /**
+         * Clone this
+         *
+         * @return a new one
+         */
+        public Object clone() {
+            return new MyBarbRenderer();
+        }
+
+    }
 }
 
