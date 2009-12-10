@@ -28,6 +28,7 @@ package ucar.unidata.idv.control;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.unidata.gis.maps.*;
 import ucar.unidata.idv.IdvResourceManager;
@@ -207,10 +208,15 @@ public class MapDisplayControl extends DisplayControlImpl {
     int mycnt = cnt++;
 
     /** The link button */
-    private JToggleButton applyToAllBtn;
+    private JToggleButton applyToAllMapsBtn;
+
+    private JToggleButton applyToAllLatLonBtn;
 
     /** Do we apply the changes to all the maps */
     private boolean applyChangesToAllMaps = false;
+
+    /** Do we apply the changes to all the maps */
+    private boolean applyChangesToAllLatLon = false;
 
     /** Are we currently updating the other maps */
     private boolean updatingOtherMapStates = false;
@@ -266,6 +272,42 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
 
+
+    protected boolean xxxshouldAddControlListener() {
+        return true;
+    }
+
+    double lastWidthDegrees = -1;
+
+    public void xxxviewpointChanged() {
+        super.viewpointChanged();
+        try {
+            if(latState == null || lonState == null) return;
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+            if ((navDisplay == null) || (navDisplay.getDisplay() == null)) {
+            System.err.println ("skipping");
+                return;
+            }
+            Rectangle screenBounds = navDisplay.getScreenBounds();
+
+            EarthLocation p1 = screenToEarth(0,0);
+            EarthLocation p2 = screenToEarth(screenBounds.width,0);
+            double diff = Math.abs(p1.getLongitude().getValue()-p2.getLongitude().getValue());
+            System.err.println ("diff:" + diff);
+            if(diff!=lastWidthDegrees) {
+                lastWidthDegrees = diff;
+                System.err.println ("setting spacing:");
+                latState.okToShare = false;
+                lonState.okToShare = false;
+                latState.setSpacing((float)(lastWidthDegrees/10));
+                lonState.setSpacing((float)(lastWidthDegrees/10));
+                latState.okToShare = true;
+                lonState.okToShare = true;
+            }
+        } catch(Exception exc) {
+            logException("Viewpoint changed", exc);
+        }
+    }
 
     /**
      * Append any label information to the list of labels.
@@ -851,6 +893,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         if (lonState == null) {
             lonState = createLatLonState(false, -180.f, 180.f, 45.f);
         }
+        latState.other = lonState;
+        lonState.other = latState;
+
         LatLonPanel latPanel = new LatLonPanel(latState);
         latState.myLatLonPanel = latPanel;
         LatLonPanel lonPanel = new LatLonPanel(lonState);
@@ -879,8 +924,15 @@ public class MapDisplayControl extends DisplayControlImpl {
         vp.setViewSize(new Dimension(600, 200));
         sp.setPreferredSize(new Dimension(600, 200));
 
+        applyToAllLatLonBtn =
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/Unlinked.gif",
+                                          "/auxdata/ui/icons/Linked.gif", 0,
+                                          0, true);
+        applyToAllLatLonBtn.setContentAreaFilled(false);
+        applyToAllLatLonBtn.setSelected(applyChangesToAllLatLon);
+        applyToAllLatLonBtn.setToolTipText("Apply changes to all lat/lon lines");
 
-        JPanel displayPanel = GuiUtils.topCenter(llPanel, ( !useZPosition()
+        JPanel displayPanel = GuiUtils.topCenter(GuiUtils.vbox(GuiUtils.left(applyToAllLatLonBtn),llPanel), ( !useZPosition()
                 ? GuiUtils.filler()
                 : GuiUtils.top(
                     GuiUtils.leftCenter(
@@ -888,19 +940,23 @@ public class MapDisplayControl extends DisplayControlImpl {
                         makePositionSlider()))));
 
 
-        applyToAllBtn =
+        applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/Unlinked.gif",
                                           "/auxdata/ui/icons/Linked.gif", 0,
                                           0, true);
-        applyToAllBtn.setContentAreaFilled(false);
-        applyToAllBtn.setSelected(applyChangesToAllMaps);
-        applyToAllBtn.setToolTipText("Apply changes to all visible maps");
+        applyToAllMapsBtn.setContentAreaFilled(false);
+        applyToAllMapsBtn.setSelected(applyChangesToAllMaps);
+        applyToAllMapsBtn.setToolTipText("Apply changes to all visible maps");
+
+
+
+
 
 
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Maps",
-                       GuiUtils.topCenter(GuiUtils.left(applyToAllBtn), sp));
+                       GuiUtils.topCenter(GuiUtils.left(applyToAllMapsBtn), sp));
         tabbedPane.add("Settings", displayPanel);
 
         /**
@@ -1267,6 +1323,10 @@ public class MapDisplayControl extends DisplayControlImpl {
         /** Flag to keep from infinite looping */
         private boolean ignoreStateChange = false;
 
+        private boolean okToShare = true;
+
+        private LatLonState other;
+
         /**
          * Parameterless ctor
          */
@@ -1326,6 +1386,88 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
         }
 
+        private void stateWasShared() {
+            ignoreStateChange = true;
+            if (myLatLonPanel != null) {
+                myLatLonPanel.setLatLonData(this);
+            }
+            ignoreStateChange = false;
+            okToShare = true;
+        }
+
+
+        private boolean shouldShare() {
+            if(mapDisplayControl!=null && 
+               mapDisplayControl.getApplyChangesToAllLatLon() &&
+               other!=null && okToShare && !ignoreStateChange) {
+                return true;
+            }
+            return false;
+        }
+
+        public void setColor(Color value) {
+            boolean shouldShare = shouldShare() && !Misc.equals(value, getColor());
+            super.setColor(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setColor(value);
+                other.stateWasShared();
+            }
+        }
+
+        public void setVisible(boolean value) {
+            boolean shouldShare = shouldShare() && value!= getVisible();
+            super.setVisible(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setVisible(value);
+                other.stateWasShared();
+            }
+        }
+
+
+        public void setFastRendering(boolean value) {
+            boolean shouldShare = shouldShare() && value!= getFastRendering();
+            super.setFastRendering(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setFastRendering(value);
+                other.stateWasShared();
+            }
+        }
+
+        public void setLineStyle(int value) {
+            boolean shouldShare = shouldShare() && value!= getLineStyle();
+            super.setLineStyle(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setLineStyle(value);
+                other.stateWasShared();
+            }
+        }
+
+        public void setSpacing(float value) {
+            boolean shouldShare = shouldShare() && value!= getSpacing();
+            super.setSpacing(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setSpacing(value);
+                other.stateWasShared();
+            }
+        }
+
+
+        public void setLineWidth(float value) {
+            boolean shouldShare = shouldShare() && value!= getLineWidth();
+            super.setLineWidth(value);
+            if(shouldShare) {
+                other.okToShare = false;
+                other.setLineWidth(value);
+                other.stateWasShared();
+            }
+        }
+
+
 
         /**
          * Apply the visibility to the myLatLon
@@ -1364,9 +1506,12 @@ public class MapDisplayControl extends DisplayControlImpl {
                     || (myLatLonPanel == null)) {
                 return;
             }
+
             ignoreStateChange = true;
             try {
-                myLatLonPanel.applyStateToData();
+                if(okToShare)  {
+                    myLatLonPanel.applyStateToData();
+                }
                 //This triggers the application of the state to the myLatLon
                 getLatLonLines();
             } catch (Exception exc) {
@@ -1381,7 +1526,7 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @return to string
          */
         public String toString() {
-            return "map state " + getVisible();
+            return (getIsLatitude()? "map state:latitude ": "map state:longitude ");
         }
 
 
@@ -1865,10 +2010,34 @@ public class MapDisplayControl extends DisplayControlImpl {
      *  @return The ApplyChangesToAllMaps
      */
     public boolean getApplyChangesToAllMaps() {
-        if (applyToAllBtn != null) {
-            return applyToAllBtn.isSelected();
+        if (applyToAllMapsBtn != null) {
+            return applyToAllMapsBtn.isSelected();
         }
         return applyChangesToAllMaps;
+    }
+
+
+
+
+    /**
+     *  Set the ApplyChangesToAllLatLon property.
+     *
+     *  @param value The new value for ApplyChangesToAllLatLon
+     */
+    public void setApplyChangesToAllLatLon(boolean value) {
+        applyChangesToAllLatLon = value;
+    }
+
+    /**
+     *  Get the ApplyChangesToAllLatLon property.
+     *
+     *  @return The ApplyChangesToAllLatLon
+     */
+    public boolean getApplyChangesToAllLatLon() {
+        if (applyToAllLatLonBtn != null) {
+            return applyToAllLatLonBtn.isSelected();
+        }
+        return applyChangesToAllLatLon;
     }
 
     /**
