@@ -2671,6 +2671,8 @@ public class IdvUIManager extends IdvManager {
             systemMenu.add(mi);
         }
 
+        GuiUtils.limitMenuSize(systemMenu, "Maps ", 20);
+
         mi = new JMenuItem("Add Background Image");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
