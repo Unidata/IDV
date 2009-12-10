@@ -31,6 +31,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.Counter;
 
 import ucar.visad.*;
 
@@ -261,11 +262,16 @@ abstract public class DisplayMaster {
     /** displayable mapped to animation */
     private Animation animation = null;
 
+    static Counter counter  =new Counter();
+
     /**
      * Parameterless ctor. Note: If you instantiate a DisplayMaster
      * through this constructor you must also call the init method.
      */
-    public DisplayMaster() {}
+    public DisplayMaster() {
+        counter.incr();
+        System.err.println ("DisplayMaster.ctor:"  + counter);
+    }
 
 
 
@@ -293,7 +299,6 @@ abstract public class DisplayMaster {
      */
     public DisplayMaster(DisplayImpl display, int initialCapacity)
             throws VisADException, RemoteException {
-
         this(display, initialCapacity, null);
     }
 
@@ -311,6 +316,8 @@ abstract public class DisplayMaster {
     public DisplayMaster(DisplayImpl display, int initialCapacity,
                          Dimension offscreenDimension)
             throws VisADException, RemoteException {
+        counter.incr();
+        System.err.println ("DisplayMaster.ctor:"  + counter);
         setOffscreenDimension(offscreenDimension);
         init(display, initialCapacity);
     }
@@ -328,7 +335,6 @@ abstract public class DisplayMaster {
      */
     public void init(DisplayImpl display, int initialCapacity)
             throws VisADException, RemoteException {
-        isDestroyed = false;
         jPanel      = new JPanel();
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.X_AXIS));
         displayables = new Displayables(initialCapacity);
@@ -475,6 +481,10 @@ abstract public class DisplayMaster {
         if (isDestroyed) {
             return;
         }
+        isDestroyed     = true;
+
+        counter.decr();
+        System.err.println ("DisplayMaster.destroy:"  + counter);
 
         /**
          * Empty the jPanel because sometimes this DisplayMaster does not
@@ -512,6 +522,8 @@ abstract public class DisplayMaster {
         displayables.removeAll();
         myScalarMaps.removeAll();
 
+        displayables = null;
+        myScalarMaps = null;
         changeListeners               = null;
         vetoableListeners             = null;
         displayableScalarMapsListener = null;
@@ -526,8 +538,8 @@ abstract public class DisplayMaster {
             //e.printStackTrace();
         }
 
+        display = null;
         animationWidget = null;
-        isDestroyed     = true;
     }
 
 
