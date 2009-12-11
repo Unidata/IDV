@@ -1434,6 +1434,7 @@ public class IdvUIManager extends IdvManager {
                 if (lastActiveFrame == window) {
                     return;
                 }
+                if(window.getHasBeenDisposed()) return;
                 lastActiveFrame = window;
                 if ( !getStateManager().isLoadingXml()
                         && getIdv().getHaveInitialized()) {
@@ -1472,6 +1473,7 @@ public class IdvUIManager extends IdvManager {
      * @param window The window
      */
     public void handleWindowActivated(IdvWindow window) {
+        if(window.getHasBeenDisposed()) return;
         List        viewManagers            = window.getViewManagers();
         ViewManager viewManagerToMakeActive = null;
         long        lastActivatedTime       = -1;
@@ -3828,7 +3830,6 @@ public class IdvUIManager extends IdvManager {
     public Border getStatusBorder() {
         return new FineLineBorder(BevelBorder.LOWERED);
     }
-
 
 
     /**

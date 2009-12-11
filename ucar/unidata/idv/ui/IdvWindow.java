@@ -566,6 +566,11 @@ public class IdvWindow extends MultiFrame {
             return;
         }
         hasBeenDisposed = true;
+
+        if(lastActiveWindow == this) {
+            lastActiveWindow = null;
+        }
+
         idv.getIdvUIManager().removeWindow(this);
 
         for (Disposable disposable : disposables) {
@@ -573,10 +578,9 @@ public class IdvWindow extends MultiFrame {
         }
         disposables = null;
 
-
         JMenuBar menuBar = (JMenuBar) getComponent(IdvUIManager.COMP_MENUBAR);
         if (menuBar != null) {
-            GuiUtils.empty(menuBar);
+            GuiUtils.empty(menuBar,true);
         }
 
         RovingProgress progress =
@@ -600,15 +604,13 @@ public class IdvWindow extends MultiFrame {
             ComponentGroup group = (ComponentGroup) groups.get(i);
             group.doRemove();
         }
-
+        this.groups               = null;
         destroyViewManagers();
-
         viewManagers         = null;
+
         components           = null;
-        groups               = null;
         persistentComponents = null;
         contents             = null;
-
 
         if (xmlUI != null) {
             //This was commented out. Not sure why.
@@ -645,7 +647,7 @@ public class IdvWindow extends MultiFrame {
      */
     public void destroy() {
         destroyViewManagers();
-        GuiUtils.empty(getContainer());
+        GuiUtils.empty(getContainer(),true);
     }
 
 
