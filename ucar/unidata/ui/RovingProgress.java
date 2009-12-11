@@ -24,7 +24,7 @@
 package ucar.unidata.ui;
 
 
-import ucar.unidata.util.Disposable;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.GuiUtils;
 
 
@@ -49,7 +49,7 @@ import javax.swing.border.*;
  * @author MetApps Development Team
  * @version $Revision: 1.11 $ $Date: 2007/07/06 20:45:33 $
  */
-public class RovingProgress extends JPanel implements Disposable {
+public class RovingProgress extends JPanel implements Removable {
 
     /** Default insets */
     public static final Insets DEFAULT_INSETS = new Insets(0, 0, 0, 0);
@@ -210,11 +210,11 @@ public class RovingProgress extends JPanel implements Disposable {
     /**
      * _more_
      */
-    public void dispose() {
+    public void doRemove() {
         currentRunnable = null;
         running         = false;
         showClock       = false;
-        GuiUtils.empty(this);
+        GuiUtils.empty(this, true);
     }
 
 
