@@ -30,6 +30,6 @@ package ucar.unidata.util;
  *
  * @author IDV development team
  */
-public interface Disposable {
-    public void dispose();
+public interface Removable {
+    public void doRemove();
 }

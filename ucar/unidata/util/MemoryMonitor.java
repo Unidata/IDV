@@ -48,7 +48,7 @@ import javax.swing.event.*;
  * @author Unidata development team
  * @version %I%, %G%
  */
-public class MemoryMonitor extends JPanel implements Runnable, Disposable {
+public class MemoryMonitor extends JPanel implements Runnable, Removable {
 
 
     /** flag for running */
@@ -182,7 +182,7 @@ public class MemoryMonitor extends JPanel implements Runnable, Disposable {
     /**
      * _more_
      */
-    public void dispose() {
+    public void doRemove() {
         running = false;
         GuiUtils.empty(this);
     }
