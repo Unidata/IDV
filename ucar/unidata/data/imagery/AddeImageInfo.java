@@ -23,6 +23,7 @@
 
 package ucar.unidata.data.imagery;
 
+import ucar.unidata.util.StringUtil;
 
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
@@ -191,4 +192,39 @@ public class AddeImageInfo extends AddeImageURL {
     /*  Uncomment to turn debugging on
     public boolean getDebug() { return true; }
     */
+
+  /**
+   * Set the extraKeys string for this ADDE URL
+   * @param extraKeys the extraKeys
+   public void setExtraKeys(String extraKeys) {
+       List<String> tokens = StringUtil.split(extraKeys, "?", true, true);
+       List<String> leftovers = new ArrayList<String>();
+       for (String token : tokens) {
+           String[] keyValue = StringUtil.split(token, "=", 2);
+           String key = keyValue[0].toLowerCase();
+           String value = keyValue[1];
+           if (key.startsWith("comp")) {                 // compression
+               setCompression(value);
+           } else if (key.startsWith("deb")) {           // debug
+               setDebug(Boolean.booleanValue(value));
+           } else if (key.startsWith("use")) {           // user
+               setUser(value);
+           } else if (key.startsWith("proj")) {           // user
+               setProject(value);
+           } else if (key.startsWith("proj")) {           // user
+               setPosition(Integer.parseInt(value));
+           } else {
+               leftovers.add(token);
+           }
+       }
+       if (!leftovers.isEmpty()) {
+          StringBuilder buf = new StringBuilder();
+          for (String leftover : leftovers) {
+              buf.append(leftover);
+              buf.append("?");
+          }
+          super.setExtraKeys(buf.toString());
+       }
+   }
+   */
 }
