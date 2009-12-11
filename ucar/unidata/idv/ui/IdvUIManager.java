@@ -1794,10 +1794,11 @@ public class IdvUIManager extends IdvManager {
             MyMenuListener menuListener = new MyMenuListener(this, idvWindow,
                                               menu, menuId);
             menu.addMenuListener(menuListener);
-            idvWindow.addRemovable(menuListener);
+            if(idvWindow!=null)
+                idvWindow.addRemovable(menuListener);
         }
-
-        idvWindow.setComponent(COMP_MENUBAR, menuBar);
+        if(idvWindow!=null)
+            idvWindow.setComponent(COMP_MENUBAR, menuBar);
 
         return menuBar;
     }
