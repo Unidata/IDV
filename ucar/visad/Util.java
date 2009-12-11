@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.visad;
 
 
@@ -3531,7 +3529,7 @@ public final class Util {
 
 
     /**
-     * Check to see if a RealTuple is all missing data.  RealTuple.isMissing() 
+     * Check to see if a RealTuple is all missing data.  RealTuple.isMissing()
      * only checks if it has null components, not if each component is missing.
      *
      * @param rt   RealTuple in question
@@ -3540,12 +3538,16 @@ public final class Util {
      *              have NaN values
      */
     public static boolean allMissing(RealTuple rt) {
-        if (rt == null || rt.isMissing()) return true;
+        if ((rt == null) || rt.isMissing()) {
+            return true;
+        }
         try {
             // rt.isMissing protects against reals being null;
             Data[] reals = rt.getComponents(false);
             for (int i = 0; i < reals.length; i++) {
-                if (!reals[i].isMissing()) return false;
+                if ( !reals[i].isMissing()) {
+                    return false;
+                }
             }
         } catch (Exception e) {
             return false;
@@ -3715,6 +3717,31 @@ public final class Util {
     }
 
 
+    /**
+     * Print out the data summary.
+     * Wrapper around visad.python.JPythonMethods.dumpTypes(Data d)
+     * @param d  the Data to print
+     */
+    public static void printData(Data d) {
+        try {
+            visad.python.JPythonMethods.dumpTypes(d);
+        } catch (Exception e) {
+            System.out.println("Unable to print data " + e.getMessage());
+        }
+    }
+
+    /**
+     * Print out the data type summary.
+     * Wrapper around visad.python.JPythonMethods.dumpType(Data d)
+     * @param d  the Data to print
+     */
+    public static void printDataType(Data d) {
+        try {
+            visad.python.JPythonMethods.dumpType(d);
+        } catch (Exception e) {
+            System.out.println("Unable to print data type " + e.getMessage());
+        }
+    }
 
 }
 
