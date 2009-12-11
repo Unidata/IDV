@@ -492,6 +492,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     // flowControl.setAutoScale(true);
                     flowControl.setStreamlineDensity(streamlineDensity);
                     flowControl.setAdjustFlowToEarth(adjustFlow);
+                    flowControl.setBarbOrientation(barborientation);
                     adjustScale(flowscale);
                 }
             }
