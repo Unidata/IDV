@@ -2511,15 +2511,14 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
 
 
+        String llb =
+            getRepository().makeMapSelector(request, ARG_POINT_BBOX, false,
+                                            "","");
+
         basicSB.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Location"),
-                HtmlUtil.makeLatLonBox(
-                    ARG_POINT_BBOX,
-                    request.getString(ARG_POINT_BBOX + "_south", ""),
-                    request.getString(ARG_POINT_BBOX + "_north", ""),
-                    request.getString(ARG_POINT_BBOX + "_east", ""),
-                    request.getString(ARG_POINT_BBOX + "_west", ""))));
+                llb));
 
         basicSB.append(HtmlUtil.hidden(ARG_POINT_REDIRECT, "true"));
 

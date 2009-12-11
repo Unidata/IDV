@@ -1409,6 +1409,13 @@ public class DataOutputHandler extends OutputHandler {
         */
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
+            String llb =
+                getRepository().makeMapSelector(request, ARG_AREA, false,
+                                                ""+llr.getLatMin(),
+                                                ""+llr.getLatMax(),
+                                                ""+llr.getLonMax(),
+                                                ""+llr.getLonMin());
+      
             sb.append(
                 HtmlUtil.formEntryTop(
                     msgLabel("Subset Spatially"),
@@ -1416,10 +1423,7 @@ public class DataOutputHandler extends OutputHandler {
                     + HtmlUtil.checkbox(
                         ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
                         request.get(ARG_SUBSETAREA, false)) + "</td><td>"
-                            + HtmlUtil.makeLatLonBox(
-                                ARG_AREA, llr.getLatMin(), llr.getLatMax(),
-                                llr.getLonMax(),
-                                llr.getLonMin()) + "</table>"));
+                            + llb + "</table>"));
         }
 
 
