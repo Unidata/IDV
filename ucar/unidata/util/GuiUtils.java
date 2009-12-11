@@ -539,10 +539,30 @@ public class GuiUtils extends LayoutUtil {
      * @param c The component to empty
      */
     public static void empty(Container c) {
+        empty(c, false);
+    }
+
+    /**
+     *  If non-null then removes all children and removes from parent.
+     *
+     * @param c The component to empty
+     * @param doItInSwingThread If true then do the emptying in the Swing thread
+     */
+    public static void empty(final Container c, boolean doItInSwingThread) {
+        if(c==null) return;
+        if(doItInSwingThread) {
+            invokeInSwingThread(new Runnable() {
+                    public void run() {
+                        empty(c, false);
+                    }
+                });
+            return;
+        }
         if (c != null) {
             c.removeAll();
-            if (c.getParent() != null) {
-                c.getParent().remove(c);
+            Container parent =c.getParent();
+            if (parent != null) {
+                parent.remove(c);
             }
         }
     }
