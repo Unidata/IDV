@@ -28,6 +28,7 @@ package ucar.visad.display;
 
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
@@ -270,7 +271,7 @@ abstract public class DisplayMaster {
      */
     public DisplayMaster() {
         counter.incr();
-        System.err.println ("DisplayMaster.ctor:"  + counter);
+        //        System.err.println ("DisplayMaster.ctor:"  + counter);
     }
 
 
@@ -484,7 +485,7 @@ abstract public class DisplayMaster {
         isDestroyed     = true;
 
         counter.decr();
-        System.err.println ("DisplayMaster.destroy:"  + counter);
+        //        System.err.println ("DisplayMaster.destroy:"  + counter);
 
         /**
          * Empty the jPanel because sometimes this DisplayMaster does not
@@ -492,11 +493,14 @@ abstract public class DisplayMaster {
          * to many, many objects.
          */
         if (jPanel != null) {
-            jPanel.removeAll();
-            if (jPanel.getParent() != null) {
-                jPanel.getParent().remove(jPanel);
-            }
-            jPanel = null;
+            GuiUtils.invokeInSwingThread(new Runnable() {
+                    public void run() {
+                        jPanel.removeAll();
+                        if (jPanel.getParent() != null) {
+                            jPanel.getParent().remove(jPanel);
+                        }
+                        jPanel = null;
+                    }});
         }
 
         /*
