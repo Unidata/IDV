@@ -539,6 +539,7 @@ public class DisplayableData extends Displayable {
      * @throws RemoteException  Java RMI failure.
      */
     protected void destroy() throws RemoteException, VisADException {
+        if(getDestroyed()) return;
         if ((changeListener != null) && (reference != null)) {
             changeListener.removeReference(reference);
         }

@@ -24,15 +24,19 @@
 
 
 
+
+
 package ucar.visad.display;
 
 
-import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Counter;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.WrapperException;
+
+
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
-import ucar.unidata.util.Counter;
+import ucar.unidata.util.WrapperException;
 
 import ucar.visad.*;
 
@@ -263,14 +267,15 @@ abstract public class DisplayMaster {
     /** displayable mapped to animation */
     private Animation animation = null;
 
-    static Counter counter  =new Counter();
+    /** _more_ */
+    static Counter counter = new Counter();
 
     /**
      * Parameterless ctor. Note: If you instantiate a DisplayMaster
      * through this constructor you must also call the init method.
      */
     public DisplayMaster() {
-        counter.incr();
+        //        counter.incr();
         //        System.err.println ("DisplayMaster.ctor:"  + counter);
     }
 
@@ -317,8 +322,8 @@ abstract public class DisplayMaster {
     public DisplayMaster(DisplayImpl display, int initialCapacity,
                          Dimension offscreenDimension)
             throws VisADException, RemoteException {
-        counter.incr();
-        System.err.println ("DisplayMaster.ctor:"  + counter);
+        //        counter.incr();
+        //        System.err.println ("DisplayMaster.ctor:"  + counter);
         setOffscreenDimension(offscreenDimension);
         init(display, initialCapacity);
     }
@@ -336,7 +341,7 @@ abstract public class DisplayMaster {
      */
     public void init(DisplayImpl display, int initialCapacity)
             throws VisADException, RemoteException {
-        jPanel      = new JPanel();
+        jPanel = new JPanel();
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.X_AXIS));
         displayables = new Displayables(initialCapacity);
         this.display = display;
@@ -482,9 +487,9 @@ abstract public class DisplayMaster {
         if (isDestroyed) {
             return;
         }
-        isDestroyed     = true;
+        isDestroyed = true;
 
-        counter.decr();
+        //        counter.decr();
         //        System.err.println ("DisplayMaster.destroy:"  + counter);
 
         /**
@@ -494,13 +499,14 @@ abstract public class DisplayMaster {
          */
         if (jPanel != null) {
             GuiUtils.invokeInSwingThread(new Runnable() {
-                    public void run() {
-                        jPanel.removeAll();
-                        if (jPanel.getParent() != null) {
-                            jPanel.getParent().remove(jPanel);
-                        }
-                        jPanel = null;
-                    }});
+                public void run() {
+                    jPanel.removeAll();
+                    if (jPanel.getParent() != null) {
+                        jPanel.getParent().remove(jPanel);
+                    }
+                    jPanel = null;
+                }
+            });
         }
 
         /*
@@ -526,8 +532,8 @@ abstract public class DisplayMaster {
         displayables.removeAll();
         myScalarMaps.removeAll();
 
-        displayables = null;
-        myScalarMaps = null;
+        displayables                  = null;
+        myScalarMaps                  = null;
         changeListeners               = null;
         vetoableListeners             = null;
         displayableScalarMapsListener = null;
@@ -542,7 +548,7 @@ abstract public class DisplayMaster {
             //e.printStackTrace();
         }
 
-        display = null;
+        display         = null;
         animationWidget = null;
     }
 
@@ -1328,8 +1334,6 @@ abstract public class DisplayMaster {
      *
      * @return ratio of the current matrix scale factor to the
      *         saved matrix scale factor.
-     * @throws VisADException problem determining scale
-     * @throws RemoteException problem determining scale for remote display
      */
     public float getDisplayScale() {
         if (display != null) {
@@ -2083,7 +2087,8 @@ abstract public class DisplayMaster {
      */
     private synchronized boolean releaseDisplayable(Displayable displayable) {
 
-        if (displayable.getScalarMapSet().size() > 0) {
+        ScalarMapSet scalarMapSet = displayable.getScalarMapSet();
+        if ((scalarMapSet != null) && (scalarMapSet.size() > 0)) {
             displayableScalarMaps.setDirty();
         }
         displayable.removePropertyChangeListener(Displayable.SCALAR_MAP_SET,

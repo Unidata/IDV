@@ -21,6 +21,8 @@
 
 
 
+
+
 package ucar.visad.display;
 
 
@@ -117,7 +119,7 @@ public class StationModelDisplayable extends DisplayableData {
     public static final float OFFSET_SCALE = 20.f;
 
     /** Mapping of param name to the index */
-    private Hashtable<String,Integer> nameToIndex;
+    private Hashtable<String, Integer> nameToIndex;
 
     /** Should we use altitude */
     private boolean shouldUseAltitude = true;
@@ -172,10 +174,11 @@ public class StationModelDisplayable extends DisplayableData {
 
 
     /** Mapping between comma separated param names and the parsed list */
-    private Hashtable<String,List> namesToList = new Hashtable<String,List>();
+    private Hashtable<String, List> namesToList = new Hashtable<String,
+                                                      List>();
 
     /** Keeps trakc of when we have  printed out a missing param message */
-    private Hashtable<String,String> haveNotified = null;
+    private Hashtable<String, String> haveNotified = null;
 
     /**
      * Should we try to merge the shapes. This gets set to false
@@ -278,7 +281,8 @@ public class StationModelDisplayable extends DisplayableData {
     /** flag for a time sequence */
     private boolean isTimeSequence = false;
 
-    private Real      missingAlt;
+    /** _more_ */
+    private Real missingAlt;
 
     /**
      * Default constructor;
@@ -369,7 +373,7 @@ public class StationModelDisplayable extends DisplayableData {
                                    JythonManager jythonManager)
             throws VisADException, RemoteException {
         super(name);
-	missingAlt = new Real(RealType.Altitude, 0);
+        missingAlt         = new Real(RealType.Altitude, 0);
         this.jythonManager = jythonManager;
         this.stationModel  = stationModel;
         setUpScalarMaps();
@@ -396,21 +400,21 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws RemoteException unable to create specified remote objects
      */
     public void setStationData(FieldImpl stationData)
-	throws VisADException, RemoteException {
+            throws VisADException, RemoteException {
 
         synchronized (DATA_MUTEX) {
-	    setDisplayInactive();
-	    try {
-		Data d = makeNewDataWithShapes(stationData);
-		if ((d != null) && !d.isMissing()) {
-		    setData(d);
-		
-		} else {
-		    setData(new Real(0));
-		}
-	    } finally {
-		setDisplayActive();
-	    } 
+            setDisplayInactive();
+            try {
+                Data d = makeNewDataWithShapes(stationData);
+                if ((d != null) && !d.isMissing()) {
+                    setData(d);
+
+                } else {
+                    setData(new Real(0));
+                }
+            } finally {
+                setDisplayActive();
+            }
             this.stationData = stationData;  // hold around for posterity
         }
     }
@@ -591,9 +595,14 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
-    private int obCounter=0;
-    private int timeCounter=0;
-    private int geometryArrayCounter=0;
+    /** _more_ */
+    private int obCounter = 0;
+
+    /** _more_ */
+    private int timeCounter = 0;
+
+    /** _more_ */
+    private int geometryArrayCounter = 0;
 
     /**
      * make the shapes and set the data
@@ -604,8 +613,8 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    private  FieldImpl makeNewDataWithShapes(FieldImpl data)
-	throws VisADException, RemoteException {
+    private FieldImpl makeNewDataWithShapes(FieldImpl data)
+            throws VisADException, RemoteException {
 
         if (data == null) {
             return null;
@@ -617,7 +626,7 @@ public class StationModelDisplayable extends DisplayableData {
             double[] aspect = master.getDisplayAspect();
             if ((aspect != null) && (aspect.length > 2)) {
                 displayScaleFactor = new double[] { 1.0 / aspect[0],
-						    1.0 / aspect[1], 1.0 / aspect[2] };
+                        1.0 / aspect[1], 1.0 / aspect[2] };
             }
         }
 
@@ -626,8 +635,8 @@ public class StationModelDisplayable extends DisplayableData {
             currentRotation = master.getRotation();
             double[] m =
                 master.getMouseBehavior().make_matrix(currentRotation[0],
-						      currentRotation[1], currentRotation[2], 1.0, 0.0, 0.0,
-						      0.0);
+                    currentRotation[1], currentRotation[2], 1.0, 0.0, 0.0,
+                    0.0);
 
             transform = new Transform3D(m);
             transform.invert();
@@ -636,55 +645,54 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
 
-	haveNotified = null;
-	isTimeSequence =
-	    ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
-	int numTimes = 0;
-	shapeIndex  = 0;
-	shapeList   = new Vector();
-	nameToIndex = new Hashtable<String,Integer>();
-	obCounter = 0;
-	timeCounter = 0;
-	geometryArrayCounter = 0;
-	try {
-	    if (isTimeSequence) {
-		boolean haveChecked = false;
-		Set     timeSet     = data.getDomainSet();
-		for (int i = 0; i < timeSet.getLength(); i++) {
-		    timeCounter++;
-		    FieldImpl sample =  (FieldImpl) data.getSample(i);
-		    FieldImpl shapeFI = makeShapesFromPointObsField(sample);
-		    if (shapeFI == null) {
-			continue;
-		    }
-		    if (newFI == null) {  // first time through
-			FunctionType functionType =
-			    new FunctionType(((FunctionType) data
-					      .getType()).getDomain(), shapeFI
-					     .getType());
-			newFI = new FieldImpl(functionType, timeSet);
-		    }
-		    newFI.setSample(i, shapeFI, false, !haveChecked);
-		    if ( !haveChecked) {
-			haveChecked = true;
-		    }
-		}  // end isSequence
-	    } else {
-		newFI = makeShapesFromPointObsField(data);
-	    }      // end single time 
-	} catch (Exception exc) {
-	    logException("making shapes", exc);
-	    return null;
-	}
+        haveNotified   = null;
+        isTimeSequence = ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
+        int numTimes = 0;
+        shapeIndex           = 0;
+        shapeList            = new Vector();
+        nameToIndex          = new Hashtable<String, Integer>();
+        obCounter            = 0;
+        timeCounter          = 0;
+        geometryArrayCounter = 0;
+        try {
+            if (isTimeSequence) {
+                boolean haveChecked = false;
+                Set     timeSet     = data.getDomainSet();
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    timeCounter++;
+                    FieldImpl sample  = (FieldImpl) data.getSample(i);
+                    FieldImpl shapeFI = makeShapesFromPointObsField(sample);
+                    if (shapeFI == null) {
+                        continue;
+                    }
+                    if (newFI == null) {  // first time through
+                        FunctionType functionType =
+                            new FunctionType(
+                                ((FunctionType) data.getType()).getDomain(),
+                                shapeFI.getType());
+                        newFI = new FieldImpl(functionType, timeSet);
+                    }
+                    newFI.setSample(i, shapeFI, false, !haveChecked);
+                    if ( !haveChecked) {
+                        haveChecked = true;
+                    }
+                }  // end isSequence
+            } else {
+                newFI = makeShapesFromPointObsField(data);
+            }      // end single time 
+        } catch (Exception exc) {
+            logException("making shapes", exc);
+            return null;
+        }
 
-	try {
-	    shapes = new VisADGeometryArray[shapeList.size()];
-	    shapes = (VisADGeometryArray[]) shapeList.toArray(shapes);
-	    setShapesInControl(shapes);
-	} catch (Exception t) {
-	    throw new VisADException(
-				     "Unable to covert vector to VisADGeometry array");
-	}
+        try {
+            shapes = new VisADGeometryArray[shapeList.size()];
+            shapes = (VisADGeometryArray[]) shapeList.toArray(shapes);
+            setShapesInControl(shapes);
+        } catch (Exception t) {
+            throw new VisADException(
+                "Unable to covert vector to VisADGeometry array");
+        }
         return newFI;
     }
 
@@ -823,16 +831,16 @@ public class StationModelDisplayable extends DisplayableData {
         }
         //      System.err.println(" usealt:" + useAltitude +" llType:" + llType);
 
-	Real indexReal  = new Real(wxType, 0);
-	Real timeReal = new Real(timeSelectType, 0);
+        Real indexReal = new Real(wxType, 0);
+        Real timeReal  = new Real(timeSelectType, 0);
 
         TupleType tt = new TupleType(new MathType[] { wxType, llType,
                 timeSelectType });
-        FunctionType retType          = new FunctionType(domain, tt);
-        List         dataList         = new ArrayList();
-        List<MetSymbol>         symbols          = new ArrayList<MetSymbol>();
-        List<Point2D>         pointOnSymbols   = new ArrayList<Point2D>();
-        List         offsetFlipPoints = new ArrayList();
+        FunctionType    retType          = new FunctionType(domain, tt);
+        List            dataList         = new ArrayList();
+        List<MetSymbol> symbols          = new ArrayList<MetSymbol>();
+        List<Point2D>   pointOnSymbols   = new ArrayList<Point2D>();
+        List            offsetFlipPoints = new ArrayList();
 
         for (Iterator iter = stationModel.iterator(); iter.hasNext(); ) {
             MetSymbol metSymbol = (MetSymbol) iter.next();
@@ -863,7 +871,7 @@ public class StationModelDisplayable extends DisplayableData {
         for (int obIdx = 0; obIdx < length; obIdx++) {
             PointOb ob = (PointOb) data.getSample(obIdx);
 
-	    obCounter ++;
+            obCounter++;
             if (typeNames == null) {
                 Tuple     obData = (Tuple) ob.getData();
                 TupleType tType  = (TupleType) obData.getType();
@@ -876,34 +884,32 @@ public class StationModelDisplayable extends DisplayableData {
             if (obShapes == null) {
                 continue;
             }
-	    geometryArrayCounter+=obShapes.size();
+            geometryArrayCounter += obShapes.size();
             if (writingKmz) {
-		processKmz(ob, obShapes);
-	    }
+                processKmz(ob, obShapes);
+            }
 
-	    Data location = (useAltitude
-			     ? ob.getEarthLocation()
-			     : ob.getEarthLocation().getLatLonPoint());
-	    // check for missing altitude
-	    if (useAltitude) {
-		EarthLocation oldOne = (EarthLocation) location;
-		Real          alt    = oldOne.getAltitude();
-		if (alt.isMissing()) {
-		    location =
-			new EarthLocationLite(oldOne.getLatitude(),
-					      oldOne.getLongitude(), missingAlt);
+            Data location = (useAltitude
+                             ? ob.getEarthLocation()
+                             : ob.getEarthLocation().getLatLonPoint());
+            // check for missing altitude
+            if (useAltitude) {
+                EarthLocation oldOne = (EarthLocation) location;
+                Real          alt    = oldOne.getAltitude();
+                if (alt.isMissing()) {
+                    location = new EarthLocationLite(oldOne.getLatitude(),
+                            oldOne.getLongitude(), missingAlt);
 
-		}
-	    }
-	    DateTime obTime = ob.getDateTime();
-	    Real time = timeReal.cloneButValue(
-					       obTime.getValue(
-							       timeSelectType.getDefaultUnit()));
+                }
+            }
+            DateTime obTime = ob.getDateTime();
+            Real time = timeReal.cloneButValue(
+                            obTime.getValue(timeSelectType.getDefaultUnit()));
 
             for (int j = 0; j < obShapes.size(); j++) {
                 Data[] dataArray = new Data[] {
-		    indexReal.cloneButValue(shapeIndex++),
-		    location, time };
+                                       indexReal.cloneButValue(shapeIndex++),
+                                       location, time };
                 if (dataTupleType == null) {
                     dataTupleType = Tuple.buildTupleType(dataArray);
                 }
@@ -938,89 +944,93 @@ public class StationModelDisplayable extends DisplayableData {
     }
 
 
-    private void processKmz(PointOb ob, List<VisADGeometryArray> obShapes) throws Exception {
-	BufferedImage image = new BufferedImage(kmzIconWidth,
-						kmzIconHeight,
-						BufferedImage.TYPE_INT_ARGB);
-	Graphics2D g = (Graphics2D) image.getGraphics();
-	if (iconColor != null) {
-	    g.setColor(iconColor);
-	    g.fillRect(0, 0, kmzIconWidth, kmzIconHeight);
-	}
-	g.setStroke(new BasicStroke(2.0f));
-	paint(g, obShapes);
-	if (kmzShowExampleDialog) {
-	    writingKmz =
-		ucar.unidata.util.GuiUtils.showOkCancelDialog(
-							      null, null,
-							      GuiUtils.vbox(
-									    new JLabel("Example:"),
-									    new JLabel(new ImageIcon(image))), null);
-	    kmzShowExampleDialog = false;
-	    if ( !writingKmz) {
-		return;
-	    }
-	}
+    /**
+     * _more_
+     *
+     * @param ob _more_
+     * @param obShapes _more_
+     *
+     * @throws Exception _more_
+     */
+    private void processKmz(PointOb ob, List<VisADGeometryArray> obShapes)
+            throws Exception {
+        BufferedImage image = new BufferedImage(kmzIconWidth, kmzIconHeight,
+                                  BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        if (iconColor != null) {
+            g.setColor(iconColor);
+            g.fillRect(0, 0, kmzIconWidth, kmzIconHeight);
+        }
+        g.setStroke(new BasicStroke(2.0f));
+        paint(g, obShapes);
+        if (kmzShowExampleDialog) {
+            writingKmz = ucar.unidata.util.GuiUtils.showOkCancelDialog(null,
+                    null,
+                    GuiUtils.vbox(new JLabel("Example:"),
+                                  new JLabel(new ImageIcon(image))), null);
+            kmzShowExampleDialog = false;
+            if ( !writingKmz) {
+                return;
+            }
+        }
 
-	if (kmzZos == null) {
-	    kmzZos =
-		new ZipOutputStream(new FileOutputStream(kmzFile));
+        if (kmzZos == null) {
+            kmzZos = new ZipOutputStream(new FileOutputStream(kmzFile));
 
-	}
-
-
-
-	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	ucar.unidata.ui.ImageUtils.writeImageToFile(image,
-						    "icon.png", bos, 1.0f);
-	String file = "kmzicon" + (kmzObCounter) + ".png";
-	kmzZos.putNextEntry(new ZipEntry(file));
-	byte[] bytes = bos.toByteArray();
-	kmzZos.write(bytes, 0, bytes.length);
-	kmzZos.closeEntry();
-	String       styleId = "obicon" + kmzObCounter;
-	StringBuffer descSB  = new StringBuffer();
-	descSB.append("<h3>Observation</h3>");
-	descSB.append("<table>");
-	Tuple     tuple = (Tuple) ob.getData();
-	TupleType tType = (TupleType) tuple.getType();
-	String[]  names = getTypeNames(tType);
-	Data[]    datum = tuple.getComponents();
-
-	for (int i = 0; i < names.length; i++) {
-	    descSB.append("<tr><td align=right><b>");
-	    descSB.append(names[i]);
-
-	    descSB.append(":</b></td><td>");
-	    if (datum[i] instanceof Real) {
-		Real r = (Real) datum[i];
-		if (r.isMissing()) {
-		    descSB.append("--");
-		} else {
-		    descSB.append("" + r);
-		}
-		Unit u = r.getUnit();
-		if (u != null) {
-		    String us = u.toString();
-		    if (us.length() > 0) {
-			descSB.append(" [" + us + "]");
-		    }
-		}
-	    } else {
-		descSB.append(datum[i] + "");
-	    }
-	    descSB.append("</td></tr>");
-	}
+        }
 
 
 
-	descSB.append("</table>");
-	Element placemark = KmlUtil.placemark(kmlDoc, "",
-					      descSB.toString(),
-					      ob.getEarthLocation(), styleId);
-	KmlUtil.timestamp(placemark, ob.getDateTime());
-	KmlUtil.iconstyle(kmlDoc, styleId, file, 2.0);
-	kmzObCounter++;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ucar.unidata.ui.ImageUtils.writeImageToFile(image, "icon.png", bos,
+                1.0f);
+        String file = "kmzicon" + (kmzObCounter) + ".png";
+        kmzZos.putNextEntry(new ZipEntry(file));
+        byte[] bytes = bos.toByteArray();
+        kmzZos.write(bytes, 0, bytes.length);
+        kmzZos.closeEntry();
+        String       styleId = "obicon" + kmzObCounter;
+        StringBuffer descSB  = new StringBuffer();
+        descSB.append("<h3>Observation</h3>");
+        descSB.append("<table>");
+        Tuple     tuple = (Tuple) ob.getData();
+        TupleType tType = (TupleType) tuple.getType();
+        String[]  names = getTypeNames(tType);
+        Data[]    datum = tuple.getComponents();
+
+        for (int i = 0; i < names.length; i++) {
+            descSB.append("<tr><td align=right><b>");
+            descSB.append(names[i]);
+
+            descSB.append(":</b></td><td>");
+            if (datum[i] instanceof Real) {
+                Real r = (Real) datum[i];
+                if (r.isMissing()) {
+                    descSB.append("--");
+                } else {
+                    descSB.append("" + r);
+                }
+                Unit u = r.getUnit();
+                if (u != null) {
+                    String us = u.toString();
+                    if (us.length() > 0) {
+                        descSB.append(" [" + us + "]");
+                    }
+                }
+            } else {
+                descSB.append(datum[i] + "");
+            }
+            descSB.append("</td></tr>");
+        }
+
+
+
+        descSB.append("</table>");
+        Element placemark = KmlUtil.placemark(kmlDoc, "", descSB.toString(),
+                                ob.getEarthLocation(), styleId);
+        KmlUtil.timestamp(placemark, ob.getDateTime());
+        KmlUtil.iconstyle(kmlDoc, styleId, file, 2.0);
+        kmzObCounter++;
     }
 
 
@@ -1038,8 +1048,8 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     private List<VisADGeometryArray> makeShapes(PointOb ob,
-            String[] typeNames, List<MetSymbol> symbols, List<Point2D> pointOnSymbols,
-            List offsetFlipPoints)
+            String[] typeNames, List<MetSymbol> symbols,
+            List<Point2D> pointOnSymbols, List offsetFlipPoints)
             throws VisADException, RemoteException {
 
         List      lineShapes     = null;
@@ -1054,8 +1064,8 @@ public class StationModelDisplayable extends DisplayableData {
         //The workDataArray should never be more than size 2
         try {
             for (int symbolIdx = 0; symbolIdx < symbols.size(); symbolIdx++) {
-                metSymbol =  symbols.get(symbolIdx);
-                Point2D pointOnSymbol =pointOnSymbols.get(symbolIdx);
+                metSymbol = symbols.get(symbolIdx);
+                Point2D  pointOnSymbol    = pointOnSymbols.get(symbolIdx);
                 float    shapeScaleFactor = .05f;
                 String[] paramIds         = metSymbol.getParamIds();
                 boolean  ok               = true;
@@ -1863,9 +1873,13 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     protected void destroy() throws RemoteException, VisADException {
+        if (getDestroyed()) {
+            return;
+        }
         if (interp != null) {
             jythonManager.removeInterpreter(interp);
-            interp = null;
+            interp        = null;
+            jythonManager = null;
         }
         super.destroy();
     }
@@ -2249,7 +2263,7 @@ public class StationModelDisplayable extends DisplayableData {
 
         if (index == PointOb.BAD_INDEX) {
             if (haveNotified == null) {
-                haveNotified = new Hashtable<String,String>();
+                haveNotified = new Hashtable<String, String>();
             }
             if (haveNotified.get(commaSeparatedNames) == null) {
                 haveNotified.put(commaSeparatedNames, commaSeparatedNames);

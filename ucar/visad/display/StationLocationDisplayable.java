@@ -20,39 +20,45 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.visad.display;
 
 
-
-import visad.*;
-
-import java.rmi.RemoteException;
-
-import java.awt.*;
-
-import visad.util.DataUtility;
-
-import visad.georef.*;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.List;
+import ucar.unidata.data.point.PointObTuple;
 
 import ucar.unidata.idv.JythonManager;
-
-import ucar.unidata.util.Trace;
+import ucar.unidata.metdata.NamedStationImpl;
 
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.TextSymbol;
 import ucar.unidata.ui.symbol.WeatherSymbol;
-import ucar.unidata.data.point.PointObTuple;
-import ucar.unidata.metdata.NamedStationImpl;
+
+import ucar.unidata.util.Counter;
+import ucar.unidata.util.Trace;
 
 import ucar.visad.quantities.CommonUnits;
+
+
+
+import visad.*;
+
+import visad.georef.*;
+
+import visad.util.DataUtility;
+
+import java.awt.*;
+
+import java.rmi.RemoteException;
+
+import java.text.DecimalFormat;
+
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
 
 
 /**
@@ -68,6 +74,8 @@ import ucar.visad.quantities.CommonUnits;
  */
 public class StationLocationDisplayable extends StationModelDisplayable {
 
+    /** _more_ */
+    static Counter counter = new Counter();
 
     /** The identifier for a station identifier */
     public static final int ID_ID = 1;
@@ -98,8 +106,8 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
     /** Array of names of station information identifiers */
     public static final String[] ID_NAMES = {
-        "ID", "Name", "Latitude", "Longitude", "Lat/Lon",
-        "Elevation (m)", "Elevation (ft)"
+        "ID", "Name", "Latitude", "Longitude", "Lat/Lon", "Elevation (m)",
+        "Elevation (ft)"
     };
 
 
@@ -161,7 +169,6 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
 
 
-
     /** default symbol type */
     private int symbolType = SYMBOL_FSTAR;
 
@@ -204,7 +211,9 @@ public class StationLocationDisplayable extends StationModelDisplayable {
      * @exception VisADException  couldn't create the necessary VisAD object
      * @exception RemoteException couldn't create the remote object
      */
-    public StationLocationDisplayable(String name, int symbolType, boolean showSymbol, int idType, boolean showId)
+    public StationLocationDisplayable(String name, int symbolType,
+                                      boolean showSymbol, int idType,
+                                      boolean showId)
             throws VisADException, RemoteException {
         this(name, symbolType, showSymbol, idType, showId, null);
     }
@@ -222,7 +231,10 @@ public class StationLocationDisplayable extends StationModelDisplayable {
      * @exception VisADException  couldn't create the necessary VisAD object
      * @exception RemoteException couldn't create the remote object
      */
-    public StationLocationDisplayable(String name, int symbolType, boolean showSymbol, int idType, boolean showId, JythonManager jythonManager)
+    public StationLocationDisplayable(String name, int symbolType,
+                                      boolean showSymbol, int idType,
+                                      boolean showId,
+                                      JythonManager jythonManager)
             throws VisADException, RemoteException {
         super(name, jythonManager);
         this.symbolType = symbolType;
@@ -230,6 +242,9 @@ public class StationLocationDisplayable extends StationModelDisplayable {
         this.showId     = showId;
         this.idType     = idType;
         setStationModel(makeStationModel());
+        //        counter.incr();
+        //System.err.println ("DisplayMaster.ctor:"  + counter);
+        //        System.err.println ("StationLocationDisplable.ctor: " + counter);
     }
 
 
@@ -242,9 +257,14 @@ public class StationLocationDisplayable extends StationModelDisplayable {
      * @exception VisADException  couldn't create the necessary VisAD object
      * @exception RemoteException couldn't create the remote object
      */
-    public StationLocationDisplayable(String name, JythonManager jythonManager)
+    public StationLocationDisplayable(String name,
+                                      JythonManager jythonManager)
             throws VisADException, RemoteException {
         super(name, jythonManager);
+
+        //        counter.incr();
+        //System.err.println ("DisplayMaster.ctor:"  + counter);
+        //        System.err.println ("StationLocationDisplable.ctor 2: " + counter);
     }
 
 
@@ -264,7 +284,27 @@ public class StationLocationDisplayable extends StationModelDisplayable {
     public StationLocationDisplayable(String name, StationModel view)
             throws VisADException, RemoteException {
         super(name, view);
+        //        counter.incr();
+        //System.err.println ("DisplayMaster.ctor:"  + counter);
+        //        System.err.println ("StationLocationDisplable.ctor 3: " + counter);
     }
+
+
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void destroy() throws RemoteException, VisADException {
+        if (getDestroyed()) {
+            return;
+        }
+        super.destroy();
+        //        counter.decr();
+        //        System.err.println ("StationLocationDisplable.destroy: " + counter);
+    }
+
 
     /**
      * Sets the parameters used for generating a station model.
@@ -277,7 +317,8 @@ public class StationLocationDisplayable extends StationModelDisplayable {
      * @throws VisADException  couldn't create the necessary VisAD object
      * @throws RemoteException couldn't create the remote object
      */
-    public void setDisplayState(int symbolType, boolean showSymbol, int idType, boolean showId)
+    public void setDisplayState(int symbolType, boolean showSymbol,
+                                int idType, boolean showId)
             throws VisADException, RemoteException {
         this.symbolType = symbolType;
         this.showSymbol = showSymbol;
@@ -492,7 +533,7 @@ public class StationLocationDisplayable extends StationModelDisplayable {
         if ((stations == null) || stations.isEmpty()) {
             return null;
         }
-        RealType index = RealType.getRealType("index");
+        RealType index  = RealType.getRealType("index");
         Real symbolData = new Real(RealType.getRealType("SYMBOL"),
                                    symbolType);
         Integer1DSet  domain       = new Integer1DSet(index, stations.size());
@@ -512,12 +553,14 @@ public class StationLocationDisplayable extends StationModelDisplayable {
                 String attrName = (String) keys.nextElement();
                 attrNames.add(attrName);
                 attrName = ucar.visad.Util.cleanName(attrName);
-                int cnt = 0;
+                int      cnt  = 0;
                 TextType type = TextType.getTextType(attrName);
-                while(type==null) {
+                while (type == null) {
                     cnt++;
-                    type = TextType.getTextType(attrName+"_"+ cnt);
-                    if(cnt>1000) break;
+                    type = TextType.getTextType(attrName + "_" + cnt);
+                    if (cnt > 1000) {
+                        break;
+                    }
                 }
                 attrTypes.add(type);
             }
@@ -525,7 +568,7 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
 
         Data[] firstData = null;
-        Trace.call1("make field"," stations:" + stations.size());
+        Trace.call1("make field", " stations:" + stations.size());
         for (int i = 0; i < stations.size(); i++) {
             Text   idData   = null;
             String idString = " ";
@@ -533,6 +576,7 @@ public class StationLocationDisplayable extends StationModelDisplayable {
             NamedStationImpl station = (NamedStationImpl) stations.get(i);
             nlt = station.getNamedLocation();
             switch (idType) {
+
               case ID_ID :
                   idData = nlt.getIdentifier();
                   break;
@@ -594,17 +638,17 @@ public class StationLocationDisplayable extends StationModelDisplayable {
                 } else {
                     TextType textType = (TextType) attrTypes.get(attrIdx);
                     try {
-                        theData[arrayIndex] =   new Text(textType,attrValue.toString());
-                    } catch(TypeException te) {
+                        theData[arrayIndex] = new Text(textType,
+                                attrValue.toString());
+                    } catch (TypeException te) {
                         throw te;
                     }
                 }
             }
             pot = new PointObTuple(nlt, bogusTime, new Tuple(theData, false));
             if (i == 0) {
-                stationField =
-                    new FieldImpl(new FunctionType(index, pot.getType()),
-                                  domain);
+                stationField = new FieldImpl(new FunctionType(index,
+                        pot.getType()), domain);
             }
             stationField.setSample(i, pot, false, false);
         }
@@ -677,8 +721,4 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
 
 }
-
-
-
-
 

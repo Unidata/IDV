@@ -307,10 +307,12 @@ public class CompositeDisplayable extends Displayable {
      */
     protected void destroy() throws RemoteException, VisADException {
         synchronized (MUTEX) {
-            for (Iterator iter = iterator(); iter.hasNext(); ) {
-                ((Displayable) iter.next()).destroy();
+            if(displayables!=null) {
+                for (Iterator iter = iterator(); iter.hasNext(); ) {
+                    ((Displayable) iter.next()).destroy();
+                }
+                displayables = null;
             }
-            displayables = null;
         }
         super.destroy();
     }

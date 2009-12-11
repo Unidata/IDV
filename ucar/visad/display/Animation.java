@@ -188,14 +188,7 @@ public class Animation extends Displayable {
         }
     }
 
-    /**
-     * Method called when class is destroyed
-     *
-     * @throws Throwable
-     */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
+
 
     /**
      * Sets the {@link visad.RealType} of the VisAD Animation parameter,

@@ -25,6 +25,8 @@
 
 
 
+
+
 package ucar.visad.display;
 
 
@@ -104,6 +106,9 @@ public abstract class Displayable {
 
     /** Should the renders display as points */
     private boolean pointMode = false;
+
+    /** _more_ */
+    private boolean destroyed = false;
 
     /**
      * The name of the VisAD display property.
@@ -732,12 +737,12 @@ public abstract class Displayable {
 
     /**
      * Sets the manipulable value of this Displayable. This is a no-op and
-     * is here for the CompositeDisplayable 
+     * is here for the CompositeDisplayable
      *
      * @param manipulable value
      * @throws VisADException     VisAD failure.
      * @throws RemoteException    Java RMI failure.
-     */    
+     */
     public void setManipulable(boolean manipulable)
             throws VisADException, RemoteException {}
 
@@ -851,6 +856,30 @@ public abstract class Displayable {
         //setDisplayActive();
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void destroyDisplayable() throws RemoteException, VisADException {
+        if ( !destroyed) {
+            destroy();
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getDestroyed() {
+        return destroyed;
+    }
+
     /**
      * Called when the displayable is removed from a display master
      *
@@ -858,12 +887,14 @@ public abstract class Displayable {
      * @throws RemoteException  Java RMI failure.
      */
     protected void destroy() throws RemoteException, VisADException {
+        destroyed         = true;
+        display           = null;
         parent            = null;
         displayMaster     = null;
         propertyListeners = null;
-        scalarMapSet      = null;
-        constantMaps      = null;
-        prevScalarMapSet  = null;
+        //        scalarMapSet      = null;
+        //        constantMaps      = null;
+        //        prevScalarMapSet  = null;
     }
 
 
