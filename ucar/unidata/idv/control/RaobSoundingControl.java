@@ -27,8 +27,10 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
+import ucar.visad.UtcDate;
 import ucar.visad.display.*;
 import ucar.visad.functiontypes.AirTemperatureProfile;
 import ucar.visad.functiontypes.CartesianHorizontalWindOfPressure;
@@ -69,6 +71,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
     Hashtable<String, List> stationsTimes;
 
     /** _more_ */
+    Hashtable<String, Set> stationsTimeSet;
+
+    /** _more_ */
     Hashtable<String, Tuple> stationsTuple;
 
     /** template math type */
@@ -102,6 +107,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
     /** _more_ */
     private Component widget;
+
+    /** _more_ */
+    private Container container;
 
     /** _more_ */
     private SoundingDataNode dataNode;
@@ -170,6 +178,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                                                      List>();
         stationsTuple = new Hashtable<String, Tuple>();
         stationsTimes = new Hashtable<String, List>();
+        stationsTimeSet = new Hashtable<String, Set>();
         int j = 0;
         for (int i = 0; i < length; i++) {
             Tuple ob = (Tuple) entries.getComponent(i);
@@ -183,6 +192,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                 stations.add(stName);
                 slatLons[j++] = station.getLatLonPoint();
             }
+
             List<DateTime> timeList  = stationsTimes.get(stName);
             List<Data>     tupleList = stationsTuples.get(stName);
             if (tupleList == null) {
@@ -197,6 +207,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
             tupleList.add((Data) ob);
 
         }
+
         latLons  = new LatLonPoint[stations.size()];
         for (int i = 0; i < stations.size(); i++) {
             latLons[i] = slatLons[i];
@@ -206,6 +217,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
             TupleType  tupleType = Tuple.buildTupleType(tpData);
             Tuple      tp        = new Tuple(tupleType, tpData);
             stationsTuple.put(st, tp);
+            stationsTimeSet.put(st, Util.makeTimeSet(stationsTimes.get(st)));
         }
 
         stationProbes.setData(Util.indexedField(latLons, false));
@@ -215,19 +227,88 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                 if (first) {
                     first = false;
                 } else {
+                    Misc.run(new Runnable() {
+                            public void run() {
                     try {
                         int i = stationProbes.getCloseIndex();
                         if ((i >= 0) && (stMenu != null)) {
                             selectedStation.setPoint((RealTuple) latLons[i]);
                             //  stationMenu.setSelectedIndex(i);
+                            setSelectedStationIndex(i);
                             stMenu.setSelectedIndex(i);
+                         
+                            setStation(i);
+
                         }
                     } catch (Exception ex) {
                         logException(ex);
                     }
-                }
+                 }});
             }
+        }
         });
+
+        final Object[] ids = stations.toArray();
+        stMenu = new JComboBox(ids);
+            stMenu.setToolTipText("Stations");
+
+            stMenu.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    try {
+                        int    i  = stMenu.getSelectedIndex();
+                        String st = (String) stations.get(i);
+                         int index = getSelectedStationIndex();
+                        setStation(index);
+                        dataNode.setData(stationsTuple.get(st));
+                        Set timeset = getDataTimeSet();
+                        dataNode.setOutputTimes((SampledSet)timeset);
+                        //DateTime dt = times.get(0);
+                        //dataNode.setTime(dt);
+                        //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
+                        updateHeaderLabel();
+
+
+                    } catch (Exception ex) {
+                        logException(ex);
+                    }
+                }
+        });
+        Set times = getDataTimeSet();
+        RealType timeType =
+                        (RealType) ((SetType) times.getType()).getDomain()
+                            .getComponent(0);
+        if (timesHolder == null) {
+            timesHolder = new LineDrawing("times ref");
+        }
+
+        /*
+         * Add a data object to the display that has the right
+         * time-centers.
+         */
+        Field dummy = new FieldImpl(new FunctionType(timeType,
+                          AirTemperatureProfile.instance()), times);
+
+        for (int i = 0, n = times.getLength(); i < n; i++) {
+            dummy.setSample(
+                i, AirTemperatureProfile.instance().missingData());
+        }
+
+        timesHolder.setData(dummy);
+
+        Animation animation = getInternalAnimation(timeType);
+        getSoundingView().setExternalAnimation(animation,
+                getAnimationWidget());
+        aeroDisplay.addDisplayable(animation);
+        aeroDisplay.addDisplayable(timesHolder);
+
+        container = Box.createHorizontalBox();
+        //Wrap these components so they don't get stretched in the Y direction
+        container.add(
+            GuiUtils.wrap(getAnimationWidget().getContents(false)));
+        //container.add(GuiUtils.wrap (animationWidget.getIndicatorComponent()));
+        widget = GuiUtils.topBottom(
+            GuiUtils.inset(GuiUtils.label("Station: ", stMenu), 8),
+            container);
 
         setPointSize();
 
@@ -244,6 +325,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         dataNode = SoundingDataNode.getInstance((new Listener()));
         Tuple tp = stationsTuple.get(stName);
         dataNode.setData(tp);
+        updateHeaderLabel();
         //    List sts = stationsTimes.get(stName);
         //    dataNode.setTime((DateTime)sts.get(0));
         //    timeChanged((DateTime)sts.get(0)) ;
@@ -312,7 +394,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @return The SelectedStationIndex
      */
     public int getSelectedStationIndex() {
-        if (stMenu != null) {
+        if(selectedStationIndex != -1)
+            return selectedStationIndex;
+        else if (stMenu != null) {
             return stMenu.getSelectedIndex();
         }
         return 0;
@@ -368,8 +452,10 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
     private void setStation(int index) throws VisADException,
             RemoteException {
         selectedStation.setPoint((RealTuple) latLons[index]);
-        //   setSounding(index);
+        //setSounding(index);
         setLocation(latLons[index]);
+        getDisplayListData();
+        getSoundingView().updateDisplayList();
     }
 
     /**
@@ -417,8 +503,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
     protected Set getDataTimeSet() throws RemoteException, VisADException {
         Set  aniSet = null;
         int            index   = getSelectedStationIndex();
-        List<DateTime> times   = stationsTimes.get(stations.get(index));
-        aniSet = Util.makeTimeSet(times);
+        aniSet  = stationsTimeSet.get(stations.get(index));
 
         return aniSet;
     }
@@ -465,6 +550,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         int            timeIdx = getCurrentIdx();
         int            index   = getSelectedStationIndex();
         List<DateTime> times   = stationsTimes.get(stations.get(index));
+        if(timeIdx >= times.size())
+            timeIdx = times.size()-1;
         String         timeStr = times.get(timeIdx).toString();
         if (index >= 0) {
             headerLabel.setText(stations.get(index) + " " + timeStr);
@@ -532,7 +619,6 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                              SoundingDataNode source) throws VisADException,
                                  RemoteException {
 
-            final Object[] ids = stations.toArray();
             RealType timeType =
                 (RealType) ((SetType) times.getType()).getDomain()
                     .getComponent(0);
@@ -541,29 +627,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
             if (timesHolder == null) {
                 timesHolder = new LineDrawing("times ref");
             }
-            stMenu = new JComboBox(ids);
-            stMenu.setToolTipText("Stations");
 
-            stMenu.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent e) {
-                    try {
-                        int    i  = stMenu.getSelectedIndex();
-                        String st = (String) stations.get(i);
-                        dataNode.setData(stationsTuple.get(st));
-                        int index = getSelectedStationIndex();
-                        List<DateTime> times =
-                            stationsTimes.get(stations.get(index));
-                        DateTime dt = times.get(0);
-                        dataNode.setTime(dt);
-                        //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
-                        updateHeaderLabel();
-
-                        setStation(stMenu.getSelectedIndex());
-                    } catch (Exception ex) {
-                        logException(ex);
-                    }
-                }
-            });
             /*
              * Add a data object to the display that has the right
              * time-centers.
@@ -578,37 +642,6 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
             timesHolder.setData(dummy);
 
-            if (times.getLength() == 1) {
-                DateTime time = new DateTime(new Real(timeType,
-                                    times.indexToDouble(new int[] {
-                                        0 })[0][0], times.getSetUnits()[0]));
-
-
-                widget = GuiUtils.topBottom(
-                    GuiUtils.inset(GuiUtils.label("Station: ", stMenu), 8),
-                    GuiUtils.wrap(new JLabel(time.toString())));
-                dataNode.setTime(time);
-                setSounding(0);
-            } else {
-                /*
-                 * Set the animation.
-                 */
-                Animation animation = getInternalAnimation(timeType);
-                getSoundingView().setExternalAnimation(animation,
-                        getAnimationWidget());
-                aeroDisplay.addDisplayable(animation);
-                aeroDisplay.addDisplayable(timesHolder);
-
-                Container container = Box.createHorizontalBox();
-                //Wrap these components so they don't get stretched in the Y direction
-                container.add(
-                    GuiUtils.wrap(getAnimationWidget().getContents(false)));
-                //container.add(GuiUtils.wrap (animationWidget.getIndicatorComponent()));
-                widget = GuiUtils.topBottom(
-                    GuiUtils.inset(GuiUtils.label("Station: ", stMenu), 8),
-                    container);
-
-            }
         }
 
         /**
