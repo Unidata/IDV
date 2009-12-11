@@ -77,8 +77,8 @@ public class WindBarbDisplayable extends FlowDisplayable {
         return (getDisplay().getDisplayRenderer()
                 instanceof DisplayRendererJ2D)
                ? (DataRenderer) new visad.bom.BarbRendererJ2D()
-        //: (DataRenderer) new visad.bom.BarbRendererJ3D();
                : (DataRenderer) new MyBarbRenderer();
+        //: (DataRenderer) new visad.bom.BarbRendererJ3D();
     }
 
     /**
