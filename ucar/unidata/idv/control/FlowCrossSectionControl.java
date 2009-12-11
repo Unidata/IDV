@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -114,6 +115,16 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
             throws VisADException, RemoteException {
         if ((getFlowRange() == null) && !getWindbarbs()) {
             setFlowRange(fieldImpl);
+        }
+        // hack for setting the barbOrientation
+        if ((startLocation != null) && getWindbarbs()) {
+            if (startLocation.getLatitude().getValue() >= 0) {
+                ((FlowDisplayable) getVerticalCSDisplay()).setBarbOrientation(
+                    FlowDisplayable.NH_ORIENTATION);
+            } else {
+                ((FlowDisplayable) getVerticalCSDisplay()).setBarbOrientation(
+                    FlowDisplayable.SH_ORIENTATION);
+            }
         }
         super.loadData(fieldImpl);
     }
@@ -261,6 +272,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
                : "Vector Size: ";
     }
 
+    /** _more_          */
     RangeDialog rangeDialog;
 
 
@@ -278,11 +290,11 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         editButton.setToolTipText("Range used for scaling the vector size");
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                if(rangeDialog==null)  {
-                    rangeDialog = 
-                        new RangeDialog(FlowCrossSectionControl.this, flowRange,
-                                        "Set the range of data for sizing vectors",
-                                        "setFlowRange");
+                if (rangeDialog == null) {
+                    rangeDialog = new RangeDialog(
+                        FlowCrossSectionControl.this, flowRange,
+                        "Set the range of data for sizing vectors",
+                        "setFlowRange");
                     addRemovable(rangeDialog);
                 }
                 rangeDialog.showDialog();
@@ -539,7 +551,6 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     public boolean showColorControlWidget() {
         return true;
     }
-
 
 
 }
