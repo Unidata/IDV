@@ -216,10 +216,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
         skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
                 getSkipWidgetLabel());
-
+        addRemovable(skipFactorWidget);
 
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
                 "Size");
+        addRemovable(barbSizeWidget);
+
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
                                       barbSizeWidget.getContents(false));
         if ( !getIsThreeComponents()) {
@@ -342,14 +344,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
                                     getClass());
         editButton.setToolTipText("Range used for scaling the vector size");
-        if(rangeDialog == null){
-            rangeDialog  =
-            new RangeDialog(this, flowRange,
-                            "Set the range of data for sizing vectors",
-                            "setFlowRange");
-        }
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
+                if(rangeDialog == null){
+                    rangeDialog  =
+                        new RangeDialog(FlowPlanViewControl.this, flowRange,
+                                        "Set the range of data for sizing vectors",
+                                        "setFlowRange");
+                    addRemovable(rangeDialog);
+                }
                 rangeDialog.showDialog();
                 setFlowRangeLabel();
             }
@@ -793,31 +796,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return !haveMultipleFields();
     }
 
-    /**
-     *  Remove this DisplayControl. Tells the {@link ucar.unidata.idv.ControlContext}
-     *  to removeDisplayControl.
-     *  Removes all Displayable-s from
-     *  their ViewManager-s, remove this object from its  Sharable
-     *  group, and sets the visibility of the dialog window to false.
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     */
-    public void doRemove() throws RemoteException, VisADException {
-        super.doRemove();
-        if(rangeDialog!=null) {
-            rangeDialog.destroy();
-            rangeDialog = null;
-        }
-        if (barbSizeWidget != null) {
-            barbSizeWidget.doRemove();
-            barbSizeWidget = null;
-        }
-        if (skipFactorWidget != null) {
-            skipFactorWidget.doRemove();
-            skipFactorWidget = null;
-        }
-    }
+
 
     /**
      * Get the cursor data

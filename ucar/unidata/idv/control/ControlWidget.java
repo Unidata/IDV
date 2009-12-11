@@ -25,6 +25,8 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.idv.DisplayConventions;
 
+import ucar.unidata.util.Removable;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 
@@ -47,7 +49,7 @@ import javax.swing.*;
  * @author  Jeff McWhirter
  * @version $Revision: 1.15 $
  */
-public class ControlWidget implements ActionListener {
+public class ControlWidget implements ActionListener, Removable {
 
 
     /** the associated control */

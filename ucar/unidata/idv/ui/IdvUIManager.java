@@ -60,7 +60,7 @@ import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
 
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.Disposable;
+import ucar.unidata.util.Removable;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -1794,7 +1794,7 @@ public class IdvUIManager extends IdvManager {
             MyMenuListener menuListener = new MyMenuListener(this, idvWindow,
                                               menu, menuId);
             menu.addMenuListener(menuListener);
-            idvWindow.addDisposable(menuListener);
+            idvWindow.addRemovable(menuListener);
         }
 
         idvWindow.setComponent(COMP_MENUBAR, menuBar);
@@ -1809,7 +1809,7 @@ public class IdvUIManager extends IdvManager {
      *
      * @author IDV Development Team
      */
-    private static class MyMenuListener implements MenuListener, Disposable {
+    private static class MyMenuListener implements MenuListener, Removable {
 
         /** _more_          */
         IdvUIManager idvUIManager;
@@ -1867,7 +1867,7 @@ public class IdvUIManager extends IdvManager {
         /**
          * _more_
          */
-        public void dispose() {
+        public void doRemove() {
             idvUIManager = null;
             idvWindow    = null;
             menu         = null;
@@ -3754,7 +3754,7 @@ public class IdvUIManager extends IdvManager {
                                    getStateManager().getPreferenceOrProperty(
                                        PROP_SHOWCLOCK,
                                        "true")).booleanValue());
-        window.addDisposable(mm);
+        window.addRemovable(mm);
 
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());
         Border paddedBorder =

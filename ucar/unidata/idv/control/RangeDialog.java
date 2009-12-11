@@ -24,6 +24,7 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -60,7 +61,7 @@ import javax.swing.event.*;
  * @author Unidata Development Team
  * @version $Revision: 1.10 $
  */
-public class RangeDialog implements RangeWidget {
+public class RangeDialog implements RangeWidget, Removable {
 
 
     /** The display */
@@ -98,6 +99,9 @@ public class RangeDialog implements RangeWidget {
 
     /** dialog */
     private JDialog dialog;
+
+    private JComponent     contents;
+
 
     /**
      * Construct the widget.
@@ -152,7 +156,7 @@ public class RangeDialog implements RangeWidget {
                                   GuiUtils.inset(rangePopupBtn,
                                       new Insets(0, 5, 0, 0)));
         dialog = new JDialog((Frame) null, dialogTitle, true);
-        JComponent     contents = GuiUtils.inset(GuiUtils.hflow(comps), 5);
+        JComponent     mainContents = GuiUtils.inset(GuiUtils.hflow(comps), 5);
 
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -182,16 +186,26 @@ public class RangeDialog implements RangeWidget {
         rangeMaxField.addActionListener(listener);
         rangeMinField.setActionCommand(GuiUtils.CMD_OK);
         rangeMaxField.setActionCommand(GuiUtils.CMD_OK);
-        dialog.getContentPane().add(GuiUtils.centerBottom(contents,
+        dialog.getContentPane().add(contents = GuiUtils.centerBottom(mainContents,
                 GuiUtils.makeApplyOkCancelButtons(listener)));
 
         dialog.pack();
     }
 
 
-    public void destroy() {
-        displayControl = null;
+
+    /**
+     * Dispose of the dialog
+     */
+    public void doRemove() {
+        if(contents!=null) {
+            GuiUtils.empty(contents, true);
+        }
+        if(dialog!=null) {
+            dialog.dispose();
+        }
         dialog = null;
+        displayControl = null;
     }
 
 
@@ -292,12 +306,7 @@ public class RangeDialog implements RangeWidget {
         displayControl.logException(message, exc);
     }
 
-    /**
-     * Dispose of the dialog
-     */
-    protected void dispose() {
-        displayControl = null;
-    }
+
 
     /**
      * Handle a new range

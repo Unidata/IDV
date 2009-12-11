@@ -32,7 +32,7 @@ import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
 
 
-import ucar.unidata.util.Disposable;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -78,7 +78,7 @@ public class IdvWindow extends MultiFrame {
 
 
     /** _more_          */
-    private List<Disposable> disposables = new ArrayList<Disposable>();
+    private List<Removable> removables = new ArrayList<Removable>();
 
     /** _more_          */
     private boolean hasBeenDisposed = false;
@@ -539,9 +539,9 @@ public class IdvWindow extends MultiFrame {
     protected boolean doClose() {
         if (isAMainWindow && mainWindows.contains(this)
                 && (mainWindows.size() == 1)) {
-            //            if ( !idv.quit()) {
-            //                return false;
-            //            }
+            if ( !idv.quit()) {
+                return false;
+            }
         }
         dispose();
         return true;
@@ -573,10 +573,10 @@ public class IdvWindow extends MultiFrame {
 
         idv.getIdvUIManager().removeWindow(this);
 
-        for (Disposable disposable : disposables) {
-            disposable.dispose();
+        for (Removable removable : removables) {
+            removable.doRemove();
         }
-        disposables = null;
+        removables = null;
 
         JMenuBar menuBar = (JMenuBar) getComponent(IdvUIManager.COMP_MENUBAR);
         if (menuBar != null) {
@@ -586,7 +586,7 @@ public class IdvWindow extends MultiFrame {
         RovingProgress progress =
             (RovingProgress) getComponent(IdvUIManager.COMP_PROGRESSBAR);
         if (progress != null) {
-            progress.dispose();
+            progress.doRemove();
         }
 
         JComponent messageLogger =
@@ -678,10 +678,10 @@ public class IdvWindow extends MultiFrame {
     /**
      * _more_
      *
-     * @param disposable _more_
+     * @param removable _more_
      */
-    public void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
+    public void addRemovable(Removable removable) {
+        removables.add(removable);
     }
 
     /**

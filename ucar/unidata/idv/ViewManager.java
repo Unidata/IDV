@@ -52,6 +52,7 @@ import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.util.BooleanProperty;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
 import ucar.unidata.util.FileManager;
@@ -694,7 +695,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private String initViewStateName;
 
 
-
+    private List<Removable> removables = new ArrayList<Removable>();
 
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
@@ -804,6 +805,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         getMaster().addKeyboardBehavior(keyboardBehavior =
             new IdvKeyboardBehavior(this));
+        addRemovable(keyboardBehavior);
 
         Trace.call1("ViewManager.init setBooleanProperties()");
         setBooleanProperties(this);
@@ -954,6 +956,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
+            addRemovable(bottomLegend);
             synchronized (legends) {
                 legends.add(bottomLegend);
             }
@@ -968,6 +971,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         //Create it if we need to
         if (sideLegend == null) {
             sideLegend = new SideLegend(this);
+            addRemovable(sideLegend);
         }
         synchronized (legends) {
             legends.add(sideLegend);
@@ -4015,7 +4019,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             displayInfos.remove(displayInfo);
         }
         if (master != null) {
-            master.removeDisplayable(displayInfo.getDisplayable());
+            Displayable displayable = displayInfo.getDisplayable();
+            if(displayable!=null) {
+                master.removeDisplayable(displayable);
+            }
         }
         fillLegends();
         updateTimelines(true);
@@ -4505,6 +4512,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    public void addRemovable(Removable removable) {
+        removables.add(removable);
+    }
+
+
     /**
      * Destroy this view manager. Turn off all pending wait cursor
      * calls,  tell the display master and the animation widget
@@ -4518,6 +4530,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         isDestroyed = true;
         getIdvUIManager().viewManagerDestroyed(this);
+
+        for(Removable removable: removables) {
+            removable.doRemove();
+        }
+        removables = null;
 
 
         //First get rid of the  displays
@@ -4546,24 +4563,22 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
-        if (keyboardBehavior != null) {
-            keyboardBehavior.viewManager = null;
-        }
+
+
         removeSharable();
 
         if (timelineDialog != null) {
             timelineDialog.dispose();
-            timelineDialog = null;
+
         }
 
         if (propertiesDialog != null) {
             propertiesDialog.dispose();
-            propertiesDialog = null;
+
         }
 
         if (animationWidget != null) {
             animationWidget.destroy();
-            animationWidget = null;
         }
 
         if (master != null) {
@@ -4583,35 +4598,38 @@ public class ViewManager extends SharableImpl implements ActionListener,
             master = null;
         }
 
+
+        if (animationMenu != null) {
+            GuiUtils.empty(animationMenu,true);
+        }
+
+        if (viewMenu != null) {
+            GuiUtils.empty(viewMenu,true);
+        }
+
+        if (menuBar != null) {
+            GuiUtils.empty(menuBar,true);
+        }
+
+        if (fullContents != null) {
+            GuiUtils.empty(fullContents,true);
+        }
+
         //Be somewhat overly agressive about nulling out references, etc.
+        timelineDialog = null;
+        propertiesDialog = null;
+        animationWidget = null;
+        keyboardBehavior = null;
         displayListDisplayables = null;
         animation               = null;
         legends                 = null;
         sideLegend              = null;
         sideLegendComponent     = null;
         mainSplitPane           = null;
-        if (animationMenu != null) {
-            GuiUtils.empty(animationMenu);
-            animationMenu = null;
-        }
-
-        if (viewMenu != null) {
-            GuiUtils.empty(viewMenu);
-            viewMenu = null;
-        }
-
-        if (menuBar != null) {
-            GuiUtils.empty(menuBar);
-        }
-
-
-
-        if (fullContents != null) {
-            GuiUtils.empty(fullContents);
-            fullContents = null;
-        }
-
-
+        animationMenu = null;
+        viewMenu = null;
+        menuBar = null;
+        fullContents = null;
         idv = null;
 
         displayInfos.clear();
@@ -5864,7 +5882,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @author IDV development team
      */
-    private static class IdvKeyboardBehavior implements KeyboardBehavior {
+    private static class IdvKeyboardBehavior implements KeyboardBehavior, Removable {
 
         /** The ViewManager */
         ViewManager viewManager;
@@ -5877,6 +5895,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
         public IdvKeyboardBehavior(ViewManager viewManager) {
             this.viewManager = viewManager;
         }
+
+        public void doRemove() {
+            viewManager = null;
+        }
+
 
         /**
          * Needed for the interface

@@ -26,6 +26,7 @@ package ucar.unidata.idv.ui;
 
 import ucar.unidata.idv.DisplayConventions;
 
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -50,7 +51,7 @@ import javax.swing.event.*;
  * @author IDV Development Team
  * @version $Revision: 1.8 $
  */
-public class ValueSliderComponent {
+public class ValueSliderComponent implements Removable {
 
     /** readout for value */
     protected Object callingObject;

@@ -236,6 +236,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
             throws VisADException, RemoteException {
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
                 "Scale: ");
+        addRemovable(barbSizeWidget);
         JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
                                      barbSizeWidget.getContents(false));
         if ( !getWindbarbs()) {
@@ -260,6 +261,9 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
                : "Vector Size: ";
     }
 
+    RangeDialog rangeDialog;
+
+
     /**
      * Create the streamline density slider
      *
@@ -272,13 +276,16 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
             GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
                                     getClass());
         editButton.setToolTipText("Range used for scaling the vector size");
-        final RangeDialog rd =
-            new RangeDialog(this, flowRange,
-                            "Set the range of data for sizing vectors",
-                            "setFlowRange");
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                rd.showDialog();
+                if(rangeDialog==null)  {
+                    rangeDialog = 
+                        new RangeDialog(FlowCrossSectionControl.this, flowRange,
+                                        "Set the range of data for sizing vectors",
+                                        "setFlowRange");
+                    addRemovable(rangeDialog);
+                }
+                rangeDialog.showDialog();
                 setFlowRangeLabel();
             }
         });
@@ -533,22 +540,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         return true;
     }
 
-    /**
-     *  Remove this DisplayControl. Tells the {@link ucar.unidata.idv.ControlContext}
-     *  to removeDisplayControl.
-     *  Removes all Displayable-s from
-     *  their ViewManager-s, remove this object from its  Sharable
-     *  group, and sets the visibility of the dialog window to false.
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     */
-    public void doRemove() throws RemoteException, VisADException {
-        super.doRemove();
-        if (barbSizeWidget != null) {
-            barbSizeWidget.doRemove();
-            barbSizeWidget = null;
-        }
-    }
+
+
 }
 

@@ -197,7 +197,8 @@ public class SelectRangeWidget extends ControlWidget {
     public void doRemove() {
         super.doRemove();
         if (rangeDialog != null) {
-            rangeDialog.dispose();
+            rangeDialog.doRemove();
+            rangeDialog = null;
         }
     }
 

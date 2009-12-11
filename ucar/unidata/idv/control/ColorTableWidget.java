@@ -32,6 +32,7 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.Removable;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -73,7 +74,7 @@ import javax.swing.*;
  * @version $Revision: 1.105 $
  */
 public class ColorTableWidget extends ControlWidget implements PropertyChangeListener,
-        RangeWidget {
+                                                               RangeWidget, Removable {
 
 
     /** This defines which color table we are editing */
@@ -391,6 +392,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         super.doRemove();
         if (myEditor != null) {
             myEditor.doClose();
+            myEditor = null;
         }
     }
 

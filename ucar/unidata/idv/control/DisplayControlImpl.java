@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -88,6 +89,7 @@ import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.Prototypable;
 import ucar.unidata.util.Range;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
@@ -589,12 +591,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      *  This is the contour info gui widget for controls enabled for contours
      */
-    protected ContourWidget cw;
+    protected ContourWidget contourWidget;
 
     /**
      *  This is the contour info gui widget for controls enabled for contours
      */
-    protected SelectRangeWidget srw;
+    protected SelectRangeWidget selectRangeWidget;
 
 
     /**
@@ -841,6 +843,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** the local display we are listening to */
     private LocalDisplay displayControlListeningTo;
+
+
+    /** _more_          */
+    private List<Removable> removables = new ArrayList<Removable>();
 
 
     /**
@@ -2073,11 +2079,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * A hook to add an entry into the range menu
      *
-     * @param srw the range dialog that has the items
+     * @param selectRangeWidget the range dialog that has the items
      * @param items List of menu items
      * @deprecated use #addToRangeMenu(RangeWidget)
      */
-    public void addToRangeMenu(RangeDialog srw, List items) {
+    public void addToRangeMenu(RangeDialog selectRangeWidget, List items) {
         //noop
     }
 
@@ -2365,6 +2371,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         viewManagers.add(s);
     }
 
+
     /**
      *  Runs through the list of ViewManager-s and tells each to destroy.
      *  Creates a new viewManagers list.
@@ -2379,6 +2386,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             ((ViewManager) tmp.get(i)).destroy();
         }
     }
+
+
+
 
     /**
      *  A sub-class can register any {@link ucar.unidata.collab.SharableImpl}-s
@@ -5761,8 +5771,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Popup the contour properties dialog
      */
     public void showContourPropertiesDialog() {
-        if (cw != null) {
-            cw.showContourPropertiesDialog();
+        if (contourWidget != null) {
+            contourWidget.showContourPropertiesDialog();
         }
     }
 
@@ -6421,14 +6431,33 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void removeDisplayables()
             throws RemoteException, VisADException {
+        removeDisplayables(false);
+    }
+
+    /**
+     * Iterates across the list of {@link ucar.unidata.idv.DisplayInfo}-s, telling them to
+     * removeDisplayable.
+     *
+     *
+     * @param andDestroyThem _more_
+     * @throws RemoteException
+     * @throws VisADException
+     */
+
+    protected void removeDisplayables(boolean andDestroyThem)
+            throws RemoteException, VisADException {
         List displayList = getDisplayInfos();
         displays = new ArrayList();
         for (int i = 0, n = displayList.size(); i < n; i++) {
-            DisplayInfo info = (DisplayInfo) displayList.get(i);
-            if (info.getDisplayable() != null) {
-                info.getDisplayable().removePropertyChangeListener(this);
+            DisplayInfo info        = (DisplayInfo) displayList.get(i);
+            Displayable displayable = info.getDisplayable();
+            if (displayable != null) {
+                displayable.removePropertyChangeListener(this);
             }
             info.removeDisplayable();
+            if ((displayable != null) && andDestroyThem) {
+                displayable.destroyDisplayable();
+            }
         }
     }
 
@@ -6463,6 +6492,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void viewManagerDestroyed(ViewManager viewManager)
             throws VisADException, RemoteException {
         doRemove();
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param removable _more_
+     */
+    public void addRemovable(Removable removable) {
+        removables.add(removable);
     }
 
 
@@ -6532,7 +6572,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         displayUnit = null;
         colorUnit   = null;
         getControlContext().removeDisplayControl(this);
-        removeDisplayables();
+        removeDisplayables(true);
         disposeOfWindow();
         removeSharable();
 
@@ -6548,6 +6588,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             sharables = null;
         }
+
+
+        for (Removable removable : removables) {
+            removable.doRemove();
+        }
+        removables = null;
 
 
         if (displayMasters != null) {
@@ -6582,24 +6628,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         dataSelection         = null;
         displays              = null;
         displayListTable.clear();
-        displayListTable = null;
-
-        if (ctw != null) {
-            ctw.doRemove();
-            ctw = null;
-        }
-        if (cw != null) {
-            cw.doRemove();
-            cw = null;
-        }
-        if (srw != null) {
-            srw.doRemove();
-            srw = null;
-        }
-        if (lww != null) {
-            lww.doRemove();
-            lww = null;
-        }
+        displayListTable  = null;
+        ctw               = null;
+        selectRangeWidget = null;
+        contourWidget     = null;
+        lww               = null;
     }
 
 
@@ -7149,8 +7182,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void getControlWidgets(List<ControlWidget> controlWidgets)
             throws VisADException, RemoteException {
         if (checkFlag(FLAG_CONTOUR)) {
-            controlWidgets.add(cw = new ContourWidget(this,
+            controlWidgets.add(contourWidget = new ContourWidget(this,
                     getContourInfo()));
+            addRemovable(contourWidget);
         }
         if (checkFlag(FLAG_COLORTABLE)) {
             controlWidgets.add(getColorTableWidget(getRangeForColorTable()));
@@ -8492,14 +8526,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (didone) {
             sb.append("</ul>");
         }
-        if(dataSelection!=null) {
+        if (dataSelection != null) {
             GeoSelection geoSelection = dataSelection.getGeoSelection();
-            if(geoSelection!=null) {
+            if (geoSelection != null) {
                 sb.append("Geo selection:" + geoSelection);
                 sb.append("<br>\n");
             }
             List times = dataSelection.getTimes();
-            if(times!=null && times.size()>0) {
+            if ((times != null) && (times.size() > 0)) {
                 sb.append("Selected times:" + StringUtil.join(" ", times));
             }
         }
@@ -9642,9 +9676,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         selectRange = newRange;
         if (selectRange != null) {
-            if (srw != null) {
-                srw.setRange(selectRange);
-                if ( !srw.getSelectRangeEnabled()) {
+            if (selectRangeWidget != null) {
+                selectRangeWidget.setRange(selectRange);
+                if ( !selectRangeWidget.getSelectRangeEnabled()) {
                     return;
                 }
             }
@@ -9818,6 +9852,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                         : controlContext
                                             .getColorTableManager()
                                             .getDefaultColorTable()), r);
+            addRemovable(ctw);
         } else if (r != null) {
             ctw.setRange(r);
         }
@@ -9834,10 +9869,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public SelectRangeWidget getSelectRangeWidget(Range r)
             throws VisADException, RemoteException {
-        if (srw == null) {
-            srw = new SelectRangeWidget(this, r);
+        if (selectRangeWidget == null) {
+            selectRangeWidget = new SelectRangeWidget(this, r);
+            addRemovable(selectRangeWidget);
         }
-        return srw;
+        return selectRangeWidget;
     }
 
     /**
@@ -9852,6 +9888,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (lww == null) {
             lww = new ValueSliderWidget(this, 1, 10, "lineWidth",
                                         getLineWidthWidgetLabel());
+            addRemovable(lww);
         }
         return lww;
     }
@@ -10003,8 +10040,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
         contourInfo = new ContourInfo(newInfo);
-        if (cw != null) {
-            cw.setContourInfo(newInfo);
+        if (contourWidget != null) {
+            contourWidget.setContourInfo(newInfo);
         }
         applyContourInfo();
     }
@@ -10826,10 +10863,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 DisplayInfo info = (DisplayInfo) displayList.get(i);
                 try {
                     Displayable displayable = info.getDisplayable();
-                    if(displayable!=null) {
+                    if (displayable != null) {
                         displayable.setUseFastRendering(
-                                                        info.getViewManager().getUseFastRendering(
-                                                                                                  useFastRendering));
+                            info.getViewManager().getUseFastRendering(
+                                useFastRendering));
                     }
                 } catch (Exception exc) {
                     logException("Setting fast rendering to: "

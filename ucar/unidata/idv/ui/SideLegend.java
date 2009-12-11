@@ -171,8 +171,9 @@ public class SideLegend extends IdvLegend {
      * have changed in some way.
      */
     protected void fillLegendSafely() {
-        if(legendsPanel==null) return;
-        List controls = viewManager.getControlsForLegend();
+        ViewManager theViewManager = viewManager;
+        if(legendsPanel==null || theViewManager == null) return;
+        List controls = theViewManager.getControlsForLegend();
         for (int i = 0; i < categoryPanels.size(); i++) {
             CategoryPanel categoryPanel =
                 (CategoryPanel) categoryPanels.get(i);
@@ -183,9 +184,8 @@ public class SideLegend extends IdvLegend {
 
 
         boolean showIcons = true;
-        ViewManager vm = viewManager;
-        if(vm!=null) {
-            IntegratedDataViewer idv = vm.getIdv();
+        if(theViewManager!=null) {
+            IntegratedDataViewer idv = theViewManager.getIdv();
             if(idv!=null) {
                 showIcons =idv.getStateManager().getPreferenceOrProperty(IdvConstants.PREF_LEGEND_SHOWICONS, false);
             }

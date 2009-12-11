@@ -30,6 +30,7 @@ import ucar.unidata.idv.ui.*;
 
 import ucar.unidata.util.GuiUtils;
 
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
 
@@ -56,7 +57,7 @@ import javax.swing.event.*;
  * @author IDV development team
  */
 
-public abstract class IdvLegend {
+public abstract class IdvLegend implements Removable {
 
     public static final String STATE_HIDDEN = "hidden";
     public static final String STATE_DOCKED = "docked";
@@ -254,6 +255,7 @@ public abstract class IdvLegend {
      *  It simply is a wrapper around fillLegendSafely, synchronizing on a MUTEX lock.
      */
     public final void fillLegend() {
+        if(viewManager ==null) return;
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     fillLegendInner();
@@ -265,6 +267,7 @@ public abstract class IdvLegend {
 
     private final void fillLegendInner() {
         synchronized (MUTEX) {
+            if(viewManager ==null) return;
             fillLegendSafely();
             if (contents != null) {
                 contents.validate();
@@ -315,6 +318,12 @@ public abstract class IdvLegend {
             floatFrame.dispose();
             floatFrame = null;
         }
+    }
+
+
+    public void doRemove() {
+        viewManager = null;
+        GuiUtils.empty(contents, true);
     }
 
 

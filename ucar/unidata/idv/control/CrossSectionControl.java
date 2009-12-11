@@ -575,9 +575,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                                                     endLLP.getLongitude().getValue(),
                                                                      0);
 
-                    System.err.println(rect);
-                    System.err.println(startLoc);
-                    System.err.println(endLoc);
                     setPosition(startLoc, endLoc);
                 } else {
                     csSelector.setPosition(start, end);

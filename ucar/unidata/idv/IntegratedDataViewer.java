@@ -509,14 +509,26 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     protected final void init() {
         GuiUtils.setApplicationTitle("Unidata IDV - ");
 
-
         /*
         final PrintStream oldErr = System.err;
         System.setErr(new PrintStream(System.out){
                 public void     println(String x) {
                     oldErr.println("ERR:" + x);
-                    if(x.indexOf("input")>=0) {
+                    //                    if(x.indexOf("size:")>=0) {
                         Misc.printStack("got it");
+                        //                    }
+                }
+            });
+        */
+
+        /*
+        final PrintStream oldOut = System.out;
+        System.setOut(new PrintStream(System.err){
+                public void     println(String x) {
+                    oldOut.println("ERR:" + x);
+                    if(x.indexOf("size:")>=0) {
+                        throw new IllegalArgumentException("got it");
+                        //                        Misc.printStack("got it");
                     }
                 }
             });
