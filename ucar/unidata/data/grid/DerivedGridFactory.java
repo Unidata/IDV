@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -679,6 +680,26 @@ public class DerivedGridFactory {
     public static FieldImpl create2DTopography(FieldImpl paramGrid,
             FieldImpl topoGrid)
             throws VisADException, RemoteException {
+        return create2DTopography(paramGrid, topoGrid, false);
+    }
+
+    /**
+     * Make a FieldImpl of some parameter and topography.  We add a little
+     * bit to the topography grid so it will raise it up just a tad
+     *
+     * @param paramGrid  parameter grid
+     * @param topoGrid   grid of topography.  Must have units convertible
+     *                   with meter or geopotential meter.
+     * @param resampleToTopography _more_
+     *
+     * @return combined grids
+     *
+     * @throws VisADException  VisAD problem
+     * @throws RemoteException  remote problem
+     */
+    public static FieldImpl create2DTopography(FieldImpl paramGrid,
+            FieldImpl topoGrid, boolean resampleToTopography)
+            throws VisADException, RemoteException {
 
         FieldImpl grid     = paramGrid;
         RealType  rt = GridUtil.getParamType(topoGrid).getRealComponents()[0];
@@ -727,19 +748,21 @@ public class DerivedGridFactory {
             // lat/lon over lon/lat (or vice versa)
             // TODO:  handle a time sequence topography or topo with CS
             //if ( !GridUtil.isTimeSequence(topoGrid)) {
-                if ( !paramRef.equals(topoRef)) {
-                    //System.out.println("refs aren't equal");
-                    if (topoDomain.getCoordinateSystem() == null) {
-                        if ((topoRef
-                                .equals(RealTupleType
-                                    .SpatialEarth2DTuple) || topoRef
-                                        .equals(RealTupleType
-                                            .LatitudeLongitudeTuple))) {
-                            topoGrid = GridUtil.swapLatLon((FlatField) topoGrid);
-                        }
+            if ( !paramRef.equals(topoRef)) {
+                //System.out.println("refs aren't equal");
+                if (topoDomain.getCoordinateSystem() == null) {
+                    if ((topoRef.equals(RealTupleType.SpatialEarth2DTuple)
+                            || topoRef.equals(
+                                RealTupleType.LatitudeLongitudeTuple))) {
+                        topoGrid = GridUtil.swapLatLon((FlatField) topoGrid);
                     }
                 }
+            }
             //}
+            if (resampleToTopography) {
+                grid = GridUtil.resampleGrid(
+                    grid, GridUtil.getSpatialDomain(topoGrid));
+            }
             return combineGrids(grid, topoGrid);
         }
     }
