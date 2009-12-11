@@ -35,6 +35,8 @@ import visad.VisADException;
 import java.net.MalformedURLException;
 
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 
 
 /**
@@ -196,23 +198,45 @@ public class AddeImageInfo extends AddeImageURL {
   /**
    * Set the extraKeys string for this ADDE URL
    * @param extraKeys the extraKeys
+   */
    public void setExtraKeys(String extraKeys) {
-       List<String> tokens = StringUtil.split(extraKeys, "?", true, true);
+       //parseQuery(query);
+       //super.setExtraKeys(extraKeys);
+       // TODO: Move this into parseQuery
+       List<String> tokens = StringUtil.split(extraKeys, "&", true, true);
        List<String> leftovers = new ArrayList<String>();
        for (String token : tokens) {
            String[] keyValue = StringUtil.split(token, "=", 2);
+           if (keyValue == null) continue;
            String key = keyValue[0].toLowerCase();
            String value = keyValue[1];
-           if (key.startsWith("comp")) {                 // compression
-               setCompression(value);
-           } else if (key.startsWith("deb")) {           // debug
-               setDebug(Boolean.booleanValue(value));
-           } else if (key.startsWith("use")) {           // user
+           if (key == null || value == null) continue;
+           if (key.startsWith("comp")) {                   // compression
+               setCompressionFromString(value);
+           } else if (key.startsWith("por")) {             // port
+               setPort(Integer.parseInt(value));
+           } else if (key.startsWith("use")) {             // user
                setUser(value);
-           } else if (key.startsWith("proj")) {           // user
-               setProject(value);
-           } else if (key.startsWith("proj")) {           // user
-               setPosition(Integer.parseInt(value));
+           } else if (key.startsWith("proj")) {            // user
+               setProject(Integer.parseInt(value));
+           } else if (key.startsWith("ver")) {             // version
+               setVersion(value);
+           } else if (key.startsWith("deb")) {             // debug
+               setDebug(value.equals("true"));
+           } else if (key.startsWith("tra")) {             // trace
+               setTrace(Integer.parseInt(value));
+           } else if (key.startsWith("pos")) {             // position
+               setDatasetPosition(Integer.parseInt(value));
+           } else if (key.startsWith("band")) {            // band
+               setBand(value);
+           } else if (key.startsWith("uni")) {             // unit
+               setUnit(value);
+           } else if (key.startsWith("gro")) {             // group
+               setGroup(value);
+           } else if (key.startsWith("desc")) {            // descriptor
+               setDescriptor(value);
+           } else if (key.startsWith("spac")) {            // spacing
+               setSpacing(Integer.parseInt(value));
            } else {
                leftovers.add(token);
            }
@@ -220,11 +244,11 @@ public class AddeImageInfo extends AddeImageURL {
        if (!leftovers.isEmpty()) {
           StringBuilder buf = new StringBuilder();
           for (String leftover : leftovers) {
+              buf.append("&");
               buf.append(leftover);
-              buf.append("?");
           }
+          //System.out.println("leftovers = " + buf.toString());
           super.setExtraKeys(buf.toString());
        }
    }
-   */
 }
