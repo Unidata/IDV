@@ -2512,7 +2512,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
 
         String llb =
-            getRepository().makeMapSelector(request, ARG_POINT_BBOX, false,
+            getRepository().makeMapSelector(request, ARG_POINT_BBOX, true,
                                             "","");
 
         basicSB.append(

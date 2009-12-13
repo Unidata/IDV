@@ -1410,7 +1410,7 @@ public class DataOutputHandler extends OutputHandler {
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
             String llb =
-                getRepository().makeMapSelector(request, ARG_AREA, false,
+                getRepository().makeMapSelector(ARG_AREA, true,
                                                 ""+llr.getLatMin(),
                                                 ""+llr.getLatMax(),
                                                 ""+llr.getLonMax(),

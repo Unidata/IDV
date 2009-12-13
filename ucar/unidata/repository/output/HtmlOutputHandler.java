@@ -824,6 +824,7 @@ public class HtmlOutputHandler extends OutputHandler {
             allEntries.addAll(subGroups);
             allEntries.addAll(entries);
 
+            if(false) {
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
                 String link = getEntriesList(request, groupsSB, subGroups,
@@ -844,6 +845,17 @@ public class HtmlOutputHandler extends OutputHandler {
                                              group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
                         entriesSB.toString(), true));
+            }
+
+            } else {
+                StringBuffer groupsSB = new StringBuffer();
+                String link = getEntriesList(request, groupsSB, allEntries,
+                                             allEntries, true,
+                                             false, true,
+                                             group.isDummy(),
+                                             group.isDummy());
+                sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
+                        groupsSB.toString(), true));
             }
 
             if ( !group.isDummy() && (subGroups.size() == 0)

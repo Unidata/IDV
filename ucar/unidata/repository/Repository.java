@@ -1534,6 +1534,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
             }
+            super.checkClass(c);
         }
 
         /**
@@ -1546,10 +1547,20 @@ public class Repository extends RepositoryBase implements RequestHandler {
         protected String defineResource(JarEntry jarEntry) {
             String path = super.defineResource(jarEntry);
             checkFile(path, true);
+            String entryName = jarEntry.getName();
+            int idx = entryName.indexOf("htdocs/");
+            if(idx>=0) {
+                String htpath  = entryName.substring(idx+"htdocs".length());
+                System.err.println(htpath);
+                pluginHtdocsMap.put(htpath,
+                                    path);
+                //                System.err.println (pluginHtdocsMap);
+            }
             return path;
         }
     }
 
+    private Hashtable<String,String> pluginHtdocsMap = new Hashtable<String,String>();
 
     /**
      * _more_
@@ -2115,15 +2126,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     return getEntryManager().addInitialMetadataToEntries(
                         request, entries, false);
                 }
-
-                StringBuffer idBuffer = new StringBuffer();
                 entries.addAll(subGroups);
-                for (Entry entry : entries) {
-                    idBuffer.append(",");
-                    idBuffer.append(entry.getId());
-                }
-                return new Result(request.url(URL_ENTRY_DELETELIST,
-                        ARG_ENTRYIDS, idBuffer.toString()));
+                request.remove(ARG_DELETE_CONFIRM);
+                return getEntryManager().processEntryListDelete(request, entries);
             }
         };
         outputHandler.addType(OUTPUT_DELETER);
@@ -2175,8 +2180,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
                 }
-                return new Result(request.url(URL_ENTRY_COPY, ARG_FROM,
-                        idBuffer.toString()));
+                request.put(ARG_FROM,idBuffer);
+                return getEntryManager().processEntryCopy(request);
+                //                return new Result(request.url(URL_ENTRY_COPY, ARG_FROM,
+                //                        idBuffer.toString()));
             }
         };
         copyHandler.addType(OUTPUT_COPY);
@@ -2614,6 +2621,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 	    path = getUrlBase()+path;
 	}
 
+
         if ( !path.startsWith(getUrlBase())) {
             getLogManager().log(request,
                                 "Unknown request" + " \"" + path + "\"");
@@ -2626,12 +2634,29 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        String type   = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
+
         int    length = getUrlBase().length();
         //        path = StringUtil.replace(path, getUrlBase(), BLANK);
         path = path.substring(length);
 
 
+        String pluginPath = pluginHtdocsMap.get(path);
+        if(pluginPath!=null) {
+            InputStream inputStream =
+                getStorageManager().getInputStream(pluginPath);
+            if (pluginPath.endsWith(".js") || pluginPath.endsWith(".css")) {
+                String js = IOUtil.readInputStream(inputStream);
+                js          = js.replace("${urlroot}", getUrlBase());
+                inputStream = new ByteArrayInputStream(js.getBytes());
+            }
+            String type   = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
+            return  new Result(BLANK, inputStream, type);
+        }
+
+
+
+
+        String type   = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
 
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
@@ -3659,6 +3684,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             type = OutputHandler.OUTPUT_HTML.getId();
         }
         OutputType output = new OutputType("", type, OutputType.TYPE_HTML);
+
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;

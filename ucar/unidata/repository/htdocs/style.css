@@ -82,13 +82,7 @@ a:hover {
 }
 
 
-.time {
-	color:#666;
-	font-size:10px;
-	font-weight:normal;
-	margin:0;
-	white-space:nowrap;
-}
+
 
 
 .footer {
@@ -98,8 +92,18 @@ a:hover {
 }
 
 .entryrowlabel {
-    font-style:italic;
+    xfont-style:italic;
+    font-size:8px;
+    white-space:nowrap;
 }
+
+.time {
+	xcolor:#666;
+	xfont-weight:normal;
+	margin:0;
+	white-space:nowrap;
+}
+
 
 .entryrow {
   margin-top:2px;

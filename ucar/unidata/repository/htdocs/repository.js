@@ -1,5 +1,6 @@
 
 var root = "${urlroot}";
+var urlroot = "${urlroot}";
 var icon_close = "${urlroot}/icons/close.gif";
 var icon_rightarrow = "${urlroot}/icons/grayrightarrow.gif";
 
@@ -1120,7 +1121,6 @@ function handleAjaxPopup(request, srcId) {
     obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
     showObject(obj);
 }
-
 
 
 function showPopup(event, srcId, popupId, alignLeft) {

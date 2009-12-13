@@ -1671,7 +1671,7 @@ return new Result(title, sb);
             idBuffer.append(entry.getId());
         }
         msgSB.append(
-            msg("Are you sure you want to delete all of the entries?"));
+            msg("Are you sure you want to delete all of the following entries?"));
         sb.append(request.formPost(getRepository().URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
         String form = Repository.makeOkCancelForm(request,
@@ -2515,6 +2515,9 @@ return new Result(title, sb);
                     msg("What do you want to do with the following entry?"));
             }
             sb.append(HtmlUtil.br());
+            sb.append(msgLabel("Destination"));
+            sb.append(toEntry.getName());
+            sb.append(HtmlUtil.br());
             StringBuffer fb = new StringBuffer();
             fb.append(request.formPost(getRepository().URL_ENTRY_COPY));
             fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
@@ -2522,21 +2525,19 @@ return new Result(title, sb);
 
             if (isGroup) {
                 fb.append(HtmlUtil.submit(((entries.size() > 1)
-                                           ? "Copy them to the group: "
-                                           : "Copy it to the group: ") + toEntry
-                                           .getName(), ARG_ACTION_COPY));
+                                           ? "Copy them to the group"
+                                           : "Copy it to the group"), ARG_ACTION_COPY));
                 fb.append(HtmlUtil.space(1));
                 fb.append(HtmlUtil.submit(((entries.size() > 1)
-                                           ? "Move them to the group: "
-                                           : "Move it to the group: ") + toEntry
-                                           .getName(), ARG_ACTION_MOVE));
+                                           ? "Move them to the group"
+                                           : "Move it to the group"), ARG_ACTION_MOVE));
                 fb.append(HtmlUtil.space(1));
             }
 
             if (entries.size() == 1) {
                 fb.append(
                     HtmlUtil.submit(
-                        "Associate it with: " + toEntry.getName(),
+                        "Associate it",
                         ARG_ACTION_ASSOCIATE));
                 fb.append(HtmlUtil.space(1));
             }
@@ -3172,8 +3173,7 @@ return new Result(title, sb);
         String share =
             "<script type=\"text/javascript\">var addthis_disable_flash=\"true\" addthis_pub=\"jeffmc\";</script><a href=\"http://www.addthis.com/bookmark.php?v=20\" onmouseover=\"return addthis_open(this, '', '" + entryUrl + "', '" + title + "')\" onmouseout=\"addthis_close()\" onclick=\"return addthis_sendto()\"><img src=\"http://s7.addthis.com/static/btn/lg-share-en.gif\" width=\"125\" height=\"16\" alt=\"Bookmark and Share\" style=\"border:0\"/></a><script type=\"text/javascript\" src=\"http://s7.addthis.com/js/200/addthis_widget.js\"></script>";
 
-        //        sb.append(share);
-
+        sb.append(share);
 
 
         String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY,

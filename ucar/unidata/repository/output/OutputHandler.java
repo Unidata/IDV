@@ -27,7 +27,6 @@ import org.w3c.dom.Element;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 
-import ucar.unidata.repository.collab.*;
 import ucar.unidata.repository.data.DataOutputHandler;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;
@@ -78,8 +77,7 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager implements WikiUtil
-    .WikiPageHandler {
+public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPageHandler {
 
     /** _more_          */
     public static final String ATTR_MAXCONNECTIONS = "maxconnections";
@@ -1059,25 +1057,49 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                new State(getEntryManager().getDummyGroup(),
                                          entries));
 
-
-        List<HtmlUtil.Selector> tfos = new ArrayList<HtmlUtil.Selector>();
+        List<String>linkCategories = new ArrayList<String>();
+        Hashtable<String, List<HtmlUtil.Selector>> linkMap = new Hashtable<String, List<HtmlUtil.Selector>>();
+        linkCategories.add("View");
+        linkMap.put("View",new ArrayList<HtmlUtil.Selector>());
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             if (outputType == null) {
                 continue;
             }
+            String category;
+            if(outputType.getIsFile()) {
+                category = "File";
+            } else if(outputType.getIsEdit()) {
+                category = "Edit";
+            } else {
+                category ="View";
+            }
+            List<HtmlUtil.Selector> linksForCategory = linkMap.get(category);
+
+            if(linksForCategory==null) {
+                linksForCategory = new ArrayList<HtmlUtil.Selector>();
+                linkCategories.add(category);
+                linkMap.put(category, linksForCategory);
+            }
+
             String icon = link.getIcon();
             if (icon == null) {
                 icon = getRepository().iconUrl(ICON_BLANK);
             }
-            tfos.add(new HtmlUtil.Selector(outputType.getLabel(),
-                                           outputType.getId(), icon));
+            linksForCategory.add(new HtmlUtil.Selector(outputType.getLabel(),
+                                                       outputType.getId(), icon, 20));
         }
 
-
+        ArrayList<HtmlUtil.Selector> tfos =  new ArrayList<HtmlUtil.Selector>();
+        for(String category: linkCategories) {
+            List<HtmlUtil.Selector> linksForCategory = linkMap.get(category);
+            if(linksForCategory.size()==0) continue;
+            tfos.add(new HtmlUtil.Selector(category,"",null,0,true));
+            tfos.addAll(linksForCategory);
+        }
 
         StringBuffer selectSB = new StringBuffer();
-        selectSB.append(msgLabel("View As"));
+        selectSB.append(msgLabel("Do"));
         selectSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
         selectSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
@@ -1370,7 +1392,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 	sb.append(descSB);
         */
 
-        sb.append("</td><td align=right class=entryrowlabel>");
+
         StringBuffer extraAlt  = new StringBuffer();
         String       userLabel = "";
         extraAlt.append(", ");
@@ -1382,10 +1404,23 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
         }
 
+        /*
+        String size = "";
+        if(entry.isFile()) {
+            size = getEntryManager().formatFileLength(entry.getResource().getFileSize());
+        }
+
+        sb.append("</td><td align=right><div class=entryrowlabel>");
+        sb.append(size);
+        sb.append(HtmlUtil.space(2));
+        sb.append("</div> </td>");
+        */
+
+        sb.append("<td align=right width=100><div class=entryrowlabel>");
         sb.append(getRepository().formatDateShort(request,
                 new Date(entry.getStartDate()),
                 getEntryManager().getTimezone(entry), extraAlt.toString()));
-        sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
+        sb.append("</div></td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
 	//	sb.append(HtmlUtil.jsLink(toggleJS,"X"));
         /*        String userSearchLink =
@@ -1528,6 +1563,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     /** _more_ */
     public static final String PROP_REQUEST = "request";
+
+    public static String TYPE_WIKIPAGE = "wikipage";
+
+    public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
+                                                     "wiki.view",
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_WIKI);
+
+
 
     /** _more_ */
     public static final String WIKIPROP_IMPORT = "import";
@@ -2405,11 +2449,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                     label = theEntry.getName();
                 }
                 if (theEntry.getType().equals(
-                        WikiPageTypeHandler.TYPE_WIKIPAGE)) {
+                                              TYPE_WIKIPAGE)) {
                     String url =
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                          theEntry, ARG_OUTPUT,
-                                         WikiPageOutputHandler.OUTPUT_WIKI);
+                                         OUTPUT_WIKI);
                     return getEntryManager().getTooltipLink(request,
                             theEntry, label, url);
 
@@ -2425,7 +2469,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                      (entry.isGroup()
                                       ? entry.getId()
                                       : parent.getId()), ARG_TYPE,
-                                          WikiPageTypeHandler.TYPE_WIKIPAGE);
+                                          TYPE_WIKIPAGE);
 
             return HtmlUtil.href(url, name,
                                  HtmlUtil.cssClass("wiki-link-noexist"));

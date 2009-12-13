@@ -723,9 +723,8 @@ public class Tables {
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
 
-    }
+    };
 
-    ;
 
     /**
      * Class WIKIPAGEHISTORY _more_

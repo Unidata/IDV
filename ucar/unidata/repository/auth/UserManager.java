@@ -77,13 +77,13 @@ public class UserManager extends RepositoryManager {
 
     /** _more_ */
     public static final OutputType OUTPUT_CART =
-        new OutputType("Add to Cart", "user.cart", OutputType.TYPE_NONHTML,
+        new OutputType("Add to Cart", "user.cart", OutputType.TYPE_FILE,
                        "", ICON_CART_ADD);
 
     /** _more_ */
     public static final OutputType OUTPUT_FAVORITE =
         new OutputType("Add as Favorite", "user.addfavorite",
-                       OutputType.TYPE_NONHTML, "", ICON_FAVORITE);
+                       OutputType.TYPE_FILE, "", ICON_FAVORITE);
 
     /** _more_ */
     public static final String ROLE_ANY = "any";
