@@ -1893,6 +1893,8 @@ public class HtmlUtil {
      */
     public static class Selector {
 
+        int margin = 3;
+
         /** _more_ */
         String label;
 
@@ -1902,6 +1904,8 @@ public class HtmlUtil {
         /** _more_ */
         String icon;
 
+        boolean isHeader = false;
+
         /**
          * _more_
          *
@@ -1910,9 +1914,20 @@ public class HtmlUtil {
          * @param icon _more_
          */
         public Selector(String label, String id, String icon) {
+            this(label, id, icon, 3,false);
+        }
+
+
+        public Selector(String label, String id, String icon, int margin) {
+            this(label, id, icon, margin, false);
+        }
+
+        public Selector(String label, String id, String icon, int margin, boolean isHeader) {
             this.label = label;
             this.id    = id;
             this.icon  = icon;
+            this.margin=margin;
+            this.isHeader = isHeader;
         }
     }
 
@@ -1950,8 +1965,10 @@ public class HtmlUtil {
                 label = selector.label;
                 if (selector.icon != null) {
                     extraAttr = style(
-                        "margin:3px;padding-left:20px;background-repeat:no-repeat; background-image: url("
+                        "margin:3px;margin-left:" + selector.margin+"px;padding-left:20px;background-repeat:no-repeat; background-image: url("
                         + selector.icon + ");");
+                } else if(selector.isHeader) {
+                    extraAttr = style("font-weight:bold");
                 }
             } else {
                 value = label = obj.toString();
