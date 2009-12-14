@@ -909,8 +909,6 @@ public class PointObFactory {
                                 (Real) ob.getComponent(notReqIndices[j]);
                             realUnits[j] = protos[j].getUnit();
                         }
-                        Misc.printArray("protos", protos);
-                        Misc.printArray("regular tuple", realUnits);
                     }
 
                     rest = new DoubleTuple((RealTupleType) tupleType, protos,
