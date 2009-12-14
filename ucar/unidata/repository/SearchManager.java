@@ -140,7 +140,7 @@ public class SearchManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public RequestUrl[] getSearchUrls() throws Exception {
+    public List<RequestUrl> getSearchUrls() throws Exception {
         if (getRegistryManager().getSelectedRemoteServers().size() > 0) {
             return getRepository().remoteSearchUrls;
         }

@@ -796,6 +796,7 @@ return new Result(title, sb);
             throws Exception {
         if ( !typeHandler.canBeCreatedBy(request)) {
             return false;
+            
         }
 
         String ips = getRepository().getProperty("ramadda.type."

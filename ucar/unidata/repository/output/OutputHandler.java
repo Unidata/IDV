@@ -1615,7 +1615,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     /** _more_ */
     public static final String WIKIPROP_URL = "url";
 
-    //        WIKIPROP_IMPORT = "import";
 
     /** _more_ */
     public static final String[] WIKIPROPS = {

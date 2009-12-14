@@ -189,5 +189,14 @@ public class RepositoryUtil {
     }
 
 
+    public static List<RequestUrl> toList(RequestUrl[]urls) {
+        List<RequestUrl> l = new ArrayList<RequestUrl>();
+        for(RequestUrl r: urls) {
+            l.add(r);
+        }
+        return l;
+    }
+
+
 }
 

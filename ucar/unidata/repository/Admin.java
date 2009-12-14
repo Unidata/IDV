@@ -148,7 +148,7 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
-    public RequestUrl[] adminUrls = {
+    public List<RequestUrl> adminUrls = RepositoryUtil.toList(new RequestUrl[]{
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
         URL_ADMIN_STATS, URL_ADMIN_ACCESS,
         getHarvesterManager().URL_HARVESTERS_LIST,
@@ -156,7 +156,13 @@ public class Admin extends RepositoryManager {
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP, URL_ADMIN_USERMESSAGE
-    };
+        });
+
+
+    public static final String BLOCK_SITE = "block.site";
+    public static final String BLOCK_ACCESS = "block.access";
+    public static final String BLOCK_DISPLAY = "block.display";
+
 
 
     /** _more_ */
@@ -168,7 +174,8 @@ public class Admin extends RepositoryManager {
     /** _more_ */
     StringBuffer cleanupStatus = new StringBuffer();
 
-
+    private List<AdminHandler> adminHandlers = new ArrayList<AdminHandler>();
+    private Hashtable<String, AdminHandler> adminHandlerMap = new Hashtable<String,AdminHandler>();
 
 
     /**
@@ -179,6 +186,24 @@ public class Admin extends RepositoryManager {
     public Admin(Repository repository) {
         super(repository);
     }
+
+
+
+    protected  AdminHandler getAdminHandler(String id) {
+        return adminHandlerMap.get(id);
+    }
+
+    public void addAdminHandler(AdminHandler adminHandler) {
+        if(adminHandlers.contains(adminHandler)) return;
+        if(adminHandlerMap.get(adminHandler.getId())!=null) return;
+        adminHandlers.add(adminHandler);
+        adminHandlerMap.put(adminHandler.getId(), adminHandler);
+        List<RequestUrl> urls=adminHandler.getUrls();
+        if(urls!=null) {
+            adminUrls.addAll(urls);
+        }
+    } 
+
 
 
 
@@ -1052,8 +1077,7 @@ public class Admin extends RepositoryManager {
 
         getRepository().getRegistryManager().addAdminConfig(request, csb);
 
-
-        csb.append(HtmlUtil.formTableClose());
+        
 
 
 
@@ -1118,7 +1142,6 @@ public class Admin extends RepositoryManager {
                 + "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
 
 
-        dsb.append(HtmlUtil.formTableClose());
 
 
 
@@ -1223,8 +1246,14 @@ public class Admin extends RepositoryManager {
 
 
 
+        for(AdminHandler adminHandler: adminHandlers) {
+            adminHandler.addToSettingsForm(BLOCK_SITE, csb);
+            adminHandler.addToSettingsForm(BLOCK_DISPLAY, dsb);
+            adminHandler.addToSettingsForm(BLOCK_ACCESS, asb);
+        }
+        csb.append(HtmlUtil.formTableClose());
+        dsb.append(HtmlUtil.formTableClose());
         asb.append(HtmlUtil.formTableClose());
-
 
 
         StringBuffer osb = new StringBuffer();

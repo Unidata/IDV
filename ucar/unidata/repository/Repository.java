@@ -192,22 +192,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public static final String MSG_SUFFIX = " msg>";
 
     /** _more_ */
-    protected RequestUrl[] entryEditUrls = {
+    protected List<RequestUrl> entryEditUrls = RepositoryUtil.toList(new RequestUrl[]{
         URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
         URL_ACCESS_FORM  //,
         //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
-    };
+        });
 
     /** _more_ */
-    protected RequestUrl[] groupEditUrls = {
+    protected List<RequestUrl> groupEditUrls = RepositoryUtil.toList(new RequestUrl[]{
         URL_ENTRY_NEW, URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
         URL_ACCESS_FORM  //,
         //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
-    };
+        });
 
 
     /** _more_ */
@@ -1533,6 +1533,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                         + c.getName());
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
+            } else if (AdminHandler.class.isAssignableFrom(c)) {
+                AdminHandler adminHandler = (AdminHandler) c.newInstance();
+                adminHandler.setRepository(Repository.this);
+                getAdmin().addAdminHandler(adminHandler);
             }
             super.checkClass(c);
         }
@@ -1551,10 +1555,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             int idx = entryName.indexOf("htdocs/");
             if(idx>=0) {
                 String htpath  = entryName.substring(idx+"htdocs".length());
-                System.err.println(htpath);
                 pluginHtdocsMap.put(htpath,
                                     path);
-                //                System.err.println (pluginHtdocsMap);
             }
             return path;
         }
@@ -4217,6 +4219,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public List getSubNavLinks(Request request, RequestUrl[] urls) {
+        return getSubNavLinks(request, RepositoryUtil.toList(urls));
+    }
+
+    public List getSubNavLinks(Request request, List<RequestUrl> urls) {
         return getSubNavLinks(request, urls, BLANK);
     }
 
@@ -4231,7 +4237,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public Result makeResult(Request request, String title, StringBuffer sb,
-                             RequestUrl[] links) {
+                             List<RequestUrl> links) {
         Result result = new Result(title, sb);
         if (links != null) {
             result.putProperty(PROP_NAVSUBLINKS,
@@ -4251,7 +4257,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public List getSubNavLinks(Request request, RequestUrl[] urls,
+    public List getSubNavLinks(Request request, List<RequestUrl> urls,
                                String arg) {
         List   links = new ArrayList();
         String type  = request.getRequestPath();
@@ -4259,16 +4265,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                     "ramadda.template.sublink.on", "");
         String offLinkTemplate = getTemplateProperty(request,
                                      "ramadda.template.sublink.off", "");
-        for (int i = 0; i < urls.length; i++) {
-            String label = urls[i].getLabel();
+        for (RequestUrl requestUrl: urls) {
+            String label = requestUrl.getLabel();
             label = msg(label);
             if (label == null) {
-                label = urls[i].toString();
+                label = requestUrl.toString();
             }
-            String url = request.url(urls[i]) + arg;
+            String url = request.url(requestUrl) + arg;
             String template;
 
-            if (type.endsWith(urls[i].getPath())) {
+            if (type.endsWith(requestUrl.getPath())) {
                 template = onLinkTemplate;
             } else {
                 template = offLinkTemplate;

@@ -95,16 +95,16 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_HOME,
+    protected List<RequestUrl> userUrls = RepositoryUtil.toList(new RequestUrl[]{ getRepositoryBase().URL_USER_HOME,
                                         getRepositoryBase().URL_USER_SETTINGS,
                                         getRepositoryBase().URL_USER_CART,
                                         getRepositoryBase()
-                                            .URL_USER_MONITORS };
+                                                                                  .URL_USER_MONITORS });
 
 
     /** _more_ */
-    protected RequestUrl[] anonUserUrls = { getRepositoryBase()
-                                              .URL_USER_CART };
+    protected List<RequestUrl> anonUserUrls = RepositoryUtil.toList(new RequestUrl[]{ getRepositoryBase()
+                                                                                      .URL_USER_CART });
 
 
 

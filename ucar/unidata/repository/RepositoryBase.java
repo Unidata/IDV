@@ -122,15 +122,15 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                    "/search/do", "Search");
 
     /** _more_ */
-    public final RequestUrl[] searchUrls = { URL_SEARCH_TEXTFORM,
+    public final List<RequestUrl> searchUrls = RepositoryUtil.toList(new RequestUrl[]{ URL_SEARCH_TEXTFORM,
                                              URL_SEARCH_FORM,
                                              URL_SEARCH_BROWSE,
-                                             URL_SEARCH_ASSOCIATIONS_FORM };
+                                                                                       URL_SEARCH_ASSOCIATIONS_FORM });
 
     /** _more_ */
-    public final RequestUrl[] remoteSearchUrls = { URL_SEARCH_TEXTFORM,
+    public final List<RequestUrl> remoteSearchUrls = RepositoryUtil.toList(new RequestUrl[]{ URL_SEARCH_TEXTFORM,
             URL_SEARCH_FORM, URL_SEARCH_BROWSE,
-            URL_SEARCH_ASSOCIATIONS_FORM };
+                                                                                             URL_SEARCH_ASSOCIATIONS_FORM });
 
     /** _more_ */
     public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
