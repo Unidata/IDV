@@ -878,9 +878,7 @@ public class PointObFactory {
             }
             int    numDouble = realTypes.size();
             int    numString = textTypes.size();
-            Real[] protos    = (numDouble > 0)
-                               ? new Real[numDouble]
-                               : null;
+            Real[] protos    = null;
             Unit[] realUnits = null;
 
             for (int i = 0; i < length; i++) {
@@ -897,23 +895,22 @@ public class PointObFactory {
                 Tuple rest = null;
 
                 // now make data
-
                 if (allReals) {
                     double[] obValues   = ((RealTuple) ob).getValues();
                     double[] realValues = new double[numNotRequired];
                     for (int j = 0; j < numNotRequired; j++) {
                         realValues[j] = obValues[notReqIndices[j]];
                     }
-                    if (realUnits == null) {  // only do this once
-                        protos = ob.getRealComponents();
-                        if (ob instanceof DoubleTuple) {
-                            realUnits = ((DoubleTuple) ob).getTupleUnits();
-                        } else {
-                            realUnits = new Unit[protos.length];
-                            for (int r = 0; r < protos.length; r++) {
-                                realUnits[r] = protos[r].getUnit();
-                            }
+                    if (protos == null) {
+                        protos    = new Real[numDouble];
+                        realUnits = new Unit[numDouble];
+                        for (int j = 0; j < numNotRequired; j++) {
+                            protos[j] =
+                                (Real) ob.getComponent(notReqIndices[j]);
+                            realUnits[j] = protos[j].getUnit();
                         }
+                        Misc.printArray("protos", protos);
+                        Misc.printArray("regular tuple", realUnits);
                     }
 
                     rest = new DoubleTuple((RealTupleType) tupleType, protos,
@@ -2187,7 +2184,7 @@ public class PointObFactory {
             PointOb po     = (PointOb) pointObs.getSample(i);
             Tuple   obData = (Tuple) po.getData();
             Real    val    = (Real) obData.getComponent(typeIndex);
-            //System.out.println("val["+i+"] ="+ val);
+            //if (i == 0) System.out.println("val["+i+"] ="+ val.toValueString() + ">"+val.getUnit()+"<");
             double obVal = val.getValue(type.getDefaultUnit());
             if (Double.isNaN(obVal)) {
                 numMissing++;
