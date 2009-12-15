@@ -97,6 +97,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** flag for coloring one param by another */
     private boolean coloredByAnother = false;
 
+    /** flag for autoscale */
+    private boolean autoScale = false;
+
     /** flag for orientation of barbs (north or south) */
     private int barborientation;
 
@@ -326,6 +329,22 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     }
 
     /**
+     * Set the autoscale property
+     *
+     * @param auto  the autoscale property
+     */
+    public void setAutoScale(boolean auto) {
+
+        if ((flowControl != null) && (auto != autoScale)) {
+            try {
+                flowControl.setAutoScale(auto);
+            } catch (VisADException e) {}
+        }
+
+        autoScale = auto;
+    }
+
+    /**
      * Sets the set of ScalarMap-s of this instance.  The ScalarMap-s of
      * this instance will be added to the set before the SCALAR_MAP_SET
      * property is set.  This method fires a PropertyChangeEvent for
@@ -377,8 +396,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public int getSpeedTypeIndex() {
         int index = -1;
-        if (!isCartesianWind() && flowYMap != null && flowRealTupleType != null){
-            RealType speedType = (RealType) flowYMap.getScalar();
+        if ( !isCartesianWind() && (flowYMap != null)
+                && (flowRealTupleType != null)) {
+            RealType   speedType = (RealType) flowYMap.getScalar();
             RealType[] realTypes = flowRealTupleType.getRealComponents();
             for (int i = 0; i < realTypes.length; i++) {
                 if (speedType.equals(realTypes[i])) {
@@ -386,7 +406,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 }
             }
         }
-           
+
         return index;
     }
 
@@ -489,7 +509,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                         || (id == event.CONTROL_REPLACED)) {
                     flowControl = (FlowControl) flowYMap.getControl();
                     flowControl.enableStreamlines(isStreamlines);
-                    // flowControl.setAutoScale(true);
+                    flowControl.setAutoScale(autoScale);
                     flowControl.setStreamlineDensity(streamlineDensity);
                     flowControl.setAdjustFlowToEarth(adjustFlow);
                     flowControl.setBarbOrientation(barborientation);
@@ -551,11 +571,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 if (get3DFlow()) {
                     flowZMap.setRange(flowMinValue, flowMaxValue);
                 }
-            } /* else if (!isCartesianWind() && (flowYMap != null)) {
-                flowXMap.setRange(0, 360);
-                flowYMap.setRange(flowMinValue, flowMaxValue);
-            }
-            */
+            }  /* else if (!isCartesianWind() && (flowYMap != null)) {
+                 flowXMap.setRange(0, 360);
+                 flowYMap.setRange(flowMinValue, flowMaxValue);
+             }
+             */
         }
     }
 
