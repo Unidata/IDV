@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -582,6 +583,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                              SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(new Boolean(getStreamlines()), "streamlines",
                              "Show Streamlines", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getAutoSize()), "autoSize",
+                             "Autosize", SETTINGS_GROUP_DISPLAY);
 
 
 
