@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -42,6 +43,7 @@ import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
 
 import visad.*;
+
 import visad.georef.EarthLocation;
 
 import java.awt.*;
@@ -103,6 +105,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** flag for wind barbs */
     boolean isThreeComponents = false;
 
+    /** autoscale */
+    boolean autoSize = false;
+
     /** a scale factor */
     protected final float scaleFactor = 0.02f;
 
@@ -118,6 +123,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** Range for flow scale */
     private Range flowRange;
 
+    /** the range dialog */
     RangeDialog rangeDialog;
 
     /**
@@ -170,6 +176,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
+        planDisplay.setAutoScale(autoSize);
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -222,8 +229,17 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 "Size");
         addRemovable(barbSizeWidget);
 
+        JCheckBox autoSizeCbx = new JCheckBox("Autosize", autoSize);
+        autoSizeCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                autoSize = ((JCheckBox) e.getSource()).isSelected();
+                getGridDisplay().setAutoScale(autoSize);
+            }
+        });
+
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
-                                      barbSizeWidget.getContents(false));
+                                      barbSizeWidget.getContents(false),
+                                      autoSizeCbx);
         if ( !getIsThreeComponents()) {
             streamlinesBtn = new JRadioButton("Streamlines:", isStreamlines);
             vectorBtn      = new JRadioButton((isWindBarbs
@@ -304,7 +320,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     GuiUtils.rLabel("Range:"), doMakeFlowRangeComponent()));
         }
 
-
         enableBarbSizeBox();
         super.getControlWidgets(controlWidgets);
     }
@@ -346,11 +361,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         editButton.setToolTipText("Range used for scaling the vector size");
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                if(rangeDialog == null){
-                    rangeDialog  =
-                        new RangeDialog(FlowPlanViewControl.this, flowRange,
-                                        "Set the range of data for sizing vectors",
-                                        "setFlowRange");
+                if (rangeDialog == null) {
+                    rangeDialog = new RangeDialog(FlowPlanViewControl.this,
+                            flowRange,
+                            "Set the range of data for sizing vectors",
+                            "setFlowRange");
                     addRemovable(rangeDialog);
                 }
                 rangeDialog.showDialog();
@@ -572,6 +587,29 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     }
 
+    /**
+     * Get the autosize property
+     * Used by XML persistence
+     *
+     * @return  the autosize for this control
+     */
+    public boolean getAutoSize() {
+        return autoSize;
+    }
+
+    /**
+     * Set the autosize property
+     * Used by XML persistence
+     *
+     * @param auto   new autosize value
+     */
+    public void setAutoSize(boolean auto) {
+        autoSize = auto;
+        if (getGridDisplay() != null) {
+            getGridDisplay().setAutoScale(autoSize);
+        }
+    }
+
 
 
     /**
@@ -752,19 +790,19 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 Data    data   = getGridDisplay().getData();
                 if (data != null) {
                     ranges = GridUtil.getMinMax((FieldImpl) data);
-                    double max      = Double.NEGATIVE_INFINITY;
-                    double min      = Double.POSITIVE_INFINITY;
-                    int  startComp = 0;
-                    int    numComps = getIsThreeComponents()
-                                      ? 3
-                                      : 2;
+                    double  max         = Double.NEGATIVE_INFINITY;
+                    double  min         = Double.POSITIVE_INFINITY;
+                    int     startComp   = 0;
+                    int     numComps    = getIsThreeComponents()
+                                          ? 3
+                                          : 2;
                     boolean isCartesian = getGridDisplay().isCartesianWind();
                     //System.out.println("control thinks cartesian is " + isCartesian);
-                    if (!isCartesian) {
+                    if ( !isCartesian) {
                         int speedIndex = getGridDisplay().getSpeedTypeIndex();
                         if (speedIndex != -1) {
                             startComp = speedIndex;
-                            numComps = startComp + 1;
+                            numComps  = startComp + 1;
                         }
                     }
                     for (int i = startComp; i < numComps; i++) {
@@ -772,7 +810,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                         max = Math.max(compRange.getMax(), max);
                         min = Math.min(compRange.getMin(), min);
                     }
-                    if ( !Double.isInfinite(max) && !Double.isInfinite(min) && isCartesian) {
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)
+                            && isCartesian) {
                         max = Math.max(max, -min);
                         min = -max;
                     }
@@ -804,6 +843,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param el  earth location
      * @param animationValue   the animation value
      * @param animationStep  the animation step
+     * @param samples the list of sample readouts
      *
      * @return  the list of readout data
      *
@@ -819,12 +859,14 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         List result = new ArrayList();
         RealTuple r = GridUtil.sampleToRealTuple(
-                     currentSlice, el, animationValue,
-                     getSamplingModeValue(
-                         getObjectStore().get(
-                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
-        if(r!=null) {
-            ReadoutInfo readoutInfo =  new ReadoutInfo(this, r, el, animationValue); 
+                          currentSlice, el, animationValue,
+                          getSamplingModeValue(
+                              getObjectStore().get(
+                                  PREF_SAMPLING_MODE,
+                                  DEFAULT_SAMPLING_MODE)));
+        if (r != null) {
+            ReadoutInfo readoutInfo = new ReadoutInfo(this, r, el,
+                                          animationValue);
             readoutInfo.setUnit(getDisplayUnit());
             readoutInfo.setRange(getRange());
             samples.add(readoutInfo);
@@ -844,7 +886,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /**
      * Format a real for the cursor readout
      *
-     * @param r  the realtuple
+     * @param rt the realtuple
      *
      * @return  the formatted string
      *
@@ -861,7 +903,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             result = "missing";
         } else {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i<rt.getDimension(); i++) {
+            for (int i = 0; i < rt.getDimension(); i++) {
                 Real r = (Real) rt.getComponent(i);
                 if (displayUnit != null) {
                     value = r.getValue(displayUnit);
@@ -871,7 +913,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     unit  = r.getUnit();
                 }
                 builder.append(Misc.format(value));
-                if (i != rt.getDimension()-1) builder.append("/");
+                if (i != rt.getDimension() - 1) {
+                    builder.append("/");
+                }
             }
             builder.append("[");
             builder.append(unit);
