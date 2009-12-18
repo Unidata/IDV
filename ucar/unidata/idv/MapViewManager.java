@@ -919,6 +919,7 @@ public class MapViewManager extends NavigatedViewManager {
                     Trace.call2("checkDefaultMap-2");
                 } else {
                     XmlResourceCollection xrc = getResourceManager().getMapResources(getUseGlobeDisplay());
+                    //                    XmlResourceCollection xrc = getResourceManager().getMapResources(false);
                     mapInfo = new MapInfo(xrc, false, true);
                 }
 

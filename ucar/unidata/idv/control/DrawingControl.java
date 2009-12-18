@@ -913,6 +913,7 @@ public class DrawingControl extends DisplayControlImpl {
 
     }
 
+    private int autoScrollCnt=0;
 
     /**
      * Listen for DisplayEvents
@@ -1059,6 +1060,18 @@ public class DrawingControl extends DisplayControlImpl {
             } else if (id == DisplayEvent.MOUSE_DRAGGED) {
                 if ( !isLeftButtonDown(event)) {
                     return;
+                }
+
+                int x = (int)event.getX();
+                int y = (int)event.getY();
+                Rectangle bounds =getScreenBounds();
+                int pad = 5;
+                if(x>bounds.width+pad || y>bounds.height+pad || x<-pad || y<-pad) {
+                    if(autoScrollCnt++>10) {
+                        EarthLocation el = screenToEarth(x,y);
+                        getNavigatedDisplay().center(el, false);
+                        autoScrollCnt = 0;
+                    }
                 }
 
                 if (currentGlyph == null) {

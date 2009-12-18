@@ -198,7 +198,9 @@ public class PipPanel extends NavigatedMapPanel {
      * @throws VisADException On badness
      */
     public void resetDrawBounds() throws RemoteException, VisADException {
+        if(mapViewManager==null) return;
         NavigatedDisplay nav = (NavigatedDisplay) mapViewManager.getMaster();
+        if(nav==null) return;
         List points = new ArrayList();
         points.add(
             getPoint(

@@ -42,6 +42,7 @@ import ucar.unidata.idv.control.WMSControl;
 
 import ucar.unidata.ui.XmlTree;
 
+import ucar.unidata.util.WmsUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -79,80 +80,8 @@ import javax.swing.event.*;
 
 public class WmsHandler extends XmlHandler {
 
-    /** XML tag name for the &quot;Abstract&quot; tag */
-    public static final String TAG_ABSTRACT = "Abstract";
 
 
-    /** XML tag name for the &quot;Dimension&quot; tag */
-    public static final String TAG_DIMENSION = "Dimension";
-
-    /** XML tag name for the &quot;Layer&quot; tag */
-    public static final String TAG_LAYER = "Layer";
-
-    /** xml tag name */
-    public static final String TAG_LATLONBOUNDINGBOX = "LatLonBoundingBox";
-
-    /** xml tag name */
-    public static final String TAG_BOUNDINGBOX = "BoundingBox";
-
-    /** xml tag name */
-    public static final String TAG_SRS = "SRS";
-
-    /** xml tag name */
-    public static final String TAG_CRS = "CRS";
-
-    /** XML tag name for the &quot;Title&quot; tag */
-    public static final String TAG_TITLE = "Title";
-
-    /** XML tag name for the &quot;Style&quot; tag */
-    public static final String TAG_STYLE = "Style";
-
-    /** XML tag name for the &quot;Capability&quot; tag */
-    public static final String TAG_CAPABILITY = "Capability";
-
-    /**
-     * This is one of the root document xml tags that I have seen
-     * for a WMS cababilities document
-     */
-    public static final String TAG_WMS1 = "WMT_MS_Capabilities";
-
-    /**
-     * This is the ther root document xml tags that I have seen
-     * for a WMS cababilities document
-     */
-    public static final String TAG_WMS2 = "WMS_Capabilities";
-
-    /** xml attribute name */
-    public static final String ATTR_FIXEDWIDTH = "fixedWidth";
-
-    /** xml attribute name */
-    public static final String ATTR_VERSION = "version";
-
-    /** xml attribute name */
-    public static final String ATTR_FIXEDHEIGHT = "fixedHeight";
-
-    /** xml attribute name */
-    public static final String ATTR_NAME = "name";
-
-
-    /** xml attribute name */
-    public static final String ATTR_NOSUBSETS = "noSubsets";
-
-    /** xml attribute name */
-    public static final String ATTR_MINX = "minx";
-
-    /** xml attribute name */
-    public static final String ATTR_MAXX = "maxx";
-
-    /** xml attribute name */
-    public static final String ATTR_MINY = "miny";
-
-    /** xml attribute name */
-    public static final String ATTR_MAXY = "maxy";
-
-
-    /** xml attribute value */
-    public static final String VALUE_TIME = "time";
 
     /** The map panel in the GUI */
     private NavigatedMapPanel mapPanel;
@@ -180,7 +109,7 @@ public class WmsHandler extends XmlHandler {
      */
     public WmsHandler(XmlChooser chooser, Element root, String path) {
         super(chooser, root, path);
-        String version = XmlUtil.getAttribute(root, ATTR_VERSION);
+        String version = XmlUtil.getAttribute(root, WmsUtil.ATTR_VERSION);
         List   tokens  = StringUtil.split(version, ".");
         if (tokens.size() > 0) {
             versionMajor = new Integer((String) tokens.get(0)).intValue();
@@ -215,11 +144,11 @@ public class WmsHandler extends XmlHandler {
                 //              System.err.println ("bbox:" + XmlUtil.toString(bboxNode));
                 ProjectionRect rect =
                     new ProjectionRect(XmlUtil.getAttribute(bboxNode,
-                        ATTR_MINX, -180.0), XmlUtil.getAttribute(bboxNode,
-                            ATTR_MINY, -90.0), XmlUtil.getAttribute(bboxNode,
-                                ATTR_MAXX,
+                        WmsUtil.ATTR_MINX, -180.0), XmlUtil.getAttribute(bboxNode,
+                            WmsUtil.ATTR_MINY, -90.0), XmlUtil.getAttribute(bboxNode,
+                                WmsUtil.ATTR_MAXX,
                                 180.0), XmlUtil.getAttribute(bboxNode,
-                                    ATTR_MAXY, 90.0));
+                                    WmsUtil.ATTR_MAXY, 90.0));
 
                 mapPanel.setDrawBounds(getUpperLeft(rect),
                                        getLowerRight(rect));
@@ -290,22 +219,22 @@ public class WmsHandler extends XmlHandler {
 
             protected boolean shouldRecurse(Element xmlNode) {
                 String tagName = xmlNode.getTagName();
-                if ( !tagName.equals(TAG_LAYER)) {
+                if ( !tagName.equals(WmsUtil.TAG_LAYER)) {
                     return super.shouldRecurse(xmlNode);
                 }
-                List styleChildren = XmlUtil.findChildren(xmlNode, TAG_STYLE);
+                List styleChildren = XmlUtil.findChildren(xmlNode, WmsUtil.TAG_STYLE);
                 return (styleChildren.size() == 0)
                        || (styleChildren.size() > 1);
             }
         };
         tree.setMultipleSelect(true);
-        tree.addTagsToProcess(Misc.newList(TAG_LAYER, TAG_STYLE));
-        tree.addTagsToNotProcessButRecurse(Misc.newList(TAG_CAPABILITY,
-                TAG_WMS1, TAG_WMS2));
-        tree.defineLabelChild(TAG_LAYER, TAG_TITLE);
-        tree.defineLabelChild(TAG_STYLE, TAG_TITLE);
-        tree.defineTooltipChild(TAG_LAYER, TAG_ABSTRACT);
-        tree.defineTooltipChild(TAG_STYLE, TAG_ABSTRACT);
+        tree.addTagsToProcess(Misc.newList(WmsUtil.TAG_LAYER, WmsUtil.TAG_STYLE));
+        tree.addTagsToNotProcessButRecurse(Misc.newList(WmsUtil.TAG_CAPABILITY,
+                WmsUtil.TAG_WMS1, WmsUtil.TAG_WMS2));
+        tree.defineLabelChild(WmsUtil.TAG_LAYER, WmsUtil.TAG_TITLE);
+        tree.defineLabelChild(WmsUtil.TAG_STYLE, WmsUtil.TAG_TITLE);
+        tree.defineTooltipChild(WmsUtil.TAG_LAYER, WmsUtil.TAG_ABSTRACT);
+        tree.defineTooltipChild(WmsUtil.TAG_STYLE, WmsUtil.TAG_ABSTRACT);
 
 
         JComponent left = GuiUtils.topCenter(mergeLayerCbx,
@@ -341,7 +270,7 @@ public class WmsHandler extends XmlHandler {
      * @return Is the node loadable
      */
     private boolean isLoadable(Element node) {
-        if (node.getTagName().equals(TAG_STYLE)) {
+        if (node.getTagName().equals(WmsUtil.TAG_STYLE)) {
             return true;
         }
         //TODO: For now just return true 
@@ -379,10 +308,10 @@ public class WmsHandler extends XmlHandler {
      */
     private Element findBbox(Element node) {
         Element bboxNode = XmlUtil.findChildRecurseUp(node,
-                               TAG_LATLONBOUNDINGBOX);
+                               WmsUtil.TAG_LATLONBOUNDINGBOX);
 
         if (bboxNode == null) {
-            bboxNode = XmlUtil.findChildRecurseUp(node, TAG_BOUNDINGBOX);
+            bboxNode = XmlUtil.findChildRecurseUp(node, WmsUtil.TAG_BOUNDINGBOX);
 
 
         }
@@ -526,11 +455,11 @@ public class WmsHandler extends XmlHandler {
             //      System.err.println ("style:" + XmlUtil.toString(styleNode));
             Element layerNode = selectedNode;
             Element styleNode;
-            if (layerNode.getTagName().equals(TAG_STYLE)) {
+            if (layerNode.getTagName().equals(WmsUtil.TAG_STYLE)) {
                 styleNode = layerNode;
                 layerNode = (Element) layerNode.getParentNode();
             } else {
-                styleNode = XmlUtil.findChild(layerNode, TAG_STYLE);
+                styleNode = XmlUtil.findChild(layerNode, WmsUtil.TAG_STYLE);
             }
             if (styleNode == null) {
                 styleNode = layerNode;
@@ -546,7 +475,7 @@ public class WmsHandler extends XmlHandler {
 
             //<Dimension name="time" units="ISO8601" default="2003-06-22T00:56Z">2003-06-20T02:44Z/2003-06-22T00:56Z/PT1H39M</Dimension>
             Element timeDimension = XmlUtil.findElement(styleNode,
-                                        TAG_DIMENSION, ATTR_NAME, VALUE_TIME);
+                                        WmsUtil.TAG_DIMENSION, WmsUtil.ATTR_NAME, WmsUtil.VALUE_TIME);
             if (timeDimension != null) {
                 String timeText = XmlUtil.getChildText(timeDimension);
                 timeList = StringUtil.split(timeText, "/");
@@ -573,7 +502,7 @@ public class WmsHandler extends XmlHandler {
             String style  = XmlUtil.getChildText(styleNameNode);
             String layer  = XmlUtil.getChildText(nameNode);
 
-            List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode, TAG_SRS);
+            List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode, WmsUtil.TAG_SRS);
             for (int srsIdx = 0;
                     (srsIdx < srsNodes.size()) && (srsString == null);
                     srsIdx++) {
@@ -599,7 +528,7 @@ public class WmsHandler extends XmlHandler {
 
             if (srsString == null) {
                 List crsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
-                                    TAG_CRS);
+                                    WmsUtil.TAG_CRS);
                 for (int crsIdx = 0;
                         (crsIdx < crsNodes.size()) && (srsString == null);
                         crsIdx++) {
@@ -633,16 +562,16 @@ public class WmsHandler extends XmlHandler {
                 error = "No bbox node found";
                 break;
             }
-            minx       = XmlUtil.getAttribute(bboxNode, ATTR_MINX, minx);
-            maxx       = XmlUtil.getAttribute(bboxNode, ATTR_MAXX, maxx);
-            miny       = XmlUtil.getAttribute(bboxNode, ATTR_MINY, miny);
-            maxy       = XmlUtil.getAttribute(bboxNode, ATTR_MAXY, maxy);
+            minx       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINX, minx);
+            maxx       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXX, maxx);
+            miny       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINY, miny);
+            maxy       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXY, maxy);
 
-            fixedWidth = XmlUtil.getAttribute(layerNode, ATTR_FIXEDWIDTH, -1);
-            fixedHeight = XmlUtil.getAttribute(layerNode, ATTR_FIXEDHEIGHT,
+            fixedWidth = XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_FIXEDWIDTH, -1);
+            fixedHeight = XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_FIXEDHEIGHT,
                     -1);
 
-            allowSubsets = (XmlUtil.getAttribute(layerNode, ATTR_NOSUBSETS,
+            allowSubsets = (XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_NOSUBSETS,
                     0) != 1);
 
 
@@ -656,7 +585,7 @@ public class WmsHandler extends XmlHandler {
                         new GeoLocationInfo(miny, maxx, maxy, minx));
 
                 Element abstractNode = XmlUtil.getElement(layerNode,
-                                           TAG_ABSTRACT);
+                                           WmsUtil.TAG_ABSTRACT);
                 if (abstractNode != null) {
                     String text = XmlUtil.getChildText(abstractNode);
                     wmsSelection.setDescription(text);

@@ -35,6 +35,7 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
+import ucar.unidata.util.WmsUtil;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.FileManager;
 
@@ -451,8 +452,8 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         setSelected(path);
         XmlHandler handler = null;
         String     tagName = xmlRoot.getTagName();
-        if (tagName.equals(WmsHandler.TAG_WMS1)
-                || tagName.equals(WmsHandler.TAG_WMS2)) {
+        if (tagName.equals(WmsUtil.TAG_WMS1)
+                || tagName.equals(WmsUtil.TAG_WMS2)) {
             handler = new WmsHandler(this, xmlRoot, path);
         } else if (tagName.equals(TAG_ERROR)) {
             final String error = XmlUtil.getAttribute(xmlRoot, "label",

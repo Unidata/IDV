@@ -1803,6 +1803,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                                            "addPointWithoutTime"));
         editMenu.add(GuiUtils.makeMenuItem("Add Point with Time", this,
                                            "addPointWithTime"));
+        editMenu.add(GuiUtils.makeMenuItem("Fly along a latitude", this,
+                                           "flyAlongLatitude"));
+        editMenu.add(GuiUtils.makeMenuItem("Fly along a longitude", this,
+                                           "flyAlongLongitude"));
 
         int cnt = pointsToUse.size();
         if (cnt > 0) {
@@ -2326,6 +2330,61 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public FlythroughPoint addPointWithoutTime() {
         return addPoint(false);
+    }
+
+    public void flyAlongLatitude() throws VisADException, RemoteException  {
+        double value=0;
+        String s = "0.0";
+        while(true) {
+            s = GuiUtils.getInput("Please enter a latitude between -90 and 90","Latitude: ",
+                                     s);
+            if(s==null) return;
+            try {
+                value = Misc.parseDouble(s.trim());
+                break;
+            } catch(Exception exc) {
+                GuiUtils.showOkDialog(null,"Oops", new JLabel("Please enter a value between -90 and 90"),null);
+            }
+        }
+
+        List<FlythroughPoint> pts =new ArrayList<FlythroughPoint>();
+        for(double other=0;other<360;other++) {
+                EarthLocationTuple pt =
+                    new EarthLocationTuple(value,other, 0);
+                pts.add(new FlythroughPoint(pt));
+        }
+        flythrough(pts);
+    }
+
+    public void flyAlongLongitude() throws VisADException, RemoteException  {
+        double value=0;
+        String s = "0.0";
+        while(true) {
+            s = GuiUtils.getInput("Please enter a longitude between -180 and 180","Longitude: ",
+                                     s);
+            if(s==null) return;
+            try {
+                value = Misc.parseDouble(s.trim());
+                break;
+            } catch(Exception exc) {
+                GuiUtils.showOkDialog(null,"Oops", new JLabel("Please enter a value between -90 and 90"),null);
+            }
+        }
+
+        List<FlythroughPoint> pts =new ArrayList<FlythroughPoint>();
+        for(double other=90;other>=-90;other--) {
+                EarthLocationTuple pt =
+                    new EarthLocationTuple(other, value, 0);
+                pts.add(new FlythroughPoint(pt));
+        }
+        /*
+        for(double other=-89;other<=90;other++) {
+                EarthLocationTuple pt =
+                    new EarthLocationTuple(other, value, 0);
+                pts.add(new FlythroughPoint(pt));
+        }
+        */
+        flythrough(pts);
     }
 
     /**
