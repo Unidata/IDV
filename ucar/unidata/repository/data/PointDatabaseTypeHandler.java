@@ -178,6 +178,8 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     /** _more_ */
     public static final String FORMAT_TIMESERIES_IMAGE = "timeseries_image";
 
+    public static final String FORMAT_TIMESERIES_DATA = "timeseries_data";
+
     /** _more_ */
     public static final String FORMAT_SCATTERPLOT = "scatterplot";
 
@@ -189,6 +191,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
     /** _more_ */
     public static final String FORMAT_CSV = "csv";
+
 
     /** _more_ */
     public static final String FORMAT_CHART = "chart";
@@ -335,6 +338,9 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
     /** _more_ */
     private List hours;
+
+    private String chartTemplate;
+
 
     /** _more_ */
     private Hashtable<String, List<PointDataMetadata>> metadataCache =
@@ -931,12 +937,30 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         if (format.equals(FORMAT_TIMESERIES)) {
             StringBuffer sb = new StringBuffer();
             getHtmlHeader(request, sb, entry, null);
+            /*
             request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_IMAGE);
             String redirectUrl = request.getRequestPath() + "/" + baseName
                                  + ".png" + "?"
                                  + request.getUrlArgs(null,
                                      Misc.newHashtable(OP_LT, OP_LT));
             sb.append(HtmlUtil.img(redirectUrl));
+            */
+            if(chartTemplate==null) {
+                chartTemplate = getRepository().getResource("/ucar/unidata/repository/resources/chart/amline.html");
+            chartTemplate  =  chartTemplate.replace("${urlroot}", getRepository().getUrlBase());
+            chartTemplate  =  chartTemplate.replace("${urlroot}", getRepository().getUrlBase());
+            chartTemplate  =  chartTemplate.replace("${urlroot}", getRepository().getUrlBase());
+            }
+
+            String html = chartTemplate;
+            request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_DATA);
+            String dataUrl = request.getRequestPath() + "/" + baseName
+                                 + ".xml" + "?"
+                                 + request.getUrlArgs(null,
+                                     Misc.newHashtable(OP_LT, OP_LT));
+            html =  html.replace("${dataurl}", dataUrl);
+
+            sb.append(html);
             return new Result("Search Results", sb);
         }
 
@@ -1206,12 +1230,15 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             ensureMinimalParameters(columnsToUse, metadata);
             return makeSearchResultsCsv(request, entry, columnsToUse,
                                         pointDataList, format);
-
         } else if (format.equals(FORMAT_CHART)) {
             return makeSearchResultsChart(request, entry, columnsToUse,
                                           pointDataList);
         } else if (format.equals(FORMAT_TIMESERIES_IMAGE)) {
             return makeSearchResultsTimeSeries(request, entry, columnsToUse,
+                    pointDataList);
+
+        } else if (format.equals(FORMAT_TIMESERIES_DATA)) {
+            return makeSearchResultsTimeSeriesXml(request, entry, columnsToUse,
                     pointDataList);
 
         } else if (format.equals(FORMAT_SCATTERPLOT_IMAGE)) {
@@ -1844,6 +1871,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
 
 
+
     /**
      * Class MyTimeSeries _more_
      *
@@ -2004,6 +2032,40 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     }
 
 
+
+
+
+    private Result makeSearchResultsTimeSeriesXml(Request request, Entry entry,
+                                        List<PointDataMetadata> columnsToUse,
+                                        List<PointData> list)
+            throws Exception {
+        StringBuffer sb = getXml(columnsToUse, list);
+        return new Result("", sb, "text/csv");
+    }
+
+
+    /****
+    <?xml version="1.0" encoding="UTF-8"?>
+<chart>
+  <!--<message><![CDATA[You can broadcast any message to chart from data XML file]]></message> -->
+	<series>
+		<value xid="0">1949</value>
+		<value xid="1">1950</value>
+	</series>
+	<graphs>
+		<graph gid="1">
+			<value xid="0">2.54</value>
+			<value xid="1">2.51</value>
+		</graph>
+		<graph gid="2">
+			<value xid="0">20.21</value>
+			<value xid="1">19.73</value>
+		</graph>
+
+	</graphs>
+</chart>
+    *****/
+
     /**
      * _more_
      *
@@ -2018,6 +2080,91 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     private StringBuffer getCsv(List<PointDataMetadata> columnsToUse,
                                 List<PointData> list, String format)
             throws Exception {
+        boolean          addMetadata = format.equals(FORMAT_CSVIDV);
+        boolean          addHeader   = format.equals(FORMAT_CSVHEADER);
+        boolean          xls         = format.equals(FORMAT_XLS);
+
+        String           dateFormat  = "yyyy/MM/dd HH:mm:ss Z";
+        SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        StringBuffer sb    = new StringBuffer();
+        String       comma = ", ";
+        List         rows  = new ArrayList();
+
+        if (addHeader) {
+            int cnt = 0;
+            for (PointDataMetadata pdm : columnsToUse) {
+                if (cnt != 0) {
+                    sb.append(",");
+                }
+                sb.append(pdm.shortName);
+                sb.append(pdm.formatUnit());
+                cnt++;
+            }
+            sb.append("\n");
+        }
+
+        if (addMetadata) {
+            StringBuffer h1 = new StringBuffer();
+            StringBuffer h2 = new StringBuffer();
+            h1.append("(index) -> (");
+            int cnt = 0;
+            for (PointDataMetadata pdm : columnsToUse) {
+                if (cnt != 0) {
+                    h1.append(",");
+                    h2.append(",");
+                }
+                h1.append(pdm.varName());
+                h2.append(pdm.varName());
+                if (pdm.isString()) {
+                    h1.append("(Text)");
+                    h2.append("(Text)");
+                } else {
+                    h2.append("[");
+                    if ((pdm.unit != null) && (pdm.unit.length() > 0)) {
+                        h2.append(" unit=\"" + pdm.unit + "\" ");
+                    }
+                    if (pdm.varType.equals(pdm.TYPE_DATE)) {
+                        h2.append(" fmt=\"" + dateFormat + "\" ");
+                    }
+                    h2.append("]");
+                }
+                cnt++;
+            }
+            h1.append(")");
+            sb.append(h1);
+            sb.append("\n");
+            sb.append(h2);
+            sb.append("\n");
+        }
+
+
+        for (PointData pointData : list) {
+            boolean didOne = false;
+            for (PointDataMetadata pdm : columnsToUse) {
+                Object value = pointData.getValue(pdm);
+                if (didOne) {
+                    sb.append(comma);
+                }
+                didOne = true;
+                if (pdm.isDate()) {
+                    sb.append(sdf.format((Date) value));
+                } else {
+                    sb.append(value);
+                }
+            }
+            sb.append("\n");
+        }
+        return sb;
+    }
+
+
+
+
+    private StringBuffer getXml(List<PointDataMetadata> columnsToUse,
+                                List<PointData> list)
+            throws Exception {
+        String format = "";
         boolean          addMetadata = format.equals(FORMAT_CSVIDV);
         boolean          addHeader   = format.equals(FORMAT_CSVHEADER);
         boolean          xls         = format.equals(FORMAT_XLS);

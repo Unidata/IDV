@@ -1,0 +1,18 @@
+
+  <script type="text/javascript" src="${urlroot}/chart/swfobject.js"></script>
+
+  <script type="text/javascript" src="amline/swfobject.js"></script>
+	<div id="flashcontent">
+		<strong>You need to upgrade your Flash Player</strong>
+	</div>
+	<script type="text/javascript">
+		// <![CDATA[		
+		var so = new SWFObject("${urlroot}/chart/amline.swf", "amline", "800", "500", "8", "#FFFFFF");
+		so.addVariable("path", "${urlroot}/");
+		so.addVariable("settings_file", encodeURIComponent("${urlroot}/chart/amline_settings.xml")); 
+//         	so.addVariable("additional_chart_settings", encodeURIComponent(settings));
+		so.addVariable("data_file", encodeURIComponent("${dataurl}"));
+		so.write("flashcontent");
+		// ]]>
+	</script>
+<!-- end of amline script -->

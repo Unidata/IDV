@@ -822,31 +822,7 @@ public class HtmlOutputHandler extends OutputHandler {
             List<Entry> allEntries = new ArrayList<Entry>();
             allEntries.addAll(subGroups);
             allEntries.addAll(entries);
-
-            if(false) {
-            if (subGroups.size() > 0) {
-                StringBuffer groupsSB = new StringBuffer();
-                String link = getEntriesList(request, groupsSB, subGroups,
-                                             allEntries, true,
-                                             (entries.size() == 0), true,
-                                             group.isDummy(),
-                                             group.isDummy());
-                sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
-                        groupsSB.toString(), true));
-            }
-
-            if (entries.size() > 0) {
-                StringBuffer entriesSB = new StringBuffer();
-                String link = getEntriesList(request, entriesSB, entries,
-                                             allEntries,
-                                             (subGroups.size() == 0), true,
-                                             true, group.isDummy(),
-                                             group.isDummy());
-                sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                        entriesSB.toString(), true));
-            }
-
-            } else {
+            if(allEntries.size()>0) {
                 StringBuffer groupsSB = new StringBuffer();
                 String link = getEntriesList(request, groupsSB, allEntries,
                                              allEntries, true,
