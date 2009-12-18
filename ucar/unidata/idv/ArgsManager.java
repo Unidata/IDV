@@ -654,6 +654,7 @@ public class ArgsManager extends IdvManager {
                + msg(ARG_DATA, "<data source> (Load the data source)")
                + msg(ARG_DISPLAY, "<parameter> <display>")
                + msg("<scriptfile.isl>", "(Run the IDV script in batch mode)")
+               + msg(ARG_SCRIPT, "<jython script file to evaluate>")
                + msg(ARG_B64ISL, "<base64 encoded inline isl> This will run the isl in interactive mode")
                + msg(ARG_ISLINTERACTIVE, "run any isl files in interactive mode")
                + msg(ARG_IMAGE, "<image file name> (create a jpeg image and then exit)")
