@@ -365,9 +365,22 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 innerField = (Field) rel.getSample(i);
                 Set dom = innerField.getDomainSet();
                 if ( !innerDom.equals(dom)) {
+                    //System.out.println("new domain");
+                    innerDom = dom;
+                    rHatField = (doNewCode
+                           ? hatFieldNew(innerDom, 0)
+                           : hatFieldOld(innerDom, 0));
+                    sHatField = (doNewCode
+                               ? hatFieldNew(innerDom, 1)
+                               : hatFieldOld(innerDom, 1));
+
+                    rHats = rHatField.getFloats(false);
+                    sHats = sHatField.getFloats(false);
+                    /*
                     throw new IllegalArgumentException("template="
                             + innerDom.toString() + "; domain="
                             + dom.toString());
+                    */
                 }
                 uvField = new FlatField(innerType, innerDom,
                                         (CoordinateSystem) null,
@@ -459,12 +472,13 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         float[][]       domainSamples = grid.getSamples(false);
 
         refCoords = (hasCS)
-                    ? cs.toReference(grid.getSamples())
-                    : grid.getSamples();
+                    ? cs.toReference(Set.copyFloats(domainSamples))
+                    : domainSamples;
         // If the grid is lat/lon or has an IdentityCoordinateSystem
         // don't do the rotation
         //TODO:  handle rotated lat/lon grids
         if ( !hasCS
+                || refCoords == domainSamples
                 || (Arrays.equals(refCoords[latI], domainSamples[latI])
                     && Arrays.equals(refCoords[lonI], domainSamples[lonI]))) {
             if (index == 0) {
@@ -761,7 +775,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     CartesianHorizontalWind.getEarthVectorType()), grid,
                         (CoordinateSystem[]) null, rel.getRangeSets(), units);
 
-        abs.setSamples(trueWind(rel.getFloats(false), grid), false);
+        abs.setSamples(trueWind(rel.getFloats(), grid), false);
 
         return abs;
     }
@@ -858,51 +872,65 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         float[]         uv1       = new float[2];
         float[]         uv2       = new float[2];
         boolean         hasCS     = cs != null;
+        float[][] domainSamples = grid.getSamples(false);
+        float[][] crefCoords = (hasCS)
+                    ? cs.toReference(Set.copyFloats(domainSamples))
+                    : domainSamples;
+        // If the grid is lat/lon or has an IdentityCoordinateSystem
+        // don't do the rotation
+        //TODO:  handle rotated lat/lon grids
+        if ( !hasCS
+                || crefCoords == domainSamples
+                || (Arrays.equals(crefCoords[latI], domainSamples[latI])
+                    && Arrays.equals(crefCoords[lonI], domainSamples[lonI]))) {
+            us = gridWinds[0];
+            vs = gridWinds[1];
+        } else {
 
-        for (int i = 0; i < neighbors.length; i++) {
+            for (int i = 0; i < neighbors.length; i++) {
 
-            float[][] refCoords = grid.indexToValue(new int[] { i });
-            if (hasCS) {
-                refCoords = cs.toReference(refCoords);
-            }
+                float[][] refCoords = grid.indexToValue(new int[] { i });
+                if (hasCS) {
+                    refCoords = cs.toReference(refCoords);
+                }
+    
+                float[][] neiCoords = grid.indexToValue(neighbors[i]);
+                if (hasCS) {
+                    neiCoords = cs.toReference(neiCoords);
+                }
+    
+                refPt.set(refCoords[latI][0], refCoords[lonI][0]);
+    
+                compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
+                        -180, gridWinds[index][i], bearing, uv1);
+    
+                float d1 = (float) bearing.getDistance();
+    
+                compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
+                        gridWinds[index][i], bearing, uv2);
+    
+                float   d2   = (float) bearing.getDistance();
+                boolean bad1 = Double.isNaN(d1);
+                boolean bad2 = Double.isNaN(d2);
 
-            float[][] neiCoords = grid.indexToValue(neighbors[i]);
-            if (hasCS) {
-                neiCoords = cs.toReference(neiCoords);
-            }
-
-            refPt.set(refCoords[latI][0], refCoords[lonI][0]);
-
-            refPt.set(refCoords[latI][0], refCoords[lonI][0]);
-            compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
-                    -180, gridWinds[index][i], bearing, uv1);
-
-            float d1 = (float) bearing.getDistance();
-
-            compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
-                    gridWinds[index][i], bearing, uv2);
-
-            float   d2   = (float) bearing.getDistance();
-            boolean bad1 = Double.isNaN(d1);
-            boolean bad2 = Double.isNaN(d2);
-
-            if (bad1 && bad2) {
-                us[i] = Float.NaN;
-                vs[i] = Float.NaN;
-            } else {
-                if (bad1) {
-                    us[i] += uv2[0];
-                    vs[i] += uv2[1];
-                } else if (bad2) {
-                    us[i] += uv1[0];
-                    vs[i] += uv1[1];
+                if (bad1 && bad2) {
+                    us[i] = Float.NaN;
+                    vs[i] = Float.NaN;
                 } else {
-                    float tot = d1 + d2;
-                    float c1  = d2 / tot;
-                    float c2  = d1 / tot;
-
-                    us[i] += c1 * uv1[0] + c2 * uv2[0];
-                    vs[i] += c1 * uv1[1] + c2 * uv2[1];
+                    if (bad1) {
+                        us[i] += uv2[0];
+                        vs[i] += uv2[1];
+                    } else if (bad2) {
+                        us[i] += uv1[0];
+                        vs[i] += uv1[1];
+                    } else {
+                        float tot = d1 + d2;
+                        float c1  = d2 / tot;
+                        float c2  = d1 / tot;
+    
+                        us[i] += c1 * uv1[0] + c2 * uv2[0];
+                        vs[i] += c1 * uv1[1] + c2 * uv2[1];
+                    }
                 }
             }
         }
