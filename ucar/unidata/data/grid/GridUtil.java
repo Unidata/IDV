@@ -227,6 +227,8 @@ public class GridUtil {
         return getSpatialDomain(grid, 0);
     }
 
+
+
     /**
      * Get the spatial domain for this grid at the specified time step.
      *
@@ -1414,6 +1416,34 @@ public class GridUtil {
         }
     }
 
+
+
+    /**
+     */
+
+    /*
+    public static FieldImpl interpolate(FieldImpl f1, FieldImpl f2, int steps) 
+        throws VisADException {
+        FieldImpl sample1=null;
+        FieldImpl sample2=null;
+        if (isTimeSequence(f1)) {
+            sample1 = (FieldImpl) f1.getSample(0);
+        } else {
+            sample1 = f1;
+        }
+
+        if (isTimeSequence(f2)) {
+            sample2 = (FieldImpl) f2.getSample(0);
+        } else {
+            sample1 = f2;
+        }
+        FieldImpl result = (FieldImpl)(f1.clone());
+        for (int i=0;i<steps;i++) {
+                
+        }
+        return null;
+    }
+    */
 
 
     /**
