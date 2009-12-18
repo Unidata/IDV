@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.quantities;
 
 
@@ -336,17 +337,25 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
 
 
 
-        Field      rHatField = (doNewCode
-                                ? hatFieldNew(innerDom, 0)
-                                : hatFieldOld(innerDom, 0));
-        Field      sHatField = (doNewCode
-                                ? hatFieldNew(innerDom, 1)
-                                : hatFieldOld(innerDom, 1));
+        //System.out.println("making rHatField");
+        Field rHatField = (doNewCode
+                           ? hatFieldNew(innerDom, 0)
+                           : hatFieldOld(innerDom, 0));
+        //System.out.println("making sHatField");
+        Field     sHatField = (doNewCode
+                               ? hatFieldNew(innerDom, 1)
+                               : hatFieldOld(innerDom, 1));
 
-        double[][] rHats     = rHatField.getValues();
-        double[][] sHats     = sHatField.getValues();
-        double[]   us        = new double[innerDom.getLength()];
-        double[]   vs        = new double[us.length];
+        float[][] rHats     = rHatField.getFloats(false);
+        //ucar.unidata.util.Misc.printArray("rHats[0]", rHats[0]);
+        //ucar.unidata.util.Misc.printArray("rHats[1]", rHats[1]);
+        //System.out.println("\n");
+        float[][] sHats = sHatField.getFloats(false);
+        //ucar.unidata.util.Misc.printArray("sHats[0]", sHats[0]);
+        //ucar.unidata.util.Misc.printArray("sHats[1]", sHats[1]);
+        //System.out.println("\n");
+        float[] us = new float[innerDom.getLength()];
+        float[] vs = new float[us.length];
 
 
 
@@ -361,19 +370,27 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 }
             }
 
-            double[][] rsWinds = innerField.getValues();
-            double[]   rWinds  = rsWinds[0];
-            double[]   sWinds  = rsWinds[1];
+            float[][] rsWinds = innerField.getFloats(false);
+            float[]   rWinds  = rsWinds[0];
+            float[]   sWinds  = rsWinds[1];
+            //ucar.unidata.util.Misc.printArray("rWinds", rWinds);
+            //System.out.println("\n");
+            //ucar.unidata.util.Misc.printArray("sWinds", sWinds);
+            //System.out.println("\n");
 
             for (int j = 0; j < us.length; j++) {
                 us[j] = rWinds[j] * rHats[0][j] + sWinds[j] * sHats[0][j];
                 vs[j] = rWinds[j] * rHats[1][j] + sWinds[j] * sHats[1][j];
             }
+            //ucar.unidata.util.Misc.printArray("us", us);
+            //System.out.println("\n");
+            //ucar.unidata.util.Misc.printArray("vs", vs);
+            //System.out.println("\n");
 
-            uvField.setSamples(new double[][] {
+            uvField.setSamples(new float[][] {
                 us, vs
             }, false);
-            result.setSample(i, uvField, true);
+            result.setSample(i, uvField, false);
         }
 
         return result;
@@ -422,75 +439,98 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             throw new IllegalArgumentException(grid.toString());
         }
 
-        int[][]         neighbors = grid.getNeighbors(index);
-        LatLonPointImpl refPt     = new LatLonPointImpl();
-        LatLonPointImpl neiPt     = new LatLonPointImpl();
-        Bearing         bearing   = new Bearing();
-        double[]        hat1      = new double[2];
-        double[]        hat2      = new double[2];
-        double[][]      hat       = new double[2][grid.getLength()];
+        int[][]         neighbors     = grid.getNeighbors(index);
+        LatLonPointImpl refPt         = new LatLonPointImpl();
+        LatLonPointImpl neiPt         = new LatLonPointImpl();
+        Bearing         bearing       = new Bearing();
+        float[]         hat1          = new float[2];
+        float[]         hat2          = new float[2];
+        float[][]       hat           = new float[2][grid.getLength()];
 
 
-        float[][]       refCoords = null;
-        float[][]       neiCoords = null;
+        float[][]       refCoords     = null;
+        float[][]       neiCoords     = null;
+        float[][]       domainSamples = grid.getSamples(false);
 
         refCoords = (hasCS)
                     ? cs.toReference(grid.getSamples())
                     : grid.getSamples();
-
-        float latBefore, lonBefore, latAfter, lonAfter;
-        for (int i = 0; i < neighbors.length; i++) {
-            refPt.set(refCoords[latI][i], refCoords[lonI][i]);
-            if ((neighbors[i][0] < 0)
-                    || (neighbors[i][0] >= neighbors.length)) {
-                latBefore = Float.NaN;
-                lonBefore = Float.NaN;
+        // If the grid is lat/lon or has an IdentityCoordinateSystem
+        // don't do the rotation
+        //TODO:  handle rotated lat/lon grids
+        if ( !hasCS
+                || (Arrays.equals(refCoords[latI], domainSamples[latI])
+                    && Arrays.equals(refCoords[lonI], domainSamples[lonI]))) {
+            if (index == 0) {
+                Arrays.fill(hat[0], 1);
+                Arrays.fill(hat[1], 0);
             } else {
-                latBefore = refCoords[latI][neighbors[i][0]];
-                lonBefore = refCoords[lonI][neighbors[i][0]];
+                Arrays.fill(hat[0], 0);
+                Arrays.fill(hat[1], 1);
             }
-            if ((neighbors[i][1] < 0)
-                    || (neighbors[i][1] >= neighbors.length)) {
-                latAfter = Float.NaN;
-                lonAfter = Float.NaN;
-            } else {
-                latAfter = refCoords[latI][neighbors[i][1]];
-                lonAfter = refCoords[lonI][neighbors[i][1]];
-            }
+        } else {
 
-            compute(refPt, neiPt, latBefore, lonBefore, -180, bearing, hat1);
-
-            double d1 = bearing.getDistance();
-
-            compute(refPt, neiPt, latAfter, lonAfter, 0, bearing, hat2);
-
-            double  d2   = bearing.getDistance();
-            boolean bad1 = Double.isNaN(d1);
-            boolean bad2 = Double.isNaN(d2);
-
-            if (bad1 && bad2) {
-                hat[0][i] = Float.NaN;
-                hat[1][i] = Float.NaN;
-            } else {
-                if (bad1) {
-                    hat[0][i] = hat2[0];
-                    hat[1][i] = hat2[1];
-                } else if (bad2) {
-                    hat[0][i] = hat1[0];
-                    hat[1][i] = hat1[1];
+            float latBefore, lonBefore, latAfter, lonAfter;
+            //int backOffset = (index==0) ? -180 : 0;
+            //int foreOffset = (index==0) ? 0 : -180;
+            int backOffset = -180;
+            int foreOffset = 0;
+            for (int i = 0; i < neighbors.length; i++) {
+                refPt.set(refCoords[latI][i], refCoords[lonI][i]);
+                if ((neighbors[i][0] < 0)
+                        || (neighbors[i][0] >= neighbors.length)) {
+                    latBefore = Float.NaN;
+                    lonBefore = Float.NaN;
                 } else {
-                    double tot  = d1 + d2;
-                    double c1   = d2 / tot;
-                    double c2   = d1 / tot;
-                    double xhat = c1 * hat1[0] + c2 * hat2[0];
-                    double yhat = c1 * hat1[1] + c2 * hat2[1];
-                    double mag  = Math.sqrt(xhat * xhat + yhat * yhat);
-
-                    hat[0][i] = xhat / mag;
-                    hat[1][i] = yhat / mag;
+                    latBefore = refCoords[latI][neighbors[i][0]];
+                    lonBefore = refCoords[lonI][neighbors[i][0]];
                 }
-            }
+                if ((neighbors[i][1] < 0)
+                        || (neighbors[i][1] >= neighbors.length)) {
+                    latAfter = Float.NaN;
+                    lonAfter = Float.NaN;
+                } else {
+                    latAfter = refCoords[latI][neighbors[i][1]];
+                    lonAfter = refCoords[lonI][neighbors[i][1]];
+                }
 
+                compute(refPt, neiPt, latBefore, lonBefore, backOffset,
+                        bearing, hat1);
+
+                float d1 = (float) bearing.getDistance();
+
+                compute(refPt, neiPt, latAfter, lonAfter, foreOffset,
+                        bearing, hat2);
+
+                float   d2   = (float) bearing.getDistance();
+                boolean bad1 = Double.isNaN(d1);
+                boolean bad2 = Double.isNaN(d2);
+
+                if (bad1 && bad2) {
+                    hat[0][i] = Float.NaN;
+                    hat[1][i] = Float.NaN;
+                } else {
+                    if (bad1) {
+                        hat[0][i] = hat2[0];
+                        hat[1][i] = hat2[1];
+                    } else if (bad2) {
+                        hat[0][i] = hat1[0];
+                        hat[1][i] = hat1[1];
+                    } else {
+                        float tot  = d1 + d2;
+                        float c1   = d2 / tot;
+                        float c2   = d1 / tot;
+                        float xhat = c1 * hat1[0] + c2 * hat2[0];
+                        float yhat = c1 * hat1[1] + c2 * hat2[1];
+                        float mag = (float) Math.sqrt(xhat * xhat
+                                        + yhat * yhat);
+
+                        hat[0][i] = xhat / mag;
+                        hat[1][i] = yhat / mag;
+                    }
+                }
+
+            }
         }
 
 
@@ -550,9 +590,9 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         LatLonPointImpl refPt     = new LatLonPointImpl();
         LatLonPointImpl neiPt     = new LatLonPointImpl();
         Bearing         bearing   = new Bearing();
-        double[]        hat1      = new double[2];
-        double[]        hat2      = new double[2];
-        double[][]      hat       = new double[2][grid.getLength()];
+        float[]         hat1      = new float[2];
+        float[]         hat2      = new float[2];
+        float[][]       hat       = new float[2][grid.getLength()];
 
         for (int i = 0; i < neighbors.length; i++) {
             float[][] refCoords = grid.indexToValue(new int[] { i });
@@ -569,12 +609,12 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
                     -180, bearing, hat1);
 
-            double d1 = bearing.getDistance();
+            float d1 = (float) bearing.getDistance();
 
             compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
                     bearing, hat2);
 
-            double  d2   = bearing.getDistance();
+            float   d2   = (float) bearing.getDistance();
             boolean bad1 = Double.isNaN(d1);
             boolean bad2 = Double.isNaN(d2);
 
@@ -589,12 +629,12 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     hat[0][i] = hat1[0];
                     hat[1][i] = hat1[1];
                 } else {
-                    double tot  = d1 + d2;
-                    double c1   = d2 / tot;
-                    double c2   = d1 / tot;
-                    double xhat = c1 * hat1[0] + c2 * hat2[0];
-                    double yhat = c1 * hat1[1] + c2 * hat2[1];
-                    double mag  = Math.sqrt(xhat * xhat + yhat * yhat);
+                    float tot  = d1 + d2;
+                    float c1   = d2 / tot;
+                    float c2   = d1 / tot;
+                    float xhat = c1 * hat1[0] + c2 * hat2[0];
+                    float yhat = c1 * hat1[1] + c2 * hat2[1];
+                    float mag  = (float) Math.sqrt(xhat * xhat + yhat * yhat);
 
                     hat[0][i] = xhat / mag;
                     hat[1][i] = yhat / mag;
@@ -635,16 +675,17 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      *                          components of unit vector.
      */
     private static void compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
-                                double lat, double lon, double azTerm,
-                                Bearing bearing, double[] hat) {
+                                float lat, float lon, float azTerm,
+                                Bearing bearing, float[] hat) {
 
         neiPt.set(lat, lon);
         Bearing.calculateBearing(refPt, neiPt, bearing);
 
-        double az = Math.toRadians(bearing.getAngle() + azTerm);
+        float az = (float) Math.toRadians(bearing.getAngle() + azTerm);
+        //System.out.println("bearing.Angle = " + bearing.getAngle() + "; azTerm = " + azTerm+ "; result= " + Math.toDegrees(az));
 
-        hat[0] = Math.sin(az);
-        hat[1] = Math.cos(az);
+        hat[0] = (float) Math.sin(az);
+        hat[1] = (float) Math.cos(az);
     }
 
     /**
@@ -714,7 +755,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     CartesianHorizontalWind.getEarthVectorType()), grid,
                         (CoordinateSystem[]) null, rel.getRangeSets(), units);
 
-        abs.setSamples(trueWind(rel.getValues(), grid), false);
+        abs.setSamples(trueWind(rel.getFloats(), grid), false);
 
         return abs;
     }
@@ -734,7 +775,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      *
      * @throws VisADException
      */
-    private static double[][] trueWind(double[][] gridWinds, SampledSet grid)
+    private static float[][] trueWind(float[][] gridWinds, SampledSet grid)
             throws VisADException {
 
         if (grid instanceof IrregularSet) {
@@ -764,15 +805,15 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             throw new IllegalArgumentException(grid.toString());
         }
 
-        double[] us = new double[grid.getLength()];
-        double[] vs = new double[grid.getLength()];
+        float[] us = new float[grid.getLength()];
+        float[] vs = new float[grid.getLength()];
 
         Arrays.fill(us, 0);
         Arrays.fill(vs, 0);
         addComponent(grid, gridWinds, cs, 0, latI, lonI, us, vs);
         addComponent(grid, gridWinds, cs, 1, latI, lonI, us, vs);
 
-        return new double[][] {
+        return new float[][] {
             us, vs
         };
     }
@@ -798,18 +839,18 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      *                                   small.
      * @throws VisADException            if a VisAD failure occurs.
      */
-    private static void addComponent(SampledSet grid, double[][] gridWinds,
+    private static void addComponent(SampledSet grid, float[][] gridWinds,
                                      CoordinateSystem cs, int index,
-                                     int latI, int lonI, double[] us,
-                                     double[] vs)
+                                     int latI, int lonI, float[] us,
+                                     float[] vs)
             throws VisADException {
 
         int[][]         neighbors = grid.getNeighbors(index);
         LatLonPointImpl refPt     = new LatLonPointImpl();
         LatLonPointImpl neiPt     = new LatLonPointImpl();
         Bearing         bearing   = new Bearing();
-        double[]        uv1       = new double[2];
-        double[]        uv2       = new double[2];
+        float[]         uv1       = new float[2];
+        float[]         uv2       = new float[2];
         boolean         hasCS     = cs != null;
 
         for (int i = 0; i < neighbors.length; i++) {
@@ -830,12 +871,12 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
                     -180, gridWinds[index][i], bearing, uv1);
 
-            double d1 = bearing.getDistance();
+            float d1 = (float) bearing.getDistance();
 
             compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
                     gridWinds[index][i], bearing, uv2);
 
-            double  d2   = bearing.getDistance();
+            float   d2   = (float) bearing.getDistance();
             boolean bad1 = Double.isNaN(d1);
             boolean bad2 = Double.isNaN(d2);
 
@@ -850,9 +891,9 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     us[i] += uv1[0];
                     vs[i] += uv1[1];
                 } else {
-                    double tot = d1 + d2;
-                    double c1  = d2 / tot;
-                    double c2  = d1 / tot;
+                    float tot = d1 + d2;
+                    float c1  = d2 / tot;
+                    float c2  = d1 / tot;
 
                     us[i] += c1 * uv1[0] + c2 * uv2[0];
                     vs[i] += c1 * uv1[1] + c2 * uv2[1];
@@ -877,15 +918,15 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      *                          components.
      */
     private static void compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
-                                double lat, double lon, double azTerm,
-                                double wind, Bearing bearing, double[] uv) {
+                                float lat, float lon, float azTerm,
+                                float wind, Bearing bearing, float[] uv) {
 
         neiPt.set(lat, lon);
         Bearing.calculateBearing(refPt, neiPt, bearing);
 
-        double az   = Math.toRadians(bearing.getAngle() + azTerm);
-        double xhat = Math.sin(az);
-        double yhat = Math.cos(az);
+        float az   = (float) Math.toRadians(bearing.getAngle() + azTerm);
+        float xhat = (float) Math.sin(az);
+        float yhat = (float) Math.cos(az);
 
         uv[0] = xhat * wind;
         uv[1] = yhat * wind;
