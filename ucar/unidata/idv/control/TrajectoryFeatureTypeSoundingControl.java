@@ -90,7 +90,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
     /** _more_ */
     private List<Data[]> dataList;
 
-
+    private List<DateTime> timeList;
     /**
      * Constructs from nothing.
      *
@@ -186,6 +186,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
             selectedStation.setPoint(
                 (RealTuple) latLons[getSelectedStationIndex()]);
         }
+        updateHeaderLabel();
         return true;
     }
 
@@ -242,7 +243,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         stationIds = new String[len];
         latLons    = new LatLonPoint[len];
         dataList   = new ArrayList();
-
+        timeList   = new ArrayList();
 
         for (int i = 0; i < len; i++) {
             TrajectoryFeatureTypeAdapter          cta   = adapters.get(i);
@@ -253,7 +254,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
             NamedLocationTuple s = cfti.getLatLonPoint();
             latLons[i]    = s.getLatLonPoint();
             stationIds[i] = s.getIdentifier().getValue();
-
+            timeList.add(cfti.getStartTime());
         }
 
         return true;
@@ -323,6 +324,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
                 try {
                     //                    System.err.println("station menu changed");
                     //                    setStation(stationMenue.getSelectedIndex());
+                    updateHeaderLabel();
                 } catch (Exception ex) {
                     logException(ex);
                 }
@@ -341,6 +343,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
                                             public void run() {
                                                 stationMenue.requestFocus();
                                             }});
+                                    updateHeaderLabel();
                                 } catch (Exception ex) {
                                     logException(ex);
                                 }
@@ -366,6 +369,49 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         selectedStation.setPoint((RealTuple) latLons[index]);
         setLocation(latLons[index]);
         initSounding(dataList.get(index));
+        getSoundingView().updateDisplayList();
     }
+
+    /**
+     * Update the location label, subclasses can override.
+     */
+    protected void updateHeaderLabel() {
+        int            timeIdx = getCurrentIdx();
+        int            index   = getSelectedStationIndex();
+        //List<DateTime> times   = stationsTimes.get(stations.get(index));
+       // if(timeIdx >= times.size())
+       //     timeIdx = times.size()-1;
+      //  String         timeStr = times.get(timeIdx).toString();
+        if (index >= 0) {
+            headerLabel.setText(stationIds[index] );
+        } else {
+            headerLabel.setText(stationIds[0]);
+        }
+    }
+
+    /**
+     * Add the data to the in display legend
+     *
+     * @return the data for the display list displayable
+     */
+
+    protected Data getDisplayListData() {
+        Data           data    = null;
+        int            timeIdx = getCurrentIdx();
+        int            index   = getSelectedStationIndex();
+       // List<DateTime> times   = stationsTimes.get(stations.get(index));
+        String         timeStr = timeList.get(index).toString();
+        if (index >= 0) {
+            String label = (String) stationIds[index] + " " + timeStr;
+            try {
+                TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
+                data = new Text(tt, label);
+            } catch (VisADException ve) {
+                logException("getting display list data ", ve);
+            }
+        }
+        return data;
+    }
+
 }
 
