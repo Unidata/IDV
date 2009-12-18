@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad.quantities;
 
 
@@ -320,14 +321,14 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 CartesianHorizontalWind.getEarthVectorType()
                     .getDefaultUnits();
         }
+        FunctionType innerType =
+            new FunctionType(((SetType) innerDom.getType()).getDomain(),
+                             CartesianHorizontalWind.getEarthVectorType());
 
 
-        FlatField uvField =
-            new FlatField(
-                new FunctionType(
-                    ((SetType) innerDom.getType()).getDomain(),
-                    CartesianHorizontalWind.getEarthVectorType()), innerDom,
-                        (CoordinateSystem) null, (Set[]) null, rangeUnits);
+        FlatField uvField = new FlatField(innerType, innerDom,
+                                          (CoordinateSystem) null,
+                                          (Set[]) null, rangeUnits);
 
 
 
@@ -368,6 +369,11 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                             + innerDom.toString() + "; domain="
                             + dom.toString());
                 }
+                uvField = new FlatField(innerType, innerDom,
+                                        (CoordinateSystem) null,
+                                        (Set[]) null, rangeUnits);
+                us = new float[innerDom.getLength()];
+                vs = new float[us.length];
             }
 
             float[][] rsWinds = innerField.getFloats(false);
@@ -755,7 +761,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     CartesianHorizontalWind.getEarthVectorType()), grid,
                         (CoordinateSystem[]) null, rel.getRangeSets(), units);
 
-        abs.setSamples(trueWind(rel.getFloats(), grid), false);
+        abs.setSamples(trueWind(rel.getFloats(false), grid), false);
 
         return abs;
     }
