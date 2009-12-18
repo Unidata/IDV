@@ -611,12 +611,11 @@ public class DerivedGridFactory {
             throw new VisADException("Not a vector grid "
                                      + GridUtil.getParamType(uvGrid));
         }
-        long t1 = System.currentTimeMillis();
+        ucar.unidata.util.Trace.call1("DGF:createTrueFlowVector");
         FieldImpl result =
             (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
                 uvGrid);
-        long t2 = System.currentTimeMillis();
-        //        System.err.println ((GridRelativeHorizontalWind.doNewCode?"New code":"Old code")  +" Time:"  +  " -- " + (t2-t1));
+        ucar.unidata.util.Trace.call2("DGF:createTrueFlowVector");
         return result;
     }
 
