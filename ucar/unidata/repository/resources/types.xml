@@ -9,13 +9,16 @@
 
 
 
+
+
+<!--
   <type name="testentry"  description="Test Entry">
      <metadata id="enum_gcmdkeyword"/>
      <metadata id="thredds.contributor"/>
-<!--
      <metadata id="dif.personnel"/>
--->
   </type>
+-->
+
 
 
   <type name="contribution"  description="Contribution" >
@@ -30,6 +33,14 @@
      <property name="icon" value="/icons/user.png"/>
    </type>
 
+
+
+  <type name="cataloglink"  description="Catalog Link" >
+     <property name="icon" value="/icons/link.png"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.file" value="false"/>
+  </type>
 
 
   <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
@@ -48,8 +59,8 @@
      <property name="form.show.date" value="false"/>
      <column name="localfilepath" group="Look for files here" type="string"     label="Local file path" columns="80"  showinhtml="false"/>
      <column name="timedelay" type="double"  label="Age" suffix="Find files that haven't changed in this time (minutes)"  showinhtml="false"/>
-     <column name="includepattern" group="Find files or directories" type="string"     label="Match files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
-     <column name="excludepattern" type="string"     label="Exclude files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
+     <column name="includepattern" group="Find files or directories" type="string"     label="Match files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;&lt;/i&gt;To match directories add a &quot;dir&quot; prefix:&lt;br&gt;&lt;i&gt;dir:*data&lt;/i&gt;"  showinhtml="false"/>
+     <column name="excludepattern" type="string"     label="Exclude files with patterns" rows="5" suffix=""  showinhtml="false"/>
      <column name="naming"  group="Attributes"       type="string"     label="Naming" rows="5" suffix="pattern:replacement e.g.&lt;br&gt;&lt;i&gt;NAM:North American Model&lt;br&gt;path:GFS:Global Forecast Model&lt;br&gt;&lt;i&gt;"  showinhtml="false"/>
  </type>
 

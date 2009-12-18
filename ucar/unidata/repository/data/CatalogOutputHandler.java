@@ -582,6 +582,18 @@ public class CatalogOutputHandler extends OutputHandler {
     public void outputEntry(Entry entry, Request request,
                             CatalogInfo catalogInfo, Element parent)
             throws Exception {
+        if(entry.getType().equals("cataloglink")) {
+            Element ref = XmlUtil.create(catalogInfo.doc,
+                                         CatalogUtil.TAG_CATALOGREF, parent,
+                                         new String[] {
+                                             CatalogUtil.ATTR_XLINK_TITLE,
+                                             entry.getName(),
+                                             CatalogUtil.ATTR_XLINK_HREF,
+                                             entry.getResource().getPath()});
+            return;
+        }
+
+
         File   f    = entry.getFile();
         String path = f.toString();
         path = path.replace("\\", "/");

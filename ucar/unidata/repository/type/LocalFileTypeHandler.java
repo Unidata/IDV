@@ -318,11 +318,12 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         String  value      = file.toString();
         boolean hadPattern = false;
         for (String pattern : patterns) {
+            pattern = pattern.trim();
             if (pattern.startsWith("dir:")) {
                 if (file.isDirectory()) {
                     hadPattern = true;
                     pattern    =
-                        getRegexp(pattern.substring("dir:".length()));
+                        getRegexp(pattern.substring("dir:".length()).trim());
                     if (StringUtil.stringMatch(value, pattern, true, false)) {
                         return true;
                     }
