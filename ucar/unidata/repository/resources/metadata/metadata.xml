@@ -39,6 +39,14 @@
     </type>
 
     <type
+       name="Logo"
+       id="content.logo">
+      <element name="Logo Image File" datatype="file" thumbnail="false" attachment="false"/>
+      <element name="Logo URL"/>
+      <element name="Page Title"/>
+    </type>
+
+    <type
        name="Jython Script"
        id="content.jython">
       <element name="Jython File" datatype="file" thumbnail="false"/>

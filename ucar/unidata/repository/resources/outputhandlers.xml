@@ -3,6 +3,7 @@
   <outputhandler class="ucar.unidata.repository.output.MapOutputHandler" name="Map"/>
   <outputhandler class="ucar.unidata.repository.output.CalendarOutputHandler" name="Calendar"/>
   <outputhandler class="ucar.unidata.repository.output.ImageOutputHandler" name="Image"/>
+  <outputhandler class="ucar.unidata.repository.output.WmsImageOutputHandler" name="WMS"/>
 <!--
   <outputhandler class="ucar.unidata.repository.output.SoseOutputHandler" name="Sose"/>
 -->

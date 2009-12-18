@@ -358,6 +358,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_          */
     private List<String> pluginPropertyFiles = new ArrayList<String>();
 
+    private List<String> pluginSqlFiles = new ArrayList<String>();
+
 
     /** _more_ */
     private List<User> cmdLineUsers = new ArrayList();
@@ -1629,6 +1631,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             metadataDefFiles.add(file);
         } else if (file.endsWith(".py")) {
             pythonLibs.add(file);
+        } else if(file.endsWith(".sql")) {
+            pluginSqlFiles.add(file);
         } else if (file.endsWith(".properties")) {
             if (fromPlugin) {
                 pluginPropertyFiles.add(file);
@@ -2867,16 +2871,25 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (head == null) {
             head = "";
         }
-        String logoImage = getProperty(PROP_LOGO_IMAGE, "").trim();
+        String logoImage =  (String) result.getProperty(PROP_LOGO_IMAGE);
+        if(logoImage == null)
+            logoImage = getProperty(PROP_LOGO_IMAGE, "").trim();
         if (logoImage.length() == 0) {
             logoImage = "${root}/images/logo.png";
         }
+        String logoUrl = (String)result.getProperty(PROP_LOGO_URL);
+        if(logoUrl==null)
+            logoUrl = getProperty(PROP_LOGO_URL, "");
+        String pageTitle  = (String) result.getProperty(PROP_REPOSITORY_NAME);
+        if(pageTitle==null)
+            pageTitle = getProperty(PROP_REPOSITORY_NAME, "Repository");
+
         String   html   = template;
         String[] macros = new String[] {
-            MACRO_LOGO_URL, getProperty(PROP_LOGO_URL, ""), MACRO_LOGO_IMAGE,
+            MACRO_LOGO_URL,logoUrl , MACRO_LOGO_IMAGE,
             logoImage, MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER),
             MACRO_HEADER_TITLE,
-            getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_USERLINK,
+            pageTitle, MACRO_USERLINK,
             getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_FOOTER,
             getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
@@ -3399,6 +3412,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
         sql = getDatabaseManager().convertSql(sql);
 
         getDatabaseManager().loadSql(sql, true, false);
+
+        for(String sqlFile:  pluginSqlFiles) {
+            sql = getStorageManager().readUncheckedSystemResource(sqlFile);
+            sql = getDatabaseManager().convertSql(sql);
+            getDatabaseManager().loadSql(sql, true, false);
+        }
+
 
         for (String file : typeDefFiles) {
             file = getStorageManager().localizePath(file);

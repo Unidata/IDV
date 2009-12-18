@@ -93,10 +93,6 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql",
                                           "SQL");
 
-    /** _more_ */
-    public RequestUrl URL_ADMIN_USERMESSAGE = new RequestUrl(this,
-                                                  "/admin/usermessage",
-                                                  "User Message");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_IMPORT_CATALOG = new RequestUrl(this,
@@ -155,7 +151,7 @@ public class Admin extends RepositoryManager {
         getRegistryManager().URL_REGISTRY_REMOTESERVERS,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
-        URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP, URL_ADMIN_USERMESSAGE
+        URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
         });
 
 
@@ -232,41 +228,7 @@ public class Admin extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminUserMessage(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        if (request.exists(ARG_SESSION_MESSAGE)) {
-            getSessionManager().setSessionMessage(
-                request.getString(ARG_SESSION_MESSAGE, ""));
-            sb.append(msg("Message set"));
-        } else {
-            sb.append(
-                msgHeader("Enter a message to show one time to all users"));
-            sb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
-            sb.append(HtmlUtil.formTable());
-            sb.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Message"),
-                    HtmlUtil.textArea(ARG_SESSION_MESSAGE, "", 5, 60)));
-            sb.append(HtmlUtil.formTableClose());
-            sb.append(HtmlUtil.submit(msg("Set user message")));
-            sb.append("</form>");
 
-        }
-        Result result = new Result(msg("Alert Message"), sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               getAdmin().adminUrls));
-        return result;
-    }
 
     /**
      * _more_
@@ -1111,6 +1073,13 @@ public class Admin extends RepositoryManager {
 
 
 
+        dsb.append(HtmlUtil.formEntry("", msg("System Message")));
+        dsb.append(
+                   HtmlUtil.formEntry(
+                                      msgLabel("Message"),
+                                      HtmlUtil.textArea(ARG_SESSION_MESSAGE,             
+                                                        getSessionManager().getSessionMessage(), 5, 60)));
+
 
         String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
         if (phrases == null) {
@@ -1134,6 +1103,8 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.checkbox(
                     PROP_RATINGS_ENABLE, "true",
                     getProperty(PROP_RATINGS_ENABLE, false))));
+
+
 
 
 
@@ -1502,6 +1473,10 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_CACHE_MAXSIZEGB,
                                     request.getString(PROP_CACHE_MAXSIZEGB,
                                         "10").trim());
+
+        getSessionManager().setSessionMessage(
+                                              request.getString(ARG_SESSION_MESSAGE, ""));
+
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
             getRepository().writeGlobal(

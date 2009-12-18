@@ -502,6 +502,12 @@ public class SessionManager extends RepositoryManager {
     //    String sessionMessage;
 
 
+    private String sessionMessage = "";
+
+    public String getSessionMessage() {
+        return sessionMessage;
+    }
+
     /**
      * _more_
      *
@@ -523,6 +529,7 @@ public class SessionManager extends RepositoryManager {
         return sessionMessage;
     }
 
+
     /**
      * _more_
      *
@@ -531,6 +538,7 @@ public class SessionManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void setSessionMessage(String message) throws Exception {
+        sessionMessage = message;
         sessionMessages = new Hashtable();
         if ((message != null) && (message.trim().length() > 0)) {
             synchronized (sessionMessages) {

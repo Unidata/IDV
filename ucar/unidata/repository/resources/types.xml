@@ -92,6 +92,16 @@
 
 
 
+<!--
+  <type name="image"  description="Image File" datatype="image"/>
+
+-->
+
+  <type name="latlonimage"  description="Lat/Lon Image" datatype="latlonimage">
+     <property name="icon" value="/icons/map.png"/>
+  </type>
+
+
 
 <!--
   <type name="blogpost"  description="Blog Post">
@@ -141,7 +151,6 @@
   </type>
 
 
-  <type name="image"  description="Image File" datatype="image"/>
 
 
 

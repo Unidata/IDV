@@ -89,6 +89,8 @@ public class MetadataType extends MetadataTypeBase {
     /** _more_ */
     public static final String ATTR_FORUSER = "foruser";
 
+
+
     /** _more_ */
     public static final String ATTR_DISPLAYCATEGORY = "displaycategory";
 
@@ -133,6 +135,8 @@ public class MetadataType extends MetadataTypeBase {
 
     /** _more_ */
     private boolean forUser = true;
+
+
 
     /**
      * _more_
@@ -226,12 +230,15 @@ public class MetadataType extends MetadataTypeBase {
         super.init(node);
         setAdminOnly(XmlUtil.getAttributeFromTree(node, ATTR_ADMINONLY,
                 false));
+
         setForUser(XmlUtil.getAttributeFromTree(node, ATTR_FORUSER, true));
 
         setBrowsable(XmlUtil.getAttributeFromTree(node, ATTR_BROWSABLE,
                 false));
+
         setDisplayCategory(XmlUtil.getAttributeFromTree(node,
                 ATTR_DISPLAYCATEGORY, "Metadata"));
+
         setCategory(XmlUtil.getAttributeFromTree(node, ATTR_CATEGORY,
                 handler.getHandlerGroupName()));
     }
@@ -415,6 +422,10 @@ public class MetadataType extends MetadataTypeBase {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
+            if ( !element.showAsAttachment()) {
+                continue;
+            }
+
             if (element.getThumbnail() || isThumbnail) {
                 String html = getFileHtml(request, entry, metadata, element,
                                           forLink);

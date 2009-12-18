@@ -135,8 +135,16 @@ public class MetadataElement extends MetadataTypeBase {
     /** _more_ */
     public static final String ATTR_INDEX = "index";
 
+    public static final String ATTR_ATTACHMENT = "attachment";
+
+
     /** _more_ */
     private String dataType = TYPE_STRING;
+
+
+    private boolean attachment = true;
+
+
 
 
     /** _more_ */
@@ -211,6 +219,7 @@ public class MetadataElement extends MetadataTypeBase {
      */
     public void init(Element node) throws Exception {
         super.init(node);
+    
         subName = XmlUtil.getAttribute(node, ATTR_SUBNAME, "");
         id      = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
         max     = XmlUtil.getAttribute(node, ATTR_MAX, max);
@@ -218,6 +227,7 @@ public class MetadataElement extends MetadataTypeBase {
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
         setDataType(XmlUtil.getAttribute(node, ATTR_DATATYPE,
                                          MetadataElement.TYPE_STRING));
+        attachment = XmlUtil.getAttribute(node, ATTR_ATTACHMENT, true);
         setDefault(XmlUtil.getAttribute(node, ATTR_DEFAULT, ""));
 
         setGroup(XmlUtil.getAttribute(node, ATTR_GROUP, (String) null));
@@ -906,7 +916,9 @@ public class MetadataElement extends MetadataTypeBase {
         return this.id;
     }
 
-
+    public boolean showAsAttachment() {
+        return attachment;
+    }
 
 
 }

@@ -113,7 +113,6 @@
    </group>
 
   <group handler="admin" needs_ssl="true" admin="true">
-      <api request="/admin/usermessage"     method="adminUserMessage"      />
       <api request="/admin/sql"          method="adminSql"           />
       <api request="/admin/log"          method="adminLog"           />
       <api request="/admin/startstop"    method="adminDbStartStop"   />

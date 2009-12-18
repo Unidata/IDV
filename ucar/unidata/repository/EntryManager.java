@@ -500,6 +500,33 @@ return new Result(title, sb);
                 result.putProperty(PROP_ENTRY_HEADER, sb.toString());
                 result.putProperty(PROP_ENTRY_BREADCRUMBS, crumbs[0]);
             }
+
+            List<Metadata> metadataList =
+                getMetadataManager().findMetadata(entry,
+                                                  ContentMetadataHandler.TYPE_LOGO, true);
+            if (metadataList != null && metadataList.size()>0) {
+                Metadata metadata = metadataList.get(0);
+                MetadataHandler handler = getMetadataManager().findMetadataHandler(metadata.getType());
+                MetadataType metadataType = handler.findType(ContentMetadataHandler.TYPE_LOGO);
+
+                String imageUrl = metadataType.getImageUrl(request,  entry,
+                                                           metadata, null);
+                if(imageUrl!=null && imageUrl.length()>0) {
+                    result.putProperty(PROP_LOGO_IMAGE, imageUrl);
+                }
+                
+                String logoUrl  =metadata.getAttr2();
+                if(logoUrl!=null && logoUrl.length()>0) {
+                    result.putProperty(PROP_LOGO_URL, logoUrl);
+                }
+
+                String pageTitle  =metadata.getAttr3();
+                if(pageTitle!=null && pageTitle.length()>0) {
+                    result.putProperty(PROP_REPOSITORY_NAME, pageTitle);
+                }
+            }
+
+
         }
         return result;
     }
@@ -796,7 +823,6 @@ return new Result(title, sb);
             throws Exception {
         if ( !typeHandler.canBeCreatedBy(request)) {
             return false;
-            
         }
 
         String ips = getRepository().getProperty("ramadda.type."

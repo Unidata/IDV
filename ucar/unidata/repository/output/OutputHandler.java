@@ -1,7 +1,7 @@
 /**
  *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * Atmospheric Research, PO. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
  * This library is free software; you can redistribute it and/or modify it
@@ -1939,7 +1939,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             throws Exception {
 
         boolean open         = Misc.getProperty(props, "open", true);
-        boolean inBlock      = Misc.getProperty(props, "showhide", true);
+        boolean inBlock      = Misc.getProperty(props, "showtoggle", true);
         String  blockContent = null;
         String  blockTitle   = "";
         boolean doBG         = true;
@@ -2016,7 +2016,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             if (children == null) {
                 children = getEntryManager().getChildren(request, entry);
             }
-
             if (children.size() == 0) {
                 return "";
             }
