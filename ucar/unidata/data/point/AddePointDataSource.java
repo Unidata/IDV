@@ -76,6 +76,8 @@ public class AddePointDataSource extends PointDataSource {
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(AddePointDataSource.class.getName());
 
+    /** does this have the Altitude parameter? */
+    private boolean hasAltitude = true;
 
     /**
      * Default contstructor.
@@ -265,7 +267,11 @@ public class AddePointDataSource extends PointDataSource {
                     && (choice.getProperty(PROP_GRID_PARAM) != null)) {
                 String param = ((RealType) choice.getProperty(
                                    PROP_GRID_PARAM)).getName();
-                temp.setParams("DAY TIME LAT LON ZS " + param);
+                if (hasAltitude) {
+                    temp.setParams("DAY TIME LAT LON ZS " + param);
+                } else {
+                    temp.setParams("DAY TIME LAT LON " + param);
+                }
             }
             temp.setSelectClause(source);
             //System.out.println("new select clause = " + source);
@@ -277,11 +283,11 @@ public class AddePointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * Make the level string
      *
-     * @param subset _more_
+     * @param subset  the data selection for the level
      *
-     * @return _more_
+     * @return  the level string
      */
     private String makeLevelString(DataSelection subset) {
         String level         = "";
@@ -409,10 +415,13 @@ public class AddePointDataSource extends PointDataSource {
                 try {
                     Trace.call1("AddePointDataSource.pda ctor");
                     PointDataAdapter pda = new PointDataAdapter(sourceUrl,
-                                               false,true);
+                                               false, true);
                     Trace.call1("AddePointDataSource.pda ctor");
                     Data data = pda.getData();
                     Trace.call2("AddePointDataSource.pda ctor");
+                    if (sampleIt) {
+                        checkForNeededParams((FieldImpl) data);
+                    }
 
                     Trace.call1("AddePointDataSource.makePointObsFromField");
                     obs = PointObFactory.makePointObsFromField(
@@ -435,6 +444,26 @@ public class AddePointDataSource extends PointDataSource {
         return obs;
     }
 
+    /**
+     * Check for required params
+     * @param rawSample  sample data (index)-&gt;Tuple
+     */
+    private void checkForNeededParams(FieldImpl rawSample) {
+        try {
+            Tuple  ob    = (Tuple) rawSample.getSample(0);
+            Real[] reals = ob.getRealComponents();
+            if (reals != null) {
+                for (int i = 0; i < reals.length; i++) {
+                    RealType rt = (RealType) reals[i].getType();
+                    if (rt.equals(RealType.Altitude)) {
+                        hasAltitude = true;
+                        return;
+                    }
+                }
+            }
+            hasAltitude = false;
+        } catch (Exception ve) {}
+    }
 
     /**
      * Can this datasource do the geoselection subsetting and decimation
@@ -527,8 +556,9 @@ public class AddePointDataSource extends PointDataSource {
             Misc.gc();
             for (int i = 0; i < args.length; i++) {
                 Trace.call1("AddePointDataSource.pda ctor");
-                long             t1  = System.currentTimeMillis();
-                PointDataAdapter pda = new PointDataAdapter(args[i], false,true);
+                long t1 = System.currentTimeMillis();
+                PointDataAdapter pda = new PointDataAdapter(args[i], false,
+                                           true);
                 Trace.call2("AddePointDataSource.pda ctor", (newWay
                         ? " new way"
                         : " old way"));
