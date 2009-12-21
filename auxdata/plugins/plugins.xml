@@ -73,9 +73,7 @@
 <plugin  name="MMOUT NetCDF Files" url="http://www.unidata.ucar.edu/software/idv/plugins/mmout.jar" category="Data Sources"/>
 
 <!-- Bug Fixes -->
-<!--
-<plugin  version="2.7" name="WRF-ARW fix for IDV 2.7" url="http://www.unidata.ucar.edu/software/idv/plugins/wrf-arw.jar" category="Bug Fixes"/>
--->
+<plugin  version="2.7" name="Spurious Map Lines Fix" url="http://www.unidata.ucar.edu/software/idv/plugins/graphicsfix.jar" category="Bug Fixes"/>
 
 <!--
 <plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
