@@ -162,6 +162,10 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_LI = "li";
 
+    public static final String TAG_LINK = "link";
+
+
+
     /** _more_ */
     public static final String TAG_NOBR = "nobr";
 
@@ -270,6 +274,8 @@ public class HtmlUtil {
 
     /** _more_ */
     public static final String ATTR_READONLY = "READONLY";
+
+    public static final String ATTR_REL = "rel";
 
     /** _more_ */
     public static final String ATTR_ROWS = "rows";
@@ -2579,6 +2585,11 @@ public class HtmlUtil {
     }
 
 
+
+
+
+
+
     /**
      * _more_
      *
@@ -2615,6 +2626,11 @@ public class HtmlUtil {
     }
 
 
+    public static String cssLink(String url) {
+        return tag(TAG_LINK, attrs(ATTR_HREF, url,
+                                   ATTR_REL, "stylesheet",
+                                   ATTR_TYPE, "text/css"));
+    }
 
 
     /** _more_ */
