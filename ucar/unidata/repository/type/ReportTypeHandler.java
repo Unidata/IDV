@@ -167,7 +167,7 @@ public class ReportTypeHandler extends TypeHandler {
         //        super.addToEntryForm(request, formBuffer, entry);
         String html = getRepository().getResource(formTemplatePath);
         for (Column column : columns) {
-            String widget = column.getFormWidget(request, entry);
+            String widget = column.getFormWidget(request, null);
             html = html.replace("${" + column.getName() + ".formwidget}",
                                 widget);
             html = html.replace("${" + column.getName() + ".label}",

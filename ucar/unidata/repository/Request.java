@@ -1437,7 +1437,8 @@ public class Request implements Constants {
         if ( !defined(from)) {
             return dflt;
         }
-        return repository.parseDate(getUnsafeString(from, ""));
+        String dateString  = (String) getDateSelect(from, "").trim();
+        return repository.parseDate(dateString);
     }
 
 

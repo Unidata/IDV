@@ -1534,9 +1534,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     public Statement select(final String what, final List tables,
-                            final Clause clause, final String extra,
+                            final Clause clause,  String extra,
                             final int max)
             throws Exception {
+        if(extra!=null)
+            extra = escapeString(extra);
         SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra,
                                     max);
         final boolean[] done = { false };

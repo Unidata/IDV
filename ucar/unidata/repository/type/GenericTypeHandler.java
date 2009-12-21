@@ -77,10 +77,10 @@ public class GenericTypeHandler extends TypeHandler {
     public static final String COL_ID = "id";
 
     /** _more_ */
-    List<Column> columns;
+    List<Column> columns = new ArrayList<Column>();
 
     /** _more_ */
-    List colNames;
+    List colNames = new ArrayList();
 
     /** _more_ */
     Hashtable nameMap = new Hashtable();
@@ -91,6 +91,12 @@ public class GenericTypeHandler extends TypeHandler {
     public GenericTypeHandler() {
         super(null);
     }
+
+    public GenericTypeHandler(Repository repository, String type,
+                       String description) {
+        super(repository, type, description);
+    }
+
 
     /**
      * _more_
@@ -143,15 +149,15 @@ public class GenericTypeHandler extends TypeHandler {
                 (String) null));
 
         setProperties(entryNode);
-
-        this.columns = new ArrayList<Column>();
-        colNames     = new ArrayList();
-
         List columnNodes = XmlUtil.findChildren(entryNode, TAG_COLUMN);
         if (columnNodes.size() == 0) {
             return;
         }
+        init((List<Element>)columnNodes);
+    }
 
+
+    public void init(List<Element> columnNodes) throws Exception {
         Statement statement = getDatabaseManager().createStatement();
         colNames.add(COL_ID);
         StringBuffer tableDef = new StringBuffer("CREATE TABLE "
@@ -196,6 +202,16 @@ public class GenericTypeHandler extends TypeHandler {
         //TODO: Run through the table and delete any columns and indices that aren't defined anymore
     }
 
+
+    public List<String> getColumnNames() {
+        return colNames;
+    }
+
+
+    public List<Column> getColumns() {
+        return columns;
+    }
+
     /**
      * _more_
      *
@@ -221,7 +237,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @return _more_
      */
     public Object[] makeValues(Hashtable map) {
-        Object[] values = new Object[columns.size()];
+        Object[] values = makeValues();
         //For now we just assume each column has a single value
         int idx = 0;
         for (Column column : columns) {
@@ -246,6 +262,11 @@ public class GenericTypeHandler extends TypeHandler {
         return column.convert(value);
     }
 
+    public Object[] makeValues() {
+        return  new Object[colNames.size()-1];
+    }
+
+
     /**
      * _more_
      *
@@ -263,13 +284,12 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() <= 1) {
             return;
         }
-        Object[] values = new Object[columns.size()];
+        Object[] values = makeValues();
         for (Column column : columns) {
             column.setValue(request, values);
         }
         entry.setValues(values);
     }
-
 
 
     /**
@@ -297,7 +317,7 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public int matchValue(String arg, Object value, Entry entry) {
         for (Column column : columns) {
-            int match = column.matchValue(arg, value, entry);
+            int match = column.matchValue(arg, value, (entry==null?null:entry.getValues()));
             if (match == MATCH_FALSE) {
                 return MATCH_FALSE;
             }
@@ -487,6 +507,7 @@ public class GenericTypeHandler extends TypeHandler {
             throws Exception {
         List<Clause> where = super.assembleWhereClause(request,
                                  searchCriteria);
+
         int originalSize = where.size();
         for (Column column : columns) {
             if ( !column.getCanSearch()) {
@@ -537,9 +558,16 @@ public class GenericTypeHandler extends TypeHandler {
     public void setStatement(Entry entry, PreparedStatement stmt,
                              boolean isNew)
             throws Exception {
+        setStatement(entry, entry.getValues(), stmt, isNew);
+    }
+
+
+    public int setStatement(Entry entry, 
+                             Object[] values, PreparedStatement stmt,
+                             boolean isNew)
+            throws Exception {
         int stmtIdx = 1;
         stmt.setString(stmtIdx++, entry.getId());
-        Object[] values = entry.getValues();
         if (values != null) {
             for (Column column : columns) {
                 stmtIdx = column.setValues(stmt, values, stmtIdx);
@@ -547,7 +575,9 @@ public class GenericTypeHandler extends TypeHandler {
         }
         if ( !isNew) {
             stmt.setString(stmtIdx, entry.getId());
+            stmtIdx++;
         }
+        return stmtIdx;
     }
 
 
@@ -570,24 +600,30 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() == 0) {
             return entry;
         }
-        Object[] values = new Object[columns.size()];
 
-        Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
-                             getTableName(),
-                             Clause.eq(COL_ID, entry.getId()));
-        ResultSet results2 = stmt.getResultSet();
-
-        if (results2.next()) {
-            //We start at 2, skipping 1, because the first one is the id
-            int valueIdx = 2;
-            for (Column column : columns) {
-                valueIdx = column.readValues(results2, values, valueIdx);
-            }
-        }
+        Object[] values = getValues(Clause.eq(COL_ID, entry.getId()));
         entry.setValues(values);
-
-        getDatabaseManager().closeAndReleaseConnection(stmt);
         return entry;
+    }
+        
+
+    public Object[] getValues(Clause clause) throws Exception {
+        Object[] values = makeValues();
+        Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
+                                                     getTableName(), clause);
+        try {
+            ResultSet results2 = stmt.getResultSet();
+            if (results2.next()) {
+                //We start at 2, skipping 1, because the first one is the id
+                int valueIdx = 2;
+                for (Column column : columns) {
+                    valueIdx = column.readValues(results2, values, valueIdx);
+                }
+            }
+        } finally {
+            getDatabaseManager().closeAndReleaseConnection(stmt);
+        }
+        return values;
     }
 
 
@@ -730,9 +766,17 @@ public class GenericTypeHandler extends TypeHandler {
     public void addColumnsToEntryForm(Request request,
                                       StringBuffer formBuffer, Entry entry)
             throws Exception {
+        addColumnsToEntryForm(request, formBuffer, (entry==null?null:entry.getValues()));
+    }
+
+
+
+    public void addColumnsToEntryForm(Request request,
+                                      StringBuffer formBuffer, Object[] values)
+            throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {
-            column.addToEntryForm(request, formBuffer, entry, state);
+            column.addToEntryForm(request, formBuffer, values, state);
         }
     }
 

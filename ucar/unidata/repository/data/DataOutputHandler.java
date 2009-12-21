@@ -1604,7 +1604,6 @@ public class DataOutputHandler extends OutputHandler {
         //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
 
         StringBuffer yui         = new StringBuffer();
-
         List         columnDefs  = new ArrayList();
         List         columnNames = new ArrayList();
         for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {

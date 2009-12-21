@@ -291,6 +291,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> loadFiles = new ArrayList<String>();
 
+    private List<Class> adminHandlerClasses = new ArrayList<Class>();
+
     /** _more_ */
     private String dumpFile;
 
@@ -945,6 +947,20 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         //Do this in a thread because (on macs) it hangs sometimes)
         Misc.run(this, "getFtpManager");
+
+
+        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
+        xadminHandler.setRepository(Repository.this);
+        getAdmin().addAdminHandler(xadminHandler);
+
+
+        for(Class adminHandlerClass: adminHandlerClasses) {
+            AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
+            adminHandler.setRepository(Repository.this);
+            getAdmin().addAdminHandler(adminHandler);
+        }
+
+
     }
 
 
@@ -1536,9 +1552,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
             } else if (AdminHandler.class.isAssignableFrom(c)) {
-                AdminHandler adminHandler = (AdminHandler) c.newInstance();
-                adminHandler.setRepository(Repository.this);
-                getAdmin().addAdminHandler(adminHandler);
+                adminHandlerClasses.add(c);
             }
             super.checkClass(c);
         }
@@ -3749,9 +3763,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param typeName _more_
      * @param typeHandler _more_
      */
-    protected void addTypeHandler(String typeName, TypeHandler typeHandler) {
+    public void addTypeHandler(String typeName, TypeHandler typeHandler) {
         theTypeHandlersMap.put(typeName, typeHandler);
         theTypeHandlers.add(typeHandler);
+    }
+
+
+    public void removeTypeHandler(TypeHandler typeHandler) {
+        theTypeHandlersMap.remove(typeHandler.getType());
+        theTypeHandlers.remove(typeHandler);
     }
 
     /**

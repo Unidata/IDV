@@ -78,8 +78,6 @@ import java.util.zip.*;
 public class CsvOutputHandler extends OutputHandler {
 
 
-
-
     /** _more_ */
     public static final OutputType OUTPUT_CSV = new OutputType("CSV",
                                                     "default.csv",

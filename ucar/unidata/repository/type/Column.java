@@ -51,6 +51,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import java.text.DecimalFormat;
 
 /**
  */
@@ -108,6 +109,9 @@ public class Column implements Constants {
     public static final String TYPE_DATE = "date";
 
     /** _more_ */
+    public static final String TYPE_LATLONBBOX = "latlonbbox";
+
+
     public static final String TYPE_LATLON = "latlon";
 
     /** _more_ */
@@ -118,58 +122,64 @@ public class Column implements Constants {
 
 
     /** _more_ */
-    private static final String ATTR_NAME = "name";
+    public static final String ATTR_NAME = "name";
+
+    public static final String ATTR_ADDTOFORM = "addtoform";
 
     /** _more_ */
-    private static final String ATTR_GROUP = "group";
+    public static final String ATTR_GROUP = "group";
 
     /** _more_ */
-    private static final String ATTR_OLDNAMES = "oldnames";
+    public static final String ATTR_OLDNAMES = "oldnames";
 
     /** _more_ */
-    private static final String ATTR_SUFFIX = "suffix";
+    public static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
-    private static final String ATTR_PROPERTIES = "properties";
+    public static final String ATTR_PROPERTIES = "properties";
 
     /** _more_ */
-    private static final String ATTR_LABEL = "label";
+    public static final String ATTR_LABEL = "label";
 
     /** _more_ */
-    private static final String ATTR_DESCRIPTION = "description";
+    public static final String ATTR_DESCRIPTION = "description";
 
     /** _more_ */
-    private static final String ATTR_TYPE = "type";
+    public static final String ATTR_TYPE = "type";
 
     /** _more_ */
-    private static final String ATTR_ISINDEX = "isindex";
+    public static final String ATTR_ISINDEX = "isindex";
 
     /** _more_ */
-    private static final String ATTR_CANSEARCH = "cansearch";
+    public static final String ATTR_CANSEARCH = "cansearch";
 
     /** _more_ */
-    private static final String ATTR_CANLIST = "canlist";
+    public static final String ATTR_CANLIST = "canlist";
 
     /** _more_ */
-    private static final String ATTR_VALUES = "values";
+    public static final String ATTR_VALUES = "values";
 
     /** _more_ */
-    private static final String ATTR_DEFAULT = "default";
+    public static final String ATTR_DEFAULT = "default";
 
     /** _more_ */
-    private static final String ATTR_SIZE = "size";
+    public static final String ATTR_SIZE = "size";
 
     /** _more_ */
-    private static final String ATTR_ROWS = "rows";
+    public static final String ATTR_ROWS = "rows";
 
     /** _more_ */
-    private static final String ATTR_COLUMNS = "columns";
+    public static final String ATTR_COLUMNS = "columns";
 
     /** _more_ */
-    private static final String ATTR_SEARCHTYPE = "searchtype";
+    public static final String ATTR_SEARCHTYPE = "searchtype";
 
     /** _more_ */
-    private static final String ATTR_SHOWINHTML = "showinhtml";
+    public static final String ATTR_SHOWINHTML = "showinhtml";
+
+
+    /** Lat/Lon format */
+    private DecimalFormat latLonFormat = new DecimalFormat("##0.00");
 
 
     /** _more_ */
@@ -234,6 +244,9 @@ public class Column implements Constants {
     private boolean canShow = true;
 
 
+    private boolean addToForm = true;
+
+
     /**
      * _more_
      *
@@ -263,6 +276,7 @@ public class Column implements Constants {
         dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "").trim();
         isIndex     = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
         canSearch   = XmlUtil.getAttribute(element, ATTR_CANSEARCH, false);
+        addToForm   = XmlUtil.getAttribute(element, ATTR_ADDTOFORM, addToForm);
         canShow     = XmlUtil.getAttribute(element, ATTR_SHOWINHTML, canShow);
         canList     = XmlUtil.getAttribute(element, ATTR_CANLIST, false);
         size        = XmlUtil.getAttribute(element, ATTR_SIZE, size);
@@ -314,6 +328,23 @@ public class Column implements Constants {
         return values[idx].toString();
     }
 
+
+    private String toLatLonString(Object[] values, int idx) {
+        if (values == null) {
+            return ((dflt != null)
+                    ? dflt
+                    : "NA");
+        }
+        if (values[idx] == null) {
+            return ((dflt != null)
+                    ? dflt
+                    : "NA");
+        }
+        if(!latLonOk(values[idx])) return "NA";
+        double d = ((Double)values[idx]).doubleValue();
+        return latLonFormat.format(d);
+    }
+
     /**
      * _more_
      *
@@ -343,15 +374,24 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    protected int formatValue(StringBuffer sb, OutputType output,
-                              Object[] values, int valueIdx) {
+    public int formatValue(StringBuffer sb, OutputType output,
+                           Object[] values, int valueIdx) {
 
         if (type.equals(TYPE_LATLON)) {
-            sb.append(toString(values, valueIdx));
+            sb.append(toLatLonString(values, valueIdx));
             valueIdx++;
             sb.append(",");
-            sb.append(toString(values, valueIdx));
+            sb.append(toLatLonString(values, valueIdx));
             valueIdx++;
+        } else  if (type.equals(TYPE_LATLONBBOX)) {
+            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(",");
+            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(",");
+            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(","); 
+           sb.append(toLatLonString(values, valueIdx++));
+
         } else {
             sb.append(toString(values, valueIdx));
             valueIdx++;
@@ -415,6 +455,14 @@ public class Column implements Constants {
                 statement.setDouble(statementIdx + 1, Entry.NONGEO);
             }
             statementIdx += 2;
+        } else if (type.equals(TYPE_LATLONBBOX)) {
+            for(int i=0;i<4;i++) { 
+                if (values[offset+i] != null) {
+                    statement.setDouble(statementIdx++, ((Double) values[offset+i]).doubleValue());
+                }  else {
+                    statement.setDouble(statementIdx++, Entry.NONGEO);
+                }
+            }
         } else if (type.equals(TYPE_PASSWORD)) {
             if (values[offset] != null) {
                 String value =
@@ -451,7 +499,7 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    protected int readValues(ResultSet results, Object[] values, int valueIdx)
+    public int readValues(ResultSet results, Object[] values, int valueIdx)
             throws Exception {
         if (type.equals(TYPE_INT)) {
             values[offset] = new Integer(results.getInt(valueIdx));
@@ -462,12 +510,19 @@ public class Column implements Constants {
         } else if (type.equals(TYPE_BOOLEAN)) {
             values[offset] = new Boolean(results.getInt(valueIdx) == 1);
             valueIdx++;
+        } else if (type.equals(TYPE_DATE)) {
+            values[offset] = typeHandler.getDatabaseManager().getTimestamp(results, valueIdx);
+            valueIdx++;
         } else if (type.equals(TYPE_LATLON)) {
             values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
             values[offset + 1] = new Double(results.getDouble(valueIdx));
             valueIdx++;
-
+        } else if (type.equals(TYPE_LATLONBBOX)) {
+            values[offset] = new Double(results.getDouble(valueIdx++));
+            values[offset+1] = new Double(results.getDouble(valueIdx++));
+            values[offset+2] = new Double(results.getDouble(valueIdx++));
+            values[offset+3] = new Double(results.getDouble(valueIdx++));
         } else if (type.equals(TYPE_PASSWORD)) {
             String value = results.getString(valueIdx);
             if (value != null) {
@@ -531,6 +586,9 @@ public class Column implements Constants {
         } else if (type.equals(TYPE_BOOLEAN)) {
             //use int as boolean for database compatibility
             defineColumn(statement, name, "int");
+
+        } else if (type.equals(TYPE_DATE)) {
+            defineColumn(statement,name,typeHandler.getDatabaseManager().convertSql("ramadda.datetime"));
         } else if (type.equals(TYPE_LATLON)) {
             defineColumn(
                 statement, name + "_lat",
@@ -538,6 +596,23 @@ public class Column implements Constants {
                     "double"));
             defineColumn(
                 statement, name + "_lon",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
+        } else if (type.equals(TYPE_LATLONBBOX)) {
+            defineColumn(
+                statement, name + "_north",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
+            defineColumn(
+                statement, name + "_west",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
+            defineColumn(
+                statement, name + "_south",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
+            defineColumn(
+                statement, name + "_east",
                 typeHandler.getRepository().getDatabaseManager().convertType(
                     "double"));
 
@@ -583,6 +658,8 @@ public class Column implements Constants {
             //TODO
         } else if (type.equals(TYPE_LATLON)) {
             //TODO
+        } else if (type.equals(TYPE_LATLONBBOX)) {
+            //TODO
         }
         return value;
     }
@@ -599,6 +676,15 @@ public class Column implements Constants {
 
 
 
+    private boolean latLonOk(Object o) {
+        if(o==null) return false;
+        Double d = (Double) o;
+        return latLonOk(d.doubleValue());
+    }
+
+    private boolean latLonOk(double v) {
+        return (v==v && v!=Entry.NONGEO);
+    }
 
     /**
      * _more_
@@ -609,22 +695,37 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    protected void assembleWhereClause(Request request, List<Clause> where,
+    public void assembleWhereClause(Request request, List<Clause> where,
                                        StringBuffer searchCriteria)
             throws Exception {
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
-            double lat1 = request.get(id + "_lat1", Double.NaN);
-            double lat2 = request.get(id + "_lat2", Double.NaN);
-            double lon1 = request.get(id + "_lon1", Double.NaN);
-            double lon2 = request.get(id + "_lon2", Double.NaN);
-            if ((lat1 == lat1) && (lat2 == lat2) && (lon1 == lon1)
-                    && (lon2 == lon2)) {
-                where.add(Clause.ge(getFullName() + "_lat", lat1));
-                where.add(Clause.le(getFullName() + "_lat", lat2));
-                where.add(Clause.le(getFullName() + "_lon", lon1));
-                where.add(Clause.ge(getFullName() + "_lon", lon2));
-            }
+            double north = request.get(id + "_north", Double.NaN);
+            double south = request.get(id + "_south", Double.NaN);
+            double east = request.get(id + "_east", Double.NaN);
+            double west= request.get(id + "_west", Double.NaN);
+            if (latLonOk(north)) 
+                where.add(Clause.le(id + "_lat", north));
+            if (latLonOk(south))
+                where.add(Clause.ge(id + "_lat", south));
+            if (latLonOk(west))
+                where.add(Clause.ge(id + "_lon", west));
+            if (latLonOk(east))
+                where.add(Clause.le(id + "_lon", east));
+        } else if(type.equals(TYPE_LATLONBBOX)) {
+            double north = request.get(id + "_north", Double.NaN);
+            double south = request.get(id + "_south", Double.NaN);
+            double east = request.get(id + "_east", Double.NaN);
+            double west= request.get(id + "_west", Double.NaN);
+
+            if (latLonOk(north)) 
+                where.add(Clause.le(id + "_north", north));
+            if (latLonOk(south))
+                where.add(Clause.ge(id + "_south", south));
+            if (latLonOk(west))
+                where.add(Clause.ge(id + "_west", west));
+            if (latLonOk(east))
+                where.add(Clause.le(id + "_east", east));
         } else if (isNumeric()) {
             String expr = request.getCheckedString(id + "_expr", EXPR_EQUALS,
                               EXPR_PATTERN);
@@ -660,6 +761,8 @@ public class Column implements Constants {
                         ? 1
                         : 0)));
             }
+        } else if (type.equals(TYPE_DATE)) {
+            //TODO: typeHandler.getDatabaseManager()
         } else {
             String value = request.getString(id, "");
             typeHandler.addOrClause(getFullName(),
@@ -679,12 +782,14 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, Entry entry) {
+    public int matchValue(String arg, Object value, Object[]values) {
         if (type.equals(TYPE_LATLON)) {
+            //TODO:
+        } else if (type.equals(TYPE_LATLONBBOX)) {
             //TODO:
         } else if (type.equals(TYPE_BOOLEAN)) {
             if (arg.equals(getFullName())) {
-                if (entry.getValues()[offset].toString().equals(value)) {
+                if (values[offset].toString().equals(value)) {
                     return TypeHandler.MATCH_TRUE;
                 }
                 return TypeHandler.MATCH_FALSE;
@@ -693,7 +798,7 @@ public class Column implements Constants {
             //
         } else {
             if (arg.equals(getFullName())) {
-                if (entry.getValues()[offset].equals(value)) {
+                if (values[offset].equals(value)) {
                     return TypeHandler.MATCH_TRUE;
                 }
                 return TypeHandler.MATCH_FALSE;
@@ -714,9 +819,10 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void addToEntryForm(Request request, StringBuffer formBuffer,
-                               Entry entry, Hashtable state)
+                               Object[]values, Hashtable state)
             throws Exception {
-        String widget = getFormWidget(request, entry);
+        if(!addToForm) return;
+        String widget = getFormWidget(request, values);
         //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
         //                                             HtmlUtil.hbox(widget, suffix)));
         if ((group != null) && (state.get(group) == null)) {
@@ -747,63 +853,87 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    public String getFormWidget(Request request, Entry entry)
+    public String getFormWidget(Request request, Object[]values)
             throws Exception {
         String   widget = "";
-        Object[] values = ((entry == null)
-                           ? null
-                           : entry.getValues());
+        String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
-            widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
+            double lat = 0;
+            double lon = 0;
+            if (values != null) {
+                lat = ((Double)values[offset]).doubleValue();
+                lon = ((Double)values[offset+1]).doubleValue();
+            }
+            widget = " Lat: " + HtmlUtil.input(id+"_lat", latLonOk(lat)?lat+"":"", HtmlUtil.SIZE_5) +
+                " Lon: " + HtmlUtil.input(id+"_lon", latLonOk(lon)?lon+"":"", HtmlUtil.SIZE_5);
+        } else  if (type.equals(TYPE_LATLONBBOX)) {
+            if(values!=null) {
+                widget = typeHandler.getRepository().makeMapSelector(id, true, "","",
+                                                                     latLonOk(values[offset+2])?values[offset+2]+"":"",
+                                                                     latLonOk(values[offset+0])?values[offset+0]+"":"",
+                                                                     latLonOk(values[offset+3])?values[offset+3]+"":"",
+                                                                     latLonOk(values[offset+1])?values[offset+1]+"":"");
+            } else {
+                widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+            }
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = "True";
-            if (entry != null) {
+            if (values != null) {
                 if (toBoolean(values, offset)) {
                     value = "True";
                 } else {
                     value = "False";
                 }
             }
-            widget = HtmlUtil.select(getFullName(),
+            widget = HtmlUtil.select(id,
                                      Misc.newList("True", "False"), value);
+        } else if (type.equals(TYPE_DATE)) {
+            Date date;
+            if (values != null) {
+                date  = (Date) values[offset];
+            } else {
+                date = new Date();
+            }
+            widget = typeHandler.getRepository().makeDateInput(
+                                                   request, id, "", date,null);
         } else if (type.equals(TYPE_ENUMERATION)) {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (entry != null) {
+            if (values != null) {
                 value = (String) toString(values, offset);
             }
-            widget = HtmlUtil.select(getFullName(), this.values, value);
+            widget = HtmlUtil.select(id, this.values, value);
         } else if (type.equals(TYPE_INT)) {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (entry != null) {
+            if (values != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
+            widget = HtmlUtil.input(id, value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_DOUBLE)) {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (entry != null) {
+            if (values != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
+            widget = HtmlUtil.input(id, value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_PASSWORD)) {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (entry != null) {
+            if (values != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.password(getFullName(), value,
+            widget = HtmlUtil.password(id, value,
                                        HtmlUtil.SIZE_10);
         } else {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (entry != null) {
+            if (values != null) {
                 value = toString(values, offset);
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
@@ -814,28 +944,28 @@ public class Column implements Constants {
                 if (props != null) {
                     for (Enumeration keys = props.keys();
                             keys.hasMoreElements(); ) {
-                        String id = (String) keys.nextElement();
-                        if (id.endsWith(".label")) {
-                            id = id.substring(0,
-                                    id.length() - ".label".length());
-                            tfos.add(new TwoFacedObject(getLabel(id), id));
+                        String xid = (String) keys.nextElement();
+                        if (xid.endsWith(".label")) {
+                            xid = xid.substring(0,
+                                    xid.length() - ".label".length());
+                            tfos.add(new TwoFacedObject(getLabel(xid), xid));
                         }
                     }
                 }
 
                 tfos = (List<TwoFacedObject>) Misc.sort(tfos);
                 if (tfos.size() == 0) {
-                    widget = HtmlUtil.input(getFullName(), value,
+                    widget = HtmlUtil.input(id, value,
                                             " size=10 ");
                 } else {
 
-                    widget = HtmlUtil.select(getFullName(), tfos, value);
+                    widget = HtmlUtil.select(id, tfos, value);
                 }
             } else if (rows > 1) {
-                widget = HtmlUtil.textArea(getFullName(), value, rows,
+                widget = HtmlUtil.textArea(id, value, rows,
                                            columns);
             } else {
-                widget = HtmlUtil.input(getFullName(), value,
+                widget = HtmlUtil.input(id, value,
                                         "size=\"" + columns + "\"");
             }
         }
@@ -853,17 +983,29 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void setValue(Request request, Object[] values) throws Exception {
+        if(!addToForm) return;
+        String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
-            //TODO
+            if (request.exists(id+"_lat")) {
+                values[offset] = new Double(request.getString(id+"_lat","0").trim());
+                values[offset+1] = new Double(request.getString(id+"_lon","0").trim());
+            }
+        } else if (type.equals(TYPE_LATLONBBOX)) {
+            values[offset] = new Double(request.get(id+"_north",Entry.NONGEO));
+            values[offset+1] = new Double(request.get(id+"_west",Entry.NONGEO));
+            values[offset+2] = new Double(request.get(id+"_south",Entry.NONGEO));
+            values[offset+3] = new Double(request.get(id+"_east",Entry.NONGEO));
+        } else if (type.equals(TYPE_DATE)) {
+            values[offset] =    request.getDate(id, new Date());
         } else if (type.equals(TYPE_BOOLEAN)) {
-            String value = request.getString(getFullName(),
+            String value = request.getString(id,
                                              (StringUtil.notEmpty(dflt)
                     ? dflt
                     : "true")).toLowerCase();
             values[offset] = new Boolean(value);
         } else if (type.equals(TYPE_ENUMERATION)) {
-            if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(),
+            if (request.exists(id)) {
+                values[offset] = request.getString(id,
                         ((dflt != null)
                          ? dflt
                          : ""));
@@ -874,8 +1016,8 @@ public class Column implements Constants {
             int dfltValue = (StringUtil.notEmpty(dflt)
                              ? new Integer(dflt).intValue()
                              : 0);
-            if (request.exists(getFullName())) {
-                values[offset] = new Integer(request.get(getFullName(),
+            if (request.exists(id)) {
+                values[offset] = new Integer(request.get(id,
                         dfltValue));
             } else {
                 values[offset] = dfltValue;
@@ -884,16 +1026,16 @@ public class Column implements Constants {
             double dfltValue = (StringUtil.notEmpty(dflt)
                                 ? new Double(dflt.trim()).doubleValue()
                                 : 0);
-            if (request.exists(getFullName())) {
-                values[offset] = new Double(request.get(getFullName(),
+            if (request.exists(id)) {
+                values[offset] = new Double(request.get(id,
                         dfltValue));
             } else {
                 values[offset] = dfltValue;
 
             }
         } else {
-            if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(),
+            if (request.exists(id)) {
+                values[offset] = request.getString(id,
                         ((dflt != null)
                          ? dflt
                          : ""));
@@ -923,29 +1065,33 @@ public class Column implements Constants {
             return;
         }
 
+        String id   = getFullName();
 
         List<Clause> tmp    = new ArrayList<Clause>(where);
         String       widget = "";
         if (type.equals(TYPE_LATLON)) {
-            widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
+            widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+        }  if (type.equals(TYPE_LATLONBBOX)) {
+            widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+        } else if (type.equals(TYPE_DATE)) {
+
         } else if (type.equals(TYPE_BOOLEAN)) {
-            widget = HtmlUtil.select(getFullName(),
+            widget = HtmlUtil.select(id,
                                      Misc.newList(TypeHandler.ALL_OBJECT,
-                                         "True", "False"));
+                                                  "True", "False"),request.getString(id,""));
         } else if (type.equals(TYPE_ENUMERATION)) {
             List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
             tmpValues.addAll(values);
-            widget = HtmlUtil.select(getFullName(), tmpValues);
+            widget = HtmlUtil.select(id, tmpValues, request.getString(id));
         } else if (isNumeric()) {
-            String id   = getFullName();
-            String expr = HtmlUtil.select(id + "_expr", EXPR_ITEMS);
-            widget = expr + HtmlUtil.input(id + "_from", "", "size=\"10\"")
-                     + HtmlUtil.input(id + "_to", "", "size=\"10\"");
+            String expr = HtmlUtil.select(id + "_expr", EXPR_ITEMS, request.getString(id+"_expr",""));
+            widget = expr + HtmlUtil.input(id + "_from", request.getString(id+"_from",""), "size=\"10\"")
+                + HtmlUtil.input(id + "_to", request.getString(id+"_to",""), "size=\"10\"");
         } else {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
                 Statement statement = typeHandler.select(request,
-                                          SqlUtil.distinct(getFullName()),
+                                          SqlUtil.distinct(id),
                                           tmp, "");
                 long t2 = System.currentTimeMillis();
                 String[] values =
@@ -968,17 +1114,17 @@ public class Column implements Constants {
                 list.addAll(sorted);
                 if (list.size() == 1) {
                     widget =
-                        HtmlUtil.hidden(getFullName(),
+                        HtmlUtil.hidden(id,
                                         (String) list.get(0).getId()) + " "
                                             + list.get(0).toString();
                 } else {
                     list.add(0, TypeHandler.ALL_OBJECT);
-                    widget = HtmlUtil.select(getFullName(), list);
+                    widget = HtmlUtil.select(id, list);
                 }
             } else if (rows > 1) {
-                widget = HtmlUtil.textArea(getFullName(), "", rows, columns);
+                widget = HtmlUtil.textArea(id, request.getString(id,""), rows, columns);
             } else {
-                widget = HtmlUtil.input(getFullName(), "",
+                widget = HtmlUtil.input(id,request.getString(id,""),
                                         "size=\"" + columns + "\"");
             }
         }
@@ -1043,6 +1189,11 @@ public class Column implements Constants {
         if (type.equals(TYPE_LATLON)) {
             names.add(name + "_lat");
             names.add(name + "_lon");
+        } else  if (type.equals(TYPE_LATLONBBOX)) {
+            names.add(name + "_north");
+            names.add(name + "_west");
+            names.add(name + "_south");
+            names.add(name + "_east");
         } else {
             names.add(name);
         }
@@ -1234,6 +1385,10 @@ public class Column implements Constants {
      */
     public String getDflt() {
         return dflt;
+    }
+
+    public String toString() {
+        return name+":" + offset;
     }
 
 
