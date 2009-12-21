@@ -100,25 +100,36 @@ public class WindBarb {
             south[i] = isSouth;
         }
 
-        float[] vx     = new float[NUM];
-        float[] vy     = new float[NUM];
-        float[] vz     = new float[NUM];
-        float[] tx     = new float[NUM];
-        float[] ty     = new float[NUM];
-        float[] tz     = new float[NUM];
-        byte[]  vred   = null;
-        byte[]  vgreen = null;
-        byte[]  vblue  = null;
-        byte[]  tred   = null;
-        byte[]  tgreen = null;
-        byte[]  tblue  = null;
+        float[] vx        = new float[NUM];
+        float[] vy        = new float[NUM];
+        float[] vz        = new float[NUM];
+        float[] tx        = new float[NUM];
+        float[] ty        = new float[NUM];
+        float[] tz        = new float[NUM];
+        byte[]  vred      = null;
+        byte[]  vgreen    = null;
+        byte[]  vblue     = null;
+        byte[]  valpha    = null;
+        byte[]  tred      = null;
+        byte[]  tgreen    = null;
+        byte[]  tblue     = null;
+        byte[]  talpha    = null;
+        int     numColors = (color_values != null)
+                            ? color_values.length
+                            : 3;
         if (color_values != null) {
             vred   = new byte[NUM];
             vgreen = new byte[NUM];
             vblue  = new byte[NUM];
+            if (numColors == 4) {
+                valpha = new byte[NUM];
+            }
             tred   = new byte[NUM];
             tgreen = new byte[NUM];
             tblue  = new byte[NUM];
+            if (numColors == 4) {
+                talpha = new byte[NUM];
+            }
         }
         int[] numv    = { 0 };
         int[] numt    = { 0 };
@@ -159,12 +170,20 @@ public class WindBarb {
                         byte[] cred   = vred;
                         byte[] cgreen = vgreen;
                         byte[] cblue  = vblue;
+                        byte[] calpha = valpha;
                         vred   = new byte[l];
                         vgreen = new byte[l];
                         vblue  = new byte[l];
+                        if (calpha != null) {
+                            valpha = new byte[l];
+                        }
                         System.arraycopy(cred, 0, vred, 0, cred.length);
                         System.arraycopy(cgreen, 0, vgreen, 0, cgreen.length);
                         System.arraycopy(cblue, 0, vblue, 0, cblue.length);
+                        if (calpha != null) {
+                            System.arraycopy(calpha, 0, valpha, 0,
+                                             calpha.length);
+                        }
                     }
                 }
                 if (numt[0] + NUM / 4 > tx.length) {
@@ -182,12 +201,20 @@ public class WindBarb {
                         byte[] cred   = tred;
                         byte[] cgreen = tgreen;
                         byte[] cblue  = tblue;
+                        byte[] calpha = talpha;
                         tred   = new byte[l];
                         tgreen = new byte[l];
                         tblue  = new byte[l];
+                        if (calpha != null) {
+                            talpha = new byte[l];
+                        }
                         System.arraycopy(cred, 0, tred, 0, cred.length);
                         System.arraycopy(cgreen, 0, tgreen, 0, cgreen.length);
                         System.arraycopy(cblue, 0, tblue, 0, cblue.length);
+                        if (calpha != null) {
+                            System.arraycopy(calpha, 0, talpha, 0,
+                                             calpha.length);
+                        }
                     }
                 }
                 int oldnv = numv[0];
@@ -213,22 +240,34 @@ public class WindBarb {
                             vred[i]   = color_values[0][j];
                             vgreen[i] = color_values[1][j];
                             vblue[i]  = color_values[2][j];
+                            if (numColors == 4) {
+                                valpha[i] = color_values[3][j];
+                            }
                         }
                         for (int i = oldnt; i < nt; i++) {
                             tred[i]   = color_values[0][j];
                             tgreen[i] = color_values[1][j];
                             tblue[i]  = color_values[2][j];
+                            if (numColors == 4) {
+                                talpha[i] = color_values[3][j];
+                            }
                         }
                     } else {  // if (color_values[0].length == 1)
                         for (int i = oldnv; i < nv; i++) {
                             vred[i]   = color_values[0][0];
                             vgreen[i] = color_values[1][0];
                             vblue[i]  = color_values[2][0];
+                            if (numColors == 4) {
+                                valpha[i] = color_values[3][0];
+                            }
                         }
                         for (int i = oldnt; i < nt; i++) {
                             tred[i]   = color_values[0][0];
                             tgreen[i] = color_values[1][0];
                             tblue[i]  = color_values[2][0];
+                            if (numColors == 4) {
+                                talpha[i] = color_values[3][0];
+                            }
                         }
                     }
                 }
@@ -262,12 +301,15 @@ public class WindBarb {
 
         byte[] colors = null;
         if (color_values != null) {
-            colors = new byte[3 * nv];
+            colors = new byte[numColors * nv];
             m      = 0;
             for (int i = 0; i < nv; i++) {
                 colors[m++] = vred[i];
                 colors[m++] = vgreen[i];
                 colors[m++] = vblue[i];
+                if (numColors == 4) {
+                    colors[m++] = valpha[i];
+                }
             }
             array.colors = colors;
         }
@@ -297,12 +339,15 @@ public class WindBarb {
             tarray.normals = normals;
 
             if (color_values != null) {
-                colors = new byte[3 * nt];
+                colors = new byte[numColors * nt];
                 m      = 0;
                 for (int i = 0; i < nt; i++) {
                     colors[m++] = tred[i];
                     colors[m++] = tgreen[i];
                     colors[m++] = tblue[i];
+                    if (numColors == 4) {
+                        colors[m++] = talpha[i];
+                    }
                 }
                 tarray.colors = colors;
             }
@@ -764,10 +809,7 @@ public class WindBarb {
                     y2 = (y + y0 * (d - flagSlant) - x0 * barb);
                 }
                 // now lengthen the distance to the next position
-                d = d - flagWidth - flagSpace;
-
-                float[] xp = { x1, x2, x3 };
-                float[] yp = { y1, y2, y3 };
+                d      = d - flagWidth - flagSpace;
 
                 tx[nt] = x1;
                 ty[nt] = y1;
