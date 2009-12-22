@@ -949,9 +949,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Misc.run(this, "getFtpManager");
 
 
-        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
+        /*        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
         xadminHandler.setRepository(Repository.this);
         getAdmin().addAdminHandler(xadminHandler);
+        */
 
 
         for(Class adminHandlerClass: adminHandlerClasses) {

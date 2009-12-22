@@ -997,7 +997,7 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.input(
                     PROP_FTP_PASSIVEPORTS,
                     getRepository().getProperty(
-                        PROP_FTP_PORT,
+                        PROP_FTP_PASSIVEPORTS,
                         FtpManager.DFLT_PASSIVE_PORTS), HtmlUtil.SIZE_15)));
 
 
