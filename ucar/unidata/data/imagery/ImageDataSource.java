@@ -1066,7 +1066,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return null;
             }
         }
-        return makeImage(aid, false, "");
+        return makeImage(aid, null, false, "");
     }
 
 
@@ -1075,6 +1075,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * Create the single image defined by the given dataChoice.
      *
      * @param aid AddeImageDescriptor
+     * @param rangeType This is the sample rangeType. For the first image this is null and this method will immediately read the data
      * @param fromSequence from a sequence
      * @param readLabel  the label
      *
@@ -1084,8 +1085,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @throws VisADException     VisAD problem
      */
     private SingleBandedImage makeImage(AddeImageDescriptor aid,
+                                        MathType rangeType,
                                         boolean fromSequence,
-                                        String readLabel)
+                                        String readLabel )
             throws VisADException, RemoteException {
 
         if (aid == null) {
@@ -1099,27 +1101,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
 
         try {
-            /*            if(!getCacheDataToDisk()) {
-                //If not caching then just load the data
-                AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
-                result = aa.getImage();
-                putCache(source, result);
-                return result;
-                }*/
-
-            /* Lets not do this right now so we can cache area files
-            if (!source.startsWith("adde:")) {
-                AreaAdapter aa = new AreaAdapter(source, false);
-                result = aa.getImage();
-                putCache(source, result);
-                return result;
-                }*/
-
             AddeImageInfo aii     = aid.getImageInfo();
             AreaDirectory areaDir = null;
             try {
                 if (aii != null) {
-                    //if (getCacheDataToDisk()) {
                     if (currentDirs != null) {
                         int    pos        =
                             Math.abs(aii.getDatasetPosition());
@@ -1133,7 +1118,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         band = 0;
                         areaDir =
                             currentDirs[currentDirs.length - pos - 1][band];
-                        //                            System.err.println("pos:" + aii.getDatasetPosition() + " date:" + areaDir.getStartTime() + " " + band);
                     } else {
                         //If its absolute time then just use the AD from the descriptor
                         if ((aii.getStartDate() != null)
@@ -1147,15 +1131,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
                             //                                + fromSequence);
                         }
                     }
-                    //                    }
                 }
             } catch (Exception exc) {
                 LogUtil.printMessage("error looking up area dir");
                 exc.printStackTrace();
                 return null;
             }
-
-
 
             if (areaDir == null) {
                 areaDir = aid.getDirectory();
@@ -1173,17 +1154,17 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 int hash = ((aii != null)
                             ? aii.makeAddeUrl().hashCode()
                             : areaDir.hashCode());
-                String filename = IOUtil.joinDir(getDataCachePath(),
-                                      "image_" + hash + "_" + ((aii != null)
-                        ? aii.getBand()
-                        : 0) + "_" + ((areaDir.getStartTime() != null)
-                                      ? "" + areaDir.getStartTime().getTime()
-                                      : "") + ".dat");
 
-
-                AreaImageFlatField aiff = AreaImageFlatField.create(aid,
-                                              areaDir, filename, readLabel);
-                result = aiff;
+                //If the range type is null then we are reading the first image
+                //and we want to read it immediately so we can get the correct range
+                //from the data itself
+                if(rangeType==null) {
+                    result =    AreaImageFlatField.createImmediate(aid, readLabel);
+                } else {
+                    //Else, pass in the already created range type
+                    result  = AreaImageFlatField.create(aid,
+                                                        areaDir, rangeType, readLabel);
+                }
             } else {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
@@ -1230,8 +1211,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @throws VisADException     VisAD problem
      */
     protected ImageSequence makeImageSequence(DataChoice dataChoice,
-            DataSelection subset)
-            throws VisADException, RemoteException {
+                                              DataSelection subset)
+        throws VisADException, RemoteException {
 
         try {
             List descriptorsToUse = new ArrayList();
@@ -1239,10 +1220,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 descriptorsToUse = getDescriptors(dataChoice, subset);
             } else {
                 List choices = (dataChoice instanceof CompositeDataChoice)
-                               ? getChoicesFromSubset(
-                                   (CompositeDataChoice) dataChoice, subset)
-                               : Arrays.asList(new DataChoice[] {
-                                   dataChoice });
+                    ? getChoicesFromSubset(
+                                           (CompositeDataChoice) dataChoice, subset)
+                    : Arrays.asList(new DataChoice[] {
+                            dataChoice });
                 for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
                     DataChoice          subChoice = (DataChoice) iter.next();
                     AddeImageDescriptor aid =
@@ -1253,7 +1234,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     DateTime dttm = aid.getImageTime();
                     if ((subset != null) && (dttm != null)) {
                         List times = getTimesFromDataSelection(subset,
-                                         dataChoice);
+                                                               dataChoice);
                         if ((times != null) && (times.indexOf(dttm) == -1)) {
                             continue;
                         }
@@ -1271,7 +1252,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             //Find the descriptor with the largest position
             String biggestSource = null;
             for (Iterator iter =
-                    descriptorsToUse.iterator(); iter.hasNext(); ) {
+                     descriptorsToUse.iterator(); iter.hasNext(); ) {
                 AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
                 if (aid.getIsRelative()) {
                     anyRelative = true;
@@ -1287,12 +1268,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 //                System.err.println (" aid:" + aid.getSource());
                 //Check if this is absolute time
                 if ((aii.getStartDate() != null)
-                        || (aii.getEndDate() != null)) {
+                    || (aii.getEndDate() != null)) {
                     biggestPosition = null;
                     break;
                 }
                 if ((biggestPosition == null)
-                        || (Math.abs(aii.getDatasetPosition()) > pos)) {
+                    || (Math.abs(aii.getDatasetPosition()) > pos)) {
                     pos             = Math.abs(aii.getDatasetPosition());
                     biggestPosition = aii;
                     biggestSource   = aid.getSource();
@@ -1305,13 +1286,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
             // TODO:  revisit this
 
             if (getCacheDataToDisk() && anyRelative
-                    && (biggestPosition != null)) {
+                && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
                 /*
-                System.err.println(biggestPosition.makeAddeUrl()
-                                   + "\nfrom aid:" + biggestSource);
-                System.err.println(biggestPosition.makeAddeUrl()
-                                   + "\nfrom aii:" + biggestPosition.makeAddeUrl());
+                  System.err.println(biggestPosition.makeAddeUrl()
+                  + "\nfrom aid:" + biggestSource);
+                  System.err.println(biggestPosition.makeAddeUrl()
+                  + "\nfrom aii:" + biggestPosition.makeAddeUrl());
                 */
                 AreaDirectoryList adl =
                     new AreaDirectoryList(biggestPosition.makeAddeUrl());
@@ -1330,8 +1311,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
             DataChoice parent = dataChoice.getParent();
             final List<SingleBandedImage> images =
                 new ArrayList<SingleBandedImage>();
+            MathType rangeType = null;
             for (Iterator iter =
-                    descriptorsToUse.iterator(); iter.hasNext(); ) {
+                     descriptorsToUse.iterator(); iter.hasNext(); ) {
                 final AddeImageDescriptor aid =
                     (AddeImageDescriptor) iter.next();
                 if (currentDirs != null) {
@@ -1355,32 +1337,43 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
                 label = label + dataChoice.toString();
                 final String readLabel = "Time: " + (cnt++) + "/"
-                                         + descriptorsToUse.size() + "  "
-                                         + label;
+                    + descriptorsToUse.size() + "  "
+                    + label;
 
-                threadManager.addRunnable(new ThreadManager.MyRunnable() {
-                    public void run() throws Exception {
-                        try {
-                            SingleBandedImage image = makeImage(aid, true,
-                                                          readLabel);
-                            if (image != null) {
-                                synchronized (images) {
-                                    images.add(image);
-                                }
-                            }
-                        } catch (VisADException ve) {
-                            LogUtil.printMessage(ve.toString());
-                        }
+                /* for now don't do things in parallel
+                   threadManager.addRunnable(new ThreadManager.MyRunnable() {
+                   public void run() throws Exception {
+                   try {
+                */
+
+                SingleBandedImage image = makeImage(aid, rangeType, true,
+                                                    readLabel);
+                            
+                if (image != null) {
+                    //If this is the first one then grab its rangeType to use for later images
+                    if(rangeType==null) {
+                        rangeType = ((FunctionType) image.getType()).getRange();
                     }
-                });
+                    synchronized (images) {
+                        images.add(image);
+                    }
+                }
+
+                /*
+                  } catch (VisADException ve) {
+                  LogUtil.printMessage(ve.toString());
+                  }
+                  }
+                  });*/
+
             }
 
-            try {
-                threadManager.runInParallel(
-                    getDataContext().getIdv().getMaxDataThreadCount());
-            } catch (VisADException ve) {
-                LogUtil.printMessage(ve.toString());
-            }
+            /*            try {
+                          threadManager.runInParallel(
+                          getDataContext().getIdv().getMaxDataThreadCount());
+                          } catch (VisADException ve) {
+                          LogUtil.printMessage(ve.toString());
+                          }*/
 
             TreeMap imageMap = new TreeMap();
             for (SingleBandedImage image : images) {
