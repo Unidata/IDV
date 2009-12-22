@@ -130,8 +130,9 @@ public class MultiFrame {
      * Show the component
      */
     public void show() {
-        if (frame != null) {
-            frame.show();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.show();
         } else if (internalFrame != null) {
             internalFrame.show();
         }
@@ -145,13 +146,14 @@ public class MultiFrame {
         if ((frame == null) && (internalFrame == null)) {
             return;
         }
-        if (frame != null) {
+        JFrame theFrame = frame;
+        if (theFrame != null) {
             if (frameListeners != null) {
                 for (WindowListener listener : frameListeners) {
-                    frame.removeWindowListener(listener);
+                    theFrame.removeWindowListener(listener);
                 }
             }
-            frame.dispose();
+            theFrame.dispose();
         } else if (internalFrame != null) {
             internalFrame.dispose();
         }
@@ -170,8 +172,9 @@ public class MultiFrame {
      * @param visible visible
      */
     public void setVisible(boolean visible) {
-        if (frame != null) {
-            frame.setVisible(visible);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setVisible(visible);
         } else if (internalFrame != null) {
             internalFrame.setVisible(visible);
         }
@@ -183,8 +186,9 @@ public class MultiFrame {
      * @return content pane
      */
     public Container getContentPane() {
-        if (frame != null) {
-            return frame.getContentPane();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            return theFrame.getContentPane();
         } else if (internalFrame != null) {
             return internalFrame.getContentPane();
         } else {
@@ -212,7 +216,10 @@ public class MultiFrame {
      * @param cursor cursor
      */
     public void setCursor(Cursor cursor) {
-        getWindow().setCursor(cursor);
+        Window window = getWindow();
+        if(window!=null) {
+            window.setCursor(cursor);
+        }
     }
 
 
@@ -222,8 +229,9 @@ public class MultiFrame {
      * @param state state
      */
     public void setState(int state) {
-        if (frame != null) {
-            frame.setState(state);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setState(state);
         } else if (internalFrame != null) {
             try {
                 if (state == Frame.NORMAL) {
@@ -243,8 +251,9 @@ public class MultiFrame {
      * @param title The title
      */
     public void setTitle(String title) {
-        if (frame != null) {
-            frame.setTitle(title);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setTitle(title);
         } else if (internalFrame != null) {
             internalFrame.setTitle(title);
         }
@@ -257,8 +266,9 @@ public class MultiFrame {
      * @return The title
      */
     public String getTitle() {
-        if (frame != null) {
-            return frame.getTitle();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            return theFrame.getTitle();
         } else if (internalFrame != null) {
             return internalFrame.getTitle();
         } else {
@@ -306,8 +316,9 @@ public class MultiFrame {
      * wrapper method
      */
     public void pack() {
-        if (frame != null) {
-            frame.pack();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.pack();
         } else if (internalFrame != null) {
             internalFrame.pack();
         }
@@ -319,8 +330,9 @@ public class MultiFrame {
      * @param operation operation
      */
     public void setDefaultCloseOperation(int operation) {
-        if (frame != null) {
-            frame.setDefaultCloseOperation(operation);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setDefaultCloseOperation(operation);
         } else if (internalFrame != null) {
             internalFrame.setDefaultCloseOperation(operation);
         }
@@ -336,9 +348,10 @@ public class MultiFrame {
      * @param l listener
      */
     public void addWindowListener(final WindowListener l) {
-        if (frame != null) {
+        JFrame theFrame = frame;
+        if (theFrame != null) {
             frameListeners.add(l);
-            frame.addWindowListener(l);
+            theFrame.addWindowListener(l);
         } else if (internalFrame != null) {
             if (dummyWindow == null) {
                 dummyWindow = new JFrame();
@@ -387,8 +400,9 @@ public class MultiFrame {
      */
     public void removeWindowListener(WindowListener l) {
         //TODO
-        if ((frame != null) && (frameListeners != null)) {
-            frame.removeWindowListener(l);
+        JFrame theFrame = frame;
+        if ((theFrame != null) && (frameListeners != null)) {
+            theFrame.removeWindowListener(l);
             frameListeners.remove(l);
         } else if ((listeners != null) && (internalFrame != null)) {
             InternalFrameListener listener =
@@ -407,8 +421,9 @@ public class MultiFrame {
      * @param menuBar _more_
      */
     public void setJMenuBar(JMenuBar menuBar) {
-        if (frame != null) {
-            frame.setJMenuBar(menuBar);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setJMenuBar(menuBar);
         } else if (internalFrame != null) {
             internalFrame.setJMenuBar(menuBar);
         }
@@ -429,9 +444,10 @@ public class MultiFrame {
      * @param bounds _more_
      */
     public void setBounds(Rectangle bounds) {
-        if (frame != null) {
+        JFrame theFrame = frame;
+        if (theFrame != null) {
             if (bounds != null) {
-                GuiUtils.positionAndFitToScreen(frame, bounds);
+                GuiUtils.positionAndFitToScreen(theFrame, bounds);
             }
         } else if (internalFrame != null) {
             internalFrame.setBounds(bounds);
@@ -444,8 +460,9 @@ public class MultiFrame {
      * @param icon _more_
      */
     public void setIconImage(Image icon) {
-        if (frame != null) {
-            frame.setIconImage(icon);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setIconImage(icon);
         } else if (internalFrame != null) {
             //            internalFrame.setFrameIcon(new ImageIcon(icon));
         }
@@ -455,8 +472,9 @@ public class MultiFrame {
      * wrapper method
      */
     public void toFront() {
-        if (frame != null) {
-            GuiUtils.toFront(frame);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            GuiUtils.toFront(theFrame);
         } else if (internalFrame != null) {
             GuiUtils.toFront(getWindow());
             internalFrame.toFront();
@@ -494,8 +512,9 @@ public class MultiFrame {
      * @return is showing
      */
     public boolean isShowing() {
-        if (frame != null) {
-            return frame.isShowing();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            return theFrame.isShowing();
         } else if (internalFrame != null) {
             return getWindow().isShowing() && !internalFrame.isIcon();
         } else {
@@ -520,8 +539,9 @@ public class MultiFrame {
      * @param y y
      */
     public void setLocation(int x, int y) {
-        if (frame != null) {
-            frame.setLocation(x, y);
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            theFrame.setLocation(x, y);
         } else if (internalFrame != null) {
             //TODO?
         }
@@ -553,8 +573,9 @@ public class MultiFrame {
      * @return state
      */
     public int getState() {
-        if (frame != null) {
-            return frame.getState();
+        JFrame theFrame = frame;
+        if (theFrame != null) {
+            return theFrame.getState();
         } else if (internalFrame != null) {
             if (internalFrame.isIcon()) {
                 return Frame.ICONIFIED;
