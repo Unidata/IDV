@@ -81,7 +81,7 @@
            target="1.5"
         >
         <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
-        <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
+        <include name="ucar/unidata/repository/client/InteractiveRepositoryClient.java"/>
         </javac>
         <jar 
             basedir="${compiledir}"
@@ -166,7 +166,6 @@
            target="1.5"
         >
         <include name="ucar/unidata/repository/client/InteractiveRepositoryClient.java"/>
-        <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
         </javac>
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
@@ -183,7 +182,7 @@
               <attribute name="Implementation-Title" value="Unidata's Ramada Client"/>
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
-              <attribute name="Main-class" value="ucar.unidata.repository.RepositoryClient"/>
+              <attribute name="Main-class" value="ucar.unidata.repository.client.RepositoryClient"/>
               <attribute name="Class-Path" value="commons-httpclient-3.1.jar commons-logging-1.1.jar commons-codec-1.3.jar"/>
             </manifest> 
 
