@@ -499,6 +499,7 @@ public class GuiUtils extends LayoutUtil {
      * @param window the window
      */
     public static void toFront(Window window) {
+        if(window == null) return;
         window.setVisible(true);
         window.toFront();
         if (window instanceof Frame) {
