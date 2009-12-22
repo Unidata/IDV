@@ -141,10 +141,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
     /**
-     * ctor
+     * ctor to use when we have created the image immediately with createImmediate
      *
      *
-     * @param aid _more_
+     * @param aid The descriptor
      * @param floats The values
      * @param type Function type
      * @param domainSet Domain
@@ -161,6 +161,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                               float[][] floats, String readLabel)
             throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
+        this.domainSet = domainSet;
         this.aid       = aid;
         this.readLabel = readLabel;
     }
@@ -208,8 +209,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
-
-
     /**
      * _more_
      *
@@ -239,9 +238,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                       domainSet, rangeCoordSys, rangeSets,
                                       units, samples, readLabel);
 
-        //        aiff.bandIndices = bandIndices;
-        //        aiff.aid         = aid;
-        //        cs.aiff          = aiff;
         aiff.startTime = ff.getStartTime();
         return aiff;
 
@@ -249,32 +245,26 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
     /**
-     * _more_
+     * Create a AIFF without reading any data yet
      *
-     * @param aid _more_
+     * @param aid The descriptor
      * @param areaDirectory _more_
-     * @param cacheFile _more_
-     * @param readLabel _more_
+     * @param rangeType Use this range type if its not null
+     * @param readLabel What to show in the gui when we are reading the data
      *
-     * @return _more_
+     * @return The flatfield
      *
      *
-     * @throws IOException _more_
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws IOException On badness
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public static AreaImageFlatField create(AddeImageDescriptor aid,
                                             AreaDirectory areaDirectory,
-                                            String cacheFile,
+                                            MathType rangeType,
                                             String readLabel)
             throws VisADException, RemoteException, IOException {
 
-
-        //        if(true) {
-        //            return createImmediate(aid, readLabel);
-        //        }
-        //        int nLines = aid.getImageInfo().getLines();
-        //        int nEles  = aid.getImageInfo().getElements();
         AddeImageInfo aii    = aid.getImageInfo();
 
         int           nLines = (aii != null)
@@ -361,7 +351,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
         // the range of the FunctionType is the band(s)
-        RealTupleType radiance = new RealTupleType(bands);
+        MathType radiance = new RealTupleType(bands);
 
         // the domain is (element,line) since elements (X) vary fastest
         RealType[]             domain_components = { element, line };
@@ -373,7 +363,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         Linear2DSet domain_set = new Linear2DSet(image_domain, 0,
                                      (nEles - 1), nEles, (nLines - 1), 0,
                                      nLines);
-        FunctionType image_type = new FunctionType(image_domain, radiance);
+        //If we were passed in a range type then use it, else use the one we create here
+        FunctionType image_type = new FunctionType(image_domain, (rangeType!=null?rangeType:(MathType)radiance));
 
         // If calibrationType is brightnes (BRIT), then we can store
         // the values as shorts.  To do this, we crunch the values down
@@ -490,19 +481,11 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @return _more_
      */
-    static int xcnt = 0;
-
-
     public Set getDomainSet() {
-        if(xcnt++ == 200) {
-            //            Misc.printStack("getDomainSet");
-        }
-
         if (aid != null) {
             checkReadData();
         }
         if (domainSet != null) {
-            //            msg("getDomainSet: " + domainSet.getClass().getName());
             return domainSet;
         }
         throw new IllegalStateException ("AreaImageFlatField.getDomainSet: domain set is null");
