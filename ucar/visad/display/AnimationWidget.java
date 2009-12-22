@@ -434,10 +434,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         List buttonList = new ArrayList();
         buttonList.add(timesCbx);
         Dimension  preferredSize = timesCbx.getPreferredSize();
-        JComponent filler = GuiUtils.filler(3, ((preferredSize != null)
-                ? preferredSize.height + 1
-                : 20));
-        buttonList.add(filler);
+        if(preferredSize!=null) {
+            int height = preferredSize.height;
+            if(height<50) {
+                JComponent filler = GuiUtils.filler(3, height);
+                buttonList.add(filler);
+            }
+        }
+
         String[][] buttonInfo = {
             { "Go to first frame", CMD_BEGINNING, getIcon("Rewind") },
             { "One frame back", CMD_BACKWARD, getIcon("StepBack") },
