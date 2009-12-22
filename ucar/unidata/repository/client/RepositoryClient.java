@@ -301,6 +301,7 @@ public class RepositoryClient extends RepositoryBase {
          * write the xml definition into the zip file
          */
         String xml = XmlUtil.toString(root);
+        System.out.println(xml);
         zos.putNextEntry(new ZipEntry("entries.xml"));
         byte[] bytes = xml.getBytes();
         zos.write(bytes, 0, bytes.length);
@@ -1017,7 +1018,7 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\nFor fetching: \n\t-print <entry id> Create and print the given entry\n\t-printxml <entry id> Print out the xml for the given entry id\n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-parent <parent group id or full path to the parent group, e.g., \"Top/Destination\">\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
+            "Where arguments are:\nFor fetching: \n\t-print <entry id> Create and print the given entry\n\t-printxml <entry id> Print out the xml for the given entry id\n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-name <entry name>\n\t-parent <parent group id or full path to the parent group, e.g., \"Top/Destination\">\n\t-file <file to upload>\n\t-description <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
         System.exit(1);
     }
 
@@ -1207,6 +1208,7 @@ public class RepositoryClient extends RepositoryBase {
                 usage("Must specify a parent group destination with -parent");
             }
             String xml = XmlUtil.toString(root);
+            System.out.println (xml);
             zos.putNextEntry(new ZipEntry("entries.xml"));
             byte[] bytes = xml.getBytes();
             zos.write(bytes, 0, bytes.length);

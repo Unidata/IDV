@@ -59,6 +59,9 @@ import java.text.DecimalFormat;
 public class Column implements Constants {
 
 
+    public static final String OUTPUT_HTML = "html";
+    public static final String OUTPUT_CSV = "csv";
+
     /** _more_ */
 
     public static final String EXPR_EQUALS = "=";
@@ -92,6 +95,8 @@ public class Column implements Constants {
 
     /** _more_ */
     public static final String TYPE_CLOB = "clob";
+
+    public static final String TYPE_EMAIL = "email";
 
     /** _more_ */
     public static final String TYPE_INT = "int";
@@ -374,24 +379,31 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public int formatValue(StringBuffer sb, OutputType output,
+    public int formatValue(StringBuffer sb, String output,
                            Object[] values, int valueIdx) {
 
+        String delimiter = (Misc.equals(OUTPUT_CSV, output)?"|":",");
         if (type.equals(TYPE_LATLON)) {
             sb.append(toLatLonString(values, valueIdx));
             valueIdx++;
-            sb.append(",");
+            sb.append(delimiter);
             sb.append(toLatLonString(values, valueIdx));
             valueIdx++;
         } else  if (type.equals(TYPE_LATLONBBOX)) {
             sb.append(toLatLonString(values, valueIdx++));
-            sb.append(",");
+            sb.append(delimiter);
             sb.append(toLatLonString(values, valueIdx++));
-            sb.append(",");
+            sb.append(delimiter);
             sb.append(toLatLonString(values, valueIdx++));
-            sb.append(","); 
+            sb.append(delimiter); 
            sb.append(toLatLonString(values, valueIdx++));
-
+        } else if(type.equals(TYPE_EMAIL)) {
+            String s = toString(values, valueIdx);
+            if(Misc.equals(output, OUTPUT_CSV)) 
+                sb.append(s);
+            else
+                sb.append("<a href=\"mailto:" + s +"\">" + s +"</a>");
+            valueIdx++;
         } else {
             sb.append(toString(values, valueIdx));
             valueIdx++;
@@ -567,7 +579,7 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void createTable(Statement statement) throws Exception {
-        if (type.equals(TYPE_STRING) || type.equals(TYPE_PASSWORD)) {
+        if (type.equals(TYPE_STRING) || type.equals(TYPE_PASSWORD) || type.equals(TYPE_EMAIL)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_CLOB)) {
             String clobType =
@@ -1074,7 +1086,7 @@ public class Column implements Constants {
         }  if (type.equals(TYPE_LATLONBBOX)) {
             widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
         } else if (type.equals(TYPE_DATE)) {
-
+            //TODO
         } else if (type.equals(TYPE_BOOLEAN)) {
             widget = HtmlUtil.select(id,
                                      Misc.newList(TypeHandler.ALL_OBJECT,
@@ -1184,8 +1196,8 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public List getColumnNames() {
-        List names = new ArrayList();
+    public List<String> getColumnNames() {
+        List<String> names = new ArrayList<String>();
         if (type.equals(TYPE_LATLON)) {
             names.add(name + "_lat");
             names.add(name + "_lon");
@@ -1198,6 +1210,16 @@ public class Column implements Constants {
             names.add(name);
         }
         return names;
+    }
+
+    public String getSortByColumn() {
+        if (type.equals(TYPE_LATLON)) {
+            return name+"_lat";
+        }
+        if (type.equals(TYPE_LATLONBBOX)) {
+            return name+"_north";
+        }
+        return name;
     }
 
 

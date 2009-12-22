@@ -655,7 +655,7 @@ public class GenericTypeHandler extends TypeHandler {
             if (values != null) {
                 for (Column column : columns) {
                     StringBuffer tmpSb = new StringBuffer();
-                    valueIdx = column.formatValue(tmpSb, output, values,
+                    valueIdx = column.formatValue(tmpSb, Column.OUTPUT_HTML, values,
                             valueIdx);
                     if ( !column.getCanShow()) {
                         continue;
@@ -690,7 +690,7 @@ public class GenericTypeHandler extends TypeHandler {
             int valueIdx = 0;
             for (Column column : columns) {
                 StringBuffer tmpSb = new StringBuffer();
-                valueIdx = column.formatValue(tmpSb, output, values,
+                valueIdx = column.formatValue(tmpSb, Column.OUTPUT_HTML, values,
                         valueIdx);
                 html = html.replace("${" + column.getName() + ".content}",
                                     tmpSb.toString());
