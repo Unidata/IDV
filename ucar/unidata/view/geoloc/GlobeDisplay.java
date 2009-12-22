@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -216,7 +217,7 @@ public class GlobeDisplay extends NavigatedDisplay {
         canDoStereo = rend.getCanvas().getStereoAvailable();
         //System.err.println("GlobeDisplay:canDoStereo = " + canDoStereo);
         setPerspectiveView(canDoStereo);
-	checkClipDistance();
+        checkClipDistance();
         setEyePosition(0.004);
 
         KeyboardBehaviorJ3D behavior = new KeyboardBehaviorJ3D(rend);
@@ -239,9 +240,9 @@ public class GlobeDisplay extends NavigatedDisplay {
                     //              System.err.println ("Samples == null");
                     return;
                 }
-                ProjectionRect rect =
-                   new ProjectionRect(samples[1][0], samples[0][0],
-                           samples[1][1], samples[0][1]);
+                ProjectionRect rect = new ProjectionRect(samples[1][0],
+                                          samples[0][0], samples[1][1],
+                                          samples[0][1]);
                 setMapArea(rect);
             }
         });
@@ -515,9 +516,10 @@ public class GlobeDisplay extends NavigatedDisplay {
     public void setMapArea(ProjectionRect mapArea)
             throws VisADException, RemoteException {
 
-        double centerLat =mapArea.getY() + mapArea.getHeight ()/2;        
-        double centerLon =mapArea.getX() + mapArea.getWidth ()/2;
-        centerAndZoom(new EarthLocationTuple(centerLat, centerLon, 0),true,2.0);
+        double centerLat = mapArea.getY() + mapArea.getHeight() / 2;
+        double centerLon = mapArea.getX() + mapArea.getWidth() / 2;
+        centerAndZoom(new EarthLocationTuple(centerLat, centerLon, 0), true,
+                      2.0);
     }
 
     /**
@@ -706,7 +708,9 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @return the View
      */
     public View getView() {
-	if(getDisplay()==null) return null;
+        if (getDisplay() == null) {
+            return null;
+        }
         DisplayRendererJ3D rend =
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         return rend.getView();
@@ -786,16 +790,20 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @param altitude  the altitude
      * @param zoomFactor  zoom factor
      * @param animated  true to animate
+     * @param northUp rotate so north is up
      *
      * @throws  RemoteException        Couldn't create a remote object
      * @throws  VisADException         Couldn't create necessary VisAD object
      */
     public void centerAndZoom(final EarthLocation el, Real altitude,
-                              double zoomFactor, boolean animated, boolean northUp)
+                              double zoomFactor, boolean animated,
+                              boolean northUp)
             throws VisADException, RemoteException {
 
 
-        if(zoomFactor==0 || zoomFactor!=zoomFactor) zoomFactor  = 1.0;
+        if ((zoomFactor == 0) || (zoomFactor != zoomFactor)) {
+            zoomFactor = 1.0;
+        }
         if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
             return;
         }
@@ -804,7 +812,7 @@ public class GlobeDisplay extends NavigatedDisplay {
         double[]      currentMatrix = getProjectionMatrix();
         double[]      trans         = { 0.0, 0.0, 0.0 };
         double[]      scale         = { 0.0, 0.0, 0.0 };
-        double[]      scaletmp         = { 0.0, 0.0, 0.0 };
+        double[]      scaletmp      = { 0.0, 0.0, 0.0 };
         double[]      rot1          = { 0.0, 0.0, 0.0 };
         double[]      rot2          = { 0.0, 0.0, 0.0 };
 
@@ -817,21 +825,26 @@ public class GlobeDisplay extends NavigatedDisplay {
         double[] xxx = getMouseBehavior().make_matrix(rot2[0], rot2[1],
                            rot2[2], 1.0, 0, 0, 0);
 
-        Transform3D t2     = new Transform3D(xxx);
-        Vector3d    upVector    = new Vector3d(0,0,(northUp?1:-1));
+        Transform3D t2       = new Transform3D(xxx);
+        Vector3d    upVector = new Vector3d(0, 0, (northUp
+                ? 1
+                : -1));
 
         //        t2.transform(v3d);
         //        System.err.println("v3d:" + v3d.x+"/"+v3d.y+"/"+v3d.z);
-        t.lookAt(new Point3d(xy[0], xy[1], xy[2]), new Point3d(0, 0, 0), upVector);
+        t.lookAt(new Point3d(xy[0], xy[1], xy[2]), new Point3d(0, 0, 0),
+                 upVector);
         double[] m = new double[16];
         t.get(m);
         getMouseBehavior().instance_unmake_matrix(rot1, scaletmp, trans, m);
-        if(zoomFactor!=zoomFactor) zoomFactor = 1;
+        if (zoomFactor != zoomFactor) {
+            zoomFactor = 1;
+        }
         m = getMouseBehavior().make_matrix(rot1[0], rot1[1], rot1[2],
-                                           zoomFactor * scale[0], 
+                                           zoomFactor * scale[0],
                                            zoomFactor * scale[1],
-                                           zoomFactor * scale[2],
-                                           trans[0], trans[1], trans[2]);
+                                           zoomFactor * scale[2], trans[0],
+                                           trans[1], trans[2]);
 
         if ( !animated) {
             setProjectionMatrix(m);
@@ -1128,12 +1141,39 @@ public class GlobeDisplay extends NavigatedDisplay {
     }
 
     /**
-     * Get the latlon box of the displayed area
+     * Get the latlon box of the displayed area. This checks to see if the globe is sort of fully zoomed out.
+     * If it is then it returns an earth spanning bbox
      *
      * @return lat lon box  or null if it can't be determined
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
-    public Rectangle2D.Double xxxgetLatLonBox() {
-        return new Rectangle2D.Double(-180, -90, 360, 180);
+    public Rectangle2D.Double getLatLonBox()
+            throws VisADException, RemoteException {
+        java.awt.Rectangle b   = getScreenBounds();
+        EarthLocation      el1 = screenToEarthLocation(b.width / 2, 0);
+        EarthLocation      el2 = screenToEarthLocation(b.width / 2, b.height);
+        EarthLocation      el3 = screenToEarthLocation(0, b.height / 2);
+        EarthLocation      el4 = screenToEarthLocation(b.width, b.height / 2);
+        if ((el1 == null) || (el2 == null) || (el3 == null)
+                || (el4 == null)) {
+            return new Rectangle2D.Double(-180, -90, 360, 180);
+        }
+
+        double[] v = { el1.getLatitude().getValue(),
+                       el2.getLatitude().getValue(),
+                       el3.getLatitude().getValue(),
+                       el4.getLatitude().getValue() };
+        if (((v[0] == 0) || (v[0] != v[0]))
+                && ((v[1] == 0) || (v[1] != v[1]))
+                && ((v[2] == 0) || (v[2] != v[2]))
+                && ((v[3] == 0) || (v[3] != v[3]))) {
+            return new Rectangle2D.Double(-180, -90, 360, 180);
+        }
+
+        return super.getLatLonBox();
+
     }
 
     /**
@@ -1342,18 +1382,28 @@ public class GlobeDisplay extends NavigatedDisplay {
 
 
 
-    public void setClipDistanceFront (double value) {
+    /**
+     * Set the front clip distance
+     *
+     * @param value clip distance
+     */
+    public void setClipDistanceFront(double value) {
         super.setClipDistanceFront(value);
-	checkClipDistance();
+        checkClipDistance();
     }
 
+    /**
+     * If we are in perspective view then set the clip distance shorter
+     */
     public void checkClipDistance() {
-	View view = getView();
-	if(view==null) return;
-	if (isPerspectiveView()) {
+        View view = getView();
+        if (view == null) {
+            return;
+        }
+        if (isPerspectiveView()) {
             view.setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
         } else {
-	    view.setFrontClipDistance(getClipDistanceFront());
+            view.setFrontClipDistance(getClipDistanceFront());
         }
     }
 
