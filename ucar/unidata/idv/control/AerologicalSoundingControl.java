@@ -1061,7 +1061,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
 
 
-        //        setSounding(currIndex);
+        setSounding(currIndex);
     }
 
     /**
