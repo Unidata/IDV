@@ -411,6 +411,10 @@ public class Column implements Constants {
         return valueIdx;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
     /**
      * _more_
      *

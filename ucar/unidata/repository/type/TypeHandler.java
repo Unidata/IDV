@@ -362,7 +362,7 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public int getProperty(String name, int dflt) {
-        return Misc.getProperty(properties, name, dflt);
+       return Misc.getProperty(properties, name, dflt);
     }
 
 
