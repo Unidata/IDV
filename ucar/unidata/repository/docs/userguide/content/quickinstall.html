@@ -1,0 +1,49 @@
+<html>
+<head>
+  <title>Quick Installation</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+If you are like most people you don't want to have to deal with lengthy install and configuration processes.
+This document will show you how to have a RAMADDA server running on your machine serving  up your data
+sets in about 5 minutes.
+<p>
+
+
+
+<ul>
+
+<li> Requirements: You need to have Java 1.6 (or higher) installed on your machine. Also, by default RAMADDA runs on port 8080 so this port should be open through your firewall.
+
+<li> To download RAMADDA from the Unidata site you need to be registered. If you are not already you can <a target="_register" href="https://www.unidata.ucar.edu/account/account.jsp">register here</a>.
+
+<li> Download the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file and unzip  to where you want to install RAMADDA.
+
+<li> Change directory to the ramadda install directory and (assuming you have java in your path) run <i>ramadda.sh</i>.
+<br>
+To run RAMADDA run the ramadda.sh in the release directory. This just does:<pre>
+   java -Xmx512m -jar repository.jar
+</pre>
+
+
+By default the server is on port 8080.  To change the port do edit ramadda.sh and change the line to:<pre>
+    java -Xmx512m -jar repository.jar -port &lt;some port&gt;
+</pre>
+
+
+<li> Now, in your web browser go to: http://yourserver:8080/repository
+
+<li> Go through the initial configuration pages, create an administrator account and log in.
+
+
+<li> Now, lets assume you have a data directory on your server 
+
+
+
+
+
+
+
+</body>
