@@ -888,97 +888,73 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserNew(Request request) throws Exception {
 
-        String       id        = "";
-        String       name      = "";
-        String       email     = "";
-        String       password1 = "";
-        String       password2 = "";
+
         List<String> roles;
 
-        boolean      admin       = false;
-
         StringBuffer sb          = new StringBuffer();
-
         StringBuffer errorBuffer = new StringBuffer();
+        List<User> users = new ArrayList<User>();
+        boolean    ok    = true;
+        for (String line : (List<String>) StringUtil.split(
+                                                           request.getString(ARG_USER_BULK, ""), "\n", true, true)) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            List<String> toks = (List<String>) StringUtil.split(line,
+                                                                ",", true, true);
+            if (toks.size() == 0) {
+                continue;
+            }
+            if (toks.size() < 2) {
+                ok = false;
+                sb.append(getRepository().showDialogError("Bad line:"
+                                                          + line));
+                break;
+            }
+            String id        = toks.get(0);
+            String password1 = toks.get(1);
+            String        name      = ((toks.size() >= 3)
+                         ? toks.get(2)
+                         : id);
+            String email     = ((toks.size() >= 4)
+                         ? toks.get(3)
+                         : "");
+            if (findUser(id) != null) {
+                ok = false;
+                sb.append(
+                          getRepository().showDialogError(
+                                                          getRepository().translate(
+                                                                                    request, "User already exists") + " " + id));
+                break;
+            }
+            User user = new User(id, name, email, "", "",
+                                 hashPassword(password1), false, "", "",
+                                 false);
+            users.add(user);
+        }
 
-        if (request.exists(ARG_USER_BULK)) {
-            List<User> users = new ArrayList<User>();
-            boolean    ok    = true;
-            for (String line : (List<String>) StringUtil.split(
-                    request.getString(ARG_USER_BULK, ""), "\n", true, true)) {
-                if (line.startsWith("#")) {
-                    continue;
-                }
-                List<String> toks = (List<String>) StringUtil.split(line,
-                                        ",", true, true);
-                if (toks.size() == 0) {
-                    continue;
-                }
-                if (toks.size() < 2) {
-                    ok = false;
-                    sb.append(getRepository().showDialogError("Bad line:"
-                            + line));
-                    break;
-                }
-                id        = toks.get(0);
-                password1 = toks.get(1);
-                name      = ((toks.size() >= 3)
-                             ? toks.get(2)
-                             : id);
-                email     = ((toks.size() >= 4)
-                             ? toks.get(3)
-                             : "");
-                roles     = new ArrayList<String>();
-                for (int i = 4; i < toks.size(); i++) {
-                    roles.add(toks.get(i));
-                }
-                if (findUser(id) != null) {
-                    ok = false;
-                    sb.append(
-                        getRepository().showDialogError(
-                            getRepository().translate(
-                                request, "User already exists") + " " + id));
-                    break;
-                }
-                User user = new User(id, name, email, "", "",
-                                     hashPassword(password1), false, "", "",
-                                     false);
-                user.setRoles(roles);
-                users.add(user);
-            }
-            if (ok) {
-                for (User user : users) {
-                    makeOrUpdateUser(user, false);
-                    setRoles(request, user);
-                    sb.append(msgLabel("Created user"));
-                    sb.append(
-                        HtmlUtil.href(
-                            request.url(
-                                getRepositoryBase().URL_USER_EDIT,
-                                ARG_USER_ID, user.getId()), user.getId()));
-                    sb.append(HtmlUtil.br());
-                }
-                if (users.size() == 0) {
-                    sb.append(
-                        getRepository().showDialogNote(
-                            msg("No users created")));
-                    makeBulkForm(request, sb,
-                                 request.getString(ARG_USER_BULK, null));
-                }
-            } else {
-                makeBulkForm(request, sb,
-                             request.getString(ARG_USER_BULK, ""));
-            }
+
+        if (!ok) {
+            makeBulkForm(request, sb,
+                         request.getString(ARG_USER_BULK, ""));
             Result result = new Result(msg("New User"), sb);
             result.putProperty(PROP_NAVSUBLINKS,
                                getRepository().getSubNavLinks(request,
-                                   getAdmin().adminUrls));
+                                                              getAdmin().adminUrls));
 
             return result;
         }
 
+        String id        ="";
+        String name = "";
+        String email  = "";
+        String password1 = "";
+        String password2 = "";
+        boolean admin    = false;
 
-        if (request.exists(ARG_USER_ID)) {
+
+        
+        if (request.defined(ARG_USER_ID)) {
             id        = request.getString(ARG_USER_ID, "").trim();
             name      = request.getString(ARG_USER_NAME, name).trim();
             email     = request.getString(ARG_USER_EMAIL, "").trim();
@@ -1012,81 +988,99 @@ public class UserManager extends RepositoryManager {
             }
 
             if (okToAdd) {
-                String homeGroupId = request.getString(ARG_USER_HOME
-                                         + "_hidden", "");
                 User newUser = new User(id, name, email, "", "",
                                         hashPassword(password1), admin, "",
                                         "", false);
-                List<String> newUserRoles =
-                    StringUtil.split(request.getString(ARG_USER_ROLES, ""),
-                                     "\n", true, true);
-
-                newUser.setRoles(newUserRoles);
-                makeOrUpdateUser(newUser, false);
-                setRoles(request, newUser);
-
-                StringBuffer msg =
-                    new StringBuffer(request.getString(ARG_USER_MESSAGE, ""));
-                msg.append("<p>User id: " + id + "<p>");
-                msg.append(
-                    "Click on this link to send a password reset link to your registered email address:<br>");
-                String resetUrl =
-                    HtmlUtil
-                        .url(getRepositoryBase().URL_USER_RESETPASSWORD
-                            .toString(), ARG_USER_NAME, id);
-
-                if ( !resetUrl.startsWith("http")) {
-                    resetUrl = getRepository().absoluteUrl(resetUrl);
-                }
-                msg.append(HtmlUtil.href(resetUrl,
-                                         "Send Password Reset Message"));
-                msg.append("<p>");
-
-                if (homeGroupId.length() > 0) {
-                    Group parent = getEntryManager().findGroup(request,
-                                       homeGroupId);
-                    Group home = getEntryManager().makeNewGroup(parent, name,
-                                     newUser, null,
-                                     TypeHandler.TYPE_HOMEPAGE);
-                    msg.append("A home group has been created for you: ");
-                    String homeUrl =
-                        HtmlUtil.url(
-                            getRepositoryBase().URL_ENTRY_SHOW.toString(),
-                            ARG_ENTRYID, home.getId());
-                    msg.append(
-                        HtmlUtil.href(
-                            getRepository().absoluteUrl(homeUrl),
-                            home.getFullName()));
-                    addFavorites(request, newUser,
-                                 (List<Entry>) Misc.newList(home));
-                }
-
-                if ((newUser.getEmail().length() > 0)
-                        && request.get(ARG_USER_SENDMAIL, false)
-                        && getAdmin().isEmailCapable()) {
-                    getAdmin().sendEmail(newUser.getEmail(),
-                                         "RAMADDA User Account",
-                                         msg.toString(), true);
-
-                }
-
-
-                String userEditLink =
-                    request.url(getRepositoryBase().URL_USER_EDIT,
-                                ARG_USER_ID, id);
-                return new Result(userEditLink);
+                users.add(newUser);
             }
         }
 
+
+        List<String> newUserRoles =
+            StringUtil.split(request.getString(ARG_USER_ROLES, ""),
+                             "\n", true, true);
+
+        String homeGroupId = request.getString(ARG_USER_HOME
+                                               + "_hidden", "");
+
+        sb.append("<ul>");
+        for (User newUser : users) {
+            newUser.setRoles(newUserRoles);
+            makeOrUpdateUser(newUser, false);
+            setRoles(request, newUser);
+
+            sb.append("<li> ");
+            sb.append(msgLabel("Created user"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(
+                      HtmlUtil.href(
+                                    request.url(
+                                                getRepositoryBase().URL_USER_EDIT,
+                                                ARG_USER_ID, newUser.getId()), newUser.getId()));
+            sb.append(HtmlUtil.br());
+
+
+            StringBuffer msg =
+                new StringBuffer(request.getString(ARG_USER_MESSAGE, ""));
+            msg.append("<p>User id: " + newUser.getId() + "<p>");
+            msg.append(
+                       "Click on this link to send a password reset link to your registered email address:<br>");
+            String resetUrl =
+                HtmlUtil
+                .url(getRepositoryBase().URL_USER_RESETPASSWORD
+                     .toString(), ARG_USER_NAME, newUser);
+            
+            if ( !resetUrl.startsWith("http")) {
+                resetUrl = getRepository().absoluteUrl(resetUrl);
+            }
+            msg.append(HtmlUtil.href(resetUrl,
+                                     "Send Password Reset Message"));
+            msg.append("<p>");
+            
+            if (homeGroupId.length() > 0) {
+                Group parent = getEntryManager().findGroup(request,
+                                                           homeGroupId);
+                Group home = getEntryManager().makeNewGroup(parent, newUser.getName(),
+                                                            newUser, null,
+                                                            TypeHandler.TYPE_HOMEPAGE);
+                msg.append("A home group has been created for you: ");
+                String homeUrl =
+                    HtmlUtil.url(
+                                 getRepositoryBase().URL_ENTRY_SHOW.toString(),
+                                 ARG_ENTRYID, home.getId());
+                msg.append(
+                           HtmlUtil.href(
+                                         getRepository().absoluteUrl(homeUrl),
+                                         home.getFullName()));
+                addFavorites(request, newUser,
+                             (List<Entry>) Misc.newList(home));
+            }
+
+            if ((newUser.getEmail().length() > 0)
+                && request.get(ARG_USER_SENDMAIL, false)
+                && getAdmin().isEmailCapable()) {
+                getAdmin().sendEmail(newUser.getEmail(),
+                                     "RAMADDA User Account",
+                                     msg.toString(), true);
+
+            }
+        }
+
+        sb.append("</ul>");
+
+
+        if(users.size()>0) {
+            return new Result("", sb);
+        }
 
 
         if (errorBuffer.toString().length() > 0) {
             sb.append(
                 getRepository().showDialogWarning(errorBuffer.toString()));
         }
-        sb.append(msgHeader("Create User"));
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
         StringBuffer formSB = new StringBuffer();
+        formSB.append(msgHeader("Create a single user"));
         formSB.append(HtmlUtil.formTable());
         formSB.append(HtmlUtil.formEntry(msgLabel("ID"),
                                          HtmlUtil.input(ARG_USER_ID, id,
@@ -1102,7 +1096,7 @@ public class UserManager extends RepositoryManager {
 
         formSB.append(HtmlUtil.formEntry(msgLabel("Email"),
                                          HtmlUtil.input(ARG_USER_EMAIL,
-                                             email, HtmlUtil.SIZE_40)));
+                                                        email, HtmlUtil.SIZE_40)));
 
         formSB.append(
             HtmlUtil.formEntry(
@@ -1113,34 +1107,37 @@ public class UserManager extends RepositoryManager {
                 msgLabel("Password Again"),
                 HtmlUtil.password(ARG_USER_PASSWORD2)));
 
-
-        String select =
-            getRepository().getHtmlOutputHandler().getSelect(request,
-                ARG_USER_HOME, HtmlUtil.space(1) + msg("Select"), false, "");
-        formSB.append(HtmlUtil.hidden(ARG_USER_HOME + "_hidden", "",
-                                      HtmlUtil.id(ARG_USER_HOME
-                                          + "_hidden")));
-
-        formSB.append(HtmlUtil.space(1));
-        String groupMsg =
-            "Create a group using the user's name under this group";
-        formSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Home group"),
-                HtmlUtil.disabledInput(
-                    ARG_USER_HOME, "",
-                    HtmlUtil.SIZE_40
-                    + HtmlUtil.id(ARG_USER_HOME)) + HtmlUtil.space(1)
-                        + select + "<br>" + groupMsg));
-
-        formSB.append(HtmlUtil.formEntry("",
-                                         HtmlUtil.submit(msg("Create User"),
-                                             ARG_USER_NEW)));
         formSB.append(HtmlUtil.formTableClose());
 
 
 
+        StringBuffer bulkSB = new StringBuffer();
+        bulkSB.append(msgHeader("Or create a number of users"));
+        String init = "#one per line\n#user id, password, name, email";
+        bulkSB.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 60));
+
         StringBuffer msgSB = new StringBuffer();
+        String select =
+            getRepository().getHtmlOutputHandler().getSelect(request,
+                ARG_USER_HOME, HtmlUtil.space(1) + msg("Select"), false, "");
+        msgSB.append(HtmlUtil.hidden(ARG_USER_HOME + "_hidden", "",
+                                      HtmlUtil.id(ARG_USER_HOME
+                                          + "_hidden")));
+
+        msgSB.append(HtmlUtil.space(1));
+        String groupMsg =
+            "Create a group using the user's name under this group";
+        msgSB.append(groupMsg);
+        msgSB.append(HtmlUtil.br());
+        msgSB.append(
+                msgLabel("Home group") +
+                HtmlUtil.disabledInput(
+                                       ARG_USER_HOME, "",
+                                       HtmlUtil.SIZE_40
+                                       + HtmlUtil.id(ARG_USER_HOME)) + HtmlUtil.space(1)
+                + select);
+
+        msgSB.append(HtmlUtil.p());
 
         String       msg   =
             "A new RAMADDA account has been created for you.";
@@ -1149,6 +1146,7 @@ public class UserManager extends RepositoryManager {
         msgSB.append(msg("Send an email to the new user with message:"));
         msgSB.append(HtmlUtil.br());
         msgSB.append(HtmlUtil.textArea(ARG_USER_MESSAGE, msg, 5, 50));
+
         msgSB.append(HtmlUtil.p());
         msgSB.append(msgLabel("User Roles"));
         msgSB.append(HtmlUtil.br());
@@ -1156,21 +1154,24 @@ public class UserManager extends RepositoryManager {
                                        request.getString(ARG_USER_ROLES, ""),
                                        5, 50));
 
-        if (getAdmin().isEmailCapable()) {
-            sb.append(
+        StringBuffer top =  new StringBuffer();
+        top.append(
                 HtmlUtil.table(
-                    HtmlUtil.rowTop(
-                        HtmlUtil.cols(formSB.toString(), msgSB.toString()))));
-        } else {
-            sb.append(formSB);
-        }
+                               HtmlUtil.rowTop(
+                                               HtmlUtil.cols(formSB.toString(), bulkSB.toString()))));
+
+        if (getAdmin().isEmailCapable()) {
+            top.append(HtmlUtil.p());
+            top.append(msgSB);
+        } 
+
+        sb.append(HtmlUtil.p());
+        sb.append(top);
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.submit(msg("Create User"), ARG_USER_NEW));
         sb.append(HtmlUtil.formClose());
 
 
-
-        sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.hr());
-        makeBulkForm(request, sb, null);
         Result result = new Result(msg("New User"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,

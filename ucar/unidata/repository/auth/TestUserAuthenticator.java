@@ -27,9 +27,9 @@
 
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
-import ucar.unidata.repository.User;
+import ucar.unidata.repository.auth.User;
 
-import ucar.unidata.repository.UserAuthenticatorImpl;
+import ucar.unidata.repository.auth.UserAuthenticatorImpl;
 
 
 
