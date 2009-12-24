@@ -356,7 +356,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
             return ids;
         }
         long t2 = System.currentTimeMillis();
-        System.err.println ("getFtpClient:" + (t2-t1));
+        //        System.err.println ("getFtpClient:" + (t2-t1));
 
         try {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
@@ -366,7 +366,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
                 long t3 = System.currentTimeMillis();
                 FTPFile[] files = ftpClient.listFiles(path);
                 long t4 = System.currentTimeMillis();
-                System.err.println ("listFiles:" + (t4-t3));
+                //                System.err.println ("listFiles:" + (t4-t3));
 
                 for (int i = 0; i < files.length; i++) {
                     String name = files[i].getName().toLowerCase();
@@ -400,7 +400,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
             closeConnection(ftpClient);
         }
         long t5 = System.currentTimeMillis();
-        System.err.println ("getSynthIds:" + (t5-t0));
+        //        System.err.println ("getSynthIds:" + (t5-t0));
         return ids;
     }
 

@@ -862,21 +862,34 @@ code.menu {
 }
 
 
+.content {
+  border: 2px #aaa groove;
+  min-height:800px;
+  margin:0;
+  margin-right:5px;
+  background-color:#ffffff;
+}
+
+
 .entrymenubar {
    background-image:url(${urlroot}/images/gradient.jpg);
    padding-left:10px;
-   padding-top:2px;
-   padding-bottom:0px;
-   xbackground-color:#ddeeff;
-   border-bottom: 1px #888 solid; 
-   margin-bottom:3px;
+   padding-right:10px;
+   padding-top:4px;
+   padding-bottom:1px;
+   margin-bottom:2px;
+   border-bottom: 1px #999 solid; 
+//   border-bottom: 2px #ddd ridge; 
 
 }
 
 
-
-
-
+.entryheader {
+   font-weight: bold;
+   font-size: 12pt;
+   border-bottom : 1px #ddd solid;
+   margin-bottom:5px;
+}
 
 .entrymenulink {
     font-size: 12pt;
@@ -905,28 +918,14 @@ code.menu {
    color:#ff0000;
 }
 
-.menuseparator {
-   margin-left:2px;
-   margin-right:2px;
-   padding-bottom:2px;
-}
 
 
-
-.entryheader {
-   font-weight: bold;
-   font-size: 12pt;
-   color: #9C9C9C;
-   border-bottom : 1px #666666 solid;
-   margin-bottom:5px;
-}
 
 
 
 
 .entryname {
    font-size: 12pt;
-   xfont-size: 110%;
    padding-left:15px;
    font-weight: bold;
    vertical-align: bottom;
@@ -940,6 +939,49 @@ code.menu {
 .entryname a {
    color: #000000;
 }
+
+
+.menuseparator {
+   margin-left:2px;
+   margin-right:2px;
+   padding-bottom:2px;
+}
+
+
+.navlink {
+   margin-top: 2px;
+}
+
+.navlink a:link {
+   color:black;
+}
+
+
+.leftcolumn {
+   border-top: 1px #aaaaaa solid; 
+   padding-top:2px;
+   margin-left:5px;
+   margin-right:5px;
+}
+
+
+.leftbox {
+   margin-top: 0px;
+   background-color:#ffffff;
+   margin-left:4px;
+}
+
+
+.favorites {
+   max-width: 125px; 
+   overflow-x: auto;
+   xborder: 1px #999999 solid; 
+   margin-top: 0px;
+   margin-left:4px;
+   background-color:#ffffff;
+}
+
+
 
 .hideshowblock {
    margin-top:5px;

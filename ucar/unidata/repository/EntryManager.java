@@ -4004,7 +4004,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public String getEntryMenubar(Request request, Entry entry)
+    public String getEntryMenubar(Request request, Entry entry, String rightSide)
             throws Exception {
         StringBuffer fileMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
@@ -4039,13 +4039,20 @@ return new Result(title, sb);
                                            true);
         String sep = HtmlUtil.div("&nbsp;|&nbsp;",
                                   HtmlUtil.cssClass("menuseparator"));
-        return HtmlUtil
+        String leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep, editMenu, sep,
+                                                                     viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
+        String table = HtmlUtil.leftRight(leftTable, rightSide, 
+                                          HtmlUtil.cssClass("entrymenubar"));
+
+
+        return table;
+        /*        return HtmlUtil
             .div(HtmlUtil
                 .table(HtmlUtil
                     .row(HtmlUtil
                         .cols(fileMenu, sep, editMenu, sep,
-                            viewMenu)), " cellpadding=0 cellspacing=0 border=0 "), HtmlUtil
-                                .cssClass("entrymenubar"));
+                            viewMenu)+"<td align=right>" + rightSide +"</td>"), " width=100% cellpadding=0 cellspacing=0 border=0 "), HtmlUtil
+                            .cssClass("entrymenubar"));*/
     }
 
 
@@ -4276,7 +4283,8 @@ return new Result(title, sb);
                              true, false);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar = getEntryToolbar(request, entry, true);
-            String menubar = getEntryMenubar(request, entry);
+            String menubar = getEntryMenubar(request, entry,toolbar);
+            toolbar = "";
 
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
