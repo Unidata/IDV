@@ -2152,10 +2152,14 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String leftRight(String left, String right) {
+        return leftRight(left,right,"");
+    }
+
+    public static String leftRight(String left, String right, String attrs) {
         return tag(TAG_TABLE,
                    attrs(ATTR_WIDTH, "100%", ATTR_CELLPADDING, "0",
                          ATTR_CELLSPACING,
-                         "0"), row(col(left)
+                         "0") + attrs, row(col(left)
                          + col(right,
                                attr(ATTR_ALIGN,
                                     VALUE_RIGHT)), attr(ATTR_VALIGN,
