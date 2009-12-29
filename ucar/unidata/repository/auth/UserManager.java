@@ -1017,7 +1017,6 @@ public class UserManager extends RepositoryManager {
                                     request.url(
                                                 getRepositoryBase().URL_USER_EDIT,
                                                 ARG_USER_ID, newUser.getId()), newUser.getId()));
-            sb.append(HtmlUtil.br());
 
 
             StringBuffer msg =
@@ -1063,6 +1062,7 @@ public class UserManager extends RepositoryManager {
                                      "RAMADDA User Account",
                                      msg.toString(), true);
 
+                sb.append(" sent mail to:" + newUser.getEmail());
             }
         }
 
@@ -1114,7 +1114,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer bulkSB = new StringBuffer();
         bulkSB.append(msgHeader("Or create a number of users"));
         String init = "#one per line\n#user id, password, name, email";
-        bulkSB.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 60));
+        bulkSB.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 80));
 
         StringBuffer msgSB = new StringBuffer();
         String select =

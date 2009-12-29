@@ -878,10 +878,8 @@ code.menu {
 
 
 .entrymenubar {
+   background-repeat: repeat-x;
    background-image:url(${urlroot}/images/gradient.jpg);
-//   background-color: #d9e2f4;
-//   background-color: #ebeff9;
-//   background-color: #f0f0f0;
    padding-left:10px;
    padding-right:10px;
    padding-top:5px;

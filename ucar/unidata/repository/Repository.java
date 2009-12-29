@@ -1553,6 +1553,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
             } else if (AdminHandler.class.isAssignableFrom(c)) {
+                System.err.println("is admin");
                 adminHandlerClasses.add(c);
             }
             super.checkClass(c);
