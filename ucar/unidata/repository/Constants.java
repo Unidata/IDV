@@ -438,6 +438,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DECORATE = "decorate";
 
+    public static final String ARG_DEPTH = "depth";
+
     /** _more_ */
     public static final String ARG_FULLURL = "fullurl";
 

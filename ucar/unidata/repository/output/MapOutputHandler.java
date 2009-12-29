@@ -247,9 +247,6 @@ public class MapOutputHandler extends OutputHandler {
                              ? "1"
                              : "0") + "," + mapVarName + ");\n");
 
-
-
-
             }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =

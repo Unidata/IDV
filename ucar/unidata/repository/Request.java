@@ -1455,13 +1455,19 @@ public class Request implements Constants {
      */
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
+
+        return getDateRange(from, to, ARG_RELATIVEDATE, dflt);
+    }
+
+    public Date[] getDateRange(String from, String to, String relativeArg, Date dflt)
+        throws java.text.ParseException {
         String fromDate = "";
         String toDate   = "";
         if (defined(from) || defined(to)) {
             fromDate = (String) getDateSelect(from, "").trim();
             toDate   = (String) getDateSelect(to, "").trim();
-        } else if (defined(ARG_RELATIVEDATE)) {
-            fromDate = (String) getDateSelect(ARG_RELATIVEDATE, "").trim();
+        } else if (defined(relativeArg)) {
+            fromDate = (String) getDateSelect(relativeArg, "").trim();
             if (fromDate.equals("none")) {
                 return new Date[] { null, null };
             }

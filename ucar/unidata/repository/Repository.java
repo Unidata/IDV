@@ -955,7 +955,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         */
 
 
-
         for(Class adminHandlerClass: adminHandlerClasses) {
             AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
             adminHandler.setRepository(Repository.this);
@@ -3670,6 +3669,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+
     /**
      * _more_
      *
@@ -3991,27 +3991,33 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                   String extraLeft, String extraTop,
                                   String south, String north, String east,
                                   String west) {
+        return makeMapSelector(arg,popup, extraLeft, extraTop, new String[]{
+                south, north, east,west});
+    }
+
+
+    public String makeMapSelector(String arg, boolean popup,
+                                  String extraLeft, String extraTop,
+                                  String[]pts) {
         StringBuffer sb = new StringBuffer();
 
-        String llb = HtmlUtil.makeLatLonBox(arg, south, north, east, west);
+
+        String widget;
+        if(pts.length==4) {
+            widget = HtmlUtil.makeLatLonBox(arg, pts[0], pts[1], pts[2], pts[3]);
+        } else {
+            widget = " Lat: " + HtmlUtil.input(arg+"_lat", pts[0], HtmlUtil.SIZE_5+" " +HtmlUtil.id(arg+"_lat")) +
+                " Lon: " + HtmlUtil.input(arg+"_lon", pts[1], HtmlUtil.SIZE_5+" " +HtmlUtil.id(arg+"_lon"));
+        }
         if ((extraLeft != null) && (extraLeft.length() > 0)) {
-            llb = llb + HtmlUtil.br() + extraLeft;
+            widget = widget + HtmlUtil.br() + extraLeft;
         }
 
         String imageId = arg + "_bbox_image";
 
-        String clickParams = "event," + HtmlUtil.squote(imageId) + ","
-                             + HtmlUtil.squote(arg) + "," + (popup
-                ? "1"
-                : "0");
-        String initParams = HtmlUtil.squote(imageId) + ","
-                            + HtmlUtil.squote(arg) + "," + (popup
-                ? "1"
-                : "0");
 
-
-        String onClickCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
-                                 clickParams));
+        String var = "mapselector" + HtmlUtil.blockCnt++;
+        String onClickCall = HtmlUtil.onMouseClick(var+".click(event);");
         String bboxDiv = HtmlUtil.div("",
                                       HtmlUtil.cssClass("latlon_box")
                                       + onClickCall
@@ -4019,29 +4025,31 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         StringBuffer imageHtml = new StringBuffer();
         String nextMapLink =
-            HtmlUtil.mouseClickHref(HtmlUtil.call("cycleMap",
-						  initParams), HtmlUtil.img(iconUrl(ICON_MAP),
-                    " View another map", ""));
+            HtmlUtil.mouseClickHref(var+".cycleMap()", HtmlUtil.img(iconUrl(ICON_MAP),
+                                                                    " View another map", ""));
+        imageHtml.append("\n");
         imageHtml.append(bboxDiv);
         imageHtml.append(HtmlUtil.table(new Object[] {
-            HtmlUtil.img(getMapUrl(), "",
-                         HtmlUtil.id(imageId) + onClickCall
-                         + HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup
-                ? "800"
-                : "800"))), nextMapLink }));
+                    HtmlUtil.img(getMapUrl(), "",
+                                 HtmlUtil.id(imageId) + onClickCall
+                                 + HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup
+                                                                       ? "800"
+                                                                       : "800"))), nextMapLink }));
 
-
+        imageHtml.append("\n");
         String rightSide = null;
-        String clearLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxClear",
-                               HtmlUtil.squote(arg)), msg("Clear"));
-        String updateLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxInit",
-                                initParams), msg("Update Map"));
+        String clearLink = HtmlUtil.mouseClickHref(var+".clear();", msg("Clear"));
+        String updateLink = HtmlUtil.mouseClickHref(var+".update();", msg("Update Map"));
 
+        String initParams = HtmlUtil.squote(imageId) + ","
+                            + HtmlUtil.squote(arg) + "," + (popup
+                ? "1"
+                : "0");
         if (popup) {
             rightSide =
-                makeStickyPopup(msg("Select"), imageHtml.toString(),
-                                HtmlUtil.call("bboxInit",
-                                    initParams)) + HtmlUtil.space(2)
+                makeStickyPopup(msg("Select"), imageHtml.toString(),  
+                                var +".init();") +
+                                 HtmlUtil.space(2)
                                         + clearLink + HtmlUtil.space(2)
                                         + updateLink + HtmlUtil.space(2)
                                         + extraTop;
@@ -4050,7 +4058,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         + HtmlUtil.br() + imageHtml;
         }
 
-        return HtmlUtil.table(new Object[] { llb, rightSide });
+        
+        String script = "var " + var + " =  new MapSelector(" +initParams +");\n";
+        return HtmlUtil.table(new Object[] { widget, rightSide }) +
+            "\n" +HtmlUtil.script(script);
 
     }
 
@@ -4632,12 +4643,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 int    thisDay   = cal.get(cal.DAY_OF_MONTH);
                 int    thisMonth = cal.get(cal.MONTH);
                 int    thisYear  = cal.get(cal.YEAR);
+                boolean currentDay = false;
                 String dayClass  = "calnavday";
                 if (thisMonth != theMonth) {
                     dayClass = "calnavoffday";
                 } else if ((theMonth == thisMonth) && (theYear == thisYear)
                            && (theDay == thisDay)) {
                     dayClass = "calnavtheday";
+                    currentDay = true;
                 }
                 String content;
                 if (dayLinks != null) {
@@ -4646,7 +4659,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         content = HtmlUtil.href(url + "&"
                                 + CalendarOutputHandler.getUrlArgs(cal), ""
                                     + thisDay);
-                        dayClass = "calnavtheday";
+                        if(!currentDay) 
+                            dayClass = "calnavoffday";
                     } else {
                         content  = "" + thisDay;
                         dayClass = "calnavday";
@@ -5261,9 +5275,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String divName    = "div." + fieldName;
         String call = HtmlUtil.call(
                           "selectDate", HtmlUtil.comma(
-                              HtmlUtil.squote(divName), "document.forms['"
-                              + formName + "']."
-                              + fieldName, HtmlUtil.squote(
+                              HtmlUtil.squote(divName), 
+                              //                              "document.forms['"  + formName + "']." + fieldName, 
+                              "findFormElement('"  + formName + "','" + fieldName +"')", 
+                              HtmlUtil.squote(
                                   anchorName), HtmlUtil.squote(
                                   "yyyy-MM-dd"))) + "return false;";
         return HtmlUtil
@@ -5326,6 +5341,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return HtmlUtil.input(
             name, dateString,
             HtmlUtil.SIZE_10
+            +HtmlUtil.id(name)
             + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
                                         + " T:"
                                         + HtmlUtil.input(

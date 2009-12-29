@@ -1247,6 +1247,17 @@ function toggleVisibilityOnObject(obj, display) {
 
 
 
+function findFormElement(form, id) {
+    var form = document.forms[form];
+    if(form) {
+        if(form[id]) return form[id];
+    }
+    obj = util.getDomObject(id);
+    if(obj) return obj.obj;
+    return null;
+}
+
+
 function selectDate(div,field,id,fmt) {
     var cal = new CalendarPopup(div);
     cal.select(field,id,fmt);
@@ -1473,194 +1484,213 @@ function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
 
 
 
-
-
-var bboxDoFirst = 1;
-var latLonX1;
-var latLonY1;
-var latLonX2=-1;
-var latLonY2=-1;
-var latLonBoxOffset = -1;
-
-function bboxClear(argBase) { 
-    bboxDoFirst = 1;
-    var    fldNorth= util.getDomObject(argBase+"_north");
-    var    fldSouth= util.getDomObject(argBase+"_south");
-    var    fldEast= util.getDomObject(argBase+"_east");
-    var    fldWest= util.getDomObject(argBase+"_west");
-    fldNorth.obj.value = "";
-    fldSouth.obj.value = "";
-    fldEast.obj.value = "";
-    fldWest.obj.value = "";
-    var box = util.getDomObject(argBase+ "_bbox_div");
-    if(box) {
-	var style = util.getStyle(box);
-	style.visibility =  "hidden";
-    }
-}
-
-
-function bboxInit(imgId, argBase, absolute) { 
-    var image = util.getDomObject(imgId);
-    if(!image) {
-	return;
-    }
-
-    imageWidth = image.obj.width;
-    imageHeight = image.obj.height;
-
-    var    fldNorth= util.getDomObject(argBase+"_north");
-    var    fldSouth= util.getDomObject(argBase+"_south");
-    var    fldEast= util.getDomObject(argBase+"_east");
-    var    fldWest= util.getDomObject(argBase+"_west");
-
-
-    var box = util.getDomObject(argBase+ "_bbox_div");
-    if(latLonBoxOffset<0) 
-	latLonBoxOffset = box.obj.offsetTop;
-
-    var valuesOk = true;
-
-    if(fldNorth.obj.value == "") valuesOk = false;
-    if(fldSouth.obj.value == "") valuesOk = false;
-    if(fldEast.obj.value == "") valuesOk = false;
-    if(fldWest.obj.value == "") valuesOk = false;
-    if(!valuesOk) {
-	if(box) {
-	    var style = util.getStyle(box);
-	    style.visibility =  "hidden";
-	}
-	return;
+function MapSelector (imgId, argBase, absolute) {
+    this.latLonX1=0;
+    this.latLonY1=0;
+    this.latLonX2=-1;
+    this.latLonY2=-1;
+    this.latLonBoxOffset = -1;
+    this.doit = function() {
+        return "hello";
     }
 
 
-    lat1 = parseFloat(fldNorth.obj.value);
-    lon1 = parseFloat(fldWest.obj.value);
+    this.doFirst = 1;
+    this.imgId = imgId;
+    this.argBase = argBase;
+    this.absolute = absolute;
+    this.image = util.getDomObject(imgId);
+    this.imageWidth = this.image.obj.width;
+    this.imageHeight = this.image.obj.height;
 
-    lat2 = parseFloat(fldSouth.obj.value);
-    lon2 = parseFloat(fldEast.obj.value);
-
-    initMaps();
-    var map = mapImages[mapIdx];
-
-
-    //    var north =  map.originLat-y1/imageHeight*map.height;
-    //    var west =  map.originLon  + x1/imageWidth*map.width;
-
-    iy1 = imageHeight*(map.originLat - lat1)/map.height;
-    iy2 = imageHeight*(map.originLat - lat2)/map.height;
-
-
-    ix1 = imageWidth*(lon1-map.originLon)/map.width;
-    ix2 = imageWidth*(lon2-map.originLon)/map.width;
+    this.mapIdx=0;
 
 
 
+    this.fldNorth= util.getDomObject(argBase+"_north");
+    this.fldSouth= util.getDomObject(argBase+"_south");
+    this.fldEast= util.getDomObject(argBase+"_east");
+    this.fldWest= util.getDomObject(argBase+"_west");
+    this.fldLat= util.getDomObject(argBase+"_lat");
+    this.fldLon= util.getDomObject(argBase+"_lon");
+
+    this.box = util.getDomObject(argBase+ "_bbox_div");
 
 
-    var  imageLeft =  util.getLeft(image.obj);
-    var  imageTop =  util.getTop(image.obj);
-
-
-    if(box) {
-	var style = util.getStyle(box);
-	style.visibility =  "visible";
-	if(absolute) {
-	    style.left = ix1;
-	    style.top =  iy1+latLonBoxOffset;
-	} else {
-	    style.left = imageLeft+ix1;
-	    style.top =  imageTop+iy1;
-	}
-
-	if(ix2>0) {
-	    style.width = ix2-ix1;
-	    style.height = iy2-iy1;
-	}  else {
-	    style.width = 0;
-	    style.height = 0;
-	}
-    }
-}
-
-function bboxClick(event, imgId, argBase,absolute) { 
-    var image = util.getDomObject(imgId);
-    if(!image) {
-	return;
-    }
-    var box = util.getDomObject(argBase+"_bbox_div");
-    if(latLonBoxOffset<0) 
-	latLonBoxOffset = box.obj.offsetTop;
-
-    imageWidth = image.obj.width;
-    imageHeight = image.obj.height;
-
-    var ex  = util.getEventX(event);
-    var ey  = util.getEventY(event);
-
-    var ulX =  util.getLeft(image.obj);
-    var ulY =  util.getTop(image.obj);
-
-
-    var imageX = ex - ulX;
-    var imageY = ey - ulY;
-
-
-
-    if(bboxDoFirst) {
-	bboxDoFirst =0;
-	latLonX1 = imageX;
-	latLonY1 = imageY;
-	latLonX2 = latLonX1;
-	latLonY2 = latLonY1;
-    } else {
-	bboxDoFirst = 1;
-	latLonX2 = imageX;
-	latLonY2 = imageY;
+    this.cycleMap = function() {
+        initMaps();
+        this.mapIdx++;
+        if(this.mapIdx >= mapImages.length) this.mapIdx=0;
+        this.image.obj.src = mapImages[this.mapIdx].url;
+        this.imageWidth = this.image.obj.width;
+        this.imageHeight = this.image.obj.height;
+        this.init();
     }
 
-    var x1 = Math.min(latLonX1,latLonX2);
-    var y1 = Math.min(latLonY1,latLonY2);
+    this.clear = function() {
+        this.doFirst = 1;
+        if(this.fldNorth)
+            this.fldNorth.obj.value = "";
+        if(this.fldSouth)
+            this.fldSouth.obj.value = "";
+        if(this.fldEast)
+            this.fldEast.obj.value = "";
+        if(this.fldWest)
+            this.fldWest.obj.value = "";
+        if(this.fldLat)
+            this.fldLat.obj.value = "";
+        if(this.fldLon)
+            this.fldLon.obj.value = "";
+        if(this.box) {
+            var style = util.getStyle(this.box);
+            style.visibility =  "hidden";
+        }
+    }
 
-    var x2 = Math.max(latLonX1,latLonX2);
-    var y2 = Math.max(latLonY1,latLonY2);
 
-    //    alert(x1 +"/" + y1 + "   " + x2 +"/" + y2);
+    this.init = function() {
+       if(this.latLonBoxOffset<0) 
+            this.latLonBoxOffset = this.box.obj.offsetTop;
 
-    initMaps();
-    var map = mapImages[mapIdx];
+        var valuesOk = true;
+       if(this.fldNorth) {
+           if(this.fldNorth.obj.value == "") valuesOk = false;
+           if(this.fldSouth.obj.value == "") valuesOk = false;
+           if(this.fldEast.obj.value == "") valuesOk = false;
+           if(this.fldWest.obj.value == "") valuesOk = false;
+       } else if(this.fldLat) {
+           if(this.fldLat.obj.value == "") valuesOk = false;
+           if(this.fldLon.obj.value == "") valuesOk = false;
+       }
+
+        if(!valuesOk) {
+            if(this.box) {
+                var style = util.getStyle(this.box);
+                style.visibility =  "hidden";
+            }
+            return;
+        }
+
+       if(this.fldNorth) {
+           lat1 = parseFloat(this.fldNorth.obj.value);
+           lon1 = parseFloat(this.fldWest.obj.value);
+
+           lat2 = parseFloat(this.fldSouth.obj.value);
+           lon2 = parseFloat(this.fldEast.obj.value);
+       } else if(this.fldLat) {
+           lat1 = parseFloat(this.fldLat.obj.value);
+           lon1 = parseFloat(this.fldLon.obj.value);
+
+           lat2 = lat1;
+           lon2 = lon1;
+       }
+
+        initMaps();
+        var map = mapImages[this.mapIdx];
+
+    //    var north =  map.originLat-y1/this.imageHeight*map.height;
+    //    var west =  map.originLon  + x1/this.imageWidth*map.width;
+
+        iy1 = this.imageHeight*(map.originLat - lat1)/map.height;
+        iy2 = this.imageHeight*(map.originLat - lat2)/map.height;
+
+        ix1 = this.imageWidth*(lon1-map.originLon)/map.width;
+        ix2 = this.imageWidth*(lon2-map.originLon)/map.width;
+
+        var  imageLeft =  util.getLeft(this.image.obj);
+        var  imageTop =  util.getTop(this.image.obj);
+
+        if(this.box) {
+            var style = util.getStyle(this.box);
+            style.visibility =  "visible";
+            if(absolute) {
+                style.left = ix1;
+                style.top =  iy1+this.latLonBoxOffset;
+            } else {
+                style.left = imageLeft+ix1;
+                style.top =  imageTop+iy1;
+            }
+
+            if(ix2>0) {
+                style.width = ix2-ix1;
+                style.height = iy2-iy1;
+            }  else {
+                style.width = 0;
+                style.height = 0;
+            }
+        }
+    }
 
 
-    var north =  map.originLat-y1/imageHeight*map.height;
-    var south =  map.originLat-y2/imageHeight*map.height;
-    var west =  map.originLon  + x1/imageWidth*map.width;
-    var east =  map.originLon + x2/imageWidth*map.width;
-    //    alert(north + " " + map.originLat + " " + y1 + " " + (y1/imageHeight) + " " + map.height);
+    this.update  =function() {
+        this.init();
+    }
+
+    this.click = function(event) {
+        var ex  = util.getEventX(event);
+        var ey  = util.getEventY(event);
+
+        var ulX =  util.getLeft(this.image.obj);
+        var ulY =  util.getTop(this.image.obj);
 
 
-    var    fldNorth= util.getDomObject(argBase+"_north");
-    var    fldSouth= util.getDomObject(argBase+"_south");
-    var    fldEast= util.getDomObject(argBase+"_east");
-    var    fldWest= util.getDomObject(argBase+"_west");
-    fldNorth.obj.value = ""+north;
-    fldSouth.obj.value = ""+south;
-    fldWest.obj.value = ""+west;
-    fldEast.obj.value = ""+east;
+        var imageX = ex - ulX;
+        var imageY = ey - ulY;
 
-    if(box) {
-	var style = util.getStyle(box);
-	style.visibility =  "visible";
-	if(absolute) {
-	    style.left = x1;
-	    style.top =  17+y1;
-	    //	    style.top =  latLonY1+image.obj.offsetTop;
-	} else {
-	    style.left = ulX+x1;
-	    style.top =  ulY+y1;
-	}
-	style.width = x2-x1;
-	style.height = y2-y1;
-	//	alert(style.left+"/" +style.top + "  " + style.width+"/" + style.height);
+
+        if(this.doFirst) {
+            this.doFirst =0;
+            this.latLonX1 = imageX;
+            this.latLonY1 = imageY;
+            this.latLonX2 = this.latLonX1;
+            this.latLonY2 = this.latLonY1;
+            if(this.fldLat) this.doFirst = 1;
+        } else {
+            this.doFirst = 1;
+            this.latLonX2 = imageX;
+            this.latLonY2 = imageY;
+        }
+
+        var x1 = Math.min(this.latLonX1,this.latLonX2);
+        var y1 = Math.min(this.latLonY1,this.latLonY2);
+
+        var x2 = Math.max(this.latLonX1,this.latLonX2);
+        var y2 = Math.max(this.latLonY1,this.latLonY2);
+
+        initMaps();
+
+        var map = mapImages[this.mapIdx];
+        var north =  map.originLat-y1/this.imageHeight*map.height;
+        var south =  map.originLat-y2/this.imageHeight*map.height;
+        var west =  map.originLon  + x1/this.imageWidth*map.width;
+        var east =  map.originLon + x2/this.imageWidth*map.width;
+
+
+        if(this.fldNorth) {
+            this.fldNorth.obj.value = ""+north;
+            this.fldSouth.obj.value = ""+south;
+            this.fldWest.obj.value = ""+west;
+            this.fldEast.obj.value = ""+east;
+        } else if(this.fldLat) {
+            this.fldLat.obj.value = ""+north;
+            this.fldLon.obj.value = ""+west;
+        }
+
+        if(this.box) {
+            var style = util.getStyle(this.box);
+            style.visibility =  "visible";
+            if(this.absolute) {
+                style.left = x1;
+                style.top =  17+y1;
+                //	    style.top =  latLonY1+image.obj.offsetTop;
+            } else {
+                style.left = ulX+x1;
+                style.top =  ulY+y1;
+            }
+            style.width = x2-x1;
+            style.height = y2-y1;
+            //	alert(style.left+"/" +style.top + "  " + style.width+"/" + style.height);
+        }
     }
 
 }
@@ -1668,7 +1698,6 @@ function bboxClick(event, imgId, argBase,absolute) {
 
 
 var mapImages;
-var mapIdx=0;
 
 function Map(url, ulLon, ulLat, lrLon, lrLat) {
     this.url=url;
@@ -1683,30 +1712,14 @@ function Map(url, ulLon, ulLat, lrLon, lrLat) {
 function initMaps() {
     if(mapImages) return;
     mapImages= new Array();
-    /*
-<north>51.126121520996094</north>
-<south>18.237728118896484</south>
-<east>-65.26223754882812</east>
-<west>-126.57781982421875</west>
-    */
-
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/caida.jpg",-180,90,180,-90);
 
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/conus.png",-126.57781982421875,51.126121520996094,-65.26223754882812,18.237728118896484);
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/usgstopo.jpg",-180,90,180,-90);
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/worldday.jpg",-180,90,180,-90);
-    mapIdx=0;
 }
 
-function cycleMap(imgId, argBase, absolute) {
-    var mapImg = util.getDomObject(imgId);
-    if(!mapImg) return;
-    initMaps();
-    mapIdx++;
-    if(mapIdx >= mapImages.length) mapIdx=0;
-    mapImg.obj.src = mapImages[mapIdx].url;
-    bboxInit(imgId, argBase, absolute);
-}
+
 
 
 var http_request = false;

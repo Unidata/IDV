@@ -62,7 +62,6 @@ body {
 .submit {
   margin-left:3px;
   margin-right:3px;
-  xfont-weight: bold;
 }
 
 
@@ -92,7 +91,6 @@ a:hover {
 }
 
 .entryrowlabel {
-    xfont-style:italic;
     font-size:8px;
     white-space:nowrap;
 }
@@ -490,6 +488,8 @@ a.header-left  {
 }
 
 .calheader {
+   padding-top:10px;
+   padding-left:10px;
    background-color:#c3d9ff;
    font-weight: bold;
 }
@@ -530,18 +530,24 @@ a.header-left  {
    text-align:right;
    font-size: 8pt;
    background-color:#c3d9ff;
+   padding-left:20px;
+   padding-top:5px;
 }
 
 .calnavtheday {
    text-align:right;
    font-size: 8pt;
-   background-color:white;
+   background-color:#fff;
+   padding-left:20px;
+   padding-top:5px;
 }
 
 .calnavoffday {
    text-align:right;
    font-size: 8pt;
    background-color:#cccccc;
+   padding-left:20px;
+   padding-top:5px;
 }
 
 
@@ -596,10 +602,12 @@ td {
    font-weight: normal;
 }
 
+
+
 .separator {
-   font-size: 11pt;
-   font-weight: bold;
-   color:#666666;
+   font-size: 9pt;
+//   font-weight: bold;
+//   color:#666666;
 }
 
 
@@ -608,7 +616,6 @@ ul {
 }
 
 .tab_titles {
-   xborder-bottom : 1px #000000 solid;
    margin:0px;
    padding:0px;
 }
@@ -847,13 +854,12 @@ code.menu {
 .breadcrumbs {
    font-size: 12pt;
    text-decoration: none;
-   font-weight: bold;
-   margin-bottom:0px;
+   margin-bottom:1px;
 }
 
 .breadcrumbs a {
    text-decoration: none;
-   color: #999999;
+   color: #000;
 }
 
 .breadcrumbs a:hover {
@@ -863,7 +869,7 @@ code.menu {
 
 
 .content {
-  border: 2px #aaa groove;
+  border: 1px #aaa solid;
   min-height:800px;
   margin:0;
   margin-right:5px;
@@ -873,19 +879,20 @@ code.menu {
 
 .entrymenubar {
    background-image:url(${urlroot}/images/gradient.jpg);
+//   background-color: #d9e2f4;
+//   background-color: #ebeff9;
+//   background-color: #f0f0f0;
    padding-left:10px;
    padding-right:10px;
-   padding-top:4px;
+   padding-top:5px;
    padding-bottom:1px;
    margin-bottom:2px;
-   border-bottom: 1px #999 solid; 
-//   border-bottom: 2px #ddd ridge; 
-
+   border-bottom: 1px #aaa solid; 
 }
 
 
 .entryheader {
-   font-weight: bold;
+//   font-weight: bold;
    font-size: 12pt;
    border-bottom : 1px #ddd solid;
    margin-bottom:5px;
@@ -968,14 +975,14 @@ code.menu {
 .leftbox {
    margin-top: 0px;
    background-color:#ffffff;
-   margin-left:4px;
+   margin-left:6px;
 }
 
 
 .favorites {
    max-width: 125px; 
    overflow-x: auto;
-   xborder: 1px #999999 solid; 
+//   border: 1px #999999 solid; 
    margin-top: 0px;
    margin-left:4px;
    background-color:#ffffff;
@@ -1003,8 +1010,6 @@ code.menu {
 
 
 .actionblock {
-   xxmax-height: 50px; 
-   xxoverflow-y: auto;
    margin:0px;
    padding:0px;
    padding-left:18px;

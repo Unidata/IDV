@@ -152,7 +152,7 @@ public class WmsImageOutputHandler extends OutputHandler {
                               Entry entry)
             throws Exception {
         if(request.getString("request","").equals("GetMap")) {
-            return getEntryManager().processEntryGet(request);
+            return outputMap(request, entry);
         }
 
         if(outputType.equals(OUTPUT_WMS_CAPABILITIES)) {
@@ -169,13 +169,21 @@ public class WmsImageOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        System.err.println ("request:" + request);
         return outputCapabilities(request, group, entries);
     }
+
+
+    public Result outputMap(Request request, 
+                            Entry entry ) throws Exception {
+        System.err.println("map:" + request);
+        return getEntryManager().processEntryGet(request);
+    }
+
 
     private   String layerTemplate = "<Layer         noSubsets=\"1\"         opaque=\"0\"         queryable=\"1\">        <Name>${name}</Name>        <Title>${title}</Title>        <SRS>EPSG:4326</SRS>        <LatLonBoundingBox           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>        <BoundingBox           SRS=\"EPSG:4326\"           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>      </Layer>";
 
     private String wmsTemplate;
+
 
     public Result outputCapabilities(Request request, 
                                      Entry entry, 

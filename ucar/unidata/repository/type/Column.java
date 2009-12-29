@@ -104,6 +104,8 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_DOUBLE = "double";
 
+    public static final String TYPE_PERCENTAGE = "percentage";
+
     /** _more_ */
     public static final String TYPE_BOOLEAN = "boolean";
 
@@ -251,6 +253,7 @@ public class Column implements Constants {
 
     private boolean addToForm = true;
 
+    private Hashtable<String,String> properties = new Hashtable<String,String>();
 
     /**
      * _more_
@@ -287,6 +290,16 @@ public class Column implements Constants {
         size        = XmlUtil.getAttribute(element, ATTR_SIZE, size);
         rows        = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
         columns     = XmlUtil.getAttribute(element, ATTR_COLUMNS, columns);
+
+        List propNodes = XmlUtil.findChildren(element,
+                                             "property");
+        for (int i = 0; i < propNodes.size(); i++) {
+            Element propNode = (Element) propNodes.get(i);
+            properties.put(XmlUtil.getAttribute(propNode,"name"),
+                           XmlUtil.getAttribute(propNode,"value"));
+        }
+
+
         if (type.equals(TYPE_ENUMERATION)) {
             String valueString = XmlUtil.getAttribute(element, ATTR_VALUES);
             if (valueString.startsWith("file:")) {
@@ -300,15 +313,38 @@ public class Column implements Constants {
         }
     }
 
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
 
+    public String msg(String s) {
+        return typeHandler.msg(s);
+    }
+
+    public String msgLabel(String s) {
+        return typeHandler.msgLabel(s);
+    }
+
+    public Repository getRepository() {
+        return typeHandler.getRepository();
+    }
 
     /**
      * _more_
      *
      * @return _more_
      */
-    private boolean isNumeric() {
-        return type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE);
+    public boolean isNumeric() {
+        return type.equals(TYPE_INT) || isDouble();
+    }
+
+    public boolean isDouble() {
+        return type.equals(TYPE_DOUBLE) || type.equals(TYPE_PERCENTAGE);
+    }
+
+
+    public boolean isString() {
+        return type.equals(TYPE_STRING)  || type.equals(TYPE_ENUMERATION); 
     }
 
     /**
@@ -384,28 +420,35 @@ public class Column implements Constants {
 
         String delimiter = (Misc.equals(OUTPUT_CSV, output)?"|":",");
         if (type.equals(TYPE_LATLON)) {
-            sb.append(toLatLonString(values, valueIdx));
+            sb.append(toLatLonString(values, offset));
             valueIdx++;
             sb.append(delimiter);
-            sb.append(toLatLonString(values, valueIdx));
+            sb.append(toLatLonString(values, offset+1));
             valueIdx++;
         } else  if (type.equals(TYPE_LATLONBBOX)) {
-            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(toLatLonString(values, offset));
             sb.append(delimiter);
-            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(toLatLonString(values, offset+1));
             sb.append(delimiter);
-            sb.append(toLatLonString(values, valueIdx++));
+            sb.append(toLatLonString(values, offset+2));
             sb.append(delimiter); 
-           sb.append(toLatLonString(values, valueIdx++));
+           sb.append(toLatLonString(values, offset+3));
+        } else if(type.equals(TYPE_PERCENTAGE)) {
+            if(Misc.equals(output, OUTPUT_CSV)) {
+                sb.append(toString(values, offset));
+            } else {
+                double percent = (Double)values[offset];
+                sb.append((int)(percent*100)+"");
+            }
         } else if(type.equals(TYPE_EMAIL)) {
-            String s = toString(values, valueIdx);
+            String s = toString(values, offset);
             if(Misc.equals(output, OUTPUT_CSV)) 
                 sb.append(s);
             else
                 sb.append("<a href=\"mailto:" + s +"\">" + s +"</a>");
             valueIdx++;
         } else {
-            sb.append(toString(values, valueIdx));
+            sb.append(toString(values, offset));
             valueIdx++;
         }
         return valueIdx;
@@ -437,7 +480,7 @@ public class Column implements Constants {
                 statement.setInt(statementIdx, 0);
             }
             statementIdx++;
-        } else if (type.equals(TYPE_DOUBLE)) {
+        } else if (isDouble()) {
             if (values[offset] != null) {
                 statement.setDouble(statementIdx,
                                     ((Double) values[offset]).doubleValue());
@@ -520,7 +563,10 @@ public class Column implements Constants {
         if (type.equals(TYPE_INT)) {
             values[offset] = new Integer(results.getInt(valueIdx));
             valueIdx++;
-        } else if (type.equals(TYPE_DOUBLE)) {
+        } else if (type.equals(TYPE_PERCENTAGE)) {
+            values[offset] = new Double(results.getDouble(valueIdx));
+            valueIdx++;
+        } else if (isDouble()) {
             values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
         } else if (type.equals(TYPE_BOOLEAN)) {
@@ -594,7 +640,7 @@ public class Column implements Constants {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {
             defineColumn(statement, name, "int");
-        } else if (type.equals(TYPE_DOUBLE)) {
+        } else if (isDouble()) {
             defineColumn(
                 statement, name,
                 typeHandler.getRepository().getDatabaseManager().convertType(
@@ -666,7 +712,7 @@ public class Column implements Constants {
     public Object convert(String value) {
         if (type.equals(TYPE_INT)) {
             return new Integer(value);
-        } else if (type.equals(TYPE_DOUBLE)) {
+        } else if (isDouble()) {
             return new Double(value);
         } else if (type.equals(TYPE_BOOLEAN)) {
             return new Boolean(value);
@@ -748,6 +794,12 @@ public class Column implements Constants {
             double from  = request.get(id + "_from", Double.NaN);
             double to    = request.get(id + "_to", Double.NaN);
             double value = request.get(id, Double.NaN);
+            
+            if(type.equals(TYPE_PERCENTAGE)) {
+                from  = from/100.0;
+                to  = to/100.0;
+                value = value/100.0;
+            }
             if ((from == from) && (to != to)) {
                 to = value;
             } else if ((from != from) && (to == to)) {
@@ -762,7 +814,7 @@ public class Column implements Constants {
                 } else if (expr.equals(EXPR_LE)) {
                     where.add(Clause.le(getFullName(), from));
                 } else if (expr.equals(EXPR_GE)) {
-                    where.add(Clause.ge(getFullName(), to));
+                    where.add(Clause.ge(getFullName(), from));
                 } else if (expr.equals(EXPR_BETWEEN)) {
                     where.add(Clause.ge(getFullName(), from));
                     where.add(Clause.le(getFullName(), to));
@@ -778,7 +830,16 @@ public class Column implements Constants {
                         : 0)));
             }
         } else if (type.equals(TYPE_DATE)) {
-            //TODO: typeHandler.getDatabaseManager()
+            String relativeArg = id+"_relative";
+            Date[] dateRange = request.getDateRange(id+"_fromdate", id+"_todate", relativeArg,
+                               new Date());
+            if (dateRange[0] != null) {
+                where.add(Clause.ge(getFullName(), dateRange[0]));
+            }
+
+            if (dateRange[1] != null) {
+                where.add(Clause.le(getFullName(), dateRange[1]));
+            }
         } else {
             String value = request.getString(id, "");
             typeHandler.addOrClause(getFullName(),
@@ -880,8 +941,9 @@ public class Column implements Constants {
                 lat = ((Double)values[offset]).doubleValue();
                 lon = ((Double)values[offset+1]).doubleValue();
             }
-            widget = " Lat: " + HtmlUtil.input(id+"_lat", latLonOk(lat)?lat+"":"", HtmlUtil.SIZE_5) +
-                " Lon: " + HtmlUtil.input(id+"_lon", latLonOk(lon)?lon+"":"", HtmlUtil.SIZE_5);
+            widget = typeHandler.getRepository().makeMapSelector(id, true, "","",new String[]{
+                    latLonOk(lat)?lat+"":"",
+                    latLonOk(lon)?lon+"":""});
         } else  if (type.equals(TYPE_LATLONBBOX)) {
             if(values!=null) {
                 widget = typeHandler.getRepository().makeMapSelector(id, true, "","",
@@ -936,6 +998,18 @@ public class Column implements Constants {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(id, value, HtmlUtil.SIZE_10);
+        } else if (type.equals(TYPE_PERCENTAGE)) {
+            String value = ((dflt != null)
+                            ? dflt
+                            : "0");
+
+            if (values != null) {
+                value = "" + toString(values, offset);
+            }
+            if(value.trim().length() == 0) value="0";
+            double d = new Double(value).doubleValue();
+            int percentage = (int)(d*100);
+            widget = HtmlUtil.input(id, percentage+"", HtmlUtil.SIZE_5)+"%";
         } else if (type.equals(TYPE_PASSWORD)) {
             String value = ((dflt != null)
                             ? dflt
@@ -990,6 +1064,20 @@ public class Column implements Constants {
 
 
 
+    public double [] getLatLonBbox(Object [] values) {
+        return new double[]{(Double)values[offset],
+                            (Double)values[offset+1],
+                            (Double)values[offset+2],
+                            (Double)values[offset+3]};
+    }
+
+
+    public double [] getLatLon(Object [] values) {
+        return new double[]{(Double)values[offset],
+                            (Double)values[offset+1]};
+    }
+
+
     /**
      * _more_
      *
@@ -1038,7 +1126,18 @@ public class Column implements Constants {
             } else {
                 values[offset] = dfltValue;
             }
-        } else if (type.equals(TYPE_DOUBLE)) {
+        } else if (type.equals(TYPE_PERCENTAGE)) {
+            double dfltValue = (StringUtil.notEmpty(dflt)
+                                ? new Double(dflt.trim()).doubleValue()
+                                : 0);
+            if (request.exists(id)) {
+                values[offset] = new Double(request.get(id,
+                        dfltValue)/100);
+            } else {
+                values[offset] = dfltValue;
+
+            }
+        } else if (isDouble()) {
             double dfltValue = (StringUtil.notEmpty(dflt)
                                 ? new Double(dflt.trim()).doubleValue()
                                 : 0);
@@ -1087,10 +1186,39 @@ public class Column implements Constants {
         String       widget = "";
         if (type.equals(TYPE_LATLON)) {
             widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
-        }  if (type.equals(TYPE_LATLONBBOX)) {
+        } else  if (type.equals(TYPE_LATLONBBOX)) {
             widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
         } else if (type.equals(TYPE_DATE)) {
-            //TODO
+            List dateSelect = new ArrayList();
+            dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));
+            dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
+            dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last 12 hours"), "-12 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last day"), "-1 day"));
+            dateSelect.add(new TwoFacedObject(msg("Last 7 days"), "-7 days"));
+            String dateSelectValue;
+            String relativeArg = id+"_relative";
+            if (request.exists(relativeArg)) {
+                dateSelectValue = request.getString(relativeArg, "");
+            } else {
+                dateSelectValue = "none";
+            }
+
+            String dateSelectInput = HtmlUtil.select(id+"_relative",
+                                                     dateSelect, dateSelectValue);
+
+            widget = getRepository().makeDateInput(
+                    request, id+"_fromdate", "searchform",
+                    null) + HtmlUtil.space(1)
+                          + HtmlUtil.img(getRepository().iconUrl(ICON_RANGE))
+                          + HtmlUtil.space(1)
+                          + getRepository().makeDateInput(
+                              request, id+"_todate", "searchform",
+                              null) + HtmlUtil.space(4) + msgLabel("Or")
+                + dateSelectInput;
+
+
         } else if (type.equals(TYPE_BOOLEAN)) {
             widget = HtmlUtil.select(id,
                                      Misc.newList(TypeHandler.ALL_OBJECT,

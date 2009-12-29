@@ -593,6 +593,26 @@ public class RepositoryClient extends RepositoryBase {
      * @return _more_
      */
     public boolean newGroup(String parentId, String name) {
+        return newGroup(parentId, name, "12345678");
+    }
+
+    public Element makeGroupNode(Element parentNode, String parentId, String name, String dummyid) throws Exception  {
+        return  XmlUtil.create(parentNode.getOwnerDocument(), TAG_ENTRY, parentNode,
+                               new String[] {
+                                   ATTR_ID, dummyid, ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
+                                   parentId, ATTR_NAME, name
+                               });
+    }
+
+    public Element  makeEntryNode(Element root, String name) throws Exception  {
+        Element entryNode = XmlUtil.create(root.getOwnerDocument(), TAG_ENTRY, root,
+                                           new String[] {});
+
+        entryNode.setAttribute(ATTR_NAME, name);
+        return entryNode;
+    }
+
+    public boolean newGroup(String parentId, String name, String dummyid) {
         try {
             if (name == null) {
                 return false;
@@ -600,12 +620,7 @@ public class RepositoryClient extends RepositoryBase {
             Document doc = XmlUtil.makeDocument();
             Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                           new String[] {});
-            Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                    new String[] {
-                ATTR_ID, "123456789", ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
-                parentId, ATTR_NAME, name
-            });
-
+            makeGroupNode(root, parentId, name, dummyid);
             String xml     = XmlUtil.toString(root);
             List   entries = new ArrayList();
             addUrlArgs(entries);
@@ -1018,7 +1033,35 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\nFor fetching: \n\t-print <entry id> Create and print the given entry\n\t-printxml <entry id> Print out the xml for the given entry id\n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-name <entry name>\n\t-parent <parent group id or full path to the parent group, e.g., \"Top/Destination\">\n\t-file <file to upload>\n\t-description <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
+            "Where arguments are:\nFor fetching: \n" +
+            "\t-print <entry id> Create and print the given entry\n" +
+            "\t-printxml <entry id> Print out the xml for the given entry id\n" +
+            "\t-fetch <entry id> <destination file or directory>\n" +
+            "For creating a new group:\n" +
+            "\t-group  <group name> <parent group id (see below)>\n" +
+            "For uploading files:\n" +
+            "\t-file <entry name> <file to upload> <parent group id (see below)>\n" +
+            "The following arguments get applied to the previously created group or file:\n" +
+            "\t-description <entry description>\n" +
+            "\t-attach <file to attach>\n" +
+            "\t-addmetadata (Add full metadata to entry)\n" +
+            "\t-addshortmetadata (Add spatial/temporal metadata to entry)\n" +
+
+            "Miscellaneous:\n" +
+            "\t-debug (print out the generated xml)\n" +
+            "\t-exit (exit without adding anything to the repository\n");
+
+
+        System.err.println ("Note: the  <parent group id> can be an identifier from a existing group in the repository or it can be \"previous\" which will use the id of the previously specified group\n" +
+                            "For example you could do:\n" +
+                            " ...  -group \"Some new group\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -group \"some other group\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" +
+                            "This results in the heirarchy:\n" +
+                            "Some new group\n" +
+                            "\tsomefile1.nc\n"+
+                            "\tsomefile2.nc\n" +
+                            "\tsome other group\n" +
+                            "\t\tsomeotherfile.nc\n");
+
         System.exit(1);
     }
 
@@ -1035,14 +1078,25 @@ public class RepositoryClient extends RepositoryBase {
         String     xmlFile    = null;
         List<File> files      = new ArrayList<File>();
         Element    root       = null;
-        Element    entryNode  = null;
+        Element    entryNode = null;
+        Element    groupNode = null;
         Document   doc        = null;
         boolean    haveParent = false;
+
+        doc = XmlUtil.makeDocument();
+        root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                              new String[] {});
+
+
+        int entryCnt = 0;
         for (int i = 3; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("-fetch")) {
+                if (i >= args.length - 1) {
+                    usage("Bad -fetch argument. Need to specify an entry id and destination file path ");
+                }
                 if (i >= args.length - 2) {
-                    usage("Bad -fetch argument");
+                    usage("Bad -fetch argument. Need to specify a destination file path ");
                 }
                 File f = writeFile(args[i + 1], new File(args[i + 2]));
                 System.err.println("Wrote file to:" + f);
@@ -1056,6 +1110,7 @@ public class RepositoryClient extends RepositoryBase {
                 printEntry(args[i + 1]);
                 return;
             }
+
             if (arg.equals("-printxml")) {
                 if (i >= args.length - 1) {
                     usage("Bad -print argument");
@@ -1063,26 +1118,31 @@ public class RepositoryClient extends RepositoryBase {
                 printEntryXml(args[i + 1]);
                 return;
             }
-            if (arg.equals("-name")) {
+            if (arg.equals("-debug")) {
+                System.out.println(XmlUtil.toString(root));
+            } else  if (arg.equals("-exit")) {
+                return;
+            } else if (arg.equals("-name") || arg.equals("-entry")) {
+                if (i == args.length) {
+                    usage("Bad -entry argument");
+                }
+                entryCnt++;
+                entryNode = makeEntryNode(root, args[++i]);
+            } else if (arg.equals("-group")) {
                 if (i == args.length) {
                     usage("Bad -name argument");
                 }
-                i++;
-                if (root == null) {
-                    doc = XmlUtil.makeDocument();
-                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                          new String[] {});
-                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                            new String[] {});
-
-                }
-                entryNode.setAttribute(ATTR_NAME, args[i]);
+                entryNode = null;
+                entryCnt++;
+                groupNode = makeGroupNode(root, args[++i],
+                                          args[++i],
+                                          args[++i]);
             } else if (arg.equals("-description")) {
                 if (i == args.length) {
                     usage("Bad -description argument");
                 }
-                if (root == null) {
-                    usage("Must specify -name first");
+                if (entryNode == null) {
+                    usage("Must specify -entry first");
                 }
                 i++;
                 Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION,
@@ -1093,7 +1153,7 @@ public class RepositoryClient extends RepositoryBase {
                 if (i == args.length) {
                     usage("Bad -parent argument");
                 }
-                if (root == null) {
+                if (entryNode == null) {
                     usage("Must specify -name first");
                 }
                 i++;
@@ -1106,15 +1166,8 @@ public class RepositoryClient extends RepositoryBase {
                 i++;
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
-                if (root == null) {
-                    doc = XmlUtil.makeDocument();
-                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                          new String[] {});
-                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                            new String[] {});
-                    entryNode.setAttribute(ATTR_NAME,
-                                           IOUtil.getFileTail(args[i]));
-                }
+                entryCnt++;
+                entryNode = makeEntryNode(root,    IOUtil.getFileTail(args[i]));
                 entryNode.setAttribute(ATTR_LOCALFILE, f.getPath());
             } else if (arg.equals("-localfiletomove")) {
                 if (i == args.length) {
@@ -1123,15 +1176,8 @@ public class RepositoryClient extends RepositoryBase {
                 i++;
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
-                if (root == null) {
-                    doc = XmlUtil.makeDocument();
-                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                          new String[] {});
-                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                            new String[] {});
-                    entryNode.setAttribute(ATTR_NAME,
-                                           IOUtil.getFileTail(args[i]));
-                }
+                entryCnt++;
+                entryNode =  makeEntryNode(root, IOUtil.getFileTail(args[i]));
                 entryNode.setAttribute(ATTR_LOCALFILETOMOVE, f.getPath());
             } else if (arg.equals("-file")) {
                 if (i == args.length) {
@@ -1142,29 +1188,26 @@ public class RepositoryClient extends RepositoryBase {
                 if ( !f.exists()) {
                     usage("File does not exist:" + args[i]);
                 }
-                if (root == null) {
-                    doc = XmlUtil.makeDocument();
-                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                          new String[] {});
-                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                            new String[] {});
-                    entryNode.setAttribute(ATTR_NAME,
-                                           IOUtil.getFileTail(args[i]));
-                }
+                entryCnt++;
+                entryNode = makeEntryNode(root,
+                                          IOUtil.getFileTail(args[i]));
                 entryNode.setAttribute(ATTR_FILE,
                                        IOUtil.getFileTail(args[i]));
                 files.add(f);
             } else if (arg.equals("-addmetadata")) {
                 if (entryNode == null) {
-                    usage("Need to specify a -file first");
+                    usage("When using -addmetadata you need to create an entry first");
                 }
                 entryNode.setAttribute(ATTR_ADDMETADATA, "true");
             } else if (arg.equals("-addshortmetadata")) {
                 if (entryNode == null) {
-                    usage("Need to specify a -file first");
+                    usage("When using -addshortmetadata you need to create an entry first");
                 }
                 entryNode.setAttribute(ATTR_ADDSHORTMETADATA, "true");
             } else if (arg.equals("-attach")) {
+                if (entryNode == null) {
+                    usage("When using -attach you need to create an entry first");
+                }
                 if (i == args.length) {
                     usage("Bad -file argument");
                 }
@@ -1176,14 +1219,8 @@ public class RepositoryClient extends RepositoryBase {
                 if (entryNode == null) {
                     usage("Need to specify a -file first");
                 }
-                if (root == null) {
-                    doc = XmlUtil.makeDocument();
-                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                          new String[] {});
-                    entryNode.setAttribute(ATTR_NAME,
-                                           IOUtil.getFileTail(args[i]));
-                }
-
+                entryNode.setAttribute(ATTR_NAME,
+                                       IOUtil.getFileTail(args[i]));
                 addAttachment(entryNode, IOUtil.getFileTail(f.toString()));
                 files.add(f);
             } else {
@@ -1195,7 +1232,7 @@ public class RepositoryClient extends RepositoryBase {
         }
 
 
-        if ((files.size() == 0) && (root == null)) {
+        if (entryCnt==0) {
             usage("");
         }
 

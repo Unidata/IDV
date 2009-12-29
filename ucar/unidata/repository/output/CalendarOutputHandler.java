@@ -350,18 +350,16 @@ public class CalendarOutputHandler extends OutputHandler {
                + dayMonthYear[IDX_DAY];
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param entries _more_
-     * @param sb _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
+
+
+
+
+
+
+
+
+
+
     private Result outputCalendar(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
@@ -370,6 +368,24 @@ public class CalendarOutputHandler extends OutputHandler {
             sb.append(
                 getRepository().showDialogNote(msg("No entries found")));
         }
+        List<CalendarEntry> calEntries = new ArrayList<CalendarEntry>();
+        for (Entry entry : entries) {
+            Date entryDate = new Date(entry.getStartDate());
+            String label = entry.getLabel();
+            if (label.length() > 20) {
+                label = label.substring(0, 19) + "...";
+            }
+            String url = 
+                HtmlUtil.nobr(
+                              getEntryManager().getAjaxLink(
+                                                            request, entry, label).toString());
+
+            calEntries.add(new CalendarEntry(entryDate, url, entry));
+        }
+        outputCalendar(request, calEntries, sb);
+        if(true) return new Result(msg("Calendar"), sb);
+
+
         boolean hadDateArgs = request.defined(ARG_YEAR)
                               || request.defined(ARG_MONTH)
                               || request.defined(ARG_DAY);
@@ -489,8 +505,6 @@ public class CalendarOutputHandler extends OutputHandler {
                             Calendar.YEAR, 1)));
             }
         }
-
-
 
 
         String[] navIcons = { "/icons/prevprev.gif", "/icons/prev.gif",
@@ -673,6 +687,332 @@ public class CalendarOutputHandler extends OutputHandler {
     }
 
 
+    public static class CalendarEntry {
+        Date date;
+        String label;
+        Object dayObject;
+        public CalendarEntry(Date date, String label,Object dayObject) {
+            this.date  = date;
+            this.label = label;
+            this.dayObject = dayObject;
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param entries _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public void outputCalendar(Request request, 
+                               List<CalendarEntry> entries, StringBuffer sb)
+            throws Exception {
+
+        boolean hadDateArgs = request.defined(ARG_YEAR)
+                              || request.defined(ARG_MONTH)
+                              || request.defined(ARG_DAY);
+
+        int[] today =
+            getDayMonthYear(new GregorianCalendar(DateUtil.TIMEZONE_GMT));
+
+        int[] selected = new int[] { request.get(ARG_DAY, today[IDX_DAY]),
+                                     request.get(ARG_MONTH, today[IDX_MONTH]),
+                                     request.get(ARG_YEAR, today[IDX_YEAR]) };
+
+        boolean doDay = request.defined(ARG_DAY);
+
+        int[]   prev  = (doDay
+                         ? getDayMonthYear(add(getCalendar(selected),
+                             Calendar.DAY_OF_MONTH, -1))
+                         : getDayMonthYear(add(getCalendar(selected),
+                             Calendar.MONTH, -1)));
+        int[] next = (doDay
+                      ? getDayMonthYear(add(getCalendar(selected),
+                                            Calendar.DAY_OF_MONTH, 1))
+                      : getDayMonthYear(add(getCalendar(selected),
+                                            Calendar.MONTH, 1)));
+
+        int[] prevprev = (doDay
+                          ? getDayMonthYear(add(getCalendar(selected),
+                              Calendar.MONTH, -1))
+                          : getDayMonthYear(add(getCalendar(selected),
+                              Calendar.YEAR, -1)));
+        int[] nextnext = (doDay
+                          ? getDayMonthYear(add(getCalendar(selected),
+                              Calendar.MONTH, 1))
+                          : getDayMonthYear(add(getCalendar(selected),
+                              Calendar.YEAR, 1)));
+
+        int[]                   someDate = null;
+
+
+        List                    dayItems = null;
+        Hashtable               dates    = new Hashtable();
+        Hashtable<String, List> map      = new Hashtable<String, List>();
+        GregorianCalendar mapCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        boolean didone = false;
+        for (int tries = 0; tries < 2; tries++) {
+            dayItems = new ArrayList();
+            for (CalendarEntry entry : entries) {
+                Date entryDate = entry.date;
+                mapCal.setTime(entryDate);
+                int[] entryDay = getDayMonthYear(mapCal);
+                String key = entryDay[IDX_YEAR] + "/" + entryDay[IDX_MONTH]
+                             + "/" + entryDay[IDX_DAY];
+                if (tries == 0) {
+                    dates.put(key, key);
+                }
+                if (someDate == null) {
+                    someDate = entryDay;
+                }
+                if (doDay) {
+                    if ((entryDay[IDX_DAY] != selected[IDX_DAY])
+                            || (entryDay[IDX_MONTH] != selected[IDX_MONTH])
+                            || (entryDay[IDX_YEAR] != selected[IDX_YEAR])) {
+                        continue;
+                    }
+                } else {
+                    if ( !((entryDay[IDX_YEAR] == selected[IDX_YEAR])
+                            && (entryDay[IDX_MONTH]
+                                == selected[IDX_MONTH]))) {
+                        continue;
+                    }
+                }
+                List dayList = map.get(key);
+                if (dayList == null) {
+                    map.put(key, dayList = new ArrayList());
+                }
+                if (doDay) {
+                    dayItems.add(entry.dayObject);
+                } else {
+                    dayList.add(entry.label);
+                }
+                didone = true;
+            }
+
+
+            if (didone || hadDateArgs) {
+                break;
+            }
+            if (someDate != null) {
+                selected = someDate;
+                prev     = (doDay
+                            ? getDayMonthYear(add(getCalendar(selected),
+                            Calendar.DAY_OF_MONTH, -1))
+                            : getDayMonthYear(add(getCalendar(selected),
+                            Calendar.MONTH, -1)));
+                next = (doDay
+                        ? getDayMonthYear(add(getCalendar(selected),
+                        Calendar.DAY_OF_MONTH, 1))
+                        : getDayMonthYear(add(getCalendar(selected),
+                        Calendar.MONTH, 1)));
+                prevprev = (doDay
+                            ? getDayMonthYear(add(getCalendar(selected),
+                            Calendar.MONTH, -1))
+                            : getDayMonthYear(add(getCalendar(selected),
+                            Calendar.YEAR, -1)));
+                nextnext = (doDay
+                            ? getDayMonthYear(add(getCalendar(selected),
+                            Calendar.MONTH, 1))
+                            : getDayMonthYear(add(getCalendar(selected),
+                            Calendar.YEAR, 1)));
+            }
+        }
+
+
+        String[] navIcons = { "/icons/prevprev.gif", "/icons/prev.gif",
+                              "/icons/today.gif", "/icons/next.gif",
+                              "/icons/nextnext.gif" };
+
+
+        String[]          navLabels;
+        SimpleDateFormat  headerSdf;
+        GregorianCalendar cal;
+        List<String>      navUrls = new ArrayList<String>();
+
+
+        if (doDay) {
+            headerSdf = new SimpleDateFormat("MMMMM, dd yyyy");
+            navLabels = new String[] { "Previous Month", "Previous Day",
+                                       "Today", "Next Day", "Next Month" };
+            cal = getCalendar(selected);
+        } else {
+            headerSdf = new SimpleDateFormat("MMMMM yyyy");
+            navLabels = new String[] { "Last Year", "Last Month",
+                                       "Current Month", "Next Month",
+                                       "Next Year" };
+            cal = getCalendar(1, selected[IDX_MONTH], selected[IDX_YEAR]);
+        }
+
+
+        request.put(ARG_YEAR, "" + (prevprev[IDX_YEAR]));
+        request.put(ARG_MONTH, "" + (prevprev[IDX_MONTH]));
+        if (doDay) {
+            request.put(ARG_DAY, "" + (prevprev[IDX_DAY]));
+        }
+        navUrls.add(request.getUrl());
+
+
+        request.put(ARG_YEAR, "" + (prev[IDX_YEAR]));
+        request.put(ARG_MONTH, "" + (prev[IDX_MONTH]));
+        if (doDay) {
+            request.put(ARG_DAY, "" + (prev[IDX_DAY]));
+        }
+        navUrls.add(request.getUrl());
+
+
+        request.put(ARG_YEAR, "" + (today[IDX_YEAR]));
+        request.put(ARG_MONTH, "" + (today[IDX_MONTH]));
+        if (doDay) {
+            request.put(ARG_DAY, "" + (today[IDX_DAY]));
+        }
+        navUrls.add(request.getUrl());
+
+
+        request.put(ARG_YEAR, "" + next[IDX_YEAR]);
+        request.put(ARG_MONTH, "" + next[IDX_MONTH]);
+        if (doDay) {
+            request.put(ARG_DAY, "" + (next[IDX_DAY]));
+        }
+        navUrls.add(request.getUrl());
+
+        request.put(ARG_YEAR, "" + (nextnext[IDX_YEAR]));
+        request.put(ARG_MONTH, "" + (nextnext[IDX_MONTH]));
+        if (doDay) {
+            request.put(ARG_DAY, "" + (nextnext[IDX_DAY]));
+        }
+        navUrls.add(request.getUrl());
+
+
+        request.remove(ARG_DAY);
+        request.remove(ARG_MONTH);
+        request.remove(ARG_YEAR);
+
+
+        List navList = new ArrayList();
+
+        for (int i = 0; i < navLabels.length; i++) {
+            navList.add(HtmlUtil.href(navUrls.get(i),
+                                      HtmlUtil.img(iconUrl(navIcons[i]),
+                                          navLabels[i], " border=\"0\"")));
+        }
+
+        if (doDay) {
+            StringBuffer tmp = new StringBuffer();
+            String link = "";
+            if(dayItems.size()>0) {
+                if(dayItems.get(0) instanceof Entry) {
+                    link = getEntriesList(request, tmp, dayItems, true, true,
+                                          true, false);
+                } else {
+                    link = StringUtil.join(" ", dayItems);
+                }
+            }
+            request.remove(ARG_MONTH);
+            request.remove(ARG_YEAR);
+            request.remove(ARG_DAY);
+            sb.append(HtmlUtil.p());
+            sb.append("<table width=100% border=0 cellpadding=10><tr valign=top><td width=200>");
+            getRepository().createMonthNav(sb, cal.getTime(),
+                                           request.getUrl(), dates);
+            sb.append("</td><td>");
+            request.put(ARG_MONTH, "" + selected[IDX_MONTH]);
+            request.put(ARG_YEAR, "" + selected[IDX_YEAR]);
+            String monthUrl = request.getUrl();
+            request.put(ARG_DAY, selected[IDX_DAY]);
+            //            sb.append(HtmlUtil.b(StringUtil.join(HtmlUtil.space(1),
+            //                    navList)));
+            sb.append(
+                HtmlUtil.href(
+                    monthUrl, HtmlUtil.b(headerSdf.format(cal.getTime()))));
+            if (dayItems.size() == 0) {
+                sb.append("<p>No Entries");
+            } else {
+                sb.append(HtmlUtil.br());
+                sb.append(link);
+                sb.append(tmp);
+            }
+            sb.append("</table>");
+        } else {
+            sb.append(
+                HtmlUtil.center(
+                    HtmlUtil.b(StringUtil.join(HtmlUtil.space(1), navList))));
+            sb.append(
+                HtmlUtil.center(HtmlUtil.b(headerSdf.format(cal.getTime()))));
+            sb.append(
+                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
+            String[] dayNames = {
+                "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+            };
+            sb.append("<tr>");
+            for (int colIdx = 0; colIdx < 7; colIdx++) {
+                sb.append("<td width=\"14%\" class=\"calheader\">"
+                          + dayNames[colIdx] + "</td>");
+            }
+            sb.append("</tr>");
+            int startDow = cal.get(cal.DAY_OF_WEEK);
+            while (startDow > 1) {
+                cal.add(cal.DAY_OF_MONTH, -1);
+                startDow--;
+            }
+            for (int rowIdx = 0; rowIdx < 6; rowIdx++) {
+                sb.append("<tr valign=top>");
+                for (int colIdx = 0; colIdx < 7; colIdx++) {
+                    String content   = HtmlUtil.space(1);
+                    String bg        = "";
+                    int    thisDay   = cal.get(cal.DAY_OF_MONTH);
+                    int    thisMonth = cal.get(cal.MONTH);
+                    int    thisYear  = cal.get(cal.YEAR);
+                    String key = thisYear + "/" + thisMonth + "/" + thisDay;
+                    List   inner     = map.get(key);
+                    request.put(ARG_MONTH, "" + thisMonth);
+                    request.put(ARG_YEAR, "" + thisYear);
+                    request.put(ARG_DAY, "" + thisDay);
+                    String dayUrl = request.getUrl();
+                    if (thisMonth != selected[IDX_MONTH]) {
+                        bg = " style=\"background-color:lightgray;\"";
+                    } else if ((today[IDX_DAY] == thisDay)
+                               && (today[IDX_MONTH] == thisMonth)
+                               && (today[IDX_YEAR] == thisYear)) {
+                        bg = " style=\"background-color:lightblue;\"";
+                    }
+                    String dayContents = "&nbsp;";
+                    if (inner != null) {
+                        dayContents = HtmlUtil.div(StringUtil.join("",
+                                inner), HtmlUtil.cssClass("calcontents"));
+                    }
+                    content =
+                        "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>"
+                        + dayContents + "</td><td align=right class=calday width=5>"
+                        + HtmlUtil.href(dayUrl, "" + thisDay)
+                        + "<br>&nbsp;</td></tr></table>";
+                    sb.append("<td class=\"calentry\" " + bg + " >" + content
+                              + "</td>");
+                    cal.add(cal.DAY_OF_MONTH, 1);
+                }
+                if ((cal.get(cal.YEAR) >= selected[IDX_YEAR])
+                        && (cal.get(cal.MONTH) > selected[IDX_MONTH])) {
+                    break;
+                }
+            }
+
+            sb.append("</table>");
+        }
+
+        request.remove(ARG_DAY);
+        request.remove(ARG_MONTH);
+        request.remove(ARG_YEAR);
+
+        //        return new Result(msg("Calendar"), sb);
+    }
 
 
 

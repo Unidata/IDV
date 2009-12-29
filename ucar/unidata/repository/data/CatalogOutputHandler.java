@@ -307,11 +307,12 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
-
         boolean justOneEntry = group.isDummy() && (entries.size() == 1)
                                && (subGroups.size() == 0);
 
 
+        int depth  = Math.min(5, request.get(ARG_DEPTH,1));
+        
         String   title = (justOneEntry
                           ? entries.get(0).getName()
                           : group.getFullName());
@@ -361,7 +362,7 @@ public class CatalogOutputHandler extends OutputHandler {
             //            System.err.println ("entries:" + entries.size() + " groups:" + subGroups.size()+ " max:" + max+" skip:" + skip);
 
             toCatalogInner(request, group, subGroups, catalogInfo,
-                           topDataset);
+                           topDataset, depth);
             if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
                 if (cnt >= max) {
                     String skipArg = request.getString(ARG_SKIP, null);
@@ -385,7 +386,7 @@ public class CatalogOutputHandler extends OutputHandler {
                 }
             }
 
-            toCatalogInner(request, group, entries, catalogInfo, topDataset);
+            toCatalogInner(request, group, entries, catalogInfo, topDataset,0);
             if ( !group.isDummy()
                     && (catalogInfo.serviceMap.get(SERVICE_OPENDAP)
                         != null)) {
@@ -690,7 +691,7 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     protected void toCatalogInner(Request request, Group parentGroup,
                                   List entryList, CatalogInfo catalogInfo,
-                                  Element parent)
+                                  Element parent, int depth)
             throws Exception {
 
         List<Entry> entries = new ArrayList();
@@ -704,17 +705,29 @@ public class CatalogOutputHandler extends OutputHandler {
             }
         }
         for (Group group : groups) {
-            String url =  /* "http://localhost:8080"+*/
-                request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
-                            group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
+            if(depth>1) {
+                Element datasetNode = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_DATASET,
+                                             parent,
+                                             new String[] { CatalogUtil.ATTR_NAME,
+                                                            group.getName()});
+                addMetadata(request, group,  catalogInfo, datasetNode);
+                List children = getEntryManager().getChildren(request, group);
+                toCatalogInner(request, group, children, 
+                               catalogInfo,
+                               datasetNode, depth-1);
+            } else {
+                String url =  /* "http://localhost:8080"+*/
+                    request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
+                                group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
-            Element ref = XmlUtil.create(catalogInfo.doc,
-                                         CatalogUtil.TAG_CATALOGREF, parent,
-                                         new String[] {
-                                             CatalogUtil.ATTR_XLINK_TITLE,
-                                             group.getName(),
-                                             CatalogUtil.ATTR_XLINK_HREF,
-                                             url });
+                Element ref = XmlUtil.create(catalogInfo.doc,
+                                             CatalogUtil.TAG_CATALOGREF, parent,
+                                             new String[] {
+                                                 CatalogUtil.ATTR_XLINK_TITLE,
+                                                 group.getName(),
+                                                 CatalogUtil.ATTR_XLINK_HREF,
+                                                 url });
+            }
         }
 
         EntryGroup entryGroup = new EntryGroup("");
