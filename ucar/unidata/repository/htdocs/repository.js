@@ -742,13 +742,16 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     this.mouseOver = function(event) {
         this.row.style.backgroundColor = this.overColor;
         //        mouseOverOnEntry(event, "", rowId);
+        //        this.row.style.borderBottom =  "1px #fff  solid";
         //        this.row.style.borderBottom =  "1px #888  solid";
+        this.row.style.border =  "1px #ccc  solid";
     }
 
     this.mouseOut = function(event) {
         this.setRowColor();
         //        mouseOutOnEntry(event, "", rowId);
         //        this.row.style.borderBottom =  "1px #fff  solid";
+        this.row.style.border =  "1px #fff  solid";
     }
 }
 
