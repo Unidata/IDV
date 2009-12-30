@@ -24,7 +24,6 @@ package ucar.unidata.data.gis;
 
 
 import java.text.SimpleDateFormat;
-import visad.DateTime;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -186,7 +185,7 @@ public class KmlUtil {
 
 
 
-    public static Element timestamp(Element parent, DateTime dttm) {
+    /*    public static Element timestamp(Element parent, DateTime dttm) {
         String when = dttm.formattedString("yyyy-MM-dd", DateUtil.TIMEZONE_GMT)
             + "T"
             + dttm.formattedString("HH:mm:ss", DateUtil.TIMEZONE_GMT)
@@ -194,7 +193,7 @@ public class KmlUtil {
         Element timestamp = makeElement(parent, TAG_TIMESTAMP);
         makeText(timestamp,TAG_WHEN, when);
         return timestamp;
-    }
+        }*/
 
 
     private static SimpleDateFormat sdf1;
@@ -340,12 +339,13 @@ public class KmlUtil {
 
 
 
+    /*
     public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) throws Exception {
         return placemark(parent, name, description, 
                          el.getLatitude().getValue(),
                          el.getLongitude().getValue(visad.CommonUnit.degree),
                          (el.getAltitude()!=null?el.getAltitude().getValue():0), style);
-    }
+                         }*/
 
     public static Element placemark(Element parent, String name, String description, double lat, double lon, double alt, String style) {
         Element placemark = placemark(parent, name, description);
