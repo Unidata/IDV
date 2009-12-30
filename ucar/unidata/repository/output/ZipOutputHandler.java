@@ -22,8 +22,8 @@
 package ucar.unidata.repository.output;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 
 
 import org.w3c.dom.*;
@@ -79,7 +79,7 @@ public class ZipOutputHandler extends OutputHandler {
 
     /** _more_ */
     private final Logger LOG =
-        LoggerFactory.getLogger(ZipOutputHandler.class);
+        Logger.getLogger(ZipOutputHandler.class);
 
 
     /** _more_ */

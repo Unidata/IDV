@@ -28,8 +28,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 
 import org.w3c.dom.*;
@@ -103,7 +102,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     .ConnectionManager {
 
     /** _more_          */
-    private final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
+    private final Logger LOG = Logger.getLogger(DatabaseManager.class);
 
 
     /** _more_ */

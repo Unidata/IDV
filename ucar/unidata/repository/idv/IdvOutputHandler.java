@@ -509,6 +509,11 @@ public class IdvOutputHandler extends OutputHandler {
         }
     }
 
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        return (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+    }
+
 
     /**
      * _more_

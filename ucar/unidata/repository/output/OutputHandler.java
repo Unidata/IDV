@@ -27,7 +27,6 @@ import org.w3c.dom.Element;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 
-import ucar.unidata.repository.data.DataOutputHandler;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;
 
@@ -2574,19 +2573,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             wikiUtil.putProperty("wikilinks", links = new Hashtable());
         }
         links.put(toEntry, toEntry);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public DataOutputHandler getDataOutputHandler() throws Exception {
-        return (DataOutputHandler) getRepository().getOutputHandler(
-            DataOutputHandler.OUTPUT_OPENDAP);
     }
 
 

@@ -26,8 +26,6 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 
-import ucar.unidata.repository.data.ThreddsMetadataHandler;
-
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -200,6 +198,8 @@ public class MetadataTypeBase extends RepositoryManager {
                                       element.getIndex() + "", ARG_ENTRYID,
                                       metadata.getEntryId(), ARG_METADATA_ID,
                                       metadata.getId());
+            //TODO:
+            /*
             if (templateType.equals(TEMPLATETYPE_THREDDS)) {
                 XmlUtil.create(
                     parent.getOwnerDocument(),
@@ -211,6 +211,10 @@ public class MetadataTypeBase extends RepositoryManager {
                                             : "attachment"), ThreddsMetadataHandler
                                             .ATTR_VALUE, url });
             }
+            */
+
+
+
         }
     }
 

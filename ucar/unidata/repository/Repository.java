@@ -26,7 +26,7 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.auth.*;
 
-import ucar.unidata.repository.data.*;
+
 
 import ucar.unidata.repository.ftp.FtpManager;
 import ucar.unidata.repository.harvester.*;
@@ -287,6 +287,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private long baseTime = System.currentTimeMillis();
 
+
+    ucar.unidata.util.SocketConnection dummyConnection;
 
     /** _more_ */
     private List<String> loadFiles = new ArrayList<String>();
@@ -759,6 +761,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         properties = new Properties();
         load(properties,
              "/ucar/unidata/repository/resources/repository.properties");
+        try {
+        load(properties,
+             "/ucar/unidata/repository/resources/georepository.properties");
+        } catch (Exception exc) {}
         try {
             load(properties,
                  "/ucar/unidata/repository/resources/build.properties");
@@ -1553,7 +1559,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
             } else if (AdminHandler.class.isAssignableFrom(c)) {
-                System.err.println("is admin");
                 adminHandlerClasses.add(c);
             }
             super.checkClass(c);
@@ -2217,24 +2222,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    /** _more_ */
-    private DataOutputHandler dataOutputHandler;
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public DataOutputHandler getDataOutputHandler() throws Exception {
-        if (dataOutputHandler == null) {
-            dataOutputHandler =
-                (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP.toString());
-        }
-        return dataOutputHandler;
-    }
 
 
 

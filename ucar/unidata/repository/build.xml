@@ -4,7 +4,7 @@
 <project basedir="../../../" default="all" name="Ramadda">
 
 
-    <target name="init">
+    <target name="initbasic">
        <tstamp>
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
@@ -25,9 +25,29 @@
         <mkdir dir="${docs_dest}"/>
         <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
         <mkdir dir="${docs_javadoc_dest}"/>
-
-       <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorylib.jar:${libsdir}/repositorytds.jar:${libsdir}/servlet-api.jar"/>
     </target>
+
+    <target name="init" depends="initbasic,initcore,initfull">
+    </target>
+
+
+    <target name="initcore" if="core">
+       <echo message="initcore"/>
+       <property name="classpath" value="${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
+       <property name="manifestjars" value="repositorylib.jar  servlet-api.jar"/>
+       <property name="includefull1" value=""/>
+       <property name="includefull2" value=""/>
+    </target>
+
+    <target name="initfull">
+       <echo message="initfull"/>
+       <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorylib.jar:${libsdir}/repositorytds.jar:${libsdir}/servlet-api.jar"/>
+       <property name="manifestjars" value="idv.jar repositorylib.jar  repositorytds.jar servlet-api.jar"/>
+
+       <property name="includefull1" value="ucar/unidata/repository/data/*.java"/>
+       <property name="includefull2" value="ucar/unidata/repository/idv/*.java"/> 
+    </target>
+
 
     <target name="clean" depends="init" >
         <delete>
@@ -211,6 +231,7 @@
 
 
     <target name="jc" depends="init">
+        <echo message="${classpath}"/>
         <javac
             classpath="${classpath}"
             debug="true"
@@ -224,22 +245,27 @@
             memoryMaximumSize="512m"
            target="1.5"
         >
+
+
+
         <include name="ucar/unidata/repository/*.java"/>
         <include name="ucar/unidata/repository/client/*.java"/>
         <include name="ucar/unidata/repository/output/*.java"/>
-        <include name="ucar/unidata/repository/data/*.java"/>
         <include name="ucar/unidata/repository/metadata/*.java"/>
         <include name="ucar/unidata/repository/harvester/*.java"/>
         <include name="ucar/unidata/repository/type/*.java"/>
         <include name="ucar/unidata/repository/ftp/*.java"/>
         <include name="ucar/unidata/repository/util/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
-        <include name="ucar/unidata/repository/idv/*.java"/>
+
+        <include name="${includefull1}"/>
+        <include name="${includefull2}"/>
 
 <!--
+
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
--->
         <include name="ucar/unidata/repository/idv/TdsOutputHandler.java"/>
+-->
         </javac>
     </target>
 
@@ -257,10 +283,10 @@
             jarfile="${jars_dest}/repository.jar">
            <manifest>
               <attribute name="Implementation-Title" value="Unidata's Ramada"/>
-              <attribute name="Implementation-Version" value="1.0"/>
+              <attribute name="Implementation-Version" value="1.1"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="idv.jar repositorylib.jar  repositorytds.jar servlet-api.jar"/>
+              <attribute name="Class-Path" value="${manifestjars}"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -346,8 +372,10 @@
         <delete includeemptydirs="true">
             <fileset dir="${tmpjardir}" includes="**/*"/>
         </delete>
+<!--
         <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
+-->
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/jython.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
@@ -365,23 +393,24 @@
         <unjar src="${libsrc}/commons-dbcp-1.2.2.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-pool-1.5.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
+
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libsrc}/ftplet-api-1.0.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/ftpserver-core-1.0.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mina-core-2.0.0-M6.jar" dest="${tmpjardir}"/>
-<!--        <unjar src="${libsrc}/slf4j-api-1.5.2.jar" dest="${tmpjardir}"/>
+
+        <unjar src="${libsrc}/log4j-1.2.15.jar" dest="${tmpjardir}"/>
+<!--
+        <unjar src="${libsrc}/slf4j-api-1.5.2.jar" dest="${tmpjardir}"/>
 -->
-
-
-
-
-
+        <unjar src="${libsrc}/slf4j-api-1.5.10.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/slf4j-simple-1.5.10.jar" dest="${tmpjardir}"/>
 
 <!--
         <unjar src="${libsdir}/servlet-api.jar" dest="${tmpjardir}"/>
 -->
-
 
 
         <jar 

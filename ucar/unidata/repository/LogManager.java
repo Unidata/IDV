@@ -22,8 +22,13 @@
 package ucar.unidata.repository;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
+
+
+import org.apache.log4j.Logger;
+
+
 
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.util.HtmlUtil;
@@ -50,10 +55,7 @@ import java.util.List;
 public class LogManager extends RepositoryManager {
 
     /** _more_ */
-    private final Logger LOG = LoggerFactory.getLogger(LogManager.class);
-
-
-
+    private final Logger LOG = Logger.getLogger(LogManager.class);
 
 
     /** _more_ */

@@ -364,6 +364,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final String ATTR_KEYWORDS = "keywords";
 
 
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        return (DataOutputHandler) getRepository().getOutputHandler(
+                                                                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+    }
+
+
     /**
      * _more_
      *
@@ -380,7 +386,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         NetcdfDataset dataset = null;
         try {
             DataOutputHandler dataOutputHandler =
-                getRepository().getDataOutputHandler();
+                getDataOutputHandler();
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);
             if ( !dataOutputHandler.canLoadAsCdm(entry)) {

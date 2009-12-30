@@ -27,7 +27,6 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
-import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.type.*;
 
 import ucar.unidata.sql.Clause;
@@ -563,12 +562,14 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(msg("Download URLs"));
         sb.append("</form>");
         if (catalog.length() > 0) {
+            /* TODO:
             CatalogHarvester harvester =
                 new CatalogHarvester(getRepository(), group, catalog,
                                      request.getUser(), recurse, download);
             harvester.setAddMetadata(addMetadata);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
+            */
         }
 
         Result result = getEntryManager().addEntryHeader(request, group,

@@ -246,10 +246,10 @@ public class RepositoryFtplet extends DefaultFtplet {
             throws FtpException, IOException {
         try {
             if ( !didit) {
-                didit = true;
-                PrintWriter     pw = new PrintWriter(System.err);
-                PropertyPrinter pp = new PropertyPrinter(pw);
-                pp.print(pw);
+                //                didit = true;
+                //                PrintWriter     pw = new PrintWriter(System.err);
+                //                PropertyPrinter pp = new PropertyPrinter(pw);
+                //                pp.print(pw);
             }
             ftpManager.logInfo("command:" + ftpRequest.getCommand() + " arg:"
                                + ftpRequest.getArgument());

@@ -1,0 +1,10 @@
+<outputhandlers>
+  <outputhandler class="ucar.unidata.repository.output.WmsImageOutputHandler" name="WMS"/>
+  <outputhandler class="ucar.unidata.repository.data.CatalogOutputHandler" name="THREDDS Catalog"/>
+  <outputhandler class="ucar.unidata.repository.output.DifOutputHandler" name="GCMD DIF"/>
+  <outputhandler class="ucar.unidata.repository.data.LasOutputHandler" name="LAS XML"/>
+  <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="true"/>
+  <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="IDV Preview"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
+</outputhandlers>

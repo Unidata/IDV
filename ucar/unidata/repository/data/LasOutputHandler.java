@@ -146,6 +146,13 @@ public class LasOutputHandler extends OutputHandler {
     }
 
 
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        return (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+    }
+
+
+
     /**
      * This method gets called to determine if the given entry or entries can be displays as las xml
      *

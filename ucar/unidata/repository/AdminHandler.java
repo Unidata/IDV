@@ -32,7 +32,7 @@ import java.util.List;
  */
 public interface AdminHandler {
 
-    public void setRepository(Repository repository);
+    public void setRepository(Repository repository) throws Exception;
 
     public String getId();
 

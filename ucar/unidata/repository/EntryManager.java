@@ -25,7 +25,6 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.auth.*;
-import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.harvester.*;
 
 import ucar.unidata.repository.metadata.*;
@@ -292,6 +291,8 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processCatalog(Request request) throws Exception {
+        return null;
+        /*****************
         StringBuffer sb    = new StringBuffer();
         String       title = msg("Catalog View");
 
@@ -314,6 +315,8 @@ public class EntryManager extends RepositoryManager {
         return new Result(request.url(getRepository().URL_ENTRY_SHOW,
                                       ARG_ENTRYID,
                                       CatalogTypeHandler.getCatalogId(url)));
+
+        ****/
         /*
 
 Element root = XmlUtil.getRoot(url, getClass());
@@ -4519,10 +4522,11 @@ return new Result(title, sb);
                 String[] tuple = getRemoteEntryInfo(entryId);
                 return getRemoteEntry(request, tuple[0], tuple[1]);
             } else if (entryId.startsWith("catalog:")) {
-                CatalogTypeHandler typeHandler =
-                    (CatalogTypeHandler) getRepository().getTypeHandler(
-                        TypeHandler.TYPE_CATALOG);
-                entry = typeHandler.makeSynthEntry(request, null, entryId);
+                //TODO:
+                //CatalogTypeHandler typeHandler =
+                //                    (CatalogTypeHandler) getRepository().getTypeHandler(
+                //                        TypeHandler.TYPE_CATALOG);
+                //                entry = typeHandler.makeSynthEntry(request, null, entryId);
             } else if (isSynthEntry(entryId)) {
                 String[] pair          = getSynthId(entryId);
                 String   parentEntryId = pair[0];

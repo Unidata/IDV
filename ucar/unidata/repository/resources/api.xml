@@ -26,7 +26,9 @@
       <api request="/entry/comments/show"    method="processCommentsShow"/>
       <api request="/entry/comments/add"     method="processCommentsAdd"      actions="comment"/>
       <api request="/entry/comments/edit"    method="processCommentsEdit"     actions="edit"/>
+<!--
       <api request="/catalog"                method="processCatalog"/>
+-->
   </group>
 
 

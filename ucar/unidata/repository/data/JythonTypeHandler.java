@@ -20,7 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.type;
+package ucar.unidata.repository.data;
 
 
 import org.apache.commons.net.ftp.*;
@@ -38,6 +38,7 @@ import ucar.unidata.data.DataSource;
 
 import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.metadata.*;
 
@@ -151,6 +152,13 @@ public class JythonTypeHandler extends GenericTypeHandler {
     }
 
 
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        return (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+    }
+
+
+
     /**
      * _more_
      *
@@ -215,7 +223,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
         }
 
         DataOutputHandler dataOutputHandler =
-            getRepository().getDataOutputHandler();
+            getDataOutputHandler();
         if (makeForm) {
             StringBuffer formSB = new StringBuffer();
             formSB.append(formInfo.prefix);

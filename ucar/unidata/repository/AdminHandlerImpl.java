@@ -37,7 +37,7 @@ public abstract class AdminHandlerImpl implements AdminHandler {
 
     public AdminHandlerImpl() {}
 
-    public void setRepository(Repository repository) {
+    public void setRepository(Repository repository) throws Exception {
         this.repository= repository;
     }
 

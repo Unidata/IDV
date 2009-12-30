@@ -40,7 +40,6 @@ import ucar.unidata.xml.XmlUtil;
 
 
 
-import visad.Unit;
 
 import java.io.File;
 

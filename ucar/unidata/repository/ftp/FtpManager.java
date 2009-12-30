@@ -30,8 +30,8 @@ import org.apache.ftpserver.usermanager.*;
 import org.apache.ftpserver.usermanager.impl.*;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
@@ -71,7 +71,7 @@ public class FtpManager extends RepositoryManager {
 
     /** _more_ */
     private final Logger LOG =
-        LoggerFactory.getLogger("org.apache.ftpserver");
+        Logger.getLogger("org.apache.ftpserver");
 
     /** _more_ */
     private FtpServer server;
