@@ -1782,8 +1782,12 @@ public class StormTrackControl extends DisplayControlImpl {
                                    "Time:" + stp.getTime(),
                                    "<html><table>"
                                    + formatStormTrackPoint(track, stp)
-                                   + "</table></html>", el, "#hurricaneicon");
-                KmlUtil.timestamp(icon, stp.getTime());
+                                   + "</table></html>", 
+                                              el.getLatitude().getValue(visad.CommonUnit.degree),
+                                              el.getLongitude().getValue(visad.CommonUnit.degree),
+                                              (el.getAltitude()!=null?el.getAltitude().getValue():0), 
+                                                 "#hurricaneicon");
+                KmlUtil.timestamp(icon, ucar.visad.Util.makeDate(stp.getTime()));
             }
 
             sb.append(el.getLongitude().getValue());
@@ -1807,7 +1811,7 @@ public class StormTrackControl extends DisplayControlImpl {
                                  sb.toString());
         //        KmlUtil.timestamp(linestring, track.getStartTime());
         if ( !track.getWay().isObservation()) {
-            KmlUtil.timestamp(placemark, track.getStartTime());
+            KmlUtil.timestamp(placemark, ucar.visad.Util.makeDate(track.getStartTime()));
         } else {}
     }
 
