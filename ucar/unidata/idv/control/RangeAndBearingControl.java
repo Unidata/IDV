@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -27,6 +29,7 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.Earth;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
@@ -37,6 +40,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -114,6 +118,9 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
     /** Command property for the text field end point */
     public static final String CMD_FLD_END = "cmdfldend";
 
+    /** Command property for the planet choice */
+    public static final String CMD_PLANET_CHOICE = "cmdplanet";
+
     /** property for sharing transect location */
     public static final String SHARE_RBCLINE = SHARE_TRANSECT;
 
@@ -146,6 +153,9 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
                    bearing     = 0.0,
                    backazimuth = 0.0;
 
+    /** default planet */
+    private Earth planet;
+
     /** starting station */
     private NamedStationImpl startStation;
 
@@ -158,6 +168,23 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
     /** combo box for selecting ending station */
     JComboBox stationEndCB;
 
+    /** combo box for selecting planet */
+    JComboBox planetCB;
+
+    /** For earth properties     */
+    JRadioButton useListBtn;
+
+    /** For earth properties     */
+    JRadioButton useFldBtn;
+
+
+    /** For earth properties     */
+    JTextField rad1Fld;
+
+    /** For earth properties     */
+    JTextField rad2Fld;
+
+
     /** label for range value */
     private JLabel rangeLbl;
 
@@ -169,7 +196,6 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
 
     /** label for bearing value */
     private JLabel bearingLbl;
-
 
     /** label for bearing value */
     private JLabel azimuthLbl;
@@ -422,6 +448,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      * @return  UI container
      */
     public Container doMakeContents() {
+
         try {
             Font monoFont = Font.decode("monospaced");
             rangeUnitLbl = new JLabel(" ");
@@ -457,6 +484,11 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
             stationEndCB.addActionListener(this);
             stationEndCB.setActionCommand(CMD_STATION_END);
 
+            // define the default earth
+            if (planet == null) {
+                planet = new Earth(6378137.0, 6356752.0, 0.0, "Earth");
+            }
+            //planet = new Earth(6378137.0 , 0., 298.257223563);
 
             JButton applyBtn = GuiUtils.makeApplyButton(this);
             applyBtn.setMargin(new Insets(0, 0, 0, 0));
@@ -495,6 +527,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
             logException("doMakeContents", exc);
         }
         return null;
+
     }
 
 
@@ -541,6 +574,103 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
         csSelector.addEndPropertyChangeListener(this);
         csSelector.addMidPropertyChangeListener(this);
 
+    }
+
+
+    /**
+     * Add the earth tab
+     *
+     * @param jtp the tabbed pane
+     */
+    protected void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+        /*
+          Values taken from McIDAS-X.
+
+          rad = [2440.,6120.,6378.137,3393.5,71400.,60330., 25900., 24750.]
+          ec = [0., 0., 0.08181919, 0.1333386, 0.35412,0.41019,0.2086,0.2]
+          name=['Mercury','Venus', 'Earth','Mars','Jupiter','Saturn', 'Uranus','Neptune']
+        */
+
+        Earth[] planets = {
+            new Earth(6378.137 * 1000, 6356.752 * 1000, 0, "Earth"),
+            new Earth(2440.0 * 1000, 2440.0 * 1000, 0, "Mercury"),
+            new Earth(6120.0 * 1000, 6120.0 * 1000, 0, "Venus"),
+            new Earth(3393.5 * 1000, 3363.2 * 1000, 0, "Mars"),
+            new Earth(71400.0 * 1000, 66773.3 * 1000, 0, "Jupiter"),
+            new Earth(60330.0 * 1000, 55021.0 * 1000, 0, "Saturn"),
+            new Earth(25900.0 * 1000, 25330.2 * 1000, 0, "Uranus"),
+            new Earth(24750.0 * 1000, 24249.9 * 1000, 0, "Neptune")
+        };
+
+        Vector<TwoFacedObject> tfos     = new Vector<TwoFacedObject>();
+        TwoFacedObject         selected = null;
+        for (Earth aPlanet : planets) {
+            TwoFacedObject tfo = new TwoFacedObject(aPlanet.getName(),
+                                     aPlanet);
+            tfos.add(tfo);
+            if (Misc.equals(aPlanet, planet)) {
+                selected = tfo;
+            }
+        }
+        planetCB = new JComboBox(tfos);
+        if (selected != null) {
+            planetCB.setSelectedItem(selected);
+        }
+        //        planetCB.setFont(Font.decode("monospaced"));
+
+
+
+        useListBtn = new JRadioButton("Use predefined:", (selected != null));
+        useFldBtn = new JRadioButton("Enter your own value:",
+                                     (selected == null));
+        GuiUtils.buttonGroup(useListBtn, useFldBtn);
+        rad1Fld = new JTextField(planet.getEquatorRadius() / 1000 + "", 10);
+        rad2Fld = new JTextField(planet.getPoleRadius() / 1000 + "", 10);
+
+        JComponent contents = GuiUtils.formLayout(Misc.newList(useListBtn,
+                                  GuiUtils.left(planetCB), useFldBtn,
+                                  GuiUtils.formLayout(new Object[] {
+                                      GuiUtils.rLabel("Equatorial Radius:"),
+                                      GuiUtils.left(rad1Fld),
+                                      GuiUtils.rLabel("Polar Radius:"),
+                                      GuiUtils.left(rad2Fld) })));
+        contents = GuiUtils.top(contents);
+        jtp.add("Planet", contents);
+
+    }
+
+    /**
+     * apply the earth properties
+     *
+     * @return ok
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+
+        TwoFacedObject selected = (TwoFacedObject) planetCB.getSelectedItem();
+
+        //For now just use the combobox
+        if (useListBtn.isSelected()) {
+            planet = (Earth) selected.getId();
+        } else {
+            double plrad1 = 6378.1370;
+            double plrad2 = 6356.75231;
+            try {
+                plrad1 = Double.parseDouble(rad1Fld.getText().trim());
+                plrad2 = Double.parseDouble(rad2Fld.getText().trim());
+            } catch (NumberFormatException plnfe) {
+                userMessage("Invalid number format");
+                return false;
+            }
+            planet = new Earth(1000 * plrad1, 1000 * plrad2, 0.0);
+        }
+
+        clearStations();
+
+        return true;
     }
 
 
@@ -724,11 +854,11 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      */
     private void setRangeAndBearing() throws VisADException, RemoteException {
 
+
         // get values from ellipsoidal earth
-        Bearing result =
-            Bearing.calculateBearing(new LatLonPointImpl(startLat, startLon),
-                                     new LatLonPointImpl(endLat, endLon),
-                                     null);
+        Bearing result = Bearing.calculateBearing(planet,
+                             new LatLonPointImpl(startLat, startLon),
+                             new LatLonPointImpl(endLat, endLon), null);
 
         range                   = result.getDistance();
         bearing                 = result.getAngle();
@@ -942,7 +1072,8 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
                           getLongitude(startLonFld), true);
                 setLatLon(POINT_END, getLatitude(endLatFld),
                           getLongitude(endLonFld), true);
-            } else {
+            } else if (cmd.equals(CMD_PLANET_CHOICE)) {}
+            else {
                 //Let the base class handle this
                 super.actionPerformed(event);
                 return;
@@ -1254,6 +1385,28 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
     public String getStationTableName() {
         return stationTableName;
     }
+
+
+    /**
+     *  Set the Planet property.
+     *
+     *  @param value The new value for Planet
+     */
+    public void setPlanet(Earth value) {
+        planet = value;
+    }
+
+    /**
+     *  Get the Planet property.
+     *
+     *  @return The Planet
+     */
+    public Earth getPlanet() {
+        return planet;
+    }
+
+
+
 
 
 }
