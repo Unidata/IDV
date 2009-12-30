@@ -1026,9 +1026,13 @@ public class StationModelDisplayable extends DisplayableData {
 
 
         descSB.append("</table>");
+        EarthLocation el = ob.getEarthLocation();
         Element placemark = KmlUtil.placemark(kmlDoc, "", descSB.toString(),
-                                ob.getEarthLocation(), styleId);
-        KmlUtil.timestamp(placemark, ob.getDateTime());
+                                              el.getLatitude().getValue(visad.CommonUnit.degree),
+                                              el.getLongitude().getValue(visad.CommonUnit.degree),
+                                              (el.getAltitude()!=null?el.getAltitude().getValue():0), 
+                                              styleId);
+        KmlUtil.timestamp(placemark, ucar.visad.Util.makeDate(ob.getDateTime()));
         KmlUtil.iconstyle(kmlDoc, styleId, file, 2.0);
         kmzObCounter++;
     }
