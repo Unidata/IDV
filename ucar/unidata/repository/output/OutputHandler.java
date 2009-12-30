@@ -1379,7 +1379,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                             HtmlUtil.call(
                                 "entryRowOut", HtmlUtil.squote(rowId)))));
         sb.append(
-            "<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
+            "<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
+
+
+        sb.append("<td>");
         sb.append(extra);
         sb.append(link.getLink());
 
@@ -1403,17 +1406,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
         }
 
-        /*
+
         String size = "";
         if(entry.isFile()) {
             size = getEntryManager().formatFileLength(entry.getResource().getFileSize());
         }
-
-        sb.append("</td><td align=right><div class=entryrowlabel>");
-        sb.append(size);
-        sb.append(HtmlUtil.space(2));
+        sb.append("</td><td width=10 align=right><div class=entryrowlabel>");
+        sb.append(HtmlUtil.nobr(size+HtmlUtil.space(3)));
         sb.append("</div> </td>");
-        */
+
 
         sb.append("<td align=right width=100><div class=entryrowlabel>");
         sb.append(getRepository().formatDateShort(request,
@@ -1430,6 +1431,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                         "title=\"View user profile\"");
 
                         sb.append(userSearchLink);*/
+        sb.append("  ");
+        sb.append(HtmlUtil.div("x", HtmlUtil.id("popup_" + rowId) +   HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
+                                                                                     "display:none;visibility:hidden")));
         sb.append("</td></tr></table>");
         sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
         sb.append(link.getFolderBlock());

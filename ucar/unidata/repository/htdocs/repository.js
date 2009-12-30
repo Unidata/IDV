@@ -740,6 +740,11 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     }
 
     this.mouseOver = function(event) {
+        obj = util.getDomObject("popup_" +rowId);
+        if(obj) {
+            showObject(obj);
+        }
+        
         this.row.style.backgroundColor = this.overColor;
         //        mouseOverOnEntry(event, "", rowId);
         //        this.row.style.borderBottom =  "1px #fff  solid";
@@ -748,6 +753,10 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     }
 
     this.mouseOut = function(event) {
+        obj = util.getDomObject("popup_" +rowId);
+        if(obj) {
+            hideObject(obj);
+        }
         this.setRowColor();
         //        mouseOutOnEntry(event, "", rowId);
         //        this.row.style.borderBottom =  "1px #fff  solid";

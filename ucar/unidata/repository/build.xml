@@ -35,17 +35,21 @@
        <echo message="initcore"/>
        <property name="classpath" value="${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
        <property name="manifestjars" value="repositorylib.jar  servlet-api.jar"/>
-       <property name="includefull1" value=""/>
-       <property name="includefull2" value=""/>
+       <property name="includesrc1" value=""/>
+       <property name="includesrc2" value=""/>
+
+       <property name="lib1" value="${libsdir}/dummy.jar"/>
+       <property name="lib2" value="${libsdir}/dummy.jar"/>
     </target>
 
     <target name="initfull">
        <echo message="initfull"/>
        <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorylib.jar:${libsdir}/repositorytds.jar:${libsdir}/servlet-api.jar"/>
        <property name="manifestjars" value="idv.jar repositorylib.jar  repositorytds.jar servlet-api.jar"/>
-
-       <property name="includefull1" value="ucar/unidata/repository/data/*.java"/>
-       <property name="includefull2" value="ucar/unidata/repository/idv/*.java"/> 
+       <property name="includesrc1" value="ucar/unidata/repository/data/*.java"/>
+       <property name="includesrc2" value="ucar/unidata/repository/idv/*.java"/> 
+       <property name="lib1" value="${libsdir}/visad.jar" />
+       <property name="lib2" value="${libsdir}/local-visad.jar"/>
     </target>
 
 
@@ -258,8 +262,8 @@
         <include name="ucar/unidata/repository/util/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
 
-        <include name="${includefull1}"/>
-        <include name="${includefull2}"/>
+        <include name="${includesrc1}"/>
+        <include name="${includesrc2}"/>
 
 <!--
 
@@ -371,11 +375,10 @@
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${tmpjardir}" includes="**/*"/>
+
         </delete>
-<!--
-        <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
-        <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
--->
+        <unjar src="${lib1}" dest="${tmpjardir}"/>
+        <unjar src="${lib1}" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/jython.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
