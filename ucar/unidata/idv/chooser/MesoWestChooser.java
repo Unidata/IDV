@@ -91,6 +91,11 @@ import ucar.unidata.view.geoloc.NavigatedMapPanel;
 public class MesoWestChooser extends IdvChooser implements ActionListener {
 
 
+    /***
+        TODO:
+        Bill F noticed a time discrpency between GMT and local time?????
+    **/
+
     public static final String BASEURL = "http://mesowest.utah.edu/cgi-bin/droman/obs_lsa_export.cgi";
 
     public static final String ARG_CLAT = "clat";
