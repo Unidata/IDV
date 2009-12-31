@@ -204,6 +204,8 @@ public class IdvComponentGroup extends ComponentGroup {
      */
     public void getViewManagers(List viewManagers) {
         List displayComponents = getDisplayComponents();
+        //Fix Jonathon's NPE by bailing out here
+        if(displayComponents == null) return;
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp  =
                 (ComponentHolder) displayComponents.get(i);
