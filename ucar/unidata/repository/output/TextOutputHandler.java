@@ -84,6 +84,10 @@ public class TextOutputHandler extends OutputHandler {
         new OutputType("Word Cloud", "wordcloud", OutputType.TYPE_HTML, "",
                        ICON_CLOUD);
 
+    public static final OutputType OUTPUT_PRETTY =
+        new OutputType("Pretty Print", "pretty", OutputType.TYPE_HTML, "",
+                       ICON_TEXT);
+
 
     /**
      * _more_
@@ -98,6 +102,7 @@ public class TextOutputHandler extends OutputHandler {
         super(repository, element);
         addType(OUTPUT_TEXT);
         addType(OUTPUT_WORDCLOUD);
+        addType(OUTPUT_PRETTY);
     }
 
 
@@ -133,6 +138,20 @@ public class TextOutputHandler extends OutputHandler {
             ".cdl", ".sh", "m4"
         };
 
+        String[] codesuffixes = new String[] {
+            ".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm", ".html",
+            ".java", ".js", ".m", ".mxml", ".perl", ".pl", ".pm", ".py", ".rb", ".sh",
+            ".xhtml", ".xml", ".xsl"
+        };
+
+        for (int i = 0; i < codesuffixes.length; i++) {
+            if (path.endsWith(codesuffixes[i])) {
+                links.add(makeLink(request, state.entry, OUTPUT_PRETTY));
+                return;
+            }
+        }
+
+
         for (int i = 0; i < suffixes.length; i++) {
             if (path.endsWith(suffixes[i])) {
                 links.add(makeLink(request, state.entry, OUTPUT_TEXT));
@@ -140,6 +159,11 @@ public class TextOutputHandler extends OutputHandler {
                 return;
             }
         }
+
+
+
+
+
         String suffix = IOUtil.getFileExtension(path);
         String type   = getRepository().getMimeTypeFromSuffix(suffix);
         if ((type != null) && type.startsWith("text/")) {
@@ -176,6 +200,11 @@ public class TextOutputHandler extends OutputHandler {
         }
 
 
+        if (outputType.equals(OUTPUT_PRETTY)) {
+            return outputPretty(request, entry);
+        }
+
+
         StringBuffer head =
             new StringBuffer(
                 "<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shCore.css\" />\n<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shThemeDefault.css\" />\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shCore.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushJScript.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushBash.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushCpp.js\">\n</script>\n");
@@ -188,17 +217,7 @@ public class TextOutputHandler extends OutputHandler {
         String contents =
             getStorageManager().readSystemResource(entry.getFile());
         StringBuffer sb  = new StringBuffer();
-        int          cnt = 0;
-        sb.append("<pre>");
-        for (String line : (List<String>) StringUtil.split(contents, "\n",
-                false, false)) {
-            cnt++;
-            line = line.replace("\r", "");
-            line = HtmlUtil.entityEncode(line);
-            sb.append("<a " + HtmlUtil.attr("name", "line" + cnt)
-                      + "></a><a href=#line" + cnt + ">" + cnt + "</a>"
-                      + HtmlUtil.space(1) + line + "<br>");
-        }
+
         sb.append("</pre>");
         return makeLinksResult(request, msg("Text"), sb, new State(entry));
     }
@@ -258,6 +277,44 @@ public class TextOutputHandler extends OutputHandler {
         Result result = makeLinksResult(request, msg("Word Cloud"), sb,
                                         new State(entry));
         result.putProperty(PROP_HTML_HEAD, head.toString());
+        return result;
+    }
+
+
+
+
+    public Result outputPretty(Request request, Entry entry)
+            throws Exception {
+        String contents =
+            getStorageManager().readSystemResource(entry.getFile());
+        StringBuffer sb   = new StringBuffer();
+        StringBuffer head = new StringBuffer();
+        head.append("\n");
+        head.append(
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.css\">\n");
+        head.append(
+                    HtmlUtil.importJS(getRepository().fileUrl("/prettify.js")));
+        head.append(
+                    HtmlUtil.cssLink(getRepository().fileUrl("/prettify.css")));
+
+
+        sb.append(head);
+        sb.append("<pre class=\"prettyprint\">\n");
+
+        int          cnt = 0;
+        for (String line : (List<String>) StringUtil.split(contents, "\n",
+                false, false)) {
+            cnt++;
+            line = line.replace("\r", "");
+            line = HtmlUtil.entityEncode(line);
+            sb.append("<span class=nocode><a " + HtmlUtil.attr("name", "line" + cnt)
+                      + "></a><a href=#line" + cnt + ">" + cnt + "</a></span>"
+                      + HtmlUtil.space(1) + line + "<br>");
+        }
+        sb.append("</pre>\n");
+        sb.append(HtmlUtil.script("prettyPrint();"));
+        Result result = makeLinksResult(request, msg("Pretty Print"), sb,
+                                        new State(entry));
         return result;
     }
 
