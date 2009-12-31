@@ -748,6 +748,11 @@ ul {
    text-decoration: underline;
 }
 
+.entrymenuarrow {
+  padding-left:5px;
+  padding-right:5px;
+}
+
 .menurow {
 }
 

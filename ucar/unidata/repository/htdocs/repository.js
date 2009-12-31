@@ -8,9 +8,11 @@ var icon_downdart ="${urlroot}/icons/downdart.gif";
 var icon_rightdart ="${urlroot}/icons/rightdart.gif";
 
 var icon_progress = "${urlroot}/icons/progress.gif";
-var icon_information = "${urlroot}/icons/information.png"
+var icon_information = "${urlroot}/icons/information.png";
 var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
 var icon_folderopen = "${urlroot}/icons/togglearrowdown.gif";
+var icon_menuarrow = "${urlroot}/icons/downdart.gif";
+var icon_blank = "${urlroot}/icons/blank.gif";
 
 
 
@@ -119,6 +121,12 @@ function Util () {
     this.getTop = function (obj) {
         if(!obj) return 0;
         return obj.offsetTop+this.getTop(obj.offsetParent);
+    }
+
+
+    this.getBottom = function (obj) {
+        if(!obj) return 0;
+        return this.getTop(obj) + obj.offsetHeight;
     }
 
 
@@ -416,6 +424,9 @@ function Tooltip () {
         util.print(msg);
     }
     this.keyPressed = function (event) {
+        alert("key")
+        tooltip.doHide();
+        return;
         if(state==STATE_INIT) return;
         c =util.getKeyChar(event);
         if(c == '\r' && state == STATE_TIP) {
@@ -533,6 +544,9 @@ var keyEvent;
 function handleKeyPress(event) {
     keyEvent = event;
     c =util.getKeyChar(event);
+    div = util.getDomObject("tooltipdiv");
+    if(!div) return;
+    hideObject(div);
 }
 
 document.onkeypress = handleKeyPress;
@@ -696,7 +710,7 @@ function initEntryListForm(formId) {
 function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     this.entryId = entryId;
     this.onColor = "#FFFFCC";
-    this.overColor = "#f5f5f5";
+    this.overColor = "#f6f6f6";
     this.rowId = rowId;
     this.cbxId = cbxId;
     this.cbxWrapperId = cbxWrapperId;
@@ -739,23 +753,43 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
         }
     }
 
+
     this.mouseOver = function(event) {
-        obj = util.getDomObject("popup_" +rowId);
-        if(obj) {
-            showObject(obj);
+        img = util.getDomObject("entrymenuarrow_" +rowId);
+        if(img) {
+            img.obj.src =  icon_menuarrow;
         }
         
         this.row.style.backgroundColor = this.overColor;
-        //        mouseOverOnEntry(event, "", rowId);
-        //        this.row.style.borderBottom =  "1px #fff  solid";
-        //        this.row.style.borderBottom =  "1px #888  solid";
-        this.row.style.border =  "1px #ccc  solid";
+        this.row.style.border =  "1px #ddd  solid";
     }
 
+    this.mouseClick = function(event) {
+        left = util.getLeft(this.row);
+        eventX = util.getEventX(event);
+        if(eventX-left<50) return;
+        var url = "${urlroot}/entry/show?entryid=" + entryId +"&output=metadataxml";
+	util.loadXML( url, this.handleTooltip,this);
+    }
+
+    this.handleTooltip = function(request,entryRow) {
+        var xmlDoc=request.responseXML.documentElement;
+        text = getChildText(xmlDoc);
+        div = util.getDomObject("tooltipdiv");
+        if(!div) return;
+
+        util.setPosition(obj, util.getLeft(entryRow.row), util.getBottom(entryRow.row));
+
+        div.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+        showObject(div);
+    }
+
+
+
     this.mouseOut = function(event) {
-        obj = util.getDomObject("popup_" +rowId);
-        if(obj) {
-            hideObject(obj);
+        img = util.getDomObject("entrymenuarrow_" +rowId);
+        if(img) {
+            img.obj.src =  icon_blank;
         }
         this.setRowColor();
         //        mouseOutOnEntry(event, "", rowId);
@@ -765,6 +799,9 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
 }
 
 
+function hideEntryPopup() {
+    hideObject(util.getDomObject("tooltipdiv"));
+}
 
 function findEntryRow(rowId) {
     for(i=0;i<groupList.length;i++) {
@@ -784,6 +821,11 @@ function entryRowOver(rowId) {
 function entryRowOut(rowId) {
     var entryRow = findEntryRow(rowId);
     if(entryRow) entryRow.mouseOut();
+}
+
+function entryRowClick(event,rowId) {
+    var entryRow = findEntryRow(rowId);
+    if(entryRow) entryRow.mouseClick(event);
 }
 
 
@@ -1121,7 +1163,7 @@ function setHtml(id, html) {
 }
 
 function showAjaxPopup(event,srcId,url) {
-    util.loadXML( url, handleAjaxPopup,srcId);
+    util.loadXML(url, handleAjaxPopup,srcId);
 }
 
 function handleAjaxPopup(request, srcId) {

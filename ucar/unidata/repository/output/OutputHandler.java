@@ -1372,6 +1372,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             HtmlUtil.open(
                 HtmlUtil.TAG_DIV,
                 HtmlUtil.id(rowId) + HtmlUtil.cssClass("entryrow")
+                + HtmlUtil.onMouseClick(
+                    HtmlUtil.call(
+                        "entryRowClick",
+                        "event, " +
+                        HtmlUtil.squote(rowId))) 
                 + HtmlUtil.onMouseOver(
                     HtmlUtil.call(
                         "entryRowOver",
@@ -1406,17 +1411,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
         }
 
-
-        String size = "";
-        if(entry.isFile()) {
-            size = getEntryManager().formatFileLength(entry.getResource().getFileSize());
-        }
-        sb.append("</td><td width=10 align=right><div class=entryrowlabel>");
-        sb.append(HtmlUtil.nobr(size+HtmlUtil.space(3)));
-        sb.append("</div> </td>");
-
-
-        sb.append("<td align=right width=100><div class=entryrowlabel>");
+        sb.append("<td align=right width=200><div class=entryrowlabel>");
         sb.append(getRepository().formatDateShort(request,
                 new Date(entry.getStartDate()),
                 getEntryManager().getTimezone(entry), extraAlt.toString()));
@@ -1433,8 +1428,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
                         sb.append(userSearchLink);*/
         sb.append("  ");
-        sb.append(HtmlUtil.div("x", HtmlUtil.id("popup_" + rowId) +   HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
-                                                                                     "display:none;visibility:hidden")));
+        sb.append(HtmlUtil.div(HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),"",HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10") +HtmlUtil.id("entrymenuarrow_" + rowId)), HtmlUtil.cssClass("entrymenuarrow")));
+        
         sb.append("</td></tr></table>");
         sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
         sb.append(link.getFolderBlock());
