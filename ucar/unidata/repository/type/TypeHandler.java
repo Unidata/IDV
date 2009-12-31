@@ -744,7 +744,7 @@ public class TypeHandler extends RepositoryManager {
                             getRepository().URL_ENTRY_FORM, ARG_GROUP,
                             entry.getId(), ARG_TYPE,
                             TYPE_GROUP), getRepository().iconUrl(
-                                ICON_FOLDER_ADD), "New Group",
+                                ICON_FOLDER_ADD), "New Folder",
                                     OutputType.TYPE_FILE));
                 links.add(
                     new Link(
@@ -1497,7 +1497,7 @@ public class TypeHandler extends RepositoryManager {
                     HtmlUtil.checkbox(ARG_FILE_UNZIP) + HtmlUtil.space(1)
                     + msg("Unzip archive")
                     + HtmlUtil.checkbox(ARG_FILE_PRESERVEDIRECTORY)
-                    + HtmlUtil.space(1) + msg("Make groups from archive")
+                    + HtmlUtil.space(1) + msg("Make folders from archive")
                     + HtmlUtil.space(3) + msgLabel("Date Pattern")
                     + HtmlUtil.space(1)
                     + HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) + " ("
@@ -1907,13 +1907,13 @@ public class TypeHandler extends RepositoryManager {
                                         "true",
                                         request.get(ARG_GROUP_CHILDREN,
                                             false)) + " ("
-                                                + msg("Search subgroups")
+                                                + msg("Search sub-folders")
                                                 + ")";
             if (groupArg.length() > 0) {
                 advancedSB.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
                 Group group = getEntryManager().findGroup(request, groupArg);
                 if (group != null) {
-                    advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
+                    advancedSB.append(HtmlUtil.formEntry(msgLabel("Folder"),
                             group.getFullName() + "&nbsp;" + searchChildren));
 
                 }
@@ -1938,12 +1938,12 @@ public class TypeHandler extends RepositoryManager {
                  *   }
                  *   String groupSelect = HtmlUtil.select(ARG_GROUP,
                  *                            groupList, null, 100);
-                 *   advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
+                 *   advancedSB.append(HtmlUtil.formEntry(msgLabel("Folder"),
                  *           groupSelect + searchChildren));
                  * } else if (groups.size() == 1) {
                  *   advancedSB.append(HtmlUtil.hidden(ARG_GROUP,
                  *           groups.get(0).getId()));
-                 *   advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
+                 *   advancedSB.append(HtmlUtil.formEntry(msgLabel("Folder"),
                  *           groups.get(0).getFullName() + searchChildren));
                  * }
                  */
@@ -2127,7 +2127,7 @@ public class TypeHandler extends RepositoryManager {
                 Group group = getEntryManager().findGroup(request,
                                   groupId.substring(0, groupId.length() - 1));
                 if (group != null) {
-                    addCriteria(searchCriteria, "Group=", group.getName());
+                    addCriteria(searchCriteria, "Folder=", group.getName());
                 }
                 where.add(Clause.like(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       groupId));
@@ -2135,9 +2135,9 @@ public class TypeHandler extends RepositoryManager {
                 Group group = getEntryManager().findGroup(request);
                 if (group == null) {
                     throw new IllegalArgumentException(
-                        msgLabel("Could not find group") + groupId);
+                        msgLabel("Could not find folder") + groupId);
                 }
-                addCriteria(searchCriteria, "Group" + (doNot
+                addCriteria(searchCriteria, "Folder" + (doNot
                         ? "!="
                         : "="), group.getName());
                 String searchChildren =

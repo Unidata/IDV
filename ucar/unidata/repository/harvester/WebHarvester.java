@@ -264,7 +264,7 @@ public class WebHarvester extends Harvester {
                 superSB.toString(), true));
 
         sb.append(HtmlUtil.hr());
-        sb.append("Enter urls and the groups to add them to.");
+        sb.append("Enter urls and the folders to add them to.");
 
 
         int cnt = 1;
@@ -313,7 +313,7 @@ public class WebHarvester extends Harvester {
                                            urlEntry.baseGroupId,
                                            HtmlUtil.id(baseGroupFieldId
                                                + "_hidden")));
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Base Group"),
+            entrySB.append(HtmlUtil.formEntry(msgLabel("Base Folder"),
                     HtmlUtil.disabledInput(baseGroupFieldId,
                                            ((baseGroup != null)
                                             ? baseGroup.getFullName()
@@ -323,7 +323,7 @@ public class WebHarvester extends Harvester {
 
 
             String fieldId = ATTR_GROUP + cnt;
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Sub-Group Template"),
+            entrySB.append(HtmlUtil.formEntry(msgLabel("Sub-Folder Template"),
                     HtmlUtil.input(fieldId, urlEntry.group,
                                    HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId)
                                    + HtmlUtil.title(templateHelp))));
@@ -356,7 +356,7 @@ public class WebHarvester extends Harvester {
                     HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
         entrySB.append(
             HtmlUtil.formEntry(
-                msgLabel("Sub-Group"),
+                msgLabel("Sub-Folder"),
                 HtmlUtil.input(
                     ATTR_GROUP + cnt, "",
                     HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));

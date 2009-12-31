@@ -923,7 +923,7 @@ return new Result(title, sb);
                             getRepository().URL_ENTRY_SHOW, entry,
                             ARG_MESSAGE,
                             getRepository().translate(
-                                request, "Cannot delete top-level group")));
+                                request, "Cannot delete top-level folder")));
                 }
 
                 List<Entry> entries = new ArrayList<Entry>();
@@ -969,7 +969,7 @@ return new Result(title, sb);
             }
             String groupId = request.getString(ARG_GROUP, (String) null);
             if (groupId == null) {
-                fatalError(request, "You must specify a parent group");
+                fatalError(request, "You must specify a parent folder");
             }
             Group parentGroup = findGroup(request);
 
@@ -1287,7 +1287,7 @@ return new Result(title, sb);
             }
 
             if (entry.isTopGroup()) {
-                //fatalError(request,"Cannot edit top-level group");
+                //fatalError(request,"Cannot edit top-level folder");
             }
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                    new Date());
@@ -1569,7 +1569,7 @@ return new Result(title, sb);
         if (entry.isTopGroup()) {
             sb.append(
                 getRepository().showDialogNote(
-                    "Cannot delete top-level group"));
+                    "Cannot delete top-level folder"));
             return makeEntryEditResult(request, entry, "Delete Entry", sb);
         }
 
@@ -1597,11 +1597,11 @@ return new Result(title, sb);
         StringBuffer inner = new StringBuffer();
         if (entry.isGroup()) {
             inner.append(
-                msg("Are you sure you want to delete the following group?"));
+                msg("Are you sure you want to delete the following folder?"));
             inner.append(HtmlUtil.p());
             inner.append(
                 msg(
-                "Note: This will also delete all of the descendents of the group"));
+                "Note: This will also delete all of the descendents of the folder"));
         } else {
             inner.append(
                 msg("Are you sure you want to delete the following entry?"));
@@ -1648,7 +1648,7 @@ return new Result(title, sb);
                 StringBuffer sb = new StringBuffer();
                 sb.append(
                     getRepository().showDialogNote(
-                        msg("Cannot delete top-level group")));
+                        msg("Cannot delete top-level folder")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -2062,13 +2062,13 @@ return new Result(title, sb);
                                   : ""), fromEmail, ""));
         User parentUser = parentGroup.getUser();
         logInfo("upload: setting user to: " + parentUser.getName()
-                + " from parent group:" + parentGroup);
+                + " from parent folder:" + parentGroup);
         entry.setUser(parentUser);
 
         if (true || getAdmin().isEmailCapable()) {
             StringBuffer contents =
                 new StringBuffer(
-                    "A new entry has been uploaded to the RAMADDA server under the group: ");
+                    "A new entry has been uploaded to the RAMADDA server under the folder: ");
             String url1 =
                 HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                              ARG_ENTRYID, parentGroup.getId());
@@ -2150,7 +2150,7 @@ return new Result(title, sb);
             HtmlUtil.href(
                 request.url(
                     getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
-                    ARG_TYPE, TYPE_GROUP), msg("Create a group")));
+                    ARG_TYPE, TYPE_GROUP), msg("Create a folder")));
         sb.append(HtmlUtil.p());
         sb.append(
             HtmlUtil.href(
@@ -2357,7 +2357,7 @@ return new Result(title, sb);
                 StringBuffer sb = new StringBuffer();
                 sb.append(
                     getRepository().showDialogNote(
-                        msg("Cannot copy top-level group")));
+                        msg("Cannot copy top-level folder")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -2406,7 +2406,7 @@ return new Result(title, sb);
 
                 if ( !didOne) {
                     sb.append(
-                        header("Please select a destination group from the following list:"));
+                        header("Please select a destination folder from the following list:"));
                     sb.append("<ul>");
                 }
                 sb.append(HtmlUtil.img(getIconUrl(request, group)));
@@ -2423,9 +2423,9 @@ return new Result(title, sb);
 
             if (didOne) {
                 sb.append("</ul>");
-                sb.append(header("Or select a group here:"));
+                sb.append(header("Or select a folder here:"));
             } else {
-                sb.append(header("Please select a destination group:"));
+                sb.append(header("Please select a destination folder:"));
             }
 
 
@@ -2467,7 +2467,7 @@ return new Result(title, sb);
         String toName = request.getString(ARG_TONAME, (String) null);
         if ((toId == null) && (toName == null)) {
             throw new IllegalArgumentException(
-                "No destination group specified");
+                "No destination folder specified");
         }
 
 
@@ -2499,7 +2499,7 @@ return new Result(title, sb);
         if (request.exists(ARG_ACTION_MOVE)) {
             if ( !isGroup) {
                 throw new IllegalArgumentException(
-                    "Can only copy/move to a group");
+                    "Can only copy/move to a folder");
             }
 
             for (Entry fromEntry : entries) {
@@ -2512,7 +2512,7 @@ return new Result(title, sb);
         } else if (request.exists(ARG_ACTION_COPY)) {
             if ( !isGroup) {
                 throw new IllegalArgumentException(
-                    "Can only copy/move to a group");
+                    "Can only copy/move to a folder");
             }
         }
 
@@ -2555,12 +2555,12 @@ return new Result(title, sb);
 
             if (isGroup) {
                 fb.append(HtmlUtil.submit(((entries.size() > 1)
-                                           ? "Copy them to the group"
-                                           : "Copy it to the group"), ARG_ACTION_COPY));
+                                           ? "Copy them to the folder"
+                                           : "Copy it to the folder"), ARG_ACTION_COPY));
                 fb.append(HtmlUtil.space(1));
                 fb.append(HtmlUtil.submit(((entries.size() > 1)
-                                           ? "Move them to the group"
-                                           : "Move it to the group"), ARG_ACTION_MOVE));
+                                           ? "Move them to the folder"
+                                           : "Move it to the folder"), ARG_ACTION_MOVE));
                 fb.append(HtmlUtil.space(1));
             }
 
@@ -2588,7 +2588,7 @@ return new Result(title, sb);
                 StringBuffer sb = new StringBuffer();
                 sb.append(
                     getRepository().showDialogError(
-                        msg("Cannot move a group to its descendent")));
+                        msg("Cannot move a folder to its descendent")));
                 return addEntryHeader(request, fromEntry, new Result("", sb));
             }
         }
@@ -3044,7 +3044,7 @@ return new Result(title, sb);
                     doAnonymousUpload = true;
                 } else {
                     throw new IllegalArgumentException(
-                        "Cannot add to parent group");
+                        "Cannot add to parent folder");
                 }
             }
         }
@@ -3630,7 +3630,7 @@ return new Result(title, sb);
             if (entry.isGroup()) {
                 prefix = HtmlUtil.img(
                     getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                    msg("Click to open group"),
+                    msg("Click to open folder"),
                     HtmlUtil.id("img_" + uid)
                     + HtmlUtil.onMouseClick(
                         HtmlUtil.call(
@@ -4779,7 +4779,7 @@ return new Result(title, sb);
 
         if ( !getRepository().getAccessManager().canDoAction(request, group,
                 Permission.ACTION_NEW)) {
-            throw new AccessException("Cannot add to group", request);
+            throw new AccessException("Cannot add to folder", request);
         }
 
         TypeHandler typeHandler =
@@ -6231,7 +6231,7 @@ return new Result(title, sb);
                 Group g = (Group) e;
                 groups.add(g);
             } catch (Throwable exc) {
-                logError("Error getting top groups", exc);
+                logError("Error getting top folder", exc);
             }
         }
         //For now don't check for access control
@@ -6325,18 +6325,18 @@ return new Result(title, sb);
                     (String) null);
         }
         if (groupNameOrId == null) {
-            throw new IllegalArgumentException("No group specified");
+            throw new IllegalArgumentException("No folder specified");
         }
         Entry entry = getEntry(request, groupNameOrId, false);
         if (entry != null) {
             if ( !entry.isGroup()) {
-                throw new IllegalArgumentException("Not a group:"
+                throw new IllegalArgumentException("Not a folder:"
                         + groupNameOrId);
             }
             return (Group) entry;
         }
         throw new RepositoryUtil.MissingEntryException(
-            "Could not find group:" + groupNameOrId);
+            "Could not find folder:" + groupNameOrId);
     }
 
 

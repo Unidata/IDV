@@ -201,7 +201,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText(
-            "<html>Right-click to show menu<br>Groups you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>");
+            "<html>Right-click to show menu<br>Folder you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>");
         groupTree.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if ((e.getKeyCode() == e.VK_R) && e.isControlDown()) {
@@ -287,7 +287,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         if (SwingUtilities.isRightMouseButton(event)) {
             JPopupMenu popup = new JPopupMenu();
             if (groupNode.canDoNew) {
-                popup.add(GuiUtils.makeMenuItem("Create New Group", this,
+                popup.add(GuiUtils.makeMenuItem("Create New Folder", this,
                         "newGroup", groupNode));
             }
             popup.add(GuiUtils.makeMenuItem("Refresh", this,
@@ -305,7 +305,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      */
     public void newGroup(GroupNode groupTreeNode) {
         String parentId = groupTreeNode.id;
-        String name = GuiUtils.getInput("Enter a group name to create",
+        String name = GuiUtils.getInput("Enter a folder name to create",
                                         "Name: ", "");
         if (super.newGroup(parentId, name)) {
             groupTreeNode.removeAllChildren();
@@ -410,7 +410,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                 treeModel.nodeStructureChanged(this);
             } catch (Exception exc) {
                 removeAllChildren();
-                LogUtil.logException("Error loading group tree", exc);
+                LogUtil.logException("Error loading folder tree", exc);
             } finally {
                 GuiUtils.setCursor(groupTree, GuiUtils.normalCursor);
             }
@@ -444,7 +444,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
          * @return _more_
          */
         public String getToolTipText(MouseEvent event) {
-            return "<html>Right-click to show menu<br>Groups you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>";
+            return "<html>Right-click to show menu<br>Folders you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>";
         }
 
         /**

@@ -481,7 +481,7 @@ public class EntryMonitor implements Constants {
             String select = OutputHandler.getGroupSelect(getRequest(), what);
             sb.append(
                 HtmlUtil.formEntry(
-                    getRepository().msgLabel("Ancestor Group"),
+                    getRepository().msgLabel("Ancestor Folder"),
                     HtmlUtil.input(what, ((group == null)
                                           ? ""
                                           : group.getFullName()), HtmlUtil.id(

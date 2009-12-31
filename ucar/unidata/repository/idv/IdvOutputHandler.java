@@ -1409,12 +1409,12 @@ public class IdvOutputHandler extends OutputHandler {
                                              "",
                                              HtmlUtil.id(ARG_PUBLISH_ENTRY
                                                  + "_hidden")));
-	    publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Select a group to publish the product to"),2)));
+	    publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Select a folder to publish the product to"),2)));
 
             String select = OutputHandler.getSelect(request,
-                                ARG_PUBLISH_ENTRY, "Select group", false,
+                                ARG_PUBLISH_ENTRY, "Select folder", false,
                                 null, entry);
-            publishSB.append(HtmlUtil.formEntry(msgLabel("Group"),
+            publishSB.append(HtmlUtil.formEntry(msgLabel("Folder"),
                     HtmlUtil.disabledInput(ARG_PUBLISH_ENTRY, "",
                                            HtmlUtil.id(ARG_PUBLISH_ENTRY)
                                            + HtmlUtil.SIZE_60) + select));
@@ -1635,7 +1635,7 @@ public class IdvOutputHandler extends OutputHandler {
                     "Grid Displays",
                     new StringBuffer(
                         getRepository().showDialogError(
-                            msg("Could not find group"))));
+                            msg("Could not find folder"))));
             }
 
             File imageFile = (File) generateGridImage(request, entry,

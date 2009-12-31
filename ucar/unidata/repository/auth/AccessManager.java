@@ -192,11 +192,11 @@ public class AccessManager extends RepositoryManager {
             Group group = getEntryManager().findGroup(request);
             if (group == null) {
                 throw new RepositoryUtil.MissingEntryException(
-                    "Could not find group:"
+                    "Could not find folder:"
                     + request.getString(ARG_GROUP, ""));
             }
             boolean canDo = canDoAction(request, group, action);
-            //            System.err.println ("action:" + action +" found group:" + group + " canDo:" + canDo);
+            //            System.err.println ("action:" + action +" found folder:" + group + " canDo:" + canDo);
             return canDo;
         }
 
@@ -223,7 +223,7 @@ public class AccessManager extends RepositoryManager {
         }
 
         throw new RepositoryUtil.MissingEntryException(
-            "Could not find entry or group");
+            "Could not find entry or folder");
         //        return false;
     }
 

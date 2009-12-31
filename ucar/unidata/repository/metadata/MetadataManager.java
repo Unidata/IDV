@@ -874,7 +874,7 @@ public class MetadataManager extends RepositoryManager {
                 sb.append(HtmlUtil.space(2));
                 sb.append(
                     HtmlUtil.submit(
-                        msg("Add selected to parent group"),
+                        msg("Add selected to parent folder"),
                         ARG_METADATA_ADDTOPARENT));
             }
             //            sb.append(HtmlUtil.formTable());

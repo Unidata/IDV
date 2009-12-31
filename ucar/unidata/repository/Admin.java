@@ -1083,7 +1083,7 @@ public class Admin extends RepositoryManager {
 
         String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
         if (phrases == null) {
-            phrases = "#label=new label to use\n#e.g.: Groups=Projects";
+            phrases = "#label=new label to use\n#e.g.: Foo=Bar";
         }
         dsb.append(
             HtmlUtil.formEntryTop(

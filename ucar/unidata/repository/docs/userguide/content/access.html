@@ -13,7 +13,7 @@ On the left of this form lists each of the access types. Under each access type
 is a field where you can enter a user role (one per line).
 <p>
 On the right shows a summary table for the paricular entry we are viewing. This shows the access control
-settings for all of the ancestor groups of the entry and allows the user to see just what access settings
+settings for all of the ancestor folders of the entry and allows the user to see just what access settings
 are applicable to the entry.
 
 
@@ -24,24 +24,24 @@ The different access types are:
 <li> View - Can a user view the entry. If a user does not have view access they will simply not
 see the entry and cannot access any aspect of the entry.
 
-<li> View Children - This is used for a group where a user without permission can see that the group exists (e.g., "Unidata Only")
-but cannot see any of the details of the group or any of the children entry of the group.
+<li> View Children - This is used for a folder where a user without permission can see that the folder exists (e.g., "Unidata Only")
+but cannot see any of the details of the folder or any of the children entry of the folder.
 
 <li> File - This allows users to see the information about an entry but they cannot access the file. i.e., they cannot download the
 file or access any of the content of the file (e.g., through OpenDAP).
 
 <li> Edit - Can a user edit the entry.
 
-<li> New - Can a user create a new sub-group or sub-entry. Note: when users have this permission they
+<li> New - Can a user create a new sub-folder or sub-entry. Note: when users have this permission they
 also need Edit permission.
 
 <li> Upload - This provides anonymous upload capability. For example, we use this
 to provide an <a href="http://motherlode.ucar.edu/repository/entry/show/Top/IDV+Community+Resources/Contributions?entryid=bfc82cf9-8548-4393-af10-20ec2274ceb9">area </a> for IDV users to upload shared content.
-When a file is uploaded it is marked so that only administrators or owners of the Group can access it. The owner
-of the group will receive an email (if email is configured) notifying them of the uploaded file.
+When a file is uploaded it is marked so that only administrators or owners of the Folder can access it. The owner
+of the folder will receive an email (if email is configured) notifying them of the uploaded file.
 In the Edit page for the uploaded Entry the owner can "bless" the entry to make it available to others.
 <p>
-If you want more people than the owner to receive notification simply add  a "Contact" metadata element to the group
+If you want more people than the owner to receive notification simply add  a "Contact" metadata element to the folder
 that contains the other recipient's email.
 
 <li> Delete - Can  a user delete an entry.

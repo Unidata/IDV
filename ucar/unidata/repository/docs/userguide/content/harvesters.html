@@ -24,7 +24,7 @@ The repository is checked so as to not add duplicate files.
 
 <subhead  id="run"  intoc="false">Run Settings</subhead>
 The form has  settings for running the harvester. When you are first creating a harvester sometimes it
-may takes some time to figure out just what you are harvesting and the name and group settings for the repository
+may takes some time to figure out just what you are harvesting and the name and folder settings for the repository
 entry. So, its good to turn on test mode. This will result in entries not being added to the repository when you run
 the harvester. Rather, when in test mode, up to &quot;Count&quot; number of files will be found and the results will be
 listed in the &quot;Information&quot; section of the harvester page.
@@ -71,25 +71,25 @@ Java <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat
 <subhead  id="entry" intoc="false">Entry Creation</subhead>
 
 
-When creating an entry we need to know the group to put it under, its name and description.
+When creating an entry we need to know the folder to put it under, its name and description.
 You specify templates for these that can contain a set of macros (see below).
 Note: this is where the Test mode described above is useful. Sometimes it takes a while to figure
-just what you want in terms of group structure and entry names.
+just what you want in terms of folder structure and entry names.
 
 <p>
 
-To define the group you need to select an existing base group and then optionally specify 
-a group template. The group template is used to automatically create a new group if needed.
-So for example, if your base group was: <i>Top/Data</i> and your Group Template was: <i>Ingested/Satellite</i>
-then the result group would be:<pre>
+To define the folder you need to select an existing base folder and then optionally specify 
+a folder template. The folder template is used to automatically create a new folder if needed.
+So for example, if your base folder was: <i>Top/Data</i> and your Folder Template was: <i>Ingested/Satellite</i>
+then the result folder would be:<pre>
 <i>Top/Data/Ingested/Satellite</i>
 </pre>
 
-The Harvester would create the <i>Ingested</i> and the <i>Satellite</i> groups as needed.
+The Harvester would create the <i>Ingested</i> and the <i>Satellite</i> folders as needed.
 
 <p>
 
-The name, description and group templates all can contain the following macros.
+The name, description and folder templates all can contain the following macros.
 Note: The different date fields (e.g., create_, from_ and to) refer to
 the create date/time, the from data time (which defaults to the create date
 unless specified in the pattern) and the to data time.
@@ -129,11 +129,11 @@ When ingesting the data2.nc file its dirgroup value would be:
 dir1/dir2
 </pre>
 
-Another  common  way of defining the group is to use the date macros. For example a group template of the form:<pre>
+Another  common  way of defining the folder is to use the date macros. For example a folder template of the form:<pre>
 ${from_year}/${from_monthname}/Week ${from_week}
 </pre>
 
-Would result in groups like:
+Would result in folders like:
 <pre>
 2009/January/Week 1
 2009/January/Week 2
@@ -144,7 +144,7 @@ Would result in groups like:
 
 
 
-You can also name the entrys using the macros. So, using the above date based group template you could then have a Name template that incorporates the formatted date:<pre>
+You can also name the entrys using the macros. So, using the above date based folder template you could then have a Name template that incorporates the formatted date:<pre>
 Gridded data - ${from_date}
 </pre>
 
@@ -166,7 +166,7 @@ to the list of file system directories in the Admin-&gt;Access area</b>
 
 <subhead  id="web"  intoc="false">Web Harvesters</subhead>
 The Web Harvesters work the same way as the File Harvesters but they fetch a URL (e.g., an image) every time they
-run. You can also define more that one URLS to fetch . The basic Run settings, Group and entry creation mechanisms
+run. You can also define more that one URLS to fetch . The basic Run settings, Folder and entry creation mechanisms
 are the same as described above.
 
 

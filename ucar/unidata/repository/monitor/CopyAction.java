@@ -116,7 +116,7 @@ public class CopyAction extends MonitorAction {
     public String getSummary(EntryMonitor entryMonitor) {
         Group group = getGroup(entryMonitor);
         if (group == null) {
-            return "Copy entry: Error bad group";
+            return "Copy entry: Error bad folder";
         }
         return "Copy entry to:" + group.getName();
     }
@@ -153,7 +153,7 @@ public class CopyAction extends MonitorAction {
             if ((group != null) && !monitor.okToAddNew(group)) {
                 errorLabel = HtmlUtil.span(
                     monitor.getRepository().msg(
-                        "You cannot add to the group"), HtmlUtil.cssClass(
+                        "You cannot add to the folder"), HtmlUtil.cssClass(
                         HtmlUtil.CLASS_ERRORLABEL));
             }
             String groupName = ((group != null)
@@ -172,13 +172,13 @@ public class CopyAction extends MonitorAction {
                                       HtmlUtil.id(inputId + "_hidden")));
             sb.append(
                 HtmlUtil.formEntry(
-                    "Group:",
+                    "Folder:",
                     HtmlUtil.disabledInput(
                         inputId, groupName,
                         HtmlUtil.SIZE_60 + HtmlUtil.id(inputId)) + select));
             sb.append(
                 HtmlUtil.formEntry(
-                    "Sub-Group Template:",
+                    "Sub-Folder Template:",
                     HtmlUtil.input(
                         getArgId(ARG_SUBGROUP), subGroup, HtmlUtil.SIZE_60)));
         } catch (Exception exc) {

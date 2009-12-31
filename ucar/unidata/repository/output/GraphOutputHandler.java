@@ -374,7 +374,7 @@ public class GraphOutputHandler extends OutputHandler {
         Group group = getEntryManager().findGroup(request, id);
         if (group == null) {
             throw new RepositoryUtil.MissingEntryException(
-                "Could not find group:" + id);
+                "Could not find folder:" + id);
         }
         sb.append(
             XmlUtil.tag(

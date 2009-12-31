@@ -1042,7 +1042,7 @@ public class UserManager extends RepositoryManager {
                 Group home = getEntryManager().makeNewGroup(parent, newUser.getName(),
                                                             newUser, null,
                                                             TypeHandler.TYPE_HOMEPAGE);
-                msg.append("A home group has been created for you: ");
+                msg.append("A home folder has been created for you: ");
                 String homeUrl =
                     HtmlUtil.url(
                                  getRepositoryBase().URL_ENTRY_SHOW.toString(),
@@ -1126,11 +1126,11 @@ public class UserManager extends RepositoryManager {
 
         msgSB.append(HtmlUtil.space(1));
         String groupMsg =
-            "Create a group using the user's name under this group";
+            "Create a folder using the user's name under this folder";
         msgSB.append(groupMsg);
         msgSB.append(HtmlUtil.br());
         msgSB.append(
-                msgLabel("Home group") +
+                msgLabel("Home folder") +
                 HtmlUtil.disabledInput(
                                        ARG_USER_HOME, "",
                                        HtmlUtil.SIZE_40
@@ -1489,8 +1489,8 @@ public class UserManager extends RepositoryManager {
             entries = new ArrayList<Entry>();
             sb.append(
                 getRepository().showDialogNote(
-                    msg("No entries in cart.") + HtmlUtil.space(1)
-                    + msg("Using top group.")));
+                    msg("No entries in cart") + HtmlUtil.space(1)
+                    + msg("Using top folder")));
             entries.add(getEntryManager().getTopGroup());
         }
 
@@ -1908,7 +1908,7 @@ public class UserManager extends RepositoryManager {
 
         if ( !user.getIsGuest() && (cnt == 0)) {
             sb.append(
-                "You have no favorite entries defined.<br>When you see an  entry or group just click on the "
+                "You have no favorite entries defined.<br>When you see an  entry or folder just click on the "
                 + HtmlUtil.img(iconUrl(ICON_FAVORITE))
                 + " icon to add it to your list of favorites");
         }

@@ -3,7 +3,7 @@
 <%nochildlist%>
 
 So, you have your RAMADDA server installed, now you may ask how do I get go about populating it with data and other content.
-We covered how to make groups and upload files (or archives of files) through the web interface. However, RAMADDA also supports
+We covered how to make folders and upload files (or archives of files) through the web interface. However, RAMADDA also supports
 ways of providing access to the files that are already on the server machine.
 
 
@@ -12,20 +12,20 @@ ways of providing access to the files that are already on the server machine.
 RAMADDA provides a harvester facility (see <a href="harvesters.html">harvesters.html</a> for more details)
 that allows an administrator to scan the local file system on the server and add entries into the database for
 those files.
-Here is an example of a harvester that walks a directory tree (/data/ldm/pub/casestudies/july18_2002) add adds group and file entries
-under the main RAMADDA group RAMADDA/Case Studies/Test.
+Here is an example of a harvester that walks a directory tree (/data/ldm/pub/casestudies/july18_2002) add adds folder and file entries
+under the main RAMADDA folder RAMADDA/Case Studies/Test.
 
 [ht::cimg images/harvesterlocalfiles.gif {Harvesting files} {border=0 width=700}]
 
 Simply create the harvester, specify the file path to look under, specify a pattern to match (.* is match all files) and specify
-the RAMADDA group to add the new group under.
+the RAMADDA folder to add the new folder under.
 See the above link for more details.
 
 
 <subhead  id="localfiles"  intoc="false">Serving up local files</subhead>
 If the server machine you have RAMADDA running on has a large collection of data files then you can
 very easily provide RAMADDA access to those files with the &quot;Local File View&quot; entry type. 
-This provides a view of the file system. The Groups and Entries it creates are not in the database but
+This provides a view of the file system. The Folders and Entries it creates are not in the database but
 they provide a way to access the data through all of the RAMADDA services.
 <p>
 For example, on Unidata's motherlode server we have a large archive (10's of millions of files)

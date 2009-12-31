@@ -166,7 +166,7 @@ public class DirectoryHarvester extends Harvester {
                                          HtmlUtil.SIZE_60) + extraLabel));
 
         sb.append(
-            RepositoryManager.tableSubHeader("Create new groups under"));
+            RepositoryManager.tableSubHeader("Create new folders under"));
 
         addBaseGroupSelect(ATTR_BASEGROUP, sb);
 

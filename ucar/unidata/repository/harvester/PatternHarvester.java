@@ -288,7 +288,7 @@ public class PatternHarvester extends Harvester {
 
         addBaseGroupSelect(ATTR_BASEGROUP, sb);
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
+        sb.append(HtmlUtil.formEntry(msgLabel("Folder template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
                                          groupTemplate, HtmlUtil.SIZE_60)));
 

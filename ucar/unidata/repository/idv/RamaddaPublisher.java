@@ -297,7 +297,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
             GuiUtils.rLabel("Tags:"),
             GuiUtils.centerRight(tagFld, new JLabel(" (optional)")),
-            GuiUtils.rLabel("Parent Group:"), treeComp,
+            GuiUtils.rLabel("Parent Folder:"), treeComp,
             GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
             GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
         });
@@ -493,7 +493,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                     parentId = repositoryClient.getSelectedGroup();
                     if (parentId == null) {
-                        LogUtil.userMessage("You must select a parent group");
+                        LogUtil.userMessage("You must select a parent folder");
                     } else {
                         break;
                     }

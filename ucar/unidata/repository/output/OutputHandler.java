@@ -846,7 +846,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                              "10"))
                           : HtmlUtil.img(
                               getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                              msg("Click to open group"),
+                              msg("Click to open folder"),
                               HtmlUtil.id("img_" + uid)
                               + HtmlUtil.onMouseClick(
                                   HtmlUtil.call(
@@ -1982,7 +1982,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             String link = getEntriesList(request, sb, children, true, true,
                                          true, false);
             blockContent = sb.toString();
-            blockTitle = Misc.getProperty(props, "title", msg("Groups"))
+            blockTitle = Misc.getProperty(props, "title", msg("Folders"))
                          + link;
         } else if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
             doBG = false;
@@ -2004,7 +2004,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             blockTitle = Misc.getProperty(props, "title", msg("Entries"))
                          + link;
             blockContent = sb.toString();
-            blockTitle = Misc.getProperty(props, "title", msg("Groups"))
+            blockTitle = Misc.getProperty(props, "title", msg("Folders"))
                          + link;
         } else if (include.equals(WIKIPROP_CHILDREN)) {
             doBG = false;

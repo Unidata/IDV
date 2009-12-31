@@ -852,7 +852,7 @@ public class RepositoryFtplet extends DefaultFtplet {
 
         String entryName = ftpRequest.getArgument();
         Entry  entry     = findEntry(request, group, entryName);
-        ftpManager.logInfo("Group:" + group.getName() + " name:" + entryName);
+        ftpManager.logInfo("Folder:" + group.getName() + " name:" + entryName);
         if (entry == null) {
             return handleError(session, ftpRequest,
                                "Not a valid file:"

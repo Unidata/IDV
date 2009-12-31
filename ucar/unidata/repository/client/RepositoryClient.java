@@ -630,18 +630,18 @@ public class RepositoryClient extends RepositoryBase {
                                   URL_ENTRY_XMLCREATE.getFullUrl());
 
             if (result[0] != null) {
-                handleError("Error creating group:\n" + result[0], null);
+                handleError("Error creating folder:\n" + result[0], null);
                 return false;
             }
             Element response = XmlUtil.getRoot(result[1]);
             if (responseOk(response)) {
-                handleMessage("Group created");
+                handleMessage("Folder created");
                 return true;
             }
             String body = XmlUtil.getChildText(response).trim();
-            handleError("Error creating group:" + body, null);
+            handleError("Error creating folder:" + body, null);
         } catch (Exception exc) {
-            handleError("Error creating group", exc);
+            handleError("Error creating folder", exc);
         }
         return false;
     }
@@ -1037,11 +1037,11 @@ public class RepositoryClient extends RepositoryBase {
             "\t-print <entry id> Create and print the given entry\n" +
             "\t-printxml <entry id> Print out the xml for the given entry id\n" +
             "\t-fetch <entry id> <destination file or directory>\n" +
-            "For creating a new group:\n" +
-            "\t-group  <group name> <parent group id (see below)>\n" +
+            "For creating a new folder:\n" +
+            "\t-folder  <folder name> <parent folder id (see below)>\n" +
             "For uploading files:\n" +
-            "\t-file <entry name> <file to upload> <parent group id (see below)>\n" +
-            "The following arguments get applied to the previously created group or file:\n" +
+            "\t-file <entry name> <file to upload> <parent folder id (see below)>\n" +
+            "The following arguments get applied to the previously created folder or file:\n" +
             "\t-description <entry description>\n" +
             "\t-attach <file to attach>\n" +
             "\t-addmetadata (Add full metadata to entry)\n" +
@@ -1052,14 +1052,14 @@ public class RepositoryClient extends RepositoryBase {
             "\t-exit (exit without adding anything to the repository\n");
 
 
-        System.err.println ("Note: the  <parent group id> can be an identifier from a existing group in the repository or it can be \"previous\" which will use the id of the previously specified group\n" +
+        System.err.println ("Note: the  <parent folder id> can be an identifier from a existing folder in the repository or it can be \"previous\" which will use the id of the previously specified folder\n" +
                             "For example you could do:\n" +
-                            " ...  -group \"Some new group\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -group \"some other group\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" +
+                            " ...  -folder \"Some new folder\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -folder \"some other folder\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" +
                             "This results in the heirarchy:\n" +
-                            "Some new group\n" +
+                            "Some new folder\n" +
                             "\tsomefile1.nc\n"+
                             "\tsomefile2.nc\n" +
-                            "\tsome other group\n" +
+                            "\tsome other folder\n" +
                             "\t\tsomeotherfile.nc\n");
 
         System.exit(1);
@@ -1128,9 +1128,9 @@ public class RepositoryClient extends RepositoryBase {
                 }
                 entryCnt++;
                 entryNode = makeEntryNode(root, args[++i]);
-            } else if (arg.equals("-group")) {
+            } else if (arg.equals("-folder")) {
                 if (i == args.length) {
-                    usage("Bad -name argument");
+                    usage("Bad -folder argument");
                 }
                 entryNode = null;
                 entryCnt++;
@@ -1242,7 +1242,7 @@ public class RepositoryClient extends RepositoryBase {
         //Write the xml if we have it
         if (root != null) {
             if ( !haveParent) {
-                usage("Must specify a parent group destination with -parent");
+                usage("Must specify a parent folder destination with -parent");
             }
             String xml = XmlUtil.toString(root);
             System.out.println (xml);

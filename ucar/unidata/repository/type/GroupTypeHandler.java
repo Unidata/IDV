@@ -72,7 +72,7 @@ public class GroupTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public GroupTypeHandler(Repository repository) throws Exception {
-        super(repository, TypeHandler.TYPE_GROUP, "Group");
+        super(repository, TypeHandler.TYPE_GROUP, "Folder");
     }
 
 
@@ -99,7 +99,7 @@ public class GroupTypeHandler extends TypeHandler {
                     request.url(
                         getRepository().URL_SEARCH_FORM, ARG_GROUP,
                         entry.getId()), getRepository().iconUrl(ICON_SEARCH),
-                                        "Search in Group"));
+                                        "Search in Folder"));
             */
         }
 

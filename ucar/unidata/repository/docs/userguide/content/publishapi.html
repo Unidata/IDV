@@ -12,7 +12,7 @@
 You can programmatically create new entries on a RAMADDA server. There is a  Java class, ucar.unidata.repository.RepositoryClient, 
 that provides some of the facilities.  You can also look at the ucar.unidata.repository.idv.RamaddaPublisher which is used within the 
 IDV to publish content to RAMADDA. This class uses the ucar.unidata.repository.InteractiveRepositoryClient class that provides some 
-GUI facilities (e.g., a group JTree component).
+GUI facilities (e.g., a folder JTree component).
 
 <p>
 
@@ -87,10 +87,10 @@ Next, create an xml file that defines the entries you want to create.
 <li> The parent is the actual parent id in RAMADDA.
 <li> The fromdata, todate, south, west, east, north and description are all optional. 
 <li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
-could create a group entry and then another entry that is a child of the group:
+could create a folder entry and then another entry that is a child of the folder:
 <pre>
  &lt;entries&gt;
-  &lt;entry name="Some group" 
+  &lt;entry name="Some folder" 
             id="0"
             parent="0/0" 
             type="group"  /&gt;

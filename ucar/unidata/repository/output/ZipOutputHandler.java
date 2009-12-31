@@ -97,7 +97,7 @@ public class ZipOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_ZIPGROUP =
-        new OutputType("Zip Group", "zip.zipgroup", OutputType.TYPE_FILE, "",
+        new OutputType("Zip Folder", "zip.zipgroup", OutputType.TYPE_FILE, "",
                        ICON_ZIP);
 
 

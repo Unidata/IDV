@@ -532,7 +532,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (cnt == 0) {
             sb.append(HtmlUtil.tag(HtmlUtil.TAG_I, "",
-                                   msg("No entries in this group")));
+                                   msg("No entries in this folder")));
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
                 if ( !getAccessManager().canDoAction(request, parent,
@@ -540,7 +540,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     sb.append(HtmlUtil.space(1));
                     sb.append(
                         msg(
-                        "You do not have permission to view the sub-groups of this entry"));
+                        "You do not have permission to view the sub-folders of this entry"));
                 }
             }
         }
@@ -841,7 +841,7 @@ public class HtmlOutputHandler extends OutputHandler {
                             Permission.ACTION_VIEWCHILDREN)) {
                         sb.append(
                             getRepository().showDialogWarning(
-                                "You do not have permission to view the sub-groups of this entry"));
+                                "You do not have permission to view the sub-folders of this entry"));
                     }
                 }
             }
@@ -857,7 +857,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 + "</td></tr></table>");
         }
 
-        return makeLinksResult(request, msg("Group"), sb,
+        return makeLinksResult(request, msg("Folder"), sb,
                                new State(group, subGroups, entries));
     }
 
