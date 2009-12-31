@@ -190,8 +190,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Shows the category */
     private JComboBox categoryField;
 
-    /** Transpancy box */
+    /** Transpency box */
     private JComboBox transBox;
+
+    private boolean ignoreTransBoxEvents = false;
 
     /** Transpancy box */
     private JComboBox brightnessBox;
@@ -460,10 +462,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
         transBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
+                if(ignoreTransBoxEvents) return;
                 modeTransparencyBtn.setSelected(true);
                 if (setColorFromChooserCbx.isSelected()) {
                     if (currentBP != null) {
+                        ignoreTransBoxEvents = true;
                         setTransparency(currentBP, currentBP);
+                        ignoreTransBoxEvents = false;
                     }
                 }
             }
@@ -2853,7 +2858,14 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             int alpha = g.getColor().getAlpha();
             if (lastAlpha != alpha) {
                 //for now let's not do this
-                //transBox.setSelectedItem (Miscformat (alpha/(double)255));
+                ignoreTransBoxEvents = true;
+                double percent = 1-alpha/(double)255;
+                int intPercent = (int)(percent*100+0.5);
+                TwoFacedObject tfo = new TwoFacedObject(intPercent + "%",
+                                                        new Integer(intPercent));
+
+                transBox.setSelectedItem (tfo);
+                ignoreTransBoxEvents = false;
                 lastAlpha = alpha;
             }
         }
