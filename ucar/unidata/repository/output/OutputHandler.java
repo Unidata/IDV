@@ -1422,6 +1422,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 getEntryManager().getTimezone(entry), extraAlt.toString()));
         sb.append("</div></td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
+
 	//	sb.append(HtmlUtil.jsLink(toggleJS,"X"));
         /*        String userSearchLink =
             HtmlUtil.href(
