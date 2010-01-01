@@ -90,6 +90,8 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    public static final String TYPE_FILE = "file";
+
     /** _more_ */
     public static final String TYPE_PASSWORD = "password";
 

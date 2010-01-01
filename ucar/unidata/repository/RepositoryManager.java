@@ -151,7 +151,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @return _more_
      */
     public static String formatFileLength(double bytes) {
-        if (bytes < 1000) {
+        if (bytes < 5000) {
             return ((int) bytes) + " bytes";
         }
         if (bytes < 1000000) {

@@ -529,7 +529,7 @@ function Tooltip () {
     function handleTooltip(request, obj) {
         var xmlDoc=request.responseXML.documentElement;
         text = getChildText(xmlDoc);
-        obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+        obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table cellspacing=0 cellpadding=0><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
         showObject(obj);
     }
 
@@ -709,8 +709,10 @@ function initEntryListForm(formId) {
 
 function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     this.entryId = entryId;
+
     this.onColor = "#FFFFCC";
     this.overColor = "#f6f6f6";
+    this.overColor = "#edf5ff";
     this.rowId = rowId;
     this.cbxId = cbxId;
     this.cbxWrapperId = cbxWrapperId;
@@ -761,7 +763,7 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
         }
         
         this.row.style.backgroundColor = this.overColor;
-        this.row.style.border =  "1px #ddd  solid";
+        this.row.style.border =  "1px #ddd  dotted";
     }
 
     this.mouseClick = function(event) {
@@ -780,7 +782,7 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
 
         util.setPosition(obj, util.getLeft(entryRow.row), util.getBottom(entryRow.row));
 
-        div.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+        div.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</table></div></div>";
         showObject(div);
     }
 

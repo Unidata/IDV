@@ -922,8 +922,8 @@ public class TypeHandler extends RepositoryManager {
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
-        String size     = " (" + entry.getResource().getFileSize()
-                          + " bytes)";
+        String size     =  " (" + formatFileLength(entry.getResource().getFileSize()) +")";
+
         String fileTail = getStorageManager().getFileTail(entry);
         return new Link(getEntryManager().getEntryResourceUrl(request,
                 entry), getRepository().iconUrl(ICON_FETCH),
@@ -1017,9 +1017,7 @@ public class TypeHandler extends RepositoryManager {
                 }
                 if (entry.getResource().getFileSize() > 0) {
                     resourceLink = resourceLink + HtmlUtil.space(2)
-                                   + entry.getResource().getFileSize()
-                                   + HtmlUtil.space(1) + msg("bytes");
-
+                        + formatFileLength(entry.getResource().getFileSize());
                 }
                 if (showImage) {
                     /*                    String nextPrev = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,

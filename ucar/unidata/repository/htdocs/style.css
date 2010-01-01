@@ -717,9 +717,13 @@ ul {
 
 
 .tooltip-inner {
-   padding:3px;
-   border : 1px solid #bbbbbb;
-   background-color : #FFFFCC;
+   padding:2px;
+   padding-bottom:0px;
+   padding-right:0px;
+   border : 1px dotted #ccc;
+//   background-color : #FFFFCC;
+   background-color : #edf5ff;
+
    margin:0px;
 }
 

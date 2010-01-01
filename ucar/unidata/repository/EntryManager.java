@@ -3891,6 +3891,7 @@ return new Result(title, sb);
             if (link.isType(OutputType.TYPE_HTML)) {
                 if (htmlSB == null) {
                     htmlSB = new StringBuffer(tableHeader);
+                    //                    htmlSB.append("<tr><td class=entrymenulink>" + msg("View") +"</td></tr>");
                     cnt++;
                 }
                 sb = htmlSB;
@@ -3898,18 +3899,21 @@ return new Result(title, sb);
                 if (nonHtmlSB == null) {
                     cnt++;
                     nonHtmlSB = new StringBuffer(tableHeader);
+                    //                    nonHtmlSB.append("<tr><td class=entrymenulink>&nbsp;</td></tr>");
                 }
                 sb = nonHtmlSB;
             } else if (link.isType(OutputType.TYPE_FILE)) {
                 if (fileSB == null) {
                     cnt++;
                     fileSB = new StringBuffer(tableHeader);
+                    //                    fileSB.append("<tr><td class=entrymenulink>" + msg("File") +"</td></tr>");
                 }
                 sb = fileSB;
             } else {
                 if (actionSB == null) {
                     cnt++;
                     actionSB = new StringBuffer(tableHeader);
+                    //                    actionSB.append("<tr><td class=entrymenulink>" + msg("Edit") +"</td></tr>");
                 }
                 sb = actionSB;
             }
@@ -3940,6 +3944,16 @@ return new Result(title, sb);
         menu.append(HtmlUtil.open(HtmlUtil.TAG_TR,
                                   HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,
                                       "top")));
+        if (fileSB != null) {
+            fileSB.append("</table>");
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", fileSB.toString()));
+        }
+        if (actionSB != null) {
+            actionSB.append("</table>");
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
+                                     actionSB.toString()));
+        }
+
         if (htmlSB != null) {
             htmlSB.append("</table>");
             menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", htmlSB.toString()));
@@ -3950,15 +3964,7 @@ return new Result(title, sb);
             menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
                                      nonHtmlSB.toString()));
         }
-        if (fileSB != null) {
-            fileSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", fileSB.toString()));
-        }
-        if (actionSB != null) {
-            actionSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
-                                     actionSB.toString()));
-        }
+
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         return menu.toString();
