@@ -363,6 +363,21 @@ public class KmlUtil {
 
 
 
+    public static Element groundOverlay(Element parent, String name, String description, String url, double north, double south, double east, double west) {
+        Element node = makeElement(parent,TAG_GROUNDOVERLAY);
+        name(node, name);
+        description(node, description);
+        visible(node, false);
+        Element icon = makeElement(node, TAG_ICON);
+        Element href = makeText(icon, TAG_HREF,url);
+        Element llb = makeElement(node, TAG_LATLONBOX);
+        makeText(llb,TAG_NORTH,""+north);
+        makeText(llb,TAG_SOUTH,""+south);
+        makeText(llb,TAG_EAST,""+east);
+        makeText(llb,TAG_WEST,""+west);
+        return node;
+    }
+
     public static Element placemark(Element parent, String name, String description, float[][]coords, Color color, int width) {
         Element placemark = placemark(parent, name, description);
         Element linestring = linestring(placemark,false,false, coords);
