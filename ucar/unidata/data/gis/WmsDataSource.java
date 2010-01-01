@@ -389,6 +389,9 @@ public class WmsDataSource extends DataSourceImpl {
                         Toolkit.getDefaultToolkit().createImage(imageContent);
                     //Wait on the image
                     image = ucar.unidata.ui.ImageUtils.waitOnImage(image);
+                    if(image == null)  {
+                        throw new IllegalStateException();
+                    }
 
 
                     Trace.call2("Making image");
