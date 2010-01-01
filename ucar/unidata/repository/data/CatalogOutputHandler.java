@@ -621,9 +621,32 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
 
+        if(WmsImageOutputHandler.isLatLonImage(entry)) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry,
+                                          ARG_OUTPUT,
+                                          WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES);
+            Element ref = XmlUtil.create(catalogInfo.doc,
+                                         CatalogUtil.TAG_CATALOGREF, parent,
+                                         new String[] {
+                                             CatalogUtil.ATTR_XLINK_TITLE,
+                                             "WMS: " + entry.getName(),
+                                             CatalogUtil.ATTR_XLINK_HREF,
+                                             url});
+            return;
+
+        }
+
+
+
         File   f    = entry.getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
+
+
+
+
+
         Element dataset = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_DATASET, parent,
                                          new String[] { CatalogUtil.ATTR_NAME,
