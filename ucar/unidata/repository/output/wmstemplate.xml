@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<WMT_MS_Capabilities version="1.1.1">
+  <Service>
+    <Name>OGC:WMS</Name>
+    <Title>${title}</Title>
+    <Abstract>${abstract}</Abstract>
+    <OnlineResource
+       xlink:href="${url}"
+       xlink:type="simple"
+       xmlns:xlink="http://www.w3.org/1999/xlink"/>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource
+                 xlink:href="${url}"
+                 xlink:type="simple"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <Format>image/jpeg</Format>
+        <Format>image/gif</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource
+                 xlink:href="${url}"
+                 xlink:type="simple"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+    </Request>
+    <Exception>
+      <Format>application/vnd.ogc.se_xml</Format>
+      <Format>application/vnd.ogc.se_inimage</Format>
+      <Format>application/vnd.ogc.se_blank</Format>
+    </Exception>
+
+
+
+${layers}
+
+
+
+
+  </Capability>
+</WMT_MS_Capabilities>

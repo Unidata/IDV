@@ -82,7 +82,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     public static final String ATTR_MAXCONNECTIONS = "maxconnections";
 
     /** _more_ */
-    public static final String LABEL_LINKS = "View &amp; Edit";
+    public static final String LABEL_LINKS = "Actions";
 
     /** _more_ */
     public static final OutputType OUTPUT_HTML =
