@@ -126,6 +126,8 @@ public class WmsDataSource extends DataSourceImpl {
      */
     byte[] lastImageContent;
 
+
+
     /** The url of the last image */
     String lastUrl;
 
@@ -385,6 +387,10 @@ public class WmsDataSource extends DataSourceImpl {
                     Trace.call1("Making image");
                     image =
                         Toolkit.getDefaultToolkit().createImage(imageContent);
+                    //Wait on the image
+                    image = ucar.unidata.ui.ImageUtils.waitOnImage(image);
+
+
                     Trace.call2("Making image");
                     lastImageContent = imageContent;
                     lastUrl          = url;
@@ -409,6 +415,7 @@ public class WmsDataSource extends DataSourceImpl {
                     throw new IllegalStateException();
                 }
                 long tt1 = System.currentTimeMillis();
+
                 xyData = DataUtility.makeField(image);
                 long tt2 = System.currentTimeMillis();
                 //      System.err.println("time to make field:" + (tt2-tt1));
@@ -502,12 +509,15 @@ public class WmsDataSource extends DataSourceImpl {
                             boundsToUse.getMaxLat(), boundsToUse.getMinLat(),
                             domain.getY().getLength());
 
+        System.err.println("image domain:" + imageDomain);
+
         /*
         new Linear2DSet(RealTupleType.SpatialEarth2DTuple,
                             boundsToUse.getMinLon(), boundsToUse.getMaxLon(),
                             domain.getX().getLength(),
                             boundsToUse.getMinLat() +diff, boundsToUse.getMinLat(),
                             domain.getY().getLength());*/
+
 
 
         FieldImpl field = GridUtil.setSpatialDomain(xyData, imageDomain,
