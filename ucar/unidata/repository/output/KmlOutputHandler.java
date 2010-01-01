@@ -192,6 +192,23 @@ public class KmlOutputHandler extends OutputHandler {
 
 
         for (Entry entry : (List<Entry>) entries) {
+            if(WmsImageOutputHandler.isLatLonImage(entry)) {
+                String fileTail = getStorageManager().getFileTail(entry);
+                String url =  HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET)
+                                           + "/" + fileTail, ARG_ENTRYID,
+                                           entry.getId());
+                url = getRepository().absoluteUrl(url);
+                KmlUtil.groundOverlay(folder, entry.getName(), entry.getDescription(),
+                                      url,
+                                      entry.getNorth(),
+                                      entry.getSouth(),
+                                      entry.getEast(),
+                                      entry.getWest());
+                continue;
+            }
+
+
+
             String resource = entry.getResource().getPath();
             if (resource == null) {
                 continue;

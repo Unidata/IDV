@@ -100,7 +100,7 @@ public class WmsImageOutputHandler extends OutputHandler {
     }
 
 
-    private boolean isLatLonImage(Entry entry) {
+    public static boolean isLatLonImage(Entry entry) {
         return  entry.getType().equals("latlonimage") && entry.getResource().isImage();
     }
 
@@ -151,7 +151,8 @@ public class WmsImageOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, OutputType outputType,
                               Entry entry)
             throws Exception {
-        if(request.getString("request","").equals("GetMap")) {
+        String wmsRequest = request.getString("request","");
+        if(wmsRequest.equals("GetMap")) {
             return outputMap(request, entry);
         }
 
@@ -164,10 +165,16 @@ public class WmsImageOutputHandler extends OutputHandler {
         return makeLinksResult(request, msg("WMS"), sb, new State(entry));
     }
 
+
     public Result outputGroup(Request request, OutputType outputType,
                               Group group, List<Group> subGroups,
                               List<Entry> entries)
             throws Exception {
+
+        String wmsRequest = request.getString("request","");
+        if(wmsRequest.equals("GetMap")) {
+            return outputMap(request, group);
+        }
         StringBuffer sb = new StringBuffer();
         return outputCapabilities(request, group, entries);
     }
@@ -175,12 +182,20 @@ public class WmsImageOutputHandler extends OutputHandler {
 
     public Result outputMap(Request request, 
                             Entry entry ) throws Exception {
-        System.err.println("map:" + request);
+        String layers = request.getString("Layers",(String)null);
+        if(layers == null) 
+            layers = request.getString("layers",(String)null);
+        if(layers==null) {
+            throw new IllegalArgumentException("No Layers argument specified");
+        }
+        //Pull out the first layer id (which is the entry id)
+        List toks = StringUtil.split(layers,",",true,true);
+        request.put(ARG_ENTRYID, (String)toks.get(0));
         return getEntryManager().processEntryGet(request);
     }
 
 
-    private   String layerTemplate = "<Layer         noSubsets=\"1\"         opaque=\"0\"         queryable=\"1\">        <Name>${name}</Name>        <Title>${title}</Title>        <SRS>EPSG:4326</SRS>        <LatLonBoundingBox           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>        <BoundingBox           SRS=\"EPSG:4326\"           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>      </Layer>";
+    private   String layerTemplate = "<Layer         noSubsets=\"1\"         opaque=\"0\"         queryable=\"0\">        <Name>${name}</Name>        <Title>${title}</Title>        <SRS>EPSG:4326</SRS>        <LatLonBoundingBox           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>        <BoundingBox           SRS=\"EPSG:4326\"           maxx=\"%east%\"           maxy=\"%north%\"           minx=\"%west%\"           miny=\"%south%\"/>      </Layer>";
 
     private String wmsTemplate;
 
