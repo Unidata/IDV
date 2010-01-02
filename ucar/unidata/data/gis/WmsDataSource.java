@@ -512,7 +512,7 @@ public class WmsDataSource extends DataSourceImpl {
                             boundsToUse.getMaxLat(), boundsToUse.getMinLat(),
                             domain.getY().getLength());
 
-        System.err.println("image domain:" + imageDomain);
+        // System.err.println("image domain:" + imageDomain);
 
         /*
         new Linear2DSet(RealTupleType.SpatialEarth2DTuple,
