@@ -2774,7 +2774,7 @@ return new Result(title, sb);
                     HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                     + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", false)
-                    + HtmlUtil.space(1) + msg("Add Metadata")
+                    + HtmlUtil.space(1) + msg("Add Property")
                     + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
                     + HtmlUtil.space(1) + msg("Download URLS")));

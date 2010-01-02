@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -801,13 +802,13 @@ public class TypeHandler extends RepositoryManager {
                     request.entryUrl(
                         getMetadataManager().URL_METADATA_FORM,
                         entry), getRepository().iconUrl(ICON_METADATA_EDIT),
-                                msg("Edit Metadata"), OutputType.TYPE_EDIT));
+                                msg("Edit Properties"), OutputType.TYPE_EDIT));
             links.add(
                 new Link(
                     request.entryUrl(
                         getMetadataManager().URL_METADATA_ADDFORM,
                         entry), getRepository().iconUrl(ICON_METADATA_ADD),
-                                msg("Add Metadata"), OutputType.TYPE_EDIT));
+                                msg("Add Property"), OutputType.TYPE_EDIT));
             links.add(
                 new Link(
                     request.entryUrl(getRepository().URL_ACCESS_FORM, entry),
@@ -1480,10 +1481,10 @@ public class TypeHandler extends RepositoryManager {
 
                 String addMetadata =
                     HtmlUtil.checkbox(ARG_METADATA_ADD) + HtmlUtil.space(1)
-                    + msg("Add Metadata") + HtmlUtil.space(1)
+                    + msg("Add Properties") + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_METADATA_ADDSHORT)
                     + HtmlUtil.space(1)
-                    + msg("Just Spatial/Temporal Metadata");
+                    + msg("Just Spatial/Temporal Properties");
 
                 List datePatterns = new ArrayList();
                 datePatterns.add(new TwoFacedObject("", BLANK));
@@ -2696,6 +2697,51 @@ public class TypeHandler extends RepositoryManager {
     public boolean hasDefaultDataType() {
         return (defaultDataType != null) && (defaultDataType.length() > 0);
     }
+
+
+
+    private Hashtable<String,HashSet> columnEnumValues = new Hashtable<String,HashSet>();
+
+
+    protected String getEnumValueKey(Column column, Entry entry) {
+        return column.getName();
+    }
+
+    protected void addEnumValue(Column column, Entry entry, String theValue) throws Exception {
+        if(theValue==null || theValue.length()==0) return;
+        HashSet set = getEnumValuesInner(column, entry);
+        set.add(theValue);
+    }
+
+    protected List getEnumValues(Column column,Entry entry) throws Exception {
+        HashSet set = getEnumValuesInner(column, entry);
+        List tmp = new ArrayList();
+        tmp.addAll(set);
+        return Misc.sort(tmp);
+    }
+
+
+    private HashSet getEnumValuesInner(Column column, Entry entry) throws Exception {
+        String key = getEnumValueKey(column, entry);
+        HashSet set =  columnEnumValues.get(key);
+        if(set!=null) return set;
+        Clause clause = getEnumValuesClause(column, entry);
+        Statement stmt = getRepository().getDatabaseManager().select(
+                                                                     SqlUtil.distinct(column.getName()),
+                                                                     column.getTableName(),
+                                                                     clause);
+        String[]values =
+            SqlUtil.readString(getRepository().getDatabaseManager().getIterator(stmt), 1);
+        set = new HashSet();
+        set.addAll(Misc.toList(values));
+        columnEnumValues.put(key, set);
+        return set;
+    }
+
+    public Clause getEnumValuesClause(Column column, Entry entry) throws Exception {
+        return null;
+    }
+
 
 
 

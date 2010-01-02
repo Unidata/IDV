@@ -289,7 +289,7 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getHandlerGroupName() {
-        return "Metadata";
+        return "Properties";
     }
 
     /**

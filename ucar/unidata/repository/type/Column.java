@@ -40,11 +40,14 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
+import java.text.SimpleDateFormat;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Date;
 import java.util.Enumeration;
 
@@ -61,6 +64,9 @@ public class Column implements Constants {
 
     public static final String OUTPUT_HTML = "html";
     public static final String OUTPUT_CSV = "csv";
+
+    private static SimpleDateFormat dateTimeFormat        = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static SimpleDateFormat dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
 
     /** _more_ */
 
@@ -114,8 +120,13 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_ENUMERATION = "enumeration";
 
+    public static final String TYPE_ENUMERATIONPLUS = "enumerationplus";
+
     /** _more_ */
     public static final String TYPE_DATE = "date";
+
+    /** _more_ */
+    public static final String TYPE_DATETIME = "datetime";
 
     /** _more_ */
     public static final String TYPE_LATLONBBOX = "latlonbbox";
@@ -229,7 +240,9 @@ public class Column implements Constants {
     private boolean canList;
 
     /** _more_ */
-    private List values;
+    private List enumValues;
+
+
 
     /** _more_ */
     private String dflt;
@@ -303,14 +316,16 @@ public class Column implements Constants {
 
 
         if (type.equals(TYPE_ENUMERATION)) {
-            String valueString = XmlUtil.getAttribute(element, ATTR_VALUES);
-            if (valueString.startsWith("file:")) {
-                valueString =
-                    typeHandler.getStorageManager().readSystemResource(
-                        valueString.substring("file:".length()));
-                values = StringUtil.split(valueString, "\n", true, true);
-            } else {
-                values = StringUtil.split(valueString, ",", true, true);
+            String valueString = XmlUtil.getAttribute(element, ATTR_VALUES,(String)null);
+            if (valueString!=null) {
+                if(valueString.startsWith("file:")) {
+                    valueString =
+                        typeHandler.getStorageManager().readSystemResource(
+                                                                           valueString.substring("file:".length()));
+                    enumValues = StringUtil.split(valueString, "\n", true, true);
+                } else {
+                    enumValues = StringUtil.split(valueString, ",", true, true);
+                }
             }
         }
     }
@@ -340,13 +355,17 @@ public class Column implements Constants {
         return type.equals(TYPE_INT) || isDouble();
     }
 
+    public boolean isDate() {
+        return type.equals(TYPE_DATETIME) || type.equals(TYPE_DATE);
+    }
+
     public boolean isDouble() {
         return type.equals(TYPE_DOUBLE) || type.equals(TYPE_PERCENTAGE);
     }
 
 
     public boolean isString() {
-        return type.equals(TYPE_STRING)  || type.equals(TYPE_ENUMERATION); 
+        return type.equals(TYPE_STRING)  || type.equals(TYPE_ENUMERATION) || type.equals(TYPE_ENUMERATIONPLUS); 
     }
 
     /**
@@ -442,6 +461,12 @@ public class Column implements Constants {
                 double percent = (Double)values[offset];
                 sb.append((int)(percent*100)+"");
             }
+        } else if(type.equals(TYPE_DATETIME)) {
+            sb.append(dateTimeFormat.format((Date)values[offset]));
+            valueIdx++;
+        } else if(type.equals(TYPE_DATE)) {
+            sb.append(dateFormat.format((Date)values[offset]));
+            valueIdx++;
         } else if(type.equals(TYPE_EMAIL)) {
             String s = toString(values, offset);
             if(Misc.equals(output, OUTPUT_CSV)) 
@@ -500,7 +525,7 @@ public class Column implements Constants {
                 statement.setInt(statementIdx, 0);
             }
             statementIdx++;
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             Date dttm = (Date) values[offset];
             typeHandler.getRepository().getDatabaseManager().setDate(
                 statement, statementIdx, dttm);
@@ -574,7 +599,7 @@ public class Column implements Constants {
         } else if (type.equals(TYPE_BOOLEAN)) {
             values[offset] = new Boolean(results.getInt(valueIdx) == 1);
             valueIdx++;
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             values[offset] = typeHandler.getDatabaseManager().getTimestamp(results, valueIdx);
             valueIdx++;
         } else if (type.equals(TYPE_LATLON)) {
@@ -638,8 +663,8 @@ public class Column implements Constants {
                 typeHandler.getRepository().getDatabaseManager().convertType(
                     "clob", size);
             defineColumn(statement, name, clobType);
-        } else if (type.equals(TYPE_ENUMERATION)) {
-            defineColumn(statement, name, "varchar(" + size + ") ");
+        } else if (type.equals(TYPE_ENUMERATION) || type.equals(TYPE_ENUMERATIONPLUS)) {
+           defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {
             defineColumn(statement, name, "int");
         } else if (isDouble()) {
@@ -651,7 +676,7 @@ public class Column implements Constants {
             //use int as boolean for database compatibility
             defineColumn(statement, name, "int");
 
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             defineColumn(statement,name,typeHandler.getDatabaseManager().convertSql("ramadda.datetime"));
         } else if (type.equals(TYPE_LATLON)) {
             defineColumn(
@@ -718,6 +743,8 @@ public class Column implements Constants {
             return new Double(value);
         } else if (type.equals(TYPE_BOOLEAN)) {
             return new Boolean(value);
+        } else if (type.equals(TYPE_DATETIME)) {
+            //TODO
         } else if (type.equals(TYPE_DATE)) {
             //TODO
         } else if (type.equals(TYPE_LATLON)) {
@@ -831,7 +858,7 @@ public class Column implements Constants {
                         ? 1
                         : 0)));
             }
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             String relativeArg = id+"_relative";
             Date[] dateRange = request.getDateRange(id+"_fromdate", id+"_todate", relativeArg,
                                new Date());
@@ -897,11 +924,12 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    public void addToEntryForm(Request request, StringBuffer formBuffer,
+    public void addToEntryForm(Request request, Entry entry,
+                               StringBuffer formBuffer,
                                Object[]values, Hashtable state)
             throws Exception {
         if(!addToForm) return;
-        String widget = getFormWidget(request, values);
+        String widget = getFormWidget(request, entry, values);
         //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
         //                                             HtmlUtil.hbox(widget, suffix)));
         if ((group != null) && (state.get(group) == null)) {
@@ -932,7 +960,7 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    public String getFormWidget(Request request, Object[]values)
+    public String getFormWidget(Request request, Entry entry, Object[]values)
             throws Exception {
         String   widget = "";
         String id = getFullName();
@@ -967,7 +995,7 @@ public class Column implements Constants {
             }
             widget = HtmlUtil.select(id,
                                      Misc.newList("True", "False"), value);
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (type.equals(TYPE_DATETIME)) {
             Date date;
             if (values != null) {
                 date  = (Date) values[offset];
@@ -976,6 +1004,15 @@ public class Column implements Constants {
             }
             widget = typeHandler.getRepository().makeDateInput(
                                                    request, id, "", date,null);
+        } else if (type.equals(TYPE_DATE)) {
+            Date date;
+            if (values != null) {
+                date  = (Date) values[offset];
+            } else {
+                date = new Date();
+            }
+            widget = typeHandler.getRepository().makeDateInput(
+                                                               request, id, "", date,null,false);
         } else if (type.equals(TYPE_ENUMERATION)) {
             String value = ((dflt != null)
                             ? dflt
@@ -983,7 +1020,16 @@ public class Column implements Constants {
             if (values != null) {
                 value = (String) toString(values, offset);
             }
-            widget = HtmlUtil.select(id, this.values, value);
+            widget = HtmlUtil.select(id, enumValues, value);
+        } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
+            if (values != null) {
+                value = (String) toString(values, offset);
+            }
+            widget = HtmlUtil.select(id, typeHandler.getEnumValues(this, entry), value) +"  or:  " +
+                HtmlUtil.input(id+"_plus", "",HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_INT)) {
             String value = ((dflt != null)
                             ? dflt
@@ -1088,7 +1134,7 @@ public class Column implements Constants {
      *
      * @throws Exception _more_
      */
-    public void setValue(Request request, Object[] values) throws Exception {
+    public void setValue(Request request, Entry entry, Object[] values) throws Exception {
         if(!addToForm) return;
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
@@ -1101,7 +1147,7 @@ public class Column implements Constants {
             values[offset+1] = new Double(request.get(id+"_west",Entry.NONGEO));
             values[offset+2] = new Double(request.get(id+"_south",Entry.NONGEO));
             values[offset+3] = new Double(request.get(id+"_east",Entry.NONGEO));
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             values[offset] =    request.getDate(id, new Date());
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = request.getString(id,
@@ -1118,6 +1164,24 @@ public class Column implements Constants {
             } else {
                 values[offset] = dflt;
             }
+        } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
+            String theValue = "";
+            if (request.defined(id+"_plus")) {
+                theValue = request.getString(id+"_plus",
+                        ((dflt != null)
+                         ? dflt
+                         : ""));
+            } else if (request.defined(id)) {
+                theValue = request.getString(id,
+                        ((dflt != null)
+                         ? dflt
+                         : ""));
+
+            } else {
+                theValue = dflt;
+            }
+            values[offset] = theValue;
+            typeHandler.addEnumValue(this,entry, theValue);
         } else if (type.equals(TYPE_INT)) {
             int dfltValue = (StringUtil.notEmpty(dflt)
                              ? new Integer(dflt).intValue()
@@ -1177,6 +1241,14 @@ public class Column implements Constants {
     public void addToSearchForm(Request request, StringBuffer formBuffer,
                                 List<Clause> where)
             throws Exception {
+        addToSearchForm(request, formBuffer, where, null);
+    }
+
+
+    public void addToSearchForm(Request request, StringBuffer formBuffer,
+                                List<Clause> where, Entry entry)
+
+            throws Exception {
 
         if ( !getCanSearch()) {
             return;
@@ -1190,7 +1262,7 @@ public class Column implements Constants {
             widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
         } else  if (type.equals(TYPE_LATLONBBOX)) {
             widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
-        } else if (type.equals(TYPE_DATE)) {
+        } else if (isDate()) {
             List dateSelect = new ArrayList();
             dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));
             dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
@@ -1212,12 +1284,12 @@ public class Column implements Constants {
 
             widget = getRepository().makeDateInput(
                     request, id+"_fromdate", "searchform",
-                    null) + HtmlUtil.space(1)
+                    null, null,type.equals(TYPE_DATETIME)) + HtmlUtil.space(1)
                           + HtmlUtil.img(getRepository().iconUrl(ICON_RANGE))
                           + HtmlUtil.space(1)
                           + getRepository().makeDateInput(
                               request, id+"_todate", "searchform",
-                              null) + HtmlUtil.space(4) + msgLabel("Or")
+                              null,null,type.equals(TYPE_DATETIME)) + HtmlUtil.space(4) + msgLabel("Or")
                 + dateSelectInput;
 
 
@@ -1227,7 +1299,11 @@ public class Column implements Constants {
                                                   "True", "False"),request.getString(id,""));
         } else if (type.equals(TYPE_ENUMERATION)) {
             List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
-            tmpValues.addAll(values);
+            tmpValues.addAll(enumValues);
+            widget = HtmlUtil.select(id, tmpValues, request.getString(id));
+        } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
+            List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
+            tmpValues.addAll(typeHandler.getEnumValues(this,entry));
             widget = HtmlUtil.select(id, tmpValues, request.getString(id));
         } else if (isNumeric()) {
             String expr = HtmlUtil.select(id + "_expr", EXPR_ITEMS, request.getString(id+"_expr",""));
@@ -1513,7 +1589,7 @@ public class Column implements Constants {
      * @param value The new value for Values
      */
     public void setValues(List value) {
-        values = value;
+        enumValues = value;
     }
 
     /**
@@ -1522,7 +1598,7 @@ public class Column implements Constants {
      * @return The Values
      */
     public List getValues() {
-        return values;
+        return enumValues;
     }
 
     /**

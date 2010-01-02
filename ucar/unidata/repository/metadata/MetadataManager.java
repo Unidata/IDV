@@ -101,22 +101,22 @@ public class MetadataManager extends RepositoryManager {
     /** _more_ */
     public RequestUrl URL_METADATA_FORM = new RequestUrl(getRepository(),
                                               "/metadata/form",
-                                              "Edit Metadata");
+                                              "Edit Properties");
 
     /** _more_ */
     public RequestUrl URL_METADATA_LIST = new RequestUrl(getRepository(),
                                               "/metadata/list",
-                                              "Metadata Listing");
+                                              "Property Listing");
 
     /** _more_ */
     public RequestUrl URL_METADATA_VIEW = new RequestUrl(getRepository(),
                                               "/metadata/view",
-                                              "Metadata View");
+                                              "Property View");
 
     /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),
                                                  "/metadata/addform",
-                                                 "Add Metadata");
+                                                 "Add Property");
 
     /** _more_ */
     public RequestUrl URL_METADATA_ADD = new RequestUrl(getRepository(),
@@ -929,7 +929,7 @@ public class MetadataManager extends RepositoryManager {
         }
 
         return getEntryManager().makeEntryEditResult(request, entry,
-                msg("Edit Metadata"), sb);
+                msg("Edit Properties"), sb);
 
     }
 
@@ -964,7 +964,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.formTableClose());
         }
         return getEntryManager().makeEntryEditResult(request, entry,
-                msg("Add Metadata"), sb);
+                msg("Add Property"), sb);
     }
 
     /**

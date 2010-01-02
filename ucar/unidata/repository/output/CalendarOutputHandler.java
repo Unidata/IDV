@@ -354,12 +354,6 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
 
-
-
-
-
-
-
     private Result outputCalendar(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {

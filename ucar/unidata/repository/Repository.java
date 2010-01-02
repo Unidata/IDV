@@ -364,6 +364,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     private List<String> pluginSqlFiles = new ArrayList<String>();
 
+    private List<String> pluginFiles = new ArrayList<String>();
+
 
     /** _more_ */
     private List<User> cmdLineUsers = new ArrayList();
@@ -1659,11 +1661,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 pluginPropertyFiles.add(file);
             }
         } else {
+            pluginFiles.add(file);
             return false;
         }
         return true;
     }
 
+
+    public List<String>getPluginFiles() {
+        return pluginFiles;
+    }
 
     /**
      * _more_
@@ -5311,6 +5318,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String makeDateInput(Request request, String name,
                                 String formName, Date date, String timezone) {
+        return makeDateInput(request, name, formName, date, timezone, true);
+    }
+
+    public String makeDateInput(Request request, String name,
+                                String formName, Date date, String timezone,boolean includeTime) {
         String dateHelp = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
         String           timeHelp   = "hh:mm:ss Z, e.g. 20:15:00 MST";
 
@@ -5331,13 +5343,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
             HtmlUtil.SIZE_10
             +HtmlUtil.id(name)
             + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
-                                        + " T:"
-                                        + HtmlUtil.input(
+            + (!includeTime?"":" T:"
+               + HtmlUtil.input(
                                             name + ".time", timeString,
                                             HtmlUtil.SIZE_15
                                             + HtmlUtil.attr(
                                                 HtmlUtil.ATTR_TITLE,
-                                                    timeHelp));
+                                                timeHelp)));
     }
 
 

@@ -20,7 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.data;
+package ucar.unidata.repository.type;
 
 
 import org.apache.commons.net.ftp.*;
@@ -28,20 +28,12 @@ import org.apache.commons.net.ftp.*;
 import org.python.core.*;
 import org.python.util.*;
 
-
 import org.w3c.dom.*;
 
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dt.grid.GridDataset;
 
-import ucar.unidata.data.DataSource;
-
-import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.type.*;
-import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.metadata.*;
-
 import ucar.unidata.repository.output.*;
 
 import ucar.unidata.util.HtmlUtil;
@@ -73,7 +65,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
     /** _more_ */
     private Pool<String, PythonInterpreter> interpPool =
-        new Pool<String, PythonInterpreter>(100) {
+        new Pool<String, PythonInterpreter>(10) {
         protected PythonInterpreter createValue(String path) {
             try {
                 getStorageManager().initPython();
@@ -104,20 +96,6 @@ public class JythonTypeHandler extends GenericTypeHandler {
     public JythonTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
-        LogUtil.setTestMode(true);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
-
     }
 
 
@@ -152,12 +130,6 @@ public class JythonTypeHandler extends GenericTypeHandler {
     }
 
 
-    public DataOutputHandler getDataOutputHandler() throws Exception {
-        return (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP.toString());
-    }
-
-
 
     /**
      * _more_
@@ -170,21 +142,19 @@ public class JythonTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    private Result getHtmlDisplay(Request request, Entry entry,
+    protected Result getHtmlDisplay(Request request, Entry entry,
                                   PythonInterpreter interp)
             throws Exception {
 
-        String       password = (String) entry.getValues()[0];
+
         String       init     = (String) entry.getValues()[1];
-        String       exec     = (String) entry.getValues()[2];
         StringBuffer sb       = new StringBuffer();
         FormInfo     formInfo = new FormInfo(this, entry, request, sb);
         boolean      makeForm = !request.exists(ARG_SUBMIT);
-        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+
 
         interp.set("formInfo", formInfo);
         interp.set("request", request);
-        interp.set("formUrl", formUrl);
         interp.set("typeHandler", this);
         interp.set("repository", getRepository());
 
@@ -212,7 +182,6 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 
 
-
         if ((init != null) && (init.trim().length() > 0)) {
             try {
                 interp.exec(init);
@@ -222,169 +191,184 @@ public class JythonTypeHandler extends GenericTypeHandler {
             }
         }
 
-        DataOutputHandler dataOutputHandler =
-            getDataOutputHandler();
-        if (makeForm) {
-            StringBuffer formSB = new StringBuffer();
-            formSB.append(formInfo.prefix);
 
-            if (formInfo.cnt > 0) {
-                if (formInfo.resultFileName != null) {
-                    formUrl = formUrl + "/" + formInfo.resultFileName;
-                }
-                formSB.append(HtmlUtil.uploadForm(formUrl, ""));
-                formSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-                formSB.append(HtmlUtil.formTable());
-                if ((password != null) && (password.trim().length() > 0)) {
-                    formSB.append(HtmlUtil.formEntry(msgLabel("Password"),
-                            HtmlUtil.password(ARG_SCRIPT_PASSWORD)));
-                }
-                formSB.append(sb);
-                formSB.append(HtmlUtil.formTableClose());
-                formSB.append(HtmlUtil.submit(msg("Submit"), ARG_SUBMIT));
-                formSB.append(HtmlUtil.formClose());
-            }
-            Result result = new Result((formInfo.title != null)
-                                       ? formInfo.title
-                                       : entry.getName(), formSB);
-            return result;
-        } else {
-            if ((password != null) && (password.trim().length() > 0)) {
-                if ( !Misc.equals(password.trim(),
-                                  request.getString(ARG_SCRIPT_PASSWORD,
-                                      "").trim())) {
-                    return new Result((formInfo.title != null)
-                                      ? formInfo.title
-                                      : entry.getName(), new StringBuffer(
-                                          repository.showDialogError(
-                                              "Bad password")));
-                }
-            }
-            List<String>        ncPaths     = new ArrayList<String>();
-            List<NetcdfDataset> ncData      = new ArrayList<NetcdfDataset>();
 
-            List<String>        gridPaths   = new ArrayList<String>();
-            List<GridDataset>   gridData    = new ArrayList<GridDataset>();
-            List<DataSource>    dataSources = new ArrayList<DataSource>();
-            List<File>          files       = new ArrayList<File>();
-            try {
-                for (InputInfo info : formInfo.inputs) {
-                    if (info.type == InputInfo.TYPE_FILE) {
-                        String file = request.getUploadedFile(info.id);
-                        if ((file != null) && (file.length() > 0)
-                                && new File(file).exists()) {
-                            files.add(new File(file));
-                            interp.set(info.id, file);
-                        } else {
-                            return new Result((formInfo.title != null)
-                                    ? formInfo.title
-                                    : entry.getName(), new StringBuffer(
-                                        repository.showDialogError(
-                                            "No file uploaded")));
-                        }
 
-                    } else if (info.type == InputInfo.TYPE_ENTRY) {
-                        String entryName = request.getString(info.id, "");
 
-                        String entryId = request.getUnsafeString(info.id
-                                             + "_hidden", "");
-                        Entry theEntry = getEntryManager().getEntry(request,
-                                             entryId);
-                        if (theEntry == null) {
-                            return new Result((formInfo.title != null)
-                                    ? formInfo.title
-                                    : entry.getName(), new StringBuffer(
-                                        repository.showDialogError(
-                                            "No entry selected")));
-                        }
 
-                        interp.set(info.id, theEntry);
-                        if (theEntry.isFile()) {
-                            interp.set(info.id + "_file",
-                                       theEntry.getResource().getPath());
-                        } else {
-                            interp.set(info.id + "_file", null);
-                        }
-                        String path = dataOutputHandler.getPath(theEntry);
-                        if (path != null) {
-                            //Try it as grid first
-                            GridDataset gds =
-                                dataOutputHandler.getGridDataset(theEntry,
-                                    path);
-                            NetcdfDataset     ncDataset  = null;
-                            GeoGridDataSource dataSource = null;
-                            interp.set(info.id + "_griddataset", gds);
-                            if (gds == null) {
-                                //Else try it as a ncdataset
-                                ncDataset =
-                                    dataOutputHandler.getNetcdfDataset(
-                                        theEntry, path);
-                            } else {
-                                dataSource = new GeoGridDataSource(gds);
-                                dataSources.add(dataSource);
-                            }
-                            interp.set(info.id + "_datasource", dataSource);
-                            interp.set(info.id + "_ncdataset", ncDataset);
-                            if (ncDataset != null) {
-                                ncPaths.add(path);
-                                ncData.add(ncDataset);
-                            }
-                        }
-                    } else if (info.type == InputInfo.TYPE_NUMBER) {
-                        interp.set(info.id,
-                                   new Double(request.getString(info.id,
-                                       "").trim()));
-                    } else {
-                        interp.set(info.id, request.getString(info.id, ""));
-                    }
-                }
-                try {
-                    interp.exec(exec);
-                } catch (Exception exc) {
-                    return new Result(entry.getName(),
-                                      new StringBuffer("Error:" + exc));
-                }
-            } finally {
-                for (File f : files) {
-                    f.delete();
-                }
-                for (DataSource dataSource : dataSources) {
-                    dataSource.doRemove();
-                }
-                for (int i = 0; i < ncPaths.size(); i++) {
-                    dataOutputHandler.returnNetcdfDataset(ncPaths.get(i),
-                            ncData.get(i));
-                }
-                for (int i = 0; i < gridPaths.size(); i++) {
-                    dataOutputHandler.returnGridDataset(gridPaths.get(i),
-                            gridData.get(i));
-                }
-
-            }
-
-            if (formInfo.errorMessage != null) {
-                formInfo.resultHtml =
-                    getRepository().showDialogError(formInfo.errorMessage);
-            }
-
-            if (formInfo.inputStream != null) {
+        String       password = (String) entry.getValues()[0];
+        if ((password != null) && (password.trim().length() > 0)) {
+            if ( !Misc.equals(password.trim(),
+                              request.getString(ARG_SCRIPT_PASSWORD,
+                                                "").trim())) {
                 return new Result((formInfo.title != null)
                                   ? formInfo.title
-                                  : entry.getName(), formInfo.inputStream,
-                                  formInfo.mimeType);
+                                  : entry.getName(), new StringBuffer(
+                                                                      repository.showDialogError(
+                                                                                                 "Bad password")));
             }
-
-            if (formInfo.resultHtml == null) {
-                formInfo.resultHtml = "No result provided";
-            }
-            Result result = new Result((formInfo.title != null)
-                                       ? formInfo.title
-                                       : entry.getName(), new StringBuffer(
-                                           formInfo.resultHtml), formInfo
-                                               .mimeType);
-            return result;
-
         }
+
+        if (makeForm) {
+            return makeForm(request, entry, interp,     formInfo);
+        } 
+
+
+        return processForm(request, entry, interp, formInfo);
+    }
+
+
+
+    protected Result makeForm(Request request, Entry entry,
+                              PythonInterpreter interp, FormInfo     formInfo)
+        throws Exception {
+
+        String       password = (String) entry.getValues()[0];
+
+
+        StringBuffer formSB = new StringBuffer();
+        formSB.append(formInfo.prefix);
+
+        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+        interp.set("formUrl", formUrl);
+
+
+
+        if (formInfo.cnt > 0) {
+            if (formInfo.resultFileName != null) {
+                formUrl = formUrl + "/" + formInfo.resultFileName;
+            }
+            formSB.append(HtmlUtil.uploadForm(formUrl, ""));
+            formSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+            formSB.append(HtmlUtil.formTable());
+            if ((password != null) && (password.trim().length() > 0)) {
+                formSB.append(HtmlUtil.formEntry(msgLabel("Password"),
+                                                 HtmlUtil.password(ARG_SCRIPT_PASSWORD)));
+            }
+            formSB.append(formInfo.sb);
+            formSB.append(HtmlUtil.formTableClose());
+            formSB.append(HtmlUtil.submit(msg("Submit"), ARG_SUBMIT));
+            formSB.append(HtmlUtil.formClose());
+        }
+        Result result = new Result((formInfo.title != null)
+                                   ? formInfo.title
+                                   : entry.getName(), formSB);
+        return result;
+    }
+
+
+
+    protected Result processForm(Request request, Entry entry,
+                                 PythonInterpreter interp, FormInfo     formInfo)
+        throws Exception {
+
+        ProcessInfo processInfo = doMakeProcessInfo();
+
+        try {
+            for (InputInfo info : formInfo.inputs) {
+                if (info.type == InputInfo.TYPE_FILE) {
+                    String file = request.getUploadedFile(info.id);
+                    if ((file != null) && (file.length() > 0)
+                        && new File(file).exists()) {
+                        processInfo.files.add(new File(file));
+                        interp.set(info.id, file);
+                    } else {
+                        return new Result((formInfo.title != null)
+                                          ? formInfo.title
+                                          : entry.getName(), new StringBuffer(
+                                                                              repository.showDialogError(
+                                                                                                         "No file uploaded")));
+                    }
+                } else if (info.type == InputInfo.TYPE_ENTRY) {
+                    String entryName = request.getString(info.id, "");
+
+                    String entryId = request.getUnsafeString(info.id
+                                                             + "_hidden", "");
+                    Entry theEntry = getEntryManager().getEntry(request,
+                                                                entryId);
+                    if (theEntry == null) {
+                        return new Result((formInfo.title != null)
+                                          ? formInfo.title
+                                          : entry.getName(), new StringBuffer(
+                                                                              repository.showDialogError(
+                                                                                                         "No entry selected")));
+                    }
+
+                    interp.set(info.id, theEntry);
+                    if (theEntry.isFile()) {
+                        interp.set(info.id + "_file",
+                                   theEntry.getResource().getPath());
+                        processInfo.variables.add(info.id+"_file");
+                    } else {
+                        interp.set(info.id + "_file", null);
+                    }
+                    processEntry(request, interp,  info, processInfo, theEntry);
+                } else if (info.type == InputInfo.TYPE_NUMBER) {
+                    interp.set(info.id,
+                               new Double(request.getString(info.id,
+                                                            "").trim()));
+                } else {
+                    interp.set(info.id, request.getString(info.id, ""));
+                }
+                processInfo.variables.add(info.id);
+            }
+            try {
+                String       exec     = (String) entry.getValues()[2];
+                interp.exec(exec);
+            } catch (Exception exc) {
+                return new Result(entry.getName(),
+                                  new StringBuffer("Error:" + exc));
+            }
+        } finally {
+            cleanup(request, entry, interp, processInfo);
+        }
+
+        if (formInfo.errorMessage != null) {
+            formInfo.resultHtml =
+                getRepository().showDialogError(formInfo.errorMessage);
+        }
+
+        if (formInfo.inputStream != null) {
+            return new Result((formInfo.title != null)
+                              ? formInfo.title
+                              : entry.getName(), formInfo.inputStream,
+                              formInfo.mimeType);
+        }
+
+        if (formInfo.resultHtml == null) {
+            formInfo.resultHtml = "No result provided";
+        }
+        Result result = new Result((formInfo.title != null)
+                                   ? formInfo.title
+                                   : entry.getName(), new StringBuffer(
+                                                                       formInfo.resultHtml), formInfo
+                                   .mimeType);
+        return result;
+    }
+
+
+    protected void processEntry(Request request, PythonInterpreter interp, InputInfo info, ProcessInfo processInfo, Entry theEntry) throws Exception {
+    }
+
+    protected void cleanup(Request request, Entry entry, PythonInterpreter interp, ProcessInfo processInfo) throws Exception {
+        for (File f : processInfo.files) {
+            f.delete();
+        }
+        for(String var: processInfo.variables) {
+            interp.set(var,null);
+        }
+    }
+
+
+    public ProcessInfo doMakeProcessInfo() {
+        return new ProcessInfo();
+    }
+
+
+    public static class ProcessInfo {
+        public ProcessInfo() {}
+        public List<File>          files       = new ArrayList<File>();
+        public List<String>        variables      = new ArrayList<String>();
 
     }
 
@@ -415,7 +399,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
         int type;
 
         /** _more_ */
-        String id;
+        public String id;
 
 
         /**

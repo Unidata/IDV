@@ -1032,13 +1032,13 @@ public class DataOutputHandler extends OutputHandler {
                 getEntryManager().addInitialMetadata(request, entries, false,
                         request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
-                sb.append(getRepository().showDialogNote("Metadata added"));
+                sb.append(getRepository().showDialogNote("Properties added"));
                 sb.append(
                     getRepository().getHtmlOutputHandler().getInformationTabs(
                         request, entry, false));
 
             } else {
-                sb.append("You cannot add metadata");
+                sb.append("You cannot add properties");
             }
             return makeLinksResult(request, "CDL", sb, new State(entry));
         }
@@ -1053,12 +1053,12 @@ public class DataOutputHandler extends OutputHandler {
                 HtmlUtil.href(
                     request.getUrl() + "&"
                     + HtmlUtil.arg(ARG_SHORT, HtmlUtil.VALUE_TRUE), msg(
-                        "Add time/spatial metadata")));
+                        "Add time/spatial properties")));
             sb.append(HtmlUtil.span("&nbsp;|&nbsp;",
                                     HtmlUtil.cssClass("separator")));
 
             sb.append(HtmlUtil.href(request.getUrl(),
-                                    msg("Add full metadata")));
+                                    msg("Add full properties")));
         }
         String        path    = getPath(entry);
         NetcdfDataset dataset = ncDatasetPool.get(path);
@@ -1266,7 +1266,6 @@ public class DataOutputHandler extends OutputHandler {
                                 getRepository().getGUID(), "", "subset from",
                                 entry.getId(), newEntry.getId()));
                         if (request.get(ARG_METADATA_ADD, false)) {
-                            //                            System.err.println("adding metadata");
                             newEntry.clearArea();
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
@@ -1305,7 +1304,7 @@ public class DataOutputHandler extends OutputHandler {
                                   "Add to Repository") + HtmlUtil.checkbox(
                                   ARG_METADATA_ADD, HtmlUtil.VALUE_TRUE,
                                   request.get(ARG_METADATA_ADD, false)) + msg(
-                                      "Add metadata");
+                                      "Add properties");
 
         }
 

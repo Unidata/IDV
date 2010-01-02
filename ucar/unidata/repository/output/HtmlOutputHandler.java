@@ -376,7 +376,7 @@ public class HtmlOutputHandler extends OutputHandler {
             }
             String cat = type.getDisplayCategory();
             if ( !decorate) {
-                cat = "Metadata";
+                cat = "Properties";
             }
             Object[] blob     = (Object[]) catMap.get(cat);
             boolean  firstOne = false;
@@ -411,7 +411,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                 getRepository().getMetadataManager()
                                     .URL_METADATA_ADDFORM, entry), iconUrl(
                                         ICON_METADATA_ADD), msg(
-                                        "Add Metadata")));
+                                        "Add Property")));
                     if (decorate) {
                         sb.append("</td></tr>");
                     }

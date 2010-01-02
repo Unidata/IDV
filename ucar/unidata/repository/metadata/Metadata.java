@@ -492,7 +492,7 @@ public class Metadata implements Constants {
     public static class Type {
 
         /** _more_ */
-        public static final String DEFAULT_CATEGORY = "Metadata";
+        public static final String DEFAULT_CATEGORY = "Properties";
 
         /** _more_ */
         public static final int SEARCHABLE_ATTR1 = 1 << 0;

@@ -118,10 +118,10 @@ public class MetadataType extends MetadataTypeBase {
 
 
     /** _more_ */
-    private String displayCategory = "Metadata";
+    private String displayCategory = "Properties";
 
     /** _more_ */
-    private String category = "Metadata";
+    private String category = "Properties";
 
 
     /** _more_ */
@@ -235,7 +235,7 @@ public class MetadataType extends MetadataTypeBase {
                 false));
 
         setDisplayCategory(XmlUtil.getAttributeFromTree(node,
-                ATTR_DISPLAYCATEGORY, "Metadata"));
+                ATTR_DISPLAYCATEGORY, "Properties"));
 
         setCategory(XmlUtil.getAttributeFromTree(node, ATTR_CATEGORY,
                 handler.getHandlerGroupName()));

@@ -286,7 +286,7 @@ public class GenericTypeHandler extends TypeHandler {
         }
         Object[] values = makeValues();
         for (Column column : columns) {
-            column.setValue(request, values);
+            column.setValue(request, entry, values);
         }
         entry.setValues(values);
     }
@@ -766,17 +766,18 @@ public class GenericTypeHandler extends TypeHandler {
     public void addColumnsToEntryForm(Request request,
                                       StringBuffer formBuffer, Entry entry)
             throws Exception {
-        addColumnsToEntryForm(request, formBuffer, (entry==null?null:entry.getValues()));
+        addColumnsToEntryForm(request, formBuffer, entry, (entry==null?null:entry.getValues()));
     }
 
 
 
+
     public void addColumnsToEntryForm(Request request,
-                                      StringBuffer formBuffer, Object[] values)
+                                      StringBuffer formBuffer, Entry entry, Object[] values)
             throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {
-            column.addToEntryForm(request, formBuffer, values, state);
+            column.addToEntryForm(request, entry, formBuffer, values, state);
         }
     }
 

@@ -230,7 +230,7 @@ public class SearchManager extends RepositoryManager {
             metadataSB.append(HtmlUtil.formTable());
             getMetadataManager().addToSearchForm(request, metadataSB);
             metadataSB.append(HtmlUtil.formTableClose());
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Metadata"),
+            sb.append(HtmlUtil.makeShowHideBlock(msg("Properties"),
                     metadataSB.toString(), false));
 
 
