@@ -147,6 +147,8 @@ public class Column implements Constants {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    public static final String ATTR_CHANGETYPE = "changetype";
+
     public static final String ATTR_ADDTOFORM = "addtoform";
 
     /** _more_ */
@@ -208,6 +210,7 @@ public class Column implements Constants {
     /** _more_ */
     private TypeHandler typeHandler;
 
+
     /** _more_ */
     private String name;
 
@@ -226,6 +229,8 @@ public class Column implements Constants {
 
     /** _more_ */
     private String type;
+
+    private boolean changeType = false;
 
     /** _more_ */
     private String suffix;
@@ -299,6 +304,7 @@ public class Column implements Constants {
 
         description = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
         type        = XmlUtil.getAttribute(element, ATTR_TYPE);
+        changeType  = XmlUtil.getAttribute(element, ATTR_CHANGETYPE, false);
         dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "").trim();
         isIndex     = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
         canSearch   = XmlUtil.getAttribute(element, ATTR_CANSEARCH, false);
@@ -683,6 +689,17 @@ public class Column implements Constants {
         String sql = "alter table " + getTableName() + " add column " + name
                      + " " + type;
         SqlUtil.loadSql(sql, statement, true);
+
+
+        if(changeType) {
+            if(typeHandler.getDatabaseManager().isDatabaseDerby()) {
+                sql = "alter table " + getTableName() +"  alter column " + name +"  set data type " + type+";";
+            } else {
+                sql = "alter table " + getTableName() +" modify column " + name +" " + type+";";
+            }
+            System.err.println ("altering table: " + sql);
+            SqlUtil.loadSql(sql, statement, true);
+        }
     }
 
 

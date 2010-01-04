@@ -1601,7 +1601,7 @@ return new Result(title, sb);
             inner.append(HtmlUtil.p());
             inner.append(
                 msg(
-                "Note: This will also delete all of the descendents of the folder"));
+                "Note: This will also delete everything contained by this folder"));
         } else {
             inner.append(
                 msg("Are you sure you want to delete the following entry?"));

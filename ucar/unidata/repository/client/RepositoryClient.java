@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.client;
 
 
@@ -68,6 +69,9 @@ import java.util.zip.*;
  */
 public class RepositoryClient extends RepositoryBase {
 
+    /** _more_          */
+    private static final String ID_PREVIOUS = "previous";
+
 
     /** _more_ */
     private String sessionId;
@@ -96,6 +100,10 @@ public class RepositoryClient extends RepositoryBase {
 
     /** _more_ */
     private String description;
+
+
+    /** _more_          */
+    private String lastId = "";
 
     /**
      * _more_
@@ -583,6 +591,113 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(message);
     }
 
+
+    /** _more_          */
+    public int idCnt = 0;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String createId() {
+        return "dummyid_" + Math.random() + "_" + idCnt++;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param parentNode _more_
+     * @param parentId _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Element makeGroupNode(Element parentNode, String parentId,
+                                 String name)
+            throws Exception {
+        return makeGroupNode(parentNode, parentId, name, createId());
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param parentNode _more_
+     * @param parentId _more_
+     * @param name _more_
+     * @param dummyId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Element makeGroupNode(Element parentNode, String parentId,
+                                 String name, String dummyId)
+            throws Exception {
+        if (parentId.equals(ID_PREVIOUS) || (parentId.trim().length() == 0)) {
+            parentId = lastId;
+        }
+        lastId = dummyId;
+        return XmlUtil.create(parentNode.getOwnerDocument(), TAG_ENTRY,
+                              parentNode, new String[] {
+            ATTR_ID, dummyId, ATTR_TYPE, TYPE_GROUP, ATTR_PARENT, parentId,
+            ATTR_NAME, name
+        });
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param root _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Element makeEntryNode(Element root, String name) throws Exception {
+        return makeEntryNode(root, name, null);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param root _more_
+     * @param name _more_
+     * @param parentId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Element makeEntryNode(Element root, String name, String parentId)
+            throws Exception {
+        String dummyId = createId();
+        if ((parentId != null) && parentId.equals(ID_PREVIOUS)) {
+            parentId = lastId;
+        }
+        lastId = dummyId;
+
+        if (parentId != null) {
+            return XmlUtil.create(root.getOwnerDocument(), TAG_ENTRY, root,
+                                  new String[] {
+                ATTR_ID, dummyId, ATTR_PARENT, parentId, ATTR_NAME, name
+            });
+        }
+
+        return XmlUtil.create(root.getOwnerDocument(), TAG_ENTRY, root,
+                              new String[] { ATTR_ID,
+                                             dummyId, ATTR_NAME, name });
+    }
+
+
     /**
      * _more_
      *
@@ -593,25 +708,21 @@ public class RepositoryClient extends RepositoryBase {
      * @return _more_
      */
     public boolean newGroup(String parentId, String name) {
-        return newGroup(parentId, name, "12345678");
+        return newGroup(parentId, name, createId());
     }
 
-    public Element makeGroupNode(Element parentNode, String parentId, String name, String dummyid) throws Exception  {
-        return  XmlUtil.create(parentNode.getOwnerDocument(), TAG_ENTRY, parentNode,
-                               new String[] {
-                                   ATTR_ID, dummyid, ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
-                                   parentId, ATTR_NAME, name
-                               });
-    }
 
-    public Element  makeEntryNode(Element root, String name) throws Exception  {
-        Element entryNode = XmlUtil.create(root.getOwnerDocument(), TAG_ENTRY, root,
-                                           new String[] {});
 
-        entryNode.setAttribute(ATTR_NAME, name);
-        return entryNode;
-    }
 
+    /**
+     * _more_
+     *
+     * @param parentId _more_
+     * @param name _more_
+     * @param dummyid _more_
+     *
+     * @return _more_
+     */
     public boolean newGroup(String parentId, String name, String dummyid) {
         try {
             if (name == null) {
@@ -645,6 +756,9 @@ public class RepositoryClient extends RepositoryBase {
         }
         return false;
     }
+
+
+
 
 
 
@@ -1033,34 +1147,29 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\nFor fetching: \n" +
-            "\t-print <entry id> Create and print the given entry\n" +
-            "\t-printxml <entry id> Print out the xml for the given entry id\n" +
-            "\t-fetch <entry id> <destination file or directory>\n" +
-            "For creating a new folder:\n" +
-            "\t-folder  <folder name> <parent folder id (see below)>\n" +
-            "For uploading files:\n" +
-            "\t-file <entry name> <file to upload> <parent folder id (see below)>\n" +
-            "The following arguments get applied to the previously created folder or file:\n" +
-            "\t-description <entry description>\n" +
-            "\t-attach <file to attach>\n" +
-            "\t-addmetadata (Add full metadata to entry)\n" +
-            "\t-addshortmetadata (Add spatial/temporal metadata to entry)\n" +
+            "Where arguments are:\nFor fetching: \n"
+            + "\t-print <entry id> Create and print the given entry\n"
+            + "\t-printxml <entry id> Print out the xml for the given entry id\n"
+            + "\t-fetch <entry id> <destination file or directory>\n" + "\n"
+            + "For creating a new folder:\n"
+            + "\t-folder  <folder name> <parent folder id (see below)>\n"
+            + "\n" + "For uploading files:\n"
+            + "\t-file <entry name> <file to upload> <parent folder id (see below)>\n"
+            + "\n"
+            + "The following arguments get applied to the previously created folder or file:\n"
+            + "\t-description <entry description>\n"
+            + "\t-attach <file to attach>\n"
+            + "\t-addmetadata (Add full metadata to entry)\n"
+            + "\t-addshortmetadata (Add spatial/temporal metadata to entry)\n"
+            + "\n" + "Miscellaneous:\n"
+            + "\t-debug (print out the generated xml)\n"
+            + "\t-exit (exit without adding anything to the repository\n");
 
-            "Miscellaneous:\n" +
-            "\t-debug (print out the generated xml)\n" +
-            "\t-exit (exit without adding anything to the repository\n");
 
-
-        System.err.println ("Note: the  <parent folder id> can be an identifier from a existing folder in the repository or it can be \"previous\" which will use the id of the previously specified folder\n" +
-                            "For example you could do:\n" +
-                            " ...  -folder \"Some new folder\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -folder \"some other folder\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" +
-                            "This results in the heirarchy:\n" +
-                            "Some new folder\n" +
-                            "\tsomefile1.nc\n"+
-                            "\tsomefile2.nc\n" +
-                            "\tsome other folder\n" +
-                            "\t\tsomeotherfile.nc\n");
+        System.err.println(
+            "Note: the  <parent folder id> can be an identifier from a existing folder in the repository or it can be \"previous\" which will use the id of the previously specified folder\n"
+            + "For example you could do:\n"
+            + " ...  -folder \"Some new folder\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -folder \"some other folder\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" + "This results in the heirarchy:\n" + "Some new folder\n" + "\tsomefile1.nc\n" + "\tsomefile2.nc\n" + "\tsome other folder\n" + "\t\tsomeotherfile.nc\n");
 
         System.exit(1);
     }
@@ -1075,17 +1184,14 @@ public class RepositoryClient extends RepositoryBase {
      */
     private void processCommandLine(String[] args) throws Exception {
 
-        String     xmlFile    = null;
-        List<File> files      = new ArrayList<File>();
-        Element    root       = null;
+        String     xmlFile   = null;
+        List<File> files     = new ArrayList<File>();
+        Element    root      = null;
         Element    entryNode = null;
-        Element    groupNode = null;
-        Document   doc        = null;
-        boolean    haveParent = false;
+        Document   doc       = null;
 
-        doc = XmlUtil.makeDocument();
-        root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                              new String[] {});
+        doc  = XmlUtil.makeDocument();
+        root = XmlUtil.create(doc, TAG_ENTRIES, null, new String[] {});
 
 
         int entryCnt = 0;
@@ -1120,45 +1226,35 @@ public class RepositoryClient extends RepositoryBase {
             }
             if (arg.equals("-debug")) {
                 System.out.println(XmlUtil.toString(root));
-            } else  if (arg.equals("-exit")) {
+            } else if (arg.equals("-exit")) {
                 return;
-            } else if (arg.equals("-name") || arg.equals("-entry")) {
-                if (i == args.length) {
-                    usage("Bad -entry argument");
-                }
-                entryCnt++;
-                entryNode = makeEntryNode(root, args[++i]);
             } else if (arg.equals("-folder")) {
                 if (i == args.length) {
                     usage("Bad -folder argument");
                 }
-                entryNode = null;
                 entryCnt++;
-                groupNode = makeGroupNode(root, args[++i],
-                                          args[++i],
-                                          args[++i]);
-            } else if (arg.equals("-description")) {
-                if (i == args.length) {
-                    usage("Bad -description argument");
+                String name     = args[++i];
+                String parentId = args[++i];
+
+                entryNode = makeGroupNode(root, parentId, name);
+            } else if (arg.equals("-file")) {
+                if (i >= args.length - 2) {
+                    usage("Bad -file argument");
                 }
-                if (entryNode == null) {
-                    usage("Must specify -entry first");
+                String name = args[++i];
+                File   f    = new File(args[++i]);
+                if ( !f.exists()) {
+                    usage("File does not exist:" + f);
                 }
-                i++;
-                Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION,
-                                       entryNode);
-                descNode.appendChild(XmlUtil.makeCDataNode(doc, args[i],
-                        false));
-            } else if (arg.equals("-parent")) {
-                if (i == args.length) {
-                    usage("Bad -parent argument");
+                if (name.length() == 0) {
+                    name = IOUtil.getFileTail(f.toString());
                 }
-                if (entryNode == null) {
-                    usage("Must specify -name first");
-                }
-                i++;
-                entryNode.setAttribute(ATTR_PARENT, args[i]);
-                haveParent = true;
+                String parentId = args[++i];
+                entryCnt++;
+                entryNode = makeEntryNode(root, name, parentId);
+                entryNode.setAttribute(ATTR_FILE,
+                                       IOUtil.getFileTail(f.toString()));
+                files.add(f);
             } else if (arg.equals("-localfile")) {
                 if (i == args.length) {
                     usage("Bad -localfile argument");
@@ -1167,7 +1263,7 @@ public class RepositoryClient extends RepositoryBase {
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
                 entryCnt++;
-                entryNode = makeEntryNode(root,    IOUtil.getFileTail(args[i]));
+                entryNode = makeEntryNode(root, IOUtil.getFileTail(args[i]));
                 entryNode.setAttribute(ATTR_LOCALFILE, f.getPath());
             } else if (arg.equals("-localfiletomove")) {
                 if (i == args.length) {
@@ -1177,37 +1273,28 @@ public class RepositoryClient extends RepositoryBase {
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
                 entryCnt++;
-                entryNode =  makeEntryNode(root, IOUtil.getFileTail(args[i]));
+                entryNode = makeEntryNode(root, IOUtil.getFileTail(args[i]));
                 entryNode.setAttribute(ATTR_LOCALFILETOMOVE, f.getPath());
-            } else if (arg.equals("-file")) {
+
+            } else if (arg.equals("-description")) {
+                checkEntryNode(entryNode, "-description");
                 if (i == args.length) {
-                    usage("Bad -file argument");
+                    usage("Bad -description argument");
                 }
                 i++;
-                File f = new File(args[i]);
-                if ( !f.exists()) {
-                    usage("File does not exist:" + args[i]);
-                }
-                entryCnt++;
-                entryNode = makeEntryNode(root,
-                                          IOUtil.getFileTail(args[i]));
-                entryNode.setAttribute(ATTR_FILE,
-                                       IOUtil.getFileTail(args[i]));
-                files.add(f);
+                Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION,
+                                       entryNode);
+                descNode.appendChild(XmlUtil.makeCDataNode(doc, args[i],
+                        false));
+
             } else if (arg.equals("-addmetadata")) {
-                if (entryNode == null) {
-                    usage("When using -addmetadata you need to create an entry first");
-                }
+                checkEntryNode(entryNode, "-addmetadata");
                 entryNode.setAttribute(ATTR_ADDMETADATA, "true");
             } else if (arg.equals("-addshortmetadata")) {
-                if (entryNode == null) {
-                    usage("When using -addshortmetadata you need to create an entry first");
-                }
+                checkEntryNode(entryNode, "-addshortmetadata");
                 entryNode.setAttribute(ATTR_ADDSHORTMETADATA, "true");
             } else if (arg.equals("-attach")) {
-                if (entryNode == null) {
-                    usage("When using -attach you need to create an entry first");
-                }
+                checkEntryNode(entryNode, "-attach");
                 if (i == args.length) {
                     usage("Bad -file argument");
                 }
@@ -1219,8 +1306,6 @@ public class RepositoryClient extends RepositoryBase {
                 if (entryNode == null) {
                     usage("Need to specify a -file first");
                 }
-                entryNode.setAttribute(ATTR_NAME,
-                                       IOUtil.getFileTail(args[i]));
                 addAttachment(entryNode, IOUtil.getFileTail(f.toString()));
                 files.add(f);
             } else {
@@ -1232,7 +1317,7 @@ public class RepositoryClient extends RepositoryBase {
         }
 
 
-        if (entryCnt==0) {
+        if (entryCnt == 0) {
             usage("");
         }
 
@@ -1241,11 +1326,8 @@ public class RepositoryClient extends RepositoryBase {
 
         //Write the xml if we have it
         if (root != null) {
-            if ( !haveParent) {
-                usage("Must specify a parent folder destination with -parent");
-            }
             String xml = XmlUtil.toString(root);
-            System.out.println (xml);
+            System.out.println(xml);
             zos.putNextEntry(new ZipEntry("entries.xml"));
             byte[] bytes = xml.getBytes();
             zos.write(bytes, 0, bytes.length);
@@ -1285,6 +1367,11 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+    private void checkEntryNode(Element entryNode, String arg) {
+        if (entryNode == null) {
+            usage("You need to create an entry first (either with -folder or -file) when using the argument:" + arg);
+        }
+    }
 
 
     /**

@@ -219,7 +219,6 @@
 
 	    </jar>
 
-
         <zip destfile="${libsdir}/repositoryclient.zip">
          <zipfileset dir="${libsdir}" includes="repositoryclient.jar" fullpath="repositoryclient/repositoryclient.jar"/>
          <zipfileset dir="${libsrc}" includes="commons-httpclient-3.1.jar" fullpath="repositoryclient/commons-httpclient-3.1.jar"/>

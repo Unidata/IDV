@@ -1271,6 +1271,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         closeAndReleaseConnection(pstatement);
     }
 
+    public boolean isDatabaseDerby() {
+        return  (db.equals(DB_DERBY));
+    }
+
     /**
      * _more_
      *
