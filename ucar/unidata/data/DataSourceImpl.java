@@ -2976,6 +2976,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if ((times != null) && (times.size() > 0)) {
             dsw = new DataSelectionWidget(getIdv());
             dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
+            dsw.setUseAllTimes(getDateTimeSelection() == null);
             JComponent extraTimesComp = getExtraTimesComponent();
             JComponent timesComp      = dsw.getTimesList("Use All");
 
