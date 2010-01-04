@@ -72,6 +72,8 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     /** _more_          */
     private List pointCats = Misc.newList(DataCategory.POINT_PLOT_CATEGORY);
 
+    /** _more_          */
+    private List selectTimes;
     /**
      * Create a SondeDataSource from the specification given.
      *
@@ -193,17 +195,34 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         List         adapters = getAdapters();
         FunctionType fiType   = null;
         DateTime[]   times    = new DateTime[tracks.size()];
-        for (int i = 0; i < tracks.size(); i++) {
-            TrackAdapter adapter = (TrackAdapter) adapters.get(i);
-            DateTime     time    = adapter.getEndTime();
-            if (fiType == null) {
-                FieldImpl data = (FieldImpl) tracks.get(i);
-                fiType = new FunctionType(RealType.Time, data.getType());
+        if(selectTimes == null ) {
+            for (int i = 0; i < tracks.size(); i++) {
+                TrackAdapter adapter = (TrackAdapter) adapters.get(i);
+                DateTime     time    = adapter.getEndTime();
+                if (fiType == null) {
+                    FieldImpl data = (FieldImpl) tracks.get(i);
+                    fiType = new FunctionType(RealType.Time, data.getType());
 
+                }
+                times[i] = time;  //adapter.getStartTime();
             }
-            times[i] = time;  //adapter.getStartTime();
         }
+        else {
+            int len = selectTimes.size();
+            times    = new DateTime[len];
+            for (int i = 0; i < len; i++) {
+                Integer ii = (Integer)selectTimes.get(i);
+                int j = ii.intValue();
+                TrackAdapter adapter = (TrackAdapter) adapters.get(j);
+                DateTime     time    = adapter.getEndTime();
+                if (fiType == null) {
+                    FieldImpl data = (FieldImpl) tracks.get(j);
+                    fiType = new FunctionType(RealType.Time, data.getType());
 
+                }
+                times[i] = time;  //adapter.getStartTime();
+            }
+        }
         FieldImpl fi = new FieldImpl(fiType, DateTime.makeTimeSet(times));
         for (int i = 0; i < tracks.size(); i++) {
             FieldImpl data = (FieldImpl) tracks.get(i);
@@ -397,6 +416,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
             Hashtable requestProperties) throws VisADException,
                 RemoteException {
         Object id = getChoiceId(dataChoice);
+        selectTimes = dataSelection.getTimes();
         if (id.equals(ID_SONDESTARTLOCATIONS)
                 || id.equals(ID_SONDEENDLOCATIONS)) {
             List   adapters = getAdapters();
