@@ -3028,6 +3028,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         try {
             String chooserClassName =
                 (String) getProperty(IdvChooser.PROP_CHOOSERCLASSNAME);
+            //For now don't do this
+            chooserClassName = null;
             if (chooserClassName != null) {
                 IdvChooser chooser  = null;
                 Class      theClass = Misc.findClass(chooserClassName);
