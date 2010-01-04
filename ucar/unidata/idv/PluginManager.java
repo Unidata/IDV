@@ -1598,7 +1598,7 @@ public class PluginManager extends IdvManager {
      */
     public void removePlugin(File file) {
         myPlugins.remove(file.toString());
-        System.err.println ("remove:" + file);
+        //System.err.println ("remove:" + file);
         try {
             String deleteThisFile = file + ".deletethis";
             IOUtil.writeFile(deleteThisFile, "");
