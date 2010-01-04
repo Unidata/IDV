@@ -41,6 +41,7 @@ import java.rmi.RemoteException;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ArrayList;
 
 
 /**
@@ -132,6 +133,45 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         return minMax[0];
     }
 
+    /**
+     * Get the  times in the  tracks
+     *
+     * @return times of the tracks
+     */
+    protected DateTime[] getTimeList() {
+        List adapters = getAdapters();
+        if (adapters == null) {
+            try {
+                return new DateTime[] { new DateTime(), new DateTime() };
+            } catch (Exception exc) {
+                logException("Create null datetimes", exc);
+                return null;
+            }
+        }
+        DateTime[] timeList = new DateTime[adapters.size()];
+
+        for (int i = 0; i < adapters.size(); i++) {
+            TrackAdapter adapter = (TrackAdapter) getAdapters().get(i);
+            DateTime     theTime = adapter.getEndTime();
+            timeList[i] = theTime;
+        }
+        return timeList;
+    }
+
+    /**
+     * Make the list of times associated with this DataSource for
+     * DataSelection.
+     *
+     * @return DateTimes as a list.
+     */
+    protected List doMakeDateTimes() {
+        DateTime[] timeList = getTimeList();
+
+        if (timeList == null) {
+            return new ArrayList();
+        }
+        return Misc.newList(timeList);
+    }
 
     /**
      * Aggregate the tracks
