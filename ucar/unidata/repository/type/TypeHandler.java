@@ -1725,7 +1725,7 @@ public class TypeHandler extends RepositoryManager {
         extra = HtmlUtil.makeToggleInline("<b>...</b>", extra, false);
         sb.append(HtmlUtil.formEntry(msgLabel("Text"),
                                      HtmlUtil.input(ARG_TEXT, name,
-                                         HtmlUtil.SIZE_50) + " " + extra));
+                                         HtmlUtil.SIZE_50 + " autofocus " ) + " " + extra));
     }
 
 
@@ -2713,7 +2713,7 @@ public class TypeHandler extends RepositoryManager {
         set.add(theValue);
     }
 
-    protected List getEnumValues(Column column,Entry entry) throws Exception {
+    public List getEnumValues(Column column,Entry entry) throws Exception {
         HashSet set = getEnumValuesInner(column, entry);
         List tmp = new ArrayList();
         tmp.addAll(set);

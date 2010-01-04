@@ -37,6 +37,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -353,6 +354,10 @@ public class Column implements Constants {
      */
     public boolean isNumeric() {
         return type.equals(TYPE_INT) || isDouble();
+    }
+
+    public boolean isEnumeration() {
+        return type.equals(TYPE_ENUMERATION) || type.equals(TYPE_ENUMERATIONPLUS);
     }
 
     public boolean isDate() {
