@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -94,13 +95,13 @@ public class CrossSectionSelector extends SelectorDisplayable {
     /** mid point location */
     private RealTuple midPoint;
 
-    /** _more_          */
+    /** The tuple type */
     private RealTupleType tupleType;
 
     /** RealTuple for zero */
     private RealTuple ZERO2D;
 
-    /** _more_          */
+    /** base tuple */
     private RealTuple ZERO3D;
 
     /** flag for whether the selector is moving */
@@ -115,7 +116,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
     /** mid point id */
     public static final int POINT_MID = 2;
 
-    /** _more_          */
+    /** Should we interpolate the line */
     private boolean interpolateLinePoints = false;
 
     /**
@@ -124,7 +125,6 @@ public class CrossSectionSelector extends SelectorDisplayable {
      *
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
-     * @throws IllegalArgumentException  wrong type for start and end
      *
      */
     public CrossSectionSelector() throws VisADException, RemoteException {
@@ -144,7 +144,6 @@ public class CrossSectionSelector extends SelectorDisplayable {
      *
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
-     * @throws IllegalArgumentException  wrong type for start and end
      */
     public CrossSectionSelector(RealTuple startPoint, RealTuple endPoint)
             throws VisADException, RemoteException {
@@ -161,7 +160,6 @@ public class CrossSectionSelector extends SelectorDisplayable {
      *
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
-     * @throws IllegalArgumentException  wrong type for start and end
      */
     public CrossSectionSelector(RealTuple startPoint, RealTuple endPoint,
                                 Color color)
@@ -174,6 +172,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
         startSp         = makeSelectorPoint(POINT_START, "Start", startPoint);
         endSp           = makeSelectorPoint(POINT_END, "End", endPoint);
+
         midSp           = makeSelectorPoint(POINT_MID, "Middle", midPoint);
 
         line            = makeLine();
@@ -190,9 +189,9 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
 
     /**
-     * _more_
+     * get the selector point
      *
-     * @return _more_
+     * @return the selector point
      */
     public SelectorPoint getStartSelectorPoint() {
         return startSp;
@@ -200,14 +199,22 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
 
     /**
-     * _more_
+     * get the selector point
      *
-     * @return _more_
+     * @return the selector point
      */
     public SelectorPoint getEndSelectorPoint() {
         return endSp;
     }
 
+    /**
+     * get the selector point
+     *
+     * @return the selector point
+     */
+    public SelectorPoint getMiddleSelectorPoint() {
+        return midSp;
+    }
 
 
     /**
@@ -828,12 +835,12 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
 
     /**
-     * _more_
+     * SHould we interpolate the line points
      *
-     * @param value _more_
+     * @param value interpolate
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public void setInterpolateLinePoints(boolean value)
             throws VisADException, RemoteException {
