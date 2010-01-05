@@ -102,6 +102,8 @@ public class ValuePlanViewControl extends PlanViewControl {
     /** decluttering filter factor */
     private float declutterFilter = 1.0f;
 
+    /** The widget to show the layout model in the gui */
+    protected LayoutModelWidget layoutModelWidget;
 
     /**
      * Default constructor.  Sets the attribute flags used by
@@ -169,6 +171,15 @@ public class ValuePlanViewControl extends PlanViewControl {
             setLayoutModel(changedModel);
         }
 
+    }
+
+    /**
+     * Set the layout model
+     *
+     * @param lm layout model
+     */
+    public void setLayoutModelFromWidget(StationModel lm) {
+        setLayoutModel(lm);
     }
 
 
@@ -310,6 +321,9 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     public void setLayoutModel(StationModel model) {
         layoutModel = model;
+        if (layoutModelWidget != null) {
+            layoutModelWidget.setLayoutModel(model);
+        }
         if (getHaveInitialized() && (pointDisplay != null)) {
             try {
                 pointDisplay.setStationModel(layoutModel);
@@ -451,6 +465,36 @@ public class ValuePlanViewControl extends PlanViewControl {
      * @return the widget
      */
     protected JPanel makeLayoutModelWidget() {
+        final JTextField scaleField =
+            new JTextField(Misc.format(layoutScale), 5);
+        ActionListener scaleListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    //System.err.println("display scale = "
+                    //                   + getDisplayScale());
+                    setLayoutScale(
+                        (float) Misc.parseNumber(scaleField.getText()));
+                } catch (Exception nfe) {
+                    userErrorMessage("Bad scale format");
+                }
+            }
+        };
+        scaleField.addActionListener(scaleListener);
+        JButton scaleBtn = new JButton("Apply");
+        scaleBtn.addActionListener(scaleListener);
+
+        JPanel stationModelPanel =
+            GuiUtils.hbox(
+                GuiUtils.left(
+                    layoutModelWidget =
+                        new LayoutModelWidget(
+                            this, this, "setLayoutModelFromWidget",
+                            getLayoutModel())), GuiUtils.rLabel(
+                                "   Scale:"), GuiUtils.hflow(
+                                Misc.newList(scaleField, scaleBtn), 4, 0));
+
+/*
+
         final JButton editButton =
             GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
                                     getClass());
@@ -508,10 +552,11 @@ public class ValuePlanViewControl extends PlanViewControl {
 
         JPanel layoutPane = GuiUtils.hbox(layoutModelPanel, vswLabel,
                                           vsw.getContents(false));
-
-
-
         return layoutPane;
+*/
+
+
+        return stationModelPanel;
 
     }
 
