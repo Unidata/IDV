@@ -261,10 +261,20 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                            * (((Double) values[COL_AGE]).doubleValue() * 60));
         long now   = System.currentTimeMillis();
         int  start = skip;
-
-        int  cnt   = 0;
+        List<File> fileList =  new ArrayList<File>();
+        List<File> dirList =  new ArrayList<File>();
         for (int i = start; i < files.length; i++) {
             File childFile = files[i];
+            if(childFile.isDirectory()) {
+                dirList.add(childFile);
+            } else {
+                fileList.add(childFile);
+            }
+        }
+        dirList.addAll(fileList);
+
+        int  cnt   = 0;
+        for (File childFile: dirList) {
             if (childFile.isHidden()) {
                 continue;
             }
