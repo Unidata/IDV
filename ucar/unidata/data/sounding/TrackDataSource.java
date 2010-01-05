@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -45,6 +46,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
+
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 
@@ -70,8 +72,8 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -211,9 +213,30 @@ public class TrackDataSource extends FilesDataSource {
     public TrackDataSource(DataSourceDescriptor descriptor, List sources,
                            Hashtable properties)
             throws VisADException {
-        super(descriptor, sources, "", "Track Files", properties);
+        this(descriptor, sources, "Track Files", properties);
     }
 
+
+
+    /**
+     * Create a TrackDataSource from the specification given.
+     *
+     * @param descriptor    data source descriptor
+     * @param sources       List of sources of data (filename/URL)
+     * @param description   dataset description
+     * @param properties    extra properties for initialization
+     *
+     * @throws VisADException   problem creating the data
+     *
+     */
+    public TrackDataSource(DataSourceDescriptor descriptor, List sources,
+                           String description, Hashtable properties)
+            throws VisADException {
+        super(descriptor, sources, ((sources.size() > 1)
+                                    ? description
+                                    : sources.get(0).toString()), 
+                                    description, properties);
+    }
 
 
     /**
@@ -776,6 +799,7 @@ public class TrackDataSource extends FilesDataSource {
      * Aggregate the list of track data
      *
      * @param tracks list of track data
+     * @param id _more_
      *
      * @return Aggregation
      *
@@ -950,9 +974,8 @@ public class TrackDataSource extends FilesDataSource {
         try {
             List datas = new ArrayList(adapters.size());
             for (int i = 0; i < adapters.size(); i++) {
-		TrackAdapter adapter = (TrackAdapter) adapters.get(i);
-                Data data = adapter.getPointObTrack(
-                                getTrackId(dc), range);
+                TrackAdapter adapter = (TrackAdapter) adapters.get(i);
+                Data data = adapter.getPointObTrack(getTrackId(dc), range);
                 if (data == null) {
                     return null;
                 }
@@ -988,10 +1011,10 @@ public class TrackDataSource extends FilesDataSource {
      *
      * @throws Exception On badness
      */
-    public  TrackAdapter getTraceAdapter()
-            throws Exception {
+    public TrackAdapter getTraceAdapter() throws Exception {
         return traceAdapter;
     }
+
     /**
      * Utility to extract the choice id
      *
@@ -1003,6 +1026,7 @@ public class TrackDataSource extends FilesDataSource {
         String[] idArray = getIdArray(dc);
         return idArray[1];
     }
+
     /**
      * Utility to extract the choice id
      *
@@ -1354,22 +1378,24 @@ public class TrackDataSource extends FilesDataSource {
                                         new ArrayList(), "Current Fields",
                                         null);
 
-        TrackInfo     trackInfo  = (TrackInfo) trackInfos.get(0);
-        List<VarInfo> vars       = trackInfo.getVariables();
+        TrackInfo     trackInfo = (TrackInfo) trackInfos.get(0);
+        List<VarInfo> vars      = trackInfo.getVariables();
 
-	HashSet skipVars =  new HashSet();
+        HashSet       skipVars  = new HashSet();
 
-	skipVars.add("time");
-	skipVars.add("latitude");
-	skipVars.add("longitude");
-	skipVars.add("altitude");
+        skipVars.add("time");
+        skipVars.add("latitude");
+        skipVars.add("longitude");
+        skipVars.add("altitude");
 
-        List          labels     = new ArrayList();
-        List          ids        = new ArrayList();
-        Hashtable     currentMap = new Hashtable();
+        List      labels     = new ArrayList();
+        List      ids        = new ArrayList();
+        Hashtable currentMap = new Hashtable();
         for (VarInfo varInfo : vars) {
-	    String name = varInfo.getName();
-	    if(skipVars.contains(name.toLowerCase())) continue;
+            String name = varInfo.getName();
+            if (skipVars.contains(name.toLowerCase())) {
+                continue;
+            }
             labels.add(varInfo.getDescription() + "  (" + varInfo.getName()
                        + ")");
             ids.add(varInfo.getName());

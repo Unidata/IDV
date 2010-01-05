@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.sounding;
 
 
@@ -39,9 +38,10 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.List;
-import java.util.ArrayList;
 
 
 /**
@@ -69,11 +69,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     /** Default Constructor */
     public TrajectoryFeatureTypeDataSource() {}
 
-    /** _more_          */
+    /** _more_ */
     private List pointCats = Misc.newList(DataCategory.POINT_PLOT_CATEGORY);
 
-    /** _more_          */
+    /** _more_ */
     private List selectTimes;
+
     /**
      * Create a SondeDataSource from the specification given.
      *
@@ -81,14 +82,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @param source        file location or URL
      * @param properties    extra properties
      *
-     * @throws visad.VisADException
-     *
-     * @throws VisADException _more_
-     *
+     * @throws VisADException  problem creating data
      */
-    public TrajectoryFeatureTypeDataSource(
-            DataSourceDescriptor descriptor, String source,
-            Hashtable properties) throws VisADException {
+    public TrajectoryFeatureTypeDataSource(DataSourceDescriptor descriptor,
+                                           String source,
+                                           Hashtable properties)
+            throws VisADException {
         this(descriptor, Misc.newList(source), properties);
     }
 
@@ -99,14 +98,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @param sources        file location or URL
      * @param properties    extra properties
      *
-     * @throws VisADException
-     *
+     * @throws VisADException  problem creating data
      */
-    public TrajectoryFeatureTypeDataSource(
-            DataSourceDescriptor descriptor, List sources,
-            Hashtable properties) throws VisADException {
-        super(descriptor, sources, properties);
-        setDescription("Sonde Data Source");
+    public TrajectoryFeatureTypeDataSource(DataSourceDescriptor descriptor,
+                                           List sources, Hashtable properties)
+            throws VisADException {
+        super(descriptor, sources, "Trajectory Soundings", properties);
     }
 
 
@@ -188,14 +185,13 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws RemoteException _more_
      * @throws VisADException  problem in VisAD
      */
-    protected FieldImpl aggregateTracks(List tracks,
-                                        Object id0) throws VisADException,
-                                            RemoteException {
+    protected FieldImpl aggregateTracks(List tracks, Object id0)
+            throws VisADException, RemoteException {
 
         List         adapters = getAdapters();
         FunctionType fiType   = null;
         DateTime[]   times    = new DateTime[tracks.size()];
-        if(selectTimes == null ) {
+        if (selectTimes == null) {
             for (int i = 0; i < tracks.size(); i++) {
                 TrackAdapter adapter = (TrackAdapter) adapters.get(i);
                 DateTime     time    = adapter.getEndTime();
@@ -206,13 +202,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 }
                 times[i] = time;  //adapter.getStartTime();
             }
-        }
-        else {
+        } else {
             int len = selectTimes.size();
-            times    = new DateTime[len];
+            times = new DateTime[len];
             for (int i = 0; i < len; i++) {
-                Integer ii = (Integer)selectTimes.get(i);
-                int j = ii.intValue();
+                Integer      ii      = (Integer) selectTimes.get(i);
+                int          j       = ii.intValue();
                 TrackAdapter adapter = (TrackAdapter) adapters.get(j);
                 DateTime     time    = adapter.getEndTime();
                 if (fiType == null) {
@@ -387,8 +382,8 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      */
     protected TrackAdapter doMakeAdapter(String file,
                                          Hashtable pointDataFilter,
-                                         int stride,
-                                         int lastNMinutes) throws Exception {
+                                         int stride, int lastNMinutes)
+            throws Exception {
 
         return new TrajectoryFeatureTypeAdapter(this, file, pointDataFilter,
                 stride, lastNMinutes);
@@ -410,11 +405,10 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws VisADException  unable to create Data object
      * @throws RemoteException (some kind of remote error.
      */
-    protected Data getDataInner(
-            DataChoice dataChoice, DataCategory category,
-            DataSelection dataSelection,
-            Hashtable requestProperties) throws VisADException,
-                RemoteException {
+    protected Data getDataInner(DataChoice dataChoice, DataCategory category,
+                                DataSelection dataSelection,
+                                Hashtable requestProperties)
+            throws VisADException, RemoteException {
         Object id = getChoiceId(dataChoice);
         selectTimes = dataSelection.getTimes();
         if (id.equals(ID_SONDESTARTLOCATIONS)
