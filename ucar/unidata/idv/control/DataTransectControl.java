@@ -28,7 +28,10 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
@@ -96,12 +99,28 @@ public class DataTransectControl extends CrossSectionControl {
         // z level at origin of grid
 
         // make a Selector line there
+        /*
         RealTuple[] positions =
             RangeAndBearingControl.makeDefaultLinePosition(
                 getNavigatedDisplay());
 
         EarthLocation loc1 = boxToEarth(positions[0]);
         EarthLocation loc2 = boxToEarth(positions[1]);
+        */
+
+        NavigatedDisplay mapDisplay = getNavigatedDisplay();
+
+        double[] right  = mapDisplay.getScreenUpperRight();
+        double[] center = mapDisplay.getScreenCenter();
+        right[1] = center[1];
+        double width = right[0] - center[0];
+
+        EarthLocationTuple loc1 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0], center[1],0,false);
+        EarthLocationTuple loc2 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0] + 0.6 * width, right[1],0,false);
+
+
+
+
         createCrossSectionSelector(loc1,loc2);
     }
 

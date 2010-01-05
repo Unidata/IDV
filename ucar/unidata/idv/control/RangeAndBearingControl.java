@@ -45,6 +45,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.display.CrossSectionSelector;
+import ucar.visad.display.DisplayableData;
 import ucar.visad.display.DisplayMaster;
 
 
@@ -56,6 +57,8 @@ import visad.*;
 import visad.data.units.Parser;
 
 import visad.georef.EarthLocationTuple;
+import visad.georef.EarthLocation;
+
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
 
@@ -95,7 +98,9 @@ import javax.swing.*;
  * @version  $Revision: 1.87 $
  */
 public class RangeAndBearingControl extends DisplayControlImpl implements ActionListener,
-        PropertyChangeListener {
+                                                                          PropertyChangeListener,
+                                                                          DisplayableData.DragAdapter 
+ {
 
     /** Start point identifier */
     public static final int POINT_START = CrossSectionSelector.POINT_START;
@@ -566,7 +571,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
                 Color.red);
         // move z level of line to near top of VisAD display box;
         // use -0.99 or so for near bottom
-        csSelector.setZValue(0.99f);
+        //        csSelector.setZValue(0.99f);
 
         // when user moves position of the Selector line, 
         // call crossSectionChanged
@@ -574,6 +579,12 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
         csSelector.addEndPropertyChangeListener(this);
         csSelector.addMidPropertyChangeListener(this);
 
+        csSelector.getStartSelectorPoint().setDragAdapter(this);
+        csSelector.getEndSelectorPoint().setDragAdapter(this);
+
+        if (inGlobeDisplay()) {
+            csSelector.setInterpolateLinePoints(true);
+        }
     }
 
 
@@ -606,7 +617,8 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
         Vector<TwoFacedObject> tfos     = new Vector<TwoFacedObject>();
         TwoFacedObject         selected = null;
         for (Earth aPlanet : planets) {
-            TwoFacedObject tfo = new TwoFacedObject(aPlanet.getName(),
+            TwoFacedObject tfo = new TwoFacedObject(aPlanet.getName()+" (" + aPlanet.getEquatorRadius()/1000 +"x" +
+                                                    aPlanet.getPoleRadius()/1000+")",
                                      aPlanet);
             tfos.add(tfo);
             if (Misc.equals(aPlanet, planet)) {
@@ -684,28 +696,126 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static RealTuple[] makeDefaultLinePosition(
+    public  RealTuple[] makeDefaultLinePosition(
             NavigatedDisplay mapDisplay)
             throws VisADException, RemoteException {
+
+        if(inGlobeDisplay()) {
+            return new RealTuple[]{
+                getRealTupleForPoint(90,0),
+                getRealTupleForPoint(-90,0)};
+        }
+
+
+
+
         double[] right  = mapDisplay.getScreenUpperRight();
         double[] center = mapDisplay.getScreenCenter();
         right[1] = center[1];
         double width = right[0] - center[0];
 
+        EarthLocationTuple el1 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0], center[1],0,false);
+        EarthLocationTuple el2 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0] + 0.6 * width, right[1],0,false);
+
+        if(true) {
+            return new RealTuple[]{
+                getRealTupleForPoint((float)el1.getLatitude().getValue(),                                     
+                                     (float)el1.getLongitude().getValue()),
+                getRealTupleForPoint((float)el2.getLatitude().getValue(),                                     
+                                     (float)el2.getLongitude().getValue())};
+        }
         // make the initial selector end positions:
         // start at center of VisAD box
         RealTuple start =
-            new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+            new RealTuple(RealTupleType.SpatialEarth3DTuple,
                           new double[] { center[0],
-                                         center[1] });
+                                         center[1], 0});
         // go to 1/3 way to right edge of the VisAd box around the data area.
-        RealTuple end = new RealTuple(RealTupleType.SpatialCartesian2DTuple,
-                                      new double[] { center[0] + 0.6 * width,
-                right[1] });
+        RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                      new double[] {center[0] ,
+                                                     right[1],0});
 
         return new RealTuple[] { start, end };
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param position _more_
+     *
+     * @return _more_
+     */
+    public boolean constrainDragPoint(float[] position) {
+        try {
+            double altitude = getSelectorAltitude();
+            EarthLocation pt = boxToEarth(position[0], position[1],
+                                          position[2], false);
+            double[] xyz = earthToBox(
+                               new EarthLocationTuple(
+                                   pt.getLatitude().getValue(),
+                                   pt.getLongitude().getValue(), altitude));
+            if (inGlobeDisplay()) {
+                position[0] = (float) xyz[0];
+                position[1] = (float) xyz[1];
+                position[2] = (float) xyz[2];
+            } else {
+                position[2] = (float) xyz[2];
+            }
+            return true;
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param ray _more_
+     * @param first _more_
+     * @param mouseModifiers _more_
+     *
+     * @return _more_
+     */
+    public boolean handleDragDirect(VisADRay ray, boolean first,
+                                    int mouseModifiers) {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @param x _more_
+     *
+     * @return _more_
+     */
+    public boolean handleAddPoint(float[] x) {
+        return true;
+    }
+
+
+     /** 
+      * Override this and just force a change in position topickup the new z
+      */
+    protected void applyZPosition() throws VisADException, RemoteException {
+        setSelectorPosition();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+     public double getSelectorAltitude() throws VisADException, RemoteException  {
+         if (inGlobeDisplay()) {
+             return 16000;
+         }
+        EarthLocation el =  boxToEarth(new double[] { 0, 0, getZPosition()});
+        return el.getAltitude().getValue();
+    }
 
 
     /**
@@ -807,7 +917,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      */
     private EarthLocationTuple getEarthLocation(double x, double y)
             throws VisADException, RemoteException {
-        return (EarthLocationTuple) boxToEarth(new double[] { x, y, 0.0 });
+        return (EarthLocationTuple) boxToEarth(new double[] { x, y, 1});
     }
 
     /**
@@ -837,6 +947,12 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      */
     private LatLonPoint getLatLonPoint(RealTuple rt)
             throws VisADException, RemoteException {
+        
+        if(rt.getType().equals(RealTupleType.SpatialEarth3DTuple)) {
+            return  new LatLonTuple((Real)rt.getComponent(1),
+                                    (Real)rt.getComponent(0));
+        }
+
         return getEarthLocation(
             ((Real) rt.getComponent(0)).getValue(),
             ((Real) rt.getComponent(1)).getValue()).getLatLonPoint();
@@ -853,7 +969,6 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      * @throws VisADException   VisAD Error
      */
     private void setRangeAndBearing() throws VisADException, RemoteException {
-
 
         // get values from ellipsoidal earth
         Bearing result = Bearing.calculateBearing(planet,
@@ -1233,8 +1348,15 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private RealTuple getRealTupleForPoint(float rlat, float rlon)
+    private  RealTuple getRealTupleForPoint(float rlat, float rlon)
             throws VisADException, RemoteException {
+        if(true) {
+            return new RealTuple(
+                          RealTupleType.SpatialEarth3DTuple,
+                          new double[] { rlon,rlat,getSelectorAltitude()});
+        }
+
+
         RealTuple visadTup = earthToBoxTuple(new EarthLocationTuple(rlat,
                                  rlon, 0.0));
         Real[] reals = visadTup.getRealComponents();
