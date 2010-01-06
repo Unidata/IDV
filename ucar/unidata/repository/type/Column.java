@@ -109,6 +109,8 @@ public class Column implements Constants {
 
     public static final String TYPE_EMAIL = "email";
 
+    public static final String TYPE_URL = "url";
+
     /** _more_ */
     public static final String TYPE_INT = "int";
 
@@ -382,7 +384,8 @@ public class Column implements Constants {
 
 
     public boolean isString() {
-        return isType(TYPE_STRING)  || isType(TYPE_ENUMERATION) || isType(TYPE_ENUMERATIONPLUS) || isType(TYPE_ENTRY); 
+        return isType(TYPE_STRING)  || isType(TYPE_ENUMERATION) || isType(TYPE_ENUMERATIONPLUS) || isType(TYPE_ENTRY) ||
+            isType(TYPE_EMAIL) ||  isType(TYPE_URL);
     }
 
     /**
@@ -516,6 +519,13 @@ public class Column implements Constants {
                 sb.append(s);
             else
                 sb.append("<a href=\"mailto:" + s +"\">" + s +"</a>");
+            valueIdx++;
+        } else if(isType(TYPE_URL)) {
+            String s = toString(values, offset);
+            if(Misc.equals(output, OUTPUT_CSV)) 
+                sb.append(s);
+            else
+                sb.append("<a href=\"" + s +"\">" + s +"</a>");
             valueIdx++;
         } else {
             sb.append(toString(values, offset));
@@ -712,7 +722,7 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void createTable(Statement statement) throws Exception {
-        if (isType(TYPE_STRING) || isType(TYPE_PASSWORD) || isType(TYPE_EMAIL) || isType(TYPE_ENTRY)) {
+        if (isType(TYPE_STRING) || isType(TYPE_PASSWORD) || isType(TYPE_EMAIL)  || isType(TYPE_URL) || isType(TYPE_ENTRY)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (isType(TYPE_CLOB)) {
             String clobType =
