@@ -6440,6 +6440,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     //                                animationWidget.getContents());
                     animationHolder.add(animationWidget.getContents());
                 }
+                innerContents.revalidate();
             }
         };
         //        GuiUtils.invokeInSwingThread(runnable);
