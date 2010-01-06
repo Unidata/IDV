@@ -1,27 +1,22 @@
 /*
- * $Id: MapViewManager.java,v 1.382 2007/08/16 14:05:04 jeffmc Exp $
- *
- * Copyright  1997-2008 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.idv;
 
@@ -120,33 +115,33 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
-    /** _more_          */
+    /** front globe clipping distance */
     public static final String PROP_CLIPDISTANCE_GLOBE_FRONT =
         "idv.clipdistance.globe.front";
 
-    /** _more_          */
+    /** back globe clipping distance */
     public static final String PROP_CLIPDISTANCE_GLOBE_BACK =
         "idv.clipdistance.globe.back";
 
-    /** _more_          */
+    /** fron map clipping distance */
     public static final String PROP_CLIPDISTANCE_MAP_FRONT =
         "idv.clipdistance.map.front";
 
-    /** _more_          */
+    /** back map clipping distance */
     public static final String PROP_CLIPDISTANCE_MAP_BACK =
         "idv.clipdistance.map.back";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_FLY_LEFT = "cmd.fly.left";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_FLY_RIGHT = "cmd.fly.right";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_FLY_FORWARD = "cmd.fly.forward";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_FLY_BACK = "cmd.fly.back";
 
     /** preference id for the list of addresses in the geocode dialog */
@@ -197,7 +192,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** The name of the display projection we are currently using */
     private String mainProjectionName = null;
 
-    /** _more_          */
+    /** _more_ */
     private String defaultProjectionName = null;
 
 
@@ -225,7 +220,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** The map panel in the GUI */
     private PipPanel pipPanel;
 
-    /** _more_          */
+    /** _more_ */
     private Object PIP_MUTEX = new Object();
 
     /** _more_ */
@@ -265,28 +260,28 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_ */
     private Flythrough flythrough;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showMaps = true;
 
-    /** _more_          */
+    /** _more_ */
     private String initMapPaths;
 
-    /** _more_          */
+    /** _more_ */
     private float initMapWidth = -1;
 
-    /** _more_          */
+    /** _more_ */
     private Color initMapColor = null;
 
-    /** _more_          */
+    /** _more_ */
     private Rectangle2D.Float initLatLonBounds;
 
-    /** _more_          */
+    /** _more_ */
     private boolean defaultGlobeBackground = false;
 
-    /** _more_          */
+    /** _more_ */
     private double displayProjectionZoom = 0;
 
-    /** _more_          */
+    /** _more_ */
     private boolean doNotSetProjection = false;
 
     /**
@@ -343,11 +338,13 @@ public class MapViewManager extends NavigatedViewManager {
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
 
-        StateManager stateManager = getStateManager();
-        IntegratedDataViewer idv = getIdv();
-        if(idv==null || stateManager == null) return null;
-        boolean mode3d =
-            stateManager.getProperty(IdvConstants.PROP_3DMODE, use3D);
+        StateManager         stateManager = getStateManager();
+        IntegratedDataViewer idv          = getIdv();
+        if ((idv == null) || (stateManager == null)) {
+            return null;
+        }
+        boolean mode3d = stateManager.getProperty(IdvConstants.PROP_3DMODE,
+                             use3D);
         mode3d = getStore().get(PREF_DIMENSION, mode3d);
         // let property override the preference
         use3D = mode3d && use3D;
@@ -918,7 +915,9 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(customMapResources, true, true);
                     Trace.call2("checkDefaultMap-2");
                 } else {
-                    XmlResourceCollection xrc = getResourceManager().getMapResources(getUseGlobeDisplay());
+                    XmlResourceCollection xrc =
+                        getResourceManager().getMapResources(
+                            getUseGlobeDisplay());
                     //                    XmlResourceCollection xrc = getResourceManager().getMapResources(false);
                     mapInfo = new MapInfo(xrc, false, true);
                 }
@@ -934,8 +933,8 @@ public class MapViewManager extends NavigatedViewManager {
                             mapData.setColor(initMapColor);
                         }
                     }
-                    for (String mapPath : StringUtil.split(initMapPaths, ",",
-                            true, true)) {
+                    for (String mapPath :
+                            StringUtil.split(initMapPaths, ",", true, true)) {
                         for (MapData mapData : mapInfo.getMapDataList()) {
                             if (Misc.equals(mapData.getSource(), mapPath)) {
                                 mapData.setVisible(true);
@@ -3405,4 +3404,3 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 }
-

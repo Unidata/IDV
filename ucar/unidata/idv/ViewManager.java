@@ -30,9 +30,7 @@ import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.publish.PublishManager;
 
-
 import ucar.unidata.idv.ui.*;
-
 
 import ucar.unidata.java3d.LightInfo;
 import ucar.unidata.ui.Command;
@@ -458,7 +456,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The last split pane divider location when we do the float/embed */
     private int lastDividerLoc = -1;
 
-    /** _more_ */
+    /** split pane location */
     private int splitPaneLocation = -1;
 
 
@@ -580,13 +578,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** properties dialog */
     JDialog propertiesDialog;
 
-    /** _more_ */
+    /** is the properties dialog shown */
     boolean propertiesDialogShown = false;
 
-    /** _more_ */
+    /** the matrix label */
     JLabel matrixLabel;
 
-    /** _more_ */
+    /** decimal format */
     DecimalFormat fmt = new DecimalFormat("####0.0###");
 
     /** the view menu */
@@ -684,11 +682,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Vector Graphics renderer */
     private VectorGraphicsRenderer vectorRenderer;
 
-    /** _more_ */
+    /** init view state name */
     private String initViewStateName;
 
 
-    /** _more_          */
+    /** removeables  */
     private List<Removable> removables = new ArrayList<Removable>();
 
     /**
@@ -1530,16 +1528,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** _more_ */
+    /** last matrix */
     private double[] lastMatrix;
 
-    /** _more_ */
+    /** last coordinates */
     private List<TwoFacedObject> lastCoords;
 
     /**
-     * _more_
+     * Set the matrix label
      *
-     * @param force _more_
+     * @param force  true to force this
      */
     private void setMatrixLabel(boolean force) {
         try {
@@ -1616,11 +1614,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Format a double
      *
-     * @param d _more_
+     * @param d  the double
      *
-     * @return _more_
+     * @return the formatted double
      */
     private String fmt(double d) {
         if (d == -0.0) {
@@ -1738,11 +1736,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Init with a view state
      *
-     * @param viewState _more_
+     * @param viewState  the view state
      *
-     * @throws Exception _more_
+     * @throws Exception  problem initializing
      */
     public void initWith(ViewState viewState) throws Exception {
         double[] matrix = (double[]) viewState.get(ViewState.PROP_MATRIX);
@@ -2533,9 +2531,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Initialize a BooleanProperty
      *
-     * @param bp _more_
+     * @param bp  the property
      */
     protected void initializeBooleanProperty(BooleanProperty bp) {
         StateManager   stateManager = getStateManager();
@@ -2605,12 +2603,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Get a BooleanProperty
      *
-     * @param propertyId _more_
-     * @param dflt _more_
+     * @param propertyId  the property
+     * @param dflt  the default value
      *
-     * @return _more_
+     * @return the property
      */
     protected BooleanProperty getBooleanProperty(String propertyId,
             boolean dflt) {
@@ -2652,12 +2650,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Get a BooleanProperty (local implementation)
      *
-     * @param propertyId _more_
-     * @param dflt _more_
+     * @param propertyId  the id
+     * @param dflt        the default value
      *
-     * @return _more_
+     * @return  the value
      */
     protected boolean getBp(String propertyId, boolean dflt) {
         return getBooleanProperty(propertyId, dflt).getValue();
@@ -3006,9 +3004,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Get the legends
      *
-     * @return _more_
+     * @return List of legends
      */
     protected List<IdvLegend> getLegends() {
         if (legends == null) {
@@ -3714,9 +3712,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Handle the display data changing
      *
-     * @param displayControl _more_
+     * @param displayControl  the control 
      */
     public void displayDataChanged(DisplayControl displayControl) {}
 
@@ -4037,12 +4035,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Add the display infos
      *
-     * @param displayInfos _more_
+     * @param displayInfos the display infos
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     public void addDisplayInfos(List<DisplayInfo> displayInfos)
             throws RemoteException, VisADException {
@@ -4305,11 +4303,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Is this compatible with the other ViewManager
      *
-     * @param vm _more_
+     * @param vm  the other VM
      *
-     * @return _more_
+     * @return  true if compatible
      */
     public boolean isCompatibleWith(ViewManager vm) {
         IdvWindow thisWindow = getDisplayWindow();
@@ -4328,11 +4326,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Is this ViewState appropriate for me?
      *
-     * @param viewState _more_
+     * @param viewState the ViewState
      *
-     * @return _more_
+     * @return  true if compatible
      */
     public boolean isCompatibleWith(ViewState viewState) {
         return getClass().getName().toString().equals(
@@ -4507,9 +4505,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Add a removeable object
      *
-     * @param removable _more_
+     * @param removable  the removeable
      */
     public void addRemovable(Removable removable) {
         removables.add(removable);
@@ -5899,7 +5897,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         /**
-         * _more_
+         * Remove me
          */
         public void doRemove() {
             viewManager = null;
@@ -6694,16 +6692,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
         aspectRatio = value;
     }
 
-    /** _more_ */
+    /** xxx */
     static int xxx = 0;
 
-    /** _more_ */
+    /** my cnt */
     int xmycnt = xxx++;
 
     /**
-     * _more_
+     * Print the aspect
      *
-     * @param msg _more_
+     * @param msg  a prefix
      */
     public void printAspect(String msg) {
         if (aspectRatio == null) {
@@ -6970,9 +6968,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Initialize the ViewState
      *
-     * @param viewState _more_
+     * @param viewState  the view state
      */
     public void initViewState(ViewState viewState) {
         viewState.put(ViewState.PROP_MATRIX, getDisplayMatrix());
@@ -6980,9 +6978,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Make a ViewState
      *
-     * @return _more_
+     * @return  the ViewState
      */
     public ViewState doMakeViewState() {
         ViewState viewState = new ViewState(getClass().getName());
@@ -6993,23 +6991,21 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Set the initial ViewState name
      *
-     * @param s _more_
+     * @param s  the name
      */
     public void setInitViewStateName(String s) {
         initViewStateName = s;
     }
 
     /**
-     * _more_
+     * Get the intial ViewState name
      *
-     * @return _more_
+     * @return  the intial ViewState name
      */
     public String getInitViewStateName() {
         return initViewStateName;
     }
-
-
 
 }
