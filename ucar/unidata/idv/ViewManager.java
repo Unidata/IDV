@@ -1,29 +1,22 @@
 /*
- * $Id: ViewManager.java,v 1.401 2007/08/16 14:05:04 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
- * This library is distributed in the hope that it will be2 useful, but
+ * 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
 
 
 package ucar.unidata.idv;
@@ -52,7 +45,6 @@ import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.util.BooleanProperty;
-import ucar.unidata.util.Removable;
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
 import ucar.unidata.util.FileManager;
@@ -63,6 +55,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
@@ -691,10 +684,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Vector Graphics renderer */
     private VectorGraphicsRenderer vectorRenderer;
 
-    /** _more_          */
+    /** _more_ */
     private String initViewStateName;
 
 
+    /** _more_          */
     private List<Removable> removables = new ArrayList<Removable>();
 
     /**
@@ -4020,7 +4014,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         if (master != null) {
             Displayable displayable = displayInfo.getDisplayable();
-            if(displayable!=null) {
+            if (displayable != null) {
                 master.removeDisplayable(displayable);
             }
         }
@@ -4512,6 +4506,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param removable _more_
+     */
     public void addRemovable(Removable removable) {
         removables.add(removable);
     }
@@ -4531,7 +4530,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         isDestroyed = true;
         getIdvUIManager().viewManagerDestroyed(this);
 
-        for(Removable removable: removables) {
+        for (Removable removable : removables) {
             removable.doRemove();
         }
         removables = null;
@@ -4600,37 +4599,37 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         if (animationMenu != null) {
-            GuiUtils.empty(animationMenu,true);
+            GuiUtils.empty(animationMenu, true);
         }
 
         if (viewMenu != null) {
-            GuiUtils.empty(viewMenu,true);
+            GuiUtils.empty(viewMenu, true);
         }
 
         if (menuBar != null) {
-            GuiUtils.empty(menuBar,true);
+            GuiUtils.empty(menuBar, true);
         }
 
         if (fullContents != null) {
-            GuiUtils.empty(fullContents,true);
+            GuiUtils.empty(fullContents, true);
         }
 
         //Be somewhat overly agressive about nulling out references, etc.
-        timelineDialog = null;
-        propertiesDialog = null;
-        animationWidget = null;
-        keyboardBehavior = null;
+        timelineDialog          = null;
+        propertiesDialog        = null;
+        animationWidget         = null;
+        keyboardBehavior        = null;
         displayListDisplayables = null;
         animation               = null;
         legends                 = null;
         sideLegend              = null;
         sideLegendComponent     = null;
         mainSplitPane           = null;
-        animationMenu = null;
-        viewMenu = null;
-        menuBar = null;
-        fullContents = null;
-        idv = null;
+        animationMenu           = null;
+        viewMenu                = null;
+        menuBar                 = null;
+        fullContents            = null;
+        idv                     = null;
 
         displayInfos.clear();
 
@@ -4885,7 +4884,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     //Use a local tmpMaster variable so we don't set the master member before we're ready to
                     DisplayMaster tmpMaster = doMakeDisplayMaster();
-                    if(tmpMaster == null) return null;
+                    if (tmpMaster == null) {
+                        return null;
+                    }
                     DisplayRenderer renderer =
                         tmpMaster.getDisplay().getDisplayRenderer();
                     if (renderer instanceof DisplayRendererJ3D) {
@@ -5882,7 +5883,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @author IDV development team
      */
-    private static class IdvKeyboardBehavior implements KeyboardBehavior, Removable {
+    private static class IdvKeyboardBehavior implements KeyboardBehavior,
+            Removable {
 
         /** The ViewManager */
         ViewManager viewManager;
@@ -5896,6 +5898,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.viewManager = viewManager;
         }
 
+        /**
+         * _more_
+         */
         public void doRemove() {
             viewManager = null;
         }
@@ -6440,7 +6445,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     //                                animationWidget.getContents());
                     animationHolder.add(animationWidget.getContents());
                 }
-                innerContents.revalidate();
             }
         };
         //        GuiUtils.invokeInSwingThread(runnable);
@@ -7009,4 +7013,3 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 }
-
