@@ -197,6 +197,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
         Trace.call1("FlowPlanView.setData");
+        getGridDisplay().setActive(false);
         boolean result = super.setData(dataChoice);
         if ( !result) {
             Trace.call2("FlowPlanView.setData");
@@ -207,6 +208,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         setFlowScale(flowScaleValue);
         //        setSkipValue(skipValue);
+        getGridDisplay().setActive(true);
         Trace.call2("FlowPlanView.setData");
         return true;
     }
