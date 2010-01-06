@@ -1357,8 +1357,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 } catch (VisADException ve) {
                     // this is a nested error so just print out the real thing
                     String realError = ve.getMessage();
-                    realError = realError.substring(realError.lastIndexOf(":"
-                            + 1));
+                    realError =
+                        realError.substring(realError.lastIndexOf(":") + 1);
                     LogUtil.printMessage(realError);
                     return null;
                 }
