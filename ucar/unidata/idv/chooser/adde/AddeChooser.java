@@ -191,7 +191,7 @@ public class AddeChooser extends TimesChooser {
     /** Property for the port */
     protected static final String PROP_PORT = "port";
 
-    /** _more_          */
+    /** property for the ADDE port */
     public static final String PROP_ADDEPORT = "adde.port";
 
     /** Property for the  POS  property */
@@ -1088,9 +1088,9 @@ public class AddeChooser extends TimesChooser {
 
 
     /**
-     * _more_
+     * Can we do a cancel
      *
-     * @return _more_
+     * @return true if we can
      */
     public boolean canDoCancel() {
         return false;

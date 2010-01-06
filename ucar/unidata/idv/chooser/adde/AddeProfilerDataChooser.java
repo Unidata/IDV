@@ -367,9 +367,9 @@ public class AddeProfilerDataChooser extends AddeChooser {
 
 
     /**
-     * _more_
+     * Get the number of times to select
      *
-     * @return _more_
+     * @return 5
      */
     protected int getNumTimesToSelect() {
         return 5;

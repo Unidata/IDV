@@ -144,10 +144,10 @@ public class AddeFrontChooser extends AddeChooser {
 
 
     /**
-     * _more_
+     * Set the status.   Override default
      *
-     * @param msg _more_
-     * @param what _more_
+     * @param msg  message
+     * @param what  what to do
      */
     public void setStatus(String msg, String what) {
         super.setStatus("Press \"" + CMD_LOAD
