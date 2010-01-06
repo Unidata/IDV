@@ -1,7 +1,7 @@
+RAMADDA Version 1.1
 
 See the installation docs at:
-http://www.unidata.ucar.edu/software/ramadda/docs/developer/
-
+http://motherlode.ucar.edu/repository/help/installing.html
 
 Look at the ramadda.sh to see how to run RAMADDA stand-alone
 When you first start up ramadda you can complete the initialization and configuration at:
