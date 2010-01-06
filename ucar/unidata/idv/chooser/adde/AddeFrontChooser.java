@@ -1,20 +1,18 @@
 /*
- * $Id: AddeFrontChooser.java,v 1.2 2007/07/06 20:40:19 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -140,11 +138,17 @@ public class AddeFrontChooser extends AddeChooser {
 
         JComponent buttons = getDefaultButtons();
         setHaveData(true);
-        JComponent contents = GuiUtils.formLayout(comps,GRID_INSETS);
+        JComponent contents = GuiUtils.formLayout(comps, GRID_INSETS);
         return GuiUtils.topLeft(GuiUtils.vbox(contents, buttons));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param what _more_
+     */
     public void setStatus(String msg, String what) {
         super.setStatus("Press \"" + CMD_LOAD
                         + "\" to load the selected front data", "buttons");
@@ -182,4 +186,3 @@ public class AddeFrontChooser extends AddeChooser {
 
 
 }
-
