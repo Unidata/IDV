@@ -168,7 +168,7 @@ public class WindBarbDisplayable extends FlowDisplayable {
                                   float f1, float[] vx, float[] vy,
                                   float[] vz, int[] numv, float[] tx,
                                   float[] ty, float[] tz, int[] numt) {
-            return WindBarb.makeBarb(south, x, y, z, scale, pt_size, f0, f1,
+            return WindBarb.makeBarbNew(south, x, y, z, scale, pt_size, f0, f1,
                                      vx, vy, vz, numv, tx, ty, tz, numt);
         }
 
