@@ -1,28 +1,22 @@
 /*
- * $Id: ImageDataSource.java,v 1.76 2007/08/20 22:33:05 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.data.imagery;
 
@@ -1087,7 +1081,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private SingleBandedImage makeImage(AddeImageDescriptor aid,
                                         MathType rangeType,
                                         boolean fromSequence,
-                                        String readLabel )
+                                        String readLabel)
             throws VisADException, RemoteException {
 
         if (aid == null) {
@@ -1158,12 +1152,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 //If the range type is null then we are reading the first image
                 //and we want to read it immediately so we can get the correct range
                 //from the data itself
-                if(rangeType==null) {
-                    result =    AreaImageFlatField.createImmediate(aid, readLabel);
+                if (rangeType == null) {
+                    result = AreaImageFlatField.createImmediate(aid,
+                            readLabel);
                 } else {
                     //Else, pass in the already created range type
-                    result  = AreaImageFlatField.create(aid,
-                                                        areaDir, rangeType, readLabel);
+                    result = AreaImageFlatField.create(aid, areaDir,
+                            rangeType, readLabel);
                 }
             } else {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
@@ -1211,8 +1206,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @throws VisADException     VisAD problem
      */
     protected ImageSequence makeImageSequence(DataChoice dataChoice,
-                                              DataSelection subset)
-        throws VisADException, RemoteException {
+            DataSelection subset)
+            throws VisADException, RemoteException {
 
         try {
             List descriptorsToUse = new ArrayList();
@@ -1220,10 +1215,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 descriptorsToUse = getDescriptors(dataChoice, subset);
             } else {
                 List choices = (dataChoice instanceof CompositeDataChoice)
-                    ? getChoicesFromSubset(
-                                           (CompositeDataChoice) dataChoice, subset)
-                    : Arrays.asList(new DataChoice[] {
-                            dataChoice });
+                               ? getChoicesFromSubset(
+                                   (CompositeDataChoice) dataChoice, subset)
+                               : Arrays.asList(new DataChoice[] {
+                                   dataChoice });
                 for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
                     DataChoice          subChoice = (DataChoice) iter.next();
                     AddeImageDescriptor aid =
@@ -1234,7 +1229,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     DateTime dttm = aid.getImageTime();
                     if ((subset != null) && (dttm != null)) {
                         List times = getTimesFromDataSelection(subset,
-                                                               dataChoice);
+                                         dataChoice);
                         if ((times != null) && (times.indexOf(dttm) == -1)) {
                             continue;
                         }
@@ -1252,7 +1247,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             //Find the descriptor with the largest position
             String biggestSource = null;
             for (Iterator iter =
-                     descriptorsToUse.iterator(); iter.hasNext(); ) {
+                    descriptorsToUse.iterator(); iter.hasNext(); ) {
                 AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
                 if (aid.getIsRelative()) {
                     anyRelative = true;
@@ -1268,12 +1263,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 //                System.err.println (" aid:" + aid.getSource());
                 //Check if this is absolute time
                 if ((aii.getStartDate() != null)
-                    || (aii.getEndDate() != null)) {
+                        || (aii.getEndDate() != null)) {
                     biggestPosition = null;
                     break;
                 }
                 if ((biggestPosition == null)
-                    || (Math.abs(aii.getDatasetPosition()) > pos)) {
+                        || (Math.abs(aii.getDatasetPosition()) > pos)) {
                     pos             = Math.abs(aii.getDatasetPosition());
                     biggestPosition = aii;
                     biggestSource   = aid.getSource();
@@ -1286,7 +1281,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             // TODO:  revisit this
 
             if (getCacheDataToDisk() && anyRelative
-                && (biggestPosition != null)) {
+                    && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
                 /*
                   System.err.println(biggestPosition.makeAddeUrl()
@@ -1313,7 +1308,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 new ArrayList<SingleBandedImage>();
             MathType rangeType = null;
             for (Iterator iter =
-                     descriptorsToUse.iterator(); iter.hasNext(); ) {
+                    descriptorsToUse.iterator(); iter.hasNext(); ) {
                 final AddeImageDescriptor aid =
                     (AddeImageDescriptor) iter.next();
                 if (currentDirs != null) {
@@ -1337,32 +1332,37 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
                 label = label + dataChoice.toString();
                 final String readLabel = "Time: " + (cnt++) + "/"
-                    + descriptorsToUse.size() + "  "
-                    + label;
+                                         + descriptorsToUse.size() + "  "
+                                         + label;
 
                 /* for now don't do things in parallel
                    threadManager.addRunnable(new ThreadManager.MyRunnable() {
                    public void run() throws Exception {
-                   try {
                 */
+                try {
 
-                SingleBandedImage image = makeImage(aid, rangeType, true,
-                                                    readLabel);
-                            
-                if (image != null) {
-                    //If this is the first one then grab its rangeType to use for later images
-                    if(rangeType==null) {
-                        rangeType = ((FunctionType) image.getType()).getRange();
+                    SingleBandedImage image = makeImage(aid, rangeType, true,
+                                                  readLabel);
+                    if (image != null) {
+                        //If this is the first one then grab its rangeType to use for later images
+                        if (rangeType == null) {
+                            rangeType =
+                                ((FunctionType) image.getType()).getRange();
+                        }
+                        synchronized (images) {
+                            images.add(image);
+                        }
                     }
-                    synchronized (images) {
-                        images.add(image);
-                    }
+
+                } catch (VisADException ve) {
+                    // this is a nested error so just print out the real thing
+                    String realError = ve.getMessage();
+                    realError = realError.substring(realError.lastIndexOf(":"
+                            + 1));
+                    LogUtil.printMessage(realError);
+                    return null;
                 }
-
                 /*
-                  } catch (VisADException ve) {
-                  LogUtil.printMessage(ve.toString());
-                  }
                   }
                   });*/
 
@@ -1384,12 +1384,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
             if ((sortedImages.size() > 0)
                     && (sortedImages.get(0) instanceof AreaImageFlatField)) {
                 DataRange[] sampleRanges = null;
-                Set domainSet = null;
+                Set         domainSet    = null;
                 for (SingleBandedImage sbi : sortedImages) {
                     AreaImageFlatField aiff = (AreaImageFlatField) sbi;
                     sampleRanges = aiff.getRanges(true);
-                    if(domainSet == null)
+                    if (domainSet == null) {
                         domainSet = aiff.getDomainSet();
+                    }
                     if ((sampleRanges != null) && (sampleRanges.length > 0)) {
                         for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
                                 rangeIdx++) {
@@ -1740,4 +1741,3 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
 }
-
