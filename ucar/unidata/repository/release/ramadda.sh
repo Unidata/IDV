@@ -3,7 +3,7 @@
 ## To run RAMADDA stand-alone just do
 echo 'Running RAMADDA on port 8080'
 echo 'Access it at: http://localhost:8080/repository'
-java -Xmx512m -jar repository.jar -port 8080 
+java -Xmx512m -jar repository.jar -port 8080 $*
 
 
 
