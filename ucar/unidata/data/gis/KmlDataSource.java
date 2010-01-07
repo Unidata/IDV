@@ -1,20 +1,18 @@
 /*
- * $Id: KmlDataSource.java,v 1.38 2007/04/16 20:34:52 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -110,6 +108,7 @@ public class KmlDataSource extends FilesDataSource {
     /** kml tag id */
     public static final String TAG_GROUNDOVERLAY = "GroundOverlay";
 
+    /** kml tag  */
     public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
 
     /** xml tag */
@@ -238,7 +237,6 @@ public class KmlDataSource extends FilesDataSource {
      * @return The image
      */
     protected Image readImage(String url, String baseUrl) {
-        System.err.println("read image url=" + url +" baseUrl:" + baseUrl +"  file exists:" + new File(url).exists());
         Image image = null;
         synchronized (cachedUrls) {
             for (int i = 0; i < cachedUrls.size(); i++) {
@@ -257,13 +255,11 @@ public class KmlDataSource extends FilesDataSource {
             imageContent = readBytes(url);
             if (imageContent == null) {
                 if ( !url.startsWith("http")) {
-                    System.err.println("trying it with the baseUrl");
                     url          = IOUtil.getFileRoot(baseUrl) + "/" + url;
                     imageContent = readBytes(url);
                 }
             }
             if (imageContent == null) {
-                System.err.println("bad image url" + url);
                 return null;
             }
             Trace.call1("createImage");
@@ -297,15 +293,11 @@ public class KmlDataSource extends FilesDataSource {
      * @throws Exception On badness
      */
     protected byte[] readBytes(String path) throws Exception {
-        System.err.println("Read bytes:" + path);
         InputStream is = getInputStream(path);
         if (is == null) {
-            System.err.println("    Read bytes no inputStream");
             return null;
         }
         byte[] bytes = IOUtil.readBytes(is, loadId);
-        System.err.println("    Read bytes read:" + bytes.length);
-
         try {
             is.close();
         } catch (Exception exc) {}
@@ -323,6 +315,10 @@ public class KmlDataSource extends FilesDataSource {
      * @throws Exception On badness
      */
     protected InputStream getInputStream(String path) throws Exception {
+        if (new File(path).exists()) {
+            return new FileInputStream(path);
+        }
+
         try {
             URL           url        = new URL(path);
             URLConnection connection = url.openConnection();
@@ -353,7 +349,7 @@ public class KmlDataSource extends FilesDataSource {
             }
             return null;
         } else {
-            if ( !path.startsWith("/")) {
+            if (IOUtil.isRelativePath(path)) {
                 path = IOUtil.getFileRoot(kmlUrl) + "/" + path;
             }
             return IOUtil.getInputStream(path);
@@ -723,7 +719,9 @@ public class KmlDataSource extends FilesDataSource {
                                   new ArrayList(currentDisplayCategories),
                                   PROP_HREF, href, PROP_BASEURL, baseUrl);
 
-            if(name == null) name = "Network Link";
+            if (name == null) {
+                name = "Network Link";
+            }
             CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
                     this, ID_NETWORKLINK, "Network Link:" + href, name,
@@ -801,12 +799,13 @@ public class KmlDataSource extends FilesDataSource {
                             currentDisplayCategories, baseUrl);
             }
             if (pointNodes != null) {
-                for(Element n: (List<Element>) pointNodes) {
-                    String name = XmlUtil.getGrandChildText(n,"name");
-                    Element ptnode = XmlUtil.findChild(n,"Point");
-                    if(ptnode!=null) {
-                        String coords = XmlUtil.getGrandChildText(ptnode,"coordinates");
-                        System.out.println(coords+"," + name);
+                for (Element n : (List<Element>) pointNodes) {
+                    String  name   = XmlUtil.getGrandChildText(n, "name");
+                    Element ptnode = XmlUtil.findChild(n, "Point");
+                    if (ptnode != null) {
+                        String coords = XmlUtil.getGrandChildText(ptnode,
+                                            "coordinates");
+                        System.out.println(coords + "," + name);
                     }
                 }
 
@@ -828,7 +827,8 @@ public class KmlDataSource extends FilesDataSource {
                         id, dataChoiceName, dataChoiceName, categories,
                         props));
             }
-        } else if (tagName.equals(TAG_GROUNDOVERLAY) || tagName.equals(TAG_PHOTOOVERLAY)) {
+        } else if (tagName.equals(TAG_GROUNDOVERLAY)
+                   || tagName.equals(TAG_PHOTOOVERLAY)) {
             //            System.err.println ("got ground overlay:" + XmlUtil.toString(node));
             String name = XmlUtil.getChildText(XmlUtil.findChild(node,
                               TAG_NAME));
@@ -839,9 +839,10 @@ public class KmlDataSource extends FilesDataSource {
             String displayCategory = StringUtil.join("-",
                                          currentDisplayCategories);
             String href = KmlGroundOverlay.getHref(node);
-            KmlId id = new KmlId(tagName.equals(TAG_GROUNDOVERLAY)?KmlId.NODE_GROUNDOVERLAY:
-                                 KmlId.NODE_PHOTOOVERLAY, name,
-                                 displayCategory, baseUrl, href);
+            KmlId  id   = new KmlId(tagName.equals(TAG_GROUNDOVERLAY)
+                                    ? KmlId.NODE_GROUNDOVERLAY
+                                    : KmlId.NODE_PHOTOOVERLAY, name,
+                                        displayCategory, baseUrl, href);
             int ucnt = 0;
             while (idToNode.get(id) != null) {
                 id.setExtra("id" + (ucnt++));
@@ -1302,4 +1303,3 @@ public class KmlDataSource extends FilesDataSource {
 
 
 }
-
