@@ -238,6 +238,7 @@ public class KmlDataSource extends FilesDataSource {
      * @return The image
      */
     protected Image readImage(String url, String baseUrl) {
+        System.err.println("read image url=" + url +" baseUrl:" + baseUrl +"  file exists:" + new File(url).exists());
         Image image = null;
         synchronized (cachedUrls) {
             for (int i = 0; i < cachedUrls.size(); i++) {
@@ -256,6 +257,7 @@ public class KmlDataSource extends FilesDataSource {
             imageContent = readBytes(url);
             if (imageContent == null) {
                 if ( !url.startsWith("http")) {
+                    System.err.println("trying it with the baseUrl");
                     url          = IOUtil.getFileRoot(baseUrl) + "/" + url;
                     imageContent = readBytes(url);
                 }
@@ -295,11 +297,14 @@ public class KmlDataSource extends FilesDataSource {
      * @throws Exception On badness
      */
     protected byte[] readBytes(String path) throws Exception {
+        System.err.println("Read bytes:" + path);
         InputStream is = getInputStream(path);
         if (is == null) {
+            System.err.println("    Read bytes no inputStream");
             return null;
         }
         byte[] bytes = IOUtil.readBytes(is, loadId);
+        System.err.println("    Read bytes read:" + bytes.length);
 
         try {
             is.close();
