@@ -1,24 +1,23 @@
 /*
- * Copyright 1997-2001 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// $Id: ValuePlanViewControl.java,v 1.25 2003/10/14 17:18:39 dmurray Exp $
 
 
 package ucar.unidata.idv.control;
@@ -124,7 +123,8 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     protected DisplayableData createPlanDisplay()
             throws VisADException, RemoteException {
-        pointDisplay = new GridValueDisplayable("plan_text_" + paramName);
+        pointDisplay = new GridValueDisplayable("plan_text_" + paramName,
+                getControlContext().getJythonManager());
         pointDisplay.setStationModel(getLayoutModel());
         addAttributedDisplayable(pointDisplay);
         return pointDisplay;
@@ -233,6 +233,13 @@ public class ValuePlanViewControl extends PlanViewControl {
         loadDataInThread();
     }
 
+    /**
+     * Respond to changes in the control.
+     */
+    public void viewpointChanged() {
+        super.viewpointChanged();
+        loadDataInThread();
+    }
 
     /**
      * Add into the given the  widgets  for the different attributes
@@ -415,6 +422,24 @@ public class ValuePlanViewControl extends PlanViewControl {
         return declutter;
     }
 
+    /**
+     * Signal base class to add this as a display listener
+     *
+     * @return Add as display listener
+     */
+    protected boolean shouldAddDisplayListener() {
+        return true;
+    }
+
+
+    /**
+     * Signal base class to add this as a control listener
+     *
+     * @return Add as control listener
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
 
 
     /**
@@ -489,72 +514,10 @@ public class ValuePlanViewControl extends PlanViewControl {
                     layoutModelWidget =
                         new LayoutModelWidget(
                             this, this, "setLayoutModelFromWidget",
-                            getLayoutModel())), GuiUtils.rLabel(
-                                "   Scale:"), GuiUtils.hflow(
-                                Misc.newList(scaleField, scaleBtn), 4, 0));
-
-/*
-
-        final JButton editButton =
-            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
-                                    getClass());
-        editButton.setToolTipText("Show the layout model editor");
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                editLayoutModel();
-            }
-        });
-
-        StationModel layout = getLayoutModel();
-
-        final JButton changeButton =
-            new JButton(getLayoutModel().getDisplayName());
-        changeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StationModelManager smm =
-                    getControlContext().getStationModelManager();
-                ObjectListener listener = new ObjectListener(null) {
-                    public void actionPerformed(ActionEvent ae) {
-                        Misc.run(new Runnable() {
-                            public void run() {
-                                showWaitCursor();
-                                try {
-                                    setLayoutModel((StationModel) theObject);
-                                    changeButton.setText(
-                                        getLayoutModel().getDisplayName());
-                                } catch (Exception exc) {
-                                    logException("Changing station model",
-                                            exc);
-                                }
-                                showNormalCursor();
-                            }
-                        });
-                    }
-                };
-
-                JPopupMenu popup =
-                    GuiUtils.makePopupMenu(
-                        StationModelCanvas.makeStationModelMenuItems(
-                            smm.getStationModels(), listener, smm));
-                popup.show(changeButton, changeButton.getSize().width / 2,
-                           changeButton.getSize().height);
-            }
-        });
-
-
-        final ValueSliderWidget vsw = new ValueSliderWidget(this, 0, 50,
-                                          "layoutScale", "Scale", 10);
-        vsw.setSnapToTicks(false);
-        final JLabel vswLabel = GuiUtils.rLabel("   Scale: ");
-
-        JPanel layoutModelPanel = GuiUtils.hflow(Misc.newList(changeButton,
-                                      editButton), 4, 0);
-
-        JPanel layoutPane = GuiUtils.hbox(layoutModelPanel, vswLabel,
-                                          vsw.getContents(false));
-        return layoutPane;
-*/
-
+                            getLayoutModel())), GuiUtils.rLabel("   Scale:"),
+                                GuiUtils.hflow(
+                                    Misc.newList(scaleField, scaleBtn), 4,
+                                    0));
 
         return stationModelPanel;
 
