@@ -650,13 +650,11 @@ public class GenericTypeHandler extends TypeHandler {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output,
                               showDescription, showResource, linkToDownload);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
-            int      valueIdx = 0;
             Object[] values   = entry.getValues();
             if (values != null) {
                 for (Column column : columns) {
                     StringBuffer tmpSb = new StringBuffer();
-                    valueIdx = column.formatValue(tmpSb, Column.OUTPUT_HTML, values,
-                            valueIdx);
+                    column.formatValue(tmpSb, Column.OUTPUT_HTML, values);
                     if ( !column.getCanShow()) {
                         continue;
                     }
@@ -687,11 +685,9 @@ public class GenericTypeHandler extends TypeHandler {
         Object[]   values = entry.getValues();
         OutputType output = request.getOutput();
         if (values != null) {
-            int valueIdx = 0;
             for (Column column : columns) {
                 StringBuffer tmpSb = new StringBuffer();
-                valueIdx = column.formatValue(tmpSb, Column.OUTPUT_HTML, values,
-                        valueIdx);
+                column.formatValue(tmpSb, Column.OUTPUT_HTML, values);
                 html = html.replace("${" + column.getName() + ".content}",
                                     tmpSb.toString());
                 html = html.replace("${" + column.getName() + ".label}",

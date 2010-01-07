@@ -456,16 +456,14 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public int formatValue(StringBuffer sb, String output,
-                           Object[] values, int valueIdx) {
+    public void formatValue(StringBuffer sb, String output,
+                           Object[] values) {
 
         String delimiter = (Misc.equals(OUTPUT_CSV, output)?"|":",");
         if (isType(TYPE_LATLON)) {
             sb.append(toLatLonString(values, offset));
-            valueIdx++;
             sb.append(delimiter);
             sb.append(toLatLonString(values, offset+1));
-            valueIdx++;
         } else  if (isType(TYPE_LATLONBBOX)) {
             sb.append(toLatLonString(values, offset));
             sb.append(delimiter);
@@ -483,10 +481,8 @@ public class Column implements Constants {
             }
         } else if(isType(TYPE_DATETIME)) {
             sb.append(dateTimeFormat.format((Date)values[offset]));
-            valueIdx++;
         } else if(isType(TYPE_DATE)) {
             sb.append(dateFormat.format((Date)values[offset]));
-            valueIdx++;
         } else if(isType(TYPE_ENTRY)) {
             String entryId = toString(values, offset);
             Entry theEntry=null;
@@ -519,19 +515,15 @@ public class Column implements Constants {
                 sb.append(s);
             else
                 sb.append("<a href=\"mailto:" + s +"\">" + s +"</a>");
-            valueIdx++;
         } else if(isType(TYPE_URL)) {
             String s = toString(values, offset);
             if(Misc.equals(output, OUTPUT_CSV)) 
                 sb.append(s);
             else
                 sb.append("<a href=\"" + s +"\">" + s +"</a>");
-            valueIdx++;
         } else {
             sb.append(toString(values, offset));
-            valueIdx++;
         }
-        return valueIdx;
     }
 
     public int getOffset() {
