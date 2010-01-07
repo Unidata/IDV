@@ -155,7 +155,7 @@ public class ImageSequenceControl extends BaseImageControl {
      * Default ctor; sets the attribute flags
      */
     public ImageSequenceControl() {
-        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
+        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_ZPOSITION
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
 

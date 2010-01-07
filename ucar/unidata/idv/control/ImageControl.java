@@ -1,20 +1,18 @@
 /*
- * $Id: ImageControl.java,v 1.28 2007/08/09 23:30:21 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -78,7 +76,8 @@ public class ImageControl extends BaseImageControl {
     /** topo flag */
     private boolean multipleIsTopography = false;
 
-
+    /** topo flag */
+    private boolean useTexture = true;
 
 
     /**
@@ -117,6 +116,7 @@ public class ImageControl extends BaseImageControl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
         imageDisplay = new ImageRGBDisplayable("plan_color_" + paramName);
+        setImageTexture(useTexture);
         if (getAlpha() != 1.0) {
             imageDisplay.setAlpha(getAlpha());
         }
@@ -146,9 +146,35 @@ public class ImageControl extends BaseImageControl {
             new WrapperWidget(
                 this, GuiUtils.rLabel("Transparency:"), doMakeAlphaSlider()));
 
+        if (getMultipleIsTopography()) {
+            JCheckBox toggle = new JCheckBox("", useTexture);
+            toggle.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        useTexture = ((JCheckBox) e.getSource()).isSelected();
+                        setImageTexture(useTexture);
+                    } catch (Exception ve) {
+                        logException("useTexture", ve);
+                    }
+                }
+            });
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Display:"),
+                    GuiUtils.left(GuiUtils.hbox(new Component[] {
+                        GuiUtils.rLabel("Texture: "),
+                        toggle }))));
+        }
+
     }
 
 
+    /**
+     * Override the base class method
+     * @return the contents
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   Problem making data
+     */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         return GuiUtils.topLeft(doMakeWidgetComponent());
@@ -260,7 +286,44 @@ public class ImageControl extends BaseImageControl {
      * @return  the flags
      */
     protected int getImageFlags() {
-        return FLAG_COLORTABLE | FLAG_ZPOSITION;
+        int imageFlags = FLAG_COLORTABLE;
+        if ( !getMultipleIsTopography()) {
+            imageFlags |= FLAG_ZPOSITION;
+        }
+        //return FLAG_COLORTABLE | FLAG_ZPOSITION;
+        return imageFlags;
+    }
+
+    /**
+     * Set whether this display should be textured or smoothed. Used
+     * by XML persistence (bundles) for the most part.
+     * @param v  true if textured.
+     */
+    public void setUseTexture(boolean v) {
+        useTexture = v;
+    }
+
+    /**
+     * Get whether this display should be textured or not.
+     * @return true if textured.
+     */
+    public boolean getUseTexture() {
+        return useTexture;
+    }
+
+    /**
+     * Set the texture map
+     * @param useTexture true to texture
+     */
+    private void setImageTexture(boolean useTexture) {
+        if (imageDisplay != null) {
+            try {
+                imageDisplay.addConstantMap(new ConstantMap(useTexture
+                        ? 1.0
+                        : 0.0, Display.TextureEnable));
+            } catch (Exception e) {
+                logException("Setting smooth value", e);
+            }
+        }
     }
 }
-

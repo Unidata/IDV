@@ -151,7 +151,7 @@ public abstract class BaseImageControl extends GridDisplayControl {
      * Default ctor; sets the attribute flags
      */
     public BaseImageControl() {
-        setAttributeFlags(FLAG_ZPOSITION);
+        //setAttributeFlags(FLAG_ZPOSITION);
     }
 
 
