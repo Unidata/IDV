@@ -476,6 +476,8 @@ public class Column implements Constants {
             if(Misc.equals(output, OUTPUT_CSV)) {
                 sb.append(toString(values, offset));
             } else {
+                //                System.err.println("offset:" + offset +" values:");
+                //                Misc.printArray("", values);
                 double percent = (Double)values[offset];
                 sb.append((int)(percent*100)+"");
             }
@@ -606,6 +608,7 @@ public class Column implements Constants {
             statementIdx++;
         } else {
             //            System.err.println("\tset statement:" + offset + " " + values[offset]);
+
             if (values[offset] != null) {
                 statement.setString(statementIdx, toString(values, offset));
             } else {

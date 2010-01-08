@@ -4860,6 +4860,13 @@ return new Result(title, sb);
 
 
 
+    public void storeEntry(Entry entry) throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        insertEntries(entries, false);
+    }
+
+
 
     /**
      * _more_
@@ -4962,8 +4969,8 @@ return new Result(title, sb);
             TypeHandler typeHandler = entry.getTypeHandler();
             typeHandler = typeHandler.getTypeHandlerForCopy(entry);
 
+            //            isNew = true;
             String sql = typeHandler.getInsertSql(isNew);
-            //            System.err.println("sql:" + sql);
             PreparedStatement typeStatement = null;
             if (sql != null) {
                 typeStatement = (PreparedStatement) typeStatements.get(sql);

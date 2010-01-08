@@ -140,7 +140,7 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    private void init(Element entryNode) throws Exception {
+    protected void init(Element entryNode) throws Exception {
         type = XmlUtil.getAttribute(entryNode, ATTR_DB_NAME);
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
@@ -566,6 +566,7 @@ public class GenericTypeHandler extends TypeHandler {
                              Object[] values, PreparedStatement stmt,
                              boolean isNew)
             throws Exception {
+
         int stmtIdx = 1;
         stmt.setString(stmtIdx++, entry.getId());
         if (values != null) {
@@ -610,7 +611,9 @@ public class GenericTypeHandler extends TypeHandler {
     public Object[] getValues(Clause clause) throws Exception {
         Object[] values = makeValues();
         Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
+
                                                      getTableName(), clause);
+
         try {
             ResultSet results2 = stmt.getResultSet();
             if (results2.next()) {
@@ -730,6 +733,7 @@ public class GenericTypeHandler extends TypeHandler {
     public String getTableName() {
         return type;
     }
+
 
 
 

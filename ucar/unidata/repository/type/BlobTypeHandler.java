@@ -47,9 +47,6 @@ import java.util.Hashtable;
 public class BlobTypeHandler extends GenericTypeHandler {
 
 
-    /** _more_ */
-    private Hashtable<String, Hashtable> propertiesCache =
-        new Hashtable<String, Hashtable>();
 
     /**
      * _more_
@@ -65,6 +62,12 @@ public class BlobTypeHandler extends GenericTypeHandler {
     }
 
 
+    public BlobTypeHandler(Repository repository, String type,
+                       String description) {
+        super(repository, type, description);
+    }
+
+
 
     /**
      * _more_
@@ -76,7 +79,8 @@ public class BlobTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     protected Hashtable getProperties(Entry entry) throws Exception {
-        Hashtable properties = propertiesCache.get(entry.getId());
+        if(entry==null) return new Hashtable();
+        Hashtable properties = null;
         if (properties == null) {
             Object[]   values     = entry.getValues();
             XmlEncoder xmlEncoder = new XmlEncoder();
@@ -84,10 +88,10 @@ public class BlobTypeHandler extends GenericTypeHandler {
                     && (values[0] != null)) {
                 properties =
                     (Hashtable) xmlEncoder.decodeXml((String) values[0]);
-            } else {
+            } 
+            if(properties==null) {
                 properties = new Hashtable();
             }
-            propertiesCache.put(entry.getId(), properties);
         }
         return properties;
     }
