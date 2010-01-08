@@ -2929,8 +2929,8 @@ Misc.run(new Runnable() {
             dataManager.initEncoder(encoder, forRead);
         }
         //For now put this here
-        //        encoder.registerNewClassName("ucar.unidata.repository.InteractiveRepositoryClient",
-        //                                     "ucar.unidata.repository.client.InteractiveRepositoryClient");
+        encoder.registerNewClassName("ucar.unidata.repository.InteractiveRepositoryClient",
+                                     "ucar.unidata.repository.client.InteractiveRepositoryClient");
 
         encoder.registerNewClassName(
             "ucar.unidata.idv.FlythroughPoint",
