@@ -1220,6 +1220,13 @@ public class JythonManager extends IdvManager implements ActionListener {
         interpreter.exec(
             "import ucar.unidata.data.grid.GridUtil as GridUtil");
         interpreter.exec(
+            "import ucar.unidata.data.DataSelection as DataSelection");
+        interpreter.exec(
+            "import ucar.unidata.data.GeoLocationInfo as GeoLocationInfo");
+        interpreter.exec(
+            "import ucar.unidata.data.GeoSelection as GeoSelection");
+        interpreter.exec("from java.lang import Integer");
+        interpreter.exec(
             "import ucar.unidata.data.grid.GridMath as GridMath");
         interpreter.exec("import ucar.unidata.data.DataUtil as DataUtil");
         interpreter.exec("import ucar.visad.Util as Util");
