@@ -1,20 +1,18 @@
 /*
- * $Id: DataSelection.java,v 1.43 2006/12/01 20:41:21 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -182,6 +180,62 @@ public class DataSelection {
             this.properties = (Hashtable) that.properties.clone();
         }
     }
+
+
+    /**
+     * set the x and y stride
+     *
+     * @param stride the stride
+     */
+    public void setXYStride(int stride) {
+        getGeoSelection(true).setXStride(stride);
+        getGeoSelection(true).setYStride(stride);
+    }
+
+
+    /**
+     * set the x stride
+     *
+     * @param stride the stride
+     */
+
+    public void setXStride(int stride) {
+        getGeoSelection(true).setXStride(stride);
+    }
+
+    /**
+     * set the y stride
+     *
+     * @param stride the stride
+     */
+    public void setYStride(int stride) {
+        getGeoSelection(true).setYStride(stride);
+    }
+
+    /**
+     * set the z stride
+     *
+     * @param stride the stride
+     */
+    public void setZStride(int stride) {
+        getGeoSelection(true).setZStride(stride);
+    }
+
+
+    /**
+     * set the clipping bounds
+     *
+     * @param north north
+     * @param west west
+     * @param south south
+     * @param east east
+     */
+    public void setBounds(double north, double west, double south,
+                          double east) {
+        getGeoSelection(true).setBoundingBox(new GeoLocationInfo(north, west,
+                south, east));
+    }
+
 
 
     /**
@@ -439,6 +493,7 @@ public class DataSelection {
     }
 
 
+
     /**
      * Get the GeoSelection property.
      *
@@ -505,4 +560,3 @@ public class DataSelection {
 
 
 }
-
