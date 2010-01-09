@@ -101,8 +101,10 @@ line using: and -Dbasedir=/some/other/dir
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
         <antcall target="svnco" /> 
+<!--  No need to do this automatically
         <echo message="FTPing visad." />
         <antcall target="visad" /> 
+-->
         <echo message="Building ucar packages." />
         <ant antfile="${srcdir}/ucar/build.xml" target="all" />
     </target>
