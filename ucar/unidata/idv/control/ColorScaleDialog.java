@@ -1,20 +1,18 @@
 /*
- * $Id: ColorScaleDialog.java,v 1.19 2007/08/06 16:20:26 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -55,7 +53,6 @@ import javax.swing.event.*;
  * in the event Listeners appearing in the constructor.
  *
  * @author Unidata Development Team
- * @version $Revision: 1.19 $
  */
 public class ColorScaleDialog implements ActionListener {
 
@@ -82,6 +79,9 @@ public class ColorScaleDialog implements ActionListener {
 
     /** checkbox for visibility */
     private JCheckBox visibilityCbx;
+
+    /** checkbox for label visibility */
+    private JCheckBox labelVisibilityCbx;
 
     /** The display */
     private DisplayControlImpl displayControl;
@@ -127,6 +127,7 @@ public class ColorScaleDialog implements ActionListener {
         }
         //orientationBox.setSelectedItem(myInfo.getOrientation());
         visibilityCbx.setSelected(myInfo.getIsVisible());
+        labelVisibilityCbx.setSelected(myInfo.getLabelVisible());
 
         if (showDialog) {
             dialog.setVisible(true);
@@ -168,6 +169,7 @@ public class ColorScaleDialog implements ActionListener {
         }
         myInfo.setLabelColor(colorSwatch.getSwatchColor());
         myInfo.setIsVisible(visibilityCbx.isSelected());
+        myInfo.setLabelVisible(labelVisibilityCbx.isSelected());
         myInfo.setLabelFont(fontSelector.getFont());
         try {
             if (displayControl != null) {
@@ -190,18 +192,35 @@ public class ColorScaleDialog implements ActionListener {
         placementBox = new JComboBox(positions);
         colorSwatch = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
                 "Color Scale Label Color");
+        final JComponent colorComp = colorSwatch.getSetPanel();
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
         fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
         fontSelector.setFont(myInfo.getLabelFont());
+
+        labelVisibilityCbx = new JCheckBox("Visible",
+                                           myInfo.getLabelVisible());
+        labelVisibilityCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean showLabel = ((JCheckBox) e.getSource()).isSelected();
+                GuiUtils.enableTree(fontSelector.getComponent(), showLabel);
+                GuiUtils.enableTree(colorComp, showLabel);
+            }
+        });
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Visible: "), visibilityCbx,
             GuiUtils.rLabel("Position: "),
             GuiUtils.leftRight(placementBox, GuiUtils.filler()),
-            GuiUtils.rLabel("Label Font: "), fontSelector.getComponent(),
-            GuiUtils.rLabel("Label Color: "),
-            GuiUtils.leftRight(colorSwatch.getSetPanel(), GuiUtils.filler())
+            GuiUtils.rLabel("Labels: "),
+            GuiUtils.leftRight(labelVisibilityCbx, GuiUtils.filler()),
+            GuiUtils.filler(),
+            GuiUtils.leftRight(GuiUtils.rLabel("Font: "),
+                               fontSelector.getComponent()),
+            GuiUtils.filler(),
+            GuiUtils.leftRight(GuiUtils.rLabel("Color: "),
+                               GuiUtils.leftRight(colorComp,
+                                   GuiUtils.filler()))
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         contents = GuiUtils.leftRight(contents, GuiUtils.filler());
         if (showDialog) {
@@ -280,4 +299,3 @@ public class ColorScaleDialog implements ActionListener {
 
 
 }
-
