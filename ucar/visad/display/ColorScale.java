@@ -1,28 +1,22 @@
 /*
- * $Id: ColorScale.java,v 1.20 2007/06/29 14:26:07 dmurray Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.visad.display;
 
@@ -118,7 +112,7 @@ public class ColorScale extends DisplayableData {
     private float Y;  // percent of view bounds
 
     /** whether or not to label */
-    private boolean isLabelOn = true;
+    private boolean labelVisible = true;
 
     /** flag for whether all ticks should be labeled */
     private boolean labelAllTicks = true;
@@ -279,6 +273,7 @@ public class ColorScale extends DisplayableData {
         labelFont    = info.getLabelFont();
         labelColor   = info.getLabelColor();
         labelSide    = info.getLabelSide();
+        labelVisible = info.getLabelVisible();
         setVisible(info.getIsVisible());
         setUpScalarMaps();
         makeShapes();
@@ -336,6 +331,7 @@ public class ColorScale extends DisplayableData {
         labelFont    = info.getLabelFont();
         labelColor   = info.getLabelColor();
         labelSide    = info.getLabelSide();
+        labelVisible = info.getLabelVisible();
         setVisible(info.getIsVisible());
         makeShapes();
     }
@@ -359,6 +355,27 @@ public class ColorScale extends DisplayableData {
      */
     public Color getLabelColor() {
         return labelColor;
+    }
+
+    /**
+     * Set the visibility of the labels
+     * @param visible true to show labels
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    public void setLabelVisible(boolean visible)
+            throws RemoteException, VisADException {
+        labelVisible = visible;
+        makeShapes();
+    }
+
+    /**
+     * Get the label visbility
+     * @return the label visibility
+     */
+    public boolean getLabelVisble() {
+        return labelVisible;
     }
 
     /**
@@ -520,7 +537,7 @@ public class ColorScale extends DisplayableData {
                 shapeVector.add(bar);
             }
         }
-        if (isLabelOn && (colorPalette != null)) {
+        if (labelVisible && (colorPalette != null)) {
             VisADGeometryArray[] labels = createLabels(scaleBounds.width,
                                               scaleBounds.height);
             if (labels != null) {
@@ -530,6 +547,13 @@ public class ColorScale extends DisplayableData {
                         shapeVector.add(ith);
                     }
                 }
+            }
+        }
+        if (false) {
+            VisADLineArray outline = createOutline(scaleBounds.width,
+                                         scaleBounds.height);
+            if ((outline != null) && (outline.coordinates != null)) {
+                shapeVector.add(outline);
             }
         }
         shapes = new VisADGeometryArray[shapeVector.size()];
@@ -718,6 +742,115 @@ public class ColorScale extends DisplayableData {
         return triangleArray;
 
     }  // end createTriangles()
+
+    /**
+     * Creates a VisADLineArray for the outline of the scale
+     *
+     * @param height the height of the scale
+     * @param width the width of the scale
+     *
+     * @return a VisADLineArray that makes up the outline
+     * @throws VisADException there's a problem with VisAD
+     */
+    private VisADLineArray createOutline(float width, float height)
+            throws VisADException {
+
+        int numPoints = 4;  // four corners, plus the start again to close
+        int numValuesPerPoint = 3;
+        int numPointsPerLine  = 2;
+
+        float[] outline =
+            new float[numPoints * numPointsPerLine * numValuesPerPoint];
+
+        float[] rgb;
+        if (labelColor == null) {
+            if (getDisplay() != null) {
+                rgb = getDisplay().getDisplayRenderer().getRendererControl()
+                    .getForegroundColor();
+            } else {
+                rgb = DEFAULT_LABEL_COLOR.getColorComponents(null);
+            }
+        } else {
+            rgb = labelColor.getColorComponents(null);
+        }
+        byte red   = ShadowType.floatToByte(rgb[0]);
+        byte green = ShadowType.floatToByte(rgb[1]);
+        byte blue  = ShadowType.floatToByte(rgb[2]);
+        byte[] colors =
+            new byte[numPoints * numPointsPerLine * numValuesPerPoint];
+        int   colorIndex = 0;
+        int   index      = 0;
+        float xdelta     = width;  //= (orient == HORIZONTAL_ORIENT)
+        //  ? width
+        //  : -width;
+
+        float ydelta = (orient == HORIZONTAL_ORIENT)
+                       ? height
+                       : -height;
+
+        for (int i = 0; i < numPoints; i++) {
+
+            switch (i) {
+
+              case 0 :
+                  // First & last point in outline
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = xdelta;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  break;
+
+              case 1 :
+                  outline[index++] = xdelta;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = xdelta;
+                  outline[index++] = ydelta;
+                  outline[index++] = 0.0f;
+                  break;
+
+              case 2 :
+                  outline[index++] = xdelta;
+                  outline[index++] = ydelta;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = ydelta;
+                  outline[index++] = 0.0f;
+                  break;
+
+              case 3 :
+                  outline[index++] = 0.0f;
+                  outline[index++] = ydelta;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  outline[index++] = 0.0f;
+                  break;
+
+              default :
+                  break;
+            }
+
+            // set the colors
+            for (int j = 0; j < numPointsPerLine; j++) {
+                colors[colorIndex++] = red;
+                colors[colorIndex++] = green;
+                colors[colorIndex++] = blue;
+            }
+
+
+        }  // for (i<numColours)
+
+        VisADLineArray lineArray = new VisADLineArray();
+        lineArray.coordinates = outline;
+        lineArray.colors      = colors;
+        lineArray.vertexCount = numPoints * numPointsPerLine;
+
+        return lineArray;
+
+    }  // end createOutline()
 
     /**
      * Create the labels for the scale.  The return will be a
@@ -1178,4 +1311,3 @@ public class ColorScale extends DisplayableData {
         return y;
     }
 }
-

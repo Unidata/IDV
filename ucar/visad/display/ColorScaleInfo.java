@@ -1,33 +1,30 @@
-/**
- * $Id: ColorScaleInfo.java,v 1.10 2006/12/01 17:42:07 jeffmc Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
  */
 
 package ucar.visad.display;
 
 
 import ucar.unidata.ui.drawing.Glyph;
+import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.GuiUtils;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -94,7 +91,10 @@ public class ColorScaleInfo {
     /** visibility */
     private boolean isVisible = false;
 
-    /** This keeps track of whether we need to update the X, Y and orientation         */
+    /** visibility of the labels */
+    private boolean labelVisible = true;
+
+    /** This keeps track of whether we need to update the X, Y and orientation */
     private boolean dirty = true;
 
     /** default ctor */
@@ -102,6 +102,11 @@ public class ColorScaleInfo {
         this("ColorScaleInfo");
     }
 
+    /**
+     * Create a ColorScaleInfo with a name
+     *
+     * @param name  the name
+     */
     public ColorScaleInfo(String name) {
         this.name = name;
     }
@@ -209,52 +214,74 @@ public class ColorScaleInfo {
         this.labelColor   = that.labelColor;
         this.labelSide    = that.labelSide;
         this.isVisible    = that.isVisible;
+        this.labelVisible = that.labelVisible;
     }
 
     /**
      * Create a color scale information object from the given param string
      *
      * @param params the param string.  see getParamStringFormat for details
+     * @param isParamString  true if this is a param string
      */
     public ColorScaleInfo(String params, boolean isParamString) {
         dirty = true;
         List<String> toks = StringUtil.split(params, ";", true, true);
-        for (String pair: toks) {
+        for (String pair : toks) {
             List subToks = StringUtil.split(pair, "=");
             if (subToks.size() != 2) {
                 throw new IllegalArgumentException(
-                                                   "Bad color scale info info format: " + params);
+                    "Bad color scale info info format: " + params);
             }
             String name  = subToks.get(0).toString().trim();
             String value = subToks.get(1).toString().trim();
-            if(name.equals("visible")) {
+            if (name.equals("visible")) {
                 this.isVisible = new Boolean(value).booleanValue();
-            } else  if(name.equals("name")) {
-                this.name =  name;
-            } else if(name.equals("color")) {
-                this.labelColor   = ucar.unidata.util.GuiUtils.decodeColor(value, this.labelColor);
-            } else if(name.equals("orientation")) {
-                if(value.equals("horizontal"))
+            } else if (name.equals("labelvisible")) {
+                this.labelVisible = new Boolean(value).booleanValue();
+            } else if (name.equals("name")) {
+                this.name = name;
+            } else if (name.equals("color")) {
+                this.labelColor =
+                    ucar.unidata.util.GuiUtils.decodeColor(value,
+                        this.labelColor);
+            } else if (name.equals("orientation")) {
+                if (value.equals("horizontal")) {
                     this.orient = HORIZONTAL;
-                else if(value.equals("vertical"))
+                } else if (value.equals("vertical")) {
                     this.orient = VERTICAL;
-                else throw new IllegalArgumentException("Unknown orientation:" + value); 
-            } else if(name.equals("placement")) {
-                if(value.equals("top")) this.placement    = TOP;
-                else if(value.equals("bottom")) this.placement    = BOTTOM;
-                else if(value.equals("left")) this.placement    = LEFT;
-                else if(value.equals("right")) this.placement    = RIGHT;
-                else throw new IllegalArgumentException("Unknown placement:" + value); 
+                } else {
+                    throw new IllegalArgumentException("Unknown orientation:"
+                            + value);
+                }
+            } else if (name.equals("placement")) {
+                if (value.equals("top")) {
+                    this.placement = TOP;
+                } else if (value.equals("bottom")) {
+                    this.placement = BOTTOM;
+                } else if (value.equals("left")) {
+                    this.placement = LEFT;
+                } else if (value.equals("right")) {
+                    this.placement = RIGHT;
+                } else {
+                    throw new IllegalArgumentException("Unknown placement:"
+                            + value);
+                }
             } else {
-                throw new IllegalArgumentException("Unknown ColorScaleInfo:" + name); 
+                throw new IllegalArgumentException("Unknown ColorScaleInfo:"
+                        + name);
             }
 
         }
 
     }
 
+    /**
+     * Get the param string format
+     *
+     * @return the param string format
+     */
     public static String getParamStringFormat() {
-        return "visible=true|false;color=somecolor;orientation=horizontal|vertical;placement=top|left|bottom|right";
+        return "visible=true|false;color=somecolor;orientation=horizontal|vertical;placement=top|left|bottom|right;labelvisible=true";
     }
 
     /**
@@ -450,11 +477,28 @@ public class ColorScaleInfo {
     }
 
     /**
-     * Get the color of the labels
-     * @return label color
+     * Get the visibility
+     * @return visibility
      */
     public boolean getIsVisible() {
         return isVisible;
+    }
+
+    /**
+     * Set the label visibility
+     *
+     * @param show   true to be label visible
+     */
+    public void setLabelVisible(boolean show) {
+        labelVisible = show;
+    }
+
+    /**
+     * Get the label visibility
+     * @return label visibility
+     */
+    public boolean getLabelVisible() {
+        return labelVisible;
     }
 
     /**
@@ -504,4 +548,3 @@ public class ColorScaleInfo {
     }
 
 }
-
