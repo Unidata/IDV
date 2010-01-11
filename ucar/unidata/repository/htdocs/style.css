@@ -96,8 +96,9 @@ a:hover {
 }
 
 .time {
-	xcolor:#666;
-	xfont-weight:normal;
+	font-size:8px;
+        color:#666;
+	font-style:italic;
 	margin:0;
 	white-space:nowrap;
 }

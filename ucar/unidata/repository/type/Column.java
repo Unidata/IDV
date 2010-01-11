@@ -1163,6 +1163,8 @@ public class Column implements Constants {
                             : "");
             if (values != null) {
                 value = toString(values, offset);
+            } else if(request.defined(id)) {
+                value  = request.getString(id);
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 Hashtable props =

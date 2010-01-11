@@ -154,7 +154,7 @@ public class RssOutputHandler extends OutputHandler {
         if (state.getEntry() != null) {
             links.add(
                 makeLink(
-                    request, state.entry, OUTPUT_RSS_SUMMARY,
+                         request, state.getEntry(), OUTPUT_RSS_SUMMARY,
                     "/" + IOUtil.stripExtension(state.getEntry().getName())
                     + ".rss"));
         }

@@ -607,7 +607,7 @@ public class RepositoryFtplet extends DefaultFtplet {
             return handleError(
                 session, ftpRequest,
                 FtpReply.REPLY_450_REQUESTED_FILE_ACTION_NOT_TAKEN,
-                "You do not have the access to create a directory");
+                "You do not have the access to store the file");
         }
 
 
@@ -620,8 +620,10 @@ public class RepositoryFtplet extends DefaultFtplet {
         FileOutputStream fos =
             getRepository().getStorageManager().getFileOutputStream(newFile);
         try {
+            System.err.println ("transferring from client");
             session.getDataConnection().openConnection().transferFromClient(
                 session, fos);
+            System.err.println ("done");
         } finally {
             IOUtil.close(fos);
         }
@@ -629,10 +631,12 @@ public class RepositoryFtplet extends DefaultFtplet {
         newFile = getRepository().getStorageManager().moveToStorage(request,
                 newFile);
 
+        System.err.println ("making entry");
         Entry entry = getEntryManager().addFileEntry(request, newFile, group,
                           name, request.getUser());
 
 
+        System.err.println ("closing session");
         session.write(
             new DefaultFtpReply(
                 FtpReply.REPLY_257_PATHNAME_CREATED, "File created"));

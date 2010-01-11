@@ -1556,8 +1556,8 @@ function MapSelector (imgId, argBase, absolute) {
     this.argBase = argBase;
     this.absolute = absolute;
     this.image = util.getDomObject(imgId);
-    this.imageWidth = this.image.obj.width;
-    this.imageHeight = this.image.obj.height;
+
+
 
     this.mapIdx=0;
 
@@ -1578,8 +1578,12 @@ function MapSelector (imgId, argBase, absolute) {
         this.mapIdx++;
         if(this.mapIdx >= mapImages.length) this.mapIdx=0;
         this.image.obj.src = mapImages[this.mapIdx].url;
-        this.imageWidth = this.image.obj.width;
-        this.imageHeight = this.image.obj.height;
+
+
+
+
+
+
         this.init();
     }
 
@@ -1605,6 +1609,8 @@ function MapSelector (imgId, argBase, absolute) {
 
 
     this.init = function() {
+
+
        if(this.latLonBoxOffset<0) 
             this.latLonBoxOffset = this.box.obj.offsetTop;
 
@@ -1644,14 +1650,16 @@ function MapSelector (imgId, argBase, absolute) {
         initMaps();
         var map = mapImages[this.mapIdx];
 
-    //    var north =  map.originLat-y1/this.imageHeight*map.height;
-    //    var west =  map.originLon  + x1/this.imageWidth*map.width;
 
-        iy1 = this.imageHeight*(map.originLat - lat1)/map.height;
-        iy2 = this.imageHeight*(map.originLat - lat2)/map.height;
+       imageWidth = this.image.obj.width;
+       imageHeight = this.image.obj.height;
+       
 
-        ix1 = this.imageWidth*(lon1-map.originLon)/map.width;
-        ix2 = this.imageWidth*(lon2-map.originLon)/map.width;
+        iy1 = imageHeight*(map.originLat - lat1)/map.height;
+        iy2 = imageHeight*(map.originLat - lat2)/map.height;
+
+        ix1 = imageWidth*(lon1-map.originLon)/map.width;
+        ix2 = imageWidth*(lon2-map.originLon)/map.width;
 
         var  imageLeft =  util.getLeft(this.image.obj);
         var  imageTop =  util.getTop(this.image.obj);
@@ -1694,6 +1702,7 @@ function MapSelector (imgId, argBase, absolute) {
         var imageY = ey - ulY;
 
 
+
         if(this.doFirst) {
             this.doFirst =0;
             this.latLonX1 = imageX;
@@ -1716,10 +1725,18 @@ function MapSelector (imgId, argBase, absolute) {
         initMaps();
 
         var map = mapImages[this.mapIdx];
-        var north =  map.originLat-y1/this.imageHeight*map.height;
-        var south =  map.originLat-y2/this.imageHeight*map.height;
-        var west =  map.originLon  + x1/this.imageWidth*map.width;
-        var east =  map.originLon + x2/this.imageWidth*map.width;
+
+
+
+       imageWidth = this.image.obj.width;
+       imageHeight = this.image.obj.height;
+        //        alert("height: " + imageHeight);
+
+
+        var north =  map.originLat-y1/imageHeight*map.height;
+        var south =  map.originLat-y2/imageHeight*map.height;
+        var west =  map.originLon  + x1/imageWidth*map.width;
+        var east =  map.originLon + x2/imageWidth*map.width;
 
 
         if(this.fldNorth) {
@@ -1769,7 +1786,6 @@ function initMaps() {
     if(mapImages) return;
     mapImages= new Array();
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/caida.jpg",-180,90,180,-90);
-
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/conus.png",-126.57781982421875,51.126121520996094,-65.26223754882812,18.237728118896484);
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/usgstopo.jpg",-180,90,180,-90);
     mapImages[mapImages.length] = new Map("${urlroot}/images/maps/worldday.jpg",-180,90,180,-90);

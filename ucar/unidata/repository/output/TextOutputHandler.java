@@ -205,19 +205,21 @@ public class TextOutputHandler extends OutputHandler {
         }
 
 
-        StringBuffer head =
-            new StringBuffer(
-                "<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shCore.css\" />\n<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shThemeDefault.css\" />\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shCore.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushJScript.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushBash.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushCpp.js\">\n</script>\n");
-
-
-        //<script type="text/javascript">SyntaxHighlighter.all();</script> 
-
-
-
         String contents =
             getStorageManager().readSystemResource(entry.getFile());
         StringBuffer sb  = new StringBuffer();
-
+        
+        sb.append("<pre>\n");
+        int          cnt = 0;
+        for (String line : (List<String>) StringUtil.split(contents, "\n",
+                false, false)) {
+            cnt++;
+            line = line.replace("\r", "");
+            line = HtmlUtil.entityEncode(line);
+            sb.append("<a " + HtmlUtil.attr("name", "line" + cnt)
+                      + "></a><a href=#line" + cnt + ">" + cnt + "</a> "
+                      + HtmlUtil.space(1) + line + "<br>");
+        }
         sb.append("</pre>");
         return makeLinksResult(request, msg("Text"), sb, new State(entry));
     }

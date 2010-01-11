@@ -1413,8 +1413,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
         sb.append("<td align=right width=200><div class=entryrowlabel>");
         sb.append(getRepository().formatDateShort(request,
-                new Date(entry.getStartDate()),
-                getEntryManager().getTimezone(entry), extraAlt.toString()));
+                                                  new Date(entry.getStartDate()),
+                                                  getEntryManager().getTimezone(entry), extraAlt.toString()));
         sb.append("</div></td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
 
