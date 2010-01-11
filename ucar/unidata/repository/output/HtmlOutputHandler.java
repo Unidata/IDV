@@ -921,8 +921,10 @@ public class HtmlOutputHandler extends OutputHandler {
         List labels = new ArrayList();
         List ids    = new ArrayList();
         for (Entry entry : entries) {
+            String label = entry.getLabel();
+            label = label.replaceAll(","," ");
             times.add(SqlUtil.format(new Date(entry.getStartDate())));
-            labels.add(entry.getLabel());
+            labels.add(label);
             ids.add(entry.getId());
         }
         String tmp = StringUtil.replace(timelineAppletTemplate, "${times}",
