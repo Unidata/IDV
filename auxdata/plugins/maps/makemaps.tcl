@@ -3,7 +3,7 @@ set ::gempak "laraine:/home/gempak/GEMPAK5.9.4/gempak/maps/ascii/asc"
 set jar jar
 
 proc makeMap {file name args} {
-#    puts "   Map: $file"
+    puts "   Map: $file"
     global xml mapFiles pluginName dir 
     array set A {-category Maps -color 0x00CC00}
     if {$::dfltCategory!=""} {set A(-category) $::dfltCategory}
@@ -174,10 +174,10 @@ makeMap ${gempak}dcvaac.ncp "DC VAAC Boundary"
 makeMap ${gempak}hpcsfc.ncp "HPC SFC Anl Boundary"
 makeMap ${gempak}hikfwa.ncp "1000 Fathom Line"
 
-
+}
 
 startPlugin europemaps "European Maps" -category Europe -color 0x00CC00 
-makeMap files/OUTLEURO Europe   OUTLEURO
+makeMap files/OUTLEURO Europe 
 makeMap files/austria.shp Austria 
 makeMap files/belgium.shp Belgium 
 makeMap files/czech.shp Czech 
@@ -189,12 +189,14 @@ makeMap files/hungary.shp Hungary
 makeMap files/italy.shp Italy 
 makeMap files/norway.shp Norway 
 makeMap files/portugal.shp Portugal 
-makeMap files/provinces.shp Provinces 
+makeMap files/netherlands.shp "The Netherlands"
 makeMap files/spain.shp Spain 
 makeMap files/sweden.shp Sweden 
 makeMap files/switzerland.shp Switzerland 
 makeMap files/uk.shp UK 
 endPlugin
+
+if {0} {
 
 
 startPlugin chinamaps "China Maps" -category China -color 0x00CC00 
