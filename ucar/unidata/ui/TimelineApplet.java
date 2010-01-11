@@ -95,6 +95,7 @@ public class TimelineApplet extends Applet {
         List realTimes = new ArrayList();
         //        System.err.println("TIMES:" + times);
         //        System.err.println("labels:" + labels);
+        //        System.err.println("ids:" + ids);
         List idList = null;
         JComponent loadComp = new JPanel();
         try {
@@ -103,9 +104,12 @@ public class TimelineApplet extends Applet {
                 List labelStrings = StringUtil.split(labels,",",true, true);
                 if(ids!=null) idList = StringUtil.split(ids,",",true, true);
                 for(int i=0;i<timeStrings.size();i++) {
-                    realTimes.add(new MyDatedObject(DateUtil.parse((String) timeStrings.get(i)),
-                                                    (String)labelStrings.get(i),
-                                                    (String)(idList!=null?idList.get(i):null)));
+                    String id = (String)(idList!=null?idList.get(i):null);
+                    Date date  = DateUtil.parse((String) timeStrings.get(i));
+                    String label = (String)labelStrings.get(i);
+                    MyDatedObject mdo = new MyDatedObject(date, label, id);
+                    //                    System.err.println ("item:" +  label + " " + date +" id=" + id);
+                    realTimes.add(mdo);
                 }
             }
         } catch(Exception exc) {
@@ -153,7 +157,7 @@ public class TimelineApplet extends Applet {
         timeline.setDatedThings(realTimes, true);
         timeline.setUseDateSelection(false);
         JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(LayoutUtil.centerRight(
-                                                                                                                         label,loadComp),new Insets(0,5,0,0)));
+                                                                                                                             label,loadComp),new Insets(0,5,0,0)));
         container.setBorder(BorderFactory.createLineBorder(Color.black));
 
         this.add(container);
@@ -161,23 +165,31 @@ public class TimelineApplet extends Applet {
 
     private void doLoad(String loadUrl) {
         try {
-        StringBuffer  ids = new StringBuffer();
-        List selected = timeline.getSelected();
-        for(int i=0;i<selected.size();i++) {
-            if(i>0) ids.append(",");
-            ids.append(((MyDatedObject) selected.get(i)).id.toString());
-        }
-        URL base  = getDocumentBase();
-        loadUrl  = loadUrl.replace("%ids%", ids.toString());
-        loadUrl  = loadUrl.replace("%25ids%25", ids.toString());
-        if(loadWhat!=null) {
-            loadUrl  = loadUrl.replace("%loadtype%", loadWhat.getSelectedItem().toString());
-            loadUrl  = loadUrl.replace("%25loadtype%25", loadWhat.getSelectedItem().toString());
-        }
-        String s = "http://" + base.getHost() +":" + base.getPort() +loadUrl;
-        URL doc = new URL(s);
-        System.err.println ("URL: " + doc);
-        getAppletContext().showDocument(doc);
+            StringBuffer  ids = new StringBuffer();
+            List selected = timeline.getSelected();
+            String extra = "&EXTRA=";
+            for(int i=0;i<selected.size();i++) {
+                if(i>0) ids.append(",");
+                MyDatedObject mdo = (MyDatedObject) selected.get(i);
+                extra = extra+mdo;
+                ids.append(mdo.id.toString());
+            }
+            URL base  = getDocumentBase();
+            loadUrl  = loadUrl.replace("%ids%", ids.toString());
+            loadUrl  = loadUrl.replace("%25ids%25", ids.toString());
+            if(loadWhat!=null) {
+                loadUrl  = loadUrl.replace("%loadtype%", loadWhat.getSelectedItem().toString());
+                loadUrl  = loadUrl.replace("%25loadtype%25", loadWhat.getSelectedItem().toString());
+            }
+            int port =base.getPort();
+            String portString = "";
+            if(port!=80 && port!=-1) {
+                portString = ":" +port;
+            }
+            String s = "http://" + base.getHost()  + portString +loadUrl;
+            URL doc = new URL(s);
+            System.err.println ("URL: " + doc);
+            getAppletContext().showDocument(doc);
         } catch(Exception exc) {
             exc.printStackTrace();
         }

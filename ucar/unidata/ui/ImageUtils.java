@@ -763,6 +763,8 @@ public class ImageUtils {
         repaintManager.setDoubleBufferingEnabled(true);
         //        component.repaint();
         //        RepaintManager.setCurrentManager(manager);
+
+
         return image;
     }
 
@@ -1142,6 +1144,7 @@ public class ImageUtils {
      */
     public static Image getImage(JEditorPane editor, Color transparentColor)
             throws Exception {
+        editor.setBackground(transparentColor);
         Image i = getImage(editor);
         if (transparentColor != null) {
             i = makeColorTransparent(i, transparentColor);
