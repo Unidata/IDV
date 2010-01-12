@@ -1,20 +1,18 @@
 /*
- * $Id: ProjectionCoordinateSystem.java,v 1.25 2006/08/18 17:28:41 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -140,19 +138,41 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
         return projection;
     }
 
-    public static boolean debug =  false;
+    /** _more_          */
+    public static boolean debug = false;
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param array _more_
+     * @param t1 _more_
+     * @param t2 _more_
+     */
     private void debug(String what, double[][] array, long t1, long t2) {
-	if(debug && array[0].length>100) {
-	    System.err.println(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
-	    ucar.unidata.util.Misc.printStack(what);
-	}
+        if (debug && (array[0].length > 100)) {
+            System.err.println(what + " projection:"
+                               + projection.getClass().getName() + " time:"
+                               + (t2 - t1) + " size:" + array[0].length);
+            ucar.unidata.util.Misc.printStack(what);
+        }
     }
 
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param array _more_
+     * @param t1 _more_
+     * @param t2 _more_
+     */
     private void debug(String what, float[][] array, long t1, long t2) {
-	if(debug && array[0].length>100) {
-	    //	    System.err.println(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
-	    ucar.unidata.util.Misc.printStack(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
-	}
+        if (debug && (array[0].length > 100)) {
+            //      System.err.println(what +" projection:" + projection.getClass().getName() + " time:" + (t2-t1) +" size:" + array[0].length);
+            ucar.unidata.util.Misc.printStack(what + " projection:"
+                    + projection.getClass().getName() + " time:" + (t2 - t1)
+                    + " size:" + array[0].length);
+        }
     }
 
 
@@ -166,11 +186,11 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      * @throws VisADException  world coordinate array length != 2
      */
     public double[][] toReference(double[][] world) throws VisADException {
-	long t1 = System.currentTimeMillis();
-        double[][]result = projection.projToLatLon(world, world);
-	long t2 = System.currentTimeMillis();
-	debug("toReference(double)",result, t1,t2);
-	return result;
+        long       t1     = System.currentTimeMillis();
+        double[][] result = projection.projToLatLon(world, world);
+        long       t2     = System.currentTimeMillis();
+        debug("toReference(double)", result, t1, t2);
+        return result;
     }
 
 
@@ -184,12 +204,12 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      */
 
     public double[][] fromReference(double[][] latlon) throws VisADException {
-	long t1 = System.currentTimeMillis();
-        double[][]result =projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
-						  getLongitudeIndex());
-	long t2 = System.currentTimeMillis();
-	debug("fromReference(double)",result, t1,t2);
-	return result;
+        long t1 = System.currentTimeMillis();
+        double[][] result = projection.latLonToProj(latlon, latlon,
+                                getLatitudeIndex(), getLongitudeIndex());
+        long t2 = System.currentTimeMillis();
+        debug("fromReference(double)", result, t1, t2);
+        return result;
     }
 
 
@@ -204,11 +224,11 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      * @throws VisADException  world coordinate array length != 2
      */
     public float[][] toReference(float[][] world) throws VisADException {
-	long t1 = System.currentTimeMillis();
+        long      t1     = System.currentTimeMillis();
         float[][] result = projection.projToLatLon(world, world);
-	long t2 = System.currentTimeMillis();
-	debug("toReference(float)",result, t1,t2);
-	return result;
+        long      t2     = System.currentTimeMillis();
+        debug("toReference(float)", result, t1, t2);
+        return result;
     }
 
 
@@ -227,12 +247,12 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
             "ProjectionCoordinateSystem.fromReference "
             + projection.getClass().getName());
 
-	long t1 = System.currentTimeMillis();
-        float[][] result = projection.latLonToProj(latlon, latlon, getLatitudeIndex(),
-                                       getLongitudeIndex());
-	long t2 = System.currentTimeMillis();
-	debug("fromReference(float)",result, t1,t2);
-	return result;
+        long t1 = System.currentTimeMillis();
+        float[][] result = projection.latLonToProj(latlon, latlon,
+                               getLatitudeIndex(), getLongitudeIndex());
+        long t2 = System.currentTimeMillis();
+        debug("fromReference(float)", result, t1, t2);
+        return result;
     }
 
 
@@ -286,4 +306,3 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
         return true;
     }
 }
-

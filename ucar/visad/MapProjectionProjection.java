@@ -1,6 +1,5 @@
 /*
- * 
- * Copyright 1997-2009 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -18,7 +17,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.visad;
 
@@ -52,7 +50,7 @@ public class MapProjectionProjection extends ProjectionImpl {
     private MapProjection mapProjection;
 
     /**
-     * copy constructor - avoid clone !! 
+     * copy constructor - avoid clone !!
      *
      * @return _more_
      */
@@ -317,12 +315,11 @@ public class MapProjectionProjection extends ProjectionImpl {
      * @param args not used
      */
     public static void main(String[] args) {
-        MapProjectionProjection  a = new MapProjectionProjection();
-        ProjectionPointImpl p = a.latLonToProj(89, -101);
+        MapProjectionProjection a = new MapProjectionProjection();
+        ProjectionPointImpl     p = a.latLonToProj(89, -101);
         System.out.println("proj point = " + p);
         LatLonPoint ll = a.projToLatLon(p);
         System.out.println("ll = " + ll);
     }
 
 }
-

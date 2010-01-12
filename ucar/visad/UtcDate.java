@@ -1,20 +1,18 @@
 /*
- * $Id: UtcDate.java,v 1.6 2007/05/22 13:52:35 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -82,12 +80,20 @@ public final class UtcDate {
      * @return true if it contains the macro
      */
     public static boolean containsTimeMacro(String s) {
-        return containsTimeMacro(s,"%");
+        return containsTimeMacro(s, "%");
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     */
     public static boolean containsTimeMacro(String s, String prefix) {
         return (s.indexOf(MACRO_TIMESTAMP) >= 0)
-               || (s.indexOf(prefix+"time:") >= 0);
+               || (s.indexOf(prefix + "time:") >= 0);
     }
 
     /**
@@ -114,11 +120,23 @@ public final class UtcDate {
     public static String applyTimeMacro(String template, DateTime dttm,
                                         String noTimeLabel) {
 
-        return applyTimeMacro(template, dttm, noTimeLabel, "%","%");
+        return applyTimeMacro(template, dttm, noTimeLabel, "%", "%");
     }
 
+    /**
+     * _more_
+     *
+     * @param template _more_
+     * @param dttm _more_
+     * @param noTimeLabel _more_
+     * @param prefix _more_
+     * @param suffix _more_
+     *
+     * @return _more_
+     */
     public static String applyTimeMacro(String template, DateTime dttm,
-                                        String noTimeLabel,String prefix, String suffix) {
+                                        String noTimeLabel, String prefix,
+                                        String suffix) {
         if (dttm != null) {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           dttm.toString());
@@ -126,19 +144,20 @@ public final class UtcDate {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           noTimeLabel);
         }
-        prefix = prefix+"time:";
+        prefix = prefix + "time:";
         int prefixLength = prefix.length();
         int suffixLength = suffix.length();
-        int idx1 = template.indexOf(prefix);
+        int idx1         = template.indexOf(prefix);
         if (idx1 >= 0) {
             int idx2 = template.indexOf(suffix, idx1 + suffixLength);
             if (idx2 > idx1) {
-                String formatString = template.substring(idx1 + prefixLength, idx2);
-                String tmp          = ((dttm == null)
-                                       ? noTimeLabel
-                                       : formatUtcDate(dttm, formatString));
+                String formatString = template.substring(idx1 + prefixLength,
+                                          idx2);
+                String tmp = ((dttm == null)
+                              ? noTimeLabel
+                              : formatUtcDate(dttm, formatString));
                 template = StringUtil.replace(template,
-                        prefix+ formatString + suffix, tmp);
+                        prefix + formatString + suffix, tmp);
             }
 
         }
@@ -213,4 +232,3 @@ public final class UtcDate {
     }
 
 }
-
