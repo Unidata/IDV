@@ -1,26 +1,22 @@
 /*
- * $Id: IdvWindow.java,v 1.56 2007/08/07 09:51:11 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -30,12 +26,12 @@ import ucar.unidata.ui.ComponentGroup;
 import ucar.unidata.ui.IndependentWindow;
 import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
-
-
-import ucar.unidata.util.Removable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+
+
+import ucar.unidata.util.Removable;
 
 
 import java.awt.*;
@@ -77,10 +73,10 @@ public class IdvWindow extends MultiFrame {
     private static boolean waitState = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<Removable> removables = new ArrayList<Removable>();
 
-    /** _more_          */
+    /** _more_ */
     private boolean hasBeenDisposed = false;
 
     /** The window contents */
@@ -567,7 +563,7 @@ public class IdvWindow extends MultiFrame {
         }
         hasBeenDisposed = true;
 
-        if(lastActiveWindow == this) {
+        if (lastActiveWindow == this) {
             lastActiveWindow = null;
         }
 
@@ -580,7 +576,7 @@ public class IdvWindow extends MultiFrame {
 
         JMenuBar menuBar = (JMenuBar) getComponent(IdvUIManager.COMP_MENUBAR);
         if (menuBar != null) {
-            GuiUtils.empty(menuBar,true);
+            GuiUtils.empty(menuBar, true);
         }
 
         RovingProgress progress =
@@ -604,7 +600,7 @@ public class IdvWindow extends MultiFrame {
             ComponentGroup group = (ComponentGroup) groups.get(i);
             group.doRemove();
         }
-        this.groups               = null;
+        this.groups = null;
         destroyViewManagers();
         viewManagers         = null;
 
@@ -647,7 +643,7 @@ public class IdvWindow extends MultiFrame {
      */
     public void destroy() {
         destroyViewManagers();
-        GuiUtils.empty(getContainer(),true);
+        GuiUtils.empty(getContainer(), true);
     }
 
 
@@ -964,4 +960,3 @@ public class IdvWindow extends MultiFrame {
 
 
 }
-

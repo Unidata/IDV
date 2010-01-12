@@ -1,20 +1,18 @@
 /*
- * $Id: QuicklinkPanel.java,v 1.8 2007/08/04 10:38:07 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -120,7 +118,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
         editors.add(this);
         putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         Font f = GuiUtils.getDefaultFont();
-        if(f!=null) {
+        if (f != null) {
             this.setFont(f);
         }
     }
@@ -406,6 +404,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
 
 
+    /** _more_          */
     protected Hashtable showMap = new Hashtable();
 
 
@@ -437,7 +436,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 setEnabled(false);
                 try {
                     handleHyperLink(id);
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     logException("Handling link:" + id, exc);
                 }
                 setCursor(Cursor.getDefaultCursor());
@@ -448,15 +447,27 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
     }
 
+    /**
+     * _more_
+     *
+     * @param header _more_
+     *
+     * @return _more_
+     */
     protected String getHeader(String header) {
-        return "<b>"
-                +  header
-                + "</b><hr>";
+        return "<b>" + header + "</b><hr>";
     }
 
+    /**
+     * _more_
+     *
+     * @param cat _more_
+     *
+     * @return _more_
+     */
     protected boolean isOpen(String cat) {
-        cat = cat.replace(">","&gt;");
-        return Misc.equals(showMap.get(cat),"open");
+        cat = cat.replace(">", "&gt;");
+        return Misc.equals(showMap.get(cat), "open");
 
     }
 
@@ -467,13 +478,14 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
      * @param id  the hyperlink ID
      */
     protected void handleHyperLink(String id) {
-        if(id.startsWith("toggle:")) {
+        if (id.startsWith("toggle:")) {
             String category = id.substring(7);
-            category = category.replace(">","&gt;");
-            if(isOpen(category)) 
-                showMap.put(category,"closed");
-            else
-                showMap.put(category,"open");
+            category = category.replace(">", "&gt;");
+            if (isOpen(category)) {
+                showMap.put(category, "closed");
+            } else {
+                showMap.put(category, "open");
+            }
             doUpdate();
             return;
         }
@@ -629,7 +641,9 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             Hashtable    ht   = new Hashtable();
             List bundles = getIdv().getPersistenceManager().getBundles(type);
             StringBuffer html = new StringBuffer("<html><body>");
-            html.append(getHeader(getIdv().getPersistenceManager().getBundleTitle(type)));
+            html.append(
+                getHeader(
+                    getIdv().getPersistenceManager().getBundleTitle(type)));
             if (bundles.size() == 0) {
                 html.append(
                     "<h2> No Saved "
@@ -647,22 +661,28 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 if (categories.size() > 0) {
                     String catString = StringUtil.join(" &gt; ", categories);
                     StringBuffer catBuffer = (StringBuffer) ht.get(catString);
-                    boolean open = isOpen(catString);
+                    boolean      open      = isOpen(catString);
                     if (catBuffer == null) {
-                        String img = (open?"<img src=\"idvresource:/auxdata/ui/icons/CategoryOpen.gif\" border=\"0\">":
-                                      "<img src=\"idvresource:/auxdata/ui/icons/CategoryClosed.gif\" border=\"0\">");
-                        catBuffer = new StringBuffer((catCnt>0?"<br>":"")+"&nbsp;&nbsp;" + "<a href=\"toggle:" + catString+"\">" +img+"</a> " +
-                                                     catString +(open? "\n<ul style=\"margin-top:0;margin-bottom:0;\">\n":""));
+                        String img = (open
+                                      ? "<img src=\"idvresource:/auxdata/ui/icons/CategoryOpen.gif\" border=\"0\">"
+                                      : "<img src=\"idvresource:/auxdata/ui/icons/CategoryClosed.gif\" border=\"0\">");
+                        catBuffer = new StringBuffer(((catCnt > 0)
+                                ? "<br>"
+                                : "") + "&nbsp;&nbsp;" + "<a href=\"toggle:"
+                                      + catString + "\">" + img + "</a> "
+                                      + catString + (open
+                                ? "\n<ul style=\"margin-top:0;margin-bottom:0;\">\n"
+                                : ""));
                         catCnt++;
                         ht.put(catString, catBuffer);
                         cats.add(catString);
                     }
-                    if(open) {
+                    if (open) {
                         catBuffer.append(
-                                         "<li> <a href=\"" + id + "\"> "
-                                         + GuiUtils.getLocalName(
-                                                                 bundle.toString(), bundle.getLocal(),
-                                                                 false) + "</a>\n");
+                            "<li> <a href=\"" + id + "\"> "
+                            + GuiUtils.getLocalName(
+                                bundle.toString(), bundle.getLocal(),
+                                false) + "</a>\n");
                     }
                 } else {
                     html.append("<li> <a href=\"" + id + "\"> " + bundle
@@ -674,8 +694,9 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 StringBuffer sb        = (StringBuffer) ht.get(catString);
                 html.append(sb.toString());
                 boolean open = isOpen(catString);
-                if(open)
+                if (open) {
                     html.append("</ul>");
+                }
             }
 
             html.append("</body></html>");
@@ -692,7 +713,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          */
         public void objectClicked(String command, Object object) {
 
-            if(command.startsWith("toggle:")) {
+            if (command.startsWith("toggle:")) {
                 return;
             }
 
@@ -841,7 +862,8 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          * @return html
          */
         protected String getHtml() {
-            StringBuffer html = new StringBuffer("<html><body>" + getHeader("Special Displays"));
+            StringBuffer html = new StringBuffer("<html><body>"
+                                    + getHeader("Special Displays"));
             List controlDescriptors =
                 getIdv().getIdvUIManager().getStandAloneControlDescriptors();
             List      cats   = new ArrayList();
@@ -972,4 +994,3 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
 
 }
-

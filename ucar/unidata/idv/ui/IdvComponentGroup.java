@@ -1,26 +1,22 @@
 /*
- * $Id: IdvXmlUi.java,v 1.54 2007/08/16 14:08:22 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -46,16 +42,17 @@ import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlResourceCollection;
+import ucar.unidata.xml.XmlUtil;
+
+import java.awt.*;
+import java.awt.event.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -68,10 +65,10 @@ public class IdvComponentGroup extends ComponentGroup {
     /** _more_ */
     IntegratedDataViewer idv;
 
-    /** _more_          */
+    /** _more_ */
     private boolean autoImportDisplays = false;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox autoImportCbx;
 
     /**
@@ -141,7 +138,8 @@ public class IdvComponentGroup extends ComponentGroup {
         super.initWith(node);
         autoImportDisplays = XmlUtil.getAttribute(node, "autoimportdisplays",
                 autoImportDisplays);
-        boolean showHeader = XmlUtil.getAttribute(node, "showheader", getShowHeader());
+        boolean showHeader = XmlUtil.getAttribute(node, "showheader",
+                                 getShowHeader());
         setShowHeader(showHeader);
     }
 
@@ -156,7 +154,7 @@ public class IdvComponentGroup extends ComponentGroup {
     public Element createXmlNode(Document doc) {
         Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_GROUP);
         node.setAttribute("autoimportdisplays", "" + autoImportDisplays);
-        node.setAttribute("showheader", ""+getShowHeader());
+        node.setAttribute("showheader", "" + getShowHeader());
         List displayComponents = getDisplayComponents();
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp  =
@@ -189,7 +187,7 @@ public class IdvComponentGroup extends ComponentGroup {
      * @return _more_
      */
     protected List getPopupMenuItems(List items) {
-        idv.getIdvUIManager().getComponentGroupMenuItems(this,items);
+        idv.getIdvUIManager().getComponentGroupMenuItems(this, items);
         super.getPopupMenuItems(items);
         return items;
     }
@@ -205,7 +203,9 @@ public class IdvComponentGroup extends ComponentGroup {
     public void getViewManagers(List viewManagers) {
         List displayComponents = getDisplayComponents();
         //Fix Jonathon's NPE by bailing out here
-        if(displayComponents == null) return;
+        if (displayComponents == null) {
+            return;
+        }
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp  =
                 (ComponentHolder) displayComponents.get(i);
@@ -241,16 +241,28 @@ public class IdvComponentGroup extends ComponentGroup {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     */
     protected void doDrop(Object object) {
-        if(object instanceof DisplayControl) {
-            importDisplayControl((DisplayControlImpl)object);
+        if (object instanceof DisplayControl) {
+            importDisplayControl((DisplayControlImpl) object);
         } else {
             super.doDrop(object);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     *
+     * @return _more_
+     */
     public boolean dropOk(Object object) {
-        if(object instanceof DisplayControl) {
+        if (object instanceof DisplayControl) {
             return true;
         }
         return super.dropOk(object);
@@ -283,6 +295,11 @@ public class IdvComponentGroup extends ComponentGroup {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     */
     public void addGroups(List l) {
         l.add(this);
         List displayComponents = getDisplayComponents();
@@ -291,7 +308,7 @@ public class IdvComponentGroup extends ComponentGroup {
                 (ComponentHolder) displayComponents.get(i);
             Element         child = null;
             if (comp instanceof IdvComponentGroup) {
-                ((IdvComponentGroup)comp).addGroups(l);
+                ((IdvComponentGroup) comp).addGroups(l);
             }
         }
     }
@@ -310,11 +327,19 @@ public class IdvComponentGroup extends ComponentGroup {
         addComponent(new IdvComponentHolder(idv, dc));
     }
 
+    /**
+     * _more_
+     *
+     * @param skinIndex _more_
+     */
     public void makeSkin(int skinIndex) {
-        XmlResourceCollection skins = getIdv().getResourceManager().getXmlResources(
-                                          IdvResourceManager.RSC_SKIN);
-        String id = skins.getProperty("skinid",skinIndex);
-        if(id == null) id = skins.get(skinIndex).toString();
+        XmlResourceCollection skins =
+            getIdv().getResourceManager().getXmlResources(
+                IdvResourceManager.RSC_SKIN);
+        String id = skins.getProperty("skinid", skinIndex);
+        if (id == null) {
+            id = skins.get(skinIndex).toString();
+        }
         IdvComponentHolder comp = new IdvComponentHolder(idv, id);
         comp.setType(comp.TYPE_SKIN);
         comp.setName(skins.getLabel(skinIndex));
@@ -351,14 +376,14 @@ public class IdvComponentGroup extends ComponentGroup {
                 idv.getVMManager().addViewManager(vm);
                 comp = new IdvComponentHolder(idv, vm);
             } else if (what.equals(IdvUIManager.COMP_COMPONENT_CHOOSERS)) {
-                comp = new IdvComponentHolder(idv,
-                                              "choosers");
+                comp = new IdvComponentHolder(idv, "choosers");
                 comp.setName("Data Choosers");
-                ((IdvComponentHolder)comp).setType(IdvComponentHolder.TYPE_CHOOSERS);
+                ((IdvComponentHolder) comp).setType(
+                    IdvComponentHolder.TYPE_CHOOSERS);
             } else if (what.equals(IdvUIManager.COMP_DATASELECTOR)) {
                 comp = new IdvComponentHolder(idv,
-                                              idv.getIdvUIManager().createDataSelector(false,
-                                                                                       false));
+                        idv.getIdvUIManager().createDataSelector(false,
+                            false));
             } else if (what.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
                 String name = GuiUtils.getInput("Enter name for tab group",
                                   "Name: ", "Group");
@@ -376,7 +401,7 @@ public class IdvComponentGroup extends ComponentGroup {
                 comp = new HtmlComponent("Html Text", text);
                 comp.setShowHeader(false);
             }
-            if(comp!=null) {
+            if (comp != null) {
                 addComponent(comp);
                 GuiUtils.showComponentInTabs(comp.getContents());
             }
@@ -459,4 +484,3 @@ public class IdvComponentGroup extends ComponentGroup {
 
 
 }
-

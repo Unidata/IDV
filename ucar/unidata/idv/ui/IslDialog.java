@@ -1,20 +1,18 @@
 /*
- * $Id: IslDialog.java,v 1.5 2007/08/06 14:12:01 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -85,6 +83,7 @@ import javax.swing.*;
 
 public class IslDialog {
 
+    /** _more_          */
     private JTabbedPane tabs;
 
 
@@ -103,6 +102,7 @@ public class IslDialog {
     /** Widget for the isl dialog */
     private JTextField imageFld;
 
+    /** _more_          */
     private List datasetFlds = new ArrayList();
 
     /** Widget for the isl dialog */
@@ -111,7 +111,10 @@ public class IslDialog {
     /** Widget for the isl dialog */
     private JTextField loopFld;
 
+    /** _more_          */
     private JTextField widthFld;
+
+    /** _more_          */
     private JTextField heightFld;
 
     /** Widget for the isl dialog */
@@ -177,8 +180,8 @@ public class IslDialog {
             debugCbx     = new JCheckBox("Debug", true);
             inlineCbx    = new JCheckBox("Include Bundle Inline", false);
 
-            imageCbx = new JCheckBox("", true);
-            imageFld = new JTextField(pngFile, 30);
+            imageCbx     = new JCheckBox("", true);
+            imageFld     = new JTextField(pngFile, 30);
             imageFld.setToolTipText(
                 "<html><b>.png,.gif,.jpg</b> for images<br><b>.kml/kmz</b> for Google Earth<br>Use ${viewindex} for each view<br>Use ${viewname} for view name<br>Use ${loopindex} for each loop iteration");
 
@@ -198,10 +201,10 @@ public class IslDialog {
             List lineComps = Misc.newList(offscreenCbx, debugCbx, inlineCbx);
             comps2.add(GuiUtils.left(GuiUtils.hbox(lineComps, 5)));
 
-            loopFld  = new JTextField("1", 5);
-            sleepFld = new JTextField("60", 5);
-            widthFld = new JTextField("",4);
-            heightFld = new JTextField("",4);
+            loopFld   = new JTextField("1", 5);
+            sleepFld  = new JTextField("60", 5);
+            widthFld  = new JTextField("", 4);
+            heightFld = new JTextField("", 4);
 
             comps2.add(GuiUtils.rLabel("#Iterations:"));
             comps2.add(GuiUtils.left(GuiUtils.hbox(loopFld,
@@ -212,9 +215,8 @@ public class IslDialog {
             heightFld.setToolTipText("View height");
             comps2.add(GuiUtils.rLabel("Dimensions:"));
             comps2.add(GuiUtils.left(GuiUtils.hbox(widthFld,
-                                                  new JLabel(" X "),
-                                                  heightFld,
-                                                  new JLabel(" Optional View Dimensions"))));
+                    new JLabel(" X "), heightFld,
+                    new JLabel(" Optional View Dimensions"))));
 
             importFld = new JTextField("", 30);
             comps2.add(GuiUtils.rLabel("Import ISL File:"));
@@ -224,12 +226,12 @@ public class IslDialog {
 
 
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            tabs = new JTabbedPane();
+            tabs               = new JTabbedPane();
             JComponent tab1 = GuiUtils.doLayout(comps1, 2, GuiUtils.WT_NY,
-                                            GuiUtils.WT_N);
+                                  GuiUtils.WT_N);
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
             JComponent tab2 = GuiUtils.doLayout(comps2, 2, GuiUtils.WT_NY,
-                                            GuiUtils.WT_N);
+                                  GuiUtils.WT_N);
 
             tabs.addTab("Product", GuiUtils.top(tab1));
             tabs.addTab("Advanced", GuiUtils.top(tab2));
@@ -258,8 +260,8 @@ public class IslDialog {
         Element bundleNode = doc.createElement(ImageGenerator.TAG_BUNDLE);
         root.appendChild(bundleNode);
 
-        if(widthFld.getText().trim().length()>0 &&
-           heightFld.getText().trim().length()>0) {
+        if ((widthFld.getText().trim().length() > 0)
+                && (heightFld.getText().trim().length() > 0)) {
             bundleNode.setAttribute(ImageGenerator.ATTR_WIDTH,
                                     widthFld.getText().trim());
             bundleNode.setAttribute(ImageGenerator.ATTR_HEIGHT,
@@ -305,4 +307,3 @@ public class IslDialog {
     }
 
 }
-

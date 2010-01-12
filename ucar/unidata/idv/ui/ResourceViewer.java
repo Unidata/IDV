@@ -1,26 +1,22 @@
 /*
- * $Id: IdvWindow.java,v 1.56 2007/08/07 09:51:11 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -66,12 +62,13 @@ import javax.swing.tree.*;
  */
 public class ResourceViewer extends IdvManager {
 
-    /** _more_          */
+    /** _more_ */
     private JDialog dialog;
 
-    /** _more_          */
+    /** _more_ */
     private JTabbedPane tabbedPane;
 
+    /** _more_          */
     private JCheckBox localOnlyCbx;
 
     /**
@@ -89,17 +86,25 @@ public class ResourceViewer extends IdvManager {
      * _more_
      */
     private void init() {
-        tabbedPane = new JTabbedPane();
+        tabbedPane   = new JTabbedPane();
         localOnlyCbx = new JCheckBox("Local Only", false);
         localOnlyCbx.setToolTipText("Only show local resources");
-        localOnlyCbx.addActionListener(GuiUtils.makeActionListener(this,"updateTrees",null));
-        JButton listResources = GuiUtils.makeButton("List Sources",getIdv().getResourceManager(),"showHtmlView",null);
+        localOnlyCbx.addActionListener(GuiUtils.makeActionListener(this,
+                "updateTrees", null));
+        JButton listResources = GuiUtils.makeButton("List Sources",
+                                    getIdv().getResourceManager(),
+                                    "showHtmlView", null);
 
-        JComponent buttons = GuiUtils.leftCenter(localOnlyCbx,GuiUtils.wrap(GuiUtils.hbox(
-                                                                                          GuiUtils.makeButton("Update", this,
-                                                                                                              "updateTrees"),listResources,5)));
-        contents = GuiUtils.inset(GuiUtils.centerBottom(tabbedPane,
-                                                        buttons), 3);
+        JComponent buttons = GuiUtils.leftCenter(
+                                 localOnlyCbx,
+                                 GuiUtils.wrap(
+                                     GuiUtils.hbox(
+                                         GuiUtils.makeButton(
+                                             "Update", this,
+                                             "updateTrees"), listResources,
+                                                 5)));
+        contents = GuiUtils.inset(GuiUtils.centerBottom(tabbedPane, buttons),
+                                  3);
         updateTrees();
     }
 
@@ -127,10 +132,8 @@ public class ResourceViewer extends IdvManager {
                 "Layout Models",
                 getIdv().getStationModelManager().getStationModels()));
 
-        trees.add(
-            makeTree(
-                "Param Defaults",
-                getIdv().getParamDefaultsEditor().getResources()));
+        trees.add(makeTree("Param Defaults",
+                           getIdv().getParamDefaultsEditor().getResources()));
 
         /*
           aliases are not supported yet
@@ -154,7 +157,7 @@ public class ResourceViewer extends IdvManager {
         for (ResourceTree tree : trees) {
             tabbedPane.addTab(tree.label, tree.getContents());
         }
-        if(tabIdx>=0) {
+        if (tabIdx >= 0) {
             tabbedPane.setSelectedIndex(tabIdx);
         }
         tabbedPane.invalidate();
@@ -171,29 +174,58 @@ public class ResourceViewer extends IdvManager {
      * @return _more_
      */
     private ResourceTree makeTree(String label, List objects) {
-       List<CategorizedThing> things = new ArrayList<CategorizedThing>();
-       boolean localOnly = localOnlyCbx.isSelected();
-       for (Object o : objects) {
-           CategorizedThing thing = makeThing(o);
-           if(localOnly && thing.state == thing.STATE_SYSTEM) continue;
-           if (thing != null) {
-               things.add(thing);
-           }
-       }
-       return new ResourceTree(label, things);
+        List<CategorizedThing> things    = new ArrayList<CategorizedThing>();
+        boolean                localOnly = localOnlyCbx.isSelected();
+        for (Object o : objects) {
+            CategorizedThing thing = makeThing(o);
+            if (localOnly && (thing.state == thing.STATE_SYSTEM)) {
+                continue;
+            }
+            if (thing != null) {
+                things.add(thing);
+            }
+        }
+        return new ResourceTree(label, things);
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Tue, Jan 12, '10
+     * @author         Enter your name here...    
+     */
     public static class ResourceWrapper {
+
+        /** _more_          */
         boolean local;
+
+        /** _more_          */
         List categories;
+
+        /** _more_          */
         String name;
+
+        /** _more_          */
         Object object;
-        public ResourceWrapper(Object o, String name, String category, boolean local) {
-            this.categories = (category!=null?StringUtil.split(category,">",true,true):null);
-            this.local = local;
-            this.name = name;
-            this.object = o;
+
+        /**
+         * _more_
+         *
+         * @param o _more_
+         * @param name _more_
+         * @param category _more_
+         * @param local _more_
+         */
+        public ResourceWrapper(Object o, String name, String category,
+                               boolean local) {
+            this.categories = ((category != null)
+                               ? StringUtil.split(category, ">", true, true)
+                               : null);
+            this.local      = local;
+            this.name       = name;
+            this.object     = o;
         }
     }
 
@@ -218,10 +250,13 @@ public class ResourceViewer extends IdvManager {
         }
 
         if (o instanceof DisplaySetting) {
-            DisplaySetting ds = (DisplaySetting) o;
-            String cat = ds.getCategory();
-            return new CategorizedThing(o, ds.getNameWithoutCategory(), (cat!=null?StringUtil.split(cat,">",true,true):null),
-                                        ds.getIsLocal());
+            DisplaySetting ds  = (DisplaySetting) o;
+            String         cat = ds.getCategory();
+            return new CategorizedThing(o, ds.getNameWithoutCategory(),
+                                        ((cat != null)
+                                         ? StringUtil.split(cat, ">", true,
+                                         true)
+                                         : null), ds.getIsLocal());
         }
 
         if (o instanceof StationModel) {
@@ -283,23 +318,28 @@ public class ResourceViewer extends IdvManager {
      */
     private static class CategorizedThing {
 
+        /** _more_          */
         public static final int STATE_LOCAL = 0;
+
+        /** _more_          */
         public static final int STATE_SYSTEM = 1;
+
+        /** _more_          */
         public static final int STATE_UNKNOWN = 2;
 
 
-        /** _more_          */
+        /** _more_ */
         String name;
 
-        /** _more_          */
+        /** _more_ */
         List<String> categories;
 
-        /** _more_          */
+        /** _more_ */
         Object thing;
 
-        /** _more_          */
+        /** _more_ */
         int state = STATE_UNKNOWN;
-        
+
         /**
          * _more_
          *
@@ -322,17 +362,32 @@ public class ResourceViewer extends IdvManager {
          */
         public CategorizedThing(Object thing, String name,
                                 List<String> categories, boolean local) {
-            this(thing, name, categories, (local?STATE_LOCAL:STATE_SYSTEM));
+            this(thing, name, categories, (local
+                                           ? STATE_LOCAL
+                                           : STATE_SYSTEM));
         }
 
+        /**
+         * _more_
+         *
+         * @param thing _more_
+         * @param name _more_
+         * @param categories _more_
+         * @param state _more_
+         */
         public CategorizedThing(Object thing, String name,
                                 List<String> categories, int state) {
             this.thing      = thing;
             this.name       = name;
             this.categories = categories;
-            this.state=  state;
+            this.state      = state;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isLocal() {
             return state == STATE_LOCAL;
         }
@@ -357,22 +412,22 @@ public class ResourceViewer extends IdvManager {
      */
     public class ResourceTree {
 
-        /** _more_          */
+        /** _more_ */
         String label;
 
-        /** _more_          */
+        /** _more_ */
         JTree tree;
 
-        /** _more_          */
+        /** _more_ */
         List<CategorizedThing> resources;
 
-        /** _more_          */
+        /** _more_ */
         JComponent contents;
 
-        /** _more_          */
+        /** _more_ */
         DefaultTreeModel treeModel;
 
-        /** _more_          */
+        /** _more_ */
         DefaultMutableTreeNode treeRoot;
 
         /**
@@ -420,7 +475,7 @@ public class ResourceViewer extends IdvManager {
         public void updateTree() {
             treeRoot.removeAllChildren();
             Hashtable nodes = new Hashtable();
-            if(resources.size()==0) {
+            if (resources.size() == 0) {
                 treeRoot.add(new DefaultMutableTreeNode("None"));
             }
             for (CategorizedThing thing : resources) {
@@ -451,8 +506,8 @@ public class ResourceViewer extends IdvManager {
                         parent = tmp;
                     }
                 }
-                String label = GuiUtils.getLocalName(thing.name, thing.isLocal(),
-                                   true);
+                String label = GuiUtils.getLocalName(thing.name,
+                                   thing.isLocal(), true);
                 parent.add(
                     new DefaultMutableTreeNode(
                         new TwoFacedObject(label, thing)));
@@ -521,8 +576,7 @@ public class ResourceViewer extends IdvManager {
      * @return window title
      */
     public String getWindowTitle() {
-        return GuiUtils.getApplicationTitle() +"Resource Viewer";
+        return GuiUtils.getApplicationTitle() + "Resource Viewer";
     }
 
 }
-

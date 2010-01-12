@@ -1,20 +1,18 @@
 /*
- * $Id: BundleTree.java,v 1.34 2007/06/12 19:56:48 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -163,7 +161,7 @@ public class BundleTree extends DndTree {
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-		if (GuiUtils.isDeleteEvent(e)) {
+                if (GuiUtils.isDeleteEvent(e)) {
                     deleteSelected();
                 } else if (e.getKeyCode() == e.VK_ENTER) {
                     SavedBundle bundle = findSelectedBundle();
@@ -707,8 +705,12 @@ public class BundleTree extends DndTree {
      * @param parentNode The parent tree node
      */
     public void doImport(DefaultMutableTreeNode parentNode) {
-        String filename = FileManager.getReadFile("Import Bundle",
-                                                  Misc.newList(uiManager.getIdv().getArgsManager().getXidvZidvFileFilter()));
+        String filename =
+            FileManager
+                .getReadFile("Import Bundle",
+                             Misc
+                             .newList(uiManager.getIdv().getArgsManager()
+                                 .getXidvZidvFileFilter()));
         if (filename == null) {
             return;
         }
@@ -766,4 +768,3 @@ public class BundleTree extends DndTree {
     }
 
 }
-

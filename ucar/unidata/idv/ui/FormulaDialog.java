@@ -1,20 +1,18 @@
 /*
- * $Id: FormulaDialog.java,v 1.64 2007/06/22 13:03:55 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -222,20 +220,29 @@ public class FormulaDialog extends JFrame implements ActionListener {
     public FormulaDialog(IntegratedDataViewer idv, DerivedDataDescriptor ddd,
                          Component src, List categories) {
 
-        this(idv, ddd, src, categories, ddd==null);
+        this(idv, ddd, src, categories, ddd == null);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     * @param ddd _more_
+     * @param src _more_
+     * @param categories _more_
+     * @param newFormula _more_
+     */
     public FormulaDialog(IntegratedDataViewer idv, DerivedDataDescriptor ddd,
                          Component src, List categories, boolean newFormula) {
         super("Formula Editor");
         LogUtil.registerWindow(this);
         //      super (null, "Formula editor", false);
         //      super (idv.getFrame (), "Formula editor", false);
-        this.idv = idv;
+        this.idv     = idv;
         makingNewOne = newFormula;
         if (ddd == null) {
-            ddd          = new DerivedDataDescriptor(idv);
+            ddd = new DerivedDataDescriptor(idv);
             ddd.setIsEndUser(true);
         }
         this.ddd        = ddd;
@@ -1258,4 +1265,3 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
 }
-

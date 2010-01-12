@@ -1,20 +1,18 @@
 /*
- * $Id: PipPanel.java,v 1.24 2006/12/01 19:54:05 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -198,9 +196,13 @@ public class PipPanel extends NavigatedMapPanel {
      * @throws VisADException On badness
      */
     public void resetDrawBounds() throws RemoteException, VisADException {
-        if(mapViewManager==null) return;
+        if (mapViewManager == null) {
+            return;
+        }
         NavigatedDisplay nav = (NavigatedDisplay) mapViewManager.getMaster();
-        if(nav==null) return;
+        if (nav == null) {
+            return;
+        }
         List points = new ArrayList();
         points.add(
             getPoint(
@@ -277,41 +279,54 @@ public class PipPanel extends NavigatedMapPanel {
         gNP.setColor(Color.red);
         gNP.draw(path);
 
-        Flythrough flythrough  = mapViewManager.getFlythrough();
-        if(flythrough!=null) {
-            FlythroughPoint currentPoint  = flythrough.getCurrentPoint();
-            if(currentPoint!=null) {
+        Flythrough flythrough = mapViewManager.getFlythrough();
+        if (flythrough != null) {
+            FlythroughPoint currentPoint = flythrough.getCurrentPoint();
+            if (currentPoint != null) {
                 try {
-                Real          lat = currentPoint.getEarthLocation().getLatLonPoint().getLatitude();
-                Real          lon = currentPoint.getEarthLocation().getLatLonPoint().getLongitude();
-                
-                ProjectionPoint p = project.latLonToProj(new LatLonPointImpl(
-                                                                             lat.getValue(CommonUnit.degree),
-                                                                             lon.getValue(CommonUnit.degree)),
-                                                           new ProjectionPointImpl());
-                gNP.setColor(Color.blue);
-                GeneralPath path2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
-                                                    points.size());
-                double dx = 4;
-                double dy = 4;
-                AffineTransform transform = gNP.getTransform();
-                if(transform!=null) {
-                    double sx = transform.getScaleX();
-                    double sy = transform.getScaleX();
-                    if(sx!=0)
-                        dx=dx/sx;
-                    if(sy!=0)
-                        dy=dy/sy;
-                }
+                    Real lat =
+                        currentPoint.getEarthLocation().getLatLonPoint()
+                            .getLatitude();
+                    Real lon =
+                        currentPoint.getEarthLocation().getLatLonPoint()
+                            .getLongitude();
 
-                path2.moveTo((float) (p.getX()-dx), (float) (p.getY()-dy));
-                path2.lineTo((float) (p.getX()+dx), (float) (p.getY()-dy));
-                path2.lineTo((float) (p.getX()+dx), (float) (p.getY()+dy));
-                path2.lineTo((float) (p.getX()-dx), (float) (p.getY()+dy));
-                path2.lineTo((float) (p.getX()-dx), (float) (p.getY()-dy));
+                    ProjectionPoint p =
+                        project.latLonToProj(new LatLonPointImpl(lat
+                            .getValue(CommonUnit.degree), lon
+                            .getValue(CommonUnit
+                                .degree)), new ProjectionPointImpl());
+                    gNP.setColor(Color.blue);
+                    GeneralPath path2 =
+                        new GeneralPath(GeneralPath.WIND_EVEN_ODD,
+                                        points.size());
+                    double          dx        = 4;
+                    double          dy        = 4;
+                    AffineTransform transform = gNP.getTransform();
+                    if (transform != null) {
+                        double sx = transform.getScaleX();
+                        double sy = transform.getScaleX();
+                        if (sx != 0) {
+                            dx = dx / sx;
+                        }
+                        if (sy != 0) {
+                            dy = dy / sy;
+                        }
+                    }
 
-                gNP.fill(path2);
-                } catch(Exception exc) {}
+                    path2.moveTo((float) (p.getX() - dx),
+                                 (float) (p.getY() - dy));
+                    path2.lineTo((float) (p.getX() + dx),
+                                 (float) (p.getY() - dy));
+                    path2.lineTo((float) (p.getX() + dx),
+                                 (float) (p.getY() + dy));
+                    path2.lineTo((float) (p.getX() - dx),
+                                 (float) (p.getY() + dy));
+                    path2.lineTo((float) (p.getX() - dx),
+                                 (float) (p.getY() - dy));
+
+                    gNP.fill(path2);
+                } catch (Exception exc) {}
             }
         }
 
@@ -361,7 +376,7 @@ public class PipPanel extends NavigatedMapPanel {
                     (NavigatedDisplay) mapViewManager.getMaster();
                 double[] destXY = nav.getSpatialCoordinates(el,
                                       (double[]) null);
-                if(!mapViewManager.getUseGlobeDisplay()) {
+                if ( !mapViewManager.getUseGlobeDisplay()) {
                     nav.moveToScreen(destXY[0], destXY[1], 0, 0);
                 }
             } catch (Exception exc) {
@@ -402,15 +417,21 @@ public class PipPanel extends NavigatedMapPanel {
     }
 
 
-        public LatLonPoint screenToLatLon(int x,int y)  {
-            ProjectionPointImpl point=
-                navigatedPanel.getNavigation().screenToWorld(
-                                                             new Point2D.Double(x,y),
-                                                             new ProjectionPointImpl());
-            return getProjection().projToLatLon(point);
-        }
+    /**
+     * _more_
+     *
+     * @param x _more_
+     * @param y _more_
+     *
+     * @return _more_
+     */
+    public LatLonPoint screenToLatLon(int x, int y) {
+        ProjectionPointImpl point =
+            navigatedPanel.getNavigation().screenToWorld(
+                new Point2D.Double(x, y), new ProjectionPointImpl());
+        return getProjection().projToLatLon(point);
+    }
 
 
 
 }
-

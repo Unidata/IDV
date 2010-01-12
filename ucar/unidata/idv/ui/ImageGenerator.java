@@ -1,26 +1,22 @@
-/**
- * $Id: ImageGenerator.java,v 1.113 2007/08/22 11:59:28 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -140,8 +136,13 @@ public class ImageGenerator extends IdvManager {
     /** macro property */
     public static final String PROP_LOOPINDEX = "loopindex";
 
+    /** _more_          */
     public static final String PROP_LOOPINDEX_PAD2 = "loopindex_pad2";
+
+    /** _more_          */
     public static final String PROP_LOOPINDEX_PAD3 = "loopindex_pad3";
+
+    /** _more_          */
     public static final String PROP_LOOPINDEX_PAD4 = "loopindex_pad4";
 
 
@@ -165,8 +166,13 @@ public class ImageGenerator extends IdvManager {
     public static final String PROP_IMAGEPATH = "imagepath";
 
 
+    /** _more_          */
     public static final String PROP_FILE = "file";
+
+    /** _more_          */
     public static final String PROP_FILETAIL = "filetail";
+
+    /** _more_          */
     public static final String PROP_FILEPREFIX = "fileprefix";
 
     /** macro property */
@@ -195,6 +201,7 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_FILESET = "fileset";
 
 
+    /** _more_          */
     public static final String TAG_VIEW = "view";
 
     /** isl tag */
@@ -245,18 +252,22 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_CLIP = "clip";
 
+    /** _more_          */
     public static final String TAG_PUBLISH = "publish";
 
     /** isl tag */
     public static final String TAG_DISPLAY = "display";
 
+    /** _more_          */
     public static final String TAG_DATASOURCE = "datasource";
 
     /** isl tag */
     public static final String TAG_MATTE = "matte";
 
+    /** _more_          */
     public static final String TAG_SHOW = "show";
 
+    /** _more_          */
     public static final String TAG_DISPLAYLIST = "displaylist";
 
     /** isl tag */
@@ -270,6 +281,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_KML = "kml";
 
+    /** _more_          */
     public static final String TAG_KML_COLORBAR = "kmlcolorbar";
 
     /** isl tag */
@@ -287,45 +299,87 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
 
+    /** _more_          */
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
+    /** _more_          */
     public static final String ATTR_STRIDE = "stride";
+
+    /** _more_          */
     public static final String ATTR_STRIDEX = "stridex";
+
+    /** _more_          */
     public static final String ATTR_STRIDEY = "stridey";
+
+    /** _more_          */
     public static final String ATTR_STRIDEZ = "stridez";
 
+    /** _more_          */
     public static final String ATTR_LEVEL_FROM = "levelfrom";
+
+    /** _more_          */
     public static final String ATTR_LEVEL_TO = "levelto";
 
+    /** _more_          */
     public static final String ATTR_AZIMUTH = "azimuth";
+
+    /** _more_          */
     public static final String ATTR_TILT = "tilt";
 
-    public static final String ATTR_ASPECTX="aspectx";
-    public static final String ATTR_ASPECTY="aspecty";
-    public static final String ATTR_ASPECTZ="aspectz";
+    /** _more_          */
+    public static final String ATTR_ASPECTX = "aspectx";
+
+    /** _more_          */
+    public static final String ATTR_ASPECTY = "aspecty";
+
+    /** _more_          */
+    public static final String ATTR_ASPECTZ = "aspectz";
 
 
-    public static final String ATTR_ROTX="rotx";
-    public static final String ATTR_ROTY="roty";
-    public static final String ATTR_ROTZ="rotz";
-    public static final String ATTR_SCALE="scale";
-    public static final String ATTR_TRANSX="transx";
+    /** _more_          */
+    public static final String ATTR_ROTX = "rotx";
+
+    /** _more_          */
+    public static final String ATTR_ROTY = "roty";
+
+    /** _more_          */
+    public static final String ATTR_ROTZ = "rotz";
+
+    /** _more_          */
+    public static final String ATTR_SCALE = "scale";
+
+    /** _more_          */
+    public static final String ATTR_TRANSX = "transx";
+
+    /** _more_          */
     public static final String ATTR_TRANSY = "transy";
+
+    /** _more_          */
     public static final String ATTR_TRANSZ = "transz";
 
 
+    /** _more_          */
     public static final String ATTR_SUFFIX = "suffix";
 
+    /** _more_          */
     public static final String ATTR_TRANSPARENCY = "transparency";
 
-    public static final String ATTR_TOP= "top";
+    /** _more_          */
+    public static final String ATTR_TOP = "top";
 
 
 
+    /** _more_          */
     public static final String ATTR_SPACE_LEFT = "space_left";
+
+    /** _more_          */
     public static final String ATTR_SPACE_RIGHT = "space_right";
+
+    /** _more_          */
     public static final String ATTR_SPACE_TOP = "space_top";
+
+    /** _more_          */
     public static final String ATTR_SPACE_BOTTOM = "space_bottom";
 
 
@@ -499,7 +553,9 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_MESSAGE = "message";
 
+    /** _more_          */
     public static final String ATTR_MATTEBG = "mattebg";
+
     /** isl tag */
     public static final String ATTR_NAME = "name";
 
@@ -521,6 +577,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_BOTTOM = "bottom";
 
+    /** _more_          */
     public static final String ATTR_VALIGN = "valign";
 
     /** isl tag */
@@ -640,10 +697,11 @@ public class ImageGenerator extends IdvManager {
     /** Keep around the last image captured */
     private Image lastImage;
 
+    /** _more_          */
     private Hashtable objectMap;
 
 
- 
+
     /**
      * Create me with the IDV
      *
@@ -689,11 +747,20 @@ public class ImageGenerator extends IdvManager {
      * @return Was it successful
      */
     public synchronized boolean processScriptFile(String islFile) {
-	return processScriptFile(islFile, new Hashtable());
+        return processScriptFile(islFile, new Hashtable());
     }
 
 
-    public synchronized boolean processScriptFile(String islFile, Hashtable properties) {
+    /**
+     * _more_
+     *
+     * @param islFile _more_
+     * @param properties _more_
+     *
+     * @return _more_
+     */
+    public synchronized boolean processScriptFile(String islFile,
+            Hashtable properties) {
         procs           = new Hashtable();
         idToDataSource  = new Hashtable();
         propertiesStack = new ArrayList();
@@ -727,10 +794,11 @@ public class ImageGenerator extends IdvManager {
             try {
                 if (islFile.startsWith("xml:")) {
                     String xml = islFile.substring(4);
-                    is = new ByteArrayInputStream(xml.getBytes());
+                    is      = new ByteArrayInputStream(xml.getBytes());
                     islFile = "Inline isl";
-                } else if(islFile.startsWith("b64:")) {
-                    is = new ByteArrayInputStream(XmlUtil.decodeBase64(islFile.substring(4)));
+                } else if (islFile.startsWith("b64:")) {
+                    is = new ByteArrayInputStream(
+                        XmlUtil.decodeBase64(islFile.substring(4)));
                     islFile = "Inline base 64 encoded isl";
                 } else {
                     is = IOUtil.getInputStream(islFile, getClass());
@@ -754,7 +822,7 @@ public class ImageGenerator extends IdvManager {
         try {
             String islPath = IOUtil.getFileRoot(islFile);
             putProperty("islpath", islPath);
-	    objectMap = properties;
+            objectMap = properties;
             processNode(root);
             popProperties();
         } catch (InvocationTargetException ite) {
@@ -767,8 +835,8 @@ public class ImageGenerator extends IdvManager {
         } catch (Throwable exc) {
             return handleError(exc);
         } finally {
-	    objectMap = null;
-	}
+            objectMap = null;
+        }
         return true;
     }
 
@@ -812,7 +880,7 @@ public class ImageGenerator extends IdvManager {
      * @return ok
      * @throws Throwable On badness
      */
-    private boolean processNode(Element node ) throws Throwable {
+    private boolean processNode(Element node) throws Throwable {
         String tagName = node.getTagName();
         //        System.err.println("tag:" + tagName);
 
@@ -953,6 +1021,15 @@ public class ImageGenerator extends IdvManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected boolean processTagPrintcache(Element node) throws Throwable {
         visad.data.DataCacheManager.getCacheManager().printStats();
         return true;
@@ -1194,6 +1271,15 @@ public class ImageGenerator extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected String[] getPropertyValue(Element node) throws Throwable {
         String name  = (String) applyMacros(node, ATTR_NAME);
         String value = null;
@@ -1210,13 +1296,23 @@ public class ImageGenerator extends IdvManager {
             }
             value = applyMacros(value);
         }
-        return new String[]{name,value};
+        return new String[] { name, value };
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected boolean processTagIdvproperty(Element node) throws Throwable {
-        String[]tuple = getPropertyValue(node);
+        String[] tuple = getPropertyValue(node);
         debug("setting idv property: " + tuple[0] + " =" + tuple[1]);
-        getIdv().getStateManager().putProperty(applyMacros(tuple[0]),applyMacros(tuple[1]));
+        getIdv().getStateManager().putProperty(applyMacros(tuple[0]),
+                applyMacros(tuple[1]));
         return true;
     }
 
@@ -1231,7 +1327,7 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected boolean processTagProperty(Element node) throws Throwable {
-        String[]tuple = getPropertyValue(node);
+        String[] tuple = getPropertyValue(node);
         putProperty(applyMacros(tuple[0]), tuple[1],
                     applyMacros(node, ATTR_GLOBAL, false));
         return true;
@@ -1500,7 +1596,7 @@ public class ImageGenerator extends IdvManager {
         for (int i = 0; i < files.size(); i++) {
             try {
                 putProperty(PROP_FILE, files.get(i).toString());
-                String tail  = IOUtil.getFileTail(files.get(i).toString());
+                String tail = IOUtil.getFileTail(files.get(i).toString());
                 putProperty(PROP_FILETAIL, tail);
                 putProperty(PROP_FILEPREFIX, IOUtil.stripExtension(tail));
                 if ( !processChildren(node)) {
@@ -1554,50 +1650,53 @@ public class ImageGenerator extends IdvManager {
         debug("Creating data source");
 
         DataSource dataSource = null;
-        String id = applyMacros(node, ATTR_ID, (String) null);
-        if (id != null && objectMap!=null) {
-	    dataSource = (DataSource) objectMap.get(id);
+        String     id         = applyMacros(node, ATTR_ID, (String) null);
+        if ((id != null) && (objectMap != null)) {
+            dataSource = (DataSource) objectMap.get(id);
         }
 
 
-	if(dataSource==null) {
-	    Object dataObject = applyMacros(node, ATTR_URL, (String) null);
-	    if (dataObject == null) {
-		dataObject = StringUtil.toString(findFiles(node));
-	    }
-	    String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
-	    String type   = applyMacros(node, ATTR_TYPE, (String) null);
-	    if ((bundle == null) && (dataObject == null)) {
-		return error(
-			     "datasource tag requires either a url, fileset or a bundle");
-	    }
+        if (dataSource == null) {
+            Object dataObject = applyMacros(node, ATTR_URL, (String) null);
+            if (dataObject == null) {
+                dataObject = StringUtil.toString(findFiles(node));
+            }
+            String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
+            String type   = applyMacros(node, ATTR_TYPE, (String) null);
+            if ((bundle == null) && (dataObject == null)) {
+                return error(
+                    "datasource tag requires either a url, fileset or a bundle");
+            }
 
-	    if (dataObject != null) {
-		dataSource = getIdv().makeOneDataSource(dataObject, type, null);
-		if (dataSource == null) {
-		    return error("Failed to create data source:" + dataObject
-				 + " " + type);
-		}
-	    } else {
-		try {
-		    String bundleXml = IOUtil.readContents(bundle);
-		    Object obj = getIdv().getEncoderForRead().toObject(bundleXml);
-		    if ( !(obj instanceof DataSource)) {
-			return error("datasource bundle is not a DataSource:"
-				     + obj.getClass().getName());
-		    }
-		    dataSource = (DataSource) obj;
-		} catch (Exception exc) {
-		    return error("Error loading data source bundle: " + bundle,
-				 exc);
-		}
-	    }
-	}
+            if (dataObject != null) {
+                dataSource = getIdv().makeOneDataSource(dataObject, type,
+                        null);
+                if (dataSource == null) {
+                    return error("Failed to create data source:" + dataObject
+                                 + " " + type);
+                }
+            } else {
+                try {
+                    String bundleXml = IOUtil.readContents(bundle);
+                    Object obj =
+                        getIdv().getEncoderForRead().toObject(bundleXml);
+                    if ( !(obj instanceof DataSource)) {
+                        return error("datasource bundle is not a DataSource:"
+                                     + obj.getClass().getName());
+                    }
+                    dataSource = (DataSource) obj;
+                } catch (Exception exc) {
+                    return error("Error loading data source bundle: "
+                                 + bundle, exc);
+                }
+            }
+        }
 
 
         if (XmlUtil.hasAttribute(node, ATTR_TIMES)) {
-            List  timesList = StringUtil.parseIntegerListString(applyMacros(node,
-                                                                            ATTR_TIMES, (String) null));
+            List timesList =
+                StringUtil.parseIntegerListString(applyMacros(node,
+                    ATTR_TIMES, (String) null));
             dataSource.setDateTimeSelection(timesList);
         }
 
@@ -1674,8 +1773,17 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected boolean processTagView(Element node) throws Throwable {
-        List vms = getViewManagers(node);
+        List   vms    = getViewManagers(node);
 
         String width  = applyMacros(node, ATTR_WIDTH, (String) null);
         String height = applyMacros(node, ATTR_HEIGHT, (String) null);
@@ -1686,84 +1794,105 @@ public class ImageGenerator extends IdvManager {
                     new Integer(height).intValue()));
         }
 
-        if(vms.size()==0) {
-	    StringBuffer properties = new StringBuffer();
-	    List nodes    = XmlUtil.findChildren(node, TAG_PROPERTY);
-	    for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
-		Element child = (Element) nodes.get(childIdx);
-		properties.append(applyMacros(child, ATTR_NAME)+"=" +
-				  applyMacros(child, ATTR_VALUE)+";");
-	    }
-	    vms.add(getIdv().getViewManager(ViewDescriptor.LASTACTIVE, false,  properties.toString()));
-	    return true;
-	}
+        if (vms.size() == 0) {
+            StringBuffer properties = new StringBuffer();
+            List         nodes      = XmlUtil.findChildren(node,
+                                          TAG_PROPERTY);
+            for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
+                Element child = (Element) nodes.get(childIdx);
+                properties.append(applyMacros(child, ATTR_NAME) + "="
+                                  + applyMacros(child, ATTR_VALUE) + ";");
+            }
+            vms.add(getIdv().getViewManager(ViewDescriptor.LASTACTIVE, false,
+                                            properties.toString()));
+            return true;
+        }
 
-        for(int i=0;i<vms.size();i++) {
-	    ViewManager vm  = (ViewManager) vms.get(i);
-	    List nodes    = XmlUtil.findChildren(node, TAG_PROPERTY);
-	    for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
-		Element child = (Element) nodes.get(childIdx);
-	       vm.setProperty(applyMacros(child, ATTR_NAME),
-			      applyMacros(child, ATTR_VALUE),false);
-	    }
-	}
-	return true;
+        for (int i = 0; i < vms.size(); i++) {
+            ViewManager vm    = (ViewManager) vms.get(i);
+            List        nodes = XmlUtil.findChildren(node, TAG_PROPERTY);
+            for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
+                Element child = (Element) nodes.get(childIdx);
+                vm.setProperty(applyMacros(child, ATTR_NAME),
+                               applyMacros(child, ATTR_VALUE), false);
+            }
+        }
+        return true;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected boolean processTagViewpoint(Element node) throws Throwable {
         List vms = getViewManagers(node);
-        if(vms.size()==0) debug("Could not find view managers processing:" + XmlUtil.toString(node));
+        if (vms.size() == 0) {
+            debug("Could not find view managers processing:"
+                  + XmlUtil.toString(node));
+        }
         ViewpointInfo viewpointInfo = null;
 
 
-        for(int i=0;i<vms.size();i++) {
-            ViewManager vm = (ViewManager)vms.get(i);
-            if(XmlUtil.hasAttribute(node, ATTR_AZIMUTH) || XmlUtil.hasAttribute(node, ATTR_TILT)) {
-                viewpointInfo = new ViewpointInfo(toDouble(node, ATTR_AZIMUTH,0.0),
-                                                  toDouble(node, ATTR_TILT,0.0));
-                if(!(vm instanceof MapViewManager)) continue;
+        for (int i = 0; i < vms.size(); i++) {
+            ViewManager vm = (ViewManager) vms.get(i);
+            if (XmlUtil.hasAttribute(node, ATTR_AZIMUTH)
+                    || XmlUtil.hasAttribute(node, ATTR_TILT)) {
+                viewpointInfo = new ViewpointInfo(toDouble(node,
+                        ATTR_AZIMUTH, 0.0), toDouble(node, ATTR_TILT, 0.0));
+                if ( !(vm instanceof MapViewManager)) {
+                    continue;
+                }
                 MapViewManager mvm = (MapViewManager) vm;
                 mvm.setViewpointInfo(viewpointInfo);
-            }  
-
-            if(XmlUtil.hasAttribute(node, ATTR_ASPECTX) ||
-               XmlUtil.hasAttribute(node, ATTR_ASPECTY)||
-               XmlUtil.hasAttribute(node, ATTR_ASPECTZ)) {
-                double[] a = vm.getMaster().getDisplayAspect();
-                a =    new double[] {
-                    toDouble(node, ATTR_ASPECTX, a[0]),
-                    toDouble(node, ATTR_ASPECTY, a[1]),
-                    toDouble(node, ATTR_ASPECTZ, a[2])};
-                    vm.getMaster().setDisplayAspect(a);
-                    vm.setAspectRatio(a);
             }
 
-            if(XmlUtil.hasAttribute(node, ATTR_ROTX) ||
-               XmlUtil.hasAttribute(node, ATTR_ROTY) ||
-               XmlUtil.hasAttribute(node, ATTR_ROTZ) ||
-               XmlUtil.hasAttribute(node, ATTR_TRANSX) ||
-               XmlUtil.hasAttribute(node, ATTR_TRANSY) ||
-               XmlUtil.hasAttribute(node, ATTR_TRANSZ) ||
-               XmlUtil.hasAttribute(node, ATTR_SCALE)) {
+            if (XmlUtil.hasAttribute(node, ATTR_ASPECTX)
+                    || XmlUtil.hasAttribute(node, ATTR_ASPECTY)
+                    || XmlUtil.hasAttribute(node, ATTR_ASPECTZ)) {
                 double[] a = vm.getMaster().getDisplayAspect();
-                double[] currentMatrix = vm.getDisplayMatrix();
-                double[] trans         = { 0.0, 0.0, 0.0 };
-                double[] rot           = { 0.0, 0.0, 0.0 };
-                double[] scale         = { 0.0, 0.0, 0.0 };
+                a = new double[] { toDouble(node, ATTR_ASPECTX, a[0]),
+                                   toDouble(node, ATTR_ASPECTY, a[1]),
+                                   toDouble(node, ATTR_ASPECTZ, a[2]) };
+                vm.getMaster().setDisplayAspect(a);
+                vm.setAspectRatio(a);
+            }
+
+            if (XmlUtil.hasAttribute(node, ATTR_ROTX)
+                    || XmlUtil.hasAttribute(node, ATTR_ROTY)
+                    || XmlUtil.hasAttribute(node, ATTR_ROTZ)
+                    || XmlUtil.hasAttribute(node, ATTR_TRANSX)
+                    || XmlUtil.hasAttribute(node, ATTR_TRANSY)
+                    || XmlUtil.hasAttribute(node, ATTR_TRANSZ)
+                    || XmlUtil.hasAttribute(node, ATTR_SCALE)) {
+                double[]      a = vm.getMaster().getDisplayAspect();
+                double[]      currentMatrix = vm.getDisplayMatrix();
+                double[]      trans         = { 0.0, 0.0, 0.0 };
+                double[]      rot           = { 0.0, 0.0, 0.0 };
+                double[]      scale         = { 0.0, 0.0, 0.0 };
                 MouseBehavior mb = vm.getMaster().getMouseBehavior();
-                mb.instance_unmake_matrix(rot, scale, trans,currentMatrix);
-                double [] matrix = mb.make_matrix(
-                                                  toDouble(node,ATTR_ROTX, rot[0]),
-                                                  toDouble(node,ATTR_ROTY, rot[1]),
-                                                  toDouble(node,ATTR_ROTZ, rot[2]),
-                                                  toDouble(node,ATTR_SCALE, scale[0])*a[0],
-                                                  toDouble(node,ATTR_SCALE, scale[0])*a[1],
-                                                  toDouble(node,ATTR_SCALE, scale[0])*a[2],
-                                                  toDouble(node,ATTR_TRANSX, trans[0]),
-                                                  toDouble(node,ATTR_TRANSY, trans[1]),
-                                                  toDouble(node,ATTR_TRANSZ,trans[2]));
+                mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                double[] matrix =
+                    mb.make_matrix(toDouble(node, ATTR_ROTX, rot[0]),
+                                   toDouble(node, ATTR_ROTY, rot[1]),
+                                   toDouble(node, ATTR_ROTZ, rot[2]),
+                                   toDouble(node, ATTR_SCALE, scale[0])
+                                   * a[0], toDouble(node, ATTR_SCALE,
+                                       scale[0]) * a[1], toDouble(node,
+                                           ATTR_SCALE,
+                                           scale[0]) * a[2], toDouble(node,
+                                               ATTR_TRANSX,
+                                               trans[0]), toDouble(node,
+                                                   ATTR_TRANSY,
+                                                   trans[1]), toDouble(node,
+                                                       ATTR_TRANSZ,
+                                                       trans[2]));
                 vm.setDisplayMatrix(matrix);
             }
         }
@@ -1889,7 +2018,16 @@ public class ImageGenerator extends IdvManager {
     }
 
 
-    public DisplayControlImpl findDisplayControl(String id, List<DisplayControlImpl> controls) {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param controls _more_
+     *
+     * @return _more_
+     */
+    public DisplayControlImpl findDisplayControl(String id,
+            List<DisplayControlImpl> controls) {
         for (int i = 0; i < controls.size(); i++) {
             DisplayControlImpl control = (DisplayControlImpl) controls.get(i);
 
@@ -1953,7 +2091,8 @@ public class ImageGenerator extends IdvManager {
                 }
             }
             fileList.add(files);
-            debug("Adding a file override id=" + dataSourceId + " files=" + files);
+            debug("Adding a file override id=" + dataSourceId + " files="
+                  + files);
         }
         if (ids.size() > 0) {
             getPersistenceManager().setFileMapping(ids, fileList);
@@ -1972,11 +2111,11 @@ public class ImageGenerator extends IdvManager {
         boolean doRemove   = applyMacros(node, ATTR_CLEAR, true);
         if (doRemove) {
             //            try {
-                cleanup();
-                //            } catch(Exception exc) {
-                //                System.err.println ("Error cleanup");
-                //                System.exit(1);
-                //            }
+            cleanup();
+            //            } catch(Exception exc) {
+            //                System.err.println ("Error cleanup");
+            //                System.exit(1);
+            //            }
         }
         getIdv().getStateManager().setAlwaysLoadBundlesSynchronously(true);
         Hashtable bundleProperties = new Hashtable();
@@ -1989,19 +2128,20 @@ public class ImageGenerator extends IdvManager {
         if (bundleFile != null) {
             debug("Loading bundle: " + bundleFile);
             if (bundleFile.endsWith(".jnlp")) {
-                String xml = getPersistenceManager().extractBundleFromJnlp(bundleFile);
+                String xml =
+                    getPersistenceManager().extractBundleFromJnlp(bundleFile);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
                         null, false, true, bundleProperties, true, false);
             } else if (getArgsManager().isZidvFile(bundleFile)) {
                 Hashtable properties = new Hashtable();
-                boolean ask = getStore().get(PREF_ZIDV_ASK, true);
+                boolean   ask        = getStore().get(PREF_ZIDV_ASK, true);
                 getStore().put(PREF_ZIDV_ASK, false);
                 getPersistenceManager().decodeXmlFile(bundleFile, "", false,
-                                                      false, properties);
+                        false, properties);
                 getStore().put(PREF_ZIDV_ASK, ask);
             } else {
                 String xml = IOUtil.readContents(bundleFile);
-                xml = applyMacros(xml,null,false);
+                xml = applyMacros(xml, null, false);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
                         null, false, true, bundleProperties, true, false);
                 //                getPersistenceManager().decodeXmlFile(bundleFile, false,
@@ -2013,8 +2153,8 @@ public class ImageGenerator extends IdvManager {
                 return error("Could not bundle");
             }
             String xml = new String(XmlUtil.decodeBase64(b64Bundle));
-            getPersistenceManager().decodeXml(xml, false, "",
-                                              null, false, true, bundleProperties, true, false);
+            getPersistenceManager().decodeXml(xml, false, "", null, false,
+                    true, bundleProperties, true, false);
 
         }
 
@@ -2023,12 +2163,11 @@ public class ImageGenerator extends IdvManager {
                 getIdv().getIdvUIManager());
         }
         getPersistenceManager().clearFileMapping();
-        Color c = applyMacros(node, ATTR_COLOR, (Color) null);
-        List viewManagers = getVMManager().getViewManagers();
+        Color c            = applyMacros(node, ATTR_COLOR, (Color) null);
+        List  viewManagers = getVMManager().getViewManagers();
         for (int i = 0; i < viewManagers.size(); i++) {
-            ViewManager viewManager =
-                (ViewManager) viewManagers.get(i);
-            if(c!=null) {
+            ViewManager viewManager = (ViewManager) viewManagers.get(i);
+            if (c != null) {
                 viewManager.setColors(null, c);
             }
             viewManager.updateDisplayList();
@@ -2037,7 +2176,7 @@ public class ImageGenerator extends IdvManager {
         //One more pause for the display lists
         updateViewManagers();
         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
-                                                            getIdv().getIdvUIManager());
+            getIdv().getIdvUIManager());
         return true;
     }
 
@@ -2408,7 +2547,7 @@ public class ImageGenerator extends IdvManager {
         Image image = ImageUtils.renderHtml(html, width, null, null);
         image = processImage(ImageUtils.toBufferedImage(image),
                              XmlUtil.getAttribute(node, ATTR_FILE), node,
-                             getAllProperties(), null,new Hashtable());
+                             getAllProperties(), null, new Hashtable());
 
         //        writeImageToFile(image, XmlUtil.getAttribute(node, ATTR_FILE));
         return true;
@@ -2586,6 +2725,7 @@ public class ImageGenerator extends IdvManager {
      * @return keep going
      */
     private boolean processDisplayNode(Element node, DataSource dataSource) {
+
         //TODO:
         String     type       = applyMacros(node, ATTR_TYPE, (String) null);
         String     param      = applyMacros(node, ATTR_PARAM, (String) null);
@@ -2619,47 +2759,59 @@ public class ImageGenerator extends IdvManager {
         }
         List dataChoices = new ArrayList();
         if (dataChoice != null) {
-	    dataChoice = dataChoice.createClone();
-	    DataSelection dataSelection = new DataSelection(applyMacros(node,ATTR_LEVEL_FROM,(String)null),
-							    applyMacros(node,ATTR_LEVEL_TO,(String)null));
-	    
-
-	    String strideString = applyMacros(node, ATTR_STRIDE, (String)null);
-            if(strideString!=null) {
-                dataSelection.getGeoSelection(true).setXStride(applyMacros(node,ATTR_STRIDE,1));
-                dataSelection.getGeoSelection(true).setYStride(applyMacros(node,ATTR_STRIDE,1));
-
-            }
+            dataChoice = dataChoice.createClone();
+            DataSelection dataSelection =
+                new DataSelection(applyMacros(node, ATTR_LEVEL_FROM,
+                    (String) null), applyMacros(node, ATTR_LEVEL_TO,
+                        (String) null));
 
 
-	    String strideXString = applyMacros(node, ATTR_STRIDEX, (String)null);
-            if(strideXString!=null) {
-                dataSelection.getGeoSelection().setXStride(applyMacros(node,ATTR_STRIDEX,1));
-
-            }
-
-	    String strideYString = applyMacros(node, ATTR_STRIDEY, (String)null);
-            if(strideYString!=null) {
-                dataSelection.getGeoSelection().setYStride(applyMacros(node,ATTR_STRIDEY,1));
-
-            }
-	    String strideZString = applyMacros(node, ATTR_STRIDEZ, (String)null);
-            if(strideZString!=null) {
-                dataSelection.getGeoSelection().setZStride(applyMacros(node,ATTR_STRIDEX,1));
+            String strideString = applyMacros(node, ATTR_STRIDE,
+                                      (String) null);
+            if (strideString != null) {
+                dataSelection.getGeoSelection(true).setXStride(
+                    applyMacros(node, ATTR_STRIDE, 1));
+                dataSelection.getGeoSelection(true).setYStride(
+                    applyMacros(node, ATTR_STRIDE, 1));
 
             }
 
 
+            String strideXString = applyMacros(node, ATTR_STRIDEX,
+                                       (String) null);
+            if (strideXString != null) {
+                dataSelection.getGeoSelection().setXStride(applyMacros(node,
+                        ATTR_STRIDEX, 1));
 
-	    String timeString = applyMacros(node, ATTR_TIMES, (String)null);
-	    if(timeString!=null) {
-		List times = new ArrayList();
-		for(String tok: StringUtil.split(timeString,",",true,true)) {
-		    times.add(new Integer(tok));
-		}
-		dataSelection.setTimes(times);
-	    }
-	    dataChoice.setDataSelection(dataSelection);
+            }
+
+            String strideYString = applyMacros(node, ATTR_STRIDEY,
+                                       (String) null);
+            if (strideYString != null) {
+                dataSelection.getGeoSelection().setYStride(applyMacros(node,
+                        ATTR_STRIDEY, 1));
+
+            }
+            String strideZString = applyMacros(node, ATTR_STRIDEZ,
+                                       (String) null);
+            if (strideZString != null) {
+                dataSelection.getGeoSelection().setZStride(applyMacros(node,
+                        ATTR_STRIDEX, 1));
+
+            }
+
+
+
+            String timeString = applyMacros(node, ATTR_TIMES, (String) null);
+            if (timeString != null) {
+                List times = new ArrayList();
+                for (String tok :
+                        StringUtil.split(timeString, ",", true, true)) {
+                    times.add(new Integer(tok));
+                }
+                dataSelection.setTimes(times);
+            }
+            dataChoice.setDataSelection(dataSelection);
             dataChoices.add(dataChoice);
         }
 
@@ -2707,6 +2859,7 @@ public class ImageGenerator extends IdvManager {
             Trace.call2("ImageGenerator making display");
         }
         return true;
+
     }
 
 
@@ -3156,9 +3309,18 @@ public class ImageGenerator extends IdvManager {
      * @return The expanded string
      */
     private String applyMacros(String s, Hashtable props) {
-        return applyMacros(s,props,true);
+        return applyMacros(s, props, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param props _more_
+     * @param doTime _more_
+     *
+     * @return _more_
+     */
     private String applyMacros(String s, Hashtable props, boolean doTime) {
         if (s == null) {
             return null;
@@ -3173,9 +3335,12 @@ public class ImageGenerator extends IdvManager {
         props.putAll(getAllProperties());
 
         putIndex(props, PROP_LOOPINDEX, currentLoopIndex);
-        props.put(PROP_LOOPINDEX_PAD2, StringUtil.padLeft(""+currentLoopIndex,2,"0"));
-        props.put(PROP_LOOPINDEX_PAD3, StringUtil.padLeft(""+currentLoopIndex,3,"0"));
-        props.put(PROP_LOOPINDEX_PAD4, StringUtil.padLeft(""+currentLoopIndex,4,"0"));
+        props.put(PROP_LOOPINDEX_PAD2,
+                  StringUtil.padLeft("" + currentLoopIndex, 2, "0"));
+        props.put(PROP_LOOPINDEX_PAD3,
+                  StringUtil.padLeft("" + currentLoopIndex, 3, "0"));
+        props.put(PROP_LOOPINDEX_PAD4,
+                  StringUtil.padLeft("" + currentLoopIndex, 4, "0"));
 
         Date now = new Date(Misc.getCurrentTime());
 
@@ -3213,13 +3378,15 @@ public class ImageGenerator extends IdvManager {
             }*/
 
 
-        s = StringUtil.replaceDate(s,"now:",now);
-        Date animationTime  = getAnimationTime();
-        if(animationTime==null) animationTime = now;
+        s = StringUtil.replaceDate(s, "now:", now);
+        Date animationTime = getAnimationTime();
+        if (animationTime == null) {
+            animationTime = now;
+        }
         if (doTime) {
-            s = StringUtil.replaceDate(s,"anim:",animationTime);
-            s = StringUtil.replaceDate(s,"time:",animationTime);
-            s = StringUtil.replaceDate(s,"now:",now);
+            s = StringUtil.replaceDate(s, "anim:", animationTime);
+            s = StringUtil.replaceDate(s, "time:", animationTime);
+            s = StringUtil.replaceDate(s, "now:", now);
         }
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
@@ -3242,7 +3409,7 @@ public class ImageGenerator extends IdvManager {
             Object result = getInterpreter().eval(s);
             s = result.toString();
         }
-        s = s.replace("\\n","\n");
+        s = s.replace("\\n", "\n");
         return s;
     }
 
@@ -3382,10 +3549,21 @@ public class ImageGenerator extends IdvManager {
      */
     public void loadBundle(String bundleFile, List setFiles)
             throws Throwable {
-        loadBundle(bundleFile, setFiles, -1,-1);
+        loadBundle(bundleFile, setFiles, -1, -1);
     }
 
-    public void loadBundle(String bundleFile, List setFiles, int width, int height)
+    /**
+     * _more_
+     *
+     * @param bundleFile _more_
+     * @param setFiles _more_
+     * @param width _more_
+     * @param height _more_
+     *
+     * @throws Throwable _more_
+     */
+    public void loadBundle(String bundleFile, List setFiles, int width,
+                           int height)
             throws Throwable {
         //        System.err.println ("width: " + width + " " + height);
         StringBuffer extra = new StringBuffer();
@@ -3402,19 +3580,18 @@ public class ImageGenerator extends IdvManager {
             }
         }
         StringBuffer attrs = new StringBuffer();
-        attrs.append(" ");            
-        attrs.append(ATTR_FILE +"=" + quote(bundleFile));
-        attrs.append(" ");            
-        if(width>0 && height>0) {
+        attrs.append(" ");
+        attrs.append(ATTR_FILE + "=" + quote(bundleFile));
+        attrs.append(" ");
+        if ((width > 0) && (height > 0)) {
             attrs.append(" ");
-            attrs.append(ATTR_WIDTH +"=" + quote(""+width));
+            attrs.append(ATTR_WIDTH + "=" + quote("" + width));
             attrs.append(" ");
-            attrs.append(ATTR_HEIGHT +"=" + quote(""+height));
-            attrs.append(" ");            
+            attrs.append(ATTR_HEIGHT + "=" + quote("" + height));
+            attrs.append(" ");
         }
 
-        String xml = "<bundle " +attrs +">" + extra
-                     + "</bundle>";
+        String xml = "<bundle " + attrs + ">" + extra + "</bundle>";
         System.err.println(xml);
         processTagBundle(makeElement(xml));
     }
@@ -3497,8 +3674,15 @@ public class ImageGenerator extends IdvManager {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     private static String quote(String s) {
-        return "\"" + s +"\"";
+        return "\"" + s + "\"";
     }
 
     /**
@@ -3570,7 +3754,8 @@ public class ImageGenerator extends IdvManager {
                           BufferedImage.TYPE_INT_RGB);
             String loopFilename = applyMacros(filename);
             lastImage = processImage((BufferedImage) tmpImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null,imageProperties);
+                                     scriptingNode, getAllProperties(), null,
+                                     imageProperties);
             return;
         }
 
@@ -3584,23 +3769,25 @@ public class ImageGenerator extends IdvManager {
                         + XmlUtil.toString(scriptingNode));
             }
             String loopFilename = applyMacros(filename);
-            String what  = applyMacros(scriptingNode,
-                                       ATTR_WHAT, (String) null);
+            String what = applyMacros(scriptingNode, ATTR_WHAT,
+                                      (String) null);
 
             ViewManager viewManager = display.getViewManagerForCapture(what);
-            if(viewManager !=null) {
+            if (viewManager != null) {
                 viewManager.updateDisplayIfNeeded();
-                viewManagers =(List<ViewManager>)Misc.newList(viewManager);
+                viewManagers = (List<ViewManager>) Misc.newList(viewManager);
             } else {
                 lastImage = display.getImage(what);
-                lastImage = processImage((BufferedImage) lastImage, loopFilename,
-                                         scriptingNode, getAllProperties(), null,imageProperties);
+                lastImage = processImage((BufferedImage) lastImage,
+                                         loopFilename, scriptingNode,
+                                         getAllProperties(), null,
+                                         imageProperties);
                 return;
             }
         }
 
-        if(viewManagers == null) {
-            viewManagers = (List<ViewManager>)getViewManagers(scriptingNode);
+        if (viewManagers == null) {
+            viewManagers = (List<ViewManager>) getViewManagers(scriptingNode);
         }
 
         if (viewManagers.size() == 0) {
@@ -3637,12 +3824,13 @@ public class ImageGenerator extends IdvManager {
                 vectorRenderer.renderTo(loopFilename);
             } else {
                 getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
-                                                                    getIdv().getIdvUIManager(),0);
-                lastImage = viewManager.getMaster().getImage(false);
+                    getIdv().getIdvUIManager(), 0);
+                lastImage       = viewManager.getMaster().getImage(false);
                 imageProperties = new Hashtable();
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
-                                         getAllProperties(), viewManager,imageProperties);
+                                         getAllProperties(), viewManager,
+                                         imageProperties);
             }
         }
         popProperties();
@@ -3742,14 +3930,14 @@ public class ImageGenerator extends IdvManager {
      * @param node Node to process
      * @param props Extra properties
      * @param viewManager The viewmanager this image came from
+     * @param imageProps _more_
      *
      *
      * @return The processed image
      * @throws Throwable On badness
      */
     protected BufferedImage processImage(BufferedImage image,
-                                         String filename, 
-                                         Element node,
+                                         String filename, Element node,
                                          Hashtable props,
                                          ViewManager viewManager,
                                          Hashtable imageProps)
@@ -3790,37 +3978,50 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_OUTPUT)) {
                 processTagOutput(child);
             } else if (tagName.equals(TAG_DISPLAYLIST)) {
-                if(viewManager!=null) {
-                    newImage = ImageUtils.toBufferedImage(image,true);
+                if (viewManager != null) {
+                    newImage = ImageUtils.toBufferedImage(image, true);
                     Graphics g = newImage.getGraphics();
-                    String valign = applyMacros(child,ATTR_VALIGN,VALUE_BOTTOM);
+                    String valign = applyMacros(child, ATTR_VALIGN,
+                                        VALUE_BOTTOM);
                     Font font = getFont(child);
-                    if(XmlUtil.hasAttribute(child,ATTR_MATTEBG)) {
-                        int height = viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
-                                                                  valign.equals(VALUE_BOTTOM),null,font);
+                    if (XmlUtil.hasAttribute(child, ATTR_MATTEBG)) {
+                        int height =
+                            viewManager.paintDisplayList((Graphics2D) g,
+                                null, imageWidth, imageHeight,
+                                valign.equals(VALUE_BOTTOM), null, font);
 
-                        int top = (valign.equals(VALUE_TOP)?height:0);
-                        int bottom = (valign.equals(VALUE_BOTTOM)?height:0);
+                        int top    = (valign.equals(VALUE_TOP)
+                                      ? height
+                                      : 0);
+                        int bottom = (valign.equals(VALUE_BOTTOM)
+                                      ? height
+                                      : 0);
                         newImage = ImageUtils.matte(image, top, bottom, 0, 0,
-                                                    applyMacros(child,ATTR_MATTEBG,Color.white));
-                        g = newImage.getGraphics();
-                        imageHeight+=height;
+                                applyMacros(child, ATTR_MATTEBG,
+                                            Color.white));
+                        g           = newImage.getGraphics();
+                        imageHeight += height;
                     }
 
-                    Color c = applyMacros(child, ATTR_COLOR, (Color)null);
-                    viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
-                                                 valign.equals(VALUE_BOTTOM),c,font);
+                    Color c = applyMacros(child, ATTR_COLOR, (Color) null);
+                    viewManager.paintDisplayList((Graphics2D) g, null,
+                            imageWidth, imageHeight,
+                            valign.equals(VALUE_BOTTOM), c, font);
                 }
-            } else if (tagName.equals(TAG_COLORBAR)||tagName.equals(TAG_KML_COLORBAR)) {
+            } else if (tagName.equals(TAG_COLORBAR)
+                       || tagName.equals(TAG_KML_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
-                List<DisplayControlImpl>   controls  = (List<DisplayControlImpl>) ((viewManager != null)
-                                     ? viewManager.getControls()
-                                     : new ArrayList());
+                List<DisplayControlImpl> controls =
+                    (List<DisplayControlImpl>) ((viewManager != null)
+                        ? viewManager.getControls()
+                        : new ArrayList());
 
                 if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
-                    DisplayControlImpl display = (controls.size()>0?findDisplayControl(XmlUtil.getAttribute(child, ATTR_DISPLAY),controls):
-                                                  findDisplayControl(child));
+                    DisplayControlImpl display = ((controls.size() > 0)
+                            ? findDisplayControl(XmlUtil.getAttribute(child,
+                                ATTR_DISPLAY), controls)
+                            : findDisplayControl(child));
                     if (display == null) {
                         error("Could not find display:"
                               + XmlUtil.toString(node));
@@ -3852,16 +4053,16 @@ public class ImageGenerator extends IdvManager {
                                          VALUE_BOTTOM);
                 boolean vertical = orientation.equals(VALUE_RIGHT)
                                    || orientation.equals(VALUE_LEFT);
-                int baseY = pp.y - ap.y + (vertical
-                                           ? 0
-                                           : height);
-                int baseX = pp.x - ap.x;
+                int     baseY       = pp.y - ap.y + (vertical
+                        ? 0
+                        : height);
+                int     baseX       = pp.x - ap.x;
 
-                List colorTables = new ArrayList();
-                List ranges = new ArrayList();
-                List units = new ArrayList();
+                List    colorTables = new ArrayList();
+                List    ranges      = new ArrayList();
+                List    units       = new ArrayList();
 
-                boolean forKml = tagName.equals(TAG_KML_COLORBAR);
+                boolean forKml      = tagName.equals(TAG_KML_COLORBAR);
 
                 for (int i = 0; i < controls.size(); i++) {
                     DisplayControlImpl control =
@@ -3883,28 +4084,37 @@ public class ImageGenerator extends IdvManager {
                 }
 
                 for (int i = 0; i < colorTables.size(); i++) {
-                    ColorTable colorTable = (ColorTable)colorTables.get(i);
-                    Range range  = (Range) ranges.get(i);
-                    Unit unit = (Unit) units.get(i);
-                    Image imageToDrawIn;
-                    if(forKml) {
-                        if(vertical) {
+                    ColorTable colorTable = (ColorTable) colorTables.get(i);
+                    Range      range      = (Range) ranges.get(i);
+                    Unit       unit       = (Unit) units.get(i);
+                    Image      imageToDrawIn;
+                    if (forKml) {
+                        if (vertical) {
                             baseX = 0;
                             baseY = 0;
                         } else {
                             baseX = 0;
                             baseY = height;
                         }
-                        int space = applyMacros(child, ATTR_SPACE,(vertical?width:height));
-                        imageToDrawIn =new  BufferedImage(width+(vertical?space:0),height+(vertical?0:space),BufferedImage.TYPE_INT_RGB);
+                        int space = applyMacros(child, ATTR_SPACE, (vertical
+                                ? width
+                                : height));
+                        imageToDrawIn = new BufferedImage(width + (vertical
+                                ? space
+                                : 0), height + (vertical
+                                ? 0
+                                : space), BufferedImage.TYPE_INT_RGB);
                     } else {
-                        imageToDrawIn = newImage = ImageUtils.toBufferedImage(image);
+                        imageToDrawIn = newImage =
+                            ImageUtils.toBufferedImage(image);
                     }
                     Graphics g = imageToDrawIn.getGraphics();
-                    if(forKml) {
-                        Color bgColor  = applyMacros(child, ATTR_BACKGROUND, Color.white);
+                    if (forKml) {
+                        Color bgColor = applyMacros(child, ATTR_BACKGROUND,
+                                            Color.white);
                         g.setColor(bgColor);
-                        g.fillRect(0, 0, imageToDrawIn.getWidth(null),imageToDrawIn.getHeight(null));
+                        g.fillRect(0, 0, imageToDrawIn.getWidth(null),
+                                   imageToDrawIn.getHeight(null));
                     }
                     ColorPreview preview =
                         new ColorPreview(
@@ -3918,9 +4128,12 @@ public class ImageGenerator extends IdvManager {
                         preview.setSize(new Dimension(width, height));
                     }
                     Image previewImage = GuiUtils.getImage(preview);
-		    previewImage = ColorTableCanvas.getImage(colorTable,  (vertical
-								   ? height
-									   : width),(vertical?width:height));
+                    previewImage = ColorTableCanvas.getImage(colorTable,
+                            (vertical
+                             ? height
+                             : width), (vertical
+                                        ? width
+                                        : height));
 
 
                     if (vertical) {
@@ -3938,27 +4151,32 @@ public class ImageGenerator extends IdvManager {
                         tmpG.drawImage(previewImage, 0, 0 - width, null);
                         previewImage = tmpImage;
                     }
-                    if(forKml) {
-                        g.drawImage(previewImage, 0,0,null);
+                    if (forKml) {
+                        g.drawImage(previewImage, 0, 0, null);
                     } else {
                         g.drawImage(previewImage, baseX, (vertical
-                                                          ? baseY
-                                                          : baseY - height), null);
+                                ? baseY
+                                : baseY - height), null);
                     }
                     if (showLines) {
                         g.setColor(lineColor);
                         g.drawRect(baseX, (vertical
                                            ? baseY
-                                           : baseY - height), width-1, height-(vertical?1:0));
+                                           : baseY - height), width - 1,
+                                           height - (vertical
+                                ? 1
+                                : 0));
                     }
                     setFont(g, child);
-                    FontMetrics fm         = g.getFontMetrics();
-                    List        values     = new ArrayList();
-                    String      labelSuffix = applyMacros(child,ATTR_SUFFIX," %unit%");
-                    if (unit!=null) {
-                        labelSuffix = labelSuffix.replace("%unit%",""+unit);
+                    FontMetrics fm     = g.getFontMetrics();
+                    List        values = new ArrayList();
+                    String labelSuffix = applyMacros(child, ATTR_SUFFIX,
+                                             " %unit%");
+                    if (unit != null) {
+                        labelSuffix = labelSuffix.replace("%unit%",
+                                "" + unit);
                     } else {
-                        labelSuffix = labelSuffix.replace("%unit%","");
+                        labelSuffix = labelSuffix.replace("%unit%", "");
                     }
                     if (valuesStr != null) {
                         double[] valueArray = Misc.parseDoubles(valuesStr,
@@ -4019,7 +4237,7 @@ public class ImageGenerator extends IdvManager {
                         }
                         String tickLabel =
                             getIdv().getDisplayConventions().format(value)
-                            +  labelSuffix;
+                            + labelSuffix;
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
@@ -4045,33 +4263,30 @@ public class ImageGenerator extends IdvManager {
                         }
                         g.setColor(c);
                         if (orientation.equals(VALUE_RIGHT)) {
-                            int yLoc = y + (int) (rect.getHeight() / 2)- 2;
-                            if(forKml) {
-                                if(valueIdx==0) {
-                                    yLoc = y + (int) (rect.getHeight())- 2;
-                                } else if(valueIdx==values.size()-1) {
-                                    yLoc = y - (int) (rect.getHeight())+6;
+                            int yLoc = y + (int) (rect.getHeight() / 2) - 2;
+                            if (forKml) {
+                                if (valueIdx == 0) {
+                                    yLoc = y + (int) (rect.getHeight()) - 2;
+                                } else if (valueIdx == values.size() - 1) {
+                                    yLoc = y - (int) (rect.getHeight()) + 6;
                                 }
                             }
-                            g.drawString(tickLabel, x + 2,
-                                         yLoc);
+                            g.drawString(tickLabel, x + 2, yLoc);
                         } else if (orientation.equals(VALUE_LEFT)) {
-                            int xLoc =  x - 2 - (int) rect.getWidth();
-                            g.drawString(tickLabel,
-                                         xLoc,
+                            int xLoc = x - 2 - (int) rect.getWidth();
+                            g.drawString(tickLabel, xLoc,
                                          y + (int) (rect.getHeight() / 2)
                                          - 2);
                         } else if (orientation.equals(VALUE_BOTTOM)) {
-                            int xLoc =  x - (int) (rect.getWidth() / 2);
-                            if(forKml) {
-                                if(valueIdx==0) {
-                                    xLoc = x+2;
-                                } else if(valueIdx==values.size()-1) {
-                                    xLoc = x-(int)rect.getWidth()+2;
+                            int xLoc = x - (int) (rect.getWidth() / 2);
+                            if (forKml) {
+                                if (valueIdx == 0) {
+                                    xLoc = x + 2;
+                                } else if (valueIdx == values.size() - 1) {
+                                    xLoc = x - (int) rect.getWidth() + 2;
                                 }
                             }
-                            g.drawString(tickLabel,
-                                         xLoc,
+                            g.drawString(tickLabel, xLoc,
                                          y + (int) rect.getHeight() + 2);
                         } else {
                             g.drawString(tickLabel,
@@ -4084,43 +4299,61 @@ public class ImageGenerator extends IdvManager {
                     } else {
                         baseY += height + 30;
                     }
-                    if(forKml) {
-                        String tmpImageFile = applyMacros(child,ATTR_FILE,getIdv().getStore().getTmpFile("testcolorbar${viewindex}.png"));
-                        String template  ="<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"+
-                            "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n" +
-                            "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n" +
-                            "<size x=\"${kml.size.x}\" y=\"${kml.size.y}\" xunits=\"${kml.size.xunits}\" yunits=\"${kml.size.yunits}\"/>\n" +
-                            "</ScreenOverlay>\n";
-                        String []macros = {"kml.name","kml.overlayXY.x","kml.overlayXY.y","kml.overlayXY.xunits","kml.overlayXY.yunits",
-                                           "kml.screenXY.x","kml.screenXY.y","kml.screenXY.xunits","kml.screenXY.yunits",
-                                           "kml.size.x", "kml.size.y","kml.size.xunits","kml.size.yunits"};
-                        String []macroValues = {"",
-                                                "0","1","fraction","fraction",
-                                                "0","1","fraction","fraction",
-                                           "-1", "-1","pixels","pixels"};
+                    if (forKml) {
+                        String tmpImageFile =
+                            applyMacros(
+                                child, ATTR_FILE,
+                                getIdv().getStore().getTmpFile(
+                                    "testcolorbar${viewindex}.png"));
+                        String template =
+                            "<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"
+                            + "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n"
+                            + "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n"
+                            + "<size x=\"${kml.size.x}\" y=\"${kml.size.y}\" xunits=\"${kml.size.xunits}\" yunits=\"${kml.size.yunits}\"/>\n"
+                            + "</ScreenOverlay>\n";
+                        String[] macros = {
+                            "kml.name", "kml.overlayXY.x", "kml.overlayXY.y",
+                            "kml.overlayXY.xunits", "kml.overlayXY.yunits",
+                            "kml.screenXY.x", "kml.screenXY.y",
+                            "kml.screenXY.xunits", "kml.screenXY.yunits",
+                            "kml.size.x", "kml.size.y", "kml.size.xunits",
+                            "kml.size.yunits"
+                        };
+                        String[] macroValues = {
+                            "", "0", "1", "fraction", "fraction", "0", "1",
+                            "fraction", "fraction", "-1", "-1", "pixels",
+                            "pixels"
+                        };
 
-                        for(int macroIdx=0;macroIdx<macros.length;macroIdx++) {
-                            template = template.replace("${" +macros[macroIdx]+"}",applyMacros(child,macros[macroIdx],macroValues[macroIdx]));
+                        for (int macroIdx = 0; macroIdx < macros.length;
+                                macroIdx++) {
+                            template =
+                                template.replace("${" + macros[macroIdx]
+                                    + "}", applyMacros(child,
+                                        macros[macroIdx],
+                                        macroValues[macroIdx]));
                         }
-                        template = template.replace("${icon}",IOUtil.getFileTail(tmpImageFile));
-                        imageProps.put("kml",template);
+                        template = template.replace("${icon}",
+                                IOUtil.getFileTail(tmpImageFile));
+                        imageProps.put("kml", template);
                         List kmlFiles = (List) imageProps.get("kmlfiles");
                         //TODO: Only do the first one for now
-                        if(kmlFiles == null) {
+                        if (kmlFiles == null) {
                             kmlFiles = new ArrayList();
                             imageProps.put("kmlfiles", kmlFiles);
                         }
                         kmlFiles.add(tmpImageFile);
 
                         //                        System.out.println(template);
-                        ImageUtils.writeImageToFile(
-                                                    imageToDrawIn, tmpImageFile);
+                        ImageUtils.writeImageToFile(imageToDrawIn,
+                                tmpImageFile);
                     }
                 }
 
 
-            } else if (tagName.equals(TAG_TRANSPARENT) || tagName.equals(TAG_BGTRANSPARENT)) {
-                Color c=null;
+            } else if (tagName.equals(TAG_TRANSPARENT)
+                       || tagName.equals(TAG_BGTRANSPARENT)) {
+                Color c = null;
                 if (tagName.equals(TAG_BGTRANSPARENT)) {
                     c = viewManager.getBackground();
                 } else {
@@ -4140,11 +4373,13 @@ public class ImageGenerator extends IdvManager {
                         greenRange, blueRange);
             } else if (tagName.equals(TAG_SHOW)) {
                 JComponent contents = new JLabel(new ImageIcon(image));
-                String message = applyMacros(child, ATTR_MESSAGE,(String) null);
-                if(message!=null) {
-                    contents = GuiUtils.topCenter(new JLabel(message), contents);
+                String message = applyMacros(child, ATTR_MESSAGE,
+                                             (String) null);
+                if (message != null) {
+                    contents = GuiUtils.topCenter(new JLabel(message),
+                            contents);
                 }
-                if(!GuiUtils.askOkCancel("Continue?",contents)) {
+                if ( !GuiUtils.askOkCancel("Continue?", contents)) {
                     throw new MyQuitException();
                 }
             } else if (tagName.equals(TAG_MATTE)) {
@@ -4163,7 +4398,8 @@ public class ImageGenerator extends IdvManager {
                     image, getImageFileName(applyMacros(child, ATTR_FILE)));
 
             } else if (tagName.equals(TAG_PUBLISH)) {
-                getIdv().getPublishManager().publishIslImage(this, node, image);
+                getIdv().getPublishManager().publishIslImage(this, node,
+                        image);
             } else if (tagName.equals(TAG_CLIP)) {
                 int[] ul;
                 int[] lr;
@@ -4208,10 +4444,16 @@ public class ImageGenerator extends IdvManager {
                         ul[1] = lr[1];
                         lr[1] = tmp;
                     }
-                    imageProps.put(ATTR_NORTH, new Double(ulEl.getLatitude().getValue()));
-                    imageProps.put(ATTR_WEST, new Double(ulEl.getLongitude().getValue()));
-                    imageProps.put(ATTR_SOUTH, new Double(lrEl.getLatitude().getValue()));
-                    imageProps.put(ATTR_EAST, new Double(lrEl.getLongitude().getValue()));
+                    imageProps.put(ATTR_NORTH,
+                                   new Double(ulEl.getLatitude().getValue()));
+                    imageProps.put(
+                        ATTR_WEST,
+                        new Double(ulEl.getLongitude().getValue()));
+                    imageProps.put(ATTR_SOUTH,
+                                   new Double(lrEl.getLatitude().getValue()));
+                    imageProps.put(
+                        ATTR_EAST,
+                        new Double(lrEl.getLongitude().getValue()));
                 } else if ((viewManager != null)
                            && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
                     NavigatedDisplay display =
@@ -4226,10 +4468,14 @@ public class ImageGenerator extends IdvManager {
                         display.getSpatialCoordinates(el1, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(el2, null));
-                     imageProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
-                    imageProps.put(ATTR_WEST, new Double(el1.getLongitude().getValue()));
-                    imageProps.put(ATTR_SOUTH, new Double(el2.getLatitude().getValue()));
-                    imageProps.put(ATTR_EAST, new Double(el2.getLongitude().getValue()));
+                    imageProps.put(ATTR_NORTH,
+                                   new Double(el1.getLatitude().getValue()));
+                    imageProps.put(ATTR_WEST,
+                                   new Double(el1.getLongitude().getValue()));
+                    imageProps.put(ATTR_SOUTH,
+                                   new Double(el2.getLatitude().getValue()));
+                    imageProps.put(ATTR_EAST,
+                                   new Double(el2.getLongitude().getValue()));
                 } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
                     ul = new int[] {
                         (int) toDouble(child, ATTR_LEFT, imageWidth),
@@ -4241,34 +4487,40 @@ public class ImageGenerator extends IdvManager {
                     //TODO: Clip on visad coordinates
                     NavigatedDisplay display =
                         (NavigatedDisplay) viewManager.getMaster();
-                    ul = display.getScreenCoordinates(new double[]{-1,1,0});
-                    lr= display.getScreenCoordinates(new double[]{1,-1,0});
-                    int space = applyMacros(child,ATTR_SPACE,0);
-                    int hspace = applyMacros(child,ATTR_HSPACE,space);
-                    int vspace = applyMacros(child,ATTR_VSPACE,space);
-                    ul[0] -= applyMacros(child,ATTR_SPACE_LEFT,hspace);
-                    ul[1] -= applyMacros(child,ATTR_SPACE_TOP,vspace);
-                    lr[0] += applyMacros(child,ATTR_SPACE_RIGHT,hspace);
-                    lr[1] += applyMacros(child,ATTR_SPACE_BOTTOM,vspace);
+                    ul = display.getScreenCoordinates(new double[] { -1, 1,
+                            0 });
+                    lr = display.getScreenCoordinates(new double[] { 1, -1,
+                            0 });
+                    int space  = applyMacros(child, ATTR_SPACE, 0);
+                    int hspace = applyMacros(child, ATTR_HSPACE, space);
+                    int vspace = applyMacros(child, ATTR_VSPACE, space);
+                    ul[0] -= applyMacros(child, ATTR_SPACE_LEFT, hspace);
+                    ul[1] -= applyMacros(child, ATTR_SPACE_TOP, vspace);
+                    lr[0] += applyMacros(child, ATTR_SPACE_RIGHT, hspace);
+                    lr[1] += applyMacros(child, ATTR_SPACE_BOTTOM, vspace);
                 } else {
                     continue;
                 }
 
 
-                for(String attr: (List<String>)Misc.newList(ATTR_NORTH,ATTR_SOUTH,ATTR_EAST,ATTR_WEST)) {
-                    String kmlAttr= "kml." + attr;
-                    if(XmlUtil.hasAttribute(child, kmlAttr)) {
-                        imageProps.put(attr, new Double(applyMacros(child,kmlAttr,0.0)));
+                for (String attr :
+                        (List<String>) Misc.newList(ATTR_NORTH, ATTR_SOUTH,
+                        ATTR_EAST, ATTR_WEST)) {
+                    String kmlAttr = "kml." + attr;
+                    if (XmlUtil.hasAttribute(child, kmlAttr)) {
+                        imageProps.put(attr,
+                                       new Double(applyMacros(child, kmlAttr,
+                                           0.0)));
                     }
                 }
 
 
 
-                ul[0] = Math.max(0, ul[0]);
-                ul[1] = Math.max(0, ul[1]);
-                
-                lr[0] = Math.min(lr[0],imageWidth);
-                lr[1] = Math.min(lr[1],imageHeight);
+                ul[0]    = Math.max(0, ul[0]);
+                ul[1]    = Math.max(0, ul[1]);
+
+                lr[0]    = Math.min(lr[0], imageWidth);
+                lr[1]    = Math.min(lr[1], imageHeight);
 
 
                 newImage = ImageUtils.clip(image, ul, lr);
@@ -4293,7 +4545,8 @@ public class ImageGenerator extends IdvManager {
                         Image splitImage = image.getSubimage(hSpace * col,
                                                vSpace * row, hSpace, vSpace);
                         processImage(ImageUtils.toBufferedImage(splitImage),
-                                     realFile, child, myprops, viewManager, new Hashtable());
+                                     realFile, child, myprops, viewManager,
+                                     new Hashtable());
                         popProperties();
                     }
                 }
@@ -4307,13 +4560,15 @@ public class ImageGenerator extends IdvManager {
                     thumbFile = IOUtil.stripExtension(filename) + "_thumb"
                                 + IOUtil.getFileExtension(filename);
                 }
-                processImage(thumbImage, thumbFile, child, null, viewManager, new Hashtable());
+                processImage(thumbImage, thumbFile, child, null, viewManager,
+                             new Hashtable());
             } else if (tagName.equals(TAG_KML)) {
                 //NOOP
             } else if (tagName.equals(TAG_KMZFILE)) {
                 //NOOP
             } else if (tagName.equals(TAG_OVERLAY)) {
-                double transparency = applyMacros(child,ATTR_TRANSPARENCY,0.0);
+                double transparency = applyMacros(child, ATTR_TRANSPARENCY,
+                                          0.0);
                 Graphics2D g = (Graphics2D) image.getGraphics();
                 String imagePath = applyMacros(child, ATTR_IMAGE,
                                        (String) null);
@@ -4323,19 +4578,22 @@ public class ImageGenerator extends IdvManager {
                 Point pp = ImageUtils.parsePoint(applyMacros(child,
                                ATTR_PLACE, "lr,-10,-10"), imageRect);
                 String text = applyMacros(child, ATTR_TEXT, (String) null);
-                Color bg = applyMacros(child, ATTR_BACKGROUND, (Color) null);
+                Color  bg = applyMacros(child, ATTR_BACKGROUND, (Color) null);
                 if (text != null) {
                     double angle = Math.toRadians(applyMacros(child,
                                        ATTR_ANGLE, 0.0));
                     text = applyMacros(text);
                     Color c = applyMacros(child, ATTR_COLOR, Color.white);
-                    if(c!=null && transparency>0) {
-                        c = new Color(c.getRed(),c.getGreen(),c.getBlue(), ImageUtils.toAlpha(transparency));
+                    if ((c != null) && (transparency > 0)) {
+                        c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                                      ImageUtils.toAlpha(transparency));
                     }
                     //Color bg = applyMacros(child, ATTR_BACKGROUND,
                     //                       (Color) null);
-                    if(bg!=null && transparency>0) {
-                        bg = new Color(bg.getRed(),bg.getGreen(),bg.getBlue(), ImageUtils.toAlpha(transparency));
+                    if ((bg != null) && (transparency > 0)) {
+                        bg = new Color(bg.getRed(), bg.getGreen(),
+                                       bg.getBlue(),
+                                       ImageUtils.toAlpha(transparency));
                     }
                     setFont(g, child);
                     FontMetrics fm     = g.getFontMetrics();
@@ -4362,8 +4620,9 @@ public class ImageGenerator extends IdvManager {
                 if (imagePath != null) {
                     Image overlay = ImageUtils.readImage(imagePath);
                     if (overlay != null) {
-                        if(transparency>0) {
-                            overlay = ImageUtils.setAlpha(overlay, transparency);
+                        if (transparency > 0) {
+                            overlay = ImageUtils.setAlpha(overlay,
+                                    transparency);
                         }
                         int width  = overlay.getWidth(null);
                         int height = overlay.getHeight(null);
@@ -4371,7 +4630,8 @@ public class ImageGenerator extends IdvManager {
                                        ATTR_ANCHOR,
                                        "lr,-10,-10"), new Rectangle(0, 0,
                                            width, height));
-                        g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, bg, null);
+                        g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, bg,
+                                    null);
                     }
                 }
             } else {
@@ -4382,7 +4642,8 @@ public class ImageGenerator extends IdvManager {
                                          (String) null);
                 if (shouldIterateChildren) {
                     newImage = processImage(newImage, newFileName, child,
-                                            null, viewManager, new Hashtable());
+                                            null, viewManager,
+                                            new Hashtable());
                 }
                 if (newFileName != null) {
                     ImageUtils.writeImageToFile(newImage,
@@ -4398,23 +4659,29 @@ public class ImageGenerator extends IdvManager {
 
         if (filename != null) {
             float quality = (float) applyMacros(node, ATTR_QUALITY, 1.0);
-            List<String> fileToks = (List<String>)StringUtil.split(filename, ",", true,
-                                             true);
-            for(String file: fileToks) {
+            List<String> fileToks = (List<String>) StringUtil.split(filename,
+                                        ",", true, true);
+            for (String file : fileToks) {
                 file = getImageFileName(file);
                 debug("Writing image:" + file);
-                if(file.endsWith(FileManager.SUFFIX_KMZ)) {
+                if (file.endsWith(FileManager.SUFFIX_KMZ)) {
                     GeoLocationInfo bounds = null;
                     if (viewManager != null) {
-                        bounds  = viewManager.getVisibleGeoBounds();
+                        bounds = viewManager.getVisibleGeoBounds();
                         ImageSequenceGrabber.subsetBounds(bounds, imageProps);
                         String tail = IOUtil.getFileTail(file);
-                        String tmpImageFile = getIdv().getStore().getTmpFile(tail+".png");
-                        ImageUtils.writeImageToFile(image, tmpImageFile, quality);
-                        ImageWrapper imageWrapper = new ImageWrapper(tmpImageFile,null,bounds,null);
+                        String tmpImageFile =
+                            getIdv().getStore().getTmpFile(tail + ".png");
+                        ImageUtils.writeImageToFile(image, tmpImageFile,
+                                quality);
+                        ImageWrapper imageWrapper =
+                            new ImageWrapper(tmpImageFile, null, bounds,
+                                             null);
                         imageWrapper.setProperties(imageProps);
-                        new ImageSequenceGrabber(file,getIdv(), this, node,(List<ImageWrapper>)Misc.newList(imageWrapper),
-                                                 null,1);
+                        new ImageSequenceGrabber(
+                            file, getIdv(), this, node,
+                            (List<ImageWrapper>) Misc.newList(imageWrapper),
+                            null, 1);
                     }
                 } else {
                     ImageUtils.writeImageToFile(image, file, quality);
@@ -4474,11 +4741,19 @@ public class ImageGenerator extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     */
     private Font getFont(Element node) {
-        if(XmlUtil.hasAttribute(node, ATTR_FONTSIZE) || XmlUtil.hasAttribute(node, ATTR_FONTFACE)) {
+        if (XmlUtil.hasAttribute(node, ATTR_FONTSIZE)
+                || XmlUtil.hasAttribute(node, ATTR_FONTFACE)) {
             int fontSize = applyMacros(node, ATTR_FONTSIZE, 12);
-            return  new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
-                             Font.PLAIN, fontSize);
+            return new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
+                            Font.PLAIN, fontSize);
         }
         return null;
     }
@@ -4541,26 +4816,27 @@ public class ImageGenerator extends IdvManager {
                 throw new IllegalArgumentException("Could not find display:"
                         + XmlUtil.toString(scriptingNode));
             }
-            String what  = applyMacros(scriptingNode,
-                                       ATTR_WHAT, (String) null);
+            String what = applyMacros(scriptingNode, ATTR_WHAT,
+                                      (String) null);
 
-            ViewManager viewManager=null;
+            ViewManager viewManager = null;
             try {
-                viewManager= display.getViewManagerForCapture(what);
-            } catch(Exception exc) {
+                viewManager = display.getViewManagerForCapture(what);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
 
-            if(viewManager !=null) {
-                viewManagers =(List<ViewManager>)Misc.newList(viewManager);
+            if (viewManager != null) {
+                viewManagers = (List<ViewManager>) Misc.newList(viewManager);
             } else {
-                throw new IllegalArgumentException("Cannot capture a movie with display:"
-                        + XmlUtil.toString(scriptingNode));
+                throw new IllegalArgumentException(
+                    "Cannot capture a movie with display:"
+                    + XmlUtil.toString(scriptingNode));
             }
         }
 
-        if(viewManagers == null) {
-            viewManagers = (List<ViewManager>)getViewManagers(scriptingNode);
+        if (viewManagers == null) {
+            viewManagers = (List<ViewManager>) getViewManagers(scriptingNode);
         }
 
 
@@ -4575,7 +4851,7 @@ public class ImageGenerator extends IdvManager {
             }
             getProperties().put(PROP_VIEWNAME, name);
 
-            if (!getIdv().getArgsManager().getIsOffScreen()) {
+            if ( !getIdv().getArgsManager().getIsOffScreen()) {
                 JFrame frame = GuiUtils.getFrame(viewManager.getContents());
                 if (frame != null) {
                     LogUtil.registerWindow(frame);
@@ -4830,6 +5106,13 @@ public class ImageGenerator extends IdvManager {
     protected static class MyReturnException extends Exception {}
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Tue, Jan 12, '10
+     * @author         Enter your name here...    
+     */
     protected static class MyQuitException extends Exception {}
 
     /**
@@ -4958,4 +5241,3 @@ public class ImageGenerator extends IdvManager {
 
 
 }
-

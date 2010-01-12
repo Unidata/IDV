@@ -1,26 +1,22 @@
 /*
- * $Id: DataTree.java,v 1.50 2007/08/21 12:15:45 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -86,8 +82,10 @@ public class JythonShell extends InteractiveShell {
     /** output stream for interp */
     private OutputStream outputStream;
 
+    /** _more_          */
     private boolean autoSelect = false;
 
+    /** _more_          */
     ImageGenerator islInterpreter;
 
 
@@ -206,7 +204,7 @@ public class JythonShell extends InteractiveShell {
 
         JMenu dataMenu = GuiUtils.makeMenu("Insert Data Source Type",
                                            getDataMenuItems());
-        GuiUtils.limitMenuSize(dataMenu,"Data Source Types",10);
+        GuiUtils.limitMenuSize(dataMenu, "Data Source Types", 10);
         items.add(dataMenu);
         items.add(GuiUtils.makeMenu("Insert Display Type",
                                     getDisplayMenuItems()));
@@ -319,12 +317,12 @@ public class JythonShell extends InteractiveShell {
         }
         try {
             interp = idv.getJythonManager().createInterpreter();
-        } catch(Exception exc) {
-            LogUtil.logException(
-                "An error occurred creating the interpeter", exc);
+        } catch (Exception exc) {
+            LogUtil.logException("An error occurred creating the interpeter",
+                                 exc);
             return;
         }
-        if(islInterpreter == null) {
+        if (islInterpreter == null) {
             islInterpreter = new ImageGenerator(idv);
         }
 
@@ -383,7 +381,8 @@ public class JythonShell extends InteractiveShell {
         items = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Clear All", this, "clear"));
         items.add(GuiUtils.makeMenuItem("Clear Output", this, "clearOutput"));
-        items.add(GuiUtils.makeCheckboxMenuItem("Auto-select Operands",this,"autoSelect",null));
+        items.add(GuiUtils.makeCheckboxMenuItem("Auto-select Operands", this,
+                "autoSelect", null));
         //        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
         menuBar.add(GuiUtils.makeMenu("Edit", items));
 
@@ -418,16 +417,23 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List getDataMenuItems() {
-        List      items= new ArrayList();
-        for (DataSourceDescriptor descriptor: idv.getDataManager().getDescriptors()) {
-            List ids = StringUtil.split(descriptor.getId(),",",true,true);
+        List items = new ArrayList();
+        for (DataSourceDescriptor descriptor :
+                idv.getDataManager().getDescriptors()) {
+            List   ids = StringUtil.split(descriptor.getId(), ",", true,
+                                          true);
             String label = descriptor.getLabel();
-            if(label==null || label.trim().length()==0) {
-                label = ""+ids.get(0);
+            if ((label == null) || (label.trim().length() == 0)) {
+                label = "" + ids.get(0);
             }
-            items.add(GuiUtils.makeMenuItem(label, this,
-                    "insert", "'" + ids.get(0) + "'"));
+            items.add(GuiUtils.makeMenuItem(label, this, "insert",
+                                            "'" + ids.get(0) + "'"));
         }
         return items;
     }
@@ -457,8 +463,8 @@ public class JythonShell extends InteractiveShell {
         String html = StringUtil.replace(code.trim(), "\n", "<br>");
         html = StringUtil.replace(html, " ", "&nbsp;");
         html = StringUtil.replace(html, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-        html = html.replace("<","&lt;");
-        html = html.replace(">","&gt;");
+        html = html.replace("<", "&lt;");
+        html = html.replace(">", "&gt;");
         return html;
     }
 
@@ -490,18 +496,19 @@ public class JythonShell extends InteractiveShell {
             }
 
             String code = sb.toString().trim();
-            if(autoSelect && 
-                              !code.startsWith("import") &&
-                              !code.startsWith("from")) {
+            if (autoSelect && !code.startsWith("import")
+                    && !code.startsWith("from")) {
                 int idx;
                 //Strip out any leading assignment
-                while(true) {
-                    idx= code.indexOf("=");
-                    if(idx<0) break;
-                    code = code.substring(idx+1);
+                while (true) {
+                    idx = code.indexOf("=");
+                    if (idx < 0) {
+                        break;
+                    }
+                    code = code.substring(idx + 1);
                 }
 
-                List operands = DerivedDataChoice.parseOperands(code);
+                List operands        = DerivedDataChoice.parseOperands(code);
                 List unboundOperands = new ArrayList();
                 for (int i = 0; i < operands.size(); i++) {
                     DataOperand operand = (DataOperand) operands.get(i);
@@ -536,7 +543,7 @@ public class JythonShell extends InteractiveShell {
         } catch (Exception exc) {
             endBufferingOutput();
             output("<font color=\"red\">Error: " + exc + "</font><br>");
-        } 
+        }
     }
 
 
@@ -559,24 +566,23 @@ public class JythonShell extends InteractiveShell {
     }
 
 
-/**
-Set the AutoSelect property.
-
-@param value The new value for AutoSelect
-**/
-public void setAutoSelect (boolean value) {
+    /**
+     * Set the AutoSelect property.
+     *
+     * @param value The new value for AutoSelect
+     */
+    public void setAutoSelect(boolean value) {
         autoSelect = value;
-}
+    }
 
-/**
-Get the AutoSelect property.
-
-@return The AutoSelect
-**/
-public boolean getAutoSelect () {
+    /**
+     * Get the AutoSelect property.
+     *
+     * @return The AutoSelect
+     */
+    public boolean getAutoSelect() {
         return autoSelect;
-}
+    }
 
 
 }
-

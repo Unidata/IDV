@@ -1,25 +1,22 @@
 /*
- * $Id: SideLegend.java,v 1.2 2008/05/08 23:59:18 jbeavers Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.ui;
 
@@ -131,6 +128,11 @@ public class SideLegend extends IdvLegend {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<String> getDisplayCategories() {
         List<String> cats = new ArrayList();
         for (int i = 0; i < categoryPanels.size(); i++) {
@@ -172,7 +174,9 @@ public class SideLegend extends IdvLegend {
      */
     protected void fillLegendSafely() {
         ViewManager theViewManager = viewManager;
-        if(legendsPanel==null || theViewManager == null) return;
+        if ((legendsPanel == null) || (theViewManager == null)) {
+            return;
+        }
         List controls = theViewManager.getControlsForLegend();
         for (int i = 0; i < categoryPanels.size(); i++) {
             CategoryPanel categoryPanel =
@@ -184,10 +188,11 @@ public class SideLegend extends IdvLegend {
 
 
         boolean showIcons = true;
-        if(theViewManager!=null) {
+        if (theViewManager != null) {
             IntegratedDataViewer idv = theViewManager.getIdv();
-            if(idv!=null) {
-                showIcons =idv.getStateManager().getPreferenceOrProperty(IdvConstants.PREF_LEGEND_SHOWICONS, false);
+            if (idv != null) {
+                showIcons = idv.getStateManager().getPreferenceOrProperty(
+                    IdvConstants.PREF_LEGEND_SHOWICONS, false);
             }
         }
         Hashtable seen = new Hashtable();
@@ -226,7 +231,8 @@ public class SideLegend extends IdvLegend {
                     control.getLegendLabel(control.SIDE_LEGEND);
                 sideLegendLabel.setBorder(BorderFactory.createEmptyBorder(0,
                         5, 0, 3));
-                JComponent buttons = control.getLegendButtons(control.SIDE_LEGEND);
+                JComponent buttons =
+                    control.getLegendButtons(control.SIDE_LEGEND);
                 legendPanel = new DisplayControlLegendPanel(control,
                         sideLegendLabel, false,
                         GuiUtils.inset(visCbx, new Insets(0, 0, 0, 2)),
@@ -579,4 +585,3 @@ public class SideLegend extends IdvLegend {
 
 
 }
-

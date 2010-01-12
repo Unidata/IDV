@@ -1,26 +1,22 @@
 /*
- * Copyright  1997-2009 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -60,7 +56,6 @@ import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
 
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.Removable;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -74,6 +69,7 @@ import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
@@ -1434,7 +1430,9 @@ public class IdvUIManager extends IdvManager {
                 if (lastActiveFrame == window) {
                     return;
                 }
-                if(window.getHasBeenDisposed()) return;
+                if (window.getHasBeenDisposed()) {
+                    return;
+                }
                 lastActiveFrame = window;
                 if ( !getStateManager().isLoadingXml()
                         && getIdv().getHaveInitialized()) {
@@ -1473,7 +1471,9 @@ public class IdvUIManager extends IdvManager {
      * @param window The window
      */
     public void handleWindowActivated(IdvWindow window) {
-        if(window.getHasBeenDisposed()) return;
+        if (window.getHasBeenDisposed()) {
+            return;
+        }
         List        viewManagers            = window.getViewManagers();
         ViewManager viewManagerToMakeActive = null;
         long        lastActivatedTime       = -1;
@@ -1626,8 +1626,8 @@ public class IdvUIManager extends IdvManager {
         } else if (id.equals("data.special")) {
             menu.removeAll();
             List menus = new ArrayList();
-            for (DataSourceDescriptor descriptor : getDataManager()
-                    .getStandaloneDescriptors()) {
+            for (DataSourceDescriptor descriptor :
+                    getDataManager().getStandaloneDescriptors()) {
                 menus.add(GuiUtils.makeMenuItem(descriptor.getLabel(),
                         getIdv(), "makeDataSource", descriptor));
             }
@@ -1794,11 +1794,13 @@ public class IdvUIManager extends IdvManager {
             MyMenuListener menuListener = new MyMenuListener(this, idvWindow,
                                               menu, menuId);
             menu.addMenuListener(menuListener);
-            if(idvWindow!=null)
+            if (idvWindow != null) {
                 idvWindow.addRemovable(menuListener);
+            }
         }
-        if(idvWindow!=null)
+        if (idvWindow != null) {
             idvWindow.setComponent(COMP_MENUBAR, menuBar);
+        }
 
         return menuBar;
     }
@@ -1812,16 +1814,16 @@ public class IdvUIManager extends IdvManager {
      */
     private static class MyMenuListener implements MenuListener, Removable {
 
-        /** _more_          */
+        /** _more_ */
         IdvUIManager idvUIManager;
 
-        /** _more_          */
+        /** _more_ */
         IdvWindow idvWindow;
 
-        /** _more_          */
+        /** _more_ */
         JMenu menu;
 
-        /** _more_          */
+        /** _more_ */
         String menuId;
 
         /**
@@ -6472,4 +6474,3 @@ public class IdvUIManager extends IdvManager {
     }
 
 }
-

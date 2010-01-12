@@ -1,26 +1,22 @@
 /*
- * $Id: IdvXmlUi.java,v 1.54 2007/08/16 14:08:22 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -54,16 +50,16 @@ import javax.swing.*;
 
 public class IdvComponentHolder extends ComponentHolder {
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_SKIN = "skin";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_CHOOSERS = "choosers";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_DEFAULT = "default";
 
-    /** _more_          */
+    /** _more_ */
     private String type = TYPE_DEFAULT;
 
 
@@ -73,7 +69,7 @@ public class IdvComponentHolder extends ComponentHolder {
     /** _more_ */
     private Object object;
 
-    /** _more_          */
+    /** _more_ */
     private List viewManagers;
 
     /**
@@ -131,7 +127,7 @@ public class IdvComponentHolder extends ComponentHolder {
                               object.getClass().getName());
             node.appendChild(XmlUtil.makeCDataNode(doc,
                     idv.encodeObject(object, false)));
-            node.setAttribute("showheader", ""+getShowHeader());
+            node.setAttribute("showheader", "" + getShowHeader());
 
             return node;
         }
@@ -355,9 +351,15 @@ public class IdvComponentHolder extends ComponentHolder {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
     public void initWith(Element node) {
         super.initWith(node);
-        setShowHeader(XmlUtil.getAttribute(node, "showheader", getShowHeader()));
+        setShowHeader(XmlUtil.getAttribute(node, "showheader",
+                                           getShowHeader()));
     }
 
 
@@ -528,4 +530,3 @@ public class IdvComponentHolder extends ComponentHolder {
 
 
 }
-

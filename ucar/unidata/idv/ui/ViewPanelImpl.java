@@ -1,27 +1,22 @@
 /*
- * $Id: ViewPanel.java,v 1.33 2007/08/16 14:05:05 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.idv.ui;
 
@@ -405,8 +400,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         ((DisplayControlImpl) control).setMakeWindow(false);
 
         JButton removeBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/delete.png",
-                                     control, "doRemove");
+            GuiUtils.makeImageButton("/auxdata/ui/icons/delete.png", control,
+                                     "doRemove");
         removeBtn.setToolTipText("Remove Display Control");
 
         GuiUtils.makeMouseOverBorder(removeBtn);
@@ -417,8 +412,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         expandBtn.setToolTipText("Expand in the tabs");
         GuiUtils.makeMouseOverBorder(expandBtn);
         JButton exportBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/application_get.png", this,
-                                     "undockControl", control);
+            GuiUtils.makeImageButton("/auxdata/ui/icons/application_get.png",
+                                     this, "undockControl", control);
         exportBtn.setToolTipText("Undock control window");
         GuiUtils.makeMouseOverBorder(exportBtn);
 
@@ -597,11 +592,17 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         if (control.canBeDocked()) {
             items.add(GuiUtils.MENU_SEPARATOR);
             if ( !control.shouldBeDocked()) {
-                items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Dock in Dashboard", this,
-                                                                 "dockControl", control),"/auxdata/ui/icons/application_put.png"));
+                items.add(
+                    GuiUtils.setIcon(
+                        GuiUtils.makeMenuItem(
+                            "Dock in Dashboard", this, "dockControl",
+                            control), "/auxdata/ui/icons/application_put.png"));
             } else {
-                items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Undock from Dashboard",
-                        this, "undockControl", control),"/auxdata/ui/icons/application_get.png"));
+                items.add(
+                    GuiUtils.setIcon(
+                        GuiUtils.makeMenuItem(
+                            "Undock from Dashboard", this, "undockControl",
+                            control), "/auxdata/ui/icons/application_get.png"));
             }
             List groups   = getIdv().getIdvUIManager().getComponentGroups();
             List subItems = new ArrayList();
@@ -1368,4 +1369,3 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
 
 }
-

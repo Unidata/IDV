@@ -1,20 +1,18 @@
 /*
- * $Id: EarthNavPanel.java,v 1.18 2006/12/01 19:54:02 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -108,6 +106,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
     /** Use to kill threaded goto address calls */
     private int[] masterTimeStamp = { 0 };
 
+    /** _more_          */
     private Flythrough flythrough;
 
     /** _more_ */
@@ -126,13 +125,27 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         }
         init(viewManager);
     }
-    public EarthNavPanel(MapViewManager viewManager, Flythrough flythrough, boolean showAddress) {
+
+    /**
+     * _more_
+     *
+     * @param viewManager _more_
+     * @param flythrough _more_
+     * @param showAddress _more_
+     */
+    public EarthNavPanel(MapViewManager viewManager, Flythrough flythrough,
+                         boolean showAddress) {
         this.showAddress = showAddress;
         this.flythrough  = flythrough;
         init(viewManager);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewManager _more_
+     */
     private void init(MapViewManager viewManager) {
         this.viewManager = viewManager;
         setLayout(new BorderLayout());
@@ -159,39 +172,41 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         label.addMouseMotionListener(this);
 
         label.addKeyListener(new KeyAdapter() {
-                public void keyReleased(KeyEvent ke) {
-                    isControlDown = ke.isControlDown();
-                    isShiftDown   = ke.isShiftDown();
-                }
-
-                public void keyPressed(KeyEvent ke) {
+            public void keyReleased(KeyEvent ke) {
                 isControlDown = ke.isControlDown();
                 isShiftDown   = ke.isShiftDown();
-                    if(flythrough==null) return;
-                    if (handlingKey) {
-                        return;
-                    }
-                    handlingKey = true;
-                    try {
-                        if (ke.getKeyCode() == KeyEvent.VK_RIGHT) {
-                            flythrough.driveRight();
-                        } else if (ke.getKeyCode() == KeyEvent.VK_LEFT) {
-                            flythrough.driveLeft();
-                        } else if (ke.getKeyCode() == KeyEvent.VK_UP) {
-                            flythrough.driveForward();
-                        } else if (ke.getKeyCode() == KeyEvent.VK_DOWN) {
-                            flythrough.driveBack();
-                        }
-                    } finally {
-                        handlingKey = false;
-                    }
+            }
+
+            public void keyPressed(KeyEvent ke) {
+                isControlDown = ke.isControlDown();
+                isShiftDown   = ke.isShiftDown();
+                if (flythrough == null) {
+                    return;
                 }
-            });
+                if (handlingKey) {
+                    return;
+                }
+                handlingKey = true;
+                try {
+                    if (ke.getKeyCode() == KeyEvent.VK_RIGHT) {
+                        flythrough.driveRight();
+                    } else if (ke.getKeyCode() == KeyEvent.VK_LEFT) {
+                        flythrough.driveLeft();
+                    } else if (ke.getKeyCode() == KeyEvent.VK_UP) {
+                        flythrough.driveForward();
+                    } else if (ke.getKeyCode() == KeyEvent.VK_DOWN) {
+                        flythrough.driveBack();
+                    }
+                } finally {
+                    handlingKey = false;
+                }
+            }
+        });
 
 
 
 
-        addressBox       = new JComboBox();
+        addressBox = new JComboBox();
         addressBox.setToolTipText(
             "<html>Enter an address, zip code, city,state, etc.<br>"
             + GeoUtils.addressToolTip + "</html>");
@@ -245,7 +260,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
             } else {
                 Real alt = new Real(RealType.Altitude, 1000.0);
                 viewManager.getMapDisplay().centerAndZoom(
-                                                          GeoUtils.toEarthLocation(llp), alt, 1.0, true,true);
+                    GeoUtils.toEarthLocation(llp), alt, 1.0, true, true);
                 ignoreChanges = true;
                 GeoUtils.initAddressBox(addressBox);
                 ignoreChanges = false;
@@ -354,7 +369,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
                 rotateRightX, rotateY, width3,
                 "action:" + MapViewManager.CMD_NAV_SMALLROTATERIGHT));
 
-        if(flythrough!=null) {
+        if (flythrough != null) {
             locations.add(new Location(panLeftX, panHY, width2,
                                        "action:"
                                        + MapViewManager.CMD_FLY_LEFT));
@@ -370,18 +385,18 @@ public class EarthNavPanel extends JPanel implements MouseListener,
                                        + MapViewManager.CMD_FLY_BACK));
         } else {
             locations.add(new Location(panLeftX, panHY, width2,
-                                   "action:"
-                                   + MapViewManager.CMD_NAV_SMALLLEFT));
-        locations.add(new Location(panRightX, panHY, width2,
-                                   "action:"
-                                   + MapViewManager.CMD_NAV_SMALLRIGHT));
+                                       "action:"
+                                       + MapViewManager.CMD_NAV_SMALLLEFT));
+            locations.add(new Location(panRightX, panHY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_NAV_SMALLRIGHT));
 
-        locations.add(new Location(panVX, panUpY, width2,
-                                   "action:"
-                                   + MapViewManager.CMD_NAV_SMALLUP));
-        locations.add(new Location(panVX, panDownY, width2,
-                                   "action:"
-                                   + MapViewManager.CMD_NAV_SMALLDOWN));
+            locations.add(new Location(panVX, panUpY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_NAV_SMALLUP));
+            locations.add(new Location(panVX, panDownY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_NAV_SMALLDOWN));
         }
 
 
@@ -660,4 +675,3 @@ public class EarthNavPanel extends JPanel implements MouseListener,
 
 
 }
-

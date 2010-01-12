@@ -1,41 +1,34 @@
-/**
- * $Id: Timeline.java,v 1.36 2007/08/16 14:09:56 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
 
 package ucar.unidata.idv.ui;
 
 
 import org.itc.idv.math.SunriseSunsetCollector;
 
-
-import ucar.unidata.ui.Timeline;
-import ucar.unidata.ui.LatLonWidget;
-
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.ui.LatLonWidget;
+
+
+import ucar.unidata.ui.Timeline;
 
 
 import ucar.unidata.util.DateSelection;
@@ -90,18 +83,17 @@ import javax.swing.event.*;
  */
 public class IdvTimeline extends Timeline {
 
-    /** _more_          */
+    /** _more_ */
     private LatLonPoint sunriseLocation;
 
-    /** _more_          */
+    /** _more_ */
     private List sunriseLocations;
 
 
     /**
      * Default  ctor
      */
-    public IdvTimeline() {
-    }
+    public IdvTimeline() {}
 
     /**
      * ctor. start and end date is the min/max of the times
@@ -160,7 +152,7 @@ public class IdvTimeline extends Timeline {
 
 
         List sunriseLocations = getSunriseLocations();
-        List subItems = new ArrayList();
+        List subItems         = new ArrayList();
         subItems.add(GuiUtils.makeMenuItem("Clear Location", this,
                                            "clearSunriseLocation"));
         subItems.add(GuiUtils.makeMenuItem("Set Location", this,
@@ -255,14 +247,22 @@ public class IdvTimeline extends Timeline {
      * _more_
      */
     public void makeSunriseDates() {
-        sunriseDates = makeSunriseDates(sunriseLocation, getStartDate(), getEndDate());
+        sunriseDates = makeSunriseDates(sunriseLocation, getStartDate(),
+                                        getEndDate());
     }
 
 
     /**
      * _more_
+     *
+     * @param sunriseLocation _more_
+     * @param startDate _more_
+     * @param endDate _more_
+     *
+     * @return _more_
      */
-    public static List  makeSunriseDates(LatLonPoint sunriseLocation, Date startDate, Date endDate) {
+    public static List makeSunriseDates(LatLonPoint sunriseLocation,
+                                        Date startDate, Date endDate) {
         List sunriseDates = new ArrayList();
         if (sunriseLocation == null) {
             return sunriseDates;
@@ -279,13 +279,13 @@ public class IdvTimeline extends Timeline {
             SunriseSunsetCollector ssc   = new SunriseSunsetCollector(dates);
             List cals = ssc.calculate(sunriseLocation.getLatitude(),
                                       sunriseLocation.getLongitude());
-            for (int i = 0; i < cals.size(); i+=2) {
+            for (int i = 0; i < cals.size(); i += 2) {
                 GregorianCalendar cal1 = (GregorianCalendar) cals.get(i);
-                GregorianCalendar cal2 = (GregorianCalendar) cals.get(i+1);
-                Date d1 = cal1.getTime();
-                Date d2 = cal2.getTime();
+                GregorianCalendar cal2 = (GregorianCalendar) cals.get(i + 1);
+                Date              d1   = cal1.getTime();
+                Date              d2   = cal2.getTime();
                 //Check the order 
-                if(d1.getTime()>d2.getTime()) {
+                if (d1.getTime() > d2.getTime()) {
                     //                    System.err.println("Flipping the dates for location:" + sunriseLocation + " date1:" + d1  + " date2:" + d2);
                     Date tmp = d1;
                     d1 = d2;
@@ -306,4 +306,3 @@ public class IdvTimeline extends Timeline {
 
 
 }
-
