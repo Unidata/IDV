@@ -2350,13 +2350,10 @@ public class MapViewManager extends NavigatedViewManager {
      * Reset projection of display based control's getDataProjection().
      * called by DisplayInfo.addDisplayable (), usually from control's init.
      *
-     * @param displayInfo The new display info to add
+     * @param displayInfos The List of new display infos to add
      *
-     * @param displayInfos _more_
-     * @return True if the addiiton worked. false otherwise
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   Problem creating VisAD object
      */
     public void addDisplayInfos(List<DisplayInfo> displayInfos)
             throws RemoteException, VisADException {
