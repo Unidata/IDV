@@ -166,46 +166,46 @@ to delete it, export, etc.
 
 <subhead id="zidv" intoc="false">Data in Bundles</subhead>
 
-The IDV  supports a  bundle format: .zidv (or zipped idv).
+<p>The IDV  supports a  bundle format: .zidv (or zipped idv).
 This is a zip file that contains a regular bundle (xidv) and a set 
-of data files. When the user does a &quot;Save As...&quot; and specifies
+of data files. When the user does a [ug::menu {Save As...}] and specifies
 a .zidv file extension the IDV prompts the user to select the data sources
 that should be written into the zip file. On opening a zidv file
 the IDV needs to unzip the data files so it prompts the user 
 as to where to place the files - a tmp directory or a user selected
 directory (this is a preference as well).
-<p>
-This doesn't seem like such a big deal in and of itself but...
-We also have implemented a &quot;Make Remote Data Local&quot; facility.
-We can now, for most of the remote data types, move the data
-from the server to the local disk. We support the ADDE types: satellite, 
-radar, point, sounding and forecast fronts. We also have preliminary
-support for grids on remote servers (see below).
-<p>
-This is used in two ways. First, the user can right click on
-a data source in the Field Selector and select &quot;Make Data Local&quot; 
-for remote data sources. The IDV prompts for a file directory
-and a file prefix (we default to use the name of the data source).
-The remote data is then copied over. For multiple files we use:
-&lt;directory&gt;&lt;prefix&gt;&lt;file count&gt;.&lt;suffix&gt;. The data source object
-within the IDV is then changed to point to the new file paths.
-<p>
-The second way this is used is when you save off a zidv file.
-The user is prompted for both the local data sources to be saved
-off as well as for the remote data sources. For the remote ones
-the IDV automatically copies the files over  and zips them up.
-<p>
-Grids: We have preliminary support for grids. This relies on some
-extra service information in the catalogs which, right at this moment,
-is not included in the regular IDV gridded data catalog but is included
-for model data under the &quot;File_Access&quot; dataset in the main motherlode
-catalog:
-http://motherlode.ucar.edu:8080/thredds/catalog.xml
-<p>
-When saving gridded data the user is prompted for the fields to save
-and the geo-spatial subset is used to subset the grids. We do not
-yet (though will soon) support sub-setting on times and grid 
-stride/decimation.
+
+<p> This doesn't seem like such a big deal in and of itself but... We   
+also have implemented a &quot;Make Remote Data Local&quot; facility.    
+We can now, for most of the remote data types, move the data from the   
+server to the local disk. We support the ADDE types: satellite, radar,  
+point, sounding and forecast fronts. We also have preliminary support   
+for grids on remote servers (see below).                                
+
+<p> This is used in two ways. First, the user can right click on a data 
+source in the Field Selector and select &quot;Make Data Local&quot;     
+for remote data sources. The IDV prompts for a file directory and       
+a file prefix (we default to use the name of the data source).          
+The remote data is then copied over. For multiple files we use:         
+&lt;directory&gt;&lt;prefix&gt;&lt;file count&gt;.&lt;suffix&gt;. The   
+data source object within the IDV is then changed to point to the new   
+file paths.                                                             
+
+<p> The second way this is used is when you save off a zidv file.       
+The user is prompted for both the local data sources to be saved off    
+as well as for the remote data sources. For the remote ones the IDV     
+automatically copies the files over and zips them up.                   
+
+<p> Grids: We have preliminary support for grids. This relies on some   
+extra service information in the catalogs which, right at this moment,  
+is not included in the regular IDV gridded data catalog but is included 
+for model data under the &quot;File_Access&quot; dataset in the main    
+motherlode catalog: http://motherlode.ucar.edu:8080/thredds/catalog.xml 
+
+<p> When saving gridded data the user is prompted for the fields to     
+save and the geo-spatial subset is used to subset the grids. We do      
+not yet (though will soon) support sub-setting on times and grid        
+stride/decimation.                                                      
 
 
 

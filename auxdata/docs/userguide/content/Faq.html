@@ -221,7 +221,7 @@ Check the documentation for the specifics of your Web server.
 
 <faqitem q="How can I tell if the IDV is busy doing something?" id="busy">
 The lower right corner of the main IDV view window shows a box with
-progress bars IDV is busy making a display or doing anything.   In
+progress bars when the IDV is busy making a display or doing anything.   In
 the status bar at the bottom, messages will appear when the IDV is reading
 data from a server or disk.  Also, while the displays are being created,
 there is usually a "please wait" notice in the lower left corner
@@ -314,7 +314,7 @@ When you next start the IDV the same arrangement will appear.
 When new data is displayed, the map projection will be automatically    
 switched to match the native projection of the data. You can control    
 this with the 
-[ug::menu Projections {Auto-Set Projection}] menu check-box. 
+[ug::menu Projections {Auto-set Projection}] menu check-box. 
 You may not want this, especially when you have   
 set up a view of a particular area which will be lost when new data is  
 loaded. Check it off if you don't want it.                              
@@ -334,7 +334,7 @@ default projection is overridden by a projection saved in the
 with new data if enabled. As a result, you may never see the
 default map projection. Make sure your default bundle has the default
 projection, and you have the menu item 
-[ug::menu Projections {Auto-Set Projection}] menu checked off.
+[ug::menu Projections {Auto-set Projection}] menu checked off.
 Choosing a default map projection is not necessary for good use of the IDV
 and you can ignore it if you like. It is often simpler to use default bundles.
 </faqitem>
@@ -517,7 +517,7 @@ topology element, where the weights are bilinear in
 
 </faqitem>
 
-<faqitem cat="Video Cards"></faqitem>
+<faqitem cat="Display/Video Cards"></faqitem>
 
 <faqitem q="Do I need a special video card to run the IDV?" id="videocard">
 Your video card must support OpenGL (or Direct-X if you are
@@ -546,6 +546,15 @@ pop-up menu.
 <li>If not, try using the Direct-X installer instead of the OpenGL 
     installer.
 </ul>
+</faqitem>
+
+<faqitem q="The maps appear as a spider web of lines. What's wrong?" 
+id="spiderweb">
+Starting with IDV 2.7, some computers are experiencing spurious map
+lines in their displays.  This seems to be a graphics driver issue being
+tickled by a change in this and later versions.  If you are experiencing
+this, please install the [ug::menu {Bug Fixes} {Spurious Map Lines Fix}]
+plugin, then restart the IDV.  That should clear up the spurious lines.
 </faqitem>
 
 <faqitem q="I'm having problems with the OpenGL version under Windows.
