@@ -1,25 +1,22 @@
 /*
- * $Id: DisplayConventions.java,v 1.125 2007/05/25 16:35:03 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv;
 
@@ -515,8 +512,7 @@ public class DisplayConventions extends IdvManager {
                 clMax      = max;
             } else {                                // for really big ranges, span > 300 
                 clInterval = (float) rint;
-                clMin      = 
-                clMax      = (float) ((int) max);
+                clMin      = clMax = (float) ((int) max);
             }
             clMax = clMax + clInterval;
             clMin = clMin - clInterval;
@@ -741,12 +737,14 @@ public class DisplayConventions extends IdvManager {
         List   unitList = getDefaultUnitList();
         if (unit != null) {
             String unitString = unit.toString();
-            List tmpList = unitList;
+            List   tmpList    = unitList;
             unitList = new ArrayList();
             for (int i = 0; i < tmpList.size(); i++) {
-                Object o       = tmpList.get(i);
-                if(o.toString().equals(unitString)) continue;
-                Unit   theUnit = null;
+                Object o = tmpList.get(i);
+                if (o.toString().equals(unitString)) {
+                    continue;
+                }
+                Unit theUnit = null;
                 if ((o instanceof TwoFacedObject)) {
                     theUnit = (Unit) ((TwoFacedObject) o).getId();
                 } else if ((o instanceof Unit)) {
@@ -818,7 +816,8 @@ public class DisplayConventions extends IdvManager {
             if (unitList == null) {
                 getDefaultUnitList();
             }
-            if (!Misc.containsString(selected.toString(), unitList, true) && !unitList.contains(selected)) {
+            if ( !Misc.containsString(selected.toString(), unitList, true)
+                    && !unitList.contains(selected)) {
                 unitList.add(selected);
                 getStore().put(PREF_UNITLIST, unitList);
                 getStore().save();
@@ -846,11 +845,15 @@ public class DisplayConventions extends IdvManager {
                 unitList.add(new TwoFacedObject("Default", null));
             }
             HashSet<String> seenName = new HashSet<String>();
-            List tmp  =new ArrayList();
-            for(Object o: unitList) {
+            List            tmp      = new ArrayList();
+            for (Object o : unitList) {
                 String s = o.toString().toLowerCase();
-                if(seenName.contains(s)) continue;
-                if(tmp.contains(o)) continue;
+                if (seenName.contains(s)) {
+                    continue;
+                }
+                if (tmp.contains(o)) {
+                    continue;
+                }
                 tmp.add(o);
                 seenName.add(s);
             }
@@ -870,7 +873,9 @@ public class DisplayConventions extends IdvManager {
                 try {
                     TwoFacedObject tfo = new TwoFacedObject(names[i],
                                              Util.parseUnit(names[i]));
-                    if (!unitList.contains(tfo) && !seenName.contains(tfo.toString().toLowerCase())) {
+                    if ( !unitList.contains(tfo)
+                            && !seenName.contains(
+                                tfo.toString().toLowerCase())) {
                         unitList.add(tfo);
                     }
 
@@ -920,4 +925,3 @@ public class DisplayConventions extends IdvManager {
     }
 
 }
-

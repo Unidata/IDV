@@ -1,34 +1,31 @@
 /*
- * $Id: IdvPreferenceManager.java,v 1.117 2007/08/17 10:51:19 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv;
 
 
 import org.w3c.dom.Element;
 
-import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.DataManager;
+
+import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
 
@@ -363,8 +360,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      * @param widgets The preference name to GUI widget map
      * @param store The store to put preferences in.
      */
-    protected static  void applyWidgets(Hashtable widgets,
+    protected static void applyWidgets(Hashtable widgets,
                                        XmlObjectStore store) {
+
         for (Enumeration keys = widgets.keys(); keys.hasMoreElements(); ) {
             String key    = (String) keys.nextElement();
             Object widget = widgets.get(key);
@@ -376,14 +374,18 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             }
 
             if (key.equals(PREF_THREADS_RENDER)) {
-                int value = ((Integer)((JComboBox)widget).getSelectedItem()).intValue();
+                int value =
+                    ((Integer) ((JComboBox) widget).getSelectedItem())
+                        .intValue();
                 store.put(key, new Integer(value));
                 visad.util.ThreadManager.setGlobalMaxThreads(value);
                 continue;
             }
 
             if (key.equals(PREF_THREADS_DATA)) {
-                int value = ((Integer)((JComboBox)widget).getSelectedItem()).intValue();
+                int value =
+                    ((Integer) ((JComboBox) widget).getSelectedItem())
+                        .intValue();
                 store.put(key, new Integer(value));
                 continue;
             }
@@ -397,10 +399,12 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             }
 
             if (key.equals(DataManager.PROP_CACHE_PERCENT)) {
-                double value = (double) Misc.parseNumber(
-                                                         (((JTextField) widget).getText().trim()))/100.0;
+                double value =
+                    (double) Misc.parseNumber(
+                        (((JTextField) widget).getText().trim())) / 100.0;
                 store.put(key, value);
-                visad.data.DataCacheManager.getCacheManager().setMemoryPercent(value);
+                visad.data.DataCacheManager.getCacheManager()
+                    .setMemoryPercent(value);
                 continue;
             }
             if (key.equals(PREF_SITEPATH)) {
@@ -412,7 +416,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 }
                 continue;
             }
-            
+
 
 
 
@@ -462,6 +466,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 continue;
             }
         }
+
     }
 
     /**
@@ -773,14 +778,18 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         PreferenceManager basicManager = new PreferenceManager() {
             public void applyPreference(XmlObjectStore theStore,
                                         Object data) {
-                boolean oldIconsValue = getStateManager().getPreferenceOrProperty(PREF_LEGEND_SHOWICONS, false);
+                boolean oldIconsValue =
+                    getStateManager().getPreferenceOrProperty(
+                        PREF_LEGEND_SHOWICONS, false);
                 getIdv().getArgsManager().sitePathFromArgs = null;
                 applyWidgets((Hashtable) data, theStore);
                 getIdv().getIdvUIManager().setDateFormat();
                 getIdv().initCacheManager();
                 applyEventPreferences(theStore);
-                boolean newIconsValue = getStateManager().getPreferenceOrProperty(PREF_LEGEND_SHOWICONS, false);
-                if(oldIconsValue!=newIconsValue) {
+                boolean newIconsValue =
+                    getStateManager().getPreferenceOrProperty(
+                        PREF_LEGEND_SHOWICONS, false);
+                if (oldIconsValue != newIconsValue) {
                     getVMManager().updateAllLegends();
                 }
 
@@ -870,8 +879,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         Object[][] prefs3 = {
             { "Display Controls:", null },
             { "Show windows when they are created", PREF_SHOWCONTROLWINDOW },
-            {"Show icons in legend", PREF_LEGEND_SHOWICONS, Boolean.FALSE,
-             "<html>Show the toggle and delete icons in the legend"},
+            { "Show icons in legend", PREF_LEGEND_SHOWICONS, Boolean.FALSE,
+              "<html>Show the toggle and delete icons in the legend" },
             { "Use Fast Rendering", PREF_FAST_RENDER, Boolean.TRUE,
               "<html>Turn this on for better performance at<br> the risk of having funky displays</html>" },
             { "Auto-select data when loading a template",
@@ -1129,26 +1138,30 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             new JTextField(Misc.format(getStore().get(PREF_CACHESIZE, 20.0)),
                            5);
         List cacheComps =
-            Misc.newList(new JLabel("   Disk Cache Size: "), diskCacheSizeFld,
+            Misc.newList(new JLabel("   Disk Cache Size: "),
+                         diskCacheSizeFld,
                          new JLabel(" (MB)  (for temporary files)"));
         widgets.put(PREF_CACHESIZE, diskCacheSizeFld);
 
         Vector threadCnt = new Vector();
-        for(int i=1;i<=Runtime.getRuntime().availableProcessors();i++) {
+        for (int i = 1; i <= Runtime.getRuntime().availableProcessors();
+                i++) {
             threadCnt.add(new Integer(i));
         }
         JComboBox maxRenderThreadsFld = new JComboBox(threadCnt);
-        maxRenderThreadsFld.setSelectedItem(new Integer(getIdv().getMaxRenderThreadCount()));
+        maxRenderThreadsFld.setSelectedItem(
+            new Integer(getIdv().getMaxRenderThreadCount()));
         widgets.put(PREF_THREADS_RENDER, maxRenderThreadsFld);
 
         Vector threadCnt2 = new Vector();
-        for(int i=1;i<=12;i++) {
+        for (int i = 1; i <= 12; i++) {
             threadCnt2.add(new Integer(i));
         }
 
-        
+
         JComboBox maxDataThreadsFld = new JComboBox(threadCnt2);
-        maxDataThreadsFld.setSelectedItem(new Integer(getIdv().getMaxDataThreadCount()));
+        maxDataThreadsFld.setSelectedItem(
+            new Integer(getIdv().getMaxDataThreadCount()));
         widgets.put(PREF_THREADS_DATA, maxDataThreadsFld);
 
 
@@ -1159,22 +1172,27 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
         formatComps.add(GuiUtils.rLabel("Thread Count:"));
-        formatComps.add(GuiUtils.left(
-                                      GuiUtils.hbox(
-                                                    new JLabel("Rendering: "),
-                                                    maxRenderThreadsFld,
-                                                    new JLabel("   Data Reading: "),
-                                                    maxDataThreadsFld)));
+        formatComps.add(
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    new JLabel("Rendering: "), maxRenderThreadsFld,
+                    new JLabel("   Data Reading: "), maxDataThreadsFld)));
 
 
 
         formatComps.add(GuiUtils.rLabel("Data Cache Memory Percent:"));
-        JTextField cacheSizeFld =
-            new JTextField(""+(int)(100*getStore().get(DataManager.PROP_CACHE_PERCENT,
-                                                       0.25)), 7);
+        JTextField cacheSizeFld = new JTextField(
+                                      "" + (int) (100
+                                          * getStore().get(
+                                              DataManager.PROP_CACHE_PERCENT,
+                                              0.25)), 7);
         widgets.put(DataManager.PROP_CACHE_PERCENT, cacheSizeFld);
-        formatComps.add(GuiUtils.left(GuiUtils.hbox(cacheSizeFld,
-                new JLabel(" (Percent of available memory to be used in the data cache)"))));
+        formatComps.add(
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    cacheSizeFld,
+                    new JLabel(
+                        " (Percent of available memory to be used in the data cache)"))));
 
 
 
@@ -1310,11 +1328,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 new JCheckBox("Try to add displays to current windows",
                               shouldMerge);
             JPanel inner = GuiUtils.vbox(new Component[] {
-                btnPanel, mergeCbx, 
+                btnPanel, mergeCbx,
                 //                GuiUtils.filler(10,10),
-                changeDataCbx,
-                GuiUtils.filler(10, 10), 
-                askCbx
+                changeDataCbx, GuiUtils.filler(10, 10), askCbx
                 //                new JLabel(
                 //                    "Note: This can be reset in the preferences window "),
 
@@ -2053,4 +2069,3 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
 }
-

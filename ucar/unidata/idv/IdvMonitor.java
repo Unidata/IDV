@@ -1,25 +1,22 @@
-/**
- * $Id: IntegratedDataViewer.java,v 1.652 2007/08/22 11:55:41 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv;
 
@@ -27,11 +24,11 @@ package ucar.unidata.idv;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.LogUtil;
 
-import java.util.Hashtable;
-
 
 import java.net.InetAddress;
 import java.net.Socket;
+
+import java.util.Hashtable;
 
 
 
@@ -47,11 +44,18 @@ import java.net.Socket;
  */
 public class IdvMonitor extends HttpServer {
 
+    /** _more_          */
     private IntegratedDataViewer idv;
 
     /** The localhost */
     private InetAddress localHost;
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     * @param port _more_
+     */
     public IdvMonitor(IntegratedDataViewer idv, int port) {
         super(port);
         this.idv = idv;
@@ -64,6 +68,8 @@ public class IdvMonitor extends HttpServer {
      *
      * @param socket incoming socket
      * @return handler or null
+     *
+     * @throws Exception _more_
      */
     protected RequestHandler doMakeRequestHandler(Socket socket)
             throws Exception {
@@ -85,7 +91,7 @@ public class IdvMonitor extends HttpServer {
      * @author IDV Development Team
      * @version $Revision: 1.11 $
      */
-    public  class MonitorRequestHandler extends HttpServer.RequestHandler {
+    public class MonitorRequestHandler extends HttpServer.RequestHandler {
 
         /** The idv */
         IntegratedDataViewer idv;
@@ -100,17 +106,25 @@ public class IdvMonitor extends HttpServer {
          * @throws Exception On badness
          */
         public MonitorRequestHandler(IntegratedDataViewer idv,
-                                         HttpServer server, Socket socket)
+                                     HttpServer server, Socket socket)
                 throws Exception {
             super(server, socket);
             this.idv = idv;
         }
 
+        /**
+         * _more_
+         *
+         * @param sb _more_
+         *
+         * @throws Exception _more_
+         */
         private void decorateHtml(StringBuffer sb) throws Exception {
-            String header = "<a href=stack.html>Stack Trace</a>&nbsp;|&nbsp;"+
-                "<a href=info.html>System Information</a>&nbsp;|&nbsp;" +
-                "<a href=shutdown.html>Shutdown</a><hr>";
-            writeResult(true,  header+sb.toString(),"text/html");
+            String header =
+                "<a href=stack.html>Stack Trace</a>&nbsp;|&nbsp;"
+                + "<a href=info.html>System Information</a>&nbsp;|&nbsp;"
+                + "<a href=shutdown.html>Shutdown</a><hr>";
+            writeResult(true, header + sb.toString(), "text/html");
         }
 
 
@@ -127,11 +141,11 @@ public class IdvMonitor extends HttpServer {
                                      Hashtable httpArgs, String content)
                 throws Exception {
             //            System.err.println("handleRequest start:" + path);
-            if(path.equals("/stack.html")) {
+            if (path.equals("/stack.html")) {
                 StringBuffer stack = LogUtil.getStackDump(true);
                 decorateHtml(stack);
-            } else  if(path.equals("/info.html")) {
-                StringBuffer extra   = idv.getIdvUIManager().getSystemInfo();
+            } else if (path.equals("/info.html")) {
+                StringBuffer extra = idv.getIdvUIManager().getSystemInfo();
                 extra.append("<H3>Data Sources</H3>");
                 extra.append("<div style=\"margin-left:20px;\">");
                 extra.append(idv.getDataManager().getDataSourceHtml());
@@ -139,12 +153,14 @@ public class IdvMonitor extends HttpServer {
                 extra.append(idv.getPluginManager().getPluginHtml());
                 extra.append(idv.getResourceManager().getHtmlView());
                 decorateHtml(extra);
-            } else  if(path.equals("/shutdown.html")) {
-                decorateHtml(new StringBuffer("Really shutdown the IDV?<br><a href=\"reallyshutdown.html\">Yes</a>"));
-            } else  if(path.equals("/reallyshutdown.html")) {
-                writeResult(true,  "OK, IDV is shutting down","text/html");
+            } else if (path.equals("/shutdown.html")) {
+                decorateHtml(
+                    new StringBuffer(
+                        "Really shutdown the IDV?<br><a href=\"reallyshutdown.html\">Yes</a>"));
+            } else if (path.equals("/reallyshutdown.html")) {
+                writeResult(true, "OK, IDV is shutting down", "text/html");
                 System.exit(0);
-            } else{
+            } else {
                 decorateHtml(new StringBuffer("Unknown url:" + path));
             }
             //            System.err.println("handleRequest end:" + path);
@@ -157,4 +173,3 @@ public class IdvMonitor extends HttpServer {
 
 
 }
-

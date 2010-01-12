@@ -1,30 +1,22 @@
-/**
- * $Id: JythonManager.java,v 1.82 2007/08/17 10:51:20 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
-
 
 package ucar.unidata.idv;
 
@@ -148,7 +140,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
     /** One text component per tab */
-    private ArrayList libHolders=new ArrayList();
+    private ArrayList libHolders = new ArrayList();
 
     /** Shows the temp jython */
     private JTextArea tmpTextArea = new JTextArea();
@@ -174,7 +166,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     private PythonInterpreter uiInterpreter = null;
 
 
-    /** the text searching widget          */
+    /** the text searching widget */
     private TextSearcher textSearcher;
 
     /**
@@ -283,14 +275,14 @@ public class JythonManager extends IdvManager implements ActionListener {
      * parsing the jar files there.
      */
     private void initPython() {
-        if(getArgsManager().isScriptingMode()) {
+        if (getArgsManager().isScriptingMode()) {
             initPythonInner();
         } else {
             Misc.run(new Runnable() {
-                    public void run() {
-                        initPythonInner();
-                    }
-                });
+                public void run() {
+                    initPythonInner();
+                }
+            });
         }
     }
 
@@ -339,7 +331,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         doMakeContents();
 
-        if(!getArgsManager().isScriptingMode()) {
+        if ( !getArgsManager().isScriptingMode()) {
             makeFormulasFromLib();
         }
 
@@ -584,10 +576,10 @@ public class JythonManager extends IdvManager implements ActionListener {
                     return findVisibleComponent();
                 }
             };
-             contents = GuiUtils.topCenterBottom(menuBar, treePanel,
+            contents = GuiUtils.topCenterBottom(menuBar, treePanel,
                     textSearcher);
-	    setMenuBar(menuBar);
-	    return contents;
+            setMenuBar(menuBar);
+            return contents;
 
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
@@ -602,7 +594,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return continue with exit
      */
     public boolean saveOnExit() {
-        if(getArgsManager().isScriptingMode()) {
+        if (getArgsManager().isScriptingMode()) {
             return true;
         }
         List toSave = new ArrayList();
@@ -758,7 +750,9 @@ public class JythonManager extends IdvManager implements ActionListener {
                 }
 
                 JPopupMenu popup = GuiUtils.makePopupMenu(items);
-                if(popup==null) return;
+                if (popup == null) {
+                    return;
+                }
                 popup.show(jythonEditor.getTextComponent(), e.getX(),
                            e.getY());
             }
@@ -948,10 +942,16 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
 
         fileMenu.addSeparator();
-        fileMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export to Plugin", this,
-                                                            "exportToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
-        fileMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Selected to Plugin", this,
-                                           "exportSelectedToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
+        fileMenu.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Export to Plugin", this,
+                    "exportToPlugin"), "/auxdata/ui/icons/plugin_add.png"));
+        fileMenu.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Export Selected to Plugin", this,
+                    "exportSelectedToPlugin"), "/auxdata/ui/icons/plugin_add.png"));
         fileMenu.addSeparator();
         fileMenu.add(GuiUtils.makeMenuItem("Close", this, "close"));
 
@@ -962,7 +962,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * Gets called when the IDV is quitting. Kills the editor process if there is one
      */
     protected void applicationClosing() {
-        if(getArgsManager().isScriptingMode()) {
+        if (getArgsManager().isScriptingMode()) {
             return;
         }
         for (int i = libHolders.size() - 1; i >= 0; i--) {
@@ -1087,7 +1087,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
     /**
-     * show the help 
+     * show the help
      *
      * @param help the help id
      */
@@ -1883,16 +1883,25 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     public List doMakeFormulaDataSourceMenuItems(DataSource dataSource) {
         List menuItems = new ArrayList();
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Create Formula", this,
-                                                             "showFormulaDialog"),"/auxdata/ui/icons/formula_add.png"));
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Edit Jython Library", this,
-                                            "showJythonEditor"),"/auxdata/ui/icons/EditJython16.gif"));
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Import Formulas", this,
-                                            "importFormulas"),"/auxdata/ui/icons/formula_import.png"));
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Formulas", this,
-                                            "exportFormulas"),"/auxdata/ui/icons/formula_export.png"));
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Formulas to Plugin",
-                                            this, "exportFormulasToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Create Formula",
+                this,
+                "showFormulaDialog"), "/auxdata/ui/icons/formula_add.png"));
+        menuItems.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Edit Jython Library", this,
+                    "showJythonEditor"), "/auxdata/ui/icons/EditJython16.gif"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Import Formulas",
+                this,
+                "importFormulas"), "/auxdata/ui/icons/formula_import.png"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Formulas",
+                this,
+                "exportFormulas"), "/auxdata/ui/icons/formula_export.png"));
+        menuItems.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Export Formulas to Plugin", this,
+                    "exportFormulasToPlugin"), "/auxdata/ui/icons/plugin_add.png"));
 
         if (dataSource instanceof DescriptorDataSource) {
             menuItems.add(
@@ -2519,8 +2528,8 @@ public class JythonManager extends IdvManager implements ActionListener {
 
                 PyStringMap seq   = (PyStringMap) interpreter.getLocals();
                 PyList      items = seq.items();
-                for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) { 
-                   PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+                for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
+                    PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
                     if ( !(pair.__finditem__(1) instanceof PyFunction)) {
                         continue;
                     }
@@ -2615,5 +2624,3 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
 }
-
-

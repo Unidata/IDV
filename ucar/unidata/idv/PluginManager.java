@@ -1,27 +1,22 @@
 /*
- * $Id: PluginManager.java,v 1.54 2007/08/19 15:58:00 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.idv;
 
@@ -1060,19 +1055,21 @@ public class PluginManager extends IdvManager {
             autoInstallCbx = new JCheckBox("Install", false);
             autoInstallCbx.setToolTipText(
                 "Automatically install the plugin when it is created");
-            createWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Plugin Creator");
-            createList   = new JList();
+            createWindow =
+                GuiUtils.createFrame(GuiUtils.getApplicationTitle()
+                                     + "Plugin Creator");
+            createList = new JList();
             createList.addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
-		    if (GuiUtils.isDeleteEvent(e)) {
+                    if (GuiUtils.isDeleteEvent(e)) {
                         removeCreateFile();
                     }
                 }
             });
             jarFileFld = new JTextField("", 30);
-            JButton deleteBtn =
-                GuiUtils.makeImageButton("/auxdata/ui/icons/plugin_delete.png",
-                                         this, "removeCreateFile");
+            JButton deleteBtn = GuiUtils.makeImageButton(
+                                    "/auxdata/ui/icons/plugin_delete.png",
+                                    this, "removeCreateFile");
             JScrollPane listScroll = GuiUtils.makeScrollPane(createList, 150,
                                          250);
             JButton writeBtn = GuiUtils.makeButton("Write Plugin: ", this,
@@ -1334,8 +1331,8 @@ public class PluginManager extends IdvManager {
             JComponent contents = GuiUtils.topCenterBottom(menuBar, center,
                                       bottom);
             createWindow.getContentPane().add(contents);
-	    GuiUtils.decorateFrame(createWindow, menuBar);
-	    createWindow.pack();
+            GuiUtils.decorateFrame(createWindow, menuBar);
+            createWindow.pack();
             ucar.unidata.util.Msg.translateTree(createWindow);
             createWindow.setLocation(100, 100);
         }
@@ -1503,8 +1500,7 @@ public class PluginManager extends IdvManager {
         else if (f.exists() && f.isDirectory()) {
             scourPlugins(f);
             File[] files = f.listFiles();
-            files = IOUtil.sortFilesOnAge(files,
-                                          false);
+            files = IOUtil.sortFilesOnAge(files, false);
             for (int jarFileIdx = 0; jarFileIdx < files.length;
                     jarFileIdx++) {
                 if ( !pluginFileOK(files[jarFileIdx])) {
@@ -1603,7 +1599,7 @@ public class PluginManager extends IdvManager {
             String deleteThisFile = file + ".deletethis";
             IOUtil.writeFile(deleteThisFile, "");
         } catch (Exception exc) {
-            System.err.println (exc);
+            System.err.println(exc);
         }
         //        file.deleteOnExit();
 
@@ -2068,8 +2064,7 @@ public class PluginManager extends IdvManager {
         if (localPluginDir != null) {
             scourPlugins(localPluginDir);
             File[] files = localPluginDir.listFiles();
-            files = IOUtil.sortFilesOnAge(files,
-                                          false);
+            files = IOUtil.sortFilesOnAge(files, false);
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 final File file = files[fileIdx];
                 if (pluginFileOK(file)) {
@@ -2095,9 +2090,9 @@ public class PluginManager extends IdvManager {
         if (deleteFile.exists()) {
             return false;
         }
-	if(file.getName().startsWith(".tmp.")) {
-	    return false;
-	}
+        if (file.getName().startsWith(".tmp.")) {
+            return false;
+        }
         return true;
     }
 
@@ -2174,24 +2169,24 @@ public class PluginManager extends IdvManager {
      */
     private File installPlugin(String plugin, boolean andLoad)
             throws Exception {
-        String filename = encode(plugin);
-	String tmpFilename = ".tmp." + filename;
+        String filename    = encode(plugin);
+        String tmpFilename = ".tmp." + filename;
         String extDir =
             IOUtil.joinDir(getStore().getUserDirectory().toString(),
                            "plugins");
         File newTmpFile = new File(IOUtil.joinDir(extDir, tmpFilename));
-        File newFile = new File(IOUtil.joinDir(extDir, filename));
+        File newFile    = new File(IOUtil.joinDir(extDir, filename));
         Object loadId =
             JobManager.getManager().startLoad("Installing plugin", true);
         byte[] bytes = null;
         try {
             URL url = IOUtil.getURL(plugin, getClass());
             if (IOUtil.writeTo(url, newTmpFile, loadId) <= 0) {
-		newTmpFile.delete();
+                newTmpFile.delete();
                 return null;
             }
-	    IOUtil.moveFile(newTmpFile, newFile);
-	    //	    newTmpFile.delete();
+            IOUtil.moveFile(newTmpFile, newFile);
+            //      newTmpFile.delete();
         } finally {
             JobManager.getManager().stopLoad(loadId);
         }
@@ -2267,10 +2262,11 @@ public class PluginManager extends IdvManager {
         contents = GuiUtils.centerBottom(
             contents,
             GuiUtils.center(GuiUtils.inset(GuiUtils.wrap(closeBtn), 5)));
-        pluginWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Plugin Manager");
+        pluginWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle()
+                                            + "Plugin Manager");
 
         pluginWindow.getContentPane().add(contents);
-	GuiUtils.decorateFrame(pluginWindow, menuBar);
+        GuiUtils.decorateFrame(pluginWindow, menuBar);
         pluginWindow.pack();
         ucar.unidata.util.Msg.translateTree(pluginWindow);
         pluginWindow.setLocation(100, 100);
@@ -2429,7 +2425,8 @@ public class PluginManager extends IdvManager {
                 }
 
 
-                String deleteHtml = "<a href=\"jython:idv.getPluginManager().removePlugin('"
+                String deleteHtml =
+                    "<a href=\"jython:idv.getPluginManager().removePlugin('"
                     + plugin.getFilePath() + "')\">";
                 //                System.err.println ("html: " + deleteHtml);
                 addDelete.append(deleteHtml
@@ -2648,9 +2645,14 @@ public class PluginManager extends IdvManager {
         }
 
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getFilePath() {
             String path = file.toString();
-            path = path.replaceAll("\\\\","/");
+            path = path.replaceAll("\\\\", "/");
             return path;
         }
 
@@ -2817,4 +2819,3 @@ public class PluginManager extends IdvManager {
 
 
 }
-

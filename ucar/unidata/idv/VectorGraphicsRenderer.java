@@ -1,24 +1,22 @@
 /*
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
- * This library is distributed in the hope that it will be2 useful, but
+ * 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv;
 
@@ -220,8 +218,8 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             //Find all visibile displays
             final List<DisplayControl> onDisplays =
                 new ArrayList<DisplayControl>();
-            for (DisplayControl control : (List<DisplayControl>) viewManager
-                    .getControls()) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) viewManager.getControls()) {
                 if (control.getDisplayVisibility()) {
                     onDisplays.add(control);
                 }
@@ -272,7 +270,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             renderer.plot(graphics, display,
                           viewManager.getDisplayCoordinateSystem(),
                           dim.width, dim.height);
-                          //viewManager.getBp(ViewManager.PREF_3DCLIP));
+            //viewManager.getBp(ViewManager.PREF_3DCLIP));
 
             //Reset all displays
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
@@ -289,7 +287,9 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                 graphics.setFont(f);
                 FontMetrics fm         = graphics.getFontMetrics();
                 int         lineHeight = fm.getAscent() + fm.getDescent();
-                viewManager.paintDisplayList(graphics,  (List<DisplayControl>) onDisplays, width, height,true,null,null);
+                viewManager.paintDisplayList(
+                    graphics, (List<DisplayControl>) onDisplays, width,
+                    height, true, null, null);
                 viewManager.setShowDisplayList(true);
             }
 
@@ -344,13 +344,14 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                 repaintManager.setDoubleBufferingEnabled(true);
             }
             if (doingPreview) {
-                JComponent previewContents = GuiUtils.centerBottom(
-                                                                   new JLabel(new ImageIcon(previewImage)),
-                                                                   GuiUtils.inset(
-                                                                                  new JLabel("Note: The actual capture will take place after the preview window is dismissed so make sure the window is not occluded"),5)
-);
-                ok = GuiUtils.showOkCancelDialog(null, "",
-                                                 previewContents, null);
+                JComponent previewContents =
+                    GuiUtils.centerBottom(
+                        new JLabel(new ImageIcon(previewImage)),
+                        GuiUtils.inset(
+                            new JLabel(
+                                "Note: The actual capture will take place after the preview window is dismissed so make sure the window is not occluded"), 5));
+                ok = GuiUtils.showOkCancelDialog(null, "", previewContents,
+                        null);
             }
 
 
@@ -477,4 +478,3 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
 
 }
-

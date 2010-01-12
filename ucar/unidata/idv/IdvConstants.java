@@ -1,20 +1,18 @@
 /*
- * $Id: IdvConstants.java,v 1.111 2007/06/11 11:32:17 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -133,6 +131,7 @@ public interface IdvConstants {
     /** is isl scripting interactive or batch */
     public static final String ARG_ISLINTERACTIVE = "-islinteractive";
 
+    /** _more_          */
     public static final String ARG_B64ISL = "-b64isl";
 
     /** an isl file */
@@ -313,18 +312,25 @@ public interface IdvConstants {
     public static final String ID_COMMANDSTORUN = "commandstorun";
 
 
+    /** _more_          */
     public static final String PREF_LEGEND_SHOWICONS = "idv.legend.showicons";
 
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
+    /** _more_          */
     public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
 
-    public static final String PROP_MINIMUMFRAMECYCLETIME = "idv.minimumframecycletime";
+    /** _more_          */
+    public static final String PROP_MINIMUMFRAMECYCLETIME =
+        "idv.minimumframecycletime";
 
+    /** _more_          */
     public static final String PROP_FIXFILELOCKUP = "idv.fixfilelockup";
 
-    public static final String PROP_DISPLAYLIST_GROUP = "idv.displaylist.group";
+    /** _more_          */
+    public static final String PROP_DISPLAYLIST_GROUP =
+        "idv.displaylist.group";
 
 
 
@@ -333,18 +339,26 @@ public interface IdvConstants {
 
 
 
+    /** _more_          */
     public static final String PROP_MAP_GLOBE_LEVEL = "idv.map.globe.level";
+
+    /** _more_          */
     public static final String PROP_MAP_MAP_LEVEL = "idv.map.map.level";
 
+    /** _more_          */
     public static final String PROP_MONITORPORT = "idv.monitorport";
 
+    /** _more_          */
     public static final String PREF_THREADS_RENDER = "idv.threads.render.max";
+
+    /** _more_          */
     public static final String PREF_THREADS_DATA = "idv.threads.render.data";
 
 
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";
 
+    /** _more_          */
     public static final String PREF_SHOWHIDDENFILES = "idv.showhiddenfiles";
 
     /** preference for scroll wheel */
@@ -637,4 +651,3 @@ public interface IdvConstants {
         GridDisplayControl.INITIAL_PROBE_EARTHLOCATION;
 
 }
-

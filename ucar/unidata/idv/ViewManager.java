@@ -18,7 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -686,7 +685,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private String initViewStateName;
 
 
-    /** removeables  */
+    /** removeables */
     private List<Removable> removables = new ArrayList<Removable>();
 
     /**
@@ -3714,7 +3713,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Handle the display data changing
      *
-     * @param displayControl  the control 
+     * @param displayControl  the control
      */
     public void displayDataChanged(DisplayControl displayControl) {}
 

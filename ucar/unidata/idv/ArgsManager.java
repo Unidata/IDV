@@ -1,25 +1,22 @@
 /*
- * $Id: ArgsManager.java,v 1.105 2007/06/11 11:32:17 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv;
 
@@ -477,7 +474,7 @@ public class ArgsManager extends IdvManager {
      */
     public List<PatternFileFilter> getBundleFileFilters() {
         return (List<PatternFileFilter>) Misc.newList(getXidvFileFilter(),
-                                                      FILTER_JNLP, FILTER_ISL, getZidvFileFilter());
+                FILTER_JNLP, FILTER_ISL, getZidvFileFilter());
     }
 
 
@@ -517,8 +514,10 @@ public class ArgsManager extends IdvManager {
      * @return Is the file a bundle file
      */
     public boolean isXidvFile(String name) {
-        return IOUtil.hasSuffix(name, getXidvFileFilter().getPreferredSuffix()) ||
-            IOUtil.hasSuffix(name, SUFFIX_XIDV);
+        return IOUtil.hasSuffix(
+            name,
+            getXidvFileFilter().getPreferredSuffix()) || IOUtil.hasSuffix(
+                name, SUFFIX_XIDV);
     }
 
     /**
@@ -551,8 +550,10 @@ public class ArgsManager extends IdvManager {
      * @return is zidv
      */
     public boolean isZidvFile(String name) {
-        return IOUtil.hasSuffix(name, getZidvFileFilter().getPreferredSuffix()) ||
-            IOUtil.hasSuffix(name, SUFFIX_ZIDV);
+        return IOUtil.hasSuffix(
+            name,
+            getZidvFileFilter().getPreferredSuffix()) || IOUtil.hasSuffix(
+                name, SUFFIX_ZIDV);
     }
 
 
@@ -647,7 +648,6 @@ public class ArgsManager extends IdvManager {
                + msg(ARG_ONEINSTANCEPORT, "<port number> (Check if another version of the IDV is running. If so pass command line arguments to it and shutdown)")
                + msg(ARG_NOONEINSTANCE, "(Don't do the one instance port)")
                + msg(ARG_NOPREF, "(Don't read in the user preferences)")
-
                + msg(ARG_USERPATH, "<user directory to use>")
                + msg(ARG_SITEPATH, "<url path to find site resources>")
                + msg(ARG_NOGUI, "(Don't show the main window gui)")
@@ -746,7 +746,7 @@ public class ArgsManager extends IdvManager {
         }
         //If we are in off screen mode (e.g., from an isl script) then don't have the LogUtil
         //show dialogs, etc.
-        if(isOffScreen) {
+        if (isOffScreen) {
             LogUtil.setTestMode(true);
         }
 
@@ -935,7 +935,7 @@ public class ArgsManager extends IdvManager {
         } else if (arg.equals(ARG_LISTRESOURCES)) {
             listResources = true;
         } else if (checkArg(arg, ARG_B64ISL, args, idx, 1)) {
-            scriptingFiles.add("b64:" +args[idx++]);
+            scriptingFiles.add("b64:" + args[idx++]);
             islInteractive = true;
             setIsOffScreen(false);
         } else if (arg.equals(ARG_ISLINTERACTIVE)) {
@@ -967,7 +967,7 @@ public class ArgsManager extends IdvManager {
             System.err.println(USAGE_MESSAGE);
             System.err.println(getUsageMessage());
             getIdv().exit(0);
-        } else if(arg.equals(ARG_NOERRORSINGUI)) {
+        } else if (arg.equals(ARG_NOERRORSINGUI)) {
             LogUtil.setShowErrorsInGui(false);
         } else if (arg.equals(ARG_TESTEVAL)) {
             testEval = true;
@@ -1231,11 +1231,14 @@ public class ArgsManager extends IdvManager {
         isOffScreen = v;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isScriptingMode() {
-        return !islInteractive && scriptingFiles.size()>0;
+        return !islInteractive && (scriptingFiles.size() > 0);
     }
 
 
 }
-
-

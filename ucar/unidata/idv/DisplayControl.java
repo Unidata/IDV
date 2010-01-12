@@ -1,35 +1,33 @@
 /*
- * $Id: DisplayControl.java,v 1.98 2007/06/08 12:32:22 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
-
-import ucar.unidata.idv.control.ReadoutInfo;
 
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+
+
+import ucar.unidata.idv.control.ReadoutInfo;
 
 import ucar.visad.display.DisplayableData;
 
@@ -628,13 +626,14 @@ public interface DisplayControl extends Sharable {
      * @param el  position
      * @param animationValue animation value
      * @param animationStep  animation index
+     * @param samples _more_
      *
      * @return List of values
      *
      * @throws Exception  problem getting the cursor readout
      */
     public List getCursorReadout(EarthLocation el, visad.Real animationValue,
-                                 int animationStep,List<ReadoutInfo> samples)
+                                 int animationStep, List<ReadoutInfo> samples)
      throws Exception;
 
 
@@ -666,4 +665,3 @@ public interface DisplayControl extends Sharable {
     public Object removeTmpProperty(Object key);
 
 }
-

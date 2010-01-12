@@ -1,20 +1,18 @@
 /*
- * $Id: ControlDescriptor.java,v 1.118 2006/12/27 20:14:06 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -121,6 +119,7 @@ public class ControlDescriptor {
     /** Xml &quot;label&quot; attribute name  for the control descriptor xml */
     public static final String ATTR_LABEL = "label";
 
+    /** _more_          */
     public static final String ATTR_LEVELS = "levels";
 
     /** Xml &quot;properties&quot; attribute name  for the control descriptor xml */
@@ -230,7 +229,8 @@ public class ControlDescriptor {
     /** The controls.xml node */
     Element node;
 
-    private List  levels;
+    /** _more_          */
+    private List levels;
 
     /**
      * Parameterless constructor for xml encoding/decoding
@@ -276,13 +276,15 @@ public class ControlDescriptor {
      */
     public ControlDescriptor(IntegratedDataViewer idv, Element node)
             throws ClassNotFoundException {
-        this.idv        = idv;
-        this.node       = node;
-        controlId       = XmlUtil.getAttribute(node, ATTR_ID);
+        this.idv     = idv;
+        this.node    = node;
+        controlId    = XmlUtil.getAttribute(node, ATTR_ID);
         controlClass = Misc.findClass(XmlUtil.getAttribute(node, ATTR_CLASS));
-        label           = XmlUtil.getAttribute(node, ATTR_LABEL, "");
-        description     = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, label);
-        if(label.length()==0) label = description;
+        label        = XmlUtil.getAttribute(node, ATTR_LABEL, "");
+        description  = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, label);
+        if (label.length() == 0) {
+            label = description;
+        }
         code            = XmlUtil.getAttribute(node, ATTR_CODE,
                 (String) null);
 
@@ -294,24 +296,25 @@ public class ControlDescriptor {
         doesLevels    = XmlUtil.getAttribute(node, ATTR_DOESLEVELS, false);
 
         if (XmlUtil.hasAttribute(node, ATTR_LEVELS)) {
-            List<String> toks = StringUtil.split(XmlUtil.getAttribute(node, ATTR_LEVELS),",", true,true);
-            levels  = new ArrayList();
+            List<String> toks = StringUtil.split(XmlUtil.getAttribute(node,
+                                    ATTR_LEVELS), ",", true, true);
+            levels = new ArrayList();
             try {
-            for(String tok: toks) {
-                levels.add(ucar.visad.Util.toReal(tok));
-            }
+                for (String tok : toks) {
+                    levels.add(ucar.visad.Util.toReal(tok));
+                }
             } catch (Throwable exc) {
                 logException("Processing levels", exc);
             }
         }
 
 
-        properties    = new Hashtable();
+        properties = new Hashtable();
         properties.put(PROP_DISPLAYNAME, label);
         properties.putAll(
             StringUtil.parsePropertiesString(
                 XmlUtil.getAttribute(node, ATTR_PROPERTIES, "")));
-        if(properties.get("displayName")==null) {
+        if (properties.get("displayName") == null) {
             properties.put("displayName", label);
         }
         List nodes = XmlUtil.findChildren(node, TAG_PROPERTY);
@@ -626,6 +629,11 @@ public class ControlDescriptor {
         return canStandAlone;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getLevels() {
         return levels;
     }
@@ -1115,4 +1123,3 @@ public class ControlDescriptor {
 
 
 }
-

@@ -1,28 +1,22 @@
 /*
- * $Id: ViewManager.java,v 1.401 2007/08/16 14:05:04 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
- * This library is distributed in the hope that it will be2 useful, but
+ * 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.idv;
 
@@ -48,8 +42,6 @@ import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
-
-import java.text.DecimalFormat;
 
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
@@ -111,6 +103,8 @@ import java.io.*;
 
 import java.rmi.RemoteException;
 
+import java.text.DecimalFormat;
+
 import java.util.ArrayList;
 
 import java.util.Arrays;
@@ -142,117 +136,150 @@ import javax.vecmath.*;
  * @author IDV development team
  */
 
-public  class ViewState {
+public class ViewState {
+
+    /** _more_          */
     public String viewClassName;
 
+    /** _more_          */
     public static String PROP_MATRIX = "matrix";
 
+    /** _more_          */
     public static String PROP_PROJECTION = "projection";
 
+    /** _more_          */
     public static String PROP_ASPECTRATIO = "aspectratio";
 
+    /** _more_          */
     public static String PROP_GLOBE = "globe";
 
+    /** _more_          */
     private String name;
 
+    /** _more_          */
     Hashtable properties = new Hashtable();
 
+    /** _more_          */
     private boolean isLocal = true;
 
-    public ViewState() {
-    }
+    /**
+     * _more_
+     */
+    public ViewState() {}
 
+    /**
+     * _more_
+     *
+     * @param viewClassName _more_
+     */
     public ViewState(String viewClassName) {
         this.viewClassName = viewClassName;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
     public void put(Object key, Object value) {
-        properties.put(key,value);
+        properties.put(key, value);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public Object get(Object key) {
         return properties.get(key);
     }
 
 
     /**
-       Set the Properties property.
-
-       @param value The new value for Properties
-    **/
-    public void setProperties (Hashtable value) {
+     *  Set the Properties property.
+     *
+     *  @param value The new value for Properties
+     */
+    public void setProperties(Hashtable value) {
         this.properties = value;
     }
 
     /**
-       Get the Properties property.
-
-       @return The Properties
-    **/
-    public Hashtable getProperties () {
+     *  Get the Properties property.
+     *
+     *  @return The Properties
+     */
+    public Hashtable getProperties() {
         return this.properties;
     }
 
 
     /**
-       Set the ViewClassName property.
-
-       @param value The new value for ViewClassName
-    **/
-    public void setViewClassName (String value) {
+     *  Set the ViewClassName property.
+     *
+     *  @param value The new value for ViewClassName
+     */
+    public void setViewClassName(String value) {
         this.viewClassName = value;
     }
 
     /**
-       Get the ViewClassName property.
-
-       @return The ViewClassName
-    **/
-    public String getViewClassName () {
+     *  Get the ViewClassName property.
+     *
+     *  @return The ViewClassName
+     */
+    public String getViewClassName() {
         return this.viewClassName;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
         this.name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
         return this.name;
     }
-        
-    /**
-       Set the IsLocal property.
 
-       @param value The new value for IsLocal
-    **/
-    public void setIsLocal (boolean value) {
-	this.isLocal = value;
+    /**
+     *  Set the IsLocal property.
+     *
+     *  @param value The new value for IsLocal
+     */
+    public void setIsLocal(boolean value) {
+        this.isLocal = value;
     }
 
     /**
-       Get the IsLocal property.
-
-       @return The IsLocal
-    **/
-    public boolean getIsLocal () {
-	return this.isLocal;
+     *  Get the IsLocal property.
+     *
+     *  @return The IsLocal
+     */
+    public boolean getIsLocal() {
+        return this.isLocal;
     }
 
 
 
 }
-

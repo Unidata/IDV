@@ -1,20 +1,18 @@
 /*
- * $Id: ImageServer.java,v 1.15 2007/04/11 16:10:17 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -32,7 +30,6 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import java.awt.*;
-import java.util.Date;
 
 import java.io.*;
 
@@ -40,6 +37,8 @@ import java.net.Socket;
 
 
 import java.net.URL;
+
+import java.util.Date;
 
 import java.util.Hashtable;
 
@@ -72,8 +71,11 @@ public class ImageServer extends HttpServer {
     /** http image arg */
     public static final String ARG_PROPERTIES = "properties";
 
-    public static final String ARG_WIDTH="width";
-    public static final String ARG_HEIGHT="height";
+    /** _more_          */
+    public static final String ARG_WIDTH = "width";
+
+    /** _more_          */
+    public static final String ARG_HEIGHT = "height";
 
     /** http image arg */
     public static final String REQ_MAKEMOVIE = "makemovie";
@@ -197,17 +199,18 @@ public class ImageServer extends HttpServer {
         protected void handleRequestInner(String path, Hashtable formArgs,
                                           Hashtable httpArgs, String content)
                 throws Exception {
-            String imageFile = (String) formArgs.get(ARG_FILE);
+            String imageFile      = (String) formArgs.get(ARG_FILE);
             String request        = (String) formArgs.get(ARG_REQUEST);
             String dataSourceName = (String) formArgs.get(ARG_DATASOURCE);
             String paramName      = (String) formArgs.get(ARG_PARAM);
             String displayName    = (String) formArgs.get(ARG_DISPLAY);
             String properties     = (String) formArgs.get(ARG_PROPERTIES);
 
-            int width = Misc.getProperty(formArgs, "width",  -1);
-            int height = Misc.getProperty(formArgs, "height", -1);
-            if(width>0 && height>0) {
-                idv.getStateManager().setViewSize(new Dimension(width, height));
+            int    width          = Misc.getProperty(formArgs, "width", -1);
+            int    height         = Misc.getProperty(formArgs, "height", -1);
+            if ((width > 0) && (height > 0)) {
+                idv.getStateManager().setViewSize(new Dimension(width,
+                        height));
             }
 
             if (request == null) {
@@ -277,11 +280,16 @@ public class ImageServer extends HttpServer {
             long t4 = System.currentTimeMillis();
             log("Total Time:" + (t4 - t1) + " Load bundle:" + (t2 - t1)
                 + " Wait: " + (t3 - t2) + " Capture:" + (t4 - t3));
-            
+
             idv.cleanup();
         }
 
 
+        /**
+         * _more_
+         *
+         * @throws Exception _more_
+         */
         protected void writeHeaderArgs() throws Exception {
             super.writeHeaderArgs();
             writeLine("Cache-Control: no-cache" + CRLF);
@@ -291,4 +299,3 @@ public class ImageServer extends HttpServer {
     }
 
 }
-

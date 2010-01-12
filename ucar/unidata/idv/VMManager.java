@@ -1,20 +1,18 @@
 /*
- * $Id: VMManager.java,v 1.73 2007/04/11 16:10:19 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -35,8 +33,6 @@ import ucar.unidata.idv.control.TransectDrawingControl;
 
 import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.WindowInfo;
-
-import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
@@ -48,15 +44,17 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
+import ucar.unidata.xml.XmlResourceCollection;
+
 import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
 
-import java.io.File;
-
 import java.awt.*;
 import java.awt.event.*;
+
+import java.io.File;
 
 import java.lang.reflect.Constructor;
 
@@ -115,10 +113,14 @@ public class VMManager extends IdvManager {
         super(idv);
         //Switch the vmstate.xml to viewpoints.xml
         try {
-            File oldFile = new File(IOUtil.joinDir(getStore().getUserDirectory(), "vmstate.xml"));
-            File newFile = new File(IOUtil.joinDir(getStore().getUserDirectory(), "viewpoints.xml"));
-            if(oldFile.exists() &&!newFile.exists()) {
-                IOUtil.moveFile(oldFile,newFile);
+            File oldFile =
+                new File(IOUtil.joinDir(getStore().getUserDirectory(),
+                                        "vmstate.xml"));
+            File newFile =
+                new File(IOUtil.joinDir(getStore().getUserDirectory(),
+                                        "viewpoints.xml"));
+            if (oldFile.exists() && !newFile.exists()) {
+                IOUtil.moveFile(oldFile, newFile);
             }
         } catch (Exception exc) {
             logException("moving vmstate.xml to viewpoints.xml", exc);
@@ -377,6 +379,9 @@ public class VMManager extends IdvManager {
 
 
 
+    /**
+     * _more_
+     */
     public void updateAllLegends() {
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager vm = (ViewManager) viewManagers.get(i);
@@ -391,19 +396,24 @@ public class VMManager extends IdvManager {
     public void writeVMState() {
         getVMState();
         List localViewpoints = new ArrayList();
-        List tmp = viewpoints;
-        for(Object o: tmp) {
-            if(o instanceof ViewState && !((ViewState)o).getIsLocal()) continue;
+        List tmp             = viewpoints;
+        for (Object o : tmp) {
+            if ((o instanceof ViewState) && !((ViewState) o).getIsLocal()) {
+                continue;
+            }
             localViewpoints.add(o);
         }
         try {
-            XmlResourceCollection rc = getResourceManager().getXmlResources(getResourceManager().RSC_VIEWPOINTS);
+            XmlResourceCollection rc =
+                getResourceManager().getXmlResources(
+                    getResourceManager().RSC_VIEWPOINTS);
             for (int i = 0; i < rc.size(); i++) {
                 if (rc.isWritableResource(i)) {
                     File f = new File(rc.get(i).toString());
-                    String contents = getIdv().encodeObject(localViewpoints,true);
+                    String contents = getIdv().encodeObject(localViewpoints,
+                                          true);
                     IOUtil.writeFile(f, contents);
-		    return;
+                    return;
                 }
             }
         } catch (Exception exc) {
@@ -421,7 +431,9 @@ public class VMManager extends IdvManager {
     public List getVMState() {
         if (viewpoints == null) {
             List tmp = new ArrayList();
-            XmlResourceCollection rc = getResourceManager().getXmlResources(getResourceManager().RSC_VIEWPOINTS);
+            XmlResourceCollection rc =
+                getResourceManager().getXmlResources(
+                    getResourceManager().RSC_VIEWPOINTS);
 
             for (int i = 0; i < rc.size(); i++) {
                 String contents = rc.read(i);
@@ -429,13 +441,14 @@ public class VMManager extends IdvManager {
                     continue;
                 }
                 try {
-                    List resources =  (List) getIdv().getEncoderForRead().toObject(
-                                                                                   contents);
+                    List resources =
+                        (List) getIdv().getEncoderForRead().toObject(
+                            contents);
                     tmp.addAll(resources);
                     boolean local = rc.isWritable(i);
-                    for(Object o: resources) {
-                        if(o instanceof ViewState) {
-                            ((ViewState)o).setIsLocal(local);
+                    for (Object o : resources) {
+                        if (o instanceof ViewState) {
+                            ((ViewState) o).setIsLocal(local);
                         }
                     }
                 } catch (Exception exc) {
@@ -858,4 +871,3 @@ public class VMManager extends IdvManager {
 
 
 }
-

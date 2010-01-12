@@ -1,20 +1,18 @@
 /*
- * $Id: SavedBundle.java,v 1.31 2007/08/09 10:02:07 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -126,7 +124,7 @@ public class SavedBundle {
     public SavedBundle(Element node, String dirRoot,
                        IdvResourceManager resourceManager, boolean local) {
 
-        this.type = type;
+        this.type  = type;
         this.local = local;
         String typeString = XmlUtil.getAttribute(node, ATTR_TYPE, "favorite");
         if (typeString.equals(VALUE_FAVORITE)) {
@@ -189,10 +187,20 @@ public class SavedBundle {
      */
     public SavedBundle(String url, String name, List categories,
                        Object prototype, boolean local) {
-        this(url,name,categories, prototype, local, TYPE_FAVORITE);
+        this(url, name, categories, prototype, local, TYPE_FAVORITE);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param name _more_
+     * @param categories _more_
+     * @param prototype _more_
+     * @param local _more_
+     * @param type _more_
+     */
     public SavedBundle(String url, String name, List categories,
                        Object prototype, boolean local, int type) {
         this.url        = url;
@@ -200,7 +208,7 @@ public class SavedBundle {
         this.categories = new ArrayList(categories);
         this.prototype  = prototype;
         this.local      = local;
-        this.type = type;
+        this.type       = type;
     }
 
     /**
@@ -286,9 +294,9 @@ public class SavedBundle {
      *
      * @return List of SavedBundle objects
      */
-    public static List<SavedBundle> processBundleXml(Element root, String dirRoot,
-                                        IdvResourceManager resourceManager,
-                                        boolean local) {
+    public static List<SavedBundle> processBundleXml(Element root,
+            String dirRoot, IdvResourceManager resourceManager,
+            boolean local) {
         List<SavedBundle> bundles = new ArrayList<SavedBundle>();
         if (root == null) {
             return bundles;
@@ -428,4 +436,3 @@ public class SavedBundle {
 
 
 }
-
