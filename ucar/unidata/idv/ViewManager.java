@@ -1304,11 +1304,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
                 if (lockLightsBtn == null) {
                     lockLightsBtn = GuiUtils.getToggleButton(
-                        "/auxdata/ui/icons/Unlinked.gif", 0, 0);
+                        "/auxdata/ui/icons/link_break.png", 0, 0);
                     lockLightsBtn.setContentAreaFilled(false);
                     lockLightsBtn.setSelectedIcon(
                         GuiUtils.getImageIcon(
-                            "/auxdata/ui/icons/Linked.gif", getClass()));
+                            "/auxdata/ui/icons/link.png", getClass()));
                     lockLightsBtn.setSelected(false);
                     lockLightsBtn.setBorder(
                         BorderFactory.createEmptyBorder(0, 0, 0, 0));

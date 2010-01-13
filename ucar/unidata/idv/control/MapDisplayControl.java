@@ -925,8 +925,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         sp.setPreferredSize(new Dimension(600, 200));
 
         applyToAllLatLonBtn =
-            GuiUtils.getToggleImageButton("/auxdata/ui/icons/Unlinked.gif",
-                                          "/auxdata/ui/icons/Linked.gif", 0,
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/link.png",
+                                          "/auxdata/ui/icons/link_break.png", 0,
                                           0, true);
         applyToAllLatLonBtn.setContentAreaFilled(false);
         applyToAllLatLonBtn.setSelected(applyChangesToAllLatLon);
@@ -941,8 +941,8 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
         applyToAllMapsBtn =
-            GuiUtils.getToggleImageButton("/auxdata/ui/icons/Unlinked.gif",
-                                          "/auxdata/ui/icons/Linked.gif", 0,
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
+                                          "/auxdata/ui/icons/link.png", 0,
                                           0, true);
         applyToAllMapsBtn.setContentAreaFilled(false);
         applyToAllMapsBtn.setSelected(applyChangesToAllMaps);

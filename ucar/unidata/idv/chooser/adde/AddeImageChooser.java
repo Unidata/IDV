@@ -1162,8 +1162,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     private JToggleButton getLockButton() {
         if (lockBtn == null) {
             lockBtn =
-                GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif",
-                    "/auxdata/ui/icons/Unlinked.gif", 0, 0, true);
+                GuiUtils.getToggleImageButton("/auxdata/ui/icons/link.png",
+                    "/auxdata/ui/icons/link_break.png", 0, 0, true);
             lockBtn.setContentAreaFilled(false);
             lockBtn.setSelected(true);
             lockBtn.setToolTipText(

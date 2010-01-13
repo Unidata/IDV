@@ -272,12 +272,12 @@ public class GeoSelectionPanel extends JPanel {
         List strideComps = new ArrayList();
         if (doStride) {
             lockBtn =
-                GuiUtils.getToggleButton("/auxdata/ui/icons/Unlinked.gif", 0,
+                GuiUtils.getToggleButton("/auxdata/ui/icons/link_break.png", 0,
                                          0);
             lockBtn.setContentAreaFilled(false);
             lockBtn.setSelectedIcon(
                 GuiUtils.getImageIcon(
-                    "/auxdata/ui/icons/Linked.gif", getClass()));
+                    "/auxdata/ui/icons/link.png", getClass()));
             lockBtn.setSelected(geoSelection.getXStride()
                                 == geoSelection.getYStride());
             lockBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
