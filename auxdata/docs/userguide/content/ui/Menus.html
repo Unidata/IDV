@@ -56,6 +56,10 @@ Allows you to select a previously created
 from your file system.
 }]
 
+[ug::menuDesc {Windows} { 
+Allows you to select one of the open windows.
+}]
+
 
 [ug::menuDesc {Save As...} {
 Allows you to save the current application state as a bundle or Web
@@ -112,9 +116,6 @@ for more information about bundles.
 [ug::menuDesc {Remove All Displays} {Remove all displays.}]
 
 
-[ug::menuDesc {Remove All Data Sources} {Remove all loaded data sources. The displays are unaffected.}]
-
-
 [ug::menuDesc {Remove All Displays and Data} {Removes all displays and loaded data sources.}]
 
 
@@ -127,8 +128,9 @@ for more information about bundles.
 to create a new formula. 
 }]
 
+[ug::menuDesc {Jython Library} {Show the <a href="../tools/Jython.html">Jython library editor</a>.}]
 
-[ug::menuDesc {Jython library} {Show the <a href="../tools/Jython.html">Jython library editor</a>.}]
+[ug::menuDesc {Jython Shell} {Show the <a href="../tools/JythonShell.html">Jython Shell</a>.}]
 
 [ug::menuDesc {Import} {Import a formula from a file.}]
 
@@ -141,9 +143,8 @@ to create a new formula.
 
 
 
-[ug::menuDesc {Delete Saved Views} { 
-This menu allows you to remove the named saved views 
-(created with the [ug::menu Views {Saved Views} {Save View State}] menu).
+[ug::menuDesc {Display Settings} { 
+This menu allows you bring up the <a href="../tools/DisplaySettings.html">Display Settings</a> editor.
 }]
 
 [ug::menuDesc {Preferences} {Show the <a href="../tools/Preferences.html">User Preferences window</a>.}]
@@ -181,16 +182,17 @@ favorite bundles.
 }]
 
 
-[ug::menuDesc {Rest of Menu List} { 
-The rest of this menu holds menu items for the favorite bundles, categorized by the
-favorites category.
+[ug::menuDesc {Menu List} { 
+The rest of this menu holds menu items for the favorite bundles, 
+categorized by the favorites category.
 }]
 
 
 </ul>
 
+<!--
 [ug::menuDesc {Display Templates} {Provides ability to access and manage the saved display templates}]
-
+-->
 
 [ug::menuDesc {Maps and Backgrounds} { 
 This menu provides facilities for  creating new 
@@ -299,26 +301,24 @@ displays control window.
 
 <subhead intoc="false"id="data">Data Menu</subhead>
 
-This menu allows you to load in a <b>New Data Source</b> from the 
+This menu allows you to load in a new data source from the 
 <a href="../data/choosers/index.html">Data Source Chooser</a>.
 It also lists all of the currently loaded formulas and data sources 
 and provides options to select fields and edit properties.
 
 <ul>
-[ug::menuDesc {New Data Source} {Provides ability to access the individual
+[ug::menuDesc {Choose Data} {Provides ability to access the individual
 [ht::command Data Source Chooser]-s from the sub menus.}]
+
+[ug::menuDesc {Special} {Provides access to special data sources
+that have preconfigured location (e.g. Weather Text and hurricane tracks).
+}]
 
 [ug::menuDesc {Favorite Data Sources} {Provides ability to access and manage the saved favorite data sources}]
 
 [ug::menuDesc {Formulas} {Provides ability to access formulas}]
 
 </ul>
-
-[
-if {0} {
-<subhead intoc="false"id="collaboration">Collaboration</subhead>
-
-}]
 
 <subhead intoc="false" id="tools">Tools Menu</subhead>
 
@@ -334,9 +334,9 @@ Show  the  <a href="../tools/ColorTableEditor.html">Color Table Editor</a>,
 which allows you to view, create and modify color tables.
 }]
 
-[ug::menuDesc {Station Model Editor} { 
-Show  the  <a href="../tools/StationModelEditor.html">Station Model Editor</a>,
-which allows you to view, create and modify station models for plotting
+[ug::menuDesc {Layout Model Editor} { 
+Show  the  <a href="../tools/StationModelEditor.html">Layout Model Editor</a>,
+which allows you to view, create and modify layout models for plotting
 point data.
 }]
 
@@ -375,6 +375,13 @@ This menu allows you to manage the IDV  <a href="../misc/Plugins.html">plugins</
 [ug::menuDesc {Plugin Creator} {
 <a name="plugincreator"></a>
 This menu allows you to <a href="../misc/PluginCreator.html">create plugins</a>.}]
+
+
+[ug::menuDesc {Resource Viewer} {
+<a name="resourceviewer"></a>
+This menu allows you to show the 
+<a href="../misc/ResourceViewer.html">resources</a> currently used by
+the IDV}]
 
 </ul>
 
@@ -431,10 +438,13 @@ which are shown at the bottom of the menu.
 
 <ul>
 
-[ug::menuDesc {Legend} { 
-Show the display legend in their own window.
+[ug::menuDesc {Hide/Embed Legend} { 
+Remove or embed the legend.
 }]
 
+[ug::menuDesc {Float Legend} { 
+Show the display legend in their own window.
+}]
 [ug::menuDesc {Remove All Displays} {Remove the displays shown in this view.}]
 
 [ug::menuDesc {Visibility Animation} {
@@ -459,7 +469,10 @@ See <a href="../tools/ImageCaptures.html">here</a> for more information.
 }]
 
 
-[ug::menuDesc {Show} {Different Flags}]
+[ug::menuDesc {Show} {A set of menus to toggle the visibility of 
+certain features one at a time.  All these can also be toggled in the 
+Properties dialog as well (see below)
+}]
 
 
 [ug::menuDesc Viewpoint { 
@@ -491,6 +504,10 @@ scaling between the top and bottom of the wire frame box.  The
 scale is linear.  You can specify the units for the max and min
 values.  Units must be convertible with meters (e.g., km, ft, fathoms, 
 etc)
+}]
+
+[ug::menuDesc {Auto-rotate View} { 
+Allows you to automatically rotate the view.
 }]
 
 </ul>
@@ -545,6 +562,9 @@ can choose from, including both system-supplied and your own projections.}]
 [ug::menuDesc {From Displays} { 
 Lists the native data projections of any displays being show.}]
 
+[ug::menuDesc {Viewpoints} { 
+Allows you to define, select or delete saved viewpoints.}]
+
 [ug::menuDesc History { 
 Contains the projections that have been used for
 this view. It allows you to easily go back to prior projections.}]
@@ -571,7 +591,7 @@ latitude longitude
 
 
 
-[ug::menuDesc {Auto-Set Projection} { 
+[ug::menuDesc {Auto-set Projection} { 
 Toggles the behavior of automatically setting the projection to the 
 projection of the most recent display that has been added.}]
 

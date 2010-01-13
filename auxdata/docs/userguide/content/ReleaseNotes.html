@@ -26,11 +26,11 @@ For information on upgrading Mac OS-X to Java 6, see the
 </faqitem>
 
 <faqitem q="Use of netCDF 4.1 library" id="nj4">
-The version of netCDF-Java has been updated to 4.1 beta.
+The version of netCDF-Java has been updated to 4.1.
 </faqitem>
 
 <faqitem q="Data caching" id="datacache">
-A new scheme for data caching has been instituted.  Details will follow
+A new scheme for data caching has been instituted.  Details can be found
 in the <a href="misc/PerformanceTuning.html">Performance Tuning</a>
 page.
 </faqitem>
@@ -41,19 +41,8 @@ page.
 A radar cross section control has been added in this release.  This
 control allows users to create arbitrary cross sections through radar
 volume data.  Details are in the 
-<a href="controls/RadarCrossSectionControl.html">
+<a href="controls/level2/RadarCrossSectionControl.html">
 Radar Cross Section Control</a> section of this guide.  
-</faqitem>
-
-<faqitem cat="Data Changes"></faqitem>
-<faqitem q="Lightning data from native and GEMPAK files" id="lightning">
-USPLN and NLDN lightning data stored in native or GEMPAK format can now be
-read in as point data.  Several new lightning layout models have been 
-added to the system list.
-</faqitem>
-
-<faqitem q="Ship/Buoy data" id="shipbuoy">
-Ship and buoy data are now available through the ADDE point obs chooser.
 </faqitem>
 
 <faqitem q="New default background image layers" id="bkgimages">
@@ -68,9 +57,26 @@ spin the globe with a mouse flick and control the rate of rotation.
 There are predefined viewpoints available through the Projections menu.
 </faqitem>
 
+<faqitem cat="Data Changes"></faqitem>
+<faqitem q="Lightning data from native and GEMPAK files" id="lightning">
+USPLN and NLDN lightning data stored in native or GEMPAK format can now be
+read in as point data.  Several new lightning layout models have been 
+added to the system list.
+</faqitem>
+
+<faqitem q="Ship/Buoy data" id="shipbuoy">
+Ship and buoy data are now available through the ADDE point obs chooser.
+</faqitem>
+
+<faqitem q="Support for high resolution NEXRAD Level III data" id="hiresl3">
+Starting in February, 2010, the National Weather Service will be transmitting
+higher resolution NEXRAD Level III radar products.  This release has support
+for reading and displaying these new products.
+</faqitem>
+
 <faqitem cat="User Interface Changes"></faqitem>
 
-<faqitem q="Known Problems" id="knownproblems">
+<faqitem q="Known Problems">
 For a list of outstanding known problems, see the 
 <a href="Bugs.html">Known Problems</a> page.<p>
 </faqitem>
