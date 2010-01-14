@@ -329,7 +329,7 @@ public class TimeLengthField {
     public JComponent getContents() {
         if (editIcon == null) {
             editIcon = GuiUtils.getImageIcon(
-                "/ucar/unidata/idv/control/images/edit.gif", getClass());
+                "/auxdata/ui/icons/calendar_edit.png", getClass());
         }
         editButton = GuiUtils.getImageButton(editIcon);
         editButton.setToolTipText("Edit " + name);
