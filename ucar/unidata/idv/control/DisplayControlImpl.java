@@ -1,28 +1,22 @@
-/**
- * $Id: DisplayControlImpl.java,v 1.726 2007/08/21 16:47:30 dmurray Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.idv.control;
 
@@ -845,7 +839,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private LocalDisplay displayControlListeningTo;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<Removable> removables = new ArrayList<Removable>();
 
 
@@ -5422,7 +5416,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         dataSource.getDataSelectionComponents(
                             getDataChoice());
                     if (dataSelectionComponents != null) {
-                        for (DataSelectionComponent dsc : dataSelectionComponents) {
+                        for (DataSelectionComponent dsc :
+                                dataSelectionComponents) {
                             if (dsc.getShowInControlProperties()) {
                                 jtp.add(dsc.getName(),
                                         dsc.getContents(getDataSelection()));
@@ -7242,7 +7237,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             GuiUtils.leftCenter(
                 GuiUtils.wrap(
                     GuiUtils.makeImageButton(
-                        "/ucar/unidata/idv/images/edit.gif", this,
+                        "/auxdata/ui/icons/calendar_edit.png", this,
                         "showTimeRangeDialog")), GuiUtils.inset(
                             getDataTimeRange(true).getTimeModeLabel(),
                             new Insets(0, 10, 0, 0)));
@@ -11647,4 +11642,3 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 }
-
