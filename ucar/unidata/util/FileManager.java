@@ -1572,7 +1572,7 @@ public class FileManager {
         final JButton goToBtn =
             new JButton(
                 "",
-                GuiUtils.getImageIcon("/auxdata/ui/icons/HistoryList16.gif"));
+                GuiUtils.getImageIcon("/auxdata/ui/icons/folder_go.png"));
         goToBtn.setContentAreaFilled(false);
         goToBtn.setMargin(new Insets(1, 1, 1, 1));
         //        goToBtn.setBorder(BorderFactory.createEtchedBorder());
