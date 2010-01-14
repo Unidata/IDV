@@ -264,7 +264,7 @@ public class ValuePlanViewControl extends PlanViewControl {
                                              toggle));
 
         controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("Layout:"),
+                                             GuiUtils.rLabel("Layout Model:"),
                                              makeLayoutModelWidget()));
         super.getControlWidgets(controlWidgets);
 
