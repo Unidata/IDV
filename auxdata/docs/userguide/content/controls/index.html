@@ -24,8 +24,8 @@ own window. This is done with the [ug::button Float Window] button.
 The  legend  shows each display under the 
 &quot;display  category&quot; of that
 display. For example,  the legend in the above image  shows the categories
-&quot;Maps&quot;, &quot;Plan Views&quot;, &quot;Probes&quot;, 
-&quot;3D Surface&quot;  and &quot;Imagery&quot;. 
+&quot;Maps&quot;, &quot;General&quot;, &quot;Imagery&quot;, 
+&quot;Plan Views&quot;  and &quot;Point Data&quot;. 
 The display category may be changed (see below). This is useful
 for grouping and controlling the visibility of a group of displays.
 
@@ -55,7 +55,7 @@ visibility of an individual display can be changed with the
 
 <p>
 The [ug::button Remove] button allows you to quickly remove a display.
-The [ug::button Visibility Toggle Lock] allows you to &quot;lock&quot;
+The [ug::button Lock Visibility Toggle] allows you to &quot;lock&quot;
 the current visibility of the display and not change it while doing the
 <a href="#visibility">visibility cycling</a>.
 
@@ -70,12 +70,13 @@ color table for that display.
 
 
 <subhead id="dnd">Drag And Drop</subhead>
-A display control's drag and drop button <img src="images/dnd.gif"> 
-is shown in the legend and in the Dashboard when the display control is docked.
-By clicking and dragging on this button you can drop it into another View to change which View
-the display control is in. Also, within the dashboard you can drop it onto one of the View  labels
-to also change the View. Within the legend you can also drag the button onto another Category
-label to change the display category. 
+
+By clicking and dragging on this legend label you can drop it into 
+another View to change which View the display control is in. Also, 
+within the Dashboard's Displays tab, you can use drag and drop button 
+<img src="images/dnd.gif"> to drop it onto one of the View labels
+to also change the View. Within the legend you can also drag label 
+onto another Category label to change the display category. 
 
 
 <subhead id="menus">Menus</subhead>
@@ -171,11 +172,6 @@ the unit that is used in the display.
 }]
 
 
-[ug::menuDesc {Use Times in Animation} { For displays that have a time
-associated with them, you can select whether the times are used
-to calculate the animation steps.
-}]
-
 [ug::menuDesc {Sharing} {This sub-menu allows you
 to turn on/off sharing and to set the &quot;share group&quot;. 
 When sharing is turned on certain state is shared among displays of the 
@@ -207,15 +203,27 @@ The [ug::menu View] menu has these common choices:
 [ug::menuDesc {Visible} { check box allows you to toggle visibility.
 }]
 
+[ug::menuDesc {Lock Visibility} { Check box allows you to toggle the
+visibility lock (see <a href="#visibility">visibility cycling</a> below).
+}]
 
-[ug::menuDesc {To Front} { If this display is showing at the same level
+[ug::menuDesc {Bring to Front} { If this display is showing at the same level
 in 3D as another (e.g., satellite and radar images in the same display),
 you can use this menu to select which display is on top.
 }]
 
+[ug::menuDesc {Show View Window} { Show the View Window that holds this
+display control.
+}]
+
+[ug::menuDesc {Use Times in Animation} { For displays that have a time
+associated with them, you can select whether the times are used
+to calculate the animation steps.
+}]
 
 
-[ug::menuDesc {Display List Color} { Allows you to set the 
+
+[ug::menuDesc {Display List} { Allows you to set the visibility and the 
 color of the label for this control in the display list.
 }]
 
@@ -283,12 +291,9 @@ The [ug::button {Extra Legend Labels}] field acts like the Legend Label field (e
 <p>
 
 The [ug::button {Display Label}] field acts like the Legend Label field
-to define the text label that is shown in the display list.
-<p>
-
-The [ug::button {Category}] field is arbitrary text and is used to organize
-the legend.  The &quot;&lt;&lt;&quot; button shows a list of all of the
-current display categories and allows you to easily set this field.
+to define the text label that is shown in the display list. The color swatch
+shows the current color for the labeld.  Clicking on it brings up a color 
+menu that can be used to change the color of the label.
 
 <p>
 The [ug::button Id] field is used to define an ID for this display. The ID is
@@ -306,7 +311,7 @@ of the view window, or by setting the global property for
 all display through the <a href="../tools/Preferences.html">User
 Preferences</a> dialog.
 
-<li> [ug::button Loc Visibility Toggle] Locks/unlocks 
+<li> [ug::button Lock Visibility Toggle] Locks/unlocks 
 <a href="#visibility">visibility toggling</a>.
 
 
@@ -372,9 +377,10 @@ of the color scale.
 
    </li>
 
-  <li>The padlock icon <img src="images/unlock.gif"> on the right side of the 
-      [ht::command {legend bar}] is used to block the effects of the visibility toggling described
-      above.  When locked the visibility of a display is not affected by the toggling.
+  <li>The padlock icon <img src="images/lock.png"> on the right
+  side of the [ht::command {Legend}] is used to block the effects of
+  the visibility toggling described above. When locked the visibility of
+  a display is not affected by the toggling.
 
    <li>Use the [ug::menu View Visible] checkbox
        menu item in each display control's menu.</li>

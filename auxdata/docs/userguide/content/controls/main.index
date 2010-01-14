@@ -6,6 +6,7 @@ title:Display Controls
 >title:Gridded Data Displays
 >>PlanViewControl.html
 >>FlowPlanViewControl.html
+>>ValuePlanViewControl.html
 >>CrossSectionControl.html
 >>ThreeDSurfaceControl.html
 >>VolumeRenderControl.html
