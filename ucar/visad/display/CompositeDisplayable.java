@@ -1,27 +1,22 @@
 /*
- * $Id: CompositeDisplayable.java,v 1.50 2007/08/21 22:42:18 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.visad.display;
 
@@ -263,7 +258,9 @@ public class CompositeDisplayable extends Displayable {
             throws IndexOutOfBoundsException {
         synchronized (MUTEX) {
             List displayables = getDisplayables();
-            if(index<0 || index>=displayables.size()) return null;
+            if ((index < 0) || (index >= displayables.size())) {
+                return null;
+            }
             return (Displayable) displayables.get(index);
         }
     }
@@ -307,7 +304,7 @@ public class CompositeDisplayable extends Displayable {
      */
     protected void destroy() throws RemoteException, VisADException {
         synchronized (MUTEX) {
-            if(displayables!=null) {
+            if (displayables != null) {
                 for (Iterator iter = iterator(); iter.hasNext(); ) {
                     ((Displayable) iter.next()).destroy();
                 }
@@ -485,7 +482,7 @@ public class CompositeDisplayable extends Displayable {
             throws RemoteException, VisADException {
         super.setVisible(visible);
         synchronized (MUTEX) {
-            for (Displayable displayable:getDisplayables()) {
+            for (Displayable displayable : getDisplayables()) {
                 if (displayable != null) {
                     displayable.setVisible(visible);
                 }
@@ -503,7 +500,7 @@ public class CompositeDisplayable extends Displayable {
     public void setManipulable(boolean manipulable)
             throws VisADException, RemoteException {
         super.setManipulable(manipulable);
-        for (Displayable displayable:getDisplayables()) {
+        for (Displayable displayable : getDisplayables()) {
             if (displayable != null) {
                 displayable.setManipulable(manipulable);
             }
@@ -928,7 +925,8 @@ public class CompositeDisplayable extends Displayable {
      */
     private List<Displayable> getDisplayables() {
         synchronized (MUTEX) {
-            return new ArrayList<Displayable>((List<Displayable>)displayables);
+            return new ArrayList<Displayable>(
+                (List<Displayable>) displayables);
         }
     }
 
@@ -1035,4 +1033,3 @@ public class CompositeDisplayable extends Displayable {
         return sb.toString();
     }
 }
-

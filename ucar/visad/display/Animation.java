@@ -1,25 +1,22 @@
 /*
- * $Id: Animation.java,v 1.75 2007/05/24 22:41:22 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.visad.display;
 
@@ -75,7 +72,7 @@ public class Animation extends Displayable {
      */
     public static final int REVERSE = 1;
 
-    /** _more_          */
+    /** are we enabled? */
     private boolean enabled = true;
 
     /** ScalarMap for animation */
@@ -99,7 +96,7 @@ public class Animation extends Displayable {
     /** Value for the current animation step */
     private Real aniValue = null;
 
-    /** _more_          */
+    /** the last time */
     private Real lastTime;
 
     /** a Real that represents the missing value for aniRealType */
@@ -470,8 +467,8 @@ public class Animation extends Displayable {
      * @param timeValue The time value to check
      * @return Is the time value the current one being displayed
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     public boolean shouldShow(Real timeValue)
             throws VisADException, RemoteException {
@@ -532,9 +529,9 @@ public class Animation extends Displayable {
 
 
     /**
-     * _more_
+     * Get the current animation value as a Real
      *
-     * @return _more_
+     * @return  the value
      */
     public Real getCurrentAnimationValue() {
         DateTime[] times   = getTimes();
@@ -547,9 +544,9 @@ public class Animation extends Displayable {
 
 
     /**
-     * _more_
+     * Get the times as an array
      *
-     * @return _more_
+     * @return  the times or null
      */
     public DateTime[] getTimes() {
         if (animationSet != null) {
@@ -1146,4 +1143,3 @@ public class Animation extends Displayable {
 
 
 }
-

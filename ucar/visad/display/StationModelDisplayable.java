@@ -1,27 +1,22 @@
 /*
- * Copyright  1997-2009 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
 
 package ucar.visad.display;
 
@@ -281,7 +276,7 @@ public class StationModelDisplayable extends DisplayableData {
     /** flag for a time sequence */
     private boolean isTimeSequence = false;
 
-    /** _more_ */
+    /** the missing alt value */
     private Real missingAlt;
 
     /**
@@ -595,13 +590,13 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
-    /** _more_ */
+    /** ob counter */
     private int obCounter = 0;
 
-    /** _more_ */
+    /** time counter */
     private int timeCounter = 0;
 
-    /** _more_ */
+    /** array counter */
     private int geometryArrayCounter = 0;
 
     /**
@@ -945,12 +940,12 @@ public class StationModelDisplayable extends DisplayableData {
 
 
     /**
-     * _more_
+     * Process a KMZ file
      *
-     * @param ob _more_
-     * @param obShapes _more_
+     * @param ob  the ob
+     * @param obShapes  the ob shaped
      *
-     * @throws Exception _more_
+     * @throws Exception  problem
      */
     private void processKmz(PointOb ob, List<VisADGeometryArray> obShapes)
             throws Exception {
@@ -1027,12 +1022,16 @@ public class StationModelDisplayable extends DisplayableData {
 
         descSB.append("</table>");
         EarthLocation el = ob.getEarthLocation();
-        Element placemark = KmlUtil.placemark(kmlDoc, "", descSB.toString(),
-                                              el.getLatitude().getValue(visad.CommonUnit.degree),
-                                              el.getLongitude().getValue(visad.CommonUnit.degree),
-                                              (el.getAltitude()!=null?el.getAltitude().getValue():0), 
-                                              styleId);
-        KmlUtil.timestamp(placemark, ucar.visad.Util.makeDate(ob.getDateTime()));
+        Element placemark =
+            KmlUtil.placemark(
+                kmlDoc, "", descSB.toString(),
+                el.getLatitude().getValue(visad.CommonUnit.degree),
+                el.getLongitude().getValue(visad.CommonUnit.degree),
+                ((el.getAltitude() != null)
+                 ? el.getAltitude().getValue()
+                 : 0), styleId);
+        KmlUtil.timestamp(placemark,
+                          ucar.visad.Util.makeDate(ob.getDateTime()));
         KmlUtil.iconstyle(kmlDoc, styleId, file, 2.0);
         kmzObCounter++;
     }
@@ -2429,4 +2428,3 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 }
-

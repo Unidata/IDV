@@ -1,27 +1,22 @@
 /*
- * $Id: AnimationWidget.java,v 1.115 2007/03/22 10:54:39 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.visad.display;
 
@@ -72,10 +67,10 @@ import javax.swing.border.*;
  */
 public class AnimationWidget extends SharableImpl implements ActionListener {
 
-    /** _more_ */
+    /** count */
     static int cnt = 0;
 
-    /** _more_ */
+    /** instance count */
     int mycnt = cnt++;
 
     /** Do we show the big icon */
@@ -164,7 +159,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** Indicator (currently a JComboBox) */
     private JComboBox timesCbx = null;
 
-    /** _more_          */
+    /** is the times checkbox visible? */
     private boolean timesCbxVisible = true;
 
     /** mutex  for accessing the timesCbx */
@@ -277,9 +272,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
 
     /**
-     * _more_
+     * Show the date box
      *
-     * @param v _more_
+     * @param v  true to show
      */
     public void showDateBox(boolean v) {
         timesCbxVisible = v;
@@ -376,9 +371,10 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             return "/auxdata/ui/icons/control_end_blue.png";
         if(name.equals("FastForward"))
             return "/auxdata/ui/icons/control_fastforward_blue.png";
-        if(name.equals("Information"))
-            return "/auxdata/ui/icons/information.png";
         */
+        if (name.equals("Information") && !bigIcon) {
+            return "/auxdata/ui/icons/information.png";
+        }
         return "/auxdata/ui/icons/" + name + (bigIcon
                 ? "24"
                 : "16") + ".gif";
@@ -393,6 +389,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * @return  UI as a Component
      */
     private JComponent doMakeContents(boolean floatToolBar) {
+
         String      imgp     = "/auxdata/ui/icons/";
         KeyListener listener = new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -433,10 +430,10 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         };
         List buttonList = new ArrayList();
         buttonList.add(timesCbx);
-        Dimension  preferredSize = timesCbx.getPreferredSize();
-        if(preferredSize!=null) {
+        Dimension preferredSize = timesCbx.getPreferredSize();
+        if (preferredSize != null) {
             int height = preferredSize.height;
-            if(height<50) {
+            if (height < 50) {
                 JComponent filler = GuiUtils.filler(3, height);
                 buttonList.add(filler);
             }
@@ -493,14 +490,15 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         updateRunButton();
         return contents;
+
     }
 
 
 
     /**
-     * _more_
+     * Debug
      *
-     * @param msg _more_
+     * @param msg the message
      */
     private void debug(String msg) {
         //        System.err.println("anim:" + mycnt + " " +Thread.currentThread() +" " + msg);
@@ -1239,4 +1237,3 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         frame.setVisible(true);
     }
 }
-

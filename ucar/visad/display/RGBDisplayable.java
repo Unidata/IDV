@@ -1,25 +1,22 @@
 /*
- * $Id: RGBDisplayable.java,v 1.58 2006/06/16 17:55:26 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.visad.display;
 
@@ -179,8 +176,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     public RGBDisplayable(String name, RealType rgbRealType,
-                          boolean alphaflag) throws VisADException,
-                              RemoteException {
+                          boolean alphaflag)
+            throws VisADException, RemoteException {
         this(name, rgbRealType, null, alphaflag);
     }
 
@@ -199,9 +196,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     public RGBDisplayable(String name, RealType rgbRealType,
-                          float[][] colorPalette,
-                          boolean alphaflag) throws VisADException,
-                              RemoteException {
+                          float[][] colorPalette, boolean alphaflag)
+            throws VisADException, RemoteException {
 
         super(name);
 
@@ -237,8 +233,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected RGBDisplayable(RGBDisplayable that) throws VisADException,
-            RemoteException {
+    protected RGBDisplayable(RGBDisplayable that)
+            throws VisADException, RemoteException {
 
         super(that);
         colorPalette   = that.colorPalette;
@@ -258,8 +254,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void setRGBRealType(RealType realType) throws RemoteException,
-            VisADException {
+    protected void setRGBRealType(RealType realType)
+            throws RemoteException, VisADException {
 
         if ( !realType.equals(rgbRealType)) {
             RealType oldValue = rgbRealType;
@@ -312,8 +308,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      *                          has not been set or its ScalarMap is alread in
      *                          the set.
      */
-    protected void setScalarMaps(
-            ScalarMapSet maps) throws BadMappingException {
+    protected void setScalarMaps(ScalarMapSet maps)
+            throws BadMappingException {
 
         if (colorMap == null) {
             throw new BadMappingException(getClass().getName()
@@ -341,8 +337,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException  if a core VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    public void setColorPalette(
-            float[][] colorPalette) throws RemoteException, VisADException {
+    public void setColorPalette(float[][] colorPalette)
+            throws RemoteException, VisADException {
         if (colorControl != null) {
             colorControl.setTable(colorPalette);
         }
@@ -373,11 +369,11 @@ public abstract class RGBDisplayable extends DisplayableData {
                                     ? 4
                                     : 3][len];
         for (int m = 0; m < len; m++) {
-            table[0][m] = color.getRed() / 255.f;    // Red amount  
-            table[1][m] = color.getGreen() / 255.f;  // Green
-            table[2][m] = color.getBlue() / 255.f;   // Blue  
-            if(alphaflag) {
-                table[3][m] = color.getAlpha() / 255.f;   // alpha
+            table[0][m] = color.getRed() / 255.f;        // Red amount  
+            table[1][m] = color.getGreen() / 255.f;      // Green
+            table[2][m] = color.getBlue() / 255.f;       // Blue  
+            if (alphaflag) {
+                table[3][m] = color.getAlpha() / 255.f;  // alpha
             }
         }
         setColorPalette(table);
@@ -389,8 +385,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException  if a core VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    public final void setGreyPalette() throws RemoteException,
-            VisADException {
+    public final void setGreyPalette()
+            throws RemoteException, VisADException {
 
         if (colorControl != null) {
             colorControl.initGreyWedge();
@@ -404,8 +400,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException  if a core VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    public final void setVisADPalette() throws RemoteException,
-            VisADException {
+    public final void setVisADPalette()
+            throws RemoteException, VisADException {
 
         if (colorControl != null) {
             colorControl.initVis5D();
@@ -424,8 +420,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setRange(double low,
-                         double hi) throws VisADException, RemoteException {
+    public void setRange(double low, double hi)
+            throws VisADException, RemoteException {
 
         setRangeForColor(low, hi);
     }
@@ -444,9 +440,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @exception VisADException   VisAD failure.
      * @exception RemoteException  Java RMI failure.
      */
-    public void setRangeForColor(double low,
-                                 double hi) throws VisADException,
-                                     RemoteException {
+    public void setRangeForColor(double low, double hi)
+            throws VisADException, RemoteException {
         lowRange  = low;
         highRange = hi;
         if ((colorMap != null) && hasRange() && !getAutoScaleColorRange()) {
@@ -483,9 +478,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    private void applyUnit(ScalarMap colorMap,
-                           RealType rgbRealType) throws VisADException,
-                               RemoteException {
+    private void applyUnit(ScalarMap colorMap, RealType rgbRealType)
+            throws VisADException, RemoteException {
         if (useDisplayUnitForColor()) {
             applyDisplayUnit(colorMap, rgbRealType);
         } else {
@@ -502,8 +496,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setDisplayUnit(Unit unit) throws VisADException,
-            RemoteException {
+    public void setDisplayUnit(Unit unit)
+            throws VisADException, RemoteException {
         if (useDisplayUnitForColor()) {
             //Make sure this unit is ok
             checkUnit(rgbRealType, unit);
@@ -526,8 +520,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setColorUnit(Unit unit) throws VisADException,
-            RemoteException {
+    public void setColorUnit(Unit unit)
+            throws VisADException, RemoteException {
         if ( !useDisplayUnitForColor()) {
             //Make sure this unit is ok
             checkUnit(rgbRealType, unit);
@@ -558,8 +552,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setPolygonMode(int polygonMode) throws VisADException,
-            RemoteException {
+    public void setPolygonMode(int polygonMode)
+            throws VisADException, RemoteException {
         this.polygonMode = polygonMode;
         addConstantMap(
             new ConstantMap(
@@ -611,8 +605,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setCurvedSize(int curvedSize) throws VisADException,
-            RemoteException {
+    public void setCurvedSize(int curvedSize)
+            throws VisADException, RemoteException {
         this.curvedSize = curvedSize;
         addConstantMap(makeCurvedSizeMap(curvedSize));
     }
@@ -626,8 +620,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    protected ConstantMap makeCurvedSizeMap(
-            int curvedSize) throws VisADException, RemoteException {
+    protected ConstantMap makeCurvedSizeMap(int curvedSize)
+            throws VisADException, RemoteException {
         return new ConstantMap(curvedSize, Display.CurvedSize);
     }
 
@@ -663,9 +657,8 @@ public abstract class RGBDisplayable extends DisplayableData {
 
         colorMap.addScalarMapListener(new ScalarMapListener() {
 
-            public void controlChanged(
-                    ScalarMapControlEvent event) throws RemoteException,
-                        VisADException {
+            public void controlChanged(ScalarMapControlEvent event)
+                    throws RemoteException, VisADException {
 
                 int id = event.getId();
 
@@ -683,10 +676,10 @@ public abstract class RGBDisplayable extends DisplayableData {
                 }
             }
 
-            public void mapChanged(
-                    ScalarMapEvent event) throws RemoteException,
-                        VisADException {
-                if ((event.getId() == event.AUTO_SCALE) && hasRange() && !getAutoScaleColorRange()) {
+            public void mapChanged(ScalarMapEvent event)
+                    throws RemoteException, VisADException {
+                if ((event.getId() == event.AUTO_SCALE) && hasRange()
+                        && !getAutoScaleColorRange()) {
                     colorMap.setRange(lowRange, highRange);
                 }
             }
@@ -703,8 +696,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void setSelectRealType(
-            RealType realType) throws RemoteException, VisADException {
+    protected void setSelectRealType(RealType realType)
+            throws RemoteException, VisADException {
 
         if ( !realType.equals(selectRealType)) {
             RealType oldValue = selectRealType;
@@ -742,9 +735,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setSelectedRange(double low,
-                                 double hi) throws VisADException,
-                                     RemoteException {
+    public void setSelectedRange(double low, double hi)
+            throws VisADException, RemoteException {
 
         lowSelectedRange  = low;
         highSelectedRange = hi;
@@ -764,9 +756,8 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setRangeForSelect(double low,
-                                  double hi) throws VisADException,
-                                      RemoteException {
+    public void setRangeForSelect(double low, double hi)
+            throws VisADException, RemoteException {
 
         minSelect = low;
         maxSelect = hi;
@@ -806,12 +797,12 @@ public abstract class RGBDisplayable extends DisplayableData {
      */
     public void setAutoScaleColorRange(boolean yesno) {
         autoScaleColorRange = yesno;
-        if (colorMap != null)  {
+        if (colorMap != null) {
             if (autoScaleColorRange) {
                 colorMap.resetAutoScale();
             } else if (hasRange()) {
                 try {
-                colorMap.setRange(lowRange, highRange);
+                    colorMap.setRange(lowRange, highRange);
                 } catch (Exception ve) {}
             }
         }
@@ -822,7 +813,7 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @return true if autoscaling  is on
      */
     public boolean getAutoScaleColorRange() {
-        return  autoScaleColorRange;
+        return autoScaleColorRange;
     }
 
     /**
@@ -845,9 +836,8 @@ public abstract class RGBDisplayable extends DisplayableData {
 
         selectMap.addScalarMapListener(new ScalarMapListener() {
 
-            public void controlChanged(
-                    ScalarMapControlEvent event) throws RemoteException,
-                        VisADException {
+            public void controlChanged(ScalarMapControlEvent event)
+                    throws RemoteException, VisADException {
 
                 int id = event.getId();
 
@@ -862,9 +852,8 @@ public abstract class RGBDisplayable extends DisplayableData {
                 }
             }
 
-            public void mapChanged(
-                    ScalarMapEvent event) throws RemoteException,
-                        VisADException {
+            public void mapChanged(ScalarMapEvent event)
+                    throws RemoteException, VisADException {
                 if ((event.getId() == event.AUTO_SCALE)
                         && hasSelectMinMax()) {
                     selectMap.setRange(minSelect, maxSelect);
@@ -877,4 +866,3 @@ public abstract class RGBDisplayable extends DisplayableData {
     }
 
 }
-

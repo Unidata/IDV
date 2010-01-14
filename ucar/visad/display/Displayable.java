@@ -1,31 +1,22 @@
 /*
- * $Id: Displayable.java,v 1.76 2007/08/22 11:54:33 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
-
-
 
 package ucar.visad.display;
 
@@ -107,7 +98,7 @@ public abstract class Displayable {
     /** Should the renders display as points */
     private boolean pointMode = false;
 
-    /** _more_ */
+    /** are we destroyed? */
     private boolean destroyed = false;
 
     /**
@@ -167,7 +158,7 @@ public abstract class Displayable {
     /** The display master. May be null */
     private DisplayMaster displayMaster;
 
-    /** _more_ */
+    /** the animation set */
     private Set animationSet = null;
 
 
@@ -253,8 +244,8 @@ public abstract class Displayable {
      *
      * @param master The {@link DisplayMaster} this displayable is part of.
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     protected void setDisplayMaster(DisplayMaster master)
             throws VisADException, RemoteException {
@@ -859,10 +850,10 @@ public abstract class Displayable {
 
 
     /**
-     * _more_
+     * Destroy this instance
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     public void destroyDisplayable() throws RemoteException, VisADException {
         if ( !destroyed) {
@@ -872,9 +863,9 @@ public abstract class Displayable {
 
 
     /**
-     * _more_
+     * Are we destroyed?
      *
-     * @return _more_
+     * @return  true if we are
      */
     public boolean getDestroyed() {
         return destroyed;
@@ -1350,10 +1341,8 @@ public abstract class Displayable {
      * this instance adapts such an object but the object is unset, or if this
      * instance does not support this type.
      *
-     * <p>This implementation always returns null.
-     *
      * @param  aniType          The type used for animation
-     * @param force _more_
+     * @param force             force the calculation
      * @return                  The set of times from all data
      *                          May be <code>null</code>.
      * @throws VisADException   if a VisAD failure occurs.
@@ -1367,9 +1356,9 @@ public abstract class Displayable {
 
 
     /**
-     * _more_
+     * Set an alternate animation set
      *
-     * @param set _more_
+     * @param set  the set
      */
     public void setOverrideAnimationSet(Set set) {
         animationSet = set;
@@ -1377,12 +1366,12 @@ public abstract class Displayable {
 
 
     /**
-     * _more_
+     * Set the animation set with a list of DateTimes
      *
-     * @param times _more_
+     * @param times  the times
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     public void setOverrideAnimationSet(List times)
             throws RemoteException, VisADException {
@@ -1420,4 +1409,3 @@ public abstract class Displayable {
 
 
 }
-

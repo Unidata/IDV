@@ -1,20 +1,18 @@
 /*
- * $Id: AreaProbe.java,v 1.4 2005/05/13 18:34:36 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,13 +21,13 @@
 package ucar.visad.display;
 
 
+import visad.*;
+
+
 
 import java.beans.PropertyChangeEvent;
 
 import java.rmi.RemoteException;
-
-
-import visad.*;
 
 
 import java.util.Iterator;
@@ -72,8 +70,8 @@ public class AreaProbe extends SelectorDisplayable {
      */
     public AreaProbe() throws VisADException, RemoteException {
         //        this (new RealTuple(getAreaType (),  new double[]{ 0, 0, 0, 0 }));
-        this(new RealTuple(getAreaType(),
-                           new double[]{ -0.9, -0.9, 0.9, 0.9 }));
+        this(new RealTuple(getAreaType(), new double[] { -0.9, -0.9, 0.9,
+                0.9 }));
     }
 
     /**
@@ -125,9 +123,9 @@ public class AreaProbe extends SelectorDisplayable {
 
 
         ulPoint.addConstantMap(new ConstantMap(constant.getValue(),
-                                               Display.ZAxis));
+                Display.ZAxis));
         lrPoint.addConstantMap(new ConstantMap(constant.getValue(),
-                                               Display.ZAxis));
+                Display.ZAxis));
         box.addConstantMap(new ConstantMap(constant.getValue(),
                                            Display.ZAxis));
 
@@ -192,8 +190,8 @@ public class AreaProbe extends SelectorDisplayable {
     private double[] getValues() throws VisADException, RemoteException {
         Real[] ulReals = ulPoint.getPoint().getRealComponents();
         Real[] lrReals = lrPoint.getPoint().getRealComponents();
-        return new double[]{ ulReals[0].getValue(), ulReals[1].getValue(),
-                             lrReals[0].getValue(), lrReals[1].getValue() };
+        return new double[] { ulReals[0].getValue(), ulReals[1].getValue(),
+                              lrReals[0].getValue(), lrReals[1].getValue() };
 
     }
 
@@ -240,8 +238,8 @@ public class AreaProbe extends SelectorDisplayable {
      */
     public void setPosition(double x1, double y1, double x2, double y2)
             throws VisADException, RemoteException {
-        setPosition(new RealTuple(getAreaType(), new double[]{ x1, y1, x2,
-                                                               y2 }));
+        setPosition(new RealTuple(getAreaType(), new double[] { x1, y1, x2,
+                y2 }));
     }
 
     /**
@@ -271,13 +269,13 @@ public class AreaProbe extends SelectorDisplayable {
             ulPoint.setPoint(
                 new RealTuple(
                     RealTupleType.SpatialCartesian2DTuple,
-                    new double[]{ values[0].getValue(),
-                                  values[1].getValue() }));
+                    new double[] { values[0].getValue(),
+                                   values[1].getValue() }));
             lrPoint.setPoint(
                 new RealTuple(
                     RealTupleType.SpatialCartesian2DTuple,
-                    new double[]{ values[2].getValue(),
-                                  values[3].getValue() }));
+                    new double[] { values[2].getValue(),
+                                   values[3].getValue() }));
 
             setLinePosition();
         } finally {
@@ -318,8 +316,3 @@ public class AreaProbe extends SelectorDisplayable {
 
 
 }
-
-
-
-
-

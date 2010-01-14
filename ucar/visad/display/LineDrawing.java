@@ -1,20 +1,18 @@
 /*
- * $Id: LineDrawing.java,v 1.21 2006/02/09 23:44:16 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,13 +21,15 @@
 package ucar.visad.display;
 
 
-
-import java.rmi.RemoteException;
-
 import visad.*;
+
 import visad.java2d.*;
 
 import java.awt.Color;
+
+
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -228,7 +228,7 @@ public class LineDrawing extends DisplayableData {
             { (float) hue }, { (float) saturation }, { (float) value }
         });
 
-        setRGB(new float[]{ rgb[0][0], rgb[1][0], rgb[2][0] });
+        setRGB(new float[] { rgb[0][0], rgb[1][0], rgb[2][0] });
     }
 
     /**
@@ -259,7 +259,7 @@ public class LineDrawing extends DisplayableData {
         synchronized (this) {
             oldValue = myColor;
 
-            addConstantMaps(new ConstantMap[]{
+            addConstantMaps(new ConstantMap[] {
                 new ConstantMap(color.getRed() / 255., Display.Red),
                 new ConstantMap(color.getGreen() / 255., Display.Green),
                 new ConstantMap(color.getBlue() / 255., Display.Blue),

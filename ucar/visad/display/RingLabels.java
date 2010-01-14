@@ -1,20 +1,18 @@
 /*
- * $Id: RingLabels.java,v 1.6 2005/05/13 18:34:45 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,14 +23,14 @@ package ucar.visad.display;
 
 import visad.*;
 
-import java.rmi.RemoteException;
-
-import java.util.Arrays;
-
 import java.awt.Color;
+
+import java.rmi.RemoteException;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import java.util.Arrays;
 
 
 /**
@@ -74,9 +72,10 @@ public class RingLabels extends TextDisplayable {
      */
     public RingLabels(String name, RealTupleType polarType, Color color)
             throws RemoteException, VisADException {
-        this(name, polarType, new Real(
-            (RealType) polarType.getComponent(
-                PolarLineDrawing.getBearingIndex(polarType)), 0), color);
+        this(name, polarType,
+             new Real(
+                 (RealType) polarType.getComponent(
+                     PolarLineDrawing.getBearingIndex(polarType)), 0), color);
 
     }
 
@@ -91,7 +90,8 @@ public class RingLabels extends TextDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public RingLabels(String name, RealTupleType polarType, Real bearing, Color color)
+    public RingLabels(String name, RealTupleType polarType, Real bearing,
+                      Color color)
             throws RemoteException, VisADException {
         //super(TextType.getTextType(name));
         super(RealType.getRealType(name));
@@ -178,7 +178,7 @@ public class RingLabels extends TextDisplayable {
             throws VisADException, RemoteException {
         setLabelValues(new Gridded1DSet(rangeType, new float[][] {
             values
-        }, values.length, (CoordinateSystem) null, new Unit[]{ units },
+        }, values.length, (CoordinateSystem) null, new Unit[] { units },
            (ErrorEstimate[]) null));
     }
 
@@ -194,10 +194,9 @@ public class RingLabels extends TextDisplayable {
     public void setLabelValues(Real rangeInc, Real rangeMax)
             throws VisADException, RemoteException {
         float min = (float) rangeInc.getValue(labelUnit);
-        float[] values =
-            Contour2D.intervalToLevels(min, min,
-                                       (float) rangeMax.getValue(labelUnit),
-                                       min, new boolean[]{ false });
+        float[] values = Contour2D.intervalToLevels(min, min,
+                             (float) rangeMax.getValue(labelUnit), min,
+                             new boolean[] { false });
         if (values != null) {
             setLabelValues(values, labelUnit);
         } else {
@@ -235,10 +234,10 @@ public class RingLabels extends TextDisplayable {
             return;
         }
         float bear = (float) bearing.getValue(bearingType.getDefaultUnit());
-        int   numLabels = values.getLength();
+        int numLabels = values.getLength();
         float[][] ranges = Unit.convertTuple(values.getSamples(),
                                              values.getSetUnits(),
-                                             new Unit[]{ labelUnit });
+                                             new Unit[] { labelUnit });
 
         float[] bearings = new float[numLabels];
         Arrays.fill(bearings, bear);
@@ -256,11 +255,10 @@ public class RingLabels extends TextDisplayable {
                              (CoordinateSystem) null,
                              (PolarLineDrawing.getBearingIndex(polarType)
                               == 0)
-                             ? new Unit[]{ bearingType.getDefaultUnit(),
-                                           labelUnit }
-                             : new Unit[]{ labelUnit,
-                                           bearingType
-                                               .getDefaultUnit() }, (ErrorEstimate[]) null);
+                             ? new Unit[] { bearingType.getDefaultUnit(),
+                                            labelUnit }
+                             : new Unit[] { labelUnit, bearingType
+                                 .getDefaultUnit() }, (ErrorEstimate[]) null);
         ScalarType   type       = getTextType();
         FunctionType ft         = new FunctionType(polarType, type);
         FieldImpl    labelField = new FieldImpl(ft, domain);
@@ -275,11 +273,11 @@ public class RingLabels extends TextDisplayable {
         } else if (type instanceof RealType) {
             labels = new Real[numLabels];
             for (int i = 0; i < numLabels; i++) {
-                labels[i] = (Unit.canConvert(
-                    ((RealType) type).getDefaultUnit(), labelUnit) == true)
-                            ? new Real((RealType) type, ranges[0][i],
-                                       labelUnit)
-                            : new Real((RealType) type, ranges[0][i]);
+                labels[i] =
+                    (Unit.canConvert(((RealType) type).getDefaultUnit(),
+                                     labelUnit) == true)
+                    ? new Real((RealType) type, ranges[0][i], labelUnit)
+                    : new Real((RealType) type, ranges[0][i]);
             }
         }
         labelField.setSamples(labels, false);

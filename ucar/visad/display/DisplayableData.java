@@ -1,27 +1,22 @@
 /*
- * $Id: DisplayableData.java,v 1.55 2007/08/22 11:54:34 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.visad.display;
 
@@ -539,7 +534,9 @@ public class DisplayableData extends Displayable {
      * @throws RemoteException  Java RMI failure.
      */
     protected void destroy() throws RemoteException, VisADException {
-        if(getDestroyed()) return;
+        if (getDestroyed()) {
+            return;
+        }
         if ((changeListener != null) && (reference != null)) {
             changeListener.removeReference(reference);
         }
@@ -717,9 +714,9 @@ public class DisplayableData extends Displayable {
 
 
     /**
-     * _more_
+     * Print out my name
      *
-     * @return _more_
+     * @return  my name
      */
     public String showme() {
         return getClass().getName();
@@ -759,7 +756,7 @@ public class DisplayableData extends Displayable {
      * instance does not support this type.
      *
      * @param  aniType          The type used for animation
-     * @param force _more_
+     * @param force             true to force
      * @return                  The set of times from all data
      *                          May be <code>null</code>.
      * @throws VisADException   if a VisAD failure occurs.
@@ -863,20 +860,20 @@ public class DisplayableData extends Displayable {
     }
 
 
-    /** _more_          */
+    /** a drag adapter */
     private DragAdapter dragAdapter;
 
     /**
-     * _more_
+     * Set the drag adapter
      *
-     * @param dragAdapter _more_
+     * @param dragAdapter the drag adapter
      */
     public void setDragAdapter(DragAdapter dragAdapter) {
         this.dragAdapter = dragAdapter;
     }
 
     /**
-     * DragAdapter _more_
+     * DragAdapter 
      *
      *
      * @author IDV Development Team
@@ -884,35 +881,34 @@ public class DisplayableData extends Displayable {
     public interface DragAdapter {
 
         /**
-         * _more_
+         * Handle a mouse drag
          *
-         * @param ray _more_
-         * @param first _more_
-         * @param mouseModifiers _more_
+         * @param ray   the ray
+         * @param first is this the first
+         * @param mouseModifiers mouse modifiers
          *
-         * @return _more_
+         * @return  okay or not
          */
         public boolean handleDragDirect(VisADRay ray, boolean first,
                                         int mouseModifiers);
 
         /**
-         * _more_
+         * Handle adding a point
          *
-         * @param x _more_
+         * @param x  the points
          *
-         * @return _more_
+         * @return  okay or not
          */
         public boolean handleAddPoint(float[] x);
 
         /**
-         * _more_
+         * Constraing the drag point
          *
-         * @param x _more_
+         * @param x  the point
          *
-         * @return _more_
+         * @return true if constrained
          */
         public boolean constrainDragPoint(float[] x);
     }
 
 }
-

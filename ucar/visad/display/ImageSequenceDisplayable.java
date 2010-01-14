@@ -1,20 +1,18 @@
 /*
- * $Id: ImageSequenceDisplayable.java,v 1.27 2006/08/23 22:06:38 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,20 +21,23 @@
 package ucar.visad.display;
 
 
-
-import java.rmi.RemoteException;
-
-import java.util.*;
-
 import visad.*;
+
 import visad.bom.ImageRendererJ3D;
 
-import visad.java2d.DisplayRendererJ2D;
 import visad.java2d.DefaultRendererJ2D;
+
+import visad.java2d.DisplayRendererJ2D;
 
 import visad.meteorology.*;
 
 import visad.util.DataUtility;
+
+
+
+import java.rmi.RemoteException;
+
+import java.util.*;
 
 
 /**
@@ -77,7 +78,8 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public ImageSequenceDisplayable(String name, RealType imageType, float[][] initialColorPalette)
+    public ImageSequenceDisplayable(String name, RealType imageType,
+                                    float[][] initialColorPalette)
             throws VisADException, RemoteException {
         super(name, imageType, initialColorPalette,
               ((initialColorPalette != null)
@@ -122,7 +124,7 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
      * @throws VisADException On badness
      */
     public void setAlpha(float alpha) throws RemoteException, VisADException {
-        addConstantMaps(new ConstantMap[]{
+        addConstantMaps(new ConstantMap[] {
             new ConstantMap(alpha, Display.Alpha) });
     }
 
@@ -262,7 +264,8 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
      */
     public void setReUseScenes(boolean on)
             throws RemoteException, VisADException {
-        if ((myRenderer != null) && (myRenderer instanceof ImageRendererJ3D)) {
+        if ((myRenderer != null)
+                && (myRenderer instanceof ImageRendererJ3D)) {
             myRenderer.setReUseFrames(on);
         }
     }

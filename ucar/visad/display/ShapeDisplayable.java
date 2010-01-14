@@ -1,20 +1,18 @@
 /*
- * $Id: ShapeDisplayable.java,v 1.7 2007/08/16 14:02:39 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,9 +21,10 @@
 package ucar.visad.display;
 
 
-import visad.*;
-
 import ucar.visad.ShapeUtility;
+
+
+import visad.*;
 
 import java.rmi.RemoteException;
 
@@ -48,7 +47,7 @@ public class ShapeDisplayable extends LineDrawing {
     private VisADGeometryArray marker;
 
     /** marker used for point */
-    private VisADGeometryArray []markers;
+    private VisADGeometryArray[] markers;
 
     /** shape ScalarMap */
     private ScalarMap shapeMap = null;
@@ -88,9 +87,8 @@ public class ShapeDisplayable extends LineDrawing {
             throws VisADException, RemoteException {
         this(name, marker,
              new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                           new double[]{ 0,
-                                         0,
-                                         0 }));
+                           new double[] { 0,
+                                          0, 0 }));
     }
 
 
@@ -149,7 +147,8 @@ public class ShapeDisplayable extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public ShapeDisplayable(String name, String markerText, RealTuple initialValue)
+    public ShapeDisplayable(String name, String markerText,
+                            RealTuple initialValue)
             throws VisADException, RemoteException {
         this(name, ShapeUtility.shapeText(markerText), initialValue);
     }
@@ -167,7 +166,8 @@ public class ShapeDisplayable extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public ShapeDisplayable(String name, VisADGeometryArray marker, RealTuple initialValue)
+    public ShapeDisplayable(String name, VisADGeometryArray marker,
+                            RealTuple initialValue)
             throws VisADException, RemoteException {
 
         super(name);
@@ -262,12 +262,12 @@ public class ShapeDisplayable extends LineDrawing {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setMarker(VisADGeometryArray marker, double x, double y, double z)
+    public void setMarker(VisADGeometryArray marker, double x, double y,
+                          double z)
             throws VisADException, RemoteException {
         RealTuple loc = new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                                      new double[]{ x,
-                                                    y,
-                                                    z });
+                                      new double[] { x,
+                y, z });
 
         setMarker(marker);
         setPoint(loc);
@@ -287,9 +287,8 @@ public class ShapeDisplayable extends LineDrawing {
     public void setPoint(double x, double y, double z)
             throws VisADException, RemoteException {
         RealTuple loc = new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                                      new double[]{ x,
-                                                    y,
-                                                    z });
+                                      new double[] { x,
+                y, z });
 
         setPoint(loc);
     }
@@ -312,10 +311,18 @@ public class ShapeDisplayable extends LineDrawing {
     }
 
 
-    public void setMarker(VisADGeometryArray []marker)
+    /**
+     * Set the marker
+     *
+     * @param marker  the marker as a geometry array
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
+     */
+    public void setMarker(VisADGeometryArray[] marker)
             throws VisADException, RemoteException {
         if (shapeControl != null) {
-            shapeControl.setShapes( marker);
+            shapeControl.setShapes(marker);
         }
         this.markers = marker;
     }
@@ -410,17 +417,17 @@ public class ShapeDisplayable extends LineDrawing {
     private void setShapesInControl() throws VisADException, RemoteException {
         if (shapeControl != null) {
             shapeControl.setShapeSet(
-                                     //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
-                                     new Integer1DSet(shapeType, 1));
-            if (marker != null) { 
+            //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
+            new Integer1DSet(shapeType, 1));
+            if (marker != null) {
                 shapeControl.setShapeSet(
-                                         //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
-                                         new Integer1DSet(shapeType, 1));
-                shapeControl.setShapes(new VisADGeometryArray[]{ marker });
-            } else if(markers!=null) {
+                //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
+                new Integer1DSet(shapeType, 1));
+                shapeControl.setShapes(new VisADGeometryArray[] { marker });
+            } else if (markers != null) {
                 shapeControl.setShapeSet(
-                                         //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
-                                         new Integer1DSet(shapeType, markers.length));
+                //new Gridded1DSet(shapeType, new float[][] {{0.0f}}, 1));
+                new Integer1DSet(shapeType, markers.length));
                 shapeControl.setShapes(markers);
             }
         }

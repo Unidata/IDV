@@ -1,26 +1,22 @@
 /*
- * $Id: StationLocationDisplayable.java,v 1.22 2006/09/05 19:16:13 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.visad.display;
 
@@ -74,7 +70,7 @@ import java.util.List;
  */
 public class StationLocationDisplayable extends StationModelDisplayable {
 
-    /** _more_ */
+    /** counter */
     static Counter counter = new Counter();
 
     /** The identifier for a station identifier */
@@ -291,10 +287,10 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
 
     /**
-     * _more_
+     * Destroy this instance
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     protected void destroy() throws RemoteException, VisADException {
         if (getDestroyed()) {
@@ -721,4 +717,3 @@ public class StationLocationDisplayable extends StationModelDisplayable {
 
 
 }
-

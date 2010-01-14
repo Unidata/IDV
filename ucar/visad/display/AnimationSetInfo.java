@@ -1,20 +1,18 @@
 /*
- * $Id: AnimationSetInfo.java,v 1.19 2007/07/25 21:02:53 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,21 +21,23 @@
 package ucar.visad.display;
 
 
-import java.rmi.RemoteException;
-
-import visad.VisADException;
-import visad.DateTime;
-import visad.Set;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import visad.DateTime;
+import visad.Set;
+
+import visad.VisADException;
+
 import java.awt.*;
+
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -66,8 +66,7 @@ public class AnimationSetInfo {
 
     /** Mode for constructing set */
     public static String[] STARTMODELABELS = { "Use Minimum Time from All Data",
-                                               "Current Time (Now)", "Fixed",
-                                               "Relative to End Time" };
+            "Current Time (Now)", "Fixed", "Relative to End Time" };
 
 
     /** Mode for constructing set */
@@ -108,6 +107,7 @@ public class AnimationSetInfo {
     /** Minutes to round to */
     private double roundTo = 1.0;
 
+    /** _more_          */
     private Set baseTimes;
 
 
@@ -145,13 +145,15 @@ public class AnimationSetInfo {
      * @return Rounded value
      */
     private double round(double seconds) {
-	return roundTo(roundTo, seconds);
+        return roundTo(roundTo, seconds);
     }
 
 
     /**
      * Utility to round the given seconds
      *
+     *
+     * @param roundTo _more_
      * @param seconds time to round
      *
      * @return Rounded value
@@ -165,12 +167,22 @@ public class AnimationSetInfo {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param times _more_
+     */
     protected void setBaseTimes(Set times) {
-	this.baseTimes = times;
+        this.baseTimes = times;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected Set getBaseTimes() {
-	return this.baseTimes;
+        return this.baseTimes;
     }
 
 
@@ -187,17 +199,26 @@ public class AnimationSetInfo {
      */
     protected Set makeTimeSet(DisplayMaster displayMaster)
             throws VisADException, RemoteException {
+
         List       dateTimes    = new ArrayList();
 
-        long       now = (long) (System.currentTimeMillis() / 1000.0);
+        long       now          = (long) (System.currentTimeMillis()
+                                          / 1000.0);
         double     startSeconds = 0.0;
         double     endSeconds   = 0.0;
         double[][] dataTimeSet  = null;
 
         //        System.err.println ("makeTimeSet " + baseTimes + " " + displayMaster);
-        if ((startMode == TIMEMODE_DATA || endMode == TIMEMODE_DATA)) {
-            Set timeSet = (baseTimes!=null?baseTimes:(displayMaster!=null?displayMaster.getAnimationSetFromDisplayables():null));
-            if(timeSet == null) return null;
+        if (((startMode == TIMEMODE_DATA) || (endMode == TIMEMODE_DATA))) {
+            Set timeSet = ((baseTimes != null)
+                           ? baseTimes
+                           : ((displayMaster != null)
+                              ? displayMaster
+                                  .getAnimationSetFromDisplayables()
+                              : null));
+            if (timeSet == null) {
+                return null;
+            }
             dataTimeSet = timeSet.getDoubles();
             if ((dataTimeSet == null) || (dataTimeSet.length == 0)
                     || (dataTimeSet[0].length == 0)) {
@@ -211,7 +232,7 @@ public class AnimationSetInfo {
         }
 
         if (startMode == TIMEMODE_DATA) {
-            if(dataTimeSet!=null) {
+            if (dataTimeSet != null) {
                 double minValue = dataTimeSet[0][0];
                 for (int i = 1; i < dataTimeSet[0].length; i++) {
                     minValue = Math.min(minValue, dataTimeSet[0][i]);
@@ -227,7 +248,7 @@ public class AnimationSetInfo {
         }
 
         if (endMode == TIMEMODE_DATA) {
-            if(dataTimeSet!=null) {
+            if (dataTimeSet != null) {
                 double maxValue = dataTimeSet[0][0];
                 for (int i = 1; i < dataTimeSet[0].length; i++) {
                     maxValue = Math.max(maxValue, dataTimeSet[0][i]);
@@ -269,8 +290,8 @@ public class AnimationSetInfo {
 
         double cnt = (int) ((double) (endSeconds - startSeconds)) / interval;
         if (cnt > 10000) {
-            throw new IllegalStateException("Too many times in animation set:"
-                                            + cnt);
+            throw new IllegalStateException(
+                "Too many times in animation set:" + cnt);
         }
         while (startSeconds <= endSeconds) {
             //      System.err.print (" " + startSeconds);
@@ -282,6 +303,7 @@ public class AnimationSetInfo {
             return null;
         }
         return makeTimeSet(dateTimes);
+
 
     }
 

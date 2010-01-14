@@ -1,26 +1,22 @@
 /*
- * $Id: LineProbe.java,v 1.20 2007/02/05 23:31:23 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.visad.display;
 
@@ -55,7 +51,7 @@ public class LineProbe extends SelectorDisplayable {
     /** flag for whether we're in the process of setting the position */
     private volatile boolean settingPosition = false;
 
-    /** _more_          */
+    /** fixed end point */
     private RealTuple fixedEndPoint;
 
 
@@ -118,14 +114,14 @@ public class LineProbe extends SelectorDisplayable {
     }
 
     /**
-     * _more_
+     * Create a new line probe
      *
-     * @param position _more_
-     * @param fixedEndPoint _more_
-     * @param constant _more_
+     * @param position  the starting position
+     * @param fixedEndPoint  a fixed end point
+     * @param constant  constant value
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
      */
     public LineProbe(RealTuple position, RealTuple fixedEndPoint,
                      Real constant)
@@ -195,9 +191,9 @@ public class LineProbe extends SelectorDisplayable {
     }
 
     /**
-     * _more_
+     * Get the selector point
      *
-     * @return _more_
+     * @return  the point
      */
     public SelectorPoint getSelectorPoint() {
         return point;
@@ -372,4 +368,3 @@ public class LineProbe extends SelectorDisplayable {
     }
 
 }
-
