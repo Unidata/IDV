@@ -769,7 +769,8 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     this.mouseClick = function(event) {
         left = util.getLeft(this.row);
         eventX = util.getEventX(event);
-        if(eventX-left<50) return;
+        //Don't pick up clicks on the left side
+        if(eventX-left<150) return;
         var url = "${urlroot}/entry/show?entryid=" + entryId +"&output=metadataxml";
 	util.loadXML( url, this.handleTooltip,this);
     }
