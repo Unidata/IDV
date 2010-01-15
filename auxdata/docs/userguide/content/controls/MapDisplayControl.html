@@ -18,9 +18,14 @@ New maps may be added through the [ug::menu Edit] menu. You can choose to add an
 maps available to the IDV or you can select a map file (e.g., a shape file)  from the
 file system.
 <p>
-The  [ug::menu Edit {Save  as the Default Map Preference}] menu item  allows you to save the current
+The  [ug::menu File {Default Maps} {Save  as the Default Map Preference}] menu item  allows you to save the current
 set of maps in a display as the default maps. When a new view window is created the maps that
-are saved as the default are used as the background maps.
+are saved as the default are used as the background maps. 
+<p><b>Note:</b> Once you save a set of maps as the default maps then every time your create a new display those maps and those maps only will be used.
+If you were to add a set of new maps using a plugin then those maps will not show up by default in your display.
+<p>
+To clear the default maps choose the menu item [ug::menu File {Default Maps} {Remove Local Map Defaults}] menu item  allows you to save the current
+
 }
 
 
@@ -29,12 +34,18 @@ This list shows the set of currently loaded maps. In this list you can remove a 
 its visibility, line width, style and color. The [ug::button Fast Rendering] button, when on,
 can save on rendering time by not checking for projection seam crossings. Note: some maps
 will display incorrectly when fast rendering is turned on.
+The &quot;plus&quot; icon on the right allows you to add the given map as a Map Data Source. This allows you to do
+display the given map in 3D draped over topography and/or do spatial analysis using the map (e.g., grid averages within a map).
+<p>
+The link button, when on, will apply any change to a particular map (e.g., color, line width) to all visible maps.
 }}
 
 
 { {Latitude/Longitude lines} {
 These controls allow you to display latitude and longitude lines. You can set the visibility,
 spacing, line width, line style and color.
+<p>
+The link button, when on, will apply any changes to a Lat or Lon line to the other line.
 }}
 
 
