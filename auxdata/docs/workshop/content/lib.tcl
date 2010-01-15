@@ -624,3 +624,4 @@ proc ug::head {title} {
 proc ug::foot {} {
     return "</body></html>"
 }
+
