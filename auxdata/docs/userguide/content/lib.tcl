@@ -396,10 +396,8 @@ list {Skip interval} "
 To avoid cluttering the display you can 
 define the number of grid points that are skipped
 with the [ht::command $widget] combo box.
-A skip interval of 0 mean show all vectors,  1 means skip every
-other vector,  2 means show every third vector, etc.
-This is also an editable box, enter  a new skip interval 
-and press return.
+A skip interval of 0 mean show all grid values,  1 means skip every
+other one,  2 means show every third one, etc.
 "
 }
 

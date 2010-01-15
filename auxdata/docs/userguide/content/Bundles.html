@@ -179,7 +179,7 @@ directory (this is a preference as well).
 also have implemented a &quot;Make Remote Data Local&quot; facility.    
 We can now, for most of the remote data types, move the data from the   
 server to the local disk. We support the ADDE types: satellite, radar,  
-point, sounding and forecast fronts. We also have preliminary support   
+point, sounding and forecast fronts. We also have support   
 for grids on remote servers (see below).                                
 
 <p> This is used in two ways. First, the user can right click on a data 
@@ -196,18 +196,11 @@ The user is prompted for both the local data sources to be saved off
 as well as for the remote data sources. For the remote ones the IDV     
 automatically copies the files over and zips them up.                   
 
-<p> Grids: We have preliminary support for grids. This relies on some   
-extra service information in the catalogs which, right at this moment,  
-is not included in the regular IDV gridded data catalog but is included 
-for model data under the &quot;File_Access&quot; dataset in the main    
-motherlode catalog: http://motherlode.ucar.edu:8080/thredds/catalog.xml 
 
 <p> When saving gridded data the user is prompted for the fields to     
 save and the geo-spatial subset is used to subset the grids. We do      
-not yet (though will soon) support sub-setting on times and grid        
+not yet  support sub-setting on times and grid        
 stride/decimation.                                                      
-
-
 
 
 
