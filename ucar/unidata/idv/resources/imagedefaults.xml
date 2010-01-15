@@ -1401,6 +1401,13 @@ Note: we can use place="default", etc., to use the default
      loc="1300 866"
      mag="-3 -3"/>
   <default
+     pattern="GLOBAL/*"
+     key="LINELE"
+     place="CENTER"
+     loc="2047 4096"
+     size="1024 2048"
+     mag="-4 -4"/>
+  <default
      pattern="nanuk.eosdis.nasa.gov:NANUK"
      compress="none"
      port="500"/>

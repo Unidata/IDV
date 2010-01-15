@@ -16,7 +16,7 @@ they essentially get it from their container type tag.
 
   <server name="adde.ucar.edu" active="true">
     <group
-       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO"
+       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL"
        type="image"/>
     <group
        names="RTNEXRAD"
