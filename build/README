@@ -22,8 +22,11 @@ That will run the build, generate the installers, move all relevant files
 (installers, docs, webstart) to conan.  The following directories will be
 created:
 
-/content/software/idv/<version>
-/content/downloads/idv/<version>
+/content/software/idv/<release_dir>
+/content/downloads/idv/<release_dir>
+
+where <release_dir> is the version number with underscores (e.g. version 2.8 will be
+in <release_dir> 2_8).
 
 Then (see below):
 
@@ -54,7 +57,7 @@ change the current link to point to the new release.
 Expand the javadoc
 
 cd /content/software/idv/<release>/docs
-jar xvf ~ftp/pub/idv/<version>/idv_javadoc_<version>.jar
+jar xvf ~ftp/pub/idv/<release_dir>/idv_javadoc_<version>.jar
 cd idv/docs
 mv javadoc ../..
 cd ../..
@@ -79,8 +82,8 @@ Once this is done, copy them to conan:
 ***********************************************************************
 Changing the index.html page
 
-cd /content/software/idv/<version>
-cp ../<previous_version>/index.html index.html.<version>
+cd /content/software/idv/<release_dir>
+cp ../<previous_release_dir>/index.html index.html.<release_dir>
 edit the index.html.<version> file and update the IDV News and Announcements
 section with information about the new release.
 cp index.html.<version> index.html
@@ -88,7 +91,7 @@ cp index.html.<version> index.html
 (If you have to redo the release, index.html will get overwritten.  That's why
 we make the edits in index.html.<version>)
 
-Open http://www.unidata.ucar.edu/software/idv/<version> in a web browser.
+Open http://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
 Test all the links to the docs.  Fix any broken links.
 
 ***********************************************************************
@@ -100,7 +103,7 @@ run:
 
 svn copy svn://zero/idv/trunk svn://zero/idv/branches/IDV_<version>
 
-where <version> is the version (no periods, e.g., 2_8).
+where <version> is the version (e.g., 2.8).
 
 ***********************************************************************
 Running the test suite
