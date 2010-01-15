@@ -39,6 +39,8 @@ import ucar.unidata.repository.util.Log4jPrintWriter;
 
 
 
+
+
 import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
@@ -54,6 +56,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.xml.XmlEncoder;
 
 
 
@@ -68,12 +71,14 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
+                
+
+import java.sql.ResultSetMetaData;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -820,7 +825,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @throws Exception _more_
      */
-    public void makeDatabaseCopy(OutputStream os, boolean all)
+    public void makeDatabaseCopyxxx(OutputStream os, boolean all)
             throws Exception {
 
         Connection connection = getConnection();
@@ -830,10 +835,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             ResultSet tables = dbmd.getTables(null, null, null,
                                    new String[] { "TABLE" });
 
+            ResultSetMetaData rsmd =  tables.getMetaData();
+            for(int col=1;col<=rsmd.getColumnCount();col++) {
+                System.err.println (rsmd.getColumnName(col));
+            }
             int totalRowCnt = 0;
             while (tables.next()) {
-                String tableName = tables.getString("Tables.NAME.NAME");
-                String tableType = tables.getString("Tables.TYPE.NAME");
+                //                String tableName = tables.getString("Tables.NAME.NAME");
+                //                String tableType = tables.getString("Tables.TYPE.NAME");
+                String tableName = tables.getString("TABLE_NAME");
+                String tableType = tables.getString("TABLE_TYPE");
                 if ((tableType == null) || Misc.equals(tableType, "INDEX")
                         || tableType.startsWith("SYSTEM")) {
                     continue;
@@ -899,7 +910,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             if (type == java.sql.Types.TIMESTAMP) {
                                 Timestamp ts = results.getTimestamp(i);
                                 //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
-                                value.append(HtmlUtil.squote(ts.toString()));
+                                if(ts==null) {
+                                    value.append("null");
+                                } else {
+                                    value.append(HtmlUtil.squote(ts.toString()));
+                                }
+
                             } else if (type == java.sql.Types.VARCHAR) {
                                 String s = results.getString(i);
                                 if (s != null) {
@@ -943,6 +959,141 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                                  + colNames + " values ");
                     IOUtil.write(os, StringUtil.join(",", valueList));
                     IOUtil.write(os, ";\n");
+                }
+            }
+        } finally {
+            closeConnection(connection);
+        }
+
+
+    }
+
+
+
+    private void write(DataOutputStream dos, Integer i) throws Exception {
+        if(i==null)
+            //            dos.writeInt(Integer.NaN);
+            dos.writeInt(-999999);
+        else
+            dos.writeInt(i.intValue());
+    }
+
+    private void write(DataOutputStream dos, long i) throws Exception {
+        dos.writeLong(i);
+    }
+
+    private void write(DataOutputStream dos, Double i) throws Exception {
+        if(i==null)
+            dos.writeDouble(Double.NaN);
+        else
+            dos.writeDouble(i.doubleValue());
+    }
+
+    private void write(DataOutputStream dos, String s) throws Exception {
+        if(s==null) {
+            dos.writeInt(-1);
+        } else {
+            dos.writeInt(s.length());
+            dos.write(s.getBytes());
+        }
+   }
+
+
+    public void makeDatabaseCopy(OutputStream os, boolean all)
+            throws Exception {
+        XmlEncoder encoder = new XmlEncoder();
+        DataOutputStream dos = new DataOutputStream(os);
+        Connection connection = getConnection();
+        try {
+            DatabaseMetaData dbmd     = connection.getMetaData();
+            ResultSet        catalogs = dbmd.getCatalogs();
+            ResultSet tables = dbmd.getTables(null, null, null,
+                                   new String[] { "TABLE" });
+
+            ResultSetMetaData rsmd =  tables.getMetaData();
+            for(int col=1;col<=rsmd.getColumnCount();col++) {
+                //                System.err.println (rsmd.getColumnName(col));
+            }
+            List<TableInfo> tableInfos = new ArrayList<TableInfo>();
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                String tableType = tables.getString("TABLE_TYPE");
+                if ((tableType == null) || Misc.equals(tableType, "INDEX")
+                        || tableType.startsWith("SYSTEM")) {
+                    continue;
+                }
+
+                String tn = tableName.toLowerCase();
+                if ( !all) {
+                    if (tn.equals(Tables.GLOBALS.NAME)
+                            || tn.equals(Tables.USERS.NAME)
+                            || tn.equals(Tables.PERMISSIONS.NAME)
+                            || tn.equals(Tables.HARVESTERS.NAME)
+                            || tn.equals(Tables.USERROLES.NAME)) {
+                        continue;
+                    }
+                }
+
+                ResultSet cols = dbmd.getColumns(null, null, tableName, null);
+                rsmd =  cols.getMetaData();
+                System.err.println (tn);
+                for(int col=1;col<=rsmd.getColumnCount();col++) {
+                    //                    System.err.println ("\t" +rsmd.getColumnName(col));
+                }
+
+                List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
+                while (cols.next()) {
+                    String colName = cols.getString("COLUMN_NAME");
+                    int type = cols.getInt("DATA_TYPE");
+                    String typeName = cols.getString("TYPE_NAME");
+                    int size = cols.getInt("COLUMN_SIZE");
+                    columns.add(new ColumnInfo(colName, typeName, type, size));
+                }
+                tableInfos.add(new TableInfo(tn, columns));
+            }
+            String xml = encoder.toXml(tableInfos);
+            write(dos,xml);
+
+            for(TableInfo tableInfo: tableInfos) {
+                List<ColumnInfo> columns = tableInfo.getColumns();
+                int              rowCnt    = 0;
+                List             valueList = new ArrayList();
+                Statement statement = execute("select * from " + tableInfo.getName(),
+                                          10000000, 0);
+                SqlUtil.Iterator iter = getIterator(statement);
+                ResultSet        results;
+                write(dos, (int)0);
+                write(dos, tableInfo.getName());
+                while ((results = iter.next()) != null) {
+                    while (results.next()) {
+                        write(dos, (int)1);
+                        rowCnt++;
+                        for(int i=1;i<=columns.size();i++) {
+                            ColumnInfo colInfo = columns.get(i-1);
+                            int type = colInfo.getType();
+                            if (type == java.sql.Types.TIMESTAMP) {
+                                Timestamp ts = results.getTimestamp(i);
+                                if(ts==null) {
+                                    write(dos,(long)-1);
+                                } else {
+                                    write(dos, (long)ts.getTime());
+                                }
+                            } else if (type == java.sql.Types.VARCHAR) {
+                                write(dos,results.getString(i));
+                            } else if(type == java.sql.Types.INTEGER) {
+                                write(dos,(Integer)results.getObject(i));
+                            } else if(type == java.sql.Types.DOUBLE) {
+                                write(dos,(Double)results.getObject(i));
+                            } else if(type == java.sql.Types.CLOB) {
+                                write(dos,results.getString(i));
+                            } else {
+                                Object object = results.getObject(i);
+                                if(rowCnt == 1) {
+                                    System.err.println ("Unknown type:" + type + "  c:" + object.getClass().getName());
+                                }
+                            }
+                        }
+                    }
                 }
             }
         } finally {

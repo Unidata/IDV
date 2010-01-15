@@ -110,6 +110,9 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     public static final String DIR_PLUGINS = "plugins";
 
+
+    public static final String DIR_BACKUPS = "backups";
+
     /** _more_ */
     public static final String DIR_RESOURCES = "resources";
 
@@ -705,9 +708,14 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-
     public String getPluginsDir() {
         String dir = IOUtil.joinDir(getRepositoryDir(), DIR_PLUGINS);
+        IOUtil.makeDirRecursive(new File(dir));
+        return dir;
+    }
+
+    public String getBackupsDir() {
+        String dir = IOUtil.joinDir(getRepositoryDir(), DIR_BACKUPS);
         IOUtil.makeDirRecursive(new File(dir));
         return dir;
     }

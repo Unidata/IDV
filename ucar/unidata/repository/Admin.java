@@ -59,6 +59,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
 
 
@@ -891,15 +892,16 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminDbDump(Request request) throws Exception {
-        File tmp = getStorageManager().getTmpFile(request, "dbdump");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm");
+        File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".sql");
         FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         getDatabaseManager().makeDatabaseCopy(bos, true);
-
         IOUtil.close(bos);
         IOUtil.close(fos);
-        FileInputStream is = new FileInputStream(tmp);
-        return new Result("", is, "text/sql");
+        return new Result("", new StringBuffer("Database has been dumped to: " + tmp));
+    //        FileInputStream is = new FileInputStream(tmp);
+    //        return new Result("", is, "text/sql");
     }
 
 
