@@ -1072,7 +1072,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @param id The id of the resource, e.g., idv.resource.colortables
      * @return The resource collection
      */
-    private ResourceCollection createResourceCollection(String id) {
+    protected ResourceCollection createResourceCollection(String id) {
         ResourceCollection rc = getResources(id);
         if (rc == null) {
             rc = new ResourceCollection(id, getDescription(id));
@@ -1090,7 +1090,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return The xml resource collection
      */
 
-    private XmlResourceCollection createXmlResourceCollection(String id) {
+    protected XmlResourceCollection createXmlResourceCollection(String id) {
         XmlResourceCollection rc = getXmlResources(id);
         if (rc == null) {
             rc = new XmlResourceCollection(id, getDescription(id));
