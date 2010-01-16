@@ -1022,7 +1022,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                         || tableType.startsWith("SYSTEM")) {
                     continue;
                 }
-
                 String tn = tableName.toLowerCase();
                 if ( !all) {
                     if (tn.equals(Tables.GLOBALS.NAME)
