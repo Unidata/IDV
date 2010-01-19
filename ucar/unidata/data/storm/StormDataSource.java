@@ -259,6 +259,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @return _more_
      */
     public int getCategory(String name) {
+        if(name==null) return CATEGORY_XX;
         for (int i = 0; i < CATEGORY_NAMES.length; i++) {
             if (name.equals(CATEGORY_NAMES[i])) {
                 return CATEGORY_VALUES[i];

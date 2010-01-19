@@ -367,6 +367,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      * @return _more_
      */
     private double getDouble(String s) {
+        if(s == null)             return Double.NaN;
         if (s.length() == 0) {
             return Double.NaN;
         }
@@ -463,17 +464,20 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                 //                System.err.println(line);
             }
             List toks = StringUtil.split(line, ",", true);
-
-
+            /*            System.err.println(toks.size() + " " + BASEIDX);
+            if(toks.size()<BASEIDX-1) {
+                System.err.println("bad line:" + line);
+                continue;
+            } else {
+                System.err.println("good line:" + line);
+            }
+            */
 
             //BASIN,CY,YYYYMMDDHH,TECHNUM,TECH,TAU,LatN/S,LonE/W,VMAX,MSLP,TY,RAD,WINDCODE,RAD1,RAD2,RAD3,RAD4,RADP,RRP,MRD,GUSTS,EYE,SUBREGION,MAXSEAS,INITIALS,DIR,SPEED,STORMNAME,DEPTH,SEAS,SEASCODE,SEAS1,SEAS2,SEAS3,SEAS4
             //AL, 01, 2007050612,   , BEST,   0, 355N,  740W,  35, 1012, EX,  34, NEQ,    0,    0,    0,  120, 
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
-            int category = getCategory((String) toks.get(IDX_TY));
-            if (category != CATEGORY_XX) {
-                //                System.err.println("cat:" + category);
-            }
+
             String dateString = (String) toks.get(IDX_YYYYMMDDHH);
             String wayString  = (String) toks.get(IDX_TECH);
             //            if (okWays.get(wayString) == null) {
@@ -482,6 +486,11 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             boolean isBest       = wayString.equals(WAY_BEST);
             boolean isWarning    = wayString.equals(WAY_WRNG);
             boolean isCarq       = wayString.equals(WAY_CARQ);
+
+            int category = (IDX_TY<toks.size()?getCategory((String) toks.get(IDX_TY)):CATEGORY_XX);
+            if (category != CATEGORY_XX) {
+                //                System.err.println("cat:" + category);
+            }
 
             String  fhour        = (String) toks.get(IDX_TAU);
             int     forecastHour = new Integer(fhour).intValue();
@@ -553,8 +562,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
             List<Real> attributes = new ArrayList<Real>();
 
-            double     windspeed  = getDouble((String) toks.get(IDX_VMAX));
-            double     pressure   = getDouble((String) toks.get(IDX_MSLP));
+            double     windspeed  = (IDX_VMAX<toks.size()?getDouble((String) toks.get(IDX_VMAX)):Double.NaN);
+            double     pressure   = (IDX_MSLP<toks.size()?getDouble((String) toks.get(IDX_MSLP)):Double.NaN);
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
             attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(windspeed));
