@@ -26,6 +26,7 @@ package ucar.unidata.repository.type;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.auth.*;
 
 import ucar.unidata.repository.metadata.*;
@@ -217,6 +218,14 @@ public class TypeHandler extends RepositoryManager {
         super(repository);
         this.type        = type;
         this.description = description;
+    }
+
+
+    /**
+     * Check if this database table is ok to write when doing a db dump
+     */
+    public boolean okToWriteTable(String tableName) {
+        return true;
     }
 
 

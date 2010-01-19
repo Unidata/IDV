@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.auth.*;
+import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.ftp.FtpManager;
 
 import ucar.unidata.repository.harvester.*;
@@ -893,7 +894,7 @@ public class Admin extends RepositoryManager {
      */
     public Result adminDbDump(Request request) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm");
-        File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".sql");
+        File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".rdb");
         FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         getDatabaseManager().makeDatabaseCopy(bos, true);

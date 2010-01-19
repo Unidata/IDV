@@ -31,6 +31,7 @@ import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.ftp.FtpManager;
 import ucar.unidata.repository.harvester.*;
 
+import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.monitor.*;
 
@@ -914,27 +915,43 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getDatabaseManager().init();
         initTypeHandlers();
         initSchema();
-
-        for (String sqlFile : (List<String>) loadFiles) {
-            String sql =
-                getStorageManager().readUncheckedSystemResource(sqlFile);
-            getDatabaseManager().loadSql(sql, false, true);
-        }
         readGlobals();
-
         checkVersion();
-
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
         getRegistryManager().checkApi();
 
+
+        /*
+        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
+        xadminHandler.setRepository(Repository.this);
+        getAdmin().addAdminHandler(xadminHandler);
+        */
+
+        for(Class adminHandlerClass: adminHandlerClasses) {
+            AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
+            adminHandler.setRepository(Repository.this);
+            getAdmin().addAdminHandler(adminHandler);
+        }
+
+
+        for (String sqlFile : (List<String>) loadFiles) {
+            if(sqlFile.endsWith(".rdb")) {
+                getDatabaseManager().loadRdbFile(sqlFile);
+            } else {
+                String sql =
+                    getStorageManager().readUncheckedSystemResource(sqlFile);
+                getDatabaseManager().loadSql(sql, false, true);
+            }
+            readGlobals();
+        }
+
         getUserManager().initUsers(cmdLineUsers);
-        getEntryManager().initGroups();
         getHarvesterManager().initHarvesters();
         initLanguages();
-
         setLocalFilePaths();
+        getEntryManager().initGroups();
 
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
@@ -953,23 +970,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
+
+
+
         //Do this in a thread because (on macs) it hangs sometimes)
         Misc.run(this, "getFtpManager");
 
 
-        /*
-        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
-        xadminHandler.setRepository(Repository.this);
-        getAdmin().addAdminHandler(xadminHandler);
-        */
-
-
-
-        for(Class adminHandlerClass: adminHandlerClasses) {
-            AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
-            adminHandler.setRepository(Repository.this);
-            getAdmin().addAdminHandler(adminHandler);
-        }
 
 
     }

@@ -20,9 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.database;
 
-
+import ucar.unidata.repository.*;
 import org.apache.commons.dbcp.BasicDataSource;
 
 
@@ -115,6 +115,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
     private Counter numberOfSelects = new Counter();
 
+    private static final int DUMPTAG_TABLE = 1;
+    private static final int DUMPTAG_ROW = 2;
+    private static final int DUMPTAG_END = 3;
+    
 
     /** _more_ */
     private String db;
@@ -808,7 +812,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @param sb _more_
      */
-    protected void addInfo(StringBuffer sb) {
+    public void addInfo(StringBuffer sb) {
         String dbUrl = "" + (String) getRepository().getProperty(
                            PROP_DB_URL.replace("${db}", db));
         sb.append(HtmlUtil.formEntry("Database:", db));
@@ -969,8 +973,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
+    private String readString(DataInputStream dos) throws Exception {
+        int length = dos.readInt();
+        if(length<0) return null;
+        byte[]bytes =new  byte[length];
+        dos.read(bytes);
+        return new String(bytes);
+    }
 
-    private void write(DataOutputStream dos, Integer i) throws Exception {
+
+    private void writeInteger(DataOutputStream dos, Integer i) throws Exception {
         if(i==null)
             //            dos.writeInt(Integer.NaN);
             dos.writeInt(-999999);
@@ -978,25 +990,123 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             dos.writeInt(i.intValue());
     }
 
-    private void write(DataOutputStream dos, long i) throws Exception {
+    private void writeLong(DataOutputStream dos, long i) throws Exception {
         dos.writeLong(i);
     }
 
-    private void write(DataOutputStream dos, Double i) throws Exception {
+    private void writeDouble(DataOutputStream dos, Double i) throws Exception {
         if(i==null)
             dos.writeDouble(Double.NaN);
         else
             dos.writeDouble(i.doubleValue());
     }
 
-    private void write(DataOutputStream dos, String s) throws Exception {
+    private void writeString(DataOutputStream dos, String s) throws Exception {
         if(s==null) {
             dos.writeInt(-1);
         } else {
             dos.writeInt(s.length());
-            dos.write(s.getBytes());
+            dos.writeBytes(s);
         }
    }
+
+
+    public void loadRdbFile(String file) throws Exception {
+        DataInputStream dis = new DataInputStream(new FileInputStream(file));
+        XmlEncoder encoder = new XmlEncoder();
+        String tableXml = readString(dis);
+        List<TableInfo> tableInfos = (List<TableInfo> ) encoder.toObject(tableXml);
+        System.err.println ("# table infos:" + tableInfos.size());
+        Hashtable<String,TableInfo> tables = new Hashtable<String,TableInfo>();
+        StringBuffer sql = new StringBuffer();
+        for(TableInfo tableInfo: tableInfos) {
+            tables.put(tableInfo.getName(), tableInfo);
+            sql.append("drop table " + tableInfo.getName()+";\n");
+            sql.append("CREATE TABLE " + tableInfo.getName() +"  (\n");
+            for(int i=0;i<tableInfo.getColumns().size();i++)  {
+                ColumnInfo column = tableInfo.getColumns().get(i);
+                if(i>0) sql.append(",\n");
+                sql.append(column.getName());
+                sql.append(" ");
+                int type = column.getType();
+                
+                if (type == ColumnInfo.TYPE_TIMESTAMP) {
+                    sql.append("ramadda.datetime");
+                } else if (type == ColumnInfo.TYPE_VARCHAR) {
+                    sql.append("varchar(" +column.getSize() +")");
+                } else if(type == ColumnInfo.TYPE_INTEGER) {
+                    sql.append("int");
+                } else if(type == ColumnInfo.TYPE_DOUBLE) {
+                    sql.append("ramadda.double");
+                } else if(type == ColumnInfo.TYPE_CLOB) { 
+                    sql.append(convertType("clob", column.getSize()));
+                }
+            }
+            sql.append(");\n");
+            for(IndexInfo indexInfo: tableInfo.getIndices()) {
+                sql.append("CREATE INDEX " + indexInfo.getName() +" ON " + tableInfo.getName() +" ("  + indexInfo.getColumnName() +");\n");
+            }
+        }
+
+        
+        System.err.println(sql);
+        loadSql(convertSql(sql.toString()), false, true);
+        
+
+        TableInfo tableInfo = null;
+        int rows = 0;
+        Connection connection = getConnection();
+        try {
+            while(true) {
+                int what  = dis.readInt();
+                if(what == DUMPTAG_TABLE) {
+                    String tableName = readString(dis);
+                    tableInfo = tables.get(tableName);
+                    if(tableInfo == null) throw new IllegalArgumentException("No table:" + tableName);
+                    if(tableInfo.statement ==null) {
+                        String insert = SqlUtil.makeInsert(tableInfo.getName(),
+                                                           tableInfo.getColumnNames());
+                        tableInfo.statement = connection.prepareStatement(insert);
+                    }
+                    continue;
+                }
+                if(what == DUMPTAG_END) {
+                    break;
+                }
+                if(what != DUMPTAG_ROW) {
+                    throw new IllegalArgumentException("Unkown tag:" + what);
+                }
+
+                rows++;
+                Object[]values = new Object[tableInfo.getColumns().size()];
+                int colCnt = 0;
+                for(ColumnInfo columnInfo: tableInfo.getColumns()) {
+                    int type = columnInfo.getType();
+                    if (type == ColumnInfo.TYPE_TIMESTAMP) {
+                        long dttm = dis.readLong();
+                        values[colCnt++] = new Date(dttm);
+                    } else if (type == ColumnInfo.TYPE_VARCHAR) {
+                        values[colCnt++] =  readString(dis);
+                    } else if(type == ColumnInfo.TYPE_INTEGER) {
+                        values[colCnt++] = new Integer(dis.readInt());
+                    } else if(type == ColumnInfo.TYPE_DOUBLE) {
+                        values[colCnt++] = new Double(dis.readDouble());
+                    } else if(type == ColumnInfo.TYPE_CLOB) { 
+                        values[colCnt++] = readString(dis);
+                    } else {
+                        throw new IllegalArgumentException("Unknown type for table" + tableInfo.getName() +" " + type);
+                    }
+                }
+                setValues(tableInfo.statement, values);
+                tableInfo.statement.addBatch();
+                tableInfo.statement.executeBatch();
+            }
+        } finally {
+            IOUtil.close(dis);
+            closeConnection(connection);
+        }
+        System.err.println("Read " + rows +" rows");
+    }
 
 
     public void makeDatabaseCopy(OutputStream os, boolean all)
@@ -1009,20 +1119,43 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             ResultSet        catalogs = dbmd.getCatalogs();
             ResultSet tables = dbmd.getTables(null, null, null,
                                    new String[] { "TABLE" });
+            
 
             ResultSetMetaData rsmd =  tables.getMetaData();
             for(int col=1;col<=rsmd.getColumnCount();col++) {
                 //                System.err.println (rsmd.getColumnName(col));
             }
             List<TableInfo> tableInfos = new ArrayList<TableInfo>();
+            List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
+
             while (tables.next()) {
                 String tableName = tables.getString("TABLE_NAME");
+
+                boolean ok = true;
+                for(TypeHandler typeHandler: typeHandlers) {
+                    if(!typeHandler.okToWriteTable(tableName)) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if(!ok) continue;
+
+                String tn = tableName.toLowerCase();
                 String tableType = tables.getString("TABLE_TYPE");
-                if ((tableType == null) || Misc.equals(tableType, "INDEX")
-                        || tableType.startsWith("SYSTEM")) {
+              
+                if ((tableType == null) || tableType.startsWith("SYSTEM") || Misc.equals(tableType, "INDEX")) {
                     continue;
                 }
-                String tn = tableName.toLowerCase();
+
+                //                System.err.println("Table:" + tableName);
+                ResultSet indices = dbmd.getIndexInfo(null,null,tableName,false,false);
+                List<IndexInfo> indexList = new ArrayList<IndexInfo>();
+                while (indices.next()) {
+                    indexList.add(new IndexInfo(indices.getString("INDEX_NAME"),
+                                                indices.getString("COLUMN_NAME")));
+                    
+                }
+
                 if ( !all) {
                     if (tn.equals(Tables.GLOBALS.NAME)
                             || tn.equals(Tables.USERS.NAME)
@@ -1035,7 +1168,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
                 ResultSet cols = dbmd.getColumns(null, null, tableName, null);
                 rsmd =  cols.getMetaData();
-                System.err.println (tn);
+                //                System.err.println (tn);
                 for(int col=1;col<=rsmd.getColumnCount();col++) {
                     //                    System.err.println ("\t" +rsmd.getColumnName(col));
                 }
@@ -1048,57 +1181,62 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     int size = cols.getInt("COLUMN_SIZE");
                     columns.add(new ColumnInfo(colName, typeName, type, size));
                 }
-                tableInfos.add(new TableInfo(tn, columns));
+                tableInfos.add(new TableInfo(tn, indexList,columns ));
             }
-            String xml = encoder.toXml(tableInfos);
-            write(dos,xml);
 
+            String xml = encoder.toXml(tableInfos,false);
+            writeString(dos,xml);
+
+            int              rowCnt    = 0;
             for(TableInfo tableInfo: tableInfos) {
                 List<ColumnInfo> columns = tableInfo.getColumns();
-                int              rowCnt    = 0;
                 List             valueList = new ArrayList();
                 Statement statement = execute("select * from " + tableInfo.getName(),
                                           10000000, 0);
                 SqlUtil.Iterator iter = getIterator(statement);
                 ResultSet        results;
-                write(dos, (int)0);
-                write(dos, tableInfo.getName());
+                dos.writeInt(DUMPTAG_TABLE);
+                writeString(dos, tableInfo.getName());
                 while ((results = iter.next()) != null) {
                     while (results.next()) {
-                        write(dos, (int)1);
+                        dos.writeInt(DUMPTAG_ROW);
                         rowCnt++;
                         for(int i=1;i<=columns.size();i++) {
                             ColumnInfo colInfo = columns.get(i-1);
                             int type = colInfo.getType();
-                            if (type == java.sql.Types.TIMESTAMP) {
+                            if (type == ColumnInfo.TYPE_TIMESTAMP) {
                                 Timestamp ts = results.getTimestamp(i);
                                 if(ts==null) {
-                                    write(dos,(long)-1);
+                                    dos.writeLong((long)-1);
                                 } else {
-                                    write(dos, (long)ts.getTime());
+                                    dos.writeLong(ts.getTime());
                                 }
-                            } else if (type == java.sql.Types.VARCHAR) {
-                                write(dos,results.getString(i));
-                            } else if(type == java.sql.Types.INTEGER) {
-                                write(dos,(Integer)results.getObject(i));
-                            } else if(type == java.sql.Types.DOUBLE) {
-                                write(dos,(Double)results.getObject(i));
-                            } else if(type == java.sql.Types.CLOB) {
-                                write(dos,results.getString(i));
+                            } else if (type == ColumnInfo.TYPE_VARCHAR) {
+                                writeString(dos,results.getString(i));
+                            } else if(type == ColumnInfo.TYPE_INTEGER) {
+                                writeInteger(dos,(Integer)results.getObject(i));
+                            } else if(type == ColumnInfo.TYPE_DOUBLE) {
+                                writeDouble(dos,(Double)results.getObject(i));
+                            } else if(type == ColumnInfo.TYPE_CLOB) {
+                                writeString(dos,results.getString(i));
                             } else {
                                 Object object = results.getObject(i);
-                                if(rowCnt == 1) {
-                                    System.err.println ("Unknown type:" + type + "  c:" + object.getClass().getName());
-                                }
+                                throw new IllegalArgumentException ("Unknown type:" + type + "  c:" + object.getClass().getName());
                             }
                         }
                     }
                 }
             }
+            System.err.println("Wrote " + rowCnt +" rows");
         } finally {
             closeConnection(connection);
         }
+        //Write the end tag
+        dos.writeInt(DUMPTAG_END);
+        IOUtil.close(dos);
 
+
+        
 
     }
 
@@ -1592,7 +1730,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @return _more_
      */
-    protected boolean canDoSelectOffset() {
+    public boolean canDoSelectOffset() {
         if (db.equals(DB_MYSQL)) {
             return true;
         } else if (db.equals(DB_DERBY)) {

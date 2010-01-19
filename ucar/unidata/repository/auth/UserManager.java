@@ -24,6 +24,7 @@ package ucar.unidata.repository.auth;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.database.*;
 
 
 import ucar.unidata.repository.output.*;

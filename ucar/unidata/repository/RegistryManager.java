@@ -23,6 +23,8 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.repository.database.*;
+
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.Clause;

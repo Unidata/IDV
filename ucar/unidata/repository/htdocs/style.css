@@ -479,7 +479,10 @@ a.header-left  {
     background-color:white;
 }
 
+
 .wikicontent {
+     margin:0px;
+     padding:0px;
 }
 
 

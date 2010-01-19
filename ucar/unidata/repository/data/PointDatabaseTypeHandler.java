@@ -88,6 +88,7 @@ import ucar.unidata.data.point.TextPointDataSource;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
+import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.OutputHandler;
 
@@ -359,6 +360,16 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     public PointDatabaseTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
+    }
+
+
+
+    /**
+     * Check if this database table is ok to write when doing a db dump
+     */
+    public boolean okToWriteTable(String tableName) {
+        if(tableName.toLowerCase().startsWith("pt_"))  return false;
+        return true;
     }
 
 

@@ -25,6 +25,7 @@ package ucar.unidata.repository.type;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.output.*;
@@ -657,7 +658,7 @@ public class GenericTypeHandler extends TypeHandler {
             if (values != null) {
                 for (Column column : columns) {
                     StringBuffer tmpSb = new StringBuffer();
-                    column.formatValue(tmpSb, Column.OUTPUT_HTML, values);
+                    column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
                     if ( !column.getCanShow()) {
                         continue;
                     }
@@ -690,7 +691,7 @@ public class GenericTypeHandler extends TypeHandler {
         if (values != null) {
             for (Column column : columns) {
                 StringBuffer tmpSb = new StringBuffer();
-                column.formatValue(tmpSb, Column.OUTPUT_HTML, values);
+                column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
                 html = html.replace("${" + column.getName() + ".content}",
                                     tmpSb.toString());
                 html = html.replace("${" + column.getName() + ".label}",

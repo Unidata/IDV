@@ -20,7 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.database;
 
 
 /**
@@ -30,17 +30,44 @@ package ucar.unidata.repository;
  * @version $Revision: 1.3 $
  */
 public class ColumnInfo {
+    public static final int  TYPE_TIMESTAMP = 1;
+    public static final int  TYPE_VARCHAR= 2;
+    public static final int  TYPE_INTEGER= 3;
+    public static final int  TYPE_DOUBLE= 4;
+    public static final int  TYPE_CLOB= 5;
+
+
     private String name;
     private String typeName;
     private int type;
     private int size;
 
+    public ColumnInfo() {
+    }
+
     public ColumnInfo(String name, String typeName,  int type, int size) {
         this.name = name;
         this.typeName = typeName;
-        this.type = type;
+        this.type = convertType(type);
         this.size = size;
     }
+
+    public static int convertType(int type) {
+        if (type == java.sql.Types.TIMESTAMP) {
+            return TYPE_TIMESTAMP;
+        } else if (type == java.sql.Types.VARCHAR) {
+            return TYPE_VARCHAR;
+        } else if(type == java.sql.Types.INTEGER) {
+            return TYPE_INTEGER;
+        } else if(type == java.sql.Types.DOUBLE) {
+            return TYPE_DOUBLE;
+        } else if(type == java.sql.Types.CLOB) {
+            return TYPE_CLOB;
+        } else {
+            throw new IllegalArgumentException("Unknown sqltype:" + type);
+        }
+    }
+
 
     /**
        Set the Name property.

@@ -456,8 +456,8 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public void formatValue(StringBuffer sb, String output,
-                           Object[] values) {
+    public void formatValue(Entry entry, StringBuffer sb, String output,
+                           Object[] values) throws Exception {
 
         String delimiter = (Misc.equals(OUTPUT_CSV, output)?"|":",");
         if (isType(TYPE_LATLON)) {
@@ -524,7 +524,11 @@ public class Column implements Constants {
             else
                 sb.append("<a href=\"" + s +"\">" + s +"</a>");
         } else {
-            sb.append(toString(values, offset));
+            String s = toString(values,offset);
+            if(rows>1) {
+                s = typeHandler.getRepository().getHtmlOutputHandler().wikifyEntry(typeHandler.getRepository().getTmpRequest(), entry, s);
+            }
+            sb.append(s);
         }
     }
 
@@ -1741,6 +1745,9 @@ public class Column implements Constants {
         return name+":" + offset;
     }
 
+    public int getRows() {
+        return rows;
+    }
 
 }
 

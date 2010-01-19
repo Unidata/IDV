@@ -108,6 +108,8 @@ public class RssOutputHandler extends OutputHandler {
     public static final String TAG_RSS_DESCRIPTION = "description";
 
 
+    SimpleDateFormat rssSdf        = new SimpleDateFormat("EEE dd, MMM yyyy HH:mm:ss Z");
+
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL =
         new OutputType("Full RSS Feed", "rss.full", OutputType.TYPE_NONHTML,
@@ -229,7 +231,7 @@ public class RssOutputHandler extends OutputHandler {
         for (Entry entry : entries) {
             sb.append(XmlUtil.openTag(TAG_RSS_ITEM));
             sb.append(XmlUtil.tag(TAG_RSS_PUBDATE, "",
-                                  "" + new Date(entry.getStartDate())));
+                                  rssSdf.format(new Date(entry.getStartDate()))));
             sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", entry.getName()));
             String url =
                 repository.absoluteUrl(request.url(repository.URL_ENTRY_SHOW,

@@ -20,9 +20,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.database;
 
+import ucar.unidata.util.StringUtil;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -32,12 +37,27 @@ import java.util.List;
  */
 public class TableInfo {
     private String name;
+    private List<IndexInfo> indices;
     private List<ColumnInfo> columns;
 
+    public PreparedStatement statement;
 
-    public TableInfo(String name, List<ColumnInfo> columns) {
+    public TableInfo() {
+    }
+
+    public TableInfo(String name, List<IndexInfo> indices, List<ColumnInfo> columns) {
         this.name = name;
+        this.indices  = indices;
         this.columns = columns;
+    }
+
+    public String[] getColumnNames() {
+        String[] names = new String[columns.size()];
+        int cnt =0;
+        for(ColumnInfo columnInfo: columns) {
+            names[cnt++] = columnInfo.getName();
+        }
+        return names;
     }
 
     /**
@@ -77,6 +97,24 @@ public class TableInfo {
 	return this.columns;
     }
 
+
+    /**
+       Set the Indices property.
+
+       @param value The new value for Indices
+    **/
+    public void setIndices (List<IndexInfo> value) {
+	this.indices = value;
+    }
+
+    /**
+       Get the Indices property.
+
+       @return The Indices
+    **/
+    public List<IndexInfo> getIndices () {
+	return this.indices;
+    }
 
 
 }
