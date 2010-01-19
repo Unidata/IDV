@@ -1661,6 +1661,10 @@ public abstract class XmlUtil {
         sb.append("]]>");
     }
 
+    public static String  getCdata(String s) {
+        return "<![CDATA[" + s +      "]]>";
+    }
+
 
 
     /**

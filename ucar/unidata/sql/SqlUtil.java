@@ -533,6 +533,24 @@ public class SqlUtil {
     }
 
 
+    public static String makeInsert(String table, 
+                                    String[] names) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("INSERT INTO ");
+        sb.append(table);
+        sb.append(" (");
+        sb.append(comma(names));
+        sb.append(" ) values ( ");
+        for (int i = 0; i < names.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(" ? ");
+        }
+        sb.append(" )");
+        return sb.toString();
+    }
+
 
 
 
@@ -696,6 +714,9 @@ public class SqlUtil {
         clause.addClause(sb);
         return sb.toString();
     }
+
+
+
 
 
 
