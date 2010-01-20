@@ -914,20 +914,25 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         getDatabaseManager().init();
         initTypeHandlers();
-        initSchema();
+
+        boolean loadedRdb = false;
+        for (String sqlFile : (List<String>) loadFiles) {
+            if(sqlFile.endsWith(".rdb")) {
+                getDatabaseManager().loadRdbFile(sqlFile);
+                loadedRdb = true;
+            } 
+        }
+
+        if(!loadedRdb) {
+            initSchema();
+        }
+
         readGlobals();
         checkVersion();
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
         getRegistryManager().checkApi();
-
-
-        /*
-        AdminHandler xadminHandler = new org.ramadda.db.DbAdminHandler();
-        xadminHandler.setRepository(Repository.this);
-        getAdmin().addAdminHandler(xadminHandler);
-        */
 
         for(Class adminHandlerClass: adminHandlerClasses) {
             AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
@@ -936,15 +941,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
+        //Load in any other sql files from the command line
         for (String sqlFile : (List<String>) loadFiles) {
-            if(sqlFile.endsWith(".rdb")) {
-                getDatabaseManager().loadRdbFile(sqlFile);
-            } else {
+            if(!sqlFile.endsWith(".rdb")) {
                 String sql =
                     getStorageManager().readUncheckedSystemResource(sqlFile);
                 getDatabaseManager().loadSql(sql, false, true);
+                readGlobals();
             }
-            readGlobals();
         }
 
         getUserManager().initUsers(cmdLineUsers);
@@ -971,6 +975,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getRegistryManager().doFinalInitialization();
         }
 
+
+ 
+        getAdmin().doFinalInitialization();
 
 
         //Do this in a thread because (on macs) it hangs sometimes)

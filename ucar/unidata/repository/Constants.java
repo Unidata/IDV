@@ -1198,6 +1198,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
+    public static final String PROP_ADMIN_INCLUDESQL = "ramadda.admin.includesql";
 
     /** _more_ */
     public static final String PROP_REGISTRY_DEFAULTSERVER =
@@ -1500,8 +1501,10 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_CLEARCACHE = "action.clearcache";
 
+
     /** _more_ */
     public static final String ACTION_NEWDB = "action.newdb";
+    public static final String ACTION_DUMPDB = "action.dumpb";
 
     /** _more_ */
     public static final String ACTION_COPY = "action.copy";

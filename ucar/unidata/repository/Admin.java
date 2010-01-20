@@ -103,7 +103,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_CLEANUP = new RequestUrl(this,
-                                              "/admin/cleanup", "Cleanup");
+                                              "/admin/cleanup", "Maintenance");
 
 
     /** _more_ */
@@ -153,7 +153,7 @@ public class Admin extends RepositoryManager {
         getRegistryManager().URL_REGISTRY_REMOTESERVERS,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
-        URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        URL_ADMIN_LOG, URL_ADMIN_CLEANUP
         });
 
 
@@ -183,9 +183,15 @@ public class Admin extends RepositoryManager {
      */
     public Admin(Repository repository) {
         super(repository);
+
     }
 
 
+    protected void doFinalInitialization() {
+        if(getRepository().getProperty(PROP_ADMIN_INCLUDESQL,false)) {
+            adminUrls.add(URL_ADMIN_SQL); 
+        }
+    }
 
     protected  AdminHandler getAdminHandler(String id) {
         return adminHandlerMap.get(id);
@@ -882,6 +888,7 @@ public class Admin extends RepositoryManager {
         return makeResult(request, "Administration", sb);
     }
 
+    private boolean amDumpingDb = false;
 
     /**
      * _more_
@@ -893,16 +900,28 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminDbDump(Request request) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm");
-        File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".rdb");
-        FileOutputStream     fos = new FileOutputStream(tmp);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        getDatabaseManager().makeDatabaseCopy(bos, true);
-        IOUtil.close(bos);
-        IOUtil.close(fos);
-        return new Result("", new StringBuffer("Database has been dumped to: " + tmp));
-    //        FileInputStream is = new FileInputStream(tmp);
-    //        return new Result("", is, "text/sql");
+        //Only do one at a time
+        if(amDumpingDb) {
+            StringBuffer sb = new StringBuffer(getRepository().showDialogWarning("Currently exporting the database"));
+            return makeResult(request, msg("Database export"), sb);
+        }
+        amDumpingDb = true;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
+            File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".rdb");
+            FileOutputStream     fos = new FileOutputStream(tmp);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            getDatabaseManager().makeDatabaseCopy(bos, true);
+            IOUtil.close(bos);
+            IOUtil.close(fos);
+
+            StringBuffer sb = new StringBuffer(getRepository().showDialogNote("Database has been exported to:<br>" + tmp));
+            return makeResult(request, msg("Database export"), sb);
+        } finally {
+            amDumpingDb = false;
+        }
+        //        FileInputStream is = new FileInputStream(tmp);
+        //        return new Result("", is, "text/sql");
     }
 
 
@@ -1735,6 +1754,10 @@ public class Admin extends RepositoryManager {
      */
     public Result adminSql(Request request) throws Exception {
 
+        if(!getRepository().getProperty(PROP_ADMIN_INCLUDESQL,false)) {
+            return new Result("",new StringBuffer("Not enabled"));
+        }
+
         boolean bulkLoad = false;
         String  query    = null;
         String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
@@ -1933,6 +1956,8 @@ public class Admin extends RepositoryManager {
         } else if (request.defined(ACTION_START)) {
             Misc.run(this, "runDatabaseCleanUp", request);
             return new Result(request.url(URL_ADMIN_CLEANUP));
+        } else if(request.defined(ACTION_DUMPDB)) {
+            return  adminDbDump(request);
         } else if (request.defined(ACTION_NEWDB)) {
             getDatabaseManager().reInitialize();
             return new Result(request.url(URL_ADMIN_CLEANUP));
@@ -1945,19 +1970,27 @@ public class Admin extends RepositoryManager {
             sb.append("<p>");
             sb.append(HtmlUtil.submit(msg("Stop cleanup"), ACTION_STOP));
         } else {
+            sb.append(HtmlUtil.p());
             sb.append(
                 msg(
                 "Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system"));
             sb.append("<p>");
             sb.append(HtmlUtil.submit(msg("Start cleanup"), ACTION_START));
 
-            sb.append("<p>");
-            sb.append(HtmlUtil.submit(msg("Clear cache"), ACTION_CLEARCACHE));
+            //            sb.append("<p>");
+            //            sb.append(HtmlUtil.submit(msg("Clear cache"), ACTION_CLEARCACHE));
 
             sb.append("<p>");
-            sb.append(
+            /*            sb.append(
                 HtmlUtil.submit(
                     msg("Reinitialize Database Connection"), ACTION_NEWDB));
+            */
+            sb.append("<p>");
+            sb.append(
+                msg(
+                "You can write out the database for backup or transfer to a new database"));
+            sb.append("<p>");
+            sb.append(HtmlUtil.submit(msg("Export the database"), ACTION_DUMPDB));
 
         }
         sb.append("</form>");

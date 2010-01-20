@@ -1050,9 +1050,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
 
         
-        System.err.println(drop);
-        System.err.println(sql);
-        loadSql(drop.toString(), true, true);
+        //        System.err.println(drop);
+        //        System.err.println(sql);
+        loadSql(drop.toString(), false, true);
         loadSql(convertSql(sql.toString()), false, true);
         
 
