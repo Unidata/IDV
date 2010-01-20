@@ -1019,9 +1019,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         System.err.println ("# table infos:" + tableInfos.size());
         Hashtable<String,TableInfo> tables = new Hashtable<String,TableInfo>();
         StringBuffer sql = new StringBuffer();
+        StringBuffer drop = new StringBuffer();
         for(TableInfo tableInfo: tableInfos) {
             tables.put(tableInfo.getName(), tableInfo);
-            sql.append("drop table " + tableInfo.getName()+";\n");
+            drop.append("drop table " + tableInfo.getName()+";\n");
             sql.append("CREATE TABLE " + tableInfo.getName() +"  (\n");
             for(int i=0;i<tableInfo.getColumns().size();i++)  {
                 ColumnInfo column = tableInfo.getColumns().get(i);
@@ -1049,7 +1050,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
 
         
+        System.err.println(drop);
         System.err.println(sql);
+        loadSql(drop.toString(), true, true);
         loadSql(convertSql(sql.toString()), false, true);
         
 
@@ -1126,20 +1129,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 //                System.err.println (rsmd.getColumnName(col));
             }
             List<TableInfo> tableInfos = new ArrayList<TableInfo>();
-            List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
-
             while (tables.next()) {
                 String tableName = tables.getString("TABLE_NAME");
-
-                boolean ok = true;
-                for(TypeHandler typeHandler: typeHandlers) {
-                    if(!typeHandler.okToWriteTable(tableName)) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if(!ok) continue;
-
                 String tn = tableName.toLowerCase();
                 String tableType = tables.getString("TABLE_TYPE");
               
@@ -1147,7 +1138,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     continue;
                 }
 
-                //                System.err.println("Table:" + tableName);
                 ResultSet indices = dbmd.getIndexInfo(null,null,tableName,false,false);
                 List<IndexInfo> indexList = new ArrayList<IndexInfo>();
                 while (indices.next()) {
@@ -1168,7 +1158,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
                 ResultSet cols = dbmd.getColumns(null, null, tableName, null);
                 rsmd =  cols.getMetaData();
-                //                System.err.println (tn);
                 for(int col=1;col<=rsmd.getColumnCount();col++) {
                     //                    System.err.println ("\t" +rsmd.getColumnName(col));
                 }

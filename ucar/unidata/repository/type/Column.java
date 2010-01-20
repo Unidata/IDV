@@ -526,7 +526,7 @@ public class Column implements Constants {
         } else {
             String s = toString(values,offset);
             if(rows>1) {
-                s = typeHandler.getRepository().getHtmlOutputHandler().wikifyEntry(typeHandler.getRepository().getTmpRequest(), entry, s);
+                s = typeHandler.getRepository().getHtmlOutputHandler().wikifyEntry(typeHandler.getRepository().getTmpRequest(), entry, s, false,null,null);
             }
             sb.append(s);
         }

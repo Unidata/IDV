@@ -221,12 +221,6 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    /**
-     * Check if this database table is ok to write when doing a db dump
-     */
-    public boolean okToWriteTable(String tableName) {
-        return true;
-    }
 
 
     /**
