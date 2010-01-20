@@ -1052,7 +1052,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         
         //        System.err.println(drop);
         //        System.err.println(sql);
-        loadSql(drop.toString(), false, true);
+        loadSql(drop.toString(), true, false);
         loadSql(convertSql(sql.toString()), false, true);
         
 
@@ -1071,6 +1071,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                                                            tableInfo.getColumnNames());
                         tableInfo.statement = connection.prepareStatement(insert);
                     }
+                    System.err.println("importing table:" + tableInfo.getName());
                     continue;
                 }
                 if(what == DUMPTAG_END) {
@@ -1081,6 +1082,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 }
 
                 rows++;
+                if((rows%1000) == 0) System.err.println("rows:" + rows);
+
                 Object[]values = new Object[tableInfo.getColumns().size()];
                 int colCnt = 0;
                 for(ColumnInfo columnInfo: tableInfo.getColumns()) {
@@ -1102,13 +1105,33 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 }
                 setValues(tableInfo.statement, values);
                 tableInfo.statement.addBatch();
-                tableInfo.statement.executeBatch();
+                tableInfo.batchCnt ++;
+                if(tableInfo.batchCnt>1000) {
+                    tableInfo.batchCnt =0;
+                    tableInfo.statement.executeBatch();
+                }
+            }
+            
+            //Now finish up the batch
+            for(TableInfo ti: tableInfos) {
+                if(ti.batchCnt>0) {
+                    ti.batchCnt =0;
+                    ti.statement.executeBatch();
+                }
             }
         } finally {
             IOUtil.close(dis);
             closeConnection(connection);
         }
-        System.err.println("Read " + rows +" rows");
+
+        System.err.println("imported " + rows +" rows");
+    }
+
+
+    public void finishRdbLoad() throws Exception {
+        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+            typeHandler.initAfterDatabaseImport();
+        }
     }
 
 
@@ -1132,6 +1155,15 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             while (tables.next()) {
                 String tableName = tables.getString("TABLE_NAME");
                 String tn = tableName.toLowerCase();
+                boolean ok = true;
+                for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+                    if(!typeHandler.shouldExportTable(tn)) {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if(!ok) continue;
                 String tableType = tables.getString("TABLE_TYPE");
               
                 if ((tableType == null) || tableType.startsWith("SYSTEM") || Misc.equals(tableType, "INDEX")) {
@@ -1163,11 +1195,24 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 }
 
                 List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
+                //                System.err.println(tn);
                 while (cols.next()) {
                     String colName = cols.getString("COLUMN_NAME");
                     int type = cols.getInt("DATA_TYPE");
                     String typeName = cols.getString("TYPE_NAME");
                     int size = cols.getInt("COLUMN_SIZE");
+                    if(type == -1) {
+                        if(typeName.toLowerCase().equals("mediumtext")) {
+                            type = java.sql.Types.CLOB;
+                            //Just come up with some size
+                            size = 36000;
+                        } else if(typeName.toLowerCase().equals("longtext")) {
+                            type = java.sql.Types.CLOB;
+                            //Just come up with some size
+                            size = 36000;
+                        }
+                    }
+                    //                    System.err.println("\tcol:" + colName + " type:" + type  + " name:" + typeName + " size:" + size);
                     columns.add(new ColumnInfo(colName, typeName, type, size));
                 }
                 tableInfos.add(new TableInfo(tn, indexList,columns ));
@@ -1177,7 +1222,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             writeString(dos,xml);
 
             int              rowCnt    = 0;
+            System.err.println("Exporting database");
             for(TableInfo tableInfo: tableInfos) {
+                System.err.println("Exporting table: " + tableInfo.getName());
                 List<ColumnInfo> columns = tableInfo.getColumns();
                 List             valueList = new ArrayList();
                 Statement statement = execute("select * from " + tableInfo.getName(),
@@ -1190,6 +1237,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     while (results.next()) {
                         dos.writeInt(DUMPTAG_ROW);
                         rowCnt++;
+                        if((rowCnt%1000) == 0) System.err.println("rows:" + rowCnt);
                         for(int i=1;i<=columns.size();i++) {
                             ColumnInfo colInfo = columns.get(i-1);
                             int type = colInfo.getType();
@@ -1223,10 +1271,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         //Write the end tag
         dos.writeInt(DUMPTAG_END);
         IOUtil.close(dos);
-
-
-        
-
     }
 
 
@@ -1502,6 +1546,26 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 statement.setInt(i + startIdx, (b
                         ? 1
                         : 0));
+            } else if (values[i] instanceof Double) {
+                double d = ((Double)values[i]).doubleValue();
+                //Special check for nans on derby
+                if(d == Double.POSITIVE_INFINITY) {
+                    d = Double.NaN;
+                } else if(d ==Double.NEGATIVE_INFINITY) {
+                    d = Double.NaN;
+                }
+                if(d!=d) {
+                    if(isDatabaseDerby()) {
+                        d = -99999999.999;
+                    }
+                    //
+                }
+                try {
+                    statement.setDouble(i+startIdx, d);
+                } catch(Exception exc) {
+                    System.err.println("d:" + d);
+                    throw exc;
+                }
             } else {
                 statement.setObject(i + startIdx, values[i]);
             }
@@ -1548,7 +1612,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         closeAndReleaseConnection(pstatement);
     }
 
-    public boolean isDatabaseDerby() {
+    public boolean  isDatabaseDerby() {
         return  (db.equals(DB_DERBY));
     }
 

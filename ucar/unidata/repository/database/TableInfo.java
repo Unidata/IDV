@@ -41,6 +41,7 @@ public class TableInfo {
     private List<ColumnInfo> columns;
 
     public PreparedStatement statement;
+    public int batchCnt = 0;
 
     public TableInfo() {
     }

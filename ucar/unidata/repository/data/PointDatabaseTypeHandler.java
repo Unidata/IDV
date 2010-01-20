@@ -165,7 +165,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     public static final String PROP_CNT = "point.cnt";
 
     /** _more_ */
-    public static String TYPE_POINTDATABASE = "pointdatabase";
+    public static String TYPE_POINTDATABASE  = "pointdatabase";
 
     /** _more_ */
     public static final String FORMAT_HTML = "html";
@@ -363,13 +363,53 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     }
 
 
+    public boolean shouldExportTable(String tableName) {
+        if(tableName.startsWith("pt_")) return false;
+        return super.shouldExportTable(tableName); 
+    }
 
-    /**
-     * Check if this database table is ok to write when doing a db dump
-     */
-    public boolean okToWriteTable(String tableName) {
-        if(tableName.toLowerCase().startsWith("pt_"))  return false;
-        return true;
+
+    public void initAfterDatabaseImport() throws Exception {
+        super.initAfterDatabaseImport();
+        Statement entryStmt =
+            getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                        Tables.ENTRIES.NAME,
+                                        Clause.eq(Tables.ENTRIES.COL_TYPE, TYPE_POINTDATABASE));
+
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(entryStmt);
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                Entry entry = this.getEntry(results, false);
+
+                List<Metadata> metadataList =
+                    getMetadataManager().findMetadata(entry,
+                                                      ContentMetadataHandler.TYPE_ATTACHMENT, true);
+                System.err.println("Initializing point database entry:" + entry.getFullName());
+                int cnt =0;
+                for (Metadata metadata : metadataList) {
+                    File dataFile = 
+                        new File(
+                                 IOUtil.joinDir(
+                                                getRepository().getStorageManager().getEntryDir(
+                                                                                                metadata.getEntryId(),
+                                                                                                false), metadata.getAttr1()));
+                    if(cnt == 0) {
+                        Connection connection = getDatabaseManager().getConnection();
+                        connection.setAutoCommit(false);
+                        createDatabase(getRepository().getTmpRequest(), entry, dataFile, entry.getParentGroup(),connection);
+
+                        connection.commit();
+                        connection.setAutoCommit(true);
+                        getDatabaseManager().closeConnection(connection);
+                    } else {
+                        loadData(entry, dataFile);
+                    }
+                    cnt++;
+                }
+
+            }
+        }
     }
 
 
@@ -419,7 +459,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         Connection connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         try {
-            createDatabase(request, entry, parent, connection);
+            createDatabase(request, entry, entry.getFile(), parent, connection);
             connection.commit();
             connection.setAutoCommit(true);
             getEntryManager().addAttachment(
@@ -492,7 +532,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    private void createDatabase(Request request, Entry entry, Group parent,
+    private void createDatabase(Request request, Entry entry, File dataFile, Group parent,
                                 Connection connection)
             throws Exception {
 
@@ -531,7 +571,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                                            PointDataMetadata.TYPE_INT));
 
 
-        FeatureDatasetPoint fdp = getDataset(entry, parent, entry.getFile());
+        FeatureDatasetPoint fdp = getDataset(entry, parent, dataFile);
         if (fdp == null) {
             throw new IllegalArgumentException(
                 "Could not open file as point observation data");
@@ -627,12 +667,18 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             getDatabaseManager().loadSql(connection, index, false, false);
         }
 
-        List<Object[]> valueList = new ArrayList<Object[]>();
-        for (PointDataMetadata pdm : metadata) {
-            valueList.add(pdm.getValues());
+        List<PointDataMetadata> existingMetadata =
+            getMetadata(getTableName(entry));
+
+        if(existingMetadata.size()==0) {
+            System.err.println ("adding pdm");
+            List<Object[]> valueList = new ArrayList<Object[]>();
+            for (PointDataMetadata pdm : metadata) {
+                valueList.add(pdm.getValues());
+            }
+            getDatabaseManager().executeInsert(Tables.POINTDATAMETADATA.INSERT,
+                                               valueList);
         }
-        getDatabaseManager().executeInsert(Tables.POINTDATAMETADATA.INSERT,
-                                           valueList);
     }
 
 
@@ -877,6 +923,27 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     }
 
 
+    private void loadData(Entry entry, File file) throws Exception {
+
+        FeatureDatasetPoint fdp = getDataset(entry,
+                                             entry.getParentGroup(), file);
+        List<PointDataMetadata> metadata =
+            getMetadata(getTableName(entry));
+        Connection connection = getDatabaseManager().getConnection();
+        try {
+            connection.setAutoCommit(false);
+            insertData(entry, metadata, fdp, connection, true);
+            connection.commit();
+            getEntryManager().addAttachment(entry, file, true);
+            for (PointDataMetadata pdm : metadata) {
+                pdm.enumeratedValues = null;
+            }
+        } finally {
+            getDatabaseManager().closeConnection(connection);
+        }
+
+    }
+
 
     /**
      * _more_
@@ -894,22 +961,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         if (request.exists(ARG_POINT_UPLOAD_FILE)) {
             File file =
                 new File(request.getUploadedFile(ARG_POINT_UPLOAD_FILE));
-            FeatureDatasetPoint fdp = getDataset(entry,
-                                          entry.getParentGroup(), file);
-            List<PointDataMetadata> metadata =
-                getMetadata(getTableName(entry));
-            Connection connection = getDatabaseManager().getConnection();
-            try {
-                connection.setAutoCommit(false);
-                insertData(entry, metadata, fdp, connection, true);
-                connection.commit();
-                getEntryManager().addAttachment(entry, file, true);
-                for (PointDataMetadata pdm : metadata) {
-                    pdm.enumeratedValues = null;
-                }
-            } finally {
-                getDatabaseManager().closeConnection(connection);
-            }
+            loadData(entry, file);
             sb.append(
                 getRepository().showDialogNote("New data has been loaded"));
         } else {
@@ -3075,8 +3127,10 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             getMetadataManager().findMetadata(entry,
                 ContentMetadataHandler.TYPE_ATTACHMENT, true);
         if (metadataList == null) {
-            metadataList = getMetadataManager().findMetadata(parent,
-                    ContentMetadataHandler.TYPE_ATTACHMENT, true, false);
+            if(parent!=null) {
+                metadataList = getMetadataManager().findMetadata(parent,
+                                                                 ContentMetadataHandler.TYPE_ATTACHMENT, true, false);
+            }
         }
 
         if (metadataList != null) {

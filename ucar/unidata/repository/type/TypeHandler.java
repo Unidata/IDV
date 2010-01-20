@@ -236,6 +236,15 @@ public class TypeHandler extends RepositoryManager {
         return this;
     }
 
+
+    public boolean shouldExportTable(String tableName) {
+        return true;
+    }
+
+    public void initAfterDatabaseImport() throws Exception {
+    }
+
+
     /**
      * _more_
      *

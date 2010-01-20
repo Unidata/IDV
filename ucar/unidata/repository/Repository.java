@@ -905,6 +905,33 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    private void createTypeHandlers() throws Exception {
+        for (String file : typeDefFiles) {
+            file = getStorageManager().localizePath(file);
+            Element entriesRoot = XmlUtil.getRoot(file, getClass());
+            if (entriesRoot == null) {
+                continue;
+            }
+            List children = XmlUtil.findChildren(entriesRoot,
+                                                 TypeHandler.TAG_TYPE);
+            for (int i = 0; i < children.size(); i++) {
+                Element entryNode = (Element) children.get(i);
+                Class handlerClass =
+                    Misc.findClass(XmlUtil.getAttribute(entryNode,
+                                                        TypeHandler.TAG_HANDLER,
+                                                        "ucar.unidata.repository.type.GenericTypeHandler"));
+                Constructor ctor = Misc.findConstructor(handlerClass,
+                                                        new Class[] { Repository.class,
+                                                                      Element.class });
+                TypeHandler typeHandler =
+                    (TypeHandler) ctor.newInstance(new Object[] { this,
+                                                                  entryNode });
+                addTypeHandler(typeHandler.getType(), typeHandler);
+            }
+        }
+
+    }
+
     /**
      * _more_
      *
@@ -926,6 +953,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if(!loadedRdb) {
             initSchema();
         }
+
+        createTypeHandlers();
+        getUserManager().makeUserIfNeeded(new User("default", "Default User",
+                                                   false));
+        getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
+                                                   false));
+
 
         readGlobals();
         checkVersion();
@@ -978,6 +1012,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
  
         getAdmin().doFinalInitialization();
+
+
+        if(loadedRdb) {
+            getDatabaseManager().finishRdbLoad();
+        }
 
 
         //Do this in a thread because (on macs) it hangs sometimes)
@@ -3444,36 +3483,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             sql = getDatabaseManager().convertSql(sql);
             getDatabaseManager().loadSql(sql, true, false);
         }
-
-
-        for (String file : typeDefFiles) {
-            file = getStorageManager().localizePath(file);
-            Element entriesRoot = XmlUtil.getRoot(file, getClass());
-            if (entriesRoot == null) {
-                continue;
-            }
-            List children = XmlUtil.findChildren(entriesRoot,
-                                TypeHandler.TAG_TYPE);
-            for (int i = 0; i < children.size(); i++) {
-                Element entryNode = (Element) children.get(i);
-                Class handlerClass =
-                    Misc.findClass(XmlUtil.getAttribute(entryNode,
-                        TypeHandler.TAG_HANDLER,
-                        "ucar.unidata.repository.type.GenericTypeHandler"));
-                Constructor ctor = Misc.findConstructor(handlerClass,
-                                       new Class[] { Repository.class,
-                        Element.class });
-                TypeHandler typeHandler =
-                    (TypeHandler) ctor.newInstance(new Object[] { this,
-                        entryNode });
-                addTypeHandler(typeHandler.getType(), typeHandler);
-            }
-        }
-
-        getUserManager().makeUserIfNeeded(new User("default", "Default User",
-                false));
-        getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
-                false));
 
 
         getDatabaseManager().initComplete();
