@@ -557,17 +557,29 @@ public class TextGlyph extends DrawingGlyph {
      * @throws Exception On badness
      */
     private Image getImage(String html, int htmlWidth) throws Exception {
-        Color bg = new Color(125, 126, 127);
+        Color bg = getBgcolor();
         if (renderedEditor == null) {
             renderedEditor = new JEditorPane();
             renderedEditor.setContentType("text/html");
             renderedEditor.setEditorKit(getEditorKit());
             renderedEditor.addHyperlinkListener(getHyperlinkListener());
         }
+
+        Color tmpBg = new Color(123,124,125);
+
         ImageUtils.getEditor(renderedEditor, processHtml(html), htmlWidth,
-                             bg, null);
+                             (bg==null?tmpBg:null), null);
+       
+        if(bg!=null) {
+            renderedEditor.setBackground(bg);
+        } else {
+            renderedEditor.setBackground(tmpBg);
+        }
         // System.err.println("\nGetting image");
-        Image image = ImageUtils.getImage(renderedEditor, bg);
+        Image image = (bg!=null?ImageUtils.getImage(renderedEditor):ImageUtils.getImage(renderedEditor,tmpBg));
+        //        JComponent p = GuiUtils.inset(new JLabel(new ImageIcon(image)),new Insets(20,20,20,20));
+        //        p.setBackground(Color.green);
+        //        GuiUtils.showOkCancelDialog(null,null,p , null);
         return image;
     }
 
@@ -814,6 +826,12 @@ public class TextGlyph extends DrawingGlyph {
     public Font getFont() {
         return font;
     }
+
+
+    protected boolean shouldShowBgColorSelector() {
+        return true;
+    }
+
 
 
 

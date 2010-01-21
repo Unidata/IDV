@@ -119,6 +119,7 @@ public abstract class DrawingGlyph {
 
     /** xml attribute name */
     public static final String ATTR_COLOR = "color";
+    public static final String ATTR_BGCOLOR = "bgcolor";
 
     /** xml attribute name */
     public static final String ATTR_FILLED = "filled";
@@ -308,6 +309,9 @@ public abstract class DrawingGlyph {
     /** My color */
     private Color color = Color.blue;
 
+    /** My color */
+    private Color bgcolor = null;
+
 
     /** My control */
     protected DrawingControl control;
@@ -324,6 +328,8 @@ public abstract class DrawingGlyph {
 
     /** Shows the color */
     private GuiUtils.ColorSwatch colorSwatch;
+
+    private GuiUtils.ColorSwatch bgColorSwatch;
 
     /** _more_          */
     private AbstractTableModel pointTableModel;
@@ -532,6 +538,10 @@ public abstract class DrawingGlyph {
         } else {
             processPointStrings(pointStrings);
         }
+
+        bgcolor = XmlUtil.getAttribute(node, ATTR_BGCOLOR, (Color)null);
+        
+
 
         Color c = XmlUtil.getAttribute(node, ATTR_COLOR, getColor());
         if (c != null) {
@@ -821,6 +831,9 @@ public abstract class DrawingGlyph {
         e.setAttribute(ATTR_PICKABLE, "" + pickable);
         e.setAttribute(ATTR_FULLLATLON, "" + fullLatLon);
         XmlUtil.setAttribute(e, ATTR_COLOR, color);
+        if(bgcolor!=null) {
+            XmlUtil.setAttribute(e, ATTR_BGCOLOR, bgcolor);
+        }
         e.setAttribute(ATTR_ZPOSITION, "" + zPosition);
         for (int i = 0; i < COORD_TYPES.length; i++) {
             if (coordType == COORD_TYPES[i]) {
@@ -1499,6 +1512,13 @@ public abstract class DrawingGlyph {
             setColor(colorSwatch.getSwatchColor());
         }
 
+        if (bgColorSwatch != null) {
+            setBgcolor(bgColorSwatch.getSwatchColor());
+        }
+
+
+
+
         JList timeList = (JList) compMap.get(ATTR_TIMES);
         if (createdByUser && (timeList != null)) {
             timeValues = Misc.toList(timeList.getSelectedValues());
@@ -1545,6 +1565,11 @@ public abstract class DrawingGlyph {
         return true;
     }
 
+
+    protected boolean shouldShowBgColorSelector() {
+        return false;
+    }
+
     /**
      * Make the properties widgets
      *
@@ -1559,24 +1584,19 @@ public abstract class DrawingGlyph {
         comps.add(visibleCbx = new JCheckBox("Visible", visibleFlag));
         if (shouldShowColorSelector()) {
             comps.add(GuiUtils.rLabel("Color:"));
-            /*
-            JComboBox box =
-                new JComboBox(control.getDisplayConventions().getColorNameList());
-            if (color != null) {
-                String colorName =
-                    control.getDisplayConventions().getColorName(color);
-                if (colorName != null) {
-                    box.setSelectedItem(colorName);
-                }
-            }
-            comps.add(GuiUtils.left(box));
-            compMap.put(ATTR_COLOR, box);
-            */
-            colorSwatch = new GuiUtils.ColorSwatch(color, "", true);
+            colorSwatch = new GuiUtils.ColorSwatch(color, "", false);
             colorSwatch.setMinimumSize(new Dimension(20, 20));
             colorSwatch.setPreferredSize(new Dimension(20, 20));
             comps.add(GuiUtils.left(colorSwatch));
-            //        compMap.put(ATTR_COLOR, box);
+        }
+
+
+        if (shouldShowBgColorSelector()) {
+            comps.add(GuiUtils.rLabel("BG Color:"));
+            bgColorSwatch = new GuiUtils.ColorSwatch(bgcolor, "", false);
+            bgColorSwatch.setMinimumSize(new Dimension(20, 20));
+            bgColorSwatch.setPreferredSize(new Dimension(20, 20));
+            comps.add(GuiUtils.left(bgColorSwatch.getPanel()));
         }
 
         getTimePropertiesComponents(comps, compMap);
@@ -2375,6 +2395,27 @@ public abstract class DrawingGlyph {
     public Color getColor() {
         return color;
     }
+
+/**
+Set the Bgcolor property.
+
+@param value The new value for Bgcolor
+**/
+public void setBgcolor (Color value) {
+	this.bgcolor = value;
+}
+
+/**
+Get the Bgcolor property.
+
+@return The Bgcolor
+**/
+public Color getBgcolor () {
+	return this.bgcolor;
+}
+
+
+
 
 
 
