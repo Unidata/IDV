@@ -137,11 +137,14 @@ public class ButtonTabbedPane extends JPanel {
         this.width  = width;
         buttonPanel = new JPanel(new BorderLayout());
         JComponent buttonPanelHolder = GuiUtils.top(buttonPanel);
+        JScrollPane sp = new JScrollPane(buttonPanelHolder);
         buttonPanelHolder.setBorder(
             BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
                 BorderFactory.createEmptyBorder(0, 0, 0, 0)));
 
+        sp.setBorder(null);
+        buttonPanelHolder = sp;
 
         JComponent labelComp;
         JComponent filler = ((width < 0)
