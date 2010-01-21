@@ -2373,6 +2373,10 @@ public class IdvUIManager extends IdvManager {
         processBundleMenu(dataMenu, IdvPersistenceManager.BUNDLES_DATA);
         // dataMenu.addSeparator();
 
+        JMenu currentDataSourcesMenu = new JMenu("Loaded Data Sources");
+        dataMenu.add(currentDataSourcesMenu);
+
+
         List dataSources = new ArrayList(getIdv().getDataSources());
         if (getIdv().getJythonManager().getDescriptorDataSource() != null) {
             dataSources.add(
@@ -2385,7 +2389,7 @@ public class IdvUIManager extends IdvManager {
             JMenu dataSourceMenu =
                 new JMenu(DataSelector.getNameForDataSource(dataSource));
             dataSourceMenu.setToolTipText(dataSource.toString());
-            dataMenu.add(dataSourceMenu);
+            currentDataSourcesMenu.add(dataSourceMenu);
 
             JMenu editMenu = GuiUtils.makeMenu("Edit",
                                  doMakeDataSourceMenuItems(dataSource, null));
@@ -2418,6 +2422,8 @@ public class IdvUIManager extends IdvManager {
             */
             addChoicesToMenu(dataSource, dataSourceMenu, dataMenu);
         }
+
+        GuiUtils.limitMenuSize(currentDataSourcesMenu, "Data Sources ", 20,false);
 
     }
 

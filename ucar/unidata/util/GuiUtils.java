@@ -1,36 +1,22 @@
-/**
- * $Id: GuiUtils.java,v 1.317 2007/08/10 14:26:33 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
-
-
-
-
-
-
-
 
 package ucar.unidata.util;
 
@@ -53,8 +39,9 @@ import java.io.*;
 
 import java.lang.reflect.*;
 
-import java.net.URL;
 import java.net.URI;
+
+import java.net.URL;
 
 import java.text.SimpleDateFormat;
 
@@ -499,7 +486,9 @@ public class GuiUtils extends LayoutUtil {
      * @param window the window
      */
     public static void toFront(Window window) {
-        if(window == null) return;
+        if (window == null) {
+            return;
+        }
         window.setVisible(true);
         window.toFront();
         if (window instanceof Frame) {
@@ -550,18 +539,20 @@ public class GuiUtils extends LayoutUtil {
      * @param doItInSwingThread If true then do the emptying in the Swing thread
      */
     public static void empty(final Container c, boolean doItInSwingThread) {
-        if(c==null) return;
-        if(doItInSwingThread) {
+        if (c == null) {
+            return;
+        }
+        if (doItInSwingThread) {
             invokeInSwingThread(new Runnable() {
-                    public void run() {
-                        empty(c, false);
-                    }
-                });
+                public void run() {
+                    empty(c, false);
+                }
+            });
             return;
         }
         if (c != null) {
             c.removeAll();
-            Container parent =c.getParent();
+            Container parent = c.getParent();
             if (parent != null) {
                 parent.remove(c);
             }
@@ -1119,7 +1110,9 @@ public class GuiUtils extends LayoutUtil {
      */
     public static Image getImage(String file, Class c, boolean cache,
                                  boolean returnNullIfNotFound) {
-	if(!CacheManager.getDoCache()) cache  = false;
+        if ( !CacheManager.getDoCache()) {
+            cache = false;
+        }
 
         if (file == null) {
             return null;
@@ -4174,6 +4167,22 @@ public class GuiUtils extends LayoutUtil {
      * @param size Max size of a menu
      */
     public static void limitMenuSize(JMenu menu, String name, int size) {
+        limitMenuSize(menu, name, size, true);
+    }
+
+
+    /**
+     * This ensures that there are no more than size number of items in any sub menu.
+     * It uses name (e.g., Group) to make the sub-menus, e.g., Group 1, Group 2, ...
+     *
+     *
+     * @param menu The menu
+     * @param name The name suffix to use
+     * @param size Max size of a menu
+     * @param recurse If true then limit the size of all sub menus
+     */
+    public static void limitMenuSize(JMenu menu, String name, int size,
+                                     boolean recurse) {
         int  cnt      = menu.getItemCount();
         List subMenus = new ArrayList();
         List subItems = new ArrayList();
@@ -4184,7 +4193,9 @@ public class GuiUtils extends LayoutUtil {
                 subMenus.add(mi);
             }
         }
-        limitMenuSize(subMenus, name, size);
+        if (recurse) {
+            limitMenuSize(subMenus, name, size);
+        }
         if (cnt >= size) {
             menu.removeAll();
             JMenu currentMenu = new JMenu(name + " 1");
@@ -4195,6 +4206,9 @@ public class GuiUtils extends LayoutUtil {
                     currentMenu = new JMenu(name + " "
                                             + (menu.getItemCount() + 1));
                     menu.add(currentMenu);
+                }
+                if (mi == null) {
+                    continue;
                 }
                 currentMenu.add(mi);
             }
@@ -6750,9 +6764,16 @@ public class GuiUtils extends LayoutUtil {
         return applicationTitle;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static boolean doMacMenubar() {
-	if(true) return false;
-	return isMac();
+        if (true) {
+            return false;
+        }
+        return isMac();
     }
 
 
@@ -6770,44 +6791,69 @@ public class GuiUtils extends LayoutUtil {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @param e _more_
+     *
+     * @return _more_
+     */
     public static boolean isDeleteEvent(KeyEvent e) {
-	return  (e.getKeyCode() == KeyEvent.VK_DELETE || (GuiUtils.isMac() && e.getKeyCode()== 8) ||
-		 (e.getKeyCode() == KeyEvent.VK_D && e.isControlDown()));
+        return ((e.getKeyCode() == KeyEvent.VK_DELETE)
+                || (GuiUtils.isMac() && (e.getKeyCode() == 8))
+                || ((e.getKeyCode() == KeyEvent.VK_D) && e.isControlDown()));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param frame _more_
+     * @param menuBar _more_
+     */
     public static void decorateFrame(JFrame frame, JMenuBar menuBar) {
-	if(frame!=null & menuBar!=null && doMacMenubar()) {
-	    frame.setJMenuBar(menuBar);
-	}
+        if ((frame != null & menuBar != null) && doMacMenubar()) {
+            frame.setJMenuBar(menuBar);
+        }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @throws Exception _more_
+     */
     public static void showUrl(String s) throws Exception {
-	URI url = new URI(s);
-	if(!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-	    System.err.println("Browse not supported");
-	    return;
-	}
-	Desktop.getDesktop().browse(url);
-    }	
+        URI url = new URI(s);
+        if ( !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            System.err.println("Browse not supported");
+            return;
+        }
+        Desktop.getDesktop().browse(url);
+    }
 
+    /**
+     * _more_
+     *
+     * @param editor _more_
+     */
     public static void addLinkListener(JEditorPane editor) {
-	editor.addHyperlinkListener(new HyperlinkListener() {
-		public void hyperlinkUpdate(HyperlinkEvent e) {
-		    if(e.getEventType()== HyperlinkEvent.EventType.ACTIVATED) { 
-			String url = e.getDescription();
-			try {
-			    showUrl(url);
-			} catch(Exception exc) {
-			    LogUtil.logException("error showing url:" + url,exc);
+        editor.addHyperlinkListener(new HyperlinkListener() {
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    String url = e.getDescription();
+                    try {
+                        showUrl(url);
+                    } catch (Exception exc) {
+                        LogUtil.logException("error showing url:" + url, exc);
 
-			}
-		    }
-		}
-	    });
+                    }
+                }
+            }
+        });
 
     }
 
 }
-
