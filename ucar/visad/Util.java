@@ -2965,6 +2965,7 @@ public final class Util {
 
         boolean    hasAlpha  = cm.hasAlpha();
 
+
         for (int i = 0; i < numPixels; i++) {
             red_pix[i]   = cm.getRed(words[i]);
             green_pix[i] = cm.getGreen(words[i]);
@@ -2976,6 +2977,8 @@ public final class Util {
             }
         }
 
+
+        int alphaCnt = 0;
         boolean opaque = true;
         if ( !makeAlpha && (alphaThreshold >= 0)) {
             float alphaValue;
@@ -2986,7 +2989,9 @@ public final class Util {
                     alphaValue = 255.0f;
                 }
 
-                if (alphaValue < alphaThreshold) {
+
+                if (alphaValue <= alphaThreshold) {
+                    alphaCnt++;
                     red_pix[i]   = Float.NaN;
                     green_pix[i] = Float.NaN;
                     blue_pix[i]  = Float.NaN;
@@ -2994,6 +2999,8 @@ public final class Util {
                 }
             }
         }
+
+        //        System.err.println(alphaThreshold +" hasAlpha:" + hasAlpha +" make alpha:" + makeAlpha +" cnt:" + alphaCnt);
 
         //System.out.println("opaque = " + opaque);
 
