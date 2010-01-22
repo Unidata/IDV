@@ -4529,11 +4529,10 @@ return new Result(title, sb);
                 String[] tuple = getRemoteEntryInfo(entryId);
                 return getRemoteEntry(request, tuple[0], tuple[1]);
             } else if (entryId.startsWith("catalog:")) {
-                //TODO:
-                //CatalogTypeHandler typeHandler =
-                //                    (CatalogTypeHandler) getRepository().getTypeHandler(
-                //                        TypeHandler.TYPE_CATALOG);
-                //                entry = typeHandler.makeSynthEntry(request, null, entryId);
+                ucar.unidata.repository.data.CatalogTypeHandler typeHandler =
+                    (ucar.unidata.repository.data.CatalogTypeHandler) getRepository().getTypeHandler(
+                                                                        TypeHandler.TYPE_CATALOG);
+                entry = typeHandler.makeSynthEntry(request, null, entryId);
             } else if (isSynthEntry(entryId)) {
                 String[] pair          = getSynthId(entryId);
                 String   parentEntryId = pair[0];

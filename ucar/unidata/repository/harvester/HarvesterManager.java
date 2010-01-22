@@ -482,6 +482,16 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(request.formPost(URL_HARVESTERS_NEW));
         sb.append(HtmlUtil.submit(msg("New Harvester")));
         sb.append(HtmlUtil.formClose());
+
+        if(request.exists(ARG_MESSAGE)) {
+            sb.append(getRepository().showDialogNote(request.getString(ARG_MESSAGE,"")));
+        }
+        makeHarvestersList(request, harvesters,  sb);
+        return getAdmin().makeResult(request, msg("Harvesters"), sb);
+    }
+
+
+    private void makeHarvestersList(Request request, List<Harvester> harvesters, StringBuffer sb) throws Exception {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.row(HtmlUtil.cols("", HtmlUtil.bold(msg("Name")),
@@ -518,7 +528,8 @@ public class HarvesterManager extends RepositoryManager {
                                               harvester.getExtraInfo())));
         }
         sb.append(HtmlUtil.formTableClose());
-        return getAdmin().makeResult(request, msg("Harvesters"), sb);
+
+
     }
 
 
@@ -563,16 +574,24 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(HtmlUtil.space(1));
         sb.append(msg("Download URLs"));
         sb.append("</form>");
+
         if (catalog.length() > 0) {
-            /* TODO:
-            CatalogHarvester harvester =
-                new CatalogHarvester(getRepository(), group, catalog,
+            sb  = new StringBuffer();
+            sb.append(msg("Catalog is being harvested"));
+            sb.append(HtmlUtil.p());
+            ucar.unidata.repository.data.CatalogHarvester harvester =
+                new ucar.unidata.repository.data.CatalogHarvester(getRepository(), group, catalog,
                                      request.getUser(), recurse, download);
             harvester.setAddMetadata(addMetadata);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
-            */
+            //            makeHarvestersList(request, (List<Harvester>)Misc.newList(harvester),  sb);
+            //            return  getEntryManager().addEntryHeader(request, group,
+            //                                                     new Result("",sb));
+            return getEntryManager().addEntryHeader(request, group,
+                                                    new Result(request.url(URL_HARVESTERS_LIST, ARG_MESSAGE,"Catalog is being harvested")));
         }
+
 
         Result result = getEntryManager().addEntryHeader(request, group,
                             new Result(request.url(URL_HARVESTERS_LIST)));
