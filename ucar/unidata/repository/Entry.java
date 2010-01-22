@@ -29,6 +29,8 @@ import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;
 
+import ucar.unidata.xml.XmlEncoder;
+
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
@@ -96,6 +98,11 @@ public class Entry extends Entity {
     /** _more_ */
     private String icon;
 
+    private Hashtable properties;
+
+    private String propertiesString;
+
+    private static  XmlEncoder xmlEncoder = new XmlEncoder();
 
     /**
      * _more_
@@ -246,8 +253,6 @@ public class Entry extends Entity {
     public boolean isFile() {
         return (resource != null) && resource.isFile();
     }
-
-
 
 
     /**
@@ -694,6 +699,55 @@ public class Entry extends Entity {
      */
     public String getRemoteServer() {
         return remoteServer;
+    }
+
+    /**
+       Set the Properties property.
+
+       @param value The new value for Properties
+    **/
+    public void putProperty (String key, Object value) throws Exception {
+	getProperties(true).put(key,value);
+    }
+
+    public Object getProperty (String key) throws Exception  {
+        Hashtable properties = getProperties();
+        if(properties==null) return null;
+        return properties.get(key);
+    }
+
+
+    /**
+       Get the Properties property.
+
+       @return The Properties
+    **/
+    public Hashtable getProperties () throws Exception  {
+        return getProperties(false);
+    }
+
+
+    public Hashtable getProperties (boolean force) throws Exception  {
+        if(properties == null) {
+            if(propertiesString != null) {
+                properties = (Hashtable) xmlEncoder.toObject(propertiesString);
+                propertiesString = null;
+            }
+            if(properties == null && force) properties = new Hashtable();
+        }
+	return this.properties;
+    }
+
+
+    /**
+       Get the PropertiesString property.
+
+       @return The PropertiesString
+    **/
+    public String getPropertiesString () throws Exception {
+        if(properties!=null)
+            return xmlEncoder.toXml(properties);
+        return null;
     }
 
 

@@ -30,7 +30,13 @@ CREATE TABLE entries (id varchar(200),
 	           west ramadda.double); 
 
 
-ALTER TABLE entries DROP COLUMN top_group_id;
+---- things to add????
+---- file size
+---- properties -  maybe a blob to hold a serialized hashtable
+---- Then the DataOutputHandler could add a flag to the entry which is the data type, e.g., netcdf, grid, etc
+----
+
+---- ALTER TABLE entries DROP COLUMN top_group_id;
 
 
 --- for mysql
