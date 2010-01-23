@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="4.2.2" transformSequenceNumber="2">
+<install4j version="4.2.6" transformSequenceNumber="2">
   <directoryPresets config="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.8" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.8" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -111,8 +111,8 @@
     <launcher name="simpleIDV" id="4" external="true" excludeFromMenu="false" menuName="" externalFile="simpleIDV" />
     <launcher name="simpleIDV.bat" id="9" external="true" excludeFromMenu="true" menuName="" externalFile="simpleIDV.bat" />
     <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_16x16.png" pngIcon32File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_32x32.png" macServiceDependencies="" swtApp="false" fileset="">
-      <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
-        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
+      <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
         <text>
@@ -120,7 +120,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="ucar.unidata.idv.DefaultIdv" vmParameters="-Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="">
+      <java mainClass="ucar.unidata.idv.DefaultIdv" vmParameters="-Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <archive location="idv.jar" failOnError="false" />
         </classPath>
@@ -277,6 +277,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
             </formComponents>
           </screen>
@@ -310,6 +311,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
               <formComponent name="" id="228" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
@@ -332,6 +334,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
             </formComponents>
           </screen>
@@ -376,6 +379,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
               <formComponent name="" id="532" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
@@ -398,6 +402,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
             </formComponents>
           </screen>
@@ -662,6 +667,7 @@
                   </java>
                 </serializedBean>
                 <initScript />
+                <visibiltyScript />
               </formComponent>
             </formComponents>
           </screen>
@@ -780,7 +786,7 @@
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Linux Installer" id="3" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-i386-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Linux Installer" id="3" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-i386-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
@@ -800,7 +806,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Linux64 Installer" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-amd64-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Linux64 Installer" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-amd64-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
@@ -822,7 +828,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <win32 name="Windows" id="8" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+    <win32 name="Windows" id="8" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="4" />
@@ -838,7 +844,7 @@
       <exclude />
       <variables />
     </win32>
-    <win32 name="Windows64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="true" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-amd64-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+    <win32 name="Windows64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="true" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-amd64-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="4" />
@@ -854,7 +860,7 @@
       <exclude />
       <variables />
     </win32>
-    <macosFolder name="Mac OS X Folder" id="12" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <macosFolder name="Mac OS X Folder" id="12" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="7" />
@@ -872,7 +878,7 @@
       </exclude>
       <variables />
     </macosFolder>
-    <unixInstaller name="Solaris x86" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-x86-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Solaris x86" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-x86-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
@@ -893,7 +899,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-sparc-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-sparc-1.6.0_17_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
@@ -914,7 +920,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
@@ -938,7 +944,7 @@
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="8" />
+    <mediaSet refId="12" />
   </buildIds>
 </install4j>
 
