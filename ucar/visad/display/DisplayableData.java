@@ -569,6 +569,9 @@ public class DisplayableData extends Displayable {
             throw new NullPointerException();
         }
         cachedAnimationSet = null;
+        if (reference == null) {
+            return;  // might have been removed before by another thread
+        }
         reference.setData(data);  // might enqueue changeListener
         if (addRefsInvoked()) {
             myAddDataReferences();
@@ -873,7 +876,7 @@ public class DisplayableData extends Displayable {
     }
 
     /**
-     * DragAdapter 
+     * DragAdapter
      *
      *
      * @author IDV Development Team
