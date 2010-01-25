@@ -321,7 +321,7 @@ public class CatalogOutputHandler extends OutputHandler {
         
         String   title = (justOneEntry
                           ? entries.get(0).getName()
-                          : group.getFullName());
+                          : group.getName());
         Document doc   = XmlUtil.makeDocument();
         Element root = XmlUtil.create(doc, CatalogUtil.TAG_CATALOG, null,
                                       new String[] {
