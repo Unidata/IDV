@@ -394,7 +394,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
         aiff.bandIndices = bandIndices;
         //        cs.aiff          = aiff;
-        aiff.startTime = new DateTime(areaDirectory.getStartTime());
+        aiff.startTime = new DateTime(areaDirectory.getNominalTime());
         return aiff;
     }
 
