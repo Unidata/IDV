@@ -445,7 +445,7 @@ public abstract class ResourceManager {
                     first = obj;
                 }
             }
-            System.err.println("first:" + first);
+            //System.err.println("first:" + first);
             return first;
         }
 
@@ -463,7 +463,7 @@ public abstract class ResourceManager {
                 }
             }
 
-            System.err.println("adding users:" + o);
+            //System.err.println("adding users:" + o);
             addUsers((NamedObject) o);
             return (NamedObject) o;
         }
