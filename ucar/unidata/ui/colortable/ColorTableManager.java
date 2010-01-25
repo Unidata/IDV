@@ -167,6 +167,7 @@ public class ColorTableManager extends ResourceManager {
     public void doExport(NamedObject object, String file) {
 	if(!ImageUtils.isImage(file)) {
 	    super.doExport(object, file);
+            return;
 	}
 	try {
 	    Image image =ColorTableCanvas.getImage((ColorTable) object, 200,30);
