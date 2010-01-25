@@ -53,6 +53,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TemporaryDir;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.xml.XmlNodeList;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -2176,12 +2177,11 @@ return new Result(title, sb);
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
 
-        /*
+
         sb.append(request.uploadForm(getRepository().URL_ENTRY_XMLCREATE));
         sb.append("File:" + HtmlUtil.fileInput(ARG_FILE, ""));
         sb.append("<br>" + HtmlUtil.submit("Submit"));
         sb.append(HtmlUtil.formClose());
-        */
 
 
         return makeEntryEditResult(request, group, "Create Entry", sb);
@@ -2902,11 +2902,20 @@ return new Result(title, sb);
                                             new String[] { ATTR_CODE,
                 CODE_OK });
 
+        StringBuffer sb = new StringBuffer();
         Element  root     = XmlUtil.getRoot(entriesXml);
-        NodeList children = XmlUtil.getElements(root);
+        NodeList children;
+        if(root.getTagName().equals(TAG_ENTRY)) {
+            children  = new XmlNodeList();
+            ((XmlNodeList)children).add(root);
+        } else {
+            children = XmlUtil.getElements(root);
+        }
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
+                
+
                 Entry entry = processEntryXml(request, node, entries,
                                   origFileToStorage, true, false);
                 //                System.err.println("entry:" + entry.getFullName() + " " + entry.getId());
@@ -2915,6 +2924,9 @@ return new Result(title, sb);
                                new String[] { ATTR_ID,
                         entry.getId() });
                 newEntries.add(entry);
+                //xxx
+                sb.append(getEntryLink(request, entry));
+                sb.append("<br>");
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
@@ -2935,10 +2947,9 @@ return new Result(title, sb);
                         id });
             } else {
                 throw new IllegalArgumentException("Unknown tag:"
-                        + node.getTagName());
+                                                   + node.getTagName());
             }
         }
-
 
         insertEntries(newEntries, true);
 
@@ -2948,9 +2959,9 @@ return new Result(title, sb);
             return new Result(xml, MIME_XML);
         }
 
-        StringBuffer sb = new StringBuffer(CODE_OK);
+        System.err.println("sb:"  +sb);
+                    
         return new Result("", sb);
-
 
     }
 
@@ -3153,8 +3164,8 @@ return new Result(title, sb);
                         files, internal);
             } else if (tag.equals(TAG_DESCRIPTION)) {}
             else {
-                throw new IllegalArgumentException("Unknown tag:"
-                        + node.getTagName());
+                //                throw new IllegalArgumentException("Unknown tag:"
+                //                        + node.getTagName());
             }
         }
         entry.getTypeHandler().initializeEntry(request, entry, node);
@@ -3611,7 +3622,7 @@ return new Result(title, sb);
         String       entryId  = entry.getId();
 
         String       uid      = "link_" + HtmlUtil.blockCnt++;
-        String       output   = "groupxml";
+        String       output   = "inline";
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtil.arg(ARG_OUTPUT, output) + "&"
@@ -3628,10 +3639,12 @@ return new Result(title, sb);
         String  prefix   = "";
 
         if (forTreeNavigation) {
-            if (entry.isGroup()) {
+            boolean showArrow = entry.isGroup()||true;
+            String message = entry.isGroup()?"Click to open folder":"Click to view contents";
+            if (showArrow) {
                 prefix = HtmlUtil.img(
                     getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                    msg("Click to open folder"),
+                    msg(message),
                     HtmlUtil.id("img_" + uid)
                     + HtmlUtil.onMouseClick(
                         HtmlUtil.call(

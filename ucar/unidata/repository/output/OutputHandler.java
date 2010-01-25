@@ -834,19 +834,21 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtil.args(new String[] {
             ARG_NOREDIRECT, "true", ARG_OUTPUT,
-            request.getString(ARG_OUTPUT, "selectxml"), ATTR_TARGET, target,
+            request.getString(ARG_OUTPUT, "inline"), ATTR_TARGET, target,
             ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES, "true"),
             ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
-        String prefix = ( !entry.isGroup()
+        String message = entry.isGroup()?"Click to open folder":"Click to view contents";
+        boolean showArrow = true;
+        String prefix = ( !showArrow
                           ? HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),
                                          "",
                                          HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
                                              "10"))
                           : HtmlUtil.img(
                               getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                              msg("Click to open folder"),
+                              msg(message),
                               HtmlUtil.id("img_" + uid)
                               + HtmlUtil.onMouseClick(
                                   HtmlUtil.call(

@@ -276,6 +276,12 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public String getInlineHtml(Request request, Entry entry)
+            throws Exception {
+        return null;
+    }
+
+
     /**
      * _more_
      *
@@ -498,6 +504,10 @@ public class TypeHandler extends RepositoryManager {
      */
     public void initializeEntry(Request request, Entry entry, Element node)
             throws Exception {}
+
+
+    public void addToEntryNode(Entry entry, Element node) throws Exception {
+    }
 
 
 

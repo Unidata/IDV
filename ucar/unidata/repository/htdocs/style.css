@@ -109,6 +109,10 @@ a:hover {
   border:1px #fff solid;
 }
 
+.inline {
+	max-height: 300px; 
+	overflow-y: auto;
+}
 
 .folderblock {
    border : 0px;
@@ -667,16 +671,16 @@ ul {
 
 .tab_title_on {
    background-color:#ffffff;
-	border: 1px #000000 solid;
-        font-weight: bold;
-	margin-bottom:0px;
-	margin-left:3px;
-	margin-right:3px;
-	padding-bottom:0;
-	padding-top:2;
-	padding-left:6;
-	padding-right:6;
-	border-bottom:2px #ffffff  solid;
+   border: 1px #000 solid;
+   border-bottom:2px #ffffff  solid;
+   font-weight: bold;
+   margin-bottom:0px;
+   margin-left:3px;
+   margin-right:3px;
+   padding-bottom:0;
+   padding-top:2;
+   padding-left:6;
+   padding-right:6;
 }
 
 
@@ -791,7 +795,7 @@ a.menulink {
 .popup {
    padding:1px;
    text-decoration: none;
-   border : 1px black solid;
+   border : 1px #000 solid;
    background-color : #FFFFFF;
    position: absolute; 
    visibility: hidden; 

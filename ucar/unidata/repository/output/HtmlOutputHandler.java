@@ -98,8 +98,8 @@ public class HtmlOutputHandler extends OutputHandler {
                                                       OutputType.TYPE_HTML);
 
     /** _more_ */
-    public static final OutputType OUTPUT_GROUPXML =
-        new OutputType("groupxml", OutputType.TYPE_INTERNAL);
+    public static final OutputType OUTPUT_INLINE =
+        new OutputType("inline", OutputType.TYPE_INTERNAL);
 
     /** _more_ */
     public static final OutputType OUTPUT_SELECTXML =
@@ -129,7 +129,7 @@ public class HtmlOutputHandler extends OutputHandler {
         addType(OUTPUT_HTML);
         addType(OUTPUT_TIMELINE);
         addType(OUTPUT_GRAPH);
-        addType(OUTPUT_GROUPXML);
+        addType(OUTPUT_INLINE);
         addType(OUTPUT_SELECTXML);
         addType(OUTPUT_METADATAXML);
         addType(OUTPUT_LINKSXML);
@@ -177,7 +177,7 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean didOne = false;
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
-                OutputHandler.OUTPUT_HTML, true, false, true));
+                OutputHandler.OUTPUT_HTML, true, true, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
                 false)) {
             sb.append(tfo.getId().toString());
@@ -216,12 +216,14 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer("<content>\n");
         String links = getEntryManager().getEntryActionsTable(request, entry,
                            OutputType.TYPE_ALL);
+        StringBuffer inner = new StringBuffer();
         String cLink =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"),
                             HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
-        sb.append(cLink);
-        sb.append(HtmlUtil.br());
-        sb.append(links);
+        inner.append(cLink);
+        inner.append(HtmlUtil.br());
+        inner.append(links);
+        XmlUtil.appendCdata(sb, inner.toString());
         sb.append("\n</content>");
         return new Result("", sb, "text/xml");
     }
@@ -243,24 +245,44 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, OutputType outputType,
                               Entry entry)
             throws Exception {
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(entry.getType());
         if (outputType.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, entry);
         }
         if (outputType.equals(OUTPUT_LINKSXML)) {
             return getLinksXml(request, entry);
         }
-        if (outputType.equals(OUTPUT_GROUPXML)) {
-            return getActionXml(request, entry);
+        if (outputType.equals(OUTPUT_INLINE)) {
+            String inline = typeHandler.getInlineHtml(request, entry);
+            if(inline!=null) {
+                inline = getRepository().translate(request, inline);
+                StringBuffer xml = new StringBuffer("<content>\n");
+                XmlUtil.appendCdata(xml,
+                                    "<div class=inline>" +inline+"</div>");
+                xml.append("\n</content>");
+                return new Result("", xml, "text/xml");
+            }
+            String wikiTemplate = getWikiText(request, entry);
+            if (wikiTemplate != null) {
+                String wiki = wikifyEntry(request, entry, wikiTemplate);
+                wiki = getRepository().translate(request, wiki);
+                StringBuffer xml = new StringBuffer("<content>\n");
+                XmlUtil.appendCdata(xml,
+                                    "<div class=inline>" +wiki+"</div>");
+                xml.append("\n</content>");
+                return new Result("", xml, "text/xml");
+            }
+
+            return getMetadataXml(request, entry);
         }
 
-        StringBuffer sb = new StringBuffer();
-        TypeHandler typeHandler =
-            getRepository().getTypeHandler(entry.getType());
         Result typeResult = typeHandler.getHtmlDisplay(request, entry);
         if (typeResult != null) {
             return typeResult;
         }
 
+        StringBuffer sb = new StringBuffer();
 
         String wikiTemplate = getWikiText(request, entry);
         if (wikiTemplate != null) {
@@ -756,7 +778,20 @@ public class HtmlOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
-        if (outputType.equals(OUTPUT_GROUPXML)) {
+
+        if (outputType.equals(OUTPUT_INLINE)) {
+            String wikiTemplate = getWikiText(request, group);
+            if (wikiTemplate != null) {
+                String wiki = wikifyEntry(request, group, wikiTemplate, true, subGroups,
+                                          entries);
+                wiki = getRepository().translate(request, wiki);
+                StringBuffer xml = new StringBuffer("<content>\n");
+                XmlUtil.appendCdata(xml,
+                                    "<div class=inline>" +wiki+"</div>");
+                xml.append("\n</content>");
+                return new Result("", xml, "text/xml");
+            }
+
             return getChildrenXml(request, group, subGroups, entries);
         }
 

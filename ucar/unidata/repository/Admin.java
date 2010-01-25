@@ -905,23 +905,42 @@ public class Admin extends RepositoryManager {
             StringBuffer sb = new StringBuffer(getRepository().showDialogWarning("Currently exporting the database"));
             return makeResult(request, msg("Database export"), sb);
         }
+
+
+        ActionManager.Action action  = new ActionManager.Action() {
+            public void run(Object actionId) throws Exception {
+                dumpDatabase(actionId);
+            }
+        };
+        String href =
+            HtmlUtil.href(request.url(URL_ADMIN_CLEANUP),  "Continue");
+
+        Result result  =  getActionManager().doAction(request, action, 
+                                                      "Dumping database",
+                                                      href);
+
+        return result;
+    }
+
+    private void dumpDatabase(Object actionId) throws Exception {
         amDumpingDb = true;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
             File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".rdb");
             FileOutputStream     fos = new FileOutputStream(tmp);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
-            getDatabaseManager().makeDatabaseCopy(bos, true);
+            getDatabaseManager().makeDatabaseCopy(bos, true, actionId);
             IOUtil.close(bos);
             IOUtil.close(fos);
 
             StringBuffer sb = new StringBuffer(getRepository().showDialogNote("Database has been exported to:<br>" + tmp));
-            return makeResult(request, msg("Database export"), sb);
+            //            return makeResult(request, msg("Database export"), sb);
         } finally {
+            if(actionId!=null) {
+                getActionManager().actionComplete(actionId);
+            }
             amDumpingDb = false;
         }
-        //        FileInputStream is = new FileInputStream(tmp);
-        //        return new Result("", is, "text/sql");
     }
 
 

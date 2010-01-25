@@ -667,7 +667,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
                                   List items) {
             cnt++;
             inputs.add(new InputInfo(InputInfo.TYPE_TEXT, id));
-            sb.append(HtmlUtil.select(id, items, dflt));
+            sb.append(HtmlUtil.formEntry(label, HtmlUtil.select(id, items, dflt)));
         }
 
 

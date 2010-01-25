@@ -993,7 +993,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
-            getDatabaseManager().makeDatabaseCopy(fos, true);
+            getDatabaseManager().makeDatabaseCopy(fos, true,null);
             IOUtil.close(fos);
         }
 
@@ -1637,10 +1637,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 String htpath  = entryName.substring(idx+"htdocs".length());
                 pluginHtdocsMap.put(htpath,
                                     path);
+
+                idx = entryName.indexOf("help/");
+                if(idx>=0) {
+                    System.err.println(htpath +"=" + path);
+                    pluginHelpMap.put(htpath,
+                                      path); 
+
+                }
             }
             return path;
         }
     }
+
+
+
+    private Hashtable<String,String>  pluginHelpMap = new Hashtable<String,String>();
+
 
     private Hashtable<String,String> pluginHtdocsMap = new Hashtable<String,String>();
 
@@ -4142,7 +4155,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (path.equals("/")) {
             path = "/index.html";
         }
-        path = "/ucar/unidata/repository/docs/userguide/processed" + path;
+
+        System.err.println("path:" + path);
+        String pluginHelp = pluginHelpMap.get(path);
+        if(pluginHelp!=null) {
+            System.err.println ("got help from plugin");
+            path  = pluginHelp;
+        } else {
+            path = "/ucar/unidata/repository/docs/userguide/processed" + path;
+        }
         Result result = null;
         if (path.endsWith(".html")) {
             String helpText = getStorageManager().readSystemResource(path);

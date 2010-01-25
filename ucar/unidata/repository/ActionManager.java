@@ -197,7 +197,7 @@ public class ActionManager extends RepositoryManager {
      * @param id _more_
      * @param msg _more_
      */
-    protected void setActionMessage(Object id, String msg) {
+    public void setActionMessage(Object id, String msg) {
         ActionInfo action = getAction(id);
         if (action == null) {
             return;

@@ -1135,7 +1135,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
-    public void makeDatabaseCopy(OutputStream os, boolean all)
+    public void makeDatabaseCopy(OutputStream os, boolean all, Object actionId)
             throws Exception {
         XmlEncoder encoder = new XmlEncoder();
         DataOutputStream dos = new DataOutputStream(os);
@@ -1237,7 +1237,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     while (results.next()) {
                         dos.writeInt(DUMPTAG_ROW);
                         rowCnt++;
-                        if((rowCnt%1000) == 0) System.err.println("rows:" + rowCnt);
+                        if((rowCnt%1000) == 0) {
+                            if(actionId!=null) {
+                                getActionManager().setActionMessage(actionId,"Written " + rowCnt +" database rows");
+                            }
+                            System.err.println("rows:" + rowCnt);
+                        }
                         for(int i=1;i<=columns.size();i++) {
                             ColumnInfo colInfo = columns.get(i-1);
                             int type = colInfo.getType();

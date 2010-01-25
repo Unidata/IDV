@@ -115,68 +115,6 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param typeHandlers _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result listTypes(Request request, List<TypeHandler> typeHandlers)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_TYPES));
-        for (TypeHandler theTypeHandler : typeHandlers) {
-            sb.append(XmlUtil.tag(TAG_TYPE,
-                                  XmlUtil.attrs(ATTR_TYPE,
-                                      theTypeHandler.getType())));
-        }
-        sb.append(XmlUtil.closeTag(TAG_TYPES));
-        return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
-    }
-
-
-
-    /*
-    protected Result listTags(Request request, List<Tag> tags)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        OutputType       output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_TAGS));
-        request.remove(ARG_OUTPUT);
-        int max = -1;
-        int min = -1;
-
-        for (Tag tag : tags) {
-            if ((max < 0) || (tag.getCount() > max)) {
-                max = tag.getCount();
-            }
-            if ((min < 0) || (tag.getCount() < min)) {
-                min = tag.getCount();
-            }
-        }
-
-        int    diff         = max - min;
-        double distribution = diff / 5.0;
-
-        for (Tag tag : tags) {
-            sb.append(XmlUtil.tag(TAG_TAG,
-                                  XmlUtil.attrs(ATTR_NAME, tag.getName())));
-        }
-
-        String pageTitle = "";
-        sb.append(XmlUtil.closeTag(TAG_TAGS));
-        Result result = new Result(pageTitle, sb, getMimeType(output));
-        return result;
-    }
-    */
-
 
 
     /**
@@ -339,6 +277,7 @@ public class XmlOutputHandler extends OutputHandler {
                            entry.getDescription(), null);
         }
         addMetadata(entry, doc, node);
+        entry.getTypeHandler().addToEntryNode(entry, node);
         return node;
     }
 
