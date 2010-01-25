@@ -1679,6 +1679,11 @@ public abstract class XmlUtil {
         return makeCDataNode(doc, text, true);
     }
 
+
+    public static void createCDataNode(Element parent, String text) {
+        parent.appendChild(makeCDataNode(parent.getOwnerDocument(), text));
+    }
+
     /**
      * _more_
      *
