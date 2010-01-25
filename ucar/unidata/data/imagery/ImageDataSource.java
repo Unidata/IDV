@@ -1117,7 +1117,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         if ((aii.getStartDate() != null)
                                 || (aii.getEndDate() != null)) {
                             areaDir = aid.getDirectory();
-                            //                                System.err.println("absolute time:" + areaDir.getStartTime());
+                            //                                System.err.println("absolute time:" + areaDir.getNominalTime());
                             //System.err.println(" from aii:" +aii.getStartDate());
                         } else {
                             //                            System.err.println(
@@ -1622,7 +1622,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     buf.append(path);
                     buf.append("</td>");
                     buf.append("<td width=\"15%\">");
-                    buf.append("" + ad.getStartTime());
+                    buf.append("" + ad.getNominalTime());
                     buf.append("</td>");
                     buf.append("<td width=\"15%\">");
                     buf.append(ad.getLines());
