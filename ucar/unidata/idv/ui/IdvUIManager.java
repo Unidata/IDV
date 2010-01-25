@@ -137,26 +137,26 @@ import javax.swing.text.JTextComponent;
  */
 public class IdvUIManager extends IdvManager {
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_TEXT = "text";
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_BOOLEAN = "boolean";
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_CHOICE = "choice";
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_FILE = "file";
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_LOCATION = "location";
 
-    /** _more_ */
+    /** type names for user data choices gui creation */
     public static final String FIELDTYPE_AREA = "area";
 
 
-    /** _more_ */
+    /** The icon used to show locked legend components */   
     public static ImageIcon ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
@@ -2373,8 +2373,7 @@ public class IdvUIManager extends IdvManager {
         processBundleMenu(dataMenu, IdvPersistenceManager.BUNDLES_DATA);
         // dataMenu.addSeparator();
 
-        JMenu currentDataSourcesMenu = new JMenu("Loaded Data Sources");
-        dataMenu.add(currentDataSourcesMenu);
+
 
 
         List dataSources = new ArrayList(getIdv().getDataSources());
@@ -2383,6 +2382,15 @@ public class IdvUIManager extends IdvManager {
                 0, getIdv().getJythonManager().getDescriptorDataSource());
         }
 
+        //Only put the datasources in a different menu if there are lots of them
+        boolean makeNewMenu = dataSources.size() > 10;
+        JMenu   currentDataSourcesMenu;
+        if (makeNewMenu) {
+            currentDataSourcesMenu = new JMenu("Current Data Sources");
+            dataMenu.add(currentDataSourcesMenu);
+        } else {
+            currentDataSourcesMenu = dataMenu;
+        }
 
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource dataSource = (DataSource) dataSources.get(i);
@@ -2423,7 +2431,10 @@ public class IdvUIManager extends IdvManager {
             addChoicesToMenu(dataSource, dataSourceMenu, dataMenu);
         }
 
-        GuiUtils.limitMenuSize(currentDataSourcesMenu, "Data Sources ", 20,false);
+        if (makeNewMenu) {
+            GuiUtils.limitMenuSize(currentDataSourcesMenu, "Data Sources ",
+                                   20, false);
+        }
 
     }
 
