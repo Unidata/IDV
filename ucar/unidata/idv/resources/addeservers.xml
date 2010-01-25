@@ -78,6 +78,11 @@ they essentially get it from their container type tag.
        names="CIMSS,GINICOMP,GINIEAST,GINIWEST,NEXRCOMP,RTIMAGES,TOPO"
        type="image"/>
   </server>
+  <server name="wxdata.db.erau.edu" active="true">
+    <group
+       names="ERAU"
+       type="image"/>
+  </server>
 <!--
   <server name="pscwx.plymouth.edu"/>
 -->

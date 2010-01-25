@@ -935,8 +935,8 @@ Note: we can use place="default", etc., to use the default
      key="LINELE"
      enh="BREF24"
      place="CENTER"
-     size="700 900"
-     loc="1500 2368"
+     size="600 950"
+     loc="1499 2367"
      mag="-5 -5"
      unit="ECHO"/>
   <default
