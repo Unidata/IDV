@@ -547,19 +547,19 @@ public class PointObFactory {
 
 
     /**
-     * _more_
+     * Make a CFPointObWriter
      *
-     * @param dos _more_
-     * @param type _more_
-     * @param skipIndices _more_
-     * @param defaultStringLength _more_
-     * @param altUnit _more_
-     * @param cnt _more_
-     * @param slengths _more_
+     * @param dos  the output stream
+     * @param type the tupe
+     * @param skipIndices which indices to skip
+     * @param defaultStringLength  the default string length
+     * @param altUnit  the altitude unit
+     * @param cnt      the number 
+     * @param slengths string lengths
      *
-     * @return _more_
+     * @return  the writer
      *
-     * @throws Exception _more_
+     * @throws Exception  problem creating something
      */
     public static CFPointObWriter makeWriter(DataOutputStream dos,
                                              TupleType type,
@@ -789,6 +789,14 @@ public class PointObFactory {
                 throw new IllegalArgumentException("can't find lat/lon");
             }
 
+            // Check for METAR cloud cover groups
+            int cc1Index = type.getIndex("CC1");
+            int cc2Index = type.getIndex("CC2");
+            int cigIndex = type.getIndex("CIGC");
+            int caIndex  = type.getIndex("CA");
+            boolean mergeClouds = ((cc1Index >= 0) && (cc2Index >= 0)
+                                   && (cigIndex >= 0) && (caIndex < 0));
+
             int[] indicies = new int[] { dayIndex, timeIndex, latIndex,
                                          lonIndex, altIndex };
 
@@ -865,6 +873,11 @@ public class PointObFactory {
                     realTypes.add((RealType) stype);
                 }
             }
+            RealType caType = null;
+            if (mergeClouds) {
+                caType = DataUtil.makeRealType("CA", DataUtil.parseUnit(""));
+                realTypes.add(caType);
+            }
             if (allReals) {
                 tupleType = new RealTupleType(
                     (RealType[]) realTypes.toArray(
@@ -877,6 +890,11 @@ public class PointObFactory {
             int    numString = textTypes.size();
             Real[] protos    = null;
             Unit[] realUnits = null;
+            Real   caProto   = null;
+            double caValue   = 0;
+            if (mergeClouds) {
+                caProto = new Real(caType, 0);
+            }
 
             for (int i = 0; i < length; i++) {
                 DateTime dateTime = (DateTime) times.get(i);
@@ -890,14 +908,65 @@ public class PointObFactory {
                                           : new Real(RealType.Altitude, 0));
 
                 Tuple rest = null;
+                // McIDAS Metar Cloud covers are:
+                // 0 - clear       = WMO 0
+                // 1 - scattered   = WMO 2
+                // 2 - broken      = WMO 6
+                // 3 - overcast    = WMO 8
+                // 5 - few         = WMO 1
+                int wmo = 0;
+                if (mergeClouds) {
+                    double cc1 =
+                        ((Real) ob.getComponent(cc1Index)).getValue();
+                    double cc2 =
+                        ((Real) ob.getComponent(cc2Index)).getValue();
+                    double cig =
+                        ((Real) ob.getComponent(cigIndex)).getValue();
+                    if (Double.isNaN(cc1)) {
+                        cc1 = 0;
+                    }
+                    if (Double.isNaN(cc2)) {
+                        cc2 = 0;
+                    }
+                    if (Double.isNaN(cig)) {
+                        cig = 0;
+                    }
+                    boolean haveFew = ((cc1 == 5) || (cc2 == 5));
+                    int     largest = 0;
+                    if ( !haveFew) {
+                        largest = (int) Math.max(Math.max(cc1, cc2), cig);
+                    } else {
+                        double val1 = (cc1 == 5)
+                                      ? 0
+                                      : cc1;
+                        double val2 = (cc2 == 5)
+                                      ? 0
+                                      : cc2;
+                        largest = (int) Math.max(Math.max(val1, val2), cig);
+                    }
+                    if (largest < 2) {          // CLR or SCT
+                        wmo = 2 * largest;
+                    } else if (largest == 2) {  // BKN
+                        wmo = 6;
+                    } else {                    // OVC
+                        wmo = 8;
+                    }
+                    if ((wmo == 0) && haveFew) {
+                        wmo++;                  // FEW
+                    }
+                }
 
                 // now make data
                 if (allReals) {
                     double[] obValues   = ((RealTuple) ob).getValues();
-                    double[] realValues = new double[numNotRequired];
+                    double[] realValues = new double[numDouble];
                     for (int j = 0; j < numNotRequired; j++) {
                         realValues[j] = obValues[notReqIndices[j]];
                     }
+                    if (mergeClouds) {
+                        realValues[numDouble - 1] = wmo;
+                    }
+
                     if (protos == null) {
                         protos    = new Real[numDouble];
                         realUnits = new Unit[numDouble];
@@ -905,6 +974,10 @@ public class PointObFactory {
                             protos[j] =
                                 (Real) ob.getComponent(notReqIndices[j]);
                             realUnits[j] = protos[j].getUnit();
+                        }
+                        if (mergeClouds) {
+                            protos[numDouble - 1]    = caProto;
+                            realUnits[numDouble - 1] = caProto.getUnit();
                         }
                     }
 
@@ -920,6 +993,10 @@ public class PointObFactory {
                     if (i == 0) {
                         protos    = new Real[numDouble];
                         realUnits = new Unit[numDouble];
+                        if (mergeClouds) {
+                            protos[numDouble - 1]    = caProto;
+                            realUnits[numDouble - 1] = caProto.getUnit();
+                        }
                     }
                     int stringIdx = 0;
                     int valIdx    = 0;
@@ -932,12 +1009,15 @@ public class PointObFactory {
                             Real real = (Real) scalar;
                             values[valIdx] = real.getValue();
                             if (i == 0) {
-                                realUnits[j] = real.getUnit();
-                                protos[j]    = real;
+                                realUnits[valIdx] = real.getUnit();
+                                protos[valIdx]    = real;
                             }
                             valIdx++;
                         }
 
+                    }
+                    if (mergeClouds) {
+                        values[numDouble - 1] = wmo;
                     }
                     rest = new DoubleStringTuple(tupleType, protos, values,
                             strings, realUnits);

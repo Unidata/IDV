@@ -36,8 +36,7 @@ import java.rmi.RemoteException;
 /**
  * Implementation of PointOb as a Tuple.  This is immutable.
  *
- * @author MetApps Development Team
- * @version $Revision: 1.14 $ $Date: 2006/12/01 20:42:34 $
+ * @author IDV Development Team
  */
 public class PointObTuple extends Tuple implements PointOb {
 
@@ -94,9 +93,9 @@ public class PointObTuple extends Tuple implements PointOb {
     }
 
     /**
-     * _more_
+     * Is this missing?
      *
-     * @return _more_
+     * @return  true if location, time and obs are missing
      */
     public boolean isMissing() {
         return (location == null) || (dateTime == null) || (data == null);
@@ -108,7 +107,7 @@ public class PointObTuple extends Tuple implements PointOb {
      * Create, if needed, and return the component array.
      *
      *
-     * @param copy _more_
+     * @param copy  true to copy
      * @return components
      */
     public Data[] getComponents(boolean copy) {

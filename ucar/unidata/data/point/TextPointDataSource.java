@@ -199,7 +199,7 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     List lines;
 
-    /** _more_ */
+    /** the stream processor*/
     private TextAdapter.StreamProcessor streamProcessor;
 
 
@@ -214,9 +214,9 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     *  Can we save locally
      *
-     * @return _more_
+     * @return  true if we can
      */
     public boolean canSaveDataToLocalDisk() {
         return !isFileBased();
@@ -224,9 +224,9 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Set the stream processor to use
      *
-     * @param streamProcessor _more_
+     * @param streamProcessor  the StreamProcessor
      */
     public void setStreamProcessor(
             TextAdapter.StreamProcessor streamProcessor) {
@@ -315,7 +315,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @param descriptor    data source descriptor
      * @param source        source of data (filename/URL)
-     * @param name _more_
+     * @param name          the name of the dataset
      * @param properties    extra properties for initialization
      *
      * @throws VisADException   problem creating the data
@@ -457,13 +457,13 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Get the contents of the file as a string
      *
-     * @param sourceFile _more_
+     * @param sourceFile the contents
      *
-     * @return _more_
+     * @return   the contents as a string
      *
-     * @throws Exception _more_
+     * @throws Exception  probably an IOException
      */
     protected final String getContents(String sourceFile) throws Exception {
         //A check to see if derived classes break
@@ -477,7 +477,7 @@ public class TextPointDataSource extends PointDataSource {
      * If the source file is a xls file then convert to csv text
      *
      * @param sourceFile The source file (or url)
-     * @param sampleIt _more_
+     * @param sampleIt   if true, then just read on ob
      *
      * @return The contents
      *
@@ -1381,7 +1381,7 @@ public class TextPointDataSource extends PointDataSource {
      * @param altIndex where is the alt
      * @param times the data tuples
      * @param tuples the trajectory
-     * @param pointData _more_
+     * @param pointData  the point data
      *
      * @return the trajectory
      *
@@ -1901,14 +1901,14 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Make point obs from a list of tuples
      *
-     * @param pointData _more_
-     * @param trackParam _more_
+     * @param pointData   point data
+     * @param trackParam  the track parameter
      *
-     * @return _more_
+     * @return a field of point obs
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem making VisAD Data
      */
     private FieldImpl makePointObs(List<Data[]> pointData, String trackParam)
             throws VisADException {
@@ -2255,11 +2255,11 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Find the lat/lon/alt indicides
      *
-     * @param type _more_
+     * @param type  the type to search
      *
-     * @return _more_
+     * @return  the indicies in the tuple
      */
     public static int[] findLatLonAltIndices(TupleType type) {
         // Check for LAT/LON/ALT
