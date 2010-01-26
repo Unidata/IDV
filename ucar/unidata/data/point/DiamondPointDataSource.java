@@ -1,20 +1,18 @@
 /*
- * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -27,6 +25,7 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
+
 import visad.DateTime;
 import visad.VisADException;
 
@@ -45,7 +44,7 @@ import java.util.List;
  */
 public class DiamondPointDataSource extends TextPointDataSource {
 
-    /** _more_          */
+    /** _more_ */
     public static String diamond1 =
         "(index -> (StationId(Text),Longitude,Latitude,Time,Altitude,CF,"
         + "CloudTotal,DIR,SPD,PressureSFC,Pressure3Hr,Weather1, Weather2,Preci6Hr,LowCloudShape,"
@@ -71,7 +70,7 @@ public class DiamondPointDataSource extends TextPointDataSource {
 
     /* StationId(Text),Longitude,Latitude,Time,Altitude,CF,High,T,TD,DIR,SPD*/
 
-    /** _more_          */
+    /** _more_ */
     public static String diamond2 =
         "(index -> (StationId(Text),Longitude,Latitude,Time,Altitude,"
         + "CF,High,T,TD,DIR,SPD))\n" + "StationId(Text),"
@@ -96,9 +95,9 @@ public class DiamondPointDataSource extends TextPointDataSource {
      * @throws VisADException _more_
      *
      */
-    public DiamondPointDataSource(
-            DataSourceDescriptor descriptor, List sources,
-            Hashtable properties) throws VisADException {
+    public DiamondPointDataSource(DataSourceDescriptor descriptor,
+                                  List sources, Hashtable properties)
+            throws VisADException {
         super(descriptor, sources, properties);
 
 
@@ -115,9 +114,9 @@ public class DiamondPointDataSource extends TextPointDataSource {
      * @throws VisADException   problem creating the data
      *
      */
-    public DiamondPointDataSource(
-            DataSourceDescriptor descriptor, String source,
-            Hashtable properties) throws VisADException {
+    public DiamondPointDataSource(DataSourceDescriptor descriptor,
+                                  String source, Hashtable properties)
+            throws VisADException {
         super(descriptor, source, properties);
 
     }
@@ -128,12 +127,14 @@ public class DiamondPointDataSource extends TextPointDataSource {
      * If the source file is a xls file then convert to csv text
      *
      * @param sourceFile The source file (or url)
+     * @param sampleIt _more_
      *
      * @return The contents
      *
      * @throws Exception On badness
      */
-    protected String getContents(String sourceFile, boolean sampleIt) throws Exception {
+    protected String getContents(String sourceFile, boolean sampleIt)
+            throws Exception {
         String       s            = IOUtil.readContents(sourceFile);
 
         List<String> lines        = StringUtil.split(s, "\n", true, true);
@@ -303,8 +304,8 @@ public class DiamondPointDataSource extends TextPointDataSource {
      *
      *  @throws Exception _more_
      */
-    private DateTime getDateTime(int year, int month, int day,
-                                 int hour) throws Exception {
+    private DateTime getDateTime(int year, int month, int day, int hour)
+            throws Exception {
         GregorianCalendar convertCal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         convertCal.clear();
@@ -318,4 +319,3 @@ public class DiamondPointDataSource extends TextPointDataSource {
 
 
 }
-

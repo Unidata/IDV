@@ -1,20 +1,18 @@
-/**
- * $Id: NetcdfPointDataSource.java,v 1.32 2007/07/31 19:29:16 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -48,6 +46,7 @@ import java.util.List;
 
 import javax.swing.JTabbedPane;
 
+
 /**
  * A data source for netCDF or CDM point data
  *
@@ -62,6 +61,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         LogUtil.getLogInstance(NetcdfPointDataSource.class.getName());
 
 
+    /** a fixed dataset */
     private FeatureDatasetPoint fixedDataset = null;
 
     /**
@@ -77,19 +77,20 @@ public class NetcdfPointDataSource extends PointDataSource {
     /**
      * Create a new NetcdfPointDataSource
      *
+     *
+     * @param fixedDataset  the data source
      * @param descriptor    data source descriptor
-     * @param source        source of data (filename/URL)
      * @param properties    extra properties for initialization
      *
      * @throws VisADException   problem creating the data
      *
      */
-    public NetcdfPointDataSource(FeatureDatasetPoint fixedDataset, 
-				 DataSourceDescriptor descriptor,
-                                  Hashtable properties)
+    public NetcdfPointDataSource(FeatureDatasetPoint fixedDataset,
+                                 DataSourceDescriptor descriptor,
+                                 Hashtable properties)
             throws VisADException {
-        this(descriptor, Misc.toList(new String[] {""}), properties);
-	this.fixedDataset = fixedDataset;
+        this(descriptor, Misc.toList(new String[] { "" }), properties);
+        this.fixedDataset = fixedDataset;
     }
 
 
@@ -212,21 +213,23 @@ public class NetcdfPointDataSource extends PointDataSource {
     /**
      * Return the FeatureDatasetPoint associated with this DataSource.
      *
+     *
+     * @param file  the file name
      * @return dataset
      */
     protected FeatureDatasetPoint getDataset(String file) {
-	if(fixedDataset!=null) {
-	    System.err.println ("Using fixed dataset");
-	    return  fixedDataset;
-	}
+        if (fixedDataset != null) {
+            System.err.println("Using fixed dataset");
+            return fixedDataset;
+        }
 
         FeatureDatasetPoint dataset = null;
-        if(file == null) {
-            if(sources !=null && sources.size()>0) {
+        if (file == null) {
+            if ((sources != null) && (sources.size() > 0)) {
                 file = (String) sources.get(0);
             }
         }
-        if(file == null) {
+        if (file == null) {
             file = getFilePath();
             if (file == null) {
                 if (haveBeenUnPersisted) {
@@ -255,19 +258,22 @@ public class NetcdfPointDataSource extends PointDataSource {
     /**
      * Make the dataset
      *
+     *
+     * @param file  the file name
      * @return the dataset
      */
     protected FeatureDatasetPoint doMakeDataset(String file) {
-        Formatter        buf     = new Formatter();
+        Formatter           buf     = new Formatter();
         FeatureDatasetPoint pods    = null;
-        Exception        toThrow = new Exception("Datset is null");
+        Exception           toThrow = new Exception("Datset is null");
         try {
             file = convertSourceFile(file);
             //pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
             //    ucar.nc2.constants.FeatureType.POINT, file, null, buf);
             if (pods == null) {  // try as ANY_POINT
-                pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                    ucar.nc2.constants.FeatureType.ANY_POINT, file, null, buf);
+                pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager
+                    .open(ucar.nc2.constants.FeatureType.ANY_POINT, file,
+                          null, buf);
             }
         } catch (Exception exc) {
             pods = null;
@@ -335,7 +341,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         String source;
         if (id instanceof Integer) {
             source = (String) sources.get(((Integer) id).intValue());
-        } else if (id instanceof List && sample) {
+        } else if ((id instanceof List) && sample) {
             source = (String) sources.get(0);
         } else {
             source = id.toString();
@@ -349,12 +355,13 @@ public class NetcdfPointDataSource extends PointDataSource {
             if (pods == null) {
                 return null;
             }
-            DateSelection ds = (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
+            DateSelection ds =
+                (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
                     getBinWidth(), bbox, ds, sample);
-	    if(fixedDataset==null) {
-		pods.close();
-	    }
+            if (fixedDataset == null) {
+                pods.close();
+            }
         }
         Trace.call2("NetcdfPointDatasource:makeObs");
         return obs;
@@ -367,16 +374,6 @@ public class NetcdfPointDataSource extends PointDataSource {
     public void doRemove() {
         super.doRemove();
     }
-
-    /**
-     * Add any extra tabs into the properties tab
-     *
-     * @param tabbedPane The properties tab
-    public void addPropertiesTabs(JTabbedPane tabbedPane) {
-        super.addPropertiesTabs(tabbedPane);
-        addNCDumpPropertiesTab(tabbedPane, getDataset().getNetcdfFile(), "Metadata");
-    }
-     */
 
     /**
      * test
@@ -412,9 +409,9 @@ public class NetcdfPointDataSource extends PointDataSource {
 
                 if (i != 0) {
                     total += (t2 - t1);
-                    System.err.println("FeatureDatasetPoint time:" + (tt2 - tt1)
-                                       + " makePointObs time:" + (t2 - t1)
-                                       + " avg:" + (total / i));
+                    System.err.println("FeatureDatasetPoint time:"
+                                       + (tt2 - tt1) + " makePointObs time:"
+                                       + (t2 - t1) + " avg:" + (total / i));
                 }
 
             }
@@ -425,4 +422,3 @@ public class NetcdfPointDataSource extends PointDataSource {
     }
 
 }
-
