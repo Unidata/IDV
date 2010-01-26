@@ -171,6 +171,12 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** flag for whether to ingnore timesCbx events or not */
     private boolean ignoreTimesCbxEvents = false;
 
+    /**
+     * Set to true after we have made the gui contents. Use this to not set the items in the combobox until
+     *   we have made the gui to fix the random huge size problem
+     */
+    private boolean madeContents = false;
+
 
 
 
@@ -428,8 +434,13 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                 }
             }
         };
+
         List buttonList = new ArrayList();
         buttonList.add(timesCbx);
+        //Update the list of times
+        setTimesInTimesBox();
+
+
         Dimension preferredSize = timesCbx.getPreferredSize();
         if (preferredSize != null) {
             int height = preferredSize.height;
@@ -466,6 +477,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             }
         }
 
+
+
+
         JComponent contents = GuiUtils.hflow(buttonList, 1, 0);
         if (boxPanel == null) {
             boxPanel = new AnimationBoxPanel(this);
@@ -489,8 +503,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         }
 
         updateRunButton();
+        madeContents = true;
         return contents;
-
     }
 
 
@@ -590,7 +604,6 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                     if (getAnimationSetInfo().getActive()) {
                         anime.setSet(getAnimationSetInfo().makeTimeSet(null));
                     } else {
-                        //                        System.err.println ("set:" + getAnimationSetInfo().getBaseTimes());
                         anime.setSet(getAnimationSetInfo().getBaseTimes());
                     }
                 }
@@ -1020,6 +1033,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                     try {
                         ignoreTimesCbxEvents = true;
                         //                        synchronized (timesCbxMutex) {
+                        xcnt++;
+
                         timesCbx.setSelectedItem(theDateTime);
                         //                        }
                         if ((boxPanel != null) && (theIndex >= 0)) {
@@ -1069,7 +1084,6 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Adds an <CODE>ucar.visad.display.Animation</CODE>
      * to be controlled by this widget.
      * @param anim ucar.visad.display.Animation to control  (must not be null)
-     * @throws NullPointerException  if anim is null
      * @deprecated  use setAnimation();
      */
     public void addAnimation(Animation anim) {
@@ -1136,6 +1150,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * from when we just have a new Animation at initialization time (timeSetChange=false)
      * from when the times have changed in the display.
      */
+    int xcnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param timeSet _more_
+     * @param timeSetChange _more_
+     */
     private void updateIndicatorInner(Set timeSet, boolean timeSetChange) {
         //      timeSet  = checkAnimationSet(timeSet);
         timesArray = Animation.getDateTimeArray(timeSet);
@@ -1147,25 +1169,37 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                boolean oldValue = ignoreTimesCbxEvents;
-                try {
-                    ignoreTimesCbxEvents = true;
-                    //        synchronized (timesCbxMutex) {
-                    GuiUtils.setListData(timesCbx, timesArray);
-                    //        }
-                    //        synchronized (timesCbxMutex) {
-                    timesCbx.setVisible(timesCbxVisible
-                                        && (timesArray != null)
-                                        && (timesCbx.getItemCount() > 0));
-                    //        }
+                //Only set the list data if we have created the gui contents 
+                if (madeContents) {
+                    setTimesInTimesBox();
                     updateRunButton();
-                } finally {
-                    ignoreTimesCbxEvents = oldValue;
                 }
             }
         });
         updateBoxPanel(timesArray);
     }
+
+
+    /**
+     * _more_
+     */
+    private void setTimesInTimesBox() {
+        DateTime[] theTimesArray = this.timesArray;
+        if (theTimesArray == null) {
+            return;
+        }
+        boolean oldValue = ignoreTimesCbxEvents;
+        try {
+            ignoreTimesCbxEvents = true;
+            GuiUtils.setListData(timesCbx, theTimesArray);
+            timesCbx.setVisible(timesCbxVisible && (theTimesArray != null)
+                                && (timesCbx.getItemCount() > 0));
+
+        } finally {
+            ignoreTimesCbxEvents = oldValue;
+        }
+    }
+
 
 
     /**
