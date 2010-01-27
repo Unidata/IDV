@@ -1,20 +1,18 @@
 /*
- * $Id: TextGlyph.java,v 1.52 2007/05/04 13:56:23 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -51,8 +49,13 @@ import visad.georef.LatLonPoint;
 
 import visad.util.DataUtility;
 
+import visad.util.ImageHelper;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+
+import java.io.IOException;
 
 import java.rmi.RemoteException;
 
@@ -565,18 +568,22 @@ public class TextGlyph extends DrawingGlyph {
             renderedEditor.addHyperlinkListener(getHyperlinkListener());
         }
 
-        Color tmpBg = new Color(123,124,125);
+        Color tmpBg = new Color(123, 124, 125);
 
         ImageUtils.getEditor(renderedEditor, processHtml(html), htmlWidth,
-                             (bg==null?tmpBg:null), null);
-       
-        if(bg!=null) {
+                             ((bg == null)
+                              ? tmpBg
+                              : null), null);
+
+        if (bg != null) {
             renderedEditor.setBackground(bg);
         } else {
             renderedEditor.setBackground(tmpBg);
         }
         // System.err.println("\nGetting image");
-        Image image = (bg!=null?ImageUtils.getImage(renderedEditor):ImageUtils.getImage(renderedEditor,tmpBg));
+        Image image = ((bg != null)
+                       ? ImageUtils.getImage(renderedEditor)
+                       : ImageUtils.getImage(renderedEditor, tmpBg));
         //        JComponent p = GuiUtils.inset(new JLabel(new ImageIcon(image)),new Insets(20,20,20,20));
         //        p.setBackground(Color.green);
         //        GuiUtils.showOkCancelDialog(null,null,p , null);
@@ -698,8 +705,10 @@ public class TextGlyph extends DrawingGlyph {
      */
     private void updateImage() {
         try {
-            image       = getImage(text, htmlWidth);
-            imageData   = Util.makeField(image, true);
+            image = getImage(text, htmlWidth);
+            //Use our own makeField for now
+            //            imageData   = Util.makeField(image, true);
+            imageData   = makeField(image, 0f, false);
             imageDomain = (Linear2DSet) imageData.getDomainSet();
         } catch (Exception exc) {
             LogUtil.logException("Rendering html image", exc);
@@ -828,6 +837,11 @@ public class TextGlyph extends DrawingGlyph {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean shouldShowBgColorSelector() {
         return true;
     }
@@ -1376,7 +1390,149 @@ public class TextGlyph extends DrawingGlyph {
 
 
 
+    /**
+     * For now copy this frim Util to fix the colliding realtype problem with ImageGlyphs
+     *
+     * @param image _more_
+     * @param alphaThreshold _more_
+     * @param makeAlpha _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     * @throws VisADException _more_
+     */
+    private static FlatField makeField(Image image, float alphaThreshold,
+                                       boolean makeAlpha)
+            throws IOException, VisADException {
+
+        if (image == null) {
+            throw new VisADException("image cannot be null");
+        }
+        ImageHelper ih = new ImageHelper();
+
+        // determine image height and width
+        int width  = -1;
+        int height = -1;
+        do {
+            if (width < 0) {
+                width = image.getWidth(ih);
+            }
+            if (height < 0) {
+                height = image.getHeight(ih);
+            }
+            if (ih.badImage || ((width >= 0) && (height >= 0))) {
+                break;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
+        } while (true);
+        if (ih.badImage) {
+            throw new IOException("Not an image");
+        }
+
+        // extract image pixels
+        int   numPixels = width * height;
+        int[] words     = new int[numPixels];
+
+        PixelGrabber grabber = new PixelGrabber(image.getSource(), 0, 0,
+                                   width, height, words, 0, width);
+
+        try {
+            grabber.grabPixels();
+        } catch (InterruptedException e) {}
+
+        ColorModel cm        = grabber.getColorModel();
+
+        float[]    red_pix   = new float[numPixels];
+        float[]    green_pix = new float[numPixels];
+        float[]    blue_pix  = new float[numPixels];
+        float[]    alpha_pix = new float[numPixels];
+
+        boolean    hasAlpha  = cm.hasAlpha();
+
+
+        for (int i = 0; i < numPixels; i++) {
+            red_pix[i]   = cm.getRed(words[i]);
+            green_pix[i] = cm.getGreen(words[i]);
+            blue_pix[i]  = cm.getBlue(words[i]);
+            if (hasAlpha) {
+                alpha_pix[i] = cm.getAlpha(words[i]);
+            } else {
+                alpha_pix[i] = 0f;
+            }
+        }
+
+
+        int     alphaCnt = 0;
+        boolean opaque   = true;
+
+        if ( !makeAlpha && (alphaThreshold >= 0)) {
+            float alphaValue;
+            for (int i = 0; i < numPixels; i++) {
+                if (hasAlpha) {
+                    alphaValue = cm.getAlpha(words[i]);
+                } else {
+                    alphaValue = 255.0f;
+                }
+
+
+                if (alphaValue <= alphaThreshold) {
+                    alphaCnt++;
+                    red_pix[i]   = Float.NaN;
+                    green_pix[i] = Float.NaN;
+                    blue_pix[i]  = Float.NaN;
+                    opaque       = false;
+                }
+            }
+        }
+
+        //        System.err.println(alphaThreshold +" hasAlpha:" + hasAlpha +" make alpha:" + makeAlpha +" cnt:" + alphaCnt);
+
+        //System.out.println("opaque = " + opaque);
+
+        // build FlatField
+        RealType   line    = RealType.getRealType("ImageLine");
+        RealType   element = RealType.getRealType("ImageElement");
+        RealType   c_red   = RealType.getRealType("Red_text");
+        RealType   c_green = RealType.getRealType("Green_text");
+        RealType   c_blue  = RealType.getRealType("Blue_text");
+        RealType   c_alpha = RealType.getRealType("Alpha_text");
+
+        RealType[] c_all   = (makeAlpha
+                              ? new RealType[] { c_red, c_green, c_blue,
+                c_alpha }
+                              : new RealType[] { c_red, c_green, c_blue });
+        RealTupleType radiance          = new RealTupleType(c_all);
+
+        RealType[]    domain_components = { element, line };
+        RealTupleType image_domain      =
+            new RealTupleType(domain_components);
+        Linear2DSet domain_set = new Linear2DSet(image_domain, 0.0,
+                                     (float) (width - 1.0), width,
+                                     (float) (height - 1.0), 0.0, height);
+        FunctionType image_type = new FunctionType(image_domain, radiance);
+
+        FlatField    field      = new FlatField(image_type, domain_set);
+
+        float[][]    samples    = (makeAlpha
+                                   ? new float[][] {
+                  red_pix, green_pix, blue_pix, alpha_pix
+              }
+                                   : new float[][] {
+                  red_pix, green_pix, blue_pix
+              });
+        try {
+            field.setSamples(samples, false);
+        } catch (RemoteException e) {
+            throw new VisADException("Couldn't finish image initialization");
+        }
+
+        return field;
+
+    }
+
+
 
 }
-
-
