@@ -3411,7 +3411,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         } else if(keyEvent.isControlDown() && code == KeyEvent.VK_M) {
             startImageCapture();
             return;
-        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_S) {
+        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_B) {
             getIdv().doSaveAs();
             return;
         } else if ( !Character.isDigit(c)) {
@@ -4276,11 +4276,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
         JMenuItem mi;
-        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...  ^I",
+        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...  Ctrl+I",
                 this,
                 "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
-        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...  ^M",
+        //        mi.setMnemonic(GuiUtils.charToKeyCode("C"));
+        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...  Ctrl+M",
                 this, "startImageCapture"), "/auxdata/ui/icons/film.png"));
+        //        mi.setMnemonic(GuiUtils.charToKeyCode("M"));
+
+
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
                 this, "doPrintImage", null,
                 true), "/auxdata/ui/icons/printer.png"));
