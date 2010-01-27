@@ -3396,6 +3396,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return;
         }
 
+        //        System.err.println ("ctrl:" + keyEvent.isControlDown() +" meta:" + keyEvent.isMetaDown());
 
         if (code == KeyEvent.VK_F1) {
             runVisibilityAnimation = false;
@@ -3404,6 +3405,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
             turnOnOffAllDisplays(true);
         } else if (code == KeyEvent.VK_F3) {
             turnOnOffAllDisplays(false);
+        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_I) {
+            doSaveImageInThread();
+            return;
+        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_M) {
+            startImageCapture();
+            return;
+        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_S) {
+            getIdv().doSaveAs();
+            return;
         } else if ( !Character.isDigit(c)) {
             return;
         } else {
@@ -3438,9 +3448,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     while (runVisibilityAnimation && !getIsDestroyed()
                             && !getDisplayInfos().isEmpty()) {
-                        stepVisibilityToggle();
+                        int sleepTime = stepVisibilityToggle();
                         try {
-                            Thread.sleep(animationSpeed);
+                            Thread.sleep(sleepTime<0?animationSpeed:sleepTime*1000);
                         } catch (InterruptedException ie) {
                             return;
                         }
@@ -3495,13 +3505,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * This turns on the visbility of the next  display control
      * (that is &quot;unlocked&quot;) and turns off the others
      */
-    private void stepVisibilityToggle() {
+    private int stepVisibilityToggle() {
         if (currentVisibilityIdx == -1) {
             currentVisibilityIdx = 0;
         } else {
             currentVisibilityIdx++;
         }
         List controls = getControls();
+
+        int visbilityAnimationPause = -1;
 
         int  cnt      = 0;
         //Find the next one in the list that is not locked
@@ -3512,7 +3524,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             DisplayControl control =
                 (DisplayControl) controls.get(currentVisibilityIdx);
             if ( !control.getLockVisibilityToggle()) {
+                visbilityAnimationPause = control.getVisbilityAnimationPause();
                 break;
+
             }
             currentVisibilityIdx++;
             cnt++;
@@ -3541,6 +3555,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
 
         }
+
+        return visbilityAnimationPause;
     }
 
 
@@ -4259,16 +4275,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...",
+        JMenuItem mi;
+        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...  ^I",
                 this,
                 "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
+        captureMenu.add(mi=(JMenuItem)GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...  ^M",
+                this, "startImageCapture"), "/auxdata/ui/icons/film.png"));
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
                 this, "doPrintImage", null,
                 true), "/auxdata/ui/icons/printer.png"));
-
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...",
-                this, "startImageCapture"), "/auxdata/ui/icons/film.png"));
-
         viewMenu.add(makeShowMenu());
 
         if (this.viewMenu == null) {
