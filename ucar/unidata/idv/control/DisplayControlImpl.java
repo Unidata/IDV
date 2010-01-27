@@ -787,6 +787,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** property widget */
     private JTextField idFld;
 
+
+
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
 
@@ -841,6 +843,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** _more_ */
     private List<Removable> removables = new ArrayList<Removable>();
+
+
+    private int visbilityAnimationPause = -1;
+
+    private JTextField visbilityAnimationPauseFld;
 
 
     /**
@@ -5347,6 +5354,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         comps.add(idFld);
         comps.add(new JLabel(" (for scripting)"));
 
+        visbilityAnimationPauseFld = new JTextField(""+visbilityAnimationPause,5);
+        visbilityAnimationPauseFld.setToolTipText("Number of seconds this display should be shown when in visibiltiy animation mode");
+        comps.add(GuiUtils.rLabel("Visiblilty pause:"));
+        comps.add(GuiUtils.left(GuiUtils.hbox(visbilityAnimationPauseFld,new JLabel(" in seconds,  use -1 for default"))));
+        comps.add(GuiUtils.filler());
+
+
+
         JPanel settingsPanel = getSettingsPanel();
         if (settingsPanel != null) {
             comps.add(GuiUtils.filler());
@@ -5720,6 +5735,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         setId(idFld.getText());
+        visbilityAnimationPause = new Integer(visbilityAnimationPauseFld.getText().trim()).intValue();
+
         setDisplayCategory(categoryFld.getText());
         setDisplayListTemplate(displayListTemplateFld.getText());
         setExtraLabelTemplate(extraLabelTemplateFld.getText().trim());
@@ -11639,6 +11656,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         return pointSizeFld;
     }
+
+    /**
+       Set the VisbilityAnimationPause property.
+
+       @param value The new value for VisbilityAnimationPause
+    **/
+    public void setVisbilityAnimationPause (int value) {
+	this.visbilityAnimationPause = value;
+    }
+
+    /**
+       Get the VisbilityAnimationPause property.
+
+       @return The VisbilityAnimationPause
+    **/
+    public int getVisbilityAnimationPause () {
+	return this.visbilityAnimationPause;
+    }
+
+
 
 
 }
