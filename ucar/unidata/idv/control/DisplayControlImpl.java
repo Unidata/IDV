@@ -841,12 +841,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private LocalDisplay displayControlListeningTo;
 
 
-    /** _more_ */
+    /** list of removeable things */
     private List<Removable> removables = new ArrayList<Removable>();
 
 
+    /** visibility animation pause (secs) */
     private int visbilityAnimationPause = -1;
 
+    /** visibility animation pause field for properties gui */
     private JTextField visbilityAnimationPauseFld;
 
 
@@ -5354,11 +5356,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         comps.add(idFld);
         comps.add(new JLabel(" (for scripting)"));
 
-        visbilityAnimationPauseFld = new JTextField(""+visbilityAnimationPause,5);
-        visbilityAnimationPauseFld.setToolTipText("Number of seconds this display should be shown when in visibiltiy animation mode");
-        comps.add(GuiUtils.rLabel("Visiblilty pause:"));
+        visbilityAnimationPauseFld = new JTextField(""
+                + visbilityAnimationPause, 5);
+        visbilityAnimationPauseFld.setToolTipText(
+            "Number of seconds this display should be shown when in visibiltiy animation mode");
+        /*
+        comps.add(GuiUtils.rLabel("Visiblilty Pause:"));
         comps.add(GuiUtils.left(GuiUtils.hbox(visbilityAnimationPauseFld,new JLabel(" in seconds,  use -1 for default"))));
         comps.add(GuiUtils.filler());
+        */
 
 
 
@@ -5735,7 +5741,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         setId(idFld.getText());
-        visbilityAnimationPause = new Integer(visbilityAnimationPauseFld.getText().trim()).intValue();
+        visbilityAnimationPause = new Integer(
+            visbilityAnimationPauseFld.getText().trim()).intValue();
 
         setDisplayCategory(categoryFld.getText());
         setDisplayListTemplate(displayListTemplateFld.getText());
@@ -6451,7 +6458,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * removeDisplayable.
      *
      *
-     * @param andDestroyThem _more_
+     * @param andDestroyThem  true to destroy them
      * @throws RemoteException
      * @throws VisADException
      */
@@ -6509,9 +6516,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Add something to be removed on doRemove
      *
-     * @param removable _more_
+     * @param removable  the removeable
      */
     public void addRemovable(Removable removable) {
         removables.add(removable);
@@ -11658,24 +11665,21 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-       Set the VisbilityAnimationPause property.
-
-       @param value The new value for VisbilityAnimationPause
-    **/
-    public void setVisbilityAnimationPause (int value) {
-	this.visbilityAnimationPause = value;
+     *  Set the VisbilityAnimationPause property.
+     *
+     *  @param value The new value for VisbilityAnimationPause
+     */
+    public void setVisbilityAnimationPause(int value) {
+        this.visbilityAnimationPause = value;
     }
 
     /**
-       Get the VisbilityAnimationPause property.
-
-       @return The VisbilityAnimationPause
-    **/
-    public int getVisbilityAnimationPause () {
-	return this.visbilityAnimationPause;
+     *  Get the VisbilityAnimationPause property.
+     *
+     *  @return The VisbilityAnimationPause
+     */
+    public int getVisbilityAnimationPause() {
+        return this.visbilityAnimationPause;
     }
-
-
-
 
 }
