@@ -664,4 +664,10 @@ public interface DisplayControl extends Sharable {
      */
     public Object removeTmpProperty(Object key);
 
+
+    /**
+     * How long should this display be shown when in visibility animation mode
+     * @return -1 if it is undefined. 0 if this one should not be used. else treat the value as seconds
+     */
+    public int getVisbilityAnimationPause ();
 }
