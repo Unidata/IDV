@@ -961,8 +961,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
             }
 
             try {
-                imageData = (FieldImpl) theDataChoice.getData(null,
-                        requestProperties);
+                FieldImpl data = (FieldImpl) theDataChoice.getData(null,
+                                                                   requestProperties);
+                if(data ==null) return null;
+                imageData = data;
             } catch (NullPointerException npe) {
                 userMessage("Image layer does not exist");
             } finally {
