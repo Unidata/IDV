@@ -1,6 +1,6 @@
 <types>
 
-  <type name="jythonscript"  description="Repository Script for Data" handler="ucar.unidata.repository.data.DataJythonTypeHandler">
+  <type name="jythonscript"  description="Repository Script for Data" handler="ucar.unidata.repository.data.DataJythonTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/python.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>

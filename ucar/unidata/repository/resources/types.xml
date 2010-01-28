@@ -37,6 +37,9 @@
 
 
   <type name="ftp"  description="Remote FTP File View" handler="ucar.unidata.repository.type.FtpTypeHandler">
+     <property name="icon" value="/icons/server_go.png"/>
+
+
      <property name="form.show.resource" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.date" value="false"/>

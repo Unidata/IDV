@@ -3777,8 +3777,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         addTypeHandler(TypeHandler.TYPE_GROUP,
                        groupTypeHandler = new GroupTypeHandler(this));
         groupTypeHandler.putProperty("form.show." + ARG_RESOURCE, "false");
+        groupTypeHandler.putProperty("icon",ICON_FOLDER);
+        TypeHandler typeHandler;
         addTypeHandler(TypeHandler.TYPE_FILE,
-                       new TypeHandler(this, "file", "File"));
+                       typeHandler = new TypeHandler(this, "file", "File"));
+        typeHandler.putProperty("icon",ICON_FILE);
     }
 
     /**

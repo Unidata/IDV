@@ -155,7 +155,7 @@ public class TypeHandler extends RepositoryManager {
     String description;
 
 
-    String category = "Misc";
+    String category = "General";
 
     /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();

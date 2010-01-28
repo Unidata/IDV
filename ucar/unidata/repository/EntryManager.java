@@ -2148,6 +2148,7 @@ return new Result(title, sb);
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
+        /*
         sb.append(
             HtmlUtil.href(
                 request.url(
@@ -2161,13 +2162,15 @@ return new Result(title, sb);
                     ARG_TYPE, TYPE_FILE), msg("Upload a file")));
 
         sb.append(HtmlUtil.p());
+        */
+        sb.append(msgHeader("Create a new entry"));
 
         List<String>categories = new ArrayList<String>();
         Hashtable<String,StringBuffer> catMap = new Hashtable<String,StringBuffer>();
 
         HashSet<String> exclude = new HashSet<String>();
-        exclude.add(TYPE_FILE);
-        exclude.add(TYPE_GROUP);
+        //        exclude.add(TYPE_FILE);
+        //        exclude.add(TYPE_GROUP);
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         for (TypeHandler typeHandler : typeHandlers) {
             if (typeHandler.isAnyHandler()) {
@@ -2179,6 +2182,16 @@ return new Result(title, sb);
             if (!typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
+            String icon = typeHandler.getProperty("icon", (String) null);
+            String img;
+            if (icon == null) {
+                icon =ICON_BLANK;
+                img = HtmlUtil.img(typeHandler.iconUrl(icon),"", HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "16"));
+            } else {
+                img = HtmlUtil.img(typeHandler.iconUrl(icon));
+            }
+
+
             StringBuffer buffer = catMap.get(typeHandler.getCategory());
             if(buffer == null) {
                 catMap.put(typeHandler.getCategory(),buffer= new StringBuffer());
@@ -2188,13 +2201,13 @@ return new Result(title, sb);
                       HtmlUtil.href(
                                     request.url(
                                                 getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
-                                                ARG_TYPE, typeHandler.getType()), typeHandler.getLabel()));
+                                                ARG_TYPE, typeHandler.getType()), img+" " +typeHandler.getLabel()));
 
             buffer.append(HtmlUtil.br());
         }
-        sb.append("<table cellpadding=5><tr valign=top>");
+        sb.append("<table cellpadding=10><tr valign=top>");
         for(String cat: categories) {
-            sb.append(HtmlUtil.col(msgHeader(cat)+ catMap.get(cat)));
+            sb.append(HtmlUtil.col(HtmlUtil.b(cat)+ HtmlUtil.insetDiv(catMap.get(cat).toString(),3,15,0,0)));
         }
         sb.append("</tr></table>");
 

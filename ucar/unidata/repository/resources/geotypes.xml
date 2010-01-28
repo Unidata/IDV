@@ -2,7 +2,7 @@
 
 
   <type name="cataloglink"  description="Catalog Link" category="Geo Data" >
-     <property name="icon" value="/icons/link.png"/>
+     <property name="icon" value="/icons/book_link.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.file" value="false"/>
@@ -17,6 +17,7 @@
   </type>
 
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler" category="Geo Data">
+     <property name="icon" value="/icons/book_open.png"/>
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
      <property name="form.label.url" value="Catalog URL"/>
