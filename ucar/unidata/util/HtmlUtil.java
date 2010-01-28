@@ -1,18 +1,18 @@
-/**
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -48,7 +48,7 @@ public class HtmlUtil {
 
     //j-
 
-    /** _more_          */
+    /** _more_ */
     public static final String HTTP_USER_AGENT = "User-Agent";
 
     /** _more_ */
@@ -162,6 +162,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_LI = "li";
 
+    /** _more_          */
     public static final String TAG_LINK = "link";
 
 
@@ -248,7 +249,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_METHOD = "method";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MULTIPLE = "multiple";
 
     /** _more_ */
@@ -275,6 +276,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_READONLY = "READONLY";
 
+    /** _more_          */
     public static final String ATTR_REL = "rel";
 
     /** _more_ */
@@ -940,25 +942,58 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String h1(String content) {
         return tag(TAG_H1, "", content);
     }
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String h2(String content) {
         return tag(TAG_H2, "", content);
     }
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String h3(String content) {
         return tag(TAG_H3, "", content);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String ul() {
-	return open(TAG_UL,"");
+        return open(TAG_UL, "");
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String p(String content) {
         return tag(TAG_P, "", content);
     }
@@ -1716,8 +1751,17 @@ public class HtmlUtil {
         return input(name, value, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param size _more_
+     *
+     * @return _more_
+     */
     public static String input(String name, Object value, int size) {
-	return input(name,value,attrs(ATTR_SIZE, ""+size));
+        return input(name, value, attrs(ATTR_SIZE, "" + size));
     }
 
 
@@ -1739,9 +1783,10 @@ public class HtmlUtil {
                                           : value.toString())) + " " + extra);
         }
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_INPUT, ATTR_VALUE, ((value == null)
-                ? ""
-                : value.toString())) + " " + extra);
+                   attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_INPUT,
+                         ATTR_VALUE, ((value == null)
+                                      ? ""
+                                      : value.toString())) + " " + extra);
     }
 
 
@@ -1899,6 +1944,7 @@ public class HtmlUtil {
      */
     public static class Selector {
 
+        /** _more_          */
         int margin = 3;
 
         /** _more_ */
@@ -1910,6 +1956,7 @@ public class HtmlUtil {
         /** _more_ */
         String icon;
 
+        /** _more_          */
         boolean isHeader = false;
 
         /**
@@ -1920,19 +1967,37 @@ public class HtmlUtil {
          * @param icon _more_
          */
         public Selector(String label, String id, String icon) {
-            this(label, id, icon, 3,false);
+            this(label, id, icon, 3, false);
         }
 
 
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param id _more_
+         * @param icon _more_
+         * @param margin _more_
+         */
         public Selector(String label, String id, String icon, int margin) {
             this(label, id, icon, margin, false);
         }
 
-        public Selector(String label, String id, String icon, int margin, boolean isHeader) {
-            this.label = label;
-            this.id    = id;
-            this.icon  = icon;
-            this.margin=margin;
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param id _more_
+         * @param icon _more_
+         * @param margin _more_
+         * @param isHeader _more_
+         */
+        public Selector(String label, String id, String icon, int margin,
+                        boolean isHeader) {
+            this.label    = label;
+            this.id       = id;
+            this.icon     = icon;
+            this.margin   = margin;
             this.isHeader = isHeader;
         }
     }
@@ -1971,9 +2036,10 @@ public class HtmlUtil {
                 label = selector.label;
                 if (selector.icon != null) {
                     extraAttr = style(
-                        "margin:3px;margin-left:" + selector.margin+"px;padding-left:20px;background-repeat:no-repeat; background-image: url("
+                        "margin:3px;margin-left:" + selector.margin
+                        + "px;padding-left:20px;background-repeat:no-repeat; background-image: url("
                         + selector.icon + ");");
-                } else if(selector.isHeader) {
+                } else if (selector.isHeader) {
                     extraAttr = style("font-weight:bold");
                 }
             } else {
@@ -2074,6 +2140,31 @@ public class HtmlUtil {
      * _more_
      *
      * @param html _more_
+     * @param top _more_
+     * @param left _more_
+     * @param bottom _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
+    public static String insetDiv(String html, int top, int left, int bottom,
+                                  int right) {
+        return div(html, style(((top == 0)
+                                ? ""
+                                : "margin-top:" + top + "px;") + ((left == 0)
+                ? ""
+                : "margin-left:" + left + "px;") + ((bottom == 0)
+                ? ""
+                : "margin-bottom:" + bottom + "px;") + ((right == 0)
+                ? ""
+                : "margin-right:" + top + "px;")));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param html _more_
      * @param space _more_
      *
      * @return _more_
@@ -2152,9 +2243,18 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String leftRight(String left, String right) {
-        return leftRight(left,right,"");
+        return leftRight(left, right, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param left _more_
+     * @param right _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     */
     public static String leftRight(String left, String right, String attrs) {
         return tag(TAG_TABLE,
                    attrs(ATTR_WIDTH, "100%", ATTR_CELLPADDING, "0",
@@ -2630,10 +2730,17 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public static String cssLink(String url) {
-        return tag(TAG_LINK, attrs(ATTR_HREF, url,
-                                   ATTR_REL, "stylesheet",
-                                   ATTR_TYPE, "text/css"));
+        return tag(TAG_LINK,
+                   attrs(ATTR_HREF, url, ATTR_REL, "stylesheet", ATTR_TYPE,
+                         "text/css"));
     }
 
 
@@ -2927,16 +3034,25 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     * @param contentSB _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
     public static String makeToggleBlock(String content,
-					 StringBuffer contentSB,
-					 boolean visible) {
-	String blockExtra = "";
-        String       id  = "block_" + (blockCnt++);
-        StringBuffer sb  = contentSB;
-        String       img = "";
-	String js = HtmlUtil.onMouseClick(call("toggleBlockVisibility",
-					       squote(id) + "," + squote(id + "img") +
-					       "," + squote("") + "," + squote("")));
+                                         StringBuffer contentSB,
+                                         boolean visible) {
+        String       blockExtra = "";
+        String       id         = "block_" + (blockCnt++);
+        StringBuffer sb         = contentSB;
+        String       img        = "";
+        String js = HtmlUtil.onMouseClick(call("toggleBlockVisibility",
+                        squote(id) + "," + squote(id + "img") + ","
+                        + squote("") + "," + squote("")));
         sb.append("<div " + HtmlUtil.cssClass("hideshowblock")
                   + HtmlUtil.id(id)
                   + HtmlUtil.style("display:block;visibility:visible") + ">");
@@ -3154,4 +3270,3 @@ public class HtmlUtil {
 
 
 }
-
