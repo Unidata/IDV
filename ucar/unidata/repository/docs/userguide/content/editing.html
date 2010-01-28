@@ -1,4 +1,4 @@
-[ht::head {Editing Entries and Metadata}]
+[ht::head {Editing Entries and their Properties}]
 
 <%nochildlist%>
 
@@ -22,20 +22,20 @@ on wiki text in RAMADDA.
 
 
 
-<subhead intoc="false" id="metadata">Adding Metadata</subhead>
-In RAMADDA entries have some basic metadata that can be edited in
+<subhead intoc="false" id="properties">Adding Properties</subhead>
+In RAMADDA entries have some basic properties that can be edited in
 the edit form, e.g., name, description, lat/lon bounding box, time range, etc.
-One can also add any number of other metadata elements to an entry.
+One can also add any number of other properties elements to an entry.
 <p>
-Clicking on the &quot;Edit Menu -&gt; Add Metadata&quot; link takes you to the
-Add Metadata form where you can select the type of metadata to add.
+Clicking on the &quot;Edit Menu -&gt; Add Properties&quot; link takes you to the
+Add Properties form where you can select the type of properties to add.
 e.g., Tag:
 
-[ht::cimg images/addmetadata1.gif {Add Metadata Form} {border=0 width=600}]
+[ht::cimg images/addmetadata1.gif {Add Properties Form} {border=0 width=600}]
 
 
-Select the type of metadata to add, e.g.,  &quot;Tag&quot;:
-[ht::cimg images/addmetadata2.gif {Add Tag Metadata Form} {border=0 width=600}]
+Select the type of properties to add, e.g.,  &quot;Tag&quot;:
+[ht::cimg images/addmetadata2.gif {Add Tag Properties Form} {border=0 width=600}]
 
 
 
@@ -51,33 +51,33 @@ Clicking on a thumbnail image will display the full size image:
 
 
 
-<subhead intoc="false" id="editmetadata">Editing Metadata</subhead>
-Selecting the &quot;Edit -&gt; Edit Metadata&quot; menu link allows you to edit and delete the metadata
+<subhead intoc="false" id="editproperties">Editing Properties</subhead>
+Selecting the &quot;Edit -&gt; Edit Properties&quot; menu link allows you to edit and delete the properties
 elements of an entry:
 
-[ht::cimg images/editmetadata.gif {Edit Metadata} {border=0 width=600}]
+[ht::cimg images/editmetadata.gif {Edit Properties} {border=0 width=600}]
 
-You can change any of the values of the metadata and press &quot;Change&quot; or
-you can select one or more metadata elements and delete them.
+You can change any of the values of the properties and press &quot;Change&quot; or
+you can select one or more properties elements and delete them.
 
 <p>
 Note: In RAMADDA when there is a collection of checkboxes in a form selecting one and then
 selecting another with a Shift-Click toggles the range of checkboxes between the first the second
 checkbox clicked. Doing a Control-Click on a checkbox toggles all of them on or off.
 <p>
-The &quot;Add select to parent folder&quot; button allows you to select some metadata elements and copy
+The &quot;Add select to parent folder&quot; button allows you to select some properties elements and copy
 them into the parent folder. For example, you may have a large number of data files one or more of which
-have metadata (see <a href="#autometadata">Automatic Metadata Harvesting</a> for more information).
-Instead of laboriously adding metadata to the parent folder you can just copy it from one of the 
+have properties (see <a href="#autoproperties">Automatic Properties Harvesting</a> for more information).
+Instead of laboriously adding properties to the parent folder you can just copy it from one of the 
 children data entries.
 
 
-<subhead intoc="false" id="autometadata">Automatic Metadata Harvesting</subhead>
+<subhead intoc="false" id="autometadata">Automatic Properties Harvesting</subhead>
 If there is a data file that RAMADDA can open using the NetCDF/CDM library (e.g., gridded data, point data,
 radar, etc.) then there will be a &quot;CDL&quot; view link in the View menu for that entry. On that page
-there will be a &quot;Add short metadata&quot; and &quot;Add full metadata&quot; links shown.
-Adding  short metadata will just try to determine the geospatial bounds and the time range of
-the data file and set those properties. Adding full metadata will also add as metadata elements
+there will be a &quot;Add short properties&quot; and &quot;Add full properties&quot; links shown.
+Adding  short properties will just try to determine the geospatial bounds and the time range of
+the data file and set those properties. Adding full properties will also add as properties elements
 the netcdf varbiables and all of the netcdf global attributes found.
 
 

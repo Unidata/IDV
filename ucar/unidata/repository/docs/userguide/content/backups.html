@@ -6,6 +6,29 @@
 
 <body>
 
+You should probably run backups of the content  stored in your RAMADDA server.
+There are two things that need to be backed up: the files managed by RAMADDA and the database.
+<p>
 
+All of RAMADDA's files are stored in the <a href="installing.html#directory">repository home directory</a> and that should be backed up. 
+
+<p>
+
+If you are running with the built in Java Derby database then all of the database files will be in the "derby" subdirectory of the repository home directory. If you are running with mysql or postgres then you need to backup wherever you have your database store.
+<p>
+You can also take a database agnostic snapshot of the RAMADDA database. Go to the Admin-&gt;Maintenance page and press the "Export Database" button. This may take a while depending on the size of the database but RAMADDA will write out a timestamped ".rdb" (RAMADDA DB) file into home/backups directory. 
+<p>
+You can use this database to recreate your RAMADDA on another machine though you will also have to copy the files over. 
+To load this database start up RAMADDA as usual but also pass in as a command line argument:<pre>
+java ...  -load &lt;the .rdb file&gt;
+</pre>
+
+
+
+<b>
+Important Note: if the RAMADDA instance you are running has already been initialized and contains content in its database then loading in the new database will delete everything in the original database.
+<p>
+If you are changing your start script to include the -load remember to shutdown RAMADDA and then remove the -load argument after the initial database load as subsequent -load will wipe out the original database.
+</b>
 
 </body>

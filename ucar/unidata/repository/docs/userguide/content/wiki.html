@@ -4,15 +4,27 @@
 
 One of the entry types that RAMADDA provides is a Wiki Page entry.
 You create a new Wiki Page just like you create any entry - in a folder
-that you have create privileges for click the create icon <img src="images/new.gif">
-and select &quot;Wiki Page&quot; to go to the Wiki Page create form:
+that you have create privileges for go to  File-&gt;New Entry menu.
+In the form select &quot;Wiki Page&quot; to go to the Wiki Page create form:
 
 [ht::cimg images/wikicreate.gif {Wiki Page Create Form} {border=0 width=600}]
 
 You can enter  an entry name and the wiki text. We generally follow the format
-that Wikipedia follows. See the 
-<a href="http://en.wikipedia.org/wiki/Wikipedia:Formatting#Wiki_markup">Wikipedia page on Wiki Markup</a> 
-for basic information.
+that Wikipedia follows. For example:<br> 
+==Section Heading 1==<br>
+===Section Heading 2===<br>
+A horizontal line:<br>
+----<br>
+Lists:<br>
+* bullet 1
+* bullet 2
+** sub bullet 1
+** sub bullet 2
+* bullet 3
+<p>
+
+See the 
+<a href=" http://en.wikipedia.org/wiki/Help:Wiki_markup">Wikipedia page on Wiki Markup</a> for more information.
 <p>
 The default HTML view of a Wiki Page entry  looks like:
 [ht::cimg images/wikiexample.gif {Wiki Page} {border=0 width=600}]
@@ -61,13 +73,16 @@ The set of import tags include:
 <li> <i>comments</i> The comments for the entry.
 <li> <i>toolbar</i> The icon toolbar.
 <li> <i>breadcrumbs</i> The breadcrumb path.
-<li> <i>information</i> The metadata information block.
+<li> <i>information</i> The properties information block.
 <li> <i>image</i> If the entry is an image then the image.
 <li> <i>links</i> The table  of views and actions.
-<li> <i>children</i> The list of children entries.
+<li> <i>children</i> The list of children entries. (see below).
 <li> <i>subfolders</i> Just the children folders.
 <li> <i>subentries</i> Just the children non folders.
 </ul>
+
+
+
 
 You can also import any of the views of an entry, e.g., the map view, the opendap view, the 
 calendar view, etc.
@@ -80,9 +95,39 @@ Look at the URL of a page and you will see &quot;output=<i>identifier</i>&quot;.
 You can use the wiki text display capabilities to customize the default
 HTML view of any other entry or folder types. If the description of the entry
 begins with &quot;&lt;wiki&gt;&quot; then we treat the description as wiki text
-and process it to create the default HTML view.
+and process it to create the default HTML view. This allows you to override the default html display and come up with your own display.
+For example, here Unidata's <a href="http://motherlode.ucar.edu/repository/entry/show/RAMADDA/Unidata/Workshops/2009+Users+Workshop?entryid=21d48da6-9b34-41cd-bdee-1b73b68ae32f">2009 User's Workshop page</a> and here is the desciption of that page:
+<pre>
+&lt;wiki&gt;
+&lt;center&gt;
+&lt;h3&gt;
+Welcome to the RAMADDA area for the Spring 2009 User's Workshop.&lt;br&gt;Using Operational and Experimental Observations in Geoscience Education&lt;br&gt;
+June 8th-12th&lt;/h3&gt;
+&lt;/center&gt;
+
+&lt;table width="100%"&gt;&lt;tr valign="top"&gt;&lt;td&gt;
+
+{{children title="Links"}}
+&lt;/td&gt;&lt;td&gt;
+&lt;img src="http://www.unidata.ucar.edu/photos/2006userwkshp/collage.jpg" width="500"&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 
+Presentation Schedule:
+{{import 075c24ad-9078-4f3f-8a96-1866668a449b calendar.calendar }}
+</pre>
+
+In this case we use html and the import tags to come up with the page layout.
+
+
+<p>
+The <i>children</i> tag is extensively used in the wiki text displays for Folders.
+It can take the form:
+<pre>
+{{children title="Links" showtoggle="false"}}
+</pre>
+
+The title attribute is used in place of "Children". Of showtoggle="false" then the show/hide toggle link is not shown.
 
 
 [ht::foot]
