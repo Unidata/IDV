@@ -1,25 +1,22 @@
 /*
- * $Id: CDMRadarAdapter.java,v 1.54 2007/07/30 22:54:16 yuanho Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.data.radar;
 
@@ -967,13 +964,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (RSL_sweep_list == null) {
             RSL_sweep_list = new CDMRadarSweepDB[numSweep];
 
-            float[][] myAziArray    = new float[numSweep][];
+            float[][] myAziArray  = new float[numSweep][];
             int[][]   aziArrayIdx = new int[numSweep][];
             for (int b = 0; b < numSweep; b++) {
                 int sb = Integer.parseInt(cut[b].toString());
-                RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
-                float[] tmpAz = getAzimuth(s1);
-                myAziArray[b]    = tmpAz.clone();
+                RadialDatasetSweep.Sweep s1    = sweepVar.getSweep(sb);
+                float[]                  tmpAz = getAzimuth(s1);
+                myAziArray[b]  = tmpAz.clone();
                 aziArrayIdx[b] = QuickSort.sort(myAziArray[b]);
             }
             for (int b = 0; b < numSweep; b++) {
@@ -1067,7 +1064,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         Trace.call2("   get cappi value");
 
-       // int[]     sortedAzs  = QuickSort.sort(cappiAz);
+        // int[]     sortedAzs  = QuickSort.sort(cappiAz);
 
         float[][] domainVals = new float[2][numBin * numRay];
         float[][] signalVals = new float[1][numBin * numRay];
@@ -1403,7 +1400,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (r == null) {
             return 999;
         }
-        int rd = r.rayIndex; //Integer.parseInt(r.index);  //.rayIndex;
+        int rd = r.rayIndex;  //Integer.parseInt(r.index);  //.rayIndex;
         closestRay = theClosestHash(azimuths, ray_angle, rd, limit);
 
         /* Is closest ray within limit parameter ? If
@@ -2188,14 +2185,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         if (RSL_sweep_list == null) {
             RSL_sweep_list = new CDMRadarSweepDB[numberOfSweeps];
-            float[][] myAziArray    = new float[numberOfSweeps][];
+            float[][] myAziArray  = new float[numberOfSweeps][];
             int[][]   aziArrayIdx = new int[numberOfSweeps][];
 
             for (int b = 0; b < numberOfSweeps; b++) {
                 int sb = Integer.parseInt(cut[b].toString());
-                RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
-                float[] tmpA = getAzimuth(s1);
-                myAziArray[b]    = tmpA.clone();
+                RadialDatasetSweep.Sweep s1   = sweepVar.getSweep(sb);
+                float[]                  tmpA = getAzimuth(s1);
+                myAziArray[b]  = tmpA.clone();
                 aziArrayIdx[b] = QuickSort.sort(myAziArray[b]);
 
             }
@@ -2252,7 +2249,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         int        tiltcounter  = 0;
 
 
-        float[][]  myAziArray     = new float[numberOfSweeps][];
+        float[][]  myAziArray   = new float[numberOfSweeps][];
         int[][]    aziArrayIdx  = new int[numberOfSweeps][];
         int[]      ray0Idx      = new int[numberOfSweeps];
         int[]      ray1Idx      = new int[numberOfSweeps];
@@ -2268,8 +2265,8 @@ public class CDMRadarAdapter implements RadarAdapter {
             numberOfRays[b] = s1.getRadialNumber();
             gateSize[b]     = s1.getGateSize() / 1000.f;
             float[] tmpAz = getAzimuth(s1);
-            myAziArray[b]     = tmpAz.clone();
-            aziArrayIdx[b]  = QuickSort.sort(myAziArray[b]);
+            myAziArray[b]  = tmpAz.clone();
+            aziArrayIdx[b] = QuickSort.sort(myAziArray[b]);
             // now get the beginning index of each sweep
             ray0Idx[b] = getClosestRayFromSweep((float) azimuth1,
                     (float) halfBeamWidth, b, myAziArray[b]);
@@ -2546,6 +2543,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param lat3 line latitude of one end
      * @param lon3 line longitude of one end
      * @param lat4 line latitude of another end
+     * @param lon4 _more_
      *
      * @return lat lon points
      */
@@ -2652,14 +2650,14 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         if (RSL_sweep_list == null) {
             RSL_sweep_list = new CDMRadarSweepDB[numberOfSweeps];
-            float[][] myAziArray    = new float[numberOfSweeps][];
+            float[][] myAziArray  = new float[numberOfSweeps][];
             int[][]   aziArrayIdx = new int[numberOfSweeps][];
 
             for (int b = 0; b < numberOfSweeps; b++) {
                 int sb = Integer.parseInt(cut[b].toString());
-                RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
-                float [] tmpA = getAzimuth(s1);
-                myAziArray[b]    = tmpA.clone();
+                RadialDatasetSweep.Sweep s1   = sweepVar.getSweep(sb);
+                float[]                  tmpA = getAzimuth(s1);
+                myAziArray[b]  = tmpA.clone();
                 aziArrayIdx[b] = QuickSort.sort(myAziArray[b]);
 
             }
@@ -3290,7 +3288,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                   }
               }    */
         // for (int eli = 0; eli < numRadials; eli++) {
-        float [] tmpElevs = varSweep.getElevation();
+        float[] tmpElevs = varSweep.getElevation();
         myElevations = tmpElevs.clone();  //.getElevation(eli);
         if (Float.isNaN(myElevations[0])) {
             myElevations[0] = 0.0f;
@@ -3445,7 +3443,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         azimuths = varSweep.getAzimuth();  //.getAzimuth(azi);
         //  }
         float[] myAzimuths = azimuths.clone();
-        float[] _azimuths = (float [])myAzimuths;
+        float[] _azimuths  = (float[]) myAzimuths;
 
         for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
             float azimuth = myAzimuths[rayIdx];
@@ -3837,14 +3835,14 @@ public class CDMRadarAdapter implements RadarAdapter {
             // gates = 500;
         }
 
-        float[][] myAziArray    = new float[numberOfSweeps][];
+        float[][] myAziArray  = new float[numberOfSweeps][];
         int[][]   aziArrayIdx = new int[numberOfSweeps][];
         float[]   meanEle     = new float[numberOfSweeps];
         for (int b = 0; b < numberOfSweeps; b++) {
             int                      sb = Integer.parseInt(cut[b].toString());
-            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
-            float [] tmpAzi = getAzimuth(s1);
-            myAziArray[b]    = tmpAzi.clone();
+            RadialDatasetSweep.Sweep s1     = sweepVar.getSweep(sb);
+            float[]                  tmpAzi = getAzimuth(s1);
+            myAziArray[b]  = tmpAzi.clone();
             aziArrayIdx[b] = QuickSort.sort(myAziArray[b]);
             meanEle[b]     = s1.getMeanElevation();
         }
@@ -4414,4 +4412,3 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
 }
-
