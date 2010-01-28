@@ -1,26 +1,22 @@
 /*
- * $Id: WmsDataSource.java,v 1.33 2007/05/04 22:23:20 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.data.gis;
 
@@ -31,9 +27,9 @@ import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.imagery.ImageXmlDataSource;
+import ucar.unidata.util.CacheManager;
 
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
@@ -44,7 +40,6 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
-import javax.swing.*;
 import visad.*;
 
 import visad.util.DataUtility;
@@ -67,6 +62,8 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -115,9 +112,11 @@ public class WmsDataSource extends DataSourceImpl {
     /** List of selections (layers) */
     private List wmsSelections;
 
-    private boolean maintainRatio  =false;
+    /** _more_          */
+    private boolean maintainRatio = false;
 
-    private JCheckBox maintainRatioCbx; 
+    /** _more_          */
+    private JCheckBox maintainRatioCbx;
 
 
     /**
@@ -132,6 +131,7 @@ public class WmsDataSource extends DataSourceImpl {
     String lastUrl;
 
 
+    /** _more_          */
     private List layerList = new ArrayList();
 
     /**
@@ -157,6 +157,11 @@ public class WmsDataSource extends DataSourceImpl {
         initWmsDataSource();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getLayerList() {
         return layerList;
     }
@@ -168,10 +173,11 @@ public class WmsDataSource extends DataSourceImpl {
         super.initAfterUnpersistence();
 
         //Check if we were created with the background layers. If so then use the new list
-        if(wmsSelections!=null) {
-            List backgroundImages =  getDataContext().getIdv().getBackgroundImages();
-            for(Object o: wmsSelections) {
-                if(backgroundImages.contains(o)) {
+        if (wmsSelections != null) {
+            List backgroundImages =
+                getDataContext().getIdv().getBackgroundImages();
+            for (Object o : wmsSelections) {
+                if (backgroundImages.contains(o)) {
                     wmsSelections = backgroundImages;
                     break;
                 }
@@ -282,7 +288,7 @@ public class WmsDataSource extends DataSourceImpl {
                 //                javax.swing.JLabel l = new javax.swing.JLabel(new javax.swing.ImageIcon(image));
                 //                l.setBackground(Color.red);
                 //                ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, l,null);
-                xyData       = ucar.visad.Util.makeField(image,true);
+                xyData = ucar.visad.Util.makeField(image, true);
             } catch (Exception iexc) {
                 logException("There was an error accessing the image:\n"
                              + wmsInfo.getImageFile(), iexc);
@@ -316,6 +322,13 @@ public class WmsDataSource extends DataSourceImpl {
             double heightDegrees = boundsToUse.getMaxLat()
                                    - boundsToUse.getMinLat();
 
+
+            if ((widthDegrees == 0) || (heightDegrees == 0)) {
+                return null;
+            }
+
+
+
             if (wmsInfo.getFixedWidth() > -1) {
                 imageWidth = wmsInfo.getFixedWidth();
             }
@@ -332,15 +345,17 @@ public class WmsDataSource extends DataSourceImpl {
             imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
 
 
-	    if(maintainRatio) {
-		imageHeight =(int)(imageWidth*(heightDegrees/widthDegrees));
-	    }
+            if (maintainRatio) {
+                imageHeight = (int) (imageWidth
+                                     * (heightDegrees / widthDegrees));
+            }
 
             double diff = Math.abs(boundsToUse.getMinLon()
                                    - boundsToUse.getMaxLon());
             String url = wmsInfo.assembleRequest(boundsToUse,
                              (int) (imageWidth / resolution),
                              (int) (imageHeight / resolution));
+
 
             String cacheGroup = "WMS";
             synchronized (cachedUrls) {
@@ -353,6 +368,7 @@ public class WmsDataSource extends DataSourceImpl {
                     }
                 }
             }
+
 
 
 
@@ -389,7 +405,7 @@ public class WmsDataSource extends DataSourceImpl {
                         Toolkit.getDefaultToolkit().createImage(imageContent);
                     //Wait on the image
                     image = ucar.unidata.ui.ImageUtils.waitOnImage(image);
-                    if(image == null)  {
+                    if (image == null) {
                         throw new IllegalStateException();
                     }
 
@@ -532,17 +548,29 @@ public class WmsDataSource extends DataSourceImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param comps _more_
+     */
     public void getPropertiesComponents(List comps) {
-	super.getPropertiesComponents(comps);
-	maintainRatioCbx = new JCheckBox("Match Ration", maintainRatio);
-	comps.add(GuiUtils.filler());
-	comps.add(GuiUtils.left(maintainRatioCbx));
+        super.getPropertiesComponents(comps);
+        maintainRatioCbx = new JCheckBox("Match Ration", maintainRatio);
+        comps.add(GuiUtils.filler());
+        comps.add(GuiUtils.left(maintainRatioCbx));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean applyProperties() {
-	if(!super.applyProperties()) return false;
-	maintainRatio =  maintainRatioCbx.isSelected();
-	return true;
+        if ( !super.applyProperties()) {
+            return false;
+        }
+        maintainRatio = maintainRatioCbx.isSelected();
+        return true;
 
     }
 
@@ -636,24 +664,23 @@ public class WmsDataSource extends DataSourceImpl {
         return Misc.equals(this.wmsSelections, that.wmsSelections);
     }
 
-/**
-Set the MaintainRatio property.
+    /**
+     * Set the MaintainRatio property.
+     *
+     * @param value The new value for MaintainRatio
+     */
+    public void setMaintainRatio(boolean value) {
+        this.maintainRatio = value;
+    }
 
-@param value The new value for MaintainRatio
-**/
-public void setMaintainRatio (boolean value) {
-	this.maintainRatio = value;
+    /**
+     * Get the MaintainRatio property.
+     *
+     * @return The MaintainRatio
+     */
+    public boolean getMaintainRatio() {
+        return this.maintainRatio;
+    }
+
+
 }
-
-/**
-Get the MaintainRatio property.
-
-@return The MaintainRatio
-**/
-public boolean getMaintainRatio () {
-	return this.maintainRatio;
-}
-
-
-}
-
