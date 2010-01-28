@@ -108,6 +108,9 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+
+    public static final String ATTR_CATEGORY = "category";
+
     /** _more_ */
     public static final String ATTR_VALUE = "value";
 
@@ -152,6 +155,8 @@ public class TypeHandler extends RepositoryManager {
     String description;
 
 
+    String category = "Misc";
+
     /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();
 
@@ -188,6 +193,7 @@ public class TypeHandler extends RepositoryManager {
         displayTemplatePath = XmlUtil.getAttribute(entryNode,
                 "displaytemplate", (String) null);
 
+        this.category  = XmlUtil.getAttribute(entryNode, ATTR_CATEGORY,category);
         List metadataNodes = XmlUtil.findChildren(entryNode, TAG_METADATA);
         for (int i= 0; i< metadataNodes.size(); i++) {
             Element metadataNode = (Element) metadataNodes.get(i);
@@ -791,12 +797,12 @@ public class TypeHandler extends RepositoryManager {
 
                 links.add(new Link(request.url(getRepository().URL_ENTRY_IMPORT,
                         ARG_GROUP,
-                                               entry.getId()), null/*getRepository().iconUrl(ICON_NEW)*/,
+                                               entry.getId()), getRepository().iconUrl(ICON_IMPORT),
                                         "Import Entries",
                                         OutputType.TYPE_FILE));
                 links.add(new Link(request.url(getRepository().URL_ENTRY_EXPORT,
                                                ARG_GROUP,
-                                               entry.getId()), null/*getRepository().iconUrl(ICON_NEW)*/,
+                                               entry.getId()), getRepository().iconUrl(ICON_EXPORT),
                                         "Export Entries",
                                         OutputType.TYPE_FILE));
 
@@ -1720,8 +1726,6 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
-
-
         Resource resource = entry.getResource();
         String   path     = resource.getPath();
         if (entry.isGroup()) {
@@ -2788,6 +2792,24 @@ public class TypeHandler extends RepositoryManager {
         return null;
     }
 
+
+    /**
+       Set the Category property.
+
+       @param value The new value for Category
+    **/
+    public void setCategory (String value) {
+	this.category = value;
+    }
+
+    /**
+       Get the Category property.
+
+       @return The Category
+    **/
+    public String getCategory () {
+	return this.category;
+    }
 
 
 

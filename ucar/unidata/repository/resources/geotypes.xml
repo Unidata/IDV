@@ -1,7 +1,7 @@
 <types>
 
 
-  <type name="cataloglink"  description="Catalog Link" >
+  <type name="cataloglink"  description="Catalog Link" category="Geo Data" >
      <property name="icon" value="/icons/link.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -9,14 +9,14 @@
   </type>
 
 
-  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
+  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.file" value="false"/>
   </type>
 
-  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
+  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler" category="Geo Data">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
      <property name="form.label.url" value="Catalog URL"/>
@@ -30,11 +30,11 @@
 
 
 
-  <type name="latlonimage"  description="Lat/Lon Image" datatype="latlonimage">
+  <type name="latlonimage"  description="Lat/Lon Image" datatype="latlonimage" category="Geo Data">
      <property name="icon" value="/icons/map.png"/>
   </type>
 
-  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler">
+  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/database.png"/>
      <property name="form.show.date" value="false"/>
 <!--     <property name="form.show.area" value="false"/> -->

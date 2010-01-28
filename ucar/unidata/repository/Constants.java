@@ -169,6 +169,9 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_IMAGE = "ramadda.icon.image";
 
+    public static final String ICON_IMPORT = "ramadda.icon.import";
+    public static final String ICON_EXPORT = "ramadda.icon.export";
+
     /** _more_ */
     public static final String ICON_IMAGES = "ramadda.icon.images";
 

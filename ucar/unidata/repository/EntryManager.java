@@ -2162,21 +2162,55 @@ return new Result(title, sb);
 
         sb.append(HtmlUtil.p());
 
-        sb.append(request.form(getRepository().URL_ENTRY_FORM));
-        sb.append(msgLabel("Or create a"));
-        sb.append(HtmlUtil.space(1));
+        List<String>categories = new ArrayList<String>();
+        Hashtable<String,StringBuffer> catMap = new Hashtable<String,StringBuffer>();
+
         HashSet<String> exclude = new HashSet<String>();
         exclude.add(TYPE_FILE);
         exclude.add(TYPE_GROUP);
+        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
+        for (TypeHandler typeHandler : typeHandlers) {
+            if (typeHandler.isAnyHandler()) {
+                continue;
+            }
+            if (exclude.contains(typeHandler.getType())) {
+                continue;
+            }
+            if (!typeHandler.canBeCreatedBy(request)) {
+                continue;
+            }
+            StringBuffer buffer = catMap.get(typeHandler.getCategory());
+            if(buffer == null) {
+                catMap.put(typeHandler.getCategory(),buffer= new StringBuffer());
+                categories.add(typeHandler.getCategory());
+            }
+            buffer.append(
+                      HtmlUtil.href(
+                                    request.url(
+                                                getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
+                                                ARG_TYPE, typeHandler.getType()), typeHandler.getLabel()));
+
+            buffer.append(HtmlUtil.br());
+        }
+        sb.append("<table cellpadding=5><tr valign=top>");
+        for(String cat: categories) {
+            sb.append(HtmlUtil.col(msgHeader(cat)+ catMap.get(cat)));
+        }
+        sb.append("</tr></table>");
+
+
+        /*
+        sb.append(request.form(getRepository().URL_ENTRY_FORM));
+        sb.append(msgLabel("Or create a"));
+        sb.append(HtmlUtil.space(1));
         sb.append(getRepository().makeTypeSelect(request, false, "", true,
                 exclude));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
-
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
-
+        */
         return makeEntryEditResult(request, group, "Create Entry", sb);
         //        return new Result("New Form", sb, Result.TYPE_HTML);
     }
