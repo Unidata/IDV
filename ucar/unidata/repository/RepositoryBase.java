@@ -150,6 +150,13 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                       "/entry/xmlcreate");
 
 
+    public final RequestUrl URL_ENTRY_IMPORT = new RequestUrl(this,
+                                                      "/entry/import");
+
+    public final RequestUrl URL_ENTRY_EXPORT = new RequestUrl(this,
+                                                      "/entry/export");
+
+
     /** _more_ */
     public final RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
                                                       "/association/add");

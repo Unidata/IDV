@@ -779,12 +779,36 @@ public class TypeHandler extends RepositoryManager {
                                     OutputType.TYPE_FILE));
 
                 links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
-                        ARG_GROUP,
-                        entry.getId()), getRepository().iconUrl(ICON_NEW),
+                                               ARG_GROUP,
+                                               entry.getId()),
+                                   getRepository().iconUrl(ICON_NEW),
                                         "New Entry",
                                         OutputType.TYPE_FILE
                                         | OutputType.TYPE_TOOLBAR));
                 Link hr = new Link(true);
+                hr.setLinkType(OutputType.TYPE_FILE);
+                links.add(hr);
+
+                links.add(new Link(request.url(getRepository().URL_ENTRY_IMPORT,
+                        ARG_GROUP,
+                                               entry.getId()), null/*getRepository().iconUrl(ICON_NEW)*/,
+                                        "Import Entries",
+                                        OutputType.TYPE_FILE));
+                links.add(new Link(request.url(getRepository().URL_ENTRY_EXPORT,
+                                               ARG_GROUP,
+                                               entry.getId()), null/*getRepository().iconUrl(ICON_NEW)*/,
+                                        "Export Entries",
+                                        OutputType.TYPE_FILE));
+
+
+                if (request.getUser().getAdmin()) {
+                    links.add(new Link(request.url(getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG,
+                                                   ARG_GROUP,
+                                                   entry.getId()), getRepository().iconUrl(ICON_CATALOG),
+                                       "Import THREDDS Catalog",
+                                       OutputType.TYPE_FILE));
+                }
+
                 hr.setLinkType(OutputType.TYPE_FILE);
                 links.add(hr);
             } else if (getAccessManager().canDoAction(request, entry,

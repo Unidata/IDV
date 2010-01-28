@@ -545,6 +545,39 @@ public class HarvesterManager extends RepositoryManager {
      */
     public Result processImportCatalog(Request request) throws Exception {
         Group        group       = getEntryManager().findGroup(request);
+        if(!request.exists(ARG_CATALOG)) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(
+                request.form(
+                    getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
+            sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
+            sb.append(msgHeader("Import a THREDDS catalog"));
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry(msgLabel("URL"),
+                                         HtmlUtil.input(ARG_CATALOG, BLANK,
+                                             HtmlUtil.SIZE_70)));
+
+            sb.append(
+                HtmlUtil.formEntry(
+                    "",
+                    HtmlUtil.checkbox(ARG_RECURSE, "true", false)
+                    + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
+                    + HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", false)
+                    + HtmlUtil.space(1) + msg("Add Property")
+                    + HtmlUtil.space(1)
+                    + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
+                    + HtmlUtil.space(1) + msg("Download URLS")));
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Go"))));
+            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.formClose());
+
+
+
+            return getEntryManager().makeEntryEditResult(request, group, "Catalog Import", sb);
+        }
+
+
+
         boolean      recurse     = request.get(ARG_RECURSE, false);
         boolean      addMetadata = request.get(ATTR_ADDMETADATA, false);
         boolean      download    = request.get(ARG_RESOURCE_DOWNLOAD, false);

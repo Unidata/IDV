@@ -2177,13 +2177,6 @@ return new Result(title, sb);
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
 
-
-        sb.append(request.uploadForm(getRepository().URL_ENTRY_XMLCREATE));
-        sb.append("File:" + HtmlUtil.fileInput(ARG_FILE, ""));
-        sb.append("<br>" + HtmlUtil.submit("Submit"));
-        sb.append(HtmlUtil.formClose());
-
-
         return makeEntryEditResult(request, group, "Create Entry", sb);
         //        return new Result("New Form", sb, Result.TYPE_HTML);
     }
@@ -2759,29 +2752,10 @@ return new Result(title, sb);
                                       String name) {
         StringBuffer sb = new StringBuffer();
         if ((parentGroup != null) && request.getUser().getAdmin()) {
-            sb.append("<p>&nbsp;");
             sb.append(
                 request.form(
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getId()));
-            sb.append(msgLabel("Import a catalog"));
-            sb.append(HtmlUtil.formTable());
-            sb.append(HtmlUtil.formEntry(msgLabel("URL"),
-                                         HtmlUtil.input(ARG_CATALOG, BLANK,
-                                             HtmlUtil.SIZE_70)));
-            sb.append(
-                HtmlUtil.formEntry(
-                    "",
-                    HtmlUtil.checkbox(ARG_RECURSE, "true", false)
-                    + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
-                    + HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", false)
-                    + HtmlUtil.space(1) + msg("Add Property")
-                    + HtmlUtil.space(1)
-                    + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
-                    + HtmlUtil.space(1) + msg("Download URLS")));
-            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Go"))));
-            sb.append(HtmlUtil.formTableClose());
-            sb.append(HtmlUtil.formClose());
         }
         return sb.toString();
     }
@@ -2834,6 +2808,26 @@ return new Result(title, sb);
             }
             return new Result("Error:" + exc, Result.TYPE_XML);
         }
+    }
+
+
+    public Result processEntryExport(Request request) throws Exception {
+        return new Result("",new StringBuffer("NA"));
+
+    }
+
+    public Result processEntryImport(Request request) throws Exception {
+        Group        group = findGroup(request);
+        StringBuffer sb = new StringBuffer();
+        sb.append(msgHeader("Import Entries"));
+        sb.append(request.uploadForm(getRepository().URL_ENTRY_XMLCREATE));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry(msgLabel("File") , HtmlUtil.fileInput(ARG_FILE, HtmlUtil.SIZE_70)));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Submit")));
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
+        return makeEntryEditResult(request, group, "Entry Import", sb);
     }
 
 
