@@ -369,13 +369,19 @@ public class WmsHandler extends XmlHandler {
             formats.add(content);
             formatMap.put(content,content);
         }
-        format = formatMap.get("image/png");
+
+
+        if(format ==null)
+            format = formatMap.get("image/png; mode=24bit");
+        if(format ==null)
+            format = formatMap.get("image/png");
         if(format ==null)
             format = formatMap.get("image/jpeg");
         if(format ==null)
             format = formatMap.get("image/gif");
         //        if(format ==null)
         //            format = formatMap.get("image/tiff");
+        //        System.err.println("format:" + format);
         if(format==null) {
             for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
                 Element formatNode = (Element) formatNodes.get(i);
