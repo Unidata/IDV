@@ -292,7 +292,8 @@ public class StationLocationMap extends JPanel {
         navigatedPanel.setBorder(BorderFactory.createEtchedBorder());
         navigatedPanel.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                navigatedPanel.requestFocus();
+                //Don't do this:
+                //                navigatedPanel.requestFocus();
             }
 
             public void mouseClicked(MouseEvent e) {
