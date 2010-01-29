@@ -2146,25 +2146,8 @@ return new Result(title, sb);
 
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
-        //        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
-        /*
-        sb.append(
-            HtmlUtil.href(
-                request.url(
-                    getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
-                    ARG_TYPE, TYPE_GROUP), msg("Create a folder")));
-        sb.append(HtmlUtil.p());
-        sb.append(
-            HtmlUtil.href(
-                request.url(
-                    getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
-                    ARG_TYPE, TYPE_FILE), msg("Upload a file")));
-
-        sb.append(HtmlUtil.p());
-        */
-        sb.append(msgHeader("Create a new entry"));
-
+        sb.append(msgHeader("Choose entry type"));
         List<String>categories = new ArrayList<String>();
         Hashtable<String,StringBuffer> catMap = new Hashtable<String,StringBuffer>();
 
@@ -2859,9 +2842,12 @@ return new Result(title, sb);
 
 
     public Result processEntryExport(Request request) throws Exception {
-        return new Result("",new StringBuffer("NA"));
-
+        Entry entry = getEntry(request, request.getString(ARG_ENTRYID,""));
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        return getRepository().getZipOutputHandler().toZip(request, "", entries, true,true);
     }
+
 
     public Result processEntryImport(Request request) throws Exception {
         Group        group = findGroup(request);
@@ -2955,7 +2941,6 @@ return new Result(title, sb);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
-                
 
                 Entry entry = processEntryXml(request, node, entries,
                                   origFileToStorage, true, false);
@@ -3005,6 +2990,7 @@ return new Result(title, sb);
         return new Result("", sb);
 
     }
+
 
 
 

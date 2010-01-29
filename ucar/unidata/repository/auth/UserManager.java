@@ -2705,26 +2705,33 @@ public class UserManager extends RepositoryManager {
 
 
         sb.append(HtmlUtil.p());
-
+        sb.append(msgHeader("User Settings"));
         sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
         makeUserForm(request, user, sb, false);
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
         sb.append(HtmlUtil.p());
+        sb.append(msgHeader("Password"));
         sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
         makePasswordForm(request, user, sb);
         sb.append(HtmlUtil.submit(msg("Change Password"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
-        sb.append(HtmlUtil.formTable());
+
+        sb.append(HtmlUtil.p());
+
         String roles = user.getRolesAsString("<br>").trim();
-        sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
         if (roles.length() == 0) {
             roles = "--none--";
+        } else {
+            sb.append(msgHeader("Your Roles"));
         }
+
+        sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntryTop(msgLabel("Roles"), roles));
         sb.append(HtmlUtil.formTableClose());
+
         return makeResult(request, msg("User Settings"), sb);
     }
 

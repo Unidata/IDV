@@ -763,73 +763,78 @@ public class TypeHandler extends RepositoryManager {
     public void getEntryLinks(Request request, Entry entry, List<Link> links)
             throws Exception {
 
-        if (entry.isGroup()) {
-            if (getAccessManager().canDoAction(request, entry,
-                    Permission.ACTION_NEW)) {
+        boolean isGroup = entry.isGroup();
+        boolean canDoNew = isGroup && getAccessManager().canDoAction(request, entry,
+                                                          Permission.ACTION_NEW);
 
-                links.add(
-                    new Link(
-                        request.url(
-                            getRepository().URL_ENTRY_FORM, ARG_GROUP,
-                            entry.getId(), ARG_TYPE,
-                            TYPE_GROUP), getRepository().iconUrl(
-                                ICON_FOLDER_ADD), "New Folder",
-                                    OutputType.TYPE_FILE));
-                links.add(
-                    new Link(
-                        request.url(
-                            getRepository().URL_ENTRY_FORM, ARG_GROUP,
-                            entry.getId(), ARG_TYPE,
-                            TYPE_FILE), getRepository().iconUrl(
-                                ICON_ENTRY_ADD), "New File",
-                                    OutputType.TYPE_FILE));
+        if(canDoNew) {
+            links.add(
+                      new Link(
+                               request.url(
+                                           getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                                           entry.getId(), ARG_TYPE,
+                                           TYPE_GROUP), getRepository().iconUrl(
+                                                                                ICON_FOLDER_ADD), "New Folder",
+                               OutputType.TYPE_FILE));
+            links.add(
+                      new Link(
+                               request.url(
+                                           getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                                           entry.getId(), ARG_TYPE,
+                                           TYPE_FILE), getRepository().iconUrl(
+                                                                               ICON_ENTRY_ADD), "New File",
+                               OutputType.TYPE_FILE));
 
-                links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
-                                               ARG_GROUP,
-                                               entry.getId()),
-                                   getRepository().iconUrl(ICON_NEW),
-                                        "New Entry",
-                                        OutputType.TYPE_FILE
-                                        | OutputType.TYPE_TOOLBAR));
-                Link hr = new Link(true);
-                hr.setLinkType(OutputType.TYPE_FILE);
-                links.add(hr);
-
-                links.add(new Link(request.url(getRepository().URL_ENTRY_IMPORT,
-                        ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_IMPORT),
-                                        "Import Entries",
-                                        OutputType.TYPE_FILE));
-                links.add(new Link(request.url(getRepository().URL_ENTRY_EXPORT,
-                                               ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_EXPORT),
-                                        "Export Entries",
-                                        OutputType.TYPE_FILE));
-
-
-                if (request.getUser().getAdmin()) {
-                    links.add(new Link(request.url(getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG,
-                                                   ARG_GROUP,
-                                                   entry.getId()), getRepository().iconUrl(ICON_CATALOG),
-                                       "Import THREDDS Catalog",
-                                       OutputType.TYPE_FILE));
-                }
-
-                hr.setLinkType(OutputType.TYPE_FILE);
-                links.add(hr);
-            } else if (getAccessManager().canDoAction(request, entry,
-                    Permission.ACTION_UPLOAD)) {
-                links.add(
-                    new Link(
-                        request.url(
-                            getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
-                            entry.getId()), getRepository().iconUrl(
-                                ICON_UPLOAD), "Upload a file",
-                                    OutputType.TYPE_FILE
-                                    | OutputType.TYPE_TOOLBAR));
-            }
+            links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
+                                           ARG_GROUP,
+                                           entry.getId()),
+                               getRepository().iconUrl(ICON_NEW),
+                               "New Entry",
+                               OutputType.TYPE_FILE
+                               | OutputType.TYPE_TOOLBAR));
+            Link hr = new Link(true);
+            hr.setLinkType(OutputType.TYPE_FILE);
+            links.add(hr);
 
         }
+        if (request.getUser().getAdmin()) {
+            links.add(new Link(HtmlUtil.url(getRepository().URL_ENTRY_EXPORT.toString()+"/" + IOUtil.stripExtension(entry.getName())+".zip",
+                                            new String[]{ARG_ENTRYID,
+                                                         entry.getId()}), getRepository().iconUrl(ICON_EXPORT),
+                               "Export Entries",
+                               OutputType.TYPE_FILE));
+
+            if(canDoNew) {
+                links.add(new Link(request.url(getRepository().URL_ENTRY_IMPORT,
+                                               ARG_GROUP,
+                                               entry.getId()), getRepository().iconUrl(ICON_IMPORT),
+                                   "Import Entries",
+                                   OutputType.TYPE_FILE));
+                
+                links.add(new Link(request.url(getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG,
+                                               ARG_GROUP,
+                                               entry.getId()), getRepository().iconUrl(ICON_CATALOG),
+                                   "Import THREDDS Catalog",
+                                   OutputType.TYPE_FILE));
+            }
+            Link hr = new Link(true);
+            hr.setLinkType(OutputType.TYPE_FILE);
+            links.add(hr);
+        }
+
+
+
+        if (!canDoNew && isGroup && getAccessManager().canDoAction(request, entry, Permission.ACTION_UPLOAD)) {
+            links.add(
+                      new Link(
+                               request.url(
+                                           getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
+                                           entry.getId()), getRepository().iconUrl(
+                                                                                   ICON_UPLOAD), "Upload a file",
+                               OutputType.TYPE_FILE
+                               | OutputType.TYPE_TOOLBAR));
+        }
+
 
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(

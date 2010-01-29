@@ -206,7 +206,7 @@ public class ZipOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return toZip(request, "", entries, false);
+        return toZip(request, "", entries, false,false);
     }
 
 
@@ -233,9 +233,9 @@ public class ZipOutputHandler extends OutputHandler {
             all.addAll(subGroups);
             all.addAll(entries);
             getLogManager().logInfo("Doing zip tree");
-            return toZip(request, group.getName(), all, true);
+            return toZip(request, group.getName(), all, true,false);
         } else {
-            return toZip(request, group.getName(), entries, false);
+            return toZip(request, group.getName(), entries, false,false);
         }
     }
 
@@ -272,8 +272,8 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected Result toZip(Request request, String prefix,
-                           List<Entry> entries, boolean recurse)
+    public Result toZip(Request request, String prefix,
+                        List<Entry> entries, boolean recurse, boolean forExport)
             throws Exception {
         OutputStream os;
         boolean      doingFile = false;
@@ -294,11 +294,12 @@ public class ZipOutputHandler extends OutputHandler {
         result.setNeedToWrite(false);
 
 
+        Element root = null;
         boolean ok = true;
         //First recurse down without a zos to check the size
         try {
-            processZip(request, entries, recurse, null, prefix, 0,
-                       new int[] { 0 });
+            processZip(request, entries, recurse, 0, null, prefix, 0,
+                       new int[] { 0 }, forExport,null);
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -315,8 +316,25 @@ public class ZipOutputHandler extends OutputHandler {
         ZipOutputStream zos  = new ZipOutputStream(os);
         Hashtable       seen = new Hashtable();
         try {
-            processZip(request, entries, recurse, zos, prefix, 0,
-                       new int[] { 0 });
+            if(forExport) {
+                Document doc = XmlUtil.makeDocument();
+                root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                      new String[] {});
+
+            }
+            processZip(request, entries, recurse, 0, zos, prefix, 0,
+                       new int[] { 0 }, forExport,root);
+
+            if(root!=null) {
+                String xml = XmlUtil.toString(root);
+                System.err.println(xml);
+                zos.putNextEntry(new ZipEntry("entries.xml"));
+                byte[] bytes = xml.getBytes();
+                zos.write(bytes, 0, bytes.length);
+                zos.closeEntry();
+            }
+
+
         } catch (IllegalArgumentException iae) {
             ok = false;
         } finally {
@@ -350,8 +368,10 @@ public class ZipOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected long processZip(Request request, List<Entry> entries,
-                              boolean recurse, ZipOutputStream zos,
-                              String prefix, long sizeSoFar, int[] counter)
+                              boolean recurse, int level, 
+                              ZipOutputStream zos,
+                              String prefix, long sizeSoFar, int[] counter,
+                              boolean forExport, Element entryRoot)
             throws Exception {
         long      sizeProcessed = 0;
         Hashtable seen          = new Hashtable();
@@ -375,6 +395,10 @@ public class ZipOutputHandler extends OutputHandler {
                                    + new Date());
                 Misc.sleep(10);
             }
+            if(forExport && entryRoot!=null) {
+                getRepository().getXmlOutputHandler().getEntryTag(null, entry, entryRoot.getOwnerDocument(),entryRoot, true, level!=0);
+            }
+
             if (entry.isGroup() && recurse) {
                 Group group = (Group) entry;
                 List<Entry> children = getEntryManager().getChildren(request,
@@ -383,13 +407,19 @@ public class ZipOutputHandler extends OutputHandler {
                 if (prefix.length() > 0) {
                     path = prefix + "/" + path;
                 }
-                sizeProcessed += processZip(request, children, recurse, zos,
+                sizeProcessed += processZip(request, children, recurse, level+1, zos,
                                             path, sizeProcessed + sizeSoFar,
-                                            counter);
+                                            counter, forExport,entryRoot);
             }
+
+
             if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
+
+
+
+
             String path = entry.getResource().getPath();
             String name = getStorageManager().getFileTail(path);
             int    cnt  = 1;

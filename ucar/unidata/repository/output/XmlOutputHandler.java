@@ -147,7 +147,7 @@ public class XmlOutputHandler extends OutputHandler {
                               Entry entry)
             throws Exception {
         Document     doc  = XmlUtil.makeDocument();
-        Element      root = getEntryTag(request, entry, doc, null);
+        Element      root = getEntryTag(request, entry, doc, null,false,true);
         StringBuffer sb   = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
     }
@@ -182,7 +182,7 @@ public class XmlOutputHandler extends OutputHandler {
             getGroupTag(request, subgroup, doc, root);
         }
         for (Entry entry : entries) {
-            getEntryTag(request, entry, doc, root);
+            getEntryTag(request, entry, doc, root,false,true);
         }
         StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
@@ -217,11 +217,12 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Element getEntryTag(Request request, Entry entry, Document doc,
-                                Element parent)
+    public Element getEntryTag(Request request, Entry entry, Document doc,
+                               Element parent, boolean forExport, boolean includeId)
             throws Exception {
+
         Element node = XmlUtil.create(doc, TAG_ENTRY, parent, new String[] {
-            ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), ATTR_GROUP,
+                ATTR_ID, (includeId?entry.getId():""), ATTR_NAME, entry.getName(), ATTR_GROUP,
             entry.getParentGroupId(), ATTR_TYPE,
             entry.getTypeHandler().getType(), ATTR_ISGROUP,
             "" + entry.isGroup(), ATTR_FROMDATE,
@@ -248,25 +249,27 @@ public class XmlOutputHandler extends OutputHandler {
 
         if ( !entry.isGroup() && entry.getResource().isDefined()) {
             XmlUtil.setAttributes(node, new String[] { ATTR_RESOURCE,
-                    entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
-                    entry.getResource().getType() });
+                                                       entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
+                                                       entry.getResource().getType() });
 
             //Add the service nodes
-            for (OutputHandler outputHandler : getRepository()
-                    .getOutputHandlers()) {
-                outputHandler.addToEntryNode(request, entry, node);
-            }
+            if(!forExport) {
+                for (OutputHandler outputHandler : getRepository()
+                         .getOutputHandlers()) {
+                    outputHandler.addToEntryNode(request, entry, node);
+                }
 
-            if (getRepository().getAccessManager().canAccessFile(request,
-                    entry)) {
-                node.setAttribute(ATTR_FILESIZE,
-                                  "" + entry.getResource().getFileSize());
-                String url =
-                    getRepository().getEntryManager().getEntryResourceUrl(
-                        request, entry, true);
-                Element serviceNode = XmlUtil.create(TAG_SERVICE, node);
-                XmlUtil.setAttributes(serviceNode, new String[] { ATTR_TYPE,
-                        SERVICE_FILE, ATTR_URL, url });
+                if (getRepository().getAccessManager().canAccessFile(request,
+                                                                     entry)) {
+                    node.setAttribute(ATTR_FILESIZE,
+                                      "" + entry.getResource().getFileSize());
+                    String url =
+                        getRepository().getEntryManager().getEntryResourceUrl(
+                                                                              request, entry, true);
+                    Element serviceNode = XmlUtil.create(TAG_SERVICE, node);
+                    XmlUtil.setAttributes(serviceNode, new String[] { ATTR_TYPE,
+                                                                      SERVICE_FILE, ATTR_URL, url });
+                }
             }
         }
 
@@ -298,7 +301,7 @@ public class XmlOutputHandler extends OutputHandler {
     private Element getGroupTag(Request request, Group group, Document doc,
                                 Element parent)
             throws Exception {
-        Element node = getEntryTag(request, group, doc, parent);
+        Element node = getEntryTag(request, group, doc, parent,false,true);
         boolean canDoNew = getAccessManager().canDoAction(request, group,
                                Permission.ACTION_NEW);
         boolean canDoUpload = getAccessManager().canDoAction(request, group,

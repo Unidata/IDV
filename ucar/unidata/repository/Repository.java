@@ -3702,6 +3702,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public ZipOutputHandler getZipOutputHandler() throws Exception {
+        return (ZipOutputHandler) getOutputHandler(
+                                                   ZipOutputHandler.OUTPUT_ZIP);
+    }
+
+    public XmlOutputHandler getXmlOutputHandler() throws Exception {
+        return (XmlOutputHandler) getOutputHandler(
+                                                   XmlOutputHandler.OUTPUT_XML);
+    }
+
+
 
     /**
      * _more_
