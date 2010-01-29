@@ -315,7 +315,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
         }
 
-
+        if (f.getName().contains("ionPrf") || f.getName().contains("atmPhs")) {
+            return;
+        }
 
         //List       adapters       = getAdapters();
         DataChoice soundingChoice = null;
