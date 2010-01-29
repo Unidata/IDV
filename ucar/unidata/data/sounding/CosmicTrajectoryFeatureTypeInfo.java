@@ -145,6 +145,25 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         varAltitude  = height;
         Attribute stimeStr = fd.findGlobalAttributeIgnoreCase("start_time");
         Attribute etimeStr = fd.findGlobalAttributeIgnoreCase("stop_time");
+        if(stimeStr == null){
+            stimeStr = fd.findGlobalAttributeIgnoreCase("startTime");
+            etimeStr = fd.findGlobalAttributeIgnoreCase("stopTime");
+        }
+        if(stimeStr == null){
+            stimeStr = fd.findGlobalAttributeIgnoreCase("bottime");
+            etimeStr = fd.findGlobalAttributeIgnoreCase("toptime");
+            if(stimeStr != null) {
+                if(stimeStr.getNumericValue().doubleValue() > etimeStr.getNumericValue().doubleValue()){
+                    Attribute  t = etimeStr;
+                    etimeStr = stimeStr;
+                    stimeStr = t;
+                }
+                varLatitude  = "GEO_lat";
+                varLongitude = "GEO_lon";
+
+            }
+        }
+
         startTime = new DateTime(stimeStr.getNumericValue().doubleValue(),
                                  getTimeUnit());
         endTime = new DateTime(etimeStr.getNumericValue().doubleValue(),
@@ -171,10 +190,18 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         List<Member> members = pfsd.getMembers();
         for(int i=0; i< members.size(); i++){
             Member mb = members.get(i);
+            String ustr =  mb.getUnitsString();
+            Unit unit = null;
+            if(!ustr.equalsIgnoreCase("none")){
+                try{
+                    unit = Util.parseUnit(ustr);
+                }  catch (visad.VisADException e) {
+                    unit = null;
+                }
+            }
 
-            Unit unit = Util.parseUnit(mb.getUnitsString());
-            if(unit.isConvertible(CommonUnits.DEGREE) ||unit.isConvertible(CommonUnits.KILOMETER) ||
-                 unit.isConvertible(CommonUnit.secondsSinceTheEpoch))
+            if(unit != null && (unit.isConvertible(CommonUnits.DEGREE) ||unit.isConvertible(CommonUnits.KILOMETER) ||
+                 unit.isConvertible(CommonUnit.secondsSinceTheEpoch)))
                 addVariable(new VarInfo(mb.getName(), mb.getDescription(), "Basic", unit));
             else
                addVariable(new VarInfo(mb.getName(), mb.getDescription(), unit));
