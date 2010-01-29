@@ -3465,10 +3465,11 @@ public class CDMRadarAdapter implements RadarAdapter {
             preAzi = myAzimuths[rayIdx];
         }
         //int[] sortedAzs = QuickSort.sort(azimuths);
-
+        boolean isSorted = false;
         int[] sortedAzs;
         if (azis >= 300) {
             sortedAzs = QuickSort.sort(myAzimuths);
+            isSorted = true;
         } else {
             sortedAzs = new int[myAzimuths.length];
             for (int i = 0; i < myAzimuths.length; i++) {
@@ -3488,39 +3489,46 @@ public class CDMRadarAdapter implements RadarAdapter {
         int   rayN = getRayNumber(myAzimuths);  //numRadials - 1;
         float azN  = myAzimuths[rayN - 1];
 
-        // add two additional radials at the begin and the end of each sweep
-        float[][] domainVals3d = new float[3][(rayN + 2) * numGates];
-        float[][] domainVals2d = new float[2][];
-        int       npix = (rayN + 2) * numGates;  // add two additional rays
-        float[][] values       = new float[1][npix];
-        // extend to 0 if first radial is between 0 and 1 degree.
-        if ((az0 >= 0) && (az0 <= 1.0)) {
-            for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[ray0] * numGates + cell;
-                domainVals3d[0][l] = cell;
-                domainVals3d[1][l] = 0.f;
-                domainVals3d[2][l] = elevations[sortedAzs[ray0]];
-                values[0][l++]     = rawValues[elem];
-            }
-        } else if (az0 > 1.0) {
-            if ((azN >= 360.0) && (azN <= 361.0)) {
-                for (int cell = 0; cell < numGates; cell++) {
-                    int elem = sortedAzs[rayN - 1] * numGates + cell;
-                    domainVals3d[0][l] = cell;
-                    domainVals3d[1][l] = ((azN - 360 - 0.5f < 0)
-                                          ? 0
-                                          : azN - 360 - 0.5f);
-                    domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
-                    values[0][l++]     = rawValues[elem];
-                }
 
-            } else {
+        float[][] domainVals3d = new float[3][(rayN) * numGates];
+        float[][] domainVals2d = new float[2][];
+        int       npix = (rayN) * numGates;  // add two additional rays
+        float[][] values       = new float[1][npix];
+        // add two additional radials at the begin and the end of each sweep
+        if(isSorted) {
+            domainVals3d = new float[3][(rayN + 2) * numGates];
+            npix = (rayN + 2) * numGates;  // add two additional rays
+        }
+        // extend to 0 if first radial is between 0 and 1 degree.
+        if( isSorted ) {
+            if ((az0 >= 0) && (az0 <= 1.0)) {
                 for (int cell = 0; cell < numGates; cell++) {
                     int elem = sortedAzs[ray0] * numGates + cell;
                     domainVals3d[0][l] = cell;
-                    domainVals3d[1][l] = az0 - 0.5f;
+                    domainVals3d[1][l] = 0.f;
                     domainVals3d[2][l] = elevations[sortedAzs[ray0]];
                     values[0][l++]     = rawValues[elem];
+                }
+            } else if (az0 > 1.0) {
+                if ((azN >= 360.0) && (azN <= 361.0)) {
+                    for (int cell = 0; cell < numGates; cell++) {
+                        int elem = sortedAzs[rayN - 1] * numGates + cell;
+                        domainVals3d[0][l] = cell;
+                        domainVals3d[1][l] = ((azN - 360 - 0.5f < 0)
+                                              ? 0
+                                              : azN - 360 - 0.5f);
+                        domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
+                        values[0][l++]     = rawValues[elem];
+                    }
+
+                } else {
+                    for (int cell = 0; cell < numGates; cell++) {
+                        int elem = sortedAzs[ray0] * numGates + cell;
+                        domainVals3d[0][l] = cell;
+                        domainVals3d[1][l] = az0 - 0.5f;
+                        domainVals3d[2][l] = elevations[sortedAzs[ray0]];
+                        values[0][l++]     = rawValues[elem];
+                    }
                 }
             }
         }
@@ -3537,30 +3545,32 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         // additional radial at the end of the sweep
-        if ((azN >= 359) && (azN <= 360)) {
-            for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN - 1] * numGates + cell;
-                domainVals3d[0][l] = cell;
-                domainVals3d[1][l] = 360;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
-                values[0][l++]     = rawValues[elem];
-            }
+        if(isSorted) {
+            if ((azN >= 359) && (azN <= 360)) {
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[rayN - 1] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = 360;
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
+                    values[0][l++]     = rawValues[elem];
+                }
 
-        } else if (azN < 359) {
-            for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN - 1] * numGates + cell;
-                domainVals3d[0][l] = cell;
-                domainVals3d[1][l] = azN + 0.5f;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
-                values[0][l++]     = rawValues[elem];
-            }
-        } else if ((azN > 360) && (azN <= 361)) {
-            for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN - 1] * numGates + cell;
-                domainVals3d[0][l] = cell;
-                domainVals3d[1][l] = 360;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
-                values[0][l++]     = rawValues[elem];
+            } else if (azN < 359) {
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[rayN - 1] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = azN + 0.5f;
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
+                    values[0][l++]     = rawValues[elem];
+                }
+            } else if ((azN > 360) && (azN <= 361)) {
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[rayN - 1] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = 360;
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
+                    values[0][l++]     = rawValues[elem];
+                }
             }
         }
         //check the value
@@ -3572,6 +3582,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         //
         // just ranges and azimuths for 2D
         //
+        int rayN2 = rayN;
+        if(isSorted)
+            rayN2 = rayN + 2;
         domainVals2d[0] = domainVals3d[0];
         domainVals2d[1] = domainVals3d[1];
 
@@ -3586,14 +3599,16 @@ public class CDMRadarAdapter implements RadarAdapter {
         RealTupleType tt  = (want3D)
                             ? radarDomain3d
                             : radarDomain2d;
+
         GriddedSet    set = (want3D)
                             ? (GriddedSet) new Gridded3DSet(tt, domainVals3d,
-                                numGates, rayN + 2, (CoordinateSystem) null,
+                                numGates, rayN2, (CoordinateSystem) null,
                                 domUnits3d, (ErrorEstimate[]) null, false)
                             : (GriddedSet) new Gridded2DSet(tt, domainVals2d,
-                                numGates, rayN + 2, tt.getCoordinateSystem(),
+                                numGates, rayN2, tt.getCoordinateSystem(),
                                 domUnits2d, (ErrorEstimate[]) null, false,
                                 false);
+
         FunctionType sweepType = new FunctionType(tt,
                                      getMomentType(varName, u));
 
