@@ -1,8 +1,25 @@
 <html xmlns:fb="http://www.facebook.com/2008/fbml">
-<head><title>${repository_name} - ${title}</title>
+<head><title>${repository_name} - ${title} ${entry.breadcrumbs}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <properties>
+name=Plain and Simple
+id=plain
+
+ramadda.template.link.wrapper =<span class="navlink"><a href="${url}">${label}</a></span>
+ramadda.template.link.separator=&nbsp;|&nbsp;
+
+ramadda.template.userlink.wrapper =<span class="navlink"><a class="navlink" href="${url}">${label}</a></span>
+ramadda.template.userlink.separator=&nbsp;|&nbsp;
+
+
+ramadda.template.sublink.wrapper=${sublinks}
+ramadda.template.sublink.on=<span class="subnavoncomp">${label}</span>
+ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${label}</a></span>
+
+ramadda.template.favorites = <b>Favorites:</b><div class="favorites">${entries}</div>
+ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
+
 </properties>
 
 
@@ -12,13 +29,158 @@
 
 
 
-${headfinal}
+<style type="text/css">
 
+body {
+}
+
+
+
+.breadcrumbs a {
+   text-decoration: none;
+   xcolor: black;
+}
+
+.breadcrumbs {
+   margin-left:5px;
+}
+
+
+.linkslabel {
+   font-weight: bold;
+}
+
+
+
+.topbox {
+   padding:0px;
+   margin-top: 5px;
+}
+
+.innercontent {
+  margin-left:5px;
+  margin-right:5px;
+}
+
+
+
+
+
+
+.content {
+  border-left: none;
+  border-right: none;
+  margin:0px;
+}
+
+.header-leftcolumn {
+  border-bottom : 2px #888888 solid;
+  xbackground-color:#006699;
+  color: #000000;
+  padding-top:10px;
+  padding-right:5px;
+}
+
+
+a.header-leftcolumn  {
+    color:black;
+}
+
+.navlink a {
+   color:#000;
+}
+
+.navlink a:hover {
+   color:red;
+}
+
+
+.header-leftcolumn a:hover  {
+    color:red;
+}
+
+.header-leftcolumn-title {
+  font-size: 24px;
+  color: black;
+  margin-top:5px;
+}
+
+.header-leftcolumn a {
+	color:black;
+}
+
+.nav-leftcolumn {
+   font-weight: bold;
+   color: black;
+}
+
+
+
+.subnav {
+   margin:10;
+   margin-left:0;
+   padding:0;
+   color: black;
+   min-height: 500px;
+}
+
+
+
+
+
+.subnavoncomp  {
+   background-color:#ffffff;
+   border: 1px #999999 solid; 
+   border-bottom: 2px white solid; 
+   margin-left:5px;
+   margin-right:5px;
+   padding-left:5;   
+   padding-right:5;   
+   padding-top:2px;   
+   padding-bottom:0px;   
+   font-weight: bold;
+}
+
+.subnavoffcomp  {
+   font-weight: bold;
+   background-color:#f1f0f3;
+   border: 1px #999999 solid; 
+   border-bottom: 1px 000000 solid; 
+   margin-left:5px;
+   margin-right:5px;
+   padding-left:5;   
+   padding-right:5;   
+   padding-top:2px;   
+   padding-bottom:0px;   
+}
+
+
+
+
+
+</style>
+
+${headfinal}
 
 </head>
 
 <body>
-<div class="innercontent">${content}</div>
+<table style="" border="0"  width="100%" cellspacing="0" cellpadding="0" border="2" >
+<tr valign="top">
+<td>
+<table width=100% border=0 cellpadding=3 cellspacing=0><tr valign=bottom><td>
+<div  class="header-leftcolumn-title">${header.title} - ${title}</div>
+</td><td align=right>
+${links} | ${userlink}
+</td></tr></table>
+
+<div class="topbox">
+${sublinks}
+</div>
+<div class="content">${entry.header}<div class="innercontent">${content}</div></div>
+</td></tr></table>
+
+
+
 ${bottom}
-</body>
-</html>
+</body></html>
