@@ -2876,6 +2876,10 @@ return new Result(title, sb);
     private Result processEntryXmlCreateInner(Request request)
             throws Exception {
 
+        Group group = null;
+        if(request.exists(ARG_GROUP)) {
+            group = findGroup(request, request.getString(ARG_GROUP));
+        }
         String file = request.getUploadedFile(ARG_FILE);
         if (file == null) {
             throw new IllegalArgumentException("No file argument given");
@@ -2911,7 +2915,6 @@ return new Result(title, sb);
                         "No entries.xml file provided");
                 }
             }
-
             if (entriesXml == null) {
                 entriesXml = IOUtil.readInputStream(fis);
             }
@@ -2923,7 +2926,10 @@ return new Result(title, sb);
         //        System.err.println ("xml:" + entriesXml);
 
         List      newEntries = new ArrayList();
-        Hashtable entries    = new Hashtable();
+        Hashtable<String,Entry>  entries    = new Hashtable<String,Entry>();
+        if(group!=null) {
+            entries.put("",group);
+        }
         Document  resultDoc  = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
                                             new String[] { ATTR_CODE,
@@ -3010,7 +3016,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected Entry processEntryXml(Request request, Element node,
-                                    Hashtable entries, Hashtable files,
+                                    Hashtable<String,Entry> entries, Hashtable files,
                                     boolean checkAccess, boolean internal)
             throws Exception {
         String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,

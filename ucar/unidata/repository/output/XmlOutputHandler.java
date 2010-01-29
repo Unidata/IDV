@@ -218,12 +218,12 @@ public class XmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Element getEntryTag(Request request, Entry entry, Document doc,
-                               Element parent, boolean forExport, boolean includeId)
+                               Element parent, boolean forExport, boolean includeParentId)
             throws Exception {
 
         Element node = XmlUtil.create(doc, TAG_ENTRY, parent, new String[] {
-                ATTR_ID, (includeId?entry.getId():""), ATTR_NAME, entry.getName(), ATTR_GROUP,
-            entry.getParentGroupId(), ATTR_TYPE,
+                ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), ATTR_PARENT,
+                (includeParentId?entry.getParentGroupId():""), ATTR_TYPE,
             entry.getTypeHandler().getType(), ATTR_ISGROUP,
             "" + entry.isGroup(), ATTR_FROMDATE,
             getRepository().formatDate(new Date(entry.getStartDate())),
