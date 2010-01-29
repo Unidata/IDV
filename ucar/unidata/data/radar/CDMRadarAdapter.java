@@ -3498,6 +3498,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         if(isSorted) {
             domainVals3d = new float[3][(rayN + 2) * numGates];
             npix = (rayN + 2) * numGates;  // add two additional rays
+            values       = new float[1][npix];
         }
         // extend to 0 if first radial is between 0 and 1 degree.
         if( isSorted ) {
