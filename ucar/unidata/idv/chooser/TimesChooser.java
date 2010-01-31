@@ -1,25 +1,22 @@
 /*
- * $Id: TimesChooser.java,v 1.12 2007/07/27 20:59:03 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
@@ -30,10 +27,10 @@ import ucar.unidata.data.imagery.AddeImageDescriptor;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ui.IdvTimeline;
 import ucar.unidata.ui.ChooserList;
 import ucar.unidata.ui.ChooserPanel;
 import ucar.unidata.ui.Timeline;
-import ucar.unidata.idv.ui.IdvTimeline;
 
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
@@ -106,13 +103,14 @@ public class TimesChooser extends IdvChooser {
     /** flag for ignoring combobox changes */
     private boolean ignoreTimeChangedEvents = false;
 
+    /** _more_          */
     private int ignoreCnt = 0;
 
 
     /** relative times list */
     private ChooserList relTimesList;
 
-    /** _more_          */
+    /** _more_ */
     private boolean usingTimeline = false;
 
     /** The timeline we popup */
@@ -121,16 +119,16 @@ public class TimesChooser extends IdvChooser {
     /** The in gui timeline */
     private IdvTimeline timeline;
 
-    /** _more_          */
+    /** _more_ */
     private JTabbedPane timesTab;
 
-    /** _more_          */
+    /** _more_ */
     private GuiUtils.CardLayoutPanel timesCardPanel;
 
     /** times container */
     protected JComponent timesContainer;
 
-    /** _more_          */
+    /** _more_ */
     private JLabel absTimesLbl = new JLabel("  ");
 
     /** times list */
@@ -139,7 +137,7 @@ public class TimesChooser extends IdvChooser {
     /** List of current absolute times */
     private List absoluteTimes = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private int[] currentSelectedAbsoluteTimes;
 
     /** Keep track of when are are doing absolute times */
@@ -149,7 +147,7 @@ public class TimesChooser extends IdvChooser {
     private int timesMode = TIMES_RELATIVE;
 
 
-    /** _more_          */
+    /** _more_ */
     protected List timesComponents = new ArrayList();
 
     /**
@@ -177,23 +175,36 @@ public class TimesChooser extends IdvChooser {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean checkIgnore() {
-        if(ignoreTimeChangedEvents) return true;
+        if (ignoreTimeChangedEvents) {
+            return true;
+        }
         pushIgnore();
         return false;
     }
 
 
+    /**
+     * _more_
+     */
     private void pushIgnore() {
         ignoreCnt++;
         ignoreTimeChangedEvents = true;
     }
 
+    /**
+     * _more_
+     */
     private void popIgnore() {
         ignoreCnt--;
-        if(ignoreCnt<=0) {
+        if (ignoreCnt <= 0) {
             ignoreTimeChangedEvents = false;
-            ignoreCnt=0;
+            ignoreCnt               = 0;
         }
     }
 
@@ -217,32 +228,41 @@ public class TimesChooser extends IdvChooser {
                         Misc.toList(getTimesList().getSelectedValues());
                     setSelectedAbsoluteTimes(items);
                     absoluteTimesSelectionChanged();
-                    if (items.size()>0 && usingTimeline) {
+                    if ((items.size() > 0) && usingTimeline) {
                         items = DatedObject.sort(items, true);
-                        Date startDate = ((DatedThing)items.get(0)).getDate();
-                        Date endDate = ((DatedThing)items.get(items.size()-1)).getDate();
-                        if(timeline.getUseDateSelection()) {
-                            timeline.getDateSelection().setStartFixedTime(startDate);
-                            timeline.getDateSelection().setEndFixedTime(endDate);
+                        Date startDate =
+                            ((DatedThing) items.get(0)).getDate();
+                        Date endDate = ((DatedThing) items.get(items.size()
+                                           - 1)).getDate();
+                        if (timeline.getUseDateSelection()) {
+                            timeline.getDateSelection().setStartFixedTime(
+                                startDate);
+                            timeline.getDateSelection().setEndFixedTime(
+                                endDate);
                         }
 
                         long visStart = timeline.getStartDate().getTime();
-                        long visEnd = timeline.getEndDate().getTime();
+                        long visEnd   = timeline.getEndDate().getTime();
                         long selStart = startDate.getTime();
-                        long selEnd = endDate.getTime();
-                        long width = visEnd-visStart;
-                        if(items.size()>=2) {
+                        long selEnd   = endDate.getTime();
+                        long width    = visEnd - visStart;
+                        if (items.size() >= 2) {
                             //If we have more than one and if the start or end time is not shown then set the visible range
                             //to the selected start/end time and expand
-                            if(selStart<visStart || selStart>visEnd || selEnd<selStart || selEnd>visEnd) {
+                            if ((selStart < visStart) || (selStart > visEnd)
+                                    || (selEnd < selStart)
+                                    || (selEnd > visEnd)) {
                                 timeline.setStartDate(new Date(selStart));
                                 timeline.setEndDate(new Date(selEnd));
                                 timeline.expandByPercent(2.0, false);
                             }
-                        } else if(selStart<visStart || selStart>visEnd) {
+                        } else if ((selStart < visStart)
+                                   || (selStart > visEnd)) {
                             //Here we just have one selected time
-                            timeline.setStartDate(new Date(selStart-width/2));
-                            timeline.setEndDate(new Date(selStart+width/2));
+                            timeline.setStartDate(new Date(selStart
+                                    - width / 2));
+                            timeline.setEndDate(new Date(selStart
+                                    + width / 2));
                             //                            timeline.expandByPercent(1.2, false);
                         }
                     }
@@ -368,17 +388,22 @@ public class TimesChooser extends IdvChooser {
         return makeTimesPanel(includeExtra, true);
     }
 
+    /**
+     * _more_
+     */
     protected void updateStatus() {
         super.updateStatus();
-        if(!doAbsoluteTimes) {
+        if ( !doAbsoluteTimes) {
             absTimesLbl.setText(" ");
         } else {
-            if (currentSelectedAbsoluteTimes== null || currentSelectedAbsoluteTimes.length == 0) {
+            if ((currentSelectedAbsoluteTimes == null)
+                    || (currentSelectedAbsoluteTimes.length == 0)) {
                 absTimesLbl.setText(" No times selected");
             } else if (currentSelectedAbsoluteTimes.length == 1) {
                 absTimesLbl.setText(" 1 time selected");
             } else {
-                absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length + " times selected");
+                absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length
+                                    + " times selected");
             }
         }
     }
@@ -403,9 +428,9 @@ public class TimesChooser extends IdvChooser {
 
 
         timeline = new IdvTimeline(new ArrayList(), 200) {
-                public List getSunriseLocations() {
-                    return getIdv().getIdvUIManager().getMapLocations();
-                }
+            public List getSunriseLocations() {
+                return getIdv().getIdvUIManager().getMapLocations();
+            }
 
             public void selectedDatesChanged() {
                 super.selectedDatesChanged();
@@ -429,8 +454,7 @@ public class TimesChooser extends IdvChooser {
         timeline.setSticky(false);
         //        timeline.setSticky(true);
         DateSelection dateSelection =
-            new DateSelection(timeline.getStartDate(),
-                              timeline.getEndDate());
+            new DateSelection(timeline.getStartDate(), timeline.getEndDate());
         timeline.setDateSelection(dateSelection);
 
 
@@ -438,48 +462,59 @@ public class TimesChooser extends IdvChooser {
         ChangeListener listener  = new ChangeListener() {
             public void stateChanged(ChangeEvent ae) {
                 boolean currentAbs = (timesTab.getSelectedIndex() == 1)
-                    || (timesTab.getSelectedIndex() == 2);
+                                     || (timesTab.getSelectedIndex() == 2);
                 if (currentAbs == getDoAbsoluteTimes()) {
                     return;
                 }
                 doAbsoluteTimes = currentAbs;
                 if (doAbsoluteTimes && !haveAnyTimes()) {
                     Misc.run(TimesChooser.this, "readTimes");
-                } 
+                }
                 updateStatus();
                 enableWidgets();
             }
         };
 
 
-        JComponent timesExtra = getExtraTimeComponent();
+        JComponent timesExtra    = getExtraTimeComponent();
         JComponent absoluteExtra = getExtraAbsoluteTimeComponent();
         JComponent relativeExtra = getExtraRelativeTimeComponent();
         timesCardPanel     = new GuiUtils.CardLayoutPanel();
         timesContainer     = GuiUtils.center(timesCardPanel);
         timesTab           = GuiUtils.getNestedTabbedPane();
         this.usingTimeline = useTimeLine;
-        timesTab.add("Relative", GuiUtils.centerBottom(getRelativeTimesList().getScroller(),relativeExtra));
+        timesTab.add(
+            "Relative",
+            GuiUtils.centerBottom(
+                getRelativeTimesList().getScroller(), relativeExtra));
         if (useTimeLine) {
             //                timesTab.add("Timeline", timeline.getContents(false));
-            timesList.getScroller().setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            timesList.getScroller().setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             //Shrink down the font a bit
-            Font f =    timesList.getFont();
-            f = f.deriveFont(f.getSize()-2f);
+            Font f = timesList.getFont();
+            f = f.deriveFont(f.getSize() - 2f);
             timesList.setFont(f);
-            JSplitPane splitter  = GuiUtils.hsplit(timeline.getContents(false), timesList.getScroller(),0.75);
+            JSplitPane splitter =
+                GuiUtils.hsplit(timeline.getContents(false),
+                                timesList.getScroller(), 0.75);
             splitter.setOneTouchExpandable(true);
-            timesTab.add("Absolute", GuiUtils.centerBottom(splitter,GuiUtils.leftRight(absTimesLbl,absoluteExtra)));
+            timesTab.add("Absolute",
+                         GuiUtils.centerBottom(splitter,
+                             GuiUtils.leftRight(absTimesLbl, absoluteExtra)));
             timesTab.setPreferredSize(new Dimension(350, 150));
         } else {
-            timesTab.add("Absolute", GuiUtils.centerBottom(timesList.getScroller(), absoluteExtra));
+            timesTab.add("Absolute",
+                         GuiUtils.centerBottom(timesList.getScroller(),
+                             absoluteExtra));
             timesTab.setPreferredSize(new Dimension(350, 150));
         }
 
 
         JPanel panel;
         if (includeExtra) {
-            panel = GuiUtils.centerBottom(timesTab, GuiUtils.left(timesExtra));
+            panel = GuiUtils.centerBottom(timesTab,
+                                          GuiUtils.left(timesExtra));
         } else {
             panel = GuiUtils.center(timesTab);
         }
@@ -523,18 +558,21 @@ public class TimesChooser extends IdvChooser {
             try {
                 timeline.setDatedThings(absoluteTimes, true);
                 Date endDate, startDate;
-                if (absoluteTimes.size() >1) {
+                if (absoluteTimes.size() > 1) {
                     //Go back N times
                     endDate =
                         ((DatedThing) absoluteTimes.get(absoluteTimes.size()
                             - 1)).getDate();
-                    int index = Math.max(0, absoluteTimes.size() - getNumTimesToSelect());
+                    int index = Math.max(0, absoluteTimes.size()
+                                         - getNumTimesToSelect());
                     startDate =
                         ((DatedThing) absoluteTimes.get(index)).getDate();
-                } else   if (absoluteTimes.size() ==1) {
+                } else if (absoluteTimes.size() == 1) {
                     DatedThing theDate = (DatedThing) absoluteTimes.get(0);
-                    endDate = new Date(theDate.getDate().getTime()+ DateUtil.daysToMillis(1));
-                    startDate = new Date(theDate.getDate().getTime()- DateUtil.daysToMillis(1));
+                    endDate = new Date(theDate.getDate().getTime()
+                                       + DateUtil.daysToMillis(1));
+                    startDate = new Date(theDate.getDate().getTime()
+                                         - DateUtil.daysToMillis(1));
                 } else {
                     startDate = new Date(System.currentTimeMillis()
                                          - DateUtil.daysToMillis(1));
@@ -555,20 +593,21 @@ public class TimesChooser extends IdvChooser {
                     endDate =
                         ((DatedThing) absoluteTimes.get(absoluteTimes.size()
                             - 1)).getDate();
-                    int index = Math.max(0, absoluteTimes.size() - getNumTimesToSelect()*2);
+                    int index = Math.max(0, absoluteTimes.size()
+                                         - getNumTimesToSelect() * 2);
                     startDate =
                         ((DatedThing) absoluteTimes.get(index)).getDate();
 
-                } else  if (absoluteTimes.size() != 1) {
+                } else if (absoluteTimes.size() != 1) {
                     startDate = new Date(System.currentTimeMillis()
                                          - DateUtil.daysToMillis(1));
                     endDate = new Date(System.currentTimeMillis());
                 }
-                
+
 
                 //Use 2.5 times the selected date range
-                long diff= endDate.getTime()-startDate.getTime();
-                startDate = new Date(endDate.getTime()-(long)2.5*diff);
+                long diff = endDate.getTime() - startDate.getTime();
+                startDate = new Date(endDate.getTime() - (long) 2.5 * diff);
                 timeline.setRange(startDate, endDate, true);
                 //Zoom out a little bit
                 timeline.expandByPercent(1.2, false);
@@ -576,19 +615,23 @@ public class TimesChooser extends IdvChooser {
                 timeline.makeCurrentRangeOriginal();
 
                 //Calling this applys the dateselection
-                if(timeline.getUseDateSelection()) {
+                if (timeline.getUseDateSelection()) {
                     timeline.setUseDateSelection(true);
                     setSelectedAbsoluteTimes(timeline.getSelected());
                     updateStatus();
-                } else {
-                }
+                } else {}
             } catch (Exception exc) {
                 logException("Setting times", exc);
             }
-        } 
+        }
         popIgnore();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected int getNumTimesToSelect() {
         return 5;
     }
@@ -672,19 +715,22 @@ public class TimesChooser extends IdvChooser {
             }
             timeline.setSelected(selected);
         }
-        if(!Misc.arraysEquals(getTimesList().getSelectedIndices(), indices)) {
+        if ( !Misc.arraysEquals(getTimesList().getSelectedIndices(),
+                                indices)) {
             getTimesList().setSelectedIndices(indices);
             int selectedIndex = getTimesList().getSelectedIndex();
             if (selectedIndex >= 0) {
                 getTimesList().ensureIndexIsVisible(selectedIndex);
             }
         }
-        if (currentSelectedAbsoluteTimes== null || currentSelectedAbsoluteTimes.length == 0) {
+        if ((currentSelectedAbsoluteTimes == null)
+                || (currentSelectedAbsoluteTimes.length == 0)) {
             absTimesLbl.setText(" No times selected");
         } else if (currentSelectedAbsoluteTimes.length == 1) {
             absTimesLbl.setText(" 1 time selected");
         } else {
-            absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length + " times selected");
+            absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length
+                                + " times selected");
         }
         popIgnore();
     }
@@ -707,8 +753,10 @@ public class TimesChooser extends IdvChooser {
      * @param to to index
      */
     protected void setSelectedAbsoluteTime(int from, int to) {
-        if(from>to) return;
-        int[] indices = new int[to - from+1];
+        if (from > to) {
+            return;
+        }
+        int[] indices = new int[to - from + 1];
         int   cnt     = 0;
         for (int i = from; i <= to; i++) {
             indices[cnt++] = i;
@@ -726,7 +774,7 @@ public class TimesChooser extends IdvChooser {
      * @return List of DatedThings
      *
      */
-    protected  List<DatedThing> makeDatedObjects(List items) {
+    protected List<DatedThing> makeDatedObjects(List items) {
         List<DatedThing> datedThings = new ArrayList<DatedThing>();
         try {
             for (int i = 0; i < items.size(); i++) {
@@ -835,10 +883,20 @@ public class TimesChooser extends IdvChooser {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent getExtraAbsoluteTimeComponent() {
         return new JPanel();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent getExtraRelativeTimeComponent() {
         return new JPanel();
     }
@@ -1024,8 +1082,10 @@ public class TimesChooser extends IdvChooser {
      * click that allos for the selection of different strides.
      *
      * @param list list to popup on
+     * @param timeline _more_
      */
-    public static void addTimeSelectionListener(final JList list, final Timeline timeline) {
+    public static void addTimeSelectionListener(final JList list,
+            final Timeline timeline) {
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -1045,26 +1105,27 @@ public class TimesChooser extends IdvChooser {
      *
      * @param e mouse click
      * @param list JList
+     * @param timeline _more_
      */
-    private static void popupTimeSelection(MouseEvent e,
-            final JList list,final Timeline timeline) {
+    private static void popupTimeSelection(MouseEvent e, final JList list,
+                                           final Timeline timeline) {
         if ( !list.isEnabled()) {
             return;
         }
-        List  items     = new ArrayList();
+        List items = new ArrayList();
         List dates = GuiUtils.getItems(list);
-        if(dates.size()>0 && (dates.get(0) instanceof DateTime)) {
+        if ((dates.size() > 0) && (dates.get(0) instanceof DateTime)) {
             JMenuItem menuItem = new JMenuItem("Show Timeline");
             menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        Misc.runInABit(1,
-                                 new Runnable() {
-                                     public void run() {
-                                         showTimelineDialog(list,timeline);
-                                     }});
+                public void actionPerformed(ActionEvent ae) {
+                    Misc.runInABit(1, new Runnable() {
+                        public void run() {
+                            showTimelineDialog(list, timeline);
+                        }
+                    });
 
-                    }
-                });
+                }
+            });
             items.add(menuItem);
         }
         GuiUtils.getConfigureStepSelectionItems(list, items);
@@ -1073,37 +1134,50 @@ public class TimesChooser extends IdvChooser {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param list _more_
+     * @param timeline _more_
+     */
     private static void showTimelineDialog(JList list, Timeline timeline) {
         try {
-            if(timeline==null) timeline = new Timeline();
-            List selected = new ArrayList();
-            Object[]tmp = list.getSelectedValues();
-            for(int i=0;i<tmp.length;i++) {
-                selected.add(new DatedObject(Util.makeDate((DateTime) tmp[i])));
+            if (timeline == null) {
+                timeline = new Timeline();
+            }
+            List     selected = new ArrayList();
+            Object[] tmp      = list.getSelectedValues();
+            for (int i = 0; i < tmp.length; i++) {
+                selected.add(
+                    new DatedObject(Util.makeDate((DateTime) tmp[i])));
             }
 
-            final JDialog dialog = GuiUtils.createDialog(GuiUtils.getWindow(list), "", true);
+            final JDialog dialog =
+                GuiUtils.createDialog(GuiUtils.getWindow(list), "", true);
             dialog.setUndecorated(true);
-            final boolean[]ok={false};
-            List dates = GuiUtils.getItems(list);
-            List datedThings = new ArrayList();
-            for(DateTime dttm: (List<DateTime>)dates) {
+            final boolean[] ok          = { false };
+            List            dates       = GuiUtils.getItems(list);
+            List            datedThings = new ArrayList();
+            for (DateTime dttm : (List<DateTime>) dates) {
                 datedThings.add(new DatedObject(Util.makeDate(dttm)));
             }
 
-            timeline.setDatedThings(datedThings,true);
+            timeline.setDatedThings(datedThings, true);
             DateSelection dateSelection;
-            if(selected.size() == dates.size()) {
-                dateSelection =new DateSelection(timeline.getStartDate(),
-                                                 timeline.getEndDate());
-            } else if(selected.size()==0) {
-                Date end  = new Date(timeline.getStartDate().getTime()+1000*60*60);
-                dateSelection =new DateSelection(timeline.getStartDate(),
-                                                 end);
+            if (selected.size() == dates.size()) {
+                dateSelection = new DateSelection(timeline.getStartDate(),
+                        timeline.getEndDate());
+            } else if (selected.size() == 0) {
+                Date end = new Date(timeline.getStartDate().getTime()
+                                    + 1000 * 60 * 60);
+                dateSelection = new DateSelection(timeline.getStartDate(),
+                        end);
 
             } else {
-                dateSelection =new DateSelection(((DatedObject)selected.get(0)).getDate(),
-                                                 ((DatedObject)selected.get(selected.size()-1)).getDate());
+                dateSelection = new DateSelection(
+                    ((DatedObject) selected.get(0)).getDate(),
+                    ((DatedObject) selected.get(
+                        selected.size() - 1)).getDate());
 
             }
 
@@ -1113,41 +1187,43 @@ public class TimesChooser extends IdvChooser {
             timeline.setUseDateSelection(true);
             timeline.setDateSelection(dateSelection);
 
-            ActionListener listener =new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        if(ae.getActionCommand().equals(GuiUtils.CMD_OK)) {
-                            ok[0] = true;
-                        }
-                        dialog.dispose();
+            ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (ae.getActionCommand().equals(GuiUtils.CMD_OK)) {
+                        ok[0] = true;
                     }
-                };
-            JComponent buttons = GuiUtils.makeOkCancelButtons(listener);
-            JComponent contents = GuiUtils.centerBottom(timeline,buttons);
-            buttons.setBorder(BorderFactory.createMatteBorder(1,1, 1, 1,
-                                                              Color.black));
-            contents.setBorder(BorderFactory.createMatteBorder(1,1, 1, 1,
-                                                               Color.black));
+                    dialog.dispose();
+                }
+            };
+            JComponent buttons  = GuiUtils.makeOkCancelButtons(listener);
+            JComponent contents = GuiUtils.centerBottom(timeline, buttons);
+            buttons.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                    Color.black));
+            contents.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                    Color.black));
             dialog.getContentPane().add(contents);
 
             dialog.pack();
             Point loc = list.getLocationOnScreen();
             //            loc.y += timelineBtn.getSize().height;
             dialog.setLocation(loc);
-            GuiUtils.positionAndFitToScreen(dialog,dialog.getBounds());
+            GuiUtils.positionAndFitToScreen(dialog, dialog.getBounds());
             dialog.show();
-            if(ok[0]) {
+            if (ok[0]) {
                 selected = new ArrayList();
-                for(Date dttm: (List<Date>)DatedObject.unwrap(timeline.getSelected())) {
+                for (Date dttm :
+                        (List<Date>) DatedObject.unwrap(
+                            timeline.getSelected())) {
                     selected.add(new DateTime(dttm));
                 }
-                if(selected.size()==0) {
-                    list.setSelectedIndices(new int[]{});
+                if (selected.size() == 0) {
+                    list.setSelectedIndices(new int[] {});
                 } else {
-                    GuiUtils.setSelectedItems( list, selected);
+                    GuiUtils.setSelectedItems(list, selected);
                 }
             }
 
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LogUtil.logException("Showing timeline dialog", exc);
         }
     }
@@ -1156,4 +1232,3 @@ public class TimesChooser extends IdvChooser {
 
 
 }
-

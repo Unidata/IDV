@@ -1,20 +1,18 @@
 /*
- * $Id: IdvChooserManager.java,v 1.98 2007/07/30 19:38:22 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -30,14 +28,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
-import ucar.unidata.idv.chooser.adde.AddeServer;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 
 
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.adde.AddeChooser;
+
+
+import ucar.unidata.idv.chooser.adde.AddeServer;
 
 import ucar.unidata.idv.ui.*;
 
@@ -107,9 +106,16 @@ public class IdvChooserManager extends IdvManager {
 
 
 
+    /** _more_          */
     public static final String PROP_CHOOSER_TREEVIEW = "idv.chooser.treeview";
-    public static final String PROP_CHOOSER_TREEVIEW_WIDTH = "idv.chooser.treeview.width";
-    public static final String PROP_CHOOSER_TREEVIEW_USESPLITPANE = "idv.chooser.treeview.usesplitpane";
+
+    /** _more_          */
+    public static final String PROP_CHOOSER_TREEVIEW_WIDTH =
+        "idv.chooser.treeview.width";
+
+    /** _more_          */
+    public static final String PROP_CHOOSER_TREEVIEW_USESPLITPANE =
+        "idv.chooser.treeview.usesplitpane";
 
 
     /** Use this member to log messages (through calls to LogUtil) */
@@ -227,6 +233,7 @@ public class IdvChooserManager extends IdvManager {
     /** All of the adde servers */
     private List addeServers = new ArrayList();
 
+    /** _more_          */
     private List<String> selectedDataSourceIds = null;
 
 
@@ -577,9 +584,14 @@ public class IdvChooserManager extends IdvManager {
                 pre  = "<buttontabbedpane>";
                 post = "</buttontabbedpane>";
             } else {
-                String attrs = "usesplitpane=\"" + getIdv().getProperty(PROP_CHOOSER_TREEVIEW_USESPLITPANE,true) +"\"  ";
-                attrs = attrs+"treewidth=\"" + getIdv().getProperty(PROP_CHOOSER_TREEVIEW_WIDTH,200)+"\"";
-                pre  = "<treepanel " + attrs+">";
+                String attrs = "usesplitpane=\""
+                               + getIdv().getProperty(
+                                   PROP_CHOOSER_TREEVIEW_USESPLITPANE,
+                                   true) + "\"  ";
+                attrs = attrs + "treewidth=\""
+                        + getIdv().getProperty(PROP_CHOOSER_TREEVIEW_WIDTH,
+                            200) + "\"";
+                pre  = "<treepanel " + attrs + ">";
                 post = "</treepanel>";
             }
         }
@@ -614,6 +626,8 @@ public class IdvChooserManager extends IdvManager {
      * Factory method to create the IdvXmlUi to be used for the given chooser xml node
      *
      * @param root The chooser xml node
+     *
+     * @return _more_
      */
     protected XmlUi createXmlUi(Element root) {
         return new IdvXmlUi(getIdv(), root);
@@ -696,7 +710,7 @@ public class IdvChooserManager extends IdvManager {
         }
         //      Trace.msg("Done: " + className);
 
-        JComponent chooserContents = (JComponent)contents;
+        JComponent chooserContents = (JComponent) contents;
 
         //        JComponent chooserContents =
         //            GuiUtils.topCenter(GuiUtils.inset(contents, 5),
@@ -880,50 +894,71 @@ public class IdvChooserManager extends IdvManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private List<String> getSelectedDataSourceIds() {
-	if(selectedDataSourceIds==null) {
-	    selectedDataSourceIds = (List) getIdv().getStore().getEncodedFile("selecteddatasourceids.xml");
-	}
-	if(selectedDataSourceIds==null) {
-	    selectedDataSourceIds= new ArrayList();
-	}
-	return selectedDataSourceIds;
-    } 
+        if (selectedDataSourceIds == null) {
+            selectedDataSourceIds = (List) getIdv().getStore().getEncodedFile(
+                "selecteddatasourceids.xml");
+        }
+        if (selectedDataSourceIds == null) {
+            selectedDataSourceIds = new ArrayList();
+        }
+        return selectedDataSourceIds;
+    }
 
+    /**
+     * _more_
+     */
     private void writeSelectedDataSourceIds() {
-	if(selectedDataSourceIds!=null) {
-	    getIdv().getStore().putEncodedFile("selecteddatasourceids.xml", 
-					       selectedDataSourceIds);
-	}
-    } 
-
-
-
-
-    public List sortDataSourceIds(List ids) {
-	List result = new ArrayList();
-	for(String id: (List<String>) getSelectedDataSourceIds()) {
-	    TwoFacedObject tfo = TwoFacedObject.findId(id, ids);
-	    if(tfo!=null) {
-		ids.remove(tfo);
-		result.add(tfo);
-	    }
-	}
-	//	TwoFacedObject.sort(result);
-	TwoFacedObject.sort(ids);
-	result.addAll(ids);
-	return result;
+        if (selectedDataSourceIds != null) {
+            getIdv().getStore().putEncodedFile("selecteddatasourceids.xml",
+                    selectedDataSourceIds);
+        }
     }
 
 
+
+
+    /**
+     * _more_
+     *
+     * @param ids _more_
+     *
+     * @return _more_
+     */
+    public List sortDataSourceIds(List ids) {
+        List result = new ArrayList();
+        for (String id : (List<String>) getSelectedDataSourceIds()) {
+            TwoFacedObject tfo = TwoFacedObject.findId(id, ids);
+            if (tfo != null) {
+                ids.remove(tfo);
+                result.add(tfo);
+            }
+        }
+        //      TwoFacedObject.sort(result);
+        TwoFacedObject.sort(ids);
+        result.addAll(ids);
+        return result;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public void dataSourceIdSelected(String id) {
-	List ids = getSelectedDataSourceIds();
-	ids.remove(id);
-	ids.add(0,id);
-	while(selectedDataSourceIds.size()>15) {
-	    ids.remove(selectedDataSourceIds.size()-1);
-	}
-	writeSelectedDataSourceIds();
+        List ids = getSelectedDataSourceIds();
+        ids.remove(id);
+        ids.add(0, id);
+        while (selectedDataSourceIds.size() > 15) {
+            ids.remove(selectedDataSourceIds.size() - 1);
+        }
+        writeSelectedDataSourceIds();
     }
 
 
@@ -1310,7 +1345,7 @@ public class IdvChooserManager extends IdvManager {
      * @return The GUI for the data sources selector
      */
     public JComboBox getDataSourcesComponent(boolean justFileSources,
-            DataManager dataManager) {
+                                             DataManager dataManager) {
         return getDataSourcesComponent(justFileSources, dataManager, true);
     }
 
@@ -1324,20 +1359,21 @@ public class IdvChooserManager extends IdvManager {
      * @return the component
      */
     public JComboBox getDataSourcesComponent(boolean justFileSources,
-            DataManager dataManager, boolean addLucky) {
+                                             DataManager dataManager,
+                                             boolean addLucky) {
         JComboBox dataSourcesCbx  = new JComboBox();
-        List      dataSources     =  new ArrayList();
+        List      dataSources     = new ArrayList();
         List      fileDataSources = (justFileSources
                                      ? dataManager.getFileDataSourceList()
                                      : (List) dataManager
                                          .getAllDataSourceIds());
 
         dataSources.addAll(fileDataSources);
-	dataSources = sortDataSourceIds(dataSources);
-	if(addLucky) {
-	    dataSources.add(0, "I'm Feeling Lucky");
-	    
-	}
+        dataSources = sortDataSourceIds(dataSources);
+        if (addLucky) {
+            dataSources.add(0, "I'm Feeling Lucky");
+
+        }
         GuiUtils.setListData(dataSourcesCbx, dataSources);
         dataSourcesCbx.setToolTipText(
             "<html>Optional way to specifically select<br>the type of datasource.</html>");
@@ -1349,4 +1385,3 @@ public class IdvChooserManager extends IdvManager {
 
 
 }
-

@@ -1,25 +1,22 @@
 /*
- * $Id: XmlChooser.java,v 1.80 2007/07/09 22:59:58 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
@@ -27,15 +24,15 @@ package ucar.unidata.idv.chooser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ucar.unidata.data.DataSource;
+
 
 
 
 import ucar.unidata.idv.*;
-import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
-import ucar.unidata.util.WmsUtil;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.FileManager;
 
@@ -45,6 +42,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PreferenceList;
+import ucar.unidata.util.WmsUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -90,6 +88,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         ucar.unidata.util.LogUtil.getLogInstance(XmlChooser.class.getName());
 
 
+    /** _more_          */
     public static final String PROP_CHOOSER_URL = "idv.chooser.url";
 
     /**
@@ -171,16 +170,23 @@ public class XmlChooser extends IdvChooser implements ActionListener {
      */
     public XmlChooser(IdvChooserManager mgr, Element root) {
         super(mgr, root);
-        initialUrlPath = (chooserNode!=null?XmlUtil.getAttribute(chooserNode, ATTR_URL, ""):"");
+        initialUrlPath = ((chooserNode != null)
+                          ? XmlUtil.getAttribute(chooserNode, ATTR_URL, "")
+                          : "");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dataSource _more_
+     */
     public void setDataSource(DataSource dataSource) {
-	super.setDataSource(dataSource);
-	String tmp = (String)dataSource.getProperty(PROP_CHOOSER_URL);
-	if(tmp!=null) {
-	    initialUrlPath = tmp;
-	}
+        super.setDataSource(dataSource);
+        String tmp = (String) dataSource.getProperty(PROP_CHOOSER_URL);
+        if (tmp != null) {
+            initialUrlPath = tmp;
+        }
     }
 
     /**
@@ -248,16 +254,30 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param properties _more_
+     */
     public void initSubProperties(Hashtable properties) {
-	properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
-	properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
+        properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
+        properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
     }
 
 
+    /**
+     * _more_
+     *
+     * @param definingObject _more_
+     * @param dataType _more_
+     * @param properties _more_
+     *
+     * @return _more_
+     */
     protected boolean makeDataSource(Object definingObject, String dataType,
                                      Hashtable properties) {
-	properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
-	return super.makeDataSource(definingObject, dataType, properties);
+        properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
+        return super.makeDataSource(definingObject, dataType, properties);
     }
 
 
@@ -340,14 +360,14 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                 makeBlankTree();
             }
         }
-        JPanel navButtons = GuiUtils.hbox(backBtn,fwdBtn);
+        JPanel navButtons = GuiUtils.hbox(backBtn, fwdBtn);
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel catPanel = GuiUtils.doLayout(new Component[] {
                               new JLabel("Catalogs:"),
                               catListPanel, browseButton }, 3,
                                   GuiUtils.WT_NYN, GuiUtils.WT_N);
-        JPanel topPanel = GuiUtils.leftCenter(navButtons,catPanel);
+        JPanel topPanel = GuiUtils.leftCenter(navButtons, catPanel);
         myContents = GuiUtils.topCenterBottom(topPanel, handlerHolder,
                 bottomButtons);
         //        myContents = GuiUtils.topCenter(getStatusComponent(), myContents);
@@ -410,7 +430,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                                   + "&request=GetCapabilities&service=WMS";
                     }
                     xmlContents = IOUtil.readContents(xmlPath, NULL_STRING);
-                    document = XmlUtil.getDocument(xmlContents);
+                    document    = XmlUtil.getDocument(xmlContents);
                 }
 
                 if ((document == null)
@@ -778,4 +798,3 @@ public class XmlChooser extends IdvChooser implements ActionListener {
     }
 
 }
-

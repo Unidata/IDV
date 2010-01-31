@@ -1,25 +1,22 @@
-/**
- * $Id: DqcRadarChooser.java,v 1.18 2007/07/18 20:44:37 yuanho Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
@@ -135,17 +132,17 @@ public class DqcRadarChooser extends TimesChooser {
         }
         boolean haveTimesSelected;
         if (getDoAbsoluteTimes()) {
-            haveTimesSelected =  getSelectedAbsoluteTimes().size() > 0;
+            haveTimesSelected = getSelectedAbsoluteTimes().size() > 0;
         } else {
             haveTimesSelected = true;
         }
         setHaveData(haveTimesSelected);
-        if(haveTimesSelected) 
-            setStatus("Press \"" + CMD_LOAD + "\" to load the selected radar data",
-                      "buttons");
-        else
-            setStatus("Please select times",
-                      "times");
+        if (haveTimesSelected) {
+            setStatus("Press \"" + CMD_LOAD
+                      + "\" to load the selected radar data", "buttons");
+        } else {
+            setStatus("Please select times", "times");
+        }
     }
 
 
@@ -177,19 +174,18 @@ public class DqcRadarChooser extends TimesChooser {
         //        getStationMap().setPreferredSize(new Dimension(200, 300));
         getStationMap().setPreferredSize(new Dimension(230, 200));
         //        getStationMap().setPreferredSize(new Dimension(300, 250));
-        JComponent buttons = getDefaultButtons();
-        JComponent timesPanel  = makeTimesPanel(true,true);
-        GuiUtils.tmpInsets = new Insets(0,3,0,3);
+        JComponent buttons    = getDefaultButtons();
+        JComponent timesPanel = makeTimesPanel(true, true);
+        GuiUtils.tmpInsets = new Insets(0, 3, 0, 3);
         JComponent contents = GuiUtils.doLayout(new Component[] {
-                                                    getStationMap(),
-                                                    timesPanel}, 1, new double[] { 3.0,
-                1.0 }, GuiUtils.WT_Y);
-        contents = GuiUtils.inset(contents,5);
+                                  getStationMap(),
+                                  timesPanel }, 1, new double[] { 3.0, 1.0 },
+                                      GuiUtils.WT_Y);
+        contents = GuiUtils.inset(contents, 5);
         Misc.run(this, "initializeCollection");
-        outerContents = GuiUtils.center(GuiUtils.topCenterBottom(        
-                                                                getStatusComponent(),
-                                                                contents,
-                                                                buttons));
+        outerContents =
+            GuiUtils.center(GuiUtils.topCenterBottom(getStatusComponent(),
+                contents, buttons));
         return outerContents;
     }
 
@@ -263,8 +259,8 @@ public class DqcRadarChooser extends TimesChooser {
             try {
                 showWaitCursor();
                 setAbsoluteTimes(new ArrayList());
-                setStatus("Reading times for station: "
-                                + selectedStation,"");
+                setStatus("Reading times for station: " + selectedStation,
+                          "");
                 //                LogUtil.message("Reading times for station: "
                 //                                + selectedStation);
                 List allTimes =
@@ -285,7 +281,7 @@ public class DqcRadarChooser extends TimesChooser {
             } catch (Exception exc) {
                 logException("Getting times for station: " + selectedStation,
                              exc);
-                setStatus("","");
+                setStatus("", "");
             }
         }
         setAbsoluteTimes(times);
@@ -316,7 +312,7 @@ public class DqcRadarChooser extends TimesChooser {
                 List selected = makeDatedObjects(getSelectedAbsoluteTimes());
                 for (int i = 0; i < selected.size(); i++) {
                     DatedThing datedThing = (DatedThing) selected.get(i);
-                    Date     date= datedThing.getDate();
+                    Date       date       = datedThing.getDate();
                     times.add(date);
                     URI uri = collection.getRadarDatasetURI(
                                   selectedStation.getID(), date);
@@ -350,4 +346,3 @@ public class DqcRadarChooser extends TimesChooser {
 
 
 }
-

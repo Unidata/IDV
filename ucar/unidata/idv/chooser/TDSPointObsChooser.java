@@ -1,40 +1,38 @@
 /*
- * Copyright 1997-2009 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
 
 import org.w3c.dom.*;
 
-import ucar.unidata.xml.XmlUtil;
-
 
 import ucar.nc2.units.TimeDuration;
 
 import ucar.unidata.util.*;
 
+import ucar.unidata.xml.XmlUtil;
+
 import visad.CommonUnit;
 import visad.DateTime;
 
-import java.text.SimpleDateFormat;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -46,6 +44,8 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 
 import java.net.URI;
+
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -114,10 +114,10 @@ public class TDSPointObsChooser extends TimesChooser {
     /** the capabilities request */
     private final String REQ_CAPABILITIES = "?req=capabilities";
 
-    /** the lat/lon box tag*/
+    /** the lat/lon box tag */
     private final String TAG_LATLONBOX = "LatLonBox";
 
-    /** the timespan tag*/
+    /** the timespan tag */
     private final String TAG_TIMESPAN = "TimeSpan";
 
     /** date selection */
@@ -164,8 +164,9 @@ public class TDSPointObsChooser extends TimesChooser {
         }
         setHaveData(haveTimesSelected);
         if (haveTimesSelected) {
-            setStatus("Press \"" + CMD_LOAD
-                      + "\" to load the selected observation data", "buttons");
+            setStatus(
+                "Press \"" + CMD_LOAD
+                + "\" to load the selected observation data", "buttons");
         } else {
             setStatus("Please select times", "timepanel");
         }
@@ -197,14 +198,13 @@ public class TDSPointObsChooser extends TimesChooser {
         collectionSelector = new JComboBox();
         collectionSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TwoFacedObject selected = 
+                TwoFacedObject selected =
                     (TwoFacedObject) collectionSelector.getSelectedItem();
 
-                if (selected == null || selected.equals(SELECT_OBJECT)) {
+                if ((selected == null) || selected.equals(SELECT_OBJECT)) {
                     return;
                 }
-                String collectionUrl =
-                    TwoFacedObject.getIdString(selected);
+                String collectionUrl = TwoFacedObject.getIdString(selected);
 
                 setCollection(collectionUrl);
             }
@@ -225,21 +225,16 @@ public class TDSPointObsChooser extends TimesChooser {
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JComponent contents = GuiUtils.doLayout(new Component[] {
-                         GuiUtils.rLabel("Catalog:"),
-                         urlBox, 
-                         GuiUtils.rLabel("Collections:"),
-                         GuiUtils.left(collectionSelector),
-                         GuiUtils.valignLabel("Coverage:"),
-                         stationMap,
-                         GuiUtils.valignLabel("Times:"),
-                         timesPanel},
-                                           2,
-                                           GuiUtils.WT_NY,
-            new double[]{0,0,0,1,0.2});
+            GuiUtils.rLabel("Catalog:"), urlBox,
+            GuiUtils.rLabel("Collections:"),
+            GuiUtils.left(collectionSelector),
+            GuiUtils.valignLabel("Coverage:"), stationMap,
+            GuiUtils.valignLabel("Times:"), timesPanel
+        }, 2, GuiUtils.WT_NY, new double[] { 0, 0, 0, 1, 0.2 });
 
         GuiUtils.enableComponents(compsThatNeedServer, false);
-        outerContents =
-            GuiUtils.center(GuiUtils.centerBottom(contents, buttons));
+        outerContents = GuiUtils.center(GuiUtils.centerBottom(contents,
+                buttons));
         return outerContents;
     }
 
@@ -300,24 +295,26 @@ public class TDSPointObsChooser extends TimesChooser {
      */
     private List getPointObsCollections(String pointobServerURL) {
         List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
-        Element root = null;
+        Element              root        = null;
         try {
             root = XmlUtil.getRoot(pointobServerURL, this.getClass());
         } catch (Exception e) {
-            userMessage("Unable to open catalog: "+pointobServerURL);
+            userMessage("Unable to open catalog: " + pointobServerURL);
             //e.printStackTrace();
             return collections;
         }
         root.setAttribute(CatalogUtil.ATTR_CATALOGURL, pointobServerURL);
-        List children = XmlUtil.findDescendants(root, CatalogUtil.TAG_DATASET);
+        List children = XmlUtil.findDescendants(root,
+                            CatalogUtil.TAG_DATASET);
         collections.add(SELECT_OBJECT);
         for (int j = 0; j < children.size(); j++) {
             Element datasetNode = (Element) children.get(j);
-            String desc    = datasetNode.getAttribute(CatalogUtil.ATTR_NAME);
-            String urlPath = datasetNode.getAttribute(CatalogUtil.ATTR_URLPATH);
+            String  desc = datasetNode.getAttribute(CatalogUtil.ATTR_NAME);
+            String urlPath =
+                datasetNode.getAttribute(CatalogUtil.ATTR_URLPATH);
             Element serviceNode =
-                    CatalogUtil.findServiceNodeForDataset(datasetNode,
-                        true, null);
+                CatalogUtil.findServiceNodeForDataset(datasetNode, true,
+                    null);
             if (serviceNode == null) {
                 continue;
             }
@@ -337,14 +334,14 @@ public class TDSPointObsChooser extends TimesChooser {
     public void initializeCollection(String url) {
         Element root = null;
         try {
-        root = XmlUtil.getRoot(url+REQ_CAPABILITIES, this.getClass());
-        //System.out.println(XmlUtil.toString(root));
+            root = XmlUtil.getRoot(url + REQ_CAPABILITIES, this.getClass());
+            //System.out.println(XmlUtil.toString(root));
         } catch (Exception e) {
             userMessage("Unable to open collection: " + url);
             //e.printStackTrace();
             return;
         }
-        collectionUrl = url;
+        collectionUrl       = url;
         capabilitiesElement = root;
         collectionChanged();
         urlListHandler.saveState(urlBox);
@@ -366,24 +363,28 @@ public class TDSPointObsChooser extends TimesChooser {
      */
     public void readTimes() {
         List<DateTime> times = new Vector<DateTime>();
-            ucar.unidata.util.Trace.call1("TDSPointObsChooser.readTimes");
-            if (capabilitiesElement != null) {
+        ucar.unidata.util.Trace.call1("TDSPointObsChooser.readTimes");
+        if (capabilitiesElement != null) {
 
-                Element timeSpan = XmlUtil.getElement(capabilitiesElement, TAG_TIMESPAN);
-                collectionDates = new DateSelection();
-                
-                if (timeSpan != null) {
-                    try {
-                    String startTime = XmlUtil.getGrandChildText(timeSpan, "begin");
-                    String endTime = XmlUtil.getGrandChildText(timeSpan, "end");
-                    String resolution = XmlUtil.getGrandChildText(timeSpan, "resolution");
+            Element timeSpan = XmlUtil.getElement(capabilitiesElement,
+                                   TAG_TIMESPAN);
+            collectionDates = new DateSelection();
+
+            if (timeSpan != null) {
+                try {
+                    String startTime = XmlUtil.getGrandChildText(timeSpan,
+                                           "begin");
+                    String endTime = XmlUtil.getGrandChildText(timeSpan,
+                                         "end");
+                    String resolution = XmlUtil.getGrandChildText(timeSpan,
+                                            "resolution");
                     Date fromDate = DateUtil.parse(startTime);
-                    Date toDate = DateUtil.parse(endTime);
-                    toDate = DateUtil.min(toDate, new Date());
+                    Date toDate   = DateUtil.parse(endTime);
+                    toDate          = DateUtil.min(toDate, new Date());
                     collectionDates = new DateSelection(fromDate, toDate);
                     if (resolution != null) {
-                        TimeDuration td = new TimeDuration(resolution);
-                        double intervalMillis = td.getValueInSeconds()*1000;
+                        TimeDuration td       = new TimeDuration(resolution);
+                        double intervalMillis = td.getValueInSeconds() * 1000;
                         collectionDates.setInterval(intervalMillis);
                         collectionDates.setRoundTo(intervalMillis);
                     }
@@ -393,22 +394,22 @@ public class TDSPointObsChooser extends TimesChooser {
                     if (getDoAbsoluteTimes()) {
                         double[] millis = collectionDates.getIntervalTicks();
                         for (int i = 0; i < millis.length; i++) {
-                            times.add(new DateTime(millis[i]/1000.));
+                            times.add(new DateTime(millis[i] / 1000.));
                         }
                     }
                     showNormalCursor();
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                        userMessage("Error reading times. ");
-                        setStatus("Select a different collection", "collections");
-                        showNormalCursor();
-                        return;
-                    }
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                    userMessage("Error reading times. ");
+                    setStatus("Select a different collection", "collections");
+                    showNormalCursor();
+                    return;
                 }
             }
-            ucar.unidata.util.Trace.call2("TDSPointObsChooser.readTimes");
+        }
+        ucar.unidata.util.Trace.call2("TDSPointObsChooser.readTimes");
         setAbsoluteTimes(times);
-        
+
     }
 
 
@@ -426,7 +427,7 @@ public class TDSPointObsChooser extends TimesChooser {
             if (getDoAbsoluteTimes()) {
                 Trace.msg("TDSPointObsChoocer:getting absolute times");
                 List<Date> times = new ArrayList<Date>();
-                List<DatedThing> selected = 
+                List<DatedThing> selected =
                     makeDatedObjects(getSelectedAbsoluteTimes());
                 for (DatedThing datedThing : selected) {
                     times.add(datedThing.getDate());
@@ -445,11 +446,14 @@ public class TDSPointObsChooser extends TimesChooser {
                 }
                 dateSelection.setEndMode(DateSelection.TIMEMODE_CURRENT);
                 dateSelection.setCount(count);
-                if (collectionDates.hasInterval()) dateSelection.setInterval(collectionDates.getInterval());
+                if (collectionDates.hasInterval()) {
+                    dateSelection.setInterval(collectionDates.getInterval());
+                }
             }
             ht.put(ucar.unidata.data.DataSelection.PROP_DATESELECTION,
-                    dateSelection);
-            makeDataSource("cdmremote:"+collectionUrl, "CDMREMOTE.POINT", ht);
+                   dateSelection);
+            makeDataSource("cdmremote:" + collectionUrl, "CDMREMOTE.POINT",
+                           ht);
         } catch (Exception exc) {
             logException("Loading radar data", exc);
         }

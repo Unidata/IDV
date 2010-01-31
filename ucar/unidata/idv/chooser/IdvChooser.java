@@ -1,25 +1,22 @@
 /*
- * j * $Id: IdvChooser.java,v 1.91 2007/07/27 20:59:03 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
@@ -116,7 +113,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(IdvChooser.class.getName());
 
-    public static final String PROP_CHOOSERCLASSNAME = "prop.chooserclassname";
+    /** _more_          */
+    public static final String PROP_CHOOSERCLASSNAME =
+        "prop.chooserclassname";
 
     /**
      * Can pass in null properties. So instead of  a null or casting null
@@ -190,6 +189,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     private JComboBox dataSourcesCbx;
 
 
+    /** _more_          */
     private DataSource dataSource;
 
 
@@ -316,10 +316,11 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * @return the button component
      */
     public JComponent getDefaultButtons(ActionListener listener) {
-	if(dataSource!=null) {
-	    JButton reloadButton = GuiUtils.makeButton("Reload Data",this,"doLoad");
-	    return GuiUtils.wrap(reloadButton);
-	}
+        if (dataSource != null) {
+            JButton reloadButton = GuiUtils.makeButton("Reload Data", this,
+                                       "doLoad");
+            return GuiUtils.wrap(reloadButton);
+        }
 
 
         JComponent buttons = super.getDefaultButtons(listener);
@@ -814,8 +815,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     public static JComboBox getDataSourcesComponent(boolean justFileSources,
             DataManager dataManager, boolean addLucky) {
-	return dataManager.getDataContext().getIdv().getIdvChooserManager().getDataSourcesComponent(justFileSources,
-										   dataManager,  addLucky);
+        return dataManager.getDataContext().getIdv().getIdvChooserManager()
+            .getDataSourcesComponent(justFileSources, dataManager, addLucky);
     }
 
     /**
@@ -824,7 +825,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * Else, return null
      *
      * @return Data source id
-    */
+     */
     protected String getDataSourceId() {
         return getDataSourceId(dataSourcesCbx);
     }
@@ -842,9 +843,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         }
         Object selected = dataSourcesCbx.getSelectedItem();
         if ((selected != null) && (selected instanceof TwoFacedObject)) {
-	    String id =  (String) ((TwoFacedObject) selected).getId();
-	    chooserManager.dataSourceIdSelected(id);
-	    return id;
+            String id = (String) ((TwoFacedObject) selected).getId();
+            chooserManager.dataSourceIdSelected(id);
+            return id;
         }
         return null;
     }
@@ -882,8 +883,13 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isReloadable() {
-	return true;
+        return true;
     }
 
 
@@ -906,15 +912,14 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     protected boolean makeDataSource(Object definingObject, String dataType,
                                      Hashtable properties) {
-	if(properties == null) {
-	    properties = new Hashtable();
-	}
+        if (properties == null) {
+            properties = new Hashtable();
+        }
 
 
-	if(isReloadable()) {
-	    properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
-	} else {
-	}
+        if (isReloadable()) {
+            properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
+        } else {}
 
         if (dataSourceListener != null) {
             dataSourceListener.actionPerformed(new ActionEvent(new Object[] {
@@ -926,18 +931,17 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
 
 
         showWaitCursor();
-	boolean result;
-	if(dataSource!=null) {
-	    try {
-		dataSource.reloadData(definingObject, properties);
-	    } catch(Exception exc) {
-		logException("Error reloading data", exc);
-	    }
-	    result = false;
-	} else {
-	    result = idv.makeDataSource(definingObject, dataType,
-					properties);
-	}
+        boolean result;
+        if (dataSource != null) {
+            try {
+                dataSource.reloadData(definingObject, properties);
+            } catch (Exception exc) {
+                logException("Error reloading data", exc);
+            }
+            result = false;
+        } else {
+            result = idv.makeDataSource(definingObject, dataType, properties);
+        }
         showNormalCursor();
         if (result) {
             closeChooser();
@@ -995,8 +999,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * show wait cursor
      */
     public void showWaitCursor() {
-	if(contents!=null) 
-	    super.showWaitCursor(contents);
+        if (contents != null) {
+            super.showWaitCursor(contents);
+        }
         idv.getIdvUIManager().showWaitCursor();
         if (cancelButton != null) {
             cancelButton.setEnabled(true);
@@ -1007,8 +1012,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * show regular cursor
      */
     public void showNormalCursor() {
-	if(contents!=null) 
-	    super.showNormalCursor(contents);
+        if (contents != null) {
+            super.showNormalCursor(contents);
+        }
         idv.getIdvUIManager().showNormalCursor();
         if (cancelButton != null) {
             cancelButton.setEnabled(false);
@@ -1341,26 +1347,25 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
                                          super.getStatusLabelForeground());
     }
 
-/**
-Set the DataSource property.
+    /**
+     * Set the DataSource property.
+     *
+     * @param value The new value for DataSource
+     */
+    public void setDataSource(DataSource value) {
+        this.dataSource = value;
+    }
 
-@param value The new value for DataSource
-**/
-public void setDataSource (DataSource value) {
-	this.dataSource = value;
+    /**
+     * Get the DataSource property.
+     *
+     * @return The DataSource
+     */
+    public DataSource getDataSource() {
+        return this.dataSource;
+    }
+
+
+
+
 }
-
-/**
-Get the DataSource property.
-
-@return The DataSource
-**/
-public DataSource getDataSource () {
-	return this.dataSource;
-}
-
-
-
-
-}
-

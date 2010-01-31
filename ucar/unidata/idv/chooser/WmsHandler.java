@@ -1,20 +1,18 @@
 /*
- * $Id: WmsHandler.java,v 1.53 2007/07/09 22:59:58 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -41,13 +39,13 @@ import ucar.unidata.idv.control.WMSControl;
 
 
 import ucar.unidata.ui.XmlTree;
-
-import ucar.unidata.util.WmsUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
+
+import ucar.unidata.util.WmsUtil;
 
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
@@ -120,9 +118,14 @@ public class WmsHandler extends XmlHandler {
     }
 
 
+    /**
+     * _more_
+     */
     protected void updateStatus() {
-        if(chooser.getHaveData()) {
-            chooser.setStatus("Press \"" + chooser.CMD_LOAD + "\" to load the selected WMS layer", "buttons");
+        if (chooser.getHaveData()) {
+            chooser.setStatus(
+                "Press \"" + chooser.CMD_LOAD
+                + "\" to load the selected WMS layer", "buttons");
         } else {
             chooser.setStatus("Please select a WMS layer");
         }
@@ -144,8 +147,10 @@ public class WmsHandler extends XmlHandler {
                 //              System.err.println ("bbox:" + XmlUtil.toString(bboxNode));
                 ProjectionRect rect =
                     new ProjectionRect(XmlUtil.getAttribute(bboxNode,
-                        WmsUtil.ATTR_MINX, -180.0), XmlUtil.getAttribute(bboxNode,
-                            WmsUtil.ATTR_MINY, -90.0), XmlUtil.getAttribute(bboxNode,
+                        WmsUtil.ATTR_MINX,
+                        -180.0), XmlUtil.getAttribute(bboxNode,
+                            WmsUtil.ATTR_MINY,
+                            -90.0), XmlUtil.getAttribute(bboxNode,
                                 WmsUtil.ATTR_MAXX,
                                 180.0), XmlUtil.getAttribute(bboxNode,
                                     WmsUtil.ATTR_MAXY, 90.0));
@@ -222,15 +227,18 @@ public class WmsHandler extends XmlHandler {
                 if ( !tagName.equals(WmsUtil.TAG_LAYER)) {
                     return super.shouldRecurse(xmlNode);
                 }
-                List styleChildren = XmlUtil.findChildren(xmlNode, WmsUtil.TAG_STYLE);
+                List styleChildren = XmlUtil.findChildren(xmlNode,
+                                         WmsUtil.TAG_STYLE);
                 return (styleChildren.size() == 0)
                        || (styleChildren.size() > 1);
             }
         };
         tree.setMultipleSelect(true);
-        tree.addTagsToProcess(Misc.newList(WmsUtil.TAG_LAYER, WmsUtil.TAG_STYLE));
-        tree.addTagsToNotProcessButRecurse(Misc.newList(WmsUtil.TAG_CAPABILITY,
-                WmsUtil.TAG_WMS1, WmsUtil.TAG_WMS2));
+        tree.addTagsToProcess(Misc.newList(WmsUtil.TAG_LAYER,
+                                           WmsUtil.TAG_STYLE));
+        tree.addTagsToNotProcessButRecurse(
+            Misc.newList(
+                WmsUtil.TAG_CAPABILITY, WmsUtil.TAG_WMS1, WmsUtil.TAG_WMS2));
         tree.defineLabelChild(WmsUtil.TAG_LAYER, WmsUtil.TAG_TITLE);
         tree.defineLabelChild(WmsUtil.TAG_STYLE, WmsUtil.TAG_TITLE);
         tree.defineTooltipChild(WmsUtil.TAG_LAYER, WmsUtil.TAG_ABSTRACT);
@@ -311,7 +319,8 @@ public class WmsHandler extends XmlHandler {
                                WmsUtil.TAG_LATLONBOUNDINGBOX);
 
         if (bboxNode == null) {
-            bboxNode = XmlUtil.findChildRecurseUp(node, WmsUtil.TAG_BOUNDINGBOX);
+            bboxNode = XmlUtil.findChildRecurseUp(node,
+                    WmsUtil.TAG_BOUNDINGBOX);
 
 
         }
@@ -361,29 +370,34 @@ public class WmsHandler extends XmlHandler {
         }
 
         List formatNodes = XmlUtil.findChildren(getMapNode, "Format");
-        Hashtable<String,String> formatMap = new Hashtable<String,String>();
-        List formats = new ArrayList();
+        Hashtable<String, String> formatMap = new Hashtable<String, String>();
+        List                      formats   = new ArrayList();
         for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
             Element formatNode = (Element) formatNodes.get(i);
-            String  content    = XmlUtil.getChildText(formatNode).toLowerCase();
+            String  content = XmlUtil.getChildText(formatNode).toLowerCase();
             formats.add(content);
-            formatMap.put(content,content);
+            formatMap.put(content, content);
         }
 
 
-        if(format ==null)
+        if (format == null) {
             format = formatMap.get("image/png; mode=24bit");
-        if(format ==null)
+        }
+        if (format == null) {
             format = formatMap.get("image/png");
-        if(format ==null)
+        }
+        if (format == null) {
             format = formatMap.get("image/jpeg");
-        if(format ==null)
+        }
+        if (format == null) {
             format = formatMap.get("image/gif");
+        }
         //        if(format ==null)
         //            format = formatMap.get("image/tiff");
         //        System.err.println("format:" + format);
-        if(format==null) {
-            for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
+        if (format == null) {
+            for (int i = 0; (i < formatNodes.size()) && (format == null);
+                    i++) {
                 Element formatNode = (Element) formatNodes.get(i);
                 if (XmlUtil.findChildren(formatNode, "PNG").size() > 0) {
                     format = "PNG";
@@ -481,7 +495,9 @@ public class WmsHandler extends XmlHandler {
 
             //<Dimension name="time" units="ISO8601" default="2003-06-22T00:56Z">2003-06-20T02:44Z/2003-06-22T00:56Z/PT1H39M</Dimension>
             Element timeDimension = XmlUtil.findElement(styleNode,
-                                        WmsUtil.TAG_DIMENSION, WmsUtil.ATTR_NAME, WmsUtil.VALUE_TIME);
+                                        WmsUtil.TAG_DIMENSION,
+                                        WmsUtil.ATTR_NAME,
+                                        WmsUtil.VALUE_TIME);
             if (timeDimension != null) {
                 String timeText = XmlUtil.getChildText(timeDimension);
                 timeList = StringUtil.split(timeText, "/");
@@ -505,10 +521,11 @@ public class WmsHandler extends XmlHandler {
             }
 
             //TODO: use the exceptions
-            String style  = XmlUtil.getChildText(styleNameNode);
-            String layer  = XmlUtil.getChildText(nameNode);
+            String style = XmlUtil.getChildText(styleNameNode);
+            String layer = XmlUtil.getChildText(nameNode);
 
-            List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode, WmsUtil.TAG_SRS);
+            List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
+                                WmsUtil.TAG_SRS);
             for (int srsIdx = 0;
                     (srsIdx < srsNodes.size()) && (srsString == null);
                     srsIdx++) {
@@ -568,17 +585,18 @@ public class WmsHandler extends XmlHandler {
                 error = "No bbox node found";
                 break;
             }
-            minx       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINX, minx);
-            maxx       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXX, maxx);
-            miny       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINY, miny);
-            maxy       = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXY, maxy);
+            minx = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINX, minx);
+            maxx = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXX, maxx);
+            miny = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINY, miny);
+            maxy = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXY, maxy);
 
-            fixedWidth = XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_FIXEDWIDTH, -1);
-            fixedHeight = XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_FIXEDHEIGHT,
-                    -1);
+            fixedWidth = XmlUtil.getAttribute(layerNode,
+                    WmsUtil.ATTR_FIXEDWIDTH, -1);
+            fixedHeight = XmlUtil.getAttribute(layerNode,
+                    WmsUtil.ATTR_FIXEDHEIGHT, -1);
 
-            allowSubsets = (XmlUtil.getAttribute(layerNode, WmsUtil.ATTR_NOSUBSETS,
-                    0) != 1);
+            allowSubsets = (XmlUtil.getAttribute(layerNode,
+                    WmsUtil.ATTR_NOSUBSETS, 0) != 1);
 
 
             if ( !mergeLayers) {
@@ -677,4 +695,3 @@ public class WmsHandler extends XmlHandler {
         }
     }
 }
-

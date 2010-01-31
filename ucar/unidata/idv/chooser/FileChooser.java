@@ -1,20 +1,18 @@
 /*
- * $Id: FileChooser.java,v 1.67 2007/07/27 13:53:08 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -149,10 +147,14 @@ public class FileChooser extends IdvChooser {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String[] getButtonLabels() {
-        return new String[] { getLoadCommandName(),
-                              GuiUtils.CMD_UPDATE,
-                              GuiUtils.CMD_HELP};
+        return new String[] { getLoadCommandName(), GuiUtils.CMD_UPDATE,
+                              GuiUtils.CMD_HELP };
     }
 
 
@@ -327,9 +329,10 @@ public class FileChooser extends IdvChooser {
             chooserPanel = GuiUtils.centerRight(fileChooser,
                     GuiUtils.top(accessory));
         }
-        JPanel filePanel = GuiUtils.centerBottom(chooserPanel, getDefaultButtons());
+        JPanel filePanel = GuiUtils.centerBottom(chooserPanel,
+                               getDefaultButtons());
 
-        List   topComps  = new ArrayList();
+        List topComps = new ArrayList();
         getTopComponents(topComps);
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JComponent topComp = GuiUtils.doLayout(topComps, 2, GuiUtils.WT_N,
@@ -471,15 +474,20 @@ public class FileChooser extends IdvChooser {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param haveData _more_
+     */
     public void setHaveData(boolean haveData) {
         super.setHaveData(haveData);
-        if(haveData) {
-            setStatus("Press \"" + CMD_LOAD
-                              + "\" to load the selected file", "buttons");
+        if (haveData) {
+            setStatus("Press \"" + CMD_LOAD + "\" to load the selected file",
+                      "buttons");
         } else {
             setStatus("Please select a file");
         }
-            
+
     }
 
 
@@ -691,4 +699,3 @@ public class FileChooser extends IdvChooser {
 
 
 }
-

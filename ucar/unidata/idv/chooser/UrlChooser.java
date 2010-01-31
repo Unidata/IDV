@@ -1,20 +1,18 @@
 /*
- * $Id: UrlChooser.java,v 1.40 2007/07/27 13:53:08 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -106,6 +104,7 @@ public class UrlChooser extends IdvChooser implements ActionListener {
     /** panel */
     private GuiUtils.CardLayoutPanel cardLayoutPanel;
 
+    /** _more_          */
     private JLabel urlLabel;
 
 
@@ -121,6 +120,11 @@ public class UrlChooser extends IdvChooser implements ActionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean canDoUpdate() {
         return false;
     }
@@ -162,9 +166,9 @@ public class UrlChooser extends IdvChooser implements ActionListener {
                                 GuiUtils.WT_Y, GuiUtils.WT_N);
         boxWrapper.setPreferredSize(new Dimension(200, 40));
         //        GuiUtils.setHFill();
-        urlLabel = GuiUtils.rLabel("URL:");
+        urlLabel  = GuiUtils.rLabel("URL:");
 
-        urlPanel = GuiUtils.top(boxWrapper);
+        urlPanel  = GuiUtils.top(boxWrapper);
         textPanel = textScroller;
         switchBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif", this,
@@ -178,28 +182,33 @@ public class UrlChooser extends IdvChooser implements ActionListener {
 
 
         JComponent widgetPanel = GuiUtils.centerRight(cardLayoutPanel,
-                                                      GuiUtils.top(switchBtn));
+                                     GuiUtils.top(switchBtn));
 
-        JComponent mainContents  = GuiUtils.formLayout(new Component[]{
-                GuiUtils.rLabel("Data Source Type:"),
-                GuiUtils.left(dsComp),
-                GuiUtils.top(GuiUtils.inset(urlLabel,new Insets(10,0,0,0))),
-                widgetPanel
-            },GRID_INSETS);
+        JComponent mainContents = GuiUtils.formLayout(new Component[] {
+                                      GuiUtils.rLabel("Data Source Type:"),
+                                      GuiUtils.left(dsComp),
+                                      GuiUtils.top(GuiUtils.inset(urlLabel,
+                                          new Insets(10, 0, 0, 0))),
+                                      widgetPanel }, GRID_INSETS);
 
         mainContents = GuiUtils.vbox(mainContents, urlButtons);
         setHaveData(true);
-        setStatus("Press \"" + CMD_LOAD
-                  + "\" to load the URL", "buttons");
+        setStatus("Press \"" + CMD_LOAD + "\" to load the URL", "buttons");
         return GuiUtils.top(mainContents);
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param what _more_
+     */
     public void setStatus(String msg, String what) {
-        super.setStatus("Press \"" + CMD_LOAD
-                        + "\" to load the URL", "buttons");
+        super.setStatus("Press \"" + CMD_LOAD + "\" to load the URL",
+                        "buttons");
     }
 
 
@@ -236,20 +245,20 @@ public class UrlChooser extends IdvChooser implements ActionListener {
      */
     private void loadURLInner() {
 
-        String url = "";
-        String    dataSourceId = getDataSourceId();
+        String url          = "";
+        String dataSourceId = getDataSourceId();
         if (showBox) {
             Object selectedItem = box.getSelectedItem();
             if (selectedItem != null) {
                 url = selectedItem.toString().trim();
             }
-            if (url.length() == 0 && dataSourceId == null) {
+            if ((url.length() == 0) && (dataSourceId == null)) {
                 userMessage("Please specify a url");
                 return;
             }
         }
 
-        Hashtable properties   = new Hashtable();
+        Hashtable properties = new Hashtable();
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         }
@@ -280,4 +289,3 @@ public class UrlChooser extends IdvChooser implements ActionListener {
 
 
 }
-

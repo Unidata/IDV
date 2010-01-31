@@ -1,25 +1,22 @@
 /*
- * $Id: ThreddsHandler.java,v 1.68 2007/07/09 22:59:58 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.chooser;
 
@@ -66,8 +63,8 @@ import java.io.File;
 
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
@@ -104,6 +101,7 @@ public class ThreddsHandler extends XmlHandler {
     /** for gui */
     private JCheckBox loadIndividuallyCbx;
 
+    /** _more_          */
     private JCheckBox showThumbsCbx;
 
     /**
@@ -215,7 +213,8 @@ public class ThreddsHandler extends XmlHandler {
             Element child = (Element) tmp;
             if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
                 node.removeChild(child);
-                if(XmlUtil.getAttribute(child,"xlink:title","").indexOf("Imported from")<0) {
+                if (XmlUtil.getAttribute(child, "xlink:title",
+                                         "").indexOf("Imported from") < 0) {
                     if (docNodes == null) {
                         docNodes = new ArrayList();
                     }
@@ -227,7 +226,7 @@ public class ThreddsHandler extends XmlHandler {
             }
         }
 
-        if (docNodes != null&& docNodes.size()>0) {
+        if ((docNodes != null) && (docNodes.size() > 0)) {
             if (docNodes.size() == 1) {
                 node.appendChild((Element) docNodes.get(0));
             } else {
@@ -243,12 +242,16 @@ public class ThreddsHandler extends XmlHandler {
 
     }
 
-    private Hashtable<String,ImageIcon> thumbnails = new Hashtable();
+    /** _more_          */
+    private Hashtable<String, ImageIcon> thumbnails = new Hashtable();
 
+    /** _more_          */
     private HashSet pendingImageUrls = new HashSet();
 
+    /** _more_          */
     private ImageIcon remoteIcon;
 
+    /** _more_          */
     private ImageIcon datasetIcon;
 
     /**
@@ -257,12 +260,14 @@ public class ThreddsHandler extends XmlHandler {
      *  @return The UI component
      */
     protected JComponent doMakeContents() {
-        showThumbsCbx = new JCheckBox("Show Thumbnail Images",!GuiUtils.isMac());
+
+        showThumbsCbx = new JCheckBox("Show Thumbnail Images",
+                                      !GuiUtils.isMac());
         showThumbsCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    updateTree();
-                }
-            });
+            public void actionPerformed(ActionEvent ae) {
+                updateTree();
+            }
+        });
         double version = CatalogUtil.getVersion(root);
         shuffleDocNodes(root, chooser.getDocument());
 
@@ -281,56 +286,68 @@ public class ThreddsHandler extends XmlHandler {
 
 
         tree = new XmlTree(root, true, path) {
-                public ImageIcon getIconForNode(Element node) {
-                    if(remoteIcon==null) {
-                        datasetIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folderclosed.png");
-                        remoteIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/remotecatalog.png");
-                    }
-                    if(node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
-                        return remoteIcon;
-                    }
-                    
-                    List propertyNodes = XmlUtil.findChildren(node,
-                                                              CatalogUtil.TAG_PROPERTY);
-                    String []  ids;
-                    if(showThumbsCbx.isSelected()) ids = new String[]{"thumbnail","icon"};
-                    else ids = new String[]{"icon"};
-                    for(String id:ids) {
-                        for (Element propertyNode : (List<Element>) propertyNodes) {
-                            String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
-                            if(name.equals(id)) {
-                                String imageUrl = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
-                                ImageIcon icon = thumbnails.get(imageUrl);
-                                if(icon == null) {
-                                    //Only fetch it once
-                                    if(!pendingImageUrls.contains(imageUrl)) {
-                                        pendingImageUrls.add(imageUrl);
-                                        Misc.run(ThreddsHandler.this,"fetchImages",new String[]{id,imageUrl});
-                                    }
-                                    return super.getIconForNode(node);
-                                } else {
-                                    return icon;
+
+            public ImageIcon getIconForNode(Element node) {
+                if (remoteIcon == null) {
+                    datasetIcon = GuiUtils.getImageIcon(
+                        "/auxdata/ui/icons/folderclosed.png");
+                    remoteIcon = GuiUtils.getImageIcon(
+                        "/auxdata/ui/icons/remotecatalog.png");
+                }
+                if (node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
+                    return remoteIcon;
+                }
+
+                List propertyNodes = XmlUtil.findChildren(node,
+                                         CatalogUtil.TAG_PROPERTY);
+                String[] ids;
+                if (showThumbsCbx.isSelected()) {
+                    ids = new String[] { "thumbnail", "icon" };
+                } else {
+                    ids = new String[] { "icon" };
+                }
+                for (String id : ids) {
+                    for (Element propertyNode : (List<Element>) propertyNodes) {
+                        String name = XmlUtil.getAttribute(propertyNode,
+                                          CatalogUtil.ATTR_NAME, "");
+                        if (name.equals(id)) {
+                            String imageUrl =
+                                XmlUtil.getAttribute(propertyNode,
+                                    CatalogUtil.ATTR_VALUE, "");
+                            ImageIcon icon = thumbnails.get(imageUrl);
+                            if (icon == null) {
+                                //Only fetch it once
+                                if ( !pendingImageUrls.contains(imageUrl)) {
+                                    pendingImageUrls.add(imageUrl);
+                                    Misc.run(ThreddsHandler.this,
+                                             "fetchImages", new String[] { id,
+                                            imageUrl });
                                 }
+                                return super.getIconForNode(node);
+                            } else {
+                                return icon;
                             }
                         }
-                    }            
-
-
-                    NodeList elements = XmlUtil.getElements(node);
-                    for(int i=0;i<elements.getLength();i++) {
-                        Element child = (Element)elements.item(i);
-                        String tag = child.getTagName();
-                        if(tag.equals(CatalogUtil.TAG_DATASET)|| tag.equals(CatalogUtil.TAG_CATALOGREF)) {
-                            return datasetIcon;
-                        }
                     }
-
-
-                    return super.getIconForNode(node);
                 }
 
 
-                protected Document readXlinkXml(String href) throws Exception {
+                NodeList elements = XmlUtil.getElements(node);
+                for (int i = 0; i < elements.getLength(); i++) {
+                    Element child = (Element) elements.item(i);
+                    String  tag   = child.getTagName();
+                    if (tag.equals(CatalogUtil.TAG_DATASET)
+                            || tag.equals(CatalogUtil.TAG_CATALOGREF)) {
+                        return datasetIcon;
+                    }
+                }
+
+
+                return super.getIconForNode(node);
+            }
+
+
+            protected Document readXlinkXml(String href) throws Exception {
                 //If it is a thredds catalog then keep it in place.
                 Document doc = XmlUtil.getDocument(href, getClass());
                 if (doc == null) {
@@ -345,7 +362,7 @@ public class ThreddsHandler extends XmlHandler {
                 //Else (e.g., wms) show a new xml xhooser ui
                 chooser.makeUi(doc, doc.getDocumentElement(), href);
                 return null;
-                }
+            }
 
 
             /**
@@ -383,19 +400,27 @@ public class ThreddsHandler extends XmlHandler {
                                 (XmlChooser.PropertiedAction) paths.get(0);
 
                             String thumbnail = null;
-                            List propertyNodes = XmlUtil.findChildren(n,
-                                                                      CatalogUtil.TAG_PROPERTY);
-                            for (Element propertyNode : (List<Element>) propertyNodes) {
-                                String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
-                                if(name.equals("thumbnail")) {
-                                    String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
-                                    thumbnail = "<img src=\"" + value +"\">";
+                            List propertyNodes =
+                                XmlUtil.findChildren(n,
+                                    CatalogUtil.TAG_PROPERTY);
+                            for (Element propertyNode :
+                                    (List<Element>) propertyNodes) {
+                                String name =
+                                    XmlUtil.getAttribute(propertyNode,
+                                        CatalogUtil.ATTR_NAME, "");
+                                if (name.equals("thumbnail")) {
+                                    String value =
+                                        XmlUtil.getAttribute(propertyNode,
+                                            CatalogUtil.ATTR_VALUE, "");
+                                    thumbnail = "<img src=\"" + value + "\">";
                                     break;
                                 }
                             }
-                            
-                            if(showThumbsCbx.isSelected() && thumbnail!=null) {
-                                return "<html>"  + "Url: " + pa.action +"<br>" + thumbnail +"</html>";
+
+                            if (showThumbsCbx.isSelected()
+                                    && (thumbnail != null)) {
+                                return "<html>" + "Url: " + pa.action
+                                       + "<br>" + thumbnail + "</html>";
                             }
                             return "Url: " + pa.action;
                         }
@@ -411,8 +436,8 @@ public class ThreddsHandler extends XmlHandler {
                 if (n.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
                     return "Documentation";
                 }
-                String lbl =super.getLabel(n);
-                lbl = lbl.replace("_"," ");
+                String lbl = super.getLabel(n);
+                lbl = lbl.replace("_", " ");
                 return lbl;
             }
 
@@ -448,7 +473,7 @@ public class ThreddsHandler extends XmlHandler {
                                      XmlTree.XmlTreeNode node,
                                      Element element, MouseEvent event) {
                 JPopupMenu popup = new JPopupMenu();
-                if (makePopupMenu(theTree, element, popup,node)) {
+                if (makePopupMenu(theTree, element, popup, node)) {
                     popup.show((Component) event.getSource(), event.getX(),
                                event.getY());
                 }
@@ -461,6 +486,7 @@ public class ThreddsHandler extends XmlHandler {
             }
 
 
+
         };
         //Define that we look for the label of a catalogref node with the xlink:title attribute.
         tree.defineLabelAttr(CatalogUtil.TAG_CATALOGREF, "xlink:title");
@@ -468,14 +494,15 @@ public class ThreddsHandler extends XmlHandler {
             TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addXlinkTag(CatalogUtil.TAG_CATALOGREF);
         if (version == CatalogUtil.THREDDS_VERSION_0_4) {
-            tree.addTagsToProcess(Misc.newList(new Object[]{CatalogUtil.TAG_CATALOG,
-                    CatalogUtil.TAG_CATALOGREF, CatalogUtil.TAG_COLLECTION,
-                                                            CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION}));
+            tree.addTagsToProcess(Misc.newList(new Object[] {
+                CatalogUtil.TAG_CATALOG,
+                CatalogUtil.TAG_CATALOGREF, CatalogUtil.TAG_COLLECTION,
+                CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION }));
         } else {
-            tree.addTagsToProcess(Misc.newList(new Object[]{CatalogUtil.TAG_CATALOGREF,
-                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET,
-                    CatalogUtil.TAG_DOCUMENTATION,
-                    CatalogUtil.TAG_DOCPARENT}));
+            tree.addTagsToProcess(Misc.newList(new Object[] {
+                CatalogUtil.TAG_CATALOGREF,
+                CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET,
+                CatalogUtil.TAG_DOCUMENTATION, CatalogUtil.TAG_DOCPARENT }));
             tree.addTagsToNotProcessButRecurse(
                 Misc.newList(CatalogUtil.TAG_CATALOG));
         }
@@ -492,8 +519,9 @@ public class ThreddsHandler extends XmlHandler {
          */
         JComponent ui =
             GuiUtils.inset(GuiUtils.topCenterBottom(GuiUtils.left(dsComp),
-                tree.getScroller(),GuiUtils.right(showThumbsCbx)), 5);
+                tree.getScroller(), GuiUtils.right(showThumbsCbx)), 5);
         return ui;
+
     }
 
 
@@ -505,14 +533,15 @@ public class ThreddsHandler extends XmlHandler {
      */
     private void updateTree() {
         GuiUtils.invokeInSwingThread(new Runnable() {
-                public void run() {
-                    try {
-                        tree.updateUI();
-                        tree.repaint();
-                    } catch(Exception exc) {
-                        exc.printStackTrace();
-                    }
-                }});
+            public void run() {
+                try {
+                    tree.updateUI();
+                    tree.repaint();
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        });
     }
 
 
@@ -524,15 +553,15 @@ public class ThreddsHandler extends XmlHandler {
      * @param tuple id and url
      */
     public void fetchImages(String[] tuple) {
-        String id = tuple[0];
+        String id       = tuple[0];
         String imageUrl = tuple[1];
-        Image image = ImageUtils.readImage(imageUrl);
-        if(id.equals("thumbnail"))  {
-            image = ImageUtils.resize(image, 100,-1);
+        Image  image    = ImageUtils.readImage(imageUrl);
+        if (id.equals("thumbnail")) {
+            image = ImageUtils.resize(image, 100, -1);
             ImageUtils.waitOnImage(image);
         }
         ImageIcon icon = new ImageIcon(image);
-        thumbnails.put(imageUrl,icon);
+        thumbnails.put(imageUrl, icon);
         pendingImageUrls.remove(imageUrl);
         updateTree();
     }
@@ -545,10 +574,12 @@ public class ThreddsHandler extends XmlHandler {
      *  @param theTree The XmlTree object displaying the current xml document.
      *  @param node The xml node the user clicked on.
      *  @param popup The popup menu to put the menu items in.
+     * @param treeNode _more_
      * @return Did we add any items into the menu
      */
     private boolean makePopupMenu(final XmlTree theTree, final Element node,
-                                  JPopupMenu popup,final XmlTree.XmlTreeNode treeNode) {
+                                  JPopupMenu popup,
+                                  final XmlTree.XmlTreeNode treeNode) {
         String    tagName = node.getTagName();
 
 
@@ -590,7 +621,7 @@ public class ThreddsHandler extends XmlHandler {
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
                         chooser.makeUiFromPath(
-                                               theTree.expandRelativeUrl(treeNode, href));
+                            theTree.expandRelativeUrl(treeNode, href));
                     }
                 });
                 popup.add(mi);
@@ -692,7 +723,7 @@ public class ThreddsHandler extends XmlHandler {
         }
         try {
             //Some html docs have a head tag which seems to screw up the html rendering
-            doc = doc.replaceAll("(?s)<head>.*</head>","");
+            doc = doc.replaceAll("(?s)<head>.*</head>", "");
             GuiUtils.showHtmlDialog(doc, title, null);
         } catch (Exception exc) {
             chooser.logException("Showing documentation", exc);
@@ -773,7 +804,7 @@ public class ThreddsHandler extends XmlHandler {
                         }
                         properties.put(DataSource.PROP_SUBPROPERTIES
                                        + urls.size(), action.properties);
-			chooser.initSubProperties(action.properties);
+                        chooser.initSubProperties(action.properties);
                         urls.add(action.action);
                     }
                 }
@@ -1173,17 +1204,21 @@ public class ThreddsHandler extends XmlHandler {
      * Test the html generation
      *
      * @param args Command line args
+     *
+     * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        
 
-        String doc = IOUtil.readContents("test.html",ThreddsHandler.class);
+
+        String doc = IOUtil.readContents("test.html", ThreddsHandler.class);
         doc = "hello<head>\nxxx</head>";
-        doc = doc.replaceAll("(?s)<head>.+</head>","");
+        doc = doc.replaceAll("(?s)<head>.+</head>", "");
         System.err.println("doc:" + doc);
 
 
-        if(true) return;
+        if (true) {
+            return;
+        }
 
 
         LogUtil.configure();
@@ -1224,4 +1259,3 @@ public class ThreddsHandler extends XmlHandler {
 
 
 }
-
