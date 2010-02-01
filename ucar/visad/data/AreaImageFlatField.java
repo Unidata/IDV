@@ -99,6 +99,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     /** _more_ */
     private int[] bandIndices;
 
+    /** _more_          */
+    private boolean readDataFailed = false;
+
     /**
      * copy ctor
      *
@@ -231,6 +234,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                       units, samples, readLabel);
 
         aiff.startTime = ff.getStartTime();
+
+
         return aiff;
 
     }
@@ -472,7 +477,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @param domainSet _more_
      */
     public void setDomainIfNeeded(Set domainSet) {
-        if ( !haveData() && (this.domainSet == null)) {
+        //        if(!haveData() && this.domainSet==null) {
+        if ( !haveData()) {
+            //        if ( !haveData() && (this.domainSet == null)) {
             this.domainSet = domainSet;
         }
     }
@@ -503,22 +510,56 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @throws Exception _more_
      */
     private float[][] readDataNewWay() throws Exception {
-        msg("readDataNewWay");
-        //        Misc.printStack(mycnt +"  readData time: " + getStartTime(),15);
-        String url = (aid.getImageInfo() != null)
-                     ? aid.getImageInfo().makeAddeUrl()
-                     : aid.getSource();
-        AreaAdapter aa = new AreaAdapter(url, false);
-        visad.meteorology.SingleBandedImageImpl ff =
-            (visad.meteorology.SingleBandedImageImpl) aa.getImage();
-        float[][]        samples       = ff.getImageData();
-        FunctionType     type          = (FunctionType) ff.getType();
-        Set              domainSet     = ff.getDomainSet();
-        CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
-        Set[]            rangeSets     = ff.getRangeSets();
-        Unit[]           units         = ff.getRangeUnits()[0];
-        setDomain(domainSet);
-        return samples;
+        try {
+            msg("readDataNewWay");
+            //        Misc.printStack(mycnt +"  readData time: " + getStartTime(),15);
+            String url = (aid.getImageInfo() != null)
+                         ? aid.getImageInfo().makeAddeUrl()
+                         : aid.getSource();
+            AreaAdapter aa = new AreaAdapter(url, false);
+            visad.meteorology.SingleBandedImageImpl ff =
+                (visad.meteorology.SingleBandedImageImpl) aa.getImage();
+            float[][]        samples       = ff.getImageData();
+            FunctionType     type          = (FunctionType) ff.getType();
+            Set              domainSet     = ff.getDomainSet();
+            CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
+            Set[]            rangeSets     = ff.getRangeSets();
+            Unit[]           units         = ff.getRangeUnits()[0];
+            setDomain(domainSet);
+            return samples;
+        } catch (Exception exc) {
+            readDataFailed = true;
+            String message = exc.toString();
+            if (message.indexOf(":") >= 0) {
+                message = message.substring(message.lastIndexOf(":"));
+            }
+            if (this.domainSet == null) {
+                this.domainSet = super.getDomainSet();
+            }
+            System.err.println("Error reading ADDE image:" + readLabel + " "
+                               + message);
+            float[][] values =
+                new float[this.domainSet.getDimension()][this.domainSet.getLength()];
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[0].length; j++) {
+                    values[i][j] = Float.NaN;
+                }
+            }
+            return values;
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isMissing() {
+        if (readDataFailed) {
+            return true;
+        }
+        return super.isMissing();
     }
 
 
