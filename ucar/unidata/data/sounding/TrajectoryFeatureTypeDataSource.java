@@ -315,7 +315,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
         }
 
-        if (f.getName().contains("ionPrf") || f.getName().contains("atmPhs")) {
+        if (f.getPath().contains("ionPrf") || f.getPath().contains("atmPhs")) {
             return;
         }
 
