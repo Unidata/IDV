@@ -1,20 +1,18 @@
 /*
- * $Id: ImageXmlDataSource.java,v 1.35 2007/06/12 20:42:58 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -59,8 +57,6 @@ import visad.util.DataUtility;
 
 import visad.util.ImageHelper;
 
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 
@@ -72,6 +68,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
+
+import javax.swing.*;
 
 
 /**
@@ -218,21 +217,23 @@ public class ImageXmlDataSource extends FilesDataSource {
                                        boolean changeLinks)
             throws Exception {
 
-        String ximgFile = getFilePath();
-        File parentDir = new File(prefix).getParentFile();
-        List newXimgFiles = IOUtil.writeTo(Misc.newList(ximgFile),
-                                       prefix, "ximg");
+        String ximgFile  = getFilePath();
+        File   parentDir = new File(prefix).getParentFile();
+        List newXimgFiles = IOUtil.writeTo(Misc.newList(ximgFile), prefix,
+                                           "ximg");
 
         if (newXimgFiles == null) {
             return null;
         }
 
         List filesToMove = new ArrayList(relativeFiles);
-        List newFiles = new ArrayList(newXimgFiles);
-        for(int i=0;i<filesToMove.size();i++) {
+        List newFiles    = new ArrayList(newXimgFiles);
+        for (int i = 0; i < filesToMove.size(); i++) {
             String file = (String) filesToMove.get(i);
-            String newFilePath = IOUtil.joinDir(parentDir.toString(), IOUtil.getFileTail(file));
-            if(IOUtil.writeTo(IOUtil.getURL(file,getClass()),  new File(newFilePath), loadId)>0) {
+            String newFilePath = IOUtil.joinDir(parentDir.toString(),
+                                     IOUtil.getFileTail(file));
+            if (IOUtil.writeTo(IOUtil.getURL(file, getClass()),
+                               new File(newFilePath), loadId) > 0) {
                 newFiles.add(newFilePath);
             }
         }
@@ -268,15 +269,24 @@ public class ImageXmlDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * Get the base of th image url
+     *
+     * @param node  the node
+     *
+     * @return  the base (or null)
+     */
     private String getBase(Element node) {
-        if(node == null) {
-            return  IOUtil.getFileRoot(getFilePath());
+        if (node == null) {
+            return IOUtil.getFileRoot(getFilePath());
         }
-        String base = XmlUtil.getAttribute(node, ATTR_BASE, (String)null);
-        if(base!=null) return base;
+        String base = XmlUtil.getAttribute(node, ATTR_BASE, (String) null);
+        if (base != null) {
+            return base;
+        }
         Node parent = node.getParentNode();
-        if (parent != null&& parent instanceof Element) {
-            return getBase((Element)parent);
+        if ((parent != null) && (parent instanceof Element)) {
+            return getBase((Element) parent);
         }
         return getBase(null);
     }
@@ -295,7 +305,7 @@ public class ImageXmlDataSource extends FilesDataSource {
             imageCategories = DataCategory.parseCategories("RGBIMAGE", false);
             shapeCategories = DataCategory.parseCategories("GIS-SHAPEFILE",
                     false);
-            Element root     = XmlUtil.getRoot(xmlFile, getClass());
+            Element root = XmlUtil.getRoot(xmlFile, getClass());
             String dataSourceName = XmlUtil.getAttribute(root, ATTR_NAME,
                                         (String) null);
             if (dataSourceName != null) {
@@ -347,7 +357,7 @@ public class ImageXmlDataSource extends FilesDataSource {
      */
     private String getUrl(Element child) {
         String base = getBase(child);
-        String url = XmlUtil.getAttribute(child, ATTR_URL, (String) null);
+        String url  = XmlUtil.getAttribute(child, ATTR_URL, (String) null);
         if (url != null) {
             //TODO: There can be a problem here if the idv is running in the directory of the ximg file
             //and the image references are relative. 
@@ -376,8 +386,8 @@ public class ImageXmlDataSource extends FilesDataSource {
      * Process the xml ximg node
      *
      * @param child The node
-     * @param base Base to the url
-     * @param cdc The data choice to add to. May be null, if so add top level data choice
+     * @param cdc The data choice to add to. May be null, 
+     *            if so add top level data choice
      *
      * @throws Exception On badness_
      */
@@ -401,7 +411,8 @@ public class ImageXmlDataSource extends FilesDataSource {
                     id = url;
                     String fullUrl = getUrl(child);
                     //If its relative then add it into the files list
-                    if(!Misc.equals(fullUrl, url) || new File(url).exists()) {
+                    if ( !Misc.equals(fullUrl, url)
+                            || new File(url).exists()) {
                         //System.err.println ("adding relative:" + fullUrl);
                         relativeFiles.add(fullUrl);
                         //System.err.println ("after:" + relativeFiles);
@@ -471,7 +482,7 @@ public class ImageXmlDataSource extends FilesDataSource {
                 addDataChoice(ddc);
             }
         } else if (child.getTagName().equals(TAG_SHAPE)) {
-            String url = XmlUtil.getAttribute(child, ATTR_URL);
+            String url  = XmlUtil.getAttribute(child, ATTR_URL);
             String base = getBase(child);
             if ( !url.startsWith("http") && (base != null)) {
                 url = base + url;
@@ -565,7 +576,7 @@ public class ImageXmlDataSource extends FilesDataSource {
             String      url  = ii.getUrl();
             Element     node = (Element) nodeMap.get(id);
             try {
-                if(node!=null) {
+                if (node != null) {
                     url = getUrl(node);
                 }
                 if ((node == null) || XmlUtil.hasAttribute(node, ATTR_URL)) {
@@ -609,7 +620,8 @@ public class ImageXmlDataSource extends FilesDataSource {
                     //                    GIFForm form = new GIFForm();
                     //FlatField   ff     = (FlatField) family.open(ii.getUrl());
                     //                    FlatField   ff = (FlatField) DataUtility.makeField(image,true);
-                    FlatField   ff = (FlatField) ucar.visad.Util.makeField(image,true);
+                    FlatField ff =
+                        (FlatField) ucar.visad.Util.makeField(image, true);
                     Linear2DSet domain = (Linear2DSet) ff.getDomainSet();
                     SampledSet  newDomain;
                     int         width  = domain.getX().getLength();
@@ -871,4 +883,3 @@ public class ImageXmlDataSource extends FilesDataSource {
 
 
 }
-

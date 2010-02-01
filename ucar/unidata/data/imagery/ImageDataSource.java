@@ -1360,12 +1360,15 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     realError =
                         realError.substring(realError.lastIndexOf(":") + 1);
                     LogUtil.printMessage(realError);
-                    return null;
+                    //return null;
                 }
                 /*
                   }
                   });*/
 
+            }
+            if (images.isEmpty()) {
+                return null;
             }
 
             /*            try {

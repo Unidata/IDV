@@ -1,25 +1,22 @@
 /*
- * $Id: AddeImageDataSource.java,v 1.56 2007/07/05 18:46:09 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.data.imagery;
 
@@ -174,23 +171,24 @@ public class AddeImageDataSource extends ImageDataSource {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
-        List newFiles = super.saveDataToLocalDisk(prefix, loadId, changeLinks);
+        List newFiles = super.saveDataToLocalDisk(prefix, loadId,
+                            changeLinks);
         if (newFiles == null) {
             return newFiles;
         }
         // write 0 as the first word
         for (int i = 0; i < newFiles.size(); i++) {
             try {
-              RandomAccessFile to    = new RandomAccessFile((String) newFiles.get(i), "rw");
-              to.seek(0);
-              to.writeInt(0);
-              to.close();
+                RandomAccessFile to =
+                    new RandomAccessFile((String) newFiles.get(i), "rw");
+                to.seek(0);
+                to.writeInt(0);
+                to.close();
             } catch (Exception e) {
-              System.out.println("unable to set first word to 0");
+                System.out.println("unable to set first word to 0");
             }
         }
         return newFiles;
     }
 
 }
-

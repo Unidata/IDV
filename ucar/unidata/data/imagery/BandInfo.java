@@ -1,27 +1,22 @@
 /*
- * $Id: BandInfo.java,v 1.5 2007/07/03 21:13:45 dmurray Exp $
- *
- * Copyright 1997-2007 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.data.imagery;
 
@@ -91,12 +86,11 @@ public class BandInfo {
      * @param description  description of band
      * @param units available calibration units
      */
-    public BandInfo(int sensor, int band, String description,
-                    List units) {
-        this.sensorNumber    = sensor;
-        this.bandNumber      = band;
-        this.bandDescription = description;
-        this.calibrationUnits    = units;
+    public BandInfo(int sensor, int band, String description, List units) {
+        this.sensorNumber     = sensor;
+        this.bandNumber       = band;
+        this.bandDescription  = description;
+        this.calibrationUnits = units;
     }
 
     /**
@@ -105,10 +99,10 @@ public class BandInfo {
      * @param that other BandInfo
      */
     public BandInfo(BandInfo that) {
-        this.sensorNumber    = that.sensorNumber;
-        this.bandNumber      = that.bandNumber;
-        this.bandDescription = that.bandDescription;
-        this.calibrationUnits    = that.calibrationUnits;
+        this.sensorNumber     = that.sensorNumber;
+        this.bandNumber       = that.bandNumber;
+        this.bandDescription  = that.bandDescription;
+        this.calibrationUnits = that.calibrationUnits;
     }
 
     /**
@@ -177,7 +171,7 @@ public class BandInfo {
     /**
      * Cet the calibration units for this BandInfo
      *
-     * @return the  calibration units, may be a list of Strings or 
+     * @return the  calibration units, may be a list of Strings or
      */
     public List getCalibrationUnits() {
         return calibrationUnits;
@@ -284,4 +278,3 @@ public class BandInfo {
     }
 
 }
-
