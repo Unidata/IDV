@@ -6777,6 +6777,20 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * Is the given event a control (or meta for the mac) key
+     *
+     * @param event _more_
+     *
+     * @return _more_
+     */
+    public static boolean isControlKey(InputEvent event) {
+        if ( !isMac()) {
+            return event.isControlDown();
+        }
+        return event.isMetaDown();
+    }
+
 
     /**
      * Is this running on a Mac?
