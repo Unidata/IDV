@@ -1,30 +1,22 @@
 /*
- * $Id: AddeFlatField.java,v 1.7 2007/08/08 17:14:56 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
-
 
 package ucar.visad.data;
 
@@ -364,7 +356,10 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                      (nEles - 1), nEles, (nLines - 1), 0,
                                      nLines);
         //If we were passed in a range type then use it, else use the one we create here
-        FunctionType image_type = new FunctionType(image_domain, (rangeType!=null?rangeType:(MathType)radiance));
+        FunctionType image_type = new FunctionType(image_domain,
+                                      ((rangeType != null)
+                                       ? rangeType
+                                       : (MathType) radiance));
 
         // If calibrationType is brightnes (BRIT), then we can store
         // the values as shorts.  To do this, we crunch the values down
@@ -432,7 +427,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @return _more_
      */
     public Set getDomainSetNoRead() {
-        if(domainSet!=null) return domainSet;
+        if (domainSet != null) {
+            return domainSet;
+        }
         return super.getDomainSet();
     }
 
@@ -469,8 +466,13 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
+    /**
+     * _more_
+     *
+     * @param domainSet _more_
+     */
     public void setDomainIfNeeded(Set domainSet) {
-        if(!haveData() && this.domainSet==null) {
+        if ( !haveData() && (this.domainSet == null)) {
             this.domainSet = domainSet;
         }
     }
@@ -488,7 +490,8 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (domainSet != null) {
             return domainSet;
         }
-        throw new IllegalStateException ("AreaImageFlatField.getDomainSet: domain set is null");
+        throw new IllegalStateException(
+            "AreaImageFlatField.getDomainSet: domain set is null");
     }
 
 
@@ -705,7 +708,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             if (anav == null) {
                 try {
                     throw new IllegalArgumentException(
-                                                       "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
+                        "MyAreaCoordinateSystem.getAreaNav: Should never get to this point");
                 } catch (Exception exc) {
                     System.err.println("error making making areanav:" + exc);
                     exc.printStackTrace();
@@ -720,4 +723,3 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 }
-
