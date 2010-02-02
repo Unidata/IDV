@@ -32,7 +32,7 @@ line using: and -Dbasedir=/some/other/dir
         <property name="svn_root"  value="svn://zero/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
-        <property name="install4jdir"  value="/upc/share/install4j" />
+        <property name="install4jdir"  value="/share/install4j" />
         <property name="makedir"  value="mkdir -p -m 775 " />
 
 
@@ -85,8 +85,8 @@ line using: and -Dbasedir=/some/other/dir
 <!-- Where we get the installer config files for the release -->
         <property name="installer_src_dir" value="${release_src_dir}/installer" />
 
-        <property name="sign_keystore" value="/upc/share/idv/.keystore"/>
-        <property name="keypassfile" value="/upc/share/idv/.keypass"/>
+        <property name="sign_keystore" value="/share/idv/.keystore"/>
+        <property name="keypassfile" value="/share/idv/.keypass"/>
         <property file="${keypassfile}"/>
         <available file="${keypassfile}" property="sign_password" value="${key.password}"/>
 
