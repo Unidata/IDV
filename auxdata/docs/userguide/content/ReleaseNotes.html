@@ -47,7 +47,10 @@ Radar Cross Section Control</a> section of this guide.
 
 <faqitem q="New default background image layers" id="bkgimages">
 Serveral new background image layers have been added to the Background
-Images control.
+Images control.  The default layer is now a static Blue Marble image.  
+This avoids the problem denied access problems users have been 
+reporting becuase of the heavy use that the NASA Web Map Server
+gets.
 </faqitem>
 
 <faqitem q="Globe display improvements" id="globe">
@@ -55,6 +58,7 @@ Several imrovements have been added to the Globe display.  You
 can now zoom in without going through the clipping plane.  You can
 spin the globe with a mouse flick and control the rate of rotation.
 There are predefined viewpoints available through the Projections menu.
+Most of the probes have been updated to work in the globe now.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
@@ -65,7 +69,8 @@ added to the system list.
 </faqitem>
 
 <faqitem q="Ship/Buoy data" id="shipbuoy">
-Ship and buoy data are now available through the ADDE point obs chooser.
+Ship and buoy data are now available through the ADDE point obs chooser.  A
+new station model has been added for these data.
 </faqitem>
 
 <faqitem q="Support for high resolution NEXRAD Level III data" id="hiresl3">
@@ -76,9 +81,32 @@ for reading and displaying these new products.
 
 <faqitem cat="User Interface Changes"></faqitem>
 
-<faqitem q="Known Problems">
+<faqitem q="New icons" id="newicons">
+Many of the icons in the toolbars and display controls have been replaced
+with icons from the Silk Icon set from 
+<a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a>
+(http://www.famfamfam.com/lab/icons/silk/)
+</faqitem>
+
+
+<faqitem cat="Bug Fixes/Known Problems"></faqitem>
+
+<faqitem q="Bug Fixes" id="bugfix">
+Many bug fixes were made in this release.  A few of the more obvious:
+<ul>
+<li>Suprious Map Lines (requires plugin, see <a href="Bugs.html#maplines">Known Problems</a>)
+<li>Redrawing of View Window after exiting Full Screen mode.
+<li>Problem with using IDV.app on Mac OS-X in 2.8
+<li>Wrong number of images returned from server
+<li>METAR plots using incorrect cloud cover parameters.
+<li>Handle missing data in ATCF hurricane track files
+<li>Handle invalid images better.
+</ul>
+</faqitem>
+
+<faqitem q="Known Problems" id="problems">
 For a list of outstanding known problems, see the 
-<a href="Bugs.html">Known Problems</a> page.<p>
+<a href="Bugs.html">Known Problems</a> page.
 </faqitem>
 
 </faq>
