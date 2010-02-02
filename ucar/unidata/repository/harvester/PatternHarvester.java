@@ -832,9 +832,10 @@ public class PatternHarvester extends Harvester {
         Entry    entry = typeHandler.createEntry(getRepository().getGUID());
         Resource resource;
         if (moveToStorage) {
+            File fromFile = new File(fileName);
             File newFile = getStorageManager().moveToStorage(null,
-                               new File(fileName),
-                               getRepository().getGUID() + "_");
+                                                             fromFile,
+                                                             getStorageManager().getStorageFileName(fromFile.getName()));
             resource = new Resource(newFile.toString(),
                                     Resource.TYPE_STOREDFILE);
         } else {

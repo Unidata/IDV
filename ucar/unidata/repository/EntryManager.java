@@ -2007,7 +2007,7 @@ return new Result(title, sb);
 
         if (entry.isFile()) {
             File newFile = getStorageManager().moveToStorage(request,
-                               entry.getResource().getTheFile(), "");
+                               entry.getResource().getTheFile());
             entry.getResource().setPath(newFile.toString());
         }
 
@@ -3096,6 +3096,7 @@ return new Result(title, sb);
 
 
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
+        String fileName = XmlUtil.getAttribute(node, ATTR_FILENAME, (String) null);
         if (file != null) {
             String tmp = ((files == null)
                           ? null
@@ -3107,8 +3108,12 @@ return new Result(title, sb);
 
                 file = newFile.toString();
             } else {
+                String targetName = fileName;
+                if(targetName != null) {
+                    targetName = getStorageManager().getStorageFileName(targetName);
+                }
                 File newFile = getStorageManager().moveToStorage(request,
-                                   new File(tmp));
+                                                                 new File(tmp), targetName);
                 file = newFile.toString();
             }
         }

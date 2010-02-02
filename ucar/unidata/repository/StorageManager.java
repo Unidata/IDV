@@ -765,7 +765,7 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original)
             throws Exception {
-        return moveToStorage(request, original, "");
+        return moveToStorage(request, original, original.getName());
     }
 
 
@@ -881,11 +881,12 @@ public class StorageManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public File moveToStorage(Request request, File original, String prefix)
+    public File moveToStorage(Request request, File original, String targetName)
             throws Exception {
+        if(targetName == null) {
+            targetName  = original.getName();
+        }
         String            storageDir = getStorageDir();
-        String            targetName = prefix + original.getName();
-
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(new Date());
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
@@ -1017,7 +1018,12 @@ public class StorageManager extends RepositoryManager {
      */
     public File getUploadFilePath(String fileName) {
         return checkFile(new File(IOUtil.joinDir(getUploadDir(),
-                repository.getGUID() + FILE_SEPARATOR + fileName)));
+                                                 getStorageFileName(fileName))));
+    }
+
+
+    public String getStorageFileName(String fileName) {
+        return  repository.getGUID() + FILE_SEPARATOR + fileName;
     }
 
 

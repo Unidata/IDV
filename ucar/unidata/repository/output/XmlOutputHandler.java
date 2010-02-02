@@ -248,9 +248,12 @@ public class XmlOutputHandler extends OutputHandler {
         }
 
         if ( !entry.isGroup() && entry.getResource().isDefined()) {
-            XmlUtil.setAttributes(node, new String[] { ATTR_RESOURCE,
-                                                       entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
-                                                       entry.getResource().getType() });
+            if(forExport) {
+            } else {
+                XmlUtil.setAttributes(node, new String[] { ATTR_RESOURCE,
+                                                           entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
+                                                           entry.getResource().getType() });
+            }
 
             //Add the service nodes
             if(!forExport) {

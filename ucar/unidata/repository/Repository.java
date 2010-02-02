@@ -2577,16 +2577,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getResult(Request request) throws Exception {
 
+
+
         ApiMethod apiMethod = findApiMethod(request);
 
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
-
+        //        System.err.println("request:"  + request);
 
         //        System.err.println("sslEnabled:" +sslEnabled + "  " + apiMethod.getNeedsSsl());
         Result sslRedirect = checkForSslRedirect(request, apiMethod);
         if (sslRedirect != null) {
+            System.err.println("ssl redirect");
             return sslRedirect;
         }
         //        System.out.println(absoluteUrl(request.getUrl()));
@@ -4143,6 +4146,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             Element  info = getServerInfo().toXml(this, doc);
             info.setAttribute(ATTR_CODE, CODE_OK);
             String xml = XmlUtil.toString(info);
+            System.err.println ("returning xml:" + xml);
             return new Result(xml, MIME_XML);
         }
         StringBuffer sb = new StringBuffer("");

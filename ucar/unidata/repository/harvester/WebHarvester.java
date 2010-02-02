@@ -513,7 +513,8 @@ public class WebHarvester extends Harvester {
             statusMessages.add("Unable to fetch URL: " + url);
             return null;
         }
-        File newFile = getStorageManager().moveToStorage(null, tmpFile, "");
+
+        File newFile = getStorageManager().moveToStorage(null, tmpFile);
         //                           getRepository().getGUID() + "_");
         //        System.err.println ("got it " + newFile);
         String tag        = tagTemplate;

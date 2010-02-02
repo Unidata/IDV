@@ -193,6 +193,7 @@ public class RepositoryClient extends RepositoryBase {
      */
     public String[] doPost(RequestUrl url, List<HttpFormEntry> entries)
             throws Exception {
+        System.err.println("url:" + url.getFullUrl());
         return HttpFormEntry.doPost(entries, url.getFullUrl());
     }
 
@@ -852,6 +853,7 @@ public class RepositoryClient extends RepositoryBase {
                                    new String[] { ARG_RESPONSE,
                         RESPONSE_XML, ARG_SESSIONID, sessionId });
             }
+            System.err.println("url:" + url);
             String contents = IOUtil.readContents(url, getClass());
             //            System.err.println ("contents:" + contents);
             Element root = XmlUtil.getRoot(contents);
@@ -863,7 +865,7 @@ public class RepositoryClient extends RepositoryBase {
             }
         } catch (Exception exc) {
             System.err.println("error:" + exc);
-            msg[0] = "Could not connect to server: " + getHostname();
+            msg[0] = "xxx Could not connect to server: " + getHostname();
             return false;
         }
     }
@@ -931,7 +933,8 @@ public class RepositoryClient extends RepositoryBase {
                 return false;
             }
         } catch (java.io.IOException exc) {
-            msg[0] = "Could not connect to server: " + getHostname();
+            exc.printStackTrace();
+            msg[0] = "yyy Could not connect to server: " + getHostname();
 
         } catch (Exception exc) {
             msg[0] = "An error occurred: " + exc + "\n";
@@ -951,8 +954,9 @@ public class RepositoryClient extends RepositoryBase {
                                   new String[] { ARG_RESPONSE,
                 RESPONSE_XML });
 
+        System.err.println("url:" + url);
         String contents = IOUtil.readContents(url, getClass());
-        //        System.err.println(contents);
+        System.err.println(contents);
         Element root = XmlUtil.getRoot(contents);
 
         String sslPortProp = XmlUtil.getGrandChildText(root,

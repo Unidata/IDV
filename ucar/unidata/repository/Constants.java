@@ -395,6 +395,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
 
+    public static final String ATTR_FILENAME = "filename";
+
     /** _more_ */
     public static final String ATTR_RESOURCE_TYPE = "resource_type";
 

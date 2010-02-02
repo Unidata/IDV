@@ -419,16 +419,17 @@ public class ZipOutputHandler extends OutputHandler {
 
 
 
-
             String path = entry.getResource().getPath();
             String name = getStorageManager().getFileTail(path);
             int    cnt  = 1;
-            while (seen.get(name) != null) {
-                name = (cnt++) + "_" + name;
-            }
-            seen.put(name, name);
-            if (prefix.length() > 0) {
-                name = prefix + "/" + name;
+            if(!forExport) {
+                while (seen.get(name) != null) {
+                    name = (cnt++) + "_" + name;
+                }
+                seen.put(name, name);
+                if (prefix.length() > 0) {
+                    name = prefix + "/" + name;
+                }
             }
             File f = new File(path);
             sizeProcessed += f.length();
@@ -441,7 +442,14 @@ public class ZipOutputHandler extends OutputHandler {
 
 
             if (zos != null) {
-                zos.putNextEntry(new ZipEntry(name));
+                if(forExport) {
+                    zos.putNextEntry(new ZipEntry(entry.getId()));
+                    XmlUtil.setAttributes(entryRoot, new String[] {ATTR_FILE, entry.getId(),
+                                                               ATTR_FILENAME, name});
+
+                } else {
+                    zos.putNextEntry(new ZipEntry(name));
+                }
                 InputStream fis =
                     getStorageManager().getFileInputStream(path);
                 try {
