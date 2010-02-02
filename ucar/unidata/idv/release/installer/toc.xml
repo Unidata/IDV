@@ -43,12 +43,14 @@
    </file>
    <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Mac OS-X">
         <description>
-        Installer for Mac OS-X.  Separate Java 3D 
-        installation needed for Mac OS-X version 10.3.X. See the
-        <![CDATA[<a href="%doc_path%/docs/userguide/Systems.html" 
+        Installer for Mac OS-X.  
+        <![CDATA[<font color="red"><b>]]>     
+         Requires Java 6. See the
+        <![CDATA[<a href="%doc_path%/docs/userguide/Systems.html"
         target="_newwindow">
         System Requirements</a>]]> section of the User's Guide for
         more information.
+        <![CDATA[</b></font>]]>
         <![CDATA[<a href="ftp/idv_%_version%_macos_installer.dmg.MD5">MD5</a>]]>
         </description>
    </file>
