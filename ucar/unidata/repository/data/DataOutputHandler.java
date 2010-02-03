@@ -1328,6 +1328,7 @@ public class DataOutputHandler extends OutputHandler {
         GridDataset  dataset   = gridPool.get(path);
         StringBuffer varSB     = new StringBuffer();
         for (VariableSimpleIF var : dataset.getDataVariables()) {
+            System.err.println("var:" + var.getName() + " type:" + var.getClass().getName());
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis ca       = (CoordinateAxis) var;
                 AxisType       axisType = ca.getAxisType();

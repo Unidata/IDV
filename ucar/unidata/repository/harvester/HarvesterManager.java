@@ -563,7 +563,10 @@ public class HarvesterManager extends RepositoryManager {
                     HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                     + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", false)
-                    + HtmlUtil.space(1) + msg("Add Property")
+                    + HtmlUtil.space(1) + msg("Add full metadata")
+                    + HtmlUtil.space(1)
+                    + HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA, "true", false)
+                    + HtmlUtil.space(1) + msg("Just add spatial/temporal metadata")
                     + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
                     + HtmlUtil.space(1) + msg("Download URLS")));
@@ -580,6 +583,7 @@ public class HarvesterManager extends RepositoryManager {
 
         boolean      recurse     = request.get(ARG_RECURSE, false);
         boolean      addMetadata = request.get(ATTR_ADDMETADATA, false);
+        boolean      addShortMetadata = request.get(ATTR_ADDSHORTMETADATA, false);
         boolean      download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
         StringBuffer sb          = new StringBuffer();
         //        sb.append(getEntryManager().makeEntryHeader(request, group));
@@ -601,8 +605,13 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(HtmlUtil.space(1));
         sb.append(msg("Add Metadata"));
 
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA, "true", addShortMetadata));
+        sb.append(HtmlUtil.space(1));
+        sb.append(msg("Just add spatial/temporal metadata"));
 
 
+        sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", download));
         sb.append(HtmlUtil.space(1));
         sb.append(msg("Download URLs"));
@@ -616,6 +625,7 @@ public class HarvesterManager extends RepositoryManager {
                 new ucar.unidata.repository.data.CatalogHarvester(getRepository(), group, catalog,
                                      request.getUser(), recurse, download);
             harvester.setAddMetadata(addMetadata);
+            harvester.setAddShortMetadata(addShortMetadata);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
             //            makeHarvestersList(request, (List<Harvester>)Misc.newList(harvester),  sb);

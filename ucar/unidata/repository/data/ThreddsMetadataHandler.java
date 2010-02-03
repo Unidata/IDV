@@ -261,7 +261,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
             }
         } catch (Exception exc) {
-            throw new IllegalArgumentException("Error parsing unit:" + exc);
+            throw new IllegalArgumentException("Error parsing unit:\"" + unitIdentifier +"\"   " +exc);
         }
         try {
             u = u.clone(unitName);
@@ -497,21 +497,27 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             }
                             haveBounds = true;
                         }
-
-
                     } else if (axisType.equals(AxisType.Time)) {
-                        Date[] dates   = getMinMaxDates(var, ca);
-                        Date   minDate = (Date) extra.get(ARG_FROMDATE);
-                        Date   maxDate = (Date) extra.get(ARG_TODATE);
-                        if (minDate != null) {
-                            dates[0] = DateUtil.min(dates[0], minDate);
-                        }
-                        if (maxDate != null) {
-                            dates[1] = DateUtil.max(dates[1], maxDate);
-                        }
+                        try {
+                            Date[] dates   = getMinMaxDates(var, ca);
+                            if(dates!=null) {
+                                Date   minDate = (Date) extra.get(ARG_FROMDATE);
+                                Date   maxDate = (Date) extra.get(ARG_TODATE);
+                                if (minDate != null) {
+                                    dates[0] = DateUtil.min(dates[0], minDate);
+                                }
+                                if (maxDate != null) {
+                                    dates[1] = DateUtil.max(dates[1], maxDate);
+                                }
 
-                        extra.put(ARG_FROMDATE, dates[0]);
-                        extra.put(ARG_TODATE, dates[1]);
+                                extra.put(ARG_FROMDATE, dates[0]);
+                                extra.put(ARG_TODATE, dates[1]);
+                            }
+                        } catch (Exception exc) {
+                            System.out.println("Error reading time axis for:"
+                                               + entry.getResource());
+                            System.out.println(exc);
+                        }
                     } else {
                         // System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
                     }

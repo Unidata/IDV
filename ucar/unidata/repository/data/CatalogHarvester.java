@@ -192,6 +192,7 @@ public class CatalogHarvester extends Harvester {
             Element root = XmlUtil.getRoot(url, getClass());
             if (root == null) {
                 System.err.println("Could not load catalog:" + url);
+                System.err.println("xml:" + IOUtil.readContents(url, getClass()));
                 return true;
             }
             //                System.err.println("loaded:" + url);
@@ -397,9 +398,9 @@ public class CatalogHarvester extends Harvester {
             }
 
 
-            if (isOpendap && getAddMetadata()) {
+            if (isOpendap && (getAddMetadata()||getAddShortMetadata())) {
                 getEntryManager().addInitialMetadata(null,
-                        (List<Entry>) Misc.newList(entry), true, false);
+                                                     (List<Entry>) Misc.newList(entry), getAddMetadata(), getAddShortMetadata());
 
             }
 
