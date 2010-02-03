@@ -1,28 +1,22 @@
 /*
- * $Id: XmlEncoder.java,v 1.79 2007/02/07 15:37:48 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.xml;
 
@@ -61,8 +55,8 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
@@ -328,10 +322,13 @@ public class XmlEncoder extends XmlUtil {
     /**
      *  A mapping from an old (perhaps no longer in existence) class name to the new Class that handles it.
      */
-    private Hashtable<String,Class> classNameToClass = new Hashtable<String,Class>();
+    private Hashtable<String, Class> classNameToClass = new Hashtable<String,
+                                                            Class>();
 
 
-    private Hashtable<String,String> newClassNames = new Hashtable<String,String>();
+    /** _more_          */
+    private Hashtable<String, String> newClassNames = new Hashtable<String,
+                                                          String>();
 
 
     /**
@@ -352,7 +349,7 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
-    
+
 
     /**
      *  Define the set of default delegates (e.g., for Rectangle, Font, etc.) for common objects
@@ -502,9 +499,20 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getExceptions() {
         return exceptions;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getErrorMessages() {
         return errorMessages;
     }
@@ -522,12 +530,30 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static Object decodeXml(String xml) throws Exception {
         return new XmlEncoder().toObject(xml);
     }
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String encodeObject(Object object) throws Exception {
-        return new XmlEncoder().toXml(object,false);
+        return new XmlEncoder().toXml(object, false);
     }
 
 
@@ -540,16 +566,36 @@ public class XmlEncoder extends XmlUtil {
      *  @throws Exception When anything bad happens.
      */
     public Object toObject(String xml) throws Exception {
+        return toObject(xml, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     * @param catchAndLogError _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Object toObject(String xml, boolean catchAndLogError)
+            throws Exception {
         if ((xml == null) || (xml.length() == 0)) {
             return null;
         }
+
         try {
             Element root = XmlUtil.getRoot(xml);
             if (root == null) {
                 return null;
             }
-            return toObjectInner(root);
+            return toObjectInner(root, catchAndLogError);
         } catch (Exception exc) {
+            if ( !catchAndLogError) {
+                throw exc;
+            }
             logException("Error:", exc);
             return null;
         }
@@ -564,7 +610,12 @@ public class XmlEncoder extends XmlUtil {
      *  @return the newly created object.
      */
     public Object toObject(Element node) {
-        return toObjectInner(node);
+        try {
+            return toObjectInner(node, true);
+        } catch (Exception exc) {
+            logException("Error:", exc);
+            return null;
+        }
     }
 
 
@@ -573,16 +624,29 @@ public class XmlEncoder extends XmlUtil {
      *  Create an object from the given dom subtree.
      *
      *  @param node The xml.
+     * @param catchAndLogError _more_
      *  @return the newly created object.
+     *
+     * @throws Exception _more_
      */
-    private Object toObjectInner(Element node) {
+    private Object toObjectInner(Element node, boolean catchAndLogError)
+            throws Exception {
         synchronized (MUTEX) {
             Object object = null;
             init();
+
             try {
                 object = createObject(node);
             } catch (Exception exc) {
+                if ( !catchAndLogError) {
+                    throw exc;
+                }
                 logException("Error:", exc);
+            }
+
+            if ((exceptions != null) && (exceptions.size() > 0)
+                    && !catchAndLogError) {
+                throw (Exception) exceptions.get(0);
             }
             LogUtil.printExceptions(errorMessages, exceptions);
             clear();
@@ -1066,6 +1130,12 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param oldName _more_
+     * @param newName _more_
+     */
     public void registerNewClassName(String oldName, String newName) {
         newClassNames.put(oldName, newName);
     }
@@ -1087,7 +1157,8 @@ public class XmlEncoder extends XmlUtil {
         }
 
         String newClassName = newClassNames.get(className);
-        if(newClassName!=null) {
+        if (newClassName != null) {
+            //            System.err.println("new class name: " + newClassName +" for:" + className);
             className = newClassName;
         }
 
@@ -1496,8 +1567,8 @@ public class XmlEncoder extends XmlUtil {
                     element.appendChild(createElement(arg, ((type != null)
                             ? type
                             : ((arg != null)
-                               ?arg.getClass()
-                               :Object.class))));
+                               ? arg.getClass()
+                               : Object.class))));
                 } else {
                     element.appendChild(createElement(arguments.get(i)));
                 }
@@ -2007,8 +2078,8 @@ public class XmlEncoder extends XmlUtil {
                 }
             }
         } catch (Exception exc) {
-            System.err.println("Error creating object:" + className + "\n"
-                               + XmlUtil.toString(element) + "\n" + exc);
+            //            System.err.println("Error creating object:" + className + "\n"
+            //                               + XmlUtil.toString(element) + "\n" + exc);
             logException("Error creating object: " + className, exc);
             return null;
         }
@@ -2569,7 +2640,7 @@ public class XmlEncoder extends XmlUtil {
 
 
 
-	/*
+        /*
         if (object instanceof HashSet) {
             List      elements = new ArrayList();
             HashSet ht       = (HashSet) object;
@@ -2580,7 +2651,7 @@ public class XmlEncoder extends XmlUtil {
                 elements.add(methodElement);
             }
             return elements;
-	    }*/
+            }*/
         return null;
     }
 
@@ -2679,14 +2750,14 @@ public class XmlEncoder extends XmlUtil {
     public static void main(String[] args) {
 
         try {
-	    /*            String xmltest = IOUtil.readContents("test.xml",
+            /*            String xmltest = IOUtil.readContents("test.xml",
                                  XmlEncoder.class, (String) null);
             XmlEncoder enc1 = new XmlEncoder();
-	    HashSet hs = new HashSet();
-	    hs.add("foo");
+            HashSet hs = new HashSet();
+            hs.add("foo");
             HashSet h2   = (HashSet) enc1.toObject(hs);
             System.err.println("o1:" + h2);
-	    */
+            */
         } catch (Exception exc) {
             System.err.println("OOps:" + exc);
         }
@@ -2777,4 +2848,3 @@ public class XmlEncoder extends XmlUtil {
 
 
 }
-
