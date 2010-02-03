@@ -1,25 +1,22 @@
 /*
- * $Id: PublishManager.java,v 1.13 2005/05/13 18:31:06 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.publish;
 
@@ -84,8 +81,9 @@ public class PublishManager extends IdvManager {
      */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
+
 
 
 
@@ -93,12 +91,12 @@ public class PublishManager extends IdvManager {
     /** List of {@link ucar.unidata.idv.publish.IdvPublisher}s */
     private List<IdvPublisher> publishers;
 
-    /** _more_          */
+    /** _more_ */
     private List<TwoFacedObject> types = new ArrayList<TwoFacedObject>();
 
 
 
-    /** _more_          */
+    /** _more_ */
     private List<JComboBox> comboBoxes = new ArrayList<JComboBox>();
 
 
@@ -122,15 +120,21 @@ public class PublishManager extends IdvManager {
             }
             try {
                 List<IdvPublisher> tmp =
-                    (List<IdvPublisher>) getIdv().decodeObject(xml);
+                    (List<IdvPublisher>) getIdv().getEncoderForRead()
+                        .toObject(xml, false);
+                if (tmp == null) {
+                    return;
+                }
                 for (IdvPublisher publisher : tmp) {
                     publisher.setLocal(resources.isWritable(resourceIdx));
                     publisher.setIdv(getIdv());
                 }
                 publishers.addAll(tmp);
             } catch (Exception exc) {
-                logException("Loading publisher file:"
-                             + resources.get(resourceIdx), exc);
+                LogUtil.userErrorMessage(
+                    "There was a problem loading the publishers file:\n"
+                    + resources.get(resourceIdx)
+                    + "\nYou should update any publisher plugin or delete the above file");
             }
         }
     }
@@ -156,7 +160,7 @@ public class PublishManager extends IdvManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, JComboBox> selectors = new Hashtable<String,
                                                          JComboBox>();
 
@@ -575,4 +579,3 @@ public class PublishManager extends IdvManager {
 
 
 }
-
