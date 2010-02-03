@@ -44,6 +44,7 @@ import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.Util;
+import ucar.visad.UtcDate;
 
 import visad.*;
 
@@ -346,7 +347,11 @@ public class ObsListControl extends ObsDisplayControl {
                 } else if (latLon != null) {
                     value = formatLatLon(latLon);
                 } else if (dttm != null) {
-                    value = dttm.toString();
+                    if (exportingToCsv) {
+                      value = UtcDate.formatUtcDate(dttm, UtcDate.DEFAULT_PATTERN);
+                    } else {
+                      value = dttm.toString();
+                    }
                 } else if (real != null) {
                     value = formatReal(real);
                 }
@@ -696,12 +701,12 @@ public class ObsListControl extends ObsDisplayControl {
         Tuple t = (Tuple) ob.getData();
         for (int i = 0; i < t.getDimension(); i++) {
             Scalar s = (Scalar) t.getComponent(i);
-	    String cleanName = Util.cleanTypeName(s.getType().prettyString());
-	    if(nameToDescription.get(cleanName) == null) {
-		nameToDescription.put(
-				      cleanName,
-				      makeDescription(s));
-	    }
+            String cleanName = Util.cleanTypeName(s.getType().prettyString());
+            if(nameToDescription.get(cleanName) == null) {
+                nameToDescription.put(
+                                      cleanName,
+                                      makeDescription(s));
+            }
         }
 
     }
@@ -774,10 +779,18 @@ public class ObsListControl extends ObsDisplayControl {
         buf.append(StringUtil.join(",", names));
         buf.append(")\n");
         for (int i = 0; i < numParams; i++) {
-            String s = (String) nameToDescription.get(names[i]);
-            //      System.err.println("x:" + s);
-            if (s != null) {
-                names[i] = s;
+            if (names[i] == RealType.Time.getName() && !getShowDataRaw()) {
+                StringBuffer buf2 = new StringBuffer(names[i]);
+                buf2.append("[fmt=");
+                buf2.append('"' + UtcDate.DEFAULT_PATTERN + '"');
+                buf2.append("]");
+                names[i] = buf2.toString();
+            } else {;
+                String s = (String) nameToDescription.get(names[i]);
+                //      System.err.println("x:" + s);
+                if (s != null) {
+                    names[i] = s;
+                }
             }
         }
         buf.append(StringUtil.join(",", names));
