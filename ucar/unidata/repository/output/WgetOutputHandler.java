@@ -62,7 +62,7 @@ import java.util.regex.*;
 
 
 /**
- * Class SqlUtil _more_
+ * Produces a wget script to download files
  *
  *
  * @author IDV Development Team
@@ -74,7 +74,7 @@ public class WgetOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_WGET =
         new OutputType("Wget Script", "wget.wget", OutputType.TYPE_FILE, "",
-                       ICON_ZIP);
+                       ICON_FETCH);
 
 
     /**

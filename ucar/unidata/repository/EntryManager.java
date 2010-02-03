@@ -2906,7 +2906,6 @@ return new Result(title, sb);
                             getStorageManager().getFileOutputStream(f);
                         IOUtil.writeTo(zin, fos);
                         fos.close();
-                        //                    System.err.println ("orig file:" + ze.getName() + " tmp file:" + f);
                         origFileToStorage.put(ze.getName(), f.toString());
                     }
                 }
@@ -2925,7 +2924,7 @@ return new Result(title, sb);
 
         //        System.err.println ("xml:" + entriesXml);
 
-        List      newEntries = new ArrayList();
+        List<Entry>      newEntries = new ArrayList<Entry>();
         Hashtable<String,Entry>  entries    = new Hashtable<String,Entry>();
         if(group!=null) {
             entries.put("",group);
@@ -2935,7 +2934,6 @@ return new Result(title, sb);
                                             new String[] { ATTR_CODE,
                 CODE_OK });
 
-        StringBuffer sb = new StringBuffer();
         Element  root     = XmlUtil.getRoot(entriesXml);
         NodeList children;
         if(root.getTagName().equals(TAG_ENTRY)) {
@@ -2944,6 +2942,8 @@ return new Result(title, sb);
         } else {
             children = XmlUtil.getElements(root);
         }
+
+
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
@@ -2957,8 +2957,6 @@ return new Result(title, sb);
                         entry.getId() });
                 newEntries.add(entry);
                 //xxx
-                sb.append(getEntryLink(request, entry));
-                sb.append("<br>");
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
@@ -2983,6 +2981,8 @@ return new Result(title, sb);
             }
         }
 
+
+
         insertEntries(newEntries, true);
 
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
@@ -2991,8 +2991,20 @@ return new Result(title, sb);
             return new Result(xml, MIME_XML);
         }
 
-        System.err.println("sb:"  +sb);
-                    
+        StringBuffer sb = new StringBuffer();
+        sb.append(msgHeader("Imported entries"));
+        sb.append("<ul>");
+        
+        for(Entry entry: newEntries) {
+            sb.append("<li> ");
+            sb.append(getBreadCrumbs(request,  entry, true, group)[1]);
+    //            sb.append(getBreadCrumbs(request, entry));
+        }
+
+        sb.append("</ul>");
+        if(group!=null) {
+            return makeEntryEditResult(request, group, "Imported Entries", sb);
+        }
         return new Result("", sb);
 
     }

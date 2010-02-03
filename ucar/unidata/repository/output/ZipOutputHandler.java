@@ -299,7 +299,7 @@ public class ZipOutputHandler extends OutputHandler {
         //First recurse down without a zos to check the size
         try {
             processZip(request, entries, recurse, 0, null, prefix, 0,
-                       new int[] { 0 }, forExport,null);
+                       new int[] { 0 },forExport, null);
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -371,7 +371,7 @@ public class ZipOutputHandler extends OutputHandler {
                               boolean recurse, int level, 
                               ZipOutputStream zos,
                               String prefix, long sizeSoFar, int[] counter,
-                              boolean forExport, Element entryRoot)
+                              boolean forExport, Element entriesRoot)
             throws Exception {
         long      sizeProcessed = 0;
         Hashtable seen          = new Hashtable();
@@ -395,8 +395,9 @@ public class ZipOutputHandler extends OutputHandler {
                                    + new Date());
                 Misc.sleep(10);
             }
-            if(forExport && entryRoot!=null) {
-                getRepository().getXmlOutputHandler().getEntryTag(null, entry, entryRoot.getOwnerDocument(),entryRoot, true, level!=0);
+            Element entryNode = null;
+            if(forExport && entriesRoot!=null) {
+                entryNode = getRepository().getXmlOutputHandler().getEntryTag(null, entry, entriesRoot.getOwnerDocument(),entriesRoot, true, level!=0);
             }
 
             if (entry.isGroup() && recurse) {
@@ -409,7 +410,7 @@ public class ZipOutputHandler extends OutputHandler {
                 }
                 sizeProcessed += processZip(request, children, recurse, level+1, zos,
                                             path, sizeProcessed + sizeSoFar,
-                                            counter, forExport,entryRoot);
+                                            counter, forExport,entriesRoot);
             }
 
 
@@ -442,10 +443,10 @@ public class ZipOutputHandler extends OutputHandler {
 
 
             if (zos != null) {
-                if(forExport) {
+                if(entryNode!=null && forExport) {
                     zos.putNextEntry(new ZipEntry(entry.getId()));
-                    XmlUtil.setAttributes(entryRoot, new String[] {ATTR_FILE, entry.getId(),
-                                                               ATTR_FILENAME, name});
+                    XmlUtil.setAttributes(entryNode, new String[] {ATTR_FILE, entry.getId(),
+                                                                   ATTR_FILENAME, name});
 
                 } else {
                     zos.putNextEntry(new ZipEntry(name));
