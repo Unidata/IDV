@@ -795,6 +795,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                    String label, boolean allEntries,
                                    String type, Entry entry)
             throws Exception {
+        return getSelect(request, elementId, label, allEntries, type, entry, true);
+    }
+
+
+    public static String getSelect(Request request, String elementId,
+                                   String label, boolean allEntries,
+                                   String type, Entry entry,boolean addClear)
+            throws Exception {
         String event = HtmlUtil.call("selectInitialClick",
                                      "event," + HtmlUtil.squote(elementId)
                                      + "," + HtmlUtil.squote("" + allEntries)
@@ -804,11 +812,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                         : "null"));
         String clearEvent = HtmlUtil.call("clearSelect",
                                           HtmlUtil.squote(elementId));
-        return HtmlUtil.mouseClickHref(
-            event, label, HtmlUtil.id(elementId + ".selectlink")) + " "
+        String link = HtmlUtil.mouseClickHref(
+                                              event, label, HtmlUtil.id(elementId + ".selectlink"));
+        if(addClear) {
+            link = link + " "
                 + HtmlUtil.mouseClickHref(
                     clearEvent, "Clear",
                     HtmlUtil.id(elementId + ".selectlink"));
+        }
+        return link;
     }
 
     /**
@@ -2219,11 +2231,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                   String textAreaId)
             throws Exception {
 
+
         String select = OutputHandler.getSelect(request, textAreaId,
-                            "Add link", true, "wikilink") + HtmlUtil.space(1)
+                                                "Add link", true, "wikilink", entry,false) + HtmlUtil.space(1) +"|" +
+            HtmlUtil.space(1) 
+
                                 + OutputHandler.getSelect(request,
-                                    textAreaId, "Add import entry", true,
-                                    "entryid", entry);
+                                    textAreaId, "Import entry", true,
+                                                          "entryid", entry,false);
 
         StringBuffer buttons = new StringBuffer();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
