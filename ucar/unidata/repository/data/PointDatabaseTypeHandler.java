@@ -3002,6 +3002,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
     private List<PointDataMetadata> getMetadata(String tableName,
             boolean checkCache)
             throws Exception {
+
         List<PointDataMetadata> metadata = (checkCache
                                             ? metadataCache.get(tableName)
                                             : null);
@@ -3036,7 +3037,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                             results.getString(col++)));
                 }
             }
-            if (checkCache) {
+            if (checkCache && metadata.size()>0) {
                 metadataCache.put(tableName, metadata);
             }
         }
