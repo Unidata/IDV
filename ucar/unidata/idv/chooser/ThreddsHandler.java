@@ -200,7 +200,7 @@ public class ThreddsHandler extends XmlHandler {
      * @param doc The document to create a new node with
      */
     private void shuffleDocNodes(Element node, Document doc) {
-        if (node.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+        if (XmlUtil.isTag(node,CatalogUtil.TAG_DOCUMENTATION)) {
             return;
         }
         List docNodes = null;
@@ -211,7 +211,7 @@ public class ThreddsHandler extends XmlHandler {
                 continue;
             }
             Element child = (Element) tmp;
-            if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+            if (XmlUtil.isTag(child,CatalogUtil.TAG_DOCUMENTATION)) {
                 node.removeChild(child);
                 if (XmlUtil.getAttribute(child, "xlink:title",
                                          "").indexOf("Imported from") < 0) {
@@ -294,7 +294,7 @@ public class ThreddsHandler extends XmlHandler {
                     remoteIcon = GuiUtils.getImageIcon(
                         "/auxdata/ui/icons/remotecatalog.png");
                 }
-                if (node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
+                if (XmlUtil.isTag(node,CatalogUtil.TAG_CATALOGREF)) {
                     return remoteIcon;
                 }
 
@@ -335,9 +335,8 @@ public class ThreddsHandler extends XmlHandler {
                 NodeList elements = XmlUtil.getElements(node);
                 for (int i = 0; i < elements.getLength(); i++) {
                     Element child = (Element) elements.item(i);
-                    String  tag   = child.getTagName();
-                    if (tag.equals(CatalogUtil.TAG_DATASET)
-                            || tag.equals(CatalogUtil.TAG_CATALOGREF)) {
+                    if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)
+                        || XmlUtil.isTag(child,CatalogUtil.TAG_CATALOGREF)) {
                         return datasetIcon;
                     }
                 }
@@ -355,8 +354,7 @@ public class ThreddsHandler extends XmlHandler {
                                              + href);
                     return null;
                 }
-                if (doc.getDocumentElement().getTagName().equals(
-                        CatalogUtil.TAG_CATALOG)) {
+                if (XmlUtil.isTag(doc.getDocumentElement(), CatalogUtil.TAG_CATALOG)) {
                     return doc;
                 }
                 //Else (e.g., wms) show a new xml xhooser ui
@@ -381,10 +379,10 @@ public class ThreddsHandler extends XmlHandler {
             }
 
             public String getToolTipText(Element n) {
-                if (n.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+                if (XmlUtil.isTag(n,CatalogUtil.TAG_DOCUMENTATION)) {
                     return getDocumentationToolTip(n);
                 }
-                if (n.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
+                if (XmlUtil.isTag(n,CatalogUtil.TAG_CATALOGREF)) {
                     String href = XmlUtil.getAttribute(n,
                                       XmlTree.ATTR_XLINKHREF, (String) null);
                     if (href == null) {
@@ -392,7 +390,7 @@ public class ThreddsHandler extends XmlHandler {
                     }
                     return "Remote catalog: " + tree.expandRelativeUrl(href);
                 }
-                if (n.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+                if (XmlUtil.isTag(n,CatalogUtil.TAG_DATASET)) {
                     List paths = new ArrayList();
                     if (collectUrlPaths(paths, n, root, false)) {
                         if (paths.size() > 0) {
@@ -430,10 +428,10 @@ public class ThreddsHandler extends XmlHandler {
             }
 
             public String getLabel(Element n) {
-                if (n.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+                if (XmlUtil.isTag(n,CatalogUtil.TAG_DOCUMENTATION)) {
                     return getDocumentationLabel(n);
                 }
-                if (n.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
+                if (XmlUtil.isTag(n,CatalogUtil.TAG_DOCPARENT)) {
                     return "Documentation";
                 }
                 String lbl = super.getLabel(n);
@@ -580,7 +578,7 @@ public class ThreddsHandler extends XmlHandler {
     private boolean makePopupMenu(final XmlTree theTree, final Element node,
                                   JPopupMenu popup,
                                   final XmlTree.XmlTreeNode treeNode) {
-        String    tagName = node.getTagName();
+        String    tagName = XmlUtil.getLocalName(node);
 
 
         boolean   didone  = false;
@@ -770,11 +768,11 @@ public class ThreddsHandler extends XmlHandler {
         Hashtable properties = null;
         for (int i = 0; i < nodes.size(); i++) {
             Element node = (Element) nodes.get(i);
-            if (node.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+            if (XmlUtil.isTag(node, CatalogUtil.TAG_DOCUMENTATION)) {
                 showDocumentation(node);
                 continue;
             }
-            if ( !node.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+            if ( !XmlUtil.isTag(node,CatalogUtil.TAG_DATASET)) {
                 continue;
             }
             if (version == CatalogUtil.THREDDS_VERSION_0_4) {
@@ -905,6 +903,9 @@ public class ThreddsHandler extends XmlHandler {
         String dataType = CatalogUtil.findDataTypeForDataset(datasetNode,
                               root, CatalogUtil.getVersion(root), true);
 
+        if(dataType!=null && (dataType.equals("unknown")  || dataType.trim().length()==0)) {
+            dataType = null;
+        }
         String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
         String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
@@ -946,7 +947,7 @@ public class ThreddsHandler extends XmlHandler {
         String link = XmlUtil.getAttribute(docNode,
                                            CatalogUtil.ATTR_XLINK_HREF,
                                            (String) null);
-        if (docNode.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
+        if (XmlUtil.isTag(docNode,CatalogUtil.TAG_DOCUMENTATION)) {
             if (link != null) {
                 if (list == null) {
                     list = new ArrayList();
@@ -1002,9 +1003,8 @@ public class ThreddsHandler extends XmlHandler {
                                     (String) null);
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
-                if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)
-                        || child.getTagName().equals(
-                            CatalogUtil.TAG_DOCPARENT)) {
+                if (XmlUtil.isTag(child,CatalogUtil.TAG_DOCUMENTATION)
+                    || XmlUtil.isTag(child,CatalogUtil.TAG_DOCPARENT)) {
                     list = getDocLinksDown(child, list);
                 }
             }

@@ -288,9 +288,10 @@ public class XmlTree extends JTree {
             return null;
         }
 
+        
         if (tagNameToTooltipChild != null) {
             String childTag =
-                (String) tagNameToTooltipChild.get(n.getTagName());
+                (String) tagNameToTooltipChild.get(XmlUtil.getLocalName(n));
             if (childTag != null) {
                 Element child = XmlUtil.getElement(n, childTag);
                 if (child != null) {
@@ -1098,7 +1099,7 @@ public class XmlTree extends JTree {
      * @return Should we look at this node and turn it into a jtree node
      */
     protected boolean shouldProcess(Element xmlNode) {
-        String tagName = xmlNode.getTagName();
+        String tagName = XmlUtil.getLocalName(xmlNode);
         if (tagsToProcess != null) {
             if (tagsToProcess.get(tagName) == null) {
                 return false;
@@ -1106,7 +1107,7 @@ public class XmlTree extends JTree {
         }
 
         if (tagsToNotProcess != null) {
-            return (tagsToNotProcess.get(xmlNode.getTagName()) == null);
+            return (tagsToNotProcess.get(XmlUtil.getLocalName(xmlNode)) == null);
         }
         return true;
     }
@@ -1121,7 +1122,7 @@ public class XmlTree extends JTree {
      * @return The icon or null
      */
     protected ImageIcon getIcon(Element xmlNode, boolean isLeaf) {
-        String    tagName = xmlNode.getTagName();
+        String    tagName = XmlUtil.getLocalName(xmlNode);
         ImageIcon icon    = (ImageIcon) tagToIcons.get(tagName);
         if (icon != null) {
             return icon;
@@ -1150,7 +1151,7 @@ public class XmlTree extends JTree {
             String xlinkHref = XmlUtil.getAttribute(xmlNode, ATTR_XLINKHREF,
                                    NULL_STRING);
             String label = getLabel(xmlNode);
-            if (isXlinkTag(xmlNode.getTagName()) && (xlinkHref != null)) {
+            if (isXlinkTag(XmlUtil.getLocalName(xmlNode)) && (xlinkHref != null)) {
                 childTreeNode = new XlinkTreeNode(xmlNode, this, label,
                         xlinkHref);
                 childTreeNode.add(new DefaultMutableTreeNode("Please wait"));
@@ -1196,7 +1197,7 @@ public class XmlTree extends JTree {
      * @return    Should we recurse down
      */
     protected boolean shouldRecurse(Element xmlNode) {
-        String tagName = xmlNode.getTagName();
+        String tagName = XmlUtil.getLocalName(xmlNode);
 
         if (tagsToNotProcessButRecurse != null) {
             if (tagsToNotProcessButRecurse.get(tagName) != null) {
@@ -1211,7 +1212,7 @@ public class XmlTree extends JTree {
         }
 
         if (tagsToNotRecurse != null) {
-            return (tagsToNotRecurse.get(xmlNode.getTagName()) == null);
+            return (tagsToNotRecurse.get(XmlUtil.getLocalName(xmlNode)) == null);
         }
         return true;
 
@@ -1230,11 +1231,11 @@ public class XmlTree extends JTree {
         String label = null;
 
         if (useTagNameAsLabel) {
-            return n.getTagName();
+            return XmlUtil.getLocalName(n);
         }
 
         if (tagNameToLabelAttr != null) {
-            String attrName = (String) tagNameToLabelAttr.get(n.getTagName());
+            String attrName = (String) tagNameToLabelAttr.get(XmlUtil.getLocalName(n));
             if (attrName != null) {
                 label = XmlUtil.getAttribute(n, attrName, NULL_STRING);
             }
@@ -1242,7 +1243,7 @@ public class XmlTree extends JTree {
 
         if (tagNameToLabelChild != null) {
             String childTag =
-                (String) tagNameToLabelChild.get(n.getTagName());
+                (String) tagNameToLabelChild.get(XmlUtil.getLocalName(n));
             if (childTag != null) {
                 Element child = XmlUtil.getElement(n, childTag);
                 if (child != null) {
@@ -1260,7 +1261,7 @@ public class XmlTree extends JTree {
         }
 
         if (label == null) {
-            label = n.getTagName();
+            label = XmlUtil.getLocalName(n);
         }
 
 

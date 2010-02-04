@@ -471,7 +471,9 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         }
         setSelected(path);
         XmlHandler handler = null;
-        String     tagName = xmlRoot.getTagName();
+        String     tagName = XmlUtil.getLocalName(xmlRoot);
+
+
         if (tagName.equals(WmsUtil.TAG_WMS1)
                 || tagName.equals(WmsUtil.TAG_WMS2)) {
             handler = new WmsHandler(this, xmlRoot, path);

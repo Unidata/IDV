@@ -620,7 +620,7 @@ public class CatalogUtil {
             Element parent = (Element) datasetNode.getParentNode();
             //Only look at parent dataset nodes.
             if ((parent == null)
-                    || !parent.getTagName().equals(TAG_DATASET)) {
+                || !XmlUtil.isTag(parent,TAG_DATASET)) {
                 return null;
             }
             return findServiceNameForDataset(parent, version, false);
@@ -660,7 +660,7 @@ public class CatalogUtil {
             Element parent = (Element) datasetNode.getParentNode();
             //Only look at parent dataset nodes.
             if ((parent == null)
-                    || !parent.getTagName().equals(TAG_DATASET)) {
+                || !XmlUtil.isTag(parent,TAG_DATASET)) {
                 return null;
             }
             return findDataTypeForDataset(parent, root, version, false);
@@ -747,7 +747,7 @@ public class CatalogUtil {
 
 
         Element parent = (Element) datasetNode.getParentNode();
-        if ((parent == null) || !parent.getTagName().equals(TAG_DATASET)) {
+        if ((parent == null) || !XmlUtil.isTag(parent,TAG_DATASET)) {
             return null;
         }
         return findTagValueFromMetaData(parent, version, false, tagName);

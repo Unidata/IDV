@@ -201,10 +201,9 @@ public class CatalogHarvester extends Harvester {
             Element  datasetNode = null;
             for (int i = 0; i < children.getLength(); i++) {
                 Element child = (Element) children.item(i);
-                if (child.getTagName().equals(CatalogUtil.TAG_DATASET)
-                        || child.getTagName().equals(
-                            CatalogUtil.TAG_CATALOGREF)) {
-                    if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+                if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)
+                    || XmlUtil.isTag(child,CatalogUtil.TAG_CATALOGREF)) {
+                    if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)) {
                         datasetNode = (Element) child;
                     }
                     cnt++;
@@ -300,7 +299,7 @@ public class CatalogHarvester extends Harvester {
         boolean haveChildDatasets = false;
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+            if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)) {
                 haveChildDatasets = true;
                 break;
             }
@@ -453,7 +452,7 @@ public class CatalogHarvester extends Harvester {
 
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            String  tag   = child.getTagName();
+            String  tag   = XmlUtil.getLocalName(child);
             if (tag.equals(CatalogUtil.TAG_DATASET)) {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
                                recurseDepth, timestamp);
