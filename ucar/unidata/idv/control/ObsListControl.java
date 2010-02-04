@@ -341,17 +341,16 @@ public class ObsListControl extends ObsDisplayControl {
          * @return the value to show in hte table
          */
         public Object getValue() {
+            if (exportingToCsv && dttm != null) {
+                return UtcDate.formatUtcDate(dttm, UtcDate.DEFAULT_PATTERN);
+            }
             if (value == null) {
                 if (data != null) {
                     value = getColValue(data, type, false, displayUnit);
                 } else if (latLon != null) {
                     value = formatLatLon(latLon);
                 } else if (dttm != null) {
-                    if (exportingToCsv) {
-                      value = UtcDate.formatUtcDate(dttm, UtcDate.DEFAULT_PATTERN);
-                    } else {
-                      value = dttm.toString();
-                    }
+                    value = dttm.toString();
                 } else if (real != null) {
                     value = formatReal(real);
                 }
@@ -463,7 +462,9 @@ public class ObsListControl extends ObsDisplayControl {
                             Object value = rowData.get(column);
                             if (value instanceof RowData) {
                                 value = ((RowData) value).getValue();
-                                rowData.set(column, value);
+                                if(!exportingToCsv) {
+                                    rowData.set(column, value);
+                                }
                             }
                             if(exportingToCsv) {
                                 if(Misc.equals("missing",value.toString())) {
