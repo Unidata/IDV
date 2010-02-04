@@ -1,20 +1,18 @@
 /*
- * $Id: ObsListControl.java,v 1.58 2007/04/11 18:56:03 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -43,8 +41,9 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 
-import ucar.visad.Util;
 import ucar.visad.UtcDate;
+
+import ucar.visad.Util;
 
 import visad.*;
 
@@ -106,6 +105,12 @@ public class ObsListControl extends ObsDisplayControl {
 
     /** Hashtable to hold the list of param names to text adapter like desc */
     private Hashtable nameToDescription = new Hashtable();
+
+    /** used in save as dialog */
+    JCheckBox includeHeaderCbx;
+
+    /** flag for when we are exporting to CSV */
+    private boolean exportingToCsv = false;
 
     /**
      * Default ctor
@@ -341,7 +346,7 @@ public class ObsListControl extends ObsDisplayControl {
          * @return the value to show in hte table
          */
         public Object getValue() {
-            if (exportingToCsv && dttm != null) {
+            if (exportingToCsv && (dttm != null)) {
                 return UtcDate.formatUtcDate(dttm, UtcDate.DEFAULT_PATTERN);
             }
             if (value == null) {
@@ -462,12 +467,13 @@ public class ObsListControl extends ObsDisplayControl {
                             Object value = rowData.get(column);
                             if (value instanceof RowData) {
                                 value = ((RowData) value).getValue();
-                                if(!exportingToCsv) {
-                                    rowData.set(column, value);
-                                }
+                                //if(!exportingToCsv) {
+                                //    rowData.set(column, value);
+                                //}
                             }
-                            if(exportingToCsv) {
-                                if(Misc.equals("missing",value.toString())) {
+                            if (exportingToCsv) {
+                                if (Misc.equals("missing",
+                                        value.toString())) {
                                     return "NaN";
                                 }
                             }
@@ -644,16 +650,12 @@ public class ObsListControl extends ObsDisplayControl {
         super.getSaveMenuItems(items, forMenuBar);
         items.add(GuiUtils.makeMenuItem("Export Table to CSV...", this,
                                         "exportTable"));
-        
+
         items.add(GuiUtils.makeMenuItem("Export all data to NetCDF...", this,
                                         "exportAsNetcdf", null, true));
     }
 
 
-
-    /** used in save as dialog */
-    JCheckBox includeHeaderCbx;
-    private boolean   exportingToCsv = false;
 
     /**
      * Export table as csv
@@ -701,12 +703,10 @@ public class ObsListControl extends ObsDisplayControl {
                               makeDescription(el.getAltitude()));
         Tuple t = (Tuple) ob.getData();
         for (int i = 0; i < t.getDimension(); i++) {
-            Scalar s = (Scalar) t.getComponent(i);
+            Scalar s         = (Scalar) t.getComponent(i);
             String cleanName = Util.cleanTypeName(s.getType().prettyString());
-            if(nameToDescription.get(cleanName) == null) {
-                nameToDescription.put(
-                                      cleanName,
-                                      makeDescription(s));
+            if (nameToDescription.get(cleanName) == null) {
+                nameToDescription.put(cleanName, makeDescription(s));
             }
         }
 
@@ -780,13 +780,14 @@ public class ObsListControl extends ObsDisplayControl {
         buf.append(StringUtil.join(",", names));
         buf.append(")\n");
         for (int i = 0; i < numParams; i++) {
-            if (names[i] == RealType.Time.getName() && !getShowDataRaw()) {
+            if ((names[i] == RealType.Time.getName()) && !getShowDataRaw()) {
                 StringBuffer buf2 = new StringBuffer(names[i]);
                 buf2.append("[fmt=");
                 buf2.append('"' + UtcDate.DEFAULT_PATTERN + '"');
                 buf2.append("]");
                 names[i] = buf2.toString();
-            } else {;
+            } else {
+                ;
                 String s = (String) nameToDescription.get(names[i]);
                 //      System.err.println("x:" + s);
                 if (s != null) {
@@ -815,4 +816,3 @@ public class ObsListControl extends ObsDisplayControl {
     }
 
 }
-
