@@ -1,30 +1,22 @@
 /*
- * $Id: XmlUtil.java,v 1.81 2007/03/22 11:23:10 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
-
-
 
 package ucar.unidata.xml;
 
@@ -283,22 +275,22 @@ public abstract class XmlUtil {
     }
 
     /**
-     * _more_
+     * Make an open tag
      *
-     * @param name _more_
+     * @param name tag name
      *
-     * @return _more_
+     * @return the open tag
      */
     public static String openTag(String name) {
         return "<" + name + ">\n";
     }
 
     /**
-     * _more_
+     * Make a close tag
      *
-     * @param name _more_
+     * @param name tag name
      *
-     * @return _more_
+     * @return the tag
      */
     public static String closeTag(String name) {
         return "</" + name + ">\n";
@@ -432,7 +424,7 @@ public abstract class XmlUtil {
                                              Hashtable tags,
                                              List listOfValues) {
         if ((tags != null) && (element instanceof Element)) {
-            String tag = ((Element) element).getTagName();
+            String tag = getLocalName(((Element) element));
             if (tags.get(tag) == null) {
                 return listOfValues;
             }
@@ -861,7 +853,7 @@ public abstract class XmlUtil {
         boolean   doAll    = ((tag == null) || tag.equals("*"));
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (doAll || child.getNodeName().equals(tag)) {
+            if (doAll || getNodeName(child).equals(tag)) {
                 found.add(child);
             }
         }
@@ -972,13 +964,13 @@ public abstract class XmlUtil {
         String  tag     = (String) tags.get(tagIdx);
         boolean lastTag = (tagIdx == tags.size() - 1);
 
-        //        System.err.println (tab+parent.getTagName () + " looking for:" + tag + " idx:" + tagIdx+ " lastTag:" + lastTag);
+        //        System.err.println (tab+getLocalName(parent) + " looking for:" + tag + " idx:" + tagIdx+ " lastTag:" + lastTag);
         NodeList elements = getElements(parent);
         tab = tab + "\t";
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            //            System.err.println (tab+">child:" + child.getTagName());
-            if (tag.equals("*") || tag.equals(child.getTagName())) {
+            //            System.err.println (tab+">child:" + getLocalName(child));
+            if (tag.equals("*") || isTag(child, tag)) {
                 if (lastTag) {
                     results.add(child);
                 } else {
@@ -1000,7 +992,7 @@ public abstract class XmlUtil {
      *  @param found The list of descendants that match the given tag.
      */
     private static void findDescendants(Node parent, String tag, List found) {
-        if (parent.getNodeName().equals(tag)) {
+        if (getNodeName(parent).equals(tag)) {
             found.add(parent);
         }
         NodeList children = parent.getChildNodes();
@@ -1347,6 +1339,61 @@ public abstract class XmlUtil {
 
 
     /**
+     * Is the non-qualified tagname of the given element equals to the given name
+     *
+     * @param element element
+     * @param name name
+     *
+     * @return is non qualified tag name the same
+     */
+    public static boolean isTag(Element element, String name) {
+        return Misc.equals(getLocalName(element), name);
+    }
+
+
+    /**
+     * Get the non qualified tag name
+     *
+     * @param element element
+     *
+     * @return tag name
+     */
+    public static String getLocalName(Element element) {
+        String localName = element.getLocalName();
+        if (localName != null) {
+            return localName;
+        }
+        String name = element.getTagName();
+        int    idx  = name.indexOf(":");
+        if (idx >= 0) {
+            name = name.substring(idx + 1);
+        }
+        return name;
+    }
+
+
+    /**
+     * Get the non qualified tag name
+     *
+     * @param node node
+     *
+     * @return node name
+     */
+    public static String getNodeName(Node node) {
+        String localName = node.getLocalName();
+        if (localName != null) {
+            return localName;
+        }
+        String name = node.getNodeName();
+        int    idx  = name.indexOf(":");
+        if (idx >= 0) {
+            name = name.substring(idx + 1);
+        }
+        return name;
+    }
+
+
+    /**
      *  Find the ancestor of the given node with the given tagname
      *
      *  @param child The xml element to serach for the root of.
@@ -1360,7 +1407,7 @@ public abstract class XmlUtil {
         }
         Element parent = (Element) parentObj;
         while (parent != null) {
-            if (parent.getTagName().equals(tagName)) {
+            if (isTag(parent, tagName)) {
                 return parent;
             }
             parentObj = parent.getParentNode();
@@ -1661,8 +1708,15 @@ public abstract class XmlUtil {
         sb.append("]]>");
     }
 
-    public static String  getCdata(String s) {
-        return "<![CDATA[" + s +      "]]>";
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String getCdata(String s) {
+        return "<![CDATA[" + s + "]]>";
     }
 
 
@@ -1680,6 +1734,12 @@ public abstract class XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param text _more_
+     */
     public static void createCDataNode(Element parent, String text) {
         parent.appendChild(makeCDataNode(parent.getOwnerDocument(), text));
     }
@@ -1743,7 +1803,7 @@ public abstract class XmlUtil {
             Object o = children.item(i);
             if (o instanceof Element) {
                 Element e = (Element) o;
-                if ((tagName == null) || e.getTagName().equals(tagName)) {
+                if ((tagName == null) || isTag(e, tagName)) {
                     nodeList.add(e);
                 }
             }
@@ -1765,7 +1825,7 @@ public abstract class XmlUtil {
             Object o = children.item(i);
             if (o instanceof Element) {
                 Element e = (Element) o;
-                if (e.getTagName().equals(tagName)) {
+                if (isTag(e, tagName)) {
                     return e;
                 }
             }
@@ -2182,14 +2242,14 @@ public abstract class XmlUtil {
                                       String attributeName,
                                       String attributeValue) {
         if (tag != null) {
-            if (root.getTagName().equals(tag)) {}
+            if (isTag(root, tag)) {}
         }
 
         NodeList elements = getElements(root);
         //First try breadth first
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if ((tag == null) || child.getTagName().equals(tag)) {
+            if ((tag == null) || isTag(child, tag)) {
                 String attr = child.getAttribute(attributeName);
                 if (attr != null) {
                     if (attr.equals(attributeValue)) {
@@ -2461,4 +2521,3 @@ public abstract class XmlUtil {
 
 
 }
-
