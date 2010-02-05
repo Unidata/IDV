@@ -2714,8 +2714,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                 "Unknown request" + " \"" + path + "\"");
             Result result =
                 new Result(msg("Error"),
-                           new StringBuffer(msgLabel("Unknown request")
-                                            + "\"" + path + "\""));
+                           new StringBuffer(showDialogError(msgLabel("Unknown request")
+                                                            + "\"" + path + "\"")));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
             return result;
         }
@@ -2788,7 +2788,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             + request.getIp());
         Result result =
             new Result(msg("Error"),
-                       new StringBuffer(msgLabel("Unknown request") + path));
+                       new StringBuffer(showDialogError(msgLabel("Unknown request") + path)));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
         return result;
     }
