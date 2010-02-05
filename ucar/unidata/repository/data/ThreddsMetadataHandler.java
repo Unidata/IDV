@@ -389,6 +389,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 getDataOutputHandler();
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);
+
+
             if ( !dataOutputHandler.canLoadAsCdm(entry)) {
                 return;
             }

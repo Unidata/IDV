@@ -12,8 +12,8 @@
   <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
-     <property name="form.show.area" value="false"/>
      <property name="form.show.file" value="false"/>
+     <property name="form.show.datatype" value="false"/>
   </type>
 
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler" category="Geo Data">

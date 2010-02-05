@@ -764,6 +764,12 @@ public class DataOutputHandler extends OutputHandler {
      * @return Can the given entry be served by the tds
      */
     public boolean canLoadAsCdm(Entry entry) {
+        if (entry.getType().equals(
+                                   OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+            return true;
+        }
+
+
         if ( !entry.getType().equals(
                 OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             if ( !entry.isFile()) {
