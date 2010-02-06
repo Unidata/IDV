@@ -983,6 +983,7 @@ public class TypeHandler extends RepositoryManager {
         String size     =  " (" + formatFileLength(entry.getResource().getFileSize()) +")";
 
         String fileTail = getStorageManager().getFileTail(entry);
+        fileTail = fileTail.replace("?","_");
         return new Link(getEntryManager().getEntryResourceUrl(request,
                 entry), getRepository().iconUrl(ICON_FETCH),
                         "Download file" + size, OutputType.TYPE_FILE);

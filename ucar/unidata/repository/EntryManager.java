@@ -552,6 +552,8 @@ return new Result(title, sb);
         Result result = null;
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
+
+        /* Don't do this for now
         if (outputHandler.getMaxConnections() > 0) {
             if (outputHandler.getNumberOfConnections()
                     >= outputHandler.getMaxConnections()) {
@@ -561,7 +563,7 @@ return new Result(title, sb);
                     new StringBuffer(
                         "Unable to process request at this time"));
             }
-        }
+            }*/
         outputHandler.incrNumberOfConnections();
         OutputType outputType = request.getOutput();
         outputType.incrNumberOfCalls();
@@ -5244,6 +5246,7 @@ return new Result(title, sb);
     public String getEntryResourceUrl(Request request, Entry entry,
                                       boolean full) {
         String fileTail = getStorageManager().getFileTail(entry);
+        fileTail = fileTail.replace("?","_");
         if (full) {
             return HtmlUtil.url(getRepository().URL_ENTRY_GET.getFullUrl()
                                 + "/" + fileTail, ARG_ENTRYID, entry.getId());
