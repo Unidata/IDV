@@ -5246,7 +5246,7 @@ return new Result(title, sb);
     public String getEntryResourceUrl(Request request, Entry entry,
                                       boolean full) {
         String fileTail = getStorageManager().getFileTail(entry);
-        fileTail = fileTail.replace("?","_");
+        fileTail = HtmlUtil.urlEncodeExceptSpace(fileTail);
         if (full) {
             return HtmlUtil.url(getRepository().URL_ENTRY_GET.getFullUrl()
                                 + "/" + fileTail, ARG_ENTRYID, entry.getId());

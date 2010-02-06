@@ -983,7 +983,7 @@ public class TypeHandler extends RepositoryManager {
         String size     =  " (" + formatFileLength(entry.getResource().getFileSize()) +")";
 
         String fileTail = getStorageManager().getFileTail(entry);
-        fileTail = fileTail.replace("?","_");
+        fileTail = HtmlUtil.urlEncodeExceptSpace(fileTail);
         return new Link(getEntryManager().getEntryResourceUrl(request,
                 entry), getRepository().iconUrl(ICON_FETCH),
                         "Download file" + size, OutputType.TYPE_FILE);
@@ -1067,7 +1067,7 @@ public class TypeHandler extends RepositoryManager {
                 } else if (entry.getResource().isFile()) {
                     resourceLink =
                         getStorageManager().getFileTail(resourceLink);
-                    resourceLink = resourceLink.replace("?","_");
+                    resourceLink = HtmlUtil.urlEncodeExceptSpace(resourceLink);
                     if (getAccessManager().canDownload(request, entry)) {
                         resourceLink =
                             HtmlUtil.href(getEntryResourceUrl(request,
