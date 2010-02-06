@@ -1066,6 +1066,7 @@ public class TypeHandler extends RepositoryManager {
                 } else if (entry.getResource().isFile()) {
                     resourceLink =
                         getStorageManager().getFileTail(resourceLink);
+                    resourceLink = resourceLink.replace("?","_");
                     if (getAccessManager().canDownload(request, entry)) {
                         resourceLink =
                             HtmlUtil.href(getEntryResourceUrl(request,
