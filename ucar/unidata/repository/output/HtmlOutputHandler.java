@@ -780,6 +780,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         if (outputType.equals(OUTPUT_INLINE)) {
+            /*
             String wikiTemplate = getWikiText(request, group);
             if (wikiTemplate != null) {
                 String wiki = wikifyEntry(request, group, wikiTemplate, true, subGroups,
@@ -790,7 +791,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                     "<div class=inline>" +wiki+"</div>");
                 xml.append("\n</content>");
                 return new Result("", xml, "text/xml");
-            }
+                }*/
 
             return getChildrenXml(request, group, subGroups, entries);
         }
