@@ -887,10 +887,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         sdf = RepositoryUtil.makeDateFormat(getProperty(PROP_DATEFORMAT,
                 DEFAULT_TIME_FORMAT));
         defaultTimeZone = TimeZone.getDefault();
-        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
+        TimeZone.setDefault(RepositoryUtil.TIMEZONE_DEFAULT);
 
-
-        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
 
         //This will end up being from the properties
@@ -2482,10 +2480,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 request.setSessionId(getSessionManager().getSessionId());
             }
             String sessionId = request.getSessionId();
-            //            result.addCookie("repositorysession", sessionId+"; path=" + getUrlBase() + "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
             result.addCookie(SessionManager.COOKIE_NAME,
                              sessionId + "; path=" + getUrlBase()
-                             + "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
+                             + "; expires=Fri, 31-Dec-2011 23:59:59 GMT;");
         }
 
         if (request.get("gc", false) && (request.getUser() != null)
@@ -2589,7 +2586,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         //        System.err.println("sslEnabled:" +sslEnabled + "  " + apiMethod.getNeedsSsl());
         Result sslRedirect = checkForSslRedirect(request, apiMethod);
         if (sslRedirect != null) {
-            System.err.println("ssl redirect");
             return sslRedirect;
         }
         //        System.out.println(absoluteUrl(request.getUrl()));
@@ -4617,7 +4613,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public void createMonthNav(StringBuffer sb, Date date, String url,
                                Hashtable dayLinks) {
 
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(date);
         int[] theDate  = CalendarOutputHandler.getDayMonthYear(cal);
         int   theDay   = cal.get(cal.DAY_OF_MONTH);
@@ -4626,10 +4622,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         while (cal.get(cal.DAY_OF_MONTH) > 1) {
             cal.add(cal.DAY_OF_MONTH, -1);
         }
-        GregorianCalendar prev = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar prev = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         prev.setTime(date);
         prev.add(cal.MONTH, -1);
-        GregorianCalendar next = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar next = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         next.setTime(date);
         next.add(cal.MONTH, 1);
 

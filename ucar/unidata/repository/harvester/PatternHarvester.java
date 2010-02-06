@@ -344,7 +344,7 @@ public class PatternHarvester extends Harvester {
                 sdf.add(new SimpleDateFormat("yyyyMMdd_HHmm"));
             }
             for (SimpleDateFormat format : sdf) {
-                format.setTimeZone(DateUtil.TIMEZONE_GMT);
+                format.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
             }
         }
         return sdf;

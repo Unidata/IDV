@@ -187,13 +187,13 @@ public class CalendarOutputHandler extends OutputHandler {
         Hashtable        contents = new Hashtable();
 
         SimpleDateFormat sdf      = new SimpleDateFormat();
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         sdf.applyPattern("yyyy/MM/dd");
         SimpleDateFormat timeSdf = new SimpleDateFormat();
-        timeSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        timeSdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         timeSdf.applyPattern("HH:mm");
         SimpleDateFormat monthSdf = new SimpleDateFormat();
-        monthSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        monthSdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         monthSdf.applyPattern("MM");
         StringBuffer header = new StringBuffer();
         header.append(HtmlUtil.cols(HtmlUtil.bold(msg("Date"))));
@@ -280,7 +280,7 @@ public class CalendarOutputHandler extends OutputHandler {
      */
     public static GregorianCalendar getCalendar(int day, int month,
             int year) {
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.set(cal.DAY_OF_MONTH, day);
         cal.set(cal.MONTH, month);
         cal.set(cal.YEAR, year);
@@ -385,7 +385,7 @@ public class CalendarOutputHandler extends OutputHandler {
                               || request.defined(ARG_DAY);
 
         int[] today =
-            getDayMonthYear(new GregorianCalendar(DateUtil.TIMEZONE_GMT));
+            getDayMonthYear(new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT));
 
         int[] selected = new int[] { request.get(ARG_DAY, today[IDX_DAY]),
                                      request.get(ARG_MONTH, today[IDX_MONTH]),
@@ -422,7 +422,7 @@ public class CalendarOutputHandler extends OutputHandler {
         Hashtable               dates    = new Hashtable();
         Hashtable<String, List> map      = new Hashtable<String, List>();
         GregorianCalendar mapCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         boolean didone = false;
         for (int tries = 0; tries < 2; tries++) {
             dayItems = new ArrayList();
@@ -714,7 +714,7 @@ public class CalendarOutputHandler extends OutputHandler {
                               || request.defined(ARG_DAY);
 
         int[] today =
-            getDayMonthYear(new GregorianCalendar(DateUtil.TIMEZONE_GMT));
+            getDayMonthYear(new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT));
 
         int[] selected = new int[] { request.get(ARG_DAY, today[IDX_DAY]),
                                      request.get(ARG_MONTH, today[IDX_MONTH]),
@@ -751,7 +751,7 @@ public class CalendarOutputHandler extends OutputHandler {
         Hashtable               dates    = new Hashtable();
         Hashtable<String, List> map      = new Hashtable<String, List>();
         GregorianCalendar mapCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         boolean didone = false;
         for (int tries = 0; tries < 2; tries++) {
             dayItems = new ArrayList();

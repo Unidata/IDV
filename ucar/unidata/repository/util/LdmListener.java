@@ -143,11 +143,11 @@ public class LdmListener {
         InputStreamReader sr = new InputStreamReader(System.in);
         br      = new BufferedReader(sr);
         yearSdf = new SimpleDateFormat();
-        yearSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        yearSdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         yearSdf.applyPattern("yyyy");
 
         monthSdf = new SimpleDateFormat();
-        monthSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        monthSdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         monthSdf.applyPattern("MM");
         startTime = System.currentTimeMillis();
         Misc.run(new Runnable() {

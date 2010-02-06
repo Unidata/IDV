@@ -764,7 +764,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         int                  cnt      = 0;
         int                  batchCnt = 0;
         GregorianCalendar calendar =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         boolean   didone     = false;
 
         Hashtable properties = getProperties(entry);
@@ -1567,7 +1567,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         }
 
 
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
 
         int               row = -1;
 
@@ -2149,7 +2149,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
         String           dateFormat  = "yyyy/MM/dd HH:mm:ss Z";
         SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         StringBuffer sb    = new StringBuffer();
         String       comma = ", ";
         List         rows  = new ArrayList();
@@ -2234,7 +2234,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
         String           dateFormat  = "yyyy/MM/dd HH:mm:ss Z";
         SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
         StringBuffer sb    = new StringBuffer();
         String       comma = ", ";
         List         rows  = new ArrayList();

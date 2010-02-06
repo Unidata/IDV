@@ -1704,13 +1704,6 @@ public class UserManager extends RepositoryManager {
         List labels = new ArrayList();
         List tips   = new ArrayList();
 
-        extras.add("");
-        urls.add(request.url(getRepositoryBase().URL_USER_CART));
-        //        labels.add(HtmlUtil.img(getRepository().iconUrl(ICON_CART),
-        //                                msg("Data Cart")));
-        labels.add(msg("Data Cart"));
-        tips.add(msg("View data cart"));
-
         if (user.getAnonymous()) {
             request.remove(ARG_MESSAGE);
             request.remove(ARG_REDIRECT);
@@ -1722,6 +1715,16 @@ public class UserManager extends RepositoryManager {
                                  ARG_REDIRECT, redirect));
             labels.add(msg("Login"));
             tips.add(msg("Login"));
+
+
+        extras.add("");
+        urls.add(request.url(getRepositoryBase().URL_USER_CART));
+        //        labels.add(HtmlUtil.img(getRepository().iconUrl(ICON_CART),
+        //                                msg("Data Cart")));
+        labels.add(msg("Data Cart"));
+        tips.add(msg("View data cart"));
+
+
         } else {
             extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_LOGOUT));
@@ -1733,6 +1736,12 @@ public class UserManager extends RepositoryManager {
             labels.add(label);
             tips.add(msg("Go to user settings"));
         }
+
+
+
+
+
+
 
         urls.add(request.url(getRepositoryBase().URL_HELP));
         extras.add("");

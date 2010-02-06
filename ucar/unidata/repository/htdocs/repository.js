@@ -713,6 +713,8 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     this.onColor = "#FFFFCC";
     this.overColor = "#f6f6f6";
     this.overColor = "#edf5ff";
+    this.overColor = "#ffffee";
+    this.overColor = "#f4f4f4";
     this.rowId = rowId;
     this.cbxId = cbxId;
     this.cbxWrapperId = cbxWrapperId;

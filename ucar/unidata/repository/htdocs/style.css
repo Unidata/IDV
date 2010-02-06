@@ -728,9 +728,10 @@ ul {
    padding:2px;
    padding-bottom:0px;
    padding-right:0px;
-   border : 1px dotted #ccc;
-//   background-color : #FFFFCC;
-   background-color : #edf5ff;
+//   border : 1px dotted #ccc;
+//   border-top : 0px dotted #ccc;
+   background-color : #f6f6f6;
+//   background-color : #edf5ff;
 
    margin:0px;
 }

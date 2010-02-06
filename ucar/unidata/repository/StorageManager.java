@@ -63,8 +63,6 @@ import java.net.*;
 
 
 
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -887,7 +885,7 @@ public class StorageManager extends RepositoryManager {
             targetName  = original.getName();
         }
         String            storageDir = getStorageDir();
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(new Date());
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
         IOUtil.makeDir(storageDir);
@@ -984,7 +982,7 @@ public class StorageManager extends RepositoryManager {
         String            targetName = newName;
         String            storageDir = getStorageDir();
 
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(new Date());
 
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));

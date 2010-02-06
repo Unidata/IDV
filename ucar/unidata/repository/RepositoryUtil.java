@@ -47,7 +47,7 @@ import java.util.TimeZone;
 public class RepositoryUtil {
 
     /** timezone */
-    public static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+    public static final TimeZone TIMEZONE_DEFAULT = TimeZone.getTimeZone("UTC");
 
 
     /**
@@ -87,7 +87,7 @@ public class RepositoryUtil {
      */
     public static SimpleDateFormat makeDateFormat(String formatString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat();
-        dateFormat.setTimeZone(TIMEZONE_GMT);
+        dateFormat.setTimeZone(TIMEZONE_DEFAULT);
         dateFormat.applyPattern(formatString);
         return dateFormat;
     }

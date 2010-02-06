@@ -71,7 +71,6 @@ import javax.servlet.http.*;
  */
 public class RepositoryServlet extends HttpServlet implements Constants {
 
-    //                                   "Tue, 20 Jan 2009 01:45:54 GMT");
 
     /** _more_ */
     private SimpleDateFormat sdf =
@@ -333,7 +332,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                                        "Tue, 08 Jan 2019 07:41:19 GMT");
                     if (lastModified == null) {
                         response.setHeader("Last-Modified",
-                                           "Tue, 20 Jan 2009 01:45:54 GMT");
+                                           "Tue, 20 Jan 2010 01:45:54 GMT");
                     }
                 }
 

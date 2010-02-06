@@ -2035,7 +2035,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             String link = getEntriesList(request, sb, children, true, true,
                                          true, false);
             blockContent = sb.toString();
-            blockTitle = Misc.getProperty(props, "title", msg("Children"))
+            blockTitle = Misc.getProperty(props, "title", msg("Links"))
                          + link;
         } else {
             return null;

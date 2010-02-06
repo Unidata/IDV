@@ -1450,15 +1450,15 @@ return new Result(title, sb);
     public String replaceMacros(String template, Date createDate,
                                 Date fromDate, Date toDate) {
         GregorianCalendar fromCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         fromCal.setTime(fromDate);
 
         GregorianCalendar createCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         createCal.setTime(createDate);
 
         GregorianCalendar toCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         toCal.setTime(toDate);
 
 

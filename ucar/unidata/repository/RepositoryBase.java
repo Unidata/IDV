@@ -302,7 +302,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public static final GregorianCalendar calendar =
-        new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        new GregorianCalendar(DateUtil.TIMEZONE_UTC);
 
 
     /** _more_ */
@@ -436,7 +436,7 @@ public class RepositoryBase implements Constants, RepositorySource {
             sdf = new SimpleDateFormat();
             sdf.applyPattern(format);
             if (timezone == null) {
-                sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+                sdf.setTimeZone(DateUtil.TIMEZONE_UTC);
             } else {
                 if ((defaultTimeZone != null)
                         && (timezone.equals("")
