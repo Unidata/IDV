@@ -87,6 +87,8 @@ public class DateUtil {
     /** timezone */
     public static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
+    public static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+
 
     /** a set of regular expressions that go along with the below DATE_FORMATS */
     public static final String[] DATE_PATTERNS = { "(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)",
