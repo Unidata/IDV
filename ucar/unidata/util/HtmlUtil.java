@@ -3181,6 +3181,20 @@ public class HtmlUtil {
 
 
 
+    public static String urlEncodeExceptSpace(String s) {
+        try {
+            s = s.replace(" ","_SPACE_");
+            s =  java.net.URLEncoder.encode(s, "UTF-8");
+            s = s.replace("_SPACE_"," ");
+            return s;
+        } catch (Exception exc) {
+            System.err.println("error encoding arg:" + s + " " + exc);
+            return "";
+        }
+    }
+
+
+
     /**
      * _more_
      *
