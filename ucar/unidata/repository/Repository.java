@@ -475,6 +475,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
     ArrayList<ApiMethod> topLevelMethods = new ArrayList();
 
 
+    /** _more_ */
+    private Hashtable<String,String> pluginHtdocsMap = new Hashtable<String,String>();
+
+    /** _more_ */
+    private Hashtable<String,String>  pluginHelpMap = new Hashtable<String,String>();
+    private List<String>  pluginHelpPaths = new ArrayList<String>();
+
+    private String pluginHelpToc;
+
 
     /**
      * _more_
@@ -848,6 +857,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getStorageManager().getLogDir();
 
         initPlugins();
+        makePluginHelp();
 
         for (String f : pluginPropertyFiles) {
             load(properties, f);
@@ -1626,7 +1636,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
          *
          * @return _more_
          */
-        protected String defineResource(JarEntry jarEntry) {
+        protected String defineResource(JarEntry jarEntry)  {
             String path = super.defineResource(jarEntry);
             checkFile(path, true);
             String entryName = jarEntry.getName();
@@ -1638,10 +1648,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
                 idx = entryName.indexOf("help/");
                 if(idx>=0) {
-                    System.err.println(htpath +"=" + path);
                     pluginHelpMap.put(htpath,
                                       path); 
-
+                    if(path.indexOf(".html")>=0) {
+                        pluginHelpPaths.add(htpath);
+                    }
                 }
             }
             return path;
@@ -1650,10 +1661,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    private Hashtable<String,String>  pluginHelpMap = new Hashtable<String,String>();
-
-
-    private Hashtable<String,String> pluginHtdocsMap = new Hashtable<String,String>();
 
     /**
      * _more_
@@ -2699,7 +2706,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
-        //        System.err.println("path:" + path);
         if ( !path.startsWith(getUrlBase())) {
 	    path = getUrlBase()+path;
 	}
@@ -4170,10 +4176,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             path = "/index.html";
         }
 
-        System.err.println("path:" + path);
         String pluginHelp = pluginHelpMap.get(path);
         if(pluginHelp!=null) {
-            System.err.println ("got help from plugin");
             path  = pluginHelp;
         } else {
             path = "/ucar/unidata/repository/docs/userguide/processed" + path;
@@ -4181,14 +4185,25 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Result result = null;
         if (path.endsWith(".html")) {
             String helpText = getStorageManager().readSystemResource(path);
-            //            Pattern pattern  = Pattern.compile(".*<body>(.*)</body>.*");
-
             //Pull out the body if we can
             Pattern pattern = Pattern.compile("(?s).*<body>(.*)</body>");
             Matcher matcher = pattern.matcher(helpText);
             if (matcher.find()) {
                 helpText = matcher.group(1);
             }
+            if (path.endsWith("toc.html")) {
+                if(pluginHelpToc == null) {
+                    makePluginHelp();
+                }
+                helpText = helpText.replace("<tocend>",pluginHelpToc);
+                //                helpText = helpText+pluginHelpToc;
+            }
+
+            if(pluginHelp!=null) {
+                helpText = HtmlUtil.href(getUrlBase()+"/help/toc.html",HtmlUtil.img(getUrlBase()+"/help/images/TOCIcon.gif")) +"<br>" + HtmlUtil.img(getUrlBase()+"/help/images/blueline.gif") +
+                    "<p>" + helpText;
+            }
+
             result = new Result(BLANK, new StringBuffer(helpText));
         } else {
             InputStream inputStream =
@@ -4199,6 +4214,38 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         result.setCacheOk(true);
         return result;
+    }
+
+
+    private void makePluginHelp() {
+        StringBuffer  pluginHelpLinks=null;
+        for(String htpath: pluginHelpPaths) {
+            String path = pluginHelpMap.get(htpath);
+            String title = IOUtil.getFileTail(path);
+            try {
+                String contents = getStorageManager().readSystemResource(path);
+                Pattern pattern = Pattern.compile("(?s).*<title>(.*)</title>");
+                Matcher matcher = pattern.matcher(contents);
+                if (matcher.find()) {
+                    title = matcher.group(1);
+                }
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+                        
+            if(pluginHelpLinks ==null) {
+                pluginHelpLinks = new StringBuffer("<p>");
+                pluginHelpLinks.append(msgHeader("Plugins"));
+                pluginHelpLinks.append("<ol>");
+            }
+            pluginHelpLinks.append("<li> " +HtmlUtil.href(getUrlBase()+"/help"+htpath,title));
+        }
+
+        if(pluginHelpLinks == null) {
+            pluginHelpToc = "";
+        } else {
+            pluginHelpToc = pluginHelpLinks +"</ol>";
+        }
     }
 
 

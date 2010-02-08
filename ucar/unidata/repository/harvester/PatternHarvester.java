@@ -307,9 +307,10 @@ public class PatternHarvester extends Harvester {
                                          dateFormat, HtmlUtil.SIZE_60)));
 
 
+        String moveNote = msg("Note: this will move the files from their current location to RAMADDA's own storage directory");
         sb.append(HtmlUtil.formEntry(msgLabel("Move file to storage"),
                                      HtmlUtil.checkbox(ATTR_MOVETOSTORAGE,
-                                         "true", moveToStorage)));
+                                                       "true", moveToStorage)+HtmlUtil.space(1) + moveNote));
 
 
         sb.append(

@@ -635,6 +635,9 @@ ul {
    border-top : 1px #000000 solid;
    margin:0px;
    padding:0px;
+
+
+
 }
 
 .tab_contents_noborder {
@@ -748,6 +751,9 @@ ul {
    position: absolute; 
    visibility: hidden; 
    z-index: 1;
+
+
+
 }
 
 
