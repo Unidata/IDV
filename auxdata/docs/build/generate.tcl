@@ -970,7 +970,7 @@ proc   schedule {day from to args} {
 
 
 
-proc gen::getToc {path} {
+proc gen::getToc {path isTop} {
     if {![gen::getIncludeInToc $path]} {return [list "" "" ""]}
     set aname "<a name=\"$path\"></a>"
     set toc "$aname <b>[gen::getLevelLabel $path]</b> <a href=\"$path\">[gen::getTitle $path]</a><br>\n" 
@@ -978,7 +978,7 @@ proc gen::getToc {path} {
     set frametoc "<tr><td class=\"framenav\"  nowrap>[gen::getNbsp $path]<a href=\"$path\" target=\"right\" style=\"font-size:9pt;\">[gen::getTitle $path]</a></td></tr>\n"
     set didone 0
     foreach child [gen::getChildren $path] {
-        foreach {childToc childFullToc  childFrameToc} [gen::getToc $child] break
+        foreach {childToc childFullToc  childFrameToc} [gen::getToc $child 0] break
         if {$childToc == ""} {continue}
         if {!$didone} {
             append toc "<ul>\n"
@@ -989,10 +989,17 @@ proc gen::getToc {path} {
         append fulltoc $childFullToc
         append frametoc $childFrameToc
     }
+
+
     if {$didone} { 
         append toc "</ul>\n"
         append fulltoc "</ul>\n"
     }
+    if {$isTop} {
+          append toc "\n<tocend>"
+     }
+
+
     list $toc $fulltoc $frametoc
 }
 
@@ -2666,7 +2673,7 @@ proc gen::writeFiles  {} {
 
 
 
-    foreach {toc fulltoc  frametoc} [gen::getToc [gen::getTopFile]] break
+    foreach {toc fulltoc  frametoc} [gen::getToc [gen::getTopFile] 1] break
     gen::createGeneralFile [file join [gen::getTargetDir] toc.html] "Table of Contents" $toc
     gen::createGeneralFile [file join [gen::getTargetDir] fulltoc.html] "Full Table of Contents" $fulltoc
 
