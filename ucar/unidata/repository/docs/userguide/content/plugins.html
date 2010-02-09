@@ -6,6 +6,43 @@
 
 <body>
 
+RAMADDA has a plugin facility that enables one to add new kinds of entry types, new content views, etc. In the RAMADDA home directory there is a &quot;plugins&quot; sub-directory. When RAMADDA starts up it loads all of the files in the plugins directory. 
+<p>
+There is a listing of available plugins at:
+<a href="http://motherlode.ucar.edu/repository/alias/ramaddaplugins">http://motherlode.ucar.edu/repository/alias/ramaddaplugins</a>. To install a plugin just download the file and copy it to the RAMADDA home directory <i>plugins</i> directory.
+
+
+<h3>How plugins work</h3>
+RAMADDA determines what to do with a plugin file by looking at its file name. If the file is a jar file it will crack open the jar file and look at each contained file. It handles the files in the following way:
+<ul>
+<li> <i>.properties</i><br>
+Any &quot;.properties&quot; files are loaded as  system properties.
+
+<li> <i>.class</i><br> 
+Any .class file is loaded via a classloader. Some classes are special:
+<ul>
+<li>
+ If the class is an instanceof a ucar.unidata.repository.auth.UserAuthenticator then the class is instantiated and it is used to handle user login and authentication.
+<li> If the class is an instanceof ucar.unidata.repository.AdminHandler then the class is instantiated. You can use this to add new apis into the repository and to add admin configuration options. Note: this is a work in progress.
+</ul>
+
+<li><i>api.xml</i><br>
+If the file ends with &quot;api.xml&quot; then it defines new web application apis. 
+<li><i>types.xml</i><br>
+If the file ends with &quot;types.xml&quot; it defines new repository entry types.
+<li><i>outputhandlers.xml</i><br>
+If the file ends with &quot;outputhandlers.xml&quot; it defines new output handlers.
+<li><i>metadata.xml</i><br>
+If the file ends with &quot;metadata.xml&quot; it defines new metadata types.
+<li><i>.py</i><br>
+If the file ends with &quot;.py&quot; then it defines new jython routines that are loaded into any jython interpreter (e.g., used by the repository script entry type).
+<li><i>.sql</i><br> 
+If the file ends with &quot;.sql&quot; then the file is evaluated at startup to define new database schemas.
+
+</ul>
+
+
+
 
 
 </body>

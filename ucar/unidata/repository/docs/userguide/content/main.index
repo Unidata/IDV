@@ -35,8 +35,14 @@ index.html
 >>backups.html
 >>harvesters.html
 >>remoteservers.html
->>publishapi.html
->>misc.html
+
+>title:For Developers:These pages are intended for developers who want to add new functionality to RAMADDA
+>>developer/build.html
+>>developer/api.html
+>>developer/publishapi.html
+
+
+
 
 >credits.html
 >license.html

@@ -1,0 +1,38 @@
+<html>
+<head>
+  <title>RAMADDA Web API</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+The API into RAMADDA is declaratively defined with one or more
+api.xml files:
+[importxml developer/api.xml]
+
+This file can be organized as a set of group tags that define
+a <i>handler</i> and contain a set of <i>api</i>. The api tag
+can also define a handler. The handlers are one of: 
+usermanager, admin, harvestermanager, actionmanager, accessmanager, metadatamanager, repository.
+<p>
+External classes can be used as handlers by providing the full
+class name. These handlers need to implement [class RequestHandler]
+and need to have a public constructor that takes as argument the
+Repository object and the xml api Element.
+<p>
+The api tag contains a <i>path</i> attribute which is used the 
+the url path. e.g., the main way to view an entry is the &quot;/entry/show&quot; path. The url ends up looking like:<br> 
+&lt;repository suffix&gt;/entry/show?id=&lt;entry id&gt;
+</br>
+The <i>method</i> attribute is the method name on the handler that is called.
+These methods have the signature:
+<pre>
+public Result processEntryShow(Request request) throws Exception {
+    ...
+}</pre>
+
+They take a [class Request] object and return a [class Result] object.
+
+
+
+
+</body>
