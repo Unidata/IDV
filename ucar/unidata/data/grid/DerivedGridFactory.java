@@ -2483,7 +2483,11 @@ public class DerivedGridFactory {
         return GridUtil.getParam(vector, index, copy);
     }
 
-    public static FieldImpl smooth5Point(FieldImpl slice) throws VisADException, RemoteException {
+    public static final String SMOOTH_5POINT = "SM5S";
+    public static final String SMOOTH_9POINT = "SM9S";
+    public static final String SMOOTH_GAUSS  = "GWFS";
+
+    public static FieldImpl smooth(FieldImpl slice, String type) throws VisADException, RemoteException {
         if (GridUtil.isVolume(slice)) {
            throw new VisADException("Grid must be a 2D slice");
         }
@@ -2498,9 +2502,15 @@ public class DerivedGridFactory {
 
             // compute each divFlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
-                FlatField smoothedFF =
-                    smooth5PointSlice((FlatField) slice.getSample(i,
+                FlatField smoothedFF = null;
+                if (type.equals(SMOOTH_5POINT)) {
+                    smoothedFF = smooth5PointSlice((FlatField) slice.getSample(i,
                         false));
+                } else if (type.equals(SMOOTH_9POINT)) {
+                    smoothedFF = smooth9PointSlice((FlatField) slice.getSample(i,
+                        false));
+                } else {
+                }
 
                 if ((smoothedFI == null) && (smoothedFF != null)) {
                     FunctionType smoothedFT =
@@ -2514,7 +2524,13 @@ public class DerivedGridFactory {
                 }
             }
         } else {
-            smoothedFI = (FieldImpl) smooth5PointSlice((FlatField) slice);
+            if (type.equals(SMOOTH_5POINT)) {
+                smoothedFI = (FieldImpl) smooth5PointSlice((FlatField) slice);
+            } else if (type.equals(SMOOTH_9POINT)) {
+                smoothedFI = (FieldImpl) smooth9PointSlice((FlatField) slice);
+            } else {
+            }
+
         }
         return smoothedFI;
     }
@@ -2523,13 +2539,13 @@ public class DerivedGridFactory {
     int jgymin, jgymax, jgxmin, jgxmax, kxd;
     int ii, ip1, im1, jp1, jm1, ier, zero;
     float wt, wt4, dip1, dim1, djp1, djm1, dsum, wsum;
-/*----------------------------------------------------------------------*/
 
     /*
      * Set filter weight.
      */
     wt = .125f;
     wt4 = 4.f * wt;
+
     FlatField newField = null;
     float[][] samples = slice.getFloats(false);
     GriddedSet domain = (GriddedSet) GridUtil.getSpatialDomain(slice);
@@ -2607,5 +2623,194 @@ public class DerivedGridFactory {
 
     return newField;
     }
+
+    private static FlatField smooth9PointSlice(FlatField slice) throws VisADException, RemoteException {
+
+    int ni, no, jgymin, jgymax, jgxmin, jgxmax, kxd, kyd, ksub1, ksub2;
+    int i, j, ii, ip1, im1, jp1, jm1, imjm, ipjm, imjp, ipjp, ier, zero;
+    float dsum, wsum, wt, wtc, wt4;
+    float dip1, dim1, djp1, djm1, dimjm, dipjm, dimjp, dipjp;
+
+    /*
+     * Set filter weight for Diamond points weight
+     */
+    wt = 2.0f;
+
+    /*
+     * Corner points weight
+     */
+    wtc = 1.0f;
+
+    /*
+     * Center point weight
+     */
+    wt4 = 4.0f;
+
+    FlatField newField = null;
+    float[][] samples = slice.getFloats(false);
+    GriddedSet domain = (GriddedSet) GridUtil.getSpatialDomain(slice);
+    int[] lengths = domain.getLengths();
+    jgxmin = 1;
+    jgxmax = lengths[0];
+    kxd = jgxmax;
+    jgymin = 1;
+    jgymax = lengths[1];
+    float[] gni = samples[0];
+    float[] gno = new float[gni.length];
+
+    for ( j = jgymin; j <= jgymax; j++ ) {
+        for ( i = jgxmin; i <= jgxmax; i++ ) {
+            ii = ( j - 1 ) * kxd + i;
+            if ( Float.isNaN ( gni[ii-1] ) ) {
+                /*
+                 * Check for missing data.
+                 */
+                gno[ii-1] = Float.NaN;
+            } else {
+                ip1 = ii + 1;
+                if ( i+1 > jgxmax ) {
+                    dip1 = Float.NaN;
+                } else {
+                    dip1 = gni[ip1-1];
+                }
+
+                im1 = ii - 1;
+                if ( i-1 < jgxmin ) {
+                    dim1 = Float.NaN;
+                } else {
+                    dim1 = gni[im1-1];
+                }
+
+                jp1 = ii + kxd;
+                if ( j+1 > jgymax ) {
+                    djp1 = Float.NaN;
+                } else {
+                    djp1 = gni[jp1-1];
+                }
+
+                jm1 = ii - kxd;
+                if ( j-1 < jgymin ) {
+                    djm1 = Float.NaN;
+                } else {
+                    djm1 = gni[jm1-1];
+                }
+
+                imjm = jm1 - 1;
+                if ( ( j-1 < jgymin ) || ( i-1 < jgxmin ) ) {
+                    dimjm = Float.NaN;
+                } else {
+                    dimjm = gni[imjm-1];
+                }
+
+                ipjm = jm1 + 1;
+                if ( ( j-1 < jgymin ) || ( i+1 > jgxmax ) ) {
+                    dipjm = Float.NaN;
+                } else {
+                    dipjm = gni[ipjm-1];
+                }
+
+                imjp = jp1 - 1;
+                if ( ( j+1 > jgymax ) || ( i-1 < jgxmin ) ) {
+                    dimjp = Float.NaN;
+                } else {
+                    dimjp = gni[imjp-1];
+                }
+
+                ipjp = jp1 + 1;
+                if ( ( j+1 > jgymax ) || ( i+1 > jgxmax ) ) {
+                    dipjp = Float.NaN;
+                } else {
+                    dipjp = gni[ipjp-1];
+                }
+
+                dsum = gni[ii-1] * wt4;
+                wsum = wt4;
+                if ( ! Float.isNaN ( dip1 ) ) {
+                    dsum += dip1 * wt;
+                    wsum += wt;
+                } else {
+                    dsum += gni[ii-1] * wt;
+                    wsum += wt;
+                }
+
+                if ( ! Float.isNaN ( dim1 ) ) {
+                    dsum += dim1 * wt;
+                    wsum += wt;
+                } else {
+                    dsum += gni[ii-1] * wt;
+                    wsum += wt;
+                }
+
+                if ( ! Float.isNaN ( djp1 ) ) {
+                    dsum += djp1 * wt;
+                    wsum += wt;
+                } else {
+                    dsum += gni[ii-1] * wt;
+                    wsum += wt;
+                }
+
+                if ( ! Float.isNaN ( djm1 ) ) {
+                    dsum += djm1 * wt;
+                    wsum += wt;
+                } else {
+                    dsum += gni[ii-1] * wt;
+                    wsum += wt;
+                }
+
+                if ( ! Float.isNaN ( dimjm ) ) {
+                    dsum += dimjm * wtc;
+                    wsum += wtc;
+                } else {
+                    dsum += gni[ii-1] * wtc;
+                    wsum += wtc;
+                }
+
+                if ( ! Float.isNaN ( dipjm ) ) {
+                    dsum += dipjm * wtc;
+                    wsum += wtc;
+                } else {
+                    dsum += gni[ii-1] * wtc;
+                    wsum += wtc;
+                }
+
+                if ( ! Float.isNaN ( dimjp ) ) {
+                    dsum += dimjp * wtc;
+                    wsum += wtc;
+                } else {
+                    dsum += gni[ii-1] * wtc;
+                    wsum += wtc;
+                }
+
+                if ( ! Float.isNaN ( dipjp ) ) {
+                    dsum += dipjp * wtc;
+                    wsum += wtc;
+                } else {
+                    dsum += gni[ii-1] * wtc;
+                    wsum += wtc;
+                }
+
+                gno[ii-1] = dsum/wsum ;
+            }
+        }
+    }
+
+    RealType rt = (RealType)  GridUtil.getParamType(slice).getComponent(0);
+    rt = Util.makeRealType(Util.cleanTypeName(rt.getName())+"_SM9S", rt.getDefaultUnit());
+    newField = (FlatField) GridUtil.setParamType(slice, rt, true);
+    newField.setSamples(new float[][] {gno}, false);
+
+    return newField;
+    }
+
+    /*
+    private static FlatField smoothGaussianSlice(FlatField slice) throws VisADException, RemoteException {
+    RealType rt = (RealType)  GridUtil.getParamType(slice).getComponent(0);
+    rt = Util.makeRealType(Util.cleanTypeName(rt.getName())+"_SM5S", rt.getDefaultUnit());
+    newField = (FlatField) GridUtil.setParamType(slice, rt, true);
+    newField.setSamples(new float[][] {gno}, false);
+
+    return newField;
+    }
+    */
 }
 
