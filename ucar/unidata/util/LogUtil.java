@@ -1159,6 +1159,24 @@ public class LogUtil {
         }
     }
 
+
+
+    /**
+     * Show the given label in an error dialog. If for some reason we are in no gui mode then just print out the text of the label
+     *
+     * @param label label
+     */
+    public static void userErrorMessage(JLabel label) {
+        if (showGui()) {
+            GuiUtils.addModalDialogComponent(label);
+            javax.swing.JOptionPane.showMessageDialog(getCurrentWindow(),
+                                                      label, "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.removeModalDialogComponent(label);
+        } else {
+            System.err.println(label.getText());
+        }
+    }
+
     /**
      * Show the error dialog to the user
      *
