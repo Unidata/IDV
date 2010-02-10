@@ -177,6 +177,9 @@ public class DataSelectionWidget {
     /** Last data source we were displaying for */
     private DataSource lastDataSource;
 
+    /** _more_          */
+    private boolean lastChoiceRequiresVolume = false;
+
     /** last DataChoice */
     private DataChoice lastDataChoice;
 
@@ -436,19 +439,38 @@ public class DataSelectionWidget {
                     selectedLevels = dcLevels.toArray();
                 }
             }
+            boolean    thisChoiceRequiresVolume = false;
+            DataChoice theDataChoice            = dc;
+            if (theDataChoice == null) {
+                theDataChoice = lastDataChoice;
+            }
+            if (theDataChoice != null) {
+                thisChoiceRequiresVolume =
+                    Misc.equals(theDataChoice.getProperty("requiresvolume"),
+                                "true");
+            }
+
             levelsList.setListData(levelsForGui);
-            ListSelectionModel lsm    = levelsList.getSelectionModel();
-            boolean            didone = false;
+            ListSelectionModel lsm = levelsList.getSelectionModel();
+            int                previouslySelectedLevels = 0;
             for (int i = 0; i < selectedLevels.length; i++) {
                 int index = levelsForGui.indexOf(selectedLevels[i]);
                 if (index >= 0) {
                     lsm.addSelectionInterval(index, index);
-                    didone = true;
+                    previouslySelectedLevels++;
                 }
             }
-            if ( !didone) {
+
+            if (thisChoiceRequiresVolume) {
+                if ((thisChoiceRequiresVolume != lastChoiceRequiresVolume)
+                        && (previouslySelectedLevels == 1)) {
+                    previouslySelectedLevels = 0;
+                }
+            }
+
+            if (previouslySelectedLevels == 0) {
                 if (levelsForGui.size() > 1) {
-                    if (defaultLevelToFirst) {
+                    if (defaultLevelToFirst && !thisChoiceRequiresVolume) {
                         levelsList.setSelectedIndex(1);
                     } else {
                         levelsList.setSelectedIndex(0);
@@ -459,6 +481,7 @@ public class DataSelectionWidget {
             }
 
             selectionTab.add(levelsTab, "Level");
+            lastChoiceRequiresVolume = thisChoiceRequiresVolume;
         }
 
 
@@ -574,9 +597,9 @@ public class DataSelectionWidget {
         }
 
         dataSelection.setGeoSelection(geoSelection);
+
         Object[] levelRange = getSelectedLevelRange();
         if ((levelRange != null) && (levelRange.length > 0)) {
-
             if (addLevels || (levelRange.length == 2)) {
                 if (levelRange.length == 1) {
                     dataSelection.setLevel(levelRange[0]);
@@ -595,6 +618,41 @@ public class DataSelectionWidget {
         return dataSelection;
     }
 
+
+
+
+    /**
+     * Check if everything is OK so we can create a display.
+     * This just checks if the current data choice requires a volume and that the user has selected
+     * Either "All Levels" or a range of levels
+     *
+     * @param addLevels Does the display need levels
+     *
+     * @return Is it ok to create the display
+     */
+    public boolean  okToCreateTheDisplay(boolean addLevels) {
+        if (lastChoiceRequiresVolume) {
+            boolean inError = false;
+            if ((levelsTab == null) || (levelsTab.getParent() == null)) {
+                return true;
+            }
+            int[] selected = levelsList.getSelectedIndices();
+            if (selected.length == 0) {
+                //None selected
+                inError = true;
+            } else if ((selected.length == 1) && (selected[0] != 0)) {
+                //One selected but not "All Levels"
+                inError = true;
+            }
+            if (inError) {
+                LogUtil.userErrorMessage(
+                    new JLabel(
+                        "<html>The selected field requires a 3D volume of data.<br>Please select \"All Levels\" or a range of 2 or more levels</html>"));
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     /**

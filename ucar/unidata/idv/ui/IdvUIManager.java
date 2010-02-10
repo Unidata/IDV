@@ -1560,6 +1560,12 @@ public class IdvUIManager extends IdvManager {
             for (int i = 0; i < selectedControls.length; i++) {
                 ControlDescriptor cd =
                     (ControlDescriptor) selectedControls[i];
+
+                //Check if the data selection is ok
+                if(!dcd.getDataSelectionWidget().okToCreateTheDisplay(cd.doesLevels())) {
+                    return;
+                }
+
                 DataSelection dataSelection =
                     dcd.getDataSelectionWidget().createDataSelection(
                         cd.doesLevels());
