@@ -105,6 +105,50 @@ def  applyFunctionToValuesInRange(function, range, timeStep, min,max,inside):
 
 
 
+def  testIndexToLatLon(field,  mapSets):
+    """Test out the GridUtil.getLatLons method. Call this with some grid field and a set of maps"""
+
+    """Get the inner field if its a time sequence"""
+    if (GridUtil.isTimeSequence(field)):
+         field = field.getSample(0);
+    domainSet = field.getDomainSet();
+
+    """Get the indices"""
+    indices = GridUtil.findContainedIndices(domainSet, mapSets);
+
+    """Now get the latlons. This is a 3D float array:
+    float[numPolygons][2][numContainedPoints]
+    """
+    latlons = GridUtil.getLatLons(domainSet,indices);
+    for polygonIdx in xrange(len(latlons)):
+         print "polygon:" + str(polygonIdx);
+         points = latlons[polygonIdx];
+         for pointIdx in xrange(len(points[0])):
+            print "    latlon:" + str(points[0][pointIdx])+" " + str(points[1][pointIdx]);
+
+
+def  testIndexToLatLon2(field,  mapSets):
+    """Test out the GridUtil.getLatLons method. Call this with some grid field and a set of maps"""
+
+    """Get the inner field if its a time sequence"""
+    if (GridUtil.isTimeSequence(field)):
+         field = field.getSample(0);
+    domainSet = field.getDomainSet();
+
+
+    """Now get the latlons. This is a 3D float array:
+    float[numPolygons][2][numContainedPoints]
+    """
+    latlons = GridUtil.findContainedLatLons(domainSet,  mapSets);
+    for polygonIdx in xrange(len(latlons)):
+         print "polygon:" + str(polygonIdx);
+         points = latlons[polygonIdx];
+         for pointIdx in xrange(len(points[0])):
+            print "    latlon:" + str(points[0][pointIdx])+" " + str(points[1][pointIdx]);
+
+
+
+
 def  applyToIndices(function, range, timeStep, indices):
     rangeObject = range.clone();
     originalValues = rangeObject.getFloats(0)
