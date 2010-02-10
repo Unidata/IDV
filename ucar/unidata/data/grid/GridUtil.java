@@ -1,26 +1,22 @@
 /*
- * $Id: GridUtil.java,v 1.112 2007/08/09 22:06:44 dmurray Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
- * This library is free software; you can redistribute it and/oar modify it
+ * 
+ * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.data.grid;
 
@@ -1419,10 +1415,17 @@ public class GridUtil {
 
 
     /**
+     *
+     * @param grid _more_
+     * @param makeTimes _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
      */
 
     /*
-    public static FieldImpl interpolate(FieldImpl f1, FieldImpl f2, int steps) 
+    public static FieldImpl interpolate(FieldImpl f1, FieldImpl f2, int steps)
         throws VisADException {
         FieldImpl sample1=null;
         FieldImpl sample2=null;
@@ -1439,7 +1442,7 @@ public class GridUtil {
         }
         FieldImpl result = (FieldImpl)(f1.clone());
         for (int i=0;i<steps;i++) {
-                
+
         }
         return null;
     }
@@ -4604,6 +4607,11 @@ public class GridUtil {
     }
 
 
+
+
+
+
+
     /**
      * find the indices not contained in the map domian
      *
@@ -4639,6 +4647,98 @@ public class GridUtil {
         //System.err.println("indices time:" + (t2 - t1));
         return indices;
     }
+
+
+
+    /**
+     * Find the lat/lon values in the given spatial domain for the given indices
+     *
+     * @param indices index array we get from findContainedIndices methods. i.e., indices[numPolygons][numIndices]
+     * @param domain  domain to use
+     *
+     *
+     * @return the lat lons of the form:<pre>
+     * float[numPolygonPoints][2][numPoints]</pre>
+     *
+     * @throws VisADException  problem sampling
+     */
+    public static float[][][] getLatLons(GriddedSet domain, int[][] indices)
+            throws VisADException {
+        return getLatLons(getLatLon(domain), indices);
+    }
+
+
+    /**
+     * Find the lat/lon values in the given spatial domain for the given indices
+     *
+     * @param indices index array we get from findContainedIndices methods. i.e., indices[numPolygons][numIndices]
+     * @param latlons lat/lons from the spatial domain
+     *
+     * @return the lat lons of the form:<pre>
+     * float[numPolygonPoints][2][numPoints]</pre>
+     *
+     * @throws VisADException  problem sampling
+     */
+    public static float[][][] getLatLons(float[][] latlons, int[][] indices)
+            throws VisADException {
+        float[][][] result = new float[indices.length][2][];
+        for (int polygonIdx = 0; polygonIdx < indices.length; polygonIdx++) {
+            result[polygonIdx][0] = new float[indices[polygonIdx].length];
+            result[polygonIdx][1] = new float[indices[polygonIdx].length];
+            for (int j = 0; j < indices[polygonIdx].length; j++) {
+                result[polygonIdx][0][j] = latlons[0][indices[polygonIdx][j]];
+                result[polygonIdx][1][j] = latlons[1][indices[polygonIdx][j]];
+            }
+        }
+        return result;
+    }
+
+
+
+
+    /**
+     * Find the lat/lon values in the given spatial domain contained by the polygons in the given map set
+     *
+     * @param domain  domain to use
+     * @param maps The maps
+     *
+     *
+     * @return the lat lons of the form:<pre>
+     * float[numPolygonPoints][2][numPoints]</pre>
+     *
+     * @throws VisADException  problem sampling
+     */
+    public static float[][][] findContainedLatLons(GriddedSet domain,
+            UnionSet maps)
+            throws VisADException {
+        return findContainedLatLons(getLatLon(domain), maps);
+    }
+
+
+    /**
+     * Find the lat/lon values in the given spatial domain contained by the polygons in the given map set
+     *
+     * @param latlons the lat/lons from the domain
+     * @param maps The maps
+     *
+     * @return the lat lons of the form:<pre>
+     * float[numPolygonPoints][2][numPoints]</pre>
+     *
+     * @throws VisADException  problem sampling
+     */
+
+    public static float[][][] findContainedLatLons(float[][] latlons,
+            UnionSet maps)
+            throws VisADException {
+        int[][] indices = findContainedIndices(latlons, maps);
+        return getLatLons(latlons, indices);
+    }
+
+
+
+
+
+
 
 
 
@@ -6050,4 +6150,3 @@ public class GridUtil {
     }
 
 }
-
