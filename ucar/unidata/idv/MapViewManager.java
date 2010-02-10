@@ -393,6 +393,8 @@ public class MapViewManager extends NavigatedViewManager {
                     NavigatedDisplay.CLIP_BACK_DEFAULT));
             navDisplay = globeDisplay;
             setGlobeBackground(globeDisplay);
+            navDisplay.setPolygonOffset(getStateManager().getProperty("idv.globe.polygonoffset",1));
+            navDisplay.setPolygonOffsetFactor(getStateManager().getProperty("idv.globe.polygonoffsetfactor",1));
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
@@ -478,7 +480,12 @@ public class MapViewManager extends NavigatedViewManager {
             initLatLonBounds      = null;
 
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
+            navDisplay.setPolygonOffset(getStateManager().getProperty("idv.map.polygonoffset",1));
+            navDisplay.setPolygonOffsetFactor(getStateManager().getProperty("idv.map.polygonoffsetfactor",1));
         }
+
+
+
 
 
         return navDisplay;
