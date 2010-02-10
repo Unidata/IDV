@@ -107,6 +107,12 @@ or
     <params  categories="GRID-2D-*;GRID-3D-*;">
 </operands>
 
+
+
+If the derived quantity needs a volume of data to work with then add the attribute:
+     properties="requiresvolume=true"
+to the derived tag. This causes the FieldSelector to make sure the user selects a volume 
+
  -->
 
 
@@ -117,6 +123,7 @@ or
      isdefault="true" 
      isenduser="false"
      formula="DerivedGridFactory.createWindSpeed (D1, D2)">
+    
     <categories>
       <category
          value="inherit"
