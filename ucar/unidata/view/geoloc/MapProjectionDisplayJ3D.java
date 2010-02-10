@@ -268,7 +268,7 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
             });
             setRubberBandBox(rubberBandBox);
             enableRubberBanding(true);
-            getDisplay().getGraphicsModeControl().setPolygonOffsetFactor(1);
+            setPolygonOffsetFactor(1);
         } catch (RemoteException e) {}  // ignore
 
     }

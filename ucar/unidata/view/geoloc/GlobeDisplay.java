@@ -248,8 +248,9 @@ public class GlobeDisplay extends NavigatedDisplay {
         });
         setRubberBandBox(rubberBandBox);
         enableRubberBanding(true);
-        getDisplay().getGraphicsModeControl().setPolygonOffsetFactor(1);
+        setPolygonOffsetFactor(1);
     }
+
 
     /**
      * Accessor method.
