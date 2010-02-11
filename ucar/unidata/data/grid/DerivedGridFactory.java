@@ -1,26 +1,22 @@
 /*
- * $Id: DerivedGridFactory.java,v 1.73 2007/05/04 15:59:01 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.data.grid;
 
@@ -689,7 +685,7 @@ public class DerivedGridFactory {
      * @param paramGrid  parameter grid
      * @param topoGrid   grid of topography.  Must have units convertible
      *                   with meter or geopotential meter.
-     * @param resampleToTopography _more_
+     * @param resampleToTopography true to resample to the topography domain
      *
      * @return combined grids
      *
@@ -2483,13 +2479,50 @@ public class DerivedGridFactory {
         return GridUtil.getParam(vector, index, copy);
     }
 
+    /** Five point smoother identifier */
     public static final String SMOOTH_5POINT = "SM5S";
-    public static final String SMOOTH_9POINT = "SM9S";
-    public static final String SMOOTH_GAUSS  = "GWFS";
 
-    public static FieldImpl smooth(FieldImpl slice, String type) throws VisADException, RemoteException {
+    /** Nine point smoother identifier */
+    public static final String SMOOTH_9POINT = "SM9S";
+
+    /** Gaussian smoother identifier */
+    public static final String SMOOTH_GAUSS = "GWFS";
+
+    /**
+     * Smooth a 2D field
+     *
+     * @param slice  the 2D slice
+     * @param type  the type of smoothing (SMOOTH_5POINT, etc)
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl smooth(FieldImpl slice, String type)
+            throws VisADException, RemoteException {
+        return smooth(slice, type, (type.equals(SMOOTH_GAUSS)
+                                    ? 4
+                                    : 0));
+    }
+
+    /**
+     * Smooth a 2D field
+     *
+     * @param slice  the 2D slice
+     * @param type  the type of smoothing (SMOOTH_5POINT, etc)
+     * @param filterLevel level of filtering (used for SMOOTH_GAUSS only)
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl smooth(FieldImpl slice, String type,
+                                   int filterLevel)
+            throws VisADException, RemoteException {
         if (GridUtil.isVolume(slice)) {
-           throw new VisADException("Grid must be a 2D slice");
+            throw new VisADException("Grid must be a 2D slice");
         }
         FieldImpl smoothedFI = null;
         if (GridUtil.isTimeSequence(slice)) {
@@ -2504,12 +2537,15 @@ public class DerivedGridFactory {
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FlatField smoothedFF = null;
                 if (type.equals(SMOOTH_5POINT)) {
-                    smoothedFF = smooth5PointSlice((FlatField) slice.getSample(i,
-                        false));
+                    smoothedFF = smooth5Point((FlatField) slice.getSample(i,
+                            false));
                 } else if (type.equals(SMOOTH_9POINT)) {
-                    smoothedFF = smooth9PointSlice((FlatField) slice.getSample(i,
-                        false));
+                    smoothedFF = smooth9Point((FlatField) slice.getSample(i,
+                            false));
                 } else {
+                    smoothedFF =
+                        smoothGaussian((FlatField) slice.getSample(i, false),
+                                       filterLevel);
                 }
 
                 if ((smoothedFI == null) && (smoothedFF != null)) {
@@ -2525,292 +2561,455 @@ public class DerivedGridFactory {
             }
         } else {
             if (type.equals(SMOOTH_5POINT)) {
-                smoothedFI = (FieldImpl) smooth5PointSlice((FlatField) slice);
+                smoothedFI = (FieldImpl) smooth5Point((FlatField) slice);
             } else if (type.equals(SMOOTH_9POINT)) {
-                smoothedFI = (FieldImpl) smooth9PointSlice((FlatField) slice);
+                smoothedFI = (FieldImpl) smooth9Point((FlatField) slice);
             } else {
+                smoothedFI = (FieldImpl) smoothGaussian((FlatField) slice,
+                        filterLevel);
             }
 
         }
         return smoothedFI;
     }
 
-    private static FlatField smooth5PointSlice(FlatField slice) throws VisADException, RemoteException {
-    int jgymin, jgymax, jgxmin, jgxmax, kxd;
-    int ii, ip1, im1, jp1, jm1, ier, zero;
-    float wt, wt4, dip1, dim1, djp1, djm1, dsum, wsum;
-
-    /*
-     * Set filter weight.
+    /**
+     * Apply a 5 point smoothing function to the grid
+     *
+     * @param slice grid to smooth
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    wt = .125f;
-    wt4 = 4.f * wt;
+    private static FlatField smooth5Point(FlatField slice)
+            throws VisADException, RemoteException {
+        int   jgymin, jgymax, jgxmin, jgxmax, kxd;
+        int   ii, ip1, im1, jp1, jm1, ier, zero;
+        float wt, wt4, dip1, dim1, djp1, djm1, dsum, wsum;
 
-    FlatField newField = null;
-    float[][] samples = slice.getFloats(false);
-    GriddedSet domain = (GriddedSet) GridUtil.getSpatialDomain(slice);
-    int[] lengths = domain.getLengths();
-    jgxmin = 1;
-    jgxmax = lengths[0];
-    kxd = jgxmax;
-    jgymin = 1;
-    jgymax = lengths[1];
-    float[] gni = samples[0];
-    float[] gno = new float[gni.length];
+        /*
+         * Set filter weight.
+         */
+        wt  = .125f;
+        wt4 = 4.f * wt;
 
-    /*
-     * Apply five-point binomial smoother over subset grid. 
-     */
-    for (int j = jgymin; j <= jgymax; j++ ) {
-        for (int i = jgxmin; i <= jgxmax; i++ ) {
-            ii = ( j - 1 ) * kxd + i;
-            if ( Float.isNaN ( gni[ii-1] ) ) {
-                /*
-                 * Check for missing data.
-                 */
-                gno[ii-1] = Float.NaN;
-            } else {
-                ip1 = ii + 1;
-                if ( i+1 > jgxmax ) {
-                    dip1 = Float.NaN;
+        FlatField  newField = null;
+        float[][]  samples  = slice.getFloats(false);
+        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths  = domain.getLengths();
+        jgxmin = 1;
+        jgxmax = lengths[0];
+        kxd    = jgxmax;
+        jgymin = 1;
+        jgymax = lengths[1];
+        float[] gni = samples[0];
+        float[] gno = new float[gni.length];
+
+        /*
+         * Apply five-point binomial smoother over subset grid.
+         */
+        for (int j = jgymin; j <= jgymax; j++) {
+            for (int i = jgxmin; i <= jgxmax; i++) {
+                ii = (j - 1) * kxd + i;
+                if (Float.isNaN(gni[ii - 1])) {
+                    /*
+                     * Check for missing data.
+                     */
+                    gno[ii - 1] = Float.NaN;
                 } else {
-                    dip1 = gni[ip1-1];
+                    ip1 = ii + 1;
+                    if (i + 1 > jgxmax) {
+                        dip1 = Float.NaN;
+                    } else {
+                        dip1 = gni[ip1 - 1];
+                    }
+                    im1 = ii - 1;
+                    if (i - 1 < jgxmin) {
+                        dim1 = Float.NaN;
+                    } else {
+                        dim1 = gni[im1 - 1];
+                    }
+                    jp1 = ii + kxd;
+                    if (j + 1 > jgymax) {
+                        djp1 = Float.NaN;
+                    } else {
+                        djp1 = gni[jp1 - 1];
+                    }
+                    jm1 = ii - kxd;
+                    if (j - 1 < jgymin) {
+                        djm1 = Float.NaN;
+                    } else {
+                        djm1 = gni[jm1 - 1];
+                    }
+                    dsum = gni[ii - 1] * wt4;
+                    wsum = wt4;
+                    if ( !Float.isNaN(dip1)) {
+                        dsum += dip1 * wt;
+                        wsum += wt;
+                    }
+                    if ( !Float.isNaN(dim1)) {
+                        dsum += dim1 * wt;
+                        wsum += wt;
+                    }
+                    if ( !Float.isNaN(djp1)) {
+                        dsum += djp1 * wt;
+                        wsum += wt;
+                    }
+                    if ( !Float.isNaN(djm1)) {
+                        dsum += djm1 * wt;
+                        wsum += wt;
+                    }
+                    gno[ii - 1] = dsum / wsum;
                 }
-                im1 = ii - 1;
-                if ( i-1 < jgxmin ) {
-                    dim1 = Float.NaN;
-                } else {
-                    dim1 = gni[im1-1];
-                }
-                jp1 = ii + kxd;
-                if ( j+1 > jgymax ) {
-                    djp1 = Float.NaN;
-                } else {
-                    djp1 = gni[jp1-1];
-                }
-                jm1 = ii - kxd;
-                if ( j-1 < jgymin ) {
-                    djm1 = Float.NaN;
-                } else {
-                    djm1 = gni[jm1-1];
-                }
-                dsum = gni[ii-1] * wt4;
-                wsum = wt4;
-                if ( ! Float.isNaN ( dip1 ) ) {
-                    dsum += dip1 * wt;
-                    wsum += wt;
-                }
-                if ( ! Float.isNaN ( dim1 ) ) {
-                    dsum += dim1 * wt;
-                    wsum += wt;
-                }
-                if ( ! Float.isNaN ( djp1 ) ) {
-                    dsum += djp1 * wt;
-                    wsum += wt;
-                }
-                if ( ! Float.isNaN ( djm1 ) ) {
-                    dsum += djm1 * wt;
-                    wsum += wt;
-                }
-                gno[ii-1] = dsum/wsum ;
             }
         }
+        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
+        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_SM5S",
+                               rt.getDefaultUnit());
+        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
+        newField.setSamples(new float[][] {
+            gno
+        }, false);
+
+        return newField;
     }
-    RealType rt = (RealType)  GridUtil.getParamType(slice).getComponent(0);
-    rt = Util.makeRealType(Util.cleanTypeName(rt.getName())+"_SM5S", rt.getDefaultUnit());
-    newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-    newField.setSamples(new float[][] {gno}, false);
 
-    return newField;
-    }
-
-    private static FlatField smooth9PointSlice(FlatField slice) throws VisADException, RemoteException {
-
-    int ni, no, jgymin, jgymax, jgxmin, jgxmax, kxd, kyd, ksub1, ksub2;
-    int i, j, ii, ip1, im1, jp1, jm1, imjm, ipjm, imjp, ipjp, ier, zero;
-    float dsum, wsum, wt, wtc, wt4;
-    float dip1, dim1, djp1, djm1, dimjm, dipjm, dimjp, dipjp;
-
-    /*
-     * Set filter weight for Diamond points weight
+    /**
+     * Apply a 9 point smoothing function to the grid
+     *
+     * @param slice grid to smooth
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    wt = 2.0f;
+    private static FlatField smooth9Point(FlatField slice)
+            throws VisADException, RemoteException {
 
-    /*
-     * Corner points weight
-     */
-    wtc = 1.0f;
+        int   ni, no, jgymin, jgymax, jgxmin, jgxmax, kxd, kyd, ksub1, ksub2;
+        int   i, j, ii, ip1, im1, jp1, jm1, imjm, ipjm, imjp, ipjp, ier, zero;
+        float dsum, wsum, wt, wtc, wt4;
+        float dip1, dim1, djp1, djm1, dimjm, dipjm, dimjp, dipjp;
 
-    /*
-     * Center point weight
-     */
-    wt4 = 4.0f;
+        /*
+         * Set filter weight for Diamond points weight
+         */
+        wt = 2.0f;
 
-    FlatField newField = null;
-    float[][] samples = slice.getFloats(false);
-    GriddedSet domain = (GriddedSet) GridUtil.getSpatialDomain(slice);
-    int[] lengths = domain.getLengths();
-    jgxmin = 1;
-    jgxmax = lengths[0];
-    kxd = jgxmax;
-    jgymin = 1;
-    jgymax = lengths[1];
-    float[] gni = samples[0];
-    float[] gno = new float[gni.length];
+        /*
+         * Corner points weight
+         */
+        wtc = 1.0f;
 
-    for ( j = jgymin; j <= jgymax; j++ ) {
-        for ( i = jgxmin; i <= jgxmax; i++ ) {
-            ii = ( j - 1 ) * kxd + i;
-            if ( Float.isNaN ( gni[ii-1] ) ) {
-                /*
-                 * Check for missing data.
-                 */
-                gno[ii-1] = Float.NaN;
-            } else {
-                ip1 = ii + 1;
-                if ( i+1 > jgxmax ) {
-                    dip1 = Float.NaN;
+        /*
+         * Center point weight
+         */
+        wt4 = 4.0f;
+
+        FlatField  newField = null;
+        float[][]  samples  = slice.getFloats(false);
+        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths  = domain.getLengths();
+        jgxmin = 1;
+        jgxmax = lengths[0];
+        kxd    = jgxmax;
+        jgymin = 1;
+        jgymax = lengths[1];
+        float[] gni = samples[0];
+        float[] gno = new float[gni.length];
+
+        for (j = jgymin; j <= jgymax; j++) {
+            for (i = jgxmin; i <= jgxmax; i++) {
+                ii = (j - 1) * kxd + i;
+                if (Float.isNaN(gni[ii - 1])) {
+                    /*
+                     * Check for missing data.
+                     */
+                    gno[ii - 1] = Float.NaN;
                 } else {
-                    dip1 = gni[ip1-1];
-                }
+                    ip1 = ii + 1;
+                    if (i + 1 > jgxmax) {
+                        dip1 = Float.NaN;
+                    } else {
+                        dip1 = gni[ip1 - 1];
+                    }
 
-                im1 = ii - 1;
-                if ( i-1 < jgxmin ) {
-                    dim1 = Float.NaN;
-                } else {
-                    dim1 = gni[im1-1];
-                }
+                    im1 = ii - 1;
+                    if (i - 1 < jgxmin) {
+                        dim1 = Float.NaN;
+                    } else {
+                        dim1 = gni[im1 - 1];
+                    }
 
-                jp1 = ii + kxd;
-                if ( j+1 > jgymax ) {
-                    djp1 = Float.NaN;
-                } else {
-                    djp1 = gni[jp1-1];
-                }
+                    jp1 = ii + kxd;
+                    if (j + 1 > jgymax) {
+                        djp1 = Float.NaN;
+                    } else {
+                        djp1 = gni[jp1 - 1];
+                    }
 
-                jm1 = ii - kxd;
-                if ( j-1 < jgymin ) {
-                    djm1 = Float.NaN;
-                } else {
-                    djm1 = gni[jm1-1];
-                }
+                    jm1 = ii - kxd;
+                    if (j - 1 < jgymin) {
+                        djm1 = Float.NaN;
+                    } else {
+                        djm1 = gni[jm1 - 1];
+                    }
 
-                imjm = jm1 - 1;
-                if ( ( j-1 < jgymin ) || ( i-1 < jgxmin ) ) {
-                    dimjm = Float.NaN;
-                } else {
-                    dimjm = gni[imjm-1];
-                }
+                    imjm = jm1 - 1;
+                    if ((j - 1 < jgymin) || (i - 1 < jgxmin)) {
+                        dimjm = Float.NaN;
+                    } else {
+                        dimjm = gni[imjm - 1];
+                    }
 
-                ipjm = jm1 + 1;
-                if ( ( j-1 < jgymin ) || ( i+1 > jgxmax ) ) {
-                    dipjm = Float.NaN;
-                } else {
-                    dipjm = gni[ipjm-1];
-                }
+                    ipjm = jm1 + 1;
+                    if ((j - 1 < jgymin) || (i + 1 > jgxmax)) {
+                        dipjm = Float.NaN;
+                    } else {
+                        dipjm = gni[ipjm - 1];
+                    }
 
-                imjp = jp1 - 1;
-                if ( ( j+1 > jgymax ) || ( i-1 < jgxmin ) ) {
-                    dimjp = Float.NaN;
-                } else {
-                    dimjp = gni[imjp-1];
-                }
+                    imjp = jp1 - 1;
+                    if ((j + 1 > jgymax) || (i - 1 < jgxmin)) {
+                        dimjp = Float.NaN;
+                    } else {
+                        dimjp = gni[imjp - 1];
+                    }
 
-                ipjp = jp1 + 1;
-                if ( ( j+1 > jgymax ) || ( i+1 > jgxmax ) ) {
-                    dipjp = Float.NaN;
-                } else {
-                    dipjp = gni[ipjp-1];
-                }
+                    ipjp = jp1 + 1;
+                    if ((j + 1 > jgymax) || (i + 1 > jgxmax)) {
+                        dipjp = Float.NaN;
+                    } else {
+                        dipjp = gni[ipjp - 1];
+                    }
 
-                dsum = gni[ii-1] * wt4;
-                wsum = wt4;
-                if ( ! Float.isNaN ( dip1 ) ) {
-                    dsum += dip1 * wt;
-                    wsum += wt;
-                } else {
-                    dsum += gni[ii-1] * wt;
-                    wsum += wt;
-                }
+                    dsum = gni[ii - 1] * wt4;
+                    wsum = wt4;
+                    if ( !Float.isNaN(dip1)) {
+                        dsum += dip1 * wt;
+                        wsum += wt;
+                    } else {
+                        dsum += gni[ii - 1] * wt;
+                        wsum += wt;
+                    }
 
-                if ( ! Float.isNaN ( dim1 ) ) {
-                    dsum += dim1 * wt;
-                    wsum += wt;
-                } else {
-                    dsum += gni[ii-1] * wt;
-                    wsum += wt;
-                }
+                    if ( !Float.isNaN(dim1)) {
+                        dsum += dim1 * wt;
+                        wsum += wt;
+                    } else {
+                        dsum += gni[ii - 1] * wt;
+                        wsum += wt;
+                    }
 
-                if ( ! Float.isNaN ( djp1 ) ) {
-                    dsum += djp1 * wt;
-                    wsum += wt;
-                } else {
-                    dsum += gni[ii-1] * wt;
-                    wsum += wt;
-                }
+                    if ( !Float.isNaN(djp1)) {
+                        dsum += djp1 * wt;
+                        wsum += wt;
+                    } else {
+                        dsum += gni[ii - 1] * wt;
+                        wsum += wt;
+                    }
 
-                if ( ! Float.isNaN ( djm1 ) ) {
-                    dsum += djm1 * wt;
-                    wsum += wt;
-                } else {
-                    dsum += gni[ii-1] * wt;
-                    wsum += wt;
-                }
+                    if ( !Float.isNaN(djm1)) {
+                        dsum += djm1 * wt;
+                        wsum += wt;
+                    } else {
+                        dsum += gni[ii - 1] * wt;
+                        wsum += wt;
+                    }
 
-                if ( ! Float.isNaN ( dimjm ) ) {
-                    dsum += dimjm * wtc;
-                    wsum += wtc;
-                } else {
-                    dsum += gni[ii-1] * wtc;
-                    wsum += wtc;
-                }
+                    if ( !Float.isNaN(dimjm)) {
+                        dsum += dimjm * wtc;
+                        wsum += wtc;
+                    } else {
+                        dsum += gni[ii - 1] * wtc;
+                        wsum += wtc;
+                    }
 
-                if ( ! Float.isNaN ( dipjm ) ) {
-                    dsum += dipjm * wtc;
-                    wsum += wtc;
-                } else {
-                    dsum += gni[ii-1] * wtc;
-                    wsum += wtc;
-                }
+                    if ( !Float.isNaN(dipjm)) {
+                        dsum += dipjm * wtc;
+                        wsum += wtc;
+                    } else {
+                        dsum += gni[ii - 1] * wtc;
+                        wsum += wtc;
+                    }
 
-                if ( ! Float.isNaN ( dimjp ) ) {
-                    dsum += dimjp * wtc;
-                    wsum += wtc;
-                } else {
-                    dsum += gni[ii-1] * wtc;
-                    wsum += wtc;
-                }
+                    if ( !Float.isNaN(dimjp)) {
+                        dsum += dimjp * wtc;
+                        wsum += wtc;
+                    } else {
+                        dsum += gni[ii - 1] * wtc;
+                        wsum += wtc;
+                    }
 
-                if ( ! Float.isNaN ( dipjp ) ) {
-                    dsum += dipjp * wtc;
-                    wsum += wtc;
-                } else {
-                    dsum += gni[ii-1] * wtc;
-                    wsum += wtc;
-                }
+                    if ( !Float.isNaN(dipjp)) {
+                        dsum += dipjp * wtc;
+                        wsum += wtc;
+                    } else {
+                        dsum += gni[ii - 1] * wtc;
+                        wsum += wtc;
+                    }
 
-                gno[ii-1] = dsum/wsum ;
+                    gno[ii - 1] = dsum / wsum;
+                }
             }
         }
+
+        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
+        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_SM9S",
+                               rt.getDefaultUnit());
+        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
+        newField.setSamples(new float[][] {
+            gno
+        }, false);
+
+        return newField;
     }
 
-    RealType rt = (RealType)  GridUtil.getParamType(slice).getComponent(0);
-    rt = Util.makeRealType(Util.cleanTypeName(rt.getName())+"_SM9S", rt.getDefaultUnit());
-    newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-    newField.setSamples(new float[][] {gno}, false);
+    /** max number of weights */
+    private static final int MAXWTS = 100;
 
-    return newField;
+    /**
+     * Apply a 5 point smoothing function to the grid
+     *
+     * @param slice grid to smooth
+     * @param filterLevel level of filtering
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField smoothGaussian(FlatField slice, int filterLevel)
+            throws VisADException, RemoteException {
+
+
+        int       ni, no, nnw, kxd, kyd, ksub1, ksub2, zero, ier;
+        int       nwl, nr, jw, iw, jj, ii, is, ie, js, je, j, i, indx;
+        float[]   gnnw, gnist, gnost;
+        float     sgma, sumw, sumf, sig2, aa, x, y;
+        float[][] w = new float[MAXWTS][MAXWTS];
+
+        nwl = filterLevel;
+
+        if (nwl <= 1) {
+            nwl = 2;
+        }
+
+        /*
+         * Compute the array of weights.
+         *
+         * The range of the filter is twice the standard deviation of the
+         * required Gaussian distribution.
+         */
+        sgma = (float) (nwl / (Math.PI * Math.sqrt(2.0)));
+        nr   = (int) (2. * sgma);
+        if (nr < 1) {
+            nr = 1;
+        }
+        if (nr >= MAXWTS) {
+            nr = MAXWTS - 1;
+        }
+
+        FlatField  newField = null;
+        float[][]  samples  = slice.getFloats(false);
+        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths  = domain.getLengths();
+        kxd   = lengths[0];
+        kyd   = lengths[1];
+        gnist = samples[0];
+        gnost = new float[gnist.length];
+
+
+        /*
+         * Compute the matrix of weights for one quadrant using symmetry
+         * of two dimensional Gaussian surface.
+         */
+        sumw = 0.0f;
+        sig2 = sgma * sgma;
+        aa   = (float) (1.f / (sig2 * Math.PI));
+        for (jw = 1; jw <= nr + 1; jw++) {
+            if (jw == 1) {
+                is = 2;
+            } else {
+                is = jw;
+            }
+            for (iw = is; iw <= nr + 1; iw++) {
+                x = iw - 1;
+                y = jw - 1;
+                w[iw - 1][jw - 1] = (float) (aa * Math.exp(-(x * x + y * y)
+                        / sig2));
+                w[jw - 1][iw - 1] = w[iw - 1][jw - 1];
+                if ((jw == 1) || (jw == iw)) {
+                    sumw += w[iw - 1][jw - 1];
+                } else {
+                    sumw += 2. * w[iw - 1][jw - 1];
+                }
+            }
+        }
+        sumw    *= 4.f;
+        w[0][0] = 1.f - sumw;
+
+        for (jj = 1; jj <= kyd; jj++) {
+            for (ii = 1; ii <= kxd; ii++) {
+                is   = ii - nr;
+                ie   = ii + nr;
+                js   = jj - nr;
+                je   = jj + nr;
+                sumw = 0.0f;
+                sumf = 0.0f;
+                for (j = js; j <= je; j++) {
+                    if ((j >= 1) && (j <= kyd)) {
+                        for (i = is; i <= ie; i++) {
+                            if ((i >= 1) && (i <= kxd)) {
+                                iw   = Math.abs(i - ii) + 1;
+                                jw   = Math.abs(j - jj) + 1;
+                                indx = (j - 1) * kxd + i;
+                                if ( !Float.isNaN(gnist[indx - 1])) {
+                                    sumw += w[iw - 1][jw - 1];
+                                    sumf += gnist[indx - 1]
+                                            * w[iw - 1][jw - 1];
+                                }
+                            }
+                        }
+                    }
+                }
+                indx = (jj - 1) * kxd + ii;
+                if ( !G_DIFFT(sumw, 0.0F, GDIFFD)
+                        && !Float.isNaN(gnist[indx - 1])) {
+                    gnost[indx - 1] = sumf / sumw;
+                } else {
+                    gnost[indx - 1] = Float.NaN;
+                }
+            }
+        }
+
+        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
+        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_GWFS",
+                               rt.getDefaultUnit());
+        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
+        newField.setSamples(new float[][] {
+            gnost
+        }, false);
+
+        return newField;
     }
 
-    /*
-    private static FlatField smoothGaussianSlice(FlatField slice) throws VisADException, RemoteException {
-    RealType rt = (RealType)  GridUtil.getParamType(slice).getComponent(0);
-    rt = Util.makeRealType(Util.cleanTypeName(rt.getName())+"_SM5S", rt.getDefaultUnit());
-    newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-    newField.setSamples(new float[][] {gno}, false);
+    /**
+     * Static grid differencing value
+     */
+    private static final float GDIFFD = 0.000001f;
 
-    return newField;
+    /**
+     * See if the difference between two values is greater than another value
+     * @param x  first value
+     * @param y  second value
+     * @param val  the value to check
+     * @return Math.abs(x-y) > val
+     */
+    private static boolean G_DIFFT(float x, float y, float val) {
+        return Math.abs(x - y) < val;
     }
-    */
 }
-
