@@ -510,9 +510,10 @@ public class DisplayConventions extends IdvManager {
                 clInterval = (float) rint;
                 clMin      = clBase = min;
                 clMax      = max;
-            } else {                                // for really big ranges, span > 300 
-                clInterval = (float) rint;
-                clMin      = clMax = (float) ((int) max);
+            } else {                                // for really big ranges, span > 300 make ints
+                clInterval = (float) ((int) rint);
+                clMin      = clBase = (float) ((int) min);
+                clMax      = (float) ((int) max);
             }
             clMax = clMax + clInterval;
             clMin = clMin - clInterval;
