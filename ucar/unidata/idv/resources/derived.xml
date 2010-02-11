@@ -509,9 +509,11 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          childidx="0"/>
     </categories>
     <operands>
+<!--
       <params categories="GRID-2D-*;"
          p1="TEMP"
          p2="absvort"/>
+-->
       <params categories="GRID-3D-*;"
          p1="TEMP"
          p2="absvort"/>
