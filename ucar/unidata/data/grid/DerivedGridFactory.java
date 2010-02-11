@@ -485,7 +485,9 @@ public class DerivedGridFactory {
     public static FieldImpl relativeVorticityFromTrueWind(FieldImpl uFI,
             FieldImpl vFI)
             throws VisADException, RemoteException {
-        return createRelativeVorticity(uFI, vFI);
+        FieldImpl trueWind = createTrueFlowVectors(uFI, vFI);
+        return createRelativeVorticity(getUComponent(trueWind),
+                                       getVComponent(trueWind));
     }
 
 
@@ -540,11 +542,10 @@ public class DerivedGridFactory {
             FieldImpl vFI)
             throws VisADException, RemoteException {
 
-        FieldImpl relVor  = createRelativeVorticity(uFI, vFI);
-        FieldImpl latGrid = createLatitudeGrid(relVor);
-        FieldImpl fc =
-            (FieldImpl) latGrid.sinDegrees().multiply(EARTH_TWO_OMEGA);
-        FieldImpl avFI   = (FieldImpl) relVor.add(fc);
+
+        FieldImpl relVor = createRelativeVorticity(uFI, vFI);
+        FieldImpl corl   = createCoriolisGrid(relVor);
+        FieldImpl avFI   = (FieldImpl) relVor.add(corl);
         Unit      avUnit = GridUtil.getParamUnits(avFI)[0];
         RealType  avRT   = DataUtil.makeRealType("absvorticity", avUnit);
         return GridUtil.setParamType(avFI, avRT, false);
