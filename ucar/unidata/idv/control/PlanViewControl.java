@@ -107,6 +107,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** list of current levels */
     protected Object[] currentLevels;
 
+    /** If we have a 3d volume of data then this is the levels we actually have from the data */
+    private Object[]levelsFromData;
+
     /** level readout label */
     protected JLabel levelReadout;
 
@@ -592,6 +595,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         DataSelection tmpSelection = new DataSelection(getDataSelection());
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
+
         List     levelsList = dataChoice.getAllLevels(tmpSelection);
         Object[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
@@ -734,6 +738,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             cycleLevelsCbx.setSelected(false);
         }
 
+        if(levelBox == null) return;
         levelBox.setEnabled(levelEnabled);
         levelUpBtn.setEnabled(levelEnabled);
         levelDownBtn.setEnabled(levelEnabled);
@@ -1060,6 +1065,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
                         GridUtil.sliceAtLevel(
                             workingGrid, realLevel, samplingMode));
                 }
+                if(levelsFromData == null) {
+                    levelsFromData = getGridDataInstance().getLevels();
+                    setLevels(levelsFromData);
+                }
             } else {
                 // only one level?  - can we get here?
                 //                System.out.println("PlanViewControl: only one level?");
@@ -1109,6 +1118,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
         Trace.call2("PlanView.loadData");
 
     }
+
+
+
 
     /**
      * Does the list of levels have this level
