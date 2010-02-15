@@ -24,10 +24,12 @@
 
   <stationtable
      name="TDWR Radar Sites"
+     type="radar"
      category="Weather"
      href="/ucar/unidata/idv/resources/stations/tdwr.tbl"/>
 
   <stationtable name="Profiler Sites" elevunit="meters" category="Weather" 
+                type="profiler"
                 href="/ucar/unidata/idv/resources/stations/profilerstns.xml"/>
 
   <stationtable
