@@ -402,16 +402,11 @@ public class CatalogHarvester extends Harvester {
 
             }
 
-            if (true) {
-                return;
-            }
-
 
             if (entries.size() > 100) {
                 getEntryManager().processEntries(this, null, entries, false);
                 entries = new ArrayList<Entry>();
             }
-            return;
         }
 
         name = name.replace(Group.IDDELIMITER, "--");
