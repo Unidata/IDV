@@ -87,6 +87,16 @@
     </target>
 
 
+    <target name="download" depends="init">
+        <scp
+            todir="${user.name}@conan:/web/ftp/pub/ramadda/ramadda1.1"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+        <fileset  dir="${libsdir}" includes="repository.war,repository_src.jar,repository.zip,repositoryclient.jar,repositoryclient.zip"/>
+        </scp>
+    </target>
+
 
 <!--
      <target name="idvplugin" depends="init,clean">
@@ -454,23 +464,20 @@
             <exclude name="ucar/**/*.class"/>
             <exclude name="ucar/**/*.map"/>
             <exclude name="ucar/**/*.jar"/>            
+            <exclude name="ucar/**/*.dat"/>            
             <exclude name="ucar/**/*.ascii"/>            
             <exclude name="ucar/**/*.tml"/>            
             <exclude name="ucar/**/*.bak"/>            
             <exclude name="ucar/**/*.zip"/>            
             <exclude name="ucar/**/*.shp"/>            
             <exclude name="ucar/**/*.nc"/>            
+            <exclude name="ucar/**/*.xidv"/>
+            <exclude name="ucar/**/*.zidv"/>
+            <exclude name="ucar/**/processed/**"/>
             <exclude name="ucar/unidata/data/storm/*ADOT*"/>
             <exclude name="ucar/unidata/idv/control/storm/*ADOT*"/>
             <exclude name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
-            <exclude name="ucar/unidata/apps/demo/**"/>
-            <exclude name="ucar/unidata/apps/imageviewer/**"/>
-            <exclude name="ucar/unidata/apps/geon/**"/>
-            <exclude name="ucar/unidata/apps/lead/**"/>
-            <exclude name="ucar/unidata/apps/rico/**"/>
-            <exclude name="ucar/unidata/apps/sti/**"/>
-            <exclude name="ucar/unidata/apps/trex/**"/>
-            <exclude name="ucar/unidata/apps/workshop/**"/>
+            <exclude name="ucar/unidata/apps/**"/>
             <exclude name="ucar/unidata/gridviewer/**/*.*"/>
             <exclude name="ucar/unidata/grid/**"/>
             <exclude name="ucar/unidata/geoloc/**"/>

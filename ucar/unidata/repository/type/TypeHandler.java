@@ -1408,6 +1408,13 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
+        if(isOrSearch(request)) {
+            Clause clause = Clause.or(clauses);
+            clauses = new ArrayList<Clause>();
+            clauses.add(clause);
+            System.err.println("clauses:" + clauses);
+        }
+
         //The join
         if (didEntries && didOther
                 && !Tables.ENTRIES.NAME.equalsIgnoreCase(getTableName())) {
@@ -2234,25 +2241,31 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+        List<Clause> dateClauses = new ArrayList<Clause>();
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {
             addCriteria(searchCriteria, "From Date>=", dateRange[0]);
-            where.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE, dateRange[0]));
+            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE, dateRange[0]));
         }
 
 
         if (dateRange[1] != null) {
             addCriteria(searchCriteria, "To Date<=", dateRange[1]);
-            where.add(Clause.le(Tables.ENTRIES.COL_TODATE, dateRange[1]));
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE, dateRange[1]));
         }
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
             addCriteria(searchCriteria, "Create Date<=", createDate);
-            where.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE, createDate));
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE, createDate));
         }
 
+        if(dateClauses.size()>1) {
+            where.add(Clause.and(dateClauses));
+        } else if(dateClauses.size()==1) {
+            where.add(dateClauses.get(0));
+        }
 
         boolean      includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
         List<Clause> areaExpressions = new ArrayList<Clause>();
@@ -2378,7 +2391,6 @@ public class TypeHandler extends RepositoryManager {
 
                 Clause clause = Clause.and(subClauses);
 
-
                 MetadataHandler handler =
                     getRepository().getMetadataManager().findMetadataHandler(
                         type);
@@ -2424,13 +2436,16 @@ public class TypeHandler extends RepositoryManager {
                 metadataOrs.add(clause);
             }
             if (metadataOrs.size() > 0) {
-                //                metadataAnds.add(SqlUtil.group(SqlUtil.makeOr(metadataOrs)));
                 metadataAnds.add(Clause.or(metadataOrs));
             }
         }
 
         if (metadataAnds.size() > 0) {
-            where.add(Clause.and(metadataAnds));
+            if(isOrSearch(request)) {
+                where.add(Clause.or(metadataAnds));
+            } else {
+                where.add(Clause.and(metadataAnds));
+            }
         }
 
 
@@ -2521,6 +2536,11 @@ public class TypeHandler extends RepositoryManager {
         }
         return where;
 
+    }
+
+
+    public boolean isOrSearch(Request request) {
+        return request.getString("search.or","false").equals("true");
     }
 
 
