@@ -6785,10 +6785,16 @@ public class GuiUtils extends LayoutUtil {
      * @return _more_
      */
     public static boolean isControlKey(InputEvent event) {
-        if ( !isMac()) {
+        if (!isMac()) {
             return event.isControlDown();
         }
         return event.isMetaDown();
+    }
+
+
+    public static boolean isControlKey(KeyEvent event, int keyCode) {
+        if(!isControlKey(event)) return false;
+        return event.getKeyCode() == keyCode;
     }
 
 
