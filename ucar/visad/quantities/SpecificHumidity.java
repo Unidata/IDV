@@ -60,12 +60,12 @@ import java.rmi.RemoteException;
  * @author Steven R. Emmerson
  * @version $Id: WaterVaporMixingRatio.java,v 1.15 2005/05/13 18:35:45 jeffmc Exp $
  */
-public class WaterVaporMixingRatio extends ScalarQuantity {
+public class SpecificHumidity extends ScalarQuantity {
 
     /**
      * The single instance.
      */
-    private static WaterVaporMixingRatio INSTANCE;
+    private static SpecificHumidity INSTANCE;
 
     /**
      * The ratio of the water vapor and dry air gas constants.
@@ -76,8 +76,8 @@ public class WaterVaporMixingRatio extends ScalarQuantity {
      * Constructs from nothing.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    private WaterVaporMixingRatio() throws VisADException {
-        this("WaterVaporMixingRatio");
+    private SpecificHumidity() throws VisADException {
+        this("SpecificHumidity");
     }
 
     /**
@@ -86,7 +86,7 @@ public class WaterVaporMixingRatio extends ScalarQuantity {
      * @param name              The name for the instance.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    protected WaterVaporMixingRatio(String name) throws VisADException {
+    protected SpecificHumidity(String name) throws VisADException {
         super(name, CommonUnits.GRAMS_PER_KILOGRAM, (Set) null);
     }
 
@@ -109,42 +109,14 @@ public class WaterVaporMixingRatio extends ScalarQuantity {
     public static RealTupleType getRealTupleType() throws VisADException {
 
         if (INSTANCE == null) {
-            synchronized (WaterVaporMixingRatio.class) {
+            synchronized (SpecificHumidity.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new WaterVaporMixingRatio();
+                    INSTANCE = new SpecificHumidity();
                 }
             }
         }
 
         return INSTANCE.realTupleType();
-    }
-
-    /**
-     * Returns the ratio of the water vapor and dry air gas constants.
-     *
-     * @return                  The water vapor to dry air gas constant ratio.
-     * @throws VisADException if a core VisAD failure occurs.
-     */
-    public static Real getGasConstantRatio() throws VisADException {
-
-        if (gasConstantRatio == null) {
-            synchronized (WaterVaporMixingRatio.class) {
-                if (gasConstantRatio == null) {
-                    try {
-                        gasConstantRatio = new Real(RealType
-                            .getRealType("WaterVaporMixingRatioGasConstantRatio",
-                                CommonUnit.dimensionless,
-                                (Set) null), ((Real) VisADMath
-                                    .divide(MolecularWeightOfWater.newReal(),
-                                        MolecularWeightOfDryAir.newReal()))
-                                            .getValue(CommonUnit
-                                                .dimensionless));
-                    } catch (RemoteException e) {}  // can't happen because above are local
-                }
-            }
-        }
-
-        return gasConstantRatio;
     }
 
     /**
@@ -169,36 +141,35 @@ public class WaterVaporMixingRatio extends ScalarQuantity {
             throws TypeException, VisADException, UnitException,
                    RemoteException {
 
-        Data saturationVaporPressure =
-            SaturationVaporPressure.create(temperature);
+        Data mixingRatio = WaterVaporMixingRatio.create(pressure,
+                               temperature);
 
-        return Util.clone(
-            VisADMath.multiply(
-                getGasConstantRatio(), VisADMath.divide(
-                    saturationVaporPressure, VisADMath.subtract(
-                        pressure, saturationVaporPressure))), getRealType());
+        return Util.clone(VisADMath.divide(mixingRatio,
+                                           VisADMath.add(new Real(1),
+                                               mixingRatio)), getRealType(),
+                                                   false, false);
+
     }
 
     /**
-     * Creates a water-vapor mixing-ratio data object from specific humidity
+     * Create SpecificHumidity from MixingRatio
      *
-     * @param specificHumidity  The specific humidity data object.
-     * @return                  Water vapor mixing-ratio or saturation
-     *                          mixing-ratio depending on the type of
-     *                          <code>temperature</code>.
-     * @throws TypeException    At least one argument has incorrect type.
-     * @throws UnitException    Unit conversion failure.
-     * @throws VisADException   Couldn't create necessary VisAD object.
-     * @throws RemoteException  Java RMI failure.
+     * @param mixingRatio mixing ratio
+     *
+     * @return  specific humidity
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws TypeException    wrong type
+     * @throws UnitException    wrong units
+     * @throws VisADException   Problem creating data object
      */
-    public static Data create(Data specificHumidity)
+    public static Data create(Data mixingRatio)
             throws TypeException, VisADException, UnitException,
                    RemoteException {
 
-        return Util.clone(
-            VisADMath.divide(
-                specificHumidity, VisADMath.subtract(
-                    new Real(1), specificHumidity)), getRealType());
+        return Util.clone(VisADMath.divide(mixingRatio,
+                                           VisADMath.add(new Real(1),
+                                               mixingRatio)), getRealType());
     }
 
 }
