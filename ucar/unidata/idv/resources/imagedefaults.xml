@@ -1183,6 +1183,57 @@ Note: we can use place="default", etc., to use the default
      size="600 600"
      loc="40 -90"
      mag="1 1"/>
+<!-- TDWR -->
+  <default
+     pattern="TR0"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="TR1"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="TR2"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="TZL"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="TV0"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="TV1"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="TV2"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+<!-- NEXRAD LEVEL III -->
   <default
      pattern="N0R"
      key="LINELE"
