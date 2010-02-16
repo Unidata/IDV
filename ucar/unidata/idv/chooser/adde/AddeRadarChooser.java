@@ -375,12 +375,14 @@ public class AddeRadarChooser extends AddeImageChooser {
             }
             StringBuffer buff        = getGroupUrl(REQ_IMAGEDIR, getGroup());
             String       descrForIds = descriptorNames[0];
-            // try to use base reflectivity if it's available.
-            for (int i = 0; i < descriptorNames.length; i++) {
-                if ((descriptorNames[i] != null)
-                        && descriptorNames[i].toLowerCase().startsWith(
-                            "base")) {
-                    descrForIds = descriptorNames[i];
+            Hashtable    dtable      = getDescriptorTable();
+            Iterator     iter        = dtable.keySet().iterator();
+            while (iter.hasNext()) {
+                String name       = (String) iter.next();
+                String descriptor = ((String) dtable.get(name)).toLowerCase();
+                if (descriptor.equals("n0r")
+                        || descriptor.startsWith("bref")) {
+                    descrForIds = name;
                     break;
                 }
             }

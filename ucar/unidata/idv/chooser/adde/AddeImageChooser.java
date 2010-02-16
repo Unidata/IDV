@@ -145,8 +145,14 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** Property for image default value lat/lon */
     protected static final String PROP_LATLON = "LATLON";
 
-    /** Property for image default value line/ele */
+    /**
+     * Property for image default value line/ele
+     * @deprecated use PROP_LINELE
+     */
     protected static final String PROP_LINEELE = "LINELE";
+
+    /** Property for image default value lin/ele */
+    protected static final String PROP_LINELE = "LINELE";
 
     /** Property for image default value loc */
     protected static final String PROP_LOC = "LOC";
@@ -2174,11 +2180,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 appendKeyValue(buf, PROP_LATLON,
                                getUserPropValue(PROP_LATLON, ad));
             } else {
-                appendKeyValue(buf, PROP_LINEELE,
-                               getUserPropValue(PROP_LINEELE, ad));
+                appendKeyValue(buf, PROP_LINELE,
+                               getUserPropValue(PROP_LINELE, ad));
             }
         } else {
-            appendKeyValue(buf, getDefault(PROP_KEY, PROP_LINEELE),
+            appendKeyValue(buf, getDefault(PROP_KEY, PROP_LINELE),
                            getPropValue(PROP_LOC, ad));
         }
 
@@ -2278,7 +2284,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             return place;
         }
 
-        if (prop.equals(PROP_LINEELE) && (centerLineFld != null)) {
+        if (prop.equals(PROP_LINELE) && (centerLineFld != null)) {
             return centerLineFld.getText().trim() + " "
                    + centerElementFld.getText().trim();
         }
@@ -2355,12 +2361,12 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if (prop.equals(PROP_MAG)) {
             return "1 1";
         }
-        //if (prop.equals(PROP_LOC) || prop.equals(PROP_LINEELE)) {
-        if (prop.equals(PROP_LINEELE)) {
+        //if (prop.equals(PROP_LOC) || prop.equals(PROP_LINELE)) {
+        if (prop.equals(PROP_LINELE)) {
             if (ad == null) {
                 return "0 0";
             }
-            return ad.getLines() / 2 + " " + ad.getElements() / 2;
+            return (ad.getLines() / 2 - 1) + " " + (ad.getElements() / 2 - 1);
         }
         //if (prop.equals(PROP_LATLON)) {
         if (prop.equals(PROP_LOC) || prop.equals(PROP_LATLON)) {
@@ -2625,13 +2631,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             }
             value = value.trim();
             if (prop.equals(PROP_LOC)) {
-                //String key = getDefault(PROP_KEY, PROP_LINEELE);
+                //String key = getDefault(PROP_KEY, PROP_LINELE);
                 String  key              = getDefault(PROP_KEY, PROP_LATLON);
 
 
 
 
-                boolean usingLineElement = key.equals(PROP_LINEELE);
+                boolean usingLineElement = key.equals(PROP_LINELE);
                 if (usingLineElement) {
                     locationPanel.show(1);
                 } else {
@@ -2639,7 +2645,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 }
                 if (usingLineElement) {
                     value = getDefault(PROP_LOC,
-                                       getDefaultPropValue(PROP_LINEELE, ad,
+                                       getDefaultPropValue(PROP_LINELE, ad,
                                            false));
                 } else {
                     value = getDefault(PROP_LOC,
@@ -3022,23 +3028,26 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         setImageInfoProps(info, getMiscKeyProps(), dir);
         setImageInfoProps(info, getBaseUrlProps(), dir);
 
-        String locKey   = getDefault(PROP_KEY, PROP_LINEELE);
+        String locKey   = getDefault(PROP_KEY, PROP_LINELE);
         String locValue = null;
         if (usePropFromUser(PROP_LOC)) {
             if (useLatLon()) {
                 locKey   = PROP_LATLON;
                 locValue = getUserPropValue(PROP_LATLON, dir);
             } else {
-                locKey   = PROP_LINEELE;
-                locValue = getUserPropValue(PROP_LINEELE, dir);
+                locKey   = PROP_LINELE;
+                locValue = getUserPropValue(PROP_LINELE, dir);
             }
         } else {
-            locValue = getPropValue(PROP_LOC, dir);
+            locValue = getPropValue(PROP_LINELE, dir);
         }
         info.setLocateKey(locKey);
         info.setLocateValue(locValue);
 
-        String placeKey = getPropValue(PROP_PLACE, dir);
+        String placeKey = PLACE_CENTER;
+        if (usePropFromUser(PROP_PLACE)) {
+            placeKey = getPropValue(PROP_PLACE, dir);
+        }
         info.setPlaceValue(placeKey);
 
         String          magKey = getPropValue(PROP_MAG, dir);
