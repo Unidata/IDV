@@ -2022,10 +2022,7 @@ public class DerivedGridFactory {
                 dtdp = (FlatField) partial(thetaFF, pressure);
 
                 // multiply by little g - surface gravity acceleration
-                // a minus sign is conventionally applied here, however it gives 
-                // wrong (negative) results; perhaps the sign of the derivative is reversed
-                // already due to VisAD coordinate directions? :
-                dtdp = (FlatField) (dtdp.multiply(g));
+                dtdp = (FlatField) dtdp.multiply(g).negate();
 
                 // multiply by absolute vorticity grid for this time step
                 dtdp = (FlatField) (dtdp.multiply(
