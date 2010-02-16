@@ -101,7 +101,7 @@
     <type
        displaycategory="Variables"
        name="Variable"
-       id="thredds.variable" searchable="true">
+       id="thredds.variable" searchable="true"   browsable="true">
       <template type="html"><![CDATA[${Variable} (${Units}) ${Long_Name}]]></template>
       <element name="Variable" />
       <element name="Long Name" />
