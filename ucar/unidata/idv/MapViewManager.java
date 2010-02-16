@@ -643,24 +643,20 @@ public class MapViewManager extends NavigatedViewManager {
         if ((id == DisplayEvent.KEY_PRESSED)
                 && (inputEvent instanceof KeyEvent)) {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
-            if (keyEvent.isControlDown()
-                    && ((keyEvent.getKeyCode() == KeyEvent.VK_N))) {
-
+            if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_N)) {
                 EarthLocation center = getScreenCenter();
                 getMapDisplay().centerAndZoom(center, null, 1.0, true, true);
                 return;
             }
 
-            if (keyEvent.isControlDown()
-                    && ((keyEvent.getKeyCode() == KeyEvent.VK_S))) {
-
+            if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_S)) {
                 EarthLocation center = getScreenCenter();
                 getMapDisplay().centerAndZoom(center, null, 1.0, true, false);
                 return;
             }
 
 
-            if (keyEvent.isControlDown()
+            if (GuiUtils.isControlKey(keyEvent)
                     && ((keyEvent.getKeyCode() == KeyEvent.VK_H)
                         || (keyEvent.getKeyCode() == KeyEvent.VK_J)
                         || (keyEvent.getKeyCode() == KeyEvent.VK_K)

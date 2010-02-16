@@ -3381,7 +3381,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         int  code = keyEvent.getKeyCode();
         int  id   = keyEvent.getID();
         if (id == KeyEvent.KEY_PRESSED) {
-            if (keyEvent.isControlDown()) {
+            if (GuiUtils.isControlKey(keyEvent)) {
                 if (code == KeyEvent.VK_Z) {
                     //                    getCommandManager().move(-1);
                 } else if (code == KeyEvent.VK_Y) {
@@ -3396,7 +3396,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return;
         }
 
-        //        System.err.println ("ctrl:" + keyEvent.isControlDown() +" meta:" + keyEvent.isMetaDown());
+
 
         if (code == KeyEvent.VK_F1) {
             runVisibilityAnimation = false;
@@ -3405,13 +3405,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
             turnOnOffAllDisplays(true);
         } else if (code == KeyEvent.VK_F3) {
             turnOnOffAllDisplays(false);
-        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_I) {
+        } else if(GuiUtils.isControlKey(keyEvent, KeyEvent.VK_I)) {
             doSaveImageInThread();
             return;
-        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_M) {
+        } else if(GuiUtils.isControlKey(keyEvent, KeyEvent.VK_M)) {
             startImageCapture();
             return;
-        } else if(keyEvent.isControlDown() && code == KeyEvent.VK_B) {
+        } else if(GuiUtils.isControlKey(keyEvent,KeyEvent.VK_B)) {
             getIdv().doSaveAs();
             return;
         } else if ( !Character.isDigit(c)) {

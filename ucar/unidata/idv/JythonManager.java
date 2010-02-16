@@ -662,7 +662,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         jythonEditor.getTextComponent().addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.isControlDown() && (e.getKeyCode() == e.VK_F)) {
+                if (GuiUtils.isControlKey(e,  KeyEvent.VK_F)) {
                     //TODO:
                     //                    findFld.requestFocus();
                     //                    findFld.selectAll();

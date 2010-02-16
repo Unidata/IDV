@@ -837,7 +837,7 @@ public class TransectViewManager extends NavigatedViewManager {
         int  code = keyEvent.getKeyCode();
 
         if (keyEvent.getID() == KeyEvent.KEY_PRESSED) {
-            if (keyEvent.isControlDown()) {
+            if (GuiUtils.isControlKey(keyEvent)) {
                 if (code == KeyEvent.VK_LEFT) {
                     getTransectDisplay().extendTransect(1.25);
                 } else if (code == KeyEvent.VK_RIGHT) {

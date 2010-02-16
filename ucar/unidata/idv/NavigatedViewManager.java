@@ -612,7 +612,7 @@ public abstract class NavigatedViewManager extends ViewManager {
             MouseEvent mouseEvent  = (MouseEvent) inputEvent;
             int[][][]  functionMap = getMaster().getMouseFunctionMap();
             if (functionMap != null) {
-                int ctrlIdx  = (mouseEvent.isControlDown()
+                int ctrlIdx  = (GuiUtils.isControlKey(mouseEvent)
                                 ? 1
                                 : 0);
                 int shiftIdx = (mouseEvent.isShiftDown()
