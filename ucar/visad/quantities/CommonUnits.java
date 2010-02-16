@@ -1,20 +1,18 @@
 /*
- * $Id: CommonUnits.java,v 1.12 2005/05/13 18:35:38 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -35,6 +33,8 @@ import visad.ScaledUnit;
 import visad.Unit;
 
 import visad.VisADException;
+
+import visad.data.units.Parser;
 
 
 /**
@@ -116,6 +116,11 @@ public class CommonUnits {
      */
     public static final Unit MILLIMETER;
 
+    /**
+     * A common unit for percent
+     */
+    public static final Unit PERCENT;
+
 
 
 
@@ -132,6 +137,7 @@ public class CommonUnits {
         Unit kilometer       = null;
         Unit mile            = null;
         Unit millimeter      = null;
+        Unit percent         = null;
 
 
         try {
@@ -148,6 +154,7 @@ public class CommonUnits {
             kilometer       = SI.meter.scale(1000).clone("km");
             mile            = foot.scale(5280).clone("mi");
             millimeter      = SI.meter.scale(.001).clone("mm");
+            percent         = Parser.parse("%").clone("%");
 
         } catch (Exception e) {
             String reason = e.getMessage();
@@ -173,6 +180,7 @@ public class CommonUnits {
         KILOMETER          = kilometer;
         MILE               = mile;
         MILLIMETER         = millimeter;
+        PERCENT            = percent;
     }
 
     /**
@@ -180,8 +188,3 @@ public class CommonUnits {
      */
     private CommonUnits() {}
 }
-
-
-
-
-
