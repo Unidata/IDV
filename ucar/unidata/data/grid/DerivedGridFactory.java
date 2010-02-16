@@ -1640,6 +1640,78 @@ public class DerivedGridFactory {
         return eptFI;
     }
 
+    /**
+     * Make a FieldImpl of Relative Humidity; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     *
+     * @param mixingRatioFI grid of mixing ratio
+     * @param temperFI grid of air temperature
+     *
+     * @return grid computed Relative Humidity result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createRelativeHumidity(FieldImpl mixingRatioFI,
+            FieldImpl temperFI)
+            throws VisADException, RemoteException {
+
+        FieldImpl rhFI = null;
+
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+                              && GridUtil.isTimeSequence(mixingRatioFI));
+
+        // get a grid of pressure values
+        FlatField press =
+            createPressureGridFromDomain((FlatField) temperFI.getSample(0));
+
+        if (isSequence) {
+
+            // Implementation:  have to take the raw time series of data FieldImpls
+            // apart, make the mixingRatio FlatField by FlatField (for each time step),
+            // and put all back together again into a new FieldImpl with all times.
+
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample mixingRationFI to match domainSet (list of times) of temperFI.  
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                mixingRatioFI = (FieldImpl) mixingRatioFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                FlatField rhFF = (FlatField) RelativeHumidity.create(
+                                     mixingRatioFI.getSample(i), press,
+                                     temperFI.getSample(i));
+
+                // first time through
+                if (i == 0) {
+                    FunctionType functionType =
+                        new FunctionType(
+                            ((FunctionType) temperFI.getType()).getDomain(),
+                            rhFF.getType());
+                    // make the new FieldImpl for relative humidity
+                    //  (but as yet empty of data)
+                    rhFI = new FieldImpl(functionType, timeSet);
+                }
+
+                rhFI.setSample(i, rhFF, false);
+            }  // end isSequence
+        }
+        // if one time only
+        else {
+            // make one FlatField 
+            rhFI = (FieldImpl) RelativeHumidity.create(mixingRatioFI, press,
+                    temperFI);
+
+        }  // end single time 
+
+        return rhFI;
+    }
+
 
     /**
      * Make a FieldImpl of mixing ratio values for series of times
@@ -1985,10 +2057,13 @@ public class DerivedGridFactory {
                 }
                 //System.out.println ("    ipv grid type range = "+
                 //                  ((FunctionType)dtdp.getType()).getRange());
+                //if (isZDescending(dtdp)) {
+                //    dtdp.multiply(NEGATIVE_ONE);
+                //}
+                dtdp = (FlatField) dtdp.changeMathType(ipvFFType);
 
                 // set this time's ipv grid 
-                ipvFI.setSample(
-                    i, (FlatField) dtdp.changeMathType(ipvFFType), false);
+                ipvFI.setSample(i, dtdp, false);
             }
         } else {
             System.out.println("   not GridUtil.isTimeSequence(temperFI) ");
@@ -3012,5 +3087,37 @@ public class DerivedGridFactory {
      */
     private static boolean G_DIFFT(float x, float y, float val) {
         return Math.abs(x - y) < val;
+    }
+
+    /**
+     * Is Z ascending or descending
+     *
+     * @param grid  the grid
+     *
+     * @return true if values are descending (1000, 925, etc)
+     *
+     * @throws VisADException  problem getting data
+     */
+    private static boolean isZDescending(FieldImpl grid)
+            throws VisADException {
+        //if (!GridUtil.isVolume(grid)) return false;
+        Gridded3DSet domain = (Gridded3DSet) GridUtil.getSpatialDomain(grid);
+        float        first     = 0;
+        float        last      = 0;
+        boolean      notLinear = true;
+        if (domain instanceof Linear3DSet) {
+            Linear1DSet zSet = ((Linear3DSet) domain).getZ();
+            first     = (float) zSet.getFirst();
+            last      = (float) zSet.getLast();
+            notLinear = false;
+        } else {
+            int[]     lens    = domain.getLengths();
+            float[][] samples = domain.getSamples(false);
+            first = samples[2][0];
+            last  = samples[2][lens[0] * lens[1] + 1];
+        }
+        //return first > last;
+        System.out.println("not linear = " + notLinear);
+        return notLinear;
     }
 }
