@@ -186,7 +186,7 @@
      fileselection="true"
      doesmultiples="true"
      factory="ucar.unidata.data.radar.CDMRadarDataSource"
-     label="NEXRAD Radar files"></datasource>
+     label="Radar files (NEXRAD/DORADE/UF)"></datasource>
 
   <datasource
      id="OPENDAP.Radial"
@@ -199,7 +199,7 @@
   <datasource
      id="FILE.DORADERADAR"
      patterns="swp\..*_$,.*dorade.*"
-     fileselection="true"
+     fileselection="false"
      doesmultiples="true"
      factory="ucar.unidata.data.radar.DoradeDataSource"
      label="DORADE Radar files"></datasource>
