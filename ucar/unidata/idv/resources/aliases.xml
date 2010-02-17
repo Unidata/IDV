@@ -12,7 +12,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="RH"
      label="Relative humidity"
-     aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES,RELH,Relative_humidity_weightedMean_pressure,SPFH_2maboveground"/>
+     aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES,RELH,Relative_humidity_weightedMean_pressure,SPFH_2maboveground,RelativeHumidity"/>
   <alias
      name="DEWPOINT"
      label="Dewpoint"
