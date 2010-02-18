@@ -1351,9 +1351,40 @@ public class GridUtil {
 
 
     /**
+     * This creates a field where D(T) = D(T)-D(0)
+     * Any time steps up to the offset time are set to missing
+     * @param grid   grid to average
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl differenceFromBaseTime(FieldImpl grid)
+            throws VisADException {
+        return timeStepFunc(grid, 0, FUNC_DIFFERENCE);
+    }
+
+
+
+    /**
+     * This creates a field where D(T) = D(T)+D(0)
+     * Any time steps up to the offset time are set to missing
+     * @param grid   grid to average
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl sumFromBaseTime(FieldImpl grid)
+            throws VisADException {
+        return timeStepFunc(grid, 0, FUNC_SUM);
+    }
+
+
+    /**
      * This creates a field where is either D(T) = D(T)-D(T+offset)
      * or D(T) = D(T)+D(T+offset) depending on the value of the func argument
-     * Any time steps up to the offset time are set to missing
+     * Any time steps up to the offset time are set to missing. If offset == 0
+     * then we use D(0) as the fixed operand foreach operator, e.g.:
+     * D(T) = D(T) - D(0)
      * @param grid   grid to average
      * @param offset time step offset.
      * @param func which function to apply, SUM or DIFFERENCE
@@ -1361,7 +1392,6 @@ public class GridUtil {
      *
      * @throws VisADException  On badness
      */
-
     public static FieldImpl timeStepFunc(FieldImpl grid, int offset,
                                          String func)
             throws VisADException {
@@ -1381,13 +1411,22 @@ public class GridUtil {
                 float[][] timeStepValues = sample.getFloats(true);
                 arrays.add(Misc.cloneArray(timeStepValues));
             }
+            float[][] baseValue = null;
+            if(offset  == 0 && arrays.size()>0) {
+                baseValue = Misc.cloneArray(arrays.get(0));
+            }
             for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
                     timeStepIdx--) {
+
                 float[][] value = arrays.get(timeStepIdx);
+                if(baseValue == null && offset  == 0) {
+                    baseValue = Misc.cloneArray(value);
+                }
                 //System.err.println("A:" + value);
-                if ((timeStepIdx + offset >= 0)
-                        && (timeStepIdx + offset < arrays.size())) {
-                    float[][] oldValue = arrays.get(timeStepIdx + offset);
+                if (offset == 0 || ((timeStepIdx + offset >= 0)
+                                    && (timeStepIdx + offset < arrays.size()))) {
+                    //If offset = 0  then use the base value
+                    float[][] oldValue = (offset == 0? baseValue :arrays.get(timeStepIdx + offset));
                     if (func.equals(FUNC_DIFFERENCE)) {
                         value = Misc.subtractArray(value, oldValue, value);
                     } else if (func.equals(FUNC_SUM)) {
