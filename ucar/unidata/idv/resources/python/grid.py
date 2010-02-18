@@ -180,6 +180,19 @@ def averageOverTime(field,makeTimes=0):
     return GridUtil.averageOverTime(field,makeTimes);
 
 
+def differenceFromBaseTime(field):
+    """set the value of each time step N:
+    D(N)= D(N) - D(0)
+    """
+    return GridUtil.differenceFromBaseTime(field);
+
+def sumFromBaseTime(field):
+    """set the value of each time step N:
+    D(N)= D(N) + D(0)
+    """
+    return GridUtil.sumFromBaseTime(field);
+
+
 def timeStepDifference(field,offset=-1):
     """set the value of each time step N:
     D(N)= D(N) - D(N+offset)
