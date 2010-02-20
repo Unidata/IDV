@@ -37,6 +37,7 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.*;
 
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.xml.XmlNodeList;
 import ucar.unidata.ui.XmlTree;
 import ucar.unidata.util.CatalogUtil;
 
@@ -63,6 +64,7 @@ import java.io.File;
 
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -477,15 +479,31 @@ public class ThreddsHandler extends XmlHandler {
                 }
             }
 
-            protected void expandXlink(XlinkTreeNode node, String href) {
-                chooser.showWaitCursor();
-                super.expandXlink(node, href);
-                chooser.showNormalCursor();
-            }
+                protected void expandXlink(XlinkTreeNode node, String href) {
+                    chooser.showWaitCursor();
+                    super.expandXlink(node, href);
+                    chooser.showNormalCursor();
+                }
 
+                public  NodeList getXlinkImportElements(Element root) {
+                    NodeList        importElements =  XmlUtil.getGrandChildren(root);
+                    for (int i = 0; i < importElements.getLength(); i++) {
+                        Element child = (Element) importElements.item(i);
+                        if(shouldProcess(child)) return importElements;
+                    }
+                    importElements = XmlUtil.getElements(root);
+                    for (int i = 0; i < importElements.getLength(); i++) {
+                        Element child = (Element) importElements.item(i);
+                        if(shouldProcess(child)) return importElements;
+                    }
+                    importElements = new XmlNodeList();
+                    ((XmlNodeList) importElements).add(root);
+                    return importElements;
 
+                }
 
-        };
+            };
+
         //Define that we look for the label of a catalogref node with the xlink:title attribute.
         tree.defineLabelAttr(CatalogUtil.TAG_CATALOGREF, "xlink:title");
         tree.getSelectionModel().setSelectionMode(
@@ -698,7 +716,6 @@ public class ThreddsHandler extends XmlHandler {
             //            <documentation xlink:href="http://cloud1.arc.nasa.gov/solve/" xlink:title="SOLVE home page"/>
             String xlink = XmlUtil.getAttribute(node,
                                CatalogUtil.ATTR_XLINK_HREF, (String) null);
-            //            System.err.println("xlink:" + xlink);
             if (xlink != null) {
                 doc = IOUtil.readContents(xlink, (String) null);
                 title = XmlUtil.getAttribute(node,

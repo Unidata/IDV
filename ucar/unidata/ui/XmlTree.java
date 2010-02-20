@@ -871,7 +871,6 @@ public class XmlTree extends JTree {
         String href;
 
 
-
         /**
          * ctor
          *
@@ -906,7 +905,7 @@ public class XmlTree extends JTree {
          * expand if needed. This gets called in a thread from the above method.
          */
         public void checkExpansionInner() {
-            tree.expandXlink(this, getBaseLocation());
+            tree.expandXlink(this, getXlinkHref());
         }
 
         /**
@@ -918,13 +917,26 @@ public class XmlTree extends JTree {
             return haveLoaded;
         }
 
+        public String getXlinkHref() {
+            String baseLocation = null;
+            XmlTreeNode parent             = (XmlTreeNode) getParent();
+            if (parent != null) {
+                baseLocation = parent.getBaseLocation();
+            }
+            String xmlUrl = expandRelativeUrl(href, baseLocation);
+            //            System.err.println("base:" + baseLocation +" href:" + href);
+            //            System.err.println("href url:" + xmlUrl);
+            return xmlUrl;
+        }
+
+
         /**
          * Where I point to
          *
          * @return Where I point to
          */
         public String getHref() {
-            return href;
+            return getXlinkHref();
         }
 
     }
@@ -1047,16 +1059,7 @@ public class XmlTree extends JTree {
             if ( !initXlinkRoot(newRoot, document, href)) {
                 return;
             }
-            NodeList importElements = null;
-            int      importLevel    = getXlinkImportLevel();
-            if (importLevel == 1) {
-                importElements = XmlUtil.getElements(newRoot);
-            } else if (importLevel == 2) {
-                importElements = XmlUtil.getGrandChildren(newRoot);
-            } else {
-                importElements = new XmlNodeList();
-                ((XmlNodeList) importElements).add(newRoot);
-            }
+            NodeList importElements = getXlinkImportElements(newRoot);
             for (int i = 0; i < importElements.getLength(); i++) {
                 Element child = (Element) importElements.item(i);
                 /*
@@ -1077,6 +1080,34 @@ public class XmlTree extends JTree {
             LogUtil.logException("Expanding xlink node:" + href, exc);
         }
     }
+
+
+    /**
+     * Find the xml elements to use when we have an xlink to an xml doc
+     *
+     * @return element to use
+     */
+    public  NodeList getXlinkImportElements(Element root) {
+        NodeList        importElements = null;
+        int      importLevel    = getXlinkImportLevel();
+        if (importLevel == 1) {
+            importElements = XmlUtil.getElements(root);
+        } else if (importLevel == 2) {
+            importElements = XmlUtil.getGrandChildren(root);
+            if(importElements.getLength()==0) {
+                importElements = XmlUtil.getElements(root);
+            }
+            if(importElements.getLength()==0) {
+                ((XmlNodeList) importElements).add(root);
+            }
+        } else {
+            importElements = new XmlNodeList();
+            ((XmlNodeList) importElements).add(root);
+        }
+
+        return importElements;
+    }
+
 
 
     /**
