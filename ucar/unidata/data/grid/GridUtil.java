@@ -734,31 +734,13 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to return a Real value
+     * This samples the given grid in both time and space and trys to 
+     * return a Real value
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue Time
-     *
-     * @return Real at the given location and time
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
-                                    Real animationValue)
-            throws VisADException, RemoteException {
-
-        return sampleToReal(grid, el, animationValue, Data.NEAREST_NEIGHBOR);
-    }
-
-
-    /**
-     * This samples the given grid in both time and space and trys to return a Real value
-     *
-     * @param grid The grid
-     * @param el Location
-     * @param animationValue The time to sample at. If null then we just sample at the location
+     * @param animationValue The time to sample at. If null then we 
+     *        just sample at the location
      * @param samplingMode mode to use
      *
      * @return Real at the given location and time
@@ -769,21 +751,44 @@ public class GridUtil {
     public static RealTuple sampleToRealTuple(FieldImpl grid,
             EarthLocation el, Real animationValue, int samplingMode)
             throws VisADException, RemoteException {
+        return sampleToRealTuple(grid, el, animationValue, samplingMode,
+                                 DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * This samples the given grid in both time and space and trys to return a Real value
+     *
+     * @param grid The grid
+     * @param el Location
+     * @param animationValue The time to sample at. If null then we just sample at the location
+     * @param samplingMode sampling mode to use
+     * @param errorMode    error mode to use
+     *
+     * @return Real at the given location and time
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static RealTuple sampleToRealTuple(FieldImpl grid,
+            EarthLocation el, Real animationValue, int samplingMode,
+            int errorMode)
+            throws VisADException, RemoteException {
         if (is3D(grid) && !isVolume(grid)) {
             grid = make2DGridFromSlice(grid, false);
         }
 
         FieldImpl sampleAtLocation;
         if (is3D(grid)) {
-            sampleAtLocation = GridUtil.sample(grid, el, samplingMode);
+            sampleAtLocation = GridUtil.sample(grid, el, samplingMode,
+                    errorMode);
         } else {
             sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint(),
-                    samplingMode);
+                    samplingMode, errorMode);
         }
         Data data = ((animationValue == null)
                      ? (Data) sampleAtLocation
                      : (Data) sampleAtLocation.evaluate(animationValue,
-                         samplingMode, Data.NO_ERRORS));
+                         samplingMode, errorMode));
 
         while ((data != null) && !(data instanceof RealTuple)) {
             if (data instanceof FieldImpl) {
@@ -801,11 +806,33 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to return a Real value
+     * This samples the given grid in both time and space and trys to return a 
+     * Real value
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue The time to sample at. If null then we just sample at the location
+     * @param animationValue Time
+     *
+     * @return Real at the given location and time
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
+                                    Real animationValue)
+            throws VisADException, RemoteException {
+
+        return sampleToReal(grid, el, animationValue, Data.NEAREST_NEIGHBOR);
+    }
+
+    /**
+     * This samples the given grid in both time and space and trys to return a 
+     * Real value
+     *
+     * @param grid The grid
+     * @param el Location
+     * @param animationValue The time to sample at. If null then we just sample 
+     *                       at the location
      * @param samplingMode mode to use
      *
      * @return Real at the given location and time
@@ -816,8 +843,32 @@ public class GridUtil {
     public static Real sampleToReal(FieldImpl grid, EarthLocation el,
                                     Real animationValue, int samplingMode)
             throws VisADException, RemoteException {
+        return sampleToReal(grid, el, animationValue, samplingMode,
+                            DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * This samples the given grid in both time and space and trys to return a 
+     * Real value
+     *
+     * @param grid The grid
+     * @param el Location
+     * @param animationValue The time to sample at. If null then we just sample 
+     *                       at the location
+     * @param samplingMode sampling mode to use
+     * @param errorMode error mode to use
+     *
+     * @return Real at the given location and time
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
+                                    Real animationValue, int samplingMode,
+                                    int errorMode)
+            throws VisADException, RemoteException {
         RealTuple sample = sampleToRealTuple(grid, el, animationValue,
-                                             samplingMode);
+                                             samplingMode, errorMode);
         return (sample == null)
                ? (Real) null
                : sample.getRealComponents()[0];
@@ -1412,21 +1463,24 @@ public class GridUtil {
                 arrays.add(Misc.cloneArray(timeStepValues));
             }
             float[][] baseValue = null;
-            if(offset  == 0 && arrays.size()>0) {
+            if ((offset == 0) && (arrays.size() > 0)) {
                 baseValue = Misc.cloneArray(arrays.get(0));
             }
             for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
                     timeStepIdx--) {
 
                 float[][] value = arrays.get(timeStepIdx);
-                if(baseValue == null && offset  == 0) {
+                if ((baseValue == null) && (offset == 0)) {
                     baseValue = Misc.cloneArray(value);
                 }
                 //System.err.println("A:" + value);
-                if (offset == 0 || ((timeStepIdx + offset >= 0)
-                                    && (timeStepIdx + offset < arrays.size()))) {
+                if ((offset == 0)
+                        || ((timeStepIdx + offset >= 0)
+                            && (timeStepIdx + offset < arrays.size()))) {
                     //If offset = 0  then use the base value
-                    float[][] oldValue = (offset == 0? baseValue :arrays.get(timeStepIdx + offset));
+                    float[][] oldValue = ((offset == 0)
+                                          ? baseValue
+                                          : arrays.get(timeStepIdx + offset));
                     if (func.equals(FUNC_DIFFERENCE)) {
                         value = Misc.subtractArray(value, oldValue, value);
                     } else if (func.equals(FUNC_SUM)) {
@@ -5954,15 +6008,15 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Find the min, max and average from the range
      *
-     * @param field _more_
-     * @param mapSets _more_
+     * @param field  the field
+     * @param mapSets  the mapsets
      *
-     * @return _more_
+     * @return the stats
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Data error
      */
     public static FieldStats findMinMaxAverageFromRange(FlatField field,
             UnionSet mapSets)
