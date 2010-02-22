@@ -2072,6 +2072,50 @@ public class DerivedGridFactory {
 
 
     /**
+     * Make a grid of isentropic potential vorticity
+     *
+     * @param  temperFI  grid or time sequence of grids of temperature
+     * @param  pressFI   grid or time sequence of grids of pressures at
+     *                   levels in grid
+     * @param  absvor    grid or time sequence of grids of absolute vorticity
+     *
+     * @return computed  grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField createPVOR(FlatField tempFF, FlatField absvor)
+            throws VisADException, RemoteException {
+
+
+        // will need little "g" - Earth surface's grav accel
+        Real g = ucar.visad.quantities.Gravity.newReal();
+        //     System.out.println ("    g = "+g.getValue() );
+
+        // compute each theta FlatField for time steps in turn; 
+        // make IPV from it and load in FieldImpl
+        RealType pressure =
+                        (RealType) ((FunctionType) tempFF.getType())
+                            .getDomain().getComponent(2);
+
+        // the derivative of theta by pressure level
+        FlatField dtdp = (FlatField) partial(tempFF, pressure);
+
+        // multiply by minus g - surface gravity acceleration
+        dtdp = (FlatField) dtdp.multiply(g).negate();
+
+        // multiply by absolute vorticity grid for this time step
+        FlatField pvor = (FlatField) dtdp.multiply(absvor);
+
+        // make the VisAD FunctionType for the PVOR; several steps
+        Unit     pvUnit = pvor.getRangeUnits()[0][0];
+        RealType pvRT   = DataUtil.makeRealType("pvor", pvUnit);
+        pvor = (FlatField) GridUtil.setParamType(dtdp, pvRT, false);
+
+        return pvor;
+    } 
+
+    /**
      * Every data grid with pressure as the z coord can be used
      * to make a grid with pressure with the grid values as well
      *
