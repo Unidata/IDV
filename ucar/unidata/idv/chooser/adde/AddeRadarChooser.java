@@ -377,10 +377,14 @@ public class AddeRadarChooser extends AddeImageChooser {
             String       descrForIds = descriptorNames[0];
             Hashtable    dtable      = getDescriptorTable();
             Iterator     iter        = dtable.keySet().iterator();
+            String group = getGroup().toLowerCase();
             while (iter.hasNext()) {
                 String name       = (String) iter.next();
                 String descriptor = ((String) dtable.get(name)).toLowerCase();
-                if (descriptor.equals("n0r")
+                if (group.indexOf("tdw") >= 0 && descriptor.equals("tr0")) {
+                    descrForIds = name;
+                    break;
+                } else if (descriptor.equals("n0r")
                         || descriptor.startsWith("bref")) {
                     descrForIds = name;
                     break;
@@ -473,6 +477,15 @@ public class AddeRadarChooser extends AddeImageChooser {
         };
         buf.append(makeProps(props, ad));
         return buf.toString();
+    }
+
+    /**
+     * Check if we are using the lat/lon widget
+     *
+     * @return true if we are using the lat/lon widget
+     */
+    protected boolean useLatLon() {
+        return true;
     }
 
     /**
