@@ -120,15 +120,39 @@ import javax.swing.JOptionPane;
 public class GridUtil {
 
     /**
+     * Weighted average sampling mode
+     */
+    public static final int WEIGHTED_AVERAGE = Data.WEIGHTED_AVERAGE;
+
+    /**
+     * Nearest Neighbor sampling mode
+     */
+    public static final int NEAREST_NEIGHBOR = Data.NEAREST_NEIGHBOR;
+
+    /**
+     * No error mode
+     */
+    public static final int NO_ERRORS = Data.NO_ERRORS;
+
+    /**
+     * Dependent error mode
+     */
+    public static final int DEPENDENT_ERRORS = Data.DEPENDENT;
+
+    /**
+     * Independent error mode
+     */
+    public static final int INDEPENDENT_ERRORS = Data.INDEPENDENT;
+
+    /**
      * Default sampling mode used for subsampling grids
      */
-    public static final int DEFAULT_SAMPLING_MODE = Data.WEIGHTED_AVERAGE;
+    public static final int DEFAULT_SAMPLING_MODE = WEIGHTED_AVERAGE;
 
     /**
      * Default error mode used for subsampling grids
      */
-    public static final int DEFAULT_ERROR_MODE = Data.NO_ERRORS;
-
+    public static final int DEFAULT_ERROR_MODE = NO_ERRORS;
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_AVERAGE = "average";
@@ -6241,5 +6265,6 @@ public class GridUtil {
 
         return llGrid;
     }
+
 
 }
