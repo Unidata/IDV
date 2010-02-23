@@ -1656,21 +1656,40 @@ public class DerivedGridFactory {
     public static FieldImpl createRelativeHumidity(FieldImpl mixingRatioFI,
             FieldImpl temperFI)
             throws VisADException, RemoteException {
+        return createRelativeHumidity(mixingRatioFI, temperFI, false);
+    }
 
-        FieldImpl rhFI = null;
+
+    /**
+     * Make a FieldImpl of Relative Humidity; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     *
+     * @param mixingRatioFI grid of mixing ratio
+     * @param temperFI grid of air temperature
+     * @param isSpecificHumidity  is the mixingRationFI really SH?
+     *
+     * @return grid computed Relative Humidity result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createRelativeHumidity(FieldImpl mixingRatioFI,
+            FieldImpl temperFI, boolean isSpecificHumidity)
+            throws VisADException, RemoteException {
+
+        FieldImpl rhFI          = null;
+        FlatField mixingRatioFF = null;
+        FlatField press         = null;
 
         boolean isSequence = (GridUtil.isTimeSequence(temperFI)
                               && GridUtil.isTimeSequence(mixingRatioFI));
 
-        // get a grid of pressure values
-        FlatField press =
-            createPressureGridFromDomain((FlatField) temperFI.getSample(0));
-
         if (isSequence) {
 
-            // Implementation:  have to take the raw time series of data FieldImpls
-            // apart, make the mixingRatio FlatField by FlatField (for each time step),
-            // and put all back together again into a new FieldImpl with all times.
+            // get a grid of pressure values
+            press = createPressureGridFromDomain(
+                (FlatField) temperFI.getSample(0));
 
             Set timeSet = temperFI.getDomainSet();
 
@@ -1683,9 +1702,16 @@ public class DerivedGridFactory {
             // compute each FlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                FlatField rhFF = (FlatField) RelativeHumidity.create(
-                                     mixingRatioFI.getSample(i), press,
-                                     temperFI.getSample(i));
+                mixingRatioFF = (FlatField) mixingRatioFI.getSample(i);
+
+                if (isSpecificHumidity) {
+                    mixingRatioFF = (FlatField) WaterVaporMixingRatio.create(
+                        mixingRatioFF);
+                }
+
+                FlatField rhFF =
+                    (FlatField) RelativeHumidity.create(mixingRatioFF, press,
+                        temperFI.getSample(i));
 
                 // first time through
                 if (i == 0) {
@@ -1703,8 +1729,18 @@ public class DerivedGridFactory {
         }
         // if one time only
         else {
+            // get a grid of pressure values
+            press         =
+                createPressureGridFromDomain((FlatField) temperFI);
+
+            mixingRatioFF = (FlatField) mixingRatioFI;
+            if (isSpecificHumidity) {
+                mixingRatioFF =
+                    (FlatField) WaterVaporMixingRatio.create(mixingRatioFI);
+            }
+
             // make one FlatField 
-            rhFI = (FieldImpl) RelativeHumidity.create(mixingRatioFI, press,
+            rhFI = (FieldImpl) RelativeHumidity.create(mixingRatioFF, press,
                     temperFI);
 
         }  // end single time 
@@ -2072,11 +2108,9 @@ public class DerivedGridFactory {
 
 
     /**
-     * Make a grid of isentropic potential vorticity
+     * Make a grid of potential vorticity
      *
-     * @param  temperFI  grid or time sequence of grids of temperature
-     * @param  pressFI   grid or time sequence of grids of pressures at
-     *                   levels in grid
+     * @param tempFF     temperature field (temp, theta, or thetaE)
      * @param  absvor    grid or time sequence of grids of absolute vorticity
      *
      * @return computed  grid
@@ -2095,8 +2129,8 @@ public class DerivedGridFactory {
         // compute each theta FlatField for time steps in turn; 
         // make IPV from it and load in FieldImpl
         RealType pressure =
-                        (RealType) ((FunctionType) tempFF.getType())
-                            .getDomain().getComponent(2);
+            (RealType) ((FunctionType) tempFF.getType()).getDomain()
+                .getComponent(2);
 
         // the derivative of theta by pressure level
         FlatField dtdp = (FlatField) partial(tempFF, pressure);
@@ -2113,7 +2147,7 @@ public class DerivedGridFactory {
         pvor = (FlatField) GridUtil.setParamType(dtdp, pvRT, false);
 
         return pvor;
-    } 
+    }
 
     /**
      * Every data grid with pressure as the z coord can be used
