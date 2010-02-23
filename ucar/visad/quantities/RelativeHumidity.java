@@ -147,14 +147,8 @@ public class RelativeHumidity extends ScalarQuantity {
         Data satMixingRatio = WaterVaporMixingRatio.create(pressure,
                                   temperature);
 
-        return Util
-            .clone(VisADMath
-                .multiply(new Real(100.0),
-                          VisADMath
-                              .divide(mixingRatio,
-                                      satMixingRatio)), getRealType(), false,
-                                          false);
-
+        return Util.clone(VisADMath.divide(mixingRatio, satMixingRatio),
+                          getRealType(), false, false);
     }
 
 }
