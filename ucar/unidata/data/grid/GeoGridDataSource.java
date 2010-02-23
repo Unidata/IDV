@@ -441,9 +441,10 @@ public class GeoGridDataSource extends GridDataSource {
         JTextArea    dumpText = new JTextArea();
         TextSearcher searcher = new TextSearcher(dumpText);
         dumpText.setFont(Font.decode("monospaced"));
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        //ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StringWriter bos = new StringWriter();
         try {
-            ucar.nc2.NCdump.print(dataset.getNetcdfDataset(), "", bos, null);
+            ucar.nc2.NCdumpW.print(dataset.getNetcdfDataset(), "", bos, null);
         } catch (IOException ioe) {
             logException("Dumping netcdf file", ioe);
         }
