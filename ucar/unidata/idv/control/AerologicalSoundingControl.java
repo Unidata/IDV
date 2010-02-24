@@ -1332,10 +1332,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         //if (specificWidget != null) {
         //    controlArea.add(GuiUtils.center(specificWidget));
         //}
+        JScrollPane bottomComp = new JScrollPane(viewOptions,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         //controlArea.add(GuiUtils.inset(viewOptions, 4));
-        JComponent soundingComp =
-            GuiUtils.centerBottom(soundingView.getContents(), viewOptions);
+        //        JComponent soundingComp =
+        //            GuiUtils.centerBottom(soundingView.getContents(), bottomComp);
+        JSplitPane soundingComp =
+            GuiUtils.vsplit(soundingView.getContents(), bottomComp,0.75);
+
+        soundingComp.setOneTouchExpandable(true);
 
         JScrollPane sp =
             new JScrollPane(
@@ -1347,6 +1354,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         JComponent left = (specificWidget != null)
                           ? GuiUtils.centerBottom(sp, specificWidget)
                           : sp;
+        JScrollPane leftSP = new JScrollPane(left,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        leftSP.setPreferredSize(new Dimension(250,100));
+
+
         viewTabs = new JTabbedPane();
         viewTabs.add("Sounding Chart", soundingComp);
         viewTabs.add(HODOGRAPH_DISPLAY, hodoView.getComponent());
@@ -1369,7 +1382,15 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                               haveWinds);
 
         //JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
-        JSplitPane spl = GuiUtils.hsplit(left, viewTabs, .35);
+
+        /*
+        JScrollPane rightSP = new JScrollPane(viewTabs,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        */
+
+        JSplitPane spl = GuiUtils.hsplit(leftSP, viewTabs, .4);
+
         spl.setOneTouchExpandable(true);
         //Container contents = GuiUtils.topCenterBottom(locLabel, spl,
         //                         controlArea);
