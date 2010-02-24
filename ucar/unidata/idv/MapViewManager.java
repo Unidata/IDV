@@ -1610,7 +1610,6 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void center(MapProjection mp) throws RemoteException, VisADException {
         LatLonPoint center = mp.getCenterLatLon();
-        System.err.println(center);
         getNavigatedDisplay().center(
                                      new EarthLocationTuple(
                                                             center.getLatitude(), center.getLongitude(),
