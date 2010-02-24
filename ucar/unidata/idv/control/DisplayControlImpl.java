@@ -5937,10 +5937,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (hasMapProjection()) {
+            items.add(GuiUtils.MENU_SEPARATOR);
             JMenuItem mi = new JMenuItem(getDataProjectionLabel());
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     setProjectionInView(false);
+                }
+            });
+            items.add(mi);
+
+            mi = new JMenuItem("Center on Display");
+            mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    centerOnDisplay();
                 }
             });
             items.add(mi);
@@ -6286,6 +6295,29 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             mp, true,
             getDisplayConventions().getMapProjectionLabel(mp, this),
             useViewPreference, true, maintainViewpoint);
+    }
+
+
+
+
+    /**
+     * If this display has a dataprojection then center the view to it
+     */
+    protected void centerOnDisplay() {
+        MapViewManager mvm = getMapViewManager();
+        if (mvm == null) {
+            return;
+        }
+        MapProjection mp = getDataProjection();
+        if (mp == null) {
+            return;
+        }
+
+        try {
+            mvm.center(mp);
+        } catch (Exception exc) {
+            logException("Centering display", exc);
+        }
     }
 
     /**
@@ -8023,7 +8055,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             JComponent comp = (JComponent) comps.get(lblIdx);
             if (lblIdx == 0) {
                 comp.setToolTipText(
-                    "<html>Click to show the control window.<br>Right click to show menu.<br>Click and drag to move display.</html>");
+                    "<html>Click to show the control window.<br>Control-Click to center display.<br>Right click to show menu.<br>Click and drag to move display.</html>");
             } else {
                 comp.setToolTipText("<html>Right click to show menu.</html>");
             }
@@ -8178,10 +8210,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent event) {
                     //Don't do anything if it is the right mouse button
-                    if (SwingUtilities.isRightMouseButton(event)) {
+                    if ( !myControl.getHaveInitialized()) {
                         return;
                     }
-                    if ( !myControl.getHaveInitialized()) {
+                    if(GuiUtils.isControlKey(event)) {
+                        myControl.centerOnDisplay();
+                        return;
+                    }
+                    if (SwingUtilities.isRightMouseButton(event)) {
                         return;
                     }
                     myControl.popup(SideLegendLabel.this);

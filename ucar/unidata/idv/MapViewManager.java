@@ -1370,6 +1370,8 @@ public class MapViewManager extends NavigatedViewManager {
 
                 addressReprojectCbx = new JCheckBox("Reproject",
                         getStore().get(PREF_ADDRESS_REPROJECT, true));
+                addressReprojectCbx.setToolTipText("When checked make a simple map projection over the location");
+
                 List savedAddresses =
                     (List) getStore().get(PREF_ADDRESS_LIST);
                 if (savedAddresses != null) {
@@ -1601,6 +1603,20 @@ public class MapViewManager extends NavigatedViewManager {
         return showMenu;
     }
 
+
+
+    /**
+     * Center the display (animated) to the center of the given mapprojection
+     */
+    public void center(MapProjection mp) throws RemoteException, VisADException {
+        LatLonPoint center = mp.getCenterLatLon();
+        System.err.println(center);
+        getNavigatedDisplay().center(
+                                     new EarthLocationTuple(
+                                                            center.getLatitude(), center.getLongitude(),
+                                                            new Real(RealType.Altitude, 0)), true);
+
+    }
 
 
     /**
