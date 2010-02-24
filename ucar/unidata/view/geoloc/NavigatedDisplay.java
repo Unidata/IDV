@@ -1211,6 +1211,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             t2.get(q2);
             boolean ask = true;
 
+
             for (int step = 1; step <= numSteps; step++) {
                 if (myTimeStamp != animationTimeStamp) {
                     isAnimating = false;
@@ -1226,6 +1227,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
                     isAnimating = false;
                     if (finalLocation != null) {
+                        //xxxxx
                         center(finalLocation);
                     }
                     return;
@@ -1908,7 +1910,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public void centerAndZoom(final EarthLocation el, boolean animated,
                               double zoomFactor)
             throws VisADException, RemoteException {
-        centerAndZoom(el, null, zoomFactor, true, true);
+        centerAndZoom(el, null, zoomFactor, animated, true);
     }
 
 
@@ -1938,6 +1940,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             return;
         }
 
+        //        Misc.printStack("centerAndZoom",10,null);
 
 
         try {
