@@ -6788,7 +6788,9 @@ public class GuiUtils extends LayoutUtil {
         if (!isMac()) {
             return event.isControlDown();
         }
-        return event.isMetaDown();
+        //Don't do this for now
+        return event.isControlDown();
+        //        return event.isMetaDown();
     }
 
 
