@@ -65,6 +65,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
     /** array of station ids */
     // private String[] stationIds;
+
     private List stations;
 
     /** _more_ */
@@ -508,40 +509,6 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         return aniSet;
     }
 
-    /**
-     * Get the DisplayListTemplate property.
-     *
-     * @return The DisplayListTemplate
-     */
-    public String getDisplayListTemplate() {
-        int            index   = getSelectedStationIndex();
-        String template = (String) stations.get(index) + " " + MACRO_TIMESTAMP;
-        return template;
-    }
-
-    /**
-     * Add the data to the in display legend
-     *
-     * @return the data for the display list displayable
-     */
-
-    protected Data getDisplayListDataOld() {
-        Data           data    = null;
-        int            timeIdx = getCurrentIdx();
-        int            index   = getSelectedStationIndex();
-        List<DateTime> times   = stationsTimes.get(stations.get(index));
-        String         timeStr = times.get(timeIdx).toString();
-        if (index >= 0) {
-            String label = (String) stations.get(index) + " " + timeStr;
-            try {
-                TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
-                data = new Text(tt, label);
-            } catch (VisADException ve) {
-                logException("getting display list data ", ve);
-            }
-        }
-        return data;
-    }
 
     /**
      * Update the location label, subclasses can override.
@@ -559,6 +526,40 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
             super.updateHeaderLabel();
         }
     }
+
+
+    /**
+     * Add any macro name/label pairs
+     *
+     * @param names List of macro names
+     * @param labels List of macro labels
+     */
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_STATION));
+        labels.addAll(Misc.newList("Station"));
+    }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template template
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template,  patterns, values);
+
+        List stations = this.stations;
+        int            index   = getSelectedStationIndex();
+        if (index >= 0 && stations!=null && index<stations.size()) {
+            patterns.add(MACRO_STATION);
+            values.add(""+ stations.get(index));
+        }
+    }
+
 
 
 

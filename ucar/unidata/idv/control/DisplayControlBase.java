@@ -169,6 +169,9 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** Macro for the short parameter name for the label */
     public static final String MACRO_SHORTNAME = "%shortname%";
 
+    public static final String MACRO_STATION = "%station%";
+
+
     /** Macro for the long parameter name for the label */
     public static final String MACRO_LONGNAME = "%longname%";
 

@@ -584,41 +584,37 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
     }
 
 
+
     /**
-     * Add the data to the in display legend
+     * Add any macro name/label pairs
      *
-     * @return the data for the display list displayable
+     * @param names List of macro names
+     * @param labels List of macro labels
      */
-    protected Data getDisplayListData() {
-        Data   data  = null;
-        String label = "";
-        if (getLocation() != null) {
-            label = getDisplayConventions().formatLatLonPoint(getLocation());
-        }
-        try {
-            Set      s  = getDataTimeSet();
-            TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
-            if (s != null) {
-                FunctionType ft =
-                    new FunctionType(((SetType) s.getType()).getDomain(), tt);
-                FieldImpl  fi      = new FieldImpl(ft, s);
-                double[][] samples = s.getDoubles();
-                for (int i = 0; i < s.getLength(); i++) {
-                    DateTime dt = new DateTime(samples[0][i]);
-                    Text     t  = new Text(tt, label + " " + dt.toString());
-                    fi.setSample(i, t, false);
-                }
-                data = fi;
-            } else {
-                label = "Gridded " + getTypeLabel(getDisplayType()) + " "
-                        + label;
-                data = new Text(tt, label);
-            }
-        } catch (VisADException ve) {
-            logException("getting display list data ", ve);
-        } catch (RemoteException re) {}
-        return data;
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_POSITION));
+        labels.addAll(Misc.newList("Probe Position"));
     }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template template
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template,  patterns, values);
+
+        if (getLocation() != null) {
+            patterns.add(MACRO_POSITION);
+            values.add(getDisplayConventions().formatLatLonPoint(getLocation()));
+        }
+    }
+
 
     /**
      * Update the location label, subclasses can override.

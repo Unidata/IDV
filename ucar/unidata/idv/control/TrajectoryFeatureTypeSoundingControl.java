@@ -390,28 +390,37 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
     }
 
     /**
-     * Add the data to the in display legend
+     * Add any macro name/label pairs
      *
-     * @return the data for the display list displayable
+     * @param names List of macro names
+     * @param labels List of macro labels
      */
-
-    protected Data getDisplayListData() {
-        Data           data    = null;
-        int            timeIdx = getCurrentIdx();
-        int            index   = getSelectedStationIndex();
-       // List<DateTime> times   = stationsTimes.get(stations.get(index));
-        String         timeStr = timeList.get(index).toString();
-        if (index >= 0) {
-            String label = (String) stationIds[index] + " " + timeStr;
-            try {
-                TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
-                data = new Text(tt, label);
-            } catch (VisADException ve) {
-                logException("getting display list data ", ve);
-            }
-        }
-        return data;
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_STATION));
+        labels.addAll(Misc.newList("Station"));
     }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template template
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template,  patterns, values);
+
+        int            index   = getSelectedStationIndex();
+        if (index >= 0) {
+            patterns.add(MACRO_POSITION);
+            values.add(""+ stationIds[index]);
+        }
+    }
+
+
 
 }
 
