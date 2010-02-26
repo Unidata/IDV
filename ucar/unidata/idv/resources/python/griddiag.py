@@ -197,6 +197,16 @@ def mixr(temp,rh):
   """
   return DerivedGridFactory.createMixingRatio(temp,rh)
 
+def relh(temp,mixr):
+  """ Create Relative Humidity from Temperature, mixing ratio (requires pressure domain) 
+  """
+  return DerivedGridFactory.createMixingRatio(temp,rh)
+
+def pvor(theta,wind):
+  """ Potetial Vorticity from theta and wind
+  """
+  return DerivedGridFactory.createPotentialVorticity(theta,wind)
+
 def sdiv(S,V):
   """ Horizontal Flux Divergence 
   <div class=jython>

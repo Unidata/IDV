@@ -537,17 +537,17 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
      description="Potential Vorticity (from %N1% &amp; %N2%)"
      label="Potential Vorticity"
      isdefault="true" 
-     isenduser="true"
-     formula="DerivedGridFactory.createPotentialVorticity(D1, D2)">
+     isenduser="false"
+     formula="pvor(D1, D2)">
     <categories>
       <category
          value="inherit"
          childidx="0"/>
     </categories>
     <operands>
-      <params categories="GRID-3D-*;"
+      <params categories="GRID-3D-*;flowvector-3D-*"
          p1="THETA"
-         p2="absvort"/>
+         p2="flowvectors"/>
     </operands>
   </derived>
   <derived
@@ -764,15 +764,15 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category
          value="inherit"
          append="Derived"
-         childidx="1"/>
+         childidx="0"/>
     </categories>
     <operands>
       <params categories="GRID-2D-*;"
-         p1="MIXR"
-         p2="TEMP"/>
+         p1="TEMP"
+         p2="MIXR"/>
       <params categories="GRID-3D-*;"
-         p1="MIXR"
-         p2="TEMP"/>
+         p1="TEMP"
+         p2="MIXR"/>
     </operands>
   </derived>
 
