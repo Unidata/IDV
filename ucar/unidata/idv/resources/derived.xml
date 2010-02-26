@@ -152,6 +152,24 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          append="Derived"
          childidx="0"
          categoryidx="0"/>
+
+<!--
+    add a new datacategory. Pick up the second datacategory (categoryidx=1) from
+    the first operand (childidx=0). Replace the string GRID with the string flowvector
+    So we end up with something like:
+    flowvector-2D-TIME 
+    from the original datacategory:
+    GRID-2D-TIME
+    Note: replace can be a set of name:value pairs of the form:
+    replace="name1:value1;name2:value2;..."
+-->
+      <category
+         value="inherit"
+         replace="GRID:flowvector"
+         childidx="0"
+         categoryidx="1"/>
+
+
       <category value="flowvector"/>
     </categories>
     <operands> 
