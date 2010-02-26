@@ -811,27 +811,29 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(JythonManager.PROP_JYTHON_EDITOR, jythonEditorField);
 
 
-        UIManager.LookAndFeelInfo[] landfs =
-            UIManager.getInstalledLookAndFeels();
-        Vector         lookAndFeelItems    = new Vector();
-        TwoFacedObject selectedLookAndFeel = null;
-        LookAndFeel    lookAndFeel         = UIManager.getLookAndFeel();
-        for (int i = 0; i < landfs.length; i++) {
-            TwoFacedObject tfo;
-            lookAndFeelItems.add(tfo =
-                new TwoFacedObject(landfs[i].getName(),
-                                   landfs[i].getClassName()));
-            if (lookAndFeel.getClass().getName().equals(
-                    landfs[i].getClassName())) {
-                selectedLookAndFeel = tfo;
+        JComboBox lookAndFeelBox = null;
+        if(!GuiUtils.isMac()) {
+            UIManager.LookAndFeelInfo[] landfs =
+                UIManager.getInstalledLookAndFeels();
+            Vector         lookAndFeelItems    = new Vector();
+            TwoFacedObject selectedLookAndFeel = null;
+            LookAndFeel    lookAndFeel         = UIManager.getLookAndFeel();
+            for (int i = 0; i < landfs.length; i++) {
+                TwoFacedObject tfo;
+                lookAndFeelItems.add(tfo =
+                                     new TwoFacedObject(landfs[i].getName(),
+                                                        landfs[i].getClassName()));
+                if (lookAndFeel.getClass().getName().equals(
+                                                            landfs[i].getClassName())) {
+                    selectedLookAndFeel = tfo;
+                }
             }
+            lookAndFeelBox = new JComboBox(lookAndFeelItems);
+            if (selectedLookAndFeel != null) {
+                lookAndFeelBox.setSelectedItem(selectedLookAndFeel);
+            }
+            widgets.put(PREF_LOOKANDFEEL, lookAndFeelBox);
         }
-        JComboBox lookAndFeelBox = new JComboBox(lookAndFeelItems);
-        if (selectedLookAndFeel != null) {
-            lookAndFeelBox.setSelectedItem(selectedLookAndFeel);
-        }
-        widgets.put(PREF_LOOKANDFEEL, lookAndFeelBox);
-
 
         GuiUtils.setHFill();
         JComponent editorComp = GuiUtils.doLayout(new Component[] {
@@ -840,12 +842,22 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                         jythonEditorField) }, 2,
                                             GuiUtils.WT_YN, GuiUtils.WT_N);
 
-        JComponent topPanel = GuiUtils.formLayout(new Component[] {
-            GuiUtils.rLabel("Resource Sitepath:"),
-            GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
-            GuiUtils.left(editorComp), GuiUtils.rLabel("Look & Feel:"),
-            GuiUtils.left(lookAndFeelBox)
-        });
+        JComponent topPanel;
+
+        if(lookAndFeelBox!=null) {
+            topPanel = GuiUtils.formLayout(new Component[] {
+                    GuiUtils.rLabel("Resource Sitepath:"),
+                    GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
+                    GuiUtils.left(editorComp), 
+                    GuiUtils.rLabel("Look & Feel:"),
+                    GuiUtils.left(lookAndFeelBox)
+                });
+        } else {
+            topPanel = GuiUtils.formLayout(new Component[] {
+                    GuiUtils.rLabel("Resource Sitepath:"),
+                    GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
+                    GuiUtils.left(editorComp)});
+        }
         Object[][] prefs1 = {
             { "General:", null },
             { "Show Help Tip Dialog On Start",

@@ -497,12 +497,15 @@ public class IdvUIManager extends IdvManager {
      */
     public void loadLookAndFeel() {
 
-        String lookAndFeel = getStore().get(PREF_LOOKANDFEEL, (String) null);
-        if (lookAndFeel != null) {
-            try {
-                UIManager.setLookAndFeel(lookAndFeel);
-            } catch (Exception exc) {
-                System.err.println("Unknown look and feel:" + lookAndFeel);
+
+        if(!GuiUtils.isMac()) {
+            String lookAndFeel = getStore().get(PREF_LOOKANDFEEL, (String) null);
+            if (lookAndFeel != null) {
+                try {
+                    UIManager.setLookAndFeel(lookAndFeel);
+                } catch (Exception exc) {
+                    System.err.println("Unknown look and feel:" + lookAndFeel);
+                }
             }
         }
         String locale = getStore().get(PREF_LOCALE, (String) null);
