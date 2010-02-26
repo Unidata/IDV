@@ -332,6 +332,11 @@ specified  -->
      range_max="10.0"
      unit="1.0E-6 K.s-1.kg-1.m2"/>
   <param
+     name="pvor"
+     range_min="-1.0"
+     range_max="10.0"
+     unit="1.0E-6 K.s-1.kg-1.m2"/>
+  <param
      name="relvort"
      range_min="-100"
      range_max="200"
