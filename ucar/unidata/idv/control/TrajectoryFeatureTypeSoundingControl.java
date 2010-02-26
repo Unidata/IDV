@@ -412,10 +412,9 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
     protected void addLabelMacros(String template, List patterns,
                                   List values) {
         super.addLabelMacros(template,  patterns, values);
-
-        int            index   = getSelectedStationIndex();
+        int index   = getSelectedStationIndex();
         if (index >= 0) {
-            patterns.add(MACRO_POSITION);
+            patterns.add(MACRO_STATION);
             values.add(""+ stationIds[index]);
         }
     }
