@@ -1947,24 +1947,25 @@ public class DerivedGridFactory {
      * @param  temperFI  grid or time sequence of grids of temperature with
      *                   a spatial domain that includes pressure in vertical
      * @param  vector    grid or time sequence of grids wind
+     * @param absvor _more_
      *
      * @return computed grid(s)
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
+     * public static FieldImpl createPotentialVorticity(FieldImpl temperFI,
+     *       FieldImpl vector)
+     *       throws VisADException, RemoteException {
+     *
+     *   return createIPV(
+     *       temperFI,
+     *       createPressureGridFromDomain(
+     *           (GridUtil.isTimeSequence(temperFI) == true)
+     *           ? (FlatField) temperFI.getSample(0)
+     *           : (FlatField) temperFI), createAbsoluteVorticity(
+     *               getUComponent(vector), getVComponent(vector)));
+     * }
      */
-    public static FieldImpl createPotentialVorticity(FieldImpl temperFI,
-            FieldImpl vector)
-            throws VisADException, RemoteException {
-
-        return createIPV(
-            temperFI,
-            createPressureGridFromDomain(
-                (GridUtil.isTimeSequence(temperFI) == true)
-                ? (FlatField) temperFI.getSample(0)
-                : (FlatField) temperFI), createAbsoluteVorticity(
-                    getUComponent(vector), getVComponent(vector)));
-    }
 
     /**
      * Make a FieldImpl of isentropic potential vorticity
@@ -2108,6 +2109,73 @@ public class DerivedGridFactory {
 
 
     /**
+     * Make a grid of isentropic potential vorticity
+     *
+     * @param  thetaFI  grid or time sequence of grids of theta, thetae, et
+     * @param  absvorFI  grid or time sequence of grids of absolute vorticity
+     *
+     * @return computed  grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createPotentialVorticity(FieldImpl thetaFI,
+            FieldImpl absvorFI)
+            throws VisADException, RemoteException {
+
+        boolean        TisSequence = (GridUtil.isTimeSequence(thetaFI));
+        boolean        AisSequence = (GridUtil.isTimeSequence(absvorFI));
+
+        FieldImpl      pvorFI      = null;
+        visad.Function dthdp       = null;
+        FunctionType   pvorFIType  = null;
+
+        if (TisSequence) {  //assumes avor is also a sequence
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make a potential temperature FlatField by FlatField,
+            // and put all back together again into a new theta FieldImpl
+
+            Set timeSet = thetaFI.getDomainSet();
+
+            // resample to domainSet of tempFI.  If they are the same, this
+            // should be a no-op
+            if ((timeSet.getLength() > 1) && (AisSequence)) {
+                absvorFI = (FieldImpl) absvorFI.resample(timeSet);
+            }
+
+            // make PVOR from it and load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FlatField pvorFF =
+                    createPVOR((FlatField) thetaFI.getSample(i),
+                               (FlatField) absvorFI.getSample(i));
+
+                if ((pvorFIType == null) && (pvorFF != null)) {
+
+                    pvorFIType = new FunctionType(
+                        ((SetType) timeSet.getType()).getDomain(),
+                        pvorFF.getType());
+
+                    // System.out.println ("    first func type = "+functionType);
+
+                    // make the new FieldImpl for IPV (but as yet empty of data)
+                    pvorFI = new FieldImpl(pvorFIType, timeSet);
+                }
+                // set this time's ipv grid 
+                if (pvorFF != null) {
+                    pvorFI.setSample(i, pvorFF, false);
+                }
+            }
+        } else {
+            pvorFI = (FieldImpl) createPVOR((FlatField) thetaFI,
+                                            (FlatField) absvorFI);
+        }
+
+        return pvorFI;
+    }  // end make PVOR
+
+
+    /**
      * Make a grid of potential vorticity
      *
      * @param tempFF     temperature field (temp, theta, or thetaE)
@@ -2144,7 +2212,7 @@ public class DerivedGridFactory {
         // make the VisAD FunctionType for the PVOR; several steps
         Unit     pvUnit = pvor.getRangeUnits()[0][0];
         RealType pvRT   = DataUtil.makeRealType("pvor", pvUnit);
-        pvor = (FlatField) GridUtil.setParamType(dtdp, pvRT, false);
+        pvor = (FlatField) GridUtil.setParamType(pvor, pvRT, false);
 
         return pvor;
     }
@@ -2653,7 +2721,7 @@ public class DerivedGridFactory {
     public static FieldImpl smooth(FieldImpl slice, String type)
             throws VisADException, RemoteException {
         return smooth(slice, type, (type.equals(SMOOTH_GAUSS)
-                                    ? 4
+                                    ? 6
                                     : 0));
     }
 
