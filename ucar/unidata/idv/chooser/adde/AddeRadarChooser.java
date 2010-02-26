@@ -480,15 +480,6 @@ public class AddeRadarChooser extends AddeImageChooser {
     }
 
     /**
-     * Check if we are using the lat/lon widget
-     *
-     * @return true if we are using the lat/lon widget
-     */
-    protected boolean useLatLon() {
-        return true;
-    }
-
-    /**
      * Get the list of properties for the base URL
      * @return list of properties
      */
