@@ -119,6 +119,9 @@ public class DerivedDataDescriptor {
     /** The XML attribute for append */
     private static final String ATTR_APPEND = "append";
 
+    /** The XML attribute for replace */
+    private static final String ATTR_REPLACE = "replace";
+
     /** The XML attribute for category index */
     private static final String ATTR_CATEGORYIDX = "categoryidx";
 
@@ -337,9 +340,12 @@ public class DerivedDataDescriptor {
                                       ATTR_CATEGORYIDX, -1);
                 String append = XmlUtil.getAttribute(child, ATTR_APPEND,
                                     NULL_STRING);
+                String replace = XmlUtil.getAttribute(child, ATTR_REPLACE,
+                                    NULL_STRING);
                 dataCategory.setChildIndex(childIdx);
                 dataCategory.setCategoryIndex(categoryIdx);
                 dataCategory.setAppend(append);
+                dataCategory.setReplace(replace);
                 categories.add(dataCategory);
             }
         }
@@ -672,6 +678,9 @@ public class DerivedDataDescriptor {
 
             if (cat.getAppend() != null) {
                 categoryNode.setAttribute(ATTR_APPEND, cat.getAppend());
+            }
+            if (cat.getReplace() != null) {
+                categoryNode.setAttribute(ATTR_REPLACE, cat.getReplace());
             }
             if (cat.getChildIndex() >= 0) {
                 categoryNode.setAttribute(ATTR_CHILDIDX,

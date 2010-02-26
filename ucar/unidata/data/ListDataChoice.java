@@ -334,6 +334,19 @@ public class ListDataChoice extends DataChoice {
                         + DataCategory.DIVIDER
                         + src.getAppend(), newCategory.getForDisplay());
             }
+            if (src.getReplace() != null) {
+                String catString = newCategory.toString()
+                    + DataCategory.DIVIDER
+                    + src.getAppend();
+                for(String pair:  StringUtil.split(src.getReplace(),";",true,true)) {
+                    List<String>tuple = StringUtil.split(pair,":",true,true);
+                    catString = catString.replaceAll(tuple.get(0), tuple.get(1));
+                }
+                newCategory =
+                    DataCategory.parseCategory(catString,
+                                               newCategory.getForDisplay());
+                System.err.println ("replace:" + newCategory);
+            }
 
             if (i == 0) {
                 categories.set(srcIndex, newCategory);

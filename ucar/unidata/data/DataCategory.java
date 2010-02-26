@@ -282,6 +282,9 @@ public class DataCategory {
     /** appended category name */
     private String append;
 
+    /** string pattern:value to replace in derived categories */
+    private String replace;
+
     /** flag for whether a category if for display */
     private boolean forDisplay = true;
 
@@ -998,6 +1001,26 @@ public class DataCategory {
     public String getAppend() {
         return append;
     }
+
+    /**
+       Set the Replace property.
+
+       @param value The new value for Replace
+    **/
+    public void setReplace (String value) {
+	this.replace = value;
+    }
+
+    /**
+       Get the Replace property.
+
+       @return The Replace
+    **/
+    public String getReplace () {
+	return this.replace;
+    }
+
+
 
     /**
      * Append the string to the data category and return a new category.
