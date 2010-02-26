@@ -1645,18 +1645,18 @@ public class DerivedGridFactory {
      * in a time series (at one or more times).
      *
      *
-     * @param mixingRatioFI grid of mixing ratio
      * @param temperFI grid of air temperature
+     * @param mixingRatioFI grid of mixing ratio
      *
      * @return grid computed Relative Humidity result grids
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl createRelativeHumidity(FieldImpl mixingRatioFI,
-            FieldImpl temperFI)
+    public static FieldImpl createRelativeHumidity(FieldImpl temperFI,
+            FieldImpl mixingRatioFI)
             throws VisADException, RemoteException {
-        return createRelativeHumidity(mixingRatioFI, temperFI, false);
+        return createRelativeHumidity(temperFI, mixingRatioFI, false);
     }
 
 
@@ -1665,8 +1665,8 @@ public class DerivedGridFactory {
      * in a time series (at one or more times).
      *
      *
-     * @param mixingRatioFI grid of mixing ratio
      * @param temperFI grid of air temperature
+     * @param mixingRatioFI grid of mixing ratio
      * @param isSpecificHumidity  is the mixingRationFI really SH?
      *
      * @return grid computed Relative Humidity result grids
@@ -1674,8 +1674,8 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl createRelativeHumidity(FieldImpl mixingRatioFI,
-            FieldImpl temperFI, boolean isSpecificHumidity)
+    public static FieldImpl createRelativeHumidity(FieldImpl temperFI,
+            FieldImpl mixingRatioFI, boolean isSpecificHumidity)
             throws VisADException, RemoteException {
 
         FieldImpl rhFI          = null;
@@ -1942,32 +1942,6 @@ public class DerivedGridFactory {
     }  // end make potential temperature fieldimpl
 
     /**
-     * Make a FieldImpl of potential vorticity
-     *
-     * @param  temperFI  grid or time sequence of grids of temperature with
-     *                   a spatial domain that includes pressure in vertical
-     * @param  vector    grid or time sequence of grids wind
-     * @param absvor _more_
-     *
-     * @return computed grid(s)
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
-     * public static FieldImpl createPotentialVorticity(FieldImpl temperFI,
-     *       FieldImpl vector)
-     *       throws VisADException, RemoteException {
-     *
-     *   return createIPV(
-     *       temperFI,
-     *       createPressureGridFromDomain(
-     *           (GridUtil.isTimeSequence(temperFI) == true)
-     *           ? (FlatField) temperFI.getSample(0)
-     *           : (FlatField) temperFI), createAbsoluteVorticity(
-     *               getUComponent(vector), getVComponent(vector)));
-     * }
-     */
-
-    /**
      * Make a FieldImpl of isentropic potential vorticity
      *
      * @param  temperFI  grid or time sequence of grids of temperature with
@@ -2112,7 +2086,7 @@ public class DerivedGridFactory {
      * Make a grid of isentropic potential vorticity
      *
      * @param  thetaFI  grid or time sequence of grids of theta, thetae, et
-     * @param  absvorFI  grid or time sequence of grids of absolute vorticity
+     * @param  vectorFI  grid or time sequence of grids of u and v
      *
      * @return computed  grid
      *
@@ -2120,8 +2094,11 @@ public class DerivedGridFactory {
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl createPotentialVorticity(FieldImpl thetaFI,
-            FieldImpl absvorFI)
+            FieldImpl vectorFI)
             throws VisADException, RemoteException {
+
+        FieldImpl absvorFI = createAbsoluteVorticity(getUComponent(vectorFI),
+                                 getVComponent(vectorFI));
 
         boolean        TisSequence = (GridUtil.isTimeSequence(thetaFI));
         boolean        AisSequence = (GridUtil.isTimeSequence(absvorFI));
