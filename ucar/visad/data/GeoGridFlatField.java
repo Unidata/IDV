@@ -217,7 +217,15 @@ public class GeoGridFlatField extends CachedFlatField {
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
-                arr = geoGrid.readVolumeData(timeIndex);
+                try {
+                    arr = geoGrid.readVolumeData(timeIndex);
+                } catch(Exception exc) {
+                    if(exc.toString().indexOf("Inconsistent array length read")>=0) {
+                        throw new ucar.unidata.data.BadDataException("Error reading data from server");
+                    } else {
+                        throw new RuntimeException(exc);
+                    }
+                }
                 LogUtil.message("");
             }
             Trace.call2("GeoGridFlatField.geogrid.readVolumeData");
@@ -237,12 +245,12 @@ public class GeoGridFlatField extends CachedFlatField {
                     }
                 }
             }
-        } catch (RemoteException e) {
+            /*        } catch (RemoteException e) {
             LogUtil.logException("getFlatField read got RemoteException", e);
             return null;
         } catch (IOException e) {
             LogUtil.logException("getFlatField read got IOException", e);
-            return null;
+            return null;*/
         } finally {
             ucar.unidata.data.DataSourceImpl.decrOutstandingGetDataCalls();
         }
