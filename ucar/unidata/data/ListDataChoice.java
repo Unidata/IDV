@@ -345,7 +345,7 @@ public class ListDataChoice extends DataChoice {
                 newCategory =
                     DataCategory.parseCategory(catString,
                                                newCategory.getForDisplay());
-                System.err.println ("replace:" + newCategory);
+                //System.err.println ("replace:" + newCategory);
             }
 
             if (i == 0) {
