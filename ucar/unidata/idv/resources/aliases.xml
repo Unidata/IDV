@@ -14,6 +14,18 @@ The label is used  (if defined) for  the AliasEditor gui.
      label="Relative humidity"
      aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES,RELH,Relative_humidity_weightedMean_pressure,SPFH_2maboveground,RelativeHumidity"/>
   <alias
+     name="MIXR"
+     label="Mixing Ratio"
+     aliases="mixr,MixingRatio,mixingratio"/>
+  <alias
+     name="THETA"
+     label="Potential Temperature"
+     aliases="THTA_.*,theta,thetaP"/>
+  <alias
+     name="THETAE"
+     label="Equivalent Potential Temperature"
+     aliases="THTE_.*,thetae"/>
+  <alias
      name="DEWPOINT"
      label="Dewpoint"
      aliases="dewpoint,Dewpoint,DEWPOINT,dp,dp_0,dp_1,TD_tenths,TD,dpdk,dew_point_temperature,Dew_point_temperature,DWPK_PRES,DWPC,DWPF,DWPK,DPT_2maboveground"/>
@@ -52,7 +64,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="CC"
      label="WMO Cloud Coverage Code"
-     aliases="OctsSkyObscured,CA,cloudCover,CC1,CC2,CC3,CC4"/>
+     aliases="OctsSkyObscured,CA,cloudCover"/>
   <alias
      name="PTNDCODE"
      label="WMO Pressure Tendency Code"

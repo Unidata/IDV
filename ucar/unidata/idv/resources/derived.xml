@@ -509,13 +509,26 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          childidx="0"/>
     </categories>
     <operands>
-<!--
-      <params categories="GRID-2D-*;"
-         p1="TEMP"
-         p2="absvort"/>
--->
       <params categories="GRID-3D-*;"
          p1="TEMP"
+         p2="absvort"/>
+    </operands>
+  </derived>
+  <derived
+     id="pvor"
+     description="Potential Vorticity (from %N1% &amp; %N2%)"
+     label="Potential Vorticity"
+     isdefault="true" 
+     isenduser="true"
+     formula="DerivedGridFactory.createPotentialVorticity(D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         childidx="0"/>
+    </categories>
+    <operands>
+      <params categories="GRID-3D-*;"
+         p1="THETA"
          p2="absvort"/>
     </operands>
   </derived>
@@ -722,6 +735,28 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
 
 
+  <derived
+     id="relh"
+     description="Relative Humidity (from %N1% &amp; %N2%)"
+     label="Relative Humidity"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createRelativeHumidity(D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="1"/>
+    </categories>
+    <operands>
+      <params categories="GRID-2D-*;"
+         p1="MIXR"
+         p2="TEMP"/>
+      <params categories="GRID-3D-*;"
+         p1="MIXR"
+         p2="TEMP"/>
+    </operands>
+  </derived>
 
 
 </derived_parameters>
