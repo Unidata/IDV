@@ -1607,6 +1607,9 @@ public class GeoGridAdapter {
         if (axis.getRank() > 1) {
             return false;
         }
+        if (axis.getSize() <= 1) {
+            return false;
+        }
         if ( !isLon && ((CoordinateAxis1D) axis).isRegular()) {
             return true;
         }
