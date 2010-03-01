@@ -2800,76 +2800,102 @@ public class DerivedGridFactory {
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
-        float[] gni = samples[0];
-        float[] gno = new float[gni.length];
+        int       numParams = samples.length;
+        float[][] newVals   = new float[numParams][];
 
-        /*
-         * Apply five-point binomial smoother over subset grid.
-         */
-        for (int j = jgymin; j <= jgymax; j++) {
-            for (int i = jgxmin; i <= jgxmax; i++) {
-                ii = (j - 1) * kxd + i;
-                if (Float.isNaN(gni[ii - 1])) {
-                    /*
-                     * Check for missing data.
-                     */
-                    gno[ii - 1] = Float.NaN;
-                } else {
-                    ip1 = ii + 1;
-                    if (i + 1 > jgxmax) {
-                        dip1 = Float.NaN;
+        for (int np = 0; np < numParams; np++) {
+            float[] gni = samples[np];
+            float[] gno = new float[gni.length];
+
+            /*
+             * Apply five-point binomial smoother over subset grid.
+             */
+            for (int j = jgymin; j <= jgymax; j++) {
+                for (int i = jgxmin; i <= jgxmax; i++) {
+                    ii = (j - 1) * kxd + i;
+                    if (Float.isNaN(gni[ii - 1])) {
+                        /*
+                         * Check for missing data.
+                         */
+                        gno[ii - 1] = Float.NaN;
                     } else {
-                        dip1 = gni[ip1 - 1];
+                        ip1 = ii + 1;
+                        if (i + 1 > jgxmax) {
+                            dip1 = Float.NaN;
+                        } else {
+                            dip1 = gni[ip1 - 1];
+                        }
+                        im1 = ii - 1;
+                        if (i - 1 < jgxmin) {
+                            dim1 = Float.NaN;
+                        } else {
+                            dim1 = gni[im1 - 1];
+                        }
+                        jp1 = ii + kxd;
+                        if (j + 1 > jgymax) {
+                            djp1 = Float.NaN;
+                        } else {
+                            djp1 = gni[jp1 - 1];
+                        }
+                        jm1 = ii - kxd;
+                        if (j - 1 < jgymin) {
+                            djm1 = Float.NaN;
+                        } else {
+                            djm1 = gni[jm1 - 1];
+                        }
+                        dsum = gni[ii - 1] * wt4;
+                        wsum = wt4;
+                        if ( !Float.isNaN(dip1)) {
+                            dsum += dip1 * wt;
+                            wsum += wt;
+                        }
+                        if ( !Float.isNaN(dim1)) {
+                            dsum += dim1 * wt;
+                            wsum += wt;
+                        }
+                        if ( !Float.isNaN(djp1)) {
+                            dsum += djp1 * wt;
+                            wsum += wt;
+                        }
+                        if ( !Float.isNaN(djm1)) {
+                            dsum += djm1 * wt;
+                            wsum += wt;
+                        }
+                        gno[ii - 1] = dsum / wsum;
                     }
-                    im1 = ii - 1;
-                    if (i - 1 < jgxmin) {
-                        dim1 = Float.NaN;
-                    } else {
-                        dim1 = gni[im1 - 1];
-                    }
-                    jp1 = ii + kxd;
-                    if (j + 1 > jgymax) {
-                        djp1 = Float.NaN;
-                    } else {
-                        djp1 = gni[jp1 - 1];
-                    }
-                    jm1 = ii - kxd;
-                    if (j - 1 < jgymin) {
-                        djm1 = Float.NaN;
-                    } else {
-                        djm1 = gni[jm1 - 1];
-                    }
-                    dsum = gni[ii - 1] * wt4;
-                    wsum = wt4;
-                    if ( !Float.isNaN(dip1)) {
-                        dsum += dip1 * wt;
-                        wsum += wt;
-                    }
-                    if ( !Float.isNaN(dim1)) {
-                        dsum += dim1 * wt;
-                        wsum += wt;
-                    }
-                    if ( !Float.isNaN(djp1)) {
-                        dsum += djp1 * wt;
-                        wsum += wt;
-                    }
-                    if ( !Float.isNaN(djm1)) {
-                        dsum += djm1 * wt;
-                        wsum += wt;
-                    }
-                    gno[ii - 1] = dsum / wsum;
                 }
             }
+            newVals[np] = gno;
         }
-        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
-        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_SM5S",
-                               rt.getDefaultUnit());
-        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-        newField.setSamples(new float[][] {
-            gno
-        }, false);
+        newField = (FlatField) GridUtil.setParamType(slice,
+                makeNewType(slice, "_SM5S"), true);
+        newField.setSamples(newVals, false);
 
         return newField;
+    }
+
+    /**
+     * Make a new type for the field by appending the suffix to the exiting
+     * RealType in the rang
+     *
+     * @param slice  grid with original names
+     * @param newSuffix  the new suffix for Range RealTypes
+     *
+     * @return  the new Range type
+     *
+     * @throws VisADException  problem creating new types
+     */
+    private static RealTupleType makeNewType(FlatField slice,
+                                             String newSuffix)
+            throws VisADException {
+        RealType[] rts    = GridUtil.getParamType(slice).getRealComponents();
+        RealType[] newRTs = new RealType[rts.length];
+        for (int i = 0; i < rts.length; i++) {
+            newRTs[i] =
+                Util.makeRealType(Util.cleanTypeName(rts[i].getName())
+                                  + newSuffix, rts[i].getDefaultUnit());
+        }
+        return new RealTupleType(newRTs);
     }
 
     /**
@@ -2914,152 +2940,153 @@ public class DerivedGridFactory {
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
-        float[] gni = samples[0];
-        float[] gno = new float[gni.length];
+        int       numParams = samples.length;
+        float[][] newVals   = new float[numParams][];
 
-        for (j = jgymin; j <= jgymax; j++) {
-            for (i = jgxmin; i <= jgxmax; i++) {
-                ii = (j - 1) * kxd + i;
-                if (Float.isNaN(gni[ii - 1])) {
-                    /*
-                     * Check for missing data.
-                     */
-                    gno[ii - 1] = Float.NaN;
-                } else {
-                    ip1 = ii + 1;
-                    if (i + 1 > jgxmax) {
-                        dip1 = Float.NaN;
+        for (int np = 0; np < numParams; np++) {
+            float[] gni = samples[np];
+            float[] gno = new float[gni.length];
+
+            for (j = jgymin; j <= jgymax; j++) {
+                for (i = jgxmin; i <= jgxmax; i++) {
+                    ii = (j - 1) * kxd + i;
+                    if (Float.isNaN(gni[ii - 1])) {
+                        /*
+                         * Check for missing data.
+                         */
+                        gno[ii - 1] = Float.NaN;
                     } else {
-                        dip1 = gni[ip1 - 1];
-                    }
+                        ip1 = ii + 1;
+                        if (i + 1 > jgxmax) {
+                            dip1 = Float.NaN;
+                        } else {
+                            dip1 = gni[ip1 - 1];
+                        }
 
-                    im1 = ii - 1;
-                    if (i - 1 < jgxmin) {
-                        dim1 = Float.NaN;
-                    } else {
-                        dim1 = gni[im1 - 1];
-                    }
+                        im1 = ii - 1;
+                        if (i - 1 < jgxmin) {
+                            dim1 = Float.NaN;
+                        } else {
+                            dim1 = gni[im1 - 1];
+                        }
 
-                    jp1 = ii + kxd;
-                    if (j + 1 > jgymax) {
-                        djp1 = Float.NaN;
-                    } else {
-                        djp1 = gni[jp1 - 1];
-                    }
+                        jp1 = ii + kxd;
+                        if (j + 1 > jgymax) {
+                            djp1 = Float.NaN;
+                        } else {
+                            djp1 = gni[jp1 - 1];
+                        }
 
-                    jm1 = ii - kxd;
-                    if (j - 1 < jgymin) {
-                        djm1 = Float.NaN;
-                    } else {
-                        djm1 = gni[jm1 - 1];
-                    }
+                        jm1 = ii - kxd;
+                        if (j - 1 < jgymin) {
+                            djm1 = Float.NaN;
+                        } else {
+                            djm1 = gni[jm1 - 1];
+                        }
 
-                    imjm = jm1 - 1;
-                    if ((j - 1 < jgymin) || (i - 1 < jgxmin)) {
-                        dimjm = Float.NaN;
-                    } else {
-                        dimjm = gni[imjm - 1];
-                    }
+                        imjm = jm1 - 1;
+                        if ((j - 1 < jgymin) || (i - 1 < jgxmin)) {
+                            dimjm = Float.NaN;
+                        } else {
+                            dimjm = gni[imjm - 1];
+                        }
 
-                    ipjm = jm1 + 1;
-                    if ((j - 1 < jgymin) || (i + 1 > jgxmax)) {
-                        dipjm = Float.NaN;
-                    } else {
-                        dipjm = gni[ipjm - 1];
-                    }
+                        ipjm = jm1 + 1;
+                        if ((j - 1 < jgymin) || (i + 1 > jgxmax)) {
+                            dipjm = Float.NaN;
+                        } else {
+                            dipjm = gni[ipjm - 1];
+                        }
 
-                    imjp = jp1 - 1;
-                    if ((j + 1 > jgymax) || (i - 1 < jgxmin)) {
-                        dimjp = Float.NaN;
-                    } else {
-                        dimjp = gni[imjp - 1];
-                    }
+                        imjp = jp1 - 1;
+                        if ((j + 1 > jgymax) || (i - 1 < jgxmin)) {
+                            dimjp = Float.NaN;
+                        } else {
+                            dimjp = gni[imjp - 1];
+                        }
 
-                    ipjp = jp1 + 1;
-                    if ((j + 1 > jgymax) || (i + 1 > jgxmax)) {
-                        dipjp = Float.NaN;
-                    } else {
-                        dipjp = gni[ipjp - 1];
-                    }
+                        ipjp = jp1 + 1;
+                        if ((j + 1 > jgymax) || (i + 1 > jgxmax)) {
+                            dipjp = Float.NaN;
+                        } else {
+                            dipjp = gni[ipjp - 1];
+                        }
 
-                    dsum = gni[ii - 1] * wt4;
-                    wsum = wt4;
-                    if ( !Float.isNaN(dip1)) {
-                        dsum += dip1 * wt;
-                        wsum += wt;
-                    } else {
-                        dsum += gni[ii - 1] * wt;
-                        wsum += wt;
-                    }
+                        dsum = gni[ii - 1] * wt4;
+                        wsum = wt4;
+                        if ( !Float.isNaN(dip1)) {
+                            dsum += dip1 * wt;
+                            wsum += wt;
+                        } else {
+                            dsum += gni[ii - 1] * wt;
+                            wsum += wt;
+                        }
 
-                    if ( !Float.isNaN(dim1)) {
-                        dsum += dim1 * wt;
-                        wsum += wt;
-                    } else {
-                        dsum += gni[ii - 1] * wt;
-                        wsum += wt;
-                    }
+                        if ( !Float.isNaN(dim1)) {
+                            dsum += dim1 * wt;
+                            wsum += wt;
+                        } else {
+                            dsum += gni[ii - 1] * wt;
+                            wsum += wt;
+                        }
 
-                    if ( !Float.isNaN(djp1)) {
-                        dsum += djp1 * wt;
-                        wsum += wt;
-                    } else {
-                        dsum += gni[ii - 1] * wt;
-                        wsum += wt;
-                    }
+                        if ( !Float.isNaN(djp1)) {
+                            dsum += djp1 * wt;
+                            wsum += wt;
+                        } else {
+                            dsum += gni[ii - 1] * wt;
+                            wsum += wt;
+                        }
 
-                    if ( !Float.isNaN(djm1)) {
-                        dsum += djm1 * wt;
-                        wsum += wt;
-                    } else {
-                        dsum += gni[ii - 1] * wt;
-                        wsum += wt;
-                    }
+                        if ( !Float.isNaN(djm1)) {
+                            dsum += djm1 * wt;
+                            wsum += wt;
+                        } else {
+                            dsum += gni[ii - 1] * wt;
+                            wsum += wt;
+                        }
 
-                    if ( !Float.isNaN(dimjm)) {
-                        dsum += dimjm * wtc;
-                        wsum += wtc;
-                    } else {
-                        dsum += gni[ii - 1] * wtc;
-                        wsum += wtc;
-                    }
+                        if ( !Float.isNaN(dimjm)) {
+                            dsum += dimjm * wtc;
+                            wsum += wtc;
+                        } else {
+                            dsum += gni[ii - 1] * wtc;
+                            wsum += wtc;
+                        }
 
-                    if ( !Float.isNaN(dipjm)) {
-                        dsum += dipjm * wtc;
-                        wsum += wtc;
-                    } else {
-                        dsum += gni[ii - 1] * wtc;
-                        wsum += wtc;
-                    }
+                        if ( !Float.isNaN(dipjm)) {
+                            dsum += dipjm * wtc;
+                            wsum += wtc;
+                        } else {
+                            dsum += gni[ii - 1] * wtc;
+                            wsum += wtc;
+                        }
 
-                    if ( !Float.isNaN(dimjp)) {
-                        dsum += dimjp * wtc;
-                        wsum += wtc;
-                    } else {
-                        dsum += gni[ii - 1] * wtc;
-                        wsum += wtc;
-                    }
+                        if ( !Float.isNaN(dimjp)) {
+                            dsum += dimjp * wtc;
+                            wsum += wtc;
+                        } else {
+                            dsum += gni[ii - 1] * wtc;
+                            wsum += wtc;
+                        }
 
-                    if ( !Float.isNaN(dipjp)) {
-                        dsum += dipjp * wtc;
-                        wsum += wtc;
-                    } else {
-                        dsum += gni[ii - 1] * wtc;
-                        wsum += wtc;
-                    }
+                        if ( !Float.isNaN(dipjp)) {
+                            dsum += dipjp * wtc;
+                            wsum += wtc;
+                        } else {
+                            dsum += gni[ii - 1] * wtc;
+                            wsum += wtc;
+                        }
 
-                    gno[ii - 1] = dsum / wsum;
+                        gno[ii - 1] = dsum / wsum;
+                    }
                 }
             }
+            newVals[np] = gno;
         }
-
-        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
-        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_SM9S",
-                               rt.getDefaultUnit());
-        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-        newField.setSamples(new float[][] {
-            gno
-        }, false);
+        newField = (FlatField) GridUtil.setParamType(slice,
+                makeNewType(slice, "_SM9S"), true);
+        newField.setSamples(newVals, false);
 
         return newField;
     }
@@ -3113,82 +3140,84 @@ public class DerivedGridFactory {
         float[][]  samples  = slice.getFloats(false);
         GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
         int[]      lengths  = domain.getLengths();
-        kxd   = lengths[0];
-        kyd   = lengths[1];
-        gnist = samples[0];
-        gnost = new float[gnist.length];
+        kxd = lengths[0];
+        kyd = lengths[1];
+        int       numParams = samples.length;
+        float[][] newVals   = new float[numParams][];
+
+        for (int np = 0; np < numParams; np++) {
+            gnist = samples[np];
+            gnost = new float[gnist.length];
 
 
-        /*
-         * Compute the matrix of weights for one quadrant using symmetry
-         * of two dimensional Gaussian surface.
-         */
-        sumw = 0.0f;
-        sig2 = sgma * sgma;
-        aa   = (float) (1.f / (sig2 * Math.PI));
-        for (jw = 1; jw <= nr + 1; jw++) {
-            if (jw == 1) {
-                is = 2;
-            } else {
-                is = jw;
-            }
-            for (iw = is; iw <= nr + 1; iw++) {
-                x = iw - 1;
-                y = jw - 1;
-                w[iw - 1][jw - 1] = (float) (aa * Math.exp(-(x * x + y * y)
-                        / sig2));
-                w[jw - 1][iw - 1] = w[iw - 1][jw - 1];
-                if ((jw == 1) || (jw == iw)) {
-                    sumw += w[iw - 1][jw - 1];
+            /*
+             * Compute the matrix of weights for one quadrant using symmetry
+             * of two dimensional Gaussian surface.
+             */
+            sumw = 0.0f;
+            sig2 = sgma * sgma;
+            aa   = (float) (1.f / (sig2 * Math.PI));
+            for (jw = 1; jw <= nr + 1; jw++) {
+                if (jw == 1) {
+                    is = 2;
                 } else {
-                    sumw += 2. * w[iw - 1][jw - 1];
+                    is = jw;
+                }
+                for (iw = is; iw <= nr + 1; iw++) {
+                    x = iw - 1;
+                    y = jw - 1;
+                    w[iw - 1][jw - 1] = (float) (aa
+                            * Math.exp(-(x * x + y * y) / sig2));
+                    w[jw - 1][iw - 1] = w[iw - 1][jw - 1];
+                    if ((jw == 1) || (jw == iw)) {
+                        sumw += w[iw - 1][jw - 1];
+                    } else {
+                        sumw += 2. * w[iw - 1][jw - 1];
+                    }
                 }
             }
-        }
-        sumw    *= 4.f;
-        w[0][0] = 1.f - sumw;
+            sumw    *= 4.f;
+            w[0][0] = 1.f - sumw;
 
-        for (jj = 1; jj <= kyd; jj++) {
-            for (ii = 1; ii <= kxd; ii++) {
-                is   = ii - nr;
-                ie   = ii + nr;
-                js   = jj - nr;
-                je   = jj + nr;
-                sumw = 0.0f;
-                sumf = 0.0f;
-                for (j = js; j <= je; j++) {
-                    if ((j >= 1) && (j <= kyd)) {
-                        for (i = is; i <= ie; i++) {
-                            if ((i >= 1) && (i <= kxd)) {
-                                iw   = Math.abs(i - ii) + 1;
-                                jw   = Math.abs(j - jj) + 1;
-                                indx = (j - 1) * kxd + i;
-                                if ( !Float.isNaN(gnist[indx - 1])) {
-                                    sumw += w[iw - 1][jw - 1];
-                                    sumf += gnist[indx - 1]
-                                            * w[iw - 1][jw - 1];
+            for (jj = 1; jj <= kyd; jj++) {
+                for (ii = 1; ii <= kxd; ii++) {
+                    is   = ii - nr;
+                    ie   = ii + nr;
+                    js   = jj - nr;
+                    je   = jj + nr;
+                    sumw = 0.0f;
+                    sumf = 0.0f;
+                    for (j = js; j <= je; j++) {
+                        if ((j >= 1) && (j <= kyd)) {
+                            for (i = is; i <= ie; i++) {
+                                if ((i >= 1) && (i <= kxd)) {
+                                    iw   = Math.abs(i - ii) + 1;
+                                    jw   = Math.abs(j - jj) + 1;
+                                    indx = (j - 1) * kxd + i;
+                                    if ( !Float.isNaN(gnist[indx - 1])) {
+                                        sumw += w[iw - 1][jw - 1];
+                                        sumf += gnist[indx - 1]
+                                                * w[iw - 1][jw - 1];
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                indx = (jj - 1) * kxd + ii;
-                if ( !G_DIFFT(sumw, 0.0F, GDIFFD)
-                        && !Float.isNaN(gnist[indx - 1])) {
-                    gnost[indx - 1] = sumf / sumw;
-                } else {
-                    gnost[indx - 1] = Float.NaN;
+                    indx = (jj - 1) * kxd + ii;
+                    if ( !G_DIFFT(sumw, 0.0F, GDIFFD)
+                            && !Float.isNaN(gnist[indx - 1])) {
+                        gnost[indx - 1] = sumf / sumw;
+                    } else {
+                        gnost[indx - 1] = Float.NaN;
+                    }
                 }
             }
+            newVals[np] = gnost;
         }
+        newField = (FlatField) GridUtil.setParamType(slice,
+                makeNewType(slice, "_GWFS"), true);
 
-        RealType rt = (RealType) GridUtil.getParamType(slice).getComponent(0);
-        rt = Util.makeRealType(Util.cleanTypeName(rt.getName()) + "_GWFS",
-                               rt.getDefaultUnit());
-        newField = (FlatField) GridUtil.setParamType(slice, rt, true);
-        newField.setSamples(new float[][] {
-            gnost
-        }, false);
+        newField.setSamples(newVals, false);
 
         return newField;
     }
