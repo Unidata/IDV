@@ -223,7 +223,7 @@ def savg(S):
       SAVG ( S ) = average of all non-missing grid point values
   </div>
   """
-  return GridUtil.applyFunctionToLevels(S, "average")
+  return GridUtil.applyFunctionToLevels(S, GridUtil.FUNC_AVERAGE)
 
 def sdiv(S,V):
   """ Horizontal Flux Divergence 
