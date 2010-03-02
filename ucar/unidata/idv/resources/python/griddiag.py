@@ -5,8 +5,8 @@
    are named slightly different from GEMPAK functions to avoid conflicts
    with Jython built-ins (e.g. str).
    <P>
-   In the following operators, scalar operands are named Si and 
-   vector operands are named Vi.  Lowercase u and v refer to the
+   In the following operators, scalar operands are named S<sub>n</sub> and 
+   vector operands are named V<sub>n</sub>.  Lowercase u and v refer to the
    grid relative components of a vector.
 """
 
@@ -146,6 +146,16 @@ def dot(V1,V2):
   product = mul(V1,V2)
   return add(ur(product),vr(product))
 
+def gwfs(S, N=6):
+  """ 
+  <div class=jython>
+ Horizontal smoothing using normally distributed weights 
+ with theoretical response of 1/e for N * delta-x wave.  
+ Increasing N increases the smoothing. (default N=6)
+  </div>
+  """
+  return DerivedGridFactory.smooth(S, "GWFS", int(N))
+
 def jcbn(S1,S2):
   """ Jacobian Determinant 
   <div class=jython>
@@ -202,10 +212,18 @@ def relh(temp,mixr):
   """
   return DerivedGridFactory.createMixingRatio(temp,rh)
 
-def pvor(theta,wind):
-  """ Potetial Vorticity from theta and wind
+def pvor(S,V):
+  """ Potetial Vorticity (usually from theta and wind)
   """
   return DerivedGridFactory.createPotentialVorticity(theta,wind)
+
+def savg(S):
+  """ Average over whole grid
+  <div class=jython>
+      SAVG ( S ) = average of all non-missing grid point values
+  </div>
+  """
+  return GridUtil.applyFunctionToLevels(S, "average")
 
 def sdiv(S,V):
   """ Horizontal Flux Divergence 
@@ -222,6 +240,30 @@ def shr(V):
   </div>
   """
   return add(ddx(vr(V)),ddy(ur(V)))
+
+def sm5s(S):
+  """ Smooth a scalar grid using a 5-point smoother
+  <div class=jython>
+     SM5S ( S ) = .5 * S (i,j) + .125 * ( S (i+1,j) + S (i,j+1) +
+                                          S (i-1,j) + S (i,j-1) ) 
+
+  </div>
+  """
+  return DerivedGridFactory.smooth(S, "SM5S")
+
+def sm9s(S):
+  """ Smooth a scalar grid using a 9-point smoother
+  <div class=jython>
+      SM9S ( S ) = .25 * S (i,j) + .125 * ( S (i+1,j) + S (i,j+1) +
+                                            S (i-1,j) + S (i,j-1) )
+                                 + .0625 * ( S (i+1,j+1) +
+                                             S (i+1,j-1) +
+                                             S (i-1,j+1) +
+                                             S (i-1,j-1) )
+
+  </div>
+  """
+  return DerivedGridFactory.smooth(S, "SM9S")
 
 def strd(V):
   """ Stretching Deformation 
@@ -308,13 +350,13 @@ def dvdy(V):
 def frnt(S,V):
   """  Frontogenesis function from theta and the wind
   <div class=jython>
-      FRNT ( THTA, V ) = 1/2 * MAG ( GRAD (THTA) ) *
-                         ( DEF * COS (2 * BETA) - DIV )
- 
-                         Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI)
-                                          - DDY (THTA) * SIN (PSI))/
-                                       MAG ( GRAD (THTA) ) )
-                                PSI  = 1/2 ATAN2 ( SHR / STR )
+      FRNT ( THTA, V ) = 1/2 * MAG ( GRAD (THTA) ) *                   
+                         ( DEF * COS (2 * BETA) - DIV )                <p>
+                                                                        
+                         Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI) <br>
+                                          - DDY (THTA) * SIN (PSI))/   <br>
+                                       MAG ( GRAD (THTA) ) )           <br>
+                                PSI  = 1/2 ATAN2 ( SHR / STR )         <br>
   </div>
   """
   shear = shr(V)
@@ -347,6 +389,16 @@ def grad(S):
   """
   return vecr(ddx(S),ddy(S))
   
+def gwfv(V, N=6):
+  """ 
+  <div class=jython>
+ Horizontal smoothing using normally distributed weights 
+ with theoretical response of 1/e for N * delta-x wave.  
+ Increasing N increases the smoothing. (default N=6)
+  </div>
+  """
+  return gwfs(V, N)
+
 def inad(V1,V2):
   """ Inertial advective wind 
   <div class=jython>
@@ -368,6 +420,17 @@ def qvec(S,V):
   qvecu = newName(-dot(dvdx(V),grads),"qvecu")
   qvecv = newName(-dot(dvdy(V),grads),"qvecv")
   return vecr(qvecu,qvecv)
+
+
+def sm5v(V):
+  """ Smooth a scalar grid using a 5-point smoother (see sm5s)
+  """
+  return sm5s(V)
+
+def sm9v(V):
+  """ Smooth a scalar grid using a 9-point smoother (see sm9s)
+  """
+  return sm9s(V)
 
 def thrm(S, level1, level2):
   """ Thermal wind 

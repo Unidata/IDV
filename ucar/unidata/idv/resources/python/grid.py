@@ -11,7 +11,7 @@ def makeVector(a,b):
 def makeFlowField(a,b,c):
   """ Make a vector from 3 components
   <div class=jython>
-      makeVector(a,b) = [a,b,c]
+      makeVector(a,b,c) = [a,b,c]
   </div>
   """
   return DerivedGridFactory.createFlowVectors(a,b,c)
