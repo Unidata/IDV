@@ -758,12 +758,12 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to 
+     * This samples the given grid in both time and space and trys to
      * return a Real value
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue The time to sample at. If null then we 
+     * @param animationValue The time to sample at. If null then we
      *        just sample at the location
      * @param samplingMode mode to use
      *
@@ -830,7 +830,7 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to return a 
+     * This samples the given grid in both time and space and trys to return a
      * Real value
      *
      * @param grid The grid
@@ -850,12 +850,12 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to return a 
+     * This samples the given grid in both time and space and trys to return a
      * Real value
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue The time to sample at. If null then we just sample 
+     * @param animationValue The time to sample at. If null then we just sample
      *                       at the location
      * @param samplingMode mode to use
      *
@@ -872,12 +872,12 @@ public class GridUtil {
     }
 
     /**
-     * This samples the given grid in both time and space and trys to return a 
+     * This samples the given grid in both time and space and trys to return a
      * Real value
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue The time to sample at. If null then we just sample 
+     * @param animationValue The time to sample at. If null then we just sample
      *                       at the location
      * @param samplingMode sampling mode to use
      * @param errorMode error mode to use
@@ -1616,7 +1616,8 @@ public class GridUtil {
 
 
     /**
-     * Apply the function to the time steps of the given grid. The function is one of the FUNC_ enums
+     * Apply the function to the time steps of the given grid.
+     * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
@@ -1682,6 +1683,163 @@ public class GridUtil {
             return newGrid;
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+
+    }
+
+
+    /**
+     * Apply the function to a single time step of a grid
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @param newRangeType   the new range type.  if null, create
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static FlatField applyFunctionToLevelsFF(FlatField grid,
+            String function, RealTupleType newRangeType)
+            throws VisADException {
+        final boolean doMax    = function.equals(FUNC_MAX);
+        final boolean doMin    = function.equals(FUNC_MIN);
+        FlatField     newField = null;
+        try {
+            GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
+            int[]      lengths   = domainSet.getLengths();
+            int        sizeX     = lengths[0];
+            int        sizeY     = lengths[1];
+            int sizeZ = ((lengths.length == 2)
+                         || (domainSet.getManifoldDimension() == 2))
+                        ? 1
+                        : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+            float[][] newValues =
+                new float[samples.length][samples[0].length];
+            // TODO: multiple params
+            for (int np = 0; np < samples.length; np++) {
+                for (int k = 0; k < sizeZ; k++) {
+                    int   numNonMissing = 0;
+                    float result        = Float.NaN;
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = samples[np][index];
+                            if (value != value) {
+                                continue;
+                            }
+                            if (result != result) result = value;
+                            if (doMax) {
+                                result = Math.max(result, value);
+                            } else if (doMin) {
+                                result = Math.min(result, value);
+                            } else {
+                                result += value;
+                                numNonMissing++;
+                            }
+                        }
+                    }
+                    if (function.equals(FUNC_AVERAGE)) {
+                        result = result / numNonMissing;
+                    }
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int index = k * sizeX * sizeY + j * sizeX + i;
+                            if (samples[np][index] == samples[np][index]) {
+                                newValues[np][index] = result;
+                            } else {
+                                newValues[np][index] = Float.NaN;
+                            }
+                        }
+                    }
+                }
+            }
+            if (newRangeType == null) {
+                newRangeType = makeNewType(grid, "_" + function);
+            }
+            newField = (FlatField) GridUtil.setParamType(grid, newRangeType,
+                    true);
+
+            newField.setSamples(newValues, false);
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
+
+    /**
+     * Make a new type for the field by appending the suffix to the exiting
+     * RealType in the rang
+     *
+     * @param slice  grid with original names
+     * @param newSuffix  the new suffix for Range RealTypes
+     *
+     * @return  the new Range type
+     *
+     * @throws VisADException  problem creating new types
+     */
+    private static RealTupleType makeNewType(FlatField slice,
+                                             String newSuffix)
+            throws VisADException {
+        RealType[] rts    = GridUtil.getParamType(slice).getRealComponents();
+        RealType[] newRTs = new RealType[rts.length];
+        for (int i = 0; i < rts.length; i++) {
+            newRTs[i] =
+                Util.makeRealType(Util.cleanTypeName(rts[i].getName())
+                                  + newSuffix, rts[i].getDefaultUnit());
+        }
+        return new RealTupleType(newRTs);
+    }
+
+    /**
+     * Apply the function to the time steps of the given grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionToLevels(FieldImpl grid,
+            String function)
+            throws VisADException {
+        FieldImpl newField = null;
+        try {
+            if (isTimeSequence(grid)) {
+                Set           timeDomain = grid.getDomainSet();
+                RealTupleType rangeType  = null;
+                for (int timeStepIdx = 0;
+                        timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                    FlatField sample =
+                        (FlatField) grid.getSample(timeStepIdx);
+                    if (sample == null) {
+                        continue;
+                    }
+                    FlatField funcFF = applyFunctionToLevelsFF(sample,
+                                           function, rangeType);
+                    if ((rangeType == null) && (funcFF != null)) {
+                        rangeType = (RealTupleType) getParamType(funcFF);
+                        FunctionType newFieldType =
+                            new FunctionType(
+                                ((SetType) timeDomain.getType()).getDomain(),
+                                funcFF.getType());
+                        newField = new FieldImpl(newFieldType, timeDomain);
+                    }
+                    if (funcFF != null) {
+                        newField.setSample(timeStepIdx, funcFF, false);
+                    }
+                }
+            } else {
+                newField = applyFunctionToLevelsFF((FlatField) grid,
+                        function, null);
+            }
+            return newField;
         } catch (RemoteException re) {
             throw new VisADException("RemoteException checking missing data");
         }
