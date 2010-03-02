@@ -1724,13 +1724,14 @@ public class GridUtil {
             float[][] newValues = newField.getFloats(false);
             // TODO: multiple params
             for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
                 for (int k = 0; k < sizeZ; k++) {
                     int   numNonMissing = 0;
                     float result        = Float.NaN;
                     for (int j = 0; j < sizeY; j++) {
                         for (int i = 0; i < sizeX; i++) {
                             int   index = k * sizeX * sizeY + j * sizeX + i;
-                            float value = samples[np][index];
+                            float value = paramVals[index];
                             if (value != value) {
                                 continue;
                             }
@@ -1747,15 +1748,14 @@ public class GridUtil {
                             }
                         }
                     }
-                    if (function.equals(FUNC_AVERAGE)) {
+                    if (function.equals(FUNC_AVERAGE) && numNonMissing != 0) {
                         result = result / numNonMissing;
                     }
                     for (int j = 0; j < sizeY; j++) {
                         for (int i = 0; i < sizeX; i++) {
                             int index = k * sizeX * sizeY + j * sizeX + i;
-                            if (newValues[np][index]
-                                    == newValues[np][index]) {
-                                newValues[np][index] = result;
+                            if (paramVals[index] == paramVals[index]) {
+                                paramVals[index] = result;
                             }
                         }
                     }
@@ -1763,6 +1763,7 @@ public class GridUtil {
             }
 
             newField.setSamples(newValues, false);
+
         } catch (RemoteException re) {
             throw new VisADException("RemoteException checking missing data");
         }
