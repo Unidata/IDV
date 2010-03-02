@@ -1704,9 +1704,13 @@ public class GridUtil {
     private static FlatField applyFunctionToLevelsFF(FlatField grid,
             String function, RealTupleType newRangeType)
             throws VisADException {
-        final boolean doMax    = function.equals(FUNC_MAX);
-        final boolean doMin    = function.equals(FUNC_MIN);
-        FlatField     newField = null;
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        if (newRangeType == null) {
+            newRangeType = makeNewType(grid, "_" + function);
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(grid,
+                                 newRangeType, true);
         try {
             GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
             int[]      lengths   = domainSet.getLengths();
@@ -1717,8 +1721,7 @@ public class GridUtil {
                         ? 1
                         : lengths[2];
             float[][] samples   = grid.getFloats(false);
-            float[][] newValues =
-                new float[samples.length][samples[0].length];
+            float[][] newValues = newField.getFloats(false);
             // TODO: multiple params
             for (int np = 0; np < samples.length; np++) {
                 for (int k = 0; k < sizeZ; k++) {
@@ -1731,7 +1734,9 @@ public class GridUtil {
                             if (value != value) {
                                 continue;
                             }
-                            if (result != result) result = value;
+                            if (result != result) {
+                                result = value;
+                            }
                             if (doMax) {
                                 result = Math.max(result, value);
                             } else if (doMin) {
@@ -1748,20 +1753,14 @@ public class GridUtil {
                     for (int j = 0; j < sizeY; j++) {
                         for (int i = 0; i < sizeX; i++) {
                             int index = k * sizeX * sizeY + j * sizeX + i;
-                            if (samples[np][index] == samples[np][index]) {
+                            if (newValues[np][index]
+                                    == newValues[np][index]) {
                                 newValues[np][index] = result;
-                            } else {
-                                newValues[np][index] = Float.NaN;
                             }
                         }
                     }
                 }
             }
-            if (newRangeType == null) {
-                newRangeType = makeNewType(grid, "_" + function);
-            }
-            newField = (FlatField) GridUtil.setParamType(grid, newRangeType,
-                    true);
 
             newField.setSamples(newValues, false);
         } catch (RemoteException re) {
