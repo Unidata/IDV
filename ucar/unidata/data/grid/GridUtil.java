@@ -1689,19 +1689,71 @@ public class GridUtil {
 
     }
 
+    /**
+     * Apply the function to the time steps of the given grid over the levels.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @return the new field with the function applied at each point over
+     *         the levels.
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverLevels(FieldImpl grid,
+            String function)
+            throws VisADException {
+        FieldImpl newField = null;
+        try {
+            if (isTimeSequence(grid)) {
+                Set       timeDomain = grid.getDomainSet();
+                TupleType rangeType  = null;
+                for (int timeStepIdx = 0;
+                        timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                    FlatField sample =
+                        (FlatField) grid.getSample(timeStepIdx);
+                    if (sample == null) {
+                        continue;
+                    }
+                    FlatField funcFF = applyFunctionOverLevelsFF(sample,
+                                           function, rangeType);
+                    if ((rangeType == null) && (funcFF != null)) {
+                        rangeType = getParamType(funcFF);
+                        FunctionType newFieldType =
+                            new FunctionType(
+                                ((SetType) timeDomain.getType()).getDomain(),
+                                funcFF.getType());
+                        newField = new FieldImpl(newFieldType, timeDomain);
+                    }
+                    if (funcFF != null) {
+                        newField.setSample(timeStepIdx, funcFF, false);
+                    }
+                }
+            } else {
+                newField = applyFunctionOverLevelsFF((FlatField) grid,
+                        function, null);
+            }
+            return newField;
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+
+    }
+
 
     /**
-     * Apply the function to a single time step of a grid
+     * Apply the function to a single time step of a grid over the levels.
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
      * @param newRangeType   the new range type.  if null, create
-     * @return the new field
+     * @return the new field with the function applied at each point over
+     *         the levels.
      *
      * @throws VisADException  On badness
      */
-    private static FlatField applyFunctionToLevelsFF(FlatField grid,
+    private static FlatField applyFunctionOverLevelsFF(FlatField grid,
             String function, TupleType newRangeType)
             throws VisADException {
         final boolean doMax = function.equals(FUNC_MAX);
@@ -1710,8 +1762,7 @@ public class GridUtil {
             newRangeType = makeNewParamType(getParamType(grid),
                                             "_" + function);
         }
-        FlatField newField = (FlatField) GridUtil.setParamType(grid,
-                                 newRangeType, true);
+        FlatField newField = null;
         try {
             GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
             int[]      lengths   = domainSet.getLengths();
@@ -1722,48 +1773,48 @@ public class GridUtil {
                         ? 1
                         : lengths[2];
             float[][] samples   = grid.getFloats(false);
-            float[][] newValues = newField.getFloats(false);
-            // TODO: multiple params
+            float[][] newValues = new float[samples.length][sizeX * sizeY];
             for (int np = 0; np < samples.length; np++) {
-                float[] paramVals = newValues[np];
-                for (int k = 0; k < sizeZ; k++) {
-                    int   numNonMissing = 0;
-                    float result        = Float.NaN;
-                    for (int j = 0; j < sizeY; j++) {
-                        for (int i = 0; i < sizeX; i++) {
+                float[] paramVals = samples[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        int   numNonMissing = 0;
+                        float result        = Float.NaN;
+                        for (int k = 0; k < sizeZ; k++) {
                             int   index = k * sizeX * sizeY + j * sizeX + i;
                             float value = paramVals[index];
                             if (value != value) {
                                 continue;
                             }
-                            if (result != result) {
+                            if (result != result) {  // first non-missing
                                 result = value;
-                            }
-                            if (doMax) {
-                                result = Math.max(result, value);
-                            } else if (doMin) {
-                                result = Math.min(result, value);
-                            } else {
-                                result += value;
                                 numNonMissing++;
+                            } else {
+                                if (doMax) {
+                                    result = Math.max(result, value);
+                                } else if (doMin) {
+                                    result = Math.min(result, value);
+                                } else {
+                                    result += value;
+                                    numNonMissing++;
+                                }
                             }
                         }
-                    }
-                    if (function.equals(FUNC_AVERAGE)
-                            && (numNonMissing != 0)) {
-                        result = result / numNonMissing;
-                    }
-                    for (int j = 0; j < sizeY; j++) {
-                        for (int i = 0; i < sizeX; i++) {
-                            int index = k * sizeX * sizeY + j * sizeX + i;
-                            if (paramVals[index] == paramVals[index]) {
-                                paramVals[index] = result;
-                            }
+                        if (function.equals(FUNC_AVERAGE)
+                                && (numNonMissing != 0)) {
+                            result = result / numNonMissing;
                         }
+                        int newindex = j * sizeX + i;
+                        newVals[newindex] = result;
                     }
                 }
             }
-
+            Gridded2DSet newDomain = makeDomain2D(domainSet);
+            FunctionType newFT =
+                new FunctionType(((SetType) newDomain.getType()).getDomain(),
+                                 newRangeType);
+            newField = new FlatField(newFT, newDomain);
             newField.setSamples(newValues, false);
 
         } catch (RemoteException re) {
@@ -1771,6 +1822,76 @@ public class GridUtil {
         }
         return newField;
 
+    }
+
+    /**
+     * Transform a (possibly) 3D set into a 2D set (removing the Z dimension)
+     *
+     * @param domainSet  the 2 or 3D domain
+     * @return a 2D version with Z values removed
+     *
+     * @throws VisADException   unable to create 2D slice
+     */
+    public static Gridded2DSet makeDomain2D(GriddedSet domainSet)
+            throws VisADException {
+        if ( !(domainSet.getManifoldDimension() >= 2)) {
+            throw new VisADException(
+                "grid needs to be at least a 2D manifold");
+        }
+        if (domainSet instanceof Gridded2DSet) {
+            return (Gridded2DSet) domainSet;
+        }
+        Gridded2DSet  newDomainSet = null;
+        RealTupleType domainType =
+            ((SetType) domainSet.getType()).getDomain();
+        RealTupleType newType = null;
+        if (domainSet.getCoordinateSystem() != null) {
+            MapProjection mp = getNavigation(domainSet);
+            newType =
+                new RealTupleType((RealType) domainType.getComponent(0),
+                                  (RealType) domainType.getComponent(1), mp,
+                                  null);
+        } else {
+            newType =
+                new RealTupleType((RealType) domainType.getComponent(0),
+                                  (RealType) domainType.getComponent(1));
+        }
+        if (domainSet instanceof Linear3DSet) {
+            Linear3DSet linearSet = (Linear3DSet) domainSet;
+            newDomainSet = new Linear2DSet(newType,
+                                           new Linear1DSet[] {
+                                               linearSet.getX(),
+                    linearSet.getY() });
+            return newDomainSet;
+        }
+        // if we make it to here, we have a Gridded3DSet, possibly on
+        // a 1D manifold;
+
+        float[][] samples    = domainSet.getSamples(false);
+        int[]     lengths    = domainSet.getLengths();
+        Unit[]    setUnits   = domainSet.getSetUnits();
+        int       sizeX      = lengths[0];
+        int       sizeY      = lengths[1];
+        float[][] newSamples = null;
+        if (domainSet.getManifoldDimension() == 2) {
+            newSamples = new float[][] {
+                samples[0], samples[1]
+            };
+        } else {  // full 3D set
+            newSamples = new float[2][sizeX * sizeY];
+            for (int j = 0; j < sizeY; j++) {
+                for (int i = 0; i < sizeX; i++) {
+                    int index = j * sizeX + i;
+                    newSamples[0][index] = samples[0][index];
+                    newSamples[1][index] = samples[1][index];
+                }
+            }
+        }
+        newDomainSet = new Gridded2DSet(newType, newSamples, sizeX, sizeY,
+                                        (CoordinateSystem) null,
+                                        new Unit[] { setUnits[0],
+                setUnits[1] }, (ErrorEstimate[]) null, true);  // copy samples
+        return newDomainSet;
     }
 
 
@@ -1833,7 +1954,7 @@ public class GridUtil {
     }
 
     /**
-     * Apply the function to the time steps of the given grid.
+     * Apply the function to the time steps of the given grid at each level.
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
@@ -1879,6 +2000,90 @@ public class GridUtil {
         } catch (RemoteException re) {
             throw new VisADException("RemoteException checking missing data");
         }
+
+    }
+
+    /**
+     * Apply the function to a single time step of a grid
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @param newRangeType   the new range type.  if null, create
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static FlatField applyFunctionToLevelsFF(FlatField grid,
+            String function, TupleType newRangeType)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        if (newRangeType == null) {
+            newRangeType = makeNewParamType(getParamType(grid),
+                                            "_" + function);
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(grid,
+                                 newRangeType, true);
+        try {
+            GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
+            int[]      lengths   = domainSet.getLengths();
+            int        sizeX     = lengths[0];
+            int        sizeY     = lengths[1];
+            int sizeZ = ((lengths.length == 2)
+                         || (domainSet.getManifoldDimension() == 2))
+                        ? 1
+                        : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+            float[][] newValues = newField.getFloats(false);
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = newValues[np];
+                for (int k = 0; k < sizeZ; k++) {
+                    int   numNonMissing = 0;
+                    float result        = Float.NaN;
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index];
+                            if (value != value) {
+                                continue;
+                            }
+                            if (result != result) {
+                                result = value;
+                                numNonMissing++;
+                            } else {
+                                if (doMax) {
+                                    result = Math.max(result, value);
+                                } else if (doMin) {
+                                    result = Math.min(result, value);
+                                } else {
+                                    result += value;
+                                    numNonMissing++;
+                                }
+                            }
+                        }
+                    }
+                    if (function.equals(FUNC_AVERAGE)
+                            && (numNonMissing != 0)) {
+                        result = result / numNonMissing;
+                    }
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int index = k * sizeX * sizeY + j * sizeX + i;
+                            if (paramVals[index] == paramVals[index]) {
+                                paramVals[index] = result;
+                            }
+                        }
+                    }
+                }
+            }
+
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
 
     }
 
@@ -2484,6 +2689,8 @@ public class GridUtil {
                 && (domainSet.getManifoldDimension() != 2)) {
             throw new VisADException("slice is not 3D with 2D manifold");
         }
+        Gridded2DSet newDomainSet = makeDomain2D(domainSet);
+        /*
         float[][]     samples    = domainSet.getSamples(false);
         int[]         lengths    = domainSet.getLengths();
         Unit[]        setUnits   = domainSet.getSetUnits();
@@ -2510,6 +2717,7 @@ public class GridUtil {
                                         (CoordinateSystem) null,
                                         new Unit[] { setUnits[0],
                 setUnits[1] }, (ErrorEstimate[]) null, true);  // copy samples
+        */
         return setSpatialDomain(slice, newDomainSet, copy);
     }
 
