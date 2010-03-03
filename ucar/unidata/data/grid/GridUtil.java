@@ -1724,7 +1724,7 @@ public class GridUtil {
             float[][] newValues = newField.getFloats(false);
             // TODO: multiple params
             for (int np = 0; np < samples.length; np++) {
-                float[] paramVals = samples[np];
+                float[] paramVals = newValues[np];
                 for (int k = 0; k < sizeZ; k++) {
                     int   numNonMissing = 0;
                     float result        = Float.NaN;
