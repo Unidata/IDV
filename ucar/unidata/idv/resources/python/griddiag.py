@@ -225,6 +225,15 @@ def savg(S):
   """
   return GridUtil.applyFunctionToLevels(S, GridUtil.FUNC_AVERAGE)
 
+def savs(S):
+  """ Average over grid subset
+  <div class=jython>
+      SAVS ( S ) = average of all non-missing grid point values in the subset 
+                   area
+  </div>
+  """
+  return savg(S)
+
 def sdiv(S,V):
   """ Horizontal Flux Divergence 
   <div class=jython>
