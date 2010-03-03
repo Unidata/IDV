@@ -1702,12 +1702,13 @@ public class GridUtil {
      * @throws VisADException  On badness
      */
     private static FlatField applyFunctionToLevelsFF(FlatField grid,
-            String function, RealTupleType newRangeType)
+            String function, TupleType newRangeType)
             throws VisADException {
         final boolean doMax = function.equals(FUNC_MAX);
         final boolean doMin = function.equals(FUNC_MIN);
         if (newRangeType == null) {
-            newRangeType = makeNewType(grid, "_" + function);
+            newRangeType = makeNewParamType(getParamType(grid),
+                                            "_" + function);
         }
         FlatField newField = (FlatField) GridUtil.setParamType(grid,
                                  newRangeType, true);
@@ -1748,7 +1749,8 @@ public class GridUtil {
                             }
                         }
                     }
-                    if (function.equals(FUNC_AVERAGE) && numNonMissing != 0) {
+                    if (function.equals(FUNC_AVERAGE)
+                            && (numNonMissing != 0)) {
                         result = result / numNonMissing;
                     }
                     for (int j = 0; j < sizeY; j++) {
@@ -1774,26 +1776,60 @@ public class GridUtil {
 
     /**
      * Make a new type for the field by appending the suffix to the exiting
-     * RealType in the rang
+     * RealTypes in the range
      *
-     * @param slice  grid with original names
-     * @param newSuffix  the new suffix for Range RealTypes
+     * @param oldParamType  old parameter type containing only real components
+     * @param newSuffix     the new suffix for Range RealTypes
      *
      * @return  the new Range type
      *
      * @throws VisADException  problem creating new types
      */
-    private static RealTupleType makeNewType(FlatField slice,
+    public static TupleType makeNewParamType(TupleType oldParamType,
                                              String newSuffix)
             throws VisADException {
-        RealType[] rts    = GridUtil.getParamType(slice).getRealComponents();
+        RealType[] rts    = oldParamType.getRealComponents();
         RealType[] newRTs = new RealType[rts.length];
         for (int i = 0; i < rts.length; i++) {
             newRTs[i] =
                 Util.makeRealType(Util.cleanTypeName(rts[i].getName())
                                   + newSuffix, rts[i].getDefaultUnit());
         }
-        return new RealTupleType(newRTs);
+        if (rts.length == oldParamType.getDimension()) {  // just straight reals
+            if (oldParamType instanceof RealVectorType) {
+                return new EarthVectorType(newRTs);
+            } else {
+                return new RealTupleType(newRTs);
+            }
+        } else {                                          // loop through the individual types
+            MathType[] types         = oldParamType.getComponents();
+            MathType[] newTypes      = new MathType[types.length];
+            int        usedRealTypes = 0;
+            // The range of a FlatField can be a Real, a RealTuple or a
+            // Tuple of Reals and RealTuples ;-)
+            for (int i = 0; i < types.length; i++) {
+                MathType mt = types[i];
+                if (mt instanceof RealTupleType) {
+                    RealType[] subTypes =
+                        new RealType[((RealTupleType) mt).getDimension()];
+                    for (int j = 0; j < subTypes.length; j++) {
+                        subTypes[j] = newRTs[usedRealTypes++];
+                    }
+                    if (mt instanceof RealVectorType) {
+                        newTypes[i] = new EarthVectorType(subTypes);
+                    } else {
+                        newTypes[i] = new RealTupleType(subTypes);
+                    }
+                } else if (mt instanceof RealType) {
+                    newTypes[i] = newRTs[usedRealTypes++];
+                } else {
+                    throw new VisADException(
+                        "Unable to create new MathType for old param type: "
+                        + oldParamType);
+                }
+            }
+            return new TupleType(newTypes);
+        }
     }
 
     /**
@@ -1812,8 +1848,8 @@ public class GridUtil {
         FieldImpl newField = null;
         try {
             if (isTimeSequence(grid)) {
-                Set           timeDomain = grid.getDomainSet();
-                RealTupleType rangeType  = null;
+                Set       timeDomain = grid.getDomainSet();
+                TupleType rangeType  = null;
                 for (int timeStepIdx = 0;
                         timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
                     FlatField sample =
@@ -1824,7 +1860,7 @@ public class GridUtil {
                     FlatField funcFF = applyFunctionToLevelsFF(sample,
                                            function, rangeType);
                     if ((rangeType == null) && (funcFF != null)) {
-                        rangeType = (RealTupleType) getParamType(funcFF);
+                        rangeType = getParamType(funcFF);
                         FunctionType newFieldType =
                             new FunctionType(
                                 ((SetType) timeDomain.getType()).getDomain(),
