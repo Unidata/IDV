@@ -1,5 +1,6 @@
 [ug::head {Jython Library}]
 
+
 <a name="grid">
 <h2> Module: grid</h2>
  This is the doc for the grid module 
@@ -19,6 +20,10 @@ to the average. Else we just return the average</p>
 <meta name="jhid" value="combineFields">
 <p><a name="combineFields"></a><code class="command">combineFields():</code><p style="padding:0;margin-left:20;margin-top:0">
 combine several fields together</p>
+<meta name="jhid" value="differenceFromBaseTime">
+<p><a name="differenceFromBaseTime"></a><code class="command">differenceFromBaseTime(field):</code><p style="padding:0;margin-left:20;margin-top:0">
+set the value of each time step N:
+D(N)= D(N) - D(0)</p>
 <meta name="jhid" value="exportGridToNetcdf">
 <p><a name="exportGridToNetcdf"></a><code class="command">exportGridToNetcdf(grid, filename):</code><p style="padding:0;margin-left:20;margin-top:0">
 Write out the grid data to CF compliant netCDF file</p>
@@ -73,7 +78,7 @@ Make a 2D slice from a 3D slice at a single level</p>
 <p><a name="makeFlowField"></a><code class="command">makeFlowField(a, b, c):</code><p style="padding:0;margin-left:20;margin-top:0">
 Make a vector from 3 components
 <div class=jython>
-makeVector(a,b) = \[a,b,c\]
+makeVector(a,b,c) = \[a,b,c\]
 </div></p>
 <meta name="jhid" value="makeTimeSequence">
 <p><a name="makeTimeSequence"></a><code class="command">makeTimeSequence(g):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -111,6 +116,10 @@ to the average. Else we just return the average</p>
 <meta name="jhid" value="resampleGrid">
 <p><a name="resampleGrid"></a><code class="command">resampleGrid(oldGrid, gridwithNewDomain):</code><p style="padding:0;margin-left:20;margin-top:0">
 display gridded data on a new domain</p>
+<meta name="jhid" value="sumFromBaseTime">
+<p><a name="sumFromBaseTime"></a><code class="command">sumFromBaseTime(field):</code><p style="padding:0;margin-left:20;margin-top:0">
+set the value of each time step N:
+D(N)= D(N) + D(0)</p>
 <meta name="jhid" value="sumOverTime">
 <p><a name="sumOverTime"></a><code class="command">sumOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
 Take the sum of the values in each time step
@@ -147,8 +156,8 @@ Write out the grid data to an excel spreadsheet</p>
    are named slightly different from GEMPAK functions to avoid conflicts
    with Jython built-ins (e.g. str).
    <P>
-   In the following operators, scalar operands are named Si and 
-   vector operands are named Vi.  Lowercase u and v refer to the
+   In the following operators, scalar operands are named S<sub>n</sub> and 
+   vector operands are named V<sub>n</sub>.  Lowercase u and v refer to the
    grid relative components of a vector.
 
 <hr>
@@ -254,11 +263,11 @@ DVDY ( V ) = \[ DDY (u), DDY (v) \]
 Frontogenesis function from theta and the wind
 <div class=jython>
 FRNT ( THTA, V ) = 1/2 * MAG ( GRAD (THTA) ) *
-( DEF * COS (2 * BETA) - DIV )
-Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI)
-- DDY (THTA) * SIN (PSI))/
-MAG ( GRAD (THTA) ) )
-PSI  = 1/2 ATAN2 ( SHR / STR )
+( DEF * COS (2 * BETA) - DIV )                <p>
+Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI) <br>
+- DDY (THTA) * SIN (PSI))/   <br>
+MAG ( GRAD (THTA) ) )           <br>
+PSI  = 1/2 ATAN2 ( SHR / STR )         <br>
 </div></p>
 <meta name="jhid" value="geo">
 <p><a name="geo"></a><code class="command">geo(z):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -271,6 +280,20 @@ GEO ( S )  = \[ - DDY (S) * const / CORL, DDX (S) * const / CORL \]
 Gradient of a scalar
 <div class=jython>
 GRAD ( S ) = \[ DDX ( S ), DDY ( S ) \]
+</div></p>
+<meta name="jhid" value="gwfs">
+<p><a name="gwfs"></a><code class="command">gwfs(S, N):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Horizontal smoothing using normally distributed weights
+with theoretical response of 1/e for N * delta-x wave.
+Increasing N increases the smoothing. (default N=6)
+</div></p>
+<meta name="jhid" value="gwfv">
+<p><a name="gwfv"></a><code class="command">gwfv(V, N):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Horizontal smoothing using normally distributed weights
+with theoretical response of 1/e for N * delta-x wave.
+Increasing N increases the smoothing. (default N=6)
 </div></p>
 <meta name="jhid" value="inad">
 <p><a name="inad"></a><code class="command">inad(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -318,6 +341,9 @@ Multiply
 <div class=jython>
 MUL  (S1, S2) = S1 * S2
 </div></p>
+<meta name="jhid" value="pvor">
+<p><a name="pvor"></a><code class="command">pvor(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Potetial Vorticity (usually from theta and wind)</p>
 <meta name="jhid" value="quo">
 <p><a name="quo"></a><code class="command">quo(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Divide
@@ -332,6 +358,22 @@ QVEC ( S, V ) = \[ - ( DOT ( DVDX (V), GRAD (S) ) ),
 - ( DOT ( DVDY (V), GRAD (S) ) ) \]
 where S can be any thermal paramenter, usually THTA.
 </div></p>
+<meta name="jhid" value="relh">
+<p><a name="relh"></a><code class="command">relh(temp, mixr):</code><p style="padding:0;margin-left:20;margin-top:0">
+Create Relative Humidity from Temperature, mixing ratio (requires pressure domain)</p>
+<meta name="jhid" value="savg">
+<p><a name="savg"></a><code class="command">savg(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average over whole grid
+<div class=jython>
+SAVG ( S ) = average of all non-missing grid point values
+</div></p>
+<meta name="jhid" value="savs">
+<p><a name="savs"></a><code class="command">savs(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average over grid subset
+<div class=jython>
+SAVS ( S ) = average of all non-missing grid point values in the subset
+area
+</div></p>
 <meta name="jhid" value="sdiv">
 <p><a name="sdiv"></a><code class="command">sdiv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Horizontal Flux Divergence
@@ -344,6 +386,30 @@ Shear Deformation
 <div class=jython>
 SHR ( V ) = DDX ( v ) + DDY ( u )
 </div></p>
+<meta name="jhid" value="sm5s">
+<p><a name="sm5s"></a><code class="command">sm5s(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Smooth a scalar grid using a 5-point smoother
+<div class=jython>
+SM5S ( S ) = .5 * S (i,j) + .125 * ( S (i+1,j) + S (i,j+1) +
+S (i-1,j) + S (i,j-1) )
+</div></p>
+<meta name="jhid" value="sm5v">
+<p><a name="sm5v"></a><code class="command">sm5v(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Smooth a scalar grid using a 5-point smoother (see sm5s)</p>
+<meta name="jhid" value="sm9s">
+<p><a name="sm9s"></a><code class="command">sm9s(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Smooth a scalar grid using a 9-point smoother
+<div class=jython>
+SM9S ( S ) = .25 * S (i,j) + .125 * ( S (i+1,j) + S (i,j+1) +
+S (i-1,j) + S (i,j-1) )
++ .0625 * ( S (i+1,j+1) +
+S (i+1,j-1) +
+S (i-1,j+1) +
+S (i-1,j-1) )
+</div></p>
+<meta name="jhid" value="sm9v">
+<p><a name="sm9v"></a><code class="command">sm9v(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Smooth a scalar grid using a 9-point smoother (see sm9s)</p>
 <meta name="jhid" value="strd">
 <p><a name="strd"></a><code class="command">strd(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Stretching Deformation
@@ -381,6 +447,12 @@ Grid relative u component</p>
 add the components of 2 vectors
 <div class=jython>
 VADD (V1, V2) = \[ u1+u2, v1+v2 \]
+</div></p>
+<meta name="jhid" value="vecn">
+<p><a name="vecn"></a><code class="command">vecn(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+Make a true nort vector from two components
+<div class=jython>
+VECN ( S1, S2 ) = \[ S1, S2 \]
 </div></p>
 <meta name="jhid" value="vecr">
 <p><a name="vecr"></a><code class="command">vecr(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -523,6 +595,12 @@ test code</p>
 <meta name="jhid" value="subsetWithProperty">
 <p><a name="subsetWithProperty"></a><code class="command">subsetWithProperty(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
 test code</p>
+<meta name="jhid" value="testIndexToLatLon">
+<p><a name="testIndexToLatLon"></a><code class="command">testIndexToLatLon(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+Test out the GridUtil.getLatLons method. Call this with some grid field and a set of maps</p>
+<meta name="jhid" value="testIndexToLatLon2">
+<p><a name="testIndexToLatLon2"></a><code class="command">testIndexToLatLon2(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+Test out the GridUtil.getLatLons method. Call this with some grid field and a set of maps</p>
 <a name="shell">
 <h2> Module: shell</h2>
 A set of utilities for selecting data and creating displays.
