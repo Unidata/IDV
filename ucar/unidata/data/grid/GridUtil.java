@@ -155,20 +155,19 @@ public class GridUtil {
     public static final int DEFAULT_ERROR_MODE = NO_ERRORS;
 
     /** function for the applyFunctionOverTime routine */
-    public static final String FUNC_AVERAGE = "average";
+    public static final String FUNC_AVERAGE = GridMath.FUNC_AVERAGE;
 
     /** function for the applyFunctionOverTime routine */
-    public static final String FUNC_SUM = "sum";
+    public static final String FUNC_SUM = GridMath.FUNC_SUM;
 
     /** function for the applyFunctionOverTime routine */
-    public static final String FUNC_MAX = "max";
+    public static final String FUNC_MAX = GridMath.FUNC_MAX;
 
     /** function for the applyFunctionOverTime routine */
-    public static final String FUNC_MIN = "min";
+    public static final String FUNC_MIN = GridMath.FUNC_MIN;
 
     /** function for the timeStepFunc routine */
-    public static final String FUNC_DIFFERENCE = "difference";
-
+    public static final String FUNC_DIFFERENCE = GridMath.FUNC_DIFFERENCE;
 
 
     /** Default ctor */
@@ -1387,10 +1386,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.averageOverTime
      */
     public static FieldImpl averageOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
-        return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
+        return GridMath.applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
     }
 
 
@@ -1402,10 +1402,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.timeStepDifference
      */
     public static FieldImpl timeStepDifference(FieldImpl grid, int offset)
             throws VisADException {
-        return timeStepFunc(grid, offset, FUNC_DIFFERENCE);
+        return GridMath.timeStepFunc(grid, offset, FUNC_DIFFERENCE);
     }
 
 
@@ -1418,10 +1419,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.timeStepSum
      */
     public static FieldImpl timeStepSum(FieldImpl grid, int offset)
             throws VisADException {
-        return timeStepFunc(grid, offset, FUNC_SUM);
+        return GridMath.timeStepFunc(grid, offset, FUNC_SUM);
     }
 
 
@@ -1432,10 +1434,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.differenceFromBaseTime
      */
     public static FieldImpl differenceFromBaseTime(FieldImpl grid)
             throws VisADException {
-        return timeStepFunc(grid, 0, FUNC_DIFFERENCE);
+        return GridMath.timeStepFunc(grid, 0, FUNC_DIFFERENCE);
     }
 
 
@@ -1447,10 +1450,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.sumFromBaseTime
      */
     public static FieldImpl sumFromBaseTime(FieldImpl grid)
             throws VisADException {
-        return timeStepFunc(grid, 0, FUNC_SUM);
+        return GridMath.timeStepFunc(grid, 0, FUNC_SUM);
     }
 
 
@@ -1466,104 +1470,13 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.timeStepFunc
      */
     public static FieldImpl timeStepFunc(FieldImpl grid, int offset,
                                          String func)
             throws VisADException {
-        try {
-            if ( !isTimeSequence(grid)) {
-                return grid;
-            }
-            List<float[][]> arrays       = new ArrayList<float[][]>();
-            FieldImpl       newGrid      = (FieldImpl) grid.clone();
-            float[][]       values       = null;
-            float[][]       priorValues  = null;
-            Set             timeDomain   = Util.getDomainSet(newGrid);
-            int             numTimeSteps = timeDomain.getLength();
-            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
-                    timeStepIdx++) {
-                FieldImpl sample = (FieldImpl) newGrid.getSample(timeStepIdx);
-                float[][] timeStepValues = sample.getFloats(true);
-                arrays.add(Misc.cloneArray(timeStepValues));
-            }
-            float[][] baseValue = null;
-            if ((offset == 0) && (arrays.size() > 0)) {
-                baseValue = Misc.cloneArray(arrays.get(0));
-            }
-            for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
-                    timeStepIdx--) {
-
-                float[][] value = arrays.get(timeStepIdx);
-                if ((baseValue == null) && (offset == 0)) {
-                    baseValue = Misc.cloneArray(value);
-                }
-                //System.err.println("A:" + value);
-                if ((offset == 0)
-                        || ((timeStepIdx + offset >= 0)
-                            && (timeStepIdx + offset < arrays.size()))) {
-                    //If offset = 0  then use the base value
-                    float[][] oldValue = ((offset == 0)
-                                          ? baseValue
-                                          : arrays.get(timeStepIdx + offset));
-                    if (func.equals(FUNC_DIFFERENCE)) {
-                        value = Misc.subtractArray(value, oldValue, value);
-                    } else if (func.equals(FUNC_SUM)) {
-                        value = Misc.addArray(value, oldValue, value);
-                    } else {
-                        throw new IllegalArgumentException(
-                            "Unknown function:" + func);
-                    }
-                } else {
-                    //System.err.println("filling");
-                    Misc.fillArray(value, Float.NaN);
-                }
-                FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
-                sample.setSamples(value, false);
-                //                newGrid.setSample(timeStepIdx,sample);
-            }
-            return newGrid;
-        } catch (CloneNotSupportedException cnse) {
-            throw new VisADException("Cannot clone field");
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
+        return GridMath.timeStepFunc(grid, offset, func);
     }
-
-
-
-    /**
-     *
-     * @param grid _more_
-     * @param makeTimes _more_
-     *
-     * @return _more_
-     *
-     * @throws VisADException _more_
-     */
-
-    /*
-    public static FieldImpl interpolate(FieldImpl f1, FieldImpl f2, int steps)
-        throws VisADException {
-        FieldImpl sample1=null;
-        FieldImpl sample2=null;
-        if (isTimeSequence(f1)) {
-            sample1 = (FieldImpl) f1.getSample(0);
-        } else {
-            sample1 = f1;
-        }
-
-        if (isTimeSequence(f2)) {
-            sample2 = (FieldImpl) f2.getSample(0);
-        } else {
-            sample1 = f2;
-        }
-        FieldImpl result = (FieldImpl)(f1.clone());
-        for (int i=0;i<steps;i++) {
-
-        }
-        return null;
-    }
-    */
 
 
     /**
@@ -1576,10 +1489,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.sumOverTime
      */
     public static FieldImpl sumOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
-        return applyFunctionOverTime(grid, FUNC_SUM, makeTimes);
+        return GridMath.applyFunctionOverTime(grid, FUNC_SUM, makeTimes);
     }
 
     /**
@@ -1592,10 +1506,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.minOverTime
      */
     public static FieldImpl minOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
-        return applyFunctionOverTime(grid, FUNC_MIN, makeTimes);
+        return GridMath.applyFunctionOverTime(grid, FUNC_MIN, makeTimes);
     }
 
     /**
@@ -1608,10 +1523,11 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.maxOverTime
      */
     public static FieldImpl maxOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
-        return applyFunctionOverTime(grid, FUNC_MAX, makeTimes);
+        return GridMath.applyFunctionOverTime(grid, FUNC_MAX, makeTimes);
     }
 
 
@@ -1627,201 +1543,12 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
+     * @deprecated use GridMath.applyFunctionOverTime
      */
     public static FieldImpl applyFunctionOverTime(FieldImpl grid,
             String function, boolean makeTimes)
             throws VisADException {
-        try {
-            FlatField newGrid = null;
-            if ( !isTimeSequence(grid)) {
-                newGrid = (FlatField) grid.clone();
-                newGrid.setSamples(grid.getFloats(false), true);
-                return newGrid;
-            }
-            final boolean doMax        = function.equals(FUNC_MAX);
-            final boolean doMin        = function.equals(FUNC_MIN);
-            float[][]     values       = null;
-            final Set     timeDomain   = Util.getDomainSet(grid);
-            int           numTimeSteps = timeDomain.getLength();
-            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
-                    timeStepIdx++) {
-                FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
-                float[][] timeStepValues = sample.getFloats(false);
-                if (values == null) {
-                    values  = Misc.cloneArray(timeStepValues);
-                    newGrid = (FlatField) sample.clone();
-                    continue;
-                }
-                for (int i = 0; i < timeStepValues.length; i++) {
-                    for (int j = 0; j < timeStepValues[i].length; j++) {
-                        float value = timeStepValues[i][j];
-                        if (value != value) {
-                            continue;
-                        }
-                        if (doMax) {
-                            values[i][j] = Math.max(values[i][j], value);
-                        } else if (doMin) {
-                            values[i][j] = Math.min(values[i][j], value);
-                        } else {
-                            values[i][j] += value;
-                        }
-                    }
-                }
-            }
-            if (function.equals(FUNC_AVERAGE) && (numTimeSteps > 0)) {
-                for (int i = 0; i < values.length; i++) {
-                    for (int j = 0; j < values[i].length; j++) {
-                        values[i][j] = values[i][j] / numTimeSteps;
-                    }
-                }
-            }
-            newGrid.setSamples(values, false);
-            if (makeTimes) {
-                return (FieldImpl) Util.makeTimeField(newGrid,
-                        GridUtil.getDateTimeList(grid));
-            }
-            return newGrid;
-        } catch (CloneNotSupportedException cnse) {
-            throw new VisADException("Cannot clone field");
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
-
-    }
-
-    /**
-     * Apply the function to the time steps of the given grid over the levels.
-     * The function is one of the FUNC_ enums
-     *
-     * @param grid   grid to average
-     * @param function One of the FUNC_ enums
-     * @return the new field with the function applied at each point over
-     *         the levels.
-     *
-     * @throws VisADException  On badness
-     */
-    public static FieldImpl applyFunctionOverLevels(FieldImpl grid,
-            String function)
-            throws VisADException {
-        FieldImpl newField = null;
-        try {
-            if (isTimeSequence(grid)) {
-                Set       timeDomain = grid.getDomainSet();
-                TupleType rangeType  = null;
-                for (int timeStepIdx = 0;
-                        timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
-                    FlatField sample =
-                        (FlatField) grid.getSample(timeStepIdx);
-                    if (sample == null) {
-                        continue;
-                    }
-                    FlatField funcFF = applyFunctionOverLevelsFF(sample,
-                                           function, rangeType);
-                    if ((rangeType == null) && (funcFF != null)) {
-                        rangeType = getParamType(funcFF);
-                        FunctionType newFieldType =
-                            new FunctionType(
-                                ((SetType) timeDomain.getType()).getDomain(),
-                                funcFF.getType());
-                        newField = new FieldImpl(newFieldType, timeDomain);
-                    }
-                    if (funcFF != null) {
-                        newField.setSample(timeStepIdx, funcFF, false);
-                    }
-                }
-            } else {
-                newField = applyFunctionOverLevelsFF((FlatField) grid,
-                        function, null);
-            }
-            return newField;
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
-
-    }
-
-
-    /**
-     * Apply the function to a single time step of a grid over the levels.
-     * The function is one of the FUNC_ enums
-     *
-     * @param grid   grid to average
-     * @param function One of the FUNC_ enums
-     * @param newRangeType   the new range type.  if null, create
-     * @return the new field with the function applied at each point over
-     *         the levels.
-     *
-     * @throws VisADException  On badness
-     */
-    private static FlatField applyFunctionOverLevelsFF(FlatField grid,
-            String function, TupleType newRangeType)
-            throws VisADException {
-        final boolean doMax = function.equals(FUNC_MAX);
-        final boolean doMin = function.equals(FUNC_MIN);
-        if (newRangeType == null) {
-            newRangeType = makeNewParamType(getParamType(grid),
-                                            "_" + function);
-        }
-        FlatField newField = null;
-        try {
-            GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
-            int[]      lengths   = domainSet.getLengths();
-            int        sizeX     = lengths[0];
-            int        sizeY     = lengths[1];
-            int sizeZ = ((lengths.length == 2)
-                         || (domainSet.getManifoldDimension() == 2))
-                        ? 1
-                        : lengths[2];
-            float[][] samples   = grid.getFloats(false);
-            float[][] newValues = new float[samples.length][sizeX * sizeY];
-            for (int np = 0; np < samples.length; np++) {
-                float[] paramVals = samples[np];
-                float[] newVals   = newValues[np];
-                for (int j = 0; j < sizeY; j++) {
-                    for (int i = 0; i < sizeX; i++) {
-                        int   numNonMissing = 0;
-                        float result        = Float.NaN;
-                        for (int k = 0; k < sizeZ; k++) {
-                            int   index = k * sizeX * sizeY + j * sizeX + i;
-                            float value = paramVals[index];
-                            if (value != value) {
-                                continue;
-                            }
-                            if (result != result) {  // first non-missing
-                                result = value;
-                                numNonMissing++;
-                            } else {
-                                if (doMax) {
-                                    result = Math.max(result, value);
-                                } else if (doMin) {
-                                    result = Math.min(result, value);
-                                } else {
-                                    result += value;
-                                    numNonMissing++;
-                                }
-                            }
-                        }
-                        if (function.equals(FUNC_AVERAGE)
-                                && (numNonMissing != 0)) {
-                            result = result / numNonMissing;
-                        }
-                        int newindex = j * sizeX + i;
-                        newVals[newindex] = result;
-                    }
-                }
-            }
-            Gridded2DSet newDomain = makeDomain2D(domainSet);
-            FunctionType newFT =
-                new FunctionType(((SetType) newDomain.getType()).getDomain(),
-                                 newRangeType);
-            newField = new FlatField(newFT, newDomain);
-            newField.setSamples(newValues, false);
-
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
-        return newField;
-
+        return GridMath.applyFunctionOverTime(grid, function, makeTimes);
     }
 
     /**
@@ -1952,141 +1679,6 @@ public class GridUtil {
             return new TupleType(newTypes);
         }
     }
-
-    /**
-     * Apply the function to the time steps of the given grid at each level.
-     * The function is one of the FUNC_ enums
-     *
-     * @param grid   grid to average
-     * @param function One of the FUNC_ enums
-     * @return the new field
-     *
-     * @throws VisADException  On badness
-     */
-    public static FieldImpl applyFunctionToLevels(FieldImpl grid,
-            String function)
-            throws VisADException {
-        FieldImpl newField = null;
-        try {
-            if (isTimeSequence(grid)) {
-                Set       timeDomain = grid.getDomainSet();
-                TupleType rangeType  = null;
-                for (int timeStepIdx = 0;
-                        timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
-                    FlatField sample =
-                        (FlatField) grid.getSample(timeStepIdx);
-                    if (sample == null) {
-                        continue;
-                    }
-                    FlatField funcFF = applyFunctionToLevelsFF(sample,
-                                           function, rangeType);
-                    if ((rangeType == null) && (funcFF != null)) {
-                        rangeType = getParamType(funcFF);
-                        FunctionType newFieldType =
-                            new FunctionType(
-                                ((SetType) timeDomain.getType()).getDomain(),
-                                funcFF.getType());
-                        newField = new FieldImpl(newFieldType, timeDomain);
-                    }
-                    if (funcFF != null) {
-                        newField.setSample(timeStepIdx, funcFF, false);
-                    }
-                }
-            } else {
-                newField = applyFunctionToLevelsFF((FlatField) grid,
-                        function, null);
-            }
-            return newField;
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
-
-    }
-
-    /**
-     * Apply the function to a single time step of a grid
-     * The function is one of the FUNC_ enums
-     *
-     * @param grid   grid to average
-     * @param function One of the FUNC_ enums
-     * @param newRangeType   the new range type.  if null, create
-     * @return the new field
-     *
-     * @throws VisADException  On badness
-     */
-    private static FlatField applyFunctionToLevelsFF(FlatField grid,
-            String function, TupleType newRangeType)
-            throws VisADException {
-        final boolean doMax = function.equals(FUNC_MAX);
-        final boolean doMin = function.equals(FUNC_MIN);
-        if (newRangeType == null) {
-            newRangeType = makeNewParamType(getParamType(grid),
-                                            "_" + function);
-        }
-        FlatField newField = (FlatField) GridUtil.setParamType(grid,
-                                 newRangeType, true);
-        try {
-            GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
-            int[]      lengths   = domainSet.getLengths();
-            int        sizeX     = lengths[0];
-            int        sizeY     = lengths[1];
-            int sizeZ = ((lengths.length == 2)
-                         || (domainSet.getManifoldDimension() == 2))
-                        ? 1
-                        : lengths[2];
-            float[][] samples   = grid.getFloats(false);
-            float[][] newValues = newField.getFloats(false);
-            for (int np = 0; np < samples.length; np++) {
-                float[] paramVals = newValues[np];
-                for (int k = 0; k < sizeZ; k++) {
-                    int   numNonMissing = 0;
-                    float result        = Float.NaN;
-                    for (int j = 0; j < sizeY; j++) {
-                        for (int i = 0; i < sizeX; i++) {
-                            int   index = k * sizeX * sizeY + j * sizeX + i;
-                            float value = paramVals[index];
-                            if (value != value) {
-                                continue;
-                            }
-                            if (result != result) {
-                                result = value;
-                                numNonMissing++;
-                            } else {
-                                if (doMax) {
-                                    result = Math.max(result, value);
-                                } else if (doMin) {
-                                    result = Math.min(result, value);
-                                } else {
-                                    result += value;
-                                    numNonMissing++;
-                                }
-                            }
-                        }
-                    }
-                    if (function.equals(FUNC_AVERAGE)
-                            && (numNonMissing != 0)) {
-                        result = result / numNonMissing;
-                    }
-                    for (int j = 0; j < sizeY; j++) {
-                        for (int i = 0; i < sizeX; i++) {
-                            int index = k * sizeX * sizeY + j * sizeX + i;
-                            if (paramVals[index] == paramVals[index]) {
-                                paramVals[index] = result;
-                            }
-                        }
-                    }
-                }
-            }
-
-            newField.setSamples(newValues, false);
-
-        } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
-        }
-        return newField;
-
-    }
-
 
     /**
      * Class Grid2D holds a 2d lat/lon and value array
