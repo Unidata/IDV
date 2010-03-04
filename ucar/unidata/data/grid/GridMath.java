@@ -356,7 +356,7 @@ public class GridMath {
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
         } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
+            throw new VisADException("RemoteException in timeStepFunc");
         }
     }
 
@@ -479,7 +479,8 @@ public class GridMath {
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
         } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
+            throw new VisADException(
+                "RemoteException in applyFunctionOverTime");
         }
 
     }
@@ -501,8 +502,9 @@ public class GridMath {
         FieldImpl newField = null;
         try {
             if (GridUtil.isTimeSequence(grid)) {
-                Set       timeDomain = grid.getDomainSet();
-                TupleType rangeType  = null;
+                Set          timeDomain = grid.getDomainSet();
+                TupleType    rangeType  = null;
+                Gridded2DSet newDomain  = null;
                 for (int timeStepIdx = 0;
                         timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
                     FlatField sample =
@@ -511,9 +513,10 @@ public class GridMath {
                         continue;
                     }
                     FlatField funcFF = applyFunctionOverLevelsFF(sample,
-                                           function, rangeType);
+                                           function, rangeType, newDomain);
                     if ((rangeType == null) && (funcFF != null)) {
                         rangeType = GridUtil.getParamType(funcFF);
+                        newDomain = (Gridded2DSet) funcFF.getDomainSet();
                         FunctionType newFieldType =
                             new FunctionType(
                                 ((SetType) timeDomain.getType()).getDomain(),
@@ -526,11 +529,12 @@ public class GridMath {
                 }
             } else {
                 newField = applyFunctionOverLevelsFF((FlatField) grid,
-                        function, null);
+                        function, null, null);
             }
             return newField;
         } catch (RemoteException re) {
-            throw new VisADException("RemoteException checking missing data");
+            throw new VisADException(
+                "RemoteException in applyFunctionOverLevels");
         }
 
     }
@@ -543,13 +547,14 @@ public class GridMath {
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
      * @param newRangeType   the new range type.  if null, create
+     * @param newDomain   the new spatial domain.  if null, create
      * @return the new field with the function applied at each point over
      *         the levels.
      *
      * @throws VisADException  On badness
      */
     private static FlatField applyFunctionOverLevelsFF(FlatField grid,
-            String function, TupleType newRangeType)
+            String function, TupleType newRangeType, Gridded2DSet newDomain)
             throws VisADException {
         final boolean doMax = function.equals(FUNC_MAX);
         final boolean doMin = function.equals(FUNC_MIN);
@@ -607,7 +612,9 @@ public class GridMath {
                     }
                 }
             }
-            Gridded2DSet newDomain = GridUtil.makeDomain2D(domainSet);
+            if (newDomain == null) {
+                newDomain = GridUtil.makeDomain2D(domainSet);
+            }
             FunctionType newFT =
                 new FunctionType(((SetType) newDomain.getType()).getDomain(),
                                  newRangeType);

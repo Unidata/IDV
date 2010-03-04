@@ -2720,7 +2720,8 @@ public class DerivedGridFactory {
         if (GridUtil.isVolume(slice)) {
             throw new VisADException("Grid must be a 2D slice");
         }
-        FieldImpl smoothedFI = null;
+        FieldImpl smoothedFI        = null;
+        TupleType smoothedRangeType = null;
         if (GridUtil.isTimeSequence(slice)) {
 
             // Implementation:  have to take the raw data FieldImpl
@@ -2734,21 +2735,24 @@ public class DerivedGridFactory {
                 FlatField smoothedFF = null;
                 if (type.equals(SMOOTH_5POINT)) {
                     smoothedFF = smooth5Point((FlatField) slice.getSample(i,
-                            false));
+                            false), smoothedRangeType);
                 } else if (type.equals(SMOOTH_9POINT)) {
                     smoothedFF = smooth9Point((FlatField) slice.getSample(i,
-                            false));
+                            false), smoothedRangeType);
                 } else {
                     smoothedFF =
                         smoothGaussian((FlatField) slice.getSample(i, false),
-                                       filterLevel);
+                                       filterLevel, smoothedRangeType);
                 }
 
                 if ((smoothedFI == null) && (smoothedFF != null)) {
+                    FunctionType smoothedFFType =
+                        (FunctionType) smoothedFF.getType();
+                    smoothedRangeType = (TupleType) smoothedFFType.getRange();
                     FunctionType smoothedFT =
                         new FunctionType(
                             ((SetType) timeSet.getType()).getDomain(),
-                            smoothedFF.getType());
+                            smoothedFFType);
                     smoothedFI = new FieldImpl(smoothedFT, timeSet);
                 }
                 if (smoothedFF != null) {
@@ -2757,12 +2761,14 @@ public class DerivedGridFactory {
             }
         } else {
             if (type.equals(SMOOTH_5POINT)) {
-                smoothedFI = (FieldImpl) smooth5Point((FlatField) slice);
+                smoothedFI = (FieldImpl) smooth5Point((FlatField) slice,
+                        smoothedRangeType);
             } else if (type.equals(SMOOTH_9POINT)) {
-                smoothedFI = (FieldImpl) smooth9Point((FlatField) slice);
+                smoothedFI = (FieldImpl) smooth9Point((FlatField) slice,
+                        smoothedRangeType);
             } else {
                 smoothedFI = (FieldImpl) smoothGaussian((FlatField) slice,
-                        filterLevel);
+                        filterLevel, smoothedRangeType);
             }
 
         }
@@ -2773,13 +2779,15 @@ public class DerivedGridFactory {
      * Apply a 5 point smoothing function to the grid
      *
      * @param slice grid to smooth
+     * @param rangeType  type for the range.  May be null;
      *
      * @return  the smoothed grid or null
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private static FlatField smooth5Point(FlatField slice)
+    private static FlatField smooth5Point(FlatField slice,
+                                          TupleType rangeType)
             throws VisADException, RemoteException {
         int   jgymin, jgymax, jgxmin, jgxmax, kxd;
         int   ii, ip1, im1, jp1, jm1, ier, zero;
@@ -2791,21 +2799,27 @@ public class DerivedGridFactory {
         wt  = .125f;
         wt4 = 4.f * wt;
 
-        FlatField  newField = null;
-        float[][]  samples  = slice.getFloats(false);
-        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
-        int[]      lengths  = domain.getLengths();
+        if (rangeType == null) {
+            rangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(slice),
+                                          "_SM5S");
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(slice,
+                                 rangeType, true);
+        float[][]  samples = slice.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths = domain.getLengths();
         jgxmin = 1;
         jgxmax = lengths[0];
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
         int       numParams = samples.length;
-        float[][] newVals   = new float[numParams][];
+        float[][] newVals   = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
             float[] gni = samples[np];
-            float[] gno = new float[gni.length];
+            float[] gno = newVals[np];
 
             /*
              * Apply five-point binomial smoother over subset grid.
@@ -2865,50 +2879,25 @@ public class DerivedGridFactory {
                     }
                 }
             }
-            newVals[np] = gno;
         }
-        newField = (FlatField) GridUtil.setParamType(slice,
-                makeNewType(slice, "_SM5S"), true);
         newField.setSamples(newVals, false);
 
         return newField;
     }
 
     /**
-     * Make a new type for the field by appending the suffix to the exiting
-     * RealType in the rang
-     *
-     * @param slice  grid with original names
-     * @param newSuffix  the new suffix for Range RealTypes
-     *
-     * @return  the new Range type
-     *
-     * @throws VisADException  problem creating new types
-     */
-    private static RealTupleType makeNewType(FlatField slice,
-                                             String newSuffix)
-            throws VisADException {
-        RealType[] rts    = GridUtil.getParamType(slice).getRealComponents();
-        RealType[] newRTs = new RealType[rts.length];
-        for (int i = 0; i < rts.length; i++) {
-            newRTs[i] =
-                Util.makeRealType(Util.cleanTypeName(rts[i].getName())
-                                  + newSuffix, rts[i].getDefaultUnit());
-        }
-        return new RealTupleType(newRTs);
-    }
-
-    /**
      * Apply a 9 point smoothing function to the grid
      *
      * @param slice grid to smooth
+     * @param rangeType  type for the range.  May be null;
      *
      * @return  the smoothed grid or null
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private static FlatField smooth9Point(FlatField slice)
+    private static FlatField smooth9Point(FlatField slice,
+                                          TupleType rangeType)
             throws VisADException, RemoteException {
 
         int   ni, no, jgymin, jgymax, jgxmin, jgxmax, kxd, kyd, ksub1, ksub2;
@@ -2931,29 +2920,35 @@ public class DerivedGridFactory {
          */
         wt4 = 4.0f;
 
-        FlatField  newField = null;
-        float[][]  samples  = slice.getFloats(false);
-        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
-        int[]      lengths  = domain.getLengths();
+        if (rangeType == null) {
+            rangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(slice),
+                                          "_SM9S");
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(slice,
+                                 rangeType, true);
+        float[][]  samples = slice.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths = domain.getLengths();
         jgxmin = 1;
         jgxmax = lengths[0];
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
         int       numParams = samples.length;
-        float[][] newVals   = new float[numParams][];
+        float[][] newVals   = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
             float[] gni = samples[np];
-            float[] gno = new float[gni.length];
+            float[] gno = newVals[np];
 
             for (j = jgymin; j <= jgymax; j++) {
                 for (i = jgxmin; i <= jgxmax; i++) {
                     ii = (j - 1) * kxd + i;
                     if (Float.isNaN(gni[ii - 1])) {
-                        /*
-                         * Check for missing data.
-                         */
+                        //
+                        // Check for missing data.
+                        //
                         gno[ii - 1] = Float.NaN;
                     } else {
                         ip1 = ii + 1;
@@ -3082,10 +3077,7 @@ public class DerivedGridFactory {
                     }
                 }
             }
-            newVals[np] = gno;
         }
-        newField = (FlatField) GridUtil.setParamType(slice,
-                makeNewType(slice, "_SM9S"), true);
         newField.setSamples(newVals, false);
 
         return newField;
@@ -3099,13 +3091,15 @@ public class DerivedGridFactory {
      *
      * @param slice grid to smooth
      * @param filterLevel level of filtering
+     * @param rangeType  type for the range.  May be null;
      *
      * @return  the smoothed grid or null
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private static FlatField smoothGaussian(FlatField slice, int filterLevel)
+    private static FlatField smoothGaussian(FlatField slice, int filterLevel,
+                                            TupleType rangeType)
             throws VisADException, RemoteException {
 
 
@@ -3136,18 +3130,24 @@ public class DerivedGridFactory {
             nr = MAXWTS - 1;
         }
 
-        FlatField  newField = null;
-        float[][]  samples  = slice.getFloats(false);
-        GriddedSet domain   = (GriddedSet) GridUtil.getSpatialDomain(slice);
-        int[]      lengths  = domain.getLengths();
+        if (rangeType == null) {
+            rangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(slice),
+                                          "_GWFS");
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(slice,
+                                 rangeType, true);
+        float[][]  samples = slice.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths = domain.getLengths();
         kxd = lengths[0];
         kyd = lengths[1];
         int       numParams = samples.length;
-        float[][] newVals   = new float[numParams][];
+        float[][] newVals   = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
             gnist = samples[np];
-            gnost = new float[gnist.length];
+            gnost = newVals[np];
 
 
             /*
@@ -3212,11 +3212,7 @@ public class DerivedGridFactory {
                     }
                 }
             }
-            newVals[np] = gnost;
         }
-        newField = (FlatField) GridUtil.setParamType(slice,
-                makeNewType(slice, "_GWFS"), true);
-
         newField.setSamples(newVals, false);
 
         return newField;
