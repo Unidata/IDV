@@ -1,25 +1,22 @@
-/**
- * $Id: ViewManager.java,v 1.401 2007/08/16 14:05:04 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
- * This library is distributed in the hope that it will be2 useful, but
+ * 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.flythrough;
 
@@ -702,7 +699,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             return d;
         }
         try {
-            return new Double(t).doubleValue();
+            return Misc.parseNumber(t);
         } catch (NumberFormatException nfe) {
             animationWidget.setRunning(false);
             logException("Parse error:" + t, nfe);
@@ -1001,7 +998,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-        zoomFld = new JTextField(zoom + "", 5);
+        //zoomFld = new JTextField(zoom + "", 5);
+        zoomFld = new JTextField(Misc.format(zoom), 5);
 
         for (int i = 0; i < tilt.length; i++) {
             final int theIndex = i;
@@ -1086,7 +1084,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public JComponent doMakePointsPanel() {
 
         pointTableModel = new FlythroughTableModel(this);
-        pointTable = new JTable(pointTableModel);
+        pointTable      = new JTable(pointTableModel);
         pointTable.setToolTipText(
             "Double click: view; Control-P: Show point properties; Delete: delete point");
 
@@ -1107,7 +1105,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     }
                 }
 
-		if (GuiUtils.isDeleteEvent(e)) {
+                if (GuiUtils.isDeleteEvent(e)) {
                     List<FlythroughPoint> newPoints =
                         new ArrayList<FlythroughPoint>();
                     int[]                 rows = pointTable.getSelectedRows();
@@ -1317,6 +1315,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public EarthLocation getLastLocation() {
         return lastLocation;
     }
@@ -2033,7 +2036,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         orientBox.setSelectedItem(TwoFacedObject.findId(orientation,
                 orients));
-        zoomFld.setText(zoom + "");
+        //zoomFld.setText(zoom + "");
+        zoomFld.setText(Misc.format(zoom));
         for (int i = 0; i < tilt.length; i++) {
             tiltSliders[i].setValue((int) tilt[i]);
             tiltLabels[i].setText("" + (int) tilt[i]);
@@ -2332,50 +2336,72 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         return addPoint(false);
     }
 
-    public void flyAlongLatitude() throws VisADException, RemoteException  {
-        double value=0;
-        String s = "0.0";
-        while(true) {
-            s = GuiUtils.getInput("Please enter a latitude between -90 and 90","Latitude: ",
-                                     s);
-            if(s==null) return;
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void flyAlongLatitude() throws VisADException, RemoteException {
+        double value = 0;
+        String s     = "0.0";
+        while (true) {
+            s = GuiUtils.getInput(
+                "Please enter a latitude between -90 and 90", "Latitude: ",
+                s);
+            if (s == null) {
+                return;
+            }
             try {
                 value = Misc.parseDouble(s.trim());
                 break;
-            } catch(Exception exc) {
-                GuiUtils.showOkDialog(null,"Oops", new JLabel("Please enter a value between -90 and 90"),null);
+            } catch (Exception exc) {
+                GuiUtils.showOkDialog(
+                    null, "Oops",
+                    new JLabel("Please enter a value between -90 and 90"),
+                    null);
             }
         }
 
-        List<FlythroughPoint> pts =new ArrayList<FlythroughPoint>();
-        for(double other=0;other<360;other++) {
-                EarthLocationTuple pt =
-                    new EarthLocationTuple(value,other, 0);
-                pts.add(new FlythroughPoint(pt));
+        List<FlythroughPoint> pts = new ArrayList<FlythroughPoint>();
+        for (double other = 0; other < 360; other++) {
+            EarthLocationTuple pt = new EarthLocationTuple(value, other, 0);
+            pts.add(new FlythroughPoint(pt));
         }
         flythrough(pts);
     }
 
-    public void flyAlongLongitude() throws VisADException, RemoteException  {
-        double value=0;
-        String s = "0.0";
-        while(true) {
-            s = GuiUtils.getInput("Please enter a longitude between -180 and 180","Longitude: ",
-                                     s);
-            if(s==null) return;
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void flyAlongLongitude() throws VisADException, RemoteException {
+        double value = 0;
+        String s     = "0.0";
+        while (true) {
+            s = GuiUtils.getInput(
+                "Please enter a longitude between -180 and 180",
+                "Longitude: ", s);
+            if (s == null) {
+                return;
+            }
             try {
                 value = Misc.parseDouble(s.trim());
                 break;
-            } catch(Exception exc) {
-                GuiUtils.showOkDialog(null,"Oops", new JLabel("Please enter a value between -90 and 90"),null);
+            } catch (Exception exc) {
+                GuiUtils.showOkDialog(
+                    null, "Oops",
+                    new JLabel("Please enter a value between -90 and 90"),
+                    null);
             }
         }
 
-        List<FlythroughPoint> pts =new ArrayList<FlythroughPoint>();
-        for(double other=90;other>=-90;other--) {
-                EarthLocationTuple pt =
-                    new EarthLocationTuple(other, value, 0);
-                pts.add(new FlythroughPoint(pt));
+        List<FlythroughPoint> pts = new ArrayList<FlythroughPoint>();
+        for (double other = 90; other >= -90; other--) {
+            EarthLocationTuple pt = new EarthLocationTuple(other, value, 0);
+            pts.add(new FlythroughPoint(pt));
         }
         /*
         for(double other=-89;other<=90;other++) {
@@ -3005,7 +3031,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
 
-        List comps  = new ArrayList();
+        List comps = new ArrayList();
         for (FlythroughDecorator decorator : decorators) {
             decorator.handleReadout(pt1, samples);
         }
@@ -3020,7 +3046,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             if (unit == null) {
                 unit = r.getUnit();
             }
-            String name = ucar.visad.Util.cleanTypeName(r.getType());
+            String name       = ucar.visad.Util.cleanTypeName(r.getType());
 
 
 
@@ -3034,7 +3060,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
             double v = r.getValue(unit);
             if (v == v) {
-                v = new Double(Misc.format(v)).doubleValue();
+                v = Misc.parseNumber(Misc.format(v));
             }
 
             JLabel label = new JLabel(name.replace("_", " "));
@@ -3117,6 +3143,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         return this.allPoints;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<FlythroughPoint> getPointsToUse() {
         return this.pointsToUse;
     }
@@ -3392,8 +3423,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *
      * @throws Exception _more_
      */
-    public void setClip(boolean value) throws Exception {
-    }
+    public void setClip(boolean value) throws Exception {}
 
 
     /**
@@ -3680,4 +3710,3 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 }
-
