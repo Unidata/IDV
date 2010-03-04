@@ -223,7 +223,7 @@ def savg(S):
       SAVG ( S ) = average of all non-missing grid point values
   </div>
   """
-  return GridUtil.applyFunctionToLevels(S, GridUtil.FUNC_AVERAGE)
+  return GridMath.applyFunctionToLevels(S, GridMath.FUNC_AVERAGE)
 
 def savs(S):
   """ Average over grid subset

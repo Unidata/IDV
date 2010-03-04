@@ -159,38 +159,38 @@ def sumOverTime(field,makeTimes=0):
     """Take the sum of the values in each time step
     If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the sum """
-    return GridUtil.sumOverTime(field,makeTimes);
+    return GridMath.sumOverTime(field,makeTimes);
 
 def minOverTime(field,makeTimes=0):
     """Take the min of the values in each time step
     If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the min """
-    return GridUtil.minOverTime(field,makeTimes);
+    return GridMath.minOverTime(field,makeTimes);
 
 def maxOverTime(field,makeTimes=0):
     """Take the max of the values in each time step
     If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the max """
-    return GridUtil.maxOverTime(field,makeTimes);
+    return GridMath.maxOverTime(field,makeTimes);
 
 def averageOverTime(field,makeTimes=0):
     """Average the values in each time step
     If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the average """
-    return GridUtil.averageOverTime(field,makeTimes);
+    return GridMath.averageOverTime(field,makeTimes);
 
 
 def differenceFromBaseTime(field):
     """set the value of each time step N:
     D(N)= D(N) - D(0)
     """
-    return GridUtil.differenceFromBaseTime(field);
+    return GridMath.differenceFromBaseTime(field);
 
 def sumFromBaseTime(field):
     """set the value of each time step N:
     D(N)= D(N) + D(0)
     """
-    return GridUtil.sumFromBaseTime(field);
+    return GridMath.sumFromBaseTime(field);
 
 
 def timeStepDifference(field,offset=-1):
@@ -199,7 +199,7 @@ def timeStepDifference(field,offset=-1):
     where offset should be negative
     """
     offset = int(offset)
-    return GridUtil.timeStepDifference(field,offset);
+    return GridMath.timeStepDifference(field,offset);
 
 
 def timeStepSum(field,offset=-1):
@@ -208,7 +208,7 @@ def timeStepSum(field,offset=-1):
     where offset should be negative
     """
     offset = int(offset)
-    return GridUtil.timeStepSum(field,offset);
+    return GridMath.timeStepSum(field,offset);
 
 
 def oldaverageOverTime(field,makeTimes = 0):
