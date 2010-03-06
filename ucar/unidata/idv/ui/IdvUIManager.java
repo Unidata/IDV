@@ -5516,6 +5516,7 @@ public class IdvUIManager extends IdvManager {
                         times);
                 }
             }
+            /*
             String level = operand.getProperty(operand.PROP_LEVEL);
             if (level != null) {
                 try {
@@ -5529,6 +5530,7 @@ public class IdvUIManager extends IdvManager {
                     throw new ucar.unidata.util.WrapperException(exc);
                 }
             }
+            */
             if (operand.getMultiple()) {
                 ListDataChoice ldc = new ListDataChoice(paramName, choices);
                 finalChoices.add(ldc);
