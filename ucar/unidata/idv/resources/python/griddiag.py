@@ -430,6 +430,19 @@ def qvec(S,V):
   qvecv = newName(-dot(dvdy(V),grads),"qvecv")
   return vecr(qvecu,qvecv)
 
+def qvcl(THTA,V):
+  """ Q-vector ( K / m / s )
+  <div class=jython>
+      QVCL ( THTA, V ) = ( 1/( D (THTA) / DP ) ) *
+                            [ ( DOT ( DVDX (V), GRAD (THTA) ) ),
+                              ( DOT ( DVDY (V), GRAD (THTA) ) ) ]
+  </div>
+  """
+  dtdp  = DerivedGridFactory.partial(THTA,2)
+  gradt = grad(THTA)
+  qvecudp = newName(quo(dot(dvdx(V),gradt),dtdp),"qvecudp")
+  qvecvdp = newName(quo(dot(dvdy(V),gradt),dtdp),"qvecvdp")
+  return vecr(qvecudp,qvecvdp)
 
 def sm5v(V):
   """ Smooth a scalar grid using a 5-point smoother (see sm5s)
