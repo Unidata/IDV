@@ -215,7 +215,7 @@ def relh(temp,mixr):
 def pvor(S,V):
   """ Potetial Vorticity (usually from theta and wind)
   """
-  return DerivedGridFactory.createPotentialVorticity(theta,wind)
+  return DerivedGridFactory.createPotentialVorticity(S,V)
 
 def savg(S):
   """ Average over whole grid
