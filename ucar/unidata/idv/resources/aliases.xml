@@ -157,4 +157,8 @@ The label is used  (if defined) for  the AliasEditor gui.
      name="ROLL"
      label="ROLL Angle"
      aliases="ROLL,hroll"/>
+  <alias
+     name="WIND"
+     label="Wind"
+     aliases="flowvectors"/>
 </aliases>

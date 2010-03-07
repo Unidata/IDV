@@ -547,7 +547,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands>
       <params categories="GRID-3D-*;flowvector-3D-*"
          p1="THETA"
-         p2="flowvectors"/>
+         p2="WIND"/>
     </operands>
   </derived>
   <derived
