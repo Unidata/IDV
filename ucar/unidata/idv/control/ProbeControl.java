@@ -1,25 +1,22 @@
 /*
- * $Id: ProbeControl.java,v 1.203 2007/08/13 21:37:40 dmurray Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -112,7 +109,8 @@ import javax.vecmath.Point3d;
  * @author Unidata IDV developers
  * @version $Revision: 1.203 $
  */
-public class ProbeControl extends DisplayControlImpl implements DisplayableData.DragAdapter {
+public class ProbeControl extends DisplayControlImpl implements DisplayableData
+    .DragAdapter {
 
     /** ID for sharing position */
     public static final String SHARE_POSITION = "ProbeControl.SHARE_POSITION";
@@ -166,10 +164,10 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
     private boolean updatePending = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean keepProbeAtHeight = true;
 
-    /** _more_          */
+    /** _more_ */
     private double probeRadius = 1.0;
 
 
@@ -260,6 +258,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
     /** Show sunrise/sunset display in time series */
     private boolean showSunriseSunset = false;
 
+    /** _more_          */
     private RealTupleType globePositionType;
 
     /**
@@ -327,16 +326,16 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         getInternalAnimation();
         aniWidget = getAnimationWidget().getContents();
 
-        if(inGlobeDisplay()) {
-            RealType[] components =
-                {RealType.XAxis, RealType.YAxis, RealType.ZAxis};
-            globePositionType =     new RealTupleType(components, null, null); 
-            probe     = new PointProbe(new RealTuple(
-                                                     globePositionType,
-                                                     new double[] {0,0,0}));
+        if (inGlobeDisplay()) {
+            RealType[] components = { RealType.XAxis, RealType.YAxis,
+                                      RealType.ZAxis };
+            globePositionType = new RealTupleType(components, null, null);
+            probe = new PointProbe(new RealTuple(globePositionType,
+                    new double[] { 0,
+                                   0, 0 }));
             probe.getSelectorPoint().setDragAdapter(this);
         } else {
-            probe     = new PointProbe(0.0, 0.0, 0.0);
+            probe = new PointProbe(0.0, 0.0, 0.0);
         }
 
 
@@ -395,13 +394,13 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         }
     }
 
-    /** _more_          */
+    /** _more_ */
     private JSlider probeSizeSlider;
 
-    /** _more_          */
+    /** _more_ */
     private GuiUtils.ColorSwatch probeColorSwatch;
 
-    /** _more_          */
+    /** _more_ */
     private JComboBox shapeCbx;
 
     /**
@@ -670,16 +669,16 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         if (inGlobeDisplay()) {
             try {
                 // This sets the probe position to be on the surface of the globe closest to the screen
-            Point3d          p          = new Point3d(0, 0, 1);
-            NavigatedDisplay navDisplay = getNavigatedDisplay();
-            navDisplay.applyRotation(p);
-            probe.setPosition(
-                new RealTuple(
-                              globePositionType, new double[] {p.x,p.y,p.z}));
+                Point3d          p          = new Point3d(0, 0, 1);
+                NavigatedDisplay navDisplay = getNavigatedDisplay();
+                navDisplay.applyRotation(p);
+                probe.setPosition(new RealTuple(globePositionType,
+                        new double[] { p.x,
+                                       p.y, p.z }));
 
-        } catch (Exception exc) {
-            logException("Resetting probe position", exc);
-        }
+            } catch (Exception exc) {
+                logException("Resetting probe position", exc);
+            }
         } else {
             resetProbePosition(0.0, 0.0, 0.0);
         }
@@ -867,6 +866,22 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         values.add(positionText);
     }
 
+    /**
+     * Collect the time animation set from the displayables.
+     * If none found then return null.
+     *
+     * @return Animation set
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Set getDataTimeSet() throws RemoteException, VisADException {
+        Animation animation = getInternalAnimation();
+        if (animation != null) {
+            return animation.getSet();
+        }
+        return null;
+    }
 
 
     /**
@@ -1130,22 +1145,46 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
 
 
 
-    public boolean handleDragDirect(VisADRay ray, boolean first, int mouseModifiers) {
+    /**
+     * _more_
+     *
+     * @param ray _more_
+     * @param first _more_
+     * @param mouseModifiers _more_
+     *
+     * @return _more_
+     */
+    public boolean handleDragDirect(VisADRay ray, boolean first,
+                                    int mouseModifiers) {
         return true;
     }
-    public boolean handleAddPoint(float[]x){
+
+    /**
+     * _more_
+     *
+     * @param x _more_
+     *
+     * @return _more_
+     */
+    public boolean handleAddPoint(float[] x) {
         return true;
     }
 
-    public boolean constrainDragPoint(float[]position) {
-        float x = position[0];
-        float y = position[1];
-        float z = position[2];
-        double length = new Point3d(0, 0,
-                                    0).distance(new Point3d(x, y, z));
+    /**
+     * _more_
+     *
+     * @param position _more_
+     *
+     * @return _more_
+     */
+    public boolean constrainDragPoint(float[] position) {
+        float  x      = position[0];
+        float  y      = position[1];
+        float  z      = position[2];
+        double length = new Point3d(0, 0, 0).distance(new Point3d(x, y, z));
 
 
-        if (!keepProbeAtHeight) {
+        if ( !keepProbeAtHeight) {
             probeRadius = length;
             return true;
         }
@@ -1154,9 +1193,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
             double newx = x * (probeRadius / length);
             double newy = y * (probeRadius / length);
             double newz = z * (probeRadius / length);
-            position[0] = (float)newx;
-            position[1] = (float)newy;
-            position[2] = (float)newz;
+            position[0] = (float) newx;
+            position[1] = (float) newy;
+            position[2] = (float) newz;
         }
         return true;
     }
@@ -1936,7 +1975,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         double[] positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                                                           positionValues[1], positionValues[2]}, false);
+                positionValues[1], positionValues[2] }, false);
         LatLonPoint llp = elt.getLatLonPoint();
         lastProbeAltitude = elt.getAltitude();
 
@@ -2264,7 +2303,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
         double[]  positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                                                           positionValues[1],positionValues[2]}, false);
+                positionValues[1], positionValues[2] }, false);
         return elt;
     }
 
@@ -3118,4 +3157,3 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData.
 
 
 }
-
