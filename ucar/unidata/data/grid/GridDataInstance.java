@@ -1,20 +1,18 @@
 /*
- * $Id: GridDataInstance.java,v 1.72 2006/12/05 18:52:36 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -206,7 +204,7 @@ public class GridDataInstance extends DataInstance {
         }
         gridData = origData;
         //jeffmc: for now clear out the origData
-        origData        = null;
+        origData = null;
 
 
         Trace.call2("GridDataInstance.getData");
@@ -251,7 +249,7 @@ public class GridDataInstance extends DataInstance {
         // case of radar RHI which has Interger1DSet to several FieldImpls
         // get first FlatField in either case
         FlatField field = null;
-        Data data = null;
+        Data      data  = null;
         if (isSequence) {
             data = gridData.getSample(0);
             // see if this sample is either a displayable FlatField, or
@@ -478,11 +476,13 @@ public class GridDataInstance extends DataInstance {
     public Range[] getRanges() {
         if (ranges == null) {
             try {
-                boolean isSequence = GridUtil.isSequence(gridData);
-                ranges = (isSequence == true)
-                         ? GridUtil.getMinMax(getOriginalGrid())
-                         : GridUtil.fieldMinMax(
-                             (FlatField) getOriginalGrid());
+                if (gridData != null) {
+                    boolean isSequence = GridUtil.isSequence(gridData);
+                    ranges = (isSequence == true)
+                             ? GridUtil.getMinMax(getOriginalGrid())
+                             : GridUtil.fieldMinMax(
+                                 (FlatField) getOriginalGrid());
+                }
             } catch (Exception exc) {
                 LogUtil.printException(log_, "getRange", exc);
             }
@@ -685,19 +685,21 @@ public class GridDataInstance extends DataInstance {
      */
     public FlatField getFlatField() {
         checkInit();
-        if(gridData==null) return null;
+        if (gridData == null) {
+            return null;
+        }
         try {
             if (GridUtil.isSequence(gridData)) {
                 Data data = gridData.getSample(0);
                 if (data instanceof FlatField) {
-                    return  (FlatField) data;
+                    return (FlatField) data;
                 } else if (data instanceof FieldImpl) {
-                    return  (FlatField) ((FieldImpl) data).getSample(0);
+                    return (FlatField) ((FieldImpl) data).getSample(0);
                 }
             } else {
                 return (FlatField) gridData;
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
         return null;
@@ -747,15 +749,13 @@ public class GridDataInstance extends DataInstance {
      * @return  output string
      */
     public String toString() {
-        return "GridDataInstance: " + "\n"  
-            + "\n" + ((gridData == null)
-                                ? " NULL  FIELDIMPL"
-                                : "") + "\n" + show("dataChoice", dataChoice)
-                                      + "\n" + show("realTypes", realTypes)
-                                      + "\n" + show("ranges", ranges) + "\n"
-                                      + show("unit", getRawUnit(0)) + "\n"
-                                      + show("domainSet3D", domainSet3D)
-                                      + "\n" + "";
+        return "GridDataInstance: " + "\n" + "\n" + ((gridData == null)
+                ? " NULL  FIELDIMPL"
+                : "") + "\n" + show("dataChoice", dataChoice) + "\n"
+                      + show("realTypes", realTypes) + "\n"
+                      + show("ranges", ranges) + "\n"
+                      + show("unit", getRawUnit(0)) + "\n"
+                      + show("domainSet3D", domainSet3D) + "\n" + "";
     }
 
 
@@ -873,4 +873,3 @@ public class GridDataInstance extends DataInstance {
     }
 
 }
-

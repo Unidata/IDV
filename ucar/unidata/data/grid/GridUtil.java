@@ -156,31 +156,31 @@ public class GridUtil {
 
     /**
      * function for the applyFunctionOverTime routine
-     *   @deprecated use GridMath.FUNC_AVERAGE 
+     *   @deprecated use GridMath.FUNC_AVERAGE
      */
     public static final String FUNC_AVERAGE = GridMath.FUNC_AVERAGE;
 
     /**
      * function for the applyFunctionOverTime routine
-     *   @deprecated use GridMath.FUNC_SUM 
+     *   @deprecated use GridMath.FUNC_SUM
      */
     public static final String FUNC_SUM = GridMath.FUNC_SUM;
 
     /**
      * function for the applyFunctionOverTime routine
-     *   @deprecated use GridMath.FUNC_MAX 
+     *   @deprecated use GridMath.FUNC_MAX
      */
     public static final String FUNC_MAX = GridMath.FUNC_MAX;
 
     /**
      * function for the applyFunctionOverTime routine
-     *   @deprecated use GridMath.FUNC_MIN 
+     *   @deprecated use GridMath.FUNC_MIN
      */
     public static final String FUNC_MIN = GridMath.FUNC_MIN;
 
     /**
      * function for the timeStepFunc routine
-     *   @deprecated use GridMath.FUNC_DIFFERENCE 
+     *   @deprecated use GridMath.FUNC_DIFFERENCE
      */
     public static final String FUNC_DIFFERENCE = GridMath.FUNC_DIFFERENCE;
 
@@ -484,8 +484,8 @@ public class GridUtil {
      * @see #isTimeSequence(FieldImpl)
      */
     public static boolean isSequence(FieldImpl grid) {
-        return ((Util.getDomainSet(grid).getDimension() == 1)
-                && !(grid instanceof FlatField));
+        return (grid != null) && !(grid instanceof FlatField)
+               && (Util.getDomainSet(grid).getDimension() == 1);
     }
 
     /**
@@ -1551,7 +1551,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.maxOverTime
+     * @deprecated use GridMath.maxOverTime(FieldImpl, boolean)
      */
     public static FieldImpl maxOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
@@ -1572,7 +1572,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.applyFunctionOverTime
+     * @deprecated use GridMath.applyFunctionOverTime(FieldImpl, String, boolean)
      */
     public static FieldImpl applyFunctionOverTime(FieldImpl grid,
             String function, boolean makeTimes)
