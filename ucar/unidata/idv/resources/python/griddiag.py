@@ -101,12 +101,12 @@ def cros(V1,V2):
 def ddx(S):
   """ Take the derivative with respect to the domain's X coordinate 
   """
-  return DerivedGridFactory.ddx(S);
+  return GridMath.ddx(S);
 
 def ddy(S):
   """ Take the derivative with respect to the domain's Y coordinate 
   """
-  return DerivedGridFactory.ddy(S);
+  return GridMath.ddy(S);
 
 def defr(V):
   """ Total deformation  
@@ -154,7 +154,7 @@ def gwfs(S, N=6):
  Increasing N increases the smoothing. (default N=6)
   </div>
   """
-  return DerivedGridFactory.smooth(S, "GWFS", int(N))
+  return GridUtil.smooth(S, "GWFS", int(N))
 
 def jcbn(S1,S2):
   """ Jacobian Determinant 
@@ -258,7 +258,7 @@ def sm5s(S):
 
   </div>
   """
-  return DerivedGridFactory.smooth(S, "SM5S")
+  return GridUtil.smooth(S, "SM5S")
 
 def sm9s(S):
   """ Smooth a scalar grid using a 9-point smoother
@@ -272,7 +272,7 @@ def sm9s(S):
 
   </div>
   """
-  return DerivedGridFactory.smooth(S, "SM9S")
+  return GridUtil.smooth(S, "SM9S")
 
 def strd(V):
   """ Stretching Deformation 
@@ -438,7 +438,7 @@ def qvcl(THTA,V):
                               ( DOT ( DVDY (V), GRAD (THTA) ) ) ]
   </div>
   """
-  dtdp  = DerivedGridFactory.partial(THTA,2)
+  dtdp  = GridMath.partial(THTA,2)
   gradt = grad(THTA)
   qvecudp = newName(quo(dot(dvdx(V),gradt),dtdp),"qvecudp")
   qvecvdp = newName(quo(dot(dvdy(V),gradt),dtdp),"qvecvdp")
