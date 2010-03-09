@@ -21,6 +21,9 @@
 package ucar.unidata.data.grid;
 
 
+import ucar.unidata.data.DataUtil;
+
+
 import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
@@ -56,6 +59,23 @@ public class GridMath {
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
 
+    /** kilometers/degree (111) */
+    private static final Real KM_PER_DEGREE;
+
+    /** negative one */
+    public static final Real NEGATIVE_ONE;
+
+    static {
+        try {
+            Unit kmPerDegree = DataUtil.parseUnit("km/degree");
+            KM_PER_DEGREE = new Real(DataUtil.makeRealType("kmPerDegree",
+                    kmPerDegree), 111.0, kmPerDegree);
+            NEGATIVE_ONE = new Real(-1);
+
+        } catch (Exception ex) {
+            throw new ExceptionInInitializerError(ex.toString());
+        }
+    }
 
 
     /**
@@ -762,6 +782,131 @@ public class GridMath {
         }
         return newField;
 
+    }
+
+
+    /**
+     * Take the partial derivative with respect to X of the given field.
+     * @param grid   grid to parialize
+     * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl ddx(FieldImpl grid)
+            throws VisADException, RemoteException {
+        return partial(grid, 0);
+    }
+
+    /**
+     * Take the partial derivative with respect to Y of the given field.
+     * @param grid   grid to parialize
+     * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl ddy(FieldImpl grid)
+            throws VisADException, RemoteException {
+        return partial(grid, 1);
+    }
+
+    /**
+     * Take the partial derivative with respect variable at the domain index.
+     * @param grid   grid to parialize
+     * @param domainIndex  index of variable to use  for derivative
+     * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl partial(FieldImpl grid, int domainIndex)
+            throws VisADException, RemoteException {
+        SampledSet ss = GridUtil.getSpatialDomain(grid);
+        RealType rt =
+            (RealType) ((SetType) ss.getType()).getDomain().getComponent(
+                domainIndex);
+        return partial(grid, rt);
+    }
+
+    /**
+     * Take the partial for the spatial domain of a grid.
+     *
+     * @param grid  FlatField to take the partial of
+     * @param var  RealType for the partial
+     *
+     * @return  partial derivative
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FieldImpl partial(FieldImpl grid, RealType var)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
+        if (isSequence) {
+            Set s = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+                FlatField f = partial(((FlatField) grid.getSample(i)), var);
+                if (i == 0) {
+                    FunctionType ftype =
+                        new FunctionType(((SetType) s.getType()).getDomain(),
+                                         f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
+        } else {
+            retField = partial(((FlatField) grid), var);
+        }
+        return retField;
+    }
+
+    /**
+     * Take the partial for the FlatField.
+     *
+     * @param f  FlatField to take the partial of
+     * @param var  RealType for the partial
+     *
+     * @return the derivative
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField partial(FlatField f, RealType var)
+            throws VisADException, RemoteException {
+        FlatField  fToUse       = f;
+        SampledSet domain       = GridUtil.getSpatialDomain(f);
+        boolean    twoDManifold = false;
+        // check for a slice
+        if (domain.getDimension() != domain.getManifoldDimension()) {
+            twoDManifold = true;
+            fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
+        }
+
+        FlatField retField = (FlatField) fToUse.derivative(var,
+                                 Data.NO_ERRORS);
+        if (twoDManifold) {
+            retField = (FlatField) GridUtil.setSpatialDomain(retField,
+                    domain);
+        }
+        if (var.equals(RealType.Longitude)
+                || var.getName().toLowerCase().startsWith("lon")) {
+            FlatField latGrid =
+                (FlatField) DerivedGridFactory.createLatitudeGrid(retField);
+            FlatField latCosGrid = (FlatField) latGrid.cosDegrees();
+            // account for 0 at poles.
+            latCosGrid = (FlatField) latCosGrid.max(
+                new Real(Math.cos(Math.toRadians(89))));
+            FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
+            //visad.python.JPythonMethods.dumpTypes(factor);
+            retField = (FlatField) retField.divide(factor);
+            //visad.python.JPythonMethods.dumpTypes(retField);
+        } else if (var.equals(RealType.Latitude)
+                   || var.getName().toLowerCase().startsWith("lat")) {
+            retField = (FlatField) retField.divide(KM_PER_DEGREE);
+        }
+        return retField;
     }
 
 
