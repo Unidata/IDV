@@ -4190,6 +4190,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+
+    /**
+     * This gets called when a display control has been moved to this viewmanager
+     *
+     * @param control The display control that has been moved
+     */
+    public void controlMoved(DisplayControl control) {
+        fillLegends();
+        getIdv().getIdvUIManager().getViewPanel().controlMoved(control);
+    }
+
     /**
      * Create and return the show menu.
      *

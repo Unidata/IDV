@@ -8819,7 +8819,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         } catch (Exception exc) {
             logException("Moving to a new view", exc);
         }
-        getIdv().getIdvUIManager().getViewPanel().controlMoved(this);
+        newViewManager.controlMoved(this);
     }
 
 
