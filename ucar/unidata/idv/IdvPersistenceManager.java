@@ -3466,10 +3466,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
 
             long t1 = System.currentTimeMillis();
-            //Don't run in parallel for now since it screws up the ordering
-            //of the displays
-            //threadManager.runAllParallel();
-            threadManager.runInParallel(getIdv().getMaxDataThreadCount());
+            try {
+                //Don't run in parallel for now since it screws up the ordering
+                //of the displays
+                //threadManager.runAllParallel();
+                threadManager.runInParallel(getIdv().getMaxDataThreadCount());
+            } catch(Exception exc)  {
+                //Catch any exceptions thrown but then get all of them and show them to the user
+                List<Exception> exceptions = threadManager.getExceptions();
+                if(exceptions.size()==0) {
+                    //This shouldn't happen
+                    exceptions.add(exc);
+                }
+                LogUtil.printExceptions(exceptions);
+            }
             long t2 = System.currentTimeMillis();
             //            System.err.println ("time to init data sources:" + (t2-t1));
 
