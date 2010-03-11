@@ -2184,6 +2184,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             throws VisADException, RemoteException {
 
 
+        if(getInError()) return null;
 
         //start up polling if we have not done so already.
         initPolling();
