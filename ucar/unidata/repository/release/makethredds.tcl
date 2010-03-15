@@ -8,6 +8,9 @@ exec jar -xvf ../thredds.war
 
 
 cd WEB-INF/classes
+##unjar the common jar
+exec jar -xvf ../../../unidatacommon.jar
+
 if {1} {
 ##exec rm -r org/apache/log4j
 foreach jar [glob ../lib/*.jar] {
