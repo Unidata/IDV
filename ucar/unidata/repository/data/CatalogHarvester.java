@@ -305,6 +305,8 @@ public class CatalogHarvester extends Harvester {
         }
 
         //        System.err.println(tab+"name:" + name+"  #children:" + elements.getLength() +" depth:" + xmlDepth + " " + urlPath +" " + haveChildDatasets);
+
+        boolean madeEntry = false;
         if ( !haveChildDatasets && (xmlDepth > 0) && (urlPath != null)) {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
@@ -337,7 +339,6 @@ public class CatalogHarvester extends Harvester {
                         Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,
                         Metadata.DFLT_EXTRA));
             }
-
 
             Resource resource = null;
             if (download
@@ -375,7 +376,7 @@ public class CatalogHarvester extends Harvester {
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);
-
+            madeEntry  =true;
 
             typeHandler.initializeNewEntry(entry);
 
@@ -409,61 +410,64 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
-        name = name.replace(Group.IDDELIMITER, "--");
-        name = name.replace("'", "");
-        Group group = null;
-        Entry newGroup = getEntryManager().findEntryWithName(null, parent,
-                             name);
-        if ((newGroup != null) && newGroup.isGroup()) {
-            group = (Group) newGroup;
-        }
-        if (group == null) {
-            //            System.err.println("Making new group:" + name);
-            group = getEntryManager().makeNewGroup(parent, name, user);
-            List<Metadata> metadataList = new ArrayList<Metadata>();
-            CatalogOutputHandler.collectMetadata(repository, metadataList,
-                    node);
-            metadataList.add(new Metadata(repository.getGUID(),
-                                          group.getId(),
-                                          ThreddsMetadataHandler.TYPE_LINK,
-                                          DFLT_INHERITED,
-                                          "Imported from catalog",
-                                          catalogUrlPath, Metadata.DFLT_ATTR,
-                                          Metadata.DFLT_ATTR,
-                                          Metadata.DFLT_EXTRA));
-
-            insertMetadata(group, metadataList);
-            String crumbs = getEntryManager().getBreadCrumbs(null, group,
-                                true, topGroup)[1];
-            crumbs = crumbs.replace("class=", "xclass=");
-            groups.add(crumbs);
-            groupCnt++;
-            if (groups.size() > 100) {
-                groups = new ArrayList();
+        if(!madeEntry) {
+            name = name.replace(Group.IDDELIMITER, "--");
+            name = name.replace("'", "");
+            Group group = null;
+            Entry newGroup = getEntryManager().findEntryWithName(null, parent,
+                                                                 name);
+            if ((newGroup != null) && newGroup.isGroup()) {
+                group = (Group) newGroup;
             }
-        }
+            if (group == null) {
+                //                System.err.println(tab+"Making new group:" + name);
+                group = getEntryManager().makeNewGroup(parent, name, user);
+                List<Metadata> metadataList = new ArrayList<Metadata>();
+                CatalogOutputHandler.collectMetadata(repository, metadataList,
+                                                     node);
+                metadataList.add(new Metadata(repository.getGUID(),
+                                              group.getId(),
+                                              ThreddsMetadataHandler.TYPE_LINK,
+                                              DFLT_INHERITED,
+                                              "Imported from catalog",
+                                              catalogUrlPath, Metadata.DFLT_ATTR,
+                                              Metadata.DFLT_ATTR,
+                                              Metadata.DFLT_EXTRA));
 
-
-        for (int i = 0; i < elements.getLength(); i++) {
-            Element child = (Element) elements.item(i);
-            String  tag   = XmlUtil.getLocalName(child);
-            if (tag.equals(CatalogUtil.TAG_DATASET)) {
-                recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
-                               recurseDepth, timestamp);
-            } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
-                if ( !recurse) {
-                    continue;
+                insertMetadata(group, metadataList);
+                String crumbs = getEntryManager().getBreadCrumbs(null, group,
+                                                                 true, topGroup)[1];
+                crumbs = crumbs.replace("class=", "xclass=");
+                groups.add(crumbs);
+                groupCnt++;
+                if (groups.size() > 100) {
+                    groups = new ArrayList();
                 }
-                String url = XmlUtil.getAttribute(child, "xlink:href");
-                URL    newCatalogUrl = new URL(catalogUrl, url);
-                //                System.err.println("url:" + newCatalogUrl);
-                if ( !importCatalog(newCatalogUrl.toString(), group,
-                                    recurseDepth + 1, timestamp)) {
-                    System.err.println("Could not load catalog:" + url);
-                    System.err.println("Base catalog:" + catalogUrl);
-                    System.err.println("Base URL:"
-                                       + XmlUtil.getAttribute(child,
-                                           "xlink:href"));
+            }
+
+
+            //xxxx
+            for (int i = 0; i < elements.getLength(); i++) {
+                Element child = (Element) elements.item(i);
+                String  tag   = XmlUtil.getLocalName(child);
+                if (tag.equals(CatalogUtil.TAG_DATASET)) {
+                    recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
+                                   recurseDepth, timestamp);
+                } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
+                    if ( !recurse) {
+                        continue;
+                    }
+                    String url = XmlUtil.getAttribute(child, "xlink:href");
+                    URL    newCatalogUrl = new URL(catalogUrl, url);
+                    //                System.err.println("url:" + newCatalogUrl);
+                    if ( !importCatalog(newCatalogUrl.toString(), group,
+                                        recurseDepth + 1, timestamp)) {
+                        System.err.println("Could not load catalog:" + url);
+                        System.err.println("Base catalog:" + catalogUrl);
+                        System.err.println("Base URL:"
+                                           + XmlUtil.getAttribute(child,
+                                                                  "xlink:href"));
+                    }
                 }
             }
         }

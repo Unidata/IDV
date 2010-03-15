@@ -169,14 +169,22 @@ public class LasOutputHandler extends OutputHandler {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         if (state.group != null) {
             for (Entry child : state.getAllEntries()) {
+                if (child.getType().equals(
+                                           OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+                    continue;
+                }
+
                 if (dataOutputHandler.canLoadAsGrid(child)) {
                     links.add(makeLink(request, state.group, OUTPUT_LAS_XML));
                     break;
                 }
             }
         } else if (state.entry != null) {
-            if (dataOutputHandler.canLoadAsGrid(state.entry)) {
-                links.add(makeLink(request, state.entry, OUTPUT_LAS_XML));
+            if (!state.entry.getType().equals(
+                                             OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+                if (dataOutputHandler.canLoadAsGrid(state.entry)) {
+                    links.add(makeLink(request, state.entry, OUTPUT_LAS_XML));
+                }
             }
         }
     }
