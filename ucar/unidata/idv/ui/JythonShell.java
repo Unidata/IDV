@@ -236,7 +236,7 @@ public class JythonShell extends InteractiveShell {
             String  name = pair.__finditem__(0).toString();
             if ((obj instanceof PyFunction)
                     || (obj instanceof PyReflectedFunction)
-                    || (obj instanceof PyJavaClass)
+                //                    || (obj instanceof PyJavaClass)
                     || (obj instanceof PyJavaPackage)
                     || (obj instanceof PySystemState)
                     || (obj instanceof PyJavaPackage)
