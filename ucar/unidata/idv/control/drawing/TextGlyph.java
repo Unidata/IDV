@@ -414,7 +414,7 @@ public class TextGlyph extends DrawingGlyph {
                 GuiUtils.inset(new JLabel("Preview:"),
                                new Insets(5, 0, 0, 0)),
                 editorWrapper = GuiUtils.hsplit(editor, GuiUtils.filler(),
-                    htmlWidth, 1.0) }, 1, GuiUtils.WT_Y, GuiUtils.WT_NYNY);
+                                                getHtmlWidthToUse(), 1.0) }, 1, GuiUtils.WT_Y, GuiUtils.WT_NYNY);
 
 
             textContents = GuiUtils.inset(textContents, 5);
@@ -701,11 +701,25 @@ public class TextGlyph extends DrawingGlyph {
 
 
     /**
+     * Get the html width to use. This is either the width of the editor pane or,
+     * if the text begins with the tag "<nobr>" then -1 which results in one big line.
+     *
+     * @return html image width to use for rendering
+     */
+    private int getHtmlWidthToUse() {
+        if(text!=null && text.trim().startsWith("<nobr>")) {
+            return  -1;
+        }
+        return htmlWidth;
+    }
+
+
+    /**
      * update the image
      */
     private void updateImage() {
         try {
-            image = getImage(text, htmlWidth);
+            image = getImage(text, getHtmlWidthToUse());
             //Use our own makeField for now
             //            imageData   = Util.makeField(image, true);
             imageData   = makeField(image, 0f, false);
