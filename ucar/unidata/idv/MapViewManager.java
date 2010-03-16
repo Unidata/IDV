@@ -132,16 +132,16 @@ public class MapViewManager extends NavigatedViewManager {
         "idv.clipdistance.map.back";
 
 
-    /** _more_ */
+    /** flythrough command */
     public static final String CMD_FLY_LEFT = "cmd.fly.left";
 
-    /** _more_ */
+    /** flythrough command */
     public static final String CMD_FLY_RIGHT = "cmd.fly.right";
 
-    /** _more_ */
+    /** flythrough command */
     public static final String CMD_FLY_FORWARD = "cmd.fly.forward";
 
-    /** _more_ */
+    /** flythrough command */
     public static final String CMD_FLY_BACK = "cmd.fly.back";
 
     /** preference id for the list of addresses in the geocode dialog */
@@ -166,9 +166,12 @@ public class MapViewManager extends NavigatedViewManager {
     /** Preference for  showing the pip */
     public static final String PREF_SHOWPIP = "View.ShowPip";
 
-    /** _more_ */
+    /** Preference for showing the globe background  */
     public static final String PREF_SHOWGLOBEBACKGROUND =
         "View.ShowGlobeBackground";
+
+    /** Preference for the globe background  color*/
+    public static final String PREF_GLOBEBACKGROUND = "View.GlobeBackground";
 
     /** Preference for  showing the earth nav panel */
     public static final String PREF_SHOWEARTHNAVPANEL =
@@ -192,7 +195,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** The name of the display projection we are currently using */
     private String mainProjectionName = null;
 
-    /** _more_ */
+    /** The name of the default projection */
     private String defaultProjectionName = null;
 
 
@@ -220,10 +223,10 @@ public class MapViewManager extends NavigatedViewManager {
     /** The map panel in the GUI */
     private PipPanel pipPanel;
 
-    /** _more_ */
+    /** mutex for dealing with the pip map */
     private Object PIP_MUTEX = new Object();
 
-    /** _more_ */
+    /** Holds the pip map */
     private JComponent pipPanelWrapper;
 
 
@@ -240,24 +243,24 @@ public class MapViewManager extends NavigatedViewManager {
     JToggleButton rotateBtn;
 
 
-    /** _more_ */
-    private Color globeBackgroundColor = Color.white;
+    /** background color for filled globe */
+    private Color globeBackgroundColor = null;
 
 
-    /** _more_ */
+    /** z level (really radius) for where to put the globe fill layer */
     private double globeBackgroundLevel = -0.001;
 
-    /** _more_ */
+    /** globe fill background stuff */
     private LineDrawing globeBackgroundDisplayable;
 
-    /** _more_ */
+    /** globe fill background stuff */
     private JComponent globeBackgroundColorComp;
 
-    /** _more_ */
+    /** globe fill background stuff */
     private ZSlider globeBackgroundLevelSlider;
 
 
-    /** _more_ */
+    /** The flythrough */
     private Flythrough flythrough;
 
     /** _more_ */
@@ -393,8 +396,11 @@ public class MapViewManager extends NavigatedViewManager {
                     NavigatedDisplay.CLIP_BACK_DEFAULT));
             navDisplay = globeDisplay;
             setGlobeBackground(globeDisplay);
-            navDisplay.setPolygonOffset(getStateManager().getProperty("idv.globe.polygonoffset",1));
-            navDisplay.setPolygonOffsetFactor(getStateManager().getProperty("idv.globe.polygonoffsetfactor",1));
+            navDisplay.setPolygonOffset(
+                getStateManager().getProperty("idv.globe.polygonoffset", 1));
+            navDisplay.setPolygonOffsetFactor(
+                getStateManager().getProperty(
+                    "idv.globe.polygonoffsetfactor", 1));
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
@@ -480,8 +486,11 @@ public class MapViewManager extends NavigatedViewManager {
             initLatLonBounds      = null;
 
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
-            navDisplay.setPolygonOffset(getStateManager().getProperty("idv.map.polygonoffset",1));
-            navDisplay.setPolygonOffsetFactor(getStateManager().getProperty("idv.map.polygonoffsetfactor",1));
+            navDisplay.setPolygonOffset(
+                getStateManager().getProperty("idv.map.polygonoffset", 1));
+            navDisplay.setPolygonOffsetFactor(
+                getStateManager().getProperty(
+                    "idv.map.polygonoffsetfactor", 1));
         }
 
 
@@ -1190,6 +1199,10 @@ public class MapViewManager extends NavigatedViewManager {
         super.initPreferences(preferenceManager);
 
 
+
+
+
+
         final JComponent[] bgComps =
             GuiUtils.makeColorSwatchWidget(getStore().get(PREF_BGCOLOR,
                 getBackground()), "Set Background Color");
@@ -1204,11 +1217,17 @@ public class MapViewManager extends NavigatedViewManager {
                     .get(PREF_BORDERCOLOR, ViewManager
                         .borderHighlightColor), "Set Selected Panel Border Color");
 
+        final JComponent[] globeComps =
+            GuiUtils.makeColorSwatchWidget(getGlobeBackgroundColorToUse(),
+                                           "Globe Background Color");
+
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel colorPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("  Background:"), bgComps[0], bgComps[1],
             GuiUtils.rLabel("  Foreground:"), fgComps[0], fgComps[1],
             GuiUtils.rLabel("  Selected Panel:"), border[0], border[1],
+            GuiUtils.rLabel("  Globe Background:"), globeComps[0],
+            globeComps[1],
         }, 3, GuiUtils.WT_N, GuiUtils.WT_N));
         colorPanel = GuiUtils.vbox(new JLabel("Color Scheme:"), colorPanel);
         final FontSelector fontSelector =
@@ -1246,6 +1265,8 @@ public class MapViewManager extends NavigatedViewManager {
                 IdvPreferenceManager.applyWidgets((Hashtable) data, theStore);
                 theStore.put(PREF_PROJ_DFLT, projBox.getSelectedItem());
                 theStore.put(PREF_BGCOLOR, bgComps[0].getBackground());
+                theStore.put(PREF_GLOBEBACKGROUND,
+                             globeComps[0].getBackground());
                 theStore.put(PREF_FGCOLOR, fgComps[0].getBackground());
                 theStore.put(PREF_BORDERCOLOR, border[0].getBackground());
                 theStore.put(PREF_DISPLAYLISTFONT, fontSelector.getFont());
@@ -1370,7 +1391,8 @@ public class MapViewManager extends NavigatedViewManager {
 
                 addressReprojectCbx = new JCheckBox("Reproject",
                         getStore().get(PREF_ADDRESS_REPROJECT, true));
-                addressReprojectCbx.setToolTipText("When checked make a simple map projection over the location");
+                addressReprojectCbx.setToolTipText(
+                    "When checked make a simple map projection over the location");
 
                 List savedAddresses =
                     (List) getStore().get(PREF_ADDRESS_LIST);
@@ -1607,13 +1629,19 @@ public class MapViewManager extends NavigatedViewManager {
 
     /**
      * Center the display (animated) to the center of the given mapprojection
+     *
+     * @param mp _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void center(MapProjection mp) throws RemoteException, VisADException {
+    public void center(MapProjection mp)
+            throws RemoteException, VisADException {
         LatLonPoint center = mp.getCenterLatLon();
         getNavigatedDisplay().center(
-                                     new EarthLocationTuple(
-                                                            center.getLatitude(), center.getLongitude(),
-                                                            new Real(RealType.Altitude, 0)), true);
+            new EarthLocationTuple(
+                center.getLatitude(), center.getLongitude(),
+                new Real(RealType.Altitude, 0)), true);
 
     }
 
@@ -2187,7 +2215,7 @@ public class MapViewManager extends NavigatedViewManager {
         globeBackgroundLevelSlider = new ZSlider(globeBackgroundLevel);
         JComponent levelComp = globeBackgroundLevelSlider.getContents();
         JComponent[] bgComps =
-            GuiUtils.makeColorSwatchWidget(globeBackgroundColor,
+            GuiUtils.makeColorSwatchWidget(getGlobeBackgroundColorToUse(),
                                            "Globe Background Color");
 
 
@@ -2222,7 +2250,8 @@ public class MapViewManager extends NavigatedViewManager {
             //                                globeBackgroundColor.getBlue(),
             //                                (int)(255*0.5));
 
-            globeBackgroundDisplayable.setColor(globeBackgroundColor);
+            globeBackgroundDisplayable.setColor(
+                getGlobeBackgroundColorToUse());
             globeBackgroundDisplayable.setVisible(getGlobeBackgroundShow());
 
             DisplayRealType drt          = globe.getDisplayAltitudeType();
@@ -3237,6 +3266,21 @@ public class MapViewManager extends NavigatedViewManager {
     public Color getGlobeBackgroundColor() {
         return globeBackgroundColor;
     }
+
+    /**
+     *  Get the GlobeBackgroundColor property to be used. If it has not been set then get the preference
+     *
+     *  @return The GlobeBackgroundColor to use
+     */
+    public Color getGlobeBackgroundColorToUse() {
+        Color backgroundColor = globeBackgroundColor;
+        if (backgroundColor == null) {
+            backgroundColor = getStore().get(PREF_GLOBEBACKGROUND,
+                                             Color.white);
+        }
+        return backgroundColor;
+    }
+
 
     /**
      *  Set the GlobeBackgroundShow property.
