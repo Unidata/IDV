@@ -1455,7 +1455,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         Point p = null;
         if ( !getShowInTabs() && (myWindow != null)) {
             p = myWindow.getLocation();
-            System.out.println("window not null " + p);
         } else {
             //            p = getIdv().getIdvUIManager().getDashboardLocation();
         }
@@ -4283,6 +4282,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Handle the window closing.
      */
     protected void handleWindowClosing() {
+    
+
         boolean remove = removeOnWindowClose();
         if ( !remove && (getDisplayInfos().size() == 0)) {
             remove = getStore().get(PREF_STANDALONE_REMOVEONCLOSE, false);
@@ -4311,6 +4312,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (remove) {
             Misc.run(this, "doRemove");
+        } else {
+            //If we are on a mac then after a window close (like from hitting the "X")
+            //we cannot show the  window again
+            if(GuiUtils.isMac()) {
+                if ((myWindow != null) && (windowListener != null)) {
+                    myWindow.removeWindowListener(windowListener);
+                    myWindow = null;
+                }
+            }
         }
     }
 
