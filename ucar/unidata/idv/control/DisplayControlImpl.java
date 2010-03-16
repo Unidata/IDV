@@ -4313,13 +4313,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (remove) {
             Misc.run(this, "doRemove");
         } else {
-            //If we are on a mac then after a window close (like from hitting the "X")
-            //we cannot show the  window again
-            if(GuiUtils.isMac()) {
-                if ((myWindow != null) && (windowListener != null)) {
-                    myWindow.removeWindowListener(windowListener);
-                    myWindow = null;
-                }
+            //After a window close (like from hitting the "X") we cannot show the  window again
+            //So null out the window so we create a new one later
+            if ((myWindow != null) && (windowListener != null)) {
+                myWindow.removeWindowListener(windowListener);
+                myWindow = null;
             }
         }
     }
