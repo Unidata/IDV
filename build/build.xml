@@ -29,7 +29,7 @@ line using: and -Dbasedir=/some/other/dir
 
         <!-- srcdir is where we check out cvs code -->
         <property name="srcdir"  value="${basedir}" />
-        <property name="svn_root"  value="svn://zero/idv/trunk" />
+        <property name="svn_root"  value="http://sub.unidata.ucar.edu/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
         <property name="install4jdir"  value="/share/install4j" />
