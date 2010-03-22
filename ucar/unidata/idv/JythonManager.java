@@ -233,13 +233,15 @@ public class JythonManager extends IdvManager implements ActionListener {
         try {
             String pythonLibDir =
                 IOUtil.joinDir(getStore().getJythonCacheDir(), "Lib");
-            double version     = 1.0;
+            double version     = 2.5;
             String versionFile = IOUtil.joinDir(pythonLibDir, "version.txt");
             if (new File(pythonLibDir).exists()) {
                 if (new File(versionFile).exists()) {
-                    if (version
-                            <= new Double(IOUtil.readContents(versionFile,
-                                getClass(), "1.0")).doubleValue()) {
+                    // check to see if we need a new version
+                    double oldVersion =
+                        new Double(IOUtil.readContents(versionFile,
+                            getClass(), "" + version)).doubleValue();
+                    if (oldVersion >= version) {
                         return;
                     }
                 }
@@ -662,7 +664,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         jythonEditor.getTextComponent().addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (GuiUtils.isControlKey(e,  KeyEvent.VK_F)) {
+                if (GuiUtils.isControlKey(e, KeyEvent.VK_F)) {
                     //TODO:
                     //                    findFld.requestFocus();
                     //                    findFld.selectAll();
