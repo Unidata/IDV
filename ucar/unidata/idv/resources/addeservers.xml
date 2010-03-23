@@ -33,7 +33,7 @@ they essentially get it from their container type tag.
        names="RTGRIDS"
        type="grid"/>
     <group
-       names="RTNEXRAD"
+       names="RTNEXRAD,NEXRALL"
        type="radar"/>
     <group
        names="RTWXTEXT"
