@@ -4,7 +4,7 @@
      id="DODS.GRID,OPENDAP.GRID"
      factory="ucar.unidata.data.grid.DodsGeoGridDataSource"
      patterns="http://.*/dods/.*$,dods://.*$,http://.*/dodsC/.*$"
-     label="Grids from an OPENDAP server">
+     label="Grids from an OPeNDAP server">
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
