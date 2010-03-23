@@ -21,14 +21,14 @@
 package ucar.visad.display;
 
 
-import visad.*;
+import ucar.unidata.data.grid.GridUtil;
 
 import visad.util.DataUtility;
+import visad.*;
 
 import java.awt.Color;
 
 import java.rmi.RemoteException;
-
 
 
 /**
@@ -400,35 +400,20 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
     public void loadData(FieldImpl field)
             throws VisADException, RemoteException {
 
-        FlatField ffld = null;
 
-        if (field.getDomainDimension() == 1)  // sequence
-        {
-            ffld = (FlatField) field.getSample(0);
-        } else {
-            ffld = (FlatField) field;
-        }
-
-        // get the RealTypes to control contouring and coloring the surface
-
-        // get how many actual fields were combined together, to look for the 
-        // case where one field colors isosurface of another field. If one
-        // it controls both contours and colors; if two use the second
-        // to color by.  However, if color fill is on, can't do it.
-
-        RealTupleType rtt =
-            (RealTupleType) DataUtility.getFlatRangeType(ffld);
-
+        RealType[] realTypes =
+            GridUtil.getParamType(field).getRealComponents();
+        
         // uncomment to determine ad-hoc rather than programatically
         //coloredByAnother = coloredByAnother && (rtt.getDimension() == 2);
         // get the RealType of the range data; use both for
         // isosurface and for RGB
-        RealType contourType = (RealType) rtt.getComponent(0);
+        RealType contourType = realTypes[0];
         setContourRealType(contourType);  // in IsoSurface
 
         // get the type of the field for rgb color
         RealType rgbType = coloredByAnother
-                           ? (RealType) rtt.getComponent(1)
+                           ? realTypes[1]
                            : contourType;
 
         setRGBRealType(rgbType);
