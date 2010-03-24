@@ -1535,6 +1535,7 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
     private Range makeRange(ucar.nc2.Dimension dim, Range range, int stride) throws InvalidRangeException {
+    	if (dim == null) return null;
         if (range == null) {
           range = new Range(0, dim.getLength() - 1, stride);
         } else {
