@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
+import ucar.ma2.Range;
 import ucar.ma2.InvalidRangeException;
 
 import ucar.nc2.Attribute;
@@ -49,8 +50,6 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.CacheManager;
-
-
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
@@ -91,7 +90,8 @@ import visad.georef.EarthLocationTuple;
 
 import visad.util.DataUtility;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 
 import java.awt.event.ActionEvent;
@@ -1427,6 +1427,7 @@ public class GeoGridDataSource extends GridDataSource {
         if (geoGrid == null) {
             return null;
         }
+        ucar.nc2.Dimension ensDim = geoGrid.getEnsembleDimension();
         GeoSelection geoSelection = ((givenDataSelection != null)
                                      ? givenDataSelection.getGeoSelection()
                                      : null);
@@ -1440,9 +1441,14 @@ public class GeoGridDataSource extends GridDataSource {
         StringBuffer filename = new StringBuffer("grid_" + paramName);
 
         try {
-            ucar.ma2.Range levelRange = null;
+            Range ensRange = makeRange(ensDim, null, 1);
+            ensRange = null;
+            Range timeRange = null;
+            Range levelRange = null;
+            Range xRange = null;
+            Range yRange = null;
             if ((fromLevelIndex >= 0) && (toLevelIndex >= 0) && !needVolume) {
-                levelRange = new ucar.ma2.Range(fromLevelIndex, toLevelIndex);
+                levelRange = new Range(fromLevelIndex, toLevelIndex);
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
@@ -1461,26 +1467,34 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_z_" + geoSelection.getZStrideToUse());
 
                 if (geoSelection.getLatLonRect() != null) {
+                	LatLonRect bbox = geoSelection.getLatLonRect();
                     filename.append(
                         "_rect_"
-                        + cleanBBoxName(geoSelection.getLatLonRect()));
+                        + cleanBBoxName(bbox));
+                    List yx_ranges = geoGrid.getCoordinateSystem().getRangesFromLatLonRect(bbox);
+                    yRange = makeRange(geoGrid.getYDimension(), (Range)yx_ranges.get(0),geoSelection.getYStrideToUse());
+                    xRange = makeRange(geoGrid.getXDimension(), (Range)yx_ranges.get(1),geoSelection.getYStrideToUse());
                 }
                 // Z stride is ignored if
                 if ((levelRange != null) && geoSelection.hasZStride()
                         && (geoSelection.getZStrideToUse() > 1)) {
-                    levelRange = new ucar.ma2.Range(fromLevelIndex,
+                    levelRange = new Range(fromLevelIndex,
                             toLevelIndex, geoSelection.getZStrideToUse());
                 }
                 //                System.out.println("level range(1):  " + levelRange);
+                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null, levelRange, yRange, xRange);
+                /*
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
                                          geoSelection.getZStrideToUse(),
                                          geoSelection.getYStrideToUse(),
                                          geoSelection.getXStrideToUse());
+                */
             } else if (levelRange != null) {
                 extraCacheKey = levelRange;
                 //                System.out.println("level range(2):  " + levelRange);
-                geoGrid = geoGrid.subset(null, levelRange, null, null);
+                //geoGrid = geoGrid.subset(null, levelRange, null, null);
+                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null, levelRange, yRange, xRange);
             }
         } catch (InvalidRangeException ire) {
             throw new IllegalArgumentException("Invalid range:" + ire);
@@ -1520,6 +1534,15 @@ public class GeoGridDataSource extends GridDataSource {
         return adapter;
     }
 
+    private Range makeRange(ucar.nc2.Dimension dim, Range range, int stride) throws InvalidRangeException {
+        if (range == null) {
+          range = new Range(0, dim.getLength() - 1, stride);
+        } else {
+          range = new Range(range.first(), range.last(), stride);
+        }
+        return range;
+    }
+    
     /**
      * Clean up the bounding box name so it can be used in a file name.
      * change : and + and any other strange chars to _

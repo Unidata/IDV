@@ -20,7 +20,6 @@
 
 package ucar.unidata.data.grid;
 
-
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 
@@ -28,6 +27,7 @@ import ucar.nc2.Attribute;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
+import ucar.nc2.Dimension;
 import ucar.nc2.dataset.*;
 
 import ucar.nc2.dt.GridCoordSystem;
@@ -73,6 +73,7 @@ import visad.Gridded2DSet;
 import visad.Gridded3DSet;
 import visad.GriddedSet;
 import visad.IdentityCoordinateSystem;
+import visad.Integer1DSet;
 import visad.Linear1DSet;
 import visad.Linear2DSet;
 import visad.Linear3DSet;
@@ -109,6 +110,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+
+
 
 
 /**
@@ -1119,9 +1122,32 @@ public class GeoGridAdapter {
      */
     private CachedFlatField getFlatField(int timeIndex, String readLabel)
             throws VisADException {
+        return getFlatField(timeIndex, -1, readLabel);
+    }
+
+    /**
+     * Create a FlatField for the particular time index.  Retrieve from
+     * cache if possible.
+     *
+     * @param timeIndex  index into set of times
+     * @param ensIndex _more_
+     * @param readLabel  label to write to
+     * @return  the data at that time
+     *
+     * @throws VisADException  problem creating the FlatField
+     */
+    private CachedFlatField getFlatField(int timeIndex, int ensIndex,
+                                         String readLabel)
+            throws VisADException {
 
         String baseCacheKey = "t_" + timeIndex;
         List   cacheKey     = Misc.newList(baseCacheKey);
+        if (ensIndex >= 0) {
+            String ensCacheKey = "e_" + ensIndex;
+            cacheKey.add(ensCacheKey);
+        } else {
+            ensIndex = 0;
+        }
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
@@ -1149,14 +1175,16 @@ public class GeoGridAdapter {
             new FunctionType(((SetType) domainSet.getType()).getDomain(),
                              paramType);
         if ( !makeGeoGridFlatField) {
-            //            System.err.println("making flat field");
+            System.err.println("making flat field");
             try {
                 LogUtil.message(readLabel);
                 Trace.call1("GeoGridAdapter.geogrid.readVolumeData");
                 //                synchronized(geoGrid) {
                 System.err.println(System.currentTimeMillis() + " time:"
                                    + timeIndex + " start read");
-                arr = geoGrid.readVolumeData(timeIndex);
+                //arr = geoGrid.readVolumeData(timeIndex);
+                arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
+                                            -1);
                 System.err.println(System.currentTimeMillis() + " time:"
                                    + timeIndex + " end read");
                 //                }
@@ -1241,7 +1269,7 @@ public class GeoGridAdapter {
                                     : new Object());
 
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid,
-                                        readLockToUse, timeIndex, domainSet,
+                                        readLockToUse, timeIndex, ensIndex, domainSet,
                                         ffType);
 
 
@@ -1391,7 +1419,7 @@ public class GeoGridAdapter {
                 int i = 0;
 
                 for (Iterator iter = keySet.iterator(); iter.hasNext(); ) {
-                    FlatField field = (FlatField) gridMap.get(iter.next());
+                    FieldImpl field = (FieldImpl) gridMap.get(iter.next());
 
                     if (i == 0) {
                         FunctionType fType = new FunctionType(RealType.Time,
@@ -1433,30 +1461,56 @@ public class GeoGridAdapter {
                               TreeMap gridMap, Range[][] sampleRanges,
                               boolean lazyEvaluation)
             throws Exception {
+        Dimension ensDim = geoGrid.getEnsembleDimension();
+        Integer1DSet       ensSet = null;
+        FieldImpl          sample = null;
+        int                numEns = 1;
+        if ((ensDim != null) && (ensDim.getLength() > 1)) {
+            numEns = ensDim.getLength();
+            ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
+                                      numEns);
+        }
+        for (int i = 0; i < numEns; i++) {
 
-        CachedFlatField sample = getFlatField(timeIndex, readLabel);
-        synchronized (sampleRanges) {
-            if (sampleRanges[0] == null) {
-                sampleRanges[0] = GridUtil.makeRanges(sample.getRanges(true));
-                //Check to see if the sample is valid
-                if ((sampleRanges[0] != null)
-                        && (sampleRanges[0].length > 0)) {
-                    for (int rangeIdx = 0; rangeIdx < sampleRanges[0].length;
-                            rangeIdx++) {
-                        Range r = sampleRanges[0][rangeIdx];
-                        if ((r.getMin() == r.getMax())
-                                || Double.isInfinite(r.getMin())
-                                || Double.isInfinite(r.getMax())) {
-                            sampleRanges[0] = null;
-                            //                                        System.err.println("bad sample range");
-                            break;
+            CachedFlatField oneTime = getFlatField(timeIndex, i, readLabel);
+            synchronized (sampleRanges) {
+                if (sampleRanges[0] == null) {
+                    sampleRanges[0] =
+                        GridUtil.makeRanges(oneTime.getRanges(true));
+                    //Check to see if the sample is valid
+                    if ((sampleRanges[0] != null)
+                            && (sampleRanges[0].length > 0)) {
+                        for (int rangeIdx = 0;
+                                rangeIdx < sampleRanges[0].length;
+                                rangeIdx++) {
+                            Range r = sampleRanges[0][rangeIdx];
+                            if ((r.getMin() == r.getMax())
+                                    || Double.isInfinite(r.getMin())
+                                    || Double.isInfinite(r.getMax())) {
+                                sampleRanges[0] = null;
+                                //  System.err.println("bad sample range");
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        sample.setSampleRanges(GridUtil.makeDataRanges(sampleRanges[0]));
+            oneTime.setSampleRanges(GridUtil.makeDataRanges(sampleRanges[0]));
+            if (numEns == 1) {
+                sample = oneTime;
+            } else {
+                if ((sample == null) && (oneTime != null)) {
+                    sample = new FieldImpl(
+                        new FunctionType(
+                            ((SetType) ensSet.getType()).getDomain(),
+                            oneTime.getType()), ensSet);
+                }
+                if (oneTime != null) {
+                    sample.setSample(i, oneTime, false);
+                }
+            }
+        }
 
 
         if ((sample != null) && !sample.isMissing()) {
@@ -1468,7 +1522,7 @@ public class GeoGridAdapter {
                     gridMap.put(time, sample);
                 }
             } else {
-                Range range = GridUtil.fieldMinMax(sample)[0];
+                Range range = GridUtil.getMinMax(sample)[0];
                 // For now, min and max are flipped if all values were NaN
                 if ( !(Double.isInfinite(range.getMin())
                         && Double.isInfinite(range.getMax()))) {

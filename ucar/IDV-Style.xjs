@@ -1751,15 +1751,6 @@
     </object> 
    </void> 
    <void method="put"> 
-    <string>java.createFriendlyFieldJavaDocs</string> 
-    <object class="jindent.settings.BooleanSetting"> 
-     <string>java.createFriendlyFieldJavaDocs</string> 
-     <void property="value"> 
-      <boolean>true</boolean> 
-     </void> 
-    </object> 
-   </void> 
-   <void method="put"> 
     <string>java.paddingNormalAnnotationParentheses</string> 
     <object class="jindent.settings.BooleanSetting"> 
      <string>java.paddingNormalAnnotationParentheses</string> 
@@ -1771,6 +1762,15 @@
      <string>java.blankLinesAfterInstanceInitializers</string> 
      <void property="value"> 
       <int>1</int> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="put"> 
+    <string>java.createFriendlyFieldJavaDocs</string> 
+    <object class="jindent.settings.BooleanSetting"> 
+     <string>java.createFriendlyFieldJavaDocs</string> 
+     <void property="value"> 
+      <boolean>true</boolean> 
      </void> 
     </object> 
    </void> 
@@ -1976,9 +1976,6 @@
     <string>java.optimizeImports</string> 
     <object class="jindent.settings.BooleanSetting"> 
      <string>java.optimizeImports</string> 
-     <void property="value"> 
-      <boolean>true</boolean> 
-     </void> 
     </object> 
    </void> 
    <void method="put"> 

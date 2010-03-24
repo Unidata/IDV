@@ -58,41 +58,62 @@ import java.rmi.RemoteException;
  */
 public class GeoGridFlatField extends CachedFlatField {
 
-    /** _more_ */
+    /** the read label */
     private String readLabel = "";
 
-    /** _more_ */
+    /** the domain set */
     private GriddedSet domainSet;
 
-    /** _more_ */
+    /** the geogrid */
     transient private GeoGrid geoGrid;
 
-    /** _more_ */
+    /** the time index */
     private int timeIndex;
 
-    /** _more_ */
+    /** the ensemble index */
+    private int ensIndex;
+
+    /** a read lock  */
     transient private Object readLock;
 
     /**
-     * ctor
+     * Create a new GeoGridFlatField
      *
-     *
-     * @param geoGrid _more_
-     * @param readLock _more_
-     * @param timeIndex _more_
-     * @param domainSet _more_
-     * @param type Function type
+     * @param geoGrid  the GeoGrid
+     * @param readLock a read lock
+     * @param timeIndex  the time index
+     * @param domainSet  the domain set
+     * @param type Function type  the function type
      *
      * @throws VisADException On badness
      */
     public GeoGridFlatField(GeoGrid geoGrid, Object readLock, int timeIndex,
                             GriddedSet domainSet, FunctionType type)
             throws VisADException {
+    	this(geoGrid, readLock, timeIndex, 0, domainSet, type);
+    }
+
+    /**
+     * Create a new GeoGridFlatField
+     *
+     * @param geoGrid  the GeoGrid
+     * @param readLock a read lock
+     * @param timeIndex  the time index
+     * @param ensIndex   the ensemble index
+     * @param domainSet  the domain set
+     * @param type Function type  the function type
+     *
+     * @throws VisADException On badness
+     */
+    public GeoGridFlatField(GeoGrid geoGrid, Object readLock, int timeIndex,
+                            int ensIndex, GriddedSet domainSet, FunctionType type)
+            throws VisADException {
         super(type, domainSet);
         this.readLock  = readLock;
         this.geoGrid   = geoGrid;
         this.domainSet = domainSet;
         this.timeIndex = timeIndex;
+        this.ensIndex = ensIndex;
     }
 
 
@@ -123,6 +144,7 @@ public class GeoGridFlatField extends CachedFlatField {
         this.geoGrid   = that.geoGrid;
         this.domainSet = that.domainSet;
         this.timeIndex = that.timeIndex;
+        this.ensIndex = that.ensIndex;
     }
 
     /**
@@ -159,7 +181,7 @@ public class GeoGridFlatField extends CachedFlatField {
 
 
     /**
-     * ctor
+     * Create a new GeoGridFlatField with the samples alread generated
      *
      * @param floats The values
      * @param type Function type
@@ -178,14 +200,14 @@ public class GeoGridFlatField extends CachedFlatField {
     }
 
 
-    /** _more_ */
+    /** a mutex */
     public static Object ALLMUTEX = new Object();
 
 
     /**
-     * _more_
+     * Get the read lock
      *
-     * @return _more_
+     * @return  the read lock
      */
     private Object getReadLock() {
         if (readLock == null) {
@@ -218,7 +240,9 @@ public class GeoGridFlatField extends CachedFlatField {
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
                 try {
-                    arr = geoGrid.readVolumeData(timeIndex);
+                    //arr = geoGrid.readVolumeData(timeIndex);
+                    arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
+                            -1);
                 } catch(Exception exc) {
                     if(exc.toString().indexOf("Inconsistent array length read")>=0) {
                         throw new ucar.unidata.data.BadDataException("Error reading data from server");
@@ -314,9 +338,9 @@ public class GeoGridFlatField extends CachedFlatField {
 
 
     /**
-     * _more_
+     * Set the read label
      *
-     * @param s _more_
+     * @param s  the new label
      */
     public void setReadLabel(String s) {
         readLabel = s;
