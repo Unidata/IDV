@@ -3984,31 +3984,68 @@ public class GridUtil {
                 sampledFI = (FlatField) grid.resample(subDomain,
                         samplingMode, errorMode);
             } else {  // some sort of sequence - resample each
-                Set          sequenceDomain = Util.getDomainSet(grid);
-                FunctionType sampledType    = null;
+                Set sequenceDomain = Util.getDomainSet(grid);
                 Trace.call1("GridUtil.sampleLoop",
                             " Length: " + sequenceDomain.getLength());
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
                     Trace.call1("GridUtil getSample");
-                    FlatField subField = (FlatField) grid.getSample(i);
+                    FieldImpl subField = (FieldImpl) grid.getSample(i, false);
                     Trace.call2("GridUtil getSample");
+                    FieldImpl sampledField = null;
+                    if ( !isSequence(subField)) {
 
-                    Trace.call1("GridUtil resample",
-                                " Length=" + subField.getLength());
-                    FlatField sampledField =
-                        (FlatField) subField.resample(subDomain,
-                            samplingMode, errorMode);
-                    Trace.call2("GridUtil resample");
+                        Trace.call1("GridUtil resample",
+                                    " Length=" + subField.getLength());
+                        sampledField =
+                            (FieldImpl) subField.resample(subDomain,
+                                samplingMode, errorMode);
+                        Trace.call2("GridUtil resample");
 
-                    if (i == 0) {  // set up the functiontype
-                        sampledType = new FunctionType(
-                            ((SetType) sequenceDomain.getType()).getDomain(),
-                            sampledField.getType());
+                    } else {  // inner sequence (e.g. ensembles)
+                        Set innerSequenceDomain = subField.getDomainSet();
+                        Trace.call1("GridUtil resample inner sequence",
+                                    " Length= "
+                                    + innerSequenceDomain.getLength());
+                        for (int j = 0; j < innerSequenceDomain.getLength();
+                                j++) {
+                            FlatField innerSubField =
+                                (FlatField) subField.getSample(j, false);
+                            if (innerSubField == null) {
+                                continue;
+                            }
+                            FlatField innerSampledField =
+                                (FlatField) innerSubField.resample(subDomain,
+                                    samplingMode, errorMode);
+                            if (innerSampledField == null) {
+                                continue;
+                            }
+                            if (sampledField == null) {
+                                FunctionType innerType =
+                                    new FunctionType(
+                                        DataUtility
+                                            .getDomainType(
+                                                innerSequenceDomain), innerSampledField
+                                                    .getType());
+                                sampledField = new FieldImpl(innerType,
+                                        innerSequenceDomain);
+                            }
+                            sampledField.setSample(j, innerSampledField,
+                                    false);
+                        }
+                        Trace.call2("GridUtil resample inner sequence");
+                    }
+                    if ((sampledField != null) && (sampledFI == null)) {  // set up the functiontype
+                        FunctionType sampledType =
+                            new FunctionType(
+                                DataUtility.getDomainType(sequenceDomain),
+                                sampledField.getType());
                         sampledFI = new FieldImpl(sampledType,
                                 sequenceDomain);
                     }
                     Trace.call1("GridUtil setSample");
-                    sampledFI.setSample(i, sampledField, false);
+                    if (sampledField != null) {
+                        sampledFI.setSample(i, sampledField, false);
+                    }
                     Trace.call2("GridUtil setSample");
                 }
                 Trace.call2("GridUtil.sampleLoop");
@@ -4050,19 +4087,23 @@ public class GridUtil {
                 sampledFI.setSamples(getSubValues(getSpatialDomain(grid),
                         grid.getFloats(), skipx, skipy));
             } else {  // some sort of sequence - resample each
-                Set          sequenceDomain = Util.getDomainSet(grid);
-                SampledSet   ss             = getSpatialDomain(grid);
-                FunctionType sampledType    = null;
+                Set        sequenceDomain = Util.getDomainSet(grid);
+                SampledSet ss             = getSpatialDomain(grid);
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
                     FlatField ff = (FlatField) grid.getSample(i);
+                    if (ff == null) {
+                        continue;
+                    }
                     FlatField sampledField =
                         new FlatField((FunctionType) ff.getType(), subDomain);
                     sampledField.setSamples(getSubValues(ss, ff.getFloats(),
                             skipx, skipy));
-                    if (i == 0) {  // set up the functiontype
-                        sampledType = new FunctionType(
-                            ((SetType) sequenceDomain.getType()).getDomain(),
-                            sampledField.getType());
+
+                    if (sampledFI == null) {  // set up the functiontype
+                        FunctionType sampledType =
+                            new FunctionType(((SetType) sequenceDomain
+                                .getType()).getDomain(), sampledField
+                                    .getType());
                         sampledFI = new FieldImpl(sampledType,
                                 sequenceDomain);
                     }
