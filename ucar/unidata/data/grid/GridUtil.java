@@ -6394,23 +6394,59 @@ public class GridUtil {
 
             // compute each divFlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
-                FlatField smoothedFF = null;
-                if (type.equals(SMOOTH_5POINT)) {
-                    smoothedFF = smooth5Point((FlatField) slice.getSample(i,
-                            false), smoothedRangeType);
-                } else if (type.equals(SMOOTH_9POINT)) {
-                    smoothedFF = smooth9Point((FlatField) slice.getSample(i,
-                            false), smoothedRangeType);
-                } else {
-                    smoothedFF =
-                        smoothGaussian((FlatField) slice.getSample(i, false),
-                                       filterLevel, smoothedRangeType);
+                FieldImpl smoothedFF = null;
+                FieldImpl sample = (FieldImpl) slice.getSample(i, false);
+                if (sample== null) continue;
+                if (!isSequence(sample)) {
+                    if (type.equals(SMOOTH_5POINT)) {
+                        smoothedFF = smooth5Point((FlatField) sample, smoothedRangeType);
+                    } else if (type.equals(SMOOTH_9POINT)) {
+                        smoothedFF = smooth9Point((FlatField) sample, smoothedRangeType);
+                    } else {
+                        smoothedFF = smoothGaussian((FlatField) sample, filterLevel, smoothedRangeType);
+                    }
+                    if (smoothedFF == null) {
+                             continue;
+                    }
+                     if (smoothedRangeType == null) {
+                             smoothedRangeType =   
+                            	 (TupleType) ((FunctionType) smoothedFF.getType()).getRange();
+                     }
+                } else {  // ensembles & such
+                    Trace.call1("GridUtil smooth inner sequence");
+                	Set ensDomain = sample.getDomainSet();
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                         FlatField innerField = (FlatField) sample.getSample(j, false);
+                         if (innerField == null) {
+                             continue;
+                         }
+                         FlatField innerSmoothedField = null;
+                         if (type.equals(SMOOTH_5POINT)) {
+                             innerSmoothedField = smooth5Point(innerField, smoothedRangeType);
+                         } else if (type.equals(SMOOTH_9POINT)) {
+                             innerSmoothedField = smooth9Point(innerField, smoothedRangeType);
+                         } else {
+                             innerSmoothedField = smoothGaussian(innerField, filterLevel, smoothedRangeType);
+                         }
+                         if (innerSmoothedField == null) {
+                             continue;
+                         }
+                         if (smoothedRangeType == null) {
+                             smoothedRangeType =   
+                            	 (TupleType) ((FunctionType) innerSmoothedField.getType()).getRange();
+                             FunctionType innerType =
+                                 new FunctionType(
+                                     DataUtility.getDomainType(ensDomain), innerSmoothedField.getType());
+                             smoothedFF = new FieldImpl(innerType, ensDomain);
+                         }
+                         smoothedFF.setSample(j, innerSmoothedField, false);
+                     }
+                     Trace.call2("GridUtil smooth inner sequence");
                 }
 
                 if ((smoothedFI == null) && (smoothedFF != null)) {
                     FunctionType smoothedFFType =
                         (FunctionType) smoothedFF.getType();
-                    smoothedRangeType = (TupleType) smoothedFFType.getRange();
                     FunctionType smoothedFT =
                         new FunctionType(
                             ((SetType) timeSet.getType()).getDomain(),
