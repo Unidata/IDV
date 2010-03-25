@@ -42,8 +42,7 @@ import java.util.Iterator;
  * Provides support for a Displayable displays wind data (u,v) or
  * (spd, dir) as wind vectors.
  *
- * @author Don Murray
- * @version $Revision: 1.40 $
+ * @author IDV Development Team
  */
 public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     implements GridDisplayable {
@@ -604,15 +603,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
         TupleType tt = GridUtil.getParamType(field);
 
-        if (GridUtil.isTimeSequence(field)) {
-            // time sequence
-            ffld = (FlatField) field.getSample(0);
-        } else {
-            ffld = (FlatField) field;
-        }
-
         // get the RealTupleType of the range data in the  FlatField
-        RealTupleType rtt       = DataUtility.getFlatRangeType(ffld);
+        RealTupleType rtt       = new RealTupleType(tt.getRealComponents());
 
         int           threeDDim = (coloredByAnother || ignoreExtraParameters)
                                   ? 3
