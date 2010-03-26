@@ -21,8 +21,8 @@
 package ucar.visad.display;
 
 
-import org.python.core.*;
-import org.python.util.*;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 
 import org.w3c.dom.Element;
 
@@ -30,32 +30,61 @@ import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.point.PointOb;
-
 import ucar.unidata.idv.JythonManager;
 import ucar.unidata.ui.drawing.Glyph;
-
-import ucar.unidata.ui.symbol.*;
+import ucar.unidata.ui.symbol.ColorMap;
+import ucar.unidata.ui.symbol.LabelSymbol;
+import ucar.unidata.ui.symbol.MetSymbol;
+import ucar.unidata.ui.symbol.RotateInfo;
+import ucar.unidata.ui.symbol.StationModel;
+import ucar.unidata.ui.symbol.TextSymbol;
+import ucar.unidata.ui.symbol.ValueSymbol;
+import ucar.unidata.ui.symbol.WeatherSymbol;
+import ucar.unidata.ui.symbol.WindBarbSymbol;
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
+
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
-
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
 import ucar.visad.WindBarb;
 
-
-
-import visad.*;
-
-import visad.data.units.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.Display;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.Integer1DSet;
+import visad.MathType;
+import visad.RangeControl;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Scalar;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.Set;
+import visad.ShadowType;
+import visad.ShapeControl;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADGeometryArray;
+import visad.VisADLineArray;
+import visad.VisADQuadArray;
+import visad.VisADTriangleArray;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
@@ -63,11 +92,22 @@ import visad.georef.NamedLocationTuple;
 
 import visad.meteorology.WeatherSymbols;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
 
-import java.io.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import java.rmi.RemoteException;
 
@@ -76,16 +116,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-
-
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.media.j3d.Transform3D;
 
-import javax.swing.*;
-
-import javax.vecmath.*;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 
 
@@ -1218,10 +1255,15 @@ public class StationModelDisplayable extends DisplayableData {
                             } catch (Exception e) {
                                 direction = (float) vOrSpeed.getValue();
                             }
+                            // should be 360 for north
                             windVector(speed, direction, workUV);
                         }
                         workFlowValues[0][0] = workUV[0];
                         workFlowValues[1][0] = workUV[1];
+                        if (Float.isNaN(workUV[0])
+                                || Float.isNaN(workUV[1])) {
+                            continue;
+                        }
                         DisplayMaster master = getDisplayMaster();
                         // adjust flow to earth
                         if ((master
@@ -2071,10 +2113,16 @@ public class StationModelDisplayable extends DisplayableData {
      * @param uv uv work array
      */
     private void windVector(float speed, float direction, float[] uv) {
-        uv[0] = (float) (-1 * speed
-                         * Math.sin(direction * Data.DEGREES_TO_RADIANS));
-        uv[1] = (float) (-1 * speed
-                         * Math.cos(direction * Data.DEGREES_TO_RADIANS));
+        if (((direction > 0.f) && (direction <= 360.f))
+                || ((direction == 0.f) && (speed == 0.f))) {
+            uv[0] = (float) (-1 * speed
+                             * Math.sin(direction * Data.DEGREES_TO_RADIANS));
+            uv[1] = (float) (-1 * speed
+                             * Math.cos(direction * Data.DEGREES_TO_RADIANS));
+        } else {
+            uv[0] = Float.NaN;
+            uv[1] = Float.NaN;
+        }
     }
 
 
