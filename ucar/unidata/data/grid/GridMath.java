@@ -21,19 +21,29 @@
 package ucar.unidata.data.grid;
 
 
-import ucar.unidata.data.DataUtil;
-
-
-import ucar.unidata.util.Misc;
-
-import ucar.visad.Util;
-
-import visad.*;
-
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.Trace;
+import ucar.visad.Util;
+import visad.Data;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded2DSet;
+import visad.GriddedSet;
+import visad.Real;
+import visad.RealType;
+import visad.SampledSet;
+import visad.Set;
+import visad.SetType;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
+import visad.util.DataUtility;
 
 
 /**
@@ -532,20 +542,63 @@ public class GridMath {
                     if (sample == null) {
                         continue;
                     }
-                    FlatField funcFF = applyFunctionOverLevelsFF(sample,
-                                           function, rangeType, newDomain);
-                    if ((rangeType == null) && (funcFF != null)) {
+                    FieldImpl funcFF = null;
+                    if ( !GridUtil.isSequence(sample)) {
+                        funcFF =
+                            applyFunctionOverLevelsFF((FlatField) sample,
+                                function, rangeType, newDomain);
+                    } else {  // ensembles & such
+                        Trace.call1(
+                            "GridMath.applyFunctionOverLevels inner sequence");
+                        Set ensDomain = sample.getDomainSet();
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                (FlatField) sample.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField innerFuncFF =
+                                applyFunctionOverLevelsFF(innerField,
+                                    function, rangeType, newDomain);
+                            if (innerFuncFF == null) {
+                                continue;
+                            }
+                            if (rangeType == null) {
+                                rangeType =
+                                    GridUtil.getParamType(innerFuncFF);
+                                newDomain =
+                                    (Gridded2DSet) GridUtil.getSpatialDomain(
+                                        innerFuncFF);
+                                FunctionType innerType =
+                                    new FunctionType(
+                                        DataUtility.getDomainType(ensDomain),
+                                        innerFuncFF.getType());
+                                funcFF = new FieldImpl(innerType, ensDomain);
+                            }
+                            funcFF.setSample(j, innerFuncFF, false);
+                        }
+                        Trace.call1(
+                            "GridMath.applyFunctionOverLevels inner sequence");
+                    }
+                    if (funcFF == null) {
+                        continue;
+                    }
+                    if (rangeType == null) {
                         rangeType = GridUtil.getParamType(funcFF);
-                        newDomain = (Gridded2DSet) funcFF.getDomainSet();
+                    }
+                    if (newDomain == null) {
+                        newDomain =
+                            (Gridded2DSet) GridUtil.getSpatialDomain(funcFF);
+                    }
+
+                    if (newField == null) {
                         FunctionType newFieldType =
                             new FunctionType(
                                 ((SetType) timeDomain.getType()).getDomain(),
                                 funcFF.getType());
                         newField = new FieldImpl(newFieldType, timeDomain);
                     }
-                    if (funcFF != null) {
-                        newField.setSample(timeStepIdx, funcFF, false);
-                    }
+                    newField.setSample(timeStepIdx, funcFF, false);
                 }
             } else {
                 newField = applyFunctionOverLevelsFF((FlatField) grid,
@@ -668,24 +721,60 @@ public class GridMath {
                 TupleType rangeType  = null;
                 for (int timeStepIdx = 0;
                         timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
-                    FlatField sample =
-                        (FlatField) grid.getSample(timeStepIdx);
+                    FieldImpl sample =
+                        (FieldImpl) grid.getSample(timeStepIdx);
                     if (sample == null) {
                         continue;
                     }
-                    FlatField funcFF = applyFunctionToLevelsFF(sample,
-                                           function, rangeType);
-                    if ((rangeType == null) && (funcFF != null)) {
+                    FieldImpl funcFF = null;
+                    if ( !GridUtil.isSequence(sample)) {
+                        funcFF = applyFunctionToLevelsFF((FlatField) sample,
+                                function, rangeType);
+                    } else {  // ensembles & such
+                        Trace.call1(
+                            "GridMath.applyFunctionOverLevels inner sequence");
+                        Set ensDomain = sample.getDomainSet();
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                (FlatField) sample.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField innerFuncFF =
+                                applyFunctionToLevelsFF(innerField, function,
+                                    rangeType);
+                            if (innerFuncFF == null) {
+                                continue;
+                            }
+                            if (rangeType == null) {
+                                rangeType =
+                                    GridUtil.getParamType(innerFuncFF);
+                                FunctionType innerType =
+                                    new FunctionType(
+                                        DataUtility.getDomainType(ensDomain),
+                                        innerFuncFF.getType());
+                                funcFF = new FieldImpl(innerType, ensDomain);
+                            }
+                            funcFF.setSample(j, innerFuncFF, false);
+                        }
+                        Trace.call1(
+                            "GridMath.applyFunctionOverLevels inner sequence");
+                    }
+                    if (funcFF == null) {
+                        continue;
+                    }
+                    if (rangeType == null) {
                         rangeType = GridUtil.getParamType(funcFF);
+                    }
+
+                    if (newField == null) {
                         FunctionType newFieldType =
                             new FunctionType(
                                 ((SetType) timeDomain.getType()).getDomain(),
                                 funcFF.getType());
                         newField = new FieldImpl(newFieldType, timeDomain);
                     }
-                    if (funcFF != null) {
-                        newField.setSample(timeStepIdx, funcFF, false);
-                    }
+                    newField.setSample(timeStepIdx, funcFF, false);
                 }
             } else {
                 newField = applyFunctionToLevelsFF((FlatField) grid,
