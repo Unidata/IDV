@@ -1442,7 +1442,6 @@ public class GeoGridDataSource extends GridDataSource {
 
         try {
             Range ensRange = makeRange(ensDim, null, 1);
-            ensRange = null;
             Range timeRange = null;
             Range levelRange = null;
             Range xRange = null;
