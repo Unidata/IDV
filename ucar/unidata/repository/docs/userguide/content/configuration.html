@@ -9,9 +9,23 @@ ways of providing access to the files that are already on the server machine.
 
 
 <subhead  id="harvesting"  intoc="false">Harvesting files</subhead>
-RAMADDA provides a harvester facility (see <a href="harvesters.html">harvesters.html</a> for more details)
-that allows an administrator to scan the local file system on the server and add entries into the database for
-those files.
+RAMADDA provides a <a href="harvesters.html">harvester facility </a>
+that allows an administrator to scan the local file system on the server 
+and add entries into the database for those files.
+For example, say you have a large directory of data (and/or other) files that you want RAMADDA to provide access to.
+You could simply create a <a href="quickinstall.html#localfiles">Local File View</a> of the directory but this does not
+actually add  entries into the repository database for the files and you cannot harvest, add metadata, search etc., with those entries.
+<p>
+The File Harvester can walk the directory tree and add entries into the repository for the files it finds.
+
+<p>
+The first thing you need to do is to specify in the <a href="admin.html#filesystemaccess">Site Administration</a> area
+that it is OK to serve up files from that directory tree.
+<p>
+Next, create a File Harvester by going to the Harvesters tab of the Admin pages:
+[ht::cimg images/harvester1.gif {Create a new File Harvester} {border=0 width=700}]
+
+
 Here is an example of a harvester that walks a directory tree (/data/ldm/pub/casestudies/july18_2002) add adds folder and file entries
 under the main RAMADDA folder RAMADDA/Case Studies/Test.
 
