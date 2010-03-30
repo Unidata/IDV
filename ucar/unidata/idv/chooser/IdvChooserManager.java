@@ -735,8 +735,9 @@ public class IdvChooserManager extends IdvManager {
     public List makeChooserMenus(List items) {
         List choosers = getChoosers();
         //this is a little tricky. If there aren't any choosers
-        //then it might meann the user deleted the dashboard window
+        //then it might mean the user deleted the dashboard window
         //If so, we recreate the basic windows if there aren't any.
+        
         if ((choosers == null) || (choosers.size() == 0)) {
             if ( !getIdv().getIdvUIManager().haveBasicWindow()) {
                 getIdv().getIdvUIManager().showBasicWindow(true);
@@ -747,6 +748,7 @@ public class IdvChooserManager extends IdvManager {
             return new ArrayList();
         }
         Hashtable seen = new Hashtable();
+        //        System.err.println ("choosers:" + choosers.size());
         for (int i = 0; i < choosers.size(); i++) {
             final IdvChooser chooser = (IdvChooser) choosers.get(i);
             if ( !chooser.getShowInMenu()) {

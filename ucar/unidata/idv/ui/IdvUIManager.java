@@ -633,9 +633,7 @@ public class IdvUIManager extends IdvManager {
      */
     public void doMakeBasicWindows() {
         splashMsg("Creating User Interface");
-        List skins = StringUtil.split(
-                         getStateManager().getProperty(
-                             "idv.ui.initskins", ""), ";", true, true);
+        List skins = getInitialSkins();
         for (int i = 0; i < skins.size(); i++) {
             String skin = (String) skins.get(i);
             try {
@@ -4750,17 +4748,38 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
+     * Get the list of  initial skins to create windows for
+     *
+     * @return List of UI skins to create
+     */
+    private List<String> getInitialSkins() {
+        return StringUtil.split(
+                                getStateManager().getProperty(
+                                                              "idv.ui.initskins", ""), ";", true, true);
+
+    }
+
+
+    /**
      * Do we have a basic window
      *
      * @return  true if the window is a basic window
      */
     public boolean haveBasicWindow() {
         List windows = new ArrayList(IdvWindow.getWindows());
+
+        List skins = getInitialSkins();
+
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            if ( !window.hasViewManagers()) {
-                return true;
+            if (window.getSkinPath() != null)  {
+                if(skins.contains(window.getSkinPath())) {
+                    return true;
+                }
             }
+            //            if (!window.hasViewManagers()) {
+            //                return true;
+            //            }
         }
         return false;
     }
@@ -4775,14 +4794,20 @@ public class IdvUIManager extends IdvManager {
      */
     public boolean showBasicWindow(boolean createThemIfNotThere) {
         List windows = new ArrayList(IdvWindow.getWindows());
+
+        List skins = getInitialSkins();
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            if ((window.getSkinPath() != null) && !window.hasViewManagers()) {
-                //got one
-                window.show();
-                return true;
+            if (window.getSkinPath() != null)  {
+                if(skins.contains(window.getSkinPath())) {
+                    //&& !window.hasViewManagers()) {
+                    //got one
+                    window.show();
+                    return true;
+                }
             }
         }
+
         if (createThemIfNotThere) {
             showWaitCursor();
             doMakeBasicWindows();
