@@ -6,6 +6,7 @@
 If you are a site administrator you can create entry harvesters that will
 scan either the server file system or will fetch web-based resources and 
 automatically ingest them into the repository.
+There is a simple introduction to the File Harvester <a href="configuration.html">here</a>.
 <p> 
 
 Go to the <i>Harvesters</i> tab under the Admin page. This lists all of the Harvesters that are created
@@ -41,7 +42,7 @@ you might want to use an &quot;Hourly&quot; setting to get the image at some fix
 
 
 <subhead  id="files" intoc="false">Files Settings</subhead>
-Under &quot; Look for files&quot; you specify a directory on the server file system to scan and a regular expression to
+Under &quot;Look for files&quot; you specify a directory on the server file system to scan and a regular expression to
 match on the file name.
 The repository will recursively scan the directory tree and any files it finds that matches the pattern it will
 add to the repository. <p>
@@ -154,12 +155,11 @@ Gridded data - ${from_date}
 
 
 <p>
-The <i>Move file to storage<i> checkbox allows you to determine whether the file is to be moved from its initial location
+The <i>Move file to storage</i> checkbox allows you to determine whether the file is to be moved from its initial location
 to the RAMADDA storage area.
 <br>
 <b>Note: If the file is not moved to the storage area than one of the data directories the file lies under needs to be added
 to the list of file system directories in the Admin-&gt;Access area</b>
-
 
 
 
