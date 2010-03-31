@@ -313,6 +313,12 @@ public class ZipOutputHandler extends OutputHandler {
         }
 
         ZipOutputStream zos  = new ZipOutputStream(os);
+        if(request.get(ARG_COMPRESS,false)) {
+            //You would think that setting the method to stored would work
+            //but it throws an error wanting the crc to be set on the ZipEntry
+            //            zos.setMethod(ZipOutputStream.STORED);
+            zos.setLevel(0);
+        }
         Hashtable       seen = new Hashtable();
         try {
             if(forExport) {
@@ -448,7 +454,10 @@ public class ZipOutputHandler extends OutputHandler {
                                                                    ATTR_FILENAME, name});
 
                 } else {
-                    zos.putNextEntry(new ZipEntry(name));
+                    ZipEntry zipEntry = new ZipEntry(name);
+                    System.err.println("putting:" + zipEntry);
+
+                    zos.putNextEntry(zipEntry);
                 }
                 InputStream fis =
                     getStorageManager().getFileInputStream(path);
