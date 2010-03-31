@@ -313,7 +313,7 @@ public class ZipOutputHandler extends OutputHandler {
         }
 
         ZipOutputStream zos  = new ZipOutputStream(os);
-        if(request.get(ARG_COMPRESS,false)) {
+        if(request.get(ARG_COMPRESS,true) == false) {
             //You would think that setting the method to stored would work
             //but it throws an error wanting the crc to be set on the ZipEntry
             //            zos.setMethod(ZipOutputStream.STORED);
