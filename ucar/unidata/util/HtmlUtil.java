@@ -1775,13 +1775,21 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String input(String name, Object value, String extra) {
-        if (extra.length() == 0) {
+        if (extra == null || extra.length() == 0) {
             return tag(TAG_INPUT,
                        attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
                              ATTR_VALUE, ((value == null)
                                           ? ""
                                           : value.toString())) + " " + extra);
         }
+        if(extra.indexOf("class=")>=0) {
+            return tag(TAG_INPUT,
+                       attrs(ATTR_NAME, name, 
+                             ATTR_VALUE, ((value == null)
+                                          ? ""
+                                          : value.toString())) + " " + extra);
+
+        } 
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_INPUT,
                          ATTR_VALUE, ((value == null)
@@ -1801,12 +1809,16 @@ public class HtmlUtil {
      */
     public static String disabledInput(String name, Object value,
                                        String extra) {
+        String classAttr="";
+        if(extra.indexOf("class=")<0) {
+            classAttr = cssClass(CLASS_DISABLEDINPUT);
+        }
         return tag(TAG_INPUT,
                    " " + ATTR_READONLY + " "
-                   + attrs(ATTR_CLASS, CLASS_DISABLEDINPUT, ATTR_NAME, name,
+                   + attrs(ATTR_NAME, name,
                            ATTR_VALUE, ((value == null)
                                         ? ""
-                                        : value.toString())) + " " + extra);
+                                        : value.toString())) + " " + extra+classAttr);
     }
 
 
