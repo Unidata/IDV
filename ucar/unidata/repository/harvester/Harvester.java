@@ -378,15 +378,20 @@ public class Harvester extends RepositoryManager {
         Group baseGroup = getBaseGroup();
         String baseSelect = OutputHandler.getGroupSelect(getRequest(),
                                 selectId);
+        String extra = "";
+        if(baseGroup==null) {
+            extra = HtmlUtil.br()+HtmlUtil.span(msg("Required"),HtmlUtil.cssClass("requiredlabel"));
+        }
+
         sb.append(HtmlUtil.hidden(selectId + "_hidden", ((baseGroup != null)
                 ? baseGroup.getId()
                 : ""), HtmlUtil.id(selectId + "_hidden")));
-        sb.append(HtmlUtil.formEntry(msgLabel("Base Folder"),
+        sb.append(HtmlUtil.formEntry(msgLabel("Base folder"),
                                      HtmlUtil.disabledInput(selectId,
                                          ((baseGroup != null)
                                           ? baseGroup.getFullName()
                                           : ""), HtmlUtil.id(selectId)
-                                          + HtmlUtil.SIZE_60) + baseSelect));
+                                                            + HtmlUtil.SIZE_60+(baseGroup==null?HtmlUtil.cssClass("requireddisabled"):"")) + baseSelect+extra));
     }
 
 
@@ -527,10 +532,6 @@ public class Harvester extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("Harvester name"),
                                      HtmlUtil.input(ARG_NAME, name,
                                          HtmlUtil.SIZE_40)));
-        sb.append(HtmlUtil.formEntry(msgLabel("Create entries of type"),
-                                     repository.makeTypeSelect(request,
-                                         false, typeHandler.getType(), false,
-                                         null)));
 
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         tfos.add(new TwoFacedObject("Absolute (minutes)", UNIT_ABSOLUTE));
@@ -559,21 +560,23 @@ public class Harvester extends RepositoryManager {
             sleepLbl += "Would run at " + then;
         }
 
-
+        StringBuffer runWidgets = new StringBuffer();
 
         //J-
-        sb.append(
-            HtmlUtil.formEntry(
-                msgLabel("Run"), 
-                HtmlUtil.checkbox(ATTR_TESTMODE, "true", testMode) + HtmlUtil.space(1) + msg("Test mode") +
+        runWidgets.append(HtmlUtil.checkbox(ATTR_TESTMODE, "true", testMode) + HtmlUtil.space(1) + msg("Test mode") +
                 HtmlUtil.space(3) +  msgLabel("Count") + HtmlUtil.input(ATTR_TESTCOUNT, "" + testCount, HtmlUtil.SIZE_5) +
                 HtmlUtil.br()    +
                 HtmlUtil.checkbox(ATTR_ACTIVEONSTART, "true", activeOnStart) + HtmlUtil.space(1) + msg("Active on startup") +
                 HtmlUtil.br() + 
                 HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor) + HtmlUtil.space(1) + msg("Run continually") +
                 HtmlUtil.br() + HtmlUtil.space(3) +
-                msgLabel("Every") + HtmlUtil.space(1) + HtmlUtil.input(ATTR_SLEEP, ""+ minutes, HtmlUtil.SIZE_5) + HtmlUtil.space(1) + sleepType + sleepLbl));
-        //J+
+                          msgLabel("Every") + HtmlUtil.space(1) + HtmlUtil.input(ATTR_SLEEP, ""+ minutes, HtmlUtil.SIZE_5) + HtmlUtil.space(1) + sleepType + sleepLbl);
+
+        sb.append(
+                  HtmlUtil.formEntryTop("",
+                                        HtmlUtil.makeShowHideBlock(msg("Run Settings"), 
+                                                                   runWidgets.toString(), false)));
+               //J+
     }
 
 

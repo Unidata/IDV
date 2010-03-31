@@ -258,6 +258,12 @@ public class WebHarvester extends Harvester {
         formSB.append(HtmlUtil.formTableClose());
         superSB.append(HtmlUtil.formTable());
         super.createEditForm(request, superSB);
+        superSB.append(HtmlUtil.formEntry(msgLabel("Entry type"),
+                                     repository.makeTypeSelect(request,
+                                         false, typeHandler.getType(), false,
+                                         null)));
+
+
         superSB.append(HtmlUtil.formTableClose());
         formSB.append(HtmlUtil.makeShowHideBlock("Basic Information",
                 superSB.toString(), true));

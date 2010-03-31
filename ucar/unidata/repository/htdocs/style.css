@@ -15,6 +15,21 @@ body {
 //  background: #eff8ff;
 //}
 
+
+.required {
+   background: #ffaaaa;
+}
+
+
+.requireddisabled {
+        border : 0px #888888 solid;
+        background: #ffaaaa;
+}
+
+.requiredlabel {
+   color: #ff0000;
+}
+
 .input:focus, .textarea:focus {
 	background: #fffeec;
 }
@@ -31,7 +46,7 @@ body {
 
 .disabledinput {
         border : 0px #888888 solid;
-	background: #efefff;
+	background: #dfdfdf;
 }
 
 

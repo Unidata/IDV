@@ -402,6 +402,8 @@ public class HarvesterManager extends RepositoryManager {
                                        harvester.getClass().getName(),
                                        harvester.getContent() });
 
+                return new Result(request.url(URL_HARVESTERS_EDIT,
+                        ARG_HARVESTER_ID, harvester.getId()));
             }
             String xmlLink =
                 HtmlUtil.href(
@@ -432,9 +434,11 @@ public class HarvesterManager extends RepositoryManager {
                 extra = HtmlUtil.makeShowHideBlock(msg("Information"), extra,
                         false);
             }
+            sb.append(formSB);
+            /*
             sb.append(HtmlUtil.table(new Object[] { formSB,
                     HtmlUtil.br() + harvester.getRunLink(request, true)
-                    + extra }));
+                    + extra }));*/
             sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());

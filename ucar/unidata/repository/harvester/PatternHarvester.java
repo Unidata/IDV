@@ -252,21 +252,39 @@ public class PatternHarvester extends Harvester {
                       : "";
         root = root.replace("\\", "/");
 
-        String adminLink =
-            HtmlUtil.href(
-                getRepository().getUrlBase()
-                + "/help/admin.html#filesystemaccess", msg(
-                    "See File System Access configuration"), " target=_HELP");
-        String extraLabel = adminLink;
-        if ((rootDir != null) && !rootDir.exists()) {
-            extraLabel = extraLabel + HtmlUtil.space(2)
-                         + HtmlUtil.bold("Directory does not exist");
+
+        String extraLabel =  "";
+        String fileFieldExtra = "";
+
+        if (rootDir != null) {
+            if (!rootDir.exists()) {
+                extraLabel = HtmlUtil.br()
+                    + HtmlUtil.span(msg("Directory does not exist"),HtmlUtil.cssClass("requiredlabel"));
+                fileFieldExtra = HtmlUtil.cssClass("required");
+            } else if (!getStorageManager().isLocalFileOk(rootDir)) {
+                String adminLink =
+                    HtmlUtil.href(
+                                  getRepository().getUrlBase()
+                                  + "/help/admin.html#filesystemaccess", msg(
+                                                                             "More information"), " target=_HELP");
+                extraLabel = HtmlUtil.br() + 
+                    HtmlUtil.span(msg("You need to add this directory to the file system access list"),HtmlUtil.cssClass("requiredlabel"))
+                    +HtmlUtil.space(2) +adminLink;
+                fileFieldExtra = HtmlUtil.cssClass("required");
+            }
+        } 
+
+        if(root.length()==0) {
+                extraLabel = HtmlUtil.br()
+                    + HtmlUtil.span(msg("Required"),HtmlUtil.cssClass("requiredlabel"));
+            fileFieldExtra = HtmlUtil.cssClass("required");
+            
         }
 
         sb.append(HtmlUtil.colspan(msgHeader("Look for files"), 2));
         sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
-                                         HtmlUtil.SIZE_60) + extraLabel));
+                                                    HtmlUtil.SIZE_60+fileFieldExtra) + extraLabel));
         sb.append(HtmlUtil.formEntry(msgLabel("That match pattern"),
                                      HtmlUtil.input(ATTR_FILEPATTERN,
                                          filePatternString,
@@ -300,6 +318,10 @@ public class PatternHarvester extends Harvester {
                                          descTemplate, HtmlUtil.SIZE_60)));
 
 
+        sb.append(HtmlUtil.formEntry(msgLabel("Entry type"),
+                                     repository.makeTypeSelect(request,
+                                         false, typeHandler.getType(), false,
+                                         null)));
 
 
         sb.append(HtmlUtil.formEntry(msgLabel("Date format"),
@@ -315,13 +337,16 @@ public class PatternHarvester extends Harvester {
 
         sb.append(
             HtmlUtil.formEntry(
-                msgLabel("Add Metadata"),
+                msgLabel("Metadata"),
                 HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", getAddMetadata())
-                + HtmlUtil.space(2)
-                + msgLabel("Just Add Spatial/Temporal Metadata")
                 + HtmlUtil.space(1)
-                + HtmlUtil.checkbox(
-                    ATTR_ADDSHORTMETADATA, "true", getAddShortMetadata())));
+                + msg("Add full metadata")
+                + HtmlUtil.space(4)
+
+                + HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA, "true", getAddShortMetadata())
+                + HtmlUtil.space(1)
+                + msg("Just add spatial/temporal metadata")
+                               ));
 
     }
 
