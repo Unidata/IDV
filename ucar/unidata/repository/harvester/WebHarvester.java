@@ -264,6 +264,12 @@ public class WebHarvester extends Harvester {
                                          null)));
 
 
+        superSB.append(
+                  HtmlUtil.formEntry(msgLabel("User"), 
+                                     HtmlUtil.input(ATTR_USER,
+                                                    getUserName()!=null?getUserName().trim():"", HtmlUtil.SIZE_30)));
+
+
         superSB.append(HtmlUtil.formTableClose());
         formSB.append(HtmlUtil.makeShowHideBlock("Basic Information",
                 superSB.toString(), true));

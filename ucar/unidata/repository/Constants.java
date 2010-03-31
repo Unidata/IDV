@@ -529,6 +529,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
+    public static final String ARG_COMPRESS = "compress";
+
     /** _more_ */
     public static final String ARG_CANCEL_DELETE = "canceldelete";
 

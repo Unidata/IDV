@@ -277,6 +277,7 @@ public class HarvesterManager extends RepositoryManager {
                 getRepository(),
                 id });
             harvester.setName(request.getString(ARG_NAME, ""));
+            harvester.setUser(request.getUser());
         }
 
         if (harvester != null) {

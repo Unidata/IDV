@@ -326,7 +326,7 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
         setName("DIF harvester");
         this.topGroup = group;
         this.url      = url;
-        this.user     = user;
+        setUserName(user.getId());
     }
 
 

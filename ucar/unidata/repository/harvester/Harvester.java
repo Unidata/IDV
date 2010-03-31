@@ -108,6 +108,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ROOTDIR = "rootdir";
 
+    public static final String ATTR_USER = "user";
+
     /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 
@@ -207,6 +209,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private boolean addMetadata = false;
 
+
+
     /** _more_ */
     private boolean addShortMetadata = false;
 
@@ -225,8 +229,9 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     protected StringBuffer status = new StringBuffer();
 
-    /** _more_ */
-    User user;
+    private String userName;
+
+    private User user;
 
     /** _more_ */
     private boolean testMode = false;
@@ -319,8 +324,14 @@ public class Harvester extends RepositoryManager {
      * @throws Exception _more_
      */
     protected User getUser() throws Exception {
-        if (user == null) {
-            user = repository.getUserManager().getDefaultUser();
+        if(user!=null) return user;
+        if (userName == null || userName.trim().length()==0) {
+            user= repository.getUserManager().getDefaultUser();
+        } else {
+            user = repository.getUserManager().findUser(userName);
+        }
+        if(user == null) {
+            user =  repository.getUserManager().getDefaultUser();
         }
         return user;
     }
@@ -429,6 +440,11 @@ public class Harvester extends RepositoryManager {
 
         this.name = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
+
+        this.userName = XmlUtil.getAttribute(element, ATTR_USER,
+                userName);
+        this.user = null;
+
         this.addMetadata = XmlUtil.getAttribute(element, ATTR_ADDMETADATA,
                 addMetadata);
         this.addShortMetadata = XmlUtil.getAttribute(element,
@@ -499,6 +515,10 @@ public class Harvester extends RepositoryManager {
         testCount        = request.get(ATTR_TESTCOUNT, testCount);
         testMode         = request.get(ATTR_TESTMODE, false);
         monitor          = request.get(ATTR_MONITOR, false);
+        userName         = request.getString(ATTR_USER, userName);
+        if(userName!=null)
+            userName = userName.trim();
+        this.user = null;
         addMetadata      = request.get(ATTR_ADDMETADATA, false);
         addShortMetadata = request.get(ATTR_ADDSHORTMETADATA, false);
         sleepMinutes     = request.get(ATTR_SLEEP, sleepMinutes);
@@ -610,6 +630,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_TESTMODE, testMode + "");
         element.setAttribute(ATTR_TESTCOUNT, testCount + "");
         element.setAttribute(ATTR_MONITOR, monitor + "");
+        element.setAttribute(ATTR_USER, userName);
         element.setAttribute(ATTR_ADDMETADATA, addMetadata + "");
         element.setAttribute(ATTR_ADDSHORTMETADATA, addShortMetadata + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
@@ -901,6 +922,34 @@ public class Harvester extends RepositoryManager {
     public boolean getAddShortMetadata() {
         return addShortMetadata;
     }
+
+
+    public void setUser (User user) {
+        if(user!=null)
+            userName = user.getId();
+        else
+            userName = null;
+    }
+
+    /**
+       Set the User property.
+
+       @param value The new value for User
+    **/
+    public void setUserName (String value) {
+	this.userName = value;
+    }
+
+    /**
+       Get the User property.
+
+       @return The User
+    **/
+    public String getUserName () {
+	return this.userName;
+    }
+
+
 
 
     /**

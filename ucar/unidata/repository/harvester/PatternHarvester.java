@@ -348,6 +348,11 @@ public class PatternHarvester extends Harvester {
                 + msg("Just add spatial/temporal metadata")
                                ));
 
+        sb.append(
+                  HtmlUtil.formEntry(msgLabel("User"), 
+                                     HtmlUtil.input(ATTR_USER,
+                                                    getUserName()!=null?getUserName().trim():"", HtmlUtil.SIZE_30)));
+
     }
 
 
