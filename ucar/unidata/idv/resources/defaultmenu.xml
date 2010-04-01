@@ -282,11 +282,11 @@
        label="Check for Updates"
        action="jython:installmanager.checkForUpdates()"/>
 
-
      <menuitem
        label="Install Nightly Build"
        action="jython:installmanager.installFromNightlyBuild()"/>
      </menu>
+
 
      <separator/>
 

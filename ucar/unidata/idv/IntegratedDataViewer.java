@@ -500,25 +500,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
     }
 
-    public void testcp() {
-        Hashtable<String,Date> jarDateMap = new Hashtable<String,Date>();
-        String cp = System.getProperty("java.class.path");
-        if(cp==null) return;
-        boolean anyChanged = false;
-        for(String path: StringUtil.split(cp,":",true,true)) {
-            File f  = new File(path);
-            if(!f.exists() || !f.isFile()|| !path.endsWith(".jar")) continue;
-            String jarName = f.getName();
-            System.err.println("path:" + jarName);
-            Date d = jarDateMap.get(jarName);
-            if(d==null) continue;
-            if(d.getTime()> f.lastModified()) {
-                anyChanged = true;
-                break;
-            }
-        }
-    }
-
 
 
     /**
@@ -755,6 +736,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                 public void run() {
                     try {
                         //Check for the bundles.xml
+                        getInstallManager().automaticallyCheckForUpdates();
                         IOUtil.readContents(
                             "http://www.unidata.ucar.edu/software/idv/resources/bundles.xml",
                             getClass());

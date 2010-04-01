@@ -261,6 +261,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                     IOUtil.writeTo(zin, new FileOutputStream(dest));
                 }
             }
+
             //Now, write out the version file
             IOUtil.writeFile(versionFile, "" + version);
         } catch (Exception exc) {
