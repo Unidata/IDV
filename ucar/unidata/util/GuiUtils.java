@@ -2280,7 +2280,7 @@ public class GuiUtils extends LayoutUtil {
         JDialog              dialog   = createDialog(f, title, true);
         final ObjectListener listener = getCloseDialogListener(dialog);
         JPanel buttons = makeButtons(listener, buttonLabels, buttonLabels);
-        packDialog(dialog, centerBottom(contents, buttons));
+        packDialog(dialog, centerBottom(contents, inset(buttons,5)));
         if (src != null) {
             dialog.setLocation(getLocation(src));
         } else {
