@@ -52,8 +52,10 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 import ucar.unidata.ui.symbol.StationModelManager;
 
+
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -85,7 +87,7 @@ import java.awt.event.*;
 
 import java.io.*;
 
-import java.lang.management.*;
+
 
 import java.lang.reflect.*;
 
@@ -95,6 +97,7 @@ import java.net.URL;
 
 import java.rmi.RemoteException;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -497,11 +500,31 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
     }
 
+    public void testcp() {
+        Hashtable<String,Date> jarDateMap = new Hashtable<String,Date>();
+        String cp = System.getProperty("java.class.path");
+        if(cp==null) return;
+        boolean anyChanged = false;
+        for(String path: StringUtil.split(cp,":",true,true)) {
+            File f  = new File(path);
+            if(!f.exists() || !f.isFile()|| !path.endsWith(".jar")) continue;
+            String jarName = f.getName();
+            System.err.println("path:" + jarName);
+            Date d = jarDateMap.get(jarName);
+            if(d==null) continue;
+            if(d.getTime()> f.lastModified()) {
+                anyChanged = true;
+                break;
+            }
+        }
+    }
+
+
+
     /**
      *  This is a wrapper that calls initInner within a thread.
      *  That  way the  gui can get built and displayed, etc.
      */
-
     protected final void init() {
         GuiUtils.setApplicationTitle("Unidata IDV - ");
 
@@ -877,7 +900,7 @@ Misc.run(new Runnable() {
                 null,
                 "<html><center>You are now running IDV version "
                 + currentVersion
-                + "<p>Would you like to see the Release Notes?</center></html>", "Show Release Notes?")) {
+                + "<p>Would you like to see the Release Notes?</center></html>", "Show Release Notes?")){ 
             getIdvUIManager().showHelp("idv.releasenotes");;
         }
     }

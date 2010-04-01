@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <menubar label="Commands">
+
+
   <menu
      label="File"
      id="file"
      mnemonic="F">
+
+     <menuitem
+       label="restart"
+       action="jython:idv.restart()"
+        />
+
+
     <menu
        icon="/auxdata/ui/icons/application_add.png"
        label="New"
@@ -267,11 +276,28 @@
        action="action:help.showsupportform"
        mnemonic="F"/>
      <separator/>
+
+     <menu label="Install">
+     <menuitem
+       label="Check for Updates"
+       action="jython:installmanager.checkForUpdates()"/>
+
+
+     <menuitem
+       label="Install Nightly Build"
+       action="jython:installmanager.installFromNightlyBuild()"/>
+     </menu>
+
+     <separator/>
+
      <menuitem
        label="Release Notes"
        icon="/auxdata/ui/icons/note.png"
        action="help:idv.releasenotes"
        mnemonic="R"/>
+
+
+
      <menuitem
        label="About..."
        action="action:help.showabout"

@@ -1180,6 +1180,8 @@ public class StateManager extends IdvManager {
      * @return build date
      */
     public String getBuildDate() {
+        //Make sure we read it
+        getVersion();
         return buildDate;
     }
 

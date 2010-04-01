@@ -21,12 +21,14 @@
 package ucar.unidata.idv;
 
 
+
 import ucar.unidata.idv.ui.*;
 
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 
 import visad.VisADException;
@@ -39,6 +41,8 @@ import java.lang.reflect.Constructor;
 
 import java.rmi.RemoteException;
 
+import java.util.Date;
+import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -110,8 +114,26 @@ public class DefaultIdv extends IntegratedDataViewer {
         return super.handleAction(action, properties, checkForAlias);
     }
 
+    /*
 
-
+      String javaBin = System.getProperty("java.home") + "/bin/java";        File jarFile;  
+      try {  
+      jarFile = new File  
+      (classInJarFile.getClass().getProtectionDomain()  
+      .getCodeSource().getLocation().toURI());  
+      } catch(Exception e) {  
+      return false;  
+      }  
+   
+      if ( !jarFile.getName().endsWith(".jar") )  
+      return false;   //no, it's a .class probably  
+   
+      String  toExec[] = new String[] { javaBin, "-jar", jarFile.getPath() };  
+      try {  
+      Process p = Runtime.getRuntime().exec( toExec );  
+      }catch(Exception exc) {
+      }
+    */
 
 
 
@@ -124,6 +146,7 @@ public class DefaultIdv extends IntegratedDataViewer {
      * @throws Exception When something untoward happens
      */
     public static void main(String[] args) throws Exception {
+
         LogUtil.configure();
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals(ARG_MAINCLASS)) {

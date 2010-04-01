@@ -1985,13 +1985,27 @@ public class PluginManager extends IdvManager {
         try {
             installPlugin(filename, true);
             updatePlugins();
-            LogUtil.userMessage(
-                "You will need to restart the IDV for this plugin to take effect");
+            notifyUser();
         } catch (Throwable exc) {
             logException("Installing plugin", exc);
         }
     }
 
+    private void notifyUser() {
+        if(!getInstallManager().isRestartable()) {
+            LogUtil.userMessage("You will need to restart the IDV for this change to take effect");
+            return;
+        }
+
+        if(GuiUtils.askYesNo("Plugin Confirmation", new JLabel("<html>You will need to restart the IDV for this change to take effect<br>Do you want to restart?"))) {
+
+            try {
+                getInstallManager().restart();
+            } catch (Throwable exc) {
+                logException("Restarting the IDV", exc);
+            }
+        }
+    }
 
     /**
      * Prompt for a plugin url and install it.
@@ -2008,8 +2022,7 @@ public class PluginManager extends IdvManager {
             try {
                 installPlugin(filename, true);
                 updatePlugins();
-                LogUtil.userMessage(
-                    "You will need to restart the IDV for this plugin to take effect");
+                notifyUser();
                 return;
             } catch (Throwable exc) {
                 logException("Installing plugin", exc);
@@ -2148,8 +2161,7 @@ public class PluginManager extends IdvManager {
                 p.file = f;
             }
             updatePlugins();
-            LogUtil.userMessage(
-                "You will need to restart the IDV for this plugin to take effect");
+            notifyUser();
         } catch (Throwable exc) {
             logException("Installing plugin: " + plugin, exc);
         }

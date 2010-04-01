@@ -1205,6 +1205,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         interpreter.set("idv", getIdv());
         interpreter.set("interpreter", interpreter);
         interpreter.set("datamanager", getDataManager());
+        interpreter.set("installmanager", getInstallManager());
     }
 
     /**

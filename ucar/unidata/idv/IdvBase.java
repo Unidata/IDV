@@ -173,6 +173,9 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
     /** Handles properties, etc. */
     protected StateManager stateManager;
 
+    /** Handles reinstalling the IDV */
+    protected InstallManager installManager;
+
 
     /**
      * Create the IdvBase
@@ -606,6 +609,36 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
             stateManager = doMakeStateManager();
         }
         return stateManager;
+    }
+
+
+
+
+
+    /**
+     * Factory method to create the
+     * {@link InstallManager}.
+     *
+     * @return The install manager
+     */
+    protected InstallManager doMakeInstallManager() {
+        return (InstallManager) makeManager(InstallManager.class,
+                                          new Object[] { idv });
+    }
+
+
+
+    /**
+     * Create, if needed, and return the
+     * {@link InstallManager}
+     *
+     * @return The install manager
+     */
+    public InstallManager getInstallManager() {
+        if (installManager == null) {
+            installManager = doMakeInstallManager();
+        }
+        return installManager;
     }
 
 

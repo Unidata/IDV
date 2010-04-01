@@ -273,6 +273,11 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
     }
 
 
+    protected InstallManager getInstallManager() {
+        return idv.getInstallManager();
+    }
+
+
 
 
     /**
