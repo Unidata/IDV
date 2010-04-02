@@ -73,7 +73,7 @@
      action="jython:idv.getPersistenceManager().doSaveAsFavorite();"/>
   <action
      id="bundle.favorite.manage"
-     image="/auxdata/ui/icons/Bookmarks16.gif"
+     image="/auxdata/ui/icons/star.png"
      description="Manage favorites"
      group="Bundles"
      action="jython:idv.getIdvUIManager().showBundleDialog();"/>
