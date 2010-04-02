@@ -697,8 +697,13 @@ public class HtmlOutputHandler extends OutputHandler {
                 new StringBuffer("\n<div class=\"description\">\n");
             descSB.append(desc);
             descSB.append("</div>\n");
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Description"),
-                    descSB.toString(), open));
+
+            //            sb.append(HtmlUtil.makeShowHideBlock(msg("Description"),
+            //                    descSB.toString(), open));
+
+            //            sb.append(HtmlUtil.makeToggleInline("",
+            //                                                desc, true));
+            sb.append(desc);
         }
     }
 

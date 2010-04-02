@@ -2937,7 +2937,7 @@ public class HtmlUtil {
     public static String makeShowHideBlock(String label, String content,
                                            boolean visible) {
         return makeShowHideBlock(label, content, visible,
-                                 cssClass("pagesubheading"));
+                                 cssClass("toggleblocklabel"));
     }
 
     /**
@@ -3025,7 +3025,7 @@ public class HtmlUtil {
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
                 + "')"), img /* + label*/,
-                         HtmlUtil.cssClass("pagesubheadinglink"));
+                         HtmlUtil.cssClass("toggleblocklabellink"));
         link = link + label;
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
@@ -3115,7 +3115,7 @@ public class HtmlUtil {
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleInlineVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
                 + "')"), img + label,
-                         HtmlUtil.cssClass("pagesubheadinglink"));
+                         HtmlUtil.cssClass("toggleblocklabellink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append(link);
@@ -3153,7 +3153,7 @@ public class HtmlUtil {
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + "" + "','" + ""
                 + "')"), clickHtml,
-                         HtmlUtil.cssClass("pagesubheadinglink")) + label;
+                         HtmlUtil.cssClass("toggleblocklabellink")) + label;
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append(link);

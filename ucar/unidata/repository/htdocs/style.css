@@ -1086,6 +1086,21 @@ a.pagesubheadinglink:visited {
    text-decoration: none;
 }
 
+a.toggleblocklabellink {
+   color:black;
+   text-decoration: none;
+}
+
+
+a.toggleblocklabellink:visited {
+   text-decoration: none;
+}
+
+
+.toggleblocklabel {
+  font-weight: bold;
+}
+
 
 
 form {
