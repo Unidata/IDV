@@ -19,9 +19,22 @@ Or:
 }] 
 
 
-The second way is to iterate on a set of files. The contained isl tags are executed with the &quot;file&quot; property being set to each file name.
+
+
+
+The second way is to iterate on a set of files. The contained isl tags are executed with the following properties set:
+<ul>
+<li> &quot;file&quot; The full path to the file, e.g., <i>/data/test/grid1.nc</i>
+<li> &quot;filetail&quot; The file name, e.g., <i>grid1.nc</i>
+<li> &quot;fileprefix&quot; The file path except for the suffix, e.g., <i>/data/test/grid1</i>
+</ul>
+
 In the example below the script iterates on all of the .nc files.
 The file name is printed out  and then the bundle is loaded. The setfiles tag is used to set the file name within the bundle.
+
+
+
+
 [isl::importxml multiplefiles.isl]
 
 
