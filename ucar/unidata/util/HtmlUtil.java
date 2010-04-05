@@ -1129,8 +1129,9 @@ public class HtmlUtil {
             try {
                 url = url + arg(args[i], args[i + 1]);
             } catch (Exception exc) {
-                System.err.println("error encoding arg:" + args[i + 1] + " "
+                System.err.println("error encoding arg(1):" + args[i + 1] + " "
                                    + exc);
+                exc.printStackTrace();
             }
             addAmpersand = true;
         }
@@ -1166,7 +1167,8 @@ public class HtmlUtil {
         try {
             return name + "=" + java.net.URLEncoder.encode(value, "UTF-8");
         } catch (Exception exc) {
-            System.err.println("error encoding arg:" + value + " " + exc);
+            System.err.println("error encoding arg(2):" + value + " " + exc);
+            exc.printStackTrace();
             return "";
         }
     }
@@ -3186,7 +3188,8 @@ public class HtmlUtil {
         try {
             return java.net.URLEncoder.encode(s, "UTF-8");
         } catch (Exception exc) {
-            System.err.println("error encoding arg:" + s + " " + exc);
+            System.err.println("error encoding arg(3):" + s + " " + exc);
+            exc.printStackTrace();
             return "";
         }
     }
@@ -3200,7 +3203,8 @@ public class HtmlUtil {
             s = s.replace("_SPACE_"," ");
             return s;
         } catch (Exception exc) {
-            System.err.println("error encoding arg:" + s + " " + exc);
+            System.err.println("error encoding arg(4):" + s + " " + exc);
+            exc.printStackTrace();
             return "";
         }
     }
