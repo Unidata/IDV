@@ -535,8 +535,20 @@ public class MetadataType extends MetadataTypeBase {
             args.add(metadata.getAttr1());
         }
 
-        return HtmlUtil.url(
-            request.url(handler.getRepository().URL_ENTRY_SEARCH), args);
+        for(Object o: args) {
+            if(o==null) {
+                System.err.println("NULL: " + args);
+                return null;
+            }
+        }
+
+        try {
+            return HtmlUtil.url(
+                                request.url(handler.getRepository().URL_ENTRY_SEARCH), args);
+        } catch(Exception exc) {
+            System.err.println("ARGS:" + args);
+            throw new RuntimeException(exc);
+        }
     }
 
 

@@ -73,6 +73,8 @@ import java.util.zip.*;
  */
 public class Metadata implements Constants {
 
+    public static final int MAX_LENGTH = 10000;
+
     /** _more_ */
     public static String TAG_EXTRA = "extra";
 
@@ -228,10 +230,10 @@ public class Metadata implements Constants {
         this.entryId   = entryId;
         this.type      = type;
         this.inherited = inherited;
-        this.attr1     = attr1;
-        this.attr2     = attr2;
-        this.attr3     = attr3;
-        this.attr4     = attr4;
+        setAttr1(attr1);
+        setAttr2(attr2);
+        setAttr3(attr3);
+        setAttr4(attr4);
         this.extra     = extra;
         if (this.extra == null) {
             this.extra = "";
@@ -258,6 +260,16 @@ public class Metadata implements Constants {
         if (this.extra == null) {
             this.extra = "";
         }
+    }
+
+    public static boolean  lengthOK(String s) {
+        if(s==null) return true;
+        return s.length()<MAX_LENGTH;
+    }
+
+
+    public static void checkLength(String s) {
+        if(!lengthOK(s)) throw new IllegalArgumentException("Metadata length too great:" +s);
     }
 
     /**
@@ -328,6 +340,9 @@ public class Metadata implements Constants {
      * @param value _more_
      */
     public void setAttr(int idx, String value) {
+        if(idx>=1 && idx<=4) {
+            checkLength(value);
+        }
         if (idx == 1) {
             attr1 = value;
         }
@@ -352,6 +367,7 @@ public class Metadata implements Constants {
      * @param value The new value for Attr1
      */
     public void setAttr1(String value) {
+        checkLength(value);
         attr1 = value;
     }
 
@@ -370,6 +386,7 @@ public class Metadata implements Constants {
      * @param value The new value for Attr2
      */
     public void setAttr2(String value) {
+        checkLength(value);
         attr2 = value;
     }
 
@@ -388,6 +405,7 @@ public class Metadata implements Constants {
      * @param value The new value for Attr3
      */
     public void setAttr3(String value) {
+        checkLength(value);
         attr3 = value;
     }
 
@@ -406,6 +424,7 @@ public class Metadata implements Constants {
      * @param value The new value for Attr4
      */
     public void setAttr4(String value) {
+        checkLength(value);
         attr4 = value;
     }
 

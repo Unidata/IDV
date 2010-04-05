@@ -383,6 +383,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    List<Metadata> metadataList,
                                    Hashtable extra, boolean shortForm) {
 
+        Metadata metadata = null;
+        String varName = null;
         NetcdfDataset dataset = null;
         try {
             DataOutputHandler dataOutputHandler =
@@ -431,7 +433,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (ATTR_KEYWORDS.equals(name)) {
                     for (String keyword : (List<String>) StringUtil.split(
                             value, ";", true, true)) {
-                        Metadata metadata =
+
+                        try {
+                        metadata =
                             new Metadata(getRepository().getGUID(),
                                          entry.getId(), TYPE_KEYWORD,
                                          DFLT_INHERITED, keyword,
@@ -439,6 +443,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                          Metadata.DFLT_ATTR,
                                          Metadata.DFLT_ATTR,
                                          Metadata.DFLT_EXTRA);
+                        } catch(Exception exc) {
+                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add keyword metadata:" + keyword);                    
+                            continue;
+                        }
+
+
                         if ( !entry.hasMetadata(metadata)) {
                             metadataList.add(metadata);
                         }
@@ -449,7 +459,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (name.startsWith("_")) {
                     continue;
                 }
-                Metadata metadata = new Metadata(getRepository().getGUID(),
+
+                //Check if the string length is too long
+                if(!Metadata.lengthOK(name) || !Metadata.lengthOK(value)) {
+                    getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add attribute:" + name);
+                    continue;
+                }
+
+
+                metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_PROPERTY,
                                         DFLT_INHERITED, name, value,
                                         Metadata.DFLT_ATTR,
@@ -527,14 +545,19 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
 
+
                 if ( !shortForm) {
-                    String varName = var.getShortName();
-                    Metadata metadata =
-                        new Metadata(getRepository().getGUID(),
+                        try {
+                            varName = var.getShortName();
+                        metadata = new Metadata(getRepository().getGUID(),
                                      entry.getId(), TYPE_VARIABLE,
                                      DFLT_INHERITED, varName, var.getName(),
                                      var.getUnitsString(),
                                      Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA);
+                        } catch(Exception exc) {
+                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add variable metadata:" + varName);                    
+                            continue;
+                        }
                     if ( !entry.hasMetadata(metadata)) {
                         metadataList.add(metadata);
                     }
@@ -545,10 +568,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
                     if (att != null) {
                         varName = att.getStringValue();
+                        try {
                         metadata = new Metadata(getRepository().getGUID(),
                                 entry.getId(), TYPE_VARIABLE, DFLT_INHERITED,
                                 varName, var.getName(), var.getUnitsString(),
                                 Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA);
+                        } catch(Exception exc) {
+                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add variable metadata:" + varName);                    
+                            continue;
+                        }
                         if ( !entry.hasMetadata(metadata)) {
                             metadataList.add(metadata);
                         }
