@@ -25,8 +25,10 @@ Or:
 The second way is to iterate on a set of files. The contained isl tags are executed with the following properties set:
 <ul>
 <li> &quot;file&quot; The full path to the file, e.g., <i>/data/test/grid1.nc</i>
+<li> &quot;filenosuffix&quot; The full path to the file without the suffix, e.g., <i>/data/test/grid1</i>
+<li> &quot;fileprefix&quot; The same as filenosuffix
 <li> &quot;filetail&quot; The file name, e.g., <i>grid1.nc</i>
-<li> &quot;fileprefix&quot; The file path except for the suffix, e.g., <i>/data/test/grid1</i>
+<li> &quot;filetailnosuffix&quot; The file name with no suffix, e.g., <i>grid1</i>
 </ul>
 
 In the example below the script iterates on all of the .nc files.
