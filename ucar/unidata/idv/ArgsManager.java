@@ -401,6 +401,7 @@ public class ArgsManager extends IdvManager {
         } else {
             if ( !islInteractive) {
                 doDefaultBundle = false;
+                getStateManager().setRunningIsl(true);
                 initRunnables.add(new Runnable() {
                     public void run() {
                         getImageGenerator().processScriptFiles(

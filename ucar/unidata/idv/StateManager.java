@@ -108,6 +108,9 @@ public class StateManager extends IdvManager {
     /** The version description */
     private String versionAbout;
 
+    private boolean runningIsl = false;
+
+
     /**
      * The persistent store. Used to write out preferences,
      * manage the user's local .unidata/idv directory, etc.
@@ -1215,6 +1218,24 @@ public class StateManager extends IdvManager {
 
 
 
+
+    /**
+       Set the RunningIsl property.
+
+       @param value The new value for RunningIsl
+    **/
+    public void setRunningIsl (boolean value) {
+	this.runningIsl = value;
+    }
+
+    /**
+       Get the RunningIsl property.
+
+       @return The RunningIsl
+    **/
+    public boolean getRunningIsl () {
+	return this.runningIsl;
+    }
 
 
 
