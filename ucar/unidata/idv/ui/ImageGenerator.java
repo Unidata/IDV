@@ -170,7 +170,13 @@ public class ImageGenerator extends IdvManager {
     public static final String PROP_FILE = "file";
 
     /** _more_          */
+    public static final String PROP_FILENOSUFFIX = "filenosuffix";
+
+    /** _more_          */
     public static final String PROP_FILETAIL = "filetail";
+
+    /** _more_          */
+    public static final String PROP_FILETAILNOSUFFIX = "filetailnosuffix";
 
     /** _more_          */
     public static final String PROP_FILEPREFIX = "fileprefix";
@@ -1595,10 +1601,13 @@ public class ImageGenerator extends IdvManager {
         pushProperties();
         for (int i = 0; i < files.size(); i++) {
             try {
-                putProperty(PROP_FILE, files.get(i).toString());
-                String tail = IOUtil.getFileTail(files.get(i).toString());
+                String filePath = files.get(i).toString();
+                String tail = IOUtil.getFileTail(filePath);
+                putProperty(PROP_FILE, filePath);
+                putProperty(PROP_FILEPREFIX, IOUtil.stripExtension(filePath));
+                putProperty(PROP_FILENOSUFFIX, IOUtil.stripExtension(filePath));
                 putProperty(PROP_FILETAIL, tail);
-                putProperty(PROP_FILEPREFIX, IOUtil.stripExtension(tail));
+                putProperty(PROP_FILETAILNOSUFFIX, IOUtil.stripExtension(tail));
                 if ( !processChildren(node)) {
                     return false;
                 }
