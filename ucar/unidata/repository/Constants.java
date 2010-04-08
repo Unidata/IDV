@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -117,7 +115,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_PUBLISH = "ramadda.icon.publish";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_PLANVIEW = "ramadda.icon.planview";
 
     /** _more_ */
@@ -169,7 +167,10 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_IMAGE = "ramadda.icon.image";
 
+    /** _more_          */
     public static final String ICON_IMPORT = "ramadda.icon.import";
+
+    /** _more_          */
     public static final String ICON_EXPORT = "ramadda.icon.export";
 
     /** _more_ */
@@ -395,6 +396,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
 
+    /** _more_          */
     public static final String ATTR_FILENAME = "filename";
 
     /** _more_ */
@@ -443,6 +445,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DECORATE = "decorate";
 
+    /** _more_          */
     public static final String ARG_DEPTH = "depth";
 
     /** _more_ */
@@ -499,6 +502,16 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
+    /** _more_          */
+    public static final String ARG_AREA_MODE = "areamode";
+
+    /** _more_          */
+    public static final String VALUE_AREA_CONTAINS = "areacontains";
+
+    /** _more_          */
+    public static final String VALUE_AREA_OVERLAPS = "areaoverlaps";
+
+
     /** _more_ */
     public static final String ARG_AREA_EAST = ARG_AREA + "_east";
 
@@ -529,6 +542,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
+    /** _more_          */
     public static final String ARG_COMPRESS = "compress";
 
     /** _more_ */
@@ -1191,7 +1205,7 @@ public interface Constants {
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ACCESS_NOBOTS = "ramadda.access.nobots";
 
     /** _more_ */
@@ -1205,7 +1219,9 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
-    public static final String PROP_ADMIN_INCLUDESQL = "ramadda.admin.includesql";
+    /** _more_          */
+    public static final String PROP_ADMIN_INCLUDESQL =
+        "ramadda.admin.includesql";
 
     /** _more_ */
     public static final String PROP_REGISTRY_DEFAULTSERVER =
@@ -1511,6 +1527,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ACTION_NEWDB = "action.newdb";
+
+    /** _more_          */
     public static final String ACTION_DUMPDB = "action.dumpb";
 
     /** _more_ */
@@ -1645,4 +1663,3 @@ public interface Constants {
 
 
 }
-

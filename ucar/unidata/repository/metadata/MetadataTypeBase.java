@@ -199,25 +199,18 @@ public class MetadataTypeBase extends RepositoryManager {
                                       metadata.getEntryId(), ARG_METADATA_ID,
                                       metadata.getId());
             //TODO:
-            /*
             if (templateType.equals(TEMPLATETYPE_THREDDS)) {
                 XmlUtil.create(
                     parent.getOwnerDocument(),
-                    ThreddsMetadataHandler.getTag(
-                        ThreddsMetadataHandler.TYPE_PROPERTY), parent,
-                            new String[] { ThreddsMetadataHandler.ATTR_NAME,
+                    "property", parent,
+                    new String[] { "name",
                                            (element.getThumbnail()
                                             ? "thumbnail"
-                                            : "attachment"), ThreddsMetadataHandler
-                                            .ATTR_VALUE, url });
+                                            : "attachment"), "value", url });
             }
-            */
-
-
 
         }
     }
-
 
 
     /**

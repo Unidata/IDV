@@ -2022,8 +2022,17 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
+            String radio = HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, true) +msg("Overlaps")+ 
+                HtmlUtil.space(3) +
+                HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, false) +msg("Contained by");
+
             String mapSelector = getRepository().makeMapSelector(request,
-                                     ARG_AREA, true, "", "");
+                                     ARG_AREA, true, "", radio);
+
+
+
+
+
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     mapSelector));
             advancedSB.append("\n");
@@ -2268,52 +2277,66 @@ public class TypeHandler extends RepositoryManager {
         }
 
         boolean      includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
-        List<Clause> areaExpressions = new ArrayList<Clause>();
-        if (request.defined(ARG_AREA + "_south")) {
-            addCriteria(searchCriteria, "South>=",
-                        request.getString(ARG_AREA + "_south", ""));
-            areaExpressions.add(
-                Clause.and(
-                    Clause.neq(
-                        Tables.ENTRIES.COL_SOUTH,
-                        new Double(Entry.NONGEO)), Clause.ge(
-                            Tables.ENTRIES.COL_SOUTH,
-                            request.get(ARG_AREA + "_south", 0.0))));
-        }
-        if (request.defined(ARG_AREA + "_north")) {
-            addCriteria(searchCriteria, "North<=",
-                        request.getString(ARG_AREA + "_north", ""));
-            areaExpressions.add(
-                Clause.and(
-                    Clause.neq(
-                        Tables.ENTRIES.COL_NORTH,
-                        new Double(Entry.NONGEO)), Clause.le(
-                            Tables.ENTRIES.COL_NORTH,
-                            request.get(ARG_AREA + "_north", 0.0))));
-        }
-        if (request.defined(ARG_AREA + "_east")) {
-            addCriteria(searchCriteria, "East<=",
-                        request.getString(ARG_AREA + "_east", ""));
-            areaExpressions.add(
-                Clause.and(
-                    Clause.neq(
-                        Tables.ENTRIES.COL_EAST,
-                        new Double(Entry.NONGEO)), Clause.le(
-                            Tables.ENTRIES.COL_EAST,
-                            request.get(ARG_AREA + "_east", 0.0))));
-        }
-        if (request.defined(ARG_AREA + "_west")) {
-            addCriteria(searchCriteria, "West>=",
-                        request.getString(ARG_AREA + "_west", ""));
-            areaExpressions.add(
-                Clause.and(
-                    Clause.neq(
-                        Tables.ENTRIES.COL_WEST,
-                        new Double(Entry.NONGEO)), Clause.ge(
-                            Tables.ENTRIES.COL_WEST,
-                            request.get(ARG_AREA + "_west", 0.0))));
+        boolean contains = !(request.getString(ARG_AREA_MODE, VALUE_AREA_OVERLAPS).equals(VALUE_AREA_OVERLAPS));
 
+
+        List<Clause> areaExpressions = new ArrayList<Clause>();
+        String[] areaNames = {"South","North","East","West"};
+        String[] areaSuffixes = {"_south","_north","_east","_west"};
+        String[] areaCols = {Tables.ENTRIES.COL_SOUTH,Tables.ENTRIES.COL_NORTH,Tables.ENTRIES.COL_EAST,Tables.ENTRIES.COL_WEST};
+        boolean[]areaLE = {false,true,true,false}; 
+        Clause areaClause;
+        if(!contains) {
+            boolean gotThemAll = true;
+            for(int i=0;i<4;i++) {
+                String areaArg = ARG_AREA + areaSuffixes[i];
+                if (!request.defined(areaArg)) {
+                    gotThemAll  = false;
+                    break;
+                }
+            }
+            if(gotThemAll) {
+                areaClause =  Clause.le(Tables.ENTRIES.COL_SOUTH, request.get(ARG_AREA_NORTH,0.0));
+                areaExpressions.add(
+                                    Clause.and(
+                                               Clause.neq(Tables.ENTRIES.COL_SOUTH, new Double(Entry.NONGEO)), 
+                                               areaClause));
+                areaClause =  Clause.ge(Tables.ENTRIES.COL_NORTH, request.get(ARG_AREA_SOUTH,0.0));
+                areaExpressions.add(
+                                    Clause.and(
+                                               Clause.neq(Tables.ENTRIES.COL_SOUTH, new Double(Entry.NONGEO)), 
+                                               areaClause));
+                
+                areaClause =  Clause.ge(Tables.ENTRIES.COL_EAST, request.get(ARG_AREA_WEST,0.0));
+                areaExpressions.add(
+                                    Clause.and(
+                                               Clause.neq(Tables.ENTRIES.COL_EAST, new Double(Entry.NONGEO)), 
+                                               areaClause));
+
+                areaClause =  Clause.le(Tables.ENTRIES.COL_WEST, request.get(ARG_AREA_EAST,0.0));
+                areaExpressions.add(
+                                    Clause.and(
+                                               Clause.neq(Tables.ENTRIES.COL_WEST, new Double(Entry.NONGEO)), 
+                                               areaClause));
+                //                System.err.println (areaExpressions);
+            } 
+
+        } else {
+            for(int i=0;i<4;i++) {
+                String areaArg = ARG_AREA + areaSuffixes[i];
+                if (request.defined(areaArg)) {
+                    addCriteria(searchCriteria, areaNames[i]+(areaLE[i]?"<=":">="),
+                                request.getString(areaArg, ""));
+                    double areaValue = request.get(areaArg, 0.0);
+                    areaClause = areaLE[i]?Clause.le(areaCols[i],areaValue):Clause.ge(areaCols[i],areaValue);
+                    areaExpressions.add(
+                                        Clause.and(
+                                                   Clause.neq(areaCols[i], new Double(Entry.NONGEO)), 
+                                                   areaClause));
+                }
+            }
         }
+
         if (areaExpressions.size() > 0) {
             Clause areaExpr = Clause.and(areaExpressions);
             if (includeNonGeo) {
