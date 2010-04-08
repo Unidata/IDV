@@ -386,6 +386,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         Metadata metadata = null;
         String varName = null;
         NetcdfDataset dataset = null;
+        boolean haveDate = false;
         try {
             DataOutputHandler dataOutputHandler =
                 getDataOutputHandler();
@@ -427,6 +428,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
 
+
                 if (shortForm) {
                     continue;
                 }
@@ -459,6 +461,18 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (name.startsWith("_")) {
                     continue;
                 }
+
+                if(isFromDateAttribute(name)||isToDateAttribute(name)) {
+                    Date  date = getDate(value);
+                    if(isToDateAttribute(name)) {
+                        extra.put(ARG_TODATE, date);
+                    } else {
+                        extra.put(ARG_FROMDATE, date);
+                    }
+                    haveDate = true;
+                    continue;
+                }
+
 
                 //Check if the string length is too long
                 if(!Metadata.lengthOK(name) || !Metadata.lengthOK(value)) {
@@ -519,19 +533,23 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         }
                     } else if (axisType.equals(AxisType.Time)) {
                         try {
-                            Date[] dates   = getMinMaxDates(var, ca);
-                            if(dates!=null) {
-                                Date   minDate = (Date) extra.get(ARG_FROMDATE);
-                                Date   maxDate = (Date) extra.get(ARG_TODATE);
-                                if (minDate != null) {
-                                    dates[0] = DateUtil.min(dates[0], minDate);
-                                }
-                                if (maxDate != null) {
-                                    dates[1] = DateUtil.max(dates[1], maxDate);
-                                }
+                            if(!haveDate) {
+                                Date[] dates   = getMinMaxDates(var, ca);
+                                if(dates!=null) {
+                                    Date   minDate = (Date) extra.get(ARG_FROMDATE);
+                                    Date   maxDate = (Date) extra.get(ARG_TODATE);
+                                    if (minDate != null) {
+                                        dates[0] = DateUtil.min(dates[0], minDate);
+                                    }
+                                    if (maxDate != null) {
+                                        dates[1] = DateUtil.max(dates[1], maxDate);
+                                    }
 
-                                extra.put(ARG_FROMDATE, dates[0]);
-                                extra.put(ARG_TODATE, dates[1]);
+                                    extra.put(ARG_FROMDATE, dates[0]);
+                                    extra.put(ARG_TODATE, dates[1]);
+                                    haveDate = true;
+                            
+                                }
                             }
                         } catch (Exception exc) {
                             System.out.println("Error reading time axis for:"
@@ -547,8 +565,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
                 if ( !shortForm) {
-                        try {
-                            varName = var.getShortName();
+                    varName = var.getShortName();
+                       try {
                         metadata = new Metadata(getRepository().getGUID(),
                                      entry.getId(), TYPE_VARIABLE,
                                      DFLT_INHERITED, varName, var.getName(),
@@ -626,6 +644,22 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
             } catch (Exception ignore) {}
         }
+    }
+
+
+    private Date getDate(String dateString) throws java.text.ParseException {
+        System.err.println ("getDate:" + dateString +" Date:" +DateUtil.parse(dateString));
+        return DateUtil.parse(dateString);
+    }
+
+    private boolean isToDateAttribute(String name) {
+        if(name.equals("stop_time")) return true;
+        return false;
+    }
+
+    private boolean isFromDateAttribute(String name) {
+        if(name.equals("start_time")) return true;
+        return false;
     }
 
 
