@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -317,8 +316,8 @@ public class CatalogOutputHandler extends OutputHandler {
                                && (subGroups.size() == 0);
 
 
-        int depth  = Math.min(5, request.get(ARG_DEPTH,1));
-        
+        int      depth = Math.min(5, request.get(ARG_DEPTH, 1));
+
         String   title = (justOneEntry
                           ? entries.get(0).getName()
                           : group.getName());
@@ -392,7 +391,8 @@ public class CatalogOutputHandler extends OutputHandler {
                 }
             }
 
-            toCatalogInner(request, group, entries, catalogInfo, topDataset,0);
+            toCatalogInner(request, group, entries, catalogInfo, topDataset,
+                           0);
             if ( !group.isDummy()
                     && (catalogInfo.serviceMap.get(SERVICE_OPENDAP)
                         != null)) {
@@ -540,9 +540,10 @@ public class CatalogOutputHandler extends OutputHandler {
         path = path.replace("\\", "/");
 
 
-        if (canDataLoad(request, entry)) {
-            String urlPath =
-                getDataOutputHandler().getOpendapUrl(entry);
+        if (canDataLoad(request, entry)
+                && !entry.getType().equals(
+                    OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+            String urlPath = getDataOutputHandler().getOpendapUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 
@@ -609,30 +610,31 @@ public class CatalogOutputHandler extends OutputHandler {
     public void outputEntry(Entry entry, Request request,
                             CatalogInfo catalogInfo, Element parent)
             throws Exception {
-        if(entry.getType().equals("cataloglink")) {
+
+        if (entry.getType().equals("cataloglink")) {
             Element ref = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_CATALOGREF, parent,
                                          new String[] {
                                              CatalogUtil.ATTR_XLINK_TITLE,
                                              entry.getName(),
                                              CatalogUtil.ATTR_XLINK_HREF,
-                                             entry.getResource().getPath()});
+                                             entry.getResource().getPath() });
             return;
         }
 
 
-        if(WmsImageOutputHandler.isLatLonImage(entry)) {
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry,
-                                          ARG_OUTPUT,
-                                          WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES);
+        if (WmsImageOutputHandler.isLatLonImage(entry)) {
+            String url = request.entryUrl(
+                             getRepository().URL_ENTRY_SHOW, entry,
+                             ARG_OUTPUT,
+                             WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES);
             Element ref = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_CATALOGREF, parent,
                                          new String[] {
                                              CatalogUtil.ATTR_XLINK_TITLE,
                                              "WMS: " + entry.getName(),
                                              CatalogUtil.ATTR_XLINK_HREF,
-                                             url});
+                                             url });
             return;
 
         }
@@ -721,6 +723,7 @@ public class CatalogOutputHandler extends OutputHandler {
         XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_END, timeCoverage,
                        "" + formatDate(request,
                                        new Date(entry.getEndDate())));
+
     }
 
 
@@ -734,6 +737,7 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param entryList _more_
      * @param catalogInfo _more_
      * @param parent _more_
+     * @param depth _more_
      *
      *
      * @throws Exception _more_
@@ -754,28 +758,27 @@ public class CatalogOutputHandler extends OutputHandler {
             }
         }
         for (Group group : groups) {
-            if(depth>1) {
-                Element datasetNode = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_DATASET,
-                                             parent,
-                                             new String[] { CatalogUtil.ATTR_NAME,
-                                                            group.getName()});
-                addMetadata(request, group,  catalogInfo, datasetNode);
+            if (depth > 1) {
+                Element datasetNode = XmlUtil.create(catalogInfo.doc,
+                                          CatalogUtil.TAG_DATASET, parent,
+                                          new String[] {
+                                              CatalogUtil.ATTR_NAME,
+                        group.getName() });
+                addMetadata(request, group, catalogInfo, datasetNode);
                 List children = getEntryManager().getChildren(request, group);
-                toCatalogInner(request, group, children, 
-                               catalogInfo,
-                               datasetNode, depth-1);
+                toCatalogInner(request, group, children, catalogInfo,
+                               datasetNode, depth - 1);
             } else {
                 String url =  /* "http://localhost:8080"+*/
                     request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
                                 group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
                 Element ref = XmlUtil.create(catalogInfo.doc,
-                                             CatalogUtil.TAG_CATALOGREF, parent,
+                                             CatalogUtil.TAG_CATALOGREF,
+                                             parent,
                                              new String[] {
                                                  CatalogUtil.ATTR_XLINK_TITLE,
-                                                 group.getName(),
-                                                 CatalogUtil.ATTR_XLINK_HREF,
-                                                 url });
+                        group.getName(), CatalogUtil.ATTR_XLINK_HREF, url });
             }
         }
 
@@ -863,4 +866,3 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 }
-
