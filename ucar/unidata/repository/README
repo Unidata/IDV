@@ -60,6 +60,8 @@ tclsh ../ucar/unidata/repository/release/makethredds.tcl
 
 ################# Making a release ################################
 
+You first need to build the help documentation. See below.
+
 To make the full release do:
 ant release
 
@@ -73,6 +75,24 @@ repository.jar
 *repositoryclient.zip  - To run the stand-alone command line client
 repositorylib.jar
 repositorytds.jar
+
+
+
+################# Building the help  ################################
+
+The integrated user documentation is in:
+docs/userguide/content
+
+This requires tclsh in your path and  uses the tcl generate.tcl script. 
+
+To build the docs do:
+cd docs/userguide/content
+source make.sh
+
+This generates the documentation and places it in:
+docs/userguide/processed
+
+When the RAMADDA release is built the processed html docs are included in the result.
 
 
 
