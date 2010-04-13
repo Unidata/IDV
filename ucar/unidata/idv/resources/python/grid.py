@@ -150,6 +150,15 @@ def newUnit(field, varname, unitname):
   newType = Util.makeRealType(varname, newunit)
   return GridUtil.setParamType(field, newType,0)
 
+def noUnit(field):
+  """ remove the units from a grid """
+  import visad
+  from visad import CommonUnit
+  newunit = CommonUnit.promiscuous
+  rt = GridUtil.getParamType(field).getRealComponents()[0]
+  newType = Util.makeRealType(rt.getName(), visad.CommonUnit.promiscuous)
+  return GridUtil.setParamType(field, newType,0)
+
 def make2D(slice):
   """Make a 2D slice from a 3D slice at a single level """
   return GridUtil.make2DGridFromSlice(slice)
