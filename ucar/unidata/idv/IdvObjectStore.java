@@ -201,13 +201,18 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
      * @return The jython cache directory
      */
     public String getJythonCacheDir() {
+        String dirName = "jython";
+        String jythonVersion = idv.getStateManager().getJythonVersion();
+        if (jythonVersion != null) {
+        	dirName += jythonVersion;
+        }
         if ( !usingNormalUserDirectory) {
-            return IOUtil.makeDir(IOUtil.joinDir(userDirectory, "jython"));
+            return IOUtil.makeDir(IOUtil.joinDir(userDirectory, dirName));
         }
         if ( !userDirectoryOk()) {
             return null;
         }
-        return IOUtil.makeDir(IOUtil.joinDir(systemDirectory, "jython"));
+        return IOUtil.makeDir(IOUtil.joinDir(systemDirectory, dirName));
     }
 
     /**

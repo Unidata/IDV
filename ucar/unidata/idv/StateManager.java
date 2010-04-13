@@ -83,6 +83,9 @@ public class StateManager extends IdvManager {
     private static final String PROP_VERSION_REVISION =
         "idv.version.revision";
 
+    /** Revision version xml attribute */
+    static final String PROP_JYTHON_VERSION = "idv.jython.version";
+
     /** Holds the initial properties */
     private Properties idvProperties;
 
@@ -108,6 +111,10 @@ public class StateManager extends IdvManager {
     /** The version description */
     private String versionAbout;
 
+    /** The Jython version */
+    private String jythonVersion;
+
+    /** flag for running isl */
     private boolean runningIsl = false;
 
 
@@ -1087,7 +1094,15 @@ public class StateManager extends IdvManager {
     }
 
 
-
+    /**
+     * Get the jython version
+     *
+     * @return The jython version
+     */
+    public String getJythonVersion() {
+        getVersion();
+        return jythonVersion;
+    }
 
 
     /**
@@ -1153,6 +1168,8 @@ public class StateManager extends IdvManager {
                         "no_minor");
                 versionRevision = Misc.getProperty(props,
                         PROP_VERSION_REVISION, "no_revision");
+                jythonVersion = Misc.getProperty(props, PROP_JYTHON_VERSION,
+                        "");
                 versionAbout =
                     IOUtil.readContents(getProperty(PROP_ABOUTTEXT,
                         "/ucar/unidata/idv/resources/about.html"), "");
@@ -1167,6 +1184,7 @@ public class StateManager extends IdvManager {
                 versionMajor    = "";
                 versionMinor    = "";
                 versionRevision = "";
+                jythonVersion   = "";
                 versionAbout    = "";
             }
         }
@@ -1220,21 +1238,21 @@ public class StateManager extends IdvManager {
 
 
     /**
-       Set the RunningIsl property.
-
-       @param value The new value for RunningIsl
-    **/
-    public void setRunningIsl (boolean value) {
-	this.runningIsl = value;
+     *  Set the RunningIsl property.
+     *
+     *  @param value The new value for RunningIsl
+     */
+    public void setRunningIsl(boolean value) {
+        this.runningIsl = value;
     }
 
     /**
-       Get the RunningIsl property.
-
-       @return The RunningIsl
-    **/
-    public boolean getRunningIsl () {
-	return this.runningIsl;
+     *  Get the RunningIsl property.
+     *
+     *  @return The RunningIsl
+     */
+    public boolean getRunningIsl() {
+        return this.runningIsl;
     }
 
 
