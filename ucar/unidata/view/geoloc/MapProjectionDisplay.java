@@ -1,26 +1,22 @@
 /*
- * $Id: MapProjectionDisplay.java,v 1.121 2007/04/13 22:19:09 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.view.geoloc;
 
@@ -350,16 +346,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             boolean offscreen, Dimension dimension, GraphicsDevice screen)
             throws VisADException, RemoteException {
         if (p == null) {
-	    Trace.call1("MapProjectionDisplay.getInstance:makeProjection");
+            Trace.call1("MapProjectionDisplay.getInstance:makeProjection");
             p = makeDefaultMapProjection();
-	    Trace.call2("MapProjectionDisplay.getInstance:makeProjection");
+            Trace.call2("MapProjectionDisplay.getInstance:makeProjection");
         }
         if (((mode == MODE_3D) || (mode == MODE_2Din3D)) && !force2D) {
-	    Trace.call1("MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
-            MapProjectionDisplay mpd =  new MapProjectionDisplayJ3D(p, mode, offscreen, dimension,
-                    screen);
-	    Trace.call2("MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
-	    return mpd;
+            Trace.call1(
+                "MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
+            MapProjectionDisplay mpd = new MapProjectionDisplayJ3D(p, mode,
+                                           offscreen, dimension, screen);
+            Trace.call2(
+                "MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
+            return mpd;
         } else {
             return new MapProjectionDisplayJ2D(p);
         }
@@ -1120,8 +1118,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     minLon    = r2d2.getX();
                     maxLon    = minLon + r2d2.getWidth();
                     centerLon = minLon + r2d2.getWidth() / 2;
+                    isLatLon  = true;
                 }
-                isLatLon = true;
             } else if (mp instanceof TrivialMapProjection) {
                 Rectangle2D r2d2 = mp.getDefaultMapArea();
                 minLon    = r2d2.getX();
@@ -1140,10 +1138,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 adjustLons = false;
             }
             /*
-            System.out.println("DisplayProjectionLon"+myInstance+
-              " has range of " + minLon + " to " + maxLon +
-              " with center at " + centerLon + "; use360 = " + use360 +
-              "; adjust lons = " + adjustLons);
+            System.out.println("DisplayProjectionLon" + myInstance
+                               + " has range of " + minLon + " to " + maxLon
+                               + " with center at " + centerLon
+                               + "; use360 = " + use360 + "; adjust lons = "
+                               + adjustLons);
             */
 
             displayLatitudeType = new DisplayRealType("ProjectionLat"
@@ -1158,9 +1157,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + myInstance, true, -1.0, 1.0, defaultZ, null);
 
             displayTupleType = new DisplayTupleType(new DisplayRealType[] {
-              displayLatitudeType,
-              displayLongitudeType,
-              displayAltitudeType }, coordinateSystem);
+                displayLatitudeType,
+                displayLongitudeType,
+                displayAltitudeType }, coordinateSystem);
         }
         setSpatialScalarMaps();
     }
@@ -1431,11 +1430,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * lat/lon to Display.DisplaySpatialCartesianTuple (XYZ).
      * Altitude (z) values are held constant.
      */
-    protected  class MapProjection3DAdapter extends CoordinateSystem {
+    protected class MapProjection3DAdapter extends CoordinateSystem {
 
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;
 
+        /** _more_          */
         private CoordinateSystem theCoordinateSystem;
 
         /** index of the latitude coordinate */
@@ -1476,9 +1476,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                   new Unit[] { CommonUnit.degree,
                                CommonUnit.degree, null });
             this.mapProjection = mapProjection;
-            this.theCoordinateSystem = new CachingCoordinateSystem(this.mapProjection);
-            latIndex           = mapProjection.getLatitudeIndex();
-            lonIndex           = mapProjection.getLongitudeIndex();
+            this.theCoordinateSystem =
+                new CachingCoordinateSystem(this.mapProjection);
+            latIndex = mapProjection.getLatitudeIndex();
+            lonIndex = mapProjection.getLongitudeIndex();
             if (mapProjection.isXYOrder()) {
                 xIndex = 0;
                 yIndex = 1;
@@ -1537,8 +1538,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                //? GeoUtils.normalizeLongitude360(latlonalt[1])
-                               ? latlonalt[1]
+                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                //               ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
             t2 = theCoordinateSystem.fromReference(t2);
@@ -1547,12 +1548,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     "MapProjection.toReference: "
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
-            double x, y;
-	    double[] t2x = t2[xIndex];
-	    double[] t2y = t2[yIndex];
+            double   x, y;
+            double[] t2x = t2[xIndex];
+            double[] t2y = t2[yIndex];
             for (int i = 0; i < numpoints; i++) {
-                if (Double.isNaN(t2x[i])
-                        || Double.isNaN(t2y[i])) {
+                if (Double.isNaN(t2x[i]) || Double.isNaN(t2y[i])) {
                     x = Double.NaN;
                     y = Double.NaN;
                 } else {
@@ -1615,28 +1615,28 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                //? GeoUtils.normalizeLongitude360(latlonalt[1])
-                               ? latlonalt[1]
+                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                //               ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
 
-	    //            call1("mapProjection.fromReference", numpoints);
-	    //	    Trace.msg("MapProjectionDisplay. class=" + mapProjection.getClass().getName());
+            //            call1("mapProjection.fromReference", numpoints);
+            //      Trace.msg("MapProjectionDisplay. class=" + mapProjection.getClass().getName());
             t2 = theCoordinateSystem.fromReference(t2);
-	    //            call2("mapProjection.fromReference", numpoints);
+            //            call2("mapProjection.fromReference", numpoints);
 
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
-            float x, y;
-	    float[]t2ax = t2[xIndex];
-	    float[]t2ay = t2[yIndex];
+            float   x, y;
+            float[] t2ax = t2[xIndex];
+            float[] t2ay = t2[yIndex];
             for (int i = 0; i < numpoints; i++) {
-		float t2x = t2ax[i];
-		float t2y = t2ay[i];
-                if (t2x!=t2x || t2y!=t2y) {
+                float t2x = t2ax[i];
+                float t2y = t2ay[i];
+                if ((t2x != t2x) || (t2y != t2y)) {
                     x = Float.NaN;
                     y = Float.NaN;
                 } else {
@@ -1687,8 +1687,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                //? GeoUtils.normalizeLongitude360(t2[lonIndex])
-                         ? t2[lonIndex]
+                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                //         ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(d)", numpoints);
@@ -1731,8 +1731,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                //? GeoUtils.normalizeLongitude360(t2[lonIndex])
-                         ? t2[lonIndex]
+                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                //         ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(f)", numpoints);
@@ -1810,8 +1810,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             ((args.length > 0) && visad.util.Util.canDoJava3D())
             ? MapProjectionDisplay.getInstance(NavigatedDisplay.MODE_3D)
             : (visad.util.Util.canDoJava3D() == true)
-              ?MapProjectionDisplay.getInstance(NavigatedDisplay.MODE_2Din3D)
-              :MapProjectionDisplay.getInstance(NavigatedDisplay.MODE_2D);
+              ? MapProjectionDisplay.getInstance(NavigatedDisplay.MODE_2Din3D)
+              : MapProjectionDisplay.getInstance(NavigatedDisplay.MODE_2D);
         /*
         double[]aspect = { 1.0, 1.0, 0.4 };
         navDisplay.setDisplayAspect((navDisplay.getDisplayMode() == NavigatedDisplay.MODE_2D)
@@ -1941,4 +1941,3 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
 
 }
-
