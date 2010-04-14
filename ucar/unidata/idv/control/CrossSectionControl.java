@@ -1,30 +1,24 @@
 /*
- * $Id: CrossSectionControl.java,v 1.173 2007/08/10 17:20:05 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
-
-
-import java.awt.geom.Rectangle2D;
 
 
 import ucar.unidata.collab.Sharable;
@@ -32,8 +26,8 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.Transect;
-import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
@@ -90,6 +84,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
 
+
+import java.awt.geom.Rectangle2D;
+
 import java.beans.PropertyChangeEvent;
 
 import java.beans.PropertyChangeListener;
@@ -141,10 +138,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** the cross section selector */
     protected CrossSectionSelector csSelector;
 
-    /** _more_          */
+    /** initial starting point */
     private RealTuple initStartPoint;
 
-    /** _more_          */
+    /** initial ending point */
     private RealTuple initEndPoint;
 
     /** the control window's view manager */
@@ -243,7 +240,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** auto scale checkbox */
     private JCheckBox autoscaleCbx;
 
-    /** _more_          */
+    /** list of levels */
     private List levelsList;
 
 
@@ -386,8 +383,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         //Are we in 3d?
         displayIs3D = isDisplay3D();
         levelsList  = dataChoice.getAllLevels(null);
-        xsDisplay  = createXSDisplay();
-        vcsDisplay = createVCSDisplay();
+        xsDisplay   = createXSDisplay();
+        vcsDisplay  = createVCSDisplay();
 
         //Now set the data (which uses the displayables  above).
         if ( !setData(dataChoice)) {
@@ -444,12 +441,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         createCrossSectionSelector();
         //Now create the selector (which needs the state from the setData call)
         if (vm instanceof MapViewManager) {
-            if(csSelector!=null) {
+            if (csSelector != null) {
                 csSelector.setPointSize(getDisplayScale());
                 csSelector.setAutoSize(true);
                 addDisplayable(csSelector, getSelectorAttributeFlags());
             } else {
-                System.err.println("NO CS SELECTOR "  + getClass().getName());
+                System.err.println("NO CS SELECTOR " + getClass().getName());
             }
         } else if (vm instanceof TransectViewManager) {
             xsDisplay.setAdjustFlow(false);
@@ -487,7 +484,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @param el  earth location
      * @param animationValue  animation value
      * @param animationStep  animation step
-     * @param samples _more_
+     * @param samples  the list of samples
      *
      * @return the list of items
      *
@@ -559,21 +556,28 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                                  startCoord.getX(),
                             startCoord.getY(), startCoord.getZ() });
                     EarthLocation endLoc = boxToEarth(new double[] {
-                            endCoord.getX(),
+                                               endCoord.getX(),
                             endCoord.getY(), endCoord.getZ() });
                     setPosition(startLoc, endLoc);
                 } else if (start == null) {
-                    MapProjection mp = getDataProjection();
-                    Rectangle2D rect  = mp.getDefaultMapArea();
-                    LatLonPoint startLLP = mp.getLatLon(new double[][] { {rect.getX()}, {rect.getCenterY()}});
-                    LatLonPoint endLLP = mp.getLatLon(new double[][] { {rect.getX()+rect.getWidth()}, {rect.getCenterY()}});
+                    MapProjection mp       = getDataProjection();
+                    Rectangle2D   rect     = mp.getDefaultMapArea();
+                    LatLonPoint   startLLP = mp.getLatLon(new double[][] {
+                        { rect.getX() }, { rect.getCenterY() }
+                    });
+                    LatLonPoint   endLLP   = mp.getLatLon(new double[][] {
+                        { rect.getX() + rect.getWidth() },
+                        { rect.getCenterY() }
+                    });
 
-                    EarthLocation startLoc = new EarthLocationTuple(startLLP.getLatitude().getValue(),
-                                                                    startLLP.getLongitude().getValue(),
-                                                                     0);
-                    EarthLocation endLoc = new EarthLocationTuple(endLLP.getLatitude().getValue(),
-                                                                    endLLP.getLongitude().getValue(),
-                                                                     0);
+                    EarthLocation startLoc =
+                        new EarthLocationTuple(
+                            startLLP.getLatitude().getValue(),
+                            startLLP.getLongitude().getValue(), 0);
+                    EarthLocation endLoc =
+                        new EarthLocationTuple(
+                            endLLP.getLatitude().getValue(),
+                            endLLP.getLongitude().getValue(), 0);
 
                     setPosition(startLoc, endLoc);
                 } else {
@@ -599,13 +603,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
 
     /**
-     * _more_
+     * Implementation of the DisplayableData.DragAdapter
      *
-     * @param ray _more_
-     * @param first _more_
-     * @param mouseModifiers _more_
+     * @param ray    the view ray
+     * @param first  if this is the first time
+     * @param mouseModifiers  the mouse modifiers
      *
-     * @return _more_
+     * @return true
      */
     public boolean handleDragDirect(VisADRay ray, boolean first,
                                     int mouseModifiers) {
@@ -613,30 +617,42 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
     /**
-     * _more_
+     * Handle adding a point
      *
-     * @param x _more_
+     * @param x  the coords
      *
-     * @return _more_
+     * @return  true
      */
     public boolean handleAddPoint(float[] x) {
         return true;
     }
 
-    public EarthLocation boxToEarth(RealTuple tuple) throws RemoteException, VisADException {
-        return        boxToEarth(((Real)tuple.getComponent(0)).getValue(),
-                                 ((Real)tuple.getComponent(1)).getValue(),
-                                 tuple.getDimension()>2?
-                                 ((Real)tuple.getComponent(2)).getValue():0);
+    /**
+     * Transform VisAD box coordinates to and EarthLocation
+     *
+     * @param tuple  the tuple of VisAD coordinates
+     *
+     * @return  the corresponding EarthLocation
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
+     */
+    public EarthLocation boxToEarth(RealTuple tuple)
+            throws RemoteException, VisADException {
+        return boxToEarth(((Real) tuple.getComponent(0)).getValue(),
+                          ((Real) tuple.getComponent(1)).getValue(),
+                          (tuple.getDimension() > 2)
+                          ? ((Real) tuple.getComponent(2)).getValue()
+                          : 0);
     }
 
 
     /**
-     * _more_
+     * Constrain the drag point
      *
-     * @param position _more_
+     * @param position  the position
      *
-     * @return _more_
+     * @return true
      */
     public boolean constrainDragPoint(float[] position) {
         try {
@@ -1080,27 +1096,35 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             throws VisADException, RemoteException {
 
         csSelector = new CrossSectionSelector(
-            new RealTuple(
-                          RealTupleType.SpatialEarth3DTuple,
-                          new double[] { 0,0,0}),
-
-            new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                          new double[] { 0,0,0}));
+            new RealTuple(RealTupleType.SpatialEarth3DTuple, new double[] { 0,
+                0, 0 }), new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                       new double[] { 0,
+                0, 0 }));
     }
 
-    protected void createCrossSectionSelector(EarthLocation loc1, EarthLocation loc2)
+    /**
+     * Create the cross section selector
+     *
+     * @param loc1  the starting location
+     * @param loc2  the ending location
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
+     */
+    protected void createCrossSectionSelector(EarthLocation loc1,
+            EarthLocation loc2)
             throws VisADException, RemoteException {
         csSelector = new CrossSectionSelector(
             new RealTuple(
-                          RealTupleType.SpatialEarth3DTuple,
-                          new double[] { loc1.getLongitude().getValue(),
-                                         loc2.getLatitude().getValue(),
-                                         0.0 }), 
-            new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                          new double[] { loc1.getLongitude().getValue(),
-                                         loc2.getLatitude().getValue(),
-                                         0 }));
-        
+                RealTupleType.SpatialEarth3DTuple,
+                new double[] { loc1.getLongitude().getValue(),
+                               loc2.getLatitude().getValue(),
+                               0.0 }), new RealTuple(
+                                   RealTupleType.SpatialEarth3DTuple,
+                                   new double[] {
+                                       loc1.getLongitude().getValue(),
+                                       loc2.getLatitude().getValue(), 0 }));
+
     }
 
 
@@ -1271,16 +1295,27 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         super.receiveShareData(from, dataId, data);
     }
 
+    /**
+     * Apply the Z position.  Now that the selector is in lat/lon/alt space, we need to transform from XYZ
+     *
+     * @throws RemoteException   Java RMI Exception
+     * @throws VisADException    VisADException
+     */
+    protected void applyZPosition() throws VisADException, RemoteException {
+        super.applyZPosition();
+        if (csSelector != null) {
+            EarthLocation[] startEnd = getLineCoords();
+            setPosition(startEnd[0], startEnd[1]);
+        }
+    }
 
 
 
     /**
-     * Set the position
+     * Set the position of the selector
      *
-     *
-     *
-     * @param startLoc _more_
-     * @param endLoc _more_
+     * @param startLoc    Start location
+     * @param endLoc      End location
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
@@ -1303,12 +1338,24 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
 
     /**
-     * _more_
+     * Get the selector altitude from the Z position
      *
-     * @return _more_
+     * @return  the altitude
      */
     public double getSelectorAltitude() {
-        return 16000;
+        double           z          = getZPosition();
+        double           altitude   = 16000.0;
+        NavigatedDisplay navDisplay = getNavigatedDisplay();
+        if (navDisplay != null) {
+            double[] range = navDisplay.getVerticalRange();
+            if ( !((range[0] == 0) && (range[1] == 0))) {
+                // Z ranges from -1 to 1 (map view) or ~0 to 2)
+                double pcntOfZRange = Math.abs((z - -1.0) / 2.0);
+                // find percentage along a -1 to 1 range
+                altitude = range[0] + pcntOfZRange * (range[1] - range[0]);
+            }
+        }
+        return altitude;
     }
 
 
@@ -1492,18 +1539,20 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
 
         EarthLocation[] elArray = getLineCoords();
-        if(elArray==null) {
-            System.err.println (getClass().getName());
+        if (elArray == null) {
+            System.err.println(getClass().getName());
         }
         startLocation = elArray[0];
         endLocation   = elArray[1];
-        LatLonPoint latlon1 = startLocation.getLatLonPoint();
-        LatLonPoint latlon2 = endLocation.getLatLonPoint();
-        GridDataInstance gdi = getGridDataInstance();
-        FieldImpl slice =
-            gdi.sliceAlongLatLonLine(latlon1, latlon2,
-                                     getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE,
-                                                                               DEFAULT_SAMPLING_MODE)));
+        LatLonPoint      latlon1 = startLocation.getLatLonPoint();
+        LatLonPoint      latlon2 = endLocation.getLatLonPoint();
+        GridDataInstance gdi     = getGridDataInstance();
+        FieldImpl slice = gdi.sliceAlongLatLonLine(
+                              latlon1, latlon2,
+                              getSamplingModeValue(
+                                  getObjectStore().get(
+                                      PREF_SAMPLING_MODE,
+                                      DEFAULT_SAMPLING_MODE)));
         loadData(slice);
     }
 
@@ -2208,4 +2257,3 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
 
 }
-
