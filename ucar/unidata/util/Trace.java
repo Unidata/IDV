@@ -182,6 +182,14 @@ public class Trace {
     }
 
     /**
+     * Clear out any of the patterns previously added by the addOnly call
+     */
+    public static void clearOnly() {
+        onlyThese = new ArrayList();
+    }
+
+
+    /**
      * _more_
      * @return _more_
      */
