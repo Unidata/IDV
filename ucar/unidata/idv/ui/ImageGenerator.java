@@ -995,6 +995,16 @@ public class ImageGenerator extends IdvManager {
     }
 
 
+    protected boolean processTagTrace(Element node) throws Throwable {
+        String pattern     = applyMacros(node, ATTR_PATTERN);
+        debug("turning trace on for:" + pattern);
+        Trace.startTrace();
+        Trace.clearOnly();
+        Trace.addOnly(pattern);
+        return true;
+    }
+
+
     /**
      * process the given node
      *
