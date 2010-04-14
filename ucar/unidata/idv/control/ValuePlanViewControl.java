@@ -18,8 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -263,9 +261,10 @@ public class ValuePlanViewControl extends PlanViewControl {
                                              GuiUtils.rLabel("Declutter:"),
                                              toggle));
 
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("Layout Model:"),
-                                             makeLayoutModelWidget()));
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Layout Model:"),
+                makeLayoutModelWidget()));
         super.getControlWidgets(controlWidgets);
 
     }
@@ -722,4 +721,3 @@ public class ValuePlanViewControl extends PlanViewControl {
 
 
 }
-

@@ -258,7 +258,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** Show sunrise/sunset display in time series */
     private boolean showSunriseSunset = false;
 
-    /** _more_          */
+    /** _more_ */
     private RealTupleType globePositionType;
 
     /**

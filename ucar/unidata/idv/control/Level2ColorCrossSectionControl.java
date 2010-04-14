@@ -1,25 +1,22 @@
 /*
- * $Id: Level2ColorCrossSectionControl.java,v 1.7 2006/12/01 20:16:34 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -33,17 +30,23 @@ import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.Range;
+
 import ucar.visad.RadarMapProjection;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.SelectorDisplayable;
+
 import visad.*;
+
 import visad.bom.Radar3DCoordinateSystem;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
 import java.beans.PropertyChangeEvent;
+
 import java.rmi.RemoteException;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -96,7 +99,7 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
         csSelector.addPropertyChangeListener(this);
         updatePositionWidget();
     }
-                                                      
+
     /**
      * Called after all initialization is finished.
      * Labels plot in control window. Loads data in displays.
@@ -118,8 +121,8 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected boolean setData(DataChoice choice) throws VisADException,
-            RemoteException {
+    protected boolean setData(DataChoice choice)
+            throws VisADException, RemoteException {
         if ( !super.setData(choice)) {
             System.out.println("set data is false");
             //return false;
@@ -228,8 +231,8 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void setRequestProperties() throws VisADException,
-            RemoteException {
+    protected void setRequestProperties()
+            throws VisADException, RemoteException {
         getRequestProperties().put(RadarConstants.PROP_VCS,
                                    new Boolean(true));
         if ((startLocation == null) || (endLocation == null)) {
@@ -272,9 +275,8 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void initLinePosition(float stationLat,
-                                    float stationLon) throws VisADException,
-                                        RemoteException {
+    protected void initLinePosition(float stationLat, float stationLon)
+            throws VisADException, RemoteException {
         if (getVerticalAxisRange() == null) {
             setVerticalAxisRange(new Range(0, 20000));
         }
@@ -325,8 +327,8 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void createCrossSectionSelector() throws VisADException,
-            RemoteException {
+    protected void createCrossSectionSelector()
+            throws VisADException, RemoteException {
 
         // make a Selector line there
         csSelector = new CrossSectionSelector();
@@ -402,8 +404,8 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void updateCenterPoint() throws VisADException,
-            RemoteException {
+    protected void updateCenterPoint()
+            throws VisADException, RemoteException {
 
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(
                                    getGridDataInstance().getGrid());
@@ -464,4 +466,3 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
 
 
 }
-

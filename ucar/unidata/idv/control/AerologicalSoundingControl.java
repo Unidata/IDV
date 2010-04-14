@@ -1,25 +1,22 @@
 /*
- * $Id: AerologicalSoundingControl.java,v 1.30 2007/05/23 20:45:24 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -245,7 +242,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /** tabbed pane for skewt, hodo and table */
     private JTabbedPane viewTabs;
 
-    /** _more_          */
+    /** _more_ */
     private List<MyActionImpl> actions = new ArrayList<MyActionImpl>();
 
     /**
@@ -1332,15 +1329,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         //if (specificWidget != null) {
         //    controlArea.add(GuiUtils.center(specificWidget));
         //}
-        JScrollPane bottomComp = new JScrollPane(viewOptions,
+        JScrollPane bottomComp =
+            new JScrollPane(
+                viewOptions,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         //controlArea.add(GuiUtils.inset(viewOptions, 4));
         //        JComponent soundingComp =
         //            GuiUtils.centerBottom(soundingView.getContents(), bottomComp);
-        JSplitPane soundingComp =
-            GuiUtils.vsplit(soundingView.getContents(), bottomComp,0.75);
+        JSplitPane soundingComp = GuiUtils.vsplit(soundingView.getContents(),
+                                      bottomComp, 0.75);
 
         soundingComp.setOneTouchExpandable(true);
 
@@ -1354,10 +1353,11 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         JComponent left = (specificWidget != null)
                           ? GuiUtils.centerBottom(sp, specificWidget)
                           : sp;
-        JScrollPane leftSP = new JScrollPane(left,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane leftSP =
+            new JScrollPane(
+                left, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        leftSP.setPreferredSize(new Dimension(250,100));
+        leftSP.setPreferredSize(new Dimension(250, 100));
 
 
         viewTabs = new JTabbedPane();
@@ -1804,10 +1804,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     private static abstract class MyActionImpl extends ActionImpl {
 
-        /** _more_          */
+        /** _more_ */
         public DataReference reference;
 
-        /** _more_          */
+        /** _more_ */
         public AerologicalReadoutTable readoutTable;
 
         /**
@@ -1867,4 +1867,3 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
 
 }
-

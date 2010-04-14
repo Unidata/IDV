@@ -1,20 +1,18 @@
 /*
- * $Id: PlanViewControl.java,v 1.185 2007/08/21 14:31:11 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -108,7 +106,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected Object[] currentLevels;
 
     /** If we have a 3d volume of data then this is the levels we actually have from the data */
-    private Object[]levelsFromData;
+    private Object[] levelsFromData;
 
     /** level readout label */
     protected JLabel levelReadout;
@@ -216,6 +214,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @param el  earth location
      * @param animationValue   the animation value
      * @param animationStep  the animation step
+     * @param samples _more_
      *
      * @return  the list of readout data
      *
@@ -235,8 +234,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
                      getSamplingModeValue(
                          getObjectStore().get(
                              PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
-        if(r!=null) {
-            ReadoutInfo readoutInfo =  new ReadoutInfo(this, r, el, animationValue); 
+        if (r != null) {
+            ReadoutInfo readoutInfo = new ReadoutInfo(this, r, el,
+                                          animationValue);
             readoutInfo.setUnit(getDisplayUnit());
             readoutInfo.setRange(getRange());
             samples.add(readoutInfo);
@@ -508,7 +508,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /**
      *
      *  Handle property change
-     * 
+     *
      *  @param evt The event
      */
     public void propertyChange(PropertyChangeEvent evt) {
@@ -529,9 +529,15 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
 
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void doRemove() throws RemoteException, VisADException {
         super.doRemove();
-        datachoice = null;
+        datachoice  = null;
         workingGrid = null;
     }
 
@@ -738,7 +744,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
             cycleLevelsCbx.setSelected(false);
         }
 
-        if(levelBox == null) return;
+        if (levelBox == null) {
+            return;
+        }
         levelBox.setEnabled(levelEnabled);
         levelUpBtn.setEnabled(levelEnabled);
         levelDownBtn.setEnabled(levelEnabled);
@@ -833,9 +841,14 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void setPointSize(float value) {
         super.setPointSize(value);
-        if(planDisplay!=null) {
+        if (planDisplay != null) {
             try {
                 planDisplay.setPointSize(getPointSize());
             } catch (Exception e) {
@@ -1065,7 +1078,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                         GridUtil.sliceAtLevel(
                             workingGrid, realLevel, samplingMode));
                 }
-                if(levelsFromData == null) {
+                if (levelsFromData == null) {
                     levelsFromData = getGridDataInstance().getLevels();
                     setLevels(levelsFromData);
                 }
@@ -1507,4 +1520,3 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
 }
-

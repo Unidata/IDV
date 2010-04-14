@@ -1,20 +1,18 @@
 /*
- * $Id: ColorRhiControl.java,v 1.64 2006/12/27 20:09:38 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -669,7 +667,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             comp, GuiUtils.left(GuiUtils.label("Station: ", stationLabel)));
     }
 
-    /** _more_          */
+    /** _more_ */
     private Container viewContents;
 
     /**
@@ -850,12 +848,14 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      */
     protected void updateLegendLabel() {
         super.updateLegendLabel();
-        CrossSectionViewManager csvm = getCrossSectionViewManager();
-        List dataChoices = getDataChoices();
-        DisplayConventions dc = getDisplayConventions();
-        if(csvm!=null && dataChoices!=null && dataChoices.size()>0 && dc!=null) {
-            csvm.setNewDisplayTitle(((DataChoice)dataChoices.get(0)).getName() + " Azimuth "
-                                    + dc.formatAngle(beamAz));
+        CrossSectionViewManager csvm        = getCrossSectionViewManager();
+        List                    dataChoices = getDataChoices();
+        DisplayConventions      dc          = getDisplayConventions();
+        if ((csvm != null) && (dataChoices != null)
+                && (dataChoices.size() > 0) && (dc != null)) {
+            csvm.setNewDisplayTitle(
+                ((DataChoice) dataChoices.get(0)).getName() + " Azimuth "
+                + dc.formatAngle(beamAz));
         }
     }
 
@@ -1074,5 +1074,3 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     }
 
 }
-
-

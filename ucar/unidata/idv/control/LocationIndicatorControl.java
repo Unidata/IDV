@@ -1,20 +1,18 @@
 /*
- * $Id: LocationIndicatorControl.java,v 1.46 2007/08/06 17:00:09 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -35,8 +33,6 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.idv.*;
 
-import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.unidata.idv.ViewManager;
 
 
@@ -54,6 +50,8 @@ import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -62,10 +60,11 @@ import ucar.visad.display.*;
 
 
 import visad.*;
-import visad.java3d.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
+
+import visad.java3d.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -100,8 +99,13 @@ import javax.swing.event.ChangeListener;
 public class LocationIndicatorControl extends DisplayControlImpl {
 
 
+    /** _more_          */
     public static final int CLIP_NONE = 0;
+
+    /** _more_          */
     public static final int CLIP_POSITIVE = 1;
+
+    /** _more_          */
     public static final int CLIP_NEGATIVE = 2;
 
     /** Indices into arrays */
@@ -113,8 +117,11 @@ public class LocationIndicatorControl extends DisplayControlImpl {
     /** Indices into arrays */
     public static final int IDX_Z = 2;
 
-    public static String [] CLIP_NAMES1 = {"Above","Left","Bottom"};
-    public static String [] CLIP_NAMES2 = {"Below","Right","Top"};
+    /** _more_          */
+    public static String[] CLIP_NAMES1 = { "Above", "Left", "Bottom" };
+
+    /** _more_          */
+    public static String[] CLIP_NAMES2 = { "Below", "Right", "Top" };
 
 
     /**
@@ -452,57 +459,54 @@ public class LocationIndicatorControl extends DisplayControlImpl {
     }
 
 
-    private void checkClip(boolean onlyIfOn)   {
+    /**
+     * _more_
+     *
+     * @param onlyIfOn _more_
+     */
+    private void checkClip(boolean onlyIfOn) {
         try {
-            double        oX       = originLoc[IDX_X];
-            double        oY       = originLoc[IDX_Y];
-            double        oZ       = originLoc[IDX_Z];
+            double           oX         = originLoc[IDX_X];
+            double           oY         = originLoc[IDX_Y];
+            double           oZ         = originLoc[IDX_Z];
             NavigatedDisplay navDisplay = getNavigatedDisplay();
             DisplayRendererJ3D dr =
-                (DisplayRendererJ3D) navDisplay.getDisplay().getDisplayRenderer();
+                (DisplayRendererJ3D) navDisplay.getDisplay()
+                    .getDisplayRenderer();
 
             AxisInfo axis;
-            int coeff;
-            double value;
+            int      coeff;
+            double   value;
 
             axis = getXInfo();
-            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+            if ( !onlyIfOn || (axis.getClip() != CLIP_NONE)) {
                 value = oY;
-                coeff=axis.getClipCoefficient();
-                dr.setClip(axis.getIndex(), 
-                           axis.getClip()!=CLIP_NONE, 
-                           0.f,
-                           (float)coeff,
-                           0.f,
-                           (float)((-coeff*(value+coeff*0.01f))));
-            } 
+                coeff = axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), axis.getClip() != CLIP_NONE, 0.f,
+                           (float) coeff, 0.f,
+                           (float) ((-coeff * (value + coeff * 0.01f))));
+            }
 
 
 
             axis = getYInfo();
-            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+            if ( !onlyIfOn || (axis.getClip() != CLIP_NONE)) {
                 value = oX;
-                coeff=-axis.getClipCoefficient();
-                dr.setClip(axis.getIndex(), 
-                           axis.getClip()!=CLIP_NONE, 
-                           (float)coeff,
-                           0.f,
-                           0.f,
-                           (float)((-coeff*(value+coeff*0.01f))));
-            } 
+                coeff = -axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), axis.getClip() != CLIP_NONE,
+                           (float) coeff, 0.f, 0.f,
+                           (float) ((-coeff * (value + coeff * 0.01f))));
+            }
 
 
             axis = getZInfo();
-            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+            if ( !onlyIfOn || (axis.getClip() != CLIP_NONE)) {
                 value = oZ;
-                coeff=-axis.getClipCoefficient();
-                dr.setClip(axis.getIndex(), 
-                           axis.getClip()!=CLIP_NONE, 
-                                             0.f,
-                           0.f,
-                           (float)coeff,
-                           (float)((-coeff*(value+coeff*0.01f))));
-            } 
+                coeff = -axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), axis.getClip() != CLIP_NONE, 0.f,
+                           0.f, (float) coeff,
+                           (float) ((-coeff * (value + coeff * 0.01f))));
+            }
 
 
 
@@ -512,7 +516,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
             logException("Updating position", exc);
         }
 
-        
+
     }
 
 
@@ -1139,22 +1143,16 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel topPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.filler(), GuiUtils.cLabel("X"), GuiUtils.cLabel("Y"),
-            GuiUtils.cLabel("Z"), GuiUtils.filler(), 
-            GuiUtils.rLabel("Move:"),
+            GuiUtils.cLabel("Z"), GuiUtils.filler(), GuiUtils.rLabel("Move:"),
             GuiUtils.makeCheckbox("", getXInfo(), "move"),
             GuiUtils.makeCheckbox("", getYInfo(), "move"),
             GuiUtils.makeCheckbox("", getZInfo(), "move"),
             GuiUtils.hbox(GuiUtils.makeCheckbox("Keep in Box", this,
                 "keepInBox"), GuiUtils.makeCheckbox("Enabled", this,
                     "enabled")),
-
-            GuiUtils.rLabel("Clip:"),
-            getXInfo().makeClipBox(),
-            getYInfo().makeClipBox(),
-            getZInfo().makeClipBox(),
-            GuiUtils.filler(),
-
-            GuiUtils.rLabel("Visibility:"),
+            GuiUtils.rLabel("Clip:"), getXInfo().makeClipBox(),
+            getYInfo().makeClipBox(), getZInfo().makeClipBox(),
+            GuiUtils.filler(), GuiUtils.rLabel("Visibility:"),
             GuiUtils.makeCheckbox("", getXInfo(), "visible"),
             GuiUtils.makeCheckbox("", getYInfo(), "visible"),
             GuiUtils.makeCheckbox("", getZInfo(), "visible"),
@@ -1653,34 +1651,34 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
 
         /** Axis visible */
-        private         boolean visible = true;
+        private boolean visible = true;
 
         /** Axis label visible */
-        private         boolean labelVisible = true;
+        private boolean labelVisible = true;
 
         /** Show solid plane */
-        private         boolean solid = false;
+        private boolean solid = false;
 
         /** Can move */
-        private         boolean move = true;
+        private boolean move = true;
 
         /** Axis holder */
-        private         CompositeDisplayable axis;
+        private CompositeDisplayable axis;
 
         /** Axis line */
-        private         LineDrawing axisLine;
+        private LineDrawing axisLine;
 
         /** Line to point */
-        private         LineDrawing line;
+        private LineDrawing line;
 
         /** Tick mark on axis */
-        private         ShapeDisplayable tick;
+        private ShapeDisplayable tick;
 
         /** The solid */
-        private         ShapeDisplayable solidDisplayable;
+        private ShapeDisplayable solidDisplayable;
 
         /** The index (x,y or x) */
-        private         int index;
+        private int index;
 
         /** Text at center */
         private ShapeDisplayable tickTextDisplayable;
@@ -1694,6 +1692,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         /** Z position of tick */
         private float tickZ = 0.0f;
 
+        /** _more_          */
         private int clip = CLIP_NONE;
 
 
@@ -1970,31 +1969,47 @@ public class LocationIndicatorControl extends DisplayControlImpl {
          */
         public void setClip(int value) {
             clip = value;
-            if(lic!=null) {
+            if (lic != null) {
                 lic.checkClip(false);
             }
         }
+
+        /** _more_          */
         private JComboBox clipBox;
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         JComboBox makeClipBox() {
-            Object[]items = {new TwoFacedObject("None", CLIP_NONE),
-                             new TwoFacedObject(CLIP_NAMES1[index],CLIP_POSITIVE),
-                             new TwoFacedObject(CLIP_NAMES2[index],CLIP_NEGATIVE)};
-            clipBox= new JComboBox(items);
+            Object[] items = { new TwoFacedObject("None", CLIP_NONE),
+                               new TwoFacedObject(CLIP_NAMES1[index],
+                                   CLIP_POSITIVE),
+                               new TwoFacedObject(CLIP_NAMES2[index],
+                                   CLIP_NEGATIVE) };
+            clipBox = new JComboBox(items);
             clipBox.setSelectedIndex(clip);
             clipBox.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        clip = clipBox.getSelectedIndex();
-                        lic.checkClip(false);
-                    }
-                });
+                public void actionPerformed(ActionEvent ae) {
+                    clip = clipBox.getSelectedIndex();
+                    lic.checkClip(false);
+                }
+            });
             return clipBox;
 
         }
 
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public int getClipCoefficient() {
-            if(clip == CLIP_POSITIVE) return 1;
+            if (clip == CLIP_POSITIVE) {
+                return 1;
+            }
             return -1;
         }
 
@@ -2009,20 +2024,20 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
 
         /**
-           Set the Index property.
-
-           @param value The new value for Index
-        **/
-        public void setIndex (int value) {
+         *  Set the Index property.
+         *
+         *  @param value The new value for Index
+         */
+        public void setIndex(int value) {
             this.index = value;
         }
 
         /**
-           Get the Index property.
-
-           @return The Index
-        **/
-        public int getIndex () {
+         *  Get the Index property.
+         *
+         *  @return The Index
+         */
+        public int getIndex() {
             return this.index;
         }
 
@@ -2334,4 +2349,3 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
 
 }
-

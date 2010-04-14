@@ -1,20 +1,18 @@
 /*
- * $Id: StationLocationControl.java,v 1.112 2007/06/08 20:00:51 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,22 +21,24 @@
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.idv.flythrough.FlythroughPoint;
 import org.w3c.dom.Element;
 
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.geoloc.Bearing;
-import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.gis.SpatialGrid;
 
 
 import ucar.unidata.idv.*;
+
+
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 
 
@@ -326,53 +326,74 @@ public class StationLocationControl extends StationModelControl {
 
 
 
+    /** _more_          */
     private boolean checkedCursorReadout = false;
+
+    /** _more_          */
     private boolean doCursorReadout = false;
 
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     * @param samples _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
                                          int animationStep,
                                          List<ReadoutInfo> samples)
             throws Exception {
-        if(!checkedCursorReadout) {
-            List    stations   = getStationList();
-            if(stations.size()==0) return null;
-            NamedStationImpl tmp= (NamedStationImpl)stations.get(0);
-            Hashtable          properties = tmp.getProperties();
-            if(properties.get("imageurl")!=null) {
+        if ( !checkedCursorReadout) {
+            List stations = getStationList();
+            if (stations.size() == 0) {
+                return null;
+            }
+            NamedStationImpl tmp        = (NamedStationImpl) stations.get(0);
+            Hashtable        properties = tmp.getProperties();
+            if (properties.get("imageurl") != null) {
                 doCursorReadout = true;
             }
             checkedCursorReadout = true;
         }
 
-        if(!doCursorReadout)return null;
-        List    stations   = getStationList();
-        NamedStationImpl closest= null;
-        double minDistance = 0;
-        LatLonPointImpl llp = new LatLonPointImpl(el.getLatitude().getValue(CommonUnit.degree), 
-                                                  el.getLongitude().getValue(CommonUnit.degree));
+        if ( !doCursorReadout) {
+            return null;
+        }
+        List             stations    = getStationList();
+        NamedStationImpl closest     = null;
+        double           minDistance = 0;
+        LatLonPointImpl llp =
+            new LatLonPointImpl(
+                el.getLatitude().getValue(CommonUnit.degree),
+                el.getLongitude().getValue(CommonUnit.degree));
         for (Iterator iter = stations.iterator(); iter.hasNext(); ) {
             NamedStationImpl station = (NamedStationImpl) iter.next();
-            EarthLocation el2 = station.getEarthLocation();
-            LatLonPointImpl llp2 = new LatLonPointImpl(el2.getLatitude().getValue(CommonUnit.degree), 
-                                                       el2.getLongitude().getValue(CommonUnit.degree));
-            Bearing bearing =
-                Bearing.calculateBearing(llp,
-                                         llp2,
-                                         null);
+            EarthLocation    el2     = station.getEarthLocation();
+            LatLonPointImpl llp2 =
+                new LatLonPointImpl(
+                    el2.getLatitude().getValue(CommonUnit.degree),
+                    el2.getLongitude().getValue(CommonUnit.degree));
+            Bearing bearing  = Bearing.calculateBearing(llp, llp2, null);
 
-            double distance     = bearing.getDistance();
-            if(closest==null || distance<minDistance) {
+            double  distance = bearing.getDistance();
+            if ((closest == null) || (distance < minDistance)) {
                 minDistance = distance;
-                closest = station;
-            } 
+                closest     = station;
+            }
         }
 
-        if(closest!=null) {
-            Hashtable          properties = closest.getProperties();
-            String url  = (String) properties.get("imageurl");
-            if(url!=null) {
-                ReadoutInfo info = new ReadoutInfo(this,null,closest.getEarthLocation(),null);
+        if (closest != null) {
+            Hashtable properties = closest.getProperties();
+            String    url        = (String) properties.get("imageurl");
+            if (url != null) {
+                ReadoutInfo info = new ReadoutInfo(this, null,
+                                       closest.getEarthLocation(), null);
                 info.setImageUrl(url);
                 info.setImageName(closest.getName());
                 samples.add(info);
@@ -561,7 +582,16 @@ public class StationLocationControl extends StationModelControl {
     }
 
 
-    protected void initDisplayable(StationModelDisplayable myDisplay) throws VisADException , RemoteException{
+    /**
+     * _more_
+     *
+     * @param myDisplay _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void initDisplayable(StationModelDisplayable myDisplay)
+            throws VisADException, RemoteException {
         super.initDisplayable(myDisplay);
         myDisplay.setRotateShapes(true);
     }
@@ -589,6 +619,9 @@ public class StationLocationControl extends StationModelControl {
     }
 
 
+    /**
+     * _more_
+     */
     protected void loadDataInAWhile() {
         super.loadDataInAWhile();
         try {
@@ -766,22 +799,28 @@ public class StationLocationControl extends StationModelControl {
         return s;
     }
 
+    /**
+     * _more_
+     *
+     * @param location _more_
+     *
+     * @return _more_
+     */
     private StringBuffer getHtml(NamedStationImpl location) {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer       sb         = new StringBuffer();
         Hashtable          properties = location.getProperties();
         Enumeration        keys       = properties.keys();
         NamedLocation      locationOb = location.getNamedLocation();
         EarthLocation      locationEl = locationOb.getEarthLocation();
         LatLonPoint        llp        = locationEl.getLatLonPoint();
         DisplayConventions dc         = getDisplayConventions();
-        String llLabel = dc.formatLatLon(llp.getLatitude().getValue())
-            + "/"
-            + dc.formatLatLon(llp.getLongitude().getValue());
+        String llLabel = dc.formatLatLon(llp.getLatitude().getValue()) + "/"
+                         + dc.formatLatLon(llp.getLongitude().getValue());
 
         StringBuffer entrySB = new StringBuffer();
         entrySB.append("<table>\n");
-        entrySB.append("<tr><td><b>Name</b>:</td><td> "
-                       + location.getName() + "</td></tr>\n");
+        entrySB.append("<tr><td><b>Name</b>:</td><td> " + location.getName()
+                       + "</td></tr>\n");
         entrySB.append("<tr><td><b>Lat/Lon</b>:</td><td> " + llLabel
                        + "</td></tr>\n");
 
@@ -789,9 +828,8 @@ public class StationLocationControl extends StationModelControl {
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             String lbl = key.toString();
-            if (lbl.equalsIgnoreCase("name")
-                || lbl.equalsIgnoreCase("lat")
-                || lbl.equalsIgnoreCase("lon")) {
+            if (lbl.equalsIgnoreCase("name") || lbl.equalsIgnoreCase("lat")
+                    || lbl.equalsIgnoreCase("lon")) {
                 continue;
             }
             if (lbl.equalsIgnoreCase("description")) {
@@ -1423,7 +1461,7 @@ public class StationLocationControl extends StationModelControl {
         readoutGuiHolder    = new JPanel(new BorderLayout());
 
         readoutText         = new JEditorPane();
-	GuiUtils.addLinkListener(readoutText);
+        GuiUtils.addLinkListener(readoutText);
         readoutText.setEditable(false);
         readoutText.setContentType("text/html");
 
@@ -2001,7 +2039,7 @@ public class StationLocationControl extends StationModelControl {
                     }
                     selected = stationTableNames.remove(index);
                     stationTableNames.add(index - 1, selected);
-                } else 	if (GuiUtils.isDeleteEvent(e)) {
+                } else if (GuiUtils.isDeleteEvent(e)) {
                     stationTableNames.remove(selected);
                 } else {
                     return;
@@ -2052,25 +2090,41 @@ public class StationLocationControl extends StationModelControl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param items _more_
+     * @param forMenuBar _more_
+     */
     protected void getViewMenuItems(List items, boolean forMenuBar) {
-        MapViewManager mvm =  getMapViewManager();
-        if(mvm!=null) {
-            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Show Flythrough", this,
-                                                             "showFlythrough", null),"/auxdata/ui/icons/plane.png"));
+        MapViewManager mvm = getMapViewManager();
+        if (mvm != null) {
+            items.add(
+                GuiUtils.setIcon(
+                    GuiUtils.makeMenuItem(
+                        "Show Flythrough", this, "showFlythrough",
+                        null), "/auxdata/ui/icons/plane.png"));
         }
 
-        super.getViewMenuItems(items,forMenuBar);
+        super.getViewMenuItems(items, forMenuBar);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void showFlythrough() throws Exception {
-        MapViewManager mvm =  getMapViewManager();
+        MapViewManager        mvm            = getMapViewManager();
         List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
-        List sortedStations    = Misc.sort(displayedStations);
-        for(int i=0;i<sortedStations.size();i++) {
-            NamedStationImpl station = (NamedStationImpl) sortedStations.get(i);
-            FlythroughPoint pt = new FlythroughPoint(station.getEarthLocation());
+        List                  sortedStations = Misc.sort(displayedStations);
+        for (int i = 0; i < sortedStations.size(); i++) {
+            NamedStationImpl station =
+                (NamedStationImpl) sortedStations.get(i);
+            FlythroughPoint pt =
+                new FlythroughPoint(station.getEarthLocation());
             pt.setDescription(getHtml(station).toString());
             points.add(pt);
         }
@@ -2415,4 +2469,3 @@ public class StationLocationControl extends StationModelControl {
 
 
 }
-

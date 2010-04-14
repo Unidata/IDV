@@ -1,26 +1,22 @@
 /*
- * $Id: TrackControl.java,v 1.69 2007/08/21 11:32:08 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.control;
 
@@ -328,8 +324,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public boolean init(DataChoice dataChoice) throws VisADException,
-            RemoteException {
+    public boolean init(DataChoice dataChoice)
+            throws VisADException, RemoteException {
         if ( !trackDataOk()) {
             return false;
         }
@@ -408,8 +404,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public LatLonPoint getDisplayCenter() throws RemoteException,
-            VisADException {
+    public LatLonPoint getDisplayCenter()
+            throws RemoteException, VisADException {
         FlatField flatField = getFlatField();
         if (flatField == null) {
             return null;
@@ -450,8 +446,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    protected boolean setData(DataChoice choice) throws VisADException,
-            RemoteException {
+    protected boolean setData(DataChoice choice)
+            throws VisADException, RemoteException {
         if (trackDisplay == null) {
             return true;
         }
@@ -512,8 +508,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected FieldImpl mergeGrid(FieldImpl fi) throws VisADException,
-            RemoteException {
+    protected FieldImpl mergeGrid(FieldImpl fi)
+            throws VisADException, RemoteException {
         FunctionType    fiType = (FunctionType) fi.getType();
         int             len    = fi.getLength();
         List<FlatField> datas  = new ArrayList<FlatField>();
@@ -670,8 +666,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private double[] declutterTime(double[] times) throws VisADException,
-            RemoteException {
+    private double[] declutterTime(double[] times)
+            throws VisADException, RemoteException {
         int numTimes = times.length;
         int seconds  = (int) (timeDeclutterMinutes * 60);
         if (seconds == 0) {
@@ -746,8 +742,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException On Badness
      * @throws VisADException On Badness
      */
-    protected Container doMakeContents() throws VisADException,
-            RemoteException {
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
         JComponent contents = (JComponent) super.doMakeContents();
         if (trackType.equals(CMD_RANGE)) {
             JTabbedPane jtp = new JTabbedPane();
@@ -834,8 +830,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public void getControlWidgets(List controlWidgets) throws VisADException,
-            RemoteException {
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
 
         super.getControlWidgets(controlWidgets);
 
@@ -1106,8 +1102,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException remote data error
      * @throws VisADException  VisAD error
      */
-    private Range getRangeForTimeSelect() throws VisADException,
-            RemoteException {
+    private Range getRangeForTimeSelect()
+            throws VisADException, RemoteException {
         Range            range = getRange();
         GridDataInstance gdi   = getGridDataInstance();
         if ((gdi != null) && (gdi.getNumRealTypes() > 1)) {
@@ -1523,8 +1519,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    private void setScaleOnMarker(float f) throws RemoteException,
-            VisADException {
+    private void setScaleOnMarker(float f)
+            throws RemoteException, VisADException {
         if (indicator != null) {
             indicator.setScale(f);
         }
@@ -1626,4 +1622,3 @@ public class TrackControl extends GridDisplayControl {
 
 
 }
-

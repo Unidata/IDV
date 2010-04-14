@@ -1,20 +1,18 @@
 /*
- * $Id: ColorTableWidget.java,v 1.105 2007/08/07 14:52:20 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
- * Atmospheric Resetrarch, P.O. Box 3000, Boulder, CO 80307,
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -32,13 +30,13 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.Removable;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
+import ucar.unidata.util.Removable;
 import ucar.unidata.util.TwoFacedObject;
 
 import visad.VisADException;
@@ -74,7 +72,7 @@ import javax.swing.*;
  * @version $Revision: 1.105 $
  */
 public class ColorTableWidget extends ControlWidget implements PropertyChangeListener,
-                                                               RangeWidget, Removable {
+        RangeWidget, Removable {
 
 
     /** This defines which color table we are editing */
@@ -207,8 +205,8 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
     private JComponent doMakePreview(boolean forMain, int legendType) {
         try {
             MyColorPreview preview =
-                new MyColorPreview(
-                                   this, (List<Color>)colorTable.getColorList(),
+                new MyColorPreview(this,
+                                   (List<Color>) colorTable.getColorList(),
                                    forMain, legendType);
             colorPreviews.add(preview);
             preview.setRange(range, displayControl.getColorUnit());
@@ -239,6 +237,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
          *
          * @param ctw   color table widget
          * @param map   color map
+         * @param colors _more_
          * @param forMain For main control window or for legend
          * @param legendType Side or bottom legend if for a legend
          *
@@ -596,18 +595,19 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
             myEditor = null;
         } else if (e.getPropertyName().equals(
                 ColorTableManager.PROP_CANCEL)) {
+
             /**
-               FOr now lets ignore the undoing of the color table on a CANCEL
-            try {
-                myEditor = null;
-                ColorTable newTable = (ColorTable) e.getNewValue();
-                displayControl.setRange(whichColorTable, range);
-                setColorTable(newTable);
-                displayControl.setColorTable(whichColorTable, newTable);
-            } catch (Exception exc2) {
-                logException("propertyChange", exc2);
-            }
-            ***/
+             *  FOr now lets ignore the undoing of the color table on a CANCEL
+             * try {
+             *   myEditor = null;
+             *   ColorTable newTable = (ColorTable) e.getNewValue();
+             *   displayControl.setRange(whichColorTable, range);
+             *   setColorTable(newTable);
+             *   displayControl.setColorTable(whichColorTable, newTable);
+             * } catch (Exception exc2) {
+             *   logException("propertyChange", exc2);
+             * }
+             */
         }
 
     }
@@ -784,8 +784,8 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
      */
     public void setColorPalette(float[][] palette)
             throws RemoteException, VisADException {
-        ColorTable ct = new ColorTable("","",palette);
-        
+        ColorTable ct = new ColorTable("", "", palette);
+
         for (int i = 0; i < colorPreviews.size(); i++) {
             MyColorPreview colorPreview =
                 (MyColorPreview) colorPreviews.get(i);
@@ -839,4 +839,3 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
     }
 
 }
-

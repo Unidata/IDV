@@ -1,20 +1,18 @@
 /*
- * $Id: RangeDialog.java,v 1.10 2007/08/07 14:52:20 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
- * General Public License for more details.1
- *
+ * General Public License for more details.
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -24,13 +22,13 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.util.Removable;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.Range;
+import ucar.unidata.util.Removable;
 
 
 import ucar.visad.display.*;
@@ -100,7 +98,8 @@ public class RangeDialog implements RangeWidget, Removable {
     /** dialog */
     private JDialog dialog;
 
-    private JComponent     contents;
+    /** _more_          */
+    private JComponent contents;
 
 
     /**
@@ -156,9 +155,10 @@ public class RangeDialog implements RangeWidget, Removable {
                                   GuiUtils.inset(rangePopupBtn,
                                       new Insets(0, 5, 0, 0)));
         dialog = new JDialog((Frame) null, dialogTitle, true);
-        JComponent     mainContents = GuiUtils.inset(GuiUtils.hflow(comps), 5);
+        JComponent     mainContents = GuiUtils.inset(GuiUtils.hflow(comps),
+                                          5);
 
-        ActionListener listener = new ActionListener() {
+        ActionListener listener     = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
                 if (cmd.equals(GuiUtils.CMD_OK)
@@ -186,8 +186,9 @@ public class RangeDialog implements RangeWidget, Removable {
         rangeMaxField.addActionListener(listener);
         rangeMinField.setActionCommand(GuiUtils.CMD_OK);
         rangeMaxField.setActionCommand(GuiUtils.CMD_OK);
-        dialog.getContentPane().add(contents = GuiUtils.centerBottom(mainContents,
-                GuiUtils.makeApplyOkCancelButtons(listener)));
+        dialog.getContentPane().add(
+            contents = GuiUtils.centerBottom(
+                mainContents, GuiUtils.makeApplyOkCancelButtons(listener)));
 
         dialog.pack();
     }
@@ -198,13 +199,13 @@ public class RangeDialog implements RangeWidget, Removable {
      * Dispose of the dialog
      */
     public void doRemove() {
-        if(contents!=null) {
+        if (contents != null) {
             GuiUtils.empty(contents, true);
         }
-        if(dialog!=null) {
+        if (dialog != null) {
             dialog.dispose();
         }
-        dialog = null;
+        dialog         = null;
         displayControl = null;
     }
 
@@ -330,4 +331,3 @@ public class RangeDialog implements RangeWidget, Removable {
     }
 
 }
-

@@ -1,20 +1,18 @@
 /*
- * $Id: ObsDisplayControl.java,v 1.58 2007/05/25 16:35:09 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -179,17 +177,18 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
                 getIdv().getPublishManager().getSelector("nc.export");
             String filename =
                 FileManager.getWriteFile(FileManager.FILTER_NETCDF,
-                                         FileManager.SUFFIX_NETCDF, ((publishCbx != null)
-                                                                     ? GuiUtils.top(publishCbx)
-                                                                     : null));
+                                         FileManager.SUFFIX_NETCDF,
+                                         ((publishCbx != null)
+                                          ? GuiUtils.top(publishCbx)
+                                          : null));
             if (filename == null) {
                 return;
             }
             PointDataInstance pdi = (PointDataInstance) getDataInstance();
             PointObFactory.writeToNetcdf(new java.io.File(filename),
                                          pdi.getTimeSequence());
-            getIdv().getPublishManager().publishContent(filename,
-                                                        null, publishCbx);
+            getIdv().getPublishManager().publishContent(filename, null,
+                    publishCbx);
         } catch (Exception exc) {
             logException("Exporting point data to netcdf", exc);
         }
@@ -368,9 +367,9 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
             int       numObs  = oneTime.getDomainSet().getLength();
             for (int obIdx = 0; obIdx < numObs; obIdx++) {
                 PointOb tmpOb = (PointOb) oneTime.getSample(obIdx);
-                double time = tmpOb.getDateTime().getValue();
+                double  time  = tmpOb.getDateTime().getValue();
                 //Humm, why do we have this check here?
-                if (time > 0 || time<0) {
+                if ((time > 0) || (time < 0)) {
                     ob = tmpOb;
                     break;
                 }
@@ -951,4 +950,3 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
 
 
 }
-

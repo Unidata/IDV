@@ -1,20 +1,18 @@
 /*
- * $Id: RadarGridControl.java,v 1.103 2007/08/06 17:00:09 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -448,23 +446,24 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      * @return  selector box
      */
     JComponent makeColorBox(final String cmd, Color color) {
-        
-        GuiUtils.ColorSwatch swatch = new GuiUtils.ColorSwatch(color,"Set Color") {
-                public void userSelectedNewColor(Color c) {
-                    super.userSelectedNewColor(c);
-                    try {
-                        if (cmd.equals(CMD_RAD_COLOR)) {
-                            rangeRings.setAzimuthLineColor(radColor = c);
-                        } else if (cmd.equals(CMD_RR_COLOR)) {
-                            rangeRings.setRangeRingColor(rrColor = c);
-                        } else if (cmd.equals(CMD_LBL_COLOR)) {
-                            rangeRings.setLabelColor(lblColor = c);
-                        }
-                    } catch(Exception exc) {
-                        logException("setting color", exc);
+
+        GuiUtils.ColorSwatch swatch = new GuiUtils.ColorSwatch(color,
+                                          "Set Color") {
+            public void userSelectedNewColor(Color c) {
+                super.userSelectedNewColor(c);
+                try {
+                    if (cmd.equals(CMD_RAD_COLOR)) {
+                        rangeRings.setAzimuthLineColor(radColor = c);
+                    } else if (cmd.equals(CMD_RR_COLOR)) {
+                        rangeRings.setRangeRingColor(rrColor = c);
+                    } else if (cmd.equals(CMD_LBL_COLOR)) {
+                        rangeRings.setLabelColor(lblColor = c);
                     }
+                } catch (Exception exc) {
+                    logException("setting color", exc);
                 }
-            };
+            }
+        };
         return swatch;
         /*
           JComboBox jcb = getDisplayConventions().makeColorSelector(color);
@@ -1395,4 +1394,3 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
 
 
 }
-

@@ -1,25 +1,22 @@
 /*
- * $Id: WMSControl.java,v 1.104 2007/08/09 17:21:32 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -170,7 +167,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
     private List cachedData = new ArrayList();
 
     /** A cache of data */
-    private static Hashtable<String,FieldImpl> fixedImageCache = new Hashtable<String,FieldImpl>();
+    private static Hashtable<String, FieldImpl> fixedImageCache =
+        new Hashtable<String, FieldImpl>();
 
 
     /** The lable that shows the legend icon */
@@ -531,8 +529,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
         }
 
 
-        GeoLocationInfo bounds =wmsInfo.getBounds(); 
-        if(bounds==null && wmsInfo.isFixedImage()) return null;
+        GeoLocationInfo bounds = wmsInfo.getBounds();
+        if ((bounds == null) && wmsInfo.isFixedImage()) {
+            return null;
+        }
 
         if (inGlobe || !wmsInfo.getAllowSubsets()) {
             return new GeoLocationInfo(wmsInfo.getBounds());
@@ -542,7 +542,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
             double minLat = rect.y;
             double maxLat = rect.y + rect.height;
             gli = new GeoLocationInfo(minLat, minLon, maxLat, maxLon);
-            if(bounds!=null) {
+            if (bounds != null) {
                 gli.rectify(bounds, 0.0);
                 gli.snapToGrid();
                 gli.rectify(bounds, 0.0);
@@ -681,7 +681,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
-        JComponent     zPositionPanel  = doMakeZPositionSlider();
+        JComponent zPositionPanel  = doMakeZPositionSlider();
 
         JComponent alphaSliderComp = doMakeAlphaSlider();
 
@@ -700,11 +700,13 @@ public class WMSControl extends ImageControl implements ImageObserver {
         } else if (theDataChoice != null) {
             List layerList =
                 (List) theDataChoice.getProperty(WmsDataSource.PROP_LAYERS);
-            if(layerList!=null) {
+            if (layerList != null) {
                 List dataSources = new ArrayList();
                 theDataChoice.getDataSources(dataSources);
-                if(dataSources.size()==1 && dataSources.get(0) instanceof WmsDataSource) {
-                    layerList = ((WmsDataSource) dataSources.get(0)).getLayerList();
+                if ((dataSources.size() == 1)
+                        && (dataSources.get(0) instanceof WmsDataSource)) {
+                    layerList =
+                        ((WmsDataSource) dataSources.get(0)).getLayerList();
                 }
             }
 
@@ -881,9 +883,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
         showWaitCursor();
         try {
-            long t1 = System.currentTimeMillis();
+            long      t1        = System.currentTimeMillis();
             FieldImpl imageData = readImageData();
-            long t2 = System.currentTimeMillis();
+            long      t2        = System.currentTimeMillis();
             //            System.err.println ("WMS:reading image data " + (t2-t1)); 
             if (imageData != null) {
                 applyData(imageData);
@@ -962,8 +964,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
             try {
                 FieldImpl data = (FieldImpl) theDataChoice.getData(null,
-                                                                   requestProperties);
-                if(data ==null) return null;
+                                     requestProperties);
+                if (data == null) {
+                    return null;
+                }
                 imageData = data;
             } catch (NullPointerException npe) {
                 userMessage("Image layer does not exist");
@@ -996,17 +1000,18 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
 
 
-        Image  image        = null;
+        Image  image = null;
         String url;
-        if(wmsInfo.isFixedImage()) {
+        if (wmsInfo.isFixedImage()) {
             url = wmsInfo.getImageFile();
             FieldImpl result = fixedImageCache.get(url);
-            if(result!=null) return result;
+            if (result != null) {
+                return result;
+            }
         } else {
             url = wmsInfo.assembleRequest(boundsToUse,
                                           (int) (imageWidth / resolution),
-                                          (int) (imageHeight
-                                                 / resolution));
+                                          (int) (imageHeight / resolution));
         }
 
 
@@ -1014,7 +1019,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
         String cacheGroup   = "WMS";
         byte[] imageContent = null;
-        if(image == null) {
+        if (image == null) {
             synchronized (cachedUrls) {
                 for (int i = 0; i < cachedUrls.size(); i++) {
                     if (url.equals(cachedUrls.get(i))) {
@@ -1084,8 +1089,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
                             domain.getY().getLength());
 
 
-        FieldImpl result = GridUtil.setSpatialDomain(xyData, imageDomain, true);
-        if(wmsInfo.isFixedImage()) {
+        FieldImpl result = GridUtil.setSpatialDomain(xyData, imageDomain,
+                               true);
+        if (wmsInfo.isFixedImage()) {
             fixedImageCache.put(url, result);
         }
         return result;
@@ -1252,7 +1258,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         }
         updateLegendAndList();
         if (imageDisplay != null) {
-            if(isLayerFixed() && getUseFastRendering()) {
+            if (isLayerFixed() && getUseFastRendering()) {
                 setUseFastRendering(false);
             }
             loadImageFromScreen();
@@ -1551,9 +1557,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
                 && (wmsInfo == null)) {
 
 
-            if(theLayer!=null && theLayer instanceof String) {
-                for(WmsSelection selection: (List<WmsSelection>)wmsSelections) {
-                    if(Misc.equals(theLayer, selection.getLayer())) {
+            if ((theLayer != null) && (theLayer instanceof String)) {
+                for (WmsSelection selection :
+                        (List<WmsSelection>) wmsSelections) {
+                    if (Misc.equals(theLayer, selection.getLayer())) {
                         wmsInfo = selection;
                         break;
                     }
@@ -1561,7 +1568,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
             }
 
 
-            if(wmsInfo==null) {
+            if (wmsInfo == null) {
                 wmsInfo = (WmsSelection) wmsSelections.get(0);
             }
             updateLegendAndList();
@@ -1666,4 +1673,3 @@ public class WMSControl extends ImageControl implements ImageObserver {
     }
 
 }
-

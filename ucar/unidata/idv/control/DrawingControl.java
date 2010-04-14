@@ -1,25 +1,22 @@
 /*
- * $Id: DrawingControl.java,v 1.145 2007/08/16 22:30:13 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -913,7 +910,8 @@ public class DrawingControl extends DisplayControlImpl {
 
     }
 
-    private int autoScrollCnt=0;
+    /** _more_          */
+    private int autoScrollCnt = 0;
 
     /**
      * Listen for DisplayEvents
@@ -964,7 +962,7 @@ public class DrawingControl extends DisplayControlImpl {
                         return;
                     }
 
-		    if (GuiUtils.isDeleteEvent(keyEvent)) {
+                    if (GuiUtils.isDeleteEvent(keyEvent)) {
                         if ((currentGlyph != null)
                                 && currentCmd.equals(CMD_STRETCH)) {
                             setSelection(currentGlyph);
@@ -1062,13 +1060,14 @@ public class DrawingControl extends DisplayControlImpl {
                     return;
                 }
 
-                int x = (int)event.getX();
-                int y = (int)event.getY();
-                Rectangle bounds =getScreenBounds();
-                int pad = 5;
-                if(x>bounds.width+pad || y>bounds.height+pad || x<-pad || y<-pad) {
-                    if(autoScrollCnt++>10) {
-                        EarthLocation el = screenToEarth(x,y);
+                int       x      = (int) event.getX();
+                int       y      = (int) event.getY();
+                Rectangle bounds = getScreenBounds();
+                int       pad    = 5;
+                if ((x > bounds.width + pad) || (y > bounds.height + pad)
+                        || (x < -pad) || (y < -pad)) {
+                    if (autoScrollCnt++ > 10) {
+                        EarthLocation el = screenToEarth(x, y);
                         getNavigatedDisplay().center(el, false);
                         autoScrollCnt = 0;
                     }
@@ -1435,7 +1434,9 @@ public class DrawingControl extends DisplayControlImpl {
      * Set the cursor depending on the current command.
      */
     private void setCursor() {
-        if(enabledCbx==null || currentCmd==null) return;
+        if ((enabledCbx == null) || (currentCmd == null)) {
+            return;
+        }
         if ( !enabledCbx.isSelected() || !canHandleEvents()) {
             clearCursor();
             return;
@@ -2642,7 +2643,7 @@ public class DrawingControl extends DisplayControlImpl {
 
 
 
-		    if (GuiUtils.isDeleteEvent(ke)) {
+                    if (GuiUtils.isDeleteEvent(ke)) {
                         int[]   rows      = getSelectedRows();
                         List    tmpGlyphs = new ArrayList(glyphs);
                         boolean orig      = glyphTableModel.ignoreChanges;
@@ -2958,4 +2959,3 @@ public class DrawingControl extends DisplayControlImpl {
 
 
 }
-

@@ -1,26 +1,22 @@
 /*
- * $Id: RaobSoundingControl.java,v 1.11 2006/12/01 20:16:37 jeffmc Exp $
- *
- * Copyright  1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.idv.control;
 
@@ -29,8 +25,9 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
-import ucar.visad.Util;
 import ucar.visad.UtcDate;
+
+import ucar.visad.Util;
 import ucar.visad.display.*;
 import ucar.visad.functiontypes.AirTemperatureProfile;
 import ucar.visad.functiontypes.CartesianHorizontalWindOfPressure;
@@ -152,8 +149,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @throws VisADException  couldn't create a VisAD object needed
      * @throws RemoteException couldn't create a remote object needed
      */
-    public boolean init(DataChoice dataChoice) throws VisADException,
-            RemoteException {
+    public boolean init(DataChoice dataChoice)
+            throws VisADException, RemoteException {
 
         /*
          * Initialize the superclass.
@@ -174,11 +171,11 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         // stationIds = new String[tempPros.length];
         int length = entries.getDimension();
         stations = new ArrayList();
-        LatLonPoint [] slatLons  = new LatLonPoint[length];
+        LatLonPoint[]           slatLons       = new LatLonPoint[length];
         Hashtable<String, List> stationsTuples = new Hashtable<String,
                                                      List>();
-        stationsTuple = new Hashtable<String, Tuple>();
-        stationsTimes = new Hashtable<String, List>();
+        stationsTuple   = new Hashtable<String, Tuple>();
+        stationsTimes   = new Hashtable<String, List>();
         stationsTimeSet = new Hashtable<String, Set>();
         int j = 0;
         for (int i = 0; i < length; i++) {
@@ -209,7 +206,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
         }
 
-        latLons  = new LatLonPoint[stations.size()];
+        latLons = new LatLonPoint[stations.size()];
         for (int i = 0; i < stations.size(); i++) {
             latLons[i] = slatLons[i];
             String     st        = (String) stations.get(i);
@@ -229,55 +226,57 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                     first = false;
                 } else {
                     Misc.run(new Runnable() {
-                            public void run() {
-                    try {
-                        int i = stationProbes.getCloseIndex();
-                        if ((i >= 0) && (stMenu != null)) {
-                            selectedStation.setPoint((RealTuple) latLons[i]);
-                            //  stationMenu.setSelectedIndex(i);
-                            setSelectedStationIndex(i);
-                            stMenu.setSelectedIndex(i);
-                         
-                            setStation(i);
+                        public void run() {
+                            try {
+                                int i = stationProbes.getCloseIndex();
+                                if ((i >= 0) && (stMenu != null)) {
+                                    selectedStation.setPoint(
+                                        (RealTuple) latLons[i]);
+                                    //  stationMenu.setSelectedIndex(i);
+                                    setSelectedStationIndex(i);
+                                    stMenu.setSelectedIndex(i);
 
+                                    setStation(i);
+
+                                }
+                            } catch (Exception ex) {
+                                logException(ex);
+                            }
                         }
-                    } catch (Exception ex) {
-                        logException(ex);
-                    }
-                 }});
+                    });
+                }
             }
-        }
         });
 
         final Object[] ids = stations.toArray();
         stMenu = new JComboBox(ids);
-            stMenu.setToolTipText("Stations");
+        stMenu.setToolTipText("Stations");
 
-            stMenu.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent e) {
-                    try {
-                        int    i  = stMenu.getSelectedIndex();
-                        String st = (String) stations.get(i);
-                         int index = getSelectedStationIndex();
-                        setStation(index);
-                        dataNode.setData(stationsTuple.get(st));
-                        Set timeset = getDataTimeSet();
-                        dataNode.setOutputTimes((SampledSet)timeset);
-                        //DateTime dt = times.get(0);
-                        //dataNode.setTime(dt);
-                        //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
-                        updateHeaderLabel();
+        stMenu.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                try {
+                    int    i     = stMenu.getSelectedIndex();
+                    String st    = (String) stations.get(i);
+                    int    index = getSelectedStationIndex();
+                    setStation(index);
+                    dataNode.setData(stationsTuple.get(st));
+                    Set timeset = getDataTimeSet();
+                    dataNode.setOutputTimes((SampledSet) timeset);
+                    //DateTime dt = times.get(0);
+                    //dataNode.setTime(dt);
+                    //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
+                    updateHeaderLabel();
 
 
-                    } catch (Exception ex) {
-                        logException(ex);
-                    }
+                } catch (Exception ex) {
+                    logException(ex);
                 }
+            }
         });
         Set times = getDataTimeSet();
         RealType timeType =
-                        (RealType) ((SetType) times.getType()).getDomain()
-                            .getComponent(0);
+            (RealType) ((SetType) times.getType()).getDomain().getComponent(
+                0);
         if (timesHolder == null) {
             timesHolder = new LineDrawing("times ref");
         }
@@ -304,12 +303,11 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
         container = Box.createHorizontalBox();
         //Wrap these components so they don't get stretched in the Y direction
-        container.add(
-            GuiUtils.wrap(getAnimationWidget().getContents(false)));
+        container.add(GuiUtils.wrap(getAnimationWidget().getContents(false)));
         //container.add(GuiUtils.wrap (animationWidget.getIndicatorComponent()));
-        widget = GuiUtils.topBottom(
-            GuiUtils.inset(GuiUtils.label("Station: ", stMenu), 8),
-            container);
+        widget =
+            GuiUtils.topBottom(GuiUtils.inset(GuiUtils.label("Station: ",
+                stMenu), 8), container);
 
         setPointSize();
 
@@ -395,9 +393,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @return The SelectedStationIndex
      */
     public int getSelectedStationIndex() {
-        if(selectedStationIndex != -1)
+        if (selectedStationIndex != -1) {
             return selectedStationIndex;
-        else if (stMenu != null) {
+        } else if (stMenu != null) {
             return stMenu.getSelectedIndex();
         }
         return 0;
@@ -421,8 +419,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    public void setSpatialLociVisible(boolean visible) throws VisADException,
-            RemoteException {
+    public void setSpatialLociVisible(boolean visible)
+            throws VisADException, RemoteException {
         super.setSpatialLociVisible(visible);
         selectedStation.setVisible(getDisplayVisibility() && visible);
     }
@@ -450,8 +448,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private void setStation(int index) throws VisADException,
-            RemoteException {
+    private void setStation(int index)
+            throws VisADException, RemoteException {
         selectedStation.setPoint((RealTuple) latLons[index]);
         //setSounding(index);
         setLocation(latLons[index]);
@@ -472,9 +470,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @throws RemoteException Java RMI problem
      * @throws VisADException problem creating the new set
      */
-    private Field addPressure(Field windField,
-                              Field tempField) throws VisADException,
-                                  RemoteException {
+    private Field addPressure(Field windField, Field tempField)
+            throws VisADException, RemoteException {
         return Util.convertDomain(
             windField, ((FunctionType) tempField.getType()).getDomain(),
             tempField.getDomainCoordinateSystem());
@@ -502,9 +499,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      * @throws VisADException On badness
      */
     protected Set getDataTimeSet() throws RemoteException, VisADException {
-        Set  aniSet = null;
-        int            index   = getSelectedStationIndex();
-        aniSet  = stationsTimeSet.get(stations.get(index));
+        Set aniSet = null;
+        int index  = getSelectedStationIndex();
+        aniSet = stationsTimeSet.get(stations.get(index));
 
         return aniSet;
     }
@@ -517,9 +514,10 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         int            timeIdx = getCurrentIdx();
         int            index   = getSelectedStationIndex();
         List<DateTime> times   = stationsTimes.get(stations.get(index));
-        if(timeIdx >= times.size())
-            timeIdx = times.size()-1;
-        String         timeStr = times.get(timeIdx).toString();
+        if (timeIdx >= times.size()) {
+            timeIdx = times.size() - 1;
+        }
+        String timeStr = times.get(timeIdx).toString();
         if (index >= 0) {
             headerLabel.setText(stations.get(index) + " " + timeStr);
         } else {
@@ -550,13 +548,13 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      */
     protected void addLabelMacros(String template, List patterns,
                                   List values) {
-        super.addLabelMacros(template,  patterns, values);
+        super.addLabelMacros(template, patterns, values);
 
         List stations = this.stations;
-        int            index   = getSelectedStationIndex();
-        if (index >= 0 && stations!=null && index<stations.size()) {
+        int  index    = getSelectedStationIndex();
+        if ((index >= 0) && (stations != null) && (index < stations.size())) {
             patterns.add(MACRO_STATION);
-            values.add(""+ stations.get(index));
+            values.add("" + stations.get(index));
         }
     }
 
@@ -588,10 +586,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
          * @throws VisADException    if a VisAD failure occurs.
          * @throws RemoteException   if a Java RMI failure occurs.
          */
-        public void setTimeIndex(
-                int index,
-                SoundingDataNode source) throws VisADException,
-                    RemoteException {
+        public void setTimeIndex(int index, SoundingDataNode source)
+                throws VisADException, RemoteException {
             setSounding(index);
         }
 
@@ -616,9 +612,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
          * @throws VisADException    if a VisAD failure occurs.
          * @throws RemoteException   if a Java RMI failure occurs.
          */
-        public void setTimes(SampledSet times,
-                             SoundingDataNode source) throws VisADException,
-                                 RemoteException {
+        public void setTimes(SampledSet times, SoundingDataNode source)
+                throws VisADException, RemoteException {
 
             RealType timeType =
                 (RealType) ((SetType) times.getType()).getDomain()
@@ -654,10 +649,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
          * @throws RemoteException
          * @throws VisADException
          */
-        public void setLocation(
-                LatLonPoint loc,
-                SoundingDataNode source) throws VisADException,
-                    RemoteException {
+        public void setLocation(LatLonPoint loc, SoundingDataNode source)
+                throws VisADException, RemoteException {
             //setLocation11(loc);
             //location = loc;
             double lat = loc.getLatitude().getValue();
@@ -680,10 +673,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
          * @throws RemoteException
          * @throws VisADException
          */
-        public void setLocations(
-                SampledSet locs,
-                SoundingDataNode source) throws VisADException,
-                    RemoteException {
+        public void setLocations(SampledSet locs, SoundingDataNode source)
+                throws VisADException, RemoteException {
             //setData(locs);
         }
 
@@ -697,14 +688,12 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
          * @throws VisADException           if a VisAD failure occurs.
          * @throws RemoteException          if a Java RMI failure occurs.
          */
-        public void setProfiles(
-                Field[] tempPros, Field[] dewPros, Field[] windPros,
-                SoundingDataNode source) throws VisADException,
-                    RemoteException {
+        public void setProfiles(Field[] tempPros, Field[] dewPros,
+                                Field[] windPros, SoundingDataNode source)
+                throws VisADException, RemoteException {
             setSoundings(tempPros, dewPros, windPros);
         }
     }
 
 
 }
-

@@ -1,25 +1,22 @@
-/**
- * $Id: ImageMovieControl.java,v 1.71 2007/08/09 17:22:25 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.idv.control;
 
@@ -258,14 +255,14 @@ public class ImageMovieControl extends DisplayControlImpl {
         new Hashtable<Element, NamedStationImpl>();
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, Element> urlToRoot = new Hashtable<String,
                                                        Element>();
 
     /** Displays imageset locations */
     private StationLocationMap stationMap;
 
-    /** _more_          */
+    /** _more_ */
     private List<NamedStationImpl> stations;
 
     /** The directory */
@@ -799,7 +796,7 @@ public class ImageMovieControl extends DisplayControlImpl {
         });
         previewPanel = new ImagePanel();
         JComponent animContents = getAnimationWidget().getContents();
-        JPanel topPanel = GuiUtils.left(animContents);
+        JPanel     topPanel     = GuiUtils.left(animContents);
 
 
         JPanel moviePanel = GuiUtils.topCenterBottom(topPanel,
@@ -808,8 +805,8 @@ public class ImageMovieControl extends DisplayControlImpl {
         /*
         fileList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-	    if (GuiUtils.isDeleteEvent(e)) {
-	    int[] indices = fileList.getSelectedIndices();
+            if (GuiUtils.isDeleteEvent(e)) {
+            int[] indices = fileList.getSelectedIndices();
                     List  tmp     = new ArrayList(files);
                     for (int i = 0; i < indices.length; i++) {
                         tmp.set(indices[i], null);
@@ -1217,10 +1214,12 @@ public class ImageMovieControl extends DisplayControlImpl {
      */
     private void setSelectedPoint() {
         imageLocation = null;
-        LatLonPoint[] tmpLatLons = latLons;
-        int tmpPointIndex = pointIndex;
-        if(tmpLatLons==null) return;
-        if (tmpPointIndex >= 0 && tmpPointIndex<tmpLatLons.length) {
+        LatLonPoint[] tmpLatLons    = latLons;
+        int           tmpPointIndex = pointIndex;
+        if (tmpLatLons == null) {
+            return;
+        }
+        if ((tmpPointIndex >= 0) && (tmpPointIndex < tmpLatLons.length)) {
             try {
                 imageLocation = tmpLatLons[tmpPointIndex];
                 selectedPoint.setPoint((RealTuple) tmpLatLons[tmpPointIndex]);
@@ -1447,15 +1446,16 @@ public class ImageMovieControl extends DisplayControlImpl {
             //Make sure we create the animation before we call setAnimationSet
             getImagePanel().setFiles(files);
             GuiUtils.invokeInSwingThread(new Runnable() {
-                    public void run() {
-                        try {
-                            Animation animation = getInternalAnimation();
-                            setAnimationSet(times);
-                            animation.setCurrent(times.size() - 1);
-                        } catch(Exception exc) {
-                            logException("Setting animation times", exc);
-                        }
-                    }});
+                public void run() {
+                    try {
+                        Animation animation = getInternalAnimation();
+                        setAnimationSet(times);
+                        animation.setCurrent(times.size() - 1);
+                    } catch (Exception exc) {
+                        logException("Setting animation times", exc);
+                    }
+                }
+            });
 
             String group = XmlUtil.getAttribute(imageSetRoot, ATTR_GROUP, "");
             String desc  = XmlUtil.getAttribute(imageSetRoot, ATTR_DESC, "");
@@ -2000,10 +2000,11 @@ public class ImageMovieControl extends DisplayControlImpl {
 
         Hashtable<String, double[]> zipcodes = new Hashtable<String,
                                                    double[]>();
-        for (String line : (List<String>) StringUtil.split(
-                IOUtil.readContents(
-                    "zip_codes.csv", ImageMovieControl.class), "\n", true,
-                        true)) {
+        for (String line :
+                (List<String>) StringUtil.split(
+                    IOUtil.readContents(
+                        "zip_codes.csv", ImageMovieControl.class), "\n",
+                            true, true)) {
             if (line.length() == 0) {
                 continue;
             }
@@ -2026,11 +2027,12 @@ public class ImageMovieControl extends DisplayControlImpl {
                                             toks.get(2)).doubleValue() });
         }
 
-        Hashtable<String,CameraInfo>      seen    = new Hashtable<String,CameraInfo>();
-        List<CameraInfo> cameras = new ArrayList<CameraInfo>();
-        File             dir     = new File(".");
-        File[]           files   = dir.listFiles();
-        Hashtable<String,Integer> zips = new Hashtable<String,Integer>();
+        Hashtable<String, CameraInfo> seen = new Hashtable<String,
+                                                 CameraInfo>();
+        List<CameraInfo>           cameras = new ArrayList<CameraInfo>();
+        File                       dir     = new File(".");
+        File[]                     files   = dir.listFiles();
+        Hashtable<String, Integer> zips    = new Hashtable<String, Integer>();
         for (File f : files) {
             if ( !f.getName().toString().startsWith("cam_")) {
                 continue;
@@ -2039,43 +2041,43 @@ public class ImageMovieControl extends DisplayControlImpl {
                                            ImageMovieControl.class);
             List nodes = XmlUtil.findDescendants(root, "aws:camera");
             for (Element camNode : (List<Element>) nodes) {
-                String id = XmlUtil.getAttribute(camNode, "id");
-                String   zipCode = XmlUtil.getAttribute(camNode, "zipcode");
-                double distance =  XmlUtil.getAttribute(camNode,"distance",0.0);
-                if(id.equals("BLDBC")) {
+                String id      = XmlUtil.getAttribute(camNode, "id");
+                String zipCode = XmlUtil.getAttribute(camNode, "zipcode");
+                double distance = XmlUtil.getAttribute(camNode, "distance",
+                                      0.0);
+                if (id.equals("BLDBC")) {
                     zipCode = "80303";
                 }
-                double[] latlon  = zipcodes.get(zipCode);
-                String name = XmlUtil.getAttribute(camNode, "name");
+                double[] latlon = zipcodes.get(zipCode);
+                String   name   = XmlUtil.getAttribute(camNode, "name");
                 if (latlon == null) {
                     //                    System.err.println ("Unknown zip:" + zipCode +" for:" + name);
                     continue;
                 }
-                double lat  = latlon[0];
-                double lon  = latlon[1];
+                double lat = latlon[0];
+                double lon = latlon[1];
                 id   = id.replace(",", "_");
                 name = name.replace(",", " ");
 
                 CameraInfo cameraInfo = new CameraInfo(id, name, latlon[0],
-                                                       latlon[1],
-                                                       distance);
+                                            latlon[1], distance);
 
-                
-                CameraInfo old= seen.get(id);
-                if(old!=null) {
-                    if(old.distance>cameraInfo.distance) {
+
+                CameraInfo old = seen.get(id);
+                if (old != null) {
+                    if (old.distance > cameraInfo.distance) {
                         old.distance = cameraInfo.distance;
                     }
                     continue;
                 }
-                seen.put(id,cameraInfo);
+                seen.put(id, cameraInfo);
                 cameras.add(cameraInfo);
 
                 Integer cnt = zips.get(zipCode);
-                if(cnt!=null) {
+                if (cnt != null) {
                     //                    System.out.println("zip:" + zipCode);
                 } else {
-                    zips.put(zipCode,new Integer(1));
+                    zips.put(zipCode, new Integer(1));
                 }
 
 
@@ -2083,28 +2085,29 @@ public class ImageMovieControl extends DisplayControlImpl {
             }
 
         }
- 
-        FileOutputStream fos     = new FileOutputStream("weatherbugcameras.xml");
+
+        FileOutputStream fos = new FileOutputStream("weatherbugcameras.xml");
         fos.write(
             new String(
                 "<stationtable name=\"WeatherBug Web Cams\">\n").getBytes());
 
-            for(CameraInfo camInfo: cameras) {
-                StringBuffer sb = new StringBuffer();
-                String imageUrl = "http://wwc.instacam.com/instacamimg/" +  camInfo.id
-                                  + "/" + camInfo.id + "_s.jpg";
-                String html = "<h3>WeatherBug WebCam</h3><b>" + camInfo.name
-                              + "</b><br><img src=\"" + imageUrl + "\">";
-                sb.append(XmlUtil.openTag("station",
-                                          XmlUtil.attrs("name", camInfo.name, "lat",
-                                              "" + camInfo.lat, "lon", "" + camInfo.lon,
-                                                  "imageurl", imageUrl)));
-                sb.append("<![CDATA[" + html + "]]></station>\n");
+        for (CameraInfo camInfo : cameras) {
+            StringBuffer sb = new StringBuffer();
+            String imageUrl = "http://wwc.instacam.com/instacamimg/"
+                              + camInfo.id + "/" + camInfo.id + "_s.jpg";
+            String html = "<h3>WeatherBug WebCam</h3><b>" + camInfo.name
+                          + "</b><br><img src=\"" + imageUrl + "\">";
+            sb.append(XmlUtil.openTag("station",
+                                      XmlUtil.attrs("name", camInfo.name,
+                                          "lat", "" + camInfo.lat, "lon",
+                                          "" + camInfo.lon, "imageurl",
+                                          imageUrl)));
+            sb.append("<![CDATA[" + html + "]]></station>\n");
 
-                fos.write(sb.toString().getBytes());
+            fos.write(sb.toString().getBytes());
 
-            }
-            
+        }
+
         fos.write(new String("</stationtable>\n").getBytes());
         fos.close();
         System.err.println("#cameras:" + cameras.size());
@@ -2118,17 +2121,19 @@ public class ImageMovieControl extends DisplayControlImpl {
      */
     public static class CameraInfo {
 
-        /** _more_          */
+        /** _more_ */
         String id;
 
+        /** _more_          */
         String name;
 
-        /** _more_          */
+        /** _more_ */
         double lat;
 
-        /** _more_          */
+        /** _more_ */
         double lon;
 
+        /** _more_          */
         double distance;
 
 
@@ -2136,18 +2141,20 @@ public class ImageMovieControl extends DisplayControlImpl {
          * _more_
          *
          * @param id _more_
+         * @param name _more_
          * @param lat _more_
          * @param lon _more_
+         * @param distance _more_
          */
-        public CameraInfo(String id, String name, double lat, double lon, double distance) {
-            this.id  = id;
-            this.name = name;
-            this.lat = lat;
-            this.lon = lon;
+        public CameraInfo(String id, String name, double lat, double lon,
+                          double distance) {
+            this.id       = id;
+            this.name     = name;
+            this.lat      = lat;
+            this.lon      = lon;
             this.distance = distance;
         }
     }
 
 
 }
-

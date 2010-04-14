@@ -4282,7 +4282,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Handle the window closing.
      */
     protected void handleWindowClosing() {
-    
+
 
         boolean remove = removeOnWindowClose();
         if ( !remove && (getDisplayInfos().size() == 0)) {
@@ -8221,7 +8221,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     if ( !myControl.getHaveInitialized()) {
                         return;
                     }
-                    if(GuiUtils.isControlKey(event)) {
+                    if (GuiUtils.isControlKey(event)) {
                         myControl.centerOnDisplay();
                         return;
                     }

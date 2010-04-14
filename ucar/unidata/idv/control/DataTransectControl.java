@@ -1,18 +1,18 @@
 /*
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -30,8 +30,6 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
@@ -42,6 +40,9 @@ import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
 
 import visad.*;
+
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 
 import visad.util.DataUtility;
 
@@ -110,18 +111,22 @@ public class DataTransectControl extends CrossSectionControl {
 
         NavigatedDisplay mapDisplay = getNavigatedDisplay();
 
-        double[] right  = mapDisplay.getScreenUpperRight();
-        double[] center = mapDisplay.getScreenCenter();
+        double[]         right      = mapDisplay.getScreenUpperRight();
+        double[]         center     = mapDisplay.getScreenCenter();
         right[1] = center[1];
         double width = right[0] - center[0];
 
-        EarthLocationTuple loc1 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0], center[1],0,false);
-        EarthLocationTuple loc2 = (EarthLocationTuple) mapDisplay.getEarthLocation(center[0] + 0.6 * width, right[1],0,false);
+        EarthLocationTuple loc1 =
+            (EarthLocationTuple) mapDisplay.getEarthLocation(center[0],
+                center[1], 0, false);
+        EarthLocationTuple loc2 =
+            (EarthLocationTuple) mapDisplay.getEarthLocation(center[0]
+                + 0.6 * width, right[1], 0, false);
 
 
 
 
-        createCrossSectionSelector(loc1,loc2);
+        createCrossSectionSelector(loc1, loc2);
     }
 
 
@@ -472,4 +477,3 @@ public class DataTransectControl extends CrossSectionControl {
         return lineWidth;
     }
 }
-

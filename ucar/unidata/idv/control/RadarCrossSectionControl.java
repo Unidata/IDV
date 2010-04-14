@@ -1,54 +1,55 @@
 /*
- * $Id: Level2ColorCrossSectionControl.java,v 1.7 2006/12/01 20:16:34 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.radar.RadarConstants;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Range;
+
 import ucar.visad.RadarMapProjection;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.SelectorDisplayable;
+
 import visad.*;
+
 import visad.bom.Radar3DCoordinateSystem;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 
 import java.beans.PropertyChangeEvent;
+
 import java.rmi.RemoteException;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -84,10 +85,10 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
 
             loadDataFromLine();
             GridDataInstance ginst = getGridDataInstance();
-            if(ginst == null)
+            if (ginst == null) {
                 return;
-            FieldImpl fieldImpl =
-                (FieldImpl) (ginst.getGrid()).getSample(0);
+            }
+            FieldImpl fieldImpl = (FieldImpl) (ginst.getGrid()).getSample(0);
             GriddedSet domainSet =
                 (GriddedSet) GridUtil.getSpatialDomain(fieldImpl);
             Unit   xUnit     = domainSet.getSetUnits()[0];
@@ -116,8 +117,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected boolean setData(DataChoice choice) throws VisADException,
-            RemoteException {
+    protected boolean setData(DataChoice choice)
+            throws VisADException, RemoteException {
         if ( !super.setData(choice)) {
             System.out.println("set data is false");
             return false;
@@ -219,15 +220,15 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void setRequestProperties() throws VisADException,
-            RemoteException {
+    protected void setRequestProperties()
+            throws VisADException, RemoteException {
         getRequestProperties().put(RadarConstants.PROP_VCS,
                                    new Boolean(true));
         if ((startLocation == null) || (endLocation == null)) {
-            MapViewManager mm = getMapViewManager();
-            MapProjection mp =mm.getMainProjection();
-            RadarMapProjection rp ;
-            try{
+            MapViewManager     mm = getMapViewManager();
+            MapProjection      mp = mm.getMainProjection();
+            RadarMapProjection rp;
+            try {
                 rp = (RadarMapProjection) mp;
             } catch (ClassCastException ce) {
                 LogUtil.consoleMessage("Radar projection cast error\n");
@@ -247,6 +248,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * Set the start location of the cross section line
      *
      *
+     *
+     * @param sl _more_
      */
     public void setStartLocation(EarthLocation sl) {
         startLocation = sl;
@@ -266,6 +269,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * Set the end location of the cross section line
      *
      *
+     *
+     * @param sl _more_
      */
     public void setEndLocation(EarthLocation sl) {
         endLocation = sl;
@@ -279,6 +284,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     public EarthLocation getEndLocation() {
         return endLocation;
     }
+
     /**
      * _more_
      *
@@ -305,9 +311,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void initLinePosition(float stationLat,
-                                    float stationLon) throws VisADException,
-                                        RemoteException {
+    protected void initLinePosition(float stationLat, float stationLon)
+            throws VisADException, RemoteException {
         if (getVerticalAxisRange() == null) {
             setVerticalAxisRange(new Range(0, 20000));
         }
@@ -361,8 +366,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void createCrossSectionSelector() throws VisADException,
-            RemoteException {
+    protected void createCrossSectionSelector()
+            throws VisADException, RemoteException {
 
         // make a Selector line there
         csSelector = new CrossSectionSelector();
@@ -433,22 +438,23 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void updateCenterPoint() throws VisADException,
-            RemoteException {
+    protected void updateCenterPoint()
+            throws VisADException, RemoteException {
 
         GridDataInstance ginst = getGridDataInstance();
-        if(ginst == null)
-              return;
+        if (ginst == null) {
+            return;
+        }
         FieldImpl fieldImpl = ginst.getGrid();
 
-        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(
-                                   fieldImpl);
+        GriddedSet domainSet =
+            (GriddedSet) GridUtil.getSpatialDomain(fieldImpl);
 
         // Get location for label of control window
         Radar3DCoordinateSystem transform =
             (Radar3DCoordinateSystem) domainSet.getCoordinateSystem();
         //   get station location from the data coordinate transform
-        if(startLocation == null || endLocation == null) {
+        if ((startLocation == null) || (endLocation == null)) {
             float  stationLat = (transform.getCenterPoint())[0];
             float  stationLon = (transform.getCenterPoint())[1];
             float  stationEl  = (transform.getCenterPoint())[2];
@@ -485,4 +491,3 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
 
 
 }
-
