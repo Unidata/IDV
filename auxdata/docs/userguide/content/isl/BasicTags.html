@@ -197,6 +197,13 @@ The [isl::tag stop] tag allows you to processing the ISL file and exit:
 }]
 
 
+[isl::tagdef trace {Turn on tracing and only show the given pattern} -attrs {pattern {The regular expression pattern to match trace output on. Use .* for all trace messages}}]
+The [isl::tag trace] tag allows you to turn on tracing in the IDV:
+[isl::xml {
+<trace pattern="GeoGridDataSource.*"/>
+}]
+
+
 [isl::tagdef pause {Pause for some time} -attrs {seconds {number of seconds to pause} minutes {number of minutes to pause} hours {number of hours to pause} every {number of hours past midnight}}]
 The [isl::tag pause] tag can have a number of attributes:
 <table>
