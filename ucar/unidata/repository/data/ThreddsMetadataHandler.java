@@ -533,7 +533,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         }
                     } else if (axisType.equals(AxisType.Time)) {
                         try {
-                            if(!haveDate) {
+                            //For now always use the axis dates even if we had a date from the attributes
+                            if(true || !haveDate) {
                                 Date[] dates   = getMinMaxDates(var, ca);
                                 if(dates!=null) {
                                     Date   minDate = (Date) extra.get(ARG_FROMDATE);
@@ -548,7 +549,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                     extra.put(ARG_FROMDATE, dates[0]);
                                     extra.put(ARG_TODATE, dates[1]);
                                     haveDate = true;
-                            
                                 }
                             }
                         } catch (Exception exc) {
