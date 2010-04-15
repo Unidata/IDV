@@ -8,9 +8,6 @@ exec jar -xvf ../thredds.war
 
 
 cd WEB-INF/classes
-##unjar the common jar
-exec jar -xvf ../../../unidatacommon.jar
-
 if {1} {
 ##exec rm -r org/apache/log4j
 foreach jar [glob ../lib/*.jar] {
@@ -18,13 +15,22 @@ foreach jar [glob ../lib/*.jar] {
         puts "skipping $jar"
         continue
     }
+    if {[regexp unidatacommon $jar]} {
+        puts "skipping $jar"
+        continue
+    }
+
     if {[regexp slf4j $jar]} {
-#        puts "***** skipping $jar"
-#        continue
+        puts "skipping $jar"
+        continue
     }
     puts "Unjarring $jar"
     exec jar -xvf $jar
 }
+
+##unjar the common jar
+puts "Unjarring unidatacommon.jar"
+exec jar -xvf ../../../unidatacommon.jar
 
 puts "Making repositorytds.jar"
 puts "pwd: [pwd]"
@@ -34,20 +40,12 @@ foreach file [glob *] {
     if {$file=="visad"} continue
     append files " "
     append files "\{[file tail $file]\}"
-    puts "$file"
+#    puts "$file"
 }
 }
-
-
 
 
 puts [exec pwd]
-foreach f [glob -nocomplain  ../../../../ucar/unidata/util/DateUtil*class] {
-    puts "File:$f"
-    file copy -force $f ucar/unidata/util
-}
-
-
 set execLine "jar -cvf ../../../repositorytds.jar $files"
 eval exec $execLine
 

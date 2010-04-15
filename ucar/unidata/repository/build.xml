@@ -397,6 +397,7 @@
         </delete>
         <unjar src="${lib1}" dest="${tmpjardir}"/>
         <unjar src="${lib1}" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/jython.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
