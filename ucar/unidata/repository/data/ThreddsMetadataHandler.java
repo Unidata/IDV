@@ -79,6 +79,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -167,6 +168,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
+
+    public static final String PROP_STARTTIME_ATTRIBUTES = "cdm.attribute.starttimes";
+    public static final String PROP_ENDTIME_ATTRIBUTES = "cdm.attribute.endtimes";
 
     /**
      * _more_
@@ -428,23 +432,33 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
 
-
+                if(isStartTimeAttribute(name)||isEndTimeAttribute(name)) {
+                    Date  date = getDate(value);
+                    //                    System.err.println(name +" " + date);
+                    if(isEndTimeAttribute(name)) {
+                        extra.put(ARG_TODATE, date);
+                    } else {
+                        extra.put(ARG_FROMDATE, date);
+                    }
+                    haveDate = true;
+                    continue;
+                }
                 if (shortForm) {
                     continue;
                 }
                 if (ATTR_KEYWORDS.equals(name)) {
                     for (String keyword : (List<String>) StringUtil.split(
-                            value, ";", true, true)) {
+                                                                          value, ";", true, true)) {
 
                         try {
-                        metadata =
-                            new Metadata(getRepository().getGUID(),
-                                         entry.getId(), TYPE_KEYWORD,
-                                         DFLT_INHERITED, keyword,
-                                         Metadata.DFLT_ATTR,
-                                         Metadata.DFLT_ATTR,
-                                         Metadata.DFLT_ATTR,
-                                         Metadata.DFLT_EXTRA);
+                            metadata =
+                                new Metadata(getRepository().getGUID(),
+                                             entry.getId(), TYPE_KEYWORD,
+                                             DFLT_INHERITED, keyword,
+                                             Metadata.DFLT_ATTR,
+                                             Metadata.DFLT_ATTR,
+                                             Metadata.DFLT_ATTR,
+                                             Metadata.DFLT_EXTRA);
                         } catch(Exception exc) {
                             getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add keyword metadata:" + keyword);                    
                             continue;
@@ -461,18 +475,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (name.startsWith("_")) {
                     continue;
                 }
-
-                if(isFromDateAttribute(name)||isToDateAttribute(name)) {
-                    Date  date = getDate(value);
-                    if(isToDateAttribute(name)) {
-                        extra.put(ARG_TODATE, date);
-                    } else {
-                        extra.put(ARG_FROMDATE, date);
-                    }
-                    haveDate = true;
-                    continue;
-                }
-
 
                 //Check if the string length is too long
                 if(!Metadata.lengthOK(name) || !Metadata.lengthOK(value)) {
@@ -539,6 +541,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                 if(dates!=null) {
                                     Date   minDate = (Date) extra.get(ARG_FROMDATE);
                                     Date   maxDate = (Date) extra.get(ARG_TODATE);
+                                    //System.err.println("dates:" + dates[0] +" " + dates[1]);
                                     if (minDate != null) {
                                         dates[0] = DateUtil.min(dates[0], minDate);
                                     }
@@ -648,19 +651,38 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
     private Date getDate(String dateString) throws java.text.ParseException {
-        System.err.println ("getDate:" + dateString +" Date:" +DateUtil.parse(dateString));
+        //        System.err.println ("getDate:" + dateString +" Date:" +DateUtil.parse(dateString));
         return DateUtil.parse(dateString);
     }
 
-    private boolean isToDateAttribute(String name) {
-        if(name.equals("stop_time")) return true;
-        return false;
+    private HashSet  startTimeAttrs;
+    private HashSet  endTimeAttrs;
+
+    private boolean isEndTimeAttribute(String name) {
+        if(endTimeAttrs==null) {
+            HashSet tmp = new HashSet();
+            for(String attr: StringUtil.split(getRepository().getProperty(PROP_ENDTIME_ATTRIBUTES,""),",",true, true)) {
+                tmp.add(attr);
+
+            }
+            endTimeAttrs = tmp;
+        }
+        return endTimeAttrs.contains(name);
     }
 
-    private boolean isFromDateAttribute(String name) {
-        if(name.equals("start_time")) return true;
-        return false;
+
+    private boolean isStartTimeAttribute(String name) {
+        if(startTimeAttrs==null) {
+            HashSet tmp = new HashSet();
+            for(String attr: StringUtil.split(getRepository().getProperty(PROP_STARTTIME_ATTRIBUTES,""),",",true, true)) {
+                tmp.add(attr);
+
+            }
+            startTimeAttrs = tmp;
+        }
+        return startTimeAttrs.contains(name);
     }
+
 
 
     /**
