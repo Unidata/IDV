@@ -1170,11 +1170,35 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected FieldImpl getSliceForDisplay(FieldImpl slice)
             throws VisADException {
         FieldImpl retField = slice;
-        if (getSkipValue() > 0) {
-            retField = GridUtil.subset(slice, getSkipValue() + 1);
+        if (slice != null) {
+            // apply skip factor
+            if (getSkipValue() > 0) {
+                retField = GridUtil.subset(retField, getSkipValue() + 1);
+            }
+            // apply smoothing
+            if (checkFlag(FLAG_SMOOTHING)
+                    && !getSmoothingType().equals(LABEL_NONE)) {
+                retField = GridUtil.smooth(retField, getSmoothingType(),
+                                           getSmoothingAmount());
+            }
         }
         //System.out.println("slice for " + paramName + " = " + retField);
         return retField;
+    }
+
+    /**
+     *  Use the value of the smoothing type and weight to subset the data.
+     */
+    protected void applySmoothing() {
+
+        if ((getGridDisplayable() != null) && (currentSlice != null)) {
+            try {
+                getGridDisplayable().loadData(
+                    getSliceForDisplay(currentSlice));
+            } catch (Exception ve) {
+                logException("applySmoothing", ve);
+            }
+        }
     }
 
     /**

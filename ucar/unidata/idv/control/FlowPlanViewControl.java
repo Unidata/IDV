@@ -60,7 +60,6 @@ import javax.swing.event.*;
  * A plan view control for flow data (vector or wind barbs)
  *
  * @author IDV Development Team
- * @version $Revision: 1.65 $
  */
 public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayControl {
 
@@ -91,7 +90,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     /** vector/barb button */
     private JRadioButton vectorBtn;
-
 
     /** flag for streamlines */
     boolean isStreamlines = false;
@@ -127,7 +125,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Create a new FlowPlanViewControl; set attribute flags
      */
     public FlowPlanViewControl() {
-        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH);
+        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
 
     /**

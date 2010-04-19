@@ -103,7 +103,7 @@ public class ValueSliderComponent implements Removable {
      * @param co  calling object
      * @param min minimum slider value
      * @param max maximum slider value
-     * @param property DisplayControl property to set
+     * @param property Object's property to set
      * @param label  label for the widget
      */
     public ValueSliderComponent(Object co, int min, int max, String property,
@@ -117,7 +117,7 @@ public class ValueSliderComponent implements Removable {
      * @param co  calling object
      * @param min minimum slider value
      * @param max maximum slider value
-     * @param property DisplayControl property to set
+     * @param property Object's property to set
      * @param label  label for the widget
      * @param scale  scale factor for the values
      * @param andSet  set the property on the calling object if true
@@ -133,7 +133,7 @@ public class ValueSliderComponent implements Removable {
      * @param co  calling object
      * @param min minimum slider value
      * @param max maximum slider value
-     * @param property DisplayControl property to set
+     * @param property calling object property to set
      * @param label  label for the widget
      * @param scale  scale factor for the values
      * @param andSet  set the property on the calling object if true
@@ -318,7 +318,7 @@ public class ValueSliderComponent implements Removable {
     /**
      * Get the display conventions
      *
-     * @return the DisplayControl's display conventions.
+     * @return the display conventions.
      */
     private DisplayConventions getDisplayConventions() {
         return DisplayConventions.getDisplayConventions();

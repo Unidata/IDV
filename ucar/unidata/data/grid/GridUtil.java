@@ -6338,11 +6338,10 @@ public class GridUtil {
      *
      * @return  the smoothed grid or null
      *
-     * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl smooth(FieldImpl slice, String type)
-            throws VisADException, RemoteException {
+            throws VisADException {
         return smooth(slice, type, (type.equals(SMOOTH_GAUSSIAN)
                                     ? 6
                                     : 0));
@@ -6370,12 +6369,11 @@ public class GridUtil {
      *
      * @return  the smoothed grid or null
      *
-     * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl smooth(FieldImpl slice, String type,
                                    int filterLevel)
-            throws VisADException, RemoteException {
+            throws VisADException {
 
         if (GridUtil.isVolume(slice)) {
             throw new VisADException("Grid must be a 2D slice");
@@ -6385,100 +6383,109 @@ public class GridUtil {
         }
         FieldImpl smoothedFI        = null;
         TupleType smoothedRangeType = null;
-        if (GridUtil.isTimeSequence(slice)) {
+        try {
+            if (GridUtil.isTimeSequence(slice)) {
 
-            // Implementation:  have to take the raw data FieldImpl
-            // apart, make direction FlatField by FlatField,
-            // and put all back together again into a new divergence FieldImpl
+                // Implementation:  have to take the raw data FieldImpl
+                // apart, make direction FlatField by FlatField,
+                // and put all back together again into a new divergence FieldImpl
 
-            Set timeSet = slice.getDomainSet();
+                Set timeSet = slice.getDomainSet();
 
-            // compute each divFlatField in turn; load in FieldImpl
-            for (int i = 0; i < timeSet.getLength(); i++) {
-                FieldImpl smoothedFF = null;
-                FieldImpl sample     = (FieldImpl) slice.getSample(i, false);
-                if (sample == null) {
-                    continue;
-                }
-                if ( !isSequence(sample)) {
-                    if (type.equals(SMOOTH_5POINT)) {
-                        smoothedFF = smooth5Point((FlatField) sample,
-                                smoothedRangeType);
-                    } else if (type.equals(SMOOTH_9POINT)) {
-                        smoothedFF = smooth9Point((FlatField) sample,
-                                smoothedRangeType);
-                    } else {
-                        smoothedFF = smoothGaussian((FlatField) sample,
-                                filterLevel, smoothedRangeType);
-                    }
-                    if (smoothedFF == null) {
+                // compute each smoothed FlatField in turn; load in FieldImpl
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    FieldImpl smoothedFF = null;
+                    FieldImpl sample = (FieldImpl) slice.getSample(i, false);
+                    if (sample == null) {
                         continue;
                     }
-                    if (smoothedRangeType == null) {
-                        smoothedRangeType = GridUtil.getParamType(smoothedFF);
-                    }
-                } else {  // ensembles & such
-                    Trace.call1("GridUtil smooth inner sequence");
-                    Set ensDomain = sample.getDomainSet();
-                    for (int j = 0; j < ensDomain.getLength(); j++) {
-                        FlatField innerField =
-                            (FlatField) sample.getSample(j, false);
-                        if (innerField == null) {
-                            continue;
-                        }
-                        FlatField innerSmoothedField = null;
+                    if ( !isSequence(sample)) {
                         if (type.equals(SMOOTH_5POINT)) {
-                            innerSmoothedField = smooth5Point(innerField,
+                            smoothedFF = smooth5Point((FlatField) sample,
                                     smoothedRangeType);
                         } else if (type.equals(SMOOTH_9POINT)) {
-                            innerSmoothedField = smooth9Point(innerField,
+                            smoothedFF = smooth9Point((FlatField) sample,
                                     smoothedRangeType);
                         } else {
-                            innerSmoothedField = smoothGaussian(innerField,
+                            smoothedFF = smoothGaussian((FlatField) sample,
                                     filterLevel, smoothedRangeType);
                         }
-                        if (innerSmoothedField == null) {
+                        if (smoothedFF == null) {
                             continue;
                         }
                         if (smoothedRangeType == null) {
                             smoothedRangeType =
-                                GridUtil.getParamType(innerSmoothedField);
-                            FunctionType innerType =
-                                new FunctionType(
-                                    DataUtility.getDomainType(ensDomain),
-                                    innerSmoothedField.getType());
-                            smoothedFF = new FieldImpl(innerType, ensDomain);
+                                GridUtil.getParamType(smoothedFF);
                         }
-                        smoothedFF.setSample(j, innerSmoothedField, false);
+                    } else {  // ensembles & such
+                        Trace.call1("GridUtil smooth inner sequence");
+                        Set ensDomain = sample.getDomainSet();
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                (FlatField) sample.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField innerSmoothedField = null;
+                            if (type.equals(SMOOTH_5POINT)) {
+                                innerSmoothedField = smooth5Point(innerField,
+                                        smoothedRangeType);
+                            } else if (type.equals(SMOOTH_9POINT)) {
+                                innerSmoothedField = smooth9Point(innerField,
+                                        smoothedRangeType);
+                            } else {
+                                innerSmoothedField =
+                                    smoothGaussian(innerField, filterLevel,
+                                        smoothedRangeType);
+                            }
+                            if (innerSmoothedField == null) {
+                                continue;
+                            }
+                            if (smoothedRangeType == null) {
+                                smoothedRangeType =
+                                    GridUtil.getParamType(innerSmoothedField);
+                                FunctionType innerType =
+                                    new FunctionType(
+                                        DataUtility.getDomainType(ensDomain),
+                                        innerSmoothedField.getType());
+                                smoothedFF = new FieldImpl(innerType,
+                                        ensDomain);
+                            }
+                            smoothedFF.setSample(j, innerSmoothedField,
+                                    false);
+                        }
+                        Trace.call2("GridUtil smooth inner sequence");
                     }
-                    Trace.call2("GridUtil smooth inner sequence");
-                }
 
-                if ((smoothedFI == null) && (smoothedFF != null)) {
-                    FunctionType smoothedFFType =
-                        (FunctionType) smoothedFF.getType();
-                    FunctionType smoothedFT =
-                        new FunctionType(
-                            ((SetType) timeSet.getType()).getDomain(),
-                            smoothedFFType);
-                    smoothedFI = new FieldImpl(smoothedFT, timeSet);
+                    if ((smoothedFI == null) && (smoothedFF != null)) {
+                        FunctionType smoothedFFType =
+                            (FunctionType) smoothedFF.getType();
+                        FunctionType smoothedFT =
+                            new FunctionType(
+                                ((SetType) timeSet.getType()).getDomain(),
+                                smoothedFFType);
+                        smoothedFI = new FieldImpl(smoothedFT, timeSet);
+                    }
+                    if (smoothedFF != null) {
+                        smoothedFI.setSample(i, smoothedFF, false, false);
+                    }
                 }
-                if (smoothedFF != null) {
-                    smoothedFI.setSample(i, smoothedFF, false, false);
-                }
-            }
-        } else {
-            if (type.equals(SMOOTH_5POINT)) {
-                smoothedFI = (FieldImpl) smooth5Point((FlatField) slice,
-                        smoothedRangeType);
-            } else if (type.equals(SMOOTH_9POINT)) {
-                smoothedFI = (FieldImpl) smooth9Point((FlatField) slice,
-                        smoothedRangeType);
             } else {
-                smoothedFI = (FieldImpl) smoothGaussian((FlatField) slice,
-                        filterLevel, smoothedRangeType);
-            }
+                if (type.equals(SMOOTH_5POINT)) {
+                    smoothedFI = (FieldImpl) smooth5Point((FlatField) slice,
+                            smoothedRangeType);
+                } else if (type.equals(SMOOTH_9POINT)) {
+                    smoothedFI = (FieldImpl) smooth9Point((FlatField) slice,
+                            smoothedRangeType);
+                } else {
+                    smoothedFI =
+                        (FieldImpl) smoothGaussian((FlatField) slice,
+                            filterLevel, smoothedRangeType);
+                }
 
+            }
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException: " + re.getMessage());
         }
         return smoothedFI;
 

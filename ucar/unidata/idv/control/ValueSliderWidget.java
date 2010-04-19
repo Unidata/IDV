@@ -59,9 +59,27 @@ public class ValueSliderWidget extends ValueSliderComponent {
      */
     public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
                              String property, String label, float scale) {
-        super(dc, min, max, property, label, scale, true);
+        this(dc, min, max, property, label, scale, true, null);
     }
 
+    /**
+     * Create a ValueSliderWidget
+     *
+     * @param dc  the display control
+     * @param min minimum slider value
+     * @param max maximum slider value
+     * @param property DisplayControl property to set
+     * @param label  label for the widget
+     * @param scale  scale factor for the values
+     * @param andSet  set the property on the calling object if true
+     * @param tip  tool tip text for the widget
+     */
+    public ValueSliderWidget(DisplayControlImpl dc, int min, int max, String property,
+                                String label, float scale, boolean andSet,
+                                String tip) {
+        super(dc, min, max, property, label, scale, true, tip);
+    }
+    
     /**
      * Has the calling object been initialized?  Subclasses should
      * override if necessary.

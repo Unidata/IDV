@@ -87,6 +87,7 @@ import ucar.unidata.util.Removable;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.GlobeDisplay;
 
@@ -310,8 +311,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** This holds the legendTextArea */
     private JPanel legendTextPanel;
 
-    /** This holds the legendTextArea */
+    /** The line width widget */
     private ValueSliderWidget lww;
+
+    /** The smoothing factor widget */
+    private ValueSliderWidget sww;
 
 
     /**
@@ -851,6 +855,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** visibility animation pause field for properties gui */
     private JTextField visbilityAnimationPauseFld;
 
+    /** labels for smoothing functions */
+    private final static String[] smootherLabels = new String[] { LABEL_NONE,
+            "5 point", "9 point", "Gaussian Weighted" };
+
+    /** types of smoothing functions */
+    private final static String[] smoothers = new String[] { LABEL_NONE,
+            GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
+            GridUtil.SMOOTH_GAUSSIAN };
+
+    /** smoothing factor for Gaussian smoother */
+    private int smoothingAmount = 6;
+
+    /** default type */
+    private String smoothingType = LABEL_NONE;
 
     /**
      * Default constructor. This is called when the control is
@@ -1492,6 +1510,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         applyLineWidth();
         applySkipFactor();
         applyTextureQuality();
+        applySmoothing();
         activateDisplays();
         //        Trace.call2("DisplayControlImpl.applyAttributes");
     }
@@ -5543,6 +5562,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                  "textureQuality", getTextureQualityLabel(),
                                  SETTINGS_GROUP_DISPLAY);
         }
+        if (checkFlag(FLAG_SMOOTHING)) {
+            dsd.addPropertyValue(getSmoothingType(), "smoothingType",
+                                 "Smoothing Type", SETTINGS_GROUP_DISPLAY);
+            dsd.addPropertyValue(new Integer(getSmoothingAmount()),
+                                 "smoothingAmount", "Smoothing Amount",
+                                 SETTINGS_GROUP_DISPLAY);
+        }
 
         dsd.addPropertyValue(new Boolean(getDisplayVisibility()),
                              "displayVisibility", "Visibility",
@@ -5571,11 +5597,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     }
-
-
-
-
-
 
 
     /**
@@ -6692,6 +6713,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         selectRangeWidget = null;
         contourWidget     = null;
         lww               = null;
+        sww               = null;
     }
 
 
@@ -7289,6 +7311,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     doMakeTextureSlider()));
         }
 
+        if (checkFlag(FLAG_SMOOTHING)) {
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
+        }
     }
 
     /**
@@ -11664,7 +11690,94 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws VisADException, RemoteException {}
 
 
+    /**
+     *  Use the value of the smoothing properties to set the value on the display.  Subclasses
+     *  need to implement.
+     */
+    protected void applySmoothing() {}
 
+
+    /**
+     * Make the smoothing widget
+     *
+     * @return the smoothing widget
+     */
+    private JComponent doMakeSmoothingWidget() {
+        sww = new ValueSliderWidget(
+            this, 1, 19, "smoothingAmount", "Amount", 1.0f, true,
+            "Amount of smoothing (larger number = greater smoothing");
+        final JComponent swwContents = sww.getContents(true);
+        addRemovable(sww);
+        GuiUtils.enableTree(
+            swwContents, getSmoothingType().equals(GridUtil.SMOOTH_GAUSSIAN));
+
+        List<TwoFacedObject> smootherList =
+            TwoFacedObject.createList(smoothers, smootherLabels);
+        JComboBox smootherBox = new JComboBox();
+        GuiUtils.setListData(smootherBox, smootherList);
+        smootherBox.setSelectedItem(TwoFacedObject.findId(getSmoothingType(),
+                smootherList));
+        smootherBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TwoFacedObject select =
+                    (TwoFacedObject) ((JComboBox) e.getSource())
+                        .getSelectedItem();
+                setSmoothingType((String) select.getId());
+                GuiUtils.enableTree(
+                    swwContents,
+                    getSmoothingType().equals(GridUtil.SMOOTH_GAUSSIAN));
+            }
+        });
+        JPanel smoothWidgets = GuiUtils.left(GuiUtils.hbox(smootherBox,
+                                   GuiUtils.filler(), swwContents));
+        return smoothWidgets;
+    }
+
+    /**
+     * Get the smoothing factor
+     *
+     * @return the smoothing factor
+     */
+    public int getSmoothingAmount() {
+        return smoothingAmount;
+    }
+
+    /**
+     * Get the smoothing type
+     *
+     * @return the smoothing factor
+     */
+    public String getSmoothingType() {
+        return smoothingType;
+    }
+
+    /**
+     * Set the smoothing factor
+     *
+     * @param val the new smoothing factor
+     */
+    public void setSmoothingAmount(int val) {
+        smoothingAmount = val;
+        if (sww != null) {
+            sww.setValue(val);
+        }
+        if (getHaveInitialized()) {
+            applySmoothing();
+        }
+    }
+
+    /**
+     * Set the smoothing type
+     *
+     * @param type  the new smoothing type
+     */
+    public void setSmoothingType(String type) {
+        smoothingType = type;
+        // reload data if done interactively
+        if (getHaveInitialized()) {
+            applySmoothing();
+        }
+    }
 
     /**
      *  Set the PointSize property.

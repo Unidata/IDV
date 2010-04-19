@@ -21,65 +21,83 @@
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.data.DataChoice;
-
-import ucar.unidata.idv.DisplayConventions;
-
-import ucar.unidata.util.ContourInfo;
-import ucar.unidata.util.GuiUtils;
-
-import ucar.visad.display.Contour2DDisplayable;
-import ucar.visad.display.DisplayableData;
-
-import visad.*;
-
-import java.awt.Component;
-import java.awt.Container;
-
-
-import java.awt.event.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.util.ContourInfo;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.visad.display.Contour2DDisplayable;
+import ucar.visad.display.DisplayableData;
+import visad.FieldImpl;
+import visad.VisADException;
 
 
 /**
  * A control for displaying gridded data as 2D contours.
  *
  * @author IDV Development Team
- * @version $Revision: 1.48 $
  */
 
 public class ContourPlanViewControl extends PlanViewControl {
 
-    /** flag for color filling */
-    boolean isColorFill = false;
+    /** labels for smoothing functions 
+    public final static String[] smootherLabels = new String[] { LABEL_NONE,
+            "5 point", "9 point", "Gaussian Weighted" };
+     * */
+
+    /** types of smoothing functions 
+    public final static String[] smoothers = new String[] { LABEL_NONE,
+            GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
+            GridUtil.SMOOTH_GAUSSIAN };
+     * */
 
     /** the displayable for the data depiction */
     private Contour2DDisplayable contourDisplay;
+
+    /** flag for color filling */
+    boolean isColorFill = false;
+
+    /** smoothing factor for Gaussian smoother
+    private int smoothingFactor = 6;
+     * */
+
+
+    /** default type 
+    private String smoothingType = LABEL_NONE;
+     * */
 
     /**
      * Create a new <code>ContourPlanViewControl</code> setting the
      * attribute flags as appropriate.
      */
     public ContourPlanViewControl() {
-        setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE | FLAG_DISPLAYUNIT);
+        setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
     }
 
+
     /**
-     * Return the contour display used by this object.  A wrapper
-     * around {@link #getPlanDisplay()}.
-     * @return this instance's Contour2Ddisplayable.
-     * @see #createPlanDisplay()
-     */
-    Contour2DDisplayable getContourDisplay() {
-        return (Contour2DDisplayable) getPlanDisplay();
+     *  Use the value of the skip factor to subset the data.
+    protected void applySmoothing() {
+
+        if ((getGridDisplayable() != null) && (currentSlice != null)) {
+            try {
+                getGridDisplayable().loadData(
+                    getSliceForDisplay(currentSlice));
+            } catch (Exception ve) {
+                logException("applySkipFactor", ve);
+            }
+        }
     }
+     */
 
     /**
      * Method to create the particular <code>DisplayableData</code> that
@@ -97,21 +115,23 @@ public class ContourPlanViewControl extends PlanViewControl {
         return contourDisplay;
     }
 
+    /**
+     * Get whether this display should use color filled contours.  Used
+     * mainly by persistence.
+     * @return  true if color fill should be used.
+     */
+    public boolean getColorFill() {
+        return isColorFill;
+    }
 
     /**
-     * Set the data displayed by this control
-     * @param data  DataChoice representing the data
-     * @return true if successful
-     * @throws VisADException  error creating data
-     * @throws RemoteException  error creating remote data
+     * Return the contour display used by this object.  A wrapper
+     * around {@link #getPlanDisplay()}.
+     * @return this instance's Contour2Ddisplayable.
+     * @see #createPlanDisplay()
      */
-    protected boolean setData(DataChoice data)
-            throws VisADException, RemoteException {
-        if ( !super.setData(data)) {
-            return false;
-        }
-        applyVerticalValue();
-        return true;
+    Contour2DDisplayable getContourDisplay() {
+        return (Contour2DDisplayable) getPlanDisplay();
     }
 
     /**
@@ -126,8 +146,6 @@ public class ContourPlanViewControl extends PlanViewControl {
         }
         return contourInfo;
     }
-
-
 
     /**
      * Get the default contour info
@@ -147,6 +165,15 @@ public class ContourPlanViewControl extends PlanViewControl {
     }
 
     /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return isColorFill;
+    }
+
+    /**
      * A hook for derived classes to set any state. ex: color filled contours turn off
      * labels
      *
@@ -159,57 +186,11 @@ public class ContourPlanViewControl extends PlanViewControl {
         }
     }
 
-
-
-
-    // Comment out for now.
-    /*
-     * Add in any special control widgets to the current list of widgets.
-     * @param controlWidgets  list of control widgets
-     *
-     * @throws VisADException   VisAD error
-     * @throws RemoteException   RMI error
-    public void getControlWidgets(List controlWidgets)
-            throws VisADException, RemoteException {
-        super.getControlWidgets(controlWidgets);
-        JCheckBox toggle = new JCheckBox("", getColorFill());
-        toggle.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    isColorFill = ((JCheckBox) e.getSource()).isSelected();
-                    getContourDisplay().setColorFill(isColorFill);
-
-                } catch (Exception ve) {
-                    logException("setSmoothed", ve);
-                }
-            }
-        });
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Color Fill:"),
-                    GuiUtils.leftCenter(toggle, GuiUtils.filler())));
-    }
-     */
-
     /**
-     * Apply the vertical offset
+     * Do what is needed when projection changes
      */
-    private void applyVerticalValue() {
-        /*  NB:  the toFront method should obviate this.
-            If still needed, uncomment
-
-        if ( !haveLevels()) {
-            try {
-                double z = getInitialZPosition();
-                contourDisplay.addConstantMap(
-                    new ConstantMap(getVerticalValue((isColorFill == true)
-                                                     ? z
-                                                     : z + .01), getDisplayAltitudeType()));
-            } catch (Exception exc) {
-                logException("applyVerticalValue", exc);
-            }
-        }
-        */
+    public void projectionChanged() {
+        super.projectionChanged();
     }
 
     /**
@@ -222,29 +203,18 @@ public class ContourPlanViewControl extends PlanViewControl {
     }
 
     /**
-     * Get whether this display should use color filled contours.  Used
-     * mainly by persistence.
-     * @return  true if color fill should be used.
+     * Set the data displayed by this control
+     * @param data  DataChoice representing the data
+     * @return true if successful
+     * @throws VisADException  error creating data
+     * @throws RemoteException  error creating remote data
      */
-    public boolean getColorFill() {
-        return isColorFill;
-    }
-
-    /**
-     * Do what is needed when projection changes
-     */
-    public void projectionChanged() {
-        super.projectionChanged();
-        applyVerticalValue();
-    }
-
-    /**
-     * Is this a raster display?
-     *
-     * @return  true if raster
-     */
-    public boolean getIsRaster() {
-        return isColorFill;
+    protected boolean setData(DataChoice data)
+            throws VisADException, RemoteException {
+        if ( !super.setData(data)) {
+            return false;
+        }
+        return true;
     }
 
 }

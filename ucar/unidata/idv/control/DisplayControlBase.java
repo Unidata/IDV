@@ -294,20 +294,23 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** Bitmask for controls that have a fixed z position */
     public static final int FLAG_ZPOSITION = 1 << 7;
 
-    /** Bitmask for controls allow selecting a data range */
+    /** Bitmask for controls that allow selecting a data range */
     public static final int FLAG_SELECTRANGE = 1 << 8;
 
-    /** Bitmask for controls allow selecting a time range */
+    /** Bitmask for controls that allow selecting a time range */
     public static final int FLAG_TIMERANGE = 1 << 9;
 
-    /** Bitmask for controls allow line width setting */
+    /** Bitmask for controls that allow line width setting */
     public static final int FLAG_LINEWIDTH = 1 << 10;
 
-    /** Bitmask for controls allow skip factor setting */
+    /** Bitmask for controls that allow skip factor setting */
     public static final int FLAG_SKIPFACTOR = 1 << 11;
 
-    /** Bitmask for controls allow skip factor setting */
+    /** Bitmask for controls that allow texture quality setting */
     public static final int FLAG_TEXTUREQUALITY = 1 << 12;
+
+    /** Bitmask for controls that allow grid smoothing setting */
+    public static final int FLAG_SMOOTHING = 1 << 13;
 
     /** No-op for attributeFlags */
     public static final int FLAG_NONE = 0;
