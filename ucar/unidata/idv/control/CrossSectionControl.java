@@ -1553,6 +1553,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                   getObjectStore().get(
                                       PREF_SAMPLING_MODE,
                                       DEFAULT_SAMPLING_MODE)));
+        // apply smoothing
+        if (checkFlag(FLAG_SMOOTHING)
+                && !getSmoothingType().equals(LABEL_NONE)) {
+            slice = GridUtil.smooth(slice, getSmoothingType(), getSmoothingAmount());
+        }
         loadData(slice);
     }
 
@@ -1591,6 +1596,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     protected void load2DData(FieldImpl twoDData)
             throws VisADException, RemoteException {
         ((GridDisplayable) vcsDisplay).loadData(twoDData);
+    }
+
+    /**
+     *  Use the value of the smoothing type and weight to subset the data.
+     */
+    protected void applySmoothing() throws VisADException, RemoteException {
+    	loadDataFromLine();
     }
 
     /**

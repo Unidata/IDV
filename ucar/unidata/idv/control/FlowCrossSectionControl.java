@@ -85,7 +85,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      * Create a new FlowCrossSectionControl; set attribute flags
      */
     public FlowCrossSectionControl() {
-        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH);
+        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
 
     /**

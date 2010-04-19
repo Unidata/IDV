@@ -11693,9 +11693,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      *  Use the value of the smoothing properties to set the value on the display.  Subclasses
      *  need to implement.
+     *
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD error
      */
-    protected void applySmoothing() {}
-
+    protected void applySmoothing() throws VisADException, RemoteException {}
 
     /**
      * Make the smoothing widget
@@ -11762,7 +11764,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             sww.setValue(val);
         }
         if (getHaveInitialized()) {
-            applySmoothing();
+            try {
+                applySmoothing();
+            } catch (Exception e) {
+                logException("Error applying smoothing", e);
+            }
         }
     }
 
@@ -11775,7 +11781,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         smoothingType = type;
         // reload data if done interactively
         if (getHaveInitialized()) {
-            applySmoothing();
+            try {
+                applySmoothing();
+            } catch (Exception e) {
+                logException("Error applying smoothing", e);
+            }
         }
     }
 

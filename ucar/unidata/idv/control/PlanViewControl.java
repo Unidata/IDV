@@ -1189,7 +1189,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /**
      *  Use the value of the smoothing type and weight to subset the data.
      */
-    protected void applySmoothing() {
+    protected void applySmoothing() throws VisADException, RemoteException {
 
         if ((getGridDisplayable() != null) && (currentSlice != null)) {
             try {
