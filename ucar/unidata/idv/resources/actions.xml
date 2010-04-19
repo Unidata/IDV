@@ -278,7 +278,7 @@
      id="help.showhelptips"
      description="Show Help Tips"
      group="Help"
-     image="/auxdata/ui/icons/TipOfTheDay16.gif"
+     image="/auxdata/ui/icons/lightbulb.png"
      action="jython:idv.getIdvUIManager().showHelpTips ();"/>
   <action
      id="help.showsupportform"
