@@ -80,7 +80,6 @@ import javax.swing.*;
  * RealType.Longitude and/or RealType.Altitude.<P>
  *
  * @author Don Murray
- * @version $Revision: 1.121 $ $Date: 2007/04/13 22:19:09 $
  */
 public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
