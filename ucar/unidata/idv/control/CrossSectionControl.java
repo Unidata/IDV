@@ -1296,7 +1296,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
     /**
-     * Apply the Z position.  Now that the selector is in lat/lon/alt space, we need to transform from XYZ
+     * Apply the Z position.  If the selector is in lat/lon/alt space,
+     * we need to transform from XYZ
      *
      * @throws RemoteException   Java RMI Exception
      * @throws VisADException    VisADException
@@ -1304,8 +1305,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     protected void applyZPosition() throws VisADException, RemoteException {
         super.applyZPosition();
         if (csSelector != null) {
-            EarthLocation[] startEnd = getLineCoords();
-            setPosition(startEnd[0], startEnd[1]);
+            RealTuple start = csSelector.getStartPoint();
+            if (Util.isEarthCoordinates(start)) {
+                EarthLocation[] startEnd = getLineCoords();
+                setPosition(startEnd[0], startEnd[1]);
+            }
         }
     }
 
@@ -1556,7 +1560,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         // apply smoothing
         if (checkFlag(FLAG_SMOOTHING)
                 && !getSmoothingType().equals(LABEL_NONE)) {
-            slice = GridUtil.smooth(slice, getSmoothingType(), getSmoothingAmount());
+            slice = GridUtil.smooth(slice, getSmoothingType(),
+                                    getSmoothingAmount());
         }
         loadData(slice);
     }
@@ -1600,9 +1605,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     /**
      *  Use the value of the smoothing type and weight to subset the data.
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
     protected void applySmoothing() throws VisADException, RemoteException {
-    	loadDataFromLine();
+        loadDataFromLine();
     }
 
     /**
