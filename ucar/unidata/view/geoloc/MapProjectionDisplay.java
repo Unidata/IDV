@@ -1124,6 +1124,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 minLon    = r2d2.getX();
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
+                //isLatLon  = true;
                 // TODO:  figure out this a little more.
             } else if (mp instanceof AREACoordinateSystem) {
                 //minLon    = -180;
@@ -1132,8 +1133,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             }
             // TODO:  figure out what we should be doing here.
             use360 = !((minLon >= -185) && (maxLon <= 185));
-            if ((isLatLon && !use360)      // lat/lon projections in +/-180 rang
-                    || !mp.isXYOrder()) {  // Vis5D
+            if ((isLatLon && !use360)  // lat/lon projections in +/-180 rang
+                    || !mp.isXYOrder()  // Vis5D
+                    || ((minLon > -360) && (minLon < 0) && (maxLon > 180))) {  // AVN grids
                 adjustLons = false;
             }
             /*
@@ -1434,7 +1436,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;
 
-        /** _more_          */
+        /** _more_ */
         private CoordinateSystem theCoordinateSystem;
 
         /** index of the latitude coordinate */
