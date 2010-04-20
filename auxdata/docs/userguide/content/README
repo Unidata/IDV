@@ -20,5 +20,11 @@ Then cd to ../processed
 Then source ../content/genpdf.sh
 Which results in a userguide.pdf file
 
- 
 
+ 
+To generate the Jython library docs:
+
+cd ucar/unidata/idv/resources/python
+java ucar.unidata.idv.JythonManager *.py > inner.html
+
+Cut and paste inner.html into the tools/JythonLib.html user guide page.
