@@ -1,23 +1,22 @@
-/**
- * Copyright  1997-2009 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.data.grid;
 
@@ -26,8 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
-import ucar.ma2.Range;
 import ucar.ma2.InvalidRangeException;
+import ucar.ma2.Range;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
@@ -92,10 +91,10 @@ import visad.util.DataUtility;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.geom.Rectangle2D;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 
 import java.io.*;
 
@@ -212,14 +211,28 @@ public class GeoGridDataSource extends GridDataSource {
     public GeoGridDataSource() {}
 
 
-    public GeoGridDataSource(DataSourceDescriptor descriptor, GridDataset gds, String name, String filename) {
-        super(descriptor,filename, name, (Hashtable)null);
-	dataset = gds;
+    /**
+     * Construct a GeoGridDataSource
+     *
+     * @param descriptor   the data source descriptor
+     * @param gds          The GridDataset
+     * @param name         A name
+     * @param filename     the filename
+     */
+    public GeoGridDataSource(DataSourceDescriptor descriptor,
+                             GridDataset gds, String name, String filename) {
+        super(descriptor, filename, name, (Hashtable) null);
+        dataset = gds;
     }
 
 
+    /**
+     * Create a GeoGridDataSource from the GridDataset
+     *
+     * @param gds  the GridDataset
+     */
     public GeoGridDataSource(GridDataset gds) {
-	dataset = gds;
+        dataset = gds;
     }
 
 
@@ -276,8 +289,13 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
+    /**
+     * Set the default selection bounds
+     *
+     * @param rect rectangle
+     */
     public void setDefaultSelectionBounds(Rectangle2D.Float rect) {
-	getDataSelection().getGeoSelection(true).setLatLonRect(rect);
+        getDataSelection().getGeoSelection(true).setLatLonRect(rect);
     }
 
 
@@ -596,7 +614,9 @@ public class GeoGridDataSource extends GridDataSource {
     public void doRemove() {
         super.doRemove();
         try {
-        if (dataset != null) dataset.close();
+            if (dataset != null) {
+                dataset.close();
+            }
         } catch (IOException ioe) {}
         dataset   = null;
         gcsVsTime = null;
@@ -693,7 +713,7 @@ public class GeoGridDataSource extends GridDataSource {
         Hashtable             catMap             = new Hashtable();
         Hashtable             currentDataChoices = new Hashtable();
 
-        List displays = getIdv().getDisplayControls();
+        List                  displays = getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -1131,6 +1151,7 @@ public class GeoGridDataSource extends GridDataSource {
      * with the method addDataChoice.
      */
     protected void doMakeDataChoices() {
+
         GridDataset myDataset = getDataset();
         if (myDataset == null) {
             return;
@@ -1202,22 +1223,22 @@ public class GeoGridDataSource extends GridDataSource {
                         choice.setName(PREFIX_GRIDRELATIVE
                                        + choice.getName());
                     }
-                } /*else {  // check for GRIB definition
-                    String canonical = DataAlias.aliasToCanonical(choice.getName());
-                    if (Misc.equals(canonical, "U") ||
-                        Misc.equals(canonical, "V")) {
-                         Attribute vecFlag = 
-                             cfield.findAttributeIgnoreCase("GRIB_VectorComponentFlag");
-                         if (vecFlag != null) {
-                             String vecFlagVal = vecFlag.getStringValue();
-                             if (vecFlagVal.equals("gridRelative")) {
-                                  choice.setName(PREFIX_GRIDRELATIVE
-                                                 + choice.getName());
-                             }
-                         }
-                    }
-                }
-                */
+                }  /*else {  // check for GRIB definition
+                     String canonical = DataAlias.aliasToCanonical(choice.getName());
+                     if (Misc.equals(canonical, "U") ||
+                         Misc.equals(canonical, "V")) {
+                          Attribute vecFlag =
+                              cfield.findAttributeIgnoreCase("GRIB_VectorComponentFlag");
+                          if (vecFlag != null) {
+                              String vecFlagVal = vecFlag.getStringValue();
+                              if (vecFlagVal.equals("gridRelative")) {
+                                   choice.setName(PREFIX_GRIDRELATIVE
+                                                  + choice.getName());
+                              }
+                          }
+                     }
+                 }
+                 */
                 addDataChoice(choice);
             }
         }
@@ -1229,9 +1250,8 @@ public class GeoGridDataSource extends GridDataSource {
                         GuiUtils.inset(new JLabel("<html>No gridded data found for:<br><br>&nbsp;&nbsp;<i>"
                             + this
                             + "</i><br><br>Do you want to try to load this as another data type?</html>"), 5), null)) {
-                getIdv().getDataManager()
-                    .createDataSourceAndAskForType(getFilePath(),
-                        getProperties());
+                getIdv().getDataManager().createDataSourceAndAskForType(
+                    getFilePath(), getProperties());
                 setInError(true, false, "");
             } else {
                 //For now just bail out
@@ -1253,6 +1273,7 @@ public class GeoGridDataSource extends GridDataSource {
         } else {
             dimensionsLabel = twoDDimensionsLabel;
         }
+
 
 
 
@@ -1287,22 +1308,38 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    /**
+     * Get the list of parameters
+     *
+     * @return  the list
+     */
     public List<String> listParameters() {
-	List<String> params = new ArrayList<String>();
-	for(DataChoice dc: (List<DataChoice>)getDataChoices()) {
-	    params.add(dc.getName());
-	}
-	return params;
+        List<String> params = new ArrayList<String>();
+        for (DataChoice dc : (List<DataChoice>) getDataChoices()) {
+            params.add(dc.getName());
+        }
+        return params;
     }
 
-    public Data getData(String parameter) 
+    /**
+     * Get the data for a particular parameter
+     *
+     * @param parameter  the parameter name
+     *
+     * @return  the Data or null
+     *
+     * @throws RemoteException Java RMI Error
+     * @throws VisADException  VisAD Error
+     */
+    public Data getData(String parameter)
             throws VisADException, RemoteException {
-	DataChoice dataChoice = findDataChoice(parameter);
-	if(dataChoice == null) return null;
-	DataSelection dataSelection = new DataSelection();
-	//	dataSelection.setTimes(Misc.newList(new Integer(0)));
-        Data data = makeFieldImpl(dataChoice, dataSelection,
-                                  new Hashtable());
+        DataChoice dataChoice = findDataChoice(parameter);
+        if (dataChoice == null) {
+            return null;
+        }
+        DataSelection dataSelection = new DataSelection();
+        //      dataSelection.setTimes(Misc.newList(new Integer(0)));
+        Data data = makeFieldImpl(dataChoice, dataSelection, new Hashtable());
         return data;
         //        }
     }
@@ -1428,10 +1465,11 @@ public class GeoGridDataSource extends GridDataSource {
         if (geoGrid == null) {
             return null;
         }
-        ucar.nc2.Dimension ensDim = geoGrid.getEnsembleDimension();
-        GeoSelection geoSelection = ((givenDataSelection != null)
-                                     ? givenDataSelection.getGeoSelection()
-                                     : null);
+        ucar.nc2.Dimension ensDim       = geoGrid.getEnsembleDimension();
+        GeoSelection       geoSelection = ((givenDataSelection != null)
+                                           ? givenDataSelection
+                                               .getGeoSelection()
+                                           : null);
         boolean needVolume =
             ((geoGrid.getCoordinateSystem().getVerticalTransform() != null)
              && ((requestProperties != null)
@@ -1442,11 +1480,11 @@ public class GeoGridDataSource extends GridDataSource {
         StringBuffer filename = new StringBuffer("grid_" + paramName);
 
         try {
-            Range ensRange = makeRange(ensDim, null, 1);
-            Range timeRange = null;
+            Range ensRange   = makeRange(ensDim, null, 1);
+            Range timeRange  = null;
             Range levelRange = null;
-            Range xRange = null;
-            Range yRange = null;
+            Range xRange     = null;
+            Range yRange     = null;
             if ((fromLevelIndex >= 0) && (toLevelIndex >= 0) && !needVolume) {
                 levelRange = new Range(fromLevelIndex, toLevelIndex);
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
@@ -1467,22 +1505,32 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_z_" + geoSelection.getZStrideToUse());
 
                 if (geoSelection.getLatLonRect() != null) {
-                	LatLonRect bbox = geoSelection.getLatLonRect();
-                    filename.append(
-                        "_rect_"
-                        + cleanBBoxName(bbox));
-                    List yx_ranges = geoGrid.getCoordinateSystem().getRangesFromLatLonRect(bbox);
-                    yRange = makeRange(geoGrid.getYDimension(), (Range)yx_ranges.get(0),geoSelection.getYStrideToUse());
-                    xRange = makeRange(geoGrid.getXDimension(), (Range)yx_ranges.get(1),geoSelection.getYStrideToUse());
+                    LatLonRect bbox = geoSelection.getLatLonRect();
+                    filename.append("_rect_" + cleanBBoxName(bbox));
+                    List yx_ranges =
+                        geoGrid.getCoordinateSystem().getRangesFromLatLonRect(
+                            bbox);
+                    yRange = makeRange(geoGrid.getYDimension(),
+                                       (Range) yx_ranges.get(0),
+                                       geoSelection.getYStrideToUse());
+                    xRange = makeRange(geoGrid.getXDimension(),
+                                       (Range) yx_ranges.get(1),
+                                       geoSelection.getYStrideToUse());
+                } else if (geoSelection.getHasNonOneStride()) {
+                    yRange = makeRange(geoGrid.getYDimension(), yRange,
+                                       geoSelection.getYStrideToUse());
+                    xRange = makeRange(geoGrid.getXDimension(), xRange,
+                                       geoSelection.getYStrideToUse());
                 }
                 // Z stride is ignored if
                 if ((levelRange != null) && geoSelection.hasZStride()
                         && (geoSelection.getZStrideToUse() > 1)) {
-                    levelRange = new Range(fromLevelIndex,
-                            toLevelIndex, geoSelection.getZStrideToUse());
+                    levelRange = new Range(fromLevelIndex, toLevelIndex,
+                                           geoSelection.getZStrideToUse());
                 }
                 //                System.out.println("level range(1):  " + levelRange);
-                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null, levelRange, yRange, xRange);
+                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null,
+                        levelRange, yRange, xRange);
                 /*
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
@@ -1494,7 +1542,8 @@ public class GeoGridDataSource extends GridDataSource {
                 extraCacheKey = levelRange;
                 //                System.out.println("level range(2):  " + levelRange);
                 //geoGrid = geoGrid.subset(null, levelRange, null, null);
-                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null, levelRange, yRange, xRange);
+                geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null,
+                        levelRange, yRange, xRange);
             }
         } catch (InvalidRangeException ire) {
             throw new IllegalArgumentException("Invalid range:" + ire);
@@ -1534,16 +1583,30 @@ public class GeoGridDataSource extends GridDataSource {
         return adapter;
     }
 
-    private Range makeRange(ucar.nc2.Dimension dim, Range range, int stride) throws InvalidRangeException {
-    	if (dim == null) return null;
+    /**
+     * Make a range for the given parameters
+     *
+     * @param dim   The dimension to subset
+     * @param range an existing subset
+     * @param stride  the stride
+     *
+     * @return the corresponding Range
+     *
+     * @throws InvalidRangeException not a valid range
+     */
+    private Range makeRange(ucar.nc2.Dimension dim, Range range, int stride)
+            throws InvalidRangeException {
+        if (dim == null) {
+            return null;
+        }
         if (range == null) {
-          range = new Range(0, dim.getLength() - 1, stride);
+            range = new Range(0, dim.getLength() - 1, stride);
         } else {
-          range = new Range(range.first(), range.last(), stride);
+            range = new Range(range.first(), range.last(), stride);
         }
         return range;
     }
-    
+
     /**
      * Clean up the bounding box name so it can be used in a file name.
      * change : and + and any other strange chars to _
@@ -1575,9 +1638,9 @@ public class GeoGridDataSource extends GridDataSource {
             o = ((TwoFacedObject) o).getId();
         }
 
-	if(o instanceof Integer) {
-	    return ((Integer)o).intValue();
-	}
+        if (o instanceof Integer) {
+            return ((Integer) o).intValue();
+        }
 
         if (o instanceof String) {
             try {
@@ -1677,7 +1740,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
-	//	System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
+        //      System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
                                      fromLevelIndex, toLevelIndex, false);
@@ -1719,13 +1782,13 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
         Trace.call2("GeoGridDataSource.make times");
-	/*
+        /*
         System.err.print("times:");
         for(int i=0;i<timeIndices.length;i++) {
             System.err.print(" " + timeIndices[i]);
         }
         System.err.println("");
-	*/
+        */
 
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
@@ -2320,9 +2383,9 @@ public class GeoGridDataSource extends GridDataSource {
         if ( !super.applyProperties()) {
             return false;
         }
-	if(reverseTimesCheckbox!=null) {
-	    reverseTimes = reverseTimesCheckbox.isSelected();
-	}
+        if (reverseTimesCheckbox != null) {
+            reverseTimes = reverseTimesCheckbox.isSelected();
+        }
         return true;
     }
 
@@ -2364,4 +2427,3 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 }
-
