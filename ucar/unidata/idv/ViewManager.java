@@ -68,9 +68,6 @@ import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Plotter;
 
-
-
-
 import ucar.visad.Util;
 
 import ucar.visad.display.*;
