@@ -170,3 +170,69 @@ To create a test archive enable the "Test" menu. There should be
 a "Write Test Archive" entry. Select that and you will be prompted
 for an archive name, an optional text description and the directory
 to place the archive in. Select /upc/share/idv/test/archives.
+
+***********************************************************************
+Building/configuring the installers
+
+The installers are built automatically by ant using install4j
+which is located in /upc/share/install4j.  We have a single,
+multi-platform license which means that only one copy can run at
+a time, but on any machine you want.  Website for install4j is
+http://www.ej-technologies.com/products/install4j/overview.html.
+The Unidata Admin staff has the license information.  The license server
+runs on zero.
+
+The configuration file is in svn:
+/ucar/unidata/idv/release/installer/idv.install4j.  This file is used
+as a template for the installer and copied to /upc/share/idv/installers
+during the build process.  At that point, the version number is filled in.
+
+To make configuration changes, run /upc/share/install4j/bin/install4j
+and open the template.  After making changes, test the build and if it
+works as you expect, save the changes back to the template.
+
+JRE bundles:
+
+The JREs that are included in the installers need to be updated
+periodically as new versions of Java come out.  On most platforms, it's
+a matter of:
+
+- downloading the JRE from java.sun.com
+- logging onto a machine of the particular OS
+- unpacking the OS specific JRE to a temporary directory 
+- installing Java 3D there (just unzip on top of the jre)
+- running install4j to create a new JRE bundles.  (Using install4j creates 
+smaller bundles than manually tar'ing and gzipping the JRE directory).
+
+The only platform that is problematic is Windows because when you install
+the JRE, it makes it the default on your system.  So, you have to install
+it on your system, not to a temporary directory.  You also have to install a
+copy of install4j on your system to run the bundle generator.
+
+To create a JRE bundle in install4j, start it up and select the 
+Project->Create a JRE Bundle menu and step through the process. The important
+page is the Select a JRE:
+
+- select the top level of the unpacked JRE
+- Input the version of the JRE (e.g. 1.6.0_20)
+- For the custom id, use the java 3d version  (e.g., j3d1.5.2)
+
+The resulting JRE bundle will use this to create a name like:
+
+linux-i386-1.6.0_17_j3d1.5.2.tar.gz
+
+The JRE bundles are automatically stored in /upc/share/install4j/jres, except
+on Windows.  It will be stored in the jres directory of the Windows install4j
+installation and then has to be manually copied over to /upc/share/install4j/jres.
+
+Once you have created the JRE bundles, you need to update the template to point
+to the new versions.  There are two ways to do this.  The most fool-proof way is
+to run install4j and update the Media instances to point to the new bundles.  The
+other is just to edit the template.  If you do the latter, just make sure you change
+all references.
+
+SSEC uses install4j for McIDAS-V, so you can contact them for help with the program.
+We also share the JRE bundles with them for platforms that we don't have.
+
+The Unidata admin staff has the information on licenses and passwords to get in
+to download new versions.
