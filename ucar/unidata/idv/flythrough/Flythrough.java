@@ -132,6 +132,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import javax.swing.text.html.*;
 
 import javax.vecmath.*;
 
@@ -845,12 +846,30 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
     /**
+     * Create if needed and return the editorpane for the description tab
+     *
+     * @return description view
+     */
+    private JEditorPane getHtmlView() {
+        if (htmlView == null) {
+            JEditorPane tmp = new JEditorPane();
+            tmp.setContentType("text/html");
+            tmp.setPreferredSize(new Dimension(300, 400));
+            tmp.setEditable(false);
+            tmp.setText(" ");
+            htmlView = tmp;
+        }
+        return htmlView;
+
+    }
+
+    /**
      * _more_
      *
      * @return _more_
      */
     public JComponent doMakeDescriptionPanel() {
-        JScrollPane htmlScrollPane = new JScrollPane(htmlView);
+        JScrollPane htmlScrollPane = new JScrollPane(getHtmlView());
         htmlScrollPane.setPreferredSize(new Dimension(400, 300));
         return htmlScrollPane;
     }
@@ -940,11 +959,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         };
 
 
-        htmlView = new JEditorPane();
-        htmlView.setPreferredSize(new Dimension(300, 400));
-        htmlView.setEditable(false);
-        htmlView.setContentType("text/html");
-
+        //xxxxx
 
         animationWidget = new AnimationWidget(null, null, animationInfo);
 
@@ -2705,12 +2720,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         double[]         aspect        = navDisplay.getDisplayAspect();
         try {
 
-            if (htmlView != null) {
-                if (pt1.getDescription() != null) {
-                    htmlView.setText(pt1.getDescription());
-                } else {
-                    htmlView.setText("");
-                }
+            if (pt1.getDescription() != null) {
+                getHtmlView().setText(pt1.getDescription());
+            } else {
+                getHtmlView().setText("");
             }
 
             processReadout(pt1);
