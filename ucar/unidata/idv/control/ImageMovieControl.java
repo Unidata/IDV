@@ -318,6 +318,8 @@ public class ImageMovieControl extends DisplayControlImpl {
     /** the last data image */
     Image lastDataImage;
 
+    /** the location of the image */
+    private LatLonPoint lastImageLocation = null;
 
 
     /**
@@ -627,6 +629,7 @@ public class ImageMovieControl extends DisplayControlImpl {
             if (lastDataImage != null) {
                 //Clear the last image to force the reload
                 lastDataImage = null;
+                lastImageLocation = null;
                 loadImage(getImagePanel().getImage());
             }
         } catch (Exception exc) {
@@ -725,10 +728,14 @@ public class ImageMovieControl extends DisplayControlImpl {
             if ((image == null) || (getImageLocation() == null)
                     || !showImageInDisplay) {
                 lastDataImage = null;
+                lastImageLocation = null;
                 imageDisplay.setVisible(false);
                 return;
             }
-            if (lastDataImage == image) {
+            if (lastImageLocation == getImageLocation() ) { //lastDataImage == image) {
+                lastDataImage = null;
+                lastImageLocation = null;
+                imageDisplay.setVisible(false);
                 return;
             }
             lastDataImage = image;
@@ -737,6 +744,7 @@ public class ImageMovieControl extends DisplayControlImpl {
             FlatField imageData = Util.makeField(image, true);
             //FlatField   imageData   = DataUtility.makeField(image, true);
             Linear2DSet imageDomain = (Linear2DSet) imageData.getDomainSet();
+            lastImageLocation = getImageLocation();
             int[] screen =
                 earthToScreen(new EarthLocationTuple(getImageLocation(),
                     new Real(RealType.Altitude, 0)));
