@@ -154,9 +154,11 @@ public class DemDataSource extends FilesDataSource {
         super(descriptor, Misc.newList(source), source, "DEM data source",
               properties);
         Object oj = properties.get("useFilenameForTime");
-        useFilenameForTime = Boolean.parseBoolean(oj.toString());
+        if(oj != null)
+            useFilenameForTime = Boolean.parseBoolean(oj.toString());
         oj = properties.get("pattern");
-        dateTimePattern = oj.toString();
+        if(oj != null)
+            dateTimePattern = oj.toString();
         initDemDataSource();
     }
 
