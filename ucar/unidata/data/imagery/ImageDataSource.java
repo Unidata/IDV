@@ -932,22 +932,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
-        //if ((dataChoice instanceof CompositeDataChoice) 
-        //        && !(hasBandInfo(dataChoice))) {
-        //      System.err.println ("ImageDataSource.getDataInner");
 
         try {
             if (dataChoice instanceof CompositeDataChoice) {
                 return makeImageSequence(myCompositeDataChoice,
                                          dataSelection);
             } else if (hasBandInfo(dataChoice)) {
-                //List descriptors = getDescriptors(dataChoice, dataSelection);
-                //if ((descriptors != null) && (descriptors.size() == 1)) {
-                //    return (Data) makeImage(
-                //        (AddeImageDescriptor) descriptors.get(0));
-                //} else {
                 return makeImageSequence(dataChoice, dataSelection);
-                //}
             }
 
         } finally {
@@ -1194,6 +1185,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
         return true;
     }
 
+    /** the ranget type */
+    private MathType rangeType = null;
 
     /**
      * Create the  image sequence defined by the given dataChoice.
@@ -1306,7 +1299,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             DataChoice parent = dataChoice.getParent();
             final List<SingleBandedImage> images =
                 new ArrayList<SingleBandedImage>();
-            MathType rangeType = null;
+            rangeType = null;
             for (Iterator iter =
                     descriptorsToUse.iterator(); iter.hasNext(); ) {
                 final AddeImageDescriptor aid =
@@ -1335,48 +1328,67 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                          + descriptorsToUse.size() + "  "
                                          + label;
 
-                /* for now don't do things in parallel
-                   threadManager.addRunnable(new ThreadManager.MyRunnable() {
-                   public void run() throws Exception {
-                */
-                try {
+                if (rangeType == null) {
+                    try {
 
-                    SingleBandedImage image = makeImage(aid, rangeType, true,
-                                                  readLabel);
-                    if (image != null) {
-                        //If this is the first one then grab its rangeType to use for later images
-                        if (rangeType == null) {
+                        SingleBandedImage image = makeImage(aid, rangeType,
+                                                      true, readLabel);
+                        if (image != null) {
+                            //This is the first one, so grab its rangeType to use for later images
                             rangeType =
                                 ((FunctionType) image.getType()).getRange();
+                            synchronized (images) {
+                                images.add(image);
+                            }
                         }
-                        synchronized (images) {
-                            images.add(image);
-                        }
+
+                    } catch (VisADException ve) {
+                        // this is a nested error so just print out the real thing
+                        String realError = ve.getMessage();
+                        realError =
+                            realError.substring(realError.lastIndexOf(":")
+                                + 1);
+                        LogUtil.printMessage(realError);
+                        //return null;
                     }
+                } else {  // have the rangeType so put reading the rest in threads
+                    threadManager.addRunnable(new ThreadManager.MyRunnable() {
+                        public void run() throws Exception {
+                            try {
 
-                } catch (VisADException ve) {
-                    // this is a nested error so just print out the real thing
-                    String realError = ve.getMessage();
-                    realError =
-                        realError.substring(realError.lastIndexOf(":") + 1);
-                    LogUtil.printMessage(realError);
-                    //return null;
+                                SingleBandedImage image = makeImage(aid,
+                                                              rangeType,
+                                                              true,
+                                                              readLabel);
+                                if (image != null) {
+                                    synchronized (images) {
+                                        images.add(image);
+                                    }
+                                }
+
+                            } catch (VisADException ve) {
+                                // this is a nested error so just print out the real thing
+                                String realError = ve.getMessage();
+                                realError = realError.substring(
+                                    realError.lastIndexOf(":") + 1);
+                                LogUtil.printMessage(realError);
+                                //return null;
+                            }
+                        }
+                    });
+
                 }
-                /*
-                  }
-                  });*/
+            }
 
+            try {
+                threadManager.runInParallel(
+                    getDataContext().getIdv().getMaxDataThreadCount());
+            } catch (VisADException ve) {
+                LogUtil.printMessage(ve.toString());
             }
             if (images.isEmpty()) {
                 return null;
             }
-
-            /*            try {
-                          threadManager.runInParallel(
-                          getDataContext().getIdv().getMaxDataThreadCount());
-                          } catch (VisADException ve) {
-                          LogUtil.printMessage(ve.toString());
-                          }*/
 
             TreeMap imageMap = new TreeMap();
             for (SingleBandedImage image : images) {
