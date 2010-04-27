@@ -29,10 +29,11 @@ import ucar.unidata.data.*;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.DatePattern;
 
 
 import ucar.visad.UTMCoordinateSystem;
-
+import ucar.nc2.units.DateFromString;
 
 
 import visad.*;
@@ -56,12 +57,7 @@ import java.net.URL;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -75,8 +71,69 @@ public class DemDataSource extends FilesDataSource {
 
     /** the DEM reader */
     MyDemFamily dem;
+    boolean useFilenameForTime = false;
+
+    private String dateTimePattern;
 
     /**
+     * pattern for parsing date/time string from filenames
+     * recognized pattern characters:
+	 * <li>y, Y : Year
+	 * <li>m, M : Month
+	 * <li>d, D	: Day
+	 * <li>h, H : Hour
+	 * <li>n, N : Minute (m is already in use for MONTH)
+	 * <li>s, S : Seconds
+	 * Other characters are used as place holders. The pattern does not support
+	 * wildcard characters.
+	 *
+	 * @return the current date/time pattern
+	 * @author nieuwenhuis
+     */
+    public String getDateTimePattern() {
+		return dateTimePattern;
+	}
+
+    /**
+     * pattern for parsing date/time string from filenames
+     * recognized pattern characters:
+	 * <li>y, Y : Year
+	 * <li>m, M : Month
+	 * <li>d, D	: Day
+	 * <li>h, H : Hour
+	 * <li>n, N : Minute (m is already in use for MONTH)
+	 * <li>s, S : Seconds
+	 * Other characters are used as place holders. The pattern does not support
+	 * wildcard characters.
+	 *
+	 * @param dateTimePattern the new date/time pattern
+	 * @author nieuwenhuis
+     */
+	public void setDateTimePattern(String dateTimePattern) {
+		this.dateTimePattern = dateTimePattern;
+	}
+
+	/**
+	 * Flag indicating if the date/time should be parsed from the filename
+	 * @return true: filename contains date/time
+	 *
+	 * @author nieuwenhuis
+	 */
+	public boolean getUseFilenameForTime() {
+		return useFilenameForTime;
+	}
+
+	/**
+	 * Flag indicating if the date/time should be parsed from the filename
+	 *
+	 * @param useFilenameForTime set to true if the filename contains the date/time
+	 * @author nieuwenhuis
+	 */
+	public void setUseFilenameForTime(boolean useFilenameForTime) {
+		this.useFilenameForTime = useFilenameForTime;
+	}
+
+	/**
      * Dummy constructor so this object can get unpersisted.
      */
     public DemDataSource() {}
@@ -96,6 +153,10 @@ public class DemDataSource extends FilesDataSource {
             throws VisADException {
         super(descriptor, Misc.newList(source), source, "DEM data source",
               properties);
+        Object oj = properties.get("useFilenameForTime");
+        useFilenameForTime = Boolean.parseBoolean(oj.toString());
+        oj = properties.get("pattern");
+        dateTimePattern = oj.toString();
         initDemDataSource();
     }
 
@@ -174,10 +235,19 @@ public class DemDataSource extends FilesDataSource {
      * @return  list of available data times
      */
     protected List doMakeDateTimes() {
-        return new ArrayList();
+    	if (useFilenameForTime) {
+    		DatePattern dp = new DatePattern(dateTimePattern);
+    		ArrayList<DateTime> dts = new ArrayList<DateTime>();
+    		for (int i = 0; i < sources.size(); i++) {
+                String fname = IOUtil.getFileTail((String) sources.get(i));
+                if (dp.match(fname))
+                  dts.add(dp.getDateTime());
+    		}
+    		return dts;
+    	}
+    	else
+    		return new ArrayList();
     }
-
-
 
     /**
      * Get the data
@@ -189,6 +259,7 @@ public class DemDataSource extends FilesDataSource {
      */
     private FieldImpl makeDemData(String filename) throws Exception {
         FieldImpl fi = (FieldImpl) getCache(filename);
+        FieldImpl fii = null;
         if (fi == null) {
             String dataFile = filename;
             try {
@@ -209,6 +280,8 @@ public class DemDataSource extends FilesDataSource {
             LogUtil.message("Reading DEM file: "
                             + IOUtil.getFileTail(filename));
             fi = (FieldImpl) dem.open(dataFile);
+            if(useFilenameForTime)
+                fi = (FieldImpl)ucar.visad.Util.makeTimeField(fi, doMakeDateTimes());
             putCache(filename, fi);
         }
         return fi;
@@ -266,9 +339,6 @@ public class DemDataSource extends FilesDataSource {
 
 
     }
-
-
-
 
 }
 
