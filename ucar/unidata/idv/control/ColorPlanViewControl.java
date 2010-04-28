@@ -63,7 +63,8 @@ public class ColorPlanViewControl extends PlanViewControl {
      */
     public ColorPlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                          | FLAG_SELECTRANGE | FLAG_TEXTUREQUALITY);
+                          | FLAG_SELECTRANGE | FLAG_TEXTUREQUALITY
+                          | FLAG_SMOOTHING);
     }
 
     /**
