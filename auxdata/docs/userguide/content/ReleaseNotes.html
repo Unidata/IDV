@@ -11,97 +11,50 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.7u2 release.
+The items below reflect changes since the 2.8u1 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="IDV <%idv.version%> requires Java 6 (aka 1.6)" id="jdk6">
-This version requires Java 6 or later.  For most operating systems, 
-Java 6 or higher has been the default for several years. On Mac OS-X, 
-Java 5 is the default except for the new Snow Leopard (10.6) release.
-For information on upgrading Mac OS-X to Java 6, see the 
-<a href="Systems.html">System Requirements</a>.
-</faqitem>
-
-<faqitem q="Use of netCDF 4.1 library" id="nj4">
-The version of netCDF-Java has been updated to 4.1.
-</faqitem>
-
-<faqitem q="Data caching" id="datacache">
-A new scheme for data caching has been instituted.  Details can be found
-in the <a href="misc/PerformanceTuning.html">Performance Tuning</a>
-page.
+<faqitem q="New Java Version" id="jdk6_20">
+The IDV installers have been updated to Java 6 Update 20.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Radar cross section display" id="radarxs">
-A radar cross section control has been added in this release.  This
-control allows users to create arbitrary cross sections through radar
-volume data.  Details are in the 
-<a href="controls/level2/RadarCrossSectionControl.html">
-Radar Cross Section Control</a> section of this guide.  
-</faqitem>
-
-<faqitem q="New default background image layers" id="bkgimages">
-Serveral new background image layers have been added to the Background
-Images control.  The default layer is now a static Blue Marble image.  
-This avoids the problem denied access problems users have been 
-reporting becuase of the heavy use that the NASA Web Map Server
-gets.
-</faqitem>
-
-<faqitem q="Globe display improvements" id="globe">
-Several imrovements have been added to the Globe display.  You
-can now zoom in without going through the clipping plane.  You can
-spin the globe with a mouse flick and control the rate of rotation.
-There are predefined viewpoints available through the Projections menu.
-Most of the probes have been updated to work in the globe now.
+<faqitem q="Smoothing of grids" id="gridsmooth">
+Selected grid displays (contours, flow vectors, wind barbs) now have
+an option to perform smoothing functions on the grid.  The GEMPAK
+5-point (SM5S), 9-point (SM9S) and Gaussian Weighted Function (GWFS)
+smoothing functions have been implemented in the IDV.  Users can select
+one of these functions in the display <a href="controls/index.html">
+control window</a> and/or save these
+as a <a href="tools/DisplaySettings.html">Display Setting</a> to use
+when creating the display.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
-<faqitem q="Lightning data from native and GEMPAK files" id="lightning">
-USPLN and NLDN lightning data stored in native or GEMPAK format can now be
-read in as point data.  Several new lightning layout models have been 
-added to the system list.
-</faqitem>
+<faqitem q="New grid diagnostics" id="pvoretc">
+New grid diagnostics are available in this release.  The following
+have been added:
 
-<faqitem q="Ship/Buoy data" id="shipbuoy">
-Ship and buoy data are now available through the ADDE point obs chooser.  A
-new station model has been added for these data.
-</faqitem>
+<ul>
+<li>PVOR(S,V) -  Potential Vorticity
+<li>QVCL(THTA, V) - Q-Vectors in a layer
+<li>SAVG,SAVS  - average over a grid
+<li>SM5S, SM9S, SM5V, SM9V, GWFS, GWFV - grid smoothers (5-point, 9-point, Gaussian)
+</ul>
 
-<faqitem q="Support for high resolution NEXRAD Level III data" id="hiresl3">
-Starting in February, 2010, the National Weather Service will be transmitting
-higher resolution NEXRAD Level III radar products.  This release has support
-for reading and displaying these new products.
-</faqitem>
-
-<faqitem cat="User Interface Changes"></faqitem>
-
-<faqitem q="New icons" id="newicons">
-Many of the icons in the toolbars and display controls have been replaced
-with icons from the Silk Icon set from 
-<a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a>
-(http://www.famfamfam.com/lab/icons/silk/)
+You can use the Grid-&gt;Define a grid diagnostic formula to use these
+functions.
 </faqitem>
 
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
-Many bug fixes were made in this release.  A few of the more obvious:
-<ul>
-<li>Suprious Map Lines (requires plugin, see <a href="Bugs.html#maplines">Known Problems</a>)
-<li>Redrawing of View Window after exiting Full Screen mode.
-<li>Problem with using IDV.app on Mac OS-X in 2.8
-<li>Wrong number of images returned from server
-<li>METAR plots using incorrect cloud cover parameters.
-<li>Handle missing data in ATCF hurricane track files
-<li>Handle invalid images better.
-</ul>
+Many bug fixes were made in this release.  
 </faqitem>
 
 <faqitem q="Known Problems" id="problems">
