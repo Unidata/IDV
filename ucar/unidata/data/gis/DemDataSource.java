@@ -20,45 +20,29 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.data.gis;
 
+//~--- non-JDK imports --------------------------------------------------------
 
 import ucar.unidata.data.*;
-
-
+import ucar.unidata.util.DatePattern;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.DatePattern;
-
-
-import ucar.visad.UTMCoordinateSystem;
-import ucar.nc2.units.DateFromString;
-
-
 import visad.*;
-
-import visad.data.*;
+import visad.data.FunctionFormFamily;
 import visad.data.gis.ArcAsciiGridForm;
 import visad.data.gis.UsgsDemForm;
 
-import java.awt.geom.Rectangle2D;
-
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-
 import java.net.MalformedURLException;
-
-
-
 import java.net.URL;
-
-
 import java.rmi.RemoteException;
-
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * DataSource for Digital Elevation Model (DEM) files. Handles USGS
@@ -68,76 +52,19 @@ import java.util.*;
  * @version $Revision: 1.16 $
  */
 public class DemDataSource extends FilesDataSource {
+    boolean useFilenameForTime = false;
+
+    /** list of data categories */
+    private List   categories = DataCategory.parseCategories("DEM;GRID-2D;");
+    private String dateTimePattern;
 
     /** the DEM reader */
     MyDemFamily dem;
-    boolean useFilenameForTime = false;
-
-    private String dateTimePattern;
 
     /**
-     * pattern for parsing date/time string from filenames
-     * recognized pattern characters:
-	 * <li>y, Y : Year
-	 * <li>m, M : Month
-	 * <li>d, D	: Day
-	 * <li>h, H : Hour
-	 * <li>n, N : Minute (m is already in use for MONTH)
-	 * <li>s, S : Seconds
-	 * Other characters are used as place holders. The pattern does not support
-	 * wildcard characters.
-	 *
-	 * @return the current date/time pattern
-	 * @author nieuwenhuis
-     */
-    public String getDateTimePattern() {
-		return dateTimePattern;
-	}
-
-    /**
-     * pattern for parsing date/time string from filenames
-     * recognized pattern characters:
-	 * <li>y, Y : Year
-	 * <li>m, M : Month
-	 * <li>d, D	: Day
-	 * <li>h, H : Hour
-	 * <li>n, N : Minute (m is already in use for MONTH)
-	 * <li>s, S : Seconds
-	 * Other characters are used as place holders. The pattern does not support
-	 * wildcard characters.
-	 *
-	 * @param dateTimePattern the new date/time pattern
-	 * @author nieuwenhuis
-     */
-	public void setDateTimePattern(String dateTimePattern) {
-		this.dateTimePattern = dateTimePattern;
-	}
-
-	/**
-	 * Flag indicating if the date/time should be parsed from the filename
-	 * @return true: filename contains date/time
-	 *
-	 * @author nieuwenhuis
-	 */
-	public boolean getUseFilenameForTime() {
-		return useFilenameForTime;
-	}
-
-	/**
-	 * Flag indicating if the date/time should be parsed from the filename
-	 *
-	 * @param useFilenameForTime set to true if the filename contains the date/time
-	 * @author nieuwenhuis
-	 */
-	public void setUseFilenameForTime(boolean useFilenameForTime) {
-		this.useFilenameForTime = useFilenameForTime;
-	}
-
-	/**
      * Dummy constructor so this object can get unpersisted.
      */
     public DemDataSource() {}
-
 
     /**
      * Create a DemDataSource from the specification given.
@@ -148,20 +75,80 @@ public class DemDataSource extends FilesDataSource {
      *
      * @throws VisADException     VisAD problem
      */
-    public DemDataSource(DataSourceDescriptor descriptor, String source,
-                         Hashtable properties)
-            throws VisADException {
-        super(descriptor, Misc.newList(source), source, "DEM data source",
-              properties);
+    public DemDataSource(DataSourceDescriptor descriptor, String source, Hashtable properties) throws VisADException {
+        super(descriptor, Misc.newList(source), source, "DEM data source", properties);
+
         Object oj = properties.get("useFilenameForTime");
-        if(oj != null)
+
+        if (oj != null) {
             useFilenameForTime = Boolean.parseBoolean(oj.toString());
+        }
+
         oj = properties.get("pattern");
-        if(oj != null)
+
+        if (oj != null) {
             dateTimePattern = oj.toString();
+        }
+
         initDemDataSource();
     }
 
+    /**
+     * pattern for parsing date/time string from filenames
+     * recognized pattern characters:
+     *     <li>y, Y : Year
+     *     <li>m, M : Month
+     *     <li>d, D     : Day
+     *     <li>h, H : Hour
+     *     <li>n, N : Minute (m is already in use for MONTH)
+     *     <li>s, S : Seconds
+     *     Other characters are used as place holders. The pattern does not support
+     *     wildcard characters.
+     *
+     *     @return the current date/time pattern
+     */
+    public String getDateTimePattern() {
+        return dateTimePattern;
+    }
+
+    /**
+     * pattern for parsing date/time string from filenames
+     * recognized pattern characters:
+     *     <li>y, Y : Year
+     *     <li>m, M : Month
+     *     <li>d, D     : Day
+     *     <li>h, H : Hour
+     *     <li>n, N : Minute (m is already in use for MONTH)
+     *     <li>s, S : Seconds
+     *     Other characters are used as place holders. The pattern does not support
+     *     wildcard characters.
+     *
+     *     @param dateTimePattern the new date/time pattern
+     *
+     */
+    public void setDateTimePattern(String dateTimePattern) {
+        this.dateTimePattern = dateTimePattern;
+    }
+
+    /**
+     * Flag indicating if the date/time should be parsed from the filename
+     * @return true: filename contains date/time
+     *
+     *
+     */
+    public boolean getUseFilenameForTime() {
+        return useFilenameForTime;
+    }
+
+    /**
+     * Flag indicating if the date/time should be parsed from the filename
+     *
+     * @param useFilenameForTime set to true if the filename contains the date/time
+     *
+     */
+    public void setUseFilenameForTime(boolean useFilenameForTime) {
+        this.useFilenameForTime = useFilenameForTime;
+    }
 
     /**
      * Is this data source capable of saving its data to local disk
@@ -187,16 +174,11 @@ public class DemDataSource extends FilesDataSource {
         dem = new MyDemFamily();
     }
 
-    /** list of data categories */
-    private List categories = DataCategory.parseCategories("DEM;GRID-2D;");
-
-
     /**
      * Make the {@link DataChoice}s associated with this source.
      */
     protected void doMakeDataChoices() {
-        addDataChoice(new DirectDataChoice(this, sources.get(0), "Elevation",
-                                           "Elevation", categories));
+        addDataChoice(new DirectDataChoice(this, sources.get(0), "Elevation", "Elevation", categories));
     }
 
     /**
@@ -217,19 +199,19 @@ public class DemDataSource extends FilesDataSource {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    protected Data getDataInner(DataChoice dataChoice, DataCategory category,
-                                DataSelection dataSelection,
+    protected Data getDataInner(DataChoice dataChoice, DataCategory category, DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         String filename = (String) dataChoice.getId();
+
         try {
             return makeDemData(filename);
         } catch (Exception exc) {
             logException("Reading DEM: " + filename, exc);
         }
+
         return null;
     }
-
 
     /**
      * Make the list of available times for this data source.
@@ -237,18 +219,22 @@ public class DemDataSource extends FilesDataSource {
      * @return  list of available data times
      */
     protected List doMakeDateTimes() {
-    	if (useFilenameForTime) {
-    		DatePattern dp = new DatePattern(dateTimePattern);
-    		ArrayList<DateTime> dts = new ArrayList<DateTime>();
-    		for (int i = 0; i < sources.size(); i++) {
+        if (useFilenameForTime) {
+            DatePattern         dp  = new DatePattern(dateTimePattern);
+            ArrayList<DateTime> dts = new ArrayList<DateTime>();
+
+            for (int i = 0; i < sources.size(); i++) {
                 String fname = IOUtil.getFileTail((String) sources.get(i));
-                if (dp.match(fname))
-                  dts.add(dp.getDateTime());
-    		}
-    		return dts;
-    	}
-    	else
-    		return new ArrayList();
+
+                if (dp.match(fname)) {
+                    dts.add(dp.getDateTime());
+                }
+            }
+
+            return dts;
+        } else {
+            return new ArrayList();
+        }
     }
 
     /**
@@ -260,37 +246,41 @@ public class DemDataSource extends FilesDataSource {
      * @throws Exception   problem accessing file or creating data
      */
     private FieldImpl makeDemData(String filename) throws Exception {
-        FieldImpl fi = (FieldImpl) getCache(filename);
+        FieldImpl fi  = (FieldImpl) getCache(filename);
         FieldImpl fii = null;
+
         if (fi == null) {
             String dataFile = filename;
+
             try {
-                //See if its a URL
+
+                // See if its a URL
                 LogUtil.message("Copying DEM file to local disk");
+
                 URL url = new URL(filename);
-                //If it is then get the bites and copy them to a temp file
-                String tail = Misc.getUniqueId()
-                              + IOUtil.getFileTail(filename);
-                String tmpFile =
-                    getDataContext().getIdv().getStore().getTmpFile(tail);
-                FileOutputStream fos = new FileOutputStream(tmpFile);
-                IOUtil.writeTo(IOUtil.getInputStream(filename, getClass()),
-                               fos);
+
+                // If it is then get the bites and copy them to a temp file
+                String           tail    = Misc.getUniqueId() + IOUtil.getFileTail(filename);
+                String           tmpFile = getDataContext().getIdv().getStore().getTmpFile(tail);
+                FileOutputStream fos     = new FileOutputStream(tmpFile);
+
+                IOUtil.writeTo(IOUtil.getInputStream(filename, getClass()), fos);
                 fos.close();
                 dataFile = tmpFile;
             } catch (MalformedURLException exc) {}
-            LogUtil.message("Reading DEM file: "
-                            + IOUtil.getFileTail(filename));
+
+            LogUtil.message("Reading DEM file: " + IOUtil.getFileTail(filename));
             fi = (FieldImpl) dem.open(dataFile);
-            if(useFilenameForTime)
-                fi = (FieldImpl)ucar.visad.Util.makeTimeField(fi, doMakeDateTimes());
+
+            if (useFilenameForTime) {
+                fi = (FieldImpl) ucar.visad.Util.makeTimeField(fi, doMakeDateTimes());
+            }
+
             putCache(filename, fi);
         }
+
         return fi;
     }
-
-
-
 
     /**
      * A container for all the supported DEM types.  Currently, USGS
@@ -306,10 +296,8 @@ public class DemDataSource extends FilesDataSource {
         public MyDemFamily() {
             super("dem");
             forms.add(new UsgsDemForm());
-            forms.add(
-                new ArcAsciiGridForm(RealTupleType.SpatialEarth2DTuple));
+            forms.add(new ArcAsciiGridForm(RealTupleType.SpatialEarth2DTuple));
         }
-
 
         /**
          * Determines if this is a DEM file from the name
@@ -329,18 +317,14 @@ public class DemDataSource extends FilesDataSource {
             return false;
         }
 
-
         /**
          * Get a list of default suffixes for McIDAS map files
          * @return  valid list of suffixes
          */
         public String[] getDefaultSuffixes() {
             String[] suff = { ".dem", ".asc" };
+
             return suff;
         }
-
-
     }
-
 }
-
