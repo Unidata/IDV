@@ -1,20 +1,18 @@
 /*
- * $Id: SaturationMixingRatio.java,v 1.15 2005/05/13 18:35:43 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,13 +21,15 @@
 package ucar.visad.quantities;
 
 
-
-import java.rmi.RemoteException;
-
-import ucar.visad.VisADMath;
 import ucar.visad.Util;
 
+import ucar.visad.VisADMath;
+
 import visad.*;
+
+
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -60,8 +60,7 @@ public final class SaturationMixingRatio extends WaterVaporMixingRatio {
     static {
         try {
             myRealType = RealType.getRealType("SaturationMixingRatio",
-                                              CommonUnits.GRAMS_PER_KILOGRAM,
-                                              (Set) null);
+                    CommonUnits.GRAMS_PER_KILOGRAM, (Set) null);
             myFunction = new MyFunction();
         } catch (Exception e) {
             System.err.println("SaturationMixingRatio.<clinit>: "
@@ -133,9 +132,10 @@ public final class SaturationMixingRatio extends WaterVaporMixingRatio {
         return SaturationVaporPressure.createTemperature(
             Util.clone(
                 VisADMath.divide(
-                    VisADMath.multiply(rSat, pressure), VisADMath.add(
-                        getGasConstantRatio(), rSat)), SaturationVaporPressure
-                            .getRealType()));
+                    VisADMath.multiply(rSat, pressure),
+                    VisADMath.add(
+                        getGasConstantRatio(),
+                        rSat)), SaturationVaporPressure.getRealType()));
     }
 
     /**
@@ -164,8 +164,8 @@ public final class SaturationMixingRatio extends WaterVaporMixingRatio {
          */
         Util.vetType(InSituAirTemperature.getRealType(), temperature);
 
-        return Util.clone(WaterVaporMixingRatio.create(pressure, temperature),
-                          getRealType());
+        return Util.clone(WaterVaporMixingRatio.create(pressure,
+                temperature), getRealType());
     }
 
     /**
@@ -311,8 +311,3 @@ public final class SaturationMixingRatio extends WaterVaporMixingRatio {
         }
     }
 }
-
-
-
-
-

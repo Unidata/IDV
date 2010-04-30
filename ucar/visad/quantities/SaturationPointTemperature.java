@@ -1,20 +1,18 @@
 /*
- * $Id: SaturationPointTemperature.java,v 1.10 2005/05/13 18:35:43 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,12 +21,13 @@
 package ucar.visad.quantities;
 
 
-
-import java.rmi.RemoteException;
-
 import ucar.visad.*;
 
 import visad.*;
+
+
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -254,31 +253,20 @@ public final class SaturationPointTemperature extends AirTemperature {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Data create(Data pressure, Data temperature, Data mixingRatio)
+    public static Data create(Data pressure, Data temperature,
+                              Data mixingRatio)
             throws TypeException, VisADException, RemoteException {
 
         Util.vetType(AirPressure.getRealType(), pressure);
         Util.vetType(AirTemperature.getRealType(), temperature);
         Util.vetType(WaterVaporMixingRatio.getRealType(), mixingRatio);
 
-        return Util.clone(
-            VisADMath.add(
-                VisADMath.divide(
-                    getNumerator(),
-                    VisADMath.subtract(
-                        VisADMath.subtract(
-                            VisADMath.multiply(getLogTCoeff(), VisADMath.log(VisADMath.divide(temperature, getT0()))),
-                            VisADMath.log(
-                                VisADMath.divide(
-                                    VisADMath.multiply(mixingRatio, VisADMath.divide(pressure, getP0())),
-                                    VisADMath.add(
-                                        mixingRatio,
-                                        WaterVaporMixingRatio
-                                            .getGasConstantRatio())))), getDenomConst())), getTempConst()), getRealType());
+        return Util.clone(VisADMath.add(VisADMath.divide(getNumerator(),
+                VisADMath.subtract(VisADMath.subtract(VisADMath.multiply(getLogTCoeff(),
+                    VisADMath.log(VisADMath.divide(temperature,
+                        getT0()))), VisADMath.log(VisADMath.divide(VisADMath.multiply(mixingRatio,
+                            VisADMath.divide(pressure,
+                                getP0())), VisADMath.add(mixingRatio,
+                                    WaterVaporMixingRatio.getGasConstantRatio())))), getDenomConst())), getTempConst()), getRealType());
     }
 }
-
-
-
-
-

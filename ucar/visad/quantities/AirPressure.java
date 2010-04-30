@@ -1,25 +1,22 @@
 /*
- * $Id: AirPressure.java,v 1.16 2006/10/12 19:22:19 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.visad.quantities;
 
@@ -91,7 +88,8 @@ public class AirPressure extends Pressure {
      *                        Standard Atmosphere.
      * @throws VisADException if a core VisAD failure occurs.
      */
-    public static AirPressureCoordinateSystem getStandardAtmosphereCS() throws VisADException {
+    public static AirPressureCoordinateSystem getStandardAtmosphereCS()
+            throws VisADException {
 
         if (standardAtmosphereCS == null) {
             synchronized (AirPressure.class) {
@@ -114,8 +112,8 @@ public class AirPressure extends Pressure {
      *
      * @throws VisADException
      */
-    private static CoordinateSystem getStandardCoordinateSystem(
-            String name) throws VisADException {
+    private static CoordinateSystem getStandardCoordinateSystem(String name)
+            throws VisADException {
 
         CoordinateSystem cs = null;
 
@@ -243,10 +241,9 @@ public class AirPressure extends Pressure {
          * @throws VisADException       VisAD failure.
          * @throws RemoteException      Java RMI failure.
          */
-        public AirPressureCoordinateSystem(
-                Gridded1DSet pressure,
-                Gridded1DSet altitude) throws VisADException,
-                    RemoteException {
+        public AirPressureCoordinateSystem(Gridded1DSet pressure,
+                                           Gridded1DSet altitude)
+                throws VisADException, RemoteException {
 
             super(((SetType) altitude.getType()).getDomain(),
                   pressure.getSetUnits());
@@ -280,8 +277,8 @@ public class AirPressure extends Pressure {
          *                      corresponding to the input pressures.
          * @throws VisADException       VisAD failure.
          */
-        public double[][] toReference(
-                double[][] pressures) throws VisADException {
+        public double[][] toReference(double[][] pressures)
+                throws VisADException {
 
             double[] vals = pressures[0];
 
@@ -303,8 +300,8 @@ public class AirPressure extends Pressure {
          *                      the input altitudes.
          * @throws VisADException       VisAD failure.
          */
-        public double[][] fromReference(
-                double[][] altitudes) throws VisADException {
+        public double[][] fromReference(double[][] altitudes)
+                throws VisADException {
 
             altitudes = logPCoordSys.fromReference(altitudes);
 
@@ -327,8 +324,8 @@ public class AirPressure extends Pressure {
          *                      corresponding to the input pressures.
          * @throws VisADException       VisAD failure.
          */
-        public float[][] toReference(
-                float[][] pressures) throws VisADException {
+        public float[][] toReference(float[][] pressures)
+                throws VisADException {
 
             float[] vals = pressures[0];
 
@@ -350,8 +347,8 @@ public class AirPressure extends Pressure {
          *                      the input altitudes.
          * @throws VisADException       VisAD failure.
          */
-        public float[][] fromReference(
-                float[][] altitudes) throws VisADException {
+        public float[][] fromReference(float[][] altitudes)
+                throws VisADException {
 
             altitudes = logPCoordSys.fromReference(altitudes);
 
@@ -399,7 +396,7 @@ public class AirPressure extends Pressure {
      */
     public static class StandardAtmosphereCoordinateSystem extends AirPressureCoordinateSystem {
 
-        /** list of pressures*/
+        /** list of pressures */
         private static float[] pressures = new float[] {
             1013.25f, 954.61f, 898.76f, 845.59f, 795.01f, 746.91f, 701.21f,
             657.80f, 616.6f, 577.52f, 540.48f, 505.39f, 472.17f, 440.75f,
@@ -424,8 +421,8 @@ public class AirPressure extends Pressure {
          * @throws RemoteException  can't happen, but we've got to throw it
          * @throws VisADException   Problem creating the CoordinateSystem
          */
-        public StandardAtmosphereCoordinateSystem() throws VisADException,
-                RemoteException {
+        public StandardAtmosphereCoordinateSystem()
+                throws VisADException, RemoteException {
             super(new Gridded1DSet(getRealType("AirPressure",
                     CommonUnits.HECTOPASCAL), new float[][] {
                 pressures

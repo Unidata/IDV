@@ -1,20 +1,18 @@
 /*
- * $Id: VirtualPotentialTemperature.java,v 1.10 2005/05/13 18:35:45 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,13 +21,15 @@
 package ucar.visad.quantities;
 
 
-
-import java.rmi.RemoteException;
-
-import ucar.visad.VisADMath;
 import ucar.visad.Util;
 
+import ucar.visad.VisADMath;
+
 import visad.*;
+
+
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -75,7 +75,8 @@ public final class VirtualPotentialTemperature extends VirtualTemperature {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Data createFromDewPoint(Data pressure, Data temperature, Data dewPoint)
+    public static Data createFromDewPoint(Data pressure, Data temperature,
+                                          Data dewPoint)
             throws TypeException, UnimplementedException, VisADException,
                    RemoteException {
         return VirtualTemperature.createFromDewPoint(pressure,
@@ -100,7 +101,8 @@ public final class VirtualPotentialTemperature extends VirtualTemperature {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Data createFromMixingRatio(Data pressure, Data temperature, Data mixingRatio)
+    public static Data createFromMixingRatio(Data pressure, Data temperature,
+                                             Data mixingRatio)
             throws TypeException, UnimplementedException, VisADException,
                    RemoteException {
 
@@ -108,8 +110,3 @@ public final class VirtualPotentialTemperature extends VirtualTemperature {
             PotentialTemperature.create(pressure, temperature), mixingRatio);
     }
 }
-
-
-
-
-

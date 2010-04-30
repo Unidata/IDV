@@ -1,20 +1,18 @@
 /*
- * $Id: PseudoAdiabaticLapseRate.java,v 1.12 2005/05/13 18:35:42 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,13 +21,15 @@
 package ucar.visad.quantities;
 
 
-
-import java.rmi.RemoteException;
-
 import ucar.visad.*;
 
 import visad.*;
+
 import visad.data.units.DefaultUnitsDB;
+
+
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -92,8 +92,9 @@ public class PseudoAdiabaticLapseRate extends ScalarQuantity {
                                 .divide(MolecularWeightOfDryAir.newReal())
                                 .multiply(lOverRSubD)
                                 .multiply(LatentHeatOfEvaporation.newReal())
-                                .divide(SpecificHeatCapacityOfDryAirAtConstantPressure
-                                    .newReal());
+                                .divide(
+                                    SpecificHeatCapacityOfDryAirAtConstantPressure
+                                        .newReal());
                         } catch (RemoteException e) {}  // can't happen because above objects are local
                     }
                 }
@@ -157,9 +158,9 @@ public class PseudoAdiabaticLapseRate extends ScalarQuantity {
         Util.vetType(Pressure.getRealType(), pressure);
         Util.vetType(Temperature.getRealType(), temperature);
 
-        Data wSubSOverT = VisADMath.divide(
-                              SaturationMixingRatio.create(
-                                  pressure, temperature), temperature);
+        Data wSubSOverT =
+            VisADMath.divide(SaturationMixingRatio.create(pressure,
+                temperature), temperature);
 
         /*
         Data    epsilonLOverP = VisADMath.divide(epsilonL, pressure);
@@ -170,15 +171,12 @@ public class PseudoAdiabaticLapseRate extends ScalarQuantity {
          * Seymour L. Hess, 1985; Robert E. Krieger Publishing Company;
          * ISBN 0-88275-857-8.
          */
-        VisADMath.divide(
-            VisADMath.divide(
-                VisADMath.add(
-                    one, VisADMath.multiply(
-                        lOverRSubD, wSubSOverT)), VisADMath.add(
-                            one, VisADMath.multiply(
-                                epsilonL2OverCSubPRSubD, VisADMath.divide(
-                                    wSubSOverT, temperature)))), SpecificHeatCapacityOfDryAirAtConstantPressure
-                                        .newReal()),
+        VisADMath.divide(VisADMath.divide(VisADMath.add(one,
+                VisADMath.multiply(lOverRSubD,
+                    wSubSOverT)), VisADMath.add(one,
+                        VisADMath.multiply(epsilonL2OverCSubPRSubD,
+                            VisADMath.divide(wSubSOverT,
+                                temperature)))), SpecificHeatCapacityOfDryAirAtConstantPressure.newReal()),
         /*
         VisADMath.divide(
             VisADMath.add(
@@ -208,21 +206,16 @@ public class PseudoAdiabaticLapseRate extends ScalarQuantity {
      */
     public static void main(String[] args) throws Exception {
 
-        Real lapseRate =
-            (Real) VisADMath
-                .multiply(Gravity
-                    .newReal(), create(new Real(AirPressure
-                        .getRealType(), 1000, CommonUnits
-                        .HECTOPASCAL), new Real(AirTemperature
-                        .getRealType(), 24.5, CommonUnits.CELSIUS)));
+        Real lapseRate = (Real) VisADMath.multiply(
+                             Gravity.newReal(),
+                             create(new Real(
+                                 AirPressure.getRealType(), 1000,
+                                 CommonUnits.HECTOPASCAL), new Real(
+                                     AirTemperature.getRealType(), 24.5,
+                                     CommonUnits.CELSIUS)));
 
         System.out.println(
             SI.kelvin.divide(SI.meter.scale(1000)).toThis(
                 lapseRate.getValue(), lapseRate.getUnit()));
     }
 }
-
-
-
-
-

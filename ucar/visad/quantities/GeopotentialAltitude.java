@@ -1,25 +1,22 @@
 /*
- * $Id: GeopotentialAltitude.java,v 1.15 2006/10/09 14:49:16 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.visad.quantities;
 
@@ -166,8 +163,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws VisADException if a core VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    public static Data fromAltitude(Data altitude) throws VisADException,
-            RemoteException {
+    public static Data fromAltitude(Data altitude)
+            throws VisADException, RemoteException {
         return fromAltitude(altitude, Gravity.newReal());
     }
 
@@ -181,9 +178,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws VisADException if a core VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    public static Data fromAltitude(Data altitude,
-                                    Real gravity) throws VisADException,
-                                        RemoteException {
+    public static Data fromAltitude(Data altitude, Real gravity)
+            throws VisADException, RemoteException {
         return Util.clone(altitude.multiply(gravity), getRealType());
     }
 
@@ -199,9 +195,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Data toAltitude(Data geopotentialAltitude,
-                                  Real gravity) throws VisADException,
-                                      RemoteException {
+    public static Data toAltitude(Data geopotentialAltitude, Real gravity)
+            throws VisADException, RemoteException {
         return Util.clone(geopotentialAltitude.divide(gravity),
                           Altitude.getRealType());
     }
@@ -217,9 +212,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Data toAltitude(
-            Data geopotentialAltitude) throws VisADException,
-                RemoteException {
+    public static Data toAltitude(Data geopotentialAltitude)
+            throws VisADException, RemoteException {
         return toAltitude(geopotentialAltitude, Gravity.newReal());
     }
 
@@ -241,8 +235,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static double[] toAltitude(double[] geoAlts, Unit geoUnit,
                                       Real gravity, double[] altitudes,
-                                      Unit altUnit) throws VisADException,
-                                          RemoteException {
+                                      Unit altUnit)
+            throws VisADException, RemoteException {
 
         return toAltitude(geoAlts, geoUnit, gravity, altitudes, altUnit,
                           true);
@@ -268,12 +262,11 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static double[] toAltitude(double[] geoAlts, Unit geoUnit,
                                       Real gravity, double[] altitudes,
-                                      Unit altUnit,
-                                      boolean copy) throws VisADException,
-                                          RemoteException {
+                                      Unit altUnit, boolean copy)
+            throws VisADException, RemoteException {
 
-        altitudes = geoUnit.toThat(geoAlts, 
-                                   getGeopotentialUnit(altUnit, gravity), 
+        altitudes = geoUnit.toThat(geoAlts,
+                                   getGeopotentialUnit(altUnit, gravity),
                                    copy);
         double gVal = gravity.getValue();
         for (int i = 0; i < altitudes.length; i++) {
@@ -300,8 +293,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static float[] toAltitude(float[] geoAlts, Unit geoUnit,
                                      Real gravity, float[] altitudes,
-                                     Unit altUnit) throws VisADException,
-                                         RemoteException {
+                                     Unit altUnit)
+            throws VisADException, RemoteException {
 
         return toAltitude(geoAlts, geoUnit, gravity, altitudes, altUnit,
                           true);
@@ -326,12 +319,11 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static float[] toAltitude(float[] geoAlts, Unit geoUnit,
                                      Real gravity, float[] altitudes,
-                                     Unit altUnit,
-                                     boolean copy) throws VisADException,
-                                         RemoteException {
+                                     Unit altUnit, boolean copy)
+            throws VisADException, RemoteException {
 
-        altitudes = geoUnit.toThat(geoAlts, 
-                                   getGeopotentialUnit(altUnit, gravity), 
+        altitudes = geoUnit.toThat(geoAlts,
+                                   getGeopotentialUnit(altUnit, gravity),
                                    copy);
         float gVal = (float) gravity.getValue();
         for (int i = 0; i < altitudes.length; i++) {
@@ -357,8 +349,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws RemoteException  Java RMI failure.
      */
     public static double[] toGeopotentialAltitude(double[] altitudes,
-            Unit altUnit, Real gravity, double[] geoAlts,
-            Unit geoUnit) throws VisADException, RemoteException {
+            Unit altUnit, Real gravity, double[] geoAlts, Unit geoUnit)
+            throws VisADException, RemoteException {
 
         return toGeopotentialAltitude(altitudes, altUnit, gravity, geoAlts,
                                       geoUnit, true);
@@ -383,7 +375,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static double[] toGeopotentialAltitude(double[] altitudes,
             Unit altUnit, Real gravity, double[] geoAlts, Unit geoUnit,
-            boolean copy) throws VisADException, RemoteException {
+            boolean copy)
+            throws VisADException, RemoteException {
 
         System.arraycopy(geoUnit.toThis(altitudes,
                                         getGeopotentialUnit(altUnit,
@@ -410,8 +403,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws RemoteException  Java RMI failure.
      */
     public static float[] toGeopotentialAltitude(float[] altitudes,
-            Unit altUnit, Real gravity, float[] geoAlts,
-            Unit geoUnit) throws VisADException, RemoteException {
+            Unit altUnit, Real gravity, float[] geoAlts, Unit geoUnit)
+            throws VisADException, RemoteException {
 
 
         return toGeopotentialAltitude(altitudes, altUnit, gravity, geoAlts,
@@ -437,7 +430,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      */
     public static float[] toGeopotentialAltitude(float[] altitudes,
             Unit altUnit, Real gravity, float[] geoAlts, Unit geoUnit,
-            boolean copy) throws VisADException, RemoteException {
+            boolean copy)
+            throws VisADException, RemoteException {
 
         System.arraycopy(geoUnit.toThis(altitudes,
                                         getGeopotentialUnit(altUnit,
@@ -457,8 +451,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      *                          gpm).
      * @throws VisADException   VisAD failure.
      */
-    public static Unit getGeopotentialUnit(
-            Unit altUnit) throws VisADException {
+    public static Unit getGeopotentialUnit(Unit altUnit)
+            throws VisADException {
 
         Unit result = null;
 
@@ -485,10 +479,9 @@ public final class GeopotentialAltitude extends ScalarQuantity {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public static Unit getGeopotentialUnit(
-            Unit altUnit,
-            Real gravity) throws UnitException, TypeException,
-                                 RemoteException, VisADException {
+    public static Unit getGeopotentialUnit(Unit altUnit, Real gravity)
+            throws UnitException, TypeException, RemoteException,
+                   VisADException {
 
         Util.vetType(Gravity.getRealType(), gravity);
 
@@ -523,7 +516,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
          * @throws VisADException if a core VisAD failure occurs.
          */
         public GeopotentialCoordinateSystem(Real gravity, RealType reference,
-                                            Unit unit) throws VisADException {
+                                            Unit unit)
+                throws VisADException {
 
             super(new RealTupleType(reference), new Unit[] { unit });
 
@@ -537,8 +531,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
          * @return            Corresponding geopotential altitude values.
          * @throws VisADException if a core VisAD failure occurs.
          */
-        public double[][] fromReference(
-                double[][] values) throws VisADException {
+        public double[][] fromReference(double[][] values)
+                throws VisADException {
 
             try {
                 GeopotentialAltitude.toGeopotentialAltitude(values[0],
@@ -558,8 +552,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
          * @return            Corresponding geopotential altitude values.
          * @throws VisADException if a core VisAD failure occurs.
          */
-        public float[][] fromReference(
-                float[][] values) throws VisADException {
+        public float[][] fromReference(float[][] values)
+                throws VisADException {
 
             try {
                 GeopotentialAltitude.toGeopotentialAltitude(values[0],
@@ -579,8 +573,8 @@ public final class GeopotentialAltitude extends ScalarQuantity {
          * @return            Corresponding altitude values.
          * @throws VisADException if a core VisAD failure occurs.
          */
-        public double[][] toReference(
-                double[][] values) throws VisADException {
+        public double[][] toReference(double[][] values)
+                throws VisADException {
 
             try {
                 GeopotentialAltitude.toAltitude(values[0],
@@ -638,4 +632,3 @@ public final class GeopotentialAltitude extends ScalarQuantity {
         }
     }
 }
-

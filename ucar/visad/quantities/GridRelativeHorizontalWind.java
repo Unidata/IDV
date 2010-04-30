@@ -1,28 +1,22 @@
 /*
- * $Id: GridRelativeHorizontalWind.java,v 1.14 2006/12/05 19:04:33 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.visad.quantities;
 
@@ -366,16 +360,16 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 Set dom = innerField.getDomainSet();
                 if ( !innerDom.equals(dom)) {
                     //System.out.println("new domain");
-                    innerDom = dom;
+                    innerDom  = dom;
                     rHatField = (doNewCode
-                           ? hatFieldNew(innerDom, 0)
-                           : hatFieldOld(innerDom, 0));
+                                 ? hatFieldNew(innerDom, 0)
+                                 : hatFieldOld(innerDom, 0));
                     sHatField = (doNewCode
-                               ? hatFieldNew(innerDom, 1)
-                               : hatFieldOld(innerDom, 1));
+                                 ? hatFieldNew(innerDom, 1)
+                                 : hatFieldOld(innerDom, 1));
 
-                    rHats = rHatField.getFloats(false);
-                    sHats = sHatField.getFloats(false);
+                    rHats     = rHatField.getFloats(false);
+                    sHats     = sHatField.getFloats(false);
                     /*
                     throw new IllegalArgumentException("template="
                             + innerDom.toString() + "; domain="
@@ -477,8 +471,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         // If the grid is lat/lon or has an IdentityCoordinateSystem
         // don't do the rotation
         //TODO:  handle rotated lat/lon grids
-        if ( !hasCS
-                || refCoords == domainSamples
+        if ( !hasCS || (refCoords == domainSamples)
                 || (Arrays.equals(refCoords[latI], domainSamples[latI])
                     && Arrays.equals(refCoords[lonI], domainSamples[lonI]))) {
             if (index == 0) {
@@ -865,24 +858,25 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                                      float[] vs)
             throws VisADException {
 
-        int[][]         neighbors = grid.getNeighbors(index);
-        LatLonPointImpl refPt     = new LatLonPointImpl();
-        LatLonPointImpl neiPt     = new LatLonPointImpl();
-        Bearing         bearing   = new Bearing();
-        float[]         uv1       = new float[2];
-        float[]         uv2       = new float[2];
-        boolean         hasCS     = cs != null;
-        float[][] domainSamples = grid.getSamples(false);
-        float[][] crefCoords = (hasCS)
-                    ? cs.toReference(Set.copyFloats(domainSamples))
-                    : domainSamples;
+        int[][]         neighbors     = grid.getNeighbors(index);
+        LatLonPointImpl refPt         = new LatLonPointImpl();
+        LatLonPointImpl neiPt         = new LatLonPointImpl();
+        Bearing         bearing       = new Bearing();
+        float[]         uv1           = new float[2];
+        float[]         uv2           = new float[2];
+        boolean         hasCS         = cs != null;
+        float[][]       domainSamples = grid.getSamples(false);
+        float[][]       crefCoords    = (hasCS)
+                                        ? cs.toReference(
+                                            Set.copyFloats(domainSamples))
+                                        : domainSamples;
         // If the grid is lat/lon or has an IdentityCoordinateSystem
         // don't do the rotation
         //TODO:  handle rotated lat/lon grids
-        if ( !hasCS
-                || crefCoords == domainSamples
+        if ( !hasCS || (crefCoords == domainSamples)
                 || (Arrays.equals(crefCoords[latI], domainSamples[latI])
-                    && Arrays.equals(crefCoords[lonI], domainSamples[lonI]))) {
+                    && Arrays.equals(crefCoords[lonI],
+                                     domainSamples[lonI]))) {
             us = gridWinds[0];
             vs = gridWinds[1];
         } else {
@@ -893,22 +887,22 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 if (hasCS) {
                     refCoords = cs.toReference(refCoords);
                 }
-    
+
                 float[][] neiCoords = grid.indexToValue(neighbors[i]);
                 if (hasCS) {
                     neiCoords = cs.toReference(neiCoords);
                 }
-    
+
                 refPt.set(refCoords[latI][0], refCoords[lonI][0]);
-    
+
                 compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
                         -180, gridWinds[index][i], bearing, uv1);
-    
+
                 float d1 = (float) bearing.getDistance();
-    
-                compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
-                        gridWinds[index][i], bearing, uv2);
-    
+
+                compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1],
+                        0, gridWinds[index][i], bearing, uv2);
+
                 float   d2   = (float) bearing.getDistance();
                 boolean bad1 = Double.isNaN(d1);
                 boolean bad2 = Double.isNaN(d2);
@@ -927,7 +921,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                         float tot = d1 + d2;
                         float c1  = d2 / tot;
                         float c2  = d1 / tot;
-    
+
                         us[i] += c1 * uv1[0] + c2 * uv2[0];
                         vs[i] += c1 * uv1[1] + c2 * uv2[1];
                     }
@@ -966,4 +960,3 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         uv[1] = yhat * wind;
     }
 }
-
