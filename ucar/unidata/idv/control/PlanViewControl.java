@@ -214,7 +214,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @param el  earth location
      * @param animationValue   the animation value
      * @param animationStep  the animation step
-     * @param samples _more_
+     * @param samples the list of samples
      *
      * @return  the list of readout data
      *
@@ -530,10 +530,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Remove this control
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD data problem
      */
     public void doRemove() throws RemoteException, VisADException {
         super.doRemove();
@@ -842,9 +842,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Set the point size
      *
-     * @param value _more_
+     * @param value  the size
      */
     public void setPointSize(float value) {
         super.setPointSize(value);
@@ -1179,7 +1179,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             if (checkFlag(FLAG_SMOOTHING)
                     && !getSmoothingType().equals(LABEL_NONE)) {
                 retField = GridUtil.smooth(retField, getSmoothingType(),
-                                           getSmoothingAmount());
+                                           getSmoothingFactor());
             }
         }
         //System.out.println("slice for " + paramName + " = " + retField);
@@ -1188,6 +1188,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /**
      *  Use the value of the smoothing type and weight to subset the data.
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
 

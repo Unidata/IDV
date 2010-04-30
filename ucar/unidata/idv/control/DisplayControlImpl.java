@@ -856,16 +856,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private JTextField visbilityAnimationPauseFld;
 
     /** labels for smoothing functions */
-    private final static String[] smootherLabels = new String[] { LABEL_NONE,
-            "5 point", "9 point", "Gaussian Weighted" };
+    private final static String[] smootherLabels = new String[] {
+        LABEL_NONE, "5 point", "9 point", "Gaussian Weighted",
+        "Cressman Weighted", "Circular Aperature", "Rectangular Aperature"
+    };
 
     /** types of smoothing functions */
-    private final static String[] smoothers = new String[] { LABEL_NONE,
-            GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
-            GridUtil.SMOOTH_GAUSSIAN };
+    private final static String[] smoothers = new String[] {
+        LABEL_NONE, GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
+        GridUtil.SMOOTH_GAUSSIAN, GridUtil.SMOOTH_CRESSMAN,
+        GridUtil.SMOOTH_RECTANGULAR, GridUtil.SMOOTH_RECTANGULAR
+    };
 
     /** smoothing factor for Gaussian smoother */
-    private int smoothingAmount = 6;
+    private int smoothingFactor = 6;
 
     /** default type */
     private String smoothingType = LABEL_NONE;
@@ -5565,8 +5569,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (checkFlag(FLAG_SMOOTHING)) {
             dsd.addPropertyValue(getSmoothingType(), "smoothingType",
                                  "Smoothing Type", SETTINGS_GROUP_DISPLAY);
-            dsd.addPropertyValue(new Integer(getSmoothingAmount()),
-                                 "smoothingAmount", "Smoothing Amount",
+            dsd.addPropertyValue(new Integer(getSmoothingFactor()),
+                                 "smoothingFactor", "Smoothing Factor",
                                  SETTINGS_GROUP_DISPLAY);
         }
 
@@ -11706,12 +11710,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private JComponent doMakeSmoothingWidget() {
         sww = new ValueSliderWidget(
-            this, 1, 19, "smoothingAmount", "Amount", 1.0f, true,
-            "Amount of smoothing (larger number = greater smoothing");
+            this, 1, 19, "smoothingFactor", "Factor", 1.0f, true,
+            "Amount of smoothing or radius in grid units (larger number = greater smoothing");
         final JComponent swwContents = sww.getContents(true);
         addRemovable(sww);
         GuiUtils.enableTree(
-            swwContents, getSmoothingType().equals(GridUtil.SMOOTH_GAUSSIAN));
+            swwContents,
+            !(getSmoothingType().equals(GridUtil.SMOOTH_5POINT)
+              || getSmoothingType().equals(GridUtil.SMOOTH_9POINT)));
 
         List<TwoFacedObject> smootherList =
             TwoFacedObject.createList(smoothers, smootherLabels);
@@ -11727,7 +11733,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 setSmoothingType((String) select.getId());
                 GuiUtils.enableTree(
                     swwContents,
-                    getSmoothingType().equals(GridUtil.SMOOTH_GAUSSIAN));
+                    !(getSmoothingType().equals(GridUtil.SMOOTH_5POINT)
+                      || getSmoothingType().equals(GridUtil.SMOOTH_9POINT)));
             }
         });
         JPanel smoothWidgets = GuiUtils.left(GuiUtils.hbox(smootherBox,
@@ -11740,8 +11747,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return the smoothing factor
      */
-    public int getSmoothingAmount() {
-        return smoothingAmount;
+    public int getSmoothingFactor() {
+        return smoothingFactor;
     }
 
     /**
@@ -11758,8 +11765,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param val the new smoothing factor
      */
-    public void setSmoothingAmount(int val) {
-        smoothingAmount = val;
+    public void setSmoothingFactor(int val) {
+        smoothingFactor = val;
         if (sww != null) {
             sww.setValue(val);
         }

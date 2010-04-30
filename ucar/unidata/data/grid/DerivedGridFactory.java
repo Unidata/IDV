@@ -961,6 +961,30 @@ public class DerivedGridFactory {
                                          int samplingMode, int errorMode,
                                          boolean flatten)
             throws VisADException, RemoteException {
+        return combineGrids(grid1, grid2, samplingMode, errorMode, flatten,
+                            false);
+    }
+
+    /**
+     * Combine two Fields into one.  If the grids are on different
+     * time domains, the second is resampled to the domain of the first.
+     *
+     * @param grid1  first grid.  This will be used for the time/space domain
+     * @param grid2  second grid.
+     * @param samplingMode  sampling mode (e.g. WEIGHTED_AVERAGE, NEAREST_NEIGHBOR)
+     * @param errorMode   sampling error mode (e.g. NO_ERRORS)
+     * @param flatten     false to keep tuple integrity.
+     * @param copy        copy the values during combine
+     *
+     * @return combined grid.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl combineGrids(FieldImpl grid1, FieldImpl grid2,
+                                         int samplingMode, int errorMode,
+                                         boolean flatten, boolean copy)
+            throws VisADException, RemoteException {
 
         boolean   isGrid1Sequence   = GridUtil.isTimeSequence(grid1);
         boolean   isGrid2Sequence   = GridUtil.isTimeSequence(grid2);
@@ -989,7 +1013,7 @@ public class DerivedGridFactory {
                                      (FlatField) grid1.getSample(i),
                                      (FlatField) grid2.getSample(
                                          i) }, samplingMode, errorMode,
-                                             flatten);
+                                             flatten, copy);
                 if (i == 0) {  // first time through
                     FunctionType functionType =
                         new FunctionType(
@@ -1027,7 +1051,7 @@ public class DerivedGridFactory {
                         : new Field[] { (FlatField) otherGrid,
                                         (FlatField) grid2.getSample(
                                             i) }, samplingMode, errorMode,
-                                                flatten);
+                                                flatten, copy);
                 if (i == 0) {  // first time through
                     FunctionType functionType =
                         new FunctionType(((FunctionType) sequenceGrid
@@ -1042,7 +1066,7 @@ public class DerivedGridFactory {
         } else {  // both FlatFields
             // make combinded FlatField
             wvFI = (FieldImpl) FieldImpl.combine(new Field[] { grid1,
-                    grid2 }, samplingMode, errorMode, flatten);
+                    grid2 }, samplingMode, errorMode, flatten, copy);
         }  // end single time 
 
         return wvFI;

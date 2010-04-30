@@ -1561,7 +1561,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         if (checkFlag(FLAG_SMOOTHING)
                 && !getSmoothingType().equals(LABEL_NONE)) {
             slice = GridUtil.smooth(slice, getSmoothingType(),
-                                    getSmoothingAmount());
+                                    getSmoothingFactor());
         }
         loadData(slice);
     }
@@ -1606,8 +1606,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /**
      *  Use the value of the smoothing type and weight to subset the data.
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
         loadDataFromLine();

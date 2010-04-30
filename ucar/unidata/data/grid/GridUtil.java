@@ -194,6 +194,15 @@ public class GridUtil {
     /** Gaussian smoother identifier */
     public static final String SMOOTH_GAUSSIAN = "GWFS";
 
+    /** Cressman smoother identifier */
+    public static final String SMOOTH_CRESSMAN = "CRES";
+
+    /** Barnes  circular smoother identifier */
+    public static final String SMOOTH_CIRCULAR = "CIRC";
+
+    /** Barnes  circular smoother identifier */
+    public static final String SMOOTH_RECTANGULAR = "RECT";
+
 
     /** Default ctor */
     public GridUtil() {}
@@ -6357,7 +6366,10 @@ public class GridUtil {
     private static boolean isValidSmoother(String type) {
         return (type != null)
                && (type.equals(SMOOTH_5POINT) || type.equals(SMOOTH_9POINT)
-                   || type.equals(SMOOTH_GAUSSIAN));
+                   || type.equals(SMOOTH_GAUSSIAN)
+                   || type.equals(SMOOTH_CRESSMAN)
+                   || type.equals(SMOOTH_CIRCULAR)
+                   || type.equals(SMOOTH_RECTANGULAR));
     }
 
     /**
@@ -6406,9 +6418,12 @@ public class GridUtil {
                         } else if (type.equals(SMOOTH_9POINT)) {
                             smoothedFF = smooth9Point((FlatField) sample,
                                     smoothedRangeType);
-                        } else {
+                        } else if (type.equals(SMOOTH_GAUSSIAN)) {
                             smoothedFF = smoothGaussian((FlatField) sample,
                                     filterLevel, smoothedRangeType);
+                        } else {
+                            smoothedFF = smoothWeighted((FlatField) sample,
+                                    filterLevel, type, smoothedRangeType);
                         }
                         if (smoothedFF == null) {
                             continue;
@@ -6433,10 +6448,14 @@ public class GridUtil {
                             } else if (type.equals(SMOOTH_9POINT)) {
                                 innerSmoothedField = smooth9Point(innerField,
                                         smoothedRangeType);
-                            } else {
+                            } else if (type.equals(SMOOTH_GAUSSIAN)) {
                                 innerSmoothedField =
                                     smoothGaussian(innerField, filterLevel,
                                         smoothedRangeType);
+                            } else {
+                                innerSmoothedField =
+                                    smoothWeighted(innerField, filterLevel,
+                                        type, smoothedRangeType);
                             }
                             if (innerSmoothedField == null) {
                                 continue;
@@ -6477,10 +6496,14 @@ public class GridUtil {
                 } else if (type.equals(SMOOTH_9POINT)) {
                     smoothedFI = (FieldImpl) smooth9Point((FlatField) slice,
                             smoothedRangeType);
-                } else {
+                } else if (type.equals(SMOOTH_GAUSSIAN)) {
                     smoothedFI =
                         (FieldImpl) smoothGaussian((FlatField) slice,
                             filterLevel, smoothedRangeType);
+                } else {
+                    smoothedFI =
+                        (FieldImpl) smoothWeighted((FlatField) slice,
+                            filterLevel, type, smoothedRangeType);
                 }
 
             }
@@ -6492,7 +6515,8 @@ public class GridUtil {
     }
 
     /**
-     * Apply a 5 point smoothing function to the grid
+     * Apply a 5 point smoothing function to the grid.  Adapted from
+     * GEMPAK dfsm5s.c
      *
      * @param slice grid to smooth
      * @param rangeType  type for the range.  May be null;
@@ -6602,7 +6626,8 @@ public class GridUtil {
     }
 
     /**
-     * Apply a 9 point smoothing function to the grid
+     * Apply a 9 point smoothing function to the grid.  Adapted from
+     * GEMPAK dfsm9s.c
      *
      * @param slice grid to smooth
      * @param rangeType  type for the range.  May be null;
@@ -6803,7 +6828,8 @@ public class GridUtil {
     private static final int MAXWTS = 100;
 
     /**
-     * Apply a 5 point smoothing function to the grid
+     * Apply a Gaussian Weighted smoothing function to the grid.  Adapted from
+     * GEMPAK dfgwfs.c
      *
      * @param slice grid to smooth
      * @param filterLevel level of filtering
@@ -6932,6 +6958,183 @@ public class GridUtil {
         newField.setSamples(newVals, false);
 
         return newField;
+    }
+
+    /**
+     * Apply a weigthed smoothing function to the grid.  The smoothing types are:
+     * <p>
+     * SMOOTH_CRESSMAN: the smoothed value is given by a weighted average of values
+     * at surrounding grid points.  The weighting function is the Cressman weighting
+     * function:
+     * <pre>
+     *         w = ( D**2 - d**2 ) / ( D**2 + d**2 )
+     * </pre>
+     * In the above, d is the distance (in grid increments) of the neighboring point
+     * to the smoothing point, and D is the radius of influence [in grid increments]
+     * <p>
+     * SMOOTH_CIRCULAR: the weighting function is the circular apperture
+     * diffraction function (following a suggestion of Barnes et al. 1996):
+     * <pre>
+     *          w = bessel(3.8317*d/D)/(3.8317*d/D)
+     * </pre>
+     * <p>
+     * SMOOTH_RECTANGULAR: the weighting function is the product of the rectangular
+     * apperture diffraction function in the x and y directions (the function used
+     * in Barnes et al. 1996):
+     * <pre>
+     *          w = [sin(pi*x/D)/(pi*x/D)]*[sin(pi*y/D)/(pi*y/D)]
+     * </pre>
+     * Adapted from smooth.f written by Mark Stoelinga in his RIP package
+     *
+     * @param slice grid to smooth
+     * @param number of grid points
+     * @param radius radius of window in grid units
+     * @param type type of smoothing
+     * @param rangeType  type for the range.  May be null;
+     *
+     * @return  the smoothed grid or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField smoothWeighted(FlatField slice, int radius,
+                                            String type, TupleType rangeType)
+            throws VisADException, RemoteException {
+
+        float     beszero = 3.8317f;
+
+        int       idist, nfp, npsq, njx, niy;
+        int       is, ie, js, je, ifp, jfp;
+        float     dist, distsq, xfac, yfac, tot, totwt, xdist, ydist;
+        float[][] fprint = new float[MAXWTS][MAXWTS];
+        float[]   pslab, work;
+        int       index, psindex;
+
+        idist = radius;
+        if (idist == 0) {
+            return slice;
+        }
+        nfp  = Math.min(MAXWTS, 2 * idist);
+        npsq = idist * idist;
+        if (rangeType == null) {
+            rangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(slice),
+                                          "_" + type);
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(slice,
+                                 rangeType, true);
+        float[][]  samples = slice.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        int[]      lengths = domain.getLengths();
+        njx = lengths[0];
+        niy = lengths[1];
+        int       numParams = samples.length;
+        float[][] newValues = newField.getFloats(false);
+
+        for (int np = 0; np < numParams; np++) {
+            pslab = samples[np];
+            work  = newValues[np];
+
+            if (type.equals(SMOOTH_CRESSMAN)) {  // Cressman function
+                for (int i = 0; i < nfp; i++) {
+                    for (int j = 0; j < nfp; j++) {
+                        distsq = (float) (Math.pow((i - idist), 2)
+                                          + Math.pow((j - idist), 2));
+                        fprint[j][i] = (float) Math.max((npsq - distsq)
+                                / (npsq + distsq), 0.f);
+                    }
+                }
+            } else if (type.equals(SMOOTH_CIRCULAR)) {  // Circular diffraction function
+                for (int i = 0; i < nfp; i++) {
+                    for (int j = 0; j < nfp; j++) {
+                        dist = (float) (beszero / idist
+                                        * Math.sqrt(Math.pow((i - idist), 2)
+                                            + Math.pow((j - idist), 2)));
+                        if ((i == idist) && (j == idist)) {
+                            fprint[j][i] = .5f;
+                        } else {
+                            fprint[j][i] = (float) Math.max(0.,
+                                    bes(dist) / dist);
+                        }
+                    }
+                }
+            } else if (type.equals(SMOOTH_RECTANGULAR)) {  // Rect. diffraction function
+                for (int i = 0; i < nfp; i++) {
+                    for (int j = 0; j < nfp; j++) {
+                        if (j == idist) {
+                            xfac = 1.f;
+                        } else {
+                            xdist = (float) Math.PI / idist * (j - idist);
+                            xfac  = (float) Math.sin(xdist) / xdist;
+                        }
+                        if (i == idist) {
+                            yfac = 1.f;
+                        } else {
+                            ydist = (float) Math.PI / idist * (i - idist);
+                            yfac  = (float) Math.sin(ydist) / ydist;
+                        }
+                        fprint[j][i] = xfac * yfac;
+                    }
+                }
+            }
+            // now do the work of smoothing
+            for (int i = 0; i < niy; i++) {
+                for (int j = 0; j < njx; j++) {
+                    index = j + i * njx;
+                    if ( !Float.isNaN(pslab[index])) {
+                        tot   = 0.f;
+                        totwt = 0.f;
+                        is    = Math.max(0, i - idist);
+                        ie    = Math.min(niy - 1, i + idist);
+                        js    = Math.max(0, j - idist);
+                        je    = Math.min(njx - 1, j + idist);
+                        for (int ireg = is; ireg < ie; ireg++) {
+                            ifp = ireg - i + idist;
+                            for (int jreg = js; jreg < je; jreg++) {
+                                jfp     = jreg - j + idist;
+                                psindex = ireg * njx + jreg;
+                                if ( !Float.isNaN(pslab[psindex])) {
+                                    totwt = totwt + fprint[jfp][ifp];
+                                    tot = tot
+                                          + fprint[jfp][ifp] * pslab[psindex];
+                                }
+                            }
+                        }
+                        work[index] = tot / totwt;
+                    } else {
+                        work[index] = Float.NaN;
+                    }
+                }
+            }
+        }
+        /*
+              do i=1,niy
+              do j=1,njx
+                 pslab(j,i)=work(j,i)
+              enddo
+              enddo
+        */
+        newField.setSamples(newValues, false);
+
+        return newField;
+    }
+
+    /**
+     * Bessel function.  (copied from RIP)
+     *
+     * @param x  the value
+     *
+     * @return  the function
+     */
+    private static float bes(float x) {
+        float rint = 0.f;
+        float u;
+        for (int i = 0; i < 1000; i++) {
+            u = i * .001f - .0005f;
+            rint = rint
+                   + (float) (Math.sqrt(1. - u * u) * Math.cos(x * u) * .001);
+        }
+        return (float) (2.f * x * rint / (4. * Math.atan(1.)));
     }
 
     /**
