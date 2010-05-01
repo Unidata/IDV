@@ -178,13 +178,16 @@ def lap(S):
   grads = grad(S)
   return div(ur(grads),vr(grads))
 
-def lav(S,level1,level2):
-  """ Layer Average 
+def lav(S,level1=None,level2=None):
+  """ Layer Average of a multi layer grid
   <div class=jython>
       LAV ( S ) = ( S (level1) + S (level2) ) / 2.
   </div>
   """
-  return layerAverage(S,level1,level2);
+  if level1 == None:
+     return GridMath.applyFunctionOverLevels(S, GridMath.FUNC_AVERAGE)
+  else:
+     return layerAverage(S,level1,level2)
 
 def ldf(S,level1,level2):
   """ Layer Difference 
