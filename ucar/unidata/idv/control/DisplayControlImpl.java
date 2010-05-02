@@ -858,14 +858,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** labels for smoothing functions */
     private final static String[] smootherLabels = new String[] {
         LABEL_NONE, "5 point", "9 point", "Gaussian Weighted",
-        "Cressman Weighted", "Circular Aperature", "Rectangular Aperature"
+        "Cressman Weighted", "Circular Aperture", "Rectangular Aperture"
     };
 
     /** types of smoothing functions */
     private final static String[] smoothers = new String[] {
         LABEL_NONE, GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
         GridUtil.SMOOTH_GAUSSIAN, GridUtil.SMOOTH_CRESSMAN,
-        GridUtil.SMOOTH_RECTANGULAR, GridUtil.SMOOTH_RECTANGULAR
+        GridUtil.SMOOTH_CIRCULAR, GridUtil.SMOOTH_RECTANGULAR
     };
 
     /** smoothing factor for Gaussian smoother */
@@ -11714,10 +11714,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             "Amount of smoothing or radius in grid units (larger number = greater smoothing");
         final JComponent swwContents = sww.getContents(true);
         addRemovable(sww);
-        GuiUtils.enableTree(
-            swwContents,
-            !(getSmoothingType().equals(GridUtil.SMOOTH_5POINT)
-              || getSmoothingType().equals(GridUtil.SMOOTH_9POINT)));
+        GuiUtils.enableTree(swwContents, useSmoothingFactor());
 
         List<TwoFacedObject> smootherList =
             TwoFacedObject.createList(smoothers, smootherLabels);
@@ -11731,15 +11728,23 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     (TwoFacedObject) ((JComboBox) e.getSource())
                         .getSelectedItem();
                 setSmoothingType((String) select.getId());
-                GuiUtils.enableTree(
-                    swwContents,
-                    !(getSmoothingType().equals(GridUtil.SMOOTH_5POINT)
-                      || getSmoothingType().equals(GridUtil.SMOOTH_9POINT)));
+                GuiUtils.enableTree(swwContents, useSmoothingFactor());
             }
         });
         JPanel smoothWidgets = GuiUtils.left(GuiUtils.hbox(smootherBox,
                                    GuiUtils.filler(), swwContents));
         return smoothWidgets;
+    }
+
+    /**
+     * Should we use the smoothing factor?
+     * @return true if it's a smoothing type that uses a factor
+     */
+    public boolean useSmoothingFactor() {
+        String type = getSmoothingType();
+        return !(type.equals(LABEL_NONE)
+                 || type.equals(GridUtil.SMOOTH_5POINT)
+                 || type.equals(GridUtil.SMOOTH_9POINT));
     }
 
     /**
