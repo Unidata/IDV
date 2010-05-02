@@ -370,10 +370,12 @@ proc ug::smoothing {} {
     list {Smoothing} "
    This control has an option to smooth the grid that
    can be used to smooth contour lines or flow fields for
-   display.  There are three types of smoothing: 5-point, 9-point
-   and gaussian weighted smoothers.  The amount of smoothness can be
+   display.  There are 6 types of smoothing: 5-point, 9-point
+   and gaussian weighted, Cressman, circular and rectangular aperture
+   smoothers.  The amount of smoothness can be
    set for the gaussian smoother.  The higher the amount, the smoother
-   the grid."
+   the grid.  For the Cressman, circular and rectangular aperture, the
+   factor is the radius in grid spacing units."
 }
 
 
