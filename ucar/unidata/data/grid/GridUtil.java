@@ -1677,9 +1677,27 @@ public class GridUtil {
         RealType[] rts    = oldParamType.getRealComponents();
         RealType[] newRTs = new RealType[rts.length];
         for (int i = 0; i < rts.length; i++) {
-            newRTs[i] =
-                Util.makeRealType(Util.cleanTypeName(rts[i].getName())
-                                  + newSuffix, rts[i].getDefaultUnit());
+            String oldName     = rts[i].getName();
+            String baseName    = Util.cleanTypeName(oldName);
+            Unit   defaultUnit = rts[i].getDefaultUnit();
+            newRTs[i] = Util.makeRealType(baseName + newSuffix, defaultUnit);
+            // name could be   xxx[unit:foo]_1, we want to preserve the _1
+            int unitBracket = oldName.indexOf("[unit:");
+            if (unitBracket >= 0) {
+                int finalBracket = oldName.lastIndexOf("]");
+                if (finalBracket > unitBracket) {
+                    String extra = oldName.substring(finalBracket + 1);
+                    if ( !extra.isEmpty()) {
+                        newRTs[i] = RealType.getRealType(newRTs[i].getName()
+                                + extra, defaultUnit);
+                        // make sure it's not null
+                        if (newRTs[i] == null) {
+                            newRTs[i] = Util.makeRealType(baseName
+                                    + newSuffix + extra, defaultUnit);
+                        }
+                    }
+                }
+            }
         }
         if (rts.length == oldParamType.getDimension()) {  // just straight reals
             if (oldParamType instanceof RealVectorType) {
@@ -6987,7 +7005,6 @@ public class GridUtil {
      * Adapted from smooth.f written by Mark Stoelinga in his RIP package
      *
      * @param slice grid to smooth
-     * @param number of grid points
      * @param radius radius of window in grid units
      * @param type type of smoothing
      * @param rangeType  type for the range.  May be null;
