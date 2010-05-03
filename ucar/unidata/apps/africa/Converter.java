@@ -336,6 +336,108 @@ public class Converter {
     }
 
 
+    /** _more_          */
+    public static final String HEADER3 =
+       "(index)->(Latitude,Longitude,Time,Country(Text),State(Text),Region(Text),population,cases,deaths,inc,cfr,alert)\nLatitude[ unit=\"degrees\" ],Longitude[ unit=\"degrees\" ],Time[ fmt=\"yyyy-MM-dd\" ],Country(Text),State(Text),Region(Text),population[ missing=\"-9999.9\" ],cases[ missing=\"-9999.9\" ],deaths[ missing=\"-9999.9\" ],inc[ missing=\"-9999.9\" ],cfr[ missing=\"-9999.9\" ],alert[ missing=\"-9999.9\" ]";
+
+
+
+    /**
+     * This parses the meningitis rates data that has the centroid location
+     *
+     * @param lines _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void process3(List<String> lines) throws Exception {
+
+        System.out.println(HEADER3);
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyw");
+        sdf1.setTimeZone(DateUtil.TIMEZONE_GMT);
+        List<String> dates       = new ArrayList<String>();
+        String       lastLoc     = null;
+        String       line        = "";
+        HashSet      seenMissing = new HashSet();
+        try {
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    continue;
+                }
+                line = lines.get(i).trim();
+                if (line.length() == 0) {
+                    continue;
+                }
+                List<String> cols = StringUtil.split(line, ",", false, false);
+
+                if ((i % 1000) == 0) {
+                    System.err.println("#" + i);
+                }
+                //Skip over the oid and geoid
+                //"OID_","GEOID","ANNEE","VAL_CAS","VAL_DECES","POPSIZE","INC","CFR","ALERT","GEONAMLEV1","GEONAMLEV2","GEONAMLEV3","PAYS","YEAR_","SEMAINE","centroidX","centroidY","area_KM","GEOJoin","lvlid"
+                //,"BJP001001000000000000",200832.000000,0.000000,0.000000,172516.000000,0.000000,0.000000,0.000000,"Benin","Donga","BASSILA","BJ",2008.000000,32.000000,1.857341,8.965200,5734.035689," ","BJP001001000000000000"
+
+
+
+
+
+                int    col        = 2;
+                String yearAndWeek = cols.get(col++);
+                //Strip off the suffix
+                yearAndWeek = yearAndWeek.substring(0,yearAndWeek.indexOf("."));
+                Date   date = sdf1.parse(yearAndWeek);
+                double val_cas    = parse(cols.get(col++));
+                double val_deces  = parse(cols.get(col++));
+                double population = parse(cols.get(col++));
+                double inc        = parse(cols.get(col++));
+                double cfr        = parse(cols.get(col++));
+                double alert      = parse(cols.get(col++));
+
+                String geonamelev1    = cols.get(col++);
+                String geonamelev2    = cols.get(col++);
+                String geonamelev3    = cols.get(col++);
+                String pays= cols.get(col++);
+                //Skip YEAR_ and SEMAINE
+                col++;
+                col++;
+
+                double lon = Double.parseDouble(cols.get(col++));
+                double lat = Double.parseDouble(cols.get(col++));
+                double area = Double.parseDouble(cols.get(col++));
+
+                String locString = lat+"__" + lon;
+                if ( !Misc.equals(lastLoc, locString)) {
+                    System.out.println("Latitude=" + lat);
+                    System.out.println("Longitude=" + lon);
+                    System.out.println("Country=" + geonamelev1);
+                    System.out.println("State=" + geonamelev2);
+                    System.out.println("Region=" + geonamelev3);
+                    lastLoc = locString;
+                }
+
+                System.out.print(format(date));
+                System.out.print(",");
+                System.out.print(population);
+                System.out.print(",");
+                System.out.print(val_cas);
+                System.out.print(",");
+                System.out.print(val_deces);
+
+                System.out.print(",");
+                System.out.print(inc);
+                System.out.print(",");
+                System.out.print(cfr);
+                System.out.print(",");
+                System.out.print(alert);
+                System.out.print("\n");
+            }
+        } catch (Exception exc) {
+            System.err.println("error reading line:" + line);
+            throw exc;
+        }
+
+    }
+
+
 
 
 
@@ -403,8 +505,9 @@ public class Converter {
             if (lines.size() == 1) {
                 lines = StringUtil.split(contents, "\r", false, false);
             }
-            //      process1(lines,"nigeria","2009");
-            process2(lines);
+            //process1(lines,"nigeria","2009");
+            //process2(lines);
+            process3(lines);
         }
     }
 
