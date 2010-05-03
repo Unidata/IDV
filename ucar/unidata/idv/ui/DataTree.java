@@ -1034,9 +1034,11 @@ public class DataTree extends DataSourceHolder {
                 /*
                   System.err.println (choice + " - " +DataCategory.applicableTo(categories,
                   choice.getCategories()) +" choice:" + choice.getCategories());*/
-                if ( !DataCategory.applicableTo(categories,
-                        choice.getCategories())) {
-                    continue;
+                if(!(choice instanceof CompositeDataChoice)){
+                    if ( !DataCategory.applicableTo(categories,
+                            choice.getCategories())) {
+                        continue;
+                    }
                 }
             }
             cnt++;
