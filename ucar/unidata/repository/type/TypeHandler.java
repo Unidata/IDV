@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -26,8 +24,8 @@ package ucar.unidata.repository.type;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.auth.*;
+import ucar.unidata.repository.database.*;
 
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
@@ -64,8 +62,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -109,6 +107,7 @@ public class TypeHandler extends RepositoryManager {
     public static final String ATTR_NAME = "name";
 
 
+    /** _more_          */
     public static final String ATTR_CATEGORY = "category";
 
     /** _more_ */
@@ -120,6 +119,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
+    /** _more_          */
     public static final String TAG_METADATA = "metadata";
 
     /** _more_ */
@@ -155,6 +155,7 @@ public class TypeHandler extends RepositoryManager {
     String description;
 
 
+    /** _more_          */
     String category = "General";
 
     /** _more_ */
@@ -170,6 +171,7 @@ public class TypeHandler extends RepositoryManager {
     private String displayTemplatePath;
 
 
+    /** _more_          */
     private List<String> requiredMetadata = new ArrayList<String>();
 
     /**
@@ -193,9 +195,10 @@ public class TypeHandler extends RepositoryManager {
         displayTemplatePath = XmlUtil.getAttribute(entryNode,
                 "displaytemplate", (String) null);
 
-        this.category  = XmlUtil.getAttribute(entryNode, ATTR_CATEGORY,category);
+        this.category = XmlUtil.getAttribute(entryNode, ATTR_CATEGORY,
+                                             category);
         List metadataNodes = XmlUtil.findChildren(entryNode, TAG_METADATA);
-        for (int i= 0; i< metadataNodes.size(); i++) {
+        for (int i = 0; i < metadataNodes.size(); i++) {
             Element metadataNode = (Element) metadataNodes.get(i);
             requiredMetadata.add(XmlUtil.getAttribute(metadataNode, ATTR_ID));
         }
@@ -243,12 +246,23 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tableName _more_
+     *
+     * @return _more_
+     */
     public boolean shouldExportTable(String tableName) {
         return true;
     }
 
-    public void initAfterDatabaseImport() throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initAfterDatabaseImport() throws Exception {}
 
 
     /**
@@ -282,6 +296,16 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getInlineHtml(Request request, Entry entry)
             throws Exception {
         return null;
@@ -387,7 +411,7 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public int getProperty(String name, int dflt) {
-       return Misc.getProperty(properties, name, dflt);
+        return Misc.getProperty(properties, name, dflt);
     }
 
 
@@ -512,8 +536,15 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
-    public void addToEntryNode(Entry entry, Element node) throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToEntryNode(Entry entry, Element node) throws Exception {}
 
 
 
@@ -612,16 +643,25 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void applyNewForm(Request request, Entry entry) throws Exception {
-        Hashtable<String, Metadata> existingMetadata = new Hashtable<String, Metadata>();
+        Hashtable<String, Metadata> existingMetadata = new Hashtable<String,
+                                                           Metadata>();
         List<Metadata> metadataList = new ArrayList<Metadata>();
-        for (String metadataId: requiredMetadata) {
-            for (MetadataHandler handler : getMetadataManager().getMetadataHandlers()) {
+        for (String metadataId : requiredMetadata) {
+            for (MetadataHandler handler :
+                    getMetadataManager().getMetadataHandlers()) {
                 if (handler.canHandle(metadataId)) {
-                    handler.handleForm(request, entry, getRepository().getGUID(),
-                                       "",
-                                       existingMetadata,
-                                       metadataList, true);
+                    handler.handleForm(request, entry,
+                                       getRepository().getGUID(), "",
+                                       existingMetadata, metadataList, true);
                     break;
                 }
             }
@@ -764,58 +804,65 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         boolean isGroup = entry.isGroup();
-        boolean canDoNew = isGroup && getAccessManager().canDoAction(request, entry,
-                                                          Permission.ACTION_NEW);
+        boolean canDoNew = isGroup
+                           && getAccessManager().canDoAction(request, entry,
+                               Permission.ACTION_NEW);
 
-        if(canDoNew) {
+        if (canDoNew) {
             links.add(
-                      new Link(
-                               request.url(
-                                           getRepository().URL_ENTRY_FORM, ARG_GROUP,
-                                           entry.getId(), ARG_TYPE,
-                                           TYPE_GROUP), getRepository().iconUrl(
-                                                                                ICON_FOLDER_ADD), "New Folder",
-                               OutputType.TYPE_FILE));
+                new Link(
+                    request.url(
+                        getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                        entry.getId(), ARG_TYPE,
+                        TYPE_GROUP), getRepository().iconUrl(
+                            ICON_FOLDER_ADD), "New Folder",
+                                OutputType.TYPE_FILE));
             links.add(
-                      new Link(
-                               request.url(
-                                           getRepository().URL_ENTRY_FORM, ARG_GROUP,
-                                           entry.getId(), ARG_TYPE,
-                                           TYPE_FILE), getRepository().iconUrl(
-                                                                               ICON_ENTRY_ADD), "New File",
-                               OutputType.TYPE_FILE));
+                new Link(
+                    request.url(
+                        getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                        entry.getId(), ARG_TYPE,
+                        TYPE_FILE), getRepository().iconUrl(ICON_ENTRY_ADD),
+                                    "New File", OutputType.TYPE_FILE));
 
-            links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
-                                           ARG_GROUP,
-                                           entry.getId()),
-                               getRepository().iconUrl(ICON_NEW),
-                               "New Entry",
-                               OutputType.TYPE_FILE
-                               | OutputType.TYPE_TOOLBAR));
+            links.add(
+                new Link(
+                    request.url(
+                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
+                        entry.getId()), getRepository().iconUrl(ICON_NEW),
+                                        "New Entry",
+                                        OutputType.TYPE_FILE
+                                        | OutputType.TYPE_TOOLBAR));
             Link hr = new Link(true);
             hr.setLinkType(OutputType.TYPE_FILE);
             links.add(hr);
 
         }
         if (request.getUser().getAdmin()) {
-            links.add(new Link(HtmlUtil.url(getRepository().URL_ENTRY_EXPORT.toString()+"/" + IOUtil.stripExtension(entry.getName())+".zip",
-                                            new String[]{ARG_ENTRYID,
-                                                         entry.getId()}), getRepository().iconUrl(ICON_EXPORT),
-                               "Export Entries",
-                               OutputType.TYPE_FILE));
+            links.add(
+                new Link(
+                    HtmlUtil.url(
+                        getRepository().URL_ENTRY_EXPORT.toString() + "/"
+                        + IOUtil.stripExtension(entry.getName())
+                        + ".zip", new String[] { ARG_ENTRYID,
+                    entry.getId() }), getRepository().iconUrl(ICON_EXPORT),
+                                      "Export Entries",
+                                      OutputType.TYPE_FILE));
 
-            if(canDoNew) {
-                links.add(new Link(request.url(getRepository().URL_ENTRY_IMPORT,
-                                               ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_IMPORT),
-                                   "Import Entries",
-                                   OutputType.TYPE_FILE));
-                
-                links.add(new Link(request.url(getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG,
-                                               ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_CATALOG),
-                                   "Import THREDDS Catalog",
-                                   OutputType.TYPE_FILE));
+            if (canDoNew) {
+                links.add(
+                    new Link(
+                        request.url(
+                            getRepository().URL_ENTRY_IMPORT, ARG_GROUP,
+                            entry.getId()), getRepository().iconUrl(
+                                ICON_IMPORT), "Import Entries",
+                                    OutputType.TYPE_FILE));
+
+                links.add(new Link(request
+                    .url(getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG,
+                        ARG_GROUP, entry.getId()), getRepository()
+                            .iconUrl(ICON_CATALOG), "Import THREDDS Catalog",
+                                OutputType.TYPE_FILE));
             }
             Link hr = new Link(true);
             hr.setLinkType(OutputType.TYPE_FILE);
@@ -824,15 +871,17 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        if (!canDoNew && isGroup && getAccessManager().canDoAction(request, entry, Permission.ACTION_UPLOAD)) {
+        if ( !canDoNew && isGroup
+                && getAccessManager().canDoAction(request, entry,
+                    Permission.ACTION_UPLOAD)) {
             links.add(
-                      new Link(
-                               request.url(
-                                           getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
-                                           entry.getId()), getRepository().iconUrl(
-                                                                                   ICON_UPLOAD), "Upload a file",
-                               OutputType.TYPE_FILE
-                               | OutputType.TYPE_TOOLBAR));
+                new Link(
+                    request.url(
+                        getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
+                        entry.getId()), getRepository().iconUrl(ICON_UPLOAD),
+                                        "Upload a file",
+                                        OutputType.TYPE_FILE
+                                        | OutputType.TYPE_TOOLBAR));
         }
 
 
@@ -859,7 +908,8 @@ public class TypeHandler extends RepositoryManager {
                     request.entryUrl(
                         getMetadataManager().URL_METADATA_FORM,
                         entry), getRepository().iconUrl(ICON_METADATA_EDIT),
-                                msg("Edit Properties"), OutputType.TYPE_EDIT));
+                                msg("Edit Properties"),
+                                OutputType.TYPE_EDIT));
             links.add(
                 new Link(
                     request.entryUrl(
@@ -980,7 +1030,9 @@ public class TypeHandler extends RepositoryManager {
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
-        String size     =  " (" + formatFileLength(entry.getResource().getFileSize()) +")";
+        String size = " ("
+                      + formatFileLength(entry.getResource().getFileSize())
+                      + ")";
 
         String fileTail = getStorageManager().getFileTail(entry);
         fileTail = HtmlUtil.urlEncodeExceptSpace(fileTail);
@@ -1067,7 +1119,8 @@ public class TypeHandler extends RepositoryManager {
                 } else if (entry.getResource().isFile()) {
                     resourceLink =
                         getStorageManager().getFileTail(resourceLink);
-                    resourceLink = HtmlUtil.urlEncodeExceptSpace(resourceLink);
+                    resourceLink =
+                        HtmlUtil.urlEncodeExceptSpace(resourceLink);
                     if (getAccessManager().canDownload(request, entry)) {
                         resourceLink =
                             HtmlUtil.href(getEntryResourceUrl(request,
@@ -1076,7 +1129,8 @@ public class TypeHandler extends RepositoryManager {
                     }
                 }
                 if (entry.getResource().getFileSize() > 0) {
-                    resourceLink = resourceLink + HtmlUtil.space(2)
+                    resourceLink =
+                        resourceLink + HtmlUtil.space(2)
                         + formatFileLength(entry.getResource().getFileSize());
                 }
                 if (showImage) {
@@ -1408,7 +1462,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
-        if(isOrSearch(request)) {
+        if (isOrSearch(request)) {
             Clause clause = Clause.or(clauses);
             clauses = new ArrayList<Clause>();
             clauses.add(clause);
@@ -1692,28 +1746,28 @@ public class TypeHandler extends RepositoryManager {
                 }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
-            String mapSelector = getRepository().getMapManager().makeMapSelector(ARG_AREA,
-                                     true,
-                                     ((entry != null) && entry.hasSouth())
-                                     ? "" + entry.getSouth()
-                                     : "", ((entry != null)
-                                            && entry.hasNorth())
-                                           ? "" + entry.getNorth()
-                                           : "", ((entry != null)
-                                               && entry.hasEast())
-                    ? "" + entry.getEast()
-                    : "", ((entry != null) && entry.hasWest())
-                          ? "" + entry.getWest()
-                          : "");
+            String mapSelector =
+                getRepository().getMapManager().makeMapSelector(ARG_AREA,
+                    true, ((entry != null) && entry.hasSouth())
+                          ? "" + entry.getSouth()
+                          : "", ((entry != null) && entry.hasNorth())
+                                ? "" + entry.getNorth()
+                                : "", ((entry != null) && entry.hasEast())
+                                      ? "" + entry.getEast()
+                                      : "", ((entry != null)
+                                             && entry.hasWest())
+                                            ? "" + entry.getWest()
+                                            : "");
 
             sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
         }
 
 
-        if(entry == null) {
-            for (String metadataId: requiredMetadata) {
-                for (MetadataHandler handler : getMetadataManager().getMetadataHandlers()) {
+        if (entry == null) {
+            for (String metadataId : requiredMetadata) {
+                for (MetadataHandler handler :
+                        getMetadataManager().getMetadataHandlers()) {
                     if (handler.canHandle(metadataId)) {
                         handler.makeAddForm(request, null,
                                             handler.findType(metadataId), sb);
@@ -1789,7 +1843,8 @@ public class TypeHandler extends RepositoryManager {
         extra = HtmlUtil.makeToggleInline("<b>...</b>", extra, false);
         sb.append(HtmlUtil.formEntry(msgLabel("Text"),
                                      HtmlUtil.input(ARG_TEXT, name,
-                                         HtmlUtil.SIZE_50 + " autofocus " ) + " " + extra));
+                                         HtmlUtil.SIZE_50
+                                         + " autofocus ") + " " + extra));
     }
 
 
@@ -2022,12 +2077,15 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
-            String radio = HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, true) +msg("Overlaps")+ 
-                HtmlUtil.space(3) +
-                HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, false) +msg("Contained by");
+            String radio =
+                HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, true)
+                + msg("Overlaps") + HtmlUtil.space(3)
+                + HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, false)
+                + msg("Contained by");
 
-            String mapSelector = getRepository().getMapManager().makeMapSelector(request,
-                                     ARG_AREA, true, "", radio);
+            String mapSelector =
+                getRepository().getMapManager().makeMapSelector(request,
+                    ARG_AREA, true, "", radio);
 
 
 
@@ -2176,8 +2234,10 @@ public class TypeHandler extends RepositoryManager {
             addCriteria(searchCriteria, "File Suffix=",
                         request.getString(ARG_FILESUFFIX, ""));
             List<Clause> clauses = new ArrayList<Clause>();
-            for (String tok : (List<String>) StringUtil.split(
-                    request.getString(ARG_FILESUFFIX, ""), ",", true, true)) {
+            for (String tok :
+                    (List<String>) StringUtil.split(
+                        request.getString(ARG_FILESUFFIX, ""), ",", true,
+                        true)) {
                 clauses.add(Clause.like(Tables.ENTRIES.COL_RESOURCE,
                                         "%" + tok));
             }
@@ -2255,84 +2315,101 @@ public class TypeHandler extends RepositoryManager {
                                new Date());
         if (dateRange[0] != null) {
             addCriteria(searchCriteria, "From Date>=", dateRange[0]);
-            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE, dateRange[0]));
+            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE,
+                                      dateRange[0]));
         }
 
 
         if (dateRange[1] != null) {
             addCriteria(searchCriteria, "To Date<=", dateRange[1]);
-            dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE, dateRange[1]));
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE,
+                                      dateRange[1]));
         }
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
             addCriteria(searchCriteria, "Create Date<=", createDate);
-            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE, createDate));
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE,
+                                      createDate));
         }
 
-        if(dateClauses.size()>1) {
+        if (dateClauses.size() > 1) {
             where.add(Clause.and(dateClauses));
-        } else if(dateClauses.size()==1) {
+        } else if (dateClauses.size() == 1) {
             where.add(dateClauses.get(0));
         }
 
-        boolean      includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
-        boolean contains = !(request.getString(ARG_AREA_MODE, VALUE_AREA_OVERLAPS).equals(VALUE_AREA_OVERLAPS));
+        boolean includeNonGeo = request.get(ARG_INCLUDENONGEO, false);
+        boolean contains = !(request.getString(
+                               ARG_AREA_MODE, VALUE_AREA_OVERLAPS).equals(
+                               VALUE_AREA_OVERLAPS));
 
 
         List<Clause> areaExpressions = new ArrayList<Clause>();
-        String[] areaNames = {"South","North","East","West"};
-        String[] areaSuffixes = {"_south","_north","_east","_west"};
-        String[] areaCols = {Tables.ENTRIES.COL_SOUTH,Tables.ENTRIES.COL_NORTH,Tables.ENTRIES.COL_EAST,Tables.ENTRIES.COL_WEST};
-        boolean[]areaLE = {false,true,true,false}; 
-        Clause areaClause;
-        if(!contains) {
+        String[]     areaNames       = { "South", "North", "East", "West" };
+        String[]     areaSuffixes = { "_south", "_north", "_east", "_west" };
+        String[] areaCols = { Tables.ENTRIES.COL_SOUTH,
+                              Tables.ENTRIES.COL_NORTH,
+                              Tables.ENTRIES.COL_EAST,
+                              Tables.ENTRIES.COL_WEST };
+        boolean[] areaLE = { false, true, true, false };
+        Clause    areaClause;
+        if ( !contains) {
             boolean gotThemAll = true;
-            for(int i=0;i<4;i++) {
+            for (int i = 0; i < 4; i++) {
                 String areaArg = ARG_AREA + areaSuffixes[i];
-                if (!request.defined(areaArg)) {
-                    gotThemAll  = false;
+                if ( !request.defined(areaArg)) {
+                    gotThemAll = false;
                     break;
                 }
             }
-            if(gotThemAll) {
-                areaClause =  Clause.le(Tables.ENTRIES.COL_SOUTH, request.get(ARG_AREA_NORTH,0.0));
+            if (gotThemAll) {
+                areaClause = Clause.le(Tables.ENTRIES.COL_SOUTH,
+                                       request.get(ARG_AREA_NORTH, 0.0));
                 areaExpressions.add(
-                                    Clause.and(
-                                               Clause.neq(Tables.ENTRIES.COL_SOUTH, new Double(Entry.NONGEO)), 
-                                               areaClause));
-                areaClause =  Clause.ge(Tables.ENTRIES.COL_NORTH, request.get(ARG_AREA_SOUTH,0.0));
+                    Clause.and(
+                        Clause.neq(
+                            Tables.ENTRIES.COL_SOUTH,
+                            new Double(Entry.NONGEO)), areaClause));
+                areaClause = Clause.ge(Tables.ENTRIES.COL_NORTH,
+                                       request.get(ARG_AREA_SOUTH, 0.0));
                 areaExpressions.add(
-                                    Clause.and(
-                                               Clause.neq(Tables.ENTRIES.COL_SOUTH, new Double(Entry.NONGEO)), 
-                                               areaClause));
-                
-                areaClause =  Clause.ge(Tables.ENTRIES.COL_EAST, request.get(ARG_AREA_WEST,0.0));
-                areaExpressions.add(
-                                    Clause.and(
-                                               Clause.neq(Tables.ENTRIES.COL_EAST, new Double(Entry.NONGEO)), 
-                                               areaClause));
+                    Clause.and(
+                        Clause.neq(
+                            Tables.ENTRIES.COL_SOUTH,
+                            new Double(Entry.NONGEO)), areaClause));
 
-                areaClause =  Clause.le(Tables.ENTRIES.COL_WEST, request.get(ARG_AREA_EAST,0.0));
+                areaClause = Clause.ge(Tables.ENTRIES.COL_EAST,
+                                       request.get(ARG_AREA_WEST, 0.0));
                 areaExpressions.add(
-                                    Clause.and(
-                                               Clause.neq(Tables.ENTRIES.COL_WEST, new Double(Entry.NONGEO)), 
-                                               areaClause));
+                    Clause.and(
+                        Clause.neq(
+                            Tables.ENTRIES.COL_EAST,
+                            new Double(Entry.NONGEO)), areaClause));
+
+                areaClause = Clause.le(Tables.ENTRIES.COL_WEST,
+                                       request.get(ARG_AREA_EAST, 0.0));
+                areaExpressions.add(
+                    Clause.and(
+                        Clause.neq(
+                            Tables.ENTRIES.COL_WEST,
+                            new Double(Entry.NONGEO)), areaClause));
                 //                System.err.println (areaExpressions);
-            } 
+            }
 
         } else {
-            for(int i=0;i<4;i++) {
+            for (int i = 0; i < 4; i++) {
                 String areaArg = ARG_AREA + areaSuffixes[i];
                 if (request.defined(areaArg)) {
-                    addCriteria(searchCriteria, areaNames[i]+(areaLE[i]?"<=":">="),
-                                request.getString(areaArg, ""));
+                    addCriteria(searchCriteria, areaNames[i] + (areaLE[i]
+                            ? "<="
+                            : ">="), request.getString(areaArg, ""));
                     double areaValue = request.get(areaArg, 0.0);
-                    areaClause = areaLE[i]?Clause.le(areaCols[i],areaValue):Clause.ge(areaCols[i],areaValue);
-                    areaExpressions.add(
-                                        Clause.and(
-                                                   Clause.neq(areaCols[i], new Double(Entry.NONGEO)), 
-                                                   areaClause));
+                    areaClause = areaLE[i]
+                                 ? Clause.le(areaCols[i], areaValue)
+                                 : Clause.ge(areaCols[i], areaValue);
+                    areaExpressions.add(Clause.and(Clause.neq(areaCols[i],
+                            new Double(Entry.NONGEO)), areaClause));
                 }
             }
         }
@@ -2464,7 +2541,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (metadataAnds.size() > 0) {
-            if(isOrSearch(request)) {
+            if (isOrSearch(request)) {
                 where.add(Clause.or(metadataAnds));
             } else {
                 where.add(Clause.and(metadataAnds));
@@ -2476,8 +2553,9 @@ public class TypeHandler extends RepositoryManager {
         String textToSearch = (String) request.getString(ARG_TEXT, "").trim();
         if (textToSearch.length() > 0) {
             List<Clause> textOrs = new ArrayList<Clause>();
-            for (String textTok : (List<String>) StringUtil.split(
-                    textToSearch, ",", true, true)) {
+            for (String textTok :
+                    (List<String>) StringUtil.split(textToSearch, ",", true,
+                    true)) {
                 List<String> nameToks = StringUtil.splitWithQuotes(textTok);
                 boolean      doLike   = false;
                 if ( !request.get(ARG_EXACT, false)) {
@@ -2562,8 +2640,15 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public boolean isOrSearch(Request request) {
-        return request.getString("search.or","false").equals("true");
+        return request.getString("search.or", "false").equals("true");
     }
 
 
@@ -2800,68 +2885,123 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-    private Hashtable<String,HashSet> columnEnumValues = new Hashtable<String,HashSet>();
+    /** _more_          */
+    private Hashtable<String, HashSet> columnEnumValues =
+        new Hashtable<String, HashSet>();
 
 
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     protected String getEnumValueKey(Column column, Entry entry) {
         return column.getName();
     }
 
-    protected void addEnumValue(Column column, Entry entry, String theValue) throws Exception {
-        if(theValue==null || theValue.length()==0) return;
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param entry _more_
+     * @param theValue _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addEnumValue(Column column, Entry entry, String theValue)
+            throws Exception {
+        if ((theValue == null) || (theValue.length() == 0)) {
+            return;
+        }
         HashSet set = getEnumValuesInner(column, entry);
         set.add(theValue);
     }
 
-    public List getEnumValues(Column column,Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List getEnumValues(Column column, Entry entry) throws Exception {
         HashSet set = getEnumValuesInner(column, entry);
-        List tmp = new ArrayList();
+        List    tmp = new ArrayList();
         tmp.addAll(set);
         return Misc.sort(tmp);
     }
 
 
-    private HashSet getEnumValuesInner(Column column, Entry entry) throws Exception {
-        String key = getEnumValueKey(column, entry);
-        HashSet set =  columnEnumValues.get(key);
-        if(set!=null) return set;
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private HashSet getEnumValuesInner(Column column, Entry entry)
+            throws Exception {
+        String  key = getEnumValueKey(column, entry);
+        HashSet set = columnEnumValues.get(key);
+        if (set != null) {
+            return set;
+        }
         Clause clause = getEnumValuesClause(column, entry);
         Statement stmt = getRepository().getDatabaseManager().select(
-                                                                     SqlUtil.distinct(column.getName()),
-                                                                     column.getTableName(),
-                                                                     clause);
-        String[]values =
-            SqlUtil.readString(getRepository().getDatabaseManager().getIterator(stmt), 1);
+                             SqlUtil.distinct(column.getName()),
+                             column.getTableName(), clause);
+        String[] values =
+            SqlUtil.readString(
+                getRepository().getDatabaseManager().getIterator(stmt), 1);
         set = new HashSet();
         set.addAll(Misc.toList(values));
         columnEnumValues.put(key, set);
         return set;
     }
 
-    public Clause getEnumValuesClause(Column column, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Clause getEnumValuesClause(Column column, Entry entry)
+            throws Exception {
         return null;
     }
 
 
     /**
-       Set the Category property.
-
-       @param value The new value for Category
-    **/
-    public void setCategory (String value) {
-	this.category = value;
+     *  Set the Category property.
+     *
+     *  @param value The new value for Category
+     */
+    public void setCategory(String value) {
+        this.category = value;
     }
 
     /**
-       Get the Category property.
-
-       @return The Category
-    **/
-    public String getCategory () {
-	return this.category;
+     *  Get the Category property.
+     *
+     *  @return The Category
+     */
+    public String getCategory() {
+        return this.category;
     }
 
 
 
 }
-

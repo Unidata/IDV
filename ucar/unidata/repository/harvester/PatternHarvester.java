@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -246,6 +244,7 @@ public class PatternHarvester extends Harvester {
      */
     public void createEditForm(Request request, StringBuffer sb)
             throws Exception {
+
         super.createEditForm(request, sb);
         String root = (rootDir != null)
                       ? rootDir.toString()
@@ -253,38 +252,44 @@ public class PatternHarvester extends Harvester {
         root = root.replace("\\", "/");
 
 
-        String extraLabel =  "";
+        String extraLabel     = "";
         String fileFieldExtra = "";
 
         if (rootDir != null) {
-            if (!rootDir.exists()) {
-                extraLabel = HtmlUtil.br()
-                    + HtmlUtil.span(msg("Directory does not exist"),HtmlUtil.cssClass("requiredlabel"));
+            if ( !rootDir.exists()) {
+                extraLabel =
+                    HtmlUtil.br()
+                    + HtmlUtil.span(msg("Directory does not exist"),
+                                    HtmlUtil.cssClass("requiredlabel"));
                 fileFieldExtra = HtmlUtil.cssClass("required");
-            } else if (!getStorageManager().isLocalFileOk(rootDir)) {
+            } else if ( !getStorageManager().isLocalFileOk(rootDir)) {
                 String adminLink =
                     HtmlUtil.href(
-                                  getRepository().getUrlBase()
-                                  + "/help/admin.html#filesystemaccess", msg(
-                                                                             "More information"), " target=_HELP");
-                extraLabel = HtmlUtil.br() + 
-                    HtmlUtil.span(msg("You need to add this directory to the file system access list"),HtmlUtil.cssClass("requiredlabel"))
-                    +HtmlUtil.space(2) +adminLink;
+                        getRepository().getUrlBase()
+                        + "/help/admin.html#filesystemaccess", msg(
+                            "More information"), " target=_HELP");
+                extraLabel =
+                    HtmlUtil.br()
+                    + HtmlUtil
+                        .span(msg("You need to add this directory to the file system access list"),
+                              HtmlUtil.cssClass("requiredlabel")) + HtmlUtil.space(2) + adminLink;
                 fileFieldExtra = HtmlUtil.cssClass("required");
             }
-        } 
+        }
 
-        if(root.length()==0) {
-                extraLabel = HtmlUtil.br()
-                    + HtmlUtil.span(msg("Required"),HtmlUtil.cssClass("requiredlabel"));
+        if (root.length() == 0) {
+            extraLabel = HtmlUtil.br()
+                         + HtmlUtil.span(msg("Required"),
+                                         HtmlUtil.cssClass("requiredlabel"));
             fileFieldExtra = HtmlUtil.cssClass("required");
-            
+
         }
 
         sb.append(HtmlUtil.colspan(msgHeader("Look for files"), 2));
         sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
-                                                    HtmlUtil.SIZE_60+fileFieldExtra) + extraLabel));
+                                         HtmlUtil.SIZE_60
+                                         + fileFieldExtra) + extraLabel));
         sb.append(HtmlUtil.formEntry(msgLabel("That match pattern"),
                                      HtmlUtil.input(ATTR_FILEPATTERN,
                                          filePatternString,
@@ -329,29 +334,30 @@ public class PatternHarvester extends Harvester {
                                          dateFormat, HtmlUtil.SIZE_60)));
 
 
-        String moveNote = msg("Note: this will move the files from their current location to RAMADDA's own storage directory");
+        String moveNote =
+            msg(
+            "Note: this will move the files from their current location to RAMADDA's own storage directory");
         sb.append(HtmlUtil.formEntry(msgLabel("Move file to storage"),
                                      HtmlUtil.checkbox(ATTR_MOVETOSTORAGE,
-                                                       "true", moveToStorage)+HtmlUtil.space(1) + moveNote));
+                                         "true",
+                                         moveToStorage) + HtmlUtil.space(1)
+                                             + moveNote));
 
 
-        sb.append(
-            HtmlUtil.formEntry(
-                msgLabel("Metadata"),
+        sb.append(HtmlUtil.formEntry(msgLabel("Metadata"),
                 HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", getAddMetadata())
-                + HtmlUtil.space(1)
-                + msg("Add full metadata")
+                + HtmlUtil.space(1) + msg("Add full metadata")
                 + HtmlUtil.space(4)
+                + HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA, "true",
+                    getAddShortMetadata()) + HtmlUtil.space(1)
+                        + msg("Just add spatial/temporal metadata")));
 
-                + HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA, "true", getAddShortMetadata())
-                + HtmlUtil.space(1)
-                + msg("Just add spatial/temporal metadata")
-                               ));
-
-        sb.append(
-                  HtmlUtil.formEntry(msgLabel("User"), 
+        sb.append(HtmlUtil.formEntry(msgLabel("User"),
                                      HtmlUtil.input(ATTR_USER,
-                                                    getUserName()!=null?getUserName().trim():"", HtmlUtil.SIZE_30)));
+                                         (getUserName() != null)
+                                         ? getUserName().trim()
+                                         : "", HtmlUtil.SIZE_30)));
+
 
     }
 
@@ -367,8 +373,9 @@ public class PatternHarvester extends Harvester {
         if (sdf == null) {
             sdf = new ArrayList<SimpleDateFormat>();
             if ((dateFormat != null) && (dateFormat.length() > 0)) {
-                for (String tok : (List<String>) StringUtil.split(dateFormat,
-                        ",", true, true)) {
+                for (String tok :
+                        (List<String>) StringUtil.split(dateFormat, ",",
+                        true, true)) {
                     sdf.add(new SimpleDateFormat(tok));
                 }
             } else {
@@ -864,9 +871,10 @@ public class PatternHarvester extends Harvester {
         Resource resource;
         if (moveToStorage) {
             File fromFile = new File(fileName);
-            File newFile = getStorageManager().moveToStorage(null,
-                                                             fromFile,
-                                                             getStorageManager().getStorageFileName(fromFile.getName()));
+            File newFile = getStorageManager().moveToStorage(
+                               null, fromFile,
+                               getStorageManager().getStorageFileName(
+                                   fromFile.getName()));
             resource = new Resource(newFile.toString(),
                                     Resource.TYPE_STOREDFILE);
         } else {
@@ -921,4 +929,3 @@ public class PatternHarvester extends Harvester {
 
 
 }
-

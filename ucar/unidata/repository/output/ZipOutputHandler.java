@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -77,8 +76,7 @@ import java.util.zip.*;
 public class ZipOutputHandler extends OutputHandler {
 
     /** _more_ */
-    private final Logger LOG =
-        Logger.getLogger(ZipOutputHandler.class);
+    private final Logger LOG = Logger.getLogger(ZipOutputHandler.class);
 
 
     /** _more_ */
@@ -96,8 +94,8 @@ public class ZipOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_ZIPGROUP =
-        new OutputType("Zip Folder", "zip.zipgroup", OutputType.TYPE_FILE, "",
-                       ICON_ZIP);
+        new OutputType("Zip Folder", "zip.zipgroup", OutputType.TYPE_FILE,
+                       "", ICON_ZIP);
 
 
     /**
@@ -205,7 +203,7 @@ public class ZipOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return toZip(request, "", entries, false,false);
+        return toZip(request, "", entries, false, false);
     }
 
 
@@ -232,9 +230,9 @@ public class ZipOutputHandler extends OutputHandler {
             all.addAll(subGroups);
             all.addAll(entries);
             getLogManager().logInfo("Doing zip tree");
-            return toZip(request, group.getName(), all, true,false);
+            return toZip(request, group.getName(), all, true, false);
         } else {
-            return toZip(request, group.getName(), entries, false,false);
+            return toZip(request, group.getName(), entries, false, false);
         }
     }
 
@@ -266,13 +264,14 @@ public class ZipOutputHandler extends OutputHandler {
      * @param prefix _more_
      * @param entries _more_
      * @param recurse _more_
+     * @param forExport _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result toZip(Request request, String prefix,
-                        List<Entry> entries, boolean recurse, boolean forExport)
+    public Result toZip(Request request, String prefix, List<Entry> entries,
+                        boolean recurse, boolean forExport)
             throws Exception {
         OutputStream os;
         boolean      doingFile = false;
@@ -294,11 +293,11 @@ public class ZipOutputHandler extends OutputHandler {
 
 
         Element root = null;
-        boolean ok = true;
+        boolean ok   = true;
         //First recurse down without a zos to check the size
         try {
             processZip(request, entries, recurse, 0, null, prefix, 0,
-                       new int[] { 0 },forExport, null);
+                       new int[] { 0 }, forExport, null);
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -312,25 +311,25 @@ public class ZipOutputHandler extends OutputHandler {
             return result;
         }
 
-        ZipOutputStream zos  = new ZipOutputStream(os);
-        if(request.get(ARG_COMPRESS,true) == false) {
+        ZipOutputStream zos = new ZipOutputStream(os);
+        if (request.get(ARG_COMPRESS, true) == false) {
             //You would think that setting the method to stored would work
             //but it throws an error wanting the crc to be set on the ZipEntry
             //            zos.setMethod(ZipOutputStream.STORED);
             zos.setLevel(0);
         }
-        Hashtable       seen = new Hashtable();
+        Hashtable seen = new Hashtable();
         try {
-            if(forExport) {
+            if (forExport) {
                 Document doc = XmlUtil.makeDocument();
                 root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                       new String[] {});
 
             }
             processZip(request, entries, recurse, 0, zos, prefix, 0,
-                       new int[] { 0 }, forExport,root);
+                       new int[] { 0 }, forExport, root);
 
-            if(root!=null) {
+            if (root != null) {
                 String xml = XmlUtil.toString(root);
                 System.err.println(xml);
                 zos.putNextEntry(new ZipEntry("entries.xml"));
@@ -363,19 +362,22 @@ public class ZipOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entries _more_
      * @param recurse _more_
+     * @param level _more_
      * @param zos _more_
      * @param prefix _more_
      * @param sizeSoFar _more_
      * @param counter _more_
+     * @param forExport _more_
+     * @param entriesRoot _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected long processZip(Request request, List<Entry> entries,
-                              boolean recurse, int level, 
-                              ZipOutputStream zos,
-                              String prefix, long sizeSoFar, int[] counter,
+                              boolean recurse, int level,
+                              ZipOutputStream zos, String prefix,
+                              long sizeSoFar, int[] counter,
                               boolean forExport, Element entriesRoot)
             throws Exception {
         long      sizeProcessed = 0;
@@ -401,8 +403,11 @@ public class ZipOutputHandler extends OutputHandler {
                 Misc.sleep(10);
             }
             Element entryNode = null;
-            if(forExport && entriesRoot!=null) {
-                entryNode = getRepository().getXmlOutputHandler().getEntryTag(null, entry, entriesRoot.getOwnerDocument(),entriesRoot, true, level!=0);
+            if (forExport && (entriesRoot != null)) {
+                entryNode =
+                    getRepository().getXmlOutputHandler().getEntryTag(null,
+                        entry, entriesRoot.getOwnerDocument(), entriesRoot,
+                        true, level != 0);
             }
 
             if (entry.isGroup() && recurse) {
@@ -413,9 +418,10 @@ public class ZipOutputHandler extends OutputHandler {
                 if (prefix.length() > 0) {
                     path = prefix + "/" + path;
                 }
-                sizeProcessed += processZip(request, children, recurse, level+1, zos,
-                                            path, sizeProcessed + sizeSoFar,
-                                            counter, forExport,entriesRoot);
+                sizeProcessed += processZip(request, children, recurse,
+                                            level + 1, zos, path,
+                                            sizeProcessed + sizeSoFar,
+                                            counter, forExport, entriesRoot);
             }
 
 
@@ -428,7 +434,7 @@ public class ZipOutputHandler extends OutputHandler {
             String path = entry.getResource().getPath();
             String name = getStorageManager().getFileTail(path);
             int    cnt  = 1;
-            if(!forExport) {
+            if ( !forExport) {
                 while (seen.get(name) != null) {
                     name = (cnt++) + "_" + name;
                 }
@@ -448,10 +454,10 @@ public class ZipOutputHandler extends OutputHandler {
 
 
             if (zos != null) {
-                if(entryNode!=null && forExport) {
+                if ((entryNode != null) && forExport) {
                     zos.putNextEntry(new ZipEntry(entry.getId()));
-                    XmlUtil.setAttributes(entryNode, new String[] {ATTR_FILE, entry.getId(),
-                                                                   ATTR_FILENAME, name});
+                    XmlUtil.setAttributes(entryNode, new String[] { ATTR_FILE,
+                            entry.getId(), ATTR_FILENAME, name });
 
                 } else {
                     ZipEntry zipEntry = new ZipEntry(name);
@@ -474,4 +480,3 @@ public class ZipOutputHandler extends OutputHandler {
     }
 
 }
-

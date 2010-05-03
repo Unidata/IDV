@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -109,6 +107,7 @@ public class StorageManager extends RepositoryManager {
     public static final String DIR_PLUGINS = "plugins";
 
 
+    /** _more_          */
     public static final String DIR_BACKUPS = "backups";
 
     /** _more_ */
@@ -712,6 +711,11 @@ public class StorageManager extends RepositoryManager {
         return dir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getBackupsDir() {
         String dir = IOUtil.joinDir(getRepositoryDir(), DIR_BACKUPS);
         IOUtil.makeDirRecursive(new File(dir));
@@ -874,18 +878,21 @@ public class StorageManager extends RepositoryManager {
      * @param request _more_
      * @param original _more_
      * @param prefix _more_
+     * @param targetName _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public File moveToStorage(Request request, File original, String targetName)
+    public File moveToStorage(Request request, File original,
+                              String targetName)
             throws Exception {
-        if(targetName == null) {
-            targetName  = original.getName();
+        if (targetName == null) {
+            targetName = original.getName();
         }
-        String            storageDir = getStorageDir();
-        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        String storageDir = getStorageDir();
+        GregorianCalendar cal =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(new Date());
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
         IOUtil.makeDir(storageDir);
@@ -979,10 +986,11 @@ public class StorageManager extends RepositoryManager {
     public File copyToStorage(Request request, InputStream original,
                               String newName)
             throws Exception {
-        String            targetName = newName;
-        String            storageDir = getStorageDir();
+        String targetName = newName;
+        String storageDir = getStorageDir();
 
-        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        GregorianCalendar cal =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(new Date());
 
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
@@ -1016,12 +1024,19 @@ public class StorageManager extends RepositoryManager {
      */
     public File getUploadFilePath(String fileName) {
         return checkFile(new File(IOUtil.joinDir(getUploadDir(),
-                                                 getStorageFileName(fileName))));
+                getStorageFileName(fileName))));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param fileName _more_
+     *
+     * @return _more_
+     */
     public String getStorageFileName(String fileName) {
-        return  repository.getGUID() + FILE_SEPARATOR + fileName;
+        return repository.getGUID() + FILE_SEPARATOR + fileName;
     }
 
 
@@ -1425,4 +1440,3 @@ public class StorageManager extends RepositoryManager {
 
 
 }
-

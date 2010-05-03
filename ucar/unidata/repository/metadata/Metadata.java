@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -73,6 +72,7 @@ import java.util.zip.*;
  */
 public class Metadata implements Constants {
 
+    /** _more_          */
     public static final int MAX_LENGTH = 10000;
 
     /** _more_ */
@@ -234,7 +234,7 @@ public class Metadata implements Constants {
         setAttr2(attr2);
         setAttr3(attr3);
         setAttr4(attr4);
-        this.extra     = extra;
+        this.extra = extra;
         if (this.extra == null) {
             this.extra = "";
         }
@@ -262,14 +262,31 @@ public class Metadata implements Constants {
         }
     }
 
-    public static boolean  lengthOK(String s) {
-        if(s==null) return true;
-        return s.length()<MAX_LENGTH;
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static boolean lengthOK(String s) {
+        if (s == null) {
+            return true;
+        }
+        return s.length() < MAX_LENGTH;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public static void checkLength(String s) {
-        if(!lengthOK(s)) throw new IllegalArgumentException("Metadata length too great:" +s);
+        if ( !lengthOK(s)) {
+            throw new IllegalArgumentException("Metadata length too great:"
+                    + s);
+        }
     }
 
     /**
@@ -340,7 +357,7 @@ public class Metadata implements Constants {
      * @param value _more_
      */
     public void setAttr(int idx, String value) {
-        if(idx>=1 && idx<=4) {
+        if ((idx >= 1) && (idx <= 4)) {
             checkLength(value);
         }
         if (idx == 1) {
@@ -886,7 +903,6 @@ public class Metadata implements Constants {
                     for (int j = 0; j < elements.size(); j++) {
                         Element extraNode = (Element) elements.get(j);
                         int index = XmlUtil.getAttribute(extraNode,
-
                                         ATTR_INDEX, -1);
                         String text = XmlUtil.getChildText(extraNode);
                         if (text == null) {
@@ -931,4 +947,3 @@ public class Metadata implements Constants {
 
 
 }
-

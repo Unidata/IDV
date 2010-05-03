@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
- * Atmospheric Research, PO. Box 3000, Boulder, CO 80307,
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -76,9 +75,10 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPageHandler {
+public class OutputHandler extends RepositoryManager implements WikiUtil
+    .WikiPageHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MAXCONNECTIONS = "maxconnections";
 
     /** _more_ */
@@ -97,18 +97,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     /** _more_ */
     private List<OutputType> types = new ArrayList<OutputType>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, OutputType> typeMap = new Hashtable<String,
                                                         OutputType>();
 
 
-    /** _more_          */
+    /** _more_ */
     private int maxConnections = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int numberOfConnections = 0;
 
-    /** _more_          */
+    /** _more_ */
     private int totalCalls = 0;
 
     /**
@@ -795,13 +795,29 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                    String label, boolean allEntries,
                                    String type, Entry entry)
             throws Exception {
-        return getSelect(request, elementId, label, allEntries, type, entry, true);
+        return getSelect(request, elementId, label, allEntries, type, entry,
+                         true);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param elementId _more_
+     * @param label _more_
+     * @param allEntries _more_
+     * @param type _more_
+     * @param entry _more_
+     * @param addClear _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String getSelect(Request request, String elementId,
                                    String label, boolean allEntries,
-                                   String type, Entry entry,boolean addClear)
+                                   String type, Entry entry, boolean addClear)
             throws Exception {
         String event = HtmlUtil.call("selectInitialClick",
                                      "event," + HtmlUtil.squote(elementId)
@@ -812,13 +828,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                         : "null"));
         String clearEvent = HtmlUtil.call("clearSelect",
                                           HtmlUtil.squote(elementId));
-        String link = HtmlUtil.mouseClickHref(
-                                              event, label, HtmlUtil.id(elementId + ".selectlink"));
-        if(addClear) {
+        String link = HtmlUtil.mouseClickHref(event, label,
+                          HtmlUtil.id(elementId + ".selectlink"));
+        if (addClear) {
             link = link + " "
-                + HtmlUtil.mouseClickHref(
-                    clearEvent, "Clear",
-                    HtmlUtil.id(elementId + ".selectlink"));
+                   + HtmlUtil.mouseClickHref(clearEvent, "Clear",
+                                             HtmlUtil.id(elementId
+                                                 + ".selectlink"));
         }
         return link;
     }
@@ -851,26 +867,27 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
-        String message = entry.isGroup()?"Click to open folder":"Click to view contents";
+        String  message   = entry.isGroup()
+                            ? "Click to open folder"
+                            : "Click to view contents";
         boolean showArrow = true;
-        String prefix = ( !showArrow
-                          ? HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),
-                                         "",
-                                         HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
-                                             "10"))
-                          : HtmlUtil.img(
-                              getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                              msg(message),
-                              HtmlUtil.id("img_" + uid)
-                              + HtmlUtil.onMouseClick(
-                                  HtmlUtil.call(
-                                      "folderClick",
-                                      HtmlUtil.comma(
-                                          HtmlUtil.squote(uid),
-                                          HtmlUtil.squote(folderClickUrl),
-                                          HtmlUtil.squote(
-                                              iconUrl(
-                                                  ICON_TOGGLEARROWDOWN)))))));
+        String  prefix    = ( !showArrow
+                              ? HtmlUtil.img(
+                                  getRepository().iconUrl(ICON_BLANK), "",
+                                  HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "10"))
+                              : HtmlUtil.img(
+                                  getRepository().iconUrl(
+                                      ICON_TOGGLEARROWRIGHT), msg(message),
+                                          HtmlUtil.id("img_" + uid)
+                                          + HtmlUtil.onMouseClick(
+                                              HtmlUtil.call(
+                                                  "folderClick",
+                                                  HtmlUtil.comma(
+                                                      HtmlUtil.squote(uid),
+                                                      HtmlUtil.squote(
+                                                          folderClickUrl), HtmlUtil.squote(
+                                                          iconUrl(
+                                                              ICON_TOGGLEARROWDOWN)))))));
 
 
         String img = prefix + HtmlUtil.space(1) + HtmlUtil.img(icon);
@@ -1070,26 +1087,27 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                                new State(getEntryManager().getDummyGroup(),
                                          entries));
 
-        List<String>linkCategories = new ArrayList<String>();
-        Hashtable<String, List<HtmlUtil.Selector>> linkMap = new Hashtable<String, List<HtmlUtil.Selector>>();
+        List<String> linkCategories = new ArrayList<String>();
+        Hashtable<String, List<HtmlUtil.Selector>> linkMap =
+            new Hashtable<String, List<HtmlUtil.Selector>>();
         linkCategories.add("View");
-        linkMap.put("View",new ArrayList<HtmlUtil.Selector>());
+        linkMap.put("View", new ArrayList<HtmlUtil.Selector>());
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             if (outputType == null) {
                 continue;
             }
             String category;
-            if(outputType.getIsFile()) {
+            if (outputType.getIsFile()) {
                 category = "File";
-            } else if(outputType.getIsEdit()) {
+            } else if (outputType.getIsEdit()) {
                 category = "Edit";
             } else {
-                category ="View";
+                category = "View";
             }
             List<HtmlUtil.Selector> linksForCategory = linkMap.get(category);
 
-            if(linksForCategory==null) {
+            if (linksForCategory == null) {
                 linksForCategory = new ArrayList<HtmlUtil.Selector>();
                 linkCategories.add(category);
                 linkMap.put(category, linksForCategory);
@@ -1100,14 +1118,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 icon = getRepository().iconUrl(ICON_BLANK);
             }
             linksForCategory.add(new HtmlUtil.Selector(outputType.getLabel(),
-                                                       outputType.getId(), icon, 20));
+                    outputType.getId(), icon, 20));
         }
 
-        ArrayList<HtmlUtil.Selector> tfos =  new ArrayList<HtmlUtil.Selector>();
-        for(String category: linkCategories) {
+        ArrayList<HtmlUtil.Selector> tfos =
+            new ArrayList<HtmlUtil.Selector>();
+        for (String category : linkCategories) {
             List<HtmlUtil.Selector> linksForCategory = linkMap.get(category);
-            if(linksForCategory.size()==0) continue;
-            tfos.add(new HtmlUtil.Selector(category,"",null,0,true));
+            if (linksForCategory.size() == 0) {
+                continue;
+            }
+            tfos.add(new HtmlUtil.Selector(category, "", null, 0, true));
             tfos.addAll(linksForCategory);
         }
 
@@ -1389,14 +1410,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 + HtmlUtil.onMouseClick(
                     HtmlUtil.call(
                         "entryRowClick",
-                        "event, " +
-                        HtmlUtil.squote(rowId))) 
-                + HtmlUtil.onMouseOver(
-                    HtmlUtil.call(
-                        "entryRowOver",
-                        HtmlUtil.squote(rowId))) + HtmlUtil.onMouseOut(
+                        "event, "
+                        + HtmlUtil.squote(rowId))) + HtmlUtil.onMouseOver(
                             HtmlUtil.call(
-                                "entryRowOut", HtmlUtil.squote(rowId)))));
+                                "entryRowOver",
+                                HtmlUtil.squote(
+                                    rowId))) + HtmlUtil.onMouseOut(
+                                        HtmlUtil.call(
+                                            "entryRowOut",
+                                            HtmlUtil.squote(rowId)))));
         sb.append(
             "<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
 
@@ -1406,11 +1428,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         sb.append(link.getLink());
 
         /*
-	String desc = entry.getDescription();
-	StringBuffer descSB = new StringBuffer();
-	String toggleJS = HtmlUtil.makeToggleBlock(desc,
-						   descSB, false);
-	sb.append(descSB);
+        String desc = entry.getDescription();
+        StringBuffer descSB = new StringBuffer();
+        String toggleJS = HtmlUtil.makeToggleBlock(desc,
+                                                   descSB, false);
+        sb.append(descSB);
         */
 
 
@@ -1427,12 +1449,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
         sb.append("<td align=right width=200><div class=entryrowlabel>");
         sb.append(getRepository().formatDateShort(request,
-                                                  new Date(entry.getStartDate()),
-                                                  getEntryManager().getTimezone(entry), extraAlt.toString()));
-        sb.append("</div></td><td width=\"1%\" align=right class=entryrowlabel>");
+                new Date(entry.getStartDate()),
+                getEntryManager().getTimezone(entry), extraAlt.toString()));
+        sb.append(
+            "</div></td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
 
-	//	sb.append(HtmlUtil.jsLink(toggleJS,"X"));
+        //      sb.append(HtmlUtil.jsLink(toggleJS,"X"));
         /*        String userSearchLink =
             HtmlUtil.href(
                 HtmlUtil.url(
@@ -1442,8 +1465,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
                         sb.append(userSearchLink);*/
         sb.append("  ");
-        sb.append(HtmlUtil.div(HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),"",HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10") +HtmlUtil.id("entrymenuarrow_" + rowId)), HtmlUtil.cssClass("entrymenuarrow")));
-        
+        sb.append(
+            HtmlUtil.div(
+                HtmlUtil.img(
+                    getRepository().iconUrl(ICON_BLANK), "",
+                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "10")
+                    + HtmlUtil.id(
+                        "entrymenuarrow_" + rowId)), HtmlUtil.cssClass(
+                            "entrymenuarrow")));
+
         sb.append("</td></tr></table>");
         sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
         sb.append(link.getFolderBlock());
@@ -1577,8 +1607,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     /** _more_ */
     public static final String PROP_REQUEST = "request";
 
+    /** _more_          */
     public static String TYPE_WIKIPAGE = "wikipage";
 
+    /** _more_          */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
                                                      "wiki.view",
                                                      OutputType.TYPE_HTML,
@@ -1769,6 +1801,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     /**
      * _more_
      *
+     *
+     * @param wikiUtil _more_
      * @param request _more_
      * @param url _more_
      * @param entry _more_
@@ -1778,8 +1812,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      *
      * @throws Exception _more_
      */
-    public String getWikiImage(WikiUtil wikiUtil, Request request, String url, Entry entry,
-                               Hashtable props)
+    public String getWikiImage(WikiUtil wikiUtil, Request request,
+                               String url, Entry entry, Hashtable props)
             throws Exception {
         String width = (String) props.get(HtmlUtil.ATTR_WIDTH);
         String extra = "";
@@ -1787,30 +1821,32 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         if (width != null) {
             extra = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, width);
         }
-	if(wikiUtil!=null) {
-	    String imageClass = (String)wikiUtil.getProperty("image.class");
-	    if(imageClass!=null) {
-		extra = extra +HtmlUtil.cssClass(imageClass);
-	    }
-	}
+        if (wikiUtil != null) {
+            String imageClass = (String) wikiUtil.getProperty("image.class");
+            if (imageClass != null) {
+                extra = extra + HtmlUtil.cssClass(imageClass);
+            }
+        }
 
 
-	String style="";
+        String style = "";
 
-	String left = (String)props.get("left");
-	if(left!=null)
-	    style = style+" left: " + left +";";
+        String left  = (String) props.get("left");
+        if (left != null) {
+            style = style + " left: " + left + ";";
+        }
 
-	String top = (String)props.get("top");
-	if(top!=null)
-	    style = style+" top: " + top +";";
+        String top = (String) props.get("top");
+        if (top != null) {
+            style = style + " top: " + top + ";";
+        }
 
-	if(style.length()>0) {
-	    extra = extra +" style=\"position:absolute; " + style +"\" ";
-	}
+        if (style.length() > 0) {
+            extra = extra + " style=\"position:absolute; " + style + "\" ";
+        }
 
 
-	
+
         String  img  = HtmlUtil.img(url, entry.getName(), extra);
         boolean link = Misc.equals("true", props.get("link"));
         if (link) {
@@ -1885,8 +1921,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             if ( !entry.getResource().isImage()) {
                 return msg("Not an image");
             }
-            return getWikiImage(wikiUtil, request, getImageUrl(request, entry), entry,
-                                props);
+            return getWikiImage(wikiUtil, request,
+                                getImageUrl(request, entry), entry, props);
         }
 
         String attachment = null;
@@ -1914,8 +1950,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
             if ( !srcEntry.getResource().isImage()) {
                 return msg("Not an image");
             }
-            return getWikiImage(wikiUtil, request, getImageUrl(request, srcEntry),
-                                srcEntry, props);
+            return getWikiImage(wikiUtil, request,
+                                getImageUrl(request, srcEntry), srcEntry,
+                                props);
         }
 
 
@@ -2170,10 +2207,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 title         = Misc.getProperty(props, "title", title);
             }
 
-	    boolean inBlock      = Misc.getProperty(props, "showhide", true);
-            boolean open = Misc.getProperty(props, "open", true);
+            boolean inBlock = Misc.getProperty(props, "showhide", true);
+            boolean open    = Misc.getProperty(props, "open", true);
 
-            if (inBlock && title != null) {
+            if (inBlock && (title != null)) {
                 return HtmlUtil.makeShowHideBlock(title, propertyValue, open,
                         HtmlUtil.cssClass("wiki-tocheader"),
                         HtmlUtil.cssClass("wiki-toc"));
@@ -2204,8 +2241,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         Entry theEntry = null;
         theEntry = getEntryManager().getEntry(request, name);
         if ((theEntry == null) && parent.isGroup()) {
-            for (Entry child : getEntryManager().getChildren(request,
-                    (Group) parent)) {
+            for (Entry child :
+                    getEntryManager().getChildren(request, (Group) parent)) {
                 if (child.getName().trim().equalsIgnoreCase(name)) {
                     theEntry = child;
                     break;
@@ -2233,12 +2270,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
 
         String select = OutputHandler.getSelect(request, textAreaId,
-                                                "Add link", true, "wikilink", entry,false) + HtmlUtil.space(1) +"|" +
-            HtmlUtil.space(1) 
-
-                                + OutputHandler.getSelect(request,
-                                    textAreaId, "Import entry", true,
-                                                          "entryid", entry,false);
+                            "Add link", true, "wikilink", entry,
+                            false) + HtmlUtil.space(1) + "|"
+                                   + HtmlUtil.space(1)
+                                   + OutputHandler.getSelect(request,
+                                       textAreaId, "Import entry", true,
+                                       "entryid", entry, false);
 
         StringBuffer buttons = new StringBuffer();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
@@ -2462,12 +2499,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 if (label.trim().length() == 0) {
                     label = theEntry.getName();
                 }
-                if (theEntry.getType().equals(
-                                              TYPE_WIKIPAGE)) {
+                if (theEntry.getType().equals(TYPE_WIKIPAGE)) {
                     String url =
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         theEntry, ARG_OUTPUT,
-                                         OUTPUT_WIKI);
+                                         theEntry, ARG_OUTPUT, OUTPUT_WIKI);
                     return getEntryManager().getTooltipLink(request,
                             theEntry, label, url);
 
@@ -2518,6 +2553,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      * @param request _more_
      * @param entry _more_
      * @param wikiContent _more_
+     * @param wrapInDiv _more_
      * @param subGroups _more_
      * @param subEntries _more_
      *
@@ -2526,14 +2562,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      * @throws Exception _more_
      */
     public String wikifyEntry(Request request, Entry entry,
-                              String wikiContent, boolean wrapInDiv, List<Group> subGroups,
-                              List<Entry> subEntries)
+                              String wikiContent, boolean wrapInDiv,
+                              List<Group> subGroups, List<Entry> subEntries)
             throws Exception {
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
-        return wikifyEntry(request, entry, wikiUtil, wikiContent, wrapInDiv, subGroups,
-                           subEntries);
+        return wikifyEntry(request, entry, wikiUtil, wikiContent, wrapInDiv,
+                           subGroups, subEntries);
     }
 
 
@@ -2544,6 +2580,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      * @param entry _more_
      * @param wikiUtil _more_
      * @param wikiContent _more_
+     * @param wrapInDiv _more_
      * @param subGroups _more_
      * @param subEntries _more_
      *
@@ -2553,8 +2590,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      */
     public String wikifyEntry(Request request, Entry entry,
                               WikiUtil wikiUtil, String wikiContent,
-			      boolean wrapInDiv,
-                              List<Group> subGroups, List<Entry> subEntries)
+                              boolean wrapInDiv, List<Group> subGroups,
+                              List<Entry> subEntries)
             throws Exception {
         List children = new ArrayList();
         if (subGroups != null) {
@@ -2573,7 +2610,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         //TODO: We need to keep track of what is getting called so we prevent
         //infinite loops
         String content = wikiUtil.wikify(wikiContent, this);
-	if(!wrapInDiv) return content;
+        if ( !wrapInDiv) {
+            return content;
+        }
         return HtmlUtil.div(content, HtmlUtil.cssClass("wikicontent"));
 
     }
@@ -2654,4 +2693,3 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
 
 }
-

@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -280,7 +279,8 @@ public class CalendarOutputHandler extends OutputHandler {
      */
     public static GregorianCalendar getCalendar(int day, int month,
             int year) {
-        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        GregorianCalendar cal =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.set(cal.DAY_OF_MONTH, day);
         cal.set(cal.MONTH, month);
         cal.set(cal.YEAR, year);
@@ -354,6 +354,18 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param entries _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result outputCalendar(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
@@ -364,28 +376,29 @@ public class CalendarOutputHandler extends OutputHandler {
         }
         List<CalendarEntry> calEntries = new ArrayList<CalendarEntry>();
         for (Entry entry : entries) {
-            Date entryDate = new Date(entry.getStartDate());
-            String label = entry.getLabel();
+            Date   entryDate = new Date(entry.getStartDate());
+            String label     = entry.getLabel();
             if (label.length() > 20) {
                 label = label.substring(0, 19) + "...";
             }
-            String url = 
-                HtmlUtil.nobr(
-                              getEntryManager().getAjaxLink(
-                                                            request, entry, label).toString());
+            String url = HtmlUtil.nobr(getEntryManager().getAjaxLink(request,
+                             entry, label).toString());
 
             calEntries.add(new CalendarEntry(entryDate, url, entry));
         }
         outputCalendar(request, calEntries, sb);
-        if(true) return new Result(msg("Calendar"), sb);
+        if (true) {
+            return new Result(msg("Calendar"), sb);
+        }
 
 
         boolean hadDateArgs = request.defined(ARG_YEAR)
                               || request.defined(ARG_MONTH)
                               || request.defined(ARG_DAY);
 
-        int[] today =
-            getDayMonthYear(new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT));
+        int[] today = getDayMonthYear(
+                          new GregorianCalendar(
+                              RepositoryUtil.TIMEZONE_DEFAULT));
 
         int[] selected = new int[] { request.get(ARG_DAY, today[IDX_DAY]),
                                      request.get(ARG_MONTH, today[IDX_MONTH]),
@@ -681,13 +694,34 @@ public class CalendarOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Mon, May 3, '10
+     * @author         Enter your name here...    
+     */
     public static class CalendarEntry {
+
+        /** _more_          */
         Date date;
+
+        /** _more_          */
         String label;
+
+        /** _more_          */
         Object dayObject;
-        public CalendarEntry(Date date, String label,Object dayObject) {
-            this.date  = date;
-            this.label = label;
+
+        /**
+         * _more_
+         *
+         * @param date _more_
+         * @param label _more_
+         * @param dayObject _more_
+         */
+        public CalendarEntry(Date date, String label, Object dayObject) {
+            this.date      = date;
+            this.label     = label;
             this.dayObject = dayObject;
         }
     }
@@ -705,16 +739,17 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void outputCalendar(Request request, 
-                               List<CalendarEntry> entries, StringBuffer sb)
+    public void outputCalendar(Request request, List<CalendarEntry> entries,
+                               StringBuffer sb)
             throws Exception {
 
         boolean hadDateArgs = request.defined(ARG_YEAR)
                               || request.defined(ARG_MONTH)
                               || request.defined(ARG_DAY);
 
-        int[] today =
-            getDayMonthYear(new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT));
+        int[] today = getDayMonthYear(
+                          new GregorianCalendar(
+                              RepositoryUtil.TIMEZONE_DEFAULT));
 
         int[] selected = new int[] { request.get(ARG_DAY, today[IDX_DAY]),
                                      request.get(ARG_MONTH, today[IDX_MONTH]),
@@ -900,10 +935,10 @@ public class CalendarOutputHandler extends OutputHandler {
         }
 
         if (doDay) {
-            StringBuffer tmp = new StringBuffer();
-            String link = "";
-            if(dayItems.size()>0) {
-                if(dayItems.get(0) instanceof Entry) {
+            StringBuffer tmp  = new StringBuffer();
+            String       link = "";
+            if (dayItems.size() > 0) {
+                if (dayItems.get(0) instanceof Entry) {
                     link = getEntriesList(request, tmp, dayItems, true, true,
                                           true, false);
                 } else {
@@ -914,7 +949,8 @@ public class CalendarOutputHandler extends OutputHandler {
             request.remove(ARG_YEAR);
             request.remove(ARG_DAY);
             sb.append(HtmlUtil.p());
-            sb.append("<table width=100% border=0 cellpadding=10><tr valign=top><td width=200>");
+            sb.append(
+                "<table width=100% border=0 cellpadding=10><tr valign=top><td width=200>");
             getRepository().createMonthNav(sb, cal.getTime(),
                                            request.getUrl(), dates);
             sb.append("</td><td>");
@@ -985,7 +1021,8 @@ public class CalendarOutputHandler extends OutputHandler {
                     }
                     content =
                         "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>"
-                        + dayContents + "</td><td align=right class=calday width=5>"
+                        + dayContents
+                        + "</td><td align=right class=calday width=5>"
                         + HtmlUtil.href(dayUrl, "" + thisDay)
                         + "<br>&nbsp;</td></tr></table>";
                     sb.append("<td class=\"calentry\" " + bg + " >" + content
@@ -1011,4 +1048,3 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
 }
-

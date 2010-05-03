@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -29,11 +27,11 @@ import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;
 
-import ucar.unidata.xml.XmlEncoder;
-
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+
+import ucar.unidata.xml.XmlEncoder;
 
 import java.io.File;
 
@@ -98,11 +96,14 @@ public class Entry extends Entity {
     /** _more_ */
     private String icon;
 
+    /** _more_          */
     private Hashtable properties;
 
+    /** _more_          */
     private String propertiesString;
 
-    private static  XmlEncoder xmlEncoder = new XmlEncoder();
+    /** _more_          */
+    private static XmlEncoder xmlEncoder = new XmlEncoder();
 
     /**
      * _more_
@@ -702,55 +703,86 @@ public class Entry extends Entity {
     }
 
     /**
-       Set the Properties property.
-
-       @param value The new value for Properties
-    **/
-    public void putProperty (String key, Object value) throws Exception {
-	getProperties(true).put(key,value);
+     *  Set the Properties property.
+     *
+     *
+     * @param key _more_
+     *  @param value The new value for Properties
+     *
+     * @throws Exception _more_
+     */
+    public void putProperty(String key, Object value) throws Exception {
+        getProperties(true).put(key, value);
     }
 
-    public Object getProperty (String key) throws Exception  {
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Object getProperty(String key) throws Exception {
         Hashtable properties = getProperties();
-        if(properties==null) return null;
+        if (properties == null) {
+            return null;
+        }
         return properties.get(key);
     }
 
 
     /**
-       Get the Properties property.
-
-       @return The Properties
-    **/
-    public Hashtable getProperties () throws Exception  {
+     *  Get the Properties property.
+     *
+     *  @return The Properties
+     *
+     * @throws Exception _more_
+     */
+    public Hashtable getProperties() throws Exception {
         return getProperties(false);
     }
 
 
-    public Hashtable getProperties (boolean force) throws Exception  {
-        if(properties == null) {
-            if(propertiesString != null) {
-                properties = (Hashtable) xmlEncoder.toObject(propertiesString);
+    /**
+     * _more_
+     *
+     * @param force _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Hashtable getProperties(boolean force) throws Exception {
+        if (properties == null) {
+            if (propertiesString != null) {
+                properties =
+                    (Hashtable) xmlEncoder.toObject(propertiesString);
                 propertiesString = null;
             }
-            if(properties == null && force) properties = new Hashtable();
+            if ((properties == null) && force) {
+                properties = new Hashtable();
+            }
         }
-	return this.properties;
+        return this.properties;
     }
 
 
     /**
-       Get the PropertiesString property.
-
-       @return The PropertiesString
-    **/
-    public String getPropertiesString () throws Exception {
-        if(properties!=null)
+     *  Get the PropertiesString property.
+     *
+     *  @return The PropertiesString
+     *
+     * @throws Exception _more_
+     */
+    public String getPropertiesString() throws Exception {
+        if (properties != null) {
             return xmlEncoder.toXml(properties);
+        }
         return null;
     }
 
 
 
 }
-

@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -62,8 +61,15 @@ public class BlobTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param type _more_
+     * @param description _more_
+     */
     public BlobTypeHandler(Repository repository, String type,
-                       String description) {
+                           String description) {
         super(repository, type, description);
     }
 
@@ -79,7 +85,9 @@ public class BlobTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     protected Hashtable getProperties(Entry entry) throws Exception {
-        if(entry==null) return new Hashtable();
+        if (entry == null) {
+            return new Hashtable();
+        }
         Hashtable properties = null;
         if (properties == null) {
             Object[]   values     = entry.getValues();
@@ -88,8 +96,8 @@ public class BlobTypeHandler extends GenericTypeHandler {
                     && (values[0] != null)) {
                 properties =
                     (Hashtable) xmlEncoder.decodeXml((String) values[0]);
-            } 
-            if(properties==null) {
+            }
+            if (properties == null) {
                 properties = new Hashtable();
             }
         }
@@ -113,4 +121,3 @@ public class BlobTypeHandler extends GenericTypeHandler {
 
 
 }
-

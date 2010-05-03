@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,8 +23,9 @@ package ucar.unidata.repository.type;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.*;
+
+import ucar.unidata.repository.database.*;
 
 import ucar.unidata.repository.output.*;
 
@@ -93,8 +92,15 @@ public class GenericTypeHandler extends TypeHandler {
         super(null);
     }
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param type _more_
+     * @param description _more_
+     */
     public GenericTypeHandler(Repository repository, String type,
-                       String description) {
+                              String description) {
         super(repository, type, description);
     }
 
@@ -154,10 +160,17 @@ public class GenericTypeHandler extends TypeHandler {
         if (columnNodes.size() == 0) {
             return;
         }
-        init((List<Element>)columnNodes);
+        init((List<Element>) columnNodes);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param columnNodes _more_
+     *
+     * @throws Exception _more_
+     */
     public void init(List<Element> columnNodes) throws Exception {
         Statement statement = getDatabaseManager().createStatement();
         colNames.add(COL_ID);
@@ -204,11 +217,21 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<String> getColumnNames() {
         return colNames;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Column> getColumns() {
         return columns;
     }
@@ -263,8 +286,13 @@ public class GenericTypeHandler extends TypeHandler {
         return column.convert(value);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Object[] makeValues() {
-        return  new Object[colNames.size()-1];
+        return new Object[colNames.size() - 1];
     }
 
 
@@ -318,7 +346,9 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public int matchValue(String arg, Object value, Entry entry) {
         for (Column column : columns) {
-            int match = column.matchValue(arg, value, (entry==null?null:entry.getValues()));
+            int match = column.matchValue(arg, value, ((entry == null)
+                    ? null
+                    : entry.getValues()));
             if (match == MATCH_FALSE) {
                 return MATCH_FALSE;
             }
@@ -563,9 +593,20 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
-    public int setStatement(Entry entry, 
-                             Object[] values, PreparedStatement stmt,
-                             boolean isNew)
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param values _more_
+     * @param stmt _more_
+     * @param isNew _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public int setStatement(Entry entry, Object[] values,
+                            PreparedStatement stmt, boolean isNew)
             throws Exception {
 
         int stmtIdx = 1;
@@ -607,13 +648,21 @@ public class GenericTypeHandler extends TypeHandler {
         entry.setValues(values);
         return entry;
     }
-        
 
+
+    /**
+     * _more_
+     *
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Object[] getValues(Clause clause) throws Exception {
         Object[] values = makeValues();
         Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
-
-                                                     getTableName(), clause);
+                             getTableName(), clause);
 
         try {
             ResultSet results2 = stmt.getResultSet();
@@ -654,11 +703,12 @@ public class GenericTypeHandler extends TypeHandler {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output,
                               showDescription, showResource, linkToDownload);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
-            Object[] values   = entry.getValues();
+            Object[] values = entry.getValues();
             if (values != null) {
                 for (Column column : columns) {
                     StringBuffer tmpSb = new StringBuffer();
-                    column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
+                    column.formatValue(entry, tmpSb, Column.OUTPUT_HTML,
+                                       values);
                     if ( !column.getCanShow()) {
                         continue;
                     }
@@ -767,14 +817,27 @@ public class GenericTypeHandler extends TypeHandler {
     public void addColumnsToEntryForm(Request request,
                                       StringBuffer formBuffer, Entry entry)
             throws Exception {
-        addColumnsToEntryForm(request, formBuffer, entry, (entry==null?null:entry.getValues()));
+        addColumnsToEntryForm(request, formBuffer, entry, ((entry == null)
+                ? null
+                : entry.getValues()));
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
     public void addColumnsToEntryForm(Request request,
-                                      StringBuffer formBuffer, Entry entry, Object[] values)
+                                      StringBuffer formBuffer, Entry entry,
+                                      Object[] values)
             throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {
@@ -816,4 +879,3 @@ public class GenericTypeHandler extends TypeHandler {
 
 
 }
-

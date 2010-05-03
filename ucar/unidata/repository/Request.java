@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -288,7 +286,7 @@ public class Request implements Constants {
                 name = name.replace("/", "_FORWARDSLASH_");
                 name = java.net.URLEncoder.encode(name, "UTF-8");
                 name = name.replace("_FORWARDSLASH_", "/");
-                name = name.replace("?","_");
+                name = name.replace("?", "_");
                 //A hack because the browser thinks this a zipped page
                 if (name.endsWith(".gz")) {
                     name = name.replace(".gz", "");
@@ -1436,7 +1434,7 @@ public class Request implements Constants {
         if ( !defined(from)) {
             return dflt;
         }
-        String dateString  = (String) getDateSelect(from, "").trim();
+        String dateString = (String) getDateSelect(from, "").trim();
         return repository.parseDate(dateString);
     }
 
@@ -1458,8 +1456,21 @@ public class Request implements Constants {
         return getDateRange(from, to, ARG_RELATIVEDATE, dflt);
     }
 
-    public Date[] getDateRange(String from, String to, String relativeArg, Date dflt)
-        throws java.text.ParseException {
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param to _more_
+     * @param relativeArg _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
+    public Date[] getDateRange(String from, String to, String relativeArg,
+                               Date dflt)
+            throws java.text.ParseException {
         String fromDate = "";
         String toDate   = "";
         if (defined(from) || defined(to)) {
@@ -1894,4 +1905,3 @@ public class Request implements Constants {
 
 
 }
-

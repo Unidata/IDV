@@ -77,7 +77,7 @@ import java.util.zip.*;
  */
 public class IdvWebstartOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** _more_ */
     private String jnlpTemplate;
 
 
@@ -162,12 +162,14 @@ public class IdvWebstartOutputHandler extends OutputHandler {
         if (jnlpTemplate == null) {
             String localPath = getStorageManager().localizePath(
                                    getProperty(
-                                       "ramadda.idv.jnlp.template", (String) null));
+                                       "ramadda.idv.jnlp.template",
+                                       (String) null));
             if (localPath != null) {
                 try {
                     jnlpTemplate = IOUtil.readContents(
                         getStorageManager().getInputStream(localPath));
-                    logInfo("IdvWebstartOutputHandler: using jnlp template: " + localPath);
+                    logInfo("IdvWebstartOutputHandler: using jnlp template: "
+                            + localPath);
                 } catch (Exception ignoreThis) {}
             }
             if (jnlpTemplate == null) {
@@ -175,8 +177,11 @@ public class IdvWebstartOutputHandler extends OutputHandler {
                     "/ucar/unidata/repository/idv/template.jnlp");
             }
             //Replace the macros
-            for(String macro: new String[]{"codebase","href","title","description","maxheapsize"}) {
-                jnlpTemplate = jnlpTemplate.replace("${" + macro+"}", getProperty("ramadda.idv.jnlp."+ macro,""));
+            for (String macro :
+                    new String[] { "codebase", "href", "title", "description",
+                                   "maxheapsize" }) {
+                jnlpTemplate = jnlpTemplate.replace("${" + macro + "}",
+                        getProperty("ramadda.idv.jnlp." + macro, ""));
             }
         }
 

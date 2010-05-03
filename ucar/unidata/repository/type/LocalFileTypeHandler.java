@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -195,6 +193,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
     public List<String> getSynthIds(Request request, Group mainEntry,
                                     Group parentEntry, String synthId)
             throws Exception {
+
         List<String> ids    = new ArrayList<String>();
         Object[]     values = mainEntry.getValues();
         if (values == null) {
@@ -259,13 +258,13 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         List<String> excludes = get(values, COL_EXCLUDES);
         long age = (long) (1000
                            * (((Double) values[COL_AGE]).doubleValue() * 60));
-        long now   = System.currentTimeMillis();
-        int  start = skip;
-        List<File> fileList =  new ArrayList<File>();
-        List<File> dirList =  new ArrayList<File>();
+        long       now      = System.currentTimeMillis();
+        int        start    = skip;
+        List<File> fileList = new ArrayList<File>();
+        List<File> dirList  = new ArrayList<File>();
         for (int i = start; i < files.length; i++) {
             File childFile = files[i];
-            if(childFile.isDirectory()) {
+            if (childFile.isDirectory()) {
                 dirList.add(childFile);
             } else {
                 fileList.add(childFile);
@@ -273,8 +272,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         }
         dirList.addAll(fileList);
 
-        int  cnt   = 0;
-        for (File childFile: dirList) {
+        int cnt = 0;
+        for (File childFile : dirList) {
             if (childFile.isHidden()) {
                 continue;
             }
@@ -296,6 +295,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         long t2 = System.currentTimeMillis();
         //        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());
         return ids;
+
     }
 
 
@@ -332,7 +332,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             if (pattern.startsWith("dir:")) {
                 if (file.isDirectory()) {
                     hadPattern = true;
-                    pattern    =
+                    pattern =
                         getRegexp(pattern.substring("dir:".length()).trim());
                     if (StringUtil.stringMatch(value, pattern, true, false)) {
                         return true;
@@ -489,4 +489,3 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
     }
 
 }
-

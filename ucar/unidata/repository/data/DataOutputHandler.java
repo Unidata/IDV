@@ -1,23 +1,21 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * a
  */
 
 package ucar.unidata.repository.data;
@@ -225,51 +223,51 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private TemporaryDir nj22Dir;
 
-    /** _more_          */
+    /** _more_ */
     private TemporaryDir dataCacheDir;
 
 
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??
 
-    /** _more_          */
+    /** _more_ */
     Counter ncCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter ncCreateCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter ncRemoveCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter ncGetCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter ncPutCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter extCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter opendapCounter = new Counter();
 
 
-    /** _more_          */
+    /** _more_ */
     Counter gridOpenCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter gridCloseCounter = new Counter();
 
 
-    /** _more_          */
+    /** _more_ */
     Counter pointOpenCounter = new Counter();
 
-    /** _more_          */
+    /** _more_ */
     Counter pointCloseCounter = new Counter();
 
     /** _more_ */
-    private Pool<String, NetcdfDataset> ncDatasetPool = new Pool<String,
-                                                         NetcdfDataset>(10) {
+    private Pool<String, NetcdfDataset> ncDatasetPool =
+        new Pool<String, NetcdfDataset>(10) {
         protected void removeValue(String key, NetcdfDataset dataset) {
             try {
                 super.removeValue(key, dataset);
@@ -316,7 +314,7 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     private Pool<String, NetcdfFile> ncFilePool = new Pool<String,
-                                                         NetcdfFile>(10) {
+                                                      NetcdfFile>(10) {
         protected void removeValue(String key, NetcdfFile ncFile) {
             try {
                 super.removeValue(key, ncFile);
@@ -349,7 +347,7 @@ public class DataOutputHandler extends OutputHandler {
             try {
                 getStorageManager().dirTouched(nj22Dir, null);
                 //                NetcdfDataset dataset = NetcdfDataset.openDataset(path);
-                NetcdfFile ncFile = NetcdfDataset.openFile(path,null);
+                NetcdfFile ncFile = NetcdfDataset.openFile(path, null);
                 ncCreateCounter.incr();
                 return ncFile;
             } catch (Exception exc) {
@@ -639,8 +637,8 @@ public class DataOutputHandler extends OutputHandler {
         if ( !canLoadAsCdm(entry)) {
             long t2 = System.currentTimeMillis();
             if ((t2 - t1) > 1) {
-		//                System.err.println("DataOutputHandler (cdm) getEntryLinks  "
-		//                                   + entry.getName() + " time:" + (t2 - t1));
+                //                System.err.println("DataOutputHandler (cdm) getEntryLinks  "
+                //                                   + entry.getName() + " time:" + (t2 - t1));
             }
             return;
         }
@@ -676,8 +674,8 @@ public class DataOutputHandler extends OutputHandler {
         links.add(cdlLink);
         long t2 = System.currentTimeMillis();
         if ((t2 - t1) > 1) {
-	    //            System.err.println("DataOutputHandler  getEntryLinks  "
-	    //                               + entry.getName() + " time:" + (t2 - t1));
+            //            System.err.println("DataOutputHandler  getEntryLinks  "
+            //                               + entry.getName() + " time:" + (t2 - t1));
         }
     }
 
@@ -763,8 +761,7 @@ public class DataOutputHandler extends OutputHandler {
      * @return Can the given entry be served by the tds
      */
     public boolean canLoadAsCdm(Entry entry) {
-        if (entry.getType().equals(
-                                   OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+        if (entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             return true;
         }
 
@@ -1333,7 +1330,8 @@ public class DataOutputHandler extends OutputHandler {
         GridDataset  dataset   = gridPool.get(path);
         StringBuffer varSB     = new StringBuffer();
         for (VariableSimpleIF var : dataset.getDataVariables()) {
-            System.err.println("var:" + var.getName() + " type:" + var.getClass().getName());
+            System.err.println("var:" + var.getName() + " type:"
+                               + var.getClass().getName());
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis ca       = (CoordinateAxis) var;
                 AxisType       axisType = ca.getAxisType();
@@ -1415,12 +1413,10 @@ public class DataOutputHandler extends OutputHandler {
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
             String llb =
-                getRepository().getMapManager().makeMapSelector(ARG_AREA, true,
-                                                ""+llr.getLatMin(),
-                                                ""+llr.getLatMax(),
-                                                ""+llr.getLonMax(),
-                                                ""+llr.getLonMin());
-      
+                getRepository().getMapManager().makeMapSelector(ARG_AREA,
+                    true, "" + llr.getLatMin(), "" + llr.getLatMax(),
+                    "" + llr.getLonMax(), "" + llr.getLonMin());
+
             sb.append(
                 HtmlUtil.formEntryTop(
                     msgLabel("Subset Spatially"),
@@ -1665,8 +1661,8 @@ public class DataOutputHandler extends OutputHandler {
         }
         //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
         getRepository().getMapManager().initMap(request, mapVarName, sb,
-                                request.get(ARG_WIDTH, 800),
-                                request.get(ARG_HEIGHT, 500), true);
+                request.get(ARG_WIDTH, 800), request.get(ARG_HEIGHT, 500),
+                true);
         /*        sb.append("</td><td>");
                   sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
                   sb.append("</td></tr></table>");
@@ -1814,7 +1810,8 @@ public class DataOutputHandler extends OutputHandler {
 
 
         js.append(mapVarName + ".autoCenterAndZoom();\n");
-        getRepository().getMapManager().initMap(request, mapVarName, sb, 800, 500, true);
+        getRepository().getMapManager().initMap(request, mapVarName, sb, 800,
+                500, true);
         sb.append(HtmlUtil.script(js.toString()));
         trajectoryPool.put(path, tod);
         return new Result(msg("Trajectory Map"), sb);
@@ -2200,8 +2197,8 @@ public class DataOutputHandler extends OutputHandler {
     public synchronized Result outputOpendap(final Request request,
                                              final Entry entry)
             throws Exception {
-        String        location  = getPath(entry);
-        NetcdfFile ncFile = ncFilePool.get(location);
+        String     location = getPath(entry);
+        NetcdfFile ncFile   = ncFilePool.get(location);
         opendapCounter.incr();
         //        try {
         //Bridge the ramadda servlet to the opendap servlet
@@ -2310,4 +2307,3 @@ public class DataOutputHandler extends OutputHandler {
 
 
 }
-

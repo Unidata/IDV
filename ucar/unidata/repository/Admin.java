@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; eithe2r version 2.1 of the License, or (at
+ * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -60,8 +58,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
+
+import java.text.SimpleDateFormat;
 
 
 import java.util.ArrayList;
@@ -103,7 +102,8 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_CLEANUP = new RequestUrl(this,
-                                              "/admin/cleanup", "Maintenance");
+                                              "/admin/cleanup",
+                                              "Maintenance");
 
 
     /** _more_ */
@@ -146,7 +146,8 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
-    public List<RequestUrl> adminUrls = RepositoryUtil.toList(new RequestUrl[]{
+    public List<RequestUrl> adminUrls =
+        RepositoryUtil.toList(new RequestUrl[] {
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
         URL_ADMIN_STATS, URL_ADMIN_ACCESS,
         getHarvesterManager().URL_HARVESTERS_LIST,
@@ -154,11 +155,16 @@ public class Admin extends RepositoryManager {
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_LOG, URL_ADMIN_CLEANUP
-        });
+    });
 
 
+    /** _more_          */
     public static final String BLOCK_SITE = "block.site";
+
+    /** _more_          */
     public static final String BLOCK_ACCESS = "block.access";
+
+    /** _more_          */
     public static final String BLOCK_DISPLAY = "block.display";
 
 
@@ -172,8 +178,12 @@ public class Admin extends RepositoryManager {
     /** _more_ */
     StringBuffer cleanupStatus = new StringBuffer();
 
+    /** _more_          */
     private List<AdminHandler> adminHandlers = new ArrayList<AdminHandler>();
-    private Hashtable<String, AdminHandler> adminHandlerMap = new Hashtable<String,AdminHandler>();
+
+    /** _more_          */
+    private Hashtable<String, AdminHandler> adminHandlerMap =
+        new Hashtable<String, AdminHandler>();
 
 
     /**
@@ -187,26 +197,45 @@ public class Admin extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     */
     protected void doFinalInitialization() {
-        if(getRepository().getProperty(PROP_ADMIN_INCLUDESQL,false)) {
-            adminUrls.add(URL_ADMIN_SQL); 
+        if (getRepository().getProperty(PROP_ADMIN_INCLUDESQL, false)) {
+            adminUrls.add(URL_ADMIN_SQL);
         }
     }
 
-    protected  AdminHandler getAdminHandler(String id) {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    protected AdminHandler getAdminHandler(String id) {
         return adminHandlerMap.get(id);
     }
 
+    /**
+     * _more_
+     *
+     * @param adminHandler _more_
+     */
     public void addAdminHandler(AdminHandler adminHandler) {
-        if(adminHandlers.contains(adminHandler)) return;
-        if(adminHandlerMap.get(adminHandler.getId())!=null) return;
+        if (adminHandlers.contains(adminHandler)) {
+            return;
+        }
+        if (adminHandlerMap.get(adminHandler.getId()) != null) {
+            return;
+        }
         adminHandlers.add(adminHandler);
         adminHandlerMap.put(adminHandler.getId(), adminHandler);
-        List<RequestUrl> urls=adminHandler.getUrls();
-        if(urls!=null) {
+        List<RequestUrl> urls = adminHandler.getUrls();
+        if (urls != null) {
             adminUrls.addAll(urls);
         }
-    } 
+    }
 
 
 
@@ -348,8 +377,8 @@ public class Admin extends RepositoryManager {
             boolean      didOne       = false;
             StringBuffer stackSB      = null;
             boolean      lastOneBlank = false;
-            for (String line : StringUtil.split(logString, "\n", false,
-                    false)) {
+            for (String line :
+                    StringUtil.split(logString, "\n", false, false)) {
                 if ( !didOne) {
                     didOne = true;
                     continue;
@@ -888,6 +917,7 @@ public class Admin extends RepositoryManager {
         return makeResult(request, "Administration", sb);
     }
 
+    /** _more_          */
     private boolean amDumpingDb = false;
 
     /**
@@ -901,42 +931,55 @@ public class Admin extends RepositoryManager {
      */
     public Result adminDbDump(Request request) throws Exception {
         //Only do one at a time
-        if(amDumpingDb) {
-            StringBuffer sb = new StringBuffer(getRepository().showDialogWarning("Currently exporting the database"));
+        if (amDumpingDb) {
+            StringBuffer sb = new StringBuffer(
+                                  getRepository().showDialogWarning(
+                                      "Currently exporting the database"));
             return makeResult(request, msg("Database export"), sb);
         }
 
 
-        ActionManager.Action action  = new ActionManager.Action() {
+        ActionManager.Action action = new ActionManager.Action() {
             public void run(Object actionId) throws Exception {
                 dumpDatabase(actionId);
             }
         };
-        String href =
-            HtmlUtil.href(request.url(URL_ADMIN_CLEANUP),  "Continue");
+        String href = HtmlUtil.href(request.url(URL_ADMIN_CLEANUP),
+                                    "Continue");
 
-        Result result  =  getActionManager().doAction(request, action, 
-                                                      "Dumping database",
-                                                      href);
+        Result result = getActionManager().doAction(request, action,
+                            "Dumping database", href);
 
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param actionId _more_
+     *
+     * @throws Exception _more_
+     */
     private void dumpDatabase(Object actionId) throws Exception {
         amDumpingDb = true;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
-            File tmp = new File(getStorageManager().getBackupsDir()+"/" +"dbdump." + sdf.format(new Date()) +".rdb");
+            File tmp = new File(getStorageManager().getBackupsDir() + "/"
+                                + "dbdump." + sdf.format(new Date())
+                                + ".rdb");
             FileOutputStream     fos = new FileOutputStream(tmp);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             getDatabaseManager().makeDatabaseCopy(bos, true, actionId);
             IOUtil.close(bos);
             IOUtil.close(fos);
 
-            StringBuffer sb = new StringBuffer(getRepository().showDialogNote("Database has been exported to:<br>" + tmp));
+            StringBuffer sb = new StringBuffer(
+                                  getRepository().showDialogNote(
+                                      "Database has been exported to:<br>"
+                                      + tmp));
             //            return makeResult(request, msg("Database export"), sb);
         } finally {
-            if(actionId!=null) {
+            if (actionId != null) {
                 getActionManager().actionComplete(actionId);
             }
             amDumpingDb = false;
@@ -1080,7 +1123,7 @@ public class Admin extends RepositoryManager {
 
         getRepository().getRegistryManager().addAdminConfig(request, csb);
 
-        
+
 
 
 
@@ -1116,10 +1159,11 @@ public class Admin extends RepositoryManager {
 
         dsb.append(HtmlUtil.formEntry("", msg("System Message")));
         dsb.append(
-                   HtmlUtil.formEntry(
-                                      msgLabel("Message"),
-                                      HtmlUtil.textArea(ARG_SESSION_MESSAGE,             
-                                                        getSessionManager().getSessionMessage(), 5, 60)));
+            HtmlUtil.formEntry(
+                msgLabel("Message"),
+                HtmlUtil.textArea(
+                    ARG_SESSION_MESSAGE,
+                    getSessionManager().getSessionMessage(), 5, 60)));
 
 
         String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
@@ -1258,7 +1302,7 @@ public class Admin extends RepositoryManager {
 
 
 
-        for(AdminHandler adminHandler: adminHandlers) {
+        for (AdminHandler adminHandler : adminHandlers) {
             adminHandler.addToSettingsForm(BLOCK_SITE, csb);
             adminHandler.addToSettingsForm(BLOCK_DISPLAY, dsb);
             adminHandler.addToSettingsForm(BLOCK_ACCESS, asb);
@@ -1516,7 +1560,7 @@ public class Admin extends RepositoryManager {
                                         "10").trim());
 
         getSessionManager().setSessionMessage(
-                                              request.getString(ARG_SESSION_MESSAGE, ""));
+            request.getString(ARG_SESSION_MESSAGE, ""));
 
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
@@ -1773,8 +1817,8 @@ public class Admin extends RepositoryManager {
      */
     public Result adminSql(Request request) throws Exception {
 
-        if(!getRepository().getProperty(PROP_ADMIN_INCLUDESQL,false)) {
-            return new Result("",new StringBuffer("Not enabled"));
+        if ( !getRepository().getProperty(PROP_ADMIN_INCLUDESQL, false)) {
+            return new Result("", new StringBuffer("Not enabled"));
         }
 
         boolean bulkLoad = false;
@@ -1812,8 +1856,8 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.textArea(ARG_QUERY, (bulkLoad
                 ? ""
                 : (query == null)
-                  ?BLANK
-                  :query),10,100));
+                  ? BLANK
+                  : query), 10, 100));
         sb.append(HtmlUtil.p());
         sb.append("SQL File: ");
         sb.append(HtmlUtil.fileInput(ARG_SQLFILE, HtmlUtil.SIZE_60));
@@ -1975,8 +2019,8 @@ public class Admin extends RepositoryManager {
         } else if (request.defined(ACTION_START)) {
             Misc.run(this, "runDatabaseCleanUp", request);
             return new Result(request.url(URL_ADMIN_CLEANUP));
-        } else if(request.defined(ACTION_DUMPDB)) {
-            return  adminDbDump(request);
+        } else if (request.defined(ACTION_DUMPDB)) {
+            return adminDbDump(request);
         } else if (request.defined(ACTION_NEWDB)) {
             getDatabaseManager().reInitialize();
             return new Result(request.url(URL_ADMIN_CLEANUP));
@@ -2009,7 +2053,8 @@ public class Admin extends RepositoryManager {
                 msg(
                 "You can write out the database for backup or transfer to a new database"));
             sb.append("<p>");
-            sb.append(HtmlUtil.submit(msg("Export the database"), ACTION_DUMPDB));
+            sb.append(HtmlUtil.submit(msg("Export the database"),
+                                      ACTION_DUMPDB));
 
         }
         sb.append("</form>");
@@ -2117,4 +2162,3 @@ public class Admin extends RepositoryManager {
 
 
 }
-

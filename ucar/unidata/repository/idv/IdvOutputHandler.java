@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -66,12 +65,12 @@ import ucar.unidata.idv.ViewState;
 import ucar.unidata.idv.ui.ImageGenerator;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.util.*;
 import ucar.unidata.repository.auth.*;
-import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.util.*;
 
 import ucar.unidata.sql.SqlUtil;
 
@@ -135,69 +134,81 @@ import java.util.Properties;
  */
 public class IdvOutputHandler extends OutputHandler {
 
-    public static final String METADATA_TYPE_VISUALIZATION = "data.visualization";
-
     /** _more_          */
+    public static final String METADATA_TYPE_VISUALIZATION =
+        "data.visualization";
+
+    /** _more_ */
     public static final String ARG_PRODUCT = "product";
 
+    /** _more_          */
     public static final String ARG_SUBMIT_SAVE = "submit.save";
-    public static final String ARG_SAVE_ATTACH = "save.attach";
-    public static final String ARG_SAVE_NAME = "save.name";
-
-    public static final String ARG_PREDEFINED = "predefined";
 
     /** _more_          */
+    public static final String ARG_SAVE_ATTACH = "save.attach";
+
+    /** _more_          */
+    public static final String ARG_SAVE_NAME = "save.name";
+
+    /** _more_          */
+    public static final String ARG_PREDEFINED = "predefined";
+
+    /** _more_ */
     public static final String PRODUCT_IMAGE = "product.image";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PRODUCT_MOV = "product.mov";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PRODUCT_KMZ = "product.kmz";
 
+    /** _more_          */
     public static final String PRODUCT_IDV = "product.idv";
 
+    /** _more_          */
     public static final String PRODUCT_ISL = "product.isl";
 
+    /** _more_ */
+    private static TwoFacedObject[] products = { new TwoFacedObject("Image",
+                                                   PRODUCT_IMAGE),
+            new TwoFacedObject("Quicktime Movie", PRODUCT_MOV),
+            new TwoFacedObject("Google Earth KMZ", PRODUCT_KMZ) };
+
+
+
     /** _more_          */
-    private static TwoFacedObject[] products = { new TwoFacedObject("Image",  PRODUCT_IMAGE),
-						 new TwoFacedObject("Quicktime Movie", PRODUCT_MOV),
-						 new TwoFacedObject("Google Earth KMZ", PRODUCT_KMZ)};
-
-
-
     public static final String ARG_SUBMIT_PUBLISH = "submit.publish";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PUBLISH_ENTRY = "publish.entry";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PUBLISH_NAME = "publish.name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PUBLISH_DESCRIPTION =
         "publish.description";
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_GLOBE = "globe";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_PROJECTION = "proj";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_VIEWPOINT = "viewpoint";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_BOUNDS = "bounds";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_JUSTCLIP = "justclip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VIEW_BACKGROUNDIMAGE = "backgroundimage";
 
 
@@ -217,7 +228,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TARGET_ISL = "isl";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ZOOM = "zoom";
 
 
@@ -230,7 +241,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_DISPLAYLISTLABEL = "dll";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DISPLAYCOLOR = "clr";
 
     /** _more_ */
@@ -255,7 +266,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_ISOSURFACEVALUE = "iso_value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CONTOUR_WIDTH = "c_w";
 
     /** _more_ */
@@ -303,13 +314,13 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_TIMES = "times";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAPS = "maps";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAPWIDTH = "mapwidth";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAPCOLOR = "mapcolor";
 
 
@@ -330,33 +341,28 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_IMAGE_HEIGHT = "height";
 
 
+    /** _more_          */
     private static final String[] NOTARGS = {
-	ARG_SUBMIT_SAVE,
-	ARG_SUBMIT_PUBLISH,
-	ARG_PUBLISH_NAME,
-	ARG_PUBLISH_ENTRY,
-	ARG_PUBLISH_ENTRY+"_hidden",
-	ARG_PUBLISH_DESCRIPTION,
-	ARG_SAVE_ATTACH,
-	ARG_SAVE_NAME,
-	ARG_ACTION
+        ARG_SUBMIT_SAVE, ARG_SUBMIT_PUBLISH, ARG_PUBLISH_NAME,
+        ARG_PUBLISH_ENTRY, ARG_PUBLISH_ENTRY + "_hidden",
+        ARG_PUBLISH_DESCRIPTION, ARG_SAVE_ATTACH, ARG_SAVE_NAME, ARG_ACTION
     };
 
+    /** _more_          */
     private Hashtable exceptArgs = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private Properties valueToAbbrev;
 
-    /** _more_          */
+    /** _more_ */
     private Properties keyToAbbrev;
 
-    /** _more_          */
+    /** _more_ */
     public static final String ACTION_ERROR = "action.error";
 
 
     /** _more_ */
-    public static final String ACTION_MAKEINITFORM =
-        "action.makeinitform";
+    public static final String ACTION_MAKEINITFORM = "action.makeinitform";
 
     /** _more_ */
     public static final String ACTION_MAKEFORM = "action.makeform";
@@ -366,8 +372,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ACTION_MAKEPAGE = "action.makepage";
 
     /** _more_ */
-    public static final String ACTION_MAKEIMAGE =
-        "action.makeimage";
+    public static final String ACTION_MAKEIMAGE = "action.makeimage";
 
 
     /** _more_ */
@@ -426,7 +431,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     int callCnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     private List backgrounds;
 
     /** _more_ */
@@ -436,7 +441,7 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     private boolean idvOk = false;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, File> imageCache = new Hashtable<String,
                                                      File>();
 
@@ -464,9 +469,9 @@ public class IdvOutputHandler extends OutputHandler {
         okControls.add("pointvolumerender");
         addType(OUTPUT_IDV_GRID);
         addType(OUTPUT_IDV_POINT);
-	for(String notArg: NOTARGS) {
-	    exceptArgs.put(notArg,"");
-	}
+        for (String notArg : NOTARGS) {
+            exceptArgs.put(notArg, "");
+        }
 
         valueToAbbrev = new Properties();
         keyToAbbrev   = new Properties();
@@ -509,9 +514,16 @@ public class IdvOutputHandler extends OutputHandler {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public DataOutputHandler getDataOutputHandler() throws Exception {
         return (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+            DataOutputHandler.OUTPUT_OPENDAP.toString());
     }
 
 
@@ -648,9 +660,9 @@ public class IdvOutputHandler extends OutputHandler {
     public Result outputGrid(final Request request, Entry entry)
             throws Exception {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
-        String action = request.getString(ARG_ACTION,
-                                          ACTION_MAKEINITFORM);
-        String path = dataOutputHandler.getPath(entry);
+        String action = request.getString(ARG_ACTION, ACTION_MAKEINITFORM);
+        String            path              =
+            dataOutputHandler.getPath(entry);
         if (path == null) {
             StringBuffer sb = new StringBuffer();
             sb.append("Could not load grid");
@@ -660,8 +672,8 @@ public class IdvOutputHandler extends OutputHandler {
         GridDataset dataset = dataOutputHandler.getGridDataset(entry, path);
         DataSourceDescriptor descriptor =
             idvServer.getIdv().getDataManager().getDescriptor("File.Grid");
-        DataSource dataSource = new GeoGridDataSource(descriptor,
-                                           dataset, entry.getName(), path);
+        DataSource dataSource = new GeoGridDataSource(descriptor, dataset,
+                                    entry.getName(), path);
 
         try {
             if (action.equals(ACTION_MAKEINITFORM)) {
@@ -852,10 +864,12 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         basic.append(HtmlUtil.formEntry(msgLabel("Image Size"),
-                                         htmlInput(request, ARG_IMAGE_WIDTH,
-						   "600") +HtmlUtil.space(1) + "X" + HtmlUtil.space(1) +
-                                         htmlInput(request, ARG_IMAGE_HEIGHT,
-						   "400")));
+                                        htmlInput(request, ARG_IMAGE_WIDTH,
+                                            "600") + HtmlUtil.space(1) + "X"
+                                                + HtmlUtil.space(1)
+                                                    + htmlInput(request,
+                                                        ARG_IMAGE_HEIGHT,
+                                                            "400")));
 
 
 
@@ -905,11 +919,11 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-	/*
-	  basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
+        /*
+          basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
                                         htmlCheckbox(request, ARG_CLIP,
                                             false)));
-	*/
+        */
 
 
 
@@ -945,12 +959,10 @@ public class IdvOutputHandler extends OutputHandler {
 
         StringBuffer bounds = new StringBuffer();
         String llb =
-            getRepository().getMapManager().makeMapSelector(request, ARG_VIEW_BOUNDS, false,
-                                            htmlCheckbox(request,
-                                                ARG_VIEW_JUSTCLIP,
-                                                false) + " "
-                                                    + msg("Just subset data")
-                                                    + HtmlUtil.space(2), "");
+            getRepository().getMapManager().makeMapSelector(request,
+                ARG_VIEW_BOUNDS, false,
+                htmlCheckbox(request, ARG_VIEW_JUSTCLIP, false) + " "
+                + msg("Just subset data") + HtmlUtil.space(2), "");
         bounds.append(llb);
 
         StringBuffer  mapSB = new StringBuffer();
@@ -1011,8 +1023,8 @@ public class IdvOutputHandler extends OutputHandler {
         if (backgrounds == null) {
             backgrounds = new ArrayList();
             backgrounds.add(new TwoFacedObject("--none--", ""));
-            for (WmsSelection selection : (List<WmsSelection>) getIdv()
-                    .getBackgroundImages()) {
+            for (WmsSelection selection :
+                    (List<WmsSelection>) getIdv().getBackgroundImages()) {
                 if (selection.getLayer().indexOf("fixed") >= 0) {
                     backgrounds.add(new TwoFacedObject(selection.getTitle(),
                             selection.getLayer()));
@@ -1088,7 +1100,8 @@ public class IdvOutputHandler extends OutputHandler {
 
             List<TwoFacedObject> displays = new ArrayList<TwoFacedObject>();
             displays.add(new TwoFacedObject("--skip--", ""));
-            for (ControlDescriptor controlDescriptor : (List<ControlDescriptor>) descriptors) {
+            for (ControlDescriptor controlDescriptor :
+                    (List<ControlDescriptor>) descriptors) {
                 String controlId = controlDescriptor.getControlId();
                 if ( !okControls.contains(controlId)) {
                     continue;
@@ -1241,8 +1254,11 @@ public class IdvOutputHandler extends OutputHandler {
                             dfltColorTable.getName());
             }
 
-            ctsb.append(HtmlUtil.hidden(ARG_COLORTABLE + displayIdx, request.getString(ARG_COLORTABLE+displayIdx,""),
-                                        HtmlUtil.id(ARG_COLORTABLE + displayIdx)));
+            ctsb.append(
+                HtmlUtil.hidden(
+                    ARG_COLORTABLE + displayIdx,
+                    request.getString(ARG_COLORTABLE + displayIdx, ""),
+                    HtmlUtil.id(ARG_COLORTABLE + displayIdx)));
             ctsb.append(HtmlUtil.br());
             String ctDiv = "-default-";
             if (request.defined(ARG_COLORTABLE + displayIdx)) {
@@ -1409,7 +1425,11 @@ public class IdvOutputHandler extends OutputHandler {
                                              "",
                                              HtmlUtil.id(ARG_PUBLISH_ENTRY
                                                  + "_hidden")));
-	    publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Select a folder to publish the product to"),2)));
+            publishSB.append(
+                HtmlUtil.row(
+                    HtmlUtil.colspan(
+                        msgHeader(
+                            "Select a folder to publish the product to"), 2)));
 
             String select = OutputHandler.getSelect(request,
                                 ARG_PUBLISH_ENTRY, "Select folder", false,
@@ -1422,20 +1442,30 @@ public class IdvOutputHandler extends OutputHandler {
             publishSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     htmlInput(request, ARG_PUBLISH_NAME, "", 30)));
 
-	    publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Publish image"),ARG_SUBMIT_PUBLISH)));
+            publishSB.append(HtmlUtil.formEntry("",
+                    HtmlUtil.submit(msg("Publish image"),
+                                    ARG_SUBMIT_PUBLISH)));
 
             if (getAccessManager().canDoAction(request, entry,
-					       Permission.ACTION_EDIT)) {
+                    Permission.ACTION_EDIT)) {
 
-		publishSB.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.p(),2)));
-		publishSB.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Or save these settings"),2)));
-		publishSB.append(HtmlUtil.formEntry(msgLabel("Settings name"),
-						    HtmlUtil.input(ARG_SAVE_NAME, "",30)));
-		publishSB.append(HtmlUtil.formEntry(msg("Attach image"),
-						    HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false)));
-		publishSB.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Save settings"),ARG_SUBMIT_SAVE)));
-		
-	    }
+                publishSB.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.p(),
+                        2)));
+                publishSB.append(
+                    HtmlUtil.row(
+                        HtmlUtil.colspan(
+                            msgHeader("Or save these settings"), 2)));
+                publishSB.append(
+                    HtmlUtil.formEntry(
+                        msgLabel("Settings name"),
+                        HtmlUtil.input(ARG_SAVE_NAME, "", 30)));
+                publishSB.append(HtmlUtil.formEntry(msg("Attach image"),
+                        HtmlUtil.checkbox(ARG_SAVE_ATTACH, "true", false)));
+                publishSB.append(HtmlUtil.formEntry("",
+                        HtmlUtil.submit(msg("Save settings"),
+                                        ARG_SUBMIT_SAVE)));
+
+            }
             publishSB.append(HtmlUtil.formTableClose());
 
 
@@ -1526,24 +1556,27 @@ public class IdvOutputHandler extends OutputHandler {
 
         List<Metadata> metadataList =
             getMetadataManager().findMetadata(entry,
-					      METADATA_TYPE_VISUALIZATION, false);
-        if (metadataList != null && metadataList.size()>0) {
-	    sb.append(HtmlUtil.p());
-	    sb.append(msgHeader("Or select a predefined visualization"));
-	    sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
-	    MetadataType metadataType = getMetadataManager().findType(METADATA_TYPE_VISUALIZATION);
-	    for (Metadata metadata : metadataList) {
-		String    url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW.toString(),
-					     new String[]{
-						 ARG_ENTRYID, entry.getId(),
-						 ARG_OUTPUT, OUTPUT_IDV_GRID.toString(),
-						 ARG_ACTION, ACTION_MAKEPAGE,
-						 ARG_PREDEFINED, metadata.getId()});
-		sb.append(HtmlUtil.li(HtmlUtil.href(url,metadata.getAttr1()),""));
-		metadataType.decorateEntry(request, entry,  sb,
-					   metadata, true,true);
-	    }
-	    sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
+                METADATA_TYPE_VISUALIZATION, false);
+        if ((metadataList != null) && (metadataList.size() > 0)) {
+            sb.append(HtmlUtil.p());
+            sb.append(msgHeader("Or select a predefined visualization"));
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
+            MetadataType metadataType =
+                getMetadataManager().findType(METADATA_TYPE_VISUALIZATION);
+            for (Metadata metadata : metadataList) {
+                String url =
+                    HtmlUtil.url(getRepository().URL_ENTRY_SHOW.toString(),
+                                 new String[] {
+                    ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
+                    OUTPUT_IDV_GRID.toString(), ARG_ACTION, ACTION_MAKEPAGE,
+                    ARG_PREDEFINED, metadata.getId()
+                });
+                sb.append(HtmlUtil.li(HtmlUtil.href(url,
+                        metadata.getAttr1()), ""));
+                metadataType.decorateEntry(request, entry, sb, metadata,
+                                           true, true);
+            }
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
         }
 
 
@@ -1624,9 +1657,11 @@ public class IdvOutputHandler extends OutputHandler {
     private Result outputGridPage(final Request request, Entry entry,
                                   DataSource dataSource)
             throws Exception {
+
         StringBuffer sb = new StringBuffer();
 
-        if (request.exists(ARG_SUBMIT_PUBLISH) && request.defined(ARG_PUBLISH_ENTRY + "_hidden")) {
+        if (request.exists(ARG_SUBMIT_PUBLISH)
+                && request.defined(ARG_PUBLISH_ENTRY + "_hidden")) {
             Group parent = getEntryManager().findGroup(request,
                                request.getString(ARG_PUBLISH_ENTRY
                                    + "_hidden", ""));
@@ -1658,51 +1693,56 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
-	if(request.defined(ARG_PREDEFINED)) {
-	    List<Metadata> metadataList =
-		getMetadataManager().findMetadata(entry,
-						  METADATA_TYPE_VISUALIZATION, false);
-	    String args = null;
-	    if (metadataList != null && metadataList.size()>0) {
-		for (Metadata metadata : metadataList) {
-		    if(metadata.getId().equals(request.getString(ARG_PREDEFINED,""))) {
-			args = metadata.getAttr2();
-			break;
-		    }
-		}
-	    }
-	    if(args!=null) {
-		Hashtable urlArgs  =new Hashtable();
-		for(String pair: StringUtil.split(args,"&",true,true)) {
-		    List<String> toks = StringUtil.splitUpTo(pair,"=",2);
-		    if(toks == null || toks.size()!=2) continue;
-		    String name  = java.net.URLDecoder.decode(toks.get(0), "UTF-8");
-		    String value = java.net.URLDecoder.decode(toks.get(1), "UTF-8");
-		    Object o = urlArgs.get(name);
-		    if(o==null) {
-			urlArgs.put(name,value);
-		    } else if(o instanceof List) {
-			((List)o).add(value);
-		    } else {
-			List l  =new ArrayList();
-			l.add(o);
-			l.add(value);
-			urlArgs.put(name,l);
-		    }
-		}
-		for (Enumeration keys =
-			 urlArgs.keys(); keys.hasMoreElements(); ) {
-		    String arg   = (String) keys.nextElement();
-		    Object value = urlArgs.get(arg);
-		    request.put(arg,value);
-		}
-		request.remove(ARG_SUBMIT_SAVE);
-	    }
+        if (request.defined(ARG_PREDEFINED)) {
+            List<Metadata> metadataList =
+                getMetadataManager().findMetadata(entry,
+                    METADATA_TYPE_VISUALIZATION, false);
+            String args = null;
+            if ((metadataList != null) && (metadataList.size() > 0)) {
+                for (Metadata metadata : metadataList) {
+                    if (metadata.getId().equals(
+                            request.getString(ARG_PREDEFINED, ""))) {
+                        args = metadata.getAttr2();
+                        break;
+                    }
+                }
+            }
+            if (args != null) {
+                Hashtable urlArgs = new Hashtable();
+                for (String pair : StringUtil.split(args, "&", true, true)) {
+                    List<String> toks = StringUtil.splitUpTo(pair, "=", 2);
+                    if ((toks == null) || (toks.size() != 2)) {
+                        continue;
+                    }
+                    String name = java.net.URLDecoder.decode(toks.get(0),
+                                      "UTF-8");
+                    String value = java.net.URLDecoder.decode(toks.get(1),
+                                       "UTF-8");
+                    Object o = urlArgs.get(name);
+                    if (o == null) {
+                        urlArgs.put(name, value);
+                    } else if (o instanceof List) {
+                        ((List) o).add(value);
+                    } else {
+                        List l = new ArrayList();
+                        l.add(o);
+                        l.add(value);
+                        urlArgs.put(name, l);
+                    }
+                }
+                for (Enumeration keys = urlArgs.keys();
+                        keys.hasMoreElements(); ) {
+                    String arg   = (String) keys.nextElement();
+                    Object value = urlArgs.get(arg);
+                    request.put(arg, value);
+                }
+                request.remove(ARG_SUBMIT_SAVE);
+            }
         }
 
 
-        String baseName = IOUtil.stripExtension(entry.getName());        
-	String product  = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
+        String baseName = IOUtil.stripExtension(entry.getName());
+        String product  = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
         String url      = getRepository().URL_ENTRY_SHOW.getFullUrl();
 
 
@@ -1721,47 +1761,50 @@ public class IdvOutputHandler extends OutputHandler {
 
 
         String args = request.getUrlArgs(exceptArgs, null, ".*_gvdflt");
-        url = url + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&"
-              + args;
+        url = url + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&" + args;
 
 
 
-	if(request.defined(ARG_SUBMIT_SAVE)) {
-            if (!getAccessManager().canDoAction(request, entry,
-					       Permission.ACTION_EDIT)) {
-		throw new AccessException("No access",request);
-	    }
-	    
-	    String fileName = "";
-	    if(request.get(ARG_SAVE_ATTACH,false)) {
-		Object fileOrResult = generateGridImage(request, entry, dataSource);
-		if (fileOrResult instanceof Result) {
-		    throw new IllegalArgumentException("You need to specify an image or movie product");
-		}
-	    
-		File   imageFile = (File) fileOrResult;
+        if (request.defined(ARG_SUBMIT_SAVE)) {
+            if ( !getAccessManager().canDoAction(request, entry,
+                    Permission.ACTION_EDIT)) {
+                throw new AccessException("No access", request);
+            }
 
-		fileName = getStorageManager().copyToEntryDir(entry,
-							      imageFile).getName();
-	    }
+            String fileName = "";
+            if (request.get(ARG_SAVE_ATTACH, false)) {
+                Object fileOrResult = generateGridImage(request, entry,
+                                          dataSource);
+                if (fileOrResult instanceof Result) {
+                    throw new IllegalArgumentException(
+                        "You need to specify an image or movie product");
+                }
 
-	    Metadata metadata =
-		new Metadata(getRepository().getGUID(),
-			     entry.getId(),
-			     METADATA_TYPE_VISUALIZATION, false,
-			     request.getString(ARG_SAVE_NAME,""),
-			     args,fileName,"","");
-	    getMetadataManager().insertMetadata(metadata);
-	    entry.addMetadata(metadata);
+                File imageFile = (File) fileOrResult;
+
+                fileName = getStorageManager().copyToEntryDir(entry,
+                        imageFile).getName();
+            }
+
+            Metadata metadata = new Metadata(getRepository().getGUID(),
+                                             entry.getId(),
+                                             METADATA_TYPE_VISUALIZATION,
+                                             false,
+                                             request.getString(ARG_SAVE_NAME,
+                                                 ""), args, fileName, "", "");
+            getMetadataManager().insertMetadata(metadata);
+            entry.addMetadata(metadata);
             return new Result(
-			      request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT, OUTPUT_IDV_GRID.toString()));
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    OUTPUT_IDV_GRID.toString()));
 
-	}
+        }
 
-        islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE
-                 + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
-        jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE
-                  + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
+        islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&"
+                 + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
+        jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_MAKEIMAGE + "&"
+                  + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
         boolean showForm = true;
 
@@ -1800,6 +1843,7 @@ public class IdvOutputHandler extends OutputHandler {
                                              showForm));
 
         return new Result("Grid Displays", sb);
+
     }
 
 
@@ -1852,11 +1896,12 @@ public class IdvOutputHandler extends OutputHandler {
         //      Trace.addOnly(".*ProjectionCoordinateSystem.*");
         //Trace.startTrace();
 
-        String  id     = entry.getId();
+        String  id      = entry.getId();
 
-        String  product       = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
-	
-        boolean forIsl = request.getString(ARG_TARGET, "").equals(TARGET_ISL);
+        String  product = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
+
+        boolean forIsl  = request.getString(ARG_TARGET,
+                                            "").equals(TARGET_ISL);
         boolean forJnlp = request.getString(ARG_TARGET,
                                             "").equals(TARGET_JNLP);
         if (forJnlp) {
@@ -1870,8 +1915,10 @@ public class IdvOutputHandler extends OutputHandler {
 
         for (Enumeration keys =
                 requestArgs.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
-	    if(exceptArgs.get(arg)!=null) continue;
+            String arg = (String) keys.nextElement();
+            if (exceptArgs.get(arg) != null) {
+                continue;
+            }
             Object value = requestArgs.get(arg);
             String s     = value.toString();
             if (s.trim().length() == 0) {
@@ -1882,15 +1929,15 @@ public class IdvOutputHandler extends OutputHandler {
         Collections.sort(argList);
         StringBuffer fileKey = new StringBuffer();
         for (String arg : argList) {
-            Object value     = requestArgs.get(arg);
-            String s         = value.toString();
-	    fileKey.append(arg);
+            Object value = requestArgs.get(arg);
+            String s     = value.toString();
+            fileKey.append(arg);
             fileKey.append("=");
-	    fileKey.append(s);
+            fileKey.append(s);
             fileKey.append(";");
         }
 
-	//	System.err.println ("fileKey: " + fileKey);
+        //      System.err.println ("fileKey: " + fileKey);
         boolean multipleTimes = false;
         String  suffix        = ".gif";
         if (product.equals(PRODUCT_IMAGE)) {
@@ -1914,7 +1961,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         if ( !forIsl && imageFile.exists()) {
-	    //	    System.err.println ("got  file");
+            //      System.err.println ("got  file");
             return imageFile;
         }
 
@@ -2549,9 +2596,11 @@ public class IdvOutputHandler extends OutputHandler {
 
         formSB.append(HtmlUtil.formEntry(msgLabel("Image Size"),
                                          htmlInput(request, ARG_IMAGE_WIDTH,
-						   "600") +HtmlUtil.space(1) + "X" + HtmlUtil.space(1) +
-                                         htmlInput(request, ARG_IMAGE_HEIGHT,
-						   "400")));
+                                             "600") + HtmlUtil.space(1) + "X"
+                                                 + HtmlUtil.space(1)
+                                                     + htmlInput(request,
+                                                         ARG_IMAGE_HEIGHT,
+                                                             "400")));
 
 
         formSB.append(HtmlUtil.formTableClose());
@@ -2837,4 +2886,3 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 }
-

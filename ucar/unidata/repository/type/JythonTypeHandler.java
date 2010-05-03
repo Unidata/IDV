@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -32,9 +30,9 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.type.*;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -143,7 +141,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     protected Result getHtmlDisplay(Request request, Entry entry,
-                                  PythonInterpreter interp)
+                                    PythonInterpreter interp)
             throws Exception {
 
 
@@ -196,22 +194,22 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 
 
-        String       password = (String) entry.getValues()[0];
+        String password = (String) entry.getValues()[0];
         if ((password != null) && (password.trim().length() > 0)) {
             if ( !Misc.equals(password.trim(),
                               request.getString(ARG_SCRIPT_PASSWORD,
-                                                "").trim())) {
+                                  "").trim())) {
                 return new Result((formInfo.title != null)
                                   ? formInfo.title
                                   : entry.getName(), new StringBuffer(
-                                                                      repository.showDialogError(
-                                                                                                 "Bad password")));
+                                      repository.showDialogError(
+                                          "Bad password")));
             }
         }
 
         if (makeForm) {
-            return makeForm(request, entry, interp,     formInfo);
-        } 
+            return makeForm(request, entry, interp, formInfo);
+        }
 
 
         return processForm(request, entry, interp, formInfo);
@@ -219,17 +217,29 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param interp _more_
+     * @param formInfo _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Result makeForm(Request request, Entry entry,
-                              PythonInterpreter interp, FormInfo     formInfo)
-        throws Exception {
+                              PythonInterpreter interp, FormInfo formInfo)
+            throws Exception {
 
         String       password = (String) entry.getValues()[0];
 
 
-        StringBuffer formSB = new StringBuffer();
+        StringBuffer formSB   = new StringBuffer();
         formSB.append(formInfo.prefix);
 
-        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+        String formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
         interp.set("formUrl", formUrl);
 
 
@@ -243,7 +253,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
             formSB.append(HtmlUtil.formTable());
             if ((password != null) && (password.trim().length() > 0)) {
                 formSB.append(HtmlUtil.formEntry(msgLabel("Password"),
-                                                 HtmlUtil.password(ARG_SCRIPT_PASSWORD)));
+                        HtmlUtil.password(ARG_SCRIPT_PASSWORD)));
             }
             formSB.append(formInfo.sb);
             formSB.append(HtmlUtil.formTableClose());
@@ -258,9 +268,21 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param interp _more_
+     * @param formInfo _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Result processForm(Request request, Entry entry,
-                                 PythonInterpreter interp, FormInfo     formInfo)
-        throws Exception {
+                                 PythonInterpreter interp, FormInfo formInfo)
+            throws Exception {
 
         ProcessInfo processInfo = doMakeProcessInfo();
 
@@ -269,51 +291,52 @@ public class JythonTypeHandler extends GenericTypeHandler {
                 if (info.type == InputInfo.TYPE_FILE) {
                     String file = request.getUploadedFile(info.id);
                     if ((file != null) && (file.length() > 0)
-                        && new File(file).exists()) {
+                            && new File(file).exists()) {
                         processInfo.files.add(new File(file));
                         interp.set(info.id, file);
                     } else {
                         return new Result((formInfo.title != null)
                                           ? formInfo.title
                                           : entry.getName(), new StringBuffer(
-                                                                              repository.showDialogError(
-                                                                                                         "No file uploaded")));
+                                          repository.showDialogError(
+                                              "No file uploaded")));
                     }
                 } else if (info.type == InputInfo.TYPE_ENTRY) {
                     String entryName = request.getString(info.id, "");
 
                     String entryId = request.getUnsafeString(info.id
-                                                             + "_hidden", "");
+                                         + "_hidden", "");
                     Entry theEntry = getEntryManager().getEntry(request,
-                                                                entryId);
+                                         entryId);
                     if (theEntry == null) {
                         return new Result((formInfo.title != null)
                                           ? formInfo.title
                                           : entry.getName(), new StringBuffer(
-                                                                              repository.showDialogError(
-                                                                                                         "No entry selected")));
+                                          repository.showDialogError(
+                                              "No entry selected")));
                     }
 
                     interp.set(info.id, theEntry);
                     if (theEntry.isFile()) {
                         interp.set(info.id + "_file",
                                    theEntry.getResource().getPath());
-                        processInfo.variables.add(info.id+"_file");
+                        processInfo.variables.add(info.id + "_file");
                     } else {
                         interp.set(info.id + "_file", null);
                     }
-                    processEntry(request, interp,  info, processInfo, theEntry);
+                    processEntry(request, interp, info, processInfo,
+                                 theEntry);
                 } else if (info.type == InputInfo.TYPE_NUMBER) {
                     interp.set(info.id,
                                new Double(request.getString(info.id,
-                                                            "").trim()));
+                                   "").trim()));
                 } else {
                     interp.set(info.id, request.getString(info.id, ""));
                 }
                 processInfo.variables.add(info.id);
             }
             try {
-                String       exec     = (String) entry.getValues()[2];
+                String exec = (String) entry.getValues()[2];
                 interp.exec(exec);
             } catch (Exception exc) {
                 return new Result(entry.getName(),
@@ -341,34 +364,79 @@ public class JythonTypeHandler extends GenericTypeHandler {
         Result result = new Result((formInfo.title != null)
                                    ? formInfo.title
                                    : entry.getName(), new StringBuffer(
-                                                                       formInfo.resultHtml), formInfo
-                                   .mimeType);
+                                       formInfo.resultHtml), formInfo
+                                           .mimeType);
         return result;
     }
 
 
-    protected void processEntry(Request request, PythonInterpreter interp, InputInfo info, ProcessInfo processInfo, Entry theEntry) throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param interp _more_
+     * @param info _more_
+     * @param processInfo _more_
+     * @param theEntry _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void processEntry(Request request, PythonInterpreter interp,
+                                InputInfo info, ProcessInfo processInfo,
+                                Entry theEntry)
+            throws Exception {}
 
-    protected void cleanup(Request request, Entry entry, PythonInterpreter interp, ProcessInfo processInfo) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param interp _more_
+     * @param processInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void cleanup(Request request, Entry entry,
+                           PythonInterpreter interp, ProcessInfo processInfo)
+            throws Exception {
         for (File f : processInfo.files) {
             f.delete();
         }
-        for(String var: processInfo.variables) {
-            interp.set(var,null);
+        for (String var : processInfo.variables) {
+            interp.set(var, null);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ProcessInfo doMakeProcessInfo() {
         return new ProcessInfo();
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Mon, May 3, '10
+     * @author         Enter your name here...    
+     */
     public static class ProcessInfo {
+
+        /**
+         * _more_
+         */
         public ProcessInfo() {}
-        public List<File>          files       = new ArrayList<File>();
-        public List<String>        variables      = new ArrayList<String>();
+
+        /** _more_          */
+        public List<File> files = new ArrayList<File>();
+
+        /** _more_          */
+        public List<String> variables = new ArrayList<String>();
 
     }
 
@@ -667,7 +735,8 @@ public class JythonTypeHandler extends GenericTypeHandler {
                                   List items) {
             cnt++;
             inputs.add(new InputInfo(InputInfo.TYPE_TEXT, id));
-            sb.append(HtmlUtil.formEntry(label, HtmlUtil.select(id, items, dflt)));
+            sb.append(HtmlUtil.formEntry(label,
+                                         HtmlUtil.select(id, items, dflt)));
         }
 
 
@@ -695,4 +764,3 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 
 }
-

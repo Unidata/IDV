@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -22,6 +22,8 @@ package ucar.unidata.repository.type;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.repository.*;
 
@@ -37,25 +39,24 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.unidata.data.gis.KmlUtil;
-
 import ucar.unidata.xml.XmlUtil;
-
-import java.text.SimpleDateFormat;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import java.text.DecimalFormat;
+
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 
 import java.util.Hashtable;
 import java.util.List;
 
-import java.text.DecimalFormat;
 
 /**
  */
@@ -63,11 +64,19 @@ import java.text.DecimalFormat;
 public class Column implements Constants {
 
 
+    /** _more_          */
     public static final String OUTPUT_HTML = "html";
+
+    /** _more_          */
     public static final String OUTPUT_CSV = "csv";
 
-    private static SimpleDateFormat dateTimeFormat        = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    private static SimpleDateFormat dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
+    /** _more_          */
+    private static SimpleDateFormat dateTimeFormat =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    /** _more_          */
+    private static SimpleDateFormat dateFormat =
+        new SimpleDateFormat("yyyy-MM-dd");
 
     /** _more_ */
 
@@ -97,8 +106,10 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    /** _more_          */
     public static final String TYPE_ENTRY = "entry";
 
+    /** _more_          */
     public static final String TYPE_FILE = "file";
 
     /** _more_ */
@@ -107,8 +118,10 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_CLOB = "clob";
 
+    /** _more_          */
     public static final String TYPE_EMAIL = "email";
 
+    /** _more_          */
     public static final String TYPE_URL = "url";
 
     /** _more_ */
@@ -117,6 +130,7 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_DOUBLE = "double";
 
+    /** _more_          */
     public static final String TYPE_PERCENTAGE = "percentage";
 
     /** _more_ */
@@ -125,6 +139,7 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_ENUMERATION = "enumeration";
 
+    /** _more_          */
     public static final String TYPE_ENUMERATIONPLUS = "enumerationplus";
 
     /** _more_ */
@@ -137,6 +152,7 @@ public class Column implements Constants {
     public static final String TYPE_LATLONBBOX = "latlonbbox";
 
 
+    /** _more_          */
     public static final String TYPE_LATLON = "latlon";
 
     /** _more_ */
@@ -149,8 +165,10 @@ public class Column implements Constants {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    /** _more_          */
     public static final String ATTR_CHANGETYPE = "changetype";
 
+    /** _more_          */
     public static final String ATTR_ADDTOFORM = "addtoform";
 
     /** _more_ */
@@ -232,6 +250,7 @@ public class Column implements Constants {
     /** _more_ */
     private String type;
 
+    /** _more_          */
     private boolean changeType = false;
 
     /** _more_ */
@@ -276,9 +295,12 @@ public class Column implements Constants {
     private boolean canShow = true;
 
 
+    /** _more_          */
     private boolean addToForm = true;
 
-    private Hashtable<String,String> properties = new Hashtable<String,String>();
+    /** _more_          */
+    private Hashtable<String, String> properties = new Hashtable<String,
+                                                       String>();
 
     /**
      * _more_
@@ -310,53 +332,89 @@ public class Column implements Constants {
         dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "").trim();
         isIndex     = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
         canSearch   = XmlUtil.getAttribute(element, ATTR_CANSEARCH, false);
-        addToForm   = XmlUtil.getAttribute(element, ATTR_ADDTOFORM, addToForm);
+        addToForm   = XmlUtil.getAttribute(element, ATTR_ADDTOFORM,
+                                           addToForm);
         canShow     = XmlUtil.getAttribute(element, ATTR_SHOWINHTML, canShow);
         canList     = XmlUtil.getAttribute(element, ATTR_CANLIST, false);
         size        = XmlUtil.getAttribute(element, ATTR_SIZE, size);
         rows        = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
         columns     = XmlUtil.getAttribute(element, ATTR_COLUMNS, columns);
 
-        List propNodes = XmlUtil.findChildren(element,
-                                             "property");
+        List propNodes = XmlUtil.findChildren(element, "property");
         for (int i = 0; i < propNodes.size(); i++) {
             Element propNode = (Element) propNodes.get(i);
-            properties.put(XmlUtil.getAttribute(propNode,"name"),
-                           XmlUtil.getAttribute(propNode,"value"));
+            properties.put(XmlUtil.getAttribute(propNode, "name"),
+                           XmlUtil.getAttribute(propNode, "value"));
         }
 
 
         if (type.equals(TYPE_ENUMERATION)) {
-            String valueString = XmlUtil.getAttribute(element, ATTR_VALUES,(String)null);
-            if (valueString!=null) {
-                if(valueString.startsWith("file:")) {
+            String valueString = XmlUtil.getAttribute(element, ATTR_VALUES,
+                                     (String) null);
+            if (valueString != null) {
+                if (valueString.startsWith("file:")) {
                     valueString =
                         typeHandler.getStorageManager().readSystemResource(
-                                                                           valueString.substring("file:".length()));
-                    enumValues = StringUtil.split(valueString, "\n", true, true);
+                            valueString.substring("file:".length()));
+                    enumValues = StringUtil.split(valueString, "\n", true,
+                            true);
                 } else {
-                    enumValues = StringUtil.split(valueString, ",", true, true);
+                    enumValues = StringUtil.split(valueString, ",", true,
+                            true);
                 }
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param t _more_
+     *
+     * @return _more_
+     */
     public boolean isType(String t) {
         return type.equals(t);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public String getProperty(String key) {
         return properties.get(key);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public String msg(String s) {
         return typeHandler.msg(s);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public String msgLabel(String s) {
         return typeHandler.msgLabel(s);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository() {
         return typeHandler.getRepository();
     }
@@ -370,22 +428,43 @@ public class Column implements Constants {
         return isType(TYPE_INT) || isDouble();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isEnumeration() {
         return isType(TYPE_ENUMERATION) || isType(TYPE_ENUMERATIONPLUS);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isDate() {
         return isType(TYPE_DATETIME) || isType(TYPE_DATE);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isDouble() {
         return isType(TYPE_DOUBLE) || isType(TYPE_PERCENTAGE);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isString() {
-        return isType(TYPE_STRING)  || isType(TYPE_ENUMERATION) || isType(TYPE_ENUMERATIONPLUS) || isType(TYPE_ENTRY) ||
-            isType(TYPE_EMAIL) ||  isType(TYPE_URL);
+        return isType(TYPE_STRING) || isType(TYPE_ENUMERATION)
+               || isType(TYPE_ENUMERATIONPLUS) || isType(TYPE_ENTRY)
+               || isType(TYPE_EMAIL) || isType(TYPE_URL);
     }
 
     /**
@@ -411,6 +490,14 @@ public class Column implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param idx _more_
+     *
+     * @return _more_
+     */
     private String toLatLonString(Object[] values, int idx) {
         if (values == null) {
             return ((dflt != null)
@@ -422,8 +509,10 @@ public class Column implements Constants {
                     ? dflt
                     : "NA");
         }
-        if(!latLonOk(values[idx])) return "NA";
-        double d = ((Double)values[idx]).doubleValue();
+        if ( !latLonOk(values[idx])) {
+            return "NA";
+        }
+        double d = ((Double) values[idx]).doubleValue();
         return latLonFormat.format(d);
     }
 
@@ -449,60 +538,72 @@ public class Column implements Constants {
     /**
      * _more_
      *
+     *
+     * @param entry _more_
      * @param sb _more_
      * @param output _more_
      * @param values _more_
      * @param valueIdx _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public void formatValue(Entry entry, StringBuffer sb, String output,
-                           Object[] values) throws Exception {
+                            Object[] values)
+            throws Exception {
 
-        String delimiter = (Misc.equals(OUTPUT_CSV, output)?"|":",");
+        String delimiter = (Misc.equals(OUTPUT_CSV, output)
+                            ? "|"
+                            : ",");
         if (isType(TYPE_LATLON)) {
             sb.append(toLatLonString(values, offset));
             sb.append(delimiter);
-            sb.append(toLatLonString(values, offset+1));
-        } else  if (isType(TYPE_LATLONBBOX)) {
+            sb.append(toLatLonString(values, offset + 1));
+        } else if (isType(TYPE_LATLONBBOX)) {
             sb.append(toLatLonString(values, offset));
             sb.append(delimiter);
-            sb.append(toLatLonString(values, offset+1));
+            sb.append(toLatLonString(values, offset + 1));
             sb.append(delimiter);
-            sb.append(toLatLonString(values, offset+2));
-            sb.append(delimiter); 
-           sb.append(toLatLonString(values, offset+3));
-        } else if(isType(TYPE_PERCENTAGE)) {
-            if(Misc.equals(output, OUTPUT_CSV)) {
+            sb.append(toLatLonString(values, offset + 2));
+            sb.append(delimiter);
+            sb.append(toLatLonString(values, offset + 3));
+        } else if (isType(TYPE_PERCENTAGE)) {
+            if (Misc.equals(output, OUTPUT_CSV)) {
                 sb.append(toString(values, offset));
             } else {
                 //                System.err.println("offset:" + offset +" values:");
                 //                Misc.printArray("", values);
-                double percent = (Double)values[offset];
-                sb.append((int)(percent*100)+"");
+                double percent = (Double) values[offset];
+                sb.append((int) (percent * 100) + "");
             }
-        } else if(isType(TYPE_DATETIME)) {
-            sb.append(dateTimeFormat.format((Date)values[offset]));
-        } else if(isType(TYPE_DATE)) {
-            sb.append(dateFormat.format((Date)values[offset]));
-        } else if(isType(TYPE_ENTRY)) {
-            String entryId = toString(values, offset);
-            Entry theEntry=null;
-            if(entryId!=null &&entryId.length()>0) {
+        } else if (isType(TYPE_DATETIME)) {
+            sb.append(dateTimeFormat.format((Date) values[offset]));
+        } else if (isType(TYPE_DATE)) {
+            sb.append(dateFormat.format((Date) values[offset]));
+        } else if (isType(TYPE_ENTRY)) {
+            String entryId  = toString(values, offset);
+            Entry  theEntry = null;
+            if ((entryId != null) && (entryId.length() > 0)) {
                 try {
-                    theEntry = getRepository().getEntryManager().getEntry(null, entryId);
-                } catch(Exception exc) {
+                    theEntry =
+                        getRepository().getEntryManager().getEntry(null,
+                            entryId);
+                } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
             }
-            if(Misc.equals(output, OUTPUT_CSV)) {
+            if (Misc.equals(output, OUTPUT_CSV)) {
                 sb.append(entryId);
-            }  else {
-                if(theEntry!=null) {
+            } else {
+                if (theEntry != null) {
                     try {
-                        String link = getRepository().getEntryManager().getAjaxLink(getRepository().getTmpRequest(),theEntry, theEntry.getName()).toString();
+                        String link =
+                            getRepository().getEntryManager().getAjaxLink(
+                                getRepository().getTmpRequest(), theEntry,
+                                theEntry.getName()).toString();
                         sb.append(link);
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         throw new RuntimeException(exc);
                     }
 
@@ -511,27 +612,36 @@ public class Column implements Constants {
                 }
 
             }
-        } else if(isType(TYPE_EMAIL)) {
+        } else if (isType(TYPE_EMAIL)) {
             String s = toString(values, offset);
-            if(Misc.equals(output, OUTPUT_CSV)) 
+            if (Misc.equals(output, OUTPUT_CSV)) {
                 sb.append(s);
-            else
-                sb.append("<a href=\"mailto:" + s +"\">" + s +"</a>");
-        } else if(isType(TYPE_URL)) {
+            } else {
+                sb.append("<a href=\"mailto:" + s + "\">" + s + "</a>");
+            }
+        } else if (isType(TYPE_URL)) {
             String s = toString(values, offset);
-            if(Misc.equals(output, OUTPUT_CSV)) 
+            if (Misc.equals(output, OUTPUT_CSV)) {
                 sb.append(s);
-            else
-                sb.append("<a href=\"" + s +"\">" + s +"</a>");
+            } else {
+                sb.append("<a href=\"" + s + "\">" + s + "</a>");
+            }
         } else {
-            String s = toString(values,offset);
-            if(rows>1) {
-                s = typeHandler.getRepository().getHtmlOutputHandler().wikifyEntry(typeHandler.getRepository().getTmpRequest(), entry, s, false,null,null);
+            String s = toString(values, offset);
+            if (rows > 1) {
+                s = typeHandler.getRepository().getHtmlOutputHandler()
+                    .wikifyEntry(typeHandler.getRepository().getTmpRequest(),
+                                 entry, s, false, null, null);
             }
             sb.append(s);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getOffset() {
         return offset;
     }
@@ -593,10 +703,12 @@ public class Column implements Constants {
             }
             statementIdx += 2;
         } else if (isType(TYPE_LATLONBBOX)) {
-            for(int i=0;i<4;i++) { 
-                if (values[offset+i] != null) {
-                    statement.setDouble(statementIdx++, ((Double) values[offset+i]).doubleValue());
-                }  else {
+            for (int i = 0; i < 4; i++) {
+                if (values[offset + i] != null) {
+                    statement.setDouble(
+                        statementIdx++,
+                        ((Double) values[offset + i]).doubleValue());
+                } else {
                     statement.setDouble(statementIdx++, Entry.NONGEO);
                 }
             }
@@ -652,7 +764,9 @@ public class Column implements Constants {
             values[offset] = new Boolean(results.getInt(valueIdx) == 1);
             valueIdx++;
         } else if (isDate()) {
-            values[offset] = typeHandler.getDatabaseManager().getTimestamp(results, valueIdx);
+            values[offset] =
+                typeHandler.getDatabaseManager().getTimestamp(results,
+                    valueIdx);
             valueIdx++;
         } else if (isType(TYPE_LATLON)) {
             values[offset] = new Double(results.getDouble(valueIdx));
@@ -661,10 +775,10 @@ public class Column implements Constants {
             valueIdx++;
 
         } else if (isType(TYPE_LATLONBBOX)) {
-            values[offset] = new Double(results.getDouble(valueIdx++));
-            values[offset+1] = new Double(results.getDouble(valueIdx++));
-            values[offset+2] = new Double(results.getDouble(valueIdx++));
-            values[offset+3] = new Double(results.getDouble(valueIdx++));
+            values[offset]     = new Double(results.getDouble(valueIdx++));
+            values[offset + 1] = new Double(results.getDouble(valueIdx++));
+            values[offset + 2] = new Double(results.getDouble(valueIdx++));
+            values[offset + 3] = new Double(results.getDouble(valueIdx++));
 
         } else if (isType(TYPE_PASSWORD)) {
             String value = results.getString(valueIdx);
@@ -700,13 +814,15 @@ public class Column implements Constants {
         SqlUtil.loadSql(sql, statement, true);
 
 
-        if(changeType) {
-            if(typeHandler.getDatabaseManager().isDatabaseDerby()) {
-                sql = "alter table " + getTableName() +"  alter column " + name +"  set data type " + type+";";
+        if (changeType) {
+            if (typeHandler.getDatabaseManager().isDatabaseDerby()) {
+                sql = "alter table " + getTableName() + "  alter column "
+                      + name + "  set data type " + type + ";";
             } else {
-                sql = "alter table " + getTableName() +" modify column " + name +" " + type+";";
+                sql = "alter table " + getTableName() + " modify column "
+                      + name + " " + type + ";";
             }
-            System.err.println ("altering table: " + sql);
+            System.err.println("altering table: " + sql);
             SqlUtil.loadSql(sql, statement, true);
         }
     }
@@ -721,7 +837,9 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void createTable(Statement statement) throws Exception {
-        if (isType(TYPE_STRING) || isType(TYPE_PASSWORD) || isType(TYPE_EMAIL)  || isType(TYPE_URL) || isType(TYPE_ENTRY)) {
+        if (isType(TYPE_STRING) || isType(TYPE_PASSWORD)
+                || isType(TYPE_EMAIL) || isType(TYPE_URL)
+                || isType(TYPE_ENTRY)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (isType(TYPE_CLOB)) {
             String clobType =
@@ -729,7 +847,7 @@ public class Column implements Constants {
                     "clob", size);
             defineColumn(statement, name, clobType);
         } else if (isType(TYPE_ENUMERATION) || isType(TYPE_ENUMERATIONPLUS)) {
-           defineColumn(statement, name, "varchar(" + size + ") ");
+            defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (isType(TYPE_INT)) {
             defineColumn(statement, name, "int");
         } else if (isDouble()) {
@@ -742,7 +860,10 @@ public class Column implements Constants {
             defineColumn(statement, name, "int");
 
         } else if (isDate()) {
-            defineColumn(statement,name,typeHandler.getDatabaseManager().convertSql("ramadda.datetime"));
+            defineColumn(
+                statement, name,
+                typeHandler.getDatabaseManager().convertSql(
+                    "ramadda.datetime"));
         } else if (isType(TYPE_LATLON)) {
             defineColumn(
                 statement, name + "_lat",
@@ -832,14 +953,30 @@ public class Column implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     private boolean latLonOk(Object o) {
-        if(o==null) return false;
+        if (o == null) {
+            return false;
+        }
         Double d = (Double) o;
         return latLonOk(d.doubleValue());
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
     private boolean latLonOk(double v) {
-        return (v==v && v!=Entry.NONGEO);
+        return ((v == v) && (v != Entry.NONGEO));
     }
 
     /**
@@ -852,47 +989,56 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void assembleWhereClause(Request request, List<Clause> where,
-                                       StringBuffer searchCriteria)
+                                    StringBuffer searchCriteria)
             throws Exception {
+
         String id = getFullName();
         if (isType(TYPE_LATLON)) {
             double north = request.get(id + "_north", Double.NaN);
             double south = request.get(id + "_south", Double.NaN);
-            double east = request.get(id + "_east", Double.NaN);
-            double west= request.get(id + "_west", Double.NaN);
-            if (latLonOk(north)) 
+            double east  = request.get(id + "_east", Double.NaN);
+            double west  = request.get(id + "_west", Double.NaN);
+            if (latLonOk(north)) {
                 where.add(Clause.le(id + "_lat", north));
-            if (latLonOk(south))
+            }
+            if (latLonOk(south)) {
                 where.add(Clause.ge(id + "_lat", south));
-            if (latLonOk(west))
+            }
+            if (latLonOk(west)) {
                 where.add(Clause.ge(id + "_lon", west));
-            if (latLonOk(east))
+            }
+            if (latLonOk(east)) {
                 where.add(Clause.le(id + "_lon", east));
-        } else if(isType(TYPE_LATLONBBOX)) {
+            }
+        } else if (isType(TYPE_LATLONBBOX)) {
             double north = request.get(id + "_north", Double.NaN);
             double south = request.get(id + "_south", Double.NaN);
-            double east = request.get(id + "_east", Double.NaN);
-            double west= request.get(id + "_west", Double.NaN);
+            double east  = request.get(id + "_east", Double.NaN);
+            double west  = request.get(id + "_west", Double.NaN);
 
-            if (latLonOk(north)) 
+            if (latLonOk(north)) {
                 where.add(Clause.le(id + "_north", north));
-            if (latLonOk(south))
+            }
+            if (latLonOk(south)) {
                 where.add(Clause.ge(id + "_south", south));
-            if (latLonOk(west))
+            }
+            if (latLonOk(west)) {
                 where.add(Clause.ge(id + "_west", west));
-            if (latLonOk(east))
+            }
+            if (latLonOk(east)) {
                 where.add(Clause.le(id + "_east", east));
+            }
         } else if (isNumeric()) {
             String expr = request.getCheckedString(id + "_expr", EXPR_EQUALS,
                               EXPR_PATTERN);
             double from  = request.get(id + "_from", Double.NaN);
             double to    = request.get(id + "_to", Double.NaN);
             double value = request.get(id, Double.NaN);
-            
-            if(isType(TYPE_PERCENTAGE)) {
-                from  = from/100.0;
-                to  = to/100.0;
-                value = value/100.0;
+
+            if (isType(TYPE_PERCENTAGE)) {
+                from  = from / 100.0;
+                to    = to / 100.0;
+                value = value / 100.0;
             }
             if ((from == from) && (to != to)) {
                 to = value;
@@ -924,9 +1070,9 @@ public class Column implements Constants {
                         : 0)));
             }
         } else if (isDate()) {
-            String relativeArg = id+"_relative";
-            Date[] dateRange = request.getDateRange(id+"_fromdate", id+"_todate", relativeArg,
-                               new Date());
+            String relativeArg = id + "_relative";
+            Date[] dateRange = request.getDateRange(id + "_fromdate",
+                                   id + "_todate", relativeArg, new Date());
             if (dateRange[0] != null) {
                 where.add(Clause.ge(getFullName(), dateRange[0]));
             }
@@ -935,8 +1081,8 @@ public class Column implements Constants {
                 where.add(Clause.le(getFullName(), dateRange[1]));
             }
         } else if (isType(TYPE_ENTRY)) {
-            String value = request.getString(id+"_hidden", "");
-            if(value.length()>0) {
+            String value = request.getString(id + "_hidden", "");
+            if (value.length() > 0) {
                 where.add(Clause.eq(getFullName(), value));
             }
         } else {
@@ -946,6 +1092,7 @@ public class Column implements Constants {
                                         (String) null), where);
 
         }
+
 
     }
 
@@ -958,10 +1105,11 @@ public class Column implements Constants {
      * @param arg _more_
      * @param value _more_
      * @param entry _more_
+     * @param values _more_
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, Object[]values) {
+    public int matchValue(String arg, Object value, Object[] values) {
         if (isType(TYPE_LATLON)) {
             //TODO:
         } else if (isType(TYPE_LATLONBBOX)) {
@@ -993,15 +1141,18 @@ public class Column implements Constants {
      * @param request _more_
      * @param formBuffer _more_
      * @param entry _more_
+     * @param values _more_
      * @param state _more_
      *
      * @throws Exception _more_
      */
     public void addToEntryForm(Request request, Entry entry,
-                               StringBuffer formBuffer,
-                               Object[]values, Hashtable state)
+                               StringBuffer formBuffer, Object[] values,
+                               Hashtable state)
             throws Exception {
-        if(!addToForm) return;
+        if ( !addToForm) {
+            return;
+        }
         String widget = getFormWidget(request, entry, values);
         //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
         //                                             HtmlUtil.hbox(widget, suffix)));
@@ -1028,34 +1179,49 @@ public class Column implements Constants {
      *
      * @param request _more_
      * @param entry _more_
+     * @param values _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public String getFormWidget(Request request, Entry entry, Object[]values)
+    public String getFormWidget(Request request, Entry entry, Object[] values)
             throws Exception {
-        String   widget = "";
-        String id = getFullName();
+
+        String widget = "";
+        String id     = getFullName();
         if (isType(TYPE_LATLON)) {
             double lat = 0;
             double lon = 0;
             if (values != null) {
-                lat = ((Double)values[offset]).doubleValue();
-                lon = ((Double)values[offset+1]).doubleValue();
+                lat = ((Double) values[offset]).doubleValue();
+                lon = ((Double) values[offset + 1]).doubleValue();
             }
-            widget = typeHandler.getRepository().getMapManager().makeMapSelector(id, true, "","",new String[]{
-                    latLonOk(lat)?lat+"":"",
-                    latLonOk(lon)?lon+"":""});
-        } else  if (isType(TYPE_LATLONBBOX)) {
-            if(values!=null) {
-                widget = typeHandler.getRepository().getMapManager().makeMapSelector(id, true, "","",
-                                                                     latLonOk(values[offset+2])?values[offset+2]+"":"",
-                                                                     latLonOk(values[offset+0])?values[offset+0]+"":"",
-                                                                     latLonOk(values[offset+3])?values[offset+3]+"":"",
-                                                                     latLonOk(values[offset+1])?values[offset+1]+"":"");
+            widget =
+                typeHandler.getRepository().getMapManager().makeMapSelector(
+                    id, true, "", "", new String[] { latLonOk(lat)
+                    ? lat + ""
+                    : "", latLonOk(lon)
+                          ? lon + ""
+                          : "" });
+        } else if (isType(TYPE_LATLONBBOX)) {
+            if (values != null) {
+                widget =
+                    typeHandler.getRepository().getMapManager()
+                        .makeMapSelector(id, true, "", "",
+                                         latLonOk(values[offset + 2])
+                                         ? values[offset + 2] + ""
+                                         : "", latLonOk(values[offset + 0])
+                        ? values[offset + 0] + ""
+                        : "", latLonOk(values[offset + 3])
+                              ? values[offset + 3] + ""
+                              : "", latLonOk(values[offset + 1])
+                                    ? values[offset + 1] + ""
+                                    : "");
             } else {
-                widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
+                widget =
+                    typeHandler.getRepository().getMapManager()
+                        .makeMapSelector(request, id, true, "", "");
             }
         } else if (isType(TYPE_BOOLEAN)) {
             String value = "True";
@@ -1066,26 +1232,26 @@ public class Column implements Constants {
                     value = "False";
                 }
             }
-            widget = HtmlUtil.select(id,
-                                     Misc.newList("True", "False"), value);
+            widget = HtmlUtil.select(id, Misc.newList("True", "False"),
+                                     value);
         } else if (isType(TYPE_DATETIME)) {
             Date date;
             if (values != null) {
-                date  = (Date) values[offset];
+                date = (Date) values[offset];
             } else {
                 date = new Date();
             }
-            widget = typeHandler.getRepository().makeDateInput(
-                                                   request, id, "", date,null);
+            widget = typeHandler.getRepository().makeDateInput(request, id,
+                    "", date, null);
         } else if (isType(TYPE_DATE)) {
             Date date;
             if (values != null) {
-                date  = (Date) values[offset];
+                date = (Date) values[offset];
             } else {
                 date = new Date();
             }
-            widget = typeHandler.getRepository().makeDateInput(
-                                                               request, id, "", date,null,false);
+            widget = typeHandler.getRepository().makeDateInput(request, id,
+                    "", date, null, false);
         } else if (isType(TYPE_ENUMERATION)) {
             String value = ((dflt != null)
                             ? dflt
@@ -1101,8 +1267,11 @@ public class Column implements Constants {
             if (values != null) {
                 value = (String) toString(values, offset);
             }
-            widget = HtmlUtil.select(id, typeHandler.getEnumValues(this, entry), value) +"  or:  " +
-                HtmlUtil.input(id+"_plus", "",HtmlUtil.SIZE_10);
+            widget = HtmlUtil.select(id,
+                                     typeHandler.getEnumValues(this, entry),
+                                     value) + "  or:  "
+                                            + HtmlUtil.input(id + "_plus",
+                                                "", HtmlUtil.SIZE_10);
         } else if (isType(TYPE_INT)) {
             String value = ((dflt != null)
                             ? dflt
@@ -1127,10 +1296,13 @@ public class Column implements Constants {
             if (values != null) {
                 value = "" + toString(values, offset);
             }
-            if(value.trim().length() == 0) value="0";
-            double d = new Double(value).doubleValue();
-            int percentage = (int)(d*100);
-            widget = HtmlUtil.input(id, percentage+"", HtmlUtil.SIZE_5)+"%";
+            if (value.trim().length() == 0) {
+                value = "0";
+            }
+            double d          = new Double(value).doubleValue();
+            int    percentage = (int) (d * 100);
+            widget = HtmlUtil.input(id, percentage + "", HtmlUtil.SIZE_5)
+                     + "%";
         } else if (isType(TYPE_PASSWORD)) {
             String value = ((dflt != null)
                             ? dflt
@@ -1138,8 +1310,7 @@ public class Column implements Constants {
             if (values != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.password(id, value,
-                                       HtmlUtil.SIZE_10);
+            widget = HtmlUtil.password(id, value, HtmlUtil.SIZE_10);
         } else if (isType(TYPE_ENTRY)) {
             String value = "";
             if (values != null) {
@@ -1147,18 +1318,20 @@ public class Column implements Constants {
             }
 
             Entry theEntry = null;
-            if(value.length()>0) {
-                theEntry = getRepository().getEntryManager().getEntry(request, value);
+            if (value.length() > 0) {
+                theEntry =
+                    getRepository().getEntryManager().getEntry(request,
+                        value);
             }
             StringBuffer sb = new StringBuffer();
-            String select =  getRepository().getHtmlOutputHandler().getSelect(request,
-                                                                              id, "Select", true,null,entry);
-            sb.append(HtmlUtil.hidden(id + "_hidden", value, HtmlUtil.id(id + "_hidden")));
-            sb.append(HtmlUtil.disabledInput(id,
-                                         ((theEntry != null)
-                                          ? theEntry.getFullName()
-                                          : ""), HtmlUtil.id(id)
-                                             + HtmlUtil.SIZE_60) + select);
+            String select =
+                getRepository().getHtmlOutputHandler().getSelect(request, id,
+                    "Select", true, null, entry);
+            sb.append(HtmlUtil.hidden(id + "_hidden", value,
+                                      HtmlUtil.id(id + "_hidden")));
+            sb.append(HtmlUtil.disabledInput(id, ((theEntry != null)
+                    ? theEntry.getFullName()
+                    : ""), HtmlUtil.id(id) + HtmlUtil.SIZE_60) + select);
 
             widget = sb.toString();
         } else {
@@ -1167,8 +1340,8 @@ public class Column implements Constants {
                             : "");
             if (values != null) {
                 value = toString(values, offset);
-            } else if(request.defined(id)) {
-                value  = request.getString(id);
+            } else if (request.defined(id)) {
+                value = request.getString(id);
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 Hashtable props =
@@ -1189,36 +1362,49 @@ public class Column implements Constants {
 
                 tfos = (List<TwoFacedObject>) Misc.sort(tfos);
                 if (tfos.size() == 0) {
-                    widget = HtmlUtil.input(id, value,
-                                            " size=10 ");
+                    widget = HtmlUtil.input(id, value, " size=10 ");
                 } else {
 
                     widget = HtmlUtil.select(id, tfos, value);
                 }
             } else if (rows > 1) {
-                widget = HtmlUtil.textArea(id, value, rows,
-                                           columns);
+                widget = HtmlUtil.textArea(id, value, rows, columns);
             } else {
                 widget = HtmlUtil.input(id, value,
                                         "size=\"" + columns + "\"");
             }
         }
         return HtmlUtil.hbox(widget, HtmlUtil.inset(suffix, 5));
+
     }
 
 
 
-    public double [] getLatLonBbox(Object [] values) {
-        return new double[]{(Double)values[offset],
-                            (Double)values[offset+1],
-                            (Double)values[offset+2],
-                            (Double)values[offset+3]};
+    /**
+     * _more_
+     *
+     * @param values _more_
+     *
+     * @return _more_
+     */
+    public double[] getLatLonBbox(Object[] values) {
+        return new double[] { (Double) values[offset],
+                              (Double) values[offset + 1],
+                              (Double) values[offset + 2],
+                              (Double) values[offset + 3] };
     }
 
 
-    public double [] getLatLon(Object [] values) {
-        return new double[]{(Double)values[offset],
-                            (Double)values[offset+1]};
+    /**
+     * _more_
+     *
+     * @param values _more_
+     *
+     * @return _more_
+     */
+    public double[] getLatLon(Object[] values) {
+        return new double[] { (Double) values[offset],
+                              (Double) values[offset + 1] };
     }
 
 
@@ -1226,65 +1412,70 @@ public class Column implements Constants {
      * _more_
      *
      * @param request _more_
+     * @param entry _more_
      * @param values _more_
      *
      * @throws Exception _more_
      */
-    public void setValue(Request request, Entry entry, Object[] values) throws Exception {
-        if(!addToForm) return;
+    public void setValue(Request request, Entry entry, Object[] values)
+            throws Exception {
+        if ( !addToForm) {
+            return;
+        }
         String id = getFullName();
         if (isType(TYPE_LATLON)) {
-            if (request.exists(id+"_lat")) {
-                values[offset] = new Double(request.getString(id+"_lat","0").trim());
-                values[offset+1] = new Double(request.getString(id+"_lon","0").trim());
+            if (request.exists(id + "_lat")) {
+                values[offset] = new Double(request.getString(id + "_lat",
+                        "0").trim());
+                values[offset + 1] = new Double(request.getString(id
+                        + "_lon", "0").trim());
             }
         } else if (isType(TYPE_LATLONBBOX)) {
-            values[offset] = new Double(request.get(id+"_north",Entry.NONGEO));
-            values[offset+1] = new Double(request.get(id+"_west",Entry.NONGEO));
-            values[offset+2] = new Double(request.get(id+"_south",Entry.NONGEO));
-            values[offset+3] = new Double(request.get(id+"_east",Entry.NONGEO));
+            values[offset] = new Double(request.get(id + "_north",
+                    Entry.NONGEO));
+            values[offset + 1] = new Double(request.get(id + "_west",
+                    Entry.NONGEO));
+            values[offset + 2] = new Double(request.get(id + "_south",
+                    Entry.NONGEO));
+            values[offset + 3] = new Double(request.get(id + "_east",
+                    Entry.NONGEO));
         } else if (isDate()) {
-            values[offset] =    request.getDate(id, new Date());
+            values[offset] = request.getDate(id, new Date());
         } else if (isType(TYPE_BOOLEAN)) {
-            String value = request.getString(id,
-                                             (StringUtil.notEmpty(dflt)
+            String value = request.getString(id, (StringUtil.notEmpty(dflt)
                     ? dflt
                     : "true")).toLowerCase();
             values[offset] = new Boolean(value);
         } else if (isType(TYPE_ENUMERATION)) {
             if (request.exists(id)) {
-                values[offset] = request.getString(id,
-                        ((dflt != null)
-                         ? dflt
-                         : ""));
+                values[offset] = request.getString(id, ((dflt != null)
+                        ? dflt
+                        : ""));
             } else {
                 values[offset] = dflt;
             }
         } else if (isType(TYPE_ENUMERATIONPLUS)) {
             String theValue = "";
-            if (request.defined(id+"_plus")) {
-                theValue = request.getString(id+"_plus",
-                        ((dflt != null)
-                         ? dflt
-                         : ""));
+            if (request.defined(id + "_plus")) {
+                theValue = request.getString(id + "_plus", ((dflt != null)
+                        ? dflt
+                        : ""));
             } else if (request.defined(id)) {
-                theValue = request.getString(id,
-                        ((dflt != null)
-                         ? dflt
-                         : ""));
+                theValue = request.getString(id, ((dflt != null)
+                        ? dflt
+                        : ""));
 
             } else {
                 theValue = dflt;
             }
             values[offset] = theValue;
-            typeHandler.addEnumValue(this,entry, theValue);
+            typeHandler.addEnumValue(this, entry, theValue);
         } else if (isType(TYPE_INT)) {
             int dfltValue = (StringUtil.notEmpty(dflt)
                              ? new Integer(dflt).intValue()
                              : 0);
             if (request.exists(id)) {
-                values[offset] = new Integer(request.get(id,
-                        dfltValue));
+                values[offset] = new Integer(request.get(id, dfltValue));
             } else {
                 values[offset] = dfltValue;
             }
@@ -1293,8 +1484,7 @@ public class Column implements Constants {
                                 ? new Double(dflt.trim()).doubleValue()
                                 : 0);
             if (request.exists(id)) {
-                values[offset] = new Double(request.get(id,
-                        dfltValue)/100);
+                values[offset] = new Double(request.get(id, dfltValue) / 100);
             } else {
                 values[offset] = dfltValue;
 
@@ -1304,20 +1494,18 @@ public class Column implements Constants {
                                 ? new Double(dflt.trim()).doubleValue()
                                 : 0);
             if (request.exists(id)) {
-                values[offset] = new Double(request.get(id,
-                        dfltValue));
+                values[offset] = new Double(request.get(id, dfltValue));
             } else {
                 values[offset] = dfltValue;
 
             }
         } else if (isType(TYPE_ENTRY)) {
-            values[offset] = request.getString(id+"_hidden","");
+            values[offset] = request.getString(id + "_hidden", "");
         } else {
             if (request.exists(id)) {
-                values[offset] = request.getString(id,
-                        ((dflt != null)
-                         ? dflt
-                         : ""));
+                values[offset] = request.getString(id, ((dflt != null)
+                        ? dflt
+                        : ""));
             } else {
                 values[offset] = dflt;
             }
@@ -1343,100 +1531,124 @@ public class Column implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param where _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
                                 List<Clause> where, Entry entry)
-
             throws Exception {
 
         if ( !getCanSearch()) {
             return;
         }
 
-        String id   = getFullName();
+        String       id     = getFullName();
 
         List<Clause> tmp    = new ArrayList<Clause>(where);
         String       widget = "";
         if (isType(TYPE_LATLON)) {
-            widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
-        } else  if (isType(TYPE_LATLONBBOX)) {
-            widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
+            widget =
+                typeHandler.getRepository().getMapManager().makeMapSelector(
+                    request, id, true, "", "");
+        } else if (isType(TYPE_LATLONBBOX)) {
+            widget =
+                typeHandler.getRepository().getMapManager().makeMapSelector(
+                    request, id, true, "", "");
         } else if (isDate()) {
             List dateSelect = new ArrayList();
             dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));
             dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
-            dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
-            dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
-            dateSelect.add(new TwoFacedObject(msg("Last 12 hours"), "-12 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last 3 hours"),
+                    "-3 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last 6 hours"),
+                    "-6 hours"));
+            dateSelect.add(new TwoFacedObject(msg("Last 12 hours"),
+                    "-12 hours"));
             dateSelect.add(new TwoFacedObject(msg("Last day"), "-1 day"));
             dateSelect.add(new TwoFacedObject(msg("Last 7 days"), "-7 days"));
             String dateSelectValue;
-            String relativeArg = id+"_relative";
+            String relativeArg = id + "_relative";
             if (request.exists(relativeArg)) {
                 dateSelectValue = request.getString(relativeArg, "");
             } else {
                 dateSelectValue = "none";
             }
 
-            String dateSelectInput = HtmlUtil.select(id+"_relative",
-                                                     dateSelect, dateSelectValue);
+            String dateSelectInput = HtmlUtil.select(id + "_relative",
+                                         dateSelect, dateSelectValue);
 
             widget = getRepository().makeDateInput(
-                    request, id+"_fromdate", "searchform",
-                    null, null,isType(TYPE_DATETIME)) + HtmlUtil.space(1)
-                          + HtmlUtil.img(getRepository().iconUrl(ICON_RANGE))
-                          + HtmlUtil.space(1)
-                          + getRepository().makeDateInput(
-                              request, id+"_todate", "searchform",
-                              null,null,isType(TYPE_DATETIME)) + HtmlUtil.space(4) + msgLabel("Or")
-                + dateSelectInput;
+                request, id + "_fromdate", "searchform", null, null,
+                isType(TYPE_DATETIME)) + HtmlUtil.space(1)
+                    + HtmlUtil.img(getRepository().iconUrl(ICON_RANGE))
+                    + HtmlUtil.space(1)
+                    + getRepository().makeDateInput(
+                        request, id + "_todate", "searchform", null, null,
+                            isType(TYPE_DATETIME)) + HtmlUtil.space(4)
+                                + msgLabel("Or") + dateSelectInput;
 
 
         } else if (isType(TYPE_BOOLEAN)) {
             widget = HtmlUtil.select(id,
                                      Misc.newList(TypeHandler.ALL_OBJECT,
-                                                  "True", "False"),request.getString(id,""));
+                                         "True",
+                                         "False"), request.getString(id, ""));
         } else if (isType(TYPE_ENUMERATION)) {
             List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
             tmpValues.addAll(enumValues);
             widget = HtmlUtil.select(id, tmpValues, request.getString(id));
         } else if (isType(TYPE_ENUMERATIONPLUS)) {
             List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
-            tmpValues.addAll(typeHandler.getEnumValues(this,entry));
+            tmpValues.addAll(typeHandler.getEnumValues(this, entry));
             widget = HtmlUtil.select(id, tmpValues, request.getString(id));
         } else if (isNumeric()) {
-            String expr = HtmlUtil.select(id + "_expr", EXPR_ITEMS, request.getString(id+"_expr",""));
-            widget = expr + HtmlUtil.input(id + "_from", request.getString(id+"_from",""), "size=\"10\"")
-                + HtmlUtil.input(id + "_to", request.getString(id+"_to",""), "size=\"10\"");
+            String expr = HtmlUtil.select(id + "_expr", EXPR_ITEMS,
+                                          request.getString(id + "_expr",
+                                              ""));
+            widget = expr
+                     + HtmlUtil.input(id + "_from",
+                                      request.getString(id + "_from", ""),
+                                      "size=\"10\"") + HtmlUtil.input(id
+                                      + "_to", request.getString(id + "_to",
+                                          ""), "size=\"10\"");
         } else if (isType(TYPE_ENTRY)) {
 
 
-            String entryId = request.getString(id+"_hidden","");
-            Entry theEntry=null;
-            if(entryId!=null && entryId.length()>0) {
+            String entryId  = request.getString(id + "_hidden", "");
+            Entry  theEntry = null;
+            if ((entryId != null) && (entryId.length() > 0)) {
                 try {
-                    theEntry = getRepository().getEntryManager().getEntry(null, entryId);
-                } catch(Exception exc) {
+                    theEntry =
+                        getRepository().getEntryManager().getEntry(null,
+                            entryId);
+                } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
             }
 
-            String select =  getRepository().getHtmlOutputHandler().getSelect(request,
-                                                                              id, "Select", true,null,entry);
+            String select =
+                getRepository().getHtmlOutputHandler().getSelect(request, id,
+                    "Select", true, null, entry);
             StringBuffer sb = new StringBuffer();
-            sb.append(HtmlUtil.hidden(id + "_hidden", entryId, HtmlUtil.id(id + "_hidden")));
-            sb.append(HtmlUtil.disabledInput(id,
-                                         ((theEntry != null)
-                                          ? theEntry.getFullName():""),
-                                             HtmlUtil.id(id)
-                                             + HtmlUtil.SIZE_60) + select);
+            sb.append(HtmlUtil.hidden(id + "_hidden", entryId,
+                                      HtmlUtil.id(id + "_hidden")));
+            sb.append(HtmlUtil.disabledInput(id, ((theEntry != null)
+                    ? theEntry.getFullName()
+                    : ""), HtmlUtil.id(id) + HtmlUtil.SIZE_60) + select);
 
             widget = sb.toString();
         } else {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
                 Statement statement = typeHandler.select(request,
-                                          SqlUtil.distinct(id),
-                                          tmp, "");
+                                          SqlUtil.distinct(id), tmp, "");
                 long t2 = System.currentTimeMillis();
                 String[] values =
                     SqlUtil.readString(
@@ -1458,17 +1670,17 @@ public class Column implements Constants {
                 list.addAll(sorted);
                 if (list.size() == 1) {
                     widget =
-                        HtmlUtil.hidden(id,
-                                        (String) list.get(0).getId()) + " "
-                                            + list.get(0).toString();
+                        HtmlUtil.hidden(id, (String) list.get(0).getId())
+                        + " " + list.get(0).toString();
                 } else {
                     list.add(0, TypeHandler.ALL_OBJECT);
                     widget = HtmlUtil.select(id, list);
                 }
             } else if (rows > 1) {
-                widget = HtmlUtil.textArea(id, request.getString(id,""), rows, columns);
+                widget = HtmlUtil.textArea(id, request.getString(id, ""),
+                                           rows, columns);
             } else {
-                widget = HtmlUtil.input(id,request.getString(id,""),
+                widget = HtmlUtil.input(id, request.getString(id, ""),
                                         "size=\"" + columns + "\"");
             }
         }
@@ -1533,7 +1745,7 @@ public class Column implements Constants {
         if (isType(TYPE_LATLON)) {
             names.add(name + "_lat");
             names.add(name + "_lon");
-        } else  if (isType(TYPE_LATLONBBOX)) {
+        } else if (isType(TYPE_LATLONBBOX)) {
             names.add(name + "_north");
             names.add(name + "_west");
             names.add(name + "_south");
@@ -1544,12 +1756,17 @@ public class Column implements Constants {
         return names;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSortByColumn() {
         if (isType(TYPE_LATLON)) {
-            return name+"_lat";
+            return name + "_lat";
         }
         if (isType(TYPE_LATLONBBOX)) {
-            return name+"_north";
+            return name + "_north";
         }
         return name;
     }
@@ -1741,13 +1958,22 @@ public class Column implements Constants {
         return dflt;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return name+":" + offset;
+        return name + ":" + offset;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getRows() {
         return rows;
     }
 
 }
-

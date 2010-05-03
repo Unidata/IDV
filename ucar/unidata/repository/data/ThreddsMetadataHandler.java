@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTYP; without even the implied warranty of
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -78,8 +77,8 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -169,8 +168,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
 
-    public static final String PROP_STARTTIME_ATTRIBUTES = "cdm.attribute.starttimes";
-    public static final String PROP_ENDTIME_ATTRIBUTES = "cdm.attribute.endtimes";
+    /** _more_          */
+    public static final String PROP_STARTTIME_ATTRIBUTES =
+        "cdm.attribute.starttimes";
+
+    /** _more_          */
+    public static final String PROP_ENDTIME_ATTRIBUTES =
+        "cdm.attribute.endtimes";
 
     /**
      * _more_
@@ -265,7 +269,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
             }
         } catch (Exception exc) {
-            throw new IllegalArgumentException("Error parsing unit:\"" + unitIdentifier +"\"   " +exc);
+            throw new IllegalArgumentException("Error parsing unit:\""
+                    + unitIdentifier + "\"   " + exc);
         }
         try {
             u = u.clone(unitName);
@@ -368,9 +373,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final String ATTR_KEYWORDS = "keywords";
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public DataOutputHandler getDataOutputHandler() throws Exception {
         return (DataOutputHandler) getRepository().getOutputHandler(
-                                                                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+            DataOutputHandler.OUTPUT_OPENDAP.toString());
     }
 
 
@@ -387,13 +399,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    List<Metadata> metadataList,
                                    Hashtable extra, boolean shortForm) {
 
-        Metadata metadata = null;
-        String varName = null;
-        NetcdfDataset dataset = null;
-        boolean haveDate = false;
+        Metadata      metadata = null;
+        String        varName  = null;
+        NetcdfDataset dataset  = null;
+        boolean       haveDate = false;
         try {
-            DataOutputHandler dataOutputHandler =
-                getDataOutputHandler();
+            DataOutputHandler dataOutputHandler = getDataOutputHandler();
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);
 
@@ -432,10 +443,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
 
-                if(isStartTimeAttribute(name)||isEndTimeAttribute(name)) {
-                    Date  date = getDate(value);
+                if (isStartTimeAttribute(name) || isEndTimeAttribute(name)) {
+                    Date date = getDate(value);
                     //                    System.err.println(name +" " + date);
-                    if(isEndTimeAttribute(name)) {
+                    if (isEndTimeAttribute(name)) {
                         extra.put(ARG_TODATE, date);
                     } else {
                         extra.put(ARG_FROMDATE, date);
@@ -447,8 +458,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
                 if (ATTR_KEYWORDS.equals(name)) {
-                    for (String keyword : (List<String>) StringUtil.split(
-                                                                          value, ";", true, true)) {
+                    for (String keyword :
+                            (List<String>) StringUtil.split(value, ";", true,
+                            true)) {
 
                         try {
                             metadata =
@@ -459,8 +471,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                              Metadata.DFLT_ATTR,
                                              Metadata.DFLT_ATTR,
                                              Metadata.DFLT_EXTRA);
-                        } catch(Exception exc) {
-                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add keyword metadata:" + keyword);                    
+                        } catch (Exception exc) {
+                            getRepository().getLogManager().logInfo(
+                                "ThreddsMetadataHandler: Unable to add keyword metadata:"
+                                + keyword);
                             continue;
                         }
 
@@ -477,8 +491,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
                 //Check if the string length is too long
-                if(!Metadata.lengthOK(name) || !Metadata.lengthOK(value)) {
-                    getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add attribute:" + name);
+                if ( !Metadata.lengthOK(name) || !Metadata.lengthOK(value)) {
+                    getRepository().getLogManager().logInfo(
+                        "ThreddsMetadataHandler: Unable to add attribute:"
+                        + name);
                     continue;
                 }
 
@@ -536,17 +552,21 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     } else if (axisType.equals(AxisType.Time)) {
                         try {
                             //For now always use the axis dates even if we had a date from the attributes
-                            if(true || !haveDate) {
-                                Date[] dates   = getMinMaxDates(var, ca);
-                                if(dates!=null) {
-                                    Date   minDate = (Date) extra.get(ARG_FROMDATE);
-                                    Date   maxDate = (Date) extra.get(ARG_TODATE);
+                            if (true || !haveDate) {
+                                Date[] dates = getMinMaxDates(var, ca);
+                                if (dates != null) {
+                                    Date minDate =
+                                        (Date) extra.get(ARG_FROMDATE);
+                                    Date maxDate =
+                                        (Date) extra.get(ARG_TODATE);
                                     //System.err.println("dates:" + dates[0] +" " + dates[1]);
                                     if (minDate != null) {
-                                        dates[0] = DateUtil.min(dates[0], minDate);
+                                        dates[0] = DateUtil.min(dates[0],
+                                                minDate);
                                     }
                                     if (maxDate != null) {
-                                        dates[1] = DateUtil.max(dates[1], maxDate);
+                                        dates[1] = DateUtil.max(dates[1],
+                                                maxDate);
                                     }
 
                                     extra.put(ARG_FROMDATE, dates[0]);
@@ -556,7 +576,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             }
                         } catch (Exception exc) {
                             System.out.println("Error reading time axis for:"
-                                               + entry.getResource());
+                                    + entry.getResource());
                             System.out.println(exc);
                         }
                     } else {
@@ -569,16 +589,17 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
                 if ( !shortForm) {
                     varName = var.getShortName();
-                       try {
+                    try {
                         metadata = new Metadata(getRepository().getGUID(),
-                                     entry.getId(), TYPE_VARIABLE,
-                                     DFLT_INHERITED, varName, var.getName(),
-                                     var.getUnitsString(),
-                                     Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA);
-                        } catch(Exception exc) {
-                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add variable metadata:" + varName);                    
-                            continue;
-                        }
+                                entry.getId(), TYPE_VARIABLE, DFLT_INHERITED,
+                                varName, var.getName(), var.getUnitsString(),
+                                Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA);
+                    } catch (Exception exc) {
+                        getRepository().getLogManager().logInfo(
+                            "ThreddsMetadataHandler: Unable to add variable metadata:"
+                            + varName);
+                        continue;
+                    }
                     if ( !entry.hasMetadata(metadata)) {
                         metadataList.add(metadata);
                     }
@@ -590,12 +611,18 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     if (att != null) {
                         varName = att.getStringValue();
                         try {
-                        metadata = new Metadata(getRepository().getGUID(),
-                                entry.getId(), TYPE_VARIABLE, DFLT_INHERITED,
-                                varName, var.getName(), var.getUnitsString(),
-                                Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA);
-                        } catch(Exception exc) {
-                            getRepository().getLogManager().logInfo("ThreddsMetadataHandler: Unable to add variable metadata:" + varName);                    
+                            metadata =
+                                new Metadata(getRepository().getGUID(),
+                                             entry.getId(), TYPE_VARIABLE,
+                                             DFLT_INHERITED, varName,
+                                             var.getName(),
+                                             var.getUnitsString(),
+                                             Metadata.DFLT_ATTR,
+                                             Metadata.DFLT_EXTRA);
+                        } catch (Exception exc) {
+                            getRepository().getLogManager().logInfo(
+                                "ThreddsMetadataHandler: Unable to add variable metadata:"
+                                + varName);
                             continue;
                         }
                         if ( !entry.hasMetadata(metadata)) {
@@ -610,8 +637,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
             if ( !haveBounds) {
-                for (CoordinateSystem coordSys : (List<CoordinateSystem>) dataset
-                        .getCoordinateSystems()) {
+                for (CoordinateSystem coordSys :
+                        (List<CoordinateSystem>) dataset
+                            .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
                     if (proj == null) {
                         continue;
@@ -650,18 +678,40 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dateString _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
     private Date getDate(String dateString) throws java.text.ParseException {
         //        System.err.println ("getDate:" + dateString +" Date:" +DateUtil.parse(dateString));
         return DateUtil.parse(dateString);
     }
 
-    private HashSet  startTimeAttrs;
-    private HashSet  endTimeAttrs;
+    /** _more_          */
+    private HashSet startTimeAttrs;
 
+    /** _more_          */
+    private HashSet endTimeAttrs;
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     private boolean isEndTimeAttribute(String name) {
-        if(endTimeAttrs==null) {
+        if (endTimeAttrs == null) {
             HashSet tmp = new HashSet();
-            for(String attr: StringUtil.split(getRepository().getProperty(PROP_ENDTIME_ATTRIBUTES,""),",",true, true)) {
+            for (String attr :
+                    StringUtil.split(
+                        getRepository().getProperty(
+                            PROP_ENDTIME_ATTRIBUTES, ""), ",", true, true)) {
                 tmp.add(attr);
 
             }
@@ -671,10 +721,21 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     private boolean isStartTimeAttribute(String name) {
-        if(startTimeAttrs==null) {
+        if (startTimeAttrs == null) {
             HashSet tmp = new HashSet();
-            for(String attr: StringUtil.split(getRepository().getProperty(PROP_STARTTIME_ATTRIBUTES,""),",",true, true)) {
+            for (String attr :
+                    StringUtil.split(
+                        getRepository().getProperty(
+                            PROP_STARTTIME_ATTRIBUTES, ""), ",", true,
+                                true)) {
                 tmp.add(attr);
 
             }
@@ -846,4 +907,3 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 }
-

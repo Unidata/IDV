@@ -164,15 +164,16 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_HEADER = "ramadda.icon.header";
 
+    /** _more_          */
     public static final String ICON_HELP = "ramadda.icon.help";
 
     /** _more_ */
     public static final String ICON_IMAGE = "ramadda.icon.image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_IMPORT = "ramadda.icon.import";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_EXPORT = "ramadda.icon.export";
 
     /** _more_ */
@@ -398,7 +399,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FILENAME = "filename";
 
     /** _more_ */
@@ -447,7 +448,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DECORATE = "decorate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DEPTH = "depth";
 
     /** _more_ */
@@ -504,13 +505,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_AREA_MODE = "areamode";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_AREA_CONTAINS = "areacontains";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_AREA_OVERLAPS = "areaoverlaps";
 
 
@@ -544,7 +545,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_COMPRESS = "compress";
 
     /** _more_ */
@@ -1221,7 +1222,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ADMIN_INCLUDESQL =
         "ramadda.admin.includesql";
 
@@ -1530,7 +1531,7 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_NEWDB = "action.newdb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ACTION_DUMPDB = "action.dumpb";
 
     /** _more_ */

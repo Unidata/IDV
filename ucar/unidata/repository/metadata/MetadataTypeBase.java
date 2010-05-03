@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -200,13 +199,10 @@ public class MetadataTypeBase extends RepositoryManager {
                                       metadata.getId());
             //TODO:
             if (templateType.equals(TEMPLATETYPE_THREDDS)) {
-                XmlUtil.create(
-                    parent.getOwnerDocument(),
-                    "property", parent,
-                    new String[] { "name",
-                                           (element.getThumbnail()
-                                            ? "thumbnail"
-                                            : "attachment"), "value", url });
+                XmlUtil.create(parent.getOwnerDocument(), "property", parent,
+                               new String[] { "name", (element.getThumbnail()
+                        ? "thumbnail"
+                        : "attachment"), "value", url });
             }
 
         }
@@ -455,7 +451,7 @@ public class MetadataTypeBase extends RepositoryManager {
                               Metadata metadata, MetadataElement element,
                               boolean forLink) {
         File f = getFile(entry, metadata, element);
-        if (f == null ||!f.exists()|| f.isDirectory()) {
+        if ((f == null) || !f.exists() || f.isDirectory()) {
             return null;
         }
 
@@ -473,7 +469,9 @@ public class MetadataTypeBase extends RepositoryManager {
                              element.getIndex() + "", ARG_ENTRYID,
                              metadata.getEntryId(), ARG_METADATA_ID,
                              metadata.getId(), ARG_THUMBNAIL,
-						   "" + forLink), (forLink?msg("Click to enlarge"):""), extra);
+                             "" + forLink), (forLink
+                                             ? msg("Click to enlarge")
+                                             : ""), extra);
 
             if (forLink) {
                 String bigimg = HtmlUtil.img(HtmlUtil.url(path, ARG_ELEMENT,
@@ -492,8 +490,8 @@ public class MetadataTypeBase extends RepositoryManager {
                 img = handler.getRepository().makePopupLink(img, bigimg,
                         true, false);
             } else {
-		img = img +"\n<br>\n<b>" + tail+"</b>\n";
-	    }
+                img = img + "\n<br>\n<b>" + tail + "</b>\n";
+            }
             return img;
         } else if (f.exists()) {
             String name = getStorageManager().getFileTail(f.getName());
@@ -506,13 +504,24 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param metadata _more_
+     * @param attr _more_
+     *
+     * @return _more_
+     */
     public File getFile(Entry entry, Metadata metadata, int attr) {
-	String filename  =  metadata.getAttr(attr);
-	if(filename == null || filename.trim().length()==0) return null;
-	return  new File(
-			 IOUtil.joinDir(
-					getStorageManager().getEntryDir(
-									metadata.getEntryId(), false),filename));
+        String filename = metadata.getAttr(attr);
+        if ((filename == null) || (filename.trim().length() == 0)) {
+            return null;
+        }
+        return new File(
+            IOUtil.joinDir(
+                getStorageManager().getEntryDir(
+                    metadata.getEntryId(), false), filename));
     }
 
 
@@ -529,12 +538,12 @@ public class MetadataTypeBase extends RepositoryManager {
                         MetadataElement element) {
         File f;
         if ( !entry.getIsLocalFile()) {
-	    f = getFile(entry, metadata, element.getIndex());
+            f = getFile(entry, metadata, element.getIndex());
         } else {
             f = new File(metadata.getAttr(element.getIndex()));
         }
 
-        if (f==null || !f.exists()) {
+        if ((f == null) || !f.exists()) {
             return null;
         }
         return f;
@@ -618,4 +627,3 @@ public class MetadataTypeBase extends RepositoryManager {
 
 
 }
-

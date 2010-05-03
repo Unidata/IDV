@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -178,8 +177,8 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, true, true, true));
-        for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
-                false)) {
+        for (TwoFacedObject tfo :
+                getMetadataHtml(request, entry, false, false)) {
             sb.append(tfo.getId().toString());
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
@@ -255,11 +254,11 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         if (outputType.equals(OUTPUT_INLINE)) {
             String inline = typeHandler.getInlineHtml(request, entry);
-            if(inline!=null) {
+            if (inline != null) {
                 inline = getRepository().translate(request, inline);
                 StringBuffer xml = new StringBuffer("<content>\n");
                 XmlUtil.appendCdata(xml,
-                                    "<div class=inline>" +inline+"</div>");
+                                    "<div class=inline>" + inline + "</div>");
                 xml.append("\n</content>");
                 return new Result("", xml, "text/xml");
             }
@@ -269,7 +268,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 wiki = getRepository().translate(request, wiki);
                 StringBuffer xml = new StringBuffer("<content>\n");
                 XmlUtil.appendCdata(xml,
-                                    "<div class=inline>" +wiki+"</div>");
+                                    "<div class=inline>" + wiki + "</div>");
                 xml.append("\n</content>");
                 return new Result("", xml, "text/xml");
             }
@@ -282,9 +281,9 @@ public class HtmlOutputHandler extends OutputHandler {
             return typeResult;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb           = new StringBuffer();
 
-        String wikiTemplate = getWikiText(request, entry);
+        String       wikiTemplate = getWikiText(request, entry);
         if (wikiTemplate != null) {
             sb.append(wikifyEntry(request, entry, wikiTemplate));
         } else {
@@ -857,17 +856,16 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (wikiTemplate != null) {
-            sb.append(wikifyEntry(request, group, wikiTemplate, true, subGroups,
-                                  entries));
+            sb.append(wikifyEntry(request, group, wikiTemplate, true,
+                                  subGroups, entries));
         } else {
             List<Entry> allEntries = new ArrayList<Entry>();
             allEntries.addAll(subGroups);
             allEntries.addAll(entries);
-            if(allEntries.size()>0) {
+            if (allEntries.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
                 String link = getEntriesList(request, groupsSB, allEntries,
-                                             allEntries, true,
-                                             false, true,
+                                             allEntries, true, false, true,
                                              group.isDummy(),
                                              group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
@@ -963,7 +961,7 @@ public class HtmlOutputHandler extends OutputHandler {
         List ids    = new ArrayList();
         for (Entry entry : entries) {
             String label = entry.getLabel();
-            label = label.replaceAll(","," ");
+            label = label.replaceAll(",", " ");
             times.add(SqlUtil.format(new Date(entry.getStartDate())));
             labels.add(label);
             ids.add(entry.getId());
@@ -991,4 +989,3 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 }
-

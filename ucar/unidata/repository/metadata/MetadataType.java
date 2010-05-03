@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -410,11 +409,24 @@ public class MetadataType extends MetadataTypeBase {
     public void decorateEntry(Request request, Entry entry, StringBuffer sb,
                               Metadata metadata, boolean forLink)
             throws Exception {
-	decorateEntry(request, entry, sb, metadata, forLink, false);
+        decorateEntry(request, entry, sb, metadata, forLink, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param metadata _more_
+     * @param forLink _more_
+     * @param isThumbnail _more_
+     *
+     * @throws Exception _more_
+     */
     public void decorateEntry(Request request, Entry entry, StringBuffer sb,
-                              Metadata metadata, boolean forLink, boolean isThumbnail)
+                              Metadata metadata, boolean forLink,
+                              boolean isThumbnail)
             throws Exception {
         for (MetadataElement element : getChildren()) {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
@@ -535,8 +547,8 @@ public class MetadataType extends MetadataTypeBase {
             args.add(metadata.getAttr1());
         }
 
-        for(Object o: args) {
-            if(o==null) {
+        for (Object o : args) {
+            if (o == null) {
                 System.err.println("NULL: " + args);
                 return null;
             }
@@ -544,8 +556,8 @@ public class MetadataType extends MetadataTypeBase {
 
         try {
             return HtmlUtil.url(
-                                request.url(handler.getRepository().URL_ENTRY_SEARCH), args);
-        } catch(Exception exc) {
+                request.url(handler.getRepository().URL_ENTRY_SEARCH), args);
+        } catch (Exception exc) {
             System.err.println("ARGS:" + args);
             throw new RuntimeException(exc);
         }
@@ -702,7 +714,7 @@ public class MetadataType extends MetadataTypeBase {
         sb.append(HtmlUtil.hidden(argtype, getId())
                   + HtmlUtil.hidden(argid, metadata.getId()));
 
-        if (!forEdit&& entry!=null) {
+        if ( !forEdit && (entry != null)) {
             sb.append(HtmlUtil.formEntry("", submit + cancel));
         }
 
@@ -840,4 +852,3 @@ public class MetadataType extends MetadataTypeBase {
 
 
 }
-

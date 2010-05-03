@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,9 +24,9 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.auth.*;
-import ucar.unidata.repository.harvester.*;
 
 import ucar.unidata.repository.database.*;
+import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
 
@@ -52,8 +51,8 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TemporaryDir;
-import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.xml.XmlNodeList;
+import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -294,31 +293,32 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processCatalog(Request request) throws Exception {
         return null;
-        /*****************
-        StringBuffer sb    = new StringBuffer();
-        String       title = msg("Catalog View");
 
-        String       url   = request.getString(ARG_CATALOG, (String) null);
-        if (url == null) {
-            sb.append(HtmlUtil.p());
-            sb.append(HtmlUtil.form("/repository/catalog"));
-            sb.append(msgLabel("Catalog URL"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(
-                HtmlUtil.input(
-                    ARG_CATALOG,
-                    "http://dataportal.ucar.edu/metadata/browse/human_dimensions.thredds.xml",
-                    HtmlUtil.SIZE_60));
-            sb.append(HtmlUtil.submit("View"));
-            sb.append(HtmlUtil.formClose());
-            //            sb.append("No catalog argument given");
-            return new Result(title, sb);
-        }
-        return new Result(request.url(getRepository().URL_ENTRY_SHOW,
-                                      ARG_ENTRYID,
-                                      CatalogTypeHandler.getCatalogId(url)));
-
-        ****/
+        /**
+         * StringBuffer sb    = new StringBuffer();
+         * String       title = msg("Catalog View");
+         *
+         * String       url   = request.getString(ARG_CATALOG, (String) null);
+         * if (url == null) {
+         *   sb.append(HtmlUtil.p());
+         *   sb.append(HtmlUtil.form("/repository/catalog"));
+         *   sb.append(msgLabel("Catalog URL"));
+         *   sb.append(HtmlUtil.space(1));
+         *   sb.append(
+         *       HtmlUtil.input(
+         *           ARG_CATALOG,
+         *           "http://dataportal.ucar.edu/metadata/browse/human_dimensions.thredds.xml",
+         *           HtmlUtil.SIZE_60));
+         *   sb.append(HtmlUtil.submit("View"));
+         *   sb.append(HtmlUtil.formClose());
+         *   //            sb.append("No catalog argument given");
+         *   return new Result(title, sb);
+         * }
+         * return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+         *                             ARG_ENTRYID,
+         *                             CatalogTypeHandler.getCatalogId(url)));
+         *
+         */
         /*
 
 Element root = XmlUtil.getRoot(url, getClass());
@@ -508,25 +508,28 @@ return new Result(title, sb);
 
             List<Metadata> metadataList =
                 getMetadataManager().findMetadata(entry,
-                                                  ContentMetadataHandler.TYPE_LOGO, true);
-            if (metadataList != null && metadataList.size()>0) {
+                    ContentMetadataHandler.TYPE_LOGO, true);
+            if ((metadataList != null) && (metadataList.size() > 0)) {
                 Metadata metadata = metadataList.get(0);
-                MetadataHandler handler = getMetadataManager().findMetadataHandler(metadata.getType());
-                MetadataType metadataType = handler.findType(ContentMetadataHandler.TYPE_LOGO);
+                MetadataHandler handler =
+                    getMetadataManager().findMetadataHandler(
+                        metadata.getType());
+                MetadataType metadataType =
+                    handler.findType(ContentMetadataHandler.TYPE_LOGO);
 
-                String imageUrl = metadataType.getImageUrl(request,  entry,
-                                                           metadata, null);
-                if(imageUrl!=null && imageUrl.length()>0) {
+                String imageUrl = metadataType.getImageUrl(request, entry,
+                                      metadata, null);
+                if ((imageUrl != null) && (imageUrl.length() > 0)) {
                     result.putProperty(PROP_LOGO_IMAGE, imageUrl);
                 }
-                
-                String logoUrl  =metadata.getAttr2();
-                if(logoUrl!=null && logoUrl.length()>0) {
+
+                String logoUrl = metadata.getAttr2();
+                if ((logoUrl != null) && (logoUrl.length() > 0)) {
                     result.putProperty(PROP_LOGO_URL, logoUrl);
                 }
 
-                String pageTitle  =metadata.getAttr3();
-                if(pageTitle!=null && pageTitle.length()>0) {
+                String pageTitle = metadata.getAttr3();
+                if ((pageTitle != null) && (pageTitle.length() > 0)) {
                     result.putProperty(PROP_REPOSITORY_NAME, pageTitle);
                 }
             }
@@ -1641,8 +1644,9 @@ return new Result(title, sb);
      */
     public Result processEntryListDelete(Request request) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS,
-                ""), ",", true, true)) {
+        for (String id :
+                StringUtil.split(request.getString(ARG_ENTRYIDS, ""), ",",
+                                 true, true)) {
             Entry entry = getEntry(request, id, false);
             if (entry == null) {
                 throw new RepositoryUtil.MissingEntryException(
@@ -1705,7 +1709,8 @@ return new Result(title, sb);
             idBuffer.append(entry.getId());
         }
         msgSB.append(
-            msg("Are you sure you want to delete all of the following entries?"));
+            msg(
+            "Are you sure you want to delete all of the following entries?"));
         sb.append(request.formPost(getRepository().URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
         String form = Repository.makeOkCancelForm(request,
@@ -2150,8 +2155,9 @@ return new Result(title, sb);
         StringBuffer sb    = new StringBuffer();
         sb.append(HtmlUtil.p());
         sb.append(msgHeader("Choose entry type"));
-        List<String>categories = new ArrayList<String>();
-        Hashtable<String,StringBuffer> catMap = new Hashtable<String,StringBuffer>();
+        List<String> categories = new ArrayList<String>();
+        Hashtable<String, StringBuffer> catMap = new Hashtable<String,
+                                                     StringBuffer>();
 
         HashSet<String> exclude = new HashSet<String>();
         //        exclude.add(TYPE_FILE);
@@ -2164,35 +2170,41 @@ return new Result(title, sb);
             if (exclude.contains(typeHandler.getType())) {
                 continue;
             }
-            if (!typeHandler.canBeCreatedBy(request)) {
+            if ( !typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
             String icon = typeHandler.getProperty("icon", (String) null);
             String img;
             if (icon == null) {
-                icon =ICON_BLANK;
-                img = HtmlUtil.img(typeHandler.iconUrl(icon),"", HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "16"));
+                icon = ICON_BLANK;
+                img = HtmlUtil.img(typeHandler.iconUrl(icon), "",
+                                   HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "16"));
             } else {
                 img = HtmlUtil.img(typeHandler.iconUrl(icon));
             }
 
 
             StringBuffer buffer = catMap.get(typeHandler.getCategory());
-            if(buffer == null) {
-                catMap.put(typeHandler.getCategory(),buffer= new StringBuffer());
+            if (buffer == null) {
+                catMap.put(typeHandler.getCategory(),
+                           buffer = new StringBuffer());
                 categories.add(typeHandler.getCategory());
             }
-            buffer.append(
-                      HtmlUtil.href(
-                                    request.url(
-                                                getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
-                                                ARG_TYPE, typeHandler.getType()), img+" " +typeHandler.getLabel()));
+            buffer.append(HtmlUtil
+                .href(request
+                    .url(getRepository().URL_ENTRY_FORM, ARG_GROUP, group
+                        .getId(), ARG_TYPE, typeHandler.getType()), img + " "
+                            + typeHandler.getLabel()));
 
             buffer.append(HtmlUtil.br());
         }
         sb.append("<table cellpadding=10><tr valign=top>");
-        for(String cat: categories) {
-            sb.append(HtmlUtil.col(HtmlUtil.b(cat)+ HtmlUtil.insetDiv(catMap.get(cat).toString(),3,15,0,0)));
+        for (String cat : categories) {
+            sb.append(
+                HtmlUtil.col(
+                    HtmlUtil.b(cat)
+                    + HtmlUtil.insetDiv(
+                        catMap.get(cat).toString(), 3, 15, 0, 0)));
         }
         sb.append("</tr></table>");
 
@@ -2591,10 +2603,8 @@ return new Result(title, sb);
             }
 
             if (entries.size() == 1) {
-                fb.append(
-                    HtmlUtil.submit(
-                        "Associate it",
-                        ARG_ACTION_ASSOCIATE));
+                fb.append(HtmlUtil.submit("Associate it",
+                                          ARG_ACTION_ASSOCIATE));
                 fb.append(HtmlUtil.space(1));
             }
 
@@ -2707,8 +2717,8 @@ return new Result(title, sb);
                 typeHandler.intializeCopiedEntry(newEntry, oldEntry);
 
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
-                for (Metadata oldMetadata : getMetadataManager().getMetadata(
-                        oldEntry)) {
+                for (Metadata oldMetadata :
+                        getMetadataManager().getMetadata(oldEntry)) {
                     newMetadata.add(new Metadata(getRepository().getGUID(),
                             newEntry.getId(), oldMetadata));
                 }
@@ -2843,22 +2853,43 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryExport(Request request) throws Exception {
-        Entry entry = getEntry(request, request.getString(ARG_ENTRYID,""));
+        Entry entry = getEntry(request, request.getString(ARG_ENTRYID, ""));
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return getRepository().getZipOutputHandler().toZip(request, "", entries, true,true);
+        return getRepository().getZipOutputHandler().toZip(request, "",
+                entries, true, true);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryImport(Request request) throws Exception {
         Group        group = findGroup(request);
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb    = new StringBuffer();
         sb.append(msgHeader("Import Entries"));
         sb.append(request.uploadForm(getRepository().URL_ENTRY_XMLCREATE));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("File") , HtmlUtil.fileInput(ARG_FILE, HtmlUtil.SIZE_70)));
+        sb.append(HtmlUtil.formEntry(msgLabel("File"),
+                                     HtmlUtil.fileInput(ARG_FILE,
+                                         HtmlUtil.SIZE_70)));
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Submit")));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
@@ -2879,7 +2910,7 @@ return new Result(title, sb);
             throws Exception {
 
         Group group = null;
-        if(request.exists(ARG_GROUP)) {
+        if (request.exists(ARG_GROUP)) {
             group = findGroup(request, request.getString(ARG_GROUP));
         }
         String file = request.getUploadedFile(ARG_FILE);
@@ -2926,21 +2957,21 @@ return new Result(title, sb);
 
         //        System.err.println ("xml:" + entriesXml);
 
-        List<Entry>      newEntries = new ArrayList<Entry>();
-        Hashtable<String,Entry>  entries    = new Hashtable<String,Entry>();
-        if(group!=null) {
-            entries.put("",group);
+        List<Entry>              newEntries = new ArrayList<Entry>();
+        Hashtable<String, Entry> entries    = new Hashtable<String, Entry>();
+        if (group != null) {
+            entries.put("", group);
         }
-        Document  resultDoc  = XmlUtil.makeDocument();
+        Document resultDoc = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
                                             new String[] { ATTR_CODE,
                 CODE_OK });
 
-        Element  root     = XmlUtil.getRoot(entriesXml);
+        Element  root = XmlUtil.getRoot(entriesXml);
         NodeList children;
-        if(root.getTagName().equals(TAG_ENTRY)) {
-            children  = new XmlNodeList();
-            ((XmlNodeList)children).add(root);
+        if (root.getTagName().equals(TAG_ENTRY)) {
+            children = new XmlNodeList();
+            ((XmlNodeList) children).add(root);
         } else {
             children = XmlUtil.getElements(root);
         }
@@ -2979,7 +3010,7 @@ return new Result(title, sb);
                         id });
             } else {
                 throw new IllegalArgumentException("Unknown tag:"
-                                                   + node.getTagName());
+                        + node.getTagName());
             }
         }
 
@@ -2996,16 +3027,17 @@ return new Result(title, sb);
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Imported entries"));
         sb.append("<ul>");
-        
-        for(Entry entry: newEntries) {
+
+        for (Entry entry : newEntries) {
             sb.append("<li> ");
-            sb.append(getBreadCrumbs(request,  entry, true, group)[1]);
-    //            sb.append(getBreadCrumbs(request, entry));
+            sb.append(getBreadCrumbs(request, entry, true, group)[1]);
+            //            sb.append(getBreadCrumbs(request, entry));
         }
 
         sb.append("</ul>");
-        if(group!=null) {
-            return makeEntryEditResult(request, group, "Imported Entries", sb);
+        if (group != null) {
+            return makeEntryEditResult(request, group, "Imported Entries",
+                                       sb);
         }
         return new Result("", sb);
 
@@ -3030,8 +3062,9 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected Entry processEntryXml(Request request, Element node,
-                                    Hashtable<String,Entry> entries, Hashtable files,
-                                    boolean checkAccess, boolean internal)
+                                    Hashtable<String, Entry> entries,
+                                    Hashtable files, boolean checkAccess,
+                                    boolean internal)
             throws Exception {
         String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
                               getTopGroup().getId());
@@ -3110,7 +3143,8 @@ return new Result(title, sb);
 
 
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
-        String fileName = XmlUtil.getAttribute(node, ATTR_FILENAME, (String) null);
+        String fileName = XmlUtil.getAttribute(node, ATTR_FILENAME,
+                              (String) null);
         if (file != null) {
             String tmp = ((files == null)
                           ? null
@@ -3123,11 +3157,12 @@ return new Result(title, sb);
                 file = newFile.toString();
             } else {
                 String targetName = fileName;
-                if(targetName != null) {
-                    targetName = getStorageManager().getStorageFileName(targetName);
+                if (targetName != null) {
+                    targetName =
+                        getStorageManager().getStorageFileName(targetName);
                 }
                 File newFile = getStorageManager().moveToStorage(request,
-                                                                 new File(tmp), targetName);
+                                   new File(tmp), targetName);
                 file = newFile.toString();
             }
         }
@@ -3691,8 +3726,10 @@ return new Result(title, sb);
         String  prefix   = "";
 
         if (forTreeNavigation) {
-            boolean showArrow = entry.isGroup()||true;
-            String message = entry.isGroup()?"Click to open folder":"Click to view contents";
+            boolean showArrow = entry.isGroup() || true;
+            String  message   = entry.isGroup()
+                                ? "Click to open folder"
+                                : "Click to view contents";
             if (showArrow) {
                 prefix = HtmlUtil.img(
                     getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
@@ -4074,12 +4111,14 @@ return new Result(title, sb);
      *
      * @param request _more_
      * @param entry _more_
+     * @param rightSide _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public String getEntryMenubar(Request request, Entry entry, String rightSide)
+    public String getEntryMenubar(Request request, Entry entry,
+                                  String rightSide)
             throws Exception {
         StringBuffer fileMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
@@ -4114,9 +4153,11 @@ return new Result(title, sb);
                                            true);
         String sep = HtmlUtil.div("&nbsp;|&nbsp;",
                                   HtmlUtil.cssClass("menuseparator"));
-        String leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep, editMenu, sep,
-                                                                     viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
-        String table = HtmlUtil.leftRight(leftTable, rightSide, 
+        String leftTable =
+            HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep,
+                editMenu, sep,
+                viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
+        String table = HtmlUtil.leftRight(leftTable, rightSide,
                                           HtmlUtil.cssClass("entrymenubar"));
 
 
@@ -4358,7 +4399,7 @@ return new Result(title, sb);
                              true, false);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar = getEntryToolbar(request, entry, true);
-            String menubar = getEntryMenubar(request, entry,toolbar);
+            String menubar = getEntryMenubar(request, entry, toolbar);
             toolbar = "";
 
             String header =
@@ -4595,8 +4636,9 @@ return new Result(title, sb);
                 return getRemoteEntry(request, tuple[0], tuple[1]);
             } else if (entryId.startsWith("catalog:")) {
                 ucar.unidata.repository.data.CatalogTypeHandler typeHandler =
-                    (ucar.unidata.repository.data.CatalogTypeHandler) getRepository().getTypeHandler(
-                                                                        TypeHandler.TYPE_CATALOG);
+                    (ucar.unidata.repository.data
+                        .CatalogTypeHandler) getRepository()
+                            .getTypeHandler(TypeHandler.TYPE_CATALOG);
                 entry = typeHandler.makeSynthEntry(request, null, entryId);
             } else if (isSynthEntry(entryId)) {
                 String[] pair          = getSynthId(entryId);
@@ -4682,12 +4724,11 @@ return new Result(title, sb);
         int skipCnt = request.get(ARG_SKIP, 0);
 
         SqlUtil.debug = false;
-        List<Entry>      entries = new ArrayList<Entry>();
-        List<Entry>      groups  = new ArrayList<Entry>();
-        boolean canDoSelectOffset   =
-            getDatabaseManager().canDoSelectOffset();
-        Hashtable        seen       = new Hashtable();
-        List<Entry>      allEntries = new ArrayList<Entry>();
+        List<Entry> entries       = new ArrayList<Entry>();
+        List<Entry> groups        = new ArrayList<Entry>();
+        boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
+        Hashtable   seen          = new Hashtable();
+        List<Entry> allEntries    = new ArrayList<Entry>();
 
 
         Statement statement =
@@ -4698,7 +4739,7 @@ return new Result(title, sb);
         ResultSet        results;
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
 
-        long t1 = System.currentTimeMillis();
+        long             t1   = System.currentTimeMillis();
         try {
             while ((results = iter.next()) != null) {
                 while (results.next()) {
@@ -4710,7 +4751,8 @@ return new Result(title, sb);
                     if (entry == null) {
                         //id,type,name,desc,group,user,file,createdata,fromdate,todate
                         TypeHandler localTypeHandler =
-                            getRepository().getTypeHandler(results.getString(2));
+                            getRepository().getTypeHandler(
+                                results.getString(2));
                         entry = localTypeHandler.getEntry(results);
                         cacheEntry(entry);
                     }
@@ -4723,8 +4765,9 @@ return new Result(title, sb);
             }
         } finally {
             long t2 = System.currentTimeMillis();
-            if((t2-t1)>60*1000) {
-                getLogManager().logError("Select took a long time:" + (t2-t1));
+            if ((t2 - t1) > 60 * 1000) {
+                getLogManager().logError("Select took a long time:"
+                                         + (t2 - t1));
             }
             getDatabaseManager().closeAndReleaseConnection(statement);
         }
@@ -4925,6 +4968,13 @@ return new Result(title, sb);
 
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void storeEntry(Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
@@ -5035,7 +5085,7 @@ return new Result(title, sb);
             typeHandler = typeHandler.getTypeHandlerForCopy(entry);
 
             //            isNew = true;
-            String sql = typeHandler.getInsertSql(isNew);
+            String            sql           = typeHandler.getInsertSql(isNew);
             PreparedStatement typeStatement = null;
             if (sql != null) {
                 typeStatement = (PreparedStatement) typeStatements.get(sql);
@@ -6346,11 +6396,11 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private List<Entry> readEntries(Statement statement) throws Exception {
-        List<Entry>      entries = new ArrayList<Entry>();
+        List<Entry> entries = new ArrayList<Entry>();
         try {
-	    SqlUtil.Iterator iter    =
-		getDatabaseManager().getIterator(statement);
-	    ResultSet        results;
+            SqlUtil.Iterator iter =
+                getDatabaseManager().getIterator(statement);
+            ResultSet results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     String entryType = results.getString(2);
@@ -6599,8 +6649,8 @@ return new Result(title, sb);
             }
 
             if (isSynthEntry(entry.getId())) {
-                for (String childId : getChildIds(request, (Group) entry,
-                        null)) {
+                for (String childId :
+                        getChildIds(request, (Group) entry, null)) {
                     Entry childEntry = getEntry(request, childId);
                     if (childEntry == null) {
                         continue;
@@ -6693,4 +6743,3 @@ return new Result(title, sb);
 
 
 }
-

@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,8 +21,10 @@
 package ucar.unidata.repository.auth;
 
 
-import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.*;
+
+
+import ucar.unidata.repository.database.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -228,30 +228,31 @@ public class SessionManager extends RepositoryManager {
         Session session = sessionMap.get(sessionId);
         if (session == null) {
             Statement stmt = getDatabaseManager().select(
-							 Tables.SESSIONS.COLUMNS,
-							 Tables.SESSIONS.NAME,
-							 Clause.eq(
-								   Tables.SESSIONS.COL_SESSION_ID,
-								   sessionId));
-	    try {
-		SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
-		ResultSet        results;
-		//COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
-		boolean ok = true;
-		while ((results = iter.next()) != null && ok) {
-		    while (results.next() && ok) {
-			session = makeSession(results);
-			session.setLastActivity(new Date());
-			//Remove it from the DB and then readd it so we update the lastActivity
-			removeSession(session.getId());
-			addSession(session);
-			sessionMap.put(sessionId, session);
-			ok  = false;
-		    }
-		}
-	    } finally {
-		getDatabaseManager().closeAndReleaseConnection(stmt);
-	    }
+                                 Tables.SESSIONS.COLUMNS,
+                                 Tables.SESSIONS.NAME,
+                                 Clause.eq(
+                                     Tables.SESSIONS.COL_SESSION_ID,
+                                     sessionId));
+            try {
+                SqlUtil.Iterator iter =
+                    getDatabaseManager().getIterator(stmt);
+                ResultSet results;
+                //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
+                boolean ok = true;
+                while ((results = iter.next()) != null && ok) {
+                    while (results.next() && ok) {
+                        session = makeSession(results);
+                        session.setLastActivity(new Date());
+                        //Remove it from the DB and then readd it so we update the lastActivity
+                        removeSession(session.getId());
+                        addSession(session);
+                        sessionMap.put(sessionId, session);
+                        ok = false;
+                    }
+                }
+            } finally {
+                getDatabaseManager().closeAndReleaseConnection(stmt);
+            }
         }
         return session;
     }
@@ -503,8 +504,14 @@ public class SessionManager extends RepositoryManager {
     //    String sessionMessage;
 
 
+    /** _more_          */
     private String sessionMessage = "";
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSessionMessage() {
         return sessionMessage;
     }
@@ -539,7 +546,7 @@ public class SessionManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void setSessionMessage(String message) throws Exception {
-        sessionMessage = message;
+        sessionMessage  = message;
         sessionMessages = new Hashtable();
         if ((message != null) && (message.trim().length() > 0)) {
             synchronized (sessionMessages) {
@@ -778,4 +785,3 @@ public class SessionManager extends RepositoryManager {
 
 
 }
-

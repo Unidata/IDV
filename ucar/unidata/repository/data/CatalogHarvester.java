@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -26,9 +24,9 @@ package ucar.unidata.repository.data;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;
 
@@ -191,7 +189,8 @@ public class CatalogHarvester extends Harvester {
             Element root = XmlUtil.getRoot(url, getClass());
             if (root == null) {
                 System.err.println("Could not load catalog:" + url);
-                System.err.println("xml:" + IOUtil.readContents(url, getClass()));
+                System.err.println("xml:"
+                                   + IOUtil.readContents(url, getClass()));
                 return true;
             }
             //                System.err.println("loaded:" + url);
@@ -200,9 +199,9 @@ public class CatalogHarvester extends Harvester {
             Element  datasetNode = null;
             for (int i = 0; i < children.getLength(); i++) {
                 Element child = (Element) children.item(i);
-                if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)
-                    || XmlUtil.isTag(child,CatalogUtil.TAG_CATALOGREF)) {
-                    if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)) {
+                if (XmlUtil.isTag(child, CatalogUtil.TAG_DATASET)
+                        || XmlUtil.isTag(child, CatalogUtil.TAG_CATALOGREF)) {
+                    if (XmlUtil.isTag(child, CatalogUtil.TAG_DATASET)) {
                         datasetNode = (Element) child;
                     }
                     cnt++;
@@ -298,7 +297,7 @@ public class CatalogHarvester extends Harvester {
         boolean haveChildDatasets = false;
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (XmlUtil.isTag(child,CatalogUtil.TAG_DATASET)) {
+            if (XmlUtil.isTag(child, CatalogUtil.TAG_DATASET)) {
                 haveChildDatasets = true;
                 break;
             }
@@ -376,7 +375,7 @@ public class CatalogHarvester extends Harvester {
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);
-            madeEntry  =true;
+            madeEntry = true;
 
             typeHandler.initializeNewEntry(entry);
 
@@ -397,9 +396,10 @@ public class CatalogHarvester extends Harvester {
             }
 
 
-            if (isOpendap && (getAddMetadata()||getAddShortMetadata())) {
+            if (isOpendap && (getAddMetadata() || getAddShortMetadata())) {
                 getEntryManager().addInitialMetadata(null,
-                                                     (List<Entry>) Misc.newList(entry), getAddMetadata(), getAddShortMetadata());
+                        (List<Entry>) Misc.newList(entry), getAddMetadata(),
+                        getAddShortMetadata());
 
             }
 
@@ -410,12 +410,12 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
-        if(!madeEntry) {
+        if ( !madeEntry) {
             name = name.replace(Group.IDDELIMITER, "--");
             name = name.replace("'", "");
             Group group = null;
-            Entry newGroup = getEntryManager().findEntryWithName(null, parent,
-                                                                 name);
+            Entry newGroup = getEntryManager().findEntryWithName(null,
+                                 parent, name);
             if ((newGroup != null) && newGroup.isGroup()) {
                 group = (Group) newGroup;
             }
@@ -423,20 +423,17 @@ public class CatalogHarvester extends Harvester {
                 //                System.err.println(tab+"Making new group:" + name);
                 group = getEntryManager().makeNewGroup(parent, name, user);
                 List<Metadata> metadataList = new ArrayList<Metadata>();
-                CatalogOutputHandler.collectMetadata(repository, metadataList,
-                                                     node);
+                CatalogOutputHandler.collectMetadata(repository,
+                        metadataList, node);
                 metadataList.add(new Metadata(repository.getGUID(),
-                                              group.getId(),
-                                              ThreddsMetadataHandler.TYPE_LINK,
-                                              DFLT_INHERITED,
-                                              "Imported from catalog",
-                                              catalogUrlPath, Metadata.DFLT_ATTR,
-                                              Metadata.DFLT_ATTR,
-                                              Metadata.DFLT_EXTRA));
+                        group.getId(), ThreddsMetadataHandler.TYPE_LINK,
+                        DFLT_INHERITED, "Imported from catalog",
+                        catalogUrlPath, Metadata.DFLT_ATTR,
+                        Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA));
 
                 insertMetadata(group, metadataList);
                 String crumbs = getEntryManager().getBreadCrumbs(null, group,
-                                                                 true, topGroup)[1];
+                                    true, topGroup)[1];
                 crumbs = crumbs.replace("class=", "xclass=");
                 groups.add(crumbs);
                 groupCnt++;
@@ -451,8 +448,8 @@ public class CatalogHarvester extends Harvester {
                 Element child = (Element) elements.item(i);
                 String  tag   = XmlUtil.getLocalName(child);
                 if (tag.equals(CatalogUtil.TAG_DATASET)) {
-                    recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
-                                   recurseDepth, timestamp);
+                    recurseCatalog(child, group, catalogUrlPath,
+                                   xmlDepth + 1, recurseDepth, timestamp);
                 } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
                     if ( !recurse) {
                         continue;
@@ -466,7 +463,7 @@ public class CatalogHarvester extends Harvester {
                         System.err.println("Base catalog:" + catalogUrl);
                         System.err.println("Base URL:"
                                            + XmlUtil.getAttribute(child,
-                                                                  "xlink:href"));
+                                               "xlink:href"));
                     }
                 }
             }
@@ -503,4 +500,3 @@ public class CatalogHarvester extends Harvester {
 
 
 }
-

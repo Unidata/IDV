@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -26,12 +25,12 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.auth.*;
 
+import ucar.unidata.repository.database.*;
+
 
 
 import ucar.unidata.repository.ftp.FtpManager;
 import ucar.unidata.repository.harvester.*;
-
-import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.monitor.*;
 
@@ -193,22 +192,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public static final String MSG_SUFFIX = " msg>";
 
     /** _more_ */
-    protected List<RequestUrl> entryEditUrls = RepositoryUtil.toList(new RequestUrl[]{
+    protected List<RequestUrl> entryEditUrls =
+        RepositoryUtil.toList(new RequestUrl[] {
         URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
         URL_ACCESS_FORM  //,
         //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
-        });
+    });
 
     /** _more_ */
-    protected List<RequestUrl> groupEditUrls = RepositoryUtil.toList(new RequestUrl[]{
+    protected List<RequestUrl> groupEditUrls =
+        RepositoryUtil.toList(new RequestUrl[] {
         URL_ENTRY_NEW, URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
         URL_ACCESS_FORM  //,
         //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
-        });
+    });
 
 
     /** _more_ */
@@ -259,7 +260,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        ICON_MOVE);
 
 
-    /** _more_          */
+    /** _more_ */
     private Counter numberOfCurrentRequests = new Counter();
 
     /** _more_ */
@@ -289,11 +290,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private long baseTime = System.currentTimeMillis();
 
 
+    /** _more_          */
     ucar.unidata.util.SocketConnection dummyConnection;
 
     /** _more_ */
     private List<String> loadFiles = new ArrayList<String>();
 
+    /** _more_          */
     private List<Class> adminHandlerClasses = new ArrayList<Class>();
 
     /** _more_ */
@@ -319,7 +322,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, OutputType> outputTypeMap =
         new Hashtable<String, OutputType>();
 
@@ -360,11 +363,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> pythonLibs = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> pluginPropertyFiles = new ArrayList<String>();
 
+    /** _more_          */
     private List<String> pluginSqlFiles = new ArrayList<String>();
 
+    /** _more_          */
     private List<String> pluginFiles = new ArrayList<String>();
 
 
@@ -408,6 +413,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private SearchManager searchManager;
 
+    /** _more_          */
     private MapManager mapManager;
 
     /** _more_ */
@@ -478,12 +484,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     /** _more_ */
-    private Hashtable<String,String> pluginHtdocsMap = new Hashtable<String,String>();
+    private Hashtable<String, String> pluginHtdocsMap = new Hashtable<String,
+                                                            String>();
 
     /** _more_ */
-    private Hashtable<String,String>  pluginHelpMap = new Hashtable<String,String>();
-    private List<String>  pluginHelpPaths = new ArrayList<String>();
+    private Hashtable<String, String> pluginHelpMap = new Hashtable<String,
+                                                          String>();
 
+    /** _more_          */
+    private List<String> pluginHelpPaths = new ArrayList<String>();
+
+    /** _more_          */
     private String pluginHelpToc;
 
 
@@ -731,7 +742,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             });
         */
 
-	CacheManager.setDoCache(false);
+        CacheManager.setDoCache(false);
         initProperties(properties);
         initServer();
         getLogManager().logInfoAndPrint("RAMADDA started");
@@ -776,8 +787,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         load(properties,
              "/ucar/unidata/repository/resources/repository.properties");
         try {
-        load(properties,
-             "/ucar/unidata/repository/resources/georepository.properties");
+            load(properties,
+                 "/ucar/unidata/repository/resources/georepository.properties");
         } catch (Exception exc) {}
         try {
             load(properties,
@@ -915,6 +926,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     private void createTypeHandlers() throws Exception {
         for (String file : typeDefFiles) {
             file = getStorageManager().localizePath(file);
@@ -923,19 +939,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 continue;
             }
             List children = XmlUtil.findChildren(entriesRoot,
-                                                 TypeHandler.TAG_TYPE);
+                                TypeHandler.TAG_TYPE);
             for (int i = 0; i < children.size(); i++) {
                 Element entryNode = (Element) children.get(i);
                 Class handlerClass =
                     Misc.findClass(XmlUtil.getAttribute(entryNode,
-                                                        TypeHandler.TAG_HANDLER,
-                                                        "ucar.unidata.repository.type.GenericTypeHandler"));
+                        TypeHandler.TAG_HANDLER,
+                        "ucar.unidata.repository.type.GenericTypeHandler"));
                 Constructor ctor = Misc.findConstructor(handlerClass,
-                                                        new Class[] { Repository.class,
-                                                                      Element.class });
+                                       new Class[] { Repository.class,
+                        Element.class });
                 TypeHandler typeHandler =
                     (TypeHandler) ctor.newInstance(new Object[] { this,
-                                                                  entryNode });
+                        entryNode });
                 addTypeHandler(typeHandler.getType(), typeHandler);
             }
         }
@@ -954,21 +970,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         boolean loadedRdb = false;
         for (String sqlFile : (List<String>) loadFiles) {
-            if(sqlFile.endsWith(".rdb")) {
+            if (sqlFile.endsWith(".rdb")) {
                 getDatabaseManager().loadRdbFile(sqlFile);
                 loadedRdb = true;
-            } 
+            }
         }
 
-        if(!loadedRdb) {
+        if ( !loadedRdb) {
             initSchema();
         }
 
         createTypeHandlers();
         getUserManager().makeUserIfNeeded(new User("default", "Default User",
-                                                   false));
+                false));
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
-                                                   false));
+                false));
 
 
         readGlobals();
@@ -978,8 +994,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         initApi();
         getRegistryManager().checkApi();
 
-        for(Class adminHandlerClass: adminHandlerClasses) {
-            AdminHandler adminHandler = (AdminHandler) adminHandlerClass.newInstance();
+        for (Class adminHandlerClass : adminHandlerClasses) {
+            AdminHandler adminHandler =
+                (AdminHandler) adminHandlerClass.newInstance();
             adminHandler.setRepository(Repository.this);
             getAdmin().addAdminHandler(adminHandler);
         }
@@ -987,7 +1004,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //Load in any other sql files from the command line
         for (String sqlFile : (List<String>) loadFiles) {
-            if(!sqlFile.endsWith(".rdb")) {
+            if ( !sqlFile.endsWith(".rdb")) {
                 String sql =
                     getStorageManager().readUncheckedSystemResource(sqlFile);
                 getDatabaseManager().loadSql(sql, false, true);
@@ -1003,7 +1020,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
-            getDatabaseManager().makeDatabaseCopy(fos, true,null);
+            getDatabaseManager().makeDatabaseCopy(fos, true, null);
             IOUtil.close(fos);
         }
 
@@ -1020,11 +1037,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
- 
+
         getAdmin().doFinalInitialization();
 
 
-        if(loadedRdb) {
+        if (loadedRdb) {
             getDatabaseManager().finishRdbLoad();
         }
 
@@ -1664,21 +1681,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
          *
          * @return _more_
          */
-        protected String defineResource(JarEntry jarEntry)  {
+        protected String defineResource(JarEntry jarEntry) {
             String path = super.defineResource(jarEntry);
             checkFile(path, true);
             String entryName = jarEntry.getName();
-            int idx = entryName.indexOf("htdocs/");
-            if(idx>=0) {
-                String htpath  = entryName.substring(idx+"htdocs".length());
-                pluginHtdocsMap.put(htpath,
-                                    path);
+            int    idx       = entryName.indexOf("htdocs/");
+            if (idx >= 0) {
+                String htpath = entryName.substring(idx + "htdocs".length());
+                pluginHtdocsMap.put(htpath, path);
 
                 idx = entryName.indexOf("help/");
-                if(idx>=0) {
-                    pluginHelpMap.put(htpath,
-                                      path); 
-                    if(path.indexOf(".html")>=0) {
+                if (idx >= 0) {
+                    pluginHelpMap.put(htpath, path);
+                    if (path.indexOf(".html") >= 0) {
                         pluginHelpPaths.add(htpath);
                     }
                 }
@@ -1755,7 +1770,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             metadataDefFiles.add(file);
         } else if (file.endsWith(".py")) {
             pythonLibs.add(file);
-        } else if(file.endsWith(".sql")) {
+        } else if (file.endsWith(".sql")) {
             pluginSqlFiles.add(file);
         } else if (file.endsWith(".properties")) {
             if (fromPlugin) {
@@ -1769,7 +1784,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    public List<String>getPluginFiles() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<String> getPluginFiles() {
         return pluginFiles;
     }
 
@@ -2263,7 +2283,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 }
                 entries.addAll(subGroups);
                 request.remove(ARG_DELETE_CONFIRM);
-                return getEntryManager().processEntryListDelete(request, entries);
+                return getEntryManager().processEntryListDelete(request,
+                        entries);
             }
         };
         outputHandler.addType(OUTPUT_DELETER);
@@ -2315,7 +2336,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
                 }
-                request.put(ARG_FROM,idBuffer);
+                request.put(ARG_FROM, idBuffer);
                 return getEntryManager().processEntryCopy(request);
                 //                return new Result(request.url(URL_ENTRY_COPY, ARG_FROM,
                 //                        idBuffer.toString()));
@@ -2735,30 +2756,32 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
         if ( !path.startsWith(getUrlBase())) {
-	    path = getUrlBase()+path;
-	}
+            path = getUrlBase() + path;
+        }
 
 
         if ( !path.startsWith(getUrlBase())) {
             getLogManager().log(request,
                                 "Unknown request" + " \"" + path + "\"");
-            Result result =
-                new Result(msg("Error"),
-                           new StringBuffer(showDialogError(msgLabel("Unknown request")
-                                                            + "\"" + path + "\"")));
+            Result result = new Result(
+                                msg("Error"),
+                                new StringBuffer(
+                                    showDialogError(
+                                        msgLabel("Unknown request") + "\""
+                                        + path + "\"")));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
             return result;
         }
 
 
 
-        int    length = getUrlBase().length();
+        int length = getUrlBase().length();
         //        path = StringUtil.replace(path, getUrlBase(), BLANK);
         path = path.substring(length);
 
 
         String pluginPath = pluginHtdocsMap.get(path);
-        if(pluginPath!=null) {
+        if (pluginPath != null) {
             InputStream inputStream =
                 getStorageManager().getInputStream(pluginPath);
             if (pluginPath.endsWith(".js") || pluginPath.endsWith(".css")) {
@@ -2766,14 +2789,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 js          = js.replace("${urlroot}", getUrlBase());
                 inputStream = new ByteArrayInputStream(js.getBytes());
             }
-            String type   = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
-            return  new Result(BLANK, inputStream, type);
+            String type =
+                getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
+            return new Result(BLANK, inputStream, type);
         }
 
 
 
 
-        String type   = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
+        String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
 
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
@@ -2816,9 +2840,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             "Unknown request:" + request.getUrl()
                             + " user-agent:" + userAgent + " ip:"
                             + request.getIp());
-        Result result =
-            new Result(msg("Error"),
-                       new StringBuffer(showDialogError(msgLabel("Unknown request") + path)));
+        Result result = new Result(
+                            msg("Error"),
+                            new StringBuffer(
+                                showDialogError(
+                                    msgLabel("Unknown request") + path)));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
         return result;
     }
@@ -2982,26 +3008,28 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (head == null) {
             head = "";
         }
-        String logoImage =  (String) result.getProperty(PROP_LOGO_IMAGE);
-        if(logoImage == null)
+        String logoImage = (String) result.getProperty(PROP_LOGO_IMAGE);
+        if (logoImage == null) {
             logoImage = getProperty(PROP_LOGO_IMAGE, "").trim();
+        }
         if (logoImage.length() == 0) {
             logoImage = "${root}/images/logo.png";
         }
-        String logoUrl = (String)result.getProperty(PROP_LOGO_URL);
-        if(logoUrl==null)
+        String logoUrl = (String) result.getProperty(PROP_LOGO_URL);
+        if (logoUrl == null) {
             logoUrl = getProperty(PROP_LOGO_URL, "");
-        String pageTitle  = (String) result.getProperty(PROP_REPOSITORY_NAME);
-        if(pageTitle==null)
+        }
+        String pageTitle = (String) result.getProperty(PROP_REPOSITORY_NAME);
+        if (pageTitle == null) {
             pageTitle = getProperty(PROP_REPOSITORY_NAME, "Repository");
+        }
 
         String   html   = template;
         String[] macros = new String[] {
-            MACRO_LOGO_URL,logoUrl , MACRO_LOGO_IMAGE,
-            logoImage, MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER),
-            MACRO_HEADER_TITLE,
-            pageTitle, MACRO_USERLINK,
-            getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
+            MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,
+            MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
+            pageTitle, MACRO_USERLINK, getUserManager().getUserLinks(request),
+            MACRO_REPOSITORY_NAME,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_FOOTER,
             getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
@@ -3032,13 +3060,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTemplateJavascriptContent() {
-	return 
-            HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip-outer\" ")
-            + HtmlUtil.div("", " id=\"popupdiv\" class=\"tooltip-outer\" ")
-            + HtmlUtil.div("", " id=\"output\"")
-            + HtmlUtil.div("", " id=\"selectdiv\" class=\"selectdiv\" ")
-            + HtmlUtil.div("", " id=\"floatdiv\" class=\"floatdiv\" ");
+        return HtmlUtil.div(
+            "", " id=\"tooltipdiv\" class=\"tooltip-outer\" ") + HtmlUtil.div(
+            "", " id=\"popupdiv\" class=\"tooltip-outer\" ") + HtmlUtil.div(
+            "", " id=\"output\"") + HtmlUtil.div(
+            "", " id=\"selectdiv\" class=\"selectdiv\" ") + HtmlUtil.div(
+            "", " id=\"floatdiv\" class=\"floatdiv\" ");
     }
 
 
@@ -3225,10 +3258,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<HtmlTemplate> theTemplates = templates;
         if (theTemplates == null) {
             theTemplates = new ArrayList<HtmlTemplate>();
-            for (String path : StringUtil.split(
-                    getProperty(
-                        PROP_HTML_TEMPLATES,
-                        "%resourcedir%/template.html"), ";", true, true)) {
+            for (String path :
+                    StringUtil.split(getProperty(PROP_HTML_TEMPLATES,
+                    "%resourcedir%/template.html"), ";", true, true)) {
                 path = getStorageManager().localizePath(path);
                 try {
                     String resource =
@@ -3524,7 +3556,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         getDatabaseManager().loadSql(sql, true, false);
 
-        for(String sqlFile:  pluginSqlFiles) {
+        for (String sqlFile : pluginSqlFiles) {
             sql = getStorageManager().readUncheckedSystemResource(sqlFile);
             sql = getDatabaseManager().convertSql(sql);
             getDatabaseManager().loadSql(sql, true, false);
@@ -3735,14 +3767,28 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public ZipOutputHandler getZipOutputHandler() throws Exception {
         return (ZipOutputHandler) getOutputHandler(
-                                                   ZipOutputHandler.OUTPUT_ZIP);
+            ZipOutputHandler.OUTPUT_ZIP);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public XmlOutputHandler getXmlOutputHandler() throws Exception {
         return (XmlOutputHandler) getOutputHandler(
-                                                   XmlOutputHandler.OUTPUT_XML);
+            XmlOutputHandler.OUTPUT_XML);
     }
 
 
@@ -3821,11 +3867,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         addTypeHandler(TypeHandler.TYPE_GROUP,
                        groupTypeHandler = new GroupTypeHandler(this));
         groupTypeHandler.putProperty("form.show." + ARG_RESOURCE, "false");
-        groupTypeHandler.putProperty("icon",ICON_FOLDER);
+        groupTypeHandler.putProperty("icon", ICON_FOLDER);
         TypeHandler typeHandler;
         addTypeHandler(TypeHandler.TYPE_FILE,
                        typeHandler = new TypeHandler(this, "file", "File"));
-        typeHandler.putProperty("icon",ICON_FILE);
+        typeHandler.putProperty("icon", ICON_FILE);
     }
 
     /**
@@ -3851,6 +3897,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param typeHandler _more_
+     */
     public void removeTypeHandler(TypeHandler typeHandler) {
         theTypeHandlersMap.remove(typeHandler.getType());
         theTypeHandlers.remove(typeHandler);
@@ -4038,7 +4089,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             Element  info = getServerInfo().toXml(this, doc);
             info.setAttribute(ATTR_CODE, CODE_OK);
             String xml = XmlUtil.toString(info);
-            System.err.println ("returning xml:" + xml);
+            System.err.println("returning xml:" + xml);
             return new Result(xml, MIME_XML);
         }
         StringBuffer sb = new StringBuffer("");
@@ -4067,8 +4118,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         String pluginHelp = pluginHelpMap.get(path);
-        if(pluginHelp!=null) {
-            path  = pluginHelp;
+        if (pluginHelp != null) {
+            path = pluginHelp;
         } else {
             path = "/ucar/unidata/repository/docs/userguide/processed" + path;
         }
@@ -4082,16 +4133,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 helpText = matcher.group(1);
             }
             if (path.endsWith("toc.html")) {
-                if(pluginHelpToc == null) {
+                if (pluginHelpToc == null) {
                     makePluginHelp();
                 }
-                helpText = helpText.replace("<tocend>",pluginHelpToc);
+                helpText = helpText.replace("<tocend>", pluginHelpToc);
                 //                helpText = helpText+pluginHelpToc;
             }
 
-            if(pluginHelp!=null) {
-                helpText = HtmlUtil.href(getUrlBase()+"/help/toc.html",HtmlUtil.img(getUrlBase()+"/help/images/TOCIcon.gif")) +"<br>" + HtmlUtil.img(getUrlBase()+"/help/images/blueline.gif") +
-                    "<p>" + helpText;
+            if (pluginHelp != null) {
+                helpText = HtmlUtil.href(
+                    getUrlBase() + "/help/toc.html",
+                    HtmlUtil.img(
+                        getUrlBase() + "/help/images/TOCIcon.gif")) + "<br>"
+                            + HtmlUtil.img(
+                                getUrlBase()
+                                + "/help/images/blueline.gif") + "<p>"
+                                    + helpText;
             }
 
             result = new Result(BLANK, new StringBuffer(helpText));
@@ -4107,34 +4164,41 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     */
     private void makePluginHelp() {
-        StringBuffer  pluginHelpLinks=null;
-        for(String htpath: pluginHelpPaths) {
-            String path = pluginHelpMap.get(htpath);
+        StringBuffer pluginHelpLinks = null;
+        for (String htpath : pluginHelpPaths) {
+            String path  = pluginHelpMap.get(htpath);
             String title = IOUtil.getFileTail(path);
             try {
-                String contents = getStorageManager().readSystemResource(path);
-                Pattern pattern = Pattern.compile("(?s).*<title>(.*)</title>");
+                String contents =
+                    getStorageManager().readSystemResource(path);
+                Pattern pattern =
+                    Pattern.compile("(?s).*<title>(.*)</title>");
                 Matcher matcher = pattern.matcher(contents);
                 if (matcher.find()) {
                     title = matcher.group(1);
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
-                        
-            if(pluginHelpLinks ==null) {
+
+            if (pluginHelpLinks == null) {
                 pluginHelpLinks = new StringBuffer("<p>");
                 pluginHelpLinks.append(msgHeader("Plugins"));
                 pluginHelpLinks.append("<ol>");
             }
-            pluginHelpLinks.append("<li> " +HtmlUtil.href(getUrlBase()+"/help"+htpath,title));
+            pluginHelpLinks.append("<li> "
+                                   + HtmlUtil.href(getUrlBase() + "/help"
+                                       + htpath, title));
         }
 
-        if(pluginHelpLinks == null) {
+        if (pluginHelpLinks == null) {
             pluginHelpToc = "";
         } else {
-            pluginHelpToc = pluginHelpLinks +"</ol>";
+            pluginHelpToc = pluginHelpLinks + "</ol>";
         }
     }
 
@@ -4267,6 +4331,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return getSubNavLinks(request, RepositoryUtil.toList(urls));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param urls _more_
+     *
+     * @return _more_
+     */
     public List getSubNavLinks(Request request, List<RequestUrl> urls) {
         return getSubNavLinks(request, urls, BLANK);
     }
@@ -4310,7 +4382,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                     "ramadda.template.sublink.on", "");
         String offLinkTemplate = getTemplateProperty(request,
                                      "ramadda.template.sublink.off", "");
-        for (RequestUrl requestUrl: urls) {
+        for (RequestUrl requestUrl : urls) {
             String label = requestUrl.getLabel();
             label = msg(label);
             if (label == null) {
@@ -4530,6 +4602,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
     public static String header(String h) {
         return HtmlUtil.div(h, HtmlUtil.cssClass("pageheading"));
     }
@@ -4550,7 +4629,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public void createMonthNav(StringBuffer sb, Date date, String url,
                                Hashtable dayLinks) {
 
-        GregorianCalendar cal = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        GregorianCalendar cal =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(date);
         int[] theDate  = CalendarOutputHandler.getDayMonthYear(cal);
         int   theDay   = cal.get(cal.DAY_OF_MONTH);
@@ -4559,10 +4639,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
         while (cal.get(cal.DAY_OF_MONTH) > 1) {
             cal.add(cal.DAY_OF_MONTH, -1);
         }
-        GregorianCalendar prev = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        GregorianCalendar prev =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         prev.setTime(date);
         prev.add(cal.MONTH, -1);
-        GregorianCalendar next = new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+        GregorianCalendar next =
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         next.setTime(date);
         next.add(cal.MONTH, 1);
 
@@ -4632,16 +4714,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                     HtmlUtil.attrs(HtmlUtil.ATTR_VALIGN,
                                         HtmlUtil.VALUE_TOP)));
             for (int colIdx = 0; colIdx < 7; colIdx++) {
-                int    thisDay   = cal.get(cal.DAY_OF_MONTH);
-                int    thisMonth = cal.get(cal.MONTH);
-                int    thisYear  = cal.get(cal.YEAR);
+                int     thisDay    = cal.get(cal.DAY_OF_MONTH);
+                int     thisMonth  = cal.get(cal.MONTH);
+                int     thisYear   = cal.get(cal.YEAR);
                 boolean currentDay = false;
-                String dayClass  = "calnavday";
+                String  dayClass   = "calnavday";
                 if (thisMonth != theMonth) {
                     dayClass = "calnavoffday";
                 } else if ((theMonth == thisMonth) && (theYear == thisYear)
                            && (theDay == thisDay)) {
-                    dayClass = "calnavtheday";
+                    dayClass   = "calnavtheday";
                     currentDay = true;
                 }
                 String content;
@@ -4651,8 +4733,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         content = HtmlUtil.href(url + "&"
                                 + CalendarOutputHandler.getUrlArgs(cal), ""
                                     + thisDay);
-                        if(!currentDay) 
+                        if ( !currentDay) {
                             dayClass = "calnavoffday";
+                        }
                     } else {
                         content  = "" + thisDay;
                         dayClass = "calnavday";
@@ -5265,14 +5348,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
         String divName    = "div." + fieldName;
-        String call = HtmlUtil.call(
-                          "selectDate", HtmlUtil.comma(
-                              HtmlUtil.squote(divName), 
-                              //                              "document.forms['"  + formName + "']." + fieldName, 
-                              "findFormElement('"  + formName + "','" + fieldName +"')", 
-                              HtmlUtil.squote(
-                                  anchorName), HtmlUtil.squote(
-                                  "yyyy-MM-dd"))) + "return false;";
+        String call = HtmlUtil.call("selectDate",
+                                    HtmlUtil.comma(HtmlUtil.squote(divName),
+        //                              "document.forms['"  + formName + "']." + fieldName, 
+        "findFormElement('" + formName + "','" + fieldName
+                            + "')", HtmlUtil.squote(anchorName),
+                                    HtmlUtil.squote(
+                                        "yyyy-MM-dd"))) + "return false;";
         return HtmlUtil
             .href("#", HtmlUtil
                 .img(iconUrl(ICON_CALENDAR), " Choose date", HtmlUtil
@@ -5318,8 +5400,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return makeDateInput(request, name, formName, date, timezone, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     * @param formName _more_
+     * @param date _more_
+     * @param timezone _more_
+     * @param includeTime _more_
+     *
+     * @return _more_
+     */
     public String makeDateInput(Request request, String name,
-                                String formName, Date date, String timezone,boolean includeTime) {
+                                String formName, Date date, String timezone,
+                                boolean includeTime) {
         String dateHelp = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
         String           timeHelp   = "hh:mm:ss Z, e.g. 20:15:00 MST";
 
@@ -5337,16 +5432,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         return HtmlUtil.input(
             name, dateString,
-            HtmlUtil.SIZE_10
-            +HtmlUtil.id(name)
+            HtmlUtil.SIZE_10 + HtmlUtil.id(name)
             + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
-            + (!includeTime?"":" T:"
-               + HtmlUtil.input(
-                                            name + ".time", timeString,
-                                            HtmlUtil.SIZE_15
-                                            + HtmlUtil.attr(
-                                                HtmlUtil.ATTR_TITLE,
-                                                timeHelp)));
+                                        + ( !includeTime
+                                            ? ""
+                                            : " T:"
+                                            + HtmlUtil.input(
+                                                name + ".time", timeString,
+                                                    HtmlUtil.SIZE_15
+                                                        + HtmlUtil.attr(
+                                                            HtmlUtil.ATTR_TITLE,
+                                                                timeHelp)));
     }
 
 
@@ -5499,4 +5595,3 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 }
-

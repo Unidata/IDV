@@ -1,20 +1,18 @@
-/**
- * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -336,7 +334,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
     public List<String> getSynthIds(Request request, Group mainEntry,
                                     Group parentEntry, String synthId)
             throws Exception {
-        long t0 = System.currentTimeMillis();
+        long         t0      = System.currentTimeMillis();
         List<String> ids     = new ArrayList<String>();
 
         Object[]     values  = mainEntry.getValues();
@@ -349,7 +347,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
         } else {
             files = IOUtil.sortFilesOnAge(files, descending);
             }*/
-        long t1 = System.currentTimeMillis();
+        long      t1        = System.currentTimeMillis();
 
         FTPClient ftpClient = getFtpClient(mainEntry);
         if (ftpClient == null) {
@@ -363,9 +361,9 @@ public class FtpTypeHandler extends GenericTypeHandler {
             if (isDir) {
                 boolean checkReadme = parentEntry.getDescription().length()
                                       == 0;
-                long t3 = System.currentTimeMillis();
+                long      t3    = System.currentTimeMillis();
                 FTPFile[] files = ftpClient.listFiles(path);
-                long t4 = System.currentTimeMillis();
+                long      t4    = System.currentTimeMillis();
                 //                System.err.println ("listFiles:" + (t4-t3));
 
                 for (int i = 0; i < files.length; i++) {
@@ -392,7 +390,8 @@ public class FtpTypeHandler extends GenericTypeHandler {
                         }
                     }
 
-                    putCache(mainEntry, path + "/" + files[i].getName(), files[i]);
+                    putCache(mainEntry, path + "/" + files[i].getName(),
+                             files[i]);
                     ids.add(getSynthId(mainEntry, baseDir, path, files[i]));
                 }
             }
@@ -520,14 +519,23 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
 
     /** _more_ */
-    private Hashtable<String, Hashtable> cache = new Hashtable<String, Hashtable>();
+    private Hashtable<String, Hashtable> cache = new Hashtable<String,
+                                                     Hashtable>();
 
-    private int cacheCnt=0;
+    /** _more_          */
+    private int cacheCnt = 0;
 
-    private void putCache (Entry entry,  String path, FTPFile file) {
-        if(cacheCnt++>1000) {
-            cache = new  Hashtable<String, Hashtable>();
-            cacheCnt=0;
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param path _more_
+     * @param file _more_
+     */
+    private void putCache(Entry entry, String path, FTPFile file) {
+        if (cacheCnt++ > 1000) {
+            cache    = new Hashtable<String, Hashtable>();
+            cacheCnt = 0;
         }
         getCache(entry).put(path, file);
     }
@@ -576,7 +584,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
         } else {
             path = new String(XmlUtil.decodeBase64(id));
         }
-        FTPFile                    ftpFile = getCache(parentEntry).get(path);
+        FTPFile ftpFile = getCache(parentEntry).get(path);
         if (ftpFile != null) {
             return new MyFTPFile(ftpFile, path);
         }
@@ -590,8 +598,8 @@ public class FtpTypeHandler extends GenericTypeHandler {
         try {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             if (isDir) {
-                File      tmp               = new File(path);
-                String    parent = tmp.getParent().replace("\\", "/");
+                File   tmp    = new File(path);
+                String parent = tmp.getParent().replace("\\", "/");
                 //                System.err.println("getFileFromId path=" + path +" parent:" + parent);
                 String    name              = tmp.getName();
                 FTPFile[] files             = ftpClient.listFiles(parent);
@@ -787,4 +795,3 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
 
 }
-

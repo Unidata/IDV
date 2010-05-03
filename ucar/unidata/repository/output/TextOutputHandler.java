@@ -1,19 +1,18 @@
-/**
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -83,6 +82,7 @@ public class TextOutputHandler extends OutputHandler {
         new OutputType("Word Cloud", "wordcloud", OutputType.TYPE_HTML, "",
                        ICON_CLOUD);
 
+    /** _more_          */
     public static final OutputType OUTPUT_PRETTY =
         new OutputType("Pretty Print", "pretty", OutputType.TYPE_HTML, "",
                        ICON_TEXT);
@@ -138,9 +138,9 @@ public class TextOutputHandler extends OutputHandler {
         };
 
         String[] codesuffixes = new String[] {
-            ".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm", ".html",
-            ".java", ".js", ".m", ".mxml", ".perl", ".pl", ".pm", ".py", ".rb", ".sh",
-            ".xhtml", ".xml", ".xsl"
+            ".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm",
+            ".html", ".java", ".js", ".m", ".mxml", ".perl", ".pl", ".pm",
+            ".py", ".rb", ".sh", ".xhtml", ".xml", ".xsl"
         };
 
         for (int i = 0; i < codesuffixes.length; i++) {
@@ -206,12 +206,13 @@ public class TextOutputHandler extends OutputHandler {
 
         String contents =
             getStorageManager().readSystemResource(entry.getFile());
-        StringBuffer sb  = new StringBuffer();
-        
+        StringBuffer sb = new StringBuffer();
+
         sb.append("<pre>\n");
-        int          cnt = 0;
-        for (String line : (List<String>) StringUtil.split(contents, "\n",
-                false, false)) {
+        int cnt = 0;
+        for (String line :
+                (List<String>) StringUtil.split(contents, "\n", false,
+                false)) {
             cnt++;
             line = line.replace("\r", "");
             line = HtmlUtil.entityEncode(line);
@@ -284,6 +285,16 @@ public class TextOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputPretty(Request request, Entry entry)
             throws Exception {
         String contents =
@@ -294,23 +305,25 @@ public class TextOutputHandler extends OutputHandler {
         head.append(
             "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.css\">\n");
         head.append(
-                    HtmlUtil.importJS(getRepository().fileUrl("/prettify.js")));
+            HtmlUtil.importJS(getRepository().fileUrl("/prettify.js")));
         head.append(
-                    HtmlUtil.cssLink(getRepository().fileUrl("/prettify.css")));
+            HtmlUtil.cssLink(getRepository().fileUrl("/prettify.css")));
 
 
         sb.append(head);
         sb.append("<pre class=\"prettyprint\">\n");
 
-        int          cnt = 0;
-        for (String line : (List<String>) StringUtil.split(contents, "\n",
-                false, false)) {
+        int cnt = 0;
+        for (String line :
+                (List<String>) StringUtil.split(contents, "\n", false,
+                false)) {
             cnt++;
             line = line.replace("\r", "");
             line = HtmlUtil.entityEncode(line);
-            sb.append("<span class=nocode><a " + HtmlUtil.attr("name", "line" + cnt)
-                      + "></a><a href=#line" + cnt + ">" + cnt + "</a></span>"
-                      + HtmlUtil.space(1) + line + "<br>");
+            sb.append("<span class=nocode><a "
+                      + HtmlUtil.attr("name", "line" + cnt)
+                      + "></a><a href=#line" + cnt + ">" + cnt
+                      + "</a></span>" + HtmlUtil.space(1) + line + "<br>");
         }
         sb.append("</pre>\n");
         sb.append(HtmlUtil.script("prettyPrint();"));
@@ -322,4 +335,3 @@ public class TextOutputHandler extends OutputHandler {
 
 
 }
-
