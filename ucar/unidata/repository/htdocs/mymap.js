@@ -33,6 +33,16 @@ function MapInitialize(addControls,mapProvider,divname)
                 zoom: 'small',
                 map_type: true 
             });
+
+        /*
+        mapstraction.click.addHandler(function(event_name, event_source, event_args) {
+                var p = event_args.location;
+                alert("<p>Lat: " + p.lat + " Lon: " + p.lon + "</p>");
+            });
+        mapstraction.changeZoom.addHandler(function(n, s, a) { alert("You changed the zoom level")});
+        mapstraction.endPan.addHandler(function(n, s, a) {  alert("You panned the map")});
+        */
+
         return mapstraction;
 }
 
