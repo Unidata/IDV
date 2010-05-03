@@ -2356,7 +2356,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         }
         js.append(mapVarName + ".autoCenterAndZoom();\n");
         //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
-        getRepository().initMap(request, mapVarName, sb,
+        getRepository().getMapManager().initMap(request, mapVarName, sb,
                                 request.get(ARG_WIDTH, 800),
                                 request.get(ARG_HEIGHT, 500), true);
         sb.append(HtmlUtil.script(js.toString()));
@@ -2722,7 +2722,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
 
         String llb =
-            getRepository().makeMapSelector(request, ARG_POINT_BBOX, true,
+            getRepository().getMapManager().makeMapSelector(request, ARG_POINT_BBOX, true,
                                             "","");
 
         basicSB.append(

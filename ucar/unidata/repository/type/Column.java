@@ -1044,18 +1044,18 @@ public class Column implements Constants {
                 lat = ((Double)values[offset]).doubleValue();
                 lon = ((Double)values[offset+1]).doubleValue();
             }
-            widget = typeHandler.getRepository().makeMapSelector(id, true, "","",new String[]{
+            widget = typeHandler.getRepository().getMapManager().makeMapSelector(id, true, "","",new String[]{
                     latLonOk(lat)?lat+"":"",
                     latLonOk(lon)?lon+"":""});
         } else  if (isType(TYPE_LATLONBBOX)) {
             if(values!=null) {
-                widget = typeHandler.getRepository().makeMapSelector(id, true, "","",
+                widget = typeHandler.getRepository().getMapManager().makeMapSelector(id, true, "","",
                                                                      latLonOk(values[offset+2])?values[offset+2]+"":"",
                                                                      latLonOk(values[offset+0])?values[offset+0]+"":"",
                                                                      latLonOk(values[offset+3])?values[offset+3]+"":"",
                                                                      latLonOk(values[offset+1])?values[offset+1]+"":"");
             } else {
-                widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+                widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
             }
         } else if (isType(TYPE_BOOLEAN)) {
             String value = "True";
@@ -1357,9 +1357,9 @@ public class Column implements Constants {
         List<Clause> tmp    = new ArrayList<Clause>(where);
         String       widget = "";
         if (isType(TYPE_LATLON)) {
-            widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+            widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
         } else  if (isType(TYPE_LATLONBBOX)) {
-            widget = typeHandler.getRepository().makeMapSelector(request, id, true, "","");
+            widget = typeHandler.getRepository().getMapManager().makeMapSelector(request, id, true, "","");
         } else if (isDate()) {
             List dateSelect = new ArrayList();
             dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));

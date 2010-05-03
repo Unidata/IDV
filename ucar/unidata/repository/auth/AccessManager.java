@@ -816,7 +816,7 @@ public class AccessManager extends RepositoryManager {
         sb.append(HtmlUtil.cols(HtmlUtil.bold("Action"),
                                 HtmlUtil.bold("Role") + " (one per line)"));
         sb.append(HtmlUtil.cols(HtmlUtil.space(5)));
-        sb.append("<td rowspan=6><b>All Roles</b><i><br>");
+        sb.append("<td rowspan=6><b>All Roles</b><i><br>user:&lt;userid&gt;<br>none<br>");
         sb.append(StringUtil.join("<br>", getUserManager().getRoles()));
         sb.append("</i></td>");
 
@@ -832,10 +832,15 @@ public class AccessManager extends RepositoryManager {
             if (roles == null) {
                 roles = "";
             }
+            String label = HtmlUtil.href(getRepository().getUrlBase()
+                                         + "/help/access.html#"+Permission.ACTIONS[i],
+                                         HtmlUtil.img(getRepository().iconUrl(ICON_HELP)),
+                                         HtmlUtil.attr(HtmlUtil.ATTR_TARGET,"_help"))+HtmlUtil.space(1) +Permission.ACTION_NAMES[i];
+
             sb.append(
                 HtmlUtil.rowTop(
                     HtmlUtil.cols(
-                        Permission.ACTION_NAMES[i],
+                                  label,
                         HtmlUtil.textArea(
                             ARG_ROLES + "." + Permission.ACTIONS[i], roles,
                             5, 20))));

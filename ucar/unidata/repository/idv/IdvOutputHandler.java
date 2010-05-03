@@ -945,7 +945,7 @@ public class IdvOutputHandler extends OutputHandler {
 
         StringBuffer bounds = new StringBuffer();
         String llb =
-            getRepository().makeMapSelector(request, ARG_VIEW_BOUNDS, false,
+            getRepository().getMapManager().makeMapSelector(request, ARG_VIEW_BOUNDS, false,
                                             htmlCheckbox(request,
                                                 ARG_VIEW_JUSTCLIP,
                                                 false) + " "

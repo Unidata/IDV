@@ -21,20 +21,26 @@ are applicable to the entry.
 
 The different access types are:
 <ul>
+<a name="view"></a>
 <li> View - Can a user view the entry. If a user does not have view access they will simply not
 see the entry and cannot access any aspect of the entry.
 
+<a name="viewchildren"></a>
 <li> View Children - This is used for a folder where a user without permission can see that the folder exists (e.g., "Unidata Only")
 but cannot see any of the details of the folder or any of the children entry of the folder.
 
+<a name="file"></a>
 <li> File - This allows users to see the information about an entry but they cannot access the file. i.e., they cannot download the
 file or access any of the content of the file (e.g., through OpenDAP).
 
+<a name="edit"></a>
 <li> Edit - Can a user edit the entry.
 
+<a name="new"></a>
 <li> New - Can a user create a new sub-folder or sub-entry. Note: when users have this permission they
 also need Edit permission.
 
+<a name="upload"></a>
 <li> Upload - This provides anonymous upload capability. For example, we use this
 to provide an <a href="http://motherlode.ucar.edu/repository/entry/show/Top/IDV+Community+Resources/Contributions?entryid=bfc82cf9-8548-4393-af10-20ec2274ceb9">area </a> for IDV users to upload shared content.
 When a file is uploaded it is marked so that only administrators or owners of the Folder can access it. The owner
@@ -44,8 +50,10 @@ In the Edit page for the uploaded Entry the owner can "bless" the entry to make 
 If you want more people than the owner to receive notification simply add  a "Contact" property to the folder
 that contains the other recipient's email.
 
+<a name="delete"></a>
 <li> Delete - Can  a user delete an entry.
 
+<a name="comment"></a>
 <li> Comment - Can a user comment on an entry.
 
 </ul>

@@ -26,19 +26,34 @@ checkbox clicked. Doing a Control-Click on a checkbox toggles all of them on or 
 
 
 
-<faqitem cxat="Administration" id="ssl" q="How do I configure SSL access to RAMADDA?" >
+<faqitem cat="Administration" id="ssl" q="How do I configure SSL access to RAMADDA?" >
 To configure SSL access see <a href="installing.html#ssl">here</a> if you are running under Tomcat.
 See <a href="installing.html#ssljetty">here</a> if you are running stand-alone.
 </faqitem>
 
 
-<faqitem id="fixssl" q="Oops, I told RAMADDA to use an SSL port and SSL is not working. Now I cannot access the admin page to turn off SSL and I'm stuck. What can I do?" >
+<faqitem cat="Administration" id="allowedlogin" q="I want to restrict where users can login from" >
+For security reasons you can configure what IP addresses users are allowed to login from.
+In your <i>repository.properties</i> file in your local RAMADDA directory, e.g.,<pre>
+&lt;home&gt;/.unidata/repository/repository.properties</pre>
+add the property:<pre>
+
+##Comma separated list of ip addresses (or prefixes) that are the ones where the user can login
+##If blank then login is allowed from anywhere
+ramadda.login.allowedips=
+##e.g.:
+##ramadda.login.allowedips=127.0.0,201.43.72.5
+</pre>
+</faqitem>
+
+
+<faqitem cat="Administration" id="fixssl" q="Oops, I told RAMADDA to use an SSL port and SSL is not working. Now I cannot access the admin page to turn off SSL and I'm stuck. What can I do?" >
 You need to comment out the ramadda.ssl.port property in your .properties file.
 Alternatively, you can run RAMADDA with the command line argument:
 <pre>-Dramadda.ssl.ignore=true</pre>
 </faqitem>
 
-<faqitem q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
+<faqitem cat="Administration" q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
 You can specify an administrator user id and password from the command line when starting RAMADDA.
 If you are running RAMADDA stand alone then just provide the arguments:<pre>
 -admin &lt;user id&gt; &lt;password&gt;
@@ -63,7 +78,7 @@ Note: you should remove this entry once you have reset your password.
 
 
 
-<faqitem id="email" q="How do I configure RAMADDA to send email?" >
+<faqitem cat="Administration" id="email" q="How do I configure RAMADDA to send email?" >
 RAMADDA can send email for both the password reset process and for monitoring new entries.
 On the main Site Administration  page under the &quot;Contact&quot; area you can specify
 a SMTP server that RAMADDA will use to send email.

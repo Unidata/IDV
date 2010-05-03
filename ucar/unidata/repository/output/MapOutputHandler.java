@@ -214,7 +214,7 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer js         = new StringBuffer();
         String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        getRepository().initMap(request, mapVarName, sb, width, height,
+        getRepository().getMapManager().initMap(request, mapVarName, sb, width, height,
                                 normalControls);
         js.append(mapVarName + ".resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");

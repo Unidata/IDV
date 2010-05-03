@@ -1692,7 +1692,7 @@ public class TypeHandler extends RepositoryManager {
                 }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
-            String mapSelector = getRepository().makeMapSelector(ARG_AREA,
+            String mapSelector = getRepository().getMapManager().makeMapSelector(ARG_AREA,
                                      true,
                                      ((entry != null) && entry.hasSouth())
                                      ? "" + entry.getSouth()
@@ -2026,7 +2026,7 @@ public class TypeHandler extends RepositoryManager {
                 HtmlUtil.space(3) +
                 HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, false) +msg("Contained by");
 
-            String mapSelector = getRepository().makeMapSelector(request,
+            String mapSelector = getRepository().getMapManager().makeMapSelector(request,
                                      ARG_AREA, true, "", radio);
 
 

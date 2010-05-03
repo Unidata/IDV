@@ -9,8 +9,6 @@ var markers = new Object();
 function MapInitialize(addControls,mapProvider,divname)
 {
 	// Create a map object
-//	mapstraction = new Mapstraction('mapstraction', 'google');
-//	mapstraction = new Mapstraction('mapstraction', 'yahoo');
 	var mapstraction = new Mapstraction(divname, mapProvider);
 	if(!addControls) {
 //		vemap = mapstraction.maps[mapstraction.api];
@@ -35,13 +33,16 @@ function MapInitialize(addControls,mapProvider,divname)
             });
 
         /*
-        mapstraction.click.addHandler(function(event_name, event_source, event_args) {
-                var p = event_args.location;
-                alert("<p>Lat: " + p.lat + " Lon: " + p.lon + "</p>");
-            });
-        mapstraction.changeZoom.addHandler(function(n, s, a) { alert("You changed the zoom level")});
-        mapstraction.endPan.addHandler(function(n, s, a) {  alert("You panned the map")});
-        */
+        mapstraction.addEventListener( 'click', onClickMap);  
+        function onClickMap( point) {  
+            alert('click ' + point.lat);
+            // the yahoo map returns 0 for lat and 180 for lon when user  
+            // clicks on a control on the map (for example on the pan-left arrow)  
+             if (point.lat != 0) {  
+                 mapstraction.addMarker( new Marker( new LatLonPoint(point.lat,point.lon)));  
+             }  
+        } 
+        */ 
 
         return mapstraction;
 }

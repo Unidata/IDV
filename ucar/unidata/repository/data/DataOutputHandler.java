@@ -1415,7 +1415,7 @@ public class DataOutputHandler extends OutputHandler {
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
             String llb =
-                getRepository().makeMapSelector(ARG_AREA, true,
+                getRepository().getMapManager().makeMapSelector(ARG_AREA, true,
                                                 ""+llr.getLatMin(),
                                                 ""+llr.getLatMax(),
                                                 ""+llr.getLonMax(),
@@ -1664,7 +1664,7 @@ public class DataOutputHandler extends OutputHandler {
             }
         }
         //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
-        getRepository().initMap(request, mapVarName, sb,
+        getRepository().getMapManager().initMap(request, mapVarName, sb,
                                 request.get(ARG_WIDTH, 800),
                                 request.get(ARG_HEIGHT, 500), true);
         /*        sb.append("</td><td>");
@@ -1814,7 +1814,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
         js.append(mapVarName + ".autoCenterAndZoom();\n");
-        getRepository().initMap(request, mapVarName, sb, 800, 500, true);
+        getRepository().getMapManager().initMap(request, mapVarName, sb, 800, 500, true);
         sb.append(HtmlUtil.script(js.toString()));
         trajectoryPool.put(path, tod);
         return new Result(msg("Trajectory Map"), sb);

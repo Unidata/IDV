@@ -108,9 +108,10 @@ public class Permission {
 
     /** _more_ */
     public static final String[] ACTION_NAMES = {
-        "View", "View Children", "File", "Edit", "New", "Upload", "Delete",
+        "View", "View Children", "File", "Edit", "New", "Anon. Upload", "Delete",
         "Comment"
     };
+
 
 
     /** _more_ */
