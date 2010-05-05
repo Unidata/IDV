@@ -107,6 +107,7 @@ argument -Dfoo=bar) -->
 
         <copy  file="${libsrc}/jythonlib.jar" todir="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/poi.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
