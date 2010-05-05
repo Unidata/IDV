@@ -614,7 +614,7 @@ public class StateManager extends IdvManager {
      */
     public Object getProperty(String name) {
         Object value = null;
-        if (getIdvUIManager().isMac()) {
+        if (GuiUtils.isMac()) {
             value = idvProperties.get("mac." + name);
         }
         if (value == null) {
