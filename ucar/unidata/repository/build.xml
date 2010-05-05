@@ -458,6 +458,9 @@
             update="false"
             compress="true"
             filesonly="true">
+          <zipfileset dir="" fullpath="${srcreleasedir}/README">
+            <include name="ucar/unidata/repository/release/README.SRC"/>
+          </zipfileset>
           <zipfileset dir="" prefix="${srcreleasedir}">
             <include name="lib/repositorylib.jar"/>
             <include name="lib/repositorytds.jar"/>

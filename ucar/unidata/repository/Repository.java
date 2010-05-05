@@ -1995,6 +1995,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     this,
                     node });
             }
+            if(handler == null) {
+                getLogManager().logInfo("Could not find handler for:" + handlerName+":");
+                return;
+            }
             handlers.put(handlerName, handler);
         }
 

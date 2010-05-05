@@ -1,11 +1,39 @@
 
 
+######################################
+## Compiling and running RAMADDA
+######################################
+
 The lib directory holds the jar files required to compile ramadda
 
 To compile ramadda:
 cd  ucar/unidata/repository
 ant
 
-This 
+This creates a repository.jar and places it into the lib dir. 
+To run ramadda do:
+cd lib
+java -Xmx1024m -jar repository.jar
+
+(The -Xmx1024 gives the JRE 1 Gig of memory)
+
+
+######################################
+## Compiling the Test user authenticator
+######################################
+There is some example java code in ucar/unidata/repository/auth/TestUserAuthenticator
+that implements the user authenticator plugin. This plugin allows for 3rd parties
+to incorporate their own user authentication process. 
+
+To build this do:
+cd  ucar/unidata/repository
+ant userauthenticator
+
+This compiles the test authenticator into a jar file and prints out a message of where the jar is
+and where it needs to be put
+
+
+
+
 
 
