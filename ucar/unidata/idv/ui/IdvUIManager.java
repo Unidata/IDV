@@ -167,7 +167,7 @@ public class IdvUIManager extends IdvManager {
     public static ImageIcon ICON_REMOVE;
 
     static {
-        ICON_REMOVE = GuiUtils.getImageIcon("/auxdata/ui/icons/delete.png");
+        ICON_REMOVE = GuiUtils.getImageIcon("/ucar/unidata/idv/images/delete.png");
         ICON_LOCK =  GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock.png");
         ICON_UNLOCK = GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock_open.png");
     }
