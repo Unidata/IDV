@@ -109,8 +109,8 @@ public class TextSearcher extends JPanel {
         this.setLayout(new BorderLayout());
 
         highlightAllBtn = GuiUtils.getToggleImageButton(
-            "/auxdata/ui/icons/SearchHighlightOff16.gif",
-            "/auxdata/ui/icons/SearchHighlightOn16.gif", 0, 0, true);
+            "/ucar/unidata/ui/images/SearchHighlightOff16.gif",
+            "/ucar/unidata/ui/images/SearchHighlightOn16.gif", 0, 0, true);
         highlightAllBtn.addActionListener(GuiUtils.makeActionListener(this,
                 "searchFor", null));
 
@@ -120,10 +120,10 @@ public class TextSearcher extends JPanel {
                 "searchFor", null));
         findFld = new JTextField("", 20);
         JButton nextBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/SearchNext16.gif",
+            GuiUtils.makeImageButton("/ucar/unidata/ui/images/SearchNext16.gif",
                                      this, "doSearch", null, true);
         JButton prevBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/SearchPrev16.gif",
+            GuiUtils.makeImageButton("/ucar/unidata/ui/images/SearchPrev16.gif",
                                      this, "doSearchPrevious", null, true);
         nextBtn.setToolTipText("Find Next");
         prevBtn.setToolTipText("Find Previous");
