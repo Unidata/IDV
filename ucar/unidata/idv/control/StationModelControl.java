@@ -219,10 +219,8 @@ public class StationModelControl extends ObsDisplayControl {
     protected LayoutModelWidget layoutModelWidget;
 
     static {
-        lockIcon =
-            new ImageIcon(Resource.getImage("/auxdata/ui/icons/lock.png"));
-        unlockIcon = new ImageIcon(
-            Resource.getImage("/auxdata/ui/icons/lock_open.png"));
+        lockIcon =GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/lock.png");
+        unlockIcon = GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/lock_open.png");
     }
 
 
