@@ -1717,12 +1717,12 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public Result makeResult(Request request, String title, StringBuffer sb) {
+        User user = request.getUser();
         return getRepository().makeResult(
             request, title, sb,
-            ((request.getUser().getIsGuest()
-              || request.getUser().getAnonymous())
+            !request.getUser().canEditSettings()
              ? anonUserUrls
-             : userUrls));
+            : userUrls);
     }
 
 
@@ -1807,6 +1807,9 @@ public class UserManager extends RepositoryManager {
         return StringUtil.join(separator, links);
     }
 
+    
+
+
     /**
      * _more_
      *
@@ -1819,12 +1822,13 @@ public class UserManager extends RepositoryManager {
     public Result processFavorite(Request request) throws Exception {
         String message = "";
         User   user    = request.getUser();
-        if (user.getAnonymous() || user.getIsGuest()) {
+        
+        if (!request.getUser().canEditSettings()){ 
             return new Result(
                 msg("Favorites"),
                 new StringBuffer(
                     getRepository().showDialogError(
-                        "Anonymous users cannot have favorites")));
+                        "Favorites not allowed")));
         }
         String entryId = request.getString(ARG_ENTRYID, BLANK);
 
@@ -1880,7 +1884,7 @@ public class UserManager extends RepositoryManager {
             throw new IllegalArgumentException(
                 "Need to be logged in to add favorites");
         }
-        if (user.getIsGuest()) {
+        if (!request.getUser().canEditSettings()) {
             throw new IllegalArgumentException("Cannot add favorites");
         }
 
@@ -1964,11 +1968,12 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        if ( !user.getIsGuest() && (cnt == 0)) {
+        if (request.getUser().canEditSettings() && (cnt == 0)) {
             sb.append(
-                "You have no favorite entries defined.<br>When you see an  entry or folder just click on the "
+                      getRepository().showDialogNote(
+                                                     "You have no favorite entries defined.<br>When you see an  entry or folder just click on the "
                 + HtmlUtil.img(iconUrl(ICON_FAVORITE))
-                + " icon to add it to your list of favorites");
+                                                     + " icon to add it to your list of favorites"));
         }
         return makeResult(request, "User Home", sb);
     }
@@ -2225,10 +2230,10 @@ public class UserManager extends RepositoryManager {
             return new Result(msg("Password Reset"), sb);
         }
 
-        if (user.getIsGuest()) {
+        if (!request.getUser().canEditSettings()) {
             return new Result(
                 msg("Password Reset"),
-                new StringBuffer(msg("Guest user cannot reset password")));
+                new StringBuffer(msg("Cannot reset password")));
         }
 
         key = getRepository().getGUID() + "_" + Math.random();
@@ -2423,6 +2428,9 @@ public class UserManager extends RepositoryManager {
                     destUrl = new String(
                         XmlUtil.decodeBase64(
                             request.getUnsafeString(ARG_REDIRECT, "")));
+                    destMsg = msg("Continue");
+                } else if(!user.canEditSettings()) {
+                    destUrl = getRepository().getUrlBase();
                     destMsg = msg("Continue");
                 } else {
                     destUrl = getRepositoryBase().URL_USER_HOME.toString();
@@ -2741,10 +2749,10 @@ public class UserManager extends RepositoryManager {
             return new Result(msg("User Settings"), sb);
         }
 
-        if (user.getIsGuest()) {
+        if (!request.getUser().canEditSettings()) {
             sb.append(
                 getRepository().showDialogWarning(
-                    msg("Guest users cannot change their settings")));
+                    msg("You cannot edit your settings")));
             return new Result(msg("User Settings"), sb);
         }
 

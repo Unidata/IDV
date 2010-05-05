@@ -460,6 +460,9 @@ public class User {
         return template;
     }
 
+    public boolean canEditSettings() {
+        return ! (getAnonymous() || getIsGuest() || !getIsLocal());
+    }
 
 
     /**
@@ -490,7 +493,8 @@ public class User {
     }
 
     /**
-     *  Get the IsLocal property.
+     *  Get the IsLocal property.This is true if the user is from the ramadda user database.
+     *  Else, for example, if it was created by a userauthenticator plugin, then this is false.
      *
      *  @return The IsLocal
      */

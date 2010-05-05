@@ -9,6 +9,8 @@
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
         <property  name="version" value="1.1"/>
+        <property  name="_version" value="1_1"/>
+        <property name="srcreleasedir" value="repositorysrc${_version}" />
         <property  name="build.sysclasspath" value="ignore"/>
         <property name="srcdir" value="${basedir}"/>
         <property name="failonerror" value="true"/>
@@ -78,7 +80,7 @@
     <target name="release" depends="init,clean">
         <antcall target="repositorylib"/>
         <antcall target="clean"/>
-        <antcall target="repositorysrcjar"/>
+        <antcall target="repositorysrczip"/>
         <antcall target="repositoryjar"/>
         <antcall target="repositorytar"/>
         <antcall target="repositorywar"/>
@@ -268,8 +270,8 @@
         >
 
 
-
         <include name="ucar/unidata/repository/*.java"/>
+        <include name="ucar/unidata/repository/auth/*.java"/>
         <include name="ucar/unidata/repository/client/*.java"/>
         <include name="ucar/unidata/repository/output/*.java"/>
         <include name="ucar/unidata/repository/metadata/*.java"/>
@@ -451,18 +453,20 @@
     </target>
 
 
-
-    <target name="repositorysrcjar" depends="init">
-        <jar 
+    <target name="repositorysrczip" depends="init">
+        <zip  destfile="${libsdir}/repository_src.zip"
             update="false"
-            basedir="${compiledir}"
             compress="true"
-            jarfile="${libsdir}/repository_src.jar">
-            <include name="ucar/**"/>
+            filesonly="true">
+          <zipfileset dir="" prefix="${srcreleasedir}">
             <include name="lib/repositorylib.jar"/>
             <include name="lib/repositorytds.jar"/>
+            <include name="lib/idv.jar"/>
             <include name="lib/servlet-api.jar"/>
+            <include name="ucar/unidata/repository/**"/>
             <exclude name="ucar/**/CVS/**"/>
+            <exclude name="ucar/**/.svn/**"/>
+            <exclude name="ucar/**/processed/**"/>
             <exclude name="ucar/**/*.class"/>
             <exclude name="ucar/**/*.map"/>
             <exclude name="ucar/**/*.jar"/>            
@@ -475,36 +479,9 @@
             <exclude name="ucar/**/*.nc"/>            
             <exclude name="ucar/**/*.xidv"/>
             <exclude name="ucar/**/*.zidv"/>
-            <exclude name="ucar/**/processed/**"/>
-            <exclude name="ucar/unidata/data/storm/*ADOT*"/>
-            <exclude name="ucar/unidata/idv/control/storm/*ADOT*"/>
-            <exclude name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
-            <exclude name="ucar/unidata/apps/**"/>
-            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
-            <exclude name="ucar/unidata/grid/**"/>
-            <exclude name="ucar/unidata/geoloc/**"/>
-            <exclude name="ucar/unidata/idv/release/**"/>
-            <exclude name="ucar/unidata/view/sounding/test/**"/>
 
-
-<!--
-            <exclude name="ucar/unidata/gis/**"/>
-            <exclude name="ucar/unidata/repository/docs/**"/>
-            <exclude name="ucar/unidata/ui/symbol/**"/>
-	    <exclude name="ucar/unidata/idv/**"/>
-            <exclude name="ucar/unidata/apps/**"/>
-            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
-            <exclude name="ucar/visad/**"/>
-            <exclude name="ucar/visad/physics/**"/>
-            <exclude name="ucar/visad/functiontypes/**"/>
-            <exclude name="ucar/visad/display/**"/>
-            <exclude name="ucar/unidata/view/sounding/**"/>
-            <exclude name="ucar/unidata/grid/**"/>
-            <exclude name="ucar/unidata/geoloc/**"/>
-            <exclude name="ucar/unidata/view/sounding/test/**"/>
--->
-
-        </jar>
+</zipfileset>
+        </zip>
     </target>
 
 
@@ -526,5 +503,32 @@
     </target>
 
 
+     <target name="userauthenticator" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+	    fork="true"
+            memoryMaximumSize="512m"
+           target="1.5"
+        >
+        <include name="ucar/unidata/repository/auth/TestUserAuthenticator.java"/>
+        </javac>
+        <jar 
+            basedir="${compiledir}"
+            update="false"
+            compress="true"
+            jarfile="${libsdir}/userauthenticator.jar">
+              <include name="ucar/unidata/repository/auth/TestUserAuthenticator.class"/>
+        </jar>
+        <echo message="The test user authenticator jar has been created: ${libsdir}/userauthenticator.jar"/>
+        <echo message="Copy the jar to &lt;ramadda home&gt;/plugins"/>
+
+     </target>
 
 </project>
