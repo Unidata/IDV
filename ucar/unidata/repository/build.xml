@@ -479,8 +479,7 @@
             <exclude name="ucar/**/*.nc"/>            
             <exclude name="ucar/**/*.xidv"/>
             <exclude name="ucar/**/*.zidv"/>
-
-</zipfileset>
+           </zipfileset>
         </zip>
     </target>
 

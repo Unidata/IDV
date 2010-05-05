@@ -1,0 +1,11 @@
+
+
+The lib directory holds the jar files required to compile ramadda
+
+To compile ramadda:
+cd  ucar/unidata/repository
+ant
+
+This 
+
+
