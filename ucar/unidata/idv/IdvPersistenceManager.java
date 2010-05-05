@@ -2486,7 +2486,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         try {
             LogUtil.consoleMessage("Decoding a base 64 bundle\n");
             String xml = new String(XmlUtil.decodeBase64(base64Bundle));
-            //            System.out.println(xml);
+            if(getArgsManager().printJnlpBundles) {
+                System.out.println(xml);
+            }
             decodeXml(xml, false, null, true);
         } catch (Throwable exc) {
             logException("Decoding base 64 bundle", exc);
@@ -2532,6 +2534,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 }
                 if (nextOneBundle) {
                     String xml = new String(XmlUtil.decodeBase64(value));
+                    System.err.println("XXXXXXXXXXXXXXX" + getArgsManager().printJnlpBundles);
                     if (getArgsManager().printJnlpBundles) {
                         System.out.println(xml);
                     }
