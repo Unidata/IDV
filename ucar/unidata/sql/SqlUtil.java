@@ -968,6 +968,16 @@ public class SqlUtil {
                                boolean ignoreErrors, boolean printStatus)
             throws Exception {
 
+        loadSql(sql, statement, ignoreErrors, printStatus, new ArrayList<SqlError>());
+    }
+
+
+    public static boolean showLoadingSql = false;
+
+    public static void loadSql(String sql, Statement statement,
+                               boolean ignoreErrors, boolean printStatus, List<SqlError> errors)
+            throws Exception {
+
         int cnt=0;
         for (String command : parseSql(sql)) {
             if(printStatus) {
@@ -979,17 +989,12 @@ public class SqlUtil {
                 command = command.trim();
                 if (command.length() > 0) {
                     statement.execute(command);
-                    //                    if(!ignoreErrors)
-                    //                        System.err.println ("OK:" + command);
-                    if(command.toLowerCase().indexOf("metadata")>=0) {
-                        //                        System.err.println("\n*********************************************");
-                        //                        System.err.println("SQL OK:" + command);                         
-                        //System.err.println("********************************************\n");
+                    if(showLoadingSql) {
+                        System.err.println("SqlUtil.loadSql:" + command.replace("\n"," "));
                     }
                 }
             } catch (Exception exc) {
-
-                //                if(command.indexOf("wiki")>=0) {
+                errors.add(new SqlError(command, exc));
                 String msg = exc.toString().toLowerCase();
                 if(msg.indexOf("duplicate")<0 && 
                    msg.indexOf("already exists")<0 && 
@@ -1001,9 +1006,7 @@ public class SqlUtil {
                     System.err.println(exc);
                     System.err.println("********************************************\n");
                 }
-                //                }
                 if ( !ignoreErrors) {
-                    //                    System.err.println("" + exc);
                     throw exc;
                 }
             }
@@ -1731,6 +1734,42 @@ public class SqlUtil {
 
 
     }
+
+
+
+    public static final class SqlError {
+        private String sql;
+        private Exception exception;
+
+
+        public SqlError(String  sql, Exception exc) {
+            this.sql = sql;
+            this.exception = exc;
+        }
+        
+        /**
+           Get the Sql property.
+
+           @return The Sql
+        **/
+        public String getSql () {
+            return this.sql;
+        }
+
+
+        /**
+           Get the Exception property.
+
+           @return The Exception
+        **/
+        public Exception getException () {
+            return this.exception;
+        }
+
+
+    }
+
+
 
 
 }

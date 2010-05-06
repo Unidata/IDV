@@ -3558,7 +3558,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                          getProperty(PROP_DB_SCRIPT));
         sql = getDatabaseManager().convertSql(sql);
 
+        System.err.println("Repository.initSchema: loading schema");
+        SqlUtil.showLoadingSql = true;
         getDatabaseManager().loadSql(sql, true, false);
+        SqlUtil.showLoadingSql = false;
+        System.err.println("Repository.initSchema: done loading schema");
 
         for (String sqlFile : pluginSqlFiles) {
             sql = getStorageManager().readUncheckedSystemResource(sqlFile);

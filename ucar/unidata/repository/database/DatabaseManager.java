@@ -183,6 +183,119 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
+
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void init() throws Exception {
+        if (haveInitialized) {
+            return;
+        }
+        haveInitialized = true;
+        SqlUtil.setConnectionManager(this);
+
+        System.err.println("DatabaseManager.init");
+        dataSource = doMakeDataSource();
+        Statement statement = getConnection().createStatement();
+        if (db.equals(DB_MYSQL)) {
+            statement.execute("set time_zone = '+0:00'");
+        }
+        closeAndReleaseConnection(statement);
+        Misc.run(this, "checkConnections", null);
+        System.err.println("DatabaseManager.init done");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void reInitialize() throws Exception {
+        if (dataSource != null) {
+            BasicDataSource bds = (BasicDataSource) dataSource;
+            try {
+                bds.close();
+            } catch (Exception exc) {
+                logError("Closing data source", exc);
+            }
+            dataSource = doMakeDataSource();
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initComplete() throws Exception {
+        //If nothing  in dummy table then add an entry
+        BasicDataSource bds   = (BasicDataSource) dataSource;
+        int             count = getCount(Tables.DUMMY.NAME, null);
+        if (count == 0) {
+            executeInsert(Tables.DUMMY.INSERT, new Object[] { "dummyentry" });
+        }
+        bds.setValidationQuery("select * from dummy");
+
+        /*
+        System.err.println("min evict:" +bds.getMinEvictableIdleTimeMillis()/1000);
+        System.err.println("test on borrow:"+bds.getTestOnBorrow());
+        System.err.println("test while idle:"+bds.getTestWhileIdle());
+        System.err.println("time between runs:"+bds.getTimeBetweenEvictionRunsMillis()/1000);
+        */
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private DataSource doMakeDataSource() throws Exception {
+        scourMessages = new ArrayList<String>();
+        totalScours   = 0;
+
+        BasicDataSource ds = new BasicDataSource();
+
+        ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
+                100));
+        ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE, 100));
+
+        String userName = (String) getRepository().getProperty(
+                              PROP_DB_USER.replace("${db}", db));
+        String password = (String) getRepository().getProperty(
+                              PROP_DB_PASSWORD.replace("${db}", db));
+        String connectionURL =
+            (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
+                db));
+        String driverClassName = (String) getRepository().getProperty(
+                                     PROP_DB_DRIVER.replace("${db}", db));
+        Misc.findClass(driverClassName);
+
+        System.err.println("DatabaseManager.doMakeDataSource connection url:"  + connectionURL+" user name:" + userName);
+
+        ds.setDriverClassName(driverClassName);
+        ds.setUsername(userName);
+        ds.setPassword(password);
+        ds.setUrl(connectionURL);
+
+
+        ds.setLogWriter(new Log4jPrintWriter(LOG));
+
+        return ds;
+    }
+
+
+
     /**
      * _more_
      *
@@ -256,115 +369,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     "CONNECTION: Error checking connection", exc);
             }
         }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void init() throws Exception {
-        if (haveInitialized) {
-            return;
-        }
-        haveInitialized = true;
-        SqlUtil.setConnectionManager(this);
-        dataSource = doMakeDataSource();
-
-
-        if (db.equals(DB_MYSQL)) {
-            Statement statement = getConnection().createStatement();
-            statement.execute("set time_zone = '+0:00'");
-            closeAndReleaseConnection(statement);
-        }
-
-
-        Misc.run(this, "checkConnections", null);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void reInitialize() throws Exception {
-        if (dataSource != null) {
-            BasicDataSource bds = (BasicDataSource) dataSource;
-            try {
-                bds.close();
-            } catch (Exception exc) {
-                logError("Closing data source", exc);
-            }
-            dataSource = doMakeDataSource();
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initComplete() throws Exception {
-        //If nothing  in dummy table then add an entry
-        BasicDataSource bds   = (BasicDataSource) dataSource;
-        int             count = getCount(Tables.DUMMY.NAME, null);
-        if (count == 0) {
-            executeInsert(Tables.DUMMY.INSERT, new Object[] { "dummyentry" });
-        }
-        bds.setValidationQuery("select * from dummy");
-
-        /*
-        System.err.println("min evict:" +bds.getMinEvictableIdleTimeMillis()/1000);
-        System.err.println("test on borrow:"+bds.getTestOnBorrow());
-        System.err.println("test while idle:"+bds.getTestWhileIdle());
-        System.err.println("time between runs:"+bds.getTimeBetweenEvictionRunsMillis()/1000);
-        */
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private DataSource doMakeDataSource() throws Exception {
-        scourMessages = new ArrayList<String>();
-        totalScours   = 0;
-
-        BasicDataSource ds = new BasicDataSource();
-
-
-        ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
-                100));
-        ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE, 100));
-
-        String userName = (String) getRepository().getProperty(
-                              PROP_DB_USER.replace("${db}", db));
-        String password = (String) getRepository().getProperty(
-                              PROP_DB_PASSWORD.replace("${db}", db));
-        String connectionURL =
-            (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
-                db));
-        String driverClassName = (String) getRepository().getProperty(
-                                     PROP_DB_DRIVER.replace("${db}", db));
-        Misc.findClass(driverClassName);
-
-        ds.setDriverClassName(driverClassName);
-        ds.setUsername(userName);
-        ds.setPassword(password);
-        ds.setUrl(connectionURL);
-
-
-        ds.setLogWriter(new Log4jPrintWriter(LOG));
-
-        return ds;
     }
 
 
@@ -1812,7 +1816,20 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             throws Exception {
         Statement statement = connection.createStatement();
         try {
-            SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
+            List<SqlUtil.SqlError> errors = new ArrayList<SqlUtil.SqlError>();
+            SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus, errors);
+            int existsCnt = 0;
+            for(SqlUtil.SqlError error: errors) {
+                if(error.getException().toString().indexOf("already exists")<0) {
+                    System.err.println("ERROR: DatabaseManager.loadSql: "  + error.getException() +"\nsql:" + error.getSql()); 
+                } else {
+                    //                    System.err.println("EXISTS: "+error.getSql());
+                    existsCnt++;
+                }
+            }
+            if(existsCnt>0) {
+                //                System.err.println("DatabaseManager.loadSql: Some tables and indices already exist");
+            }
         } finally {
             closeStatement(statement);
         }
