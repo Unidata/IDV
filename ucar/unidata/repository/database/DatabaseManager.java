@@ -1770,9 +1770,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             sql = sql.replace("ramadda.clob", "clob(64000)");
             sql = sql.replace("ramadda.bigclob", "clob(256000)");
         } else if (db.equals(DB_POSTGRES)) {
-            //TODO: handle ramadda.clob and ramadda.bigclob
             sql = sql.replace("ramadda.double", "float8");
             sql = sql.replace("ramadda.datetime", "timestamp");
+            sql = sql.replace("ramadda.clob", "text");
+            sql = sql.replace("ramadda.bigclob", "text");
         }
         return sql;
     }
