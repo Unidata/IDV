@@ -1357,7 +1357,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             throws VisADException, RemoteException {
 
         float[] altValues;
-        if ((altitudeMap != null) && (el.getAltitude() != null)) {
+        if ((altitudeMap != null) && (el.getAltitude() != null)
+                && !(Double.isNaN(altitude))) {
             altValues = altitudeMap.scaleValues(new double[] { altitude });
         } else {
             altValues = new float[] { 0f };
