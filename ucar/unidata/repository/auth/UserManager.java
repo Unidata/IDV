@@ -97,7 +97,11 @@ public class UserManager extends RepositoryManager {
         "ramadda.login.allowedips";
 
 
-    /** _more_ */
+    public static final String ACTIVITY_LOGIN = "login";
+    public static final String ACTIVITY_LOGOUT = "logout";
+    public static final String ACTIVITY_PASSWORD_CHANGE = "password.change";
+
+    /** _More_ */
     protected List<RequestUrl> userUrls =
         RepositoryUtil.toList(new RequestUrl[] {
             getRepositoryBase().URL_USER_HOME,
@@ -2176,6 +2180,7 @@ public class UserManager extends RepositoryManager {
                         getRepository().showDialogNote(
                             msg("Your password has been reset")));
                     sb.append(makeLoginForm(request));
+                    addActivity(request, request.getUser(), ACTIVITY_PASSWORD_CHANGE, "");
                     return new Result(msg("Password Reset"), sb);
                 }
                 sb.append(
@@ -2415,7 +2420,7 @@ public class UserManager extends RepositoryManager {
 
 
             if (user != null) {
-                addActivity(request, user, "login", "");
+                addActivity(request, user, ACTIVITY_LOGIN, "");
                 getSessionManager().setUserSession(request, user);
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
@@ -2503,10 +2508,14 @@ public class UserManager extends RepositoryManager {
      */
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+        addActivity(request, request.getUser(), ACTIVITY_LOGOUT, "");
         getSessionManager().removeUserSession(request);
         request.setSessionId(getSessionManager().getSessionId());
         sb.append(getRepository().showDialogNote(msg("You are logged out")));
         sb.append(makeLoginForm(request));
+
+
+
         Result result = new Result(msg("Logout"), sb);
         return result;
     }
@@ -2767,6 +2776,7 @@ public class UserManager extends RepositoryManager {
                             msg("Incorrect passwords")));
                 }
                 message = "Your password has been changed";
+                addActivity(request, request.getUser(), ACTIVITY_PASSWORD_CHANGE, "");
             } else {
                 message = "Your settings have been changed";
             }
