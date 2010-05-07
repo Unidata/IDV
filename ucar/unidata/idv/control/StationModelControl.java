@@ -219,8 +219,10 @@ public class StationModelControl extends ObsDisplayControl {
     protected LayoutModelWidget layoutModelWidget;
 
     static {
-        lockIcon =GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/lock.png");
-        unlockIcon = GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/lock_open.png");
+        lockIcon = GuiUtils.getImageIcon(
+            "/ucar/unidata/idv/control/images/lock.png");
+        unlockIcon = GuiUtils.getImageIcon(
+            "/ucar/unidata/idv/control/images/lock_open.png");
     }
 
 
@@ -1939,14 +1941,15 @@ public class StationModelControl extends ObsDisplayControl {
         super.projectionChanged();
         //Handle this in a thread
         Misc.run(new Runnable() {
-                public void run() {
-                    try {
-                        setScaleOnDisplayable();
-                        loadData();
-                    } catch (Exception exc) {
-                        logException("handling projection change", exc);
-                    }
-                }});
+            public void run() {
+                try {
+                    setScaleOnDisplayable();
+                    loadData();
+                } catch (Exception exc) {
+                    logException("handling projection change", exc);
+                }
+            }
+        });
 
     }
 
