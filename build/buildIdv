@@ -2,9 +2,9 @@
 #set -x
 
 export JAVA_HOME=/opt/jdk
-export ANT_HOME=/upc/share/jakarta-ant
+export ANT_HOME=/share/jakarta-ant
 export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/csw/bin:/opt/bin:/bin
-export ANT_OPTS=-Xmx256m
+export ANT_OPTS=-Xmx512m
 export CLASSPATH=
 
 errmsg()
@@ -24,7 +24,7 @@ build()
         status=1
         ant -version
         java -version
-        if cd /upc/share/idv; then
+        if cd /share/idv; then
 	    newdir=build$(date '+%Y%m%dT%H%M')
 	    if test -d $newdir; then
 		echo 1>&2 "Directory \"$newdir\" exists!"
@@ -72,7 +72,7 @@ ftp()
 {
     (
         status=1
-        if cd /upc/share/idv; then
+        if cd /share/idv; then
 	    umask 02
 	    if ant -Dbasedir=`pwd` -buildfile build/build.xml ftp; then
 		echo "IDV FTP done"
@@ -91,7 +91,7 @@ nightly()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /upc/share/idv; then
+            if cd /share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml nightly_release; then
 	        echo "IDV release done"
@@ -112,7 +112,7 @@ release()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /upc/share/idv; then
+            if cd /share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml release; then
 	        echo "IDV release done"
@@ -133,7 +133,7 @@ test_release()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /upc/share/idv; then
+            if cd /share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml test_release; then
 	        echo "IDV release done"
@@ -152,7 +152,7 @@ installers()
 {
     (
         status=1
-        if cd /upc/share/idv; then
+        if cd /share/idv; then
 	    umask 02
 	    if ant -Dbasedir=`pwd` -buildfile build/build.xml installers; then
 		echo "IDV installers built"
