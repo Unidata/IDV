@@ -86,7 +86,7 @@ argument -Dfoo=bar) -->
         <!-- javac flags -->
         <property name="failonerror" value="true"/>
         <property name="fork" value="true"/>
-        <property name="maxmemory" value="256m"/>
+        <property name="maxmemory" value="512m"/>
 
         <!-- Source verions -->
         <property name="srcversion" value="1.6"/>
@@ -492,7 +492,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             Windowtitle="Unidata IDV API v${idv.version}"
             classpath="${classpath}:/upc/share/junit/junit.jar"
             destdir="${docs_javadoc_dest}"
-            maxmemory="256m"
+            maxmemory="512m"
             sourcepath="${srcdir}"
                  >
             <link href="http://www.ssec.wisc.edu/visad-docs/javadoc"/>
