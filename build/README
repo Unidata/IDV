@@ -104,7 +104,7 @@ After the release of a version, you should make a brand in the SVN repository
 in case changes are needed later.  To branch the SVN repository,
 run:
 
-svn copy svn://zero/idv/trunk svn://zero/idv/branches/IDV_<version>
+svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/branches/IDV_<version>
 
 where <version> is the version (e.g., 2.8).
 
