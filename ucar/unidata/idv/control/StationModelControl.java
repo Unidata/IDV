@@ -1937,11 +1937,17 @@ public class StationModelControl extends ObsDisplayControl {
      */
     public void projectionChanged() {
         super.projectionChanged();
-        try {
-            setScaleOnDisplayable();
-        } catch (Exception exc) {}
+        //Handle this in a thread
+        Misc.run(new Runnable() {
+                public void run() {
+                    try {
+                        setScaleOnDisplayable();
+                        loadData();
+                    } catch (Exception exc) {
+                        logException("handling projection change", exc);
+                    }
+                }});
 
-        loadDataInThread();
     }
 
 
