@@ -20,6 +20,9 @@ Then cd to ../processed
 Then source ../content/genpdf.sh
 Which results in a userguide.pdf file
 
+Note: There is a version of htmldoc in:
+/upc/share/idv/software
+that is compiled to run on harpo and the like
 
  
 To generate the Jython library docs:
