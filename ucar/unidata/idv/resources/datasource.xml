@@ -56,7 +56,7 @@
 
   <datasource
      id="DB.POINT"
-     fileselection="true"
+     fileselection="false"
      factory="ucar.unidata.data.point.DbPointDataSource"
      label="Point data database"/>
 
