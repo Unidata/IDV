@@ -27,7 +27,7 @@ import ucar.unidata.util.Misc;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
+import visad.DateTime;
 
 
 /**
@@ -62,6 +62,8 @@ public class DataSelection {
 
     /** list of times */
     private List times;
+
+    private List<DateTime> timeDriverTimes;
 
 
     /** From level. Typically null or a Real */
@@ -171,6 +173,9 @@ public class DataSelection {
     public DataSelection(DataSelection that) {
         if (that != null) {
             this.times     = Misc.cloneList(that.times);
+            if(that.timeDriverTimes!=null) {
+                this.timeDriverTimes = (List<DateTime>)Misc.cloneList(that.timeDriverTimes);
+            }
             this.timesMode = that.timesMode;
             if (that.geoSelection != null) {
                 this.geoSelection = new GeoSelection(that.geoSelection);
@@ -555,6 +560,24 @@ public class DataSelection {
      */
     public void putProperty(Object key, Object value) {
         properties.put(key, value);
+    }
+
+    /**
+       Set the TimeDriverTimes property.
+
+       @param value The new value for TimeDriverTimes
+    **/
+    public void setTimeDriverTimes (List<DateTime> value) {
+	this.timeDriverTimes = value;
+    }
+
+    /**
+       Get the TimeDriverTimes property.
+
+       @return The TimeDriverTimes
+    **/
+    public List<DateTime> getTimeDriverTimes () {
+	return this.timeDriverTimes;
     }
 
 

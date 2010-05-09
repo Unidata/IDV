@@ -3668,31 +3668,45 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     final visad.util.ThreadManager displaysThreadManager =
                         new visad.util.ThreadManager(
                             "display initialization");
-                    for (int i = 0; i < newControls.size(); i++) {
-                        final DisplayControl displayControl =
-                            (DisplayControl) newControls.get(i);
-                        loadDialog.setMessage1("Loading display " + (i + 1)
-                                + " of " + newControls.size());
-                        loadDialog.setMessage2("("
-                                + displayControl.getLabel() + ")");
-                        //                        if(displayControl instanceof ucar.unidata.idv.control.ImageSequenceControl) continue;
-                        if (getIdv().haveCollabManager() && fromCollab
-                                && getCollabManager().haveDisplayControl(
-                                    displayControl)) {
-                            continue;
-                        }
-                        displaysThreadManager.addRunnable(
-                            new visad.util.ThreadManager.MyRunnable() {
-                            public void run() throws Exception {
-                                displayControl.initAfterUnPersistence(
-                                    getIdv(), properties);
+                    //If we are doing the time driver then do a 2 step initialization
+                    //First do all of the displays that are the time driver displays
+                    //next do the ones that aren't
+                    //Note: This will screw up z ordering because the time driver
+                    //displays will always get added first
+                    int numberOfInitSteps = (DisplayControl.DOTIMEDRIVER?2:1);
+                    for(int initStep=0;initStep<numberOfInitSteps;initStep++) {
+                        for (int i = 0; i < newControls.size(); i++) {
+                            final DisplayControl displayControl =
+                                (DisplayControl) newControls.get(i);
+                            if(DisplayControl.DOTIMEDRIVER) {
+                                if(initStep == 0 && !displayControl.getIsTimeDriver()) continue;
+                                else  if(initStep == 1 && displayControl.getIsTimeDriver()) continue;
                             }
-                        });
-                        loadDialog.addDisplayControl(displayControl);
-                        if ( !loadDialog.okToRun()) {
-                            return;
+
+                            loadDialog.setMessage1("Loading display " + (i + 1)
+                                                   + " of " + newControls.size());
+                            loadDialog.setMessage2("("
+                                                   + displayControl.getLabel() + ")");
+                            if (getIdv().haveCollabManager() && fromCollab
+                                && getCollabManager().haveDisplayControl(
+                                                                         displayControl)) {
+                                continue;
+                            }
+                            displaysThreadManager.addRunnable(
+                                                              new visad.util.ThreadManager.MyRunnable() {
+                                                                  public void run() throws Exception {
+                                                                      displayControl.initAfterUnPersistence(
+                                                                                                            getIdv(), properties);
+                                                                  }
+                                                              });
+                            loadDialog.addDisplayControl(displayControl);
+                            if ( !loadDialog.okToRun()) {
+                                return;
+                            }
                         }
                     }
+
+
                     long tt1 = System.currentTimeMillis();
                     displaysThreadManager.runSequentially();
                     //                    displaysThreadManager.runInParallel();

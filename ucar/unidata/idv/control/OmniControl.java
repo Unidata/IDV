@@ -346,7 +346,7 @@ public class OmniControl extends DisplayControlImpl {
             DataInstance dataInstance =
                 doMakeDataInstance((DataChoice) choices.get(i));
             if (dataInstance.dataOk()) {
-                display.addData(dataInstance.getData());
+                display.addData(getData(dataInstance));
                 dataInstances.add(dataInstance);
                 dataChoiceList.add(dataInstance.getDataChoice());
             }

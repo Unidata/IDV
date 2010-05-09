@@ -138,7 +138,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      * @throws Exception problem getting data
      */
     protected Data getCursorReadoutData() throws Exception {
-        return getGridDataInstance().getData();
+        return getData(getGridDataInstance());
     }
 
 

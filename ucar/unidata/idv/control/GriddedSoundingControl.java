@@ -183,7 +183,7 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
 
         dataNode = SoundingDataNode.getInstance(new Listener());
 
-        dataNode.setData(getDataInstance().getData());
+        dataNode.setData(getData(getDataInstance()));
 
         return true;
     }
@@ -573,7 +573,7 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
         Set aniSet = null;
 
         if (dataNode != null) {
-            FieldImpl data = (FieldImpl) getDataInstance().getData();
+            FieldImpl data = (FieldImpl) getData(getDataInstance());
             if (data != null) {
                 aniSet = GridUtil.getTimeSet(data);
             }

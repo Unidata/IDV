@@ -248,7 +248,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         }
         ((GridDisplayable) myDisplay).setColoredByAnother(
             haveMultipleFields());
-        myDisplay.setGrid3D(getGridDataInstance().getGrid());
+        myDisplay.setGrid3D(getGrid(getGridDataInstance()));
         setSliderValues();
         double initialValue = surfaceValue;
         if (Double.isNaN(initialValue)) {

@@ -831,6 +831,22 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return null;
     }
 
+    /**
+     * Get the list of times from the control that is flagged as the time driver
+     *
+     * @return list of times from the time driver control or null
+     */
+    public List<DateTime> getTimeDriverTimes()  throws VisADException, RemoteException {
+        for(DisplayControl control: (List<DisplayControl>)getControls()) {
+            if(control.getIsTimeDriver()) {
+                Set timeSet = control.getTimeSet();
+                DateTime[] times = Animation.getDateTimeArray(timeSet);
+                return (List<DateTime>)Misc.toList(times);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * have we initialized
@@ -2050,6 +2066,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         /** member */
         JLabel label;
 
+        JLabel rightComp;
+
         /** member */
         Real animationValue;
 
@@ -2071,6 +2089,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.timeSet = timeSet;
             this.control = control;
             this.label   = control.makeLegendLabel();
+            if(DisplayControl.DOTIMEDRIVER) {
+                this.rightComp = GuiUtils.rLabel(control.getIsTimeDriver()?"Time Driver":"");
+            } else {
+                this.rightComp = GuiUtils.rLabel("");
+            }
             setIsCapableOfSelection(false);
         }
 
@@ -2267,7 +2290,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         timeline.setShortDisplay(true);
                     }
                     timelines.add(timeline);
-                    comps.add(GuiUtils.inset(GuiUtils.left(timeline.label),
+                    comps.add(GuiUtils.inset(GuiUtils.leftRight(timeline.label,timeline.rightComp),
                                              lblInsets));
                     comps.add(timeline.getContents(false));
                 }

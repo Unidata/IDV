@@ -64,6 +64,12 @@ import javax.swing.JLabel;
  */
 public interface DisplayControl extends Sharable {
 
+    /** For now this allows us to programmatically turn off the time driver functionality */
+    public static final boolean DOTIMEDRIVER = false;
+
+    //    public static final boolean DOTIMEDRIVER = true;
+
+
     /**
      * Preference prefix for preferences of this class.
      */
@@ -670,4 +676,13 @@ public interface DisplayControl extends Sharable {
      * @return -1 if it is undefined. 0 if this one should not be used. else treat the value as seconds
      */
     public int getVisbilityAnimationPause ();
+
+
+    /**
+     * is this display the one that drives time selection for other displays
+     */
+    public boolean getIsTimeDriver ();
+
+
 }
+

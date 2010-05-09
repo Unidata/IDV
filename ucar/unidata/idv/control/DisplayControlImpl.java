@@ -30,6 +30,7 @@ import ucar.unidata.data.DataCancelException;
 import ucar.unidata.data.DataChangeListener;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.DataOperand;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSelectionComponent;
@@ -779,6 +780,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** A flag to note whether this object was unpersisted */
     private boolean wasUnPersisted = false;
+
+
+
+    private boolean isTimeDriver = false;
+
+    private boolean usesTimeDriver = true;
 
     /** color dimness flag */
     private float colorDimness = 1.0f;
@@ -3301,7 +3308,95 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             return null;
         }
-        return (DataInstance) dataInstances.get(0);
+        try {
+            DataInstance dataInstance = (DataInstance) dataInstances.get(0);
+            return dataInstance;
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+    /**
+     * A wrapper around dataInstance.getData but this calls
+     * updateDataInstance first
+     *
+     * @param dataInstance the dataInstance
+     * @return dataInstance.getData();
+     */
+    public Data getData(DataInstance dataInstance) 
+        throws VisADException, RemoteException {
+        return updateDataInstance(dataInstance).getData();
+    }
+
+    /**
+     * A wrapper around dataInstance.getGrid but this calls
+     * updateDataInstance first
+     *
+     * @param dataInstance the dataInstance
+     * @return dataInstance.getGrid();
+     */
+    public FieldImpl getGrid(GridDataInstance dataInstance) 
+        throws VisADException, RemoteException {
+        return getGrid(dataInstance, false);
+    }
+
+
+    /**
+     * A wrapper around dataInstance.getGrid but this calls
+     * updateDataInstance first
+     *
+     * @param dataInstance the dataInstance
+     * @param copy make a copy of the field
+     * @return dataInstance.getGrid(copy);
+     */
+    public FieldImpl getGrid(GridDataInstance dataInstance, boolean copy) 
+        throws VisADException, RemoteException {
+        return updateGridDataInstance(dataInstance).getGrid(copy);
+    }
+
+
+    /**
+     * update the datainstance in preparation for a getData call
+     */
+    protected GridDataInstance updateGridDataInstance(GridDataInstance dataInstance)  
+        throws VisADException, RemoteException {
+        return (GridDataInstance) updateDataInstance(dataInstance);
+    }
+
+
+    /**
+     * update the datainstance in preparation for a getData call.
+     * This will set the timeDriverTimes if enabled 
+     *
+     * @param dataInstance the dataInstance to update
+     * @return the updated dataInstance
+     */
+    protected DataInstance updateDataInstance(DataInstance dataInstance) 
+        throws VisADException, RemoteException {
+        if(!DOTIMEDRIVER) return dataInstance;
+        dataInstance.setDataSelection(updateDataSelection(dataInstance.getDataSelection()));
+        return dataInstance;
+    }
+
+
+    /**
+     * update the dataselection in preparation for a getData call.
+     * This will set the timeDriverTimes if enabled 
+     *
+     * @param dataSelection the dataSelection to update
+     */
+    protected DataSelection updateDataSelection(DataSelection dataSelection) 
+        throws VisADException, RemoteException {
+        if(!DOTIMEDRIVER) return dataSelection;
+        System.err.println ("updateDataSelection:" + this);
+        if(isTimeDriver || !usesTimeDriver) return dataSelection;
+        ViewManager vm = getViewManager();
+        if(vm==null) return dataSelection;
+        List<DateTime> times = vm.getTimeDriverTimes();
+        System.err.println ("\t     driver times to use:" + times);
+        dataSelection.setTimeDriverTimes(times);
+        return dataSelection;
     }
 
 
@@ -4960,6 +5055,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(GuiUtils.MENU_SEPARATOR);
         }
 
+
+
+        if(DOTIMEDRIVER) {
+            items.add(GuiUtils.makeCheckboxMenuItem("Drive times with this display", this,
+                                                    "isTimeDriver", null));
+            items.add(GuiUtils.makeCheckboxMenuItem("Uses time driver times", this,
+                                                    "usesTimeDriver", null));
+            items.add(GuiUtils.MENU_SEPARATOR);
+
+        }
 
         items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Display Settings...",
                 this,
@@ -11860,5 +11965,43 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public int getVisbilityAnimationPause() {
         return this.visbilityAnimationPause;
     }
+    /**
+       Set the IsTimeDriver property.
+
+       @param value The new value for IsTimeDriver
+    **/
+    public void setIsTimeDriver (boolean value) {
+	this.isTimeDriver = value;
+    }
+
+    /**
+       Get the IsTimeDriver property.
+
+       @return The IsTimeDriver
+    **/
+    public boolean getIsTimeDriver () {
+	return this.isTimeDriver;
+    }
+
+    /**
+       Set the UsesTimeDriver property.
+
+       @param value The new value for UsesTimeDriver
+    **/
+    public void setUsesTimeDriver (boolean value) {
+	this.usesTimeDriver = value;
+    }
+
+    /**
+       Get the UsesTimeDriver property.
+
+       @return The UsesTimeDriver
+    **/
+    public boolean getUsesTimeDriver () {
+	return this.usesTimeDriver;
+    }
+
+
+
 
 }

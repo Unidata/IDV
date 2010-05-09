@@ -1041,7 +1041,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 if (loadedAny) {
                     //                    getDataInstance().reInitialize();
                 }
-                workingGrid = (FieldImpl) getGridDataInstance().getGrid();
+                workingGrid = (FieldImpl) getGrid(getGridDataInstance());
                 if (workingGrid == null) {
                     return;
                 }

@@ -171,6 +171,10 @@ public class DataInstance {
     }
 
 
+    public DataSelection getDataSelection() {
+        return dataSelection;
+    }
+
     /**
      * Get the {@link DataChoice} associated with this instance.
      *
