@@ -21,20 +21,19 @@
 package ucar.unidata.data.grid;
 
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+
 import ucar.visad.Util;
+
 import visad.Data;
 import visad.FieldImpl;
 import visad.FlatField;
 import visad.FunctionType;
 import visad.Gridded2DSet;
 import visad.GriddedSet;
+import visad.MathType;
 import visad.Real;
 import visad.RealType;
 import visad.SampledSet;
@@ -43,7 +42,14 @@ import visad.SetType;
 import visad.TupleType;
 import visad.Unit;
 import visad.VisADException;
+
 import visad.util.DataUtility;
+
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -971,6 +977,11 @@ public class GridMath {
         if (domain.getDimension() != domain.getManifoldDimension()) {
             twoDManifold = true;
             fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
+            if ( !MathType.findScalarType(fToUse.getType(), var)) {
+                throw new VisADException(
+                    "Multiple levels needed for partial with respect to "
+                    + var.getName());
+            }
         }
 
         FlatField retField = (FlatField) fToUse.derivative(var,
