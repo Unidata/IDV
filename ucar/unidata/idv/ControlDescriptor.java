@@ -991,12 +991,15 @@ public class ControlDescriptor {
         } catch (DataCancelException dce) {
             //This means the selection of some derived quantity operand was canceled
         } catch (org.python.core.PyException pye) {  // kind of a hack to get the real error
-            String       message = pye.toString();
-            List<String> lines   = StringUtil.split(message, "\n", true,
-                                       true);
+            List<String> lines = StringUtil.split(pye.toString(), "\n", true,
+                                     true);
+            String message = lines.get(lines.size() - 1);
+            message = message.replace("visad.VisADException:", "");
+            message = message.replace("java.lang.Exception:", "");
+            message = message.trim();
             LogUtil.printException(log_,
                                    "Creating display: " + label + "\n"
-                                   + lines.get(lines.size() - 1), pye);
+                                   + message, pye);
         } catch (Throwable exc) {
             LogUtil.printException(log_, "Creating display: " + label, exc);
         }
