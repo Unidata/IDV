@@ -979,8 +979,7 @@ public class GridMath {
             fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
             if ( !MathType.findScalarType(fToUse.getType(), var)) {
                 throw new VisADException(
-                    "Multiple levels needed for partial with respect to "
-                    + var.getName());
+                    "Multiple levels needed for partial with respect to vertical dimension");
             }
         }
 
