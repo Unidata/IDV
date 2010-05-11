@@ -119,12 +119,11 @@ public class ControlDescriptor {
     /** Xml &quot;label&quot; attribute name  for the control descriptor xml */
     public static final String ATTR_LABEL = "label";
 
-    /** _more_          */
+    /** Xml &quot;levels&quot; attribute name  for the control descriptor xml */
     public static final String ATTR_LEVELS = "levels";
 
     /** Xml &quot;properties&quot; attribute name  for the control descriptor xml */
     public static final String TAG_PROPERTY = "property";
-
 
     /** Xml &quot;properties&quot; attribute name  for the control descriptor xml */
     public static final String ATTR_PROPERTIES = "properties";
@@ -229,7 +228,7 @@ public class ControlDescriptor {
     /** The controls.xml node */
     Element node;
 
-    /** _more_          */
+    /** the levels */
     private List levels;
 
     /**
@@ -630,9 +629,9 @@ public class ControlDescriptor {
     }
 
     /**
-     * _more_
+     * Get the levels
      *
-     * @return _more_
+     * @return the levels
      */
     public List getLevels() {
         return levels;
@@ -991,6 +990,13 @@ public class ControlDescriptor {
             idv.controlHasBeenInitialized(control);
         } catch (DataCancelException dce) {
             //This means the selection of some derived quantity operand was canceled
+        } catch (org.python.core.PyException pye) {  // kind of a hack to get the real error
+            String       message = pye.toString();
+            List<String> lines   = StringUtil.split(message, "\n", true,
+                                       true);
+            LogUtil.printException(log_,
+                                   "Creating display: " + label + "\n"
+                                   + lines.get(lines.size() - 1), pye);
         } catch (Throwable exc) {
             LogUtil.printException(log_, "Creating display: " + label, exc);
         }
