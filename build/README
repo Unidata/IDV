@@ -1,11 +1,9 @@
 ***********************************************************************
-
-
-
 The release environment:
 
-On conan all release oriented dirs and files point through the 
+On conan all release oriented directories and files point through the 
 symbolic link:
+
 /content/software/idv/current
 
 So we have(in an abbreviated way):                            
@@ -85,10 +83,13 @@ Once this is done, copy them to conan:
 ***********************************************************************
 Changing the index.html page
 
-cd /content/software/idv/<release_dir>
+cd /content/software/idv/<release_dir> 
+
 cp ../<previous_release_dir>/index.html index.html.<release_dir>
+
 edit the index.html.<version> file and update the IDV News and Announcements
 section with information about the new release.
+
 cp index.html.<version> index.html
 
 (If you have to redo the release, index.html will get overwritten.  That's why
@@ -107,6 +108,16 @@ run:
 svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/branches/IDV_<version>
 
 where <version> is the version (e.g., 2.8).
+
+***********************************************************************
+Flip the current link:
+
+cd /content/software/idv
+rm current
+ln -s <version> current
+
+Go to the IDV homepage and make sure it is pointing to the updated directory.  Make 
+sure all the links on the page work correctly.
 
 ***********************************************************************
 Running the test suite
