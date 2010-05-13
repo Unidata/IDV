@@ -200,6 +200,11 @@ The IDV normally tries to cache data that it loads in memory. You can turn this 
 [ug::preference  {Disk Cache Size}]
 The IDV will cache some data sets to disk to eliminate network latency.  Specify the maximum amount of disk size with this preference.
 
+[ug::preference  {Write Grib Index in Disk Cache}]
+The IDV will normally cache grib data index sets to disk in the default directory: .unidata/idv/DefaultIdv/tmp/nj22.  If you uncheck this box,
+the IDV will save those index sets to the same directory as the grib datasets. When you make the change, you need to restart the IDV for this
+change to take effect, and you need to make sure the write permission on this data directory.
+
 [ug::preference  {Thread Count}]
 The IDV can do processing in multiple threads. This allows one to take advantage of mulitple core chip architectures.
 One can set both the thread count for rendering and for data reading. 
