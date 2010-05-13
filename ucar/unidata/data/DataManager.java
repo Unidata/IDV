@@ -1,27 +1,22 @@
 /*
- * $Id: DataManager.java,v 1.122 2007/08/08 16:24:11 dmurray Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.data;
 
@@ -196,6 +191,9 @@ public class DataManager {
     /** The XML value attribute */
     public static final String ATTR_VALUE = "value";
 
+    /** Preference for where to save the grib index */
+    public static final String PREF_GRIBINDEXINCACHE =
+        "idv.data.gribindexincache";
 
     /**
      * The {@link DataContext} provides some services for this
@@ -319,8 +317,7 @@ public class DataManager {
             "visad.java3d.imageByRef", "visad.java3d.geometryByRef",
             "visad.actionimpl.tracetime", "visad.actionimpl.tracestack",
             "visad.cachingcoordinatesystem.debugtime",
-            "visad.java3d.textureNpot", 
-            "visad.data.arraycache.enabled",
+            "visad.java3d.textureNpot", "visad.data.arraycache.enabled",
             "visad.data.arraycache.lowerthreshold",
             "visad.data.arraycache.upperthreshold",
             "visad.data.arraycache.usedatacachemanager",
@@ -356,10 +353,12 @@ public class DataManager {
             ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
             ucar.nc2.util.DiskCache.setCachePolicy(true);
             // have to do this since nj2.2.20
-            ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(
-                true);
-            ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(
-                true);
+            ucar.nc2.iosp.grib.GribServiceProvider
+                .setIndexAlwaysInCache(dataContext.getIdv().getStateManager()
+                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true));
+            ucar.nc2.iosp.grid.GridServiceProvider
+                .setIndexAlwaysInCache(dataContext.getIdv().getStateManager()
+                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true));
 
 
             visad.data.DataCacheManager.getCacheManager().setCacheDir(
@@ -1785,4 +1784,3 @@ public class DataManager {
 
 
 }
-

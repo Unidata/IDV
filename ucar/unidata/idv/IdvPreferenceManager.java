@@ -812,7 +812,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
         JComboBox lookAndFeelBox = null;
-        if(!GuiUtils.isMac()) {
+        if ( !GuiUtils.isMac()) {
             UIManager.LookAndFeelInfo[] landfs =
                 UIManager.getInstalledLookAndFeels();
             Vector         lookAndFeelItems    = new Vector();
@@ -821,10 +821,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             for (int i = 0; i < landfs.length; i++) {
                 TwoFacedObject tfo;
                 lookAndFeelItems.add(tfo =
-                                     new TwoFacedObject(landfs[i].getName(),
-                                                        landfs[i].getClassName()));
+                    new TwoFacedObject(landfs[i].getName(),
+                                       landfs[i].getClassName()));
                 if (lookAndFeel.getClass().getName().equals(
-                                                            landfs[i].getClassName())) {
+                        landfs[i].getClassName())) {
                     selectedLookAndFeel = tfo;
                 }
             }
@@ -844,19 +844,20 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         JComponent topPanel;
 
-        if(lookAndFeelBox!=null) {
+        if (lookAndFeelBox != null) {
             topPanel = GuiUtils.formLayout(new Component[] {
-                    GuiUtils.rLabel("Resource Sitepath:"),
-                    GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
-                    GuiUtils.left(editorComp), 
-                    GuiUtils.rLabel("Look & Feel:"),
-                    GuiUtils.left(lookAndFeelBox)
-                });
+                GuiUtils.rLabel("Resource Sitepath:"),
+                GuiUtils.left(sitePathField),
+                GuiUtils.rLabel("External Editor:"),
+                GuiUtils.left(editorComp), GuiUtils.rLabel("Look & Feel:"),
+                GuiUtils.left(lookAndFeelBox)
+            });
         } else {
             topPanel = GuiUtils.formLayout(new Component[] {
-                    GuiUtils.rLabel("Resource Sitepath:"),
-                    GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
-                    GuiUtils.left(editorComp)});
+                GuiUtils.rLabel("Resource Sitepath:"),
+                GuiUtils.left(sitePathField),
+                GuiUtils.rLabel("External Editor:"),
+                GuiUtils.left(editorComp) });
         }
         Object[][] prefs1 = {
             { "General:", null },
@@ -866,8 +867,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
             { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES,
               Boolean.FALSE },
-            { "Check for Updates", InstallManager.PREF_CHECKFORNEWRELEASE, Boolean.TRUE },
-
+            { "Check for Updates", InstallManager.PREF_CHECKFORNEWRELEASE,
+              Boolean.TRUE },
             /*            { "Dock in Dashboard:", null },
             { "Quick Links", PREF_EMBEDQUICKLINKSINDASHBOARD, Boolean.TRUE },
             { "Data Chooser", PREF_EMBEDDATACHOOSERINDASHBOARD,
@@ -1157,6 +1158,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                          new JLabel(" (MB)  (for temporary files)"));
         widgets.put(PREF_CACHESIZE, diskCacheSizeFld);
 
+
+        JCheckBox gribIdxCacheCbx =
+            new JCheckBox("Write Grib Index in Disk Cache",
+                          getStore().get(DataManager.PREF_GRIBINDEXINCACHE,
+                                         true));
+        widgets.put(DataManager.PREF_GRIBINDEXINCACHE, gribIdxCacheCbx);
+
         Vector threadCnt = new Vector();
         for (int i = 1; i <= Runtime.getRuntime().availableProcessors();
                 i++) {
@@ -1183,6 +1191,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         formatComps.add(GuiUtils.filler());
         formatComps.add(GuiUtils.left(GuiUtils.hbox(cacheComps)));
 
+        formatComps.add(GuiUtils.filler());
+        formatComps.add(GuiUtils.left(gribIdxCacheCbx));
 
 
         formatComps.add(GuiUtils.rLabel("Thread Count:"));
