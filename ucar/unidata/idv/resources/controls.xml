@@ -540,7 +540,29 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
-<!-- End 3D Surface Displays -->
+  <control
+     id="planviewcolorasz"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ColorPlanViewControl"
+     doeslevels="true"
+     label="Color-Shaded Image As Topography"
+     code="makeTopographyFromField(D1)"
+     displaycategory="3D Surface"
+     properties="smoothed=false;multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+<!-- 
+  <control
+     id="radarsweepasz"
+     categories="SWEEP-2D-*"
+     doeslevels="true"
+     class="ucar.unidata.idv.control.RadarSweepControl"
+     label="Radar Sweep as 3D"
+     code="makeTopographyFromField(D1)"
+     displaycategory="3D Surface"
+     properties="smoothed=false;use3D=false;allowSmoothing=false;multipleIsTopography=true"/>
+ -->
 
   <control
      id="imagecontroloverz"
@@ -553,6 +575,7 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+<!-- End 3D Surface Displays -->
 
 <!-- Begin Probe Displays -->
 <!--

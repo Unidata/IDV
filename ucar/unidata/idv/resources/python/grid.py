@@ -307,3 +307,8 @@ def exportGridToNetcdf(grid,filename='grid.nc'):
     """Write out the grid data to CF compliant netCDF file"""
     GridUtil.exportGridToNetcdf(grid,filename)
     return grid
+
+def makeTopographyFromField(grid):
+    """make a topography out of a grid """
+    c = newUnit(grid, "topo", "m")
+    return DerivedGridFactory.create2DTopography(grid,c)
