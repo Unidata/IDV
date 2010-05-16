@@ -3020,7 +3020,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             logoImage = "${root}/images/logo.png";
         }
         String logoUrl = (String) result.getProperty(PROP_LOGO_URL);
-        if (logoUrl == null) {
+        if (logoUrl == null || logoUrl.trim().length()==0) {
             logoUrl = getProperty(PROP_LOGO_URL, "");
         }
         String pageTitle = (String) result.getProperty(PROP_REPOSITORY_NAME);
@@ -3600,8 +3600,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected void writeGlobal(Request request, String propName)
             throws Exception {
-        writeGlobal(propName,
-                    request.getString(propName, getProperty(propName, "")));
+        writeGlobal(request, propName, false);
+    }
+
+
+
+    protected void writeGlobal(Request request, String propName, boolean deleteIfNull)
+            throws Exception {
+        String value = request.getString(propName, getProperty(propName, ""));
+        if(deleteIfNull && value.trim().length()==0) {
+            getDatabaseManager().delete(Tables.GLOBALS.NAME,
+                                        Clause.eq(Tables.GLOBALS.COL_NAME, propName));
+            dbProperties.remove(propName);
+        } else {
+            writeGlobal(propName, value);
+        }
     }
 
 

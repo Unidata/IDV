@@ -140,6 +140,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     private static final String DB_POSTGRES = "postgres";
 
     /** _more_ */
+    private static final String DB_ORACLE = "oracle";
+
+    /** _more_ */
     private DataSource dataSource;
 
     /** Keeps track of active connections */
@@ -1774,6 +1777,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "text");
             sql = sql.replace("ramadda.bigclob", "text");
+        } else if (db.equals(DB_ORACLE)) {
+            sql = sql.replace("ramadda.double", "number");
+            sql = sql.replace("ramadda.datetime", "date");
+            sql = sql.replace("ramadda.clob", "clob");
+            sql = sql.replace("ramadda.bigclob", "clob");
         }
         return sql;
     }

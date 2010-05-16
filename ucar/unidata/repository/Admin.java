@@ -1514,17 +1514,18 @@ public class Admin extends RepositoryManager {
         getRepository().getRegistryManager().applyAdminConfig(request);
 
 
-        getRepository().writeGlobal(request, PROP_ADMIN_EMAIL);
-        getRepository().writeGlobal(request, PROP_ADMIN_SMTP);
-        getRepository().writeGlobal(request, PROP_LDM_PQINSERT);
-        getRepository().writeGlobal(request, PROP_LDM_QUEUE);
-        getRepository().writeGlobal(request, PROP_LOGO_URL);
-        getRepository().writeGlobal(request, PROP_LOGO_IMAGE);
-        getRepository().writeGlobal(request, PROP_REPOSITORY_NAME);
-        getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION);
+        getRepository().writeGlobal(request, PROP_ADMIN_EMAIL,true);
+        getRepository().writeGlobal(request, PROP_ADMIN_SMTP,true);
+        getRepository().writeGlobal(request, PROP_LOGO_URL,true);
+        getRepository().writeGlobal(request, PROP_LOGO_IMAGE,true);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_NAME,true);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION,true);
         getRepository().writeGlobal(request, PROP_ADMIN_PHRASES);
         getRepository().writeGlobal(request, PROP_HTML_FOOTER);
-        getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS);
+
+        getRepository().writeGlobal(request, PROP_LDM_PQINSERT,true);
+        getRepository().writeGlobal(request, PROP_LDM_QUEUE,true);
+        getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS,true);
         getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
 
         String ratings = "" + request.get(PROP_RATINGS_ENABLE, false);
