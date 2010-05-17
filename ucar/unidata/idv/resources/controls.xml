@@ -490,7 +490,7 @@ Since this is confusing and needs more work lets remove this for now
 
 
 
- 
+
   <control
      id="isosurfacebyanother"
      categories="GRID-3D-*;RADAR-3D-*"
@@ -552,17 +552,16 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
-<!-- 
+<!--    -->
   <control
      id="radarsweepasz"
-     categories="SWEEP-2D-*"
+     categories="SWEEP-2D-AS-3D-*"
      doeslevels="true"
      class="ucar.unidata.idv.control.RadarSweepControl"
      label="Radar Sweep as 3D"
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
      properties="smoothed=false;use3D=false;allowSmoothing=false;multipleIsTopography=true"/>
- -->
 
   <control
      id="imagecontroloverz"
