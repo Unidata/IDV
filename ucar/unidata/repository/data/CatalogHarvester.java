@@ -131,6 +131,11 @@ public class CatalogHarvester extends Harvester {
 
 
 
+    public String getDescription() {
+        return "THREDDS Catalog Harvester";
+    }
+
+
     /**
      * _more_
      *
