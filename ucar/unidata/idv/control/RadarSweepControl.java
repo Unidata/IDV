@@ -145,6 +145,8 @@ public class RadarSweepControl extends ColorPlanViewControl {
             userMessage("Can't display 3D sweep in 2D display");
             return false;
         }
+        if(dataChoice.getName().startsWith("ucar.unidata.util"))
+            dataChoice.setName(dataChoice.getDescription());
         return super.init(dataChoice);
     }
 

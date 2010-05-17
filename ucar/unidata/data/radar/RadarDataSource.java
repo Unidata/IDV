@@ -91,11 +91,15 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
     public static final DataCategory CATEGORY_SWEEP_3D =
         DataCategory.parseCategory("SWEEP-3D", false);
 
+    public static final DataCategory CATEGORY_SWEEP_2D_AS_3D =
+        DataCategory.parseCategory("SWEEP-2D-AS-3D", false);
 
     /** 3d sweep category */
     public static final DataCategory CATEGORY_SWEEP_3D_TIME =
         DataCategory.parseCategory("SWEEP-3D-TIME", false);
 
+    public static final DataCategory CATEGORY_SWEEP_2D_AS_3D_TIME =
+        DataCategory.parseCategory("SWEEP-2D-AS-3D-TIME", false);
 
     /** The 2D radar sweep category */
     public static final DataCategory CATEGORY_SWEEP_2D =
