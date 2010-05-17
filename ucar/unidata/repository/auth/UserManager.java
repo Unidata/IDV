@@ -168,7 +168,9 @@ public class UserManager extends RepositoryManager {
             allowedIpsForLogin =
                 StringUtil.split(getProperty(PROP_LOGIN_ALLOWEDIPS, ""), ",",
                                  true, true);
+            getLogManager().logInfoAndPrint("UserManager: allowed ip addresses: " + allowedIpsForLogin);
         }
+
         if (allowedIpsForLogin.size() > 0) {
             String requestIp = request.getIp();
             //            System.err.println ("IP:" + requestIp +" ips:" + allowedIpsForLogin);
@@ -180,10 +182,10 @@ public class UserManager extends RepositoryManager {
                     return true;
                 }
             }
+            //If there were any ips and none matched then return false
+            return false;
         }
-
         return true;
-        //        return new File("/Users/jeffmc/login").exists();
     }
 
 
