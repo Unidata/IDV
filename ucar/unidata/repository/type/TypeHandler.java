@@ -622,17 +622,22 @@ public class TypeHandler extends RepositoryManager {
         int    col   = 3;
         String id    = results.getString(1);
         Entry  entry = createEntry(id);
-        entry.initEntry(results.getString(col++), results
-            .getString(col++), getEntryManager()
+        DatabaseManager dbm = getDatabaseManager();
+        Date createDate = null;
+        
+        entry.initEntry(results.getString(col++), 
+                        results.getString(col++), 
+                        getEntryManager()
             .findGroup(null, results.getString(col++)), getUserManager()
             .findUser(results
                 .getString(col++), true), new Resource(getStorageManager()
                 .resourceFromDB(results.getString(col++)), results
                 .getString(col++)), results
-                    .getString(col++), getDatabaseManager()
-                    .getDate(results, col++).getTime(), getDatabaseManager()
-                    .getDate(results, col++).getTime(), getDatabaseManager()
-                    .getDate(results, col++).getTime(), null);
+                    .getString(col++), 
+                        (createDate=dbm.getDate(results, col++)).getTime(), 
+                        dbm.getDate(results, col++, createDate).getTime(), 
+                        dbm.getDate(results, col++).getTime(), 
+                        dbm.getDate(results, col++).getTime(), null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
@@ -693,6 +698,9 @@ public class TypeHandler extends RepositoryManager {
                             entry.getDescription());
         html = html.replace("${" + ARG_CREATEDATE + "}",
                             formatDate(request, entry.getCreateDate(),
+                                       entry));
+        html = html.replace("${" + ARG_CHANGEDATE + "}",
+                            formatDate(request, entry.getChangeDate(),
                                        entry));
         html = html.replace("${" + ARG_FROMDATE + "}",
                             formatDate(request, entry.getStartDate(), entry));
@@ -2319,19 +2327,45 @@ public class TypeHandler extends RepositoryManager {
                                       dateRange[0]));
         }
 
-
         if (dateRange[1] != null) {
             addCriteria(searchCriteria, "To Date<=", dateRange[1]);
             dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE,
                                       dateRange[1]));
         }
 
-        Date createDate = request.get(ARG_CREATEDATE, (Date) null);
-        if (createDate != null) {
-            addCriteria(searchCriteria, "Create Date<=", createDate);
-            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE,
-                                      createDate));
+
+        dateRange = request.getDateRange(ARG_CREATEDATE+"_from", ARG_CREATEDATE+"_to",
+                                         null,
+                                         new Date());
+        if (dateRange[0] != null) {
+            addCriteria(searchCriteria, "Create Date>=", dateRange[0]);
+            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_CREATEDATE,
+                                      dateRange[0]));
         }
+
+        if (dateRange[1] != null) {
+            addCriteria(searchCriteria, "Create Date<=", dateRange[1]);
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE,
+                                      dateRange[1]));
+        }
+
+        dateRange = request.getDateRange(ARG_CHANGEDATE+"_from", ARG_CHANGEDATE+"_to",
+                                         null,
+                                         new Date());
+        if (dateRange[0] != null) {
+            addCriteria(searchCriteria, "Change Date>=", dateRange[0]);
+            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_CHANGEDATE,
+                                      dateRange[0]));
+        }
+
+        if (dateRange[1] != null) {
+            addCriteria(searchCriteria, "Change Date<=", dateRange[1]);
+            dateClauses.add(Clause.le(Tables.ENTRIES.COL_CHANGEDATE,
+                                      dateRange[1]));
+        }
+
+
+
 
         if (dateClauses.size() > 1) {
             where.add(Clause.and(dateClauses));

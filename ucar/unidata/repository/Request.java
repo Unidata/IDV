@@ -1032,6 +1032,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public boolean defined(String key) {
+        if(key == null) return false;
         Object result = getValue(key, (Object) null);
         if (result == null) {
             return false;
@@ -1452,7 +1453,6 @@ public class Request implements Constants {
      */
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
-
         return getDateRange(from, to, ARG_RELATIVEDATE, dflt);
     }
 

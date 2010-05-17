@@ -22,6 +22,7 @@ CREATE TABLE entries (id varchar(200),
                    resource_type varchar(200),
 		   datatype varchar(200),
 	           createdate ramadda.datetime, 
+                   changedate ramadda.datetime, 
 	           fromdate ramadda.datetime, 
 	           todate ramadda.datetime,
 	           south ramadda.double,
@@ -29,6 +30,8 @@ CREATE TABLE entries (id varchar(200),
 	           east ramadda.double,
 	           west ramadda.double); 
 
+
+ALTER table entries add column changedate ramadda.datetime;
 
 ---- things to add????
 ---- file size

@@ -1670,7 +1670,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     (UserAuthenticator) c.newInstance());
             } else if (AdminHandler.class.isAssignableFrom(c)) {
                 adminHandlerClasses.add(c);
+            } else if (Harvester.class.isAssignableFrom(c)) {
+                getHarvesterManager().addHarvesterType(c);
             }
+
             super.checkClass(c);
         }
 
@@ -1718,7 +1721,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 continue;
             }
             String pluginFile = plugins[i].toString();
-            if (pluginFile.endsWith(".jar")) {
+            if (pluginFile.toLowerCase().endsWith(".jar")) {
                 PluginClassLoader cl = new MyClassLoader(pluginFile,
                                            getClass().getClassLoader());
 
@@ -3559,9 +3562,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         sql = getDatabaseManager().convertSql(sql);
 
         System.err.println("Repository.initSchema: loading schema");
-        SqlUtil.showLoadingSql = true;
+        //        SqlUtil.showLoadingSql = true;
         getDatabaseManager().loadSql(sql, true, false);
-        SqlUtil.showLoadingSql = false;
+        //        SqlUtil.showLoadingSql = false;
         System.err.println("Repository.initSchema: done loading schema");
 
         for (String sqlFile : pluginSqlFiles) {

@@ -75,7 +75,7 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Harvester extends RepositoryManager {
+public abstract class Harvester extends RepositoryManager {
 
     /** _more_ */
 
@@ -180,7 +180,6 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private String name = "";
 
-
     /** _more_ */
     private Element element;
 
@@ -193,9 +192,6 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private boolean activeOnStart = false;
 
-
-
-
     /** _more_ */
     private double sleepMinutes = 5;
 
@@ -207,7 +203,6 @@ public class Harvester extends RepositoryManager {
 
     /** _more_ */
     private boolean addMetadata = false;
-
 
 
     /** _more_ */
@@ -284,6 +279,8 @@ public class Harvester extends RepositoryManager {
         }
     }
 
+
+    public abstract String getDescription();
 
     /**
      * _more_

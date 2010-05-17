@@ -463,6 +463,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                         new Resource(targetFile, (targetFile.isDirectory()
                 ? Resource.TYPE_LOCAL_DIRECTORY
                 : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
+                        targetFile.lastModified(),
                 targetFile.lastModified(), targetFile.lastModified(), null);
 
         if (templateEntry != null) {

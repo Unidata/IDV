@@ -1272,7 +1272,9 @@ return new Result(title, sb);
 
                 entry.initEntry(name, description, parent, request.getUser(),
                                 new Resource(theResource, resourceType),
-                                dataType, createDate.getTime(),
+                                dataType, 
+                                createDate.getTime(),
+                                createDate.getTime(),
                                 theDateRange[0].getTime(),
                                 theDateRange[1].getTime(), null);
                 if (forUpload) {
@@ -2710,6 +2712,7 @@ return new Result(title, sb);
                                    (Group) newParent, request.getUser(),
                                    newResource, oldEntry.getDataType(),
                                    oldEntry.getCreateDate(),
+                                   new Date().getTime(),
                                    oldEntry.getStartDate(),
                                    oldEntry.getEndDate(),
                                    oldEntry.getValues());
@@ -3206,12 +3209,15 @@ return new Result(title, sb);
             resource = new Resource("", Resource.TYPE_UNKNOWN);
         }
         Date createDate = new Date();
-        Date fromDate   = createDate;
+
+
         //        System.err.println("node:" + XmlUtil.toString(node));
         if (XmlUtil.hasAttribute(node, ATTR_CREATEDATE)) {
             createDate = getRepository().parseDate(XmlUtil.getAttribute(node,
                     ATTR_CREATEDATE));
         }
+
+        Date fromDate = createDate;
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = getRepository().parseDate(XmlUtil.getAttribute(node,
                     ATTR_FROMDATE));
@@ -3230,6 +3236,7 @@ return new Result(title, sb);
         Entry entry = typeHandler.createEntry(id);
         entry.initEntry(name, description, parentGroup, request.getUser(),
                         resource, dataType, createDate.getTime(),
+                        new Date().getTime(),
                         fromDate.getTime(), toDate.getTime(), null);
 
         if (doAnonymousUpload) {
@@ -4903,7 +4910,7 @@ return new Result(title, sb);
                                          Resource.TYPE_STOREDFILE);
         Date dttm = new Date();
         entry.initEntry(name, "", group, request.getUser(), resource, "",
-                        dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
+                        dttm.getTime(), dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
         typeHandler.initializeNewEntry(entry);
         List<Entry> newEntries = new ArrayList<Entry>();
         newEntries.add(entry);
@@ -4943,6 +4950,11 @@ return new Result(title, sb);
             getStorageManager().resourceToDB(entry.getResource().getPath()));
         statement.setString(col++, entry.getResource().getType());
         statement.setString(col++, entry.getDataType());
+        //create date
+        getDatabaseManager().setDate(statement, col++,
+                                     entry.getCreateDate());
+
+        //change date
         getDatabaseManager().setDate(statement, col++,
                                      getRepository().currentTime());
         try {

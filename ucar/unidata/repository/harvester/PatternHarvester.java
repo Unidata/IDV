@@ -196,6 +196,10 @@ public class PatternHarvester extends Harvester {
     }
 
 
+    public String getDescription() {
+        return "Local Files";
+    }
+
     /**
      * _more_
      *
@@ -881,7 +885,7 @@ public class PatternHarvester extends Harvester {
             resource = new Resource(fileName, Resource.TYPE_FILE);
         }
         entry.initEntry(name, desc, group, getUser(), resource, "",
-                        createDate.getTime(), fromDate.getTime(),
+                        createDate.getTime(), createDate.getTime(),fromDate.getTime(),
                         toDate.getTime(), values);
         /*
         if (tag.length() > 0) {

@@ -146,7 +146,6 @@ public class Entry extends Entity {
 
 
 
-
     /**
      * _more_
      *
@@ -201,6 +200,7 @@ public class Entry extends Entity {
             setMetadata(thisMetadata);
         }
         setCreateDate(template.getCreateDate());
+        setChangeDate(template.getChangeDate());
         setStartDate(template.getStartDate());
         setEndDate(template.getEndDate());
         setNorth(template.getNorth());
@@ -228,9 +228,9 @@ public class Entry extends Entity {
      */
     public void initEntry(String name, String description, Group group,
                           User user, Resource resource, String dataType,
-                          long createDate, long startDate, long endDate,
+                          long createDate, long changeDate, long startDate, long endDate,
                           Object[] values) {
-        super.init(name, description, group, user, createDate);
+        super.init(name, description, group, user, createDate,changeDate);
         //topGroup id is a noop
         this.resource = resource;
         this.dataType = dataType;
@@ -293,6 +293,7 @@ public class Entry extends Entity {
      */
     public void setDate(long value) {
         super.setCreateDate(value);
+        super.setChangeDate(value);
         setStartDate(value);
         setEndDate(value);
     }

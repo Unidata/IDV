@@ -429,6 +429,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_CREATEDATE = "createdate";
 
+    public static final String ATTR_CHANGEDATE = "changedate";
+
     /** _more_ */
     public static final String ATTR_TOOLTIP = "tooltip";
 
@@ -579,6 +581,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_CREATEDATE = "createdate";
+
+    public static final String ARG_CHANGEDATE = "changedate";
 
     /** _more_ */
     public static final String ARG_CREATOR = "creator";

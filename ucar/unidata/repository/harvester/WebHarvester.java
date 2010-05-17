@@ -154,6 +154,10 @@ public class WebHarvester extends Harvester {
     }
 
 
+    public String getDescription() {
+        return "URL";
+    }
+
     /**
      * _more_
      *
@@ -561,7 +565,7 @@ public class WebHarvester extends Harvester {
 
         //        System.err.println ("WebHarvester: " + getName() +" adding entry: " + name);
         entry.initEntry(name, desc, group, getUser(), resource, "",
-                        createDate.getTime(), fromDate.getTime(),
+                        createDate.getTime(), createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), null);
         if (tag.length() > 0) {
             List tags = StringUtil.split(tag, ",", true, true);

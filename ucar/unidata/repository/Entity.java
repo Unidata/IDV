@@ -86,6 +86,8 @@ public class Entity implements Cloneable {
     /** _more_ */
     private long createDate;
 
+    private long changeDate;
+
 
     /** _more_ */
     boolean isDummy = false;
@@ -110,13 +112,14 @@ public class Entity implements Cloneable {
      * @param createDate _more_
      */
     public Entity(String id, String name, String description,
-                  Group parentGroup, User user, long createDate) {
+                  Group parentGroup, User user, long createDate, long changeDate) {
         this.id          = id;
         this.name        = name;
         this.description = description;
         this.parentGroup = parentGroup;
         this.user        = user;
         this.createDate  = createDate;
+        this.changeDate  = changeDate;
     }
 
 
@@ -130,12 +133,13 @@ public class Entity implements Cloneable {
      * @param createDate _more_
      */
     public void init(String name, String description, Group parentGroup,
-                     User user, long createDate) {
+                     User user, long createDate, long changeDate) {
         this.name        = name;
         this.description = description;
         this.parentGroup = parentGroup;
         this.user        = user;
         this.createDate  = createDate;
+        this.changeDate  = changeDate;
     }
 
 
@@ -188,6 +192,26 @@ public class Entity implements Cloneable {
      */
     public long getCreateDate() {
         return createDate;
+    }
+
+
+
+    /**
+     * Set the ChangeDate property.
+     *
+     * @param value The new value for ChangeDate
+     */
+    public void setChangeDate(long value) {
+        changeDate = value;
+    }
+
+    /**
+     * Get the ChangeDate property.
+     *
+     * @return The ChangeDate
+     */
+    public long getChangeDate() {
+        return changeDate;
     }
 
     /**

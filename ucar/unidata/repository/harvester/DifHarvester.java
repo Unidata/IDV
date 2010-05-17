@@ -328,6 +328,12 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
     }
 
 
+    public String getDescription() {
+        return "DIF";
+    }
+
+
+
 
     /**
      * _more_

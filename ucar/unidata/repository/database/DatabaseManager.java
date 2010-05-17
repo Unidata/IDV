@@ -1570,11 +1570,17 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     public Date getTimestamp(ResultSet results, int col) throws Exception {
+        return getTimestamp(results, col);
+    }
+
+    public Date getTimestamp(ResultSet results, int col, boolean makeDflt) throws Exception {
         Date date = results.getTimestamp(col, Repository.calendar);
         if (date != null) {
             return date;
         }
-        return new Date();
+        if(makeDflt)
+            return new Date();
+        return null;
     }
 
 
@@ -1619,6 +1625,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
+    public Date getDate(ResultSet results, int col, Date dflt) throws Exception {
+        Date date = getDate(results, col, false);
+        if(date == null) return dflt;
+        return date;
+    }
+
+
     /**
      * _more_
      *
@@ -1630,15 +1643,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     public Date getDate(ResultSet results, int col) throws Exception {
+        return getDate(results, col, true);
+    }
+
+    public Date getDate(ResultSet results, int col, boolean makeDflt) throws Exception {
         //        if (!db.equals(DB_MYSQL)) {
         if (true || !db.equals(DB_MYSQL)) {
-            return getTimestamp(results, col);
+            return getTimestamp(results, col, makeDflt);
         }
         Date date = results.getTime(col, Repository.calendar);
         if (date != null) {
             return date;
         }
-        return new Date();
+        if(makeDflt)
+            return new Date();
+        return null;
     }
 
 

@@ -109,6 +109,10 @@ public class DirectoryHarvester extends Harvester {
     }
 
 
+    public String getDescription() {
+        return "Make folders from directory tree";
+    }
+
     /**
      * _more_
      *

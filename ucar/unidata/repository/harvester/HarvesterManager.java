@@ -96,6 +96,9 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     private Hashtable harvesterMap = new Hashtable();
 
+    List<TwoFacedObject> harvesterTypes = new ArrayList<TwoFacedObject>();
+
+
     /**
      * _more_
      *
@@ -103,8 +106,29 @@ public class HarvesterManager extends RepositoryManager {
      */
     public HarvesterManager(Repository repository) {
         super(repository);
+        addHarvesterType(PatternHarvester.class);
+        addHarvesterType(WebHarvester.class);
+        addHarvesterType(DirectoryHarvester.class);
     }
 
+    
+    public void addHarvesterType(Class c)  {
+        try {
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class,
+                                                                  String.class });
+            if(ctor == null) {
+                throw new IllegalArgumentException("Could not find constructor for harvester:" + c.getName());
+            }
+            Harvester dummy =
+                (Harvester) ctor.newInstance(new Object[] {
+                        getRepository(),
+                        ""});
+            harvesterTypes.add(new TwoFacedObject(dummy.getDescription(), c.getName()));
+        } catch(Exception exc) {
+            logError("Error creating harvester: " + c.getName(), exc);
+        }
+    }
 
 
     /**
@@ -304,14 +328,7 @@ public class HarvesterManager extends RepositoryManager {
         String typeInput =
             HtmlUtil.select(
                 ARG_HARVESTER_CLASS,
-                Misc.newList(
-                    new TwoFacedObject(
-                        "Local Files",
-                        "ucar.unidata.repository.harvester.PatternHarvester"), new TwoFacedObject(
-                            "URL",
-                            "ucar.unidata.repository.harvester.WebHarvester"), new TwoFacedObject(
-                                "Make folders from directory tree",
-                                "ucar.unidata.repository.harvester.DirectoryHarvester")));
+                harvesterTypes);
         sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeInput));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit(msg("Create"))

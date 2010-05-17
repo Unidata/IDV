@@ -76,6 +76,8 @@ public class Tables {
         /** _more_ */
         public static final String COL_CREATEDATE = NAME + ".createdate";
 
+        public static final String COL_CHANGEDATE = NAME + ".changedate";
+
         /** _more_ */
         public static final String COL_FROMDATE = NAME + ".fromdate";
 
@@ -98,7 +100,7 @@ public class Tables {
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_TYPE, COL_NAME, COL_DESCRIPTION, COL_PARENT_GROUP_ID,
             COL_USER_ID, COL_RESOURCE, COL_RESOURCE_TYPE, COL_DATATYPE,
-            COL_CREATEDATE, COL_FROMDATE, COL_TODATE, COL_SOUTH, COL_NORTH,
+            COL_CREATEDATE, COL_CHANGEDATE, COL_FROMDATE, COL_TODATE, COL_SOUTH, COL_NORTH,
             COL_EAST, COL_WEST
         };
 

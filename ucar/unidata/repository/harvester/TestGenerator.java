@@ -92,7 +92,16 @@ public class TestGenerator extends Harvester {
     }
 
 
+    public TestGenerator(Repository repository, String id)
+            throws Exception {
+        super(repository, id);
+        this.typeHandler = repository.getTypeHandler(TypeHandler.TYPE_FILE);
+    }
 
+
+    public String getDescription() {
+        return "Test";
+    }
 
     /** _more_ */
     int cnt = 0;
@@ -144,6 +153,7 @@ public class TestGenerator extends Harvester {
                                     group, user,
                                     new Resource("", Resource.TYPE_UNKNOWN),
                                     "", createDate.getTime(),
+                                    createDate.getTime(),
                                     createDate.getTime(),
                                     createDate.getTime(), null);
                     entries.add(entry);

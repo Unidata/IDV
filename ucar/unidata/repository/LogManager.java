@@ -217,7 +217,6 @@ public class LogManager extends RepositoryManager {
      */
     public void logError(Logger log, String message, Throwable exc) {
         message = encode(message);
-
         Throwable thr = null;
         if (exc != null) {
             thr = LogUtil.getInnerException(exc);
@@ -231,6 +230,9 @@ public class LogManager extends RepositoryManager {
             } else {
                 log.error(message + "\n<stack>\n" + thr + "\n"
                           + LogUtil.getStackTrace(thr) + "\n</stack>");
+
+                System.err.println("ERROR:" + message);
+                thr.printStackTrace();
             }
         }
 

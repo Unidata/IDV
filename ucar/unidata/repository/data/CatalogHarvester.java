@@ -372,7 +372,9 @@ public class CatalogHarvester extends Harvester {
             }
 
             entry.initEntry(name, "", parent, user, resource, "",
-                            createDate.getTime(), createDate.getTime(),
+                            createDate.getTime(), 
+                            createDate.getTime(),
+                            createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);
             madeEntry = true;
