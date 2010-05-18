@@ -239,7 +239,7 @@ example:
      properties="windowVisible=true;smoothed=false;autoScaleYAxis=true;"/>
   <control
      id="dataxs"
-     categories="GRID-2D-*;IMAGE-*-*;SWEEP-2D-*"
+     categories="GRID-2D-*;IMAGE-*-*"
      class="ucar.unidata.idv.control.DataTransectControl"
      label="Data Transect"
      displaycategory="Cross sections"
@@ -555,7 +555,7 @@ Since this is confusing and needs more work lets remove this for now
 <!--    -->
   <control
      id="radarsweepasz"
-     categories="SWEEP-2D-AS-3D-*"
+     categories="SWEEP-2D-*"
      doeslevels="true"
      class="ucar.unidata.idv.control.RadarSweepControl"
      label="Radar Sweep as 3D"
