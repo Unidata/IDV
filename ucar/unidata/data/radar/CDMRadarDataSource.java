@@ -390,10 +390,10 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                     } else if (haveTimes) {
                         categories = Misc.newList(CATEGORY_SWEEP_2D_TIME,
-                                CATEGORY_SWEEP_3D_TIME, CATEGORY_SWEEP_2D_AS_3D_TIME);
+                                CATEGORY_SWEEP_3D_TIME );
                     } else {
                         categories = Misc.newList(CATEGORY_SWEEP_2D,
-                                CATEGORY_SWEEP_3D, CATEGORY_SWEEP_2D_AS_3D);
+                                CATEGORY_SWEEP_3D );
                     }
                     //categories = Misc.newList(CATEGORY_SWEEP_2D,
                     //        CATEGORY_SWEEP_3D);
@@ -442,10 +442,10 @@ public class CDMRadarDataSource extends RadarDataSource {
                 } else {
                     if (haveTimes) {
                         categories2D = Misc.newList(CATEGORY_SWEEP_2D_TIME,
-                                CATEGORY_SWEEP_3D_TIME, CATEGORY_SWEEP_2D_AS_3D_TIME);
+                                CATEGORY_SWEEP_3D_TIME );
                     } else {
                         categories2D = Misc.newList(CATEGORY_SWEEP_2D,
-                                CATEGORY_SWEEP_3D, CATEGORY_SWEEP_2D_AS_3D);
+                                CATEGORY_SWEEP_3D);
                     }
                     // categories2D = Misc.newList(CATEGORY_SWEEP_2D,
                     //         CATEGORY_SWEEP_3D);
