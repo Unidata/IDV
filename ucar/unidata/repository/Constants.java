@@ -599,6 +599,14 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DATE = "date";
 
+    public static final String  ARG_DATE_OVERLAPS = "date.overlaps";
+    public static final String  ARG_DATE_SEARCHMODE = "date.searchmode";
+
+    public static final String  DATE_SEARCHMODE_OVERLAPS = "overlaps";
+    public static final String  DATE_SEARCHMODE_CONTAINEDBY = "containedby";
+    public static final String  DATE_SEARCHMODE_CONTAINS = "contains";
+
+
     /** _more_ */
     public static final String ARG_DATE_PATTERN = "date.pattern";
 

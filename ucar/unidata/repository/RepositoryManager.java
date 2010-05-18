@@ -193,9 +193,16 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param label _more_
      * @param value _more_
      */
-    public static void addCriteria(StringBuffer sb, String label,
+    public void addCriteria(Request request, 
+                                   StringBuffer sb, String label,
                                    Object value) {
-        String sv = value.toString();
+        String sv;
+        if(value instanceof Date)  {
+            Date dttm = (Date) value;
+            sv = formatDate(request, dttm);
+        } else {
+            sv  = value.toString();
+        }
         sv = sv.replace("<", "&lt;");
         sv = sv.replace(">", "&gt;");
         sb.append("<tr valign=\"top\"><td align=right>");

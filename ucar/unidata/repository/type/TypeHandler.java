@@ -1871,7 +1871,7 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         List dateSelect = new ArrayList();
-        dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));
+        dateSelect.add(new TwoFacedObject(msg("---"), "none"));
         dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
         dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
@@ -2013,8 +2013,26 @@ public class TypeHandler extends RepositoryManager {
 
         addSearchField(request, ARG_FILESUFFIX, advancedSB);
 
+
+        String dateTypeValue = request.getString(ARG_DATE_SEARCHMODE, DATE_SEARCHMODE_CONTAINEDBY);
+        List dateTypes = new ArrayList();
+        dateTypes.add(new TwoFacedObject(msg("Contained by range"), DATE_SEARCHMODE_CONTAINEDBY));
+        dateTypes.add(new TwoFacedObject(msg("Overlaps range"), DATE_SEARCHMODE_OVERLAPS));
+        dateTypes.add(new TwoFacedObject(msg("Contains range"), DATE_SEARCHMODE_CONTAINS));
+        String dateTypeInput = HtmlUtil.select(ARG_DATE_SEARCHMODE,
+                                               dateTypes, dateTypeValue);
+
+        String dateExtra =  HtmlUtil.space(4) +HtmlUtil.makeToggleInline("More...",
+                                                                         HtmlUtil.p()  + 
+                                                                         HtmlUtil.formTable(new String[]{
+                                                                                 msgLabel("Search for data whose time is"),
+                                                                                 dateTypeInput,
+                                                                                 msgLabel("Or search relative"),
+                                                                                 dateSelectInput}),
+                                                                         false);
+
         basicSB.append(
-            HtmlUtil.formEntry(
+            HtmlUtil.formEntryTop(
                 msgLabel("Date Range"),
                 getRepository().makeDateInput(
                     request, ARG_FROMDATE, "searchform",
@@ -2023,8 +2041,7 @@ public class TypeHandler extends RepositoryManager {
                           + HtmlUtil.space(1)
                           + getRepository().makeDateInput(
                               request, ARG_TODATE, "searchform",
-                              null) + HtmlUtil.space(4) + msgLabel("Or")
-                                    + dateSelectInput));
+                              null) + dateExtra));
 
         if (advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
@@ -2192,16 +2209,16 @@ public class TypeHandler extends RepositoryManager {
         typeList.remove(TYPE_ANY);
         if (typeList.size() > 0) {
             if (request.get(ARG_TYPE_EXCLUDE, false)) {
-                addCriteria(searchCriteria, "Entry Type!=",
+                addCriteria(request,searchCriteria, "Entry Type!=",
                             StringUtil.join(",", typeList));
             } else {
-                addCriteria(searchCriteria, "Entry Type=",
+                addCriteria(request,searchCriteria, "Entry Type=",
                             StringUtil.join(",", typeList));
             }
         }
 
         if (request.defined(ARG_RESOURCE)) {
-            addCriteria(searchCriteria, "Resource=",
+            addCriteria(request,searchCriteria, "Resource=",
                         request.getString(ARG_RESOURCE, ""));
             String resource = request.getString(ARG_RESOURCE, "");
             resource = getStorageManager().resourceFromDB(resource);
@@ -2209,14 +2226,14 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (request.defined(ARG_DATATYPE)) {
-            addCriteria(searchCriteria, "Datatype=",
+            addCriteria(request,searchCriteria, "Datatype=",
                         request.getString(ARG_DATATYPE, ""));
             addOrClause(Tables.ENTRIES.COL_DATATYPE,
                         request.getString(ARG_DATATYPE, ""), where);
         }
 
         if (request.defined(ARG_USER_ID)) {
-            addCriteria(searchCriteria, "User=",
+            addCriteria(request,searchCriteria, "User=",
                         request.getString(ARG_USER_ID, ""));
             addOrClause(Tables.ENTRIES.COL_USER_ID,
                         request.getString(ARG_USER_ID, ""), where);
@@ -2228,10 +2245,10 @@ public class TypeHandler extends RepositoryManager {
          *                               request.getString(ARG_COLLECTION,
          *                                   ""));
          *   if (collectionEntry != null) {
-         *       addCriteria(searchCriteria, "Collection=",
+         *       addCriteria(request,searchCriteria, "Collection=",
          *                   collectionEntry.getName());
          *   } else {
-         *       addCriteria(searchCriteria, "Collection=", "Unknown");
+         *       addCriteria(request,searchCriteria, "Collection=", "Unknown");
          *   }
          *   addOrClause(Tables.ENTRIES.COL_TOP_GROUP_ID,
          *               request.getString(ARG_COLLECTION, ""), where);
@@ -2239,7 +2256,7 @@ public class TypeHandler extends RepositoryManager {
          */
 
         if (request.defined(ARG_FILESUFFIX)) {
-            addCriteria(searchCriteria, "File Suffix=",
+            addCriteria(request,searchCriteria, "File Suffix=",
                         request.getString(ARG_FILESUFFIX, ""));
             List<Clause> clauses = new ArrayList<Clause>();
             for (String tok :
@@ -2267,7 +2284,7 @@ public class TypeHandler extends RepositoryManager {
                 Group group = getEntryManager().findGroup(request,
                                   groupId.substring(0, groupId.length() - 1));
                 if (group != null) {
-                    addCriteria(searchCriteria, "Folder=", group.getName());
+                    addCriteria(request,searchCriteria, "Folder=", group.getName());
                 }
                 where.add(Clause.like(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       groupId));
@@ -2277,7 +2294,7 @@ public class TypeHandler extends RepositoryManager {
                     throw new IllegalArgumentException(
                         msgLabel("Could not find folder") + groupId);
                 }
-                addCriteria(searchCriteria, "Folder" + (doNot
+                addCriteria(request,searchCriteria, "Folder" + (doNot
                         ? "!="
                         : "="), group.getName());
                 String searchChildren =
@@ -2321,30 +2338,45 @@ public class TypeHandler extends RepositoryManager {
         List<Clause> dateClauses = new ArrayList<Clause>();
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
-        if (dateRange[0] != null) {
-            addCriteria(searchCriteria, "From Date>=", dateRange[0]);
-            dateClauses.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE,
-                                      dateRange[0]));
+        if(dateRange[0] != null ||  dateRange[1] != null) {
+            Date date1= dateRange[0];
+            Date date2= dateRange[1];
+            if(date1==null) date1=date2;
+            if(date2==null) date2=date1;
+
+            String dateSearchMode = request.getString(ARG_DATE_SEARCHMODE,DATE_SEARCHMODE_OVERLAPS);
+            if (dateSearchMode.equals(DATE_SEARCHMODE_OVERLAPS)) {
+                addCriteria(request,searchCriteria, "To&nbsp;Date&gt;=", date1);
+                addCriteria(request,searchCriteria, "From&nbsp;Date&lt;=", date2);
+                dateClauses.add(Clause.le(Tables.ENTRIES.COL_FROMDATE, date2));
+                dateClauses.add(Clause.ge(Tables.ENTRIES.COL_TODATE, date1));
+            } else if (dateSearchMode.equals(DATE_SEARCHMODE_CONTAINEDBY)) {
+                addCriteria(request,searchCriteria, "From&nbsp;Date&gt;=", date1);
+                addCriteria(request,searchCriteria, "To&nbsp;Date&lt;=", date2);
+                dateClauses.add(Clause.ge(Tables.ENTRIES.COL_FROMDATE, date1));
+                dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE, date2));
+            }  else {
+                //DATE_SEARCHMODE_CONTAINS
+                addCriteria(request,searchCriteria, "From&nbsp;Date&lt;=", date1);
+                addCriteria(request,searchCriteria, "To&nbsp;Date&gt;=", date2);
+                dateClauses.add(Clause.le(Tables.ENTRIES.COL_FROMDATE, date1));
+                dateClauses.add(Clause.ge(Tables.ENTRIES.COL_TODATE, date2));
+            }
         }
 
-        if (dateRange[1] != null) {
-            addCriteria(searchCriteria, "To Date<=", dateRange[1]);
-            dateClauses.add(Clause.le(Tables.ENTRIES.COL_TODATE,
-                                      dateRange[1]));
-        }
 
 
         dateRange = request.getDateRange(ARG_CREATEDATE+"_from", ARG_CREATEDATE+"_to",
                                          null,
                                          new Date());
         if (dateRange[0] != null) {
-            addCriteria(searchCriteria, "Create Date>=", dateRange[0]);
+            addCriteria(request,searchCriteria, "Create Date>=", dateRange[0]);
             dateClauses.add(Clause.ge(Tables.ENTRIES.COL_CREATEDATE,
                                       dateRange[0]));
         }
 
         if (dateRange[1] != null) {
-            addCriteria(searchCriteria, "Create Date<=", dateRange[1]);
+            addCriteria(request,searchCriteria, "Create Date<=", dateRange[1]);
             dateClauses.add(Clause.le(Tables.ENTRIES.COL_CREATEDATE,
                                       dateRange[1]));
         }
@@ -2353,13 +2385,13 @@ public class TypeHandler extends RepositoryManager {
                                          null,
                                          new Date());
         if (dateRange[0] != null) {
-            addCriteria(searchCriteria, "Change Date>=", dateRange[0]);
+            addCriteria(request,searchCriteria, "Change Date>=", dateRange[0]);
             dateClauses.add(Clause.ge(Tables.ENTRIES.COL_CHANGEDATE,
                                       dateRange[0]));
         }
 
         if (dateRange[1] != null) {
-            addCriteria(searchCriteria, "Change Date<=", dateRange[1]);
+            addCriteria(request,searchCriteria, "Change Date<=", dateRange[1]);
             dateClauses.add(Clause.le(Tables.ENTRIES.COL_CHANGEDATE,
                                       dateRange[1]));
         }
@@ -2435,7 +2467,7 @@ public class TypeHandler extends RepositoryManager {
             for (int i = 0; i < 4; i++) {
                 String areaArg = ARG_AREA + areaSuffixes[i];
                 if (request.defined(areaArg)) {
-                    addCriteria(searchCriteria, areaNames[i] + (areaLE[i]
+                    addCriteria(request,searchCriteria, areaNames[i] + (areaLE[i]
                             ? "<="
                             : ">="), request.getString(areaArg, ""));
                     double areaValue = request.get(areaArg, 0.0);
@@ -2530,7 +2562,7 @@ public class TypeHandler extends RepositoryManager {
                         type);
                 MetadataType metadataType = handler.findType(type);
                 if (metadataType != null) {
-                    addCriteria(searchCriteria,
+                    addCriteria(request,searchCriteria,
                                 metadataType.getLabel() + "=", tmp);
                 }
 
@@ -2593,12 +2625,12 @@ public class TypeHandler extends RepositoryManager {
                 List<String> nameToks = StringUtil.splitWithQuotes(textTok);
                 boolean      doLike   = false;
                 if ( !request.get(ARG_EXACT, false)) {
-                    addCriteria(searchCriteria, "Text like", textTok);
+                    addCriteria(request,searchCriteria, "Text like", textTok);
                     List tmp = StringUtil.split(textTok, ",", true, true);
                     textTok = "%" + StringUtil.join("%,%", tmp) + "%";
                     doLike  = true;
                 } else {
-                    addCriteria(searchCriteria, "Text =", textToSearch);
+                    addCriteria(request,searchCriteria, "Text =", textToSearch);
                 }
                 //            System.err.println (doLike +" toks:" + nameToks);
                 List<Clause> ands = new ArrayList<Clause>();

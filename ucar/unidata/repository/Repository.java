@@ -5463,7 +5463,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                             : " T:"
                                             + HtmlUtil.input(
                                                 name + ".time", timeString,
-                                                    HtmlUtil.SIZE_15
+                                                HtmlUtil.sizeAttr(6)
                                                         + HtmlUtil.attr(
                                                             HtmlUtil.ATTR_TITLE,
                                                                 timeHelp)));
