@@ -69,10 +69,19 @@ public class HtmlUtil {
     public static final String SIZE_3 = "  size=\"3\" ";
 
     /** _more_ */
+    public static final String SIZE_4 = "  size=\"4\" ";
+
+    /** _more_ */
     public static final String SIZE_5 = "  size=\"5\" ";
+
+    public static final String SIZE_6 = "  size=\"6\" ";
+
+    public static final String SIZE_7 = "  size=\"7\" ";
 
     /** _more_ */
     public static final String SIZE_8 = "  size=\"8\" ";
+
+    public static final String SIZE_9 = "  size=\"9\" ";
 
     /** _more_ */
     public static final String SIZE_10 = "  size=\"10\" ";
@@ -2231,6 +2240,16 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+    public static String formTable(String[] cols) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(formTable());
+        for (int i = 0; i < cols.length; i += 2) {
+            sb.append(formEntry(cols[i], cols[i + 1]));
+        }
+        sb.append(formTableClose());
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -3296,6 +3315,10 @@ public class HtmlUtil {
         sb.append("//j+\n");
         //        System.out.println (sb);
 
+    }
+
+    public static final String sizeAttr(int size) {
+        return  "  size=" + quote(""+size)+" ";
     }
 
 
