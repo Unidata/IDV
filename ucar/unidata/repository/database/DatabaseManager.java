@@ -1570,9 +1570,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     public Date getTimestamp(ResultSet results, int col) throws Exception {
-        return getTimestamp(results, col);
+        return getTimestamp(results, col, true);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param results _more_
+     * @param col _more_
+     * @param makeDflt If true then return a new Date if there are no results found
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Date getTimestamp(ResultSet results, int col, boolean makeDflt) throws Exception {
         Date date = results.getTimestamp(col, Repository.calendar);
         if (date != null) {
