@@ -30,7 +30,6 @@ import ucar.unidata.data.DataCancelException;
 import ucar.unidata.data.DataChangeListener;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.DataOperand;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSelectionComponent;
@@ -39,6 +38,7 @@ import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
@@ -783,8 +783,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+    /** is this a time driver? */
     private boolean isTimeDriver = false;
 
+    /** does this use the time driver? */
     private boolean usesTimeDriver = true;
 
     /** color dimness flag */
@@ -3311,7 +3313,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             DataInstance dataInstance = (DataInstance) dataInstances.get(0);
             return dataInstance;
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
@@ -3323,9 +3325,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param dataInstance the dataInstance
      * @return dataInstance.getData();
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    public Data getData(DataInstance dataInstance) 
-        throws VisADException, RemoteException {
+    public Data getData(DataInstance dataInstance)
+            throws VisADException, RemoteException {
         return updateDataInstance(dataInstance).getData();
     }
 
@@ -3335,9 +3340,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param dataInstance the dataInstance
      * @return dataInstance.getGrid();
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    public FieldImpl getGrid(GridDataInstance dataInstance) 
-        throws VisADException, RemoteException {
+    public FieldImpl getGrid(GridDataInstance dataInstance)
+            throws VisADException, RemoteException {
         return getGrid(dataInstance, false);
     }
 
@@ -3349,52 +3357,80 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param dataInstance the dataInstance
      * @param copy make a copy of the field
      * @return dataInstance.getGrid(copy);
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    public FieldImpl getGrid(GridDataInstance dataInstance, boolean copy) 
-        throws VisADException, RemoteException {
+    public FieldImpl getGrid(GridDataInstance dataInstance, boolean copy)
+            throws VisADException, RemoteException {
         return updateGridDataInstance(dataInstance).getGrid(copy);
     }
 
 
     /**
      * update the datainstance in preparation for a getData call
+     *
+     * @param dataInstance  the grid data instance
+     *
+     * @return the new instance
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    protected GridDataInstance updateGridDataInstance(GridDataInstance dataInstance)  
-        throws VisADException, RemoteException {
+    protected GridDataInstance updateGridDataInstance(
+            GridDataInstance dataInstance)
+            throws VisADException, RemoteException {
         return (GridDataInstance) updateDataInstance(dataInstance);
     }
 
 
     /**
      * update the datainstance in preparation for a getData call.
-     * This will set the timeDriverTimes if enabled 
+     * This will set the timeDriverTimes if enabled
      *
      * @param dataInstance the dataInstance to update
      * @return the updated dataInstance
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    protected DataInstance updateDataInstance(DataInstance dataInstance) 
-        throws VisADException, RemoteException {
-        if(!DOTIMEDRIVER) return dataInstance;
-        dataInstance.setDataSelection(updateDataSelection(dataInstance.getDataSelection()));
+    protected DataInstance updateDataInstance(DataInstance dataInstance)
+            throws VisADException, RemoteException {
+        if ( !DOTIMEDRIVER) {
+            return dataInstance;
+        }
+        dataInstance.setDataSelection(
+            updateDataSelection(dataInstance.getDataSelection()));
         return dataInstance;
     }
 
 
     /**
      * update the dataselection in preparation for a getData call.
-     * This will set the timeDriverTimes if enabled 
+     * This will set the timeDriverTimes if enabled
      *
      * @param dataSelection the dataSelection to update
+     *
+     * @return the new DataSelection
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
-    protected DataSelection updateDataSelection(DataSelection dataSelection) 
-        throws VisADException, RemoteException {
-        if(!DOTIMEDRIVER) return dataSelection;
-        System.err.println ("updateDataSelection:" + this);
-        if(isTimeDriver || !usesTimeDriver) return dataSelection;
+    protected DataSelection updateDataSelection(DataSelection dataSelection)
+            throws VisADException, RemoteException {
+        if ( !DOTIMEDRIVER) {
+            return dataSelection;
+        }
+        System.err.println("updateDataSelection:" + this);
+        if (isTimeDriver || !usesTimeDriver) {
+            return dataSelection;
+        }
         ViewManager vm = getViewManager();
-        if(vm==null) return dataSelection;
+        if (vm == null) {
+            return dataSelection;
+        }
         List<DateTime> times = vm.getTimeDriverTimes();
-        System.err.println ("\t     driver times to use:" + times);
+        System.err.println("\t     driver times to use:" + times);
         dataSelection.setTimeDriverTimes(times);
         return dataSelection;
     }
@@ -5057,11 +5093,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-        if(DOTIMEDRIVER) {
-            items.add(GuiUtils.makeCheckboxMenuItem("Drive times with this display", this,
-                                                    "isTimeDriver", null));
-            items.add(GuiUtils.makeCheckboxMenuItem("Uses time driver times", this,
-                                                    "usesTimeDriver", null));
+        if (DOTIMEDRIVER) {
+            items.add(
+                GuiUtils.makeCheckboxMenuItem(
+                    "Drive times with this display", this, "isTimeDriver",
+                    null));
+            items.add(GuiUtils.makeCheckboxMenuItem("Uses time driver times",
+                    this, "usesTimeDriver", null));
             items.add(GuiUtils.MENU_SEPARATOR);
 
         }
@@ -11884,7 +11922,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             try {
                 applySmoothing();
             } catch (Exception e) {
-                logException("Error applying smoothing", e);
+                logException("Error applying smoothing factor", e);
             }
         }
     }
@@ -11901,7 +11939,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             try {
                 applySmoothing();
             } catch (Exception e) {
-                logException("Error applying smoothing", e);
+                logException("Error applying smoothing type", e);
             }
         }
     }
@@ -11965,40 +12003,41 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public int getVisbilityAnimationPause() {
         return this.visbilityAnimationPause;
     }
-    /**
-       Set the IsTimeDriver property.
 
-       @param value The new value for IsTimeDriver
-    **/
-    public void setIsTimeDriver (boolean value) {
-	this.isTimeDriver = value;
+    /**
+     *  Set the IsTimeDriver property.
+     *
+     *  @param value The new value for IsTimeDriver
+     */
+    public void setIsTimeDriver(boolean value) {
+        this.isTimeDriver = value;
     }
 
     /**
-       Get the IsTimeDriver property.
-
-       @return The IsTimeDriver
-    **/
-    public boolean getIsTimeDriver () {
-	return this.isTimeDriver;
+     *  Get the IsTimeDriver property.
+     *
+     *  @return The IsTimeDriver
+     */
+    public boolean getIsTimeDriver() {
+        return this.isTimeDriver;
     }
 
     /**
-       Set the UsesTimeDriver property.
-
-       @param value The new value for UsesTimeDriver
-    **/
-    public void setUsesTimeDriver (boolean value) {
-	this.usesTimeDriver = value;
+     *  Set the UsesTimeDriver property.
+     *
+     *  @param value The new value for UsesTimeDriver
+     */
+    public void setUsesTimeDriver(boolean value) {
+        this.usesTimeDriver = value;
     }
 
     /**
-       Get the UsesTimeDriver property.
-
-       @return The UsesTimeDriver
-    **/
-    public boolean getUsesTimeDriver () {
-	return this.usesTimeDriver;
+     *  Get the UsesTimeDriver property.
+     *
+     *  @return The UsesTimeDriver
+     */
+    public boolean getUsesTimeDriver() {
+        return this.usesTimeDriver;
     }
 
 

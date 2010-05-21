@@ -1193,13 +1193,16 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
+        if (checkFlag(FLAG_SMOOTHING)
+                && !getSmoothingType().equals(LABEL_NONE)) {
 
-        if ((getGridDisplayable() != null) && (currentSlice != null)) {
-            try {
-                getGridDisplayable().loadData(
-                    getSliceForDisplay(currentSlice));
-            } catch (Exception ve) {
-                logException("applySmoothing", ve);
+            if ((getGridDisplayable() != null) && (currentSlice != null)) {
+                try {
+                    getGridDisplayable().loadData(
+                        getSliceForDisplay(currentSlice));
+                } catch (Exception ve) {
+                    logException("applySmoothing", ve);
+                }
             }
         }
     }

@@ -1610,7 +1610,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
-        loadDataFromLine();
+        if (checkFlag(FLAG_SMOOTHING)
+                && !getSmoothingType().equals(LABEL_NONE)) {
+            loadDataFromLine();
+        }
     }
 
     /**
