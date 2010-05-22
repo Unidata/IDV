@@ -1,20 +1,18 @@
 /*
- * $Id: AddeProfilerDataSource.java,v 1.50 2007/04/16 20:34:56 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -1045,7 +1043,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                 //  finalize previous time's group (all z-> dir spd groups)
                 //     but only if you are dealing with a "timecount" to save
                 if (timecount % obInt == 0) {
-                    //  first make sure have processed some data; 
+                    //  first make sure have processed some data;
                     // (is not very first item in list)
 
                     if (dirspd != null) {
@@ -1065,7 +1063,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                         //System.out.println("  there are "+ dsList.size()
                         // +" dir-spd obs ");
 
-                        // sort the z and related dir-spd groups 
+                        // sort the z and related dir-spd groups
                         if (zsList.size() != dsList.size()) {
                             System.out.println("  SIZE mismatch");
                         }
@@ -1093,9 +1091,9 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                         }
                         */
 
-                        // Make the (z->(dir,spd)) FlatField 
+                        // Make the (z->(dir,spd)) FlatField
 
-                        //make the FunctionType(MathType domain, MathType range) 
+                        //make the FunctionType(MathType domain, MathType range)
                         onetimeFT = new FunctionType(
                             RealTupleType.LatitudeLongitudeAltitude,
                         //   sortedDS[0].getType());
@@ -1128,8 +1126,8 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                         onetimeFF = new FlatField(onetimeFT, locset);
                         //System.out.println
                         // ("  one-time flatfield function type "+onetimeFT);
-                        //set range data with FlatField.setSamples(Data[] range, 
-                        // boolean copy) 
+                        //set range data with FlatField.setSamples(Data[] range,
+                        // boolean copy)
                         onetimeFF.setSamples(ds /*sortedDS*/, false);
 
                         obFFsList.add(onetimeFF);
@@ -1144,13 +1142,13 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                 if ((obInt != 1)
                         && !(thisobsdatetime.equals(thisgroupdatetime))) {
                     // a new group time was hit; neither the previous time
-                    // as checked and used way up above, nor the just found time 
+                    // as checked and used way up above, nor the just found time
 
                     // advance time counter once per group - count every time group;
                     // may use only some of them
                     timecount++;
 
-                    //System.out.println("   found new group time at i= "+i+ 
+                    //System.out.println("   found new group time at i= "+i+
                     //  "   just past grouptime = "+thisgroupdatetime+
                     //  "   this new obs time = "+thisobsdatetime+
                     // "  new timecount= "+ timecount);
@@ -1191,8 +1189,8 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                     zvalue = (Real) ob.getComponent(zIndex);
 
                     // look for level desired
-                    //if (use3D|| 
-                    //    (!use3D && zvalue.getValue()>=zmin 
+                    //if (use3D||
+                    //    (!use3D && zvalue.getValue()>=zmin
                     //     && zvalue.getValue()<=zmax) )
                     {
                         zsList.add(zvalue);
@@ -1215,7 +1213,68 @@ public class AddeProfilerDataSource extends DataSourceImpl {
             }  // else if new time
 
         }
+        // this will add the last time step dirspd to the list
+        if (dirspd != null) {
+            // make domain array of Z-s
+            float[][] zsetfloats = new float[1][zsList.size()];
+            for (int j = 0; j < zsList.size(); j++) {
+                //zs[j] = (Real) zsList.get(j);
+                zsetfloats[0][j] = (float) ((Real) zsList.get(j)).getValue();
+            }
 
+            // make range array of dir-spd-s
+            Data[] ds = new RealTuple[dsList.size()];
+            for (int j = 0; j < dsList.size(); j++) {
+                ds[j] = (RealTuple) dsList.get(j);
+            }
+            //System.out.println("  there are "+ dsList.size()
+            // +" dir-spd obs ");
+
+            // sort the z and related dir-spd groups
+            if (zsList.size() != dsList.size()) {
+                System.out.println("  SIZE mismatch");
+            }
+
+
+
+            // Make the (z->(dir,spd)) FlatField
+
+            //make the FunctionType(MathType domain, MathType range)
+            onetimeFT =
+                new FunctionType(RealTupleType.LatitudeLongitudeAltitude,
+            //   sortedDS[0].getType());
+            ds[0].getType());
+
+            // do cstr FlatField(FunctionType type, Set domain_set)
+
+            int       numPoints = locList.size();
+            float[][] points    = new float[3][numPoints];
+            int       curPoint  = 0;
+            while (curPoint < numPoints) {
+                points[0][curPoint] =
+                    (float) ((Real) ((RealTuple) locList.get(
+                        curPoint)).getComponent(0)).getValue();
+                points[1][curPoint] =
+                    -1.0f
+                    * (float) ((Real) ((RealTuple) locList.get(
+                        curPoint)).getComponent(1)).getValue();
+                points[2][curPoint] =
+                    (float) ((Real) ((RealTuple) locList.get(
+                        curPoint)).getComponent(2)).getValue();
+                curPoint++;
+            }
+
+            Gridded3DSet locset =
+                new Gridded3DSet(RealTupleType.LatitudeLongitudeAltitude,
+                                 points, numPoints);
+
+            onetimeFF = new FlatField(onetimeFT, locset);
+
+            onetimeFF.setSamples(ds /*sortedDS*/, false);
+
+            obFFsList.add(onetimeFF);
+            //System.out.println("  finished obFFsList with "+dateTime);
+        }
         //System.out.println("  there are obFFsList "+obFFsList.size()
         //                       +" obs groups");
         //System.out.println("  there are timesList "+timesList.size()+" times");
@@ -1313,4 +1372,3 @@ public class AddeProfilerDataSource extends DataSourceImpl {
     }
 
 }
-
