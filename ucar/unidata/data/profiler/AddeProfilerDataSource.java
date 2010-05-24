@@ -467,7 +467,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
      *
      * @throws VisADException
      */
-    private static FieldImpl recastProfilerSingleStationData(FieldImpl input,
+    protected static FieldImpl recastProfilerSingleStationData(FieldImpl input,
             int obInt)
             throws VisADException {
 
@@ -879,7 +879,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
      * @throws RemoteException
      * @throws VisADException
      */
-    private static FieldImpl recastProfilerMultiStationData(FieldImpl input,
+    protected static FieldImpl recastProfilerMultiStationData(FieldImpl input,
             int obInt)
             throws VisADException, RemoteException {
 
