@@ -94,6 +94,9 @@ public class ColorScaleInfo {
     /** visibility of the labels */
     private boolean labelVisible = true;
 
+    /** use alpha when drawing */
+    private boolean useAlpha = false;
+
     /** This keeps track of whether we need to update the X, Y and orientation */
     private boolean dirty = true;
 
@@ -188,6 +191,24 @@ public class ColorScaleInfo {
     public ColorScaleInfo(String name, int orient, float x, float y,
                           Font labelFont, float[][] colorPalette,
                           Color labelColor) {
+        this(name, orient, x, y, labelFont, colorPalette, labelColor, false);
+    }
+
+    /**
+     * Create a color scale information object with the given parameters.
+     *
+     * @param name name of the ColorScale
+     * @param orient  orientation (HORIZONTAL, VERTICAL)
+     * @param x   x location (percent from left side of display)
+     * @param y   y location (percent from top side of display)
+     * @param labelFont  font used for labels
+     * @param colorPalette  color palette (rgb values)
+     * @param labelColor  color for labels
+     * @param useAlpha  true to use alpha when drawing color scale
+     */
+    public ColorScaleInfo(String name, int orient, float x, float y,
+                          Font labelFont, float[][] colorPalette,
+                          Color labelColor, boolean useAlpha) {
         this.name         = name;
         this.orient       = orient;
         this.x            = x;
@@ -195,6 +216,7 @@ public class ColorScaleInfo {
         this.labelFont    = labelFont;
         this.colorPalette = colorPalette;
         this.labelColor   = labelColor;
+        this.useAlpha     = useAlpha;
     }
 
     /**
@@ -215,6 +237,7 @@ public class ColorScaleInfo {
         this.labelSide    = that.labelSide;
         this.isVisible    = that.isVisible;
         this.labelVisible = that.labelVisible;
+        this.useAlpha     = that.useAlpha;
     }
 
     /**
@@ -499,6 +522,24 @@ public class ColorScaleInfo {
      */
     public boolean getLabelVisible() {
         return labelVisible;
+    }
+
+    /**
+     *     Gets the useAlpha property
+     *    
+     *     @return the useAlpha
+     */
+    public boolean getUseAlpha() {
+        return useAlpha;
+    }
+
+    /**
+     * Sets the useAlpha property
+     *
+     * @param useAlpha the useAlpha to set
+     */
+    public void setUseAlpha(boolean useAlpha) {
+        this.useAlpha = useAlpha;
     }
 
     /**

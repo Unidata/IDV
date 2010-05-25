@@ -174,6 +174,9 @@ public class ColorScale extends DisplayableData {
     /** z position */
     private double zPosition = 2.0;
 
+    /** use alpha when drawing */
+    private boolean useAlpha = false;
+
     /**
      * Construct a new <code>ColorScale</code> with the given name
      * and default orientation.
@@ -274,6 +277,7 @@ public class ColorScale extends DisplayableData {
         labelColor   = info.getLabelColor();
         labelSide    = info.getLabelSide();
         labelVisible = info.getLabelVisible();
+        useAlpha     = info.getUseAlpha();
         setVisible(info.getIsVisible());
         setUpScalarMaps();
         makeShapes();
@@ -332,6 +336,7 @@ public class ColorScale extends DisplayableData {
         labelColor   = info.getLabelColor();
         labelSide    = info.getLabelSide();
         labelVisible = info.getLabelVisible();
+        useAlpha = info.getUseAlpha();
         setVisible(info.getIsVisible());
         makeShapes();
     }
@@ -379,8 +384,30 @@ public class ColorScale extends DisplayableData {
     }
 
     /**
-     * Set the labelling side.
-     * @param side labelling side (PRIMARY, SECONDARY);
+     *     Gets the useAlpha property
+     *    
+     *     @return the useAlpha
+     */
+    public boolean getUseAlpha() {
+        return useAlpha;
+    }
+
+    /**
+     * Sets the useAlpha property
+     * @param useAlpha the useAlpha to set
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    public void setUseAlpha(boolean useAlpha)
+            throws RemoteException, VisADException {
+        this.useAlpha = useAlpha;
+        makeShapes();
+    }
+
+    /**
+     * Set the labeling side.
+     * @param side labeling side (PRIMARY, SECONDARY);
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
@@ -402,7 +429,7 @@ public class ColorScale extends DisplayableData {
     /**
      * This method sets the color palette
      * according to the color table in argument;
-     * pair this method with setRange(lo,high) to get
+     * pair this method with setRange(low,high) to get
      * a fixed association of color table and range of values.
      *
      * @param colorPalette     the color table or color-alpha table desired
@@ -580,27 +607,35 @@ public class ColorScale extends DisplayableData {
             throws VisADException {
 
         // Get the color table used by the signalStrength scalar map.
-        int   numColours           = colorPalette[0].length;
+        int     numColours           = colorPalette[0].length;
+        boolean hasAlpha             = (colorPalette.length == 4) && useAlpha;
 
-        float delta                = ((orient == HORIZONTAL_ORIENT)
-                                      ? width
-                                      : height) / (float) numColours;
-        int   numPointsPerTriangle = 3;
-        int   numValuesPerPoint    = 3;
-        int   numTriangles         = numColours * 2;
+        float   delta                = ((orient == HORIZONTAL_ORIENT)
+                                        ? width
+                                        : height) / (float) numColours;
+        int     numPointsPerTriangle = 3;
+        int     numValuesPerPoint    = 3;
+        int     numColoursPerPoint   = hasAlpha
+                                       ? 4
+                                       : 3;
+        int     numTriangles         = numColours * 2;
         float[] triangles =
             new float[numTriangles * numPointsPerTriangle * numValuesPerPoint];
         byte[] colors =
-            new byte[numTriangles * numPointsPerTriangle * numValuesPerPoint];
+            new byte[numTriangles * numPointsPerTriangle * numColoursPerPoint];
 
         int index      = 0;
         int colorIndex = 0;
 
         for (int i = 0; i < numColours; ++i) {
 
-            final byte red   = (byte) (colorPalette[0][i] * 255);
-            final byte green = (byte) (colorPalette[1][i] * 255);
-            final byte blue  = (byte) (colorPalette[2][i] * 255);
+            byte red   = (byte) (colorPalette[0][i] * 255);
+            byte green = (byte) (colorPalette[1][i] * 255);
+            byte blue  = (byte) (colorPalette[2][i] * 255);
+            byte alpha = (byte) 0;
+            if (hasAlpha) {
+                alpha = (byte) (colorPalette[3][i] * 255);
+            }
 
 
             // The right-half triangle
@@ -702,6 +737,9 @@ public class ColorScale extends DisplayableData {
                 colors[colorIndex++] = red;
                 colors[colorIndex++] = green;
                 colors[colorIndex++] = blue;
+                if (hasAlpha) {
+                    colors[colorIndex++] = alpha;
+                }
             }
 
         }                                  // for (i<numColours)
