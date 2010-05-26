@@ -339,6 +339,8 @@ public class HtmlUtil {
     /** _more_ */
     public static final String CLASS_FORMLABEL = "formlabel";
 
+    public static final String CLASS_FORMLABEL_TOP = "formlabeltop";
+
     /** _more_ */
     public static final String CLASS_HIDDENINPUT = "hiddeninput";
 
@@ -2476,7 +2478,7 @@ public class HtmlUtil {
                    tag(TAG_TD,
                        attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_VALIGN, VALUE_TOP,
                              ATTR_CLASS,
-                             CLASS_FORMLABEL), left) + tag(TAG_TD, "",
+                             CLASS_FORMLABEL_TOP), left) + tag(TAG_TD, "",
                                  right));
     }
 
@@ -2496,7 +2498,7 @@ public class HtmlUtil {
                    + col(left,
                          attrs(ATTR_VALIGN, VALUE_TOP, ATTR_ALIGN,
                                VALUE_RIGHT, ATTR_CLASS,
-                               CLASS_FORMLABEL)) + col(right));
+                               CLASS_FORMLABEL_TOP)) + col(right));
     }
 
     /**
