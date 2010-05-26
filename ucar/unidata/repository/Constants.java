@@ -601,6 +601,10 @@ public interface Constants {
 
     public static final String  ARG_DATE_OVERLAPS = "date.overlaps";
     public static final String  ARG_DATE_SEARCHMODE = "date.searchmode";
+    public static final String  ARG_DATE_NODATAMODE = "date.nodatamode";
+    public static final String  VALUE_NODATAMODE_NONE = "none";
+    public static final String  VALUE_NODATAMODE_INCLUDE = "include";
+
 
     public static final String  DATE_SEARCHMODE_OVERLAPS = "overlaps";
     public static final String  DATE_SEARCHMODE_CONTAINEDBY = "containedby";

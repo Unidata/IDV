@@ -81,7 +81,6 @@ public class RepositoryServlet extends HttpServlet implements Constants {
 
     /** ExceptionLogger to handle any runtime exceptions */
 
-    //    private  ucar.unidata.plaza.error.ExceptionLogger logger = new ucar.unidata.plaza.error.ExceptionLogger();
 
     /** Repository object that will be instantiated */
     private static Repository repository;

@@ -5945,6 +5945,16 @@ return new Result(title, sb);
         if (group != null) {
             return group;
         }
+        String[] ids = findEntryIdsWithName(request, parent, name);
+        if (ids.length == 0) {
+            return null;
+        }
+        return getEntry(request, ids[0], false);
+    }
+
+
+    public String[] findEntryIdsWithName(Request request, Group parent, String name)
+            throws Exception {
         String[] ids =
             SqlUtil.readString(
                 getDatabaseManager().getIterator(
@@ -5955,12 +5965,9 @@ return new Result(title, sb);
                                 Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                 parent.getId()), Clause.eq(
                                     Tables.ENTRIES.COL_NAME, name)))));
-        if (ids.length == 0) {
-            return null;
-        }
-        return getEntry(request, ids[0], false);
-    }
 
+        return ids;
+    }
 
     /**
      * _more_

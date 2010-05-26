@@ -308,6 +308,8 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
+
+
         //        System.err.println(tab+"name:" + name+"  #children:" + elements.getLength() +" depth:" + xmlDepth + " " + urlPath +" " + haveChildDatasets);
 
         boolean madeEntry = false;
@@ -325,6 +327,15 @@ public class CatalogHarvester extends Harvester {
                 isOpendap = serviceType.equals("opendap")
                             || serviceType.equals("dods");
             }
+
+            
+            //Check if we already have one with this name under the parent
+            String[] existingIds = getEntryManager().findEntryIdsWithName(getRequest(), parent, name);
+            if(existingIds.length>0) {
+                return;
+            }
+            //            System.err.println ("Creating one:" + name);
+
 
             TypeHandler typeHandler = repository.getTypeHandler((isOpendap
                     ? TypeHandler.TYPE_OPENDAPLINK
@@ -381,6 +392,7 @@ public class CatalogHarvester extends Harvester {
                             createDate.getTime(),
                             createDate.getTime(),
                             createDate.getTime(), null);
+
             entries.add(entry);
             madeEntry = true;
 

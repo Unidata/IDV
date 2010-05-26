@@ -2022,13 +2022,18 @@ public class TypeHandler extends RepositoryManager {
         String dateTypeInput = HtmlUtil.select(ARG_DATE_SEARCHMODE,
                                                dateTypes, dateTypeValue);
 
+        String noDataMode = request.getString(ARG_DATE_NODATAMODE, "");
+        String noDateInput = HtmlUtil.checkbox(ARG_DATE_NODATAMODE,VALUE_NODATAMODE_INCLUDE, noDataMode.equals(VALUE_NODATAMODE_INCLUDE));
         String dateExtra =  HtmlUtil.space(4) +HtmlUtil.makeToggleInline("More...",
                                                                          HtmlUtil.p()  + 
                                                                          HtmlUtil.formTable(new String[]{
                                                                                  msgLabel("Search for data whose time is"),
                                                                                  dateTypeInput,
                                                                                  msgLabel("Or search relative"),
-                                                                                 dateSelectInput}),
+                                                                                 dateSelectInput,
+                                                                                 "",
+                                                                                 noDateInput+HtmlUtil.space(1)+msg("Include entries with no data times")}
+),
                                                                          false);
 
         basicSB.append(
@@ -2366,6 +2371,19 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+        String noDataMode = request.getString(ARG_DATE_NODATAMODE, "");
+        if(noDataMode.equals(VALUE_NODATAMODE_INCLUDE) && dateClauses.size()>0)  {
+            Clause dateClause = Clause.and(dateClauses);
+            dateClauses = new ArrayList<Clause>();
+            Clause allEqualClause = Clause.and(Clause.join(Tables.ENTRIES.COL_CREATEDATE, Tables.ENTRIES.COL_FROMDATE),
+                                               Clause.join(Tables.ENTRIES.COL_FROMDATE, Tables.ENTRIES.COL_TODATE));
+
+            dateClauses.add(allEqualClause);
+            dateClauses.add(Clause.or(dateClause, allEqualClause));
+            addCriteria(request,searchCriteria, "Include no data times", "");
+        }
+
+
         dateRange = request.getDateRange(ARG_CREATEDATE+"_from", ARG_CREATEDATE+"_to",
                                          null,
                                          new Date());
@@ -2395,6 +2413,9 @@ public class TypeHandler extends RepositoryManager {
             dateClauses.add(Clause.le(Tables.ENTRIES.COL_CHANGEDATE,
                                       dateRange[1]));
         }
+
+
+
 
 
 
