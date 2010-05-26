@@ -1108,9 +1108,13 @@ form {
     padding: 0px;
 }
 
-.formlabel {
+.formlabel, .formlabeltop {
   font-size: 11px;
   font-weight: bold;
+}
+
+.formlabeltop {
+   padding-top:6px;
 }
 
 

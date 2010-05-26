@@ -1847,9 +1847,9 @@ public class TypeHandler extends RepositoryManager {
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
                                  request.get(ARG_EXACT, false)) + " "
                                      + msg("Match exactly");
-        String extra = searchExact + searchMetaData;
-        extra = HtmlUtil.makeToggleInline("<b>...</b>", extra, false);
-        sb.append(HtmlUtil.formEntry(msgLabel("Text"),
+        String extra = HtmlUtil.p() +searchExact + searchMetaData;
+        extra = HtmlUtil.makeToggleInline("More...", extra, false);
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Text"),
                                      HtmlUtil.input(ARG_TEXT, name,
                                          HtmlUtil.SIZE_50
                                          + " autofocus ") + " " + extra));
@@ -2107,10 +2107,11 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
+
             String radio =
-                HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, true)
+                HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, request.getString(ARG_AREA_MODE,VALUE_AREA_OVERLAPS).equals(VALUE_AREA_OVERLAPS))
                 + msg("Overlaps") + HtmlUtil.space(3)
-                + HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, false)
+                + HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_CONTAINS, request.getString(ARG_AREA_MODE,VALUE_AREA_OVERLAPS).equals(VALUE_AREA_CONTAINS))
                 + msg("Contained by");
 
             String mapSelector =
