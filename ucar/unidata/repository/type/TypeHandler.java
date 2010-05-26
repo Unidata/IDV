@@ -2107,7 +2107,6 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
 
 
-
             String radio =
                 HtmlUtil.radio(ARG_AREA_MODE, VALUE_AREA_OVERLAPS, request.getString(ARG_AREA_MODE,VALUE_AREA_OVERLAPS).equals(VALUE_AREA_OVERLAPS))
                 + msg("Overlaps") + HtmlUtil.space(3)
