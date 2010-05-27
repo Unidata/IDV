@@ -42,7 +42,7 @@ argument -Dfoo=bar) -->
         <mkdir dir="${docs_dest}"/>
 
 
-        <property name="htmldoc" value="/usr/share/htmldoc/htmldoc/htmldoc"/>
+        <property name="htmldoc" value="/usr/bin/htmldoc"/>
         <property name="docs_srchtml_dest" value="${docs_dest}/srchtml" />
         <mkdir dir="${docs_srchtml_dest}"/>
 
