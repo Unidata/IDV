@@ -21,6 +21,12 @@ The items below reflect changes since the 2.8u1 release.
 The IDV installers have been updated to Java 6 Update 20.
 </faqitem>
 
+<faqitem q="New netCDF-Java Version" id="nj42">
+This version of the IDV is using a preliminary release of version
+4.2 of the netCDF-Java library.  This new version includes several
+bug fixes for GRIB and point data reading.
+</faqitem>
+
 <faqitem cat="Display Changes"></faqitem>
 
 <faqitem q="Smoothing of grids" id="gridsmooth">
@@ -50,6 +56,17 @@ You can use the Grid-&gt;Define a grid diagnostic formula to use these
 functions.
 </faqitem>
 
+<faqitem q="GRIB indexing" id="gribindex">
+When GRIB files are read from disk, an index is created to speed up access
+to the individual records.  This was always created in the temporary
+cache under the DefaultIdv/tmp/nj22 directory.  However, that cache gets 
+scoured after a couple of days, the the indexes need to be recreated the
+next time you load the data.  There is now an option the 
+<a href="tools/Preferences.html">User Preferences</a> under the
+Formats &amp; Data tab to control where the indexes are written.  By
+unchecking the "Write Grib Index in Disk Cache" option, the indexes will
+be written to the same directory as the files and will not be scoured.
+</faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
