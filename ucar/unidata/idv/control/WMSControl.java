@@ -106,7 +106,6 @@ import javax.swing.*;
 /**
  * Class for controlling the display of color images.
  * @author Jeff McWhirter
- * @version $Revision: 1.104 $
  */
 public class WMSControl extends ImageControl implements ImageObserver {
 
