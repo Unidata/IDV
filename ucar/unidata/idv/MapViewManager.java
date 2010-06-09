@@ -2028,7 +2028,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-        if (getUseGlobeDisplay()) {
+        if (getUseGlobeDisplay() && !getViewpointControl().getAutoRotate()) {
             try {
                 LatLonPoint center = projection.getCenterLatLon();
                 getNavigatedDisplay().center(
@@ -2362,7 +2362,7 @@ public class MapViewManager extends NavigatedViewManager {
                         IdvConstants.PROP_LOADINGXML, false)) {
                 MapProjection mp = display.getDataProjection();
 
-                if (getUseGlobeDisplay()) {
+                if (getUseGlobeDisplay() && !getViewpointControl().getAutoRotate()) {
                     LatLonPoint center = mp.getCenterLatLon();
                     getNavigatedDisplay().center(
                         new EarthLocationTuple(
