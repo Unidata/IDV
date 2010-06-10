@@ -126,8 +126,6 @@ public class TypeHandler extends RepositoryManager {
     public static final String TAG_HANDLER = "handler";
 
 
-
-
     /** _more_ */
     public static final int MATCH_UNKNOWN = 0;
 
@@ -795,6 +793,14 @@ public class TypeHandler extends RepositoryManager {
             }
         }
     }
+
+
+
+    public List<Service> getServices(Request request, Entry entry) {
+        return new ArrayList<Service>();
+    }
+
+
 
 
 

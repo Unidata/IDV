@@ -206,12 +206,20 @@ public class KmlOutputHandler extends OutputHandler {
                 continue;
             }
 
-
+            List<Service> services = entry.getTypeHandler().getServices( request,  entry);
+            for(Service service: services) {
+                if(service.isType(Service.TYPE_KML)) {
+                    KmlUtil.networkLink(folder, service.getName(), service.getUrl());
+                }
+            }
 
             String resource = entry.getResource().getPath();
             if (resource == null) {
                 continue;
             }
+
+
+
             if ( !IOUtil.hasSuffix(resource, "kml")
                     && !IOUtil.hasSuffix(resource, "kmz")) {
                 continue;

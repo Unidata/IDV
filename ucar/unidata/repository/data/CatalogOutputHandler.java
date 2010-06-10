@@ -414,7 +414,7 @@ public class CatalogOutputHandler extends OutputHandler {
                                new String[] { CatalogUtil.ATTR_NAME,
                         "icon", CatalogUtil.ATTR_VALUE,
                         getRepository().absoluteUrl(
-                            getRepository().iconUrl(ICON_OPENDAP)) });
+                             getRepository().iconUrl(ICON_OPENDAP))});
 
 
                 topDataset.insertBefore(latestDataset, firstChild);
@@ -522,6 +522,24 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
+    private Element createDataset(CatalogInfo catalogInfo, Entry entry, Element parent, String name) throws Exception {
+        Element dataset = XmlUtil.create(catalogInfo.doc,
+                                         CatalogUtil.TAG_DATASET, parent,
+                                         new String[] { CatalogUtil.ATTR_NAME,
+                                                        name});
+
+        XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY, dataset,
+                       new String[] { CatalogUtil.ATTR_NAME,
+                                      "ramadda.id", CatalogUtil.ATTR_VALUE,
+                                      entry.getId() });
+        XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY, dataset,
+                       new String[] { CatalogUtil.ATTR_NAME,
+                                      "ramadda.host", CatalogUtil.ATTR_VALUE,
+                                      getRepository().getHostname() });
+        return dataset;
+    }
+
+
     /**
      * _more_
      *
@@ -539,7 +557,9 @@ public class CatalogOutputHandler extends OutputHandler {
         String path = f.toString();
         path = path.replace("\\", "/");
 
-
+        int cnt = 0;
+        List<Service>  services = entry.getTypeHandler().getServices(request, entry);
+        boolean didOpendap = false;
         if (canDataLoad(request, entry)
                 && !entry.getType().equals(
                     OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
@@ -547,13 +567,39 @@ public class CatalogOutputHandler extends OutputHandler {
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 
+            cnt++;
             Element service = XmlUtil.create(catalogInfo.doc,
                                              CatalogUtil.TAG_ACCESS, dataset,
                                              new String[] {
                                                  CatalogUtil.ATTR_SERVICENAME,
                     SERVICE_OPENDAP, CatalogUtil.ATTR_URLPATH, urlPath });
+            didOpendap = true;
         }
 
+
+        for(Service service: services) {
+            String url = service.getUrl();
+            String type = service.getType();
+            String name = service.getName();
+            String icon = service.getIcon();
+
+            cnt++;
+
+            Element subDataset = createDataset(catalogInfo,  entry, dataset, name);
+            addService(catalogInfo, type,
+                       "http://"+getRepository().getHostname() +":" +getRepository().getPort());
+            Element serviceNode = XmlUtil.create(catalogInfo.doc,
+                                             CatalogUtil.TAG_ACCESS, subDataset,
+                                             new String[] {
+                                                 CatalogUtil.ATTR_SERVICENAME,
+                                                 type, CatalogUtil.ATTR_URLPATH, url});
+
+                XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY,
+                               subDataset,
+                               new String[] { CatalogUtil.ATTR_NAME,
+                                              "icon", CatalogUtil.ATTR_VALUE,icon});
+
+        }
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
             String urlPath =
@@ -561,12 +607,21 @@ public class CatalogOutputHandler extends OutputHandler {
                              ARG_ENTRYID, entry.getId());
             addService(catalogInfo, SERVICE_HTTP,
                        getRepository().URL_ENTRY_GET.getFullUrl());
+            Element subDataset;
+
+            if(cnt>0) {
+                subDataset = createDataset(catalogInfo,  entry, dataset, "File download");
+            } else {
+                subDataset = dataset;
+            }
             Element service = XmlUtil.create(catalogInfo.doc,
-                                             CatalogUtil.TAG_ACCESS, dataset,
+                                             CatalogUtil.TAG_ACCESS, subDataset,
                                              new String[] {
                                                  CatalogUtil.ATTR_SERVICENAME,
                     SERVICE_HTTP, CatalogUtil.ATTR_URLPATH, urlPath });
         }
+
+
         if (entry.getResource().isUrl()) {
             //            try {
             URL    url     = new URL(entry.getResource().getPath());
@@ -647,8 +702,6 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
-
-
         Element dataset = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_DATASET, parent,
                                          new String[] { CatalogUtil.ATTR_NAME,
@@ -684,9 +737,6 @@ public class CatalogOutputHandler extends OutputHandler {
             dataset.setAttribute(CatalogUtil.ATTR_DATATYPE, dataType);
         }
 
-
-
-
         if (entry.getDataType() != null) {
             String type = entry.getDataType();
             if (false && (type != null) && (type.length() > 0)) {
@@ -696,7 +746,6 @@ public class CatalogOutputHandler extends OutputHandler {
             }
 
         }
-
 
         addServices(entry, request, catalogInfo, dataset);
 

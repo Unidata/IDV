@@ -3985,10 +3985,18 @@ return new Result(title, sb);
                                        int typeMask)
             throws Exception {
         List<Link>   links  = getEntryLinks(request, entry);
+        return getEntryActionsTable(request, entry, typeMask, links);
+    }
+
+
+    public String getEntryActionsTable(Request request, Entry entry,
+                                       int typeMask, List<Link> links)
+            throws Exception {
         StringBuffer
             htmlSB          = null,
             nonHtmlSB       = null,
             actionSB        = null,
+            categorySB         = null,
             fileSB          = null;
         int     cnt         = 0;
         boolean needToAddHr = false;
@@ -4009,16 +4017,20 @@ return new Result(title, sb);
                 if (nonHtmlSB == null) {
                     cnt++;
                     nonHtmlSB = new StringBuffer(tableHeader);
-                    //                    nonHtmlSB.append("<tr><td class=entrymenulink>&nbsp;</td></tr>");
                 }
                 sb = nonHtmlSB;
             } else if (link.isType(OutputType.TYPE_FILE)) {
                 if (fileSB == null) {
                     cnt++;
                     fileSB = new StringBuffer(tableHeader);
-                    //                    fileSB.append("<tr><td class=entrymenulink>" + msg("File") +"</td></tr>");
                 }
                 sb = fileSB;
+            } else if (link.isType(OutputType.TYPE_CATEGORY)) {
+                if (categorySB == null) {
+                    cnt++;
+                    categorySB = new StringBuffer(tableHeader);
+                }
+                sb = categorySB;
             } else {
                 if (actionSB == null) {
                     cnt++;
@@ -4057,6 +4069,10 @@ return new Result(title, sb);
         if (fileSB != null) {
             fileSB.append("</table>");
             menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", fileSB.toString()));
+        }
+        if (categorySB != null) {
+            categorySB.append("</table>");
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", categorySB.toString()));
         }
         if (actionSB != null) {
             actionSB.append("</table>");
@@ -4127,15 +4143,39 @@ return new Result(title, sb);
     public String getEntryMenubar(Request request, Entry entry,
                                   String rightSide)
             throws Exception {
+        List<Link>   links  = getEntryLinks(request, entry);
         StringBuffer fileMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                OutputType.TYPE_FILE));
+                                                  OutputType.TYPE_FILE,links));
         StringBuffer editMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                OutputType.TYPE_EDIT));
+                                                  OutputType.TYPE_EDIT,links));
         StringBuffer viewMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                OutputType.TYPE_HTML | OutputType.TYPE_NONHTML));
+                                                  OutputType.TYPE_HTML | OutputType.TYPE_NONHTML,links));
+
+        StringBuffer categoryMenuInner = null;
+        String categoryMenu =null;
+
+        for (Link link : links) {
+            if (link.isType(OutputType.TYPE_CATEGORY)) {
+                categoryMenuInner =
+                    new StringBuffer(getEntryActionsTable(request, entry,
+                                                  OutputType.TYPE_CATEGORY,links));
+                String categoryName = link.getOutputType().getCategory();
+                categoryMenu =
+                    getRepository().makePopupLink(
+                                                  HtmlUtil.span(
+                                                                msg(categoryName),
+                                                                HtmlUtil.cssClass(
+                                                                                  "entrymenulink")), 
+                                                  categoryMenuInner.toString(), false,
+                                                  true);
+                break;
+            }
+        }
+
+
         String fileMenu =
             getRepository().makePopupLink(
                 HtmlUtil.span(
@@ -4160,10 +4200,18 @@ return new Result(title, sb);
                                            true);
         String sep = HtmlUtil.div("&nbsp;|&nbsp;",
                                   HtmlUtil.cssClass("menuseparator"));
-        String leftTable =
-            HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep,
-                editMenu, sep,
-                viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
+        String leftTable;
+        if(categoryMenu==null)
+            leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep,
+                                                                  editMenu, sep,
+                                                                  viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
+
+        else
+            leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(new String[]{fileMenu, sep,
+                                                                  editMenu, sep,
+                                                                               viewMenu, sep, categoryMenu})), " cellpadding=0 cellspacing=0 border=0 ");
+
+
         String table = HtmlUtil.leftRight(leftTable, rightSide,
                                           HtmlUtil.cssClass("entrymenubar"));
 

@@ -292,6 +292,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @return _more_
      */
     public Object[] makeValues() {
+        if(colNames.size()==0) return new Object[0];
         return new Object[colNames.size() - 1];
     }
 

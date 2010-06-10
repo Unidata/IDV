@@ -101,9 +101,13 @@ public class OutputType {
 
 
     /** _more_ */
+    public static final int TYPE_CATEGORY = 1 << 9;
+
+
+    /** _more_ */
     public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML
                                        | TYPE_FILE | TYPE_EDIT | TYPE_VIEW
-                                       | TYPE_TOOLBAR;
+                                       | TYPE_TOOLBAR | TYPE_CATEGORY;
 
 
     /** _more_ */
@@ -126,6 +130,10 @@ public class OutputType {
 
     /** _more_ */
     private String groupName = "";
+
+    private String category = "";
+
+
 
     /** _more_ */
     private String icon;
@@ -172,11 +180,17 @@ public class OutputType {
      */
     public OutputType(String label, String id, int type, String suffix,
                       String icon) {
+        this(label,  id,  type,  suffix, icon,null);
+    }
+
+    public OutputType(String label, String id, int type, String suffix,
+                      String icon, String category) {
         this.label  = label;
         this.id     = id;
         this.type   = type;
         this.suffix = suffix;
         this.icon   = icon;
+        this.category = category;
     }
 
 
@@ -324,6 +338,11 @@ public class OutputType {
      */
     public String getGroupName() {
         return groupName;
+    }
+
+
+    public String getCategory() {
+        return category;
     }
 
 

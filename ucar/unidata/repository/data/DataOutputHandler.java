@@ -1784,7 +1784,7 @@ public class DataOutputHandler extends OutputHandler {
                     markerSB.append("initMarker(startMarker,\"startMarker\","
                                     + mapVarName + ");\n");
                 }
-                js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
+               js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
             }
             js.append("]);\n");
             js.append("line.setWidth(2);\n");

@@ -383,6 +383,11 @@ public class Request implements Constants {
         return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), args));
     }
 
+
+    public String entryUrl(RequestUrl theUrl, Entry entry, String [] args) {
+        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), args));
+    }
+
     /**
      * _more_
      *

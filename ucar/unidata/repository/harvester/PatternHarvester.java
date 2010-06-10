@@ -632,6 +632,9 @@ public class PatternHarvester extends Harvester {
                     }
                     if (needToAdd.size() > 1000) {
                         if ( !getTestMode()) {
+                            for(Entry newEntry:needToAdd) 
+                                newEntry.getTypeHandler().initializeNewEntry(newEntry);
+
                             if (getAddMetadata() || getAddShortMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
                                         needToAdd, true,
@@ -656,6 +659,9 @@ public class PatternHarvester extends Harvester {
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
+                System.err.println("Initializing new entry");
+                for(Entry newEntry:needToAdd) 
+                    newEntry.getTypeHandler().initializeNewEntry(newEntry);
                 if (getAddMetadata() || getAddShortMetadata()) {
                     getEntryManager().addInitialMetadata(null, needToAdd,
                             true, getAddShortMetadata());
@@ -897,7 +903,8 @@ public class PatternHarvester extends Harvester {
             }
             }*/
 
-        typeHandler.initializeNewEntry(entry);
+        //        System.err.println("Initializing new entry:" + typeHandler.getClass().getName());
+        //xxxxx        typeHandler.initializeNewEntry(entry);
         return entry;
     }
 
