@@ -4054,6 +4054,20 @@ public class Misc {
 
 
 
+    public static float[] getRange(float[][] a) {
+        float[]range = {Float.MAX_VALUE,Float.MIN_VALUE};
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[i].length; j++) {
+                if(a[i][j]==a[i][j]) {
+                    range[0] = (float)Math.min(range[0],a[i][j]);
+                    range[1] = (float)Math.max(range[1],a[i][j]);
+                }
+            }
+        }
+        return range;
+    }
+
+
     /**
      * fill array with value
      *
@@ -4401,6 +4415,27 @@ public class Misc {
         return vals;
     }
 
+    public static float[][]copy(float[][]pts, int pointCnt) {
+        int numFields = pts.length;
+        float[][]newPts = new float[numFields][pointCnt];
+        for(int i=0;i<pointCnt;i++) {
+            for(int fieldIdx = 0;fieldIdx<numFields;fieldIdx++) {
+                    newPts[fieldIdx][i] = pts[fieldIdx][i];
+                }
+            }
+        return newPts;
+    }
+
+    public static float[][] expand(float[][]pts) {
+        int numFields = pts.length;
+        float[][]newPts = new float[numFields][pts[0].length*2];
+        for(int i=0;i<pts[0].length;i++) {
+            for(int fieldIdx = 0;fieldIdx<numFields;fieldIdx++) {
+                newPts[fieldIdx][i] = pts[fieldIdx][i];
+            }
+        }
+        return newPts;
+    }
 
     /*
      * Unpack an array of packed integers
