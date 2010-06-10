@@ -100,9 +100,15 @@ public class VolumeDisplayable extends RGBDisplayable implements GridDisplayable
     public void loadData(FieldImpl field)
             throws VisADException, RemoteException {
 
+        loadData(field, 0);
+    }
+
+    public void loadData(FieldImpl field, int rgbIndex)
+            throws VisADException, RemoteException {
+
         // get the RealType of the range from the FlatField
         TupleType tt       = GridUtil.getParamType(field);
-        RealType  ffldType = tt.getRealComponents()[0];
+        RealType  ffldType = tt.getRealComponents()[rgbIndex];
 
         if ((getRGBRealType() == null)
                 || !ffldType.equals(getRGBRealType())) {
