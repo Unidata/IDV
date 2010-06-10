@@ -254,6 +254,9 @@ public class PointCloudDataSource extends FilesDataSource {
                 }
                 pointCnt++;
             }
+            if(pts == null) {
+                throw new BadDataException("No points were read. Bad delimiter?");
+            }
             long t2 = System.currentTimeMillis();
             System.err.println("cnt:" + pointCnt +" time:" + (t2-t1)/1000);
             pts = Misc.copy(pts, pointCnt);
