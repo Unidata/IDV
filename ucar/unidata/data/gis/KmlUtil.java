@@ -381,6 +381,8 @@ public class KmlUtil {
     public static Element placemark(Element parent, String name, String description, float[][]coords, Color color, int width) {
         Element placemark = placemark(parent, name, description);
         Element linestring = linestring(placemark,false,false, coords);
+        String randomStyle = System.currentTimeMillis() +"_" + (int)(Math.random()*1000);
+        linestyle(placemark, randomStyle,color, width);
         return placemark;
     }
 

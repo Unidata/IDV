@@ -151,6 +151,7 @@ public abstract class FilesDataSource extends DataSourceImpl {
                            String name, String description,
                            Hashtable properties) {
         super(descriptor, name, description, properties);
+
         if (getName().length() == 0) {
             if (newSources.size() > 0) {
                 setName(newSources.get(0).toString());
