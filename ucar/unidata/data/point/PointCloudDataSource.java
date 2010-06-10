@@ -169,6 +169,7 @@ public class PointCloudDataSource extends FilesDataSource {
         return true;
     }
 
+    private static int typeCnt = 0;
 
     protected Data getDataInner(DataChoice dataChoice, DataCategory category,
                                 DataSelection dataSelection,
@@ -273,42 +274,22 @@ public class PointCloudDataSource extends FilesDataSource {
             }
 
 
-
-            float  minX     = Float.POSITIVE_INFINITY;
-            float  minY     = Float.POSITIVE_INFINITY;
-            float  maxX     = Float.NEGATIVE_INFINITY;
-            float  maxY     = Float.NEGATIVE_INFINITY;
-            for(int i=0;i<pts[0].length;i++) {
-                minX = Math.min(minX, pts[INDEX_LON][i]);
-                maxX = Math.max(maxX, pts[INDEX_LON][i]);
-
-                minY = Math.min(minY, pts[INDEX_LAT][i]);
-                maxY = Math.max(maxY, pts[INDEX_LAT][i]);
-            }
-
-            Rectangle2D.Float rect = new Rectangle2D.Float( minX, minY,  (maxX - minX),  (maxY - minY));
-            System.err.println(rect);
-            /*
-              Rectangle2D.Float rect = new Rectangle2D.Float( minX, minY,  (maxX - minX),  (maxY - minY));
-              projection =  new TrivialMapProjection(
-              RealTupleType.SpatialEarth2DTuple, rect);
-            */
-
             RealType index = RealType.getRealType("index");
             Integer1DSet domain = new Integer1DSet(index, pts[0].length);
+            RealType rt=null;
+            if(pts.length>3) {
+                rt = Util.makeRealType("brightness_" +(typeCnt++),null);
+            }
             MathType type = 
                 pts.length==3?
                 new RealTupleType(RealType.Altitude,            
                                   RealType.Longitude, RealType.Latitude):
                 new RealTupleType(RealType.Altitude,            
-                                  RealType.Longitude, RealType.Latitude,RealType.Generic);
-
-        
-
+                                  RealType.Longitude, RealType.Latitude,rt);
             FunctionType ft = new FunctionType(index, type); 
             FlatField field = new FlatField(ft,domain);
             field.setSamples(pts,false);
-            //        System.out.println(field);
+
             return field;
         } catch(Exception exc) {
             throw new RuntimeException(exc);

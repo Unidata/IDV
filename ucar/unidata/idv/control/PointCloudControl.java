@@ -78,7 +78,7 @@ import javax.swing.event.*;
  * @author Unidata IDV Development Team
  * @version $Revision: 1.11 $
  */
-public class PointCloudControl extends GridDisplayControl {
+public class PointCloudControl extends DisplayControlImpl {
 
     /** the display for the volume renderer */
     VolumeDisplayable myDisplay;
@@ -220,32 +220,20 @@ public class PointCloudControl extends GridDisplayControl {
      * @throws VisADException    problem loading the data
      */
     private void loadVolumeData() throws VisADException, RemoteException {
-        FlatField points    = (FlatField)getGridDataInstance().getGrid();
+        FlatField points    = (FlatField)getDataInstance().getData();
         float[][]pts = points.getFloats(false);
-        //        pts = null;
-        if(pts == null) {
-            int size = 500000;
-            pts = new float[3][size];
-            for(int i=0;i<pts[0].length;i++) {
-                pts[PointCloudDataSource.INDEX_ALT][i] = (float)(10000*Math.random());
-                pts[PointCloudDataSource.INDEX_LON][i] = (float)(360*Math.random()-180);
-                pts[PointCloudDataSource.INDEX_LAT][i] = (float)(180*Math.random()-90);
-            }
-        }
         if(pts.length == 3) {
             colorRangeIndex = PointCloudDataSource.INDEX_ALT;
         } else {
             colorRangeIndex = pts.length-1;
         }
 
-        System.err.println("Load data:" + colorRangeIndex);
-
         float  minX     = Float.POSITIVE_INFINITY;
         float  minY     = Float.POSITIVE_INFINITY;
         float  maxX     = Float.NEGATIVE_INFINITY;
         float  maxY     = Float.NEGATIVE_INFINITY;
-        float  minField     = Float.POSITIVE_INFINITY;
-        float  maxField  = Float.NEGATIVE_INFINITY;
+        float  minField = Float.POSITIVE_INFINITY;
+        float  maxField = Float.NEGATIVE_INFINITY;
 
         for(int i=0;i<pts[0].length;i++) {
             minX = Math.min(minX, pts[PointCloudDataSource.INDEX_LON][i]);
@@ -268,25 +256,8 @@ public class PointCloudControl extends GridDisplayControl {
 
         projection =  new TrivialMapProjection(
                                                RealTupleType.SpatialEarth2DTuple, rect);
-        //        myDisplay.loadData(points,colorRangeIndex);
-
-
-        RealType index = RealType.getRealType("index");
-        Integer1DSet domain = new Integer1DSet(index, pts[0].length);
-            MathType type = 
-                pts.length==3?
-                new RealTupleType(RealType.Altitude,            
-                                  RealType.Longitude, RealType.Latitude):
-                new RealTupleType(RealType.Altitude,            
-                                  RealType.Longitude, RealType.Latitude,RealType.Generic);
-
-
-        FunctionType ft = new FunctionType(index, type); 
-        FlatField field = new FlatField(ft,domain);
-        field.setSamples(pts,false);
-        myDisplay.loadData(field,colorRangeIndex);
-
-
+        System.err.println("type1:" + points.getType());
+        myDisplay.loadData(points,colorRangeIndex);
     }
 
 

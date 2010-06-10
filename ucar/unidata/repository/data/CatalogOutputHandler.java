@@ -594,10 +594,12 @@ public class CatalogOutputHandler extends OutputHandler {
                                                  CatalogUtil.ATTR_SERVICENAME,
                                                  type, CatalogUtil.ATTR_URLPATH, url});
 
+            if(icon!=null && icon.length()>0) {
                 XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY,
                                subDataset,
                                new String[] { CatalogUtil.ATTR_NAME,
                                               "icon", CatalogUtil.ATTR_VALUE,icon});
+            }
 
         }
 
@@ -619,6 +621,12 @@ public class CatalogOutputHandler extends OutputHandler {
                                              new String[] {
                                                  CatalogUtil.ATTR_SERVICENAME,
                     SERVICE_HTTP, CatalogUtil.ATTR_URLPATH, urlPath });
+            XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY,
+                           subDataset,
+                           new String[] { CatalogUtil.ATTR_NAME,
+                                          "icon", CatalogUtil.ATTR_VALUE,
+                                          getRepository().absoluteUrl(getRepository().iconUrl(ICON_FILE))});
+
         }
 
 
