@@ -256,6 +256,16 @@ example:
 
 
   <control
+     id="pointcloud"
+     categories="pointcloud"
+     class="ucar.unidata.idv.control.PointCloudControl"
+     canstandalone="true"
+     label="Point Cloud"
+     displaycategory="Volume Rendering"
+    />
+
+
+  <control
      id="stormtrackcontrol"
      categories="stormtrack"
      class="ucar.unidata.idv.control.storm.StormTrackControl"

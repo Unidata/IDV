@@ -61,6 +61,23 @@
      label="Point data database"/>
 
   <datasource
+     id="pointcloud"
+     factory="ucar.unidata.data.point.PointCloudDataSource"
+     patterns=".*/pointcloud.*\.csv|\.tls"
+     fileselection="true"
+     label="Point cloud data"/>
+
+  <datasource
+     id="pointcloudlonlat"
+     factory="ucar.unidata.data.point.PointCloudDataSource"
+     patterns=""
+     fileselection="true"
+     label="Point cloud data (lon/lat)">
+    <property name="latlon" value="false"/>
+  </datasource>
+
+
+  <datasource
      id="waterml"
      fileselection="true"
      factory="ucar.unidata.data.point.WaterMLDataSource"
