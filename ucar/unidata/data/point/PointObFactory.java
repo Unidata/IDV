@@ -83,6 +83,7 @@ import ucar.visad.quantities.GeopotentialAltitude;
 import visad.*;
 
 import visad.georef.*;
+import visad.util.DataUtility;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -178,6 +179,34 @@ public class PointObFactory {
         return makeTimeSequenceOfPointObs(obs, lumpMinutes, -1);
     }
 
+    public static FieldImpl makePointCloud(FieldImpl pointObs) throws VisADException, RemoteException {
+    	FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs, -1);
+    	FieldImpl cloudData = null;
+    	Set timeSet = timeObs.getDomainSet();
+    	FunctionType cloudType = null;
+    	FunctionType timeCloudType = null;
+    	for (int i=0; i < timeSet.getLength(); i++) {
+    		FieldImpl obs = (FieldImpl) timeObs.getSample(i, false);
+    		Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
+    		FlatField timeStep = null;
+    		for (int j = 0; j < indexSet.getLength(); j++) {
+    		   PointOb ob = (PointOb) obs.getSample(j,false);
+    		   if (cloudType == null) {
+    			   cloudType = 
+    				   new FunctionType(DataUtility.getDomainType(indexSet), new TupleType(new MathType[] {ob.getEarthLocation().getType(), ob.getData().getType()}));
+    			   timeStep = new FlatField(cloudType, indexSet);
+    		   }
+    		   timeStep.setSample(j, new Tuple(new Data[] {ob.getEarthLocation(), ob.getData()}), false);
+    		}
+    		if (cloudType == null) {
+    			cloudType = new FunctionType(DataUtility.getDomainType(timeSet), timeStep.getType());
+    			cloudData = new FieldImpl(cloudType, timeSet);
+    		}
+    		cloudData.setSample(i, timeStep, false, false);
+    	}
+    	return cloudData;
+    }
+    
     /**
      * From a field of point observations, reorder them with time
      * as the outer dimension. If componentIndex &gt; -1 then we extract that
@@ -209,7 +238,7 @@ public class PointObFactory {
                     " " + lumpMinutes + " num obs:" + numObs);
         Hashtable seenTime = new Hashtable();
         for (int i = 0; i < numObs; i++) {
-            PointOb ob = (PointOb) pointObs.get(i);
+            PointObTuple ob = (PointObTuple) pointObs.get(i);
             if (i == 0) {
                 if (componentIndex < 0) {
                     obType = ob.getType();

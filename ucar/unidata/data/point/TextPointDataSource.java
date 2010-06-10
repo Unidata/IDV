@@ -361,7 +361,9 @@ public class TextPointDataSource extends PointDataSource {
      */
     protected String getSource(DataChoice dataChoice) {
         Object id = dataChoice.getId();
-        if ((id instanceof String) && (id.toString().startsWith("track:"))) {
+        if ((id instanceof String) && 
+        		(id.toString().startsWith("track:") ||
+        		 id.toString().startsWith("pointcloud:"))) {
             return (String) sources.get(0);
         }
         return super.getSource(dataChoice);
@@ -1370,7 +1372,7 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /** var names */
-    List varNames = new ArrayList();
+    List<String> varNames = new ArrayList<String>();
 
     /**
      * make a trajectory form the obs data
@@ -1488,7 +1490,7 @@ public class TextPointDataSource extends PointDataSource {
     private FieldImpl makePointObs(Data input, String trackParam)
             throws VisADException {
 
-        varNames = new ArrayList();
+        varNames = new ArrayList<String>();
         long      millis   = System.currentTimeMillis();
         FieldImpl retField = null;
         try {
@@ -1916,7 +1918,7 @@ public class TextPointDataSource extends PointDataSource {
         if (pointData.size() == 0) {
             return null;
         }
-        varNames = new ArrayList();
+        varNames = new ArrayList<String>();
         FieldImpl retField = null;
         try {
             Data[]    input = pointData.get(0);
@@ -2339,6 +2341,12 @@ public class TextPointDataSource extends PointDataSource {
             //Sample the data to see if we need to show the metadata gui
             Data sample = makeObs(dataChoice, null, null, null, true, true);
 
+            List cloudCats = DataCategory.parseCategories("Point Cloud;pointcloud", true);
+            for (String varname : varNames) {
+                DataChoice choice = new DirectDataChoice(this,
+                                        "pointcloud:" + varname, varname, varname, cloudCats, (Hashtable) null);
+                addDataChoice(choice);
+            }
             if (isTrajectoryEnabled()) {
 
                 //                System.err.println ("sample:" + sample);
@@ -2399,8 +2407,22 @@ public class TextPointDataSource extends PointDataSource {
                 return null;
             }
         }
-        return super.getDataInner(dataChoice, category, dataSelection,
+        /*
+        if ((id instanceof String) && (id.toString().startsWith("pointcloud:"))) {
+            try {
+                FieldImpl d = makeObs((DataChoice) dataChoice, dataSelection, null,
+                               id.toString().substring(11), false, true);
+                FieldImpl cloud = PointObFactory.makePointCloud(d);
+                return cloud;
+            } catch (Exception exc) {
+                logException("Creating point cloud", exc);
+                return null;
+            }
+        }
+        */
+        FieldImpl data =  (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
                                   requestProperties);
+        return data;
     }
 
 
