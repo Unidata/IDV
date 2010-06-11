@@ -194,13 +194,15 @@ public class PointObFactory {
     		   if (cloudType == null) {
     			   cloudType = 
     				   new FunctionType(DataUtility.getDomainType(indexSet), new TupleType(new MathType[] {ob.getEarthLocation().getType(), ob.getData().getType()}));
+    		   }
+    		   if (timeStep == null) {
     			   timeStep = new FlatField(cloudType, indexSet);
     		   }
     		   timeStep.setSample(j, new Tuple(new Data[] {ob.getEarthLocation(), ob.getData()}), false);
     		}
-    		if (cloudType == null) {
-    			cloudType = new FunctionType(DataUtility.getDomainType(timeSet), timeStep.getType());
-    			cloudData = new FieldImpl(cloudType, timeSet);
+    		if (timeCloudType == null) {
+    			timeCloudType = new FunctionType(DataUtility.getDomainType(timeSet), timeStep.getType());
+    			cloudData = new FieldImpl(timeCloudType, timeSet);
     		}
     		cloudData.setSample(i, timeStep, false, false);
     	}

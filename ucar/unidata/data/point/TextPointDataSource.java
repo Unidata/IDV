@@ -2407,22 +2407,19 @@ public class TextPointDataSource extends PointDataSource {
                 return null;
             }
         }
-        /*
         if ((id instanceof String) && (id.toString().startsWith("pointcloud:"))) {
             try {
-                FieldImpl d = makeObs((DataChoice) dataChoice, dataSelection, null,
-                               id.toString().substring(11), false, true);
-                FieldImpl cloud = PointObFactory.makePointCloud(d);
+               FieldImpl obs =  (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
+                                  requestProperties);
+                FieldImpl cloud = PointObFactory.makePointCloud(obs);
                 return cloud;
             } catch (Exception exc) {
                 logException("Creating point cloud", exc);
                 return null;
             }
         }
-        */
-        FieldImpl data =  (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
+        return (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
                                   requestProperties);
-        return data;
     }
 
 
