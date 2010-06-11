@@ -1383,14 +1383,14 @@ public class HtmlUtil {
                                        String north, String east,
                                        String west) {
         //TODO: Clean this up
-        return table("<tr><td colspan=\"2\" align=\"center\">"
+        return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
                      + makeLatLonInput(baseName + "_north", north)
                      + "</td></tr>" + "<tr><td>"
                      + makeLatLonInput(baseName + "_west", west)
                      + "</td><td>"
                      + makeLatLonInput(baseName + "_east", east) + "</tr>"
                      + "<tr><td colspan=\"2\" align=\"center\">"
-                     + makeLatLonInput(baseName + "_south", south));
+                     + makeLatLonInput(baseName + "_south", south)+"</table>";
     }
 
     /**
