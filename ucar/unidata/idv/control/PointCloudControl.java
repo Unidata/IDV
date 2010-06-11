@@ -109,7 +109,20 @@ public class PointCloudControl extends DisplayControlImpl {
 
     public Range getColorRangeFromData() {
         if(dataRange!=null) return dataRange;
-        return  getColorRangeFromData();
+        return  super.getColorRangeFromData();
+    }
+
+    /**
+     * Hook method to allow derived classes to return a different
+     * initial {@link ucar.unidata.util.Range}
+     *
+     * @return The initial range to use
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    protected Range getInitialRange() throws RemoteException, VisADException {
+        return getColorRangeFromData();
     }
 
 
