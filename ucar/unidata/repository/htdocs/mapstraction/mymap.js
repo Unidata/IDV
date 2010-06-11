@@ -6,10 +6,10 @@ var lines = new Object();
 var addedToMap = new Object();
 var markers = new Object();
 
-function MapInitialize(addControls,mapProvider,divname)
-{
+function MapInitialize(addControls,mapProvider,divname) {
 	// Create a map object
 	var mapstraction = new Mapstraction(divname, mapProvider);
+
 	if(!addControls) {
 //		vemap = mapstraction.maps[mapstraction.api];
 //		vemap.SetDashboardSize(VEDashboardSize.Tiny);
@@ -32,20 +32,22 @@ function MapInitialize(addControls,mapProvider,divname)
                 map_type: true 
             });
 
-        /*
         mapstraction.addEventListener( 'click', onClickMap);  
-        function onClickMap( point) {  
-            alert('click ' + point.lat);
-            // the yahoo map returns 0 for lat and 180 for lon when user  
-            // clicks on a control on the map (for example on the pan-left arrow)  
-             if (point.lat != 0) {  
-                 mapstraction.addMarker( new Marker( new LatLonPoint(point.lat,point.lon)));  
-             }  
-        } 
-        */ 
 
         return mapstraction;
 }
+
+
+function onClickMap( point) {  
+    // the yahoo map returns 0 for lat and 180 for lon when user  
+    // clicks on a control on the map (for example on the pan-left arrow)  
+    if (point.lat != 0) {  
+        if(mapSelector) {
+            mapSelector.handleMapClick(point.lat, point.lon);
+        }
+    }  
+} 
+
 
 
 function initMarker(marker,id,theMap) {
@@ -84,4 +86,115 @@ function hiliteEntry(map,id) {
 		map.removePolyline(lastLine);
 		map.addPolyline(lastLine);
 	}
+}
+
+
+
+var mapSelector;
+
+function MapSelector (argBase, absolute) {
+    mapSelector = this;
+    this.doFirst = 1;
+    this.argBase = argBase;
+    this.absolute = absolute;
+
+    this.fldNorth= util.getDomObject(argBase+"_north");
+    this.fldSouth= util.getDomObject(argBase+"_south");
+    this.fldEast= util.getDomObject(argBase+"_east");
+    this.fldWest= util.getDomObject(argBase+"_west");
+    this.fldLat= util.getDomObject(argBase+"_lat");
+    this.fldLon= util.getDomObject(argBase+"_lon");
+
+    this.selectorPolyline = null;
+
+    this.handleMapClick = function(lat1,lon1) {
+        if(this.fldNorth) {
+            if(this.doFirst) {
+                this.doFirst =0;
+                this.fldNorth.obj.value = ""+lat1;
+                this.fldWest.obj.value = ""+lon1;
+                this.fldSouth.obj.value = "";
+                this.fldEast.obj.value = "";
+            } else {
+                this.doFirst = 1;
+                var ns = this.fldNorth.obj.value;
+                var ws = this.fldWest.obj.value;
+                if(ns!="" && ws!="") {
+                    var lat2 = parseFloat(ns);
+                    var lon2 = parseFloat(ws);
+                    this.fldSouth.obj.value = ""+Math.min(lat1,lat2);
+                    this.fldNorth.obj.value = ""+Math.max(lat1,lat2);
+                    this.fldEast.obj.value = ""+Math.max(lon1,lon2);
+                    this.fldWest.obj.value = ""+Math.min(lon1,lon2);
+                } else {
+                    this.fldSouth.obj.value = ""+lat1;
+                    this.fldEast.obj.value = ""+lon1;
+                }
+            }
+            this.setSelectorBox();
+        } else if(this.fldLat) {
+            this.fldLat.obj.value = ""+lat1;
+            this.fldLon.obj.value = ""+lon1;
+        }
+    }
+
+    this.setSelectorBox = function() {
+            if(this.selectorPolyline) {
+                selectormap.removePolyline(this.selectorPolyline);
+            }
+            var ns = this.fldNorth.obj.value;
+            var ss = this.fldSouth.obj.value;
+            var es = this.fldEast.obj.value;
+            var ws = this.fldWest.obj.value;
+            if(es=="") es=ws;
+            if(ss=="") ss=ns;
+
+            if(ns!="" &&
+               ss!="" &&
+               es!="" &&
+               ws!="" ) {
+                var n = parseFloat(ns);
+                var s = parseFloat(ss);
+                var e = parseFloat(es);
+                var w = parseFloat(ws);
+                line = new Polyline([new LatLonPoint(n,w),
+                                     new LatLonPoint(n,e),
+                                     new LatLonPoint(s,e),
+                                     new LatLonPoint(s,w),
+                                     new LatLonPoint(n,w)]);
+                line.setColor("#FF0000");
+                line.setWidth(2);
+                this.selectorPolyline = line;
+                selectormap.addPolyline(this.selectorPolyline);
+            }
+    }
+
+    this.clear = function() {
+        if(this.selectorPolyline) {
+            selectormap.removePolyline(this.selectorPolyline);
+        }
+        this.doFirst = 1;
+        if(this.fldNorth)
+            this.fldNorth.obj.value = "";
+        if(this.fldSouth)
+            this.fldSouth.obj.value = "";
+        if(this.fldEast)
+            this.fldEast.obj.value = "";
+        if(this.fldWest)
+            this.fldWest.obj.value = "";
+        if(this.fldLat)
+            this.fldLat.obj.value = "";
+        if(this.fldLon)
+            this.fldLon.obj.value = "";
+        if(this.box) {
+            var style = util.getStyle(this.box);
+            style.visibility =  "hidden";
+        }
+    }
+
+
+    this.init = function() {
+    }
+
+    this.setSelectorBox();
 }

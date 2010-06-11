@@ -1414,8 +1414,9 @@ public class DataOutputHandler extends OutputHandler {
         if (llr != null) {
             String llb =
                 getRepository().getMapManager().makeMapSelector(ARG_AREA,
-                    true, "" + llr.getLatMin(), "" + llr.getLatMax(),
-                    "" + llr.getLonMax(), "" + llr.getLonMin());
+                                                                true, new String[]{
+                                                                    "" + llr.getLatMin(), "" + llr.getLatMax(),
+                                                                    "" + llr.getLonMax(), "" + llr.getLonMin()});
 
             sb.append(
                 HtmlUtil.formEntryTop(

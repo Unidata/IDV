@@ -590,6 +590,13 @@ public class Entry extends Entity {
                 : NONGEO);
     }
 
+    public double[][] getLatLonBounds() {
+        return new double[][] {
+            {north,north,south,south,north},
+            {west,east,east,west,west}
+        };
+    }
+
     /**
      * Set the West property.
      *

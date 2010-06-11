@@ -98,7 +98,7 @@ public class MapManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public String initMap(Request request, String mapVarName,
+    public void initMap(Request request, String mapVarName,
                           StringBuffer sb, int width, int height,
                           boolean normalControls) {
         String userAgent = request.getHeaderArg("User-Agent");
@@ -166,7 +166,6 @@ public class MapManager extends RepositoryManager {
                                       normalControls + ","
                                       + HtmlUtil.squote(mapProvider) + ","
                                       + HtmlUtil.squote(mapVarName)) + ";"));
-        return "";
     }
 
 
@@ -193,11 +192,18 @@ public class MapManager extends RepositoryManager {
      */
     public String makeMapSelector(Request request, String arg, boolean popup,
                                   String extraLeft, String extraTop) {
+
+        return makeMapSelector(request, arg, popup, extraLeft, extraTop, null);
+    }
+
+    public String makeMapSelector(Request request, String arg, boolean popup,
+                                  String extraLeft, String extraTop, double[][]marker) {
         return makeMapSelector(arg, popup, extraLeft, extraTop,
-                               request.getString(arg + "_south", ""),
-                               request.getString(arg + "_north", ""),
-                               request.getString(arg + "_east", ""),
-                               request.getString(arg + "_west", ""));
+                               new String[]{
+                                   request.getString(arg + "_south", ""),
+                                   request.getString(arg + "_north", ""),
+                                   request.getString(arg + "_east", ""),
+                                   request.getString(arg + "_west", "")},marker);
     }
 
 
@@ -206,16 +212,12 @@ public class MapManager extends RepositoryManager {
      *
      * @param arg _more_
      * @param popup _more_
-     * @param south _more_
-     * @param north _more_
-     * @param east _more_
-     * @param west _more_
      *
      * @return _more_
      */
-    public String makeMapSelector(String arg, boolean popup, String south,
-                                  String north, String east, String west) {
-        return makeMapSelector(arg, popup, "", "", south, north, east, west);
+    public String makeMapSelector(String arg, boolean popup, 
+                                  String[] snew) {
+        return makeMapSelector(arg, popup, "", "", snew);
     }
 
     /**
@@ -225,51 +227,36 @@ public class MapManager extends RepositoryManager {
      * @param popup _more_
      * @param extraLeft _more_
      * @param extraTop _more_
-     * @param south _more_
-     * @param north _more_
-     * @param east _more_
-     * @param west _more_
      *
      * @return _more_
      */
     public String makeMapSelector(String arg, boolean popup,
                                   String extraLeft, String extraTop,
-                                  String south, String north, String east,
-                                  String west) {
-        return makeMapSelector(arg, popup, extraLeft, extraTop,
-                               new String[] { south,
-                north, east, west });
+                                  String[]snew) {
+
+        return makeMapSelector(arg,popup, extraLeft, extraTop, snew, null);
     }
 
 
-    /**
-     * _more_
-     *
-     * @param arg _more_
-     * @param popup _more_
-     * @param extraLeft _more_
-     * @param extraTop _more_
-     * @param pts _more_
-     *
-     * @return _more_
-     */
     public String makeMapSelector(String arg, boolean popup,
                                   String extraLeft, String extraTop,
-                                  String[] pts) {
+                                  String[]snew,
+                                  double[][]markerLatLons) {
         StringBuffer sb = new StringBuffer();
-
-
+        String msg = HtmlUtil.italics(msg("Shift-click to select point"));
+        sb.append(msg);
+        sb.append(HtmlUtil.br());
         String       widget;
-        if (pts.length == 4) {
-            widget = HtmlUtil.makeLatLonBox(arg, pts[0], pts[1], pts[2],
-                                            pts[3]);
+        if (snew.length == 4) {
+            widget = HtmlUtil.makeLatLonBox(arg, snew[0], snew[1], snew[2],
+                                            snew[3]);
         } else {
             widget = " Lat: "
-                     + HtmlUtil.input(arg + "_lat", pts[0],
+                     + HtmlUtil.input(arg + "_lat", snew[0],
                                       HtmlUtil.SIZE_5 + " "
                                       + HtmlUtil.id(arg + "_lat")) + " Lon: "
                                           + HtmlUtil.input(arg + "_lon",
-                                              pts[1],
+                                              snew[1],
                                                   HtmlUtil.SIZE_5 + " "
                                                       + HtmlUtil.id(arg
                                                           + "_lon"));
@@ -278,56 +265,52 @@ public class MapManager extends RepositoryManager {
             widget = widget + HtmlUtil.br() + extraLeft;
         }
 
-        String imageId     = arg + "_bbox_image";
-
 
         String var         = "mapselector" + HtmlUtil.blockCnt++;
         String onClickCall = HtmlUtil.onMouseClick(var + ".click(event);");
-        String bboxDiv = HtmlUtil.div("",
-                                      HtmlUtil.cssClass("latlon_box")
-                                      + onClickCall
-                                      + HtmlUtil.id(arg + "_bbox_div"));
-
-        StringBuffer imageHtml = new StringBuffer();
-        String nextMapLink = HtmlUtil.mouseClickHref(var + ".cycleMap()",
-                                 HtmlUtil.img(iconUrl(ICON_MAP),
-                                     " View another map", ""));
-        imageHtml.append("\n");
-        imageHtml.append(bboxDiv);
-        imageHtml.append(HtmlUtil.table(new Object[] {
-            HtmlUtil.img(getMapUrl(), "",
-                         HtmlUtil.id(imageId) + onClickCall
-                         + HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup
-                ? "800"
-                : "800"))), nextMapLink }));
-
-        imageHtml.append("\n");
         String rightSide = null;
         String clearLink = HtmlUtil.mouseClickHref(var + ".clear();",
                                msg("Clear"));
-        String updateLink = HtmlUtil.mouseClickHref(var + ".update();",
-                                msg("Update Map"));
-
-        String initParams = HtmlUtil.squote(imageId) + ","
-                            + HtmlUtil.squote(arg) + "," + (popup
+        String initParams = HtmlUtil.squote(arg) + "," + (popup
                 ? "1"
                 : "0");
+
+        String mapVarName = "selectormap";
+
+        try {
+            initMap(getRepository().getTmpRequest(), mapVarName, sb, 500,300,true);
+        } catch(Exception exc) {}
+
         if (popup) {
             rightSide = getRepository().makeStickyPopup(msg("Select"),
-                    imageHtml.toString(),
-                    var + ".init();") + HtmlUtil.space(2) + clearLink
-                                      + HtmlUtil.space(2) + updateLink
+                                                        sb.toString(),
+                                                        var + ".init();") + HtmlUtil.space(2) + clearLink
+                                      + HtmlUtil.space(2)
                                       + HtmlUtil.space(2) + extraTop;
         } else {
-            rightSide = clearLink + HtmlUtil.space(2) + updateLink
-                        + HtmlUtil.br() + imageHtml;
+            rightSide = clearLink + HtmlUtil.space(2) 
+                + HtmlUtil.br() + sb.toString();
         }
 
+        StringBuffer script = new StringBuffer();
+        script.append("var " + var + " =  new MapSelector(" + initParams+ ");\n");
+        if(markerLatLons!=null) {
+            script.append("var markerLine = new Polyline([");
+            for(int i=0;i<markerLatLons[0].length;i++) {
+                if(i>0)
+                    script.append(",");
+                script.append("new LatLonPoint(" + markerLatLons[0][i]+"," +
+                              markerLatLons[1][i]+")");
+            }
+            script.append("]);\n");
+            script.append("markerLine.setColor(\"#00FF00\");\n");
+            script.append("markerLine.setWidth(3);\n");
+            script.append(mapVarName +".addPolyline(markerLine);\n");
+            script.append(mapVarName +".autoCenterAndZoom();\n");
+        }
 
-        String script = "var " + var + " =  new MapSelector(" + initParams
-                        + ");\n";
         return HtmlUtil.table(new Object[] { widget, rightSide }) + "\n"
-               + HtmlUtil.script(script);
+            + HtmlUtil.script(script.toString());
 
     }
 

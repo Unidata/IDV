@@ -1206,18 +1206,15 @@ public class Column implements Constants {
                           : "" });
         } else if (isType(TYPE_LATLONBBOX)) {
             if (values != null) {
+                String[] snew = {
+                    latLonOk(values[offset + 2]) ? values[offset + 2] + "" : "", 
+                    latLonOk(values[offset + 0]) ? values[offset + 0] + "" : "", 
+                    latLonOk(values[offset + 3]) ? values[offset + 3] + "" : "", 
+                    latLonOk(values[offset + 1]) ? values[offset + 1] + "" : ""
+                };
                 widget =
                     typeHandler.getRepository().getMapManager()
-                        .makeMapSelector(id, true, "", "",
-                                         latLonOk(values[offset + 2])
-                                         ? values[offset + 2] + ""
-                                         : "", latLonOk(values[offset + 0])
-                        ? values[offset + 0] + ""
-                        : "", latLonOk(values[offset + 3])
-                              ? values[offset + 3] + ""
-                              : "", latLonOk(values[offset + 1])
-                                    ? values[offset + 1] + ""
-                                    : "");
+                        .makeMapSelector(id, true, "", "", snew);
             } else {
                 widget =
                     typeHandler.getRepository().getMapManager()

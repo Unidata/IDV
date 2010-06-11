@@ -321,7 +321,13 @@ Mapstraction.prototype.addAPI = function(element,api) {
         this.maps[api] = new VEMap(element.id);
         this.maps[api].LoadMap();
 
-//        this.maps[api].AttachEvent("onclick", function(e) { me.clickHandler(e.view.LatLong.Latitude, e.view.LatLong.Longitude, me); });
+        this.maps[api].AttachEvent("onclick", function(e) {
+                if(e.shiftKey) {
+                    var loc = me.maps['microsoft'].PixelToLatLong(new VEPixel(e.mapX, e.mapY));     
+                    me.clickHandler(loc.Latitude, loc.Longitude, me); 
+                    return true;
+                }
+            });
 //        this.maps[api].AttachEvent("onchangeview", function(e) {me.moveendHandler(me);});
 
         //Source of our trouble with Mapufacture?

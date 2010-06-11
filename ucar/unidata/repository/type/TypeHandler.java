@@ -1760,18 +1760,16 @@ public class TypeHandler extends RepositoryManager {
                 }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
+            String[]pts=null;
+            if(entry!=null) {
+                pts = new String[]{
+                    entry.hasSouth() ? "" + entry.getSouth(): "", 
+                    entry.hasNorth() ? "" + entry.getNorth(): "", 
+                    entry.hasEast()  ? "" + entry.getEast(): "", 
+                    entry.hasWest()  ? "" + entry.getWest(): ""};
+            }
             String mapSelector =
-                getRepository().getMapManager().makeMapSelector(ARG_AREA,
-                    true, ((entry != null) && entry.hasSouth())
-                          ? "" + entry.getSouth()
-                          : "", ((entry != null) && entry.hasNorth())
-                                ? "" + entry.getNorth()
-                                : "", ((entry != null) && entry.hasEast())
-                                      ? "" + entry.getEast()
-                                      : "", ((entry != null)
-                                             && entry.hasWest())
-                                            ? "" + entry.getWest()
-                                            : "");
+                getRepository().getMapManager().makeMapSelector(ARG_AREA, true, pts);
 
             sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
@@ -2054,6 +2052,7 @@ public class TypeHandler extends RepositoryManager {
                               request, ARG_TODATE, "searchform",
                               null) + dateExtra));
 
+
         if (advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
             String searchChildren = " "
@@ -2123,13 +2122,9 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().getMapManager().makeMapSelector(request,
                     ARG_AREA, true, "", radio);
 
-
-
-
-
-            advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     mapSelector));
-            advancedSB.append("\n");
+            basicSB.append("\n");
         }
 
 
@@ -2148,7 +2143,7 @@ public class TypeHandler extends RepositoryManager {
         formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Basic"),
                 basicSB.toString(), true));
         formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Advanced"),
-                advancedSB.toString(), false));
+                                                     advancedSB.toString(), false));
     }
 
 
