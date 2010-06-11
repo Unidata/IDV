@@ -220,7 +220,13 @@ public class PointCloudControl extends DisplayControlImpl {
      * @throws VisADException    problem loading the data
      */
     private void loadVolumeData() throws VisADException, RemoteException {
-        FlatField points    = (FlatField)getDataInstance().getData();
+        FieldImpl data    = (FieldImpl)getDataInstance().getData();
+        FlatField points = null;
+        if (GridUtil.isTimeSequence(data)) {
+        	points = (FlatField) data.getSample(0, false);
+        } else {
+        	points =  (FlatField) data;
+        }
         float[][]pts = points.getFloats(false);
         if(pts.length == 3) {
             colorRangeIndex = PointCloudDataSource.INDEX_ALT;
@@ -257,7 +263,7 @@ public class PointCloudControl extends DisplayControlImpl {
         projection =  new TrivialMapProjection(
                                                RealTupleType.SpatialEarth2DTuple, rect);
         System.err.println("type1:" + points.getType());
-        myDisplay.loadData(points,colorRangeIndex);
+        myDisplay.loadData(data,colorRangeIndex);
     }
 
 
