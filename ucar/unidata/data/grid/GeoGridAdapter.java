@@ -20,14 +20,15 @@
 
 package ucar.unidata.data.grid;
 
+
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 
 import ucar.nc2.Attribute;
+import ucar.nc2.Dimension;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-import ucar.nc2.Dimension;
 import ucar.nc2.dataset.*;
 
 import ucar.nc2.dt.GridCoordSystem;
@@ -990,7 +991,40 @@ public class GeoGridAdapter {
             Trace.call2("GeoGridAdapter.getCoordinateArray");
 
             Trace.call1("GeoGridAdapter.get1DValues");
-            refVals[2] = DataUtil.toFloatArray(array);
+            float[] vals = DataUtil.toFloatArray(array);
+            if (vals.length != domainSet.getLength()) {
+                int[]   dl    = domainSet.getLengths();
+                float[] valsT = new float[domainSet.getLength()];
+                int     ii    = 0;
+                int     jj    = 0;
+                int     xl    = dl[0] - 1;
+                if (dl.length == 2) {
+                    for (int j = 0; j < dl[1]; j++) {
+                        for (int i = 0; i < xl; i++) {
+                            ii        = i + j * xl;
+                            jj        = i + j * (xl + 1);
+                            valsT[jj] = vals[ii];
+                        }
+                        valsT[jj + 1] = valsT[jj];
+
+                    }
+                } else if (dl.length == 3) {
+                    int yl = dl[1];
+                    for (int k = 0; k < dl[2]; k++) {
+                        for (int j = 0; j < dl[1]; j++) {
+                            for (int i = 0; i < xl; i++) {
+                                ii        = i + j * xl + k * xl * yl;
+                                jj        = i + j * (xl + 1) + k * xl * yl;
+                                valsT[jj] = vals[ii];
+                            }
+                            valsT[jj + 1] = valsT[jj];
+                        }
+                    }
+                }
+                refVals[2] = valsT;
+            } else {
+                refVals[2] = vals;
+            }
             Trace.call2("GeoGridAdapter.get1DValues");
 
             if (isPressure) {  // convert to altitude using standard atmos
@@ -1269,8 +1303,8 @@ public class GeoGridAdapter {
                                     : new Object());
 
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid,
-                                        readLockToUse, timeIndex, ensIndex, domainSet,
-                                        ffType);
+                                        readLockToUse, timeIndex, ensIndex,
+                                        domainSet, ffType);
 
 
             ggff.setReadLabel(readLabel);
@@ -1461,10 +1495,10 @@ public class GeoGridAdapter {
                               TreeMap gridMap, Range[][] sampleRanges,
                               boolean lazyEvaluation)
             throws Exception {
-        Dimension ensDim = geoGrid.getEnsembleDimension();
-        Integer1DSet       ensSet = null;
-        FieldImpl          sample = null;
-        int                numEns = 1;
+        Dimension    ensDim = geoGrid.getEnsembleDimension();
+        Integer1DSet ensSet = null;
+        FieldImpl    sample = null;
+        int          numEns = 1;
         if ((ensDim != null) && (ensDim.getLength() > 1)) {
             numEns = ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
