@@ -1005,8 +1005,7 @@ public class GeoGridAdapter {
                             jj        = i + j * (xl + 1);
                             valsT[jj] = vals[ii];
                         }
-                        valsT[jj + 1] = valsT[jj];
-
+                        valsT[jj + 1] = valsT[j*xl];
                     }
                 } else if (dl.length == 3) {
                     int yl = dl[1];
@@ -1017,7 +1016,7 @@ public class GeoGridAdapter {
                                 jj        = i + j * (xl + 1) + k * xl * yl;
                                 valsT[jj] = vals[ii];
                             }
-                            valsT[jj + 1] = valsT[jj];
+                            valsT[jj + 1] = valsT[j * xl + k * xl * yl];
                         }
                     }
                 }
