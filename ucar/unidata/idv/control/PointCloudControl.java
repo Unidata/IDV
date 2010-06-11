@@ -92,6 +92,10 @@ public class PointCloudControl extends DisplayControlImpl {
     private int colorRangeIndex = PointCloudDataSource.INDEX_ALT;
 
     private Range dataRange;
+    
+    private JComboBox colorParamsBox = null;
+    
+    private RealType[] rangeTypes;
 
 
     /**
@@ -103,8 +107,12 @@ public class PointCloudControl extends DisplayControlImpl {
     }
 
 
-    protected int getColorRangeIndex() {
+    public int getColorRangeIndex() {
         return colorRangeIndex;
+    }
+
+    public void setColorRangeIndex(int index) {
+        colorRangeIndex = index;
     }
 
     public Range getColorRangeFromData() {
@@ -153,9 +161,9 @@ public class PointCloudControl extends DisplayControlImpl {
 
         myDisplay = new VolumeDisplayable("volrend_" + dataChoice);
         myDisplay.setUseRGBTypeForSelect(true);
-        myDisplay.addConstantMap(new ConstantMap(useTexture3D
-                                                 ? GraphicsModeControl.TEXTURE3D
-                                                 : GraphicsModeControl.STACK2D, Display.Texture3DMode));
+        //myDisplay.addConstantMap(new ConstantMap(useTexture3D
+        //                                         ? GraphicsModeControl.TEXTURE3D
+        //                                       : GraphicsModeControl.STACK2D, Display.Texture3DMode));
         myDisplay.setPointSize(getPointSize());
         addDisplayable(myDisplay, getAttributeFlags());
 
@@ -181,10 +189,42 @@ public class PointCloudControl extends DisplayControlImpl {
         super.getControlWidgets(controlWidgets);
 
         controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Color By:"),
+                                             GuiUtils.left(doMakeColorByWidget())));
+        controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Point Size:"),
                                              GuiUtils.left(doMakePointSizeWidget())));
     }
 
+    
+    private JComponent doMakeColorByWidget() {
+    	if (colorParamsBox == null) {
+    		colorParamsBox = new JComboBox();
+    		colorParamsBox.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				if (myDisplay != null) {
+            try {
+            	colorRangeIndex =  colorParamsBox.getSelectedIndex();
+                myDisplay.setRGBRealType((RealType)colorParamsBox.getSelectedItem());
+            } catch (Exception excp) {
+                logException("Setting rgb type", excp);
+            }
+    				} }
+    		});
+        	setColorParams();
+    	}
+    	return colorParamsBox;
+    	
+    }
+    
+    private void setColorParams() {
+    	if (colorParamsBox != null && rangeTypes != null) {
+    		GuiUtils.setListData(colorParamsBox, rangeTypes);
+    	}
+        colorParamsBox.setSelectedIndex(colorRangeIndex);
+    }
+    
+    
 
     /**
      * _more_
@@ -246,7 +286,7 @@ public class PointCloudControl extends DisplayControlImpl {
         int latIndex = PointCloudDataSource.INDEX_LAT;
         int lonIndex = PointCloudDataSource.INDEX_LON;
         int altIndex = PointCloudDataSource.INDEX_ALT;
-        RealType[] rangeTypes = ((TupleType) DataUtility.getRangeType(points)).getRealComponents();
+        rangeTypes = ((TupleType) DataUtility.getRangeType(points)).getRealComponents();
         for (int i = 0; i < rangeTypes.length; i++) {
         	if (rangeTypes[i].equals(RealType.Latitude)) {
         		latIndex = i;

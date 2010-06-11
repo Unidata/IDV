@@ -86,7 +86,7 @@ public class WindBarbDisplayable extends FlowDisplayable {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void setRGBRealType(RealType realType)
+    public void setRGBRealType(RealType realType)
             throws RemoteException, VisADException {
         super.setRGBRealType(realType);
         setDisplayUnit(CommonUnits.KNOT);

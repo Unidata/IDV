@@ -254,7 +254,7 @@ public abstract class RGBDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void setRGBRealType(RealType realType)
+    public void setRGBRealType(RealType realType)
             throws RemoteException, VisADException {
 
         if ( !realType.equals(rgbRealType)) {
