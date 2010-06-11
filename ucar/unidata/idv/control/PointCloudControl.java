@@ -48,6 +48,7 @@ import visad.*;
 
 import visad.georef.MapProjection;
 
+import visad.util.DataUtility;
 import visad.util.SelectRangeWidget;
 
 import java.io.*;
@@ -222,14 +223,30 @@ public class PointCloudControl extends DisplayControlImpl {
     private void loadVolumeData() throws VisADException, RemoteException {
         FieldImpl data    = (FieldImpl)getDataInstance().getData();
         FlatField points = null;
-        if (GridUtil.isTimeSequence(data)) {
+        boolean isSequence = GridUtil.isTimeSequence(data);
+        if (isSequence) {
         	points = (FlatField) data.getSample(0, false);
         } else {
         	points =  (FlatField) data;
         }
+        // set some default indices
+        int latIndex = PointCloudDataSource.INDEX_LAT;
+        int lonIndex = PointCloudDataSource.INDEX_LON;
+        int altIndex = PointCloudDataSource.INDEX_ALT;
+        RealType[] rangeTypes = ((TupleType) DataUtility.getRangeType(points)).getRealComponents();
+        for (int i = 0; i < rangeTypes.length; i++) {
+        	if (rangeTypes[i].equals(RealType.Latitude)) {
+        		latIndex = i;
+        	} else if (rangeTypes[i].equals(RealType.Longitude)) {
+        		lonIndex = i;
+        	} else if (rangeTypes[i].equals(RealType.Altitude)) {
+        		altIndex = i;
+        	}
+        }
+        
         float[][]pts = points.getFloats(false);
-        if(pts.length == 3) {
-            colorRangeIndex = PointCloudDataSource.INDEX_ALT;
+        if(pts.length == 3) {   // just lat/lon/alt
+            colorRangeIndex = altIndex;
         } else {
             colorRangeIndex = pts.length-1;
         }
@@ -240,19 +257,23 @@ public class PointCloudControl extends DisplayControlImpl {
         float  maxY     = Float.NEGATIVE_INFINITY;
         float  minField = Float.POSITIVE_INFINITY;
         float  maxField = Float.NEGATIVE_INFINITY;
+        int numTimes = (!isSequence) ? 1 : data.getDomainSet().getLength();
+        for (int j = 0; j < numTimes; j++) {
+        	if (j > 0) { pts = ((FlatField)data.getSample(j, false)).getFloats(false); }
 
         for(int i=0;i<pts[0].length;i++) {
-            minX = Math.min(minX, pts[PointCloudDataSource.INDEX_LON][i]);
-            maxX = Math.max(maxX, pts[PointCloudDataSource.INDEX_LON][i]);
-            minY = Math.min(minY, pts[PointCloudDataSource.INDEX_LAT][i]);
-            maxY = Math.max(maxY, pts[PointCloudDataSource.INDEX_LAT][i]);
+            minX = Math.min(minX, pts[lonIndex][i]);
+            maxX = Math.max(maxX, pts[lonIndex][i]);
+            minY = Math.min(minY, pts[latIndex][i]);
+            maxY = Math.max(maxY, pts[latIndex][i]);
             if(pts.length==3) {
-                maxField = Math.max(maxField, pts[PointCloudDataSource.INDEX_ALT][i]);
-                minField = Math.min(minField, pts[PointCloudDataSource.INDEX_ALT][i]);
+                maxField = Math.max(maxField, pts[altIndex][i]);
+                minField = Math.min(minField, pts[altIndex][i]);
             } else {
-                maxField = Math.max(maxField, pts[3][i]);
-                minField = Math.min(minField, pts[3][i]);
+                maxField = Math.max(maxField, pts[colorRangeIndex][i]);
+                minField = Math.min(minField, pts[colorRangeIndex][i]);
             }
+        }
         }
         dataRange = new Range(minField, maxField);
 
@@ -262,7 +283,7 @@ public class PointCloudControl extends DisplayControlImpl {
 
         projection =  new TrivialMapProjection(
                                                RealTupleType.SpatialEarth2DTuple, rect);
-        System.err.println("type1:" + points.getType());
+        //System.err.println("type1:" + points.getType());
         myDisplay.loadData(data,colorRangeIndex);
     }
 

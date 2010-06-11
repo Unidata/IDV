@@ -2411,7 +2411,7 @@ public class TextPointDataSource extends PointDataSource {
             try {
                FieldImpl obs =  (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
                                   requestProperties);
-                FieldImpl cloud = PointObFactory.makePointCloud(obs);
+                FieldImpl cloud = PointObFactory.makePointCloud(obs, id.toString().substring(11));
                 return cloud;
             } catch (Exception exc) {
                 logException("Creating point cloud", exc);
