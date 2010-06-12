@@ -247,7 +247,9 @@ public class MapManager extends RepositoryManager {
         sb.append(msg);
         sb.append(HtmlUtil.br());
         String       widget;
-        if (snew.length == 4) {
+        if (snew==null) {
+            widget = HtmlUtil.makeLatLonBox(arg, "","","","");
+        } else if (snew.length == 4) {
             widget = HtmlUtil.makeLatLonBox(arg, snew[0], snew[1], snew[2],
                                             snew[3]);
         } else {
