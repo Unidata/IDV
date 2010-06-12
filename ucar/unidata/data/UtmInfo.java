@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class UtmInfo {
     private boolean isUtm = false;
-    private boolean isUtmMeters = false;
+    private boolean isUtmMeters = true;
     private int utmZone = 30;
     private boolean isUtmNorth = true;
 
@@ -55,7 +55,7 @@ public class UtmInfo {
         utmZoneFld = new JTextField(""+utmZone,5);
         comps.add(GuiUtils.rLabel("UTM:"));
         comps.add(GuiUtils.vbox(isUtmCbx, GuiUtils.hbox(new JLabel("Zone: " ), GuiUtils.left(utmZoneFld),
-                                                        isUtmMetersCbx,isUtmNorthCbx)));
+                                                        /*isUtmMetersCbx,*/isUtmNorthCbx)));
     }
 
 

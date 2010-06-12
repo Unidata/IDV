@@ -201,6 +201,24 @@ public class Transect {
         return XmlUtil.toString(root);
     }
 
+    public void shiftPercent(double latPercent, double lonPercent, boolean doPoint1, boolean doPoint2 ) {
+        System.err.println("before:" + this);
+        List newPoints = new ArrayList();
+        LatLonPoint llp1 = (LatLonPoint) points.get(0);
+        LatLonPoint llp2 = (LatLonPoint) points.get(1);
+        double latDelta = latPercent*Math.abs(llp1.getLatitude()-llp2.getLatitude());
+        double lonDelta = lonPercent*Math.abs(llp1.getLongitude()-llp2.getLongitude());
+
+
+
+        newPoints.add(doPoint1?new LatLonPointImpl(llp1.getLatitude()+latDelta,
+                                                   llp1.getLongitude()+lonDelta):llp1);
+        newPoints.add(doPoint2?new LatLonPointImpl(llp2.getLatitude()+latDelta,
+                                                   llp2.getLongitude()+lonDelta):llp2);
+        points = newPoints;
+        System.err.println("after:" + this);
+        
+    }
 
 
     /**
