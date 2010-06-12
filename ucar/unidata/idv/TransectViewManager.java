@@ -723,7 +723,11 @@ public class TransectViewManager extends NavigatedViewManager {
      * @param value The new value for Transect
      */
     public void setTransect(Transect value) {
-        if (Misc.equals(transect, value)) {
+        setTransect(value, false);
+    }
+
+    public void setTransect(Transect value, boolean force) {
+        if (!force && Misc.equals(transect, value)) {
             return;
         }
         transect = value;
@@ -838,6 +842,22 @@ public class TransectViewManager extends NavigatedViewManager {
 
         if (keyEvent.getID() == KeyEvent.KEY_PRESSED) {
             if (GuiUtils.isControlKey(keyEvent)) {
+                if (keyEvent.isShiftDown()) {
+                    if (code == KeyEvent.VK_LEFT) {
+                        transect.shiftPercent(0,-0.25,true,true);
+                    } else if (code == KeyEvent.VK_RIGHT) {
+                        transect.shiftPercent(0,0.25,true,true);
+                    } else if (code == KeyEvent.VK_UP) {
+                        transect.shiftPercent(0.25,0,true,true);
+                    } else if (code == KeyEvent.VK_DOWN) {
+                        transect.shiftPercent(-0.25,0,true,true);
+                    } else {
+                        return;
+                    }
+                    setTransect(transect, true);
+                    return;
+                } 
+
                 if (code == KeyEvent.VK_LEFT) {
                     getTransectDisplay().extendTransect(1.25);
                 } else if (code == KeyEvent.VK_RIGHT) {
@@ -847,6 +867,17 @@ public class TransectViewManager extends NavigatedViewManager {
                 } else if (code == KeyEvent.VK_DOWN) {
                     getTransectDisplay().extendVerticalRange(1.25);
                 }
+            } else {
+                if (code == KeyEvent.VK_LEFT) {
+                    getTransectDisplay().translate(-0.25,0);
+                } else if (code == KeyEvent.VK_RIGHT) {
+                    getTransectDisplay().translate(0.25,0);
+                } else if (code == KeyEvent.VK_UP) {
+                    getTransectDisplay().translate(0,0.25);
+                } else if (code == KeyEvent.VK_DOWN) {
+                    getTransectDisplay().translate(0,-0.25);
+                }
+
             }
         }
         super.keyWasTyped(keyEvent);

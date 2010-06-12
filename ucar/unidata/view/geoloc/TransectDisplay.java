@@ -311,10 +311,15 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         DisplayRendererJ3D rend =
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         KeyboardBehaviorJ3D kb = new KeyboardBehaviorJ3D(rend);
-        kb.mapKeyToFunction(kb.ROTATE_Z_POS, KeyEvent.VK_Z,
+        /*        kb.mapKeyToFunction(kb.ROTATE_Z_POS, KeyEvent.VK_Z,
                             InputEvent.CTRL_MASK);
         kb.mapKeyToFunction(kb.ROTATE_Z_NEG, KeyEvent.VK_Z,
                             InputEvent.SHIFT_MASK);
+        kb.mapKeyToFunction(KeyboardBehaviorJ3D.TRANSLATE_LEFT, KeyEvent.VK_LEFT,
+                            KeyboardBehaviorJ3D.NO_MASK);
+        kb.mapKeyToFunction(KeyboardBehaviorJ3D.TRANSLATE_RIGHT, KeyEvent.VK_RIGHT,
+                            KeyboardBehaviorJ3D.NO_MASK);
+        */
         rend.addKeyboardBehavior(kb);
         setKeyboardBehavior(kb);
         setPerspectiveView(false);
@@ -744,6 +749,8 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
     public void setVerticalRange(double min, double max)
             throws VisADException, RemoteException {
         super.setVerticalRange(min, max);
+        System.err.println("min:" + min +" max:" + max);
+
         verticalMapSet.setVerticalRange(min, max);
         altitudeMin = min;
         altitudeMax = max;
