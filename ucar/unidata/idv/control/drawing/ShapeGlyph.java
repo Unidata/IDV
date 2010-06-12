@@ -43,6 +43,7 @@ import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 import java.rmi.RemoteException;
 
@@ -476,6 +477,23 @@ public class ShapeGlyph extends LineGlyph {
             pts[IDX_Z][3] = lineVals[IDX_Z][1];
         }
         return pts;
+    }
+
+    public static Rectangle2D.Float makeRectangle2D(float[][] pts) {
+        float  minX     = Float.POSITIVE_INFINITY;
+        float  minY     = Float.POSITIVE_INFINITY;
+        float  maxX     = Float.NEGATIVE_INFINITY;
+        float  maxY     = Float.NEGATIVE_INFINITY;
+        for(int i=0;i<pts[0].length;i++) {
+            minX = (float)Math.min(minX, pts[IDX_LON][i]);
+            maxX = (float)Math.max(maxX, pts[IDX_LON][i]);
+            minY = (float)Math.min(minY, pts[IDX_LAT][i]);
+            maxY = (float)Math.max(maxY, pts[IDX_LAT][i]);
+        }
+
+        float width = (maxX - minX);
+        float height = (maxY - minY);
+        return  new Rectangle2D.Float( minX, minY,  width, height);
     }
 
 

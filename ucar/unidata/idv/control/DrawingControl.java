@@ -468,7 +468,6 @@ public class DrawingControl extends DisplayControlImpl {
             try {
                 root = XmlUtil.getRoot(contents);
             } catch (Exception exc) {
-                System.err.println("Xml error:" + exc);
                 exc.printStackTrace();
             }
             if (root != null) {
@@ -546,6 +545,7 @@ public class DrawingControl extends DisplayControlImpl {
                 glyph = new ShapeGlyph();
             } else if (child.getTagName().equals(TAG_EDITOR)) {
                 if (initialXml) {
+
                     editable = XmlUtil.getAttribute(child, ATTR_EDITABLE,
                             editable);
                     editorTitle = XmlUtil.getAttribute(child, ATTR_TITLE,
@@ -1642,7 +1642,6 @@ public class DrawingControl extends DisplayControlImpl {
                                          GuiUtils.WT_N);
 
         return GuiUtils.top(GuiUtils.topCenter(titleLabel, comps));
-
     }
 
     /**
