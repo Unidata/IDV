@@ -29,6 +29,7 @@ import ucar.unidata.data.point.PointCloudDataSource;
 
 import ucar.unidata.idv.control.drawing.*;
 
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
@@ -36,6 +37,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -114,6 +116,8 @@ public class PointCloudControl extends DrawingControl {
     /** _more_          */
     private boolean showInside = true;
 
+    private FlatField  displayedData;
+
     /**
      * Default constructor; does nothing.
      */
@@ -123,6 +127,57 @@ public class PointCloudControl extends DrawingControl {
         currentCmd = GlyphCreatorCommand.CMD_RECTANGLE;
     }
 
+
+    protected void getSaveMenuItems(List items, boolean forMenuBar) {
+        super.getSaveMenuItems(items, forMenuBar);
+        items.add(GuiUtils.makeMenuItem("Export Points...", this, "exportPoints"));
+
+    }
+
+    public void exportPoints() throws Exception {
+        JComboBox publishCbx =
+            getIdv().getPublishManager().getSelector("nc.export");
+        String filename =
+            FileManager.getWriteFile(FileManager.FILTER_CSV,
+                                     FileManager.SUFFIX_CSV, ((publishCbx != null)
+                                                              ? GuiUtils.top(publishCbx)
+                                                              : null));
+        if(filename == null) return;
+        OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+
+        PrintWriter pw = new PrintWriter(os);
+
+        FlatField points     = null;
+        boolean   isSequence = GridUtil.isTimeSequence(displayedData);
+        if (isSequence) {
+            points = (FlatField) displayedData.getSample(0, false);
+        } else {
+            points = (FlatField) displayedData;
+        }
+        // set some default indices
+        int latIndex = PointCloudDataSource.INDEX_LAT;
+        int lonIndex = PointCloudDataSource.INDEX_LON;
+        int altIndex = PointCloudDataSource.INDEX_ALT;
+        float[][]pts = points.getFloats(false);
+        //        pw.write("#latitude,longitude,altitude");
+        for(int i=0;i<pts[0].length;i++) {
+            pw.print(pts[latIndex][i]);
+            pw.print(",");
+            pw.print(pts[lonIndex][i]);
+            pw.print(",");            
+            pw.print(pts[altIndex][i]);
+            for(int j=3;j<pts.length;j++) {
+                pw.print(",");            
+                pw.print(pts[j][i]);
+            }
+            pw.print("\n");            
+        }
+        os.close();
+
+        getIdv().getPublishManager().publishContent(filename,
+                                                    null, publishCbx);
+
+    }
 
     /**
      * _more_
@@ -240,6 +295,13 @@ public class PointCloudControl extends DrawingControl {
         return false;
     }
 
+    protected void initDisplayUnit() {
+    }
+
+    public Unit getDistanceUnit() {
+        return getDefaultDistanceUnit();
+    }
+
 
     /**
      * _more_
@@ -319,15 +381,17 @@ public class PointCloudControl extends DrawingControl {
             colorParamsBox = new JComboBox();
             colorParamsBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (myDisplay != null) {
-                        try {
-                            colorRangeIndex =
-                                colorParamsBox.getSelectedIndex();
-                            myDisplay.setRGBRealType(
-                                (RealType) colorParamsBox.getSelectedItem());
-                        } catch (Exception excp) {
-                            logException("Setting rgb type", excp);
-                        }
+                    if (myDisplay == null) {
+                        return;
+                    }
+                    try {
+                        colorRangeIndex =
+                            colorParamsBox.getSelectedIndex();
+                        RealType colorType = (RealType) colorParamsBox.getSelectedItem();
+                        System.err.println("type:" + colorType);
+                        myDisplay.setRGBRealType(colorType);
+                    } catch (Exception excp) {
+                        logException("Setting rgb type", excp);
                     }
                 }
             });
@@ -385,7 +449,7 @@ public class PointCloudControl extends DrawingControl {
             }
         }
         try {
-            loadVolumeData();
+            loadPointData();
         } catch (Exception exc) {
             throw new RuntimeException(exc);
 
@@ -402,7 +466,7 @@ public class PointCloudControl extends DrawingControl {
      */
     public void reloadPointData() throws Exception {
         try {
-            loadVolumeData();
+            loadPointData();
         } catch (Exception exc) {
             logException("Loading points", exc);
         }
@@ -416,7 +480,7 @@ public class PointCloudControl extends DrawingControl {
      *
      * @throws Exception _more_
      */
-    private void loadVolumeData() throws Exception {
+    private void loadPointData() throws Exception {
 
         FieldImpl data       = (FieldImpl) getDataInstance().getData();
         FlatField points     = null;
@@ -558,6 +622,7 @@ public class PointCloudControl extends DrawingControl {
         projection =
             new TrivialMapProjection(RealTupleType.SpatialEarth2DTuple, rect);
         //System.err.println("type1:" + points.getType());
+        this.displayedData =  (FlatField)data;
         myDisplay.loadData(data, colorRangeIndex);
 
     }

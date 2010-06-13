@@ -330,9 +330,12 @@ public class DrawingControl extends DisplayControlImpl {
     public String formatDistance(Real distance)
             throws VisADException, RemoteException {
         return getDisplayConventions().formatDistance(
-            distance.getValue(displayUnit)) + " " + displayUnit;
+                                                      distance.getValue(getDistanceUnit())) + " " + getDistanceUnit();
     }
 
+    public Unit getDistanceUnit() {
+        return getDisplayUnit();
+    }
 
     /**
      * Call to help make this kind of Display Control; also calls code to
@@ -354,10 +357,7 @@ public class DrawingControl extends DisplayControlImpl {
                 new Point(0, 0), "Custom Delete");
         }
 
-
-        if (getDisplayUnit() == null) {
-            setDisplayUnit(getDefaultDistanceUnit());
-        }
+        initDisplayUnit();
         displayHolder = new CompositeDisplayable();
         displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
         addDisplayable(displayHolder);
@@ -385,6 +385,12 @@ public class DrawingControl extends DisplayControlImpl {
         return true;
     }
 
+
+    protected void initDisplayUnit() {
+        if (getDisplayUnit() == null) {
+            setDisplayUnit(getDefaultDistanceUnit());
+        }
+    }
 
     /**
      * Signal base class to add this as a display listener
@@ -1078,7 +1084,7 @@ public class DrawingControl extends DisplayControlImpl {
                 }
                 Real distance = currentGlyph.getDistance();
                 if (distance != null) {
-                    Unit displayUnit = getDisplayUnit();
+                    Unit distanceUnit = getDistanceUnit();
                     msgLabel.setText(" Distance: "
                                      + formatDistance(distance));
 
