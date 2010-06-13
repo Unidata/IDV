@@ -199,7 +199,7 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     List lines;
 
-    /** the stream processor*/
+    /** the stream processor */
     private TextAdapter.StreamProcessor streamProcessor;
 
 
@@ -361,9 +361,9 @@ public class TextPointDataSource extends PointDataSource {
      */
     protected String getSource(DataChoice dataChoice) {
         Object id = dataChoice.getId();
-        if ((id instanceof String) && 
-        		(id.toString().startsWith("track:") ||
-        		 id.toString().startsWith("pointcloud:"))) {
+        if ((id instanceof String)
+                && (id.toString().startsWith("track:")
+                    || id.toString().startsWith("pointcloud:"))) {
             return (String) sources.get(0);
         }
         return super.getSource(dataChoice);
@@ -1382,7 +1382,6 @@ public class TextPointDataSource extends PointDataSource {
      * @param lonIndex where is the lion
      * @param altIndex where is the alt
      * @param times the data tuples
-     * @param tuples the trajectory
      * @param pointData  the point data
      *
      * @return the trajectory
@@ -2341,10 +2340,12 @@ public class TextPointDataSource extends PointDataSource {
             //Sample the data to see if we need to show the metadata gui
             Data sample = makeObs(dataChoice, null, null, null, true, true);
 
-            List cloudCats = DataCategory.parseCategories("Point Cloud;pointcloud", true);
+            List cloudCats =
+                DataCategory.parseCategories("Point Cloud;pointcloud", true);
             for (String varname : varNames) {
                 DataChoice choice = new DirectDataChoice(this,
-                                        "pointcloud:" + varname, varname, varname, cloudCats, (Hashtable) null);
+                                        "pointcloud:" + varname, varname,
+                                        varname, cloudCats, (Hashtable) null);
                 addDataChoice(choice);
             }
             if (isTrajectoryEnabled()) {
@@ -2407,19 +2408,22 @@ public class TextPointDataSource extends PointDataSource {
                 return null;
             }
         }
-        if ((id instanceof String) && (id.toString().startsWith("pointcloud:"))) {
+        if ((id instanceof String)
+                && (id.toString().startsWith("pointcloud:"))) {
             try {
-               FieldImpl obs =  (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
-                                  requestProperties);
-                FieldImpl cloud = PointObFactory.makePointCloud(obs, id.toString().substring(11));
+                FieldImpl obs = (FieldImpl) super.getDataInner(dataChoice,
+                                    category, dataSelection,
+                                    requestProperties);
+                FieldImpl cloud = PointObFactory.makePointCloud(obs,
+                                      id.toString().substring(11));
                 return cloud;
             } catch (Exception exc) {
                 logException("Creating point cloud", exc);
                 return null;
             }
         }
-        return (FieldImpl) super.getDataInner(dataChoice, category, dataSelection,
-                                  requestProperties);
+        return (FieldImpl) super.getDataInner(dataChoice, category,
+                dataSelection, requestProperties);
     }
 
 

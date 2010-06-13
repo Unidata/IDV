@@ -21,25 +21,14 @@
 package ucar.unidata.data.point;
 
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import au.gov.bom.aifs.osa.analysis.Barnes;
+
+import edu.wisc.ssec.mcidas.McIDASUtil;
 
 import ucar.ma2.DataType;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
+
 import ucar.nc2.Attribute;
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dt.PointObsDataset;
@@ -55,6 +44,7 @@ import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
 import ucar.nc2.units.DateRange;
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
@@ -65,9 +55,11 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
 import ucar.visad.quantities.GeopotentialAltitude;
+
 import visad.CommonUnit;
 import visad.CoordinateSystem;
 import visad.Data;
@@ -98,12 +90,31 @@ import visad.Tuple;
 import visad.TupleType;
 import visad.Unit;
 import visad.VisADException;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.LatLonPoint;
+
 import visad.util.DataUtility;
-import au.gov.bom.aifs.osa.analysis.Barnes;
-import edu.wisc.ssec.mcidas.McIDASUtil;
+
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -143,44 +154,66 @@ public class PointObFactory {
                                 point.getDateTime(), point.getData());
     }
 
-    public static FieldImpl makePointCloud(FieldImpl pointObs, String param) throws VisADException, RemoteException {
-    	int paramIndex = -1;
-    	if (param != null) {
+    /**
+     * Make a point cloud structure from point obs
+     *
+     * @param pointObs the point obs
+     * @param param  the parameter to extract - null if want all
+     *
+     * @return  a PointCloud (time->((index)->((Latitude, Longitude, Altitude),param)))
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+    public static FieldImpl makePointCloud(FieldImpl pointObs, String param)
+            throws VisADException, RemoteException {
+        int paramIndex = -1;
+        if (param != null) {
             PointObTuple ob = (PointObTuple) pointObs.getSample(0, false);
-            TupleType obType = (TupleType) ((Tuple) ob.getData()).getType();
-            RealType paramType = RealType.getRealType(param);
-            int index = obType.getIndex(paramType);
-            if (index != 0) paramIndex = index;
-    	}
-    	FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs, paramIndex);
-    	FieldImpl cloudData = null;
-    	Set timeSet = timeObs.getDomainSet();
-    	FunctionType cloudType = null;
-    	FunctionType timeCloudType = null;
-    	for (int i=0; i < timeSet.getLength(); i++) {
-    		FieldImpl obs = (FieldImpl) timeObs.getSample(i, false);
-    		Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
-    		FlatField timeStep = null;
-    		for (int j = 0; j < indexSet.getLength(); j++) {
-    		   PointOb ob = (PointOb) obs.getSample(j,false);
-    		   if (cloudType == null) {
-    			   cloudType = 
-    				   new FunctionType(DataUtility.getDomainType(indexSet), new TupleType(new MathType[] {ob.getEarthLocation().getType(), ob.getData().getType()}));
-    		   }
-    		   if (timeStep == null) {
-    			   timeStep = new FlatField(cloudType, indexSet);
-    		   }
-    		   timeStep.setSample(j, new Tuple(new Data[] {ob.getEarthLocation(), ob.getData()}), false);
-    		}
-    		if (timeCloudType == null) {
-    			timeCloudType = new FunctionType(DataUtility.getDomainType(timeSet), timeStep.getType());
-    			cloudData = new FieldImpl(timeCloudType, timeSet);
-    		}
-    		cloudData.setSample(i, timeStep, false, false);
-    	}
-    	return cloudData;
+            TupleType    obType =
+                (TupleType) ((Tuple) ob.getData()).getType();
+            RealType     paramType = RealType.getRealType(param);
+            int          index     = obType.getIndex(paramType);
+            if (index != 0) {
+                paramIndex = index;
+            }
+        }
+        FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs, paramIndex);
+        FieldImpl    cloudData     = null;
+        Set          timeSet       = timeObs.getDomainSet();
+        FunctionType cloudType     = null;
+        FunctionType timeCloudType = null;
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            FieldImpl    obs      = (FieldImpl) timeObs.getSample(i, false);
+            Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
+            FlatField    timeStep = null;
+            for (int j = 0; j < indexSet.getLength(); j++) {
+                PointOb ob = (PointOb) obs.getSample(j, false);
+                if (cloudType == null) {
+                    cloudType =
+                        new FunctionType(DataUtility.getDomainType(indexSet),
+                                         new TupleType(new MathType[] {
+                                             ob.getEarthLocation().getType(),
+                                             ob.getData().getType() }));
+                }
+                if (timeStep == null) {
+                    timeStep = new FlatField(cloudType, indexSet);
+                }
+                timeStep.setSample(j, new Tuple(new Data[] {
+                    ob.getEarthLocation(),
+                    ob.getData() }), false);
+            }
+            if (timeCloudType == null) {
+                timeCloudType =
+                    new FunctionType(DataUtility.getDomainType(timeSet),
+                                     timeStep.getType());
+                cloudData = new FieldImpl(timeCloudType, timeSet);
+            }
+            cloudData.setSample(i, timeStep, false, false);
+        }
+        return cloudData;
     }
-    
+
     /**
      * From a field of point observations, reorder them with time
      * as the outer dimension.
@@ -595,7 +628,7 @@ public class PointObFactory {
      * @param skipIndices which indices to skip
      * @param defaultStringLength  the default string length
      * @param altUnit  the altitude unit
-     * @param cnt      the number 
+     * @param cnt      the number
      * @param slengths string lengths
      *
      * @return  the writer
