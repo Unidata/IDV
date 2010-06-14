@@ -1,20 +1,22 @@
 /*
- * Copyright 2010 UNAVCO, 6350 Nautilus Drive, Boulder, CO 80301
- * http://www.unavco.org
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.idv.control;
@@ -40,12 +42,18 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
+import ucar.visad.GeoUtils;
+
 import ucar.visad.Util;
 import ucar.visad.display.RGBDisplayable;
 
 import ucar.visad.display.VolumeDisplayable;
 
 import visad.*;
+
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
+import visad.georef.LatLonPoint;
 
 import visad.georef.MapProjection;
 
@@ -91,29 +99,42 @@ public class PointCloudControl extends DrawingControl {
     /** the display for the volume renderer */
     boolean useTexture3D = true;
 
-    /** _more_ */
+    /** trivial map projection of the points */
     MapProjection projection;
 
-    /** _more_ */
+    /** Which field in the data should be used for coloring */
     private int colorRangeIndex;
 
-    /** _more_ */
+    /** The data range */
     private Range dataRange;
 
-    /** _more_ */
+    /** widget */
     private JComboBox colorParamsBox = null;
 
     /** _more_ */
     private RealType[] rangeTypes;
 
-    /** _more_ */
+    /** clip the points to the shapes */
     private boolean doClip = true;
 
-    /** _more_ */
+    /** clip out the things outside the shapes */
     private boolean showInside = true;
 
-    /** _more_          */
+    /** copy of the data */
     private FieldImpl displayedData;
+
+    /** do we have times */
+    private boolean isSequence = false;
+
+    /** should we change the view as the time changes */
+    private boolean followTimeStep = false;
+
+    /** holds center points */
+    private Hashtable<Integer, LatLonPoint> timeMap = new Hashtable<Integer,
+                                                          LatLonPoint>();
+
+    /** _more_          */
+    private Set animationSet;
 
     /**
      * Default constructor; does nothing.
@@ -126,10 +147,10 @@ public class PointCloudControl extends DrawingControl {
 
 
     /**
-     * _more_
+     * Add export points menu tiem
      *
-     * @param items _more_
-     * @param forMenuBar _more_
+     * @param items menu items to add to
+     * @param forMenuBar for menubar
      */
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         super.getSaveMenuItems(items, forMenuBar);
@@ -139,9 +160,79 @@ public class PointCloudControl extends DrawingControl {
     }
 
     /**
-     * _more_
+     * add view menu items
      *
-     * @throws Exception _more_
+     * @param items menu items to add to
+     * @param forMenuBar for menubar
+     */
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        super.getViewMenuItems(items, forMenuBar);
+        if (isSequence) {
+            items.add(GuiUtils.makeCheckboxMenuItem("Follow Time Steps",
+                    this, "followTimeStep", null));
+        }
+    }
+
+    /**
+     * noop so the drawing control doesn't add its items
+     *
+     * @param items menu items to add to
+     * @param forMenuBar for menubar
+     */
+    protected void addFileMenuItems(List items, boolean forMenuBar) {}
+
+
+    /**
+     * get animation time changes
+     *
+     * @return true
+     */
+    protected boolean shouldAddAnimationListener() {
+        return true;
+    }
+
+
+
+    /**
+     * handle when the animation changes. If this is a time sequence and
+     * followTimeStep is true then center the display
+     *
+     * @param time current time
+     */
+    protected void timeChanged(Real time) {
+        super.timeChanged(time);
+        try {
+            if ( !isSequence || !followTimeStep || (animationSet == null)) {
+                return;
+            }
+            int index = ucar.visad.Util.findIndex(animationSet, time);
+            if (index < 0) {
+                return;
+            }
+
+            LatLonPoint llp = timeMap.get(new Integer(index));
+            if (llp == null) {
+                //Find the center point of the bounding box of the points in the current time
+                EarthLocation el = new EarthLocationTuple(
+                                       new Real(RealType.Latitude, 40),
+                                       new Real(RealType.Longitude, -107),
+                                       new Real(RealType.Altitude, 0.0));
+                llp = el.getLatLonPoint();
+                timeMap.put(new Integer(index), llp);
+            }
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+            navDisplay.center(GeoUtils.toEarthLocation(llp), false);
+        } catch (Exception exc) {
+            followTimeStep = false;
+            logException("Handling time change", exc);
+        }
+    }
+
+
+    /**
+     * write out the points
+     *
+     * @throws Exception on badness
      */
     public void exportPoints() throws Exception {
         JComboBox publishCbx =
@@ -156,10 +247,10 @@ public class PointCloudControl extends DrawingControl {
         OutputStream os =
             new BufferedOutputStream(new FileOutputStream(filename));
 
-        PrintWriter pw         = new PrintWriter(os);
+        PrintWriter pw     = new PrintWriter(os);
 
-        FlatField   points     = null;
-        boolean     isSequence = GridUtil.isTimeSequence(displayedData);
+        FlatField   points = null;
+        isSequence = GridUtil.isTimeSequence(displayedData);
         if (isSequence) {
             points = (FlatField) displayedData.getSample(0, false);
         } else {
@@ -191,9 +282,9 @@ public class PointCloudControl extends DrawingControl {
     }
 
     /**
-     * _more_
+     * Define the shapes to use for the drawing
      *
-     * @return _more_
+     * @return shapes
      */
     protected List getShapeCommands() {
         return Misc.newList(GlyphCreatorCommand.CMD_RECTANGLE,
@@ -497,9 +588,9 @@ public class PointCloudControl extends DrawingControl {
      */
     private void loadPointData() throws Exception {
 
-        FieldImpl data       = (FieldImpl) getDataInstance().getData();
-        FlatField points     = null;
-        boolean   isSequence = GridUtil.isTimeSequence(data);
+        FieldImpl data   = (FieldImpl) getDataInstance().getData();
+        FlatField points = null;
+        isSequence = GridUtil.isTimeSequence(data);
         if (isSequence) {
             points = (FlatField) data.getSample(0, false);
         } else {
@@ -528,15 +619,18 @@ public class PointCloudControl extends DrawingControl {
             colorRangeIndex = pts.length - 1;
         }
 
-        float       minX     = Float.POSITIVE_INFINITY;
-        float       minY     = Float.POSITIVE_INFINITY;
-        float       maxX     = Float.NEGATIVE_INFINITY;
-        float       maxY     = Float.NEGATIVE_INFINITY;
-        float       minField = Float.POSITIVE_INFINITY;
-        float       maxField = Float.NEGATIVE_INFINITY;
+        float minX     = Float.POSITIVE_INFINITY;
+        float minY     = Float.POSITIVE_INFINITY;
+        float maxX     = Float.NEGATIVE_INFINITY;
+        float maxY     = Float.NEGATIVE_INFINITY;
+        float minField = Float.POSITIVE_INFINITY;
+        float maxField = Float.NEGATIVE_INFINITY;
+        if (isSequence) {
+            animationSet = data.getDomainSet();
+        }
         int         numTimes = ( !isSequence)
                                ? 1
-                               : data.getDomainSet().getLength();
+                               : animationSet.getLength();
         int         SCALE    = 1000000;
         List        glyphs   = getGlyphs();
         int[]       scales   = new int[glyphs.size()];
@@ -579,12 +673,16 @@ public class PointCloudControl extends DrawingControl {
             if (j > 0) {
                 pts = ((FlatField) data.getSample(j, false)).getFloats(false);
             }
+            float timeminX = Float.POSITIVE_INFINITY;
+            float timeminY = Float.POSITIVE_INFINITY;
+            float timemaxX = Float.NEGATIVE_INFINITY;
+            float timemaxY = Float.NEGATIVE_INFINITY;
 
             for (int i = 0; i < pts[0].length; i++) {
-                minX = Math.min(minX, pts[lonIndex][i]);
-                maxX = Math.max(maxX, pts[lonIndex][i]);
-                minY = Math.min(minY, pts[latIndex][i]);
-                maxY = Math.max(maxY, pts[latIndex][i]);
+                timeminX = Math.min(timeminX, pts[lonIndex][i]);
+                timemaxX = Math.max(timemaxX, pts[lonIndex][i]);
+                timeminY = Math.min(timeminY, pts[latIndex][i]);
+                timemaxY = Math.max(timemaxY, pts[latIndex][i]);
                 if (pts.length == 3) {
                     maxField = Math.max(maxField, pts[altIndex][i]);
                     minField = Math.min(minField, pts[altIndex][i]);
@@ -593,6 +691,21 @@ public class PointCloudControl extends DrawingControl {
                     minField = Math.min(minField, pts[colorRangeIndex][i]);
                 }
             }
+            EarthLocation el =
+                new EarthLocationTuple(new Real(RealType.Latitude,
+                    timeminY
+                    + (timemaxY - timeminY)
+                      / 2), new Real(RealType.Longitude,
+                                     timeminX
+                                     + (timemaxX - timeminX)
+                                       / 2), new Real(RealType.Altitude,
+                                           0.0));
+            timeMap.put(new Integer(j), el.getLatLonPoint());
+            System.err.println(j + ":" + el.getLatLonPoint());
+            minX = Math.min(timeminX, minX);
+            maxX = Math.max(timemaxX, maxX);
+            minY = Math.min(timeminY, minY);
+            maxY = Math.max(timemaxY, maxY);
         }
 
         if (shapes.size() > 0) {
@@ -691,6 +804,24 @@ public class PointCloudControl extends DrawingControl {
      */
     public boolean getDoClip() {
         return this.doClip;
+    }
+
+    /**
+     *  Set the FollowTimeStep property.
+     *
+     *  @param value The new value for FollowTimeStep
+     */
+    public void setFollowTimeStep(boolean value) {
+        this.followTimeStep = value;
+    }
+
+    /**
+     *  Get the FollowTimeStep property.
+     *
+     *  @return The FollowTimeStep
+     */
+    public boolean getFollowTimeStep() {
+        return this.followTimeStep;
     }
 
 
