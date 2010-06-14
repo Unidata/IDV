@@ -780,6 +780,8 @@ public class ThreddsHandler extends XmlHandler {
      * @param nodes nodes to process
      */
     private void processNodes(List nodes) {
+        System.err.println("doLoad");
+
         double    version    = CatalogUtil.getVersion(root);
         List      urls       = new ArrayList();
         Hashtable properties = null;
@@ -830,7 +832,14 @@ public class ThreddsHandler extends XmlHandler {
         }
 
         if (urls.size() > 0) {
-            //            System.out.println(urls);
+            if(properties!=null && properties.get(DataManager.DATATYPE_ID)==null) {
+                String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
+                if (dataSourceId != null) {
+                    properties.put(DataManager.DATATYPE_ID, dataSourceId);
+                }
+            }
+            System.err.println("p:" + properties);
+
             if (chooser.makeDataSource(urls, null, properties)) {
                 chooser.closeChooser();
             }
@@ -875,9 +884,6 @@ public class ThreddsHandler extends XmlHandler {
         }
         String    url        = base + urlPath;
         Hashtable properties = new Hashtable();
-
-
-
         chooser.handleAction(url, getProperties(datasetNode, serverNode));
     }
 
@@ -926,6 +932,9 @@ public class ThreddsHandler extends XmlHandler {
         String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
         String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
+
+
+
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         } else {
