@@ -2,20 +2,21 @@
  * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 // $Id: StringUtil.java,v 1.53 2007/06/01 17:02:44 jeffmc Exp $
@@ -74,13 +75,16 @@ public class HtmlUtil {
     /** _more_ */
     public static final String SIZE_5 = "  size=\"5\" ";
 
+    /** _more_          */
     public static final String SIZE_6 = "  size=\"6\" ";
 
+    /** _more_          */
     public static final String SIZE_7 = "  size=\"7\" ";
 
     /** _more_ */
     public static final String SIZE_8 = "  size=\"8\" ";
 
+    /** _more_          */
     public static final String SIZE_9 = "  size=\"9\" ";
 
     /** _more_ */
@@ -171,7 +175,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_LI = "li";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LINK = "link";
 
 
@@ -285,7 +289,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_READONLY = "READONLY";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_REL = "rel";
 
     /** _more_ */
@@ -339,6 +343,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String CLASS_FORMLABEL = "formlabel";
 
+    /** _more_          */
     public static final String CLASS_FORMLABEL_TOP = "formlabeltop";
 
     /** _more_ */
@@ -1120,6 +1125,19 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String url(String path, String[] args) {
+        return url(path, args, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param args _more_
+     * @param encodeArgs _more_
+     *
+     * @return _more_
+     */
+    public static String url(String path, String[] args, boolean encodeArgs) {
         if (args.length == 0) {
             return path.toString();
         }
@@ -1138,10 +1156,10 @@ public class HtmlUtil {
                 url = url + "&";
             }
             try {
-                url = url + arg(args[i], args[i + 1]);
+                url = url + arg(args[i], args[i + 1], encodeArgs);
             } catch (Exception exc) {
-                System.err.println("error encoding arg(1):" + args[i + 1] + " "
-                                   + exc);
+                System.err.println("error encoding arg(1):" + args[i + 1]
+                                   + " " + exc);
                 exc.printStackTrace();
             }
             addAmpersand = true;
@@ -1175,8 +1193,23 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String arg(String name, String value) {
+        return arg(name, value, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param encodeArg _more_
+     *
+     * @return _more_
+     */
+    public static String arg(String name, String value, boolean encodeArg) {
         try {
-            return name + "=" + java.net.URLEncoder.encode(value, "UTF-8");
+            return name + "=" + (encodeArg
+                                 ? java.net.URLEncoder.encode(value, "UTF-8")
+                                 : value);
         } catch (Exception exc) {
             System.err.println("error encoding arg(2):" + value + " " + exc);
             exc.printStackTrace();
@@ -1384,13 +1417,11 @@ public class HtmlUtil {
                                        String west) {
         //TODO: Clean this up
         return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
-                     + makeLatLonInput(baseName + "_north", north)
-                     + "</td></tr>" + "<tr><td>"
-                     + makeLatLonInput(baseName + "_west", west)
-                     + "</td><td>"
-                     + makeLatLonInput(baseName + "_east", east) + "</tr>"
-                     + "<tr><td colspan=\"2\" align=\"center\">"
-                     + makeLatLonInput(baseName + "_south", south)+"</table>";
+               + makeLatLonInput(baseName + "_north", north) + "</td></tr>"
+               + "<tr><td>" + makeLatLonInput(baseName + "_west", west)
+               + "</td><td>" + makeLatLonInput(baseName + "_east", east)
+               + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
+               + makeLatLonInput(baseName + "_south", south) + "</table>";
     }
 
     /**
@@ -1788,21 +1819,20 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String input(String name, Object value, String extra) {
-        if (extra == null || extra.length() == 0) {
+        if ((extra == null) || (extra.length() == 0)) {
             return tag(TAG_INPUT,
                        attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
                              ATTR_VALUE, ((value == null)
                                           ? ""
                                           : value.toString())) + " " + extra);
         }
-        if(extra.indexOf("class=")>=0) {
+        if (extra.indexOf("class=") >= 0) {
             return tag(TAG_INPUT,
-                       attrs(ATTR_NAME, name, 
-                             ATTR_VALUE, ((value == null)
-                                          ? ""
-                                          : value.toString())) + " " + extra);
+                       attrs(ATTR_NAME, name, ATTR_VALUE, ((value == null)
+                    ? ""
+                    : value.toString())) + " " + extra);
 
-        } 
+        }
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_INPUT,
                          ATTR_VALUE, ((value == null)
@@ -1822,16 +1852,15 @@ public class HtmlUtil {
      */
     public static String disabledInput(String name, Object value,
                                        String extra) {
-        String classAttr="";
-        if(extra.indexOf("class=")<0) {
+        String classAttr = "";
+        if (extra.indexOf("class=") < 0) {
             classAttr = cssClass(CLASS_DISABLEDINPUT);
         }
         return tag(TAG_INPUT,
                    " " + ATTR_READONLY + " "
-                   + attrs(ATTR_NAME, name,
-                           ATTR_VALUE, ((value == null)
-                                        ? ""
-                                        : value.toString())) + " " + extra+classAttr);
+                   + attrs(ATTR_NAME, name, ATTR_VALUE, ((value == null)
+                ? ""
+                : value.toString())) + " " + extra + classAttr);
     }
 
 
@@ -1969,7 +1998,7 @@ public class HtmlUtil {
      */
     public static class Selector {
 
-        /** _more_          */
+        /** _more_ */
         int margin = 3;
 
         /** _more_ */
@@ -1981,7 +2010,7 @@ public class HtmlUtil {
         /** _more_ */
         String icon;
 
-        /** _more_          */
+        /** _more_ */
         boolean isHeader = false;
 
         /**
@@ -2242,6 +2271,13 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param cols _more_
+     *
+     * @return _more_
+     */
     public static String formTable(String[] cols) {
         StringBuffer sb = new StringBuffer();
         sb.append(formTable());
@@ -3217,11 +3253,18 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String urlEncodeExceptSpace(String s) {
         try {
-            s = s.replace(" ","_SPACE_");
-            s =  java.net.URLEncoder.encode(s, "UTF-8");
-            s = s.replace("_SPACE_"," ");
+            s = s.replace(" ", "_SPACE_");
+            s = java.net.URLEncoder.encode(s, "UTF-8");
+            s = s.replace("_SPACE_", " ");
             return s;
         } catch (Exception exc) {
             System.err.println("error encoding arg(4):" + s + " " + exc);
@@ -3319,8 +3362,15 @@ public class HtmlUtil {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param size _more_
+     *
+     * @return _more_
+     */
     public static final String sizeAttr(int size) {
-        return  "  size=" + quote(""+size)+" ";
+        return "  size=" + quote("" + size) + " ";
     }
 
 
