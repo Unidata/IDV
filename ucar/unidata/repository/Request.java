@@ -1049,6 +1049,10 @@ public class Request implements Constants {
         if (sresult.trim().length() == 0) {
             return false;
         }
+        //Check if its a macro that was not set
+        if(sresult.equals("${" + key +"}")) {
+            return false;
+        }
         return true;
     }
 

@@ -507,6 +507,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
+    public static final String ARG_BBOX = "bbox";
+
+    public static final String ARG_DEFAULTBBOX = "defaultbbox";
+
     /** _more_ */
     public static final String ARG_AREA_MODE = "areamode";
 
