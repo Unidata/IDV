@@ -2899,6 +2899,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return replaced bundle xml
      */
     protected String applyPropertiesToBundle(String xml) {
+        //LOOK: For now don't try to be tricky with macros in bundles
+        if(true) return xml;
         StringBuffer sb        = new StringBuffer(xml);
         Hashtable    map       = getResourceManager().getMacroMap();
 
