@@ -6,16 +6,15 @@
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.idv.control;
@@ -30,6 +29,7 @@ import ucar.unidata.data.point.PointCloudDataSource;
 import ucar.unidata.idv.control.drawing.*;
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
@@ -37,7 +37,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-import ucar.unidata.util.FileManager;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -79,13 +78,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 
-// $Id: VolumeRenderControl.java,v 1.11 2006/12/01 20:16:39 jeffmc Exp $ 
-
 /**
  * A display control for volume rendering of a 3D grid
  *
- * @author Unidata IDV Development Team
- * @version $Revision: 1.11 $
+ * @author IDV Development Team
  */
 public class PointCloudControl extends DrawingControl {
 
@@ -95,28 +91,29 @@ public class PointCloudControl extends DrawingControl {
     /** the display for the volume renderer */
     boolean useTexture3D = true;
 
-    /** _more_          */
+    /** _more_ */
     MapProjection projection;
 
-    /** _more_          */
-    private int colorRangeIndex = PointCloudDataSource.INDEX_ALT;
+    /** _more_ */
+    private int colorRangeIndex;
 
-    /** _more_          */
+    /** _more_ */
     private Range dataRange;
 
-    /** _more_          */
+    /** _more_ */
     private JComboBox colorParamsBox = null;
 
-    /** _more_          */
+    /** _more_ */
     private RealType[] rangeTypes;
 
-    /** _more_          */
+    /** _more_ */
     private boolean doClip = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showInside = true;
 
-    private FlatField  displayedData;
+    /** _more_          */
+    private FieldImpl displayedData;
 
     /**
      * Default constructor; does nothing.
@@ -128,54 +125,68 @@ public class PointCloudControl extends DrawingControl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param items _more_
+     * @param forMenuBar _more_
+     */
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         super.getSaveMenuItems(items, forMenuBar);
-        items.add(GuiUtils.makeMenuItem("Export Points...", this, "exportPoints"));
+        items.add(GuiUtils.makeMenuItem("Export Points...", this,
+                                        "exportPoints"));
 
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void exportPoints() throws Exception {
         JComboBox publishCbx =
             getIdv().getPublishManager().getSelector("nc.export");
-        String filename =
-            FileManager.getWriteFile(FileManager.FILTER_CSV,
-                                     FileManager.SUFFIX_CSV, ((publishCbx != null)
-                                                              ? GuiUtils.top(publishCbx)
-                                                              : null));
-        if(filename == null) return;
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+        String filename = FileManager.getWriteFile(FileManager.FILTER_CSV,
+                              FileManager.SUFFIX_CSV, ((publishCbx != null)
+                ? GuiUtils.top(publishCbx)
+                : null));
+        if (filename == null) {
+            return;
+        }
+        OutputStream os =
+            new BufferedOutputStream(new FileOutputStream(filename));
 
-        PrintWriter pw = new PrintWriter(os);
+        PrintWriter pw         = new PrintWriter(os);
 
-        FlatField points     = null;
-        boolean   isSequence = GridUtil.isTimeSequence(displayedData);
+        FlatField   points     = null;
+        boolean     isSequence = GridUtil.isTimeSequence(displayedData);
         if (isSequence) {
             points = (FlatField) displayedData.getSample(0, false);
         } else {
             points = (FlatField) displayedData;
         }
         // set some default indices
-        int latIndex = PointCloudDataSource.INDEX_LAT;
-        int lonIndex = PointCloudDataSource.INDEX_LON;
-        int altIndex = PointCloudDataSource.INDEX_ALT;
-        float[][]pts = points.getFloats(false);
+        int       latIndex = PointCloudDataSource.INDEX_LAT;
+        int       lonIndex = PointCloudDataSource.INDEX_LON;
+        int       altIndex = PointCloudDataSource.INDEX_ALT;
+        float[][] pts      = points.getFloats(false);
         //        pw.write("#latitude,longitude,altitude");
-        for(int i=0;i<pts[0].length;i++) {
+        for (int i = 0; i < pts[0].length; i++) {
             pw.print(pts[latIndex][i]);
             pw.print(",");
             pw.print(pts[lonIndex][i]);
-            pw.print(",");            
+            pw.print(",");
             pw.print(pts[altIndex][i]);
-            for(int j=3;j<pts.length;j++) {
-                pw.print(",");            
+            for (int j = 3; j < pts.length; j++) {
+                pw.print(",");
                 pw.print(pts[j][i]);
             }
-            pw.print("\n");            
+            pw.print("\n");
         }
         os.close();
 
-        getIdv().getPublishManager().publishContent(filename,
-                                                    null, publishCbx);
+        getIdv().getPublishManager().publishContent(filename, null,
+                publishCbx);
 
     }
 
@@ -295,9 +306,16 @@ public class PointCloudControl extends DrawingControl {
         return false;
     }
 
-    protected void initDisplayUnit() {
-    }
+    /**
+     * _more_
+     */
+    protected void initDisplayUnit() {}
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Unit getDistanceUnit() {
         return getDefaultDistanceUnit();
     }
@@ -381,14 +399,14 @@ public class PointCloudControl extends DrawingControl {
             colorParamsBox = new JComboBox();
             colorParamsBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (myDisplay == null) {
+                    if ((myDisplay == null) || !getHaveInitialized()) {
                         return;
                     }
                     try {
-                        colorRangeIndex =
-                            colorParamsBox.getSelectedIndex();
-                        RealType colorType = (RealType) colorParamsBox.getSelectedItem();
-                        System.err.println("type:" + colorType);
+                        colorRangeIndex = colorParamsBox.getSelectedIndex();
+                        RealType colorType =
+                            (RealType) colorParamsBox.getSelectedItem();
+                        //System.err.println("type:" + colorType);
                         myDisplay.setRGBRealType(colorType);
                     } catch (Exception excp) {
                         logException("Setting rgb type", excp);
@@ -475,10 +493,7 @@ public class PointCloudControl extends DrawingControl {
     /**
      * Load the volume data to the display
      *
-     * @throws RemoteException   problem loading remote data
-     * @throws VisADException    problem loading the data
-     *
-     * @throws Exception _more_
+     * @throws Exception problem loading data
      */
     private void loadPointData() throws Exception {
 
@@ -544,18 +559,20 @@ public class PointCloudControl extends DrawingControl {
                                        * SCALE);
                         ys[i] = (int) (latLons[DrawingGlyph.IDX_LAT][i]
                                        * SCALE);
+                        /*
                         System.err.println("pts:" + xs[i] + " " + ys[i]
                                            + "   "
                                            + latLons[DrawingGlyph.IDX_LON]
                                            + " "
                                            + latLons[DrawingGlyph.IDX_LAT]);
+                        */
                     }
                     shapes.add(new Polygon(xs, ys, xs.length));
                     scales[shapes.size() - 1] = SCALE;
                 }
             }
 
-            System.err.println(shapes);
+            //System.err.println(shapes);
 
         }
         for (int j = 0; j < numTimes; j++) {
@@ -622,7 +639,7 @@ public class PointCloudControl extends DrawingControl {
         projection =
             new TrivialMapProjection(RealTupleType.SpatialEarth2DTuple, rect);
         //System.err.println("type1:" + points.getType());
-        this.displayedData =  (FlatField)data;
+        this.displayedData = data;
         myDisplay.loadData(data, colorRangeIndex);
 
     }
