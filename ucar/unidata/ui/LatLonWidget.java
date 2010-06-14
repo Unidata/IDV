@@ -40,6 +40,8 @@ import javax.swing.event.*;
 
 public class LatLonWidget extends JPanel {
 
+    private boolean doFormat = true;
+
     /** widget */
     private JTextField latFld;
 
@@ -416,6 +418,7 @@ public class LatLonWidget extends JPanel {
      * @return value in regional formatting
      */
     protected String formatLatLonString(String latOrLon) {
+        if(!doFormat) return latOrLon;
         if ((latOrLon == null) || (latOrLon.length() == 0)) {
             return latOrLon;
         }
@@ -427,6 +430,27 @@ public class LatLonWidget extends JPanel {
         }
         return formatted;
     }
+
+    /**
+       Set the DoFormat property.
+
+       @param value The new value for DoFormat
+    **/
+    public void setDoFormat (boolean value) {
+	this.doFormat = value;
+    }
+
+    /**
+       Get the DoFormat property.
+
+       @return The DoFormat
+    **/
+    public boolean getDoFormat () {
+	return this.doFormat;
+    }
+
+
+
 
 }
 
