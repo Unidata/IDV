@@ -701,7 +701,6 @@ public class PointCloudControl extends DrawingControl {
                                        / 2), new Real(RealType.Altitude,
                                            0.0));
             timeMap.put(new Integer(j), el.getLatLonPoint());
-            System.err.println(j + ":" + el.getLatLonPoint());
             minX = Math.min(timeminX, minX);
             maxX = Math.max(timemaxX, maxX);
             minY = Math.min(timeminY, minY);
