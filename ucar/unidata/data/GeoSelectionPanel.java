@@ -321,8 +321,9 @@ public class GeoSelectionPanel extends JPanel {
             indexCbx = new JCheckBox("Use indices");
 
             ulLatLon = new LatLonWidget("Lat:", "Lon:", actionListener);
-
             lrLatLon = new LatLonWidget("Lat:", "Lon:", actionListener);
+            ulLatLon.setDoFormat(false);
+            lrLatLon.setDoFormat(false);
             latLonPanel = GuiUtils.doLayout(new Component[] {
                 GuiUtils.inset(GuiUtils.wrap(ulLatLon.getLatField()), 5),
                 GuiUtils.hbox(ulLatLon.getLonField(), lrLatLon.getLonField(),
@@ -578,10 +579,15 @@ public class GeoSelectionPanel extends JPanel {
         LatLonPointImpl    ul = llr.getUpperLeftPoint();
         LatLonPointImpl    lr = llr.getLowerRightPoint();
         DisplayConventions dc = DisplayConventions.getDisplayConventions();
-        ulLatLon.setLatLon(dc.formatLatLon(ul.getLatitude()),
+        /*        ulLatLon.setLatLon(dc.formatLatLon(ul.getLatitude()),
                            dc.formatLatLon(ul.getLongitude()));
         lrLatLon.setLatLon(dc.formatLatLon(lr.getLatitude()),
                            dc.formatLatLon(lr.getLongitude()));
+        */
+        ulLatLon.setLatLon(ul.getLatitude(),
+                           ul.getLongitude());
+        lrLatLon.setLatLon(lr.getLatitude(),
+                           lr.getLongitude());
     }
 
 
