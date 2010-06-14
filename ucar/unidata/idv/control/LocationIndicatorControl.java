@@ -888,6 +888,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
             }
 
 
+
             if (id == DisplayEvent.MOUSE_DRAGGED) {
                 if ( !isLeftButtonDown(event) || inputEvent.isShiftDown()) {
                     return;
@@ -895,7 +896,9 @@ public class LocationIndicatorControl extends DisplayControlImpl {
                 //                textHolder.setVisible(false);
                 dragging = true;
                 double[] location = toBox(event);
-                float[]  ptArray  = (inputEvent.isControlDown()
+                System.err.println("ctrl:" + inputEvent.isControlDown() +" " + inputEvent.isAltDown());
+                boolean doPoint = inputEvent.isControlDown()||inputEvent.isAltDown();
+                float[]  ptArray  = (doPoint
                                      ? pointLoc
                                      : originLoc);
                 ptArray[0] = (float) (getXInfo().move
@@ -924,7 +927,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
                 pointLoc[IDX_Z] = (float) Math.min(max[IDX_Z],
                         Math.max(pointLoc[IDX_Z], min[IDX_Z]));
 
-                if (inputEvent.isControlDown() && !showPoint) {
+                if (doPoint && !showPoint) {
                     showPointCbx.setSelected(true);
                     showPoint = true;
                     checkVisibility();
