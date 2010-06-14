@@ -152,12 +152,20 @@ public abstract class FilesDataSource extends DataSourceImpl {
                            Hashtable properties) {
         super(descriptor, name, description, properties);
 
+        int idx = name.indexOf("?");
+        if(idx>=0) {
+            name= name.substring(0,idx);
+            setName(name);
+        }
+
         if (getName().length() == 0) {
             if (newSources.size() > 0) {
-                setName(newSources.get(0).toString());
+                String s = newSources.get(0).toString();
+                idx = s.indexOf("?");
+                if(idx>=0) s= s.substring(0,idx);
+                setName(s);
             } else {
                 setName(description);
-
             }
         }
         this.sources = newSources;
