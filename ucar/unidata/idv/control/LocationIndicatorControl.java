@@ -896,7 +896,6 @@ public class LocationIndicatorControl extends DisplayControlImpl {
                 //                textHolder.setVisible(false);
                 dragging = true;
                 double[] location = toBox(event);
-                System.err.println("ctrl:" + inputEvent.isControlDown() +" " + inputEvent.isAltDown());
                 boolean doPoint = inputEvent.isControlDown()||inputEvent.isAltDown();
                 float[]  ptArray  = (doPoint
                                      ? pointLoc
