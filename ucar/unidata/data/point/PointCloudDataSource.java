@@ -126,30 +126,30 @@ public class PointCloudDataSource extends FilesDataSource {
     private String header;
 
     /** _more_ */
-    private String fieldName;
+    protected String fieldName;
 
-    /** _more_          */
+    /** _more_ */
     private int gridWidth = 800;
 
-    /** _more_          */
+    /** _more_ */
     private int gridHeight = 800;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField gridWidthFld;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField gridHeightFld;
 
-    /** _more_          */
+    /** _more_ */
     private float hillShadeAzimuth = 315;
 
-    /** _more_          */
+    /** _more_ */
     private float hillShadeAngle = 45;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField hillShadeAzimuthFld;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField hillShadeAngleFld;
 
 
@@ -393,166 +393,18 @@ public class PointCloudDataSource extends FilesDataSource {
 
         try {
 
-            float[][] pts       = null;
-            String    filePath  = getFilePath();
-            File      f         = new File(filePath);
-            int       skipToUse = skip;
 
-            if (serverHandlesSkip()) {
-                filePath  = filePath.replace("${skip}", "" + skip);
-                skipToUse = 0;
-            }
-            BufferedReader reader;
-            if (f.exists()) {
-                reader = new BufferedReader(new FileReader(f));
-            } else {
-
-                if (dataSelection.getGeoSelection() != null) {
-                    GeoLocationInfo gli =
-                        dataSelection.getGeoSelection().getBoundingBox();
-                    if (gli != null) {
-                        //west,south,east,north   
-                        String bbox = gli.getMinLon() + "," + gli.getMinLat()
-                                      + "," + gli.getMaxLon() + ","
-                                      + gli.getMaxLat();
-                        filePath = filePath.replace("${bbox}", bbox);
-                    }
-                }
-
-                System.err.println(filePath);
-
-                InputStream inputStream = IOUtil.getInputStream(filePath,
-                                              getClass());
-                //                inputStream = new BufferedInputStream(inputStream, 10000);
-                reader =
-                    new BufferedReader(new InputStreamReader(inputStream));
-            }
+            String    filePath = getFilePath();
+            float[][] pts      = readPoints(filePath, dataSelection, skip);
 
 
-            int     pointCnt  = 0;
-            int     numFields = 3;
-            boolean latLon    = true;
-            //check the order
-            if (Misc.equals(getProperty("latlon"), "false")) {
-                latLon = false;
-            }
-
-            int  skipCnt = 0;
-
-
-            long t1      = System.currentTimeMillis();
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                //Check for header
-                if (pointCnt == 0) {
-                    if (line.toLowerCase().indexOf("latitude") >= 0) {
-                        header = line;
-                        continue;
-                    }
-                    if (line.toLowerCase().indexOf("x") >= 0) {
-                        header = line;
-                        continue;
-                    }
-                }
-
-                if (line.startsWith("#")) {
-                    continue;
-                }
-                List<String> toks = StringUtil.split(line, delimiter, true,
-                                        true);
-                if (toks.size() < 3) {
-                    System.err.println("Bad line:" + line);
-                    continue;
-                }
-
-                if (skipToUse > 0) {
-                    if (skipCnt > 0) {
-                        skipCnt--;
-                        continue;
-                    }
-                    skipCnt = skipToUse;
-                }
-
-                if (pts == null) {
-                    numFields = Math.min(4, toks.size());
-                    numFields = 3;
-                    pts       = new float[numFields][10000];
-                } else if (pointCnt >= pts[0].length) {
-                    pts = Misc.expand(pts);
-                }
-
-                //            if(pointCnt>50) break;
-                float v1  = Float.parseFloat(toks.get(0).toString());
-                float v2  = Float.parseFloat(toks.get(1).toString());
-                float v3  = Float.parseFloat(toks.get(2).toString());
-
-                float lat = latLon
-                            ? v1
-                            : v2;
-                float lon = latLon
-                            ? v2
-                            : v1;
-                float alt = v3;
-                if (utmInfo.getIsUtm() && utmInfo.getIsUtmMeters()) {
-                    lon = lon / 1000;
-                    lat = lat / 1000;
-                }
-                pts[INDEX_ALT][pointCnt] = alt;
-                pts[INDEX_LON][pointCnt] = lon;
-                pts[INDEX_LAT][pointCnt] = lat;
-                //            System.err.println(lat +"/" + lon +"/" + alt);
-
-                if (numFields == 4) {
-                    pts[3][pointCnt] =
-                        Float.parseFloat(toks.get(colorByIndex).toString());
-                }
-
-                pointCnt++;
-            }
-            if (pts == null) {
-                throw new BadDataException(
-                    "No points were read. Bad delimiter?");
-            }
-            long t2 = System.currentTimeMillis();
-            System.err.println("cnt:" + pointCnt + " time:"
-                               + (t2 - t1) / 1000);
-            pts = Misc.copy(pts, pointCnt);
-
-            if (utmInfo.getIsUtm()) {
-                UtmProjection utm = new UtmProjection(utmInfo.getUtmZone(),
-                                        utmInfo.getIsUtmNorth());
-                float[]   lats   = pts[INDEX_LAT];
-                float[]   lons   = pts[INDEX_LON];
-                float[][] result = utm.projToLatLon(new float[][] {
-                    lats, lons
-                }, new float[][] {
-                    lats, lons
-                });
-
-                pts[INDEX_LAT] = lats;
-                pts[INDEX_LON] = lons;
-            }
-
-
-            if (header != null) {
-                List<String> tmpToks = StringUtil.split(header, delimiter,
-                                           true, true);
-                if ((pts.length > 3) && (tmpToks.size() > 3)) {
-                    fieldName = tmpToks.get(3);
-                }
-            }
-
-
-            RealType rt = null;
+            RealType  rt       = null;
             if (pts.length > 3) {
                 rt = Util.makeRealType(((fieldName != null)
                                         ? fieldName
                                         : "field") + "_" + (typeCnt++), null);
             }
-            System.err.println("Alt:" + RealType.Altitude.getDefaultUnit());
+
             MathType type = (pts.length == 3)
                             ? new RealTupleType(RealType.Altitude,
                                 RealType.Longitude, RealType.Latitude)
@@ -570,6 +422,173 @@ public class PointCloudDataSource extends FilesDataSource {
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
+    }
+
+    /**
+     * This reads the actual lat/lon/alt points and returns an array of the form:
+     * <pre>float[lat/lon/alt/optional value][number pf points]</pre>
+     *
+     * @param filePath Path to the file or url
+     * @param dataSelection data subsetting
+     * @param skipToUse skip factor 0 = all points. 1 = skip 1, etc.
+     *
+     * @return points
+     *
+     * @throws IOException On badness
+     */
+    protected float[][] readPoints(String filePath,
+                                   DataSelection dataSelection, int skipToUse)
+            throws IOException {
+
+        float[][] pts = null;
+        File      f   = new File(filePath);
+
+
+        if (serverHandlesSkip()) {
+            filePath  = filePath.replace("${skip}", "" + skip);
+            skipToUse = 0;
+        }
+        BufferedReader reader;
+        if (f.exists()) {
+            reader = new BufferedReader(new FileReader(f));
+        } else {
+
+            if (dataSelection.getGeoSelection() != null) {
+                GeoLocationInfo gli =
+                    dataSelection.getGeoSelection().getBoundingBox();
+                if (gli != null) {
+                    //west,south,east,north   
+                    String bbox = gli.getMinLon() + "," + gli.getMinLat()
+                                  + "," + gli.getMaxLon() + ","
+                                  + gli.getMaxLat();
+                    filePath = filePath.replace("${bbox}", bbox);
+                }
+            }
+
+            System.err.println(filePath);
+
+            InputStream inputStream = IOUtil.getInputStream(filePath,
+                                          getClass());
+            //                inputStream = new BufferedInputStream(inputStream, 10000);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+        }
+
+
+        int     pointCnt  = 0;
+        int     numFields = 3;
+        boolean latLon    = true;
+        //check the order
+        if (Misc.equals(getProperty("latlon"), "false")) {
+            latLon = false;
+        }
+
+        int  skipCnt = 0;
+
+
+        long t1      = System.currentTimeMillis();
+        while (true) {
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+            //Check for header
+            if (pointCnt == 0) {
+                if (line.toLowerCase().indexOf("latitude") >= 0) {
+                    header = line;
+                    continue;
+                }
+                if (line.toLowerCase().indexOf("x") >= 0) {
+                    header = line;
+                    continue;
+                }
+            }
+
+            if (line.startsWith("#")) {
+                continue;
+            }
+            List<String> toks = StringUtil.split(line, delimiter, true, true);
+            if (toks.size() < 3) {
+                System.err.println("Bad line:" + line);
+                continue;
+            }
+
+            if (skipToUse > 0) {
+                if (skipCnt > 0) {
+                    skipCnt--;
+                    continue;
+                }
+                skipCnt = skipToUse;
+            }
+
+            if (pts == null) {
+                numFields = Math.min(4, toks.size());
+                numFields = 3;
+                pts       = new float[numFields][10000];
+            } else if (pointCnt >= pts[0].length) {
+                pts = Misc.expand(pts);
+            }
+
+            //            if(pointCnt>50) break;
+            float v1  = Float.parseFloat(toks.get(0).toString());
+            float v2  = Float.parseFloat(toks.get(1).toString());
+            float v3  = Float.parseFloat(toks.get(2).toString());
+
+            float lat = latLon
+                        ? v1
+                        : v2;
+            float lon = latLon
+                        ? v2
+                        : v1;
+            float alt = v3;
+            if (utmInfo.getIsUtm() && utmInfo.getIsUtmMeters()) {
+                lon = lon / 1000;
+                lat = lat / 1000;
+            }
+            pts[INDEX_ALT][pointCnt] = alt;
+            pts[INDEX_LON][pointCnt] = lon;
+            pts[INDEX_LAT][pointCnt] = lat;
+            //            System.err.println(lat +"/" + lon +"/" + alt);
+
+            if (numFields == 4) {
+                pts[3][pointCnt] =
+                    Float.parseFloat(toks.get(colorByIndex).toString());
+            }
+
+            pointCnt++;
+        }
+        if (pts == null) {
+            throw new BadDataException("No points were read. Bad delimiter?");
+        }
+        long t2 = System.currentTimeMillis();
+        System.err.println("cnt:" + pointCnt + " time:" + (t2 - t1) / 1000);
+        pts = Misc.copy(pts, pointCnt);
+
+        if (utmInfo.getIsUtm()) {
+            UtmProjection utm = new UtmProjection(utmInfo.getUtmZone(),
+                                    utmInfo.getIsUtmNorth());
+            float[]   lats   = pts[INDEX_LAT];
+            float[]   lons   = pts[INDEX_LON];
+            float[][] result = utm.projToLatLon(new float[][] {
+                lats, lons
+            }, new float[][] {
+                lats, lons
+            });
+
+            pts[INDEX_LAT] = lats;
+            pts[INDEX_LON] = lons;
+        }
+
+
+        if (header != null) {
+            List<String> tmpToks = StringUtil.split(header, delimiter, true,
+                                       true);
+            if ((pts.length > 3) && (tmpToks.size() > 3)) {
+                fieldName = tmpToks.get(3);
+            }
+        }
+
+        return pts;
+
     }
 
 
