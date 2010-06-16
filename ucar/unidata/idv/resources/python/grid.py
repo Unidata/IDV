@@ -312,3 +312,30 @@ def makeTopographyFromField(grid):
     """make a topography out of a grid """
     c = newUnit(grid, "topo", "m")
     return DerivedGridFactory.create2DTopography(grid,c)
+
+
+
+
+
+def substitute(data, low, high, newValue):
+    """change values in data  between low/high to newvalue """
+    newData = data.clone();
+    if (GridUtil.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeObject = newData.getSample(t)
+            values = rangeObject.getFloats(0);
+            for i in range(len(values[0])):
+		if values[0][i]>=low:      
+                  if values[0][i]<=high: 
+			values[0][i] = newValue;
+            rangeObject.setSamples(values,1);
+    else:
+        rangeObject = newData;
+        values = rangeObject.getFloats(0);
+        for i in range(len(values[0])):                                                                   
+           if values[0][i]>=low:                                                                            
+                if values[0][i]<=high: values[0][i] = newValue;
+        rangeObject.setSamples(values,1);
+    return newData;
+
+
