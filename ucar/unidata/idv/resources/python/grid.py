@@ -313,10 +313,6 @@ def makeTopographyFromField(grid):
     c = newUnit(grid, "topo", "m")
     return DerivedGridFactory.create2DTopography(grid,c)
 
-
-
-
-
 def substitute(data, low, high, newValue):
     """change values in data  between low/high to newvalue """
     newData = data.clone();
@@ -324,18 +320,21 @@ def substitute(data, low, high, newValue):
         for t in range(newData.getDomainSet().getLength()):
             rangeObject = newData.getSample(t)
             values = rangeObject.getFloats(0);
-            for i in range(len(values[0])):
-		if values[0][i]>=low:      
-                  if values[0][i]<=high: 
-			values[0][i] = newValue;
+            for i in range(len(values)):
+               for j in range(len(values[0])):
+		           if values[i][j]>=low:       
+		             if values[i][j]<=high:  values[i][j] = newValue;
             rangeObject.setSamples(values,1);
     else:
         rangeObject = newData;
         values = rangeObject.getFloats(0);
-        for i in range(len(values[0])):                                                                   
-           if values[0][i]>=low:                                                                            
-                if values[0][i]<=high: values[0][i] = newValue;
+        for i in range(len(values)):
+          for j in range(len(values[0])):                                                                   
+             if values[i][j]>=low:                                                                            
+                if values[i][j]<=high: values[0][i] = newValue;
         rangeObject.setSamples(values,1);
     return newData;
 
-
+def maskGrid(grid, mask, value=0):
+    """mask one grid by the values in the other.  value is the masking value"""
+    return DerivedGridFactory.mask(grid, mask, value)
