@@ -1,20 +1,18 @@
 /*
- * $Id: XmlTree.java,v 1.35 2007/07/06 20:45:34 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -258,9 +256,8 @@ public class XmlTree extends JTree {
                 XmlTreeNode treeNode = (XmlTreeNode) value;
                 if (treeNode.getXmlNode() != null) {
                     ImageIcon icon = getIconForNode(treeNode.getXmlNode());
-                    if(icon == null) {
-                        icon = xmlTree.getIcon(treeNode.getXmlNode(),
-                                         leaf);
+                    if (icon == null) {
+                        icon = xmlTree.getIcon(treeNode.getXmlNode(), leaf);
                     }
                     if (icon != null) {
                         setIcon(icon);
@@ -271,6 +268,13 @@ public class XmlTree extends JTree {
         }
     }
 
+    /**
+     * Get the icon for a node
+     *
+     * @param node  the node
+     *
+     * @return null
+     */
     public ImageIcon getIconForNode(Element node) {
         return null;
     }
@@ -288,7 +292,7 @@ public class XmlTree extends JTree {
             return null;
         }
 
-        
+
         if (tagNameToTooltipChild != null) {
             String childTag =
                 (String) tagNameToTooltipChild.get(XmlUtil.getLocalName(n));
@@ -917,9 +921,14 @@ public class XmlTree extends JTree {
             return haveLoaded;
         }
 
+        /**
+         * Get the xlink:href url
+         *
+         * @return  the url
+         */
         public String getXlinkHref() {
-            String baseLocation = null;
-            XmlTreeNode parent             = (XmlTreeNode) getParent();
+            String      baseLocation = null;
+            XmlTreeNode parent       = (XmlTreeNode) getParent();
             if (parent != null) {
                 baseLocation = parent.getBaseLocation();
             }
@@ -941,9 +950,17 @@ public class XmlTree extends JTree {
 
     }
 
-    public String expandRelativeUrl(XmlTreeNode node,String href) {
+    /**
+     * Expand the relative url
+     *
+     * @param node  the node
+     * @param href  the base href
+     *
+     * @return  the expanded URL
+     */
+    public String expandRelativeUrl(XmlTreeNode node, String href) {
         String base = node.getBaseLocation();
-        if(base!=null) {
+        if (base != null) {
             return expandRelativeUrl(href, base);
         }
         return expandRelativeUrl(href);
@@ -988,9 +1005,16 @@ public class XmlTree extends JTree {
                 try {
                     //See if the baseUrlPath is well formed
                     URL url = new URL(baseUrlPath);
+                    //don't add the port if there isn't one
+                    int    port       = url.getPort();
+                    String portString = "";
+                    if (port != -1) {
+                        portString = ":" + port;
+                    }
                     //If it is then construct the full
-                    return url.getProtocol() + "://" + url.getHost() + ":"
-                           + url.getPort() + href;
+                    return url.getProtocol() + "://" + url.getHost() +
+                    //":" + url.getPort() + href
+                    portString + href;
                 } catch (Exception exc) {
                     //Humm, here the baseurl is not well formed so we'll just return the href
                     return href;
@@ -1071,11 +1095,12 @@ public class XmlTree extends JTree {
             }
             final TreePath path = new TreePath(treeModel.getPathToRoot(node));
             GuiUtils.invokeInSwingThread(new Runnable() {
-                    public void run() {
-                        expandPath(path);
-                        treeModel.nodeStructureChanged(node);
-                        repaint();
-                    }});
+                public void run() {
+                    expandPath(path);
+                    treeModel.nodeStructureChanged(node);
+                    repaint();
+                }
+            });
         } catch (Throwable exc) {
             LogUtil.logException("Expanding xlink node:" + href, exc);
         }
@@ -1085,19 +1110,20 @@ public class XmlTree extends JTree {
     /**
      * Find the xml elements to use when we have an xlink to an xml doc
      *
+     * @param root  get the xlink elements
      * @return element to use
      */
-    public  NodeList getXlinkImportElements(Element root) {
-        NodeList        importElements = null;
+    public NodeList getXlinkImportElements(Element root) {
+        NodeList importElements = null;
         int      importLevel    = getXlinkImportLevel();
         if (importLevel == 1) {
             importElements = XmlUtil.getElements(root);
         } else if (importLevel == 2) {
             importElements = XmlUtil.getGrandChildren(root);
-            if(importElements.getLength()==0) {
+            if (importElements.getLength() == 0) {
                 importElements = XmlUtil.getElements(root);
             }
-            if(importElements.getLength()==0) {
+            if (importElements.getLength() == 0) {
                 ((XmlNodeList) importElements).add(root);
             }
         } else {
@@ -1138,7 +1164,8 @@ public class XmlTree extends JTree {
         }
 
         if (tagsToNotProcess != null) {
-            return (tagsToNotProcess.get(XmlUtil.getLocalName(xmlNode)) == null);
+            return (tagsToNotProcess.get(XmlUtil.getLocalName(xmlNode))
+                    == null);
         }
         return true;
     }
@@ -1182,7 +1209,8 @@ public class XmlTree extends JTree {
             String xlinkHref = XmlUtil.getAttribute(xmlNode, ATTR_XLINKHREF,
                                    NULL_STRING);
             String label = getLabel(xmlNode);
-            if (isXlinkTag(XmlUtil.getLocalName(xmlNode)) && (xlinkHref != null)) {
+            if (isXlinkTag(XmlUtil.getLocalName(xmlNode))
+                    && (xlinkHref != null)) {
                 childTreeNode = new XlinkTreeNode(xmlNode, this, label,
                         xlinkHref);
                 childTreeNode.add(new DefaultMutableTreeNode("Please wait"));
@@ -1243,7 +1271,8 @@ public class XmlTree extends JTree {
         }
 
         if (tagsToNotRecurse != null) {
-            return (tagsToNotRecurse.get(XmlUtil.getLocalName(xmlNode)) == null);
+            return (tagsToNotRecurse.get(XmlUtil.getLocalName(xmlNode))
+                    == null);
         }
         return true;
 
@@ -1266,7 +1295,8 @@ public class XmlTree extends JTree {
         }
 
         if (tagNameToLabelAttr != null) {
-            String attrName = (String) tagNameToLabelAttr.get(XmlUtil.getLocalName(n));
+            String attrName =
+                (String) tagNameToLabelAttr.get(XmlUtil.getLocalName(n));
             if (attrName != null) {
                 label = XmlUtil.getAttribute(n, attrName, NULL_STRING);
             }
@@ -1431,4 +1461,3 @@ public class XmlTree extends JTree {
 
 
 }
-
