@@ -491,7 +491,7 @@ public class GeoUtils {
      */
     public static double normalizeLongitude360(double lonValue) {
         if (lonValue == lonValue) {
-            while ((lonValue < 0.) || (lonValue > 360.)) {
+            while ((lonValue < 0.) || (lonValue > 361.)) {
                 lonValue = 180. + Math.IEEEremainder(lonValue - 180., 360.0);
             }
         }
@@ -507,7 +507,7 @@ public class GeoUtils {
      */
     public static double[] normalizeLongitude360(double[] lonValues) {
         for (int i = 0; i < lonValues.length; i++) {
-            lonValues[i] = normalizeLongitude(lonValues[i]);
+            lonValues[i] = normalizeLongitude360(lonValues[i]);
         }
         return lonValues;
     }
