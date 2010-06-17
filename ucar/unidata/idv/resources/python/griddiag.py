@@ -324,6 +324,47 @@ def vr(V):
   """
   return DerivedGridFactory.getVComponent(V)
 
+def xav(S):
+  """ Average along a grid row
+  <div class=jython>
+      XAV (S) = ( S (X1) + S (X2) + ... + S (KXD) ) / KNT
+                KXD = number of points in row
+                KNT = number of non-missing points in row
+                XAV for a row is stored at every point in that row.
+  </div>
+  """
+  return GridMath.applyFunctionToAxis(S, GridMath.FUNC_AVERAGE, GridMath.AXIS_X)
+
+def xsum(S):
+  """ Sum along a grid row
+  <div class=jython>
+      XSUM (S) = ( S (X1) + S (X2) + ... + S (KXD) )
+                 KXD = number of points in row
+                 XSUM for a row is stored at every point in that row.
+  </div>
+  """
+  return GridMath.applyFunctionToAxis(S, GridMath.FUNC_SUM, GridMath.AXIS_X)
+
+def yav(S):
+  """ Average along a grid column
+  <div class=jython>
+      YAV (S) = ( S (Y1) + S (Y2) + ... + S (KYD) ) / KNT
+                KYD = number of points in column
+                KNT = number of non-missing points in column
+  </div>
+  """
+  return GridMath.applyFunctionToAxis(S, GridMath.FUNC_AVERAGE, GridMath.AXIS_Y)
+
+def ysum(S):
+  """ Sum along a grid column
+  <div class=jython>
+      YSUM (S) = ( S (Y1) + S (Y2) + ... + S (KYD) )
+                 KYD = number of points in row
+                 YSUM for a column is stored at every point in that column.
+  </div>
+  """
+  return GridMath.applyFunctionToAxis(S, GridMath.FUNC_SUM, GridMath.AXIS_Y)
+
 def wshr(V, Z, top, bottom):
   """  Magnitude of the vertical wind shear in a layer
   <div class=jython>

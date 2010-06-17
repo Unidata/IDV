@@ -63,6 +63,7 @@ public class GridMath {
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_AVERAGE = "average";
 
+
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_SUM = "sum";
 
@@ -74,6 +75,12 @@ public class GridMath {
 
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
+
+    /** axis identifier - X */
+    public static final String AXIS_X = "X";
+
+    /** axis identifier - Y */
+    public static final String AXIS_Y = "Y";
 
     /** kilometers/degree (111) */
     private static final Real KM_PER_DEGREE;
@@ -878,6 +885,189 @@ public class GridMath {
         return newField;
 
     }
+
+    /**
+     * Apply the function to the x or y of the given grid at each level.
+     * The function is one of the FUNC_ enumerations
+     *
+     * @param grid   grid to apply
+     * @param function One of the FUNC_ enumerations
+     * @param axis the axis to apply the function (AXIS_X or AXIS_Y)
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionToAxis(FieldImpl grid,
+            String function, String axis)
+            throws VisADException {
+        FieldImpl newField = null;
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+                Set       timeDomain = grid.getDomainSet();
+                TupleType rangeType  = null;
+                for (int timeStepIdx = 0;
+                        timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                    FieldImpl sample =
+                        (FieldImpl) grid.getSample(timeStepIdx);
+                    if (sample == null) {
+                        continue;
+                    }
+                    FieldImpl funcFF = null;
+                    if ( !GridUtil.isSequence(sample)) {
+                        funcFF = applyFunctionToAxisFF((FlatField) sample,
+                                function, axis, rangeType);
+                    } else {  // ensembles & such
+                        Trace.call1(
+                            "GridMath.applyFunctionToAxis inner sequence");
+                        Set ensDomain = sample.getDomainSet();
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                (FlatField) sample.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField innerFuncFF =
+                                applyFunctionToAxisFF(innerField, function,
+                                    axis, rangeType);
+                            if (innerFuncFF == null) {
+                                continue;
+                            }
+                            if (rangeType == null) {
+                                rangeType =
+                                    GridUtil.getParamType(innerFuncFF);
+                                FunctionType innerType =
+                                    new FunctionType(
+                                        DataUtility.getDomainType(ensDomain),
+                                        innerFuncFF.getType());
+                                funcFF = new FieldImpl(innerType, ensDomain);
+                            }
+                            funcFF.setSample(j, innerFuncFF, false);
+                        }
+                        Trace.call1(
+                            "GridMath.applyFunctionToAxis inner sequence");
+                    }
+                    if (funcFF == null) {
+                        continue;
+                    }
+                    if (rangeType == null) {
+                        rangeType = GridUtil.getParamType(funcFF);
+                    }
+
+                    if (newField == null) {
+                        FunctionType newFieldType =
+                            new FunctionType(
+                                ((SetType) timeDomain.getType()).getDomain(),
+                                funcFF.getType());
+                        newField = new FieldImpl(newFieldType, timeDomain);
+                    }
+                    newField.setSample(timeStepIdx, funcFF, false);
+                }
+            } else {
+                newField = applyFunctionToAxisFF((FlatField) grid, function,
+                        axis, null);
+            }
+            return newField;
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+
+    }
+
+    /**
+     * Apply the function to the axis of a single time step of a grid
+     * The function is one of the FUNC_ enumerations
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enumerations
+     * @param axis the axis to apply it to
+     * @param newRangeType   the new range type.  if null, create
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static FlatField applyFunctionToAxisFF(FlatField grid,
+            String function, String axis, TupleType newRangeType)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        if (newRangeType == null) {
+            newRangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(grid),
+                                          "_" + axis + function);
+        }
+        FlatField newField = (FlatField) GridUtil.setParamType(grid,
+                                 newRangeType, true);
+        try {
+            GriddedSet domainSet =
+                (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int sizeZ = ((lengths.length == 2)
+                         || (domainSet.getManifoldDimension() == 2))
+                        ? 1
+                        : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+            float[][] newValues = newField.getFloats(false);
+            int       outer     = (axis.equals(AXIS_X))
+                                  ? sizeY
+                                  : sizeX;
+            int       inner     = (axis.equals(AXIS_X))
+                                  ? sizeX
+                                  : sizeY;
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = newValues[np];
+                for (int k = 0; k < sizeZ; k++) {
+                    for (int j = 0; j < outer; j++) {
+                        int   numNonMissing = 0;
+                        float result        = Float.NaN;
+                        for (int i = 0; i < inner; i++) {
+                            int   index = (axis.equals(AXIS_X))
+                                          ? k * inner * outer + j * inner + i
+                                          : k * inner * outer + i * outer + j;
+                            float value = paramVals[index];
+                            if (value != value) {
+                                continue;
+                            }
+                            if (result != result) {
+                                result = value;
+                                numNonMissing++;
+                            } else {
+                                if (doMax) {
+                                    result = Math.max(result, value);
+                                } else if (doMin) {
+                                    result = Math.min(result, value);
+                                } else {
+                                    result += value;
+                                    numNonMissing++;
+                                }
+                            }
+                        }
+                        if (function.equals(FUNC_AVERAGE)
+                                && (numNonMissing != 0)) {
+                            result = result / numNonMissing;
+                        }
+                        for (int i = 0; i < inner; i++) {
+                            int index = (axis.equals(AXIS_X))
+                                        ? k * inner * outer + j * inner + i
+                                        : k * inner * outer + i * outer + j;
+                            if (paramVals[index] == paramVals[index]) {
+                                paramVals[index] = result;
+                            }
+                        }
+                    }
+                }
+            }
+
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
 
 
     /**
