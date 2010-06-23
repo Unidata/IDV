@@ -383,6 +383,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             IOUtil.writeFile(file, ncml);
             return file;
         }
+        //Convert the -1 port number on urls to blank
+        source = source.replace(":-1/","/");
         return source;
     }
 
