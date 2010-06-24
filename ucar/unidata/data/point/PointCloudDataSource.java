@@ -23,6 +23,7 @@ package ucar.unidata.data.point;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.LatLonProjection;
 
@@ -397,7 +398,6 @@ public class PointCloudDataSource extends FilesDataSource {
             String    filePath = getFilePath();
             float[][] pts      = readPoints(filePath, dataSelection, skip);
 
-
             RealType  rt       = null;
             if (pts.length > 3) {
                 rt = Util.makeRealType(((fieldName != null)
@@ -405,18 +405,31 @@ public class PointCloudDataSource extends FilesDataSource {
                                         : "field") + "_" + (typeCnt++), null);
             }
 
-            MathType type = (pts.length == 3)
-                            ? new RealTupleType(RealType.Altitude,
-                                RealType.Longitude, RealType.Latitude)
-                            : new RealTupleType(RealType.Altitude,
-                                RealType.Longitude, RealType.Latitude, rt);
+            MathType type;
+            if(pts.length == 3) {
+                type = new RealTupleType(RealType.Altitude,
+                                         RealType.Longitude, RealType.Latitude);
+            } else if(pts.length == 6) {
+                type = new RealTupleType(new RealType[]{RealType.Altitude,
+                                         RealType.Longitude, RealType.Latitude, 
+                                         Util.makeRealType("rgb red",null),
+                                         Util.makeRealType("rgb green",null),
+                                                        Util.makeRealType("rgb blue",null)});
+            } else {
+                type = new RealTupleType(RealType.Altitude,
+                                         RealType.Longitude, RealType.Latitude, rt);
+            }
 
             if (dataChoice.getId().equals("altitudegrid")) {
-                return makeGrid(pts, rt, false);
+                return makeGrid(pts, rt, false,false);
             }
 
             if (dataChoice.getId().equals("hillshadegrid")) {
-                return makeGrid(pts, rt, true);
+                return makeGrid(pts, rt, true,false);
+            }
+
+            if (dataChoice.getId().equals("pointcount")) {
+                return makeGrid(pts, rt, false,true);
             }
             return makeField(type, pts);
         } catch (Exception exc) {
@@ -705,7 +718,8 @@ public class PointCloudDataSource extends FilesDataSource {
      * @throws Exception _more_
      */
     private FieldImpl makeGrid(float[][] pts, RealType type,
-                               boolean hillshade)
+                               boolean hillshade,
+                               boolean pointCount)
             throws Exception {
 
         boolean   fillMissing = true;
@@ -753,112 +767,44 @@ public class PointCloudDataSource extends FilesDataSource {
             cntGrid[latIndex][lonIndex]++;
         }
 
-        for (int x = 0; x < numCols; x++) {
-            for (int y = 0; y < numRows; y++) {
-                if (latLonGrid[y][x] == latLonGrid[y][x]) {
-                    latLonGrid[y][x] = latLonGrid[y][x] / cntGrid[y][x];
-                }
-            }
-        }
-
-        if (fillMissing) {
+        if (pointCount) {
             for (int x = 0; x < numCols; x++) {
                 for (int y = 0; y < numRows; y++) {
-                    if (latLonGrid[y][x] != latLonGrid[y][x]) {
-                        int     delta                 = numCols / 100;
-                        boolean foundNonMissingNearby = false;
-                        for (int dx = -delta; dx < delta; dx++) {
-                            for (int dy = -delta; dy < delta; dy++) {
-                                int nx = x + dx;
-                                int ny = y + dy;
-                                if ((nx >= 0) && (nx < latLonGrid[0].length)
-                                        && (ny >= 0)
-                                        && (ny < latLonGrid.length)) {
-                                    if ((latLonGrid[ny][nx]
-                                            == latLonGrid[ny][nx]) && (latLonGrid[ny][nx]
-                                                != GRID_MISSING)) {
-                                        foundNonMissingNearby = true;
-                                    }
-                                }
-                            }
-                        }
-                        if ( !foundNonMissingNearby) {
-                            latLonGrid[y][x] = GRID_MISSING;
-                        }
+                    if(cntGrid[y][x]>0) {
+                        latLonGrid[y][x] =  cntGrid[y][x];
                     }
                 }
             }
-
-            for (int pass = 0; pass < 1; pass++) {
-                boolean anyMissing = false;
-                for (int x = 0; x < numCols; x++) {
-                    for (int y = 0; y < numRows; y++) {
-                        if (fillMissingFromNeighbors(latLonGrid, x, y)) {
-                            anyMissing = true;
-                        }
+        } else {
+            for (int x = 0; x < numCols; x++) {
+                for (int y = 0; y < numRows; y++) {
+                    if (latLonGrid[y][x] == latLonGrid[y][x]) {
+                        latLonGrid[y][x] = latLonGrid[y][x] / cntGrid[y][x];
                     }
-                }
-                if (anyMissing) {
-                    for (int y = 0; y < numRows; y++) {
-                        for (int x = 0; x < numCols; x++) {
-                            if (fillMissingFromNeighbors(latLonGrid, x, y)) {
-                                anyMissing = true;
-                            }
-                        }
-                    }
-                }
-                if (anyMissing) {
-                    for (int y = numRows - 1; y >= 0; y--) {
-                        for (int x = numCols - 1; x >= 0; x--) {
-                            if (fillMissingFromNeighbors(latLonGrid, x, y)) {
-                                anyMissing = true;
-                            }
-                        }
-                    }
-                }
-                if (anyMissing) {
-                    for (int x = numCols - 1; x >= 0; x--) {
-                        for (int y = numRows - 1; y >= 0; y--) {
-                            if (fillMissingFromNeighbors(latLonGrid, x, y)) {
-                                anyMissing = true;
-                            }
-                        }
-                    }
-                }
-                if ( !anyMissing) {
-                    break;
                 }
             }
         }
 
+        if (fillMissing && !pointCount) {
+            GridUtil.fillMissing(latLonGrid, GRID_MISSING);
+        }
 
         if (hillshade) {
             type = Util.makeRealType("hillshade" + (typeCnt++), null);
             latLonGrid = doHillShade(latLonGrid, hillShadeAzimuth,
                                      hillShadeAngle);
+        } else  if (pointCount) {
+            type = Util.makeRealType("pointcount" + (typeCnt++), null);
+        } else {
+            type = RealType.Altitude;
         }
 
-        float[][] gridValues = new float[1][numCols * numRows];
+        float[][] gridValues = GridUtil.makeGrid(latLonGrid, numCols, numRows, GRID_MISSING);
 
-        int       m          = 0;
-        for (int j = 0; j < numRows; j++) {
-            for (int i = 0; i < numCols; i++) {
-                float value = (float) latLonGrid[j][i];
-                if (value == GRID_MISSING) {
-                    value = Float.NaN;
-                }
-                gridValues[0][m] = value;
-                m++;
-            }
-        }
-
-        type = RealType.Altitude;
         Linear1DSet xSet = new Linear1DSet(RealType.Longitude, west, east,
                                            numCols);
         Linear1DSet ySet = new Linear1DSet(RealType.Latitude, north, south,
                                            numRows);
-        System.err.println(xSet);
-        System.err.println(ySet);
         GriddedSet gdsSet =
             new LinearLatLonSet(RealTupleType.SpatialEarth2DTuple,
                                 new Linear1DSet[] { xSet,
@@ -878,44 +824,6 @@ public class PointCloudDataSource extends FilesDataSource {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param grid _more_
-     * @param x _more_
-     * @param y _more_
-     *
-     * @return _more_
-     */
-    private static boolean fillMissingFromNeighbors(float[][] grid, int x,
-            int y) {
-        if (grid[y][x] == grid[y][x]) {
-            return false;
-        }
-        if (grid[y][x] == GRID_MISSING) {
-            return false;
-        }
-        float sum = 0;
-        int   cnt = 0;
-        for (int dx = -1; dx < 2; dx++) {
-            for (int dy = -1; dy < 2; dy++) {
-                int nx = x + dx;
-                int ny = y + dy;
-                if ((nx >= 0) && (nx < grid[0].length) && (ny >= 0)
-                        && (ny < grid.length)) {
-                    if ((grid[ny][nx] == grid[ny][nx])
-                            && (grid[ny][nx] != GRID_MISSING)) {
-                        sum += grid[ny][nx];
-                        cnt++;
-                    }
-                }
-            }
-        }
-        if (cnt > 0) {
-            grid[y][x] = sum / cnt;
-        }
-        return true;
-    }
 
 
 
@@ -964,6 +872,11 @@ public class PointCloudDataSource extends FilesDataSource {
                 DataCategory.parseCategories("GRID-2D;", false),
                 new Hashtable()));
 
+        addDataChoice(
+            new DirectDataChoice(
+                this, "pointcount", "pointcount", "Point Count",
+                DataCategory.parseCategories("GRID-2D;", false),
+                new Hashtable()));
 
 
     }
