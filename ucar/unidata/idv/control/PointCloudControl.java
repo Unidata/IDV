@@ -24,13 +24,16 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointCloudDataSource;
 
 import ucar.unidata.idv.control.drawing.*;
 
+import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
@@ -46,6 +49,7 @@ import ucar.visad.GeoUtils;
 
 import ucar.visad.Util;
 import ucar.visad.display.RGBDisplayable;
+import ucar.visad.display.ImageRGBDisplayable;
 
 import ucar.visad.display.VolumeDisplayable;
 
@@ -85,6 +89,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.w3c.dom.*;
+
 
 /**
  * A display control for volume rendering of a 3D grid
@@ -96,11 +102,16 @@ public class PointCloudControl extends DrawingControl {
     /** the display for the volume renderer */
     VolumeDisplayable myDisplay;
 
+    ImageRGBDisplayable myRGBDisplay;
+
+
     /** the display for the volume renderer */
     boolean useTexture3D = true;
 
     /** trivial map projection of the points */
     MapProjection projection;
+
+    private JTabbedPane tabbedPane;
 
     /** Which field in the data should be used for coloring */
     private int colorRangeIndex;
@@ -123,6 +134,8 @@ public class PointCloudControl extends DrawingControl {
     /** copy of the data */
     private FieldImpl displayedData;
 
+    private boolean hasRGB = false;
+
     /** do we have times */
     private boolean isSequence = false;
 
@@ -143,6 +156,17 @@ public class PointCloudControl extends DrawingControl {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
                           | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
         currentCmd = GlyphCreatorCommand.CMD_RECTANGLE;
+    }
+
+    protected double getInitialZPosition() {
+        return 1.0;
+    }
+
+    protected boolean canHandleEvents() {
+
+        if(tabbedPane!=null)
+            return super.canHandleEvents() && tabbedPane.getSelectedIndex()!=0;
+        return super.canHandleEvents();
     }
 
 
@@ -229,6 +253,43 @@ public class PointCloudControl extends DrawingControl {
     }
 
 
+    public void exportKml(String filename) throws Exception {
+        //        OutputStream os =
+        //            new BufferedOutputStream(new FileOutputStream(filename));
+        try {
+        OutputStream os = new FileOutputStream(filename);
+        Element root   = KmlUtil.kml(IOUtil.getFileTail(IOUtil.stripExtension(filename)));
+        Element folder = KmlUtil.folder(root, "Points", false);
+        KmlUtil.open(folder, false);
+
+        FlatField   points = null;
+        isSequence = GridUtil.isTimeSequence(displayedData);
+        if (isSequence) {
+            points = (FlatField) displayedData.getSample(0, false);
+        } else {
+            points = (FlatField) displayedData;
+        }
+        // set some default indices
+        int       latIndex = PointCloudDataSource.INDEX_LAT;
+        int       lonIndex = PointCloudDataSource.INDEX_LON;
+        int       altIndex = PointCloudDataSource.INDEX_ALT;
+        float[][] pts      = points.getFloats(false);
+        //        pw.write("#latitude,longitude,altitude");
+        for (int i = 0; i < pts[0].length; i++) {
+            KmlUtil.placemark(folder, "", null,pts[latIndex][i],
+                              pts[lonIndex][i],
+                              pts[altIndex][i],null);
+        }
+        byte[]bytes = XmlUtil.toString(root).getBytes();
+        os.write(bytes);
+        os.flush();
+        os.close();
+        } catch(Exception exc) {
+            logException("oops", exc);
+        }
+    }
+
+
     /**
      * write out the points
      *
@@ -237,8 +298,7 @@ public class PointCloudControl extends DrawingControl {
     public void exportPoints() throws Exception {
         JComboBox publishCbx =
             getIdv().getPublishManager().getSelector("nc.export");
-        String filename = FileManager.getWriteFile(FileManager.FILTER_CSV,
-                              FileManager.SUFFIX_CSV, ((publishCbx != null)
+        String filename = FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV), FileManager.SUFFIX_CSV, ((publishCbx != null)
                 ? GuiUtils.top(publishCbx)
                 : null));
         if (filename == null) {
@@ -247,8 +307,12 @@ public class PointCloudControl extends DrawingControl {
         OutputStream os =
             new BufferedOutputStream(new FileOutputStream(filename));
 
-        PrintWriter pw     = new PrintWriter(os);
+        if(filename.toLowerCase().endsWith(".kml")) {
+            exportKml(filename);
+            return;
+        }
 
+        PrintWriter pw     = new PrintWriter(os);
         FlatField   points = null;
         isSequence = GridUtil.isTimeSequence(displayedData);
         if (isSequence) {
@@ -364,29 +428,55 @@ public class PointCloudControl extends DrawingControl {
             return false;
         }
 
-
         if ( !isDisplay3D()) {
-            LogUtil.userMessage(log_, "Can't render volume in 2D display");
+            LogUtil.userMessage(log_, "Can't render point cloud in 2D display");
             return false;
         }
 
-        super.setEditable(true);
-        myDisplay = new VolumeDisplayable("volrend_" + dataChoice);
-        myDisplay.setUseRGBTypeForSelect(true);
-        //myDisplay.addConstantMap(new ConstantMap(useTexture3D
-        //                                         ? GraphicsModeControl.TEXTURE3D
-        //                                       : GraphicsModeControl.STACK2D, Display.Texture3DMode));
-        myDisplay.setPointSize(getPointSize());
-        addDisplayable(myDisplay, getAttributeFlags());
+        setEditable(true);
 
         //Now, set the data. Return false if it fails.
-        if ( !setData(dataChoice)) {
+        if (!setData(dataChoice)) {
             return false;
         }
 
-        //Now set up the flags and add the displayable 
         return true;
     }
+
+    private void makeDisplay() throws VisADException, RemoteException {
+        if(myDisplay!=null || myRGBDisplay!=null) return;
+
+        if(hasRGB) {
+            setAttributeFlags(FLAG_DATACONTROL
+                              | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+            myRGBDisplay = new ImageRGBDisplayable("pointcloudrgb_" + getDataInstance().getDataChoice().getName());
+            myRGBDisplay.addConstantMap(
+                                        new ConstantMap(
+                                                        visad.java3d.DisplayImplJ3D.POLYGON_POINT, 
+                                                        Display.PolygonMode));
+            myRGBDisplay.addConstantMap(new ConstantMap(10, Display.CurvedSize));
+            myRGBDisplay.setPointSize(getPointSize());
+            addDisplayable(myRGBDisplay, getAttributeFlags());
+        } else {
+            setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
+                              | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+
+            myDisplay = new VolumeDisplayable("pointcloud_" + getDataInstance().getDataChoice().getName());
+            myDisplay.setUseRGBTypeForSelect(true);
+
+            //myDisplay.addConstantMap(new ConstantMap(useTexture3D
+            //                                         ? GraphicsModeControl.TEXTURE3D
+            //                                       : GraphicsModeControl.STACK2D, Display.Texture3DMode));
+            myDisplay.setPointSize(getPointSize());
+            addDisplayable(myDisplay, getAttributeFlags());
+        }
+
+    }
+
+    protected ColorTable getInitialColorTable() {
+        return getDisplayConventions().getParamColorTable("image");
+    }
+
 
     /**
      * _more_
@@ -437,7 +527,7 @@ public class PointCloudControl extends DrawingControl {
         JComponent  mine               = doMakeWidgetComponent();
         JComponent  controls           = super.doMakeControlsPanel();
         JComponent  shapes             = doMakeShapesPanel();
-        JTabbedPane tabbedPane         = new JTabbedPane();
+        tabbedPane        = new JTabbedPane();
         tabbedPane.add("Point Cloud", mine);
         tabbedPane.add("Clipping", controls);
         tabbedPane.add("Shapes", shapes);
@@ -456,10 +546,12 @@ public class PointCloudControl extends DrawingControl {
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Color By:"),
-                GuiUtils.left(doMakeColorByWidget())));
+        if(!hasRGB) {
+            controlWidgets.add(
+                               new WrapperWidget(
+                                                 this, GuiUtils.rLabel("Color By:"),
+                                                 GuiUtils.left(doMakeColorByWidget())));
+        }
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Point Size:"),
@@ -529,12 +621,15 @@ public class PointCloudControl extends DrawingControl {
      */
     public void setPointSize(float value) {
         super.setPointSize(value);
-        if (myDisplay != null) {
-            try {
+        try {
+            if (myDisplay != null) {
                 myDisplay.setPointSize(getPointSize());
-            } catch (Exception e) {
-                logException("Setting point size", e);
             }
+            if(myRGBDisplay!=null) {
+                myRGBDisplay.setPointSize(getPointSize());
+            }
+        } catch (Exception e) {
+            logException("Setting point size", e);
         }
     }
 
@@ -561,7 +656,6 @@ public class PointCloudControl extends DrawingControl {
             loadPointData();
         } catch (Exception exc) {
             throw new RuntimeException(exc);
-
         }
         return true;
     }
@@ -602,6 +696,7 @@ public class PointCloudControl extends DrawingControl {
         int altIndex = PointCloudDataSource.INDEX_ALT;
         rangeTypes = ((TupleType) DataUtility.getRangeType(
             points)).getRealComponents();
+
         for (int i = 0; i < rangeTypes.length; i++) {
             if (rangeTypes[i].equals(RealType.Latitude)) {
                 latIndex = i;
@@ -617,6 +712,11 @@ public class PointCloudControl extends DrawingControl {
             colorRangeIndex = altIndex;
         } else {
             colorRangeIndex = pts.length - 1;
+        }
+
+        hasRGB = (pts.length ==6);
+        if(hasRGB) {
+            colorRangeIndex = altIndex;
         }
 
         float minX     = Float.POSITIVE_INFINITY;
@@ -653,21 +753,11 @@ public class PointCloudControl extends DrawingControl {
                                        * SCALE);
                         ys[i] = (int) (latLons[DrawingGlyph.IDX_LAT][i]
                                        * SCALE);
-                        /*
-                        System.err.println("pts:" + xs[i] + " " + ys[i]
-                                           + "   "
-                                           + latLons[DrawingGlyph.IDX_LON]
-                                           + " "
-                                           + latLons[DrawingGlyph.IDX_LAT]);
-                        */
                     }
                     shapes.add(new Polygon(xs, ys, xs.length));
                     scales[shapes.size() - 1] = SCALE;
                 }
             }
-
-            //System.err.println(shapes);
-
         }
         for (int j = 0; j < numTimes; j++) {
             if (j > 0) {
@@ -741,7 +831,9 @@ public class PointCloudControl extends DrawingControl {
             data = PointCloudDataSource.makeField(ft.getRange(), pts);
         }
 
+
         dataRange = new Range(minField, maxField);
+        //        System.err.println("Range:" + dataRange +" idx:" + colorRangeIndex);
 
         float width  = Math.max((maxX - minX), (maxY - minY));
         float height = Math.max((maxY - minY), (maxY - minY));
@@ -750,12 +842,20 @@ public class PointCloudControl extends DrawingControl {
 
         projection =
             new TrivialMapProjection(RealTupleType.SpatialEarth2DTuple, rect);
-        //System.err.println("type1:" + points.getType());
+
+        //Keep this around for exporting points
         this.displayedData = data;
-        myDisplay.loadData(data, colorRangeIndex);
+
+        makeDisplay();
+        if(myRGBDisplay!=null) {
+            myRGBDisplay.loadData(data);
+        }
+
+        if(myDisplay!=null) {
+            myDisplay.loadData(data, colorRangeIndex);
+        }
 
     }
-
 
 
     /**
