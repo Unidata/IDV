@@ -102,10 +102,13 @@ public class RepositoryClient extends RepositoryBase {
     /** _more_ */
     private String lastId = "";
 
+
     /**
      * _more_
      */
-    public RepositoryClient() {}
+    public RepositoryClient() {
+        initCertificates();
+    }
 
     /**
      * _more_
@@ -123,6 +126,7 @@ public class RepositoryClient extends RepositoryBase {
         setUrlBase(serverUrl.getPath());
         this.user     = user;
         this.password = password;
+        initCertificates();
     }
 
 
@@ -161,9 +165,30 @@ public class RepositoryClient extends RepositoryBase {
         this.user     = user;
         this.password = password;
         setUrlBase(base);
+        initCertificates();
     }
 
 
+    private void initCertificates() {
+        if(System.getProperty("javax.net.ssl.trustStore")==null) {
+            String userHome = System.getProperty("user.home");
+            if(userHome == null) userHome = ".";
+            String ramaddaHome = userHome +"/" + ".unidata/repository"; 
+            File[]files = {new File(ramaddaHome+"/cacerts"), new File("./cacerts"),new File(userHome+"/cacerts")}; 
+            for(File f: files) {
+                if(f.exists()) {
+                    System.setProperty("javax.net.ssl.trustStore",
+                                       getProperty("javax.net.ssl.trustStore", 
+                                                   f.toString()));
+                    break;
+                }
+            }
+        }
+        if(System.getProperty("javax.net.ssl.trustStorePassword") == null) {
+            System.setProperty("javax.net.ssl.trustStorePassword",
+                               "somepassword");
+        }
+    }
 
 
     /**
@@ -190,7 +215,6 @@ public class RepositoryClient extends RepositoryBase {
      */
     public String[] doPost(RequestUrl url, List<HttpFormEntry> entries)
             throws Exception {
-        System.err.println("url:" + url.getFullUrl());
         return HttpFormEntry.doPost(entries, url.getFullUrl());
     }
 
