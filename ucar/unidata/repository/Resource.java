@@ -72,6 +72,8 @@ public class Resource {
     /** _more_ */
     private long fileSize = -1;
 
+    private String md5;
+
     /**
      * _more_
      */
@@ -119,8 +121,17 @@ public class Resource {
      * @param type _more_
      */
     public Resource(String path, String type) {
+        this(path, type,  null,-1);
+    }
+
+    public Resource(String path, String type, String md5, long fileSize) {
         this.path = path;
         this.type = type;
+        this.md5 = md5;
+        this.fileSize = fileSize;
+        if(fileSize<0 && path!=null) {
+            fileSize = new File(path).length();
+        }
     }
 
     /**
@@ -131,6 +142,8 @@ public class Resource {
     public Resource(Resource that) {
         this.path = that.path;
         this.type = that.type;
+        this.md5 = that.md5;
+        this.fileSize = that.fileSize;
     }
 
     /**
@@ -178,7 +191,7 @@ public class Resource {
         if (fileSize >= 0) {
             return fileSize;
         }
-        return getTheFile().length();
+        return fileSize = getTheFile().length();
     }
 
     /**
@@ -299,6 +312,31 @@ public class Resource {
         this.fileSize = value;
     }
 
+
+    /**
+       Set the Md5 property.
+
+       @param value The new value for Md5
+    **/
+    public void setMd5 (String value) {
+	md5 = value;
+    }
+
+    /**
+       Get the Md5 property.
+
+       @return The Md5
+    **/
+    public String getMd5 () {
+        if(md5==null) {
+            //For now don't do this because big files take a long time
+            //            File file = getTheFile();
+            //            if(file.exists()) {
+            //                md5 = IOUtil.getMd5(file.toString());
+            //            }
+        }
+	return md5;
+    }
 
 
 }

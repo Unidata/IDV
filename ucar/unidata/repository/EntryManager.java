@@ -1315,7 +1315,9 @@ return new Result(title, sb);
             }
             if (request.defined(ARG_URL)) {
                 entry.setResource(new Resource(request.getString(ARG_URL,
-                        BLANK)));
+                                                                 BLANK),  
+                                               Resource.TYPE_URL,
+                                               request.getString(ARG_MD5, null),request.get(ARG_FILESIZE,(long)-1)));
             }
 
 
@@ -1557,6 +1559,22 @@ return new Result(title, sb);
         entry.setNorth(request.get(ARG_AREA + "_north", entry.getNorth()));
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
         entry.setEast(request.get(ARG_AREA + "_east", entry.getEast()));
+
+        double altitudeTop = Entry.NONGEO;
+        double altitudeBottom = Entry.NONGEO;
+        if(request.defined(ARG_ALTITUDE)) {
+            altitudeTop = altitudeBottom =   request.get(ARG_ALTITUDE, Entry.NONGEO);
+        } else {
+            if(request.defined(ARG_ALTITUDE_TOP)) {
+                altitudeTop = request.get(ARG_ALTITUDE_TOP, Entry.NONGEO);
+            }
+            if(request.defined(ARG_ALTITUDE_BOTTOM)) {
+                altitudeBottom = request.get(ARG_ALTITUDE_BOTTOM, Entry.NONGEO);
+            }
+        }
+        entry.setAltitudeTop(altitudeTop);
+        entry.setAltitudeBottom(altitudeBottom);
+
         entry.getTypeHandler().initializeEntry(request, entry, parent,
                 newEntry);
     }
@@ -3250,6 +3268,16 @@ return new Result(title, sb);
                 entry.getEast() + "")));
         entry.setWest(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_WEST,
                 entry.getWest() + "")));
+
+        entry.setAltitudeTop(XmlUtil.getAttribute(node, ATTR_ALTITUDE_TOP,
+                                                  entry.getAltitudeTop()));
+        entry.setAltitudeBottom(XmlUtil.getAttribute(node, ATTR_ALTITUDE_BOTTOM,
+                                                     entry.getAltitudeBottom()));
+        entry.setAltitudeTop(XmlUtil.getAttribute(node, ATTR_ALTITUDE,
+                                                  entry.getAltitudeTop()));
+        entry.setAltitudeBottom(XmlUtil.getAttribute(node, ATTR_ALTITUDE,
+                                                     entry.getAltitudeBottom()));
+                                                   
         NodeList entryChildren = XmlUtil.getElements(node);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
@@ -4997,6 +5025,8 @@ return new Result(title, sb);
             col++,
             getStorageManager().resourceToDB(entry.getResource().getPath()));
         statement.setString(col++, entry.getResource().getType());
+        statement.setString(col++, entry.getResource().getMd5());
+        statement.setLong(col++, entry.getResource().getFileSize());
         statement.setString(col++, entry.getDataType());
         //create date
         getDatabaseManager().setDate(statement, col++,
@@ -5021,6 +5051,8 @@ return new Result(title, sb);
         statement.setDouble(col++, entry.getNorth());
         statement.setDouble(col++, entry.getEast());
         statement.setDouble(col++, entry.getWest());
+        statement.setDouble(col++, entry.getAltitudeTop());
+        statement.setDouble(col++, entry.getAltitudeBottom());
         if ( !isNew) {
             statement.setString(col++, entry.getId());
         }

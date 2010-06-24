@@ -237,6 +237,17 @@ public class XmlOutputHandler extends OutputHandler {
         });
 
 
+        if (entry.hasAltitude()) {
+            node.setAttribute(ATTR_ALTITUDE, "" + entry.getAltitude());
+        } else {
+            if (entry.hasAltitudeBottom()) {
+                node.setAttribute(ATTR_ALTITUDE_BOTTOM, "" + entry.getAltitudeBottom());
+            }
+            if (entry.hasAltitudeTop()) {
+                node.setAttribute(ATTR_ALTITUDE_TOP, "" + entry.getAltitudeTop());
+            }
+        }
+
         if (entry.hasNorth()) {
             node.setAttribute(ATTR_NORTH, "" + entry.getNorth());
         }
@@ -253,9 +264,18 @@ public class XmlOutputHandler extends OutputHandler {
         if ( !entry.isGroup() && entry.getResource().isDefined()) {
             if (forExport) {}
             else {
+                Resource resource = entry.getResource();
                 XmlUtil.setAttributes(node, new String[] { ATTR_RESOURCE,
-                        entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
-                        entry.getResource().getType() });
+                        resource.getPath(), ATTR_RESOURCE_TYPE,
+                        resource.getType() });
+                String md5 = resource.getMd5();
+                if(md5!=null) {
+                    node.setAttribute(ATTR_MD5, md5);
+                }
+                long filesize = resource.getFileSize();
+                if(filesize>=0) {
+                    node.setAttribute(ATTR_FILESIZE, ""+filesize);
+                }
             }
 
             //Add the service nodes

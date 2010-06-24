@@ -1216,6 +1216,13 @@ public class Request implements Constants {
         return getString(key, "");
     }
 
+    public void ensureAdmin() {
+        if ( !getUser().getAdmin()) {
+            throw new IllegalArgumentException(
+                                               "Need to be an administrator");
+        }
+    }
+
     /**
      * _more_
      *
@@ -1393,6 +1400,15 @@ public class Request implements Constants {
             return dflt;
         }
         return new Integer(result).intValue();
+    }
+
+
+    public long get(Object key, long dflt) {
+        String result = (String) getValue(key, (String) null);
+        if ((result == null) || (result.trim().length() == 0)) {
+            return dflt;
+        }
+        return new Long(result).longValue();
     }
 
     /**

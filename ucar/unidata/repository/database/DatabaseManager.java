@@ -1797,23 +1797,27 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             sql = sql.replace("ramadda.datetime", "datetime");
             sql = sql.replace("ramadda.clob", "mediumtext");
             sql = sql.replace("ramadda.bigclob", "longtext");
+            sql = sql.replace("ramadda.bigint", "bigint");
             //sql = sql.replace("ramadda.datetime", "timestamp");
         } else if (db.equals(DB_DERBY)) {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "clob(64000)");
             sql = sql.replace("ramadda.bigclob", "clob(256000)");
+            sql = sql.replace("ramadda.bigint", "bigint");
         } else if (db.equals(DB_POSTGRES)) {
             sql = sql.replace("ramadda.double", "float8");
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "text");
             sql = sql.replace("ramadda.bigclob", "text");
+            sql = sql.replace("ramadda.bigint", "bigint");
         } else if (db.equals(DB_ORACLE)) {
             sql = sql.replace("ramadda.double", "number");
             //            sql = sql.replace("ramadda.datetime", "date");
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "clob");
             sql = sql.replace("ramadda.bigclob", "clob");
+            sql = sql.replace("ramadda.bigint", "bigint");
         }
         return sql;
     }

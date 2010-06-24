@@ -71,6 +71,11 @@ public class Tables {
                                                        + ".resource_type";
 
         /** _more_ */
+        public static final String COL_MD5 = NAME     + ".md5";
+
+        public static final String COL_FILESIZE = NAME  + ".filesize";
+
+        /** _more_ */
         public static final String COL_DATATYPE = NAME + ".datatype";
 
         /** _more_ */
@@ -96,12 +101,18 @@ public class Tables {
         /** _more_ */
         public static final String COL_WEST = NAME + ".west";
 
+        public static final String COL_ALTITUDETOP = NAME + ".altitudetop";
+        public static final String COL_ALTITUDEBOTTOM = NAME + ".altitudebottom";
+
         /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_TYPE, COL_NAME, COL_DESCRIPTION, COL_PARENT_GROUP_ID,
-            COL_USER_ID, COL_RESOURCE, COL_RESOURCE_TYPE, COL_DATATYPE,
+            COL_USER_ID, COL_RESOURCE, COL_RESOURCE_TYPE, COL_MD5, COL_FILESIZE, COL_DATATYPE,
             COL_CREATEDATE, COL_CHANGEDATE, COL_FROMDATE, COL_TODATE, COL_SOUTH, COL_NORTH,
-            COL_EAST, COL_WEST
+            COL_EAST, 
+            COL_WEST,
+            COL_ALTITUDETOP,
+            COL_ALTITUDEBOTTOM
         };
 
         /** _more_ */

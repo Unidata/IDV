@@ -84,6 +84,10 @@ public class Entry extends Entity {
     /** _more_ */
     private double west = NONGEO;
 
+    private double altitudeBottom = NONGEO;
+
+    private double altitudeTop = NONGEO;
+
     /** _more_ */
     private boolean isLocalFile = false;
 
@@ -530,6 +534,61 @@ public class Entry extends Entity {
         return ((north == north)
                 ? north
                 : NONGEO);
+    }
+
+    /**
+       Set the AltitudeTop property.
+
+       @param value The new value for AltitudeTop
+    **/
+    public void setAltitudeTop (double value) {
+	altitudeTop = value;
+    }
+
+    /**
+       Get the AltitudeTop property.
+
+       @return The AltitudeTop
+    **/
+    public double getAltitudeTop () {
+	return altitudeTop;
+    }
+
+    /**
+       Set the AltitudeBottom property.
+
+       @param value The new value for AltitudeBottom
+    **/
+    public void setAltitudeBottom (double value) {
+	altitudeBottom = value;
+    }
+
+    /**
+       Get the AltitudeBottom property.
+
+       @return The AltitudeBottom
+    **/
+    public double getAltitudeBottom () {
+	return altitudeBottom;
+    }
+
+    public double getAltitude () {
+	return altitudeTop;
+    }
+
+
+    public boolean hasAltitudeTop() {
+        return (altitudeTop == altitudeTop) && (altitudeTop != NONGEO);
+    }
+
+
+    public boolean hasAltitudeBottom() {
+        return (altitudeBottom == altitudeBottom) && (altitudeBottom != NONGEO);
+    }
+
+
+    public boolean hasAltitude() {
+        return hasAltitudeTop() && hasAltitudeBottom() && (altitudeBottom== altitudeTop);
     }
 
 

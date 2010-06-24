@@ -20,6 +20,8 @@ CREATE TABLE entries (id varchar(200),
    		   user_id varchar(200),
 	           resource varchar(500),	           
                    resource_type varchar(200),
+                   md5           varchar(32),
+                   filesize ramadda.bigint,
 		   datatype varchar(200),
 	           createdate ramadda.datetime, 
                    changedate ramadda.datetime, 
@@ -28,10 +30,19 @@ CREATE TABLE entries (id varchar(200),
 	           south ramadda.double,
 	           north ramadda.double,
 	           east ramadda.double,
-	           west ramadda.double); 
+	           west ramadda.double,
+                   altitudetop ramadda.double,
+                   altitudebottom ramadda.double); 
 
 
 ALTER table entries add column changedate ramadda.datetime;
+ALTER table entries add column md5 varchar(32);
+ALTER table entries add column filesize ramadda.bigint;
+ALTER table entries add column altitudetop ramadda.double;
+ALTER table entries add column altitudebottom ramadda.double;
+
+
+
 
 ---- things to add????
 ---- file size

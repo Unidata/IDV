@@ -466,7 +466,11 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean okToShowInForm(String arg) {
-        return getProperty("form.show." + arg, true);
+        return okToShowInForm(arg, true);
+    }
+
+    public boolean okToShowInForm(String arg, boolean dflt) {
+        return getProperty("form.show." + arg, dflt);
     }
 
     /**
@@ -630,7 +634,7 @@ public class TypeHandler extends RepositoryManager {
             .findUser(results
                 .getString(col++), true), new Resource(getStorageManager()
                 .resourceFromDB(results.getString(col++)), results
-                .getString(col++)), results
+                                                       .getString(col++), results.getString(col++), results.getLong(col++)), results
                     .getString(col++), 
                         (createDate=dbm.getDate(results, col++)).getTime(), 
                         dbm.getDate(results, col++, createDate).getTime(), 
@@ -640,8 +644,8 @@ public class TypeHandler extends RepositoryManager {
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
         entry.setWest(results.getDouble(col++));
-
-
+        entry.setAltitudeTop(results.getDouble(col++));
+        entry.setAltitudeBottom(results.getDouble(col++));
         return entry;
     }
 
@@ -1773,6 +1777,30 @@ public class TypeHandler extends RepositoryManager {
 
             sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
+        }
+
+
+        
+        if (okToShowInForm(ARG_ALTITUDE,false)) {
+            String altitude="";
+            if(entry!=null && entry.hasAltitude()) {
+                altitude = ""+entry.getAltitude();
+            }
+            sb.append(HtmlUtil.formEntry("Altitude:", HtmlUtil.input(ARG_ALTITUDE, altitude,HtmlUtil.SIZE_10)));
+        } else if (okToShowInForm(ARG_ALTITUDE_TOP,true)) {
+            String altitudeTop="";
+            String altitudeBottom="";
+            if(entry!=null) {
+                if(entry.hasAltitudeTop()) {
+                    altitudeTop = ""+entry.getAltitudeTop();
+                }
+                if(entry.hasAltitudeBottom()) {
+                    altitudeBottom = ""+entry.getAltitudeBottom();
+                }
+            }
+            sb.append(HtmlUtil.formEntry("Altitude Range:", 
+                                         HtmlUtil.input(ARG_ALTITUDE_BOTTOM, altitudeBottom,HtmlUtil.SIZE_10) +" - " +
+                                         HtmlUtil.input(ARG_ALTITUDE_TOP, altitudeTop,HtmlUtil.SIZE_10)+" " + msg("meters")));
         }
 
 

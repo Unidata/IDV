@@ -446,6 +446,10 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_WEST = "west";
 
+    public static final String ATTR_ALTITUDE = "altiude";
+    public static final String ATTR_ALTITUDE_TOP = "altiudetop";
+    public static final String ATTR_ALTITUDE_BOTTOM = "altiudebottom";
+
 
     /** _more_ */
     public static final String ARG_DECORATE = "decorate";
@@ -862,6 +866,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NAME = "name";
 
+
+
     /** _more_ */
     public static final String ARG_NOREDIRECT = "noredirect";
 
@@ -882,6 +888,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_USER_HOME = "userhome";
+
+    public static final String ARG_ALTITUDE         = "altitude";
+    public static final String ARG_ALTITUDE_TOP     = "altitude.top";
+    public static final String ARG_ALTITUDE_BOTTOM  = "altitude.bottom";
+
 
     /** _more_ */
     public static final String ARG_NORTH = "north";
@@ -1039,6 +1050,12 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_URL = "url";
+
+    public static final String ARG_MD5 = "md5";
+
+    public static final String ATTR_MD5 = "md5";
+
+    public static final String ARG_FILESIZE = "filesize";
 
     /** _more_ */
     public static final String ARG_USER = "user";
