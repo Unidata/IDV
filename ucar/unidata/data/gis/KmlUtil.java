@@ -1,7 +1,5 @@
 /*
- * $Id: KmlDataSource.java,v 1.38 2007/04/16 20:34:52 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -18,22 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.data.gis;
 
 
-import java.text.SimpleDateFormat;
-
-import ucar.unidata.xml.XmlUtil;
+import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.StringUtil;
-import java.util.Date;
+
+import ucar.unidata.xml.XmlUtil;
+
 import java.awt.Color;
 
 
-import org.w3c.dom.*;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 
 
 /**
@@ -107,19 +108,37 @@ public class KmlUtil {
 
 
 
+    /** _more_          */
     public static final String TAG_TOUR = "gx:Tour";
+
+    /** _more_          */
     public static final String TAG_PLAYLIST = "gx:Playlist";
+
+    /** _more_          */
     public static final String TAG_FLYTO = "gx:FlyTo";
+
+    /** _more_          */
     public static final String TAG_WAIT = "gx:Wait";
 
 
 
 
+    /** _more_          */
     public static final String ATTR_ID = "id";
+
+    /** _more_          */
     public static final String ATTR_NAME = "name";
 
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     public static Element makeElement(Element parent, String tag) {
         Element child = parent.getOwnerDocument().createElement(tag);
         parent.appendChild(child);
@@ -129,58 +148,122 @@ public class KmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static Element kml(String name) {
-        Document doc = XmlUtil.makeDocument();
-        Element child = doc.createElement(TAG_KML);
+        Document doc   = XmlUtil.makeDocument();
+        Element  child = doc.createElement(TAG_KML);
         return child;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static Element document(Element parent, String name) {
         return document(parent, name, false);
     }
 
 
-    public static Element networkLink(Element parent, String name, String url) {
-        Element networkLink = makeElement(parent,TAG_NETWORKLINK);
-        makeText(networkLink, TAG_NAME,name);
-        Element link  =    makeElement(networkLink,TAG_LINK);
-        makeText(link, TAG_HREF,url);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param url _more_
+     *
+     * @return _more_
+     */
+    public static Element networkLink(Element parent, String name,
+                                      String url) {
+        Element networkLink = makeElement(parent, TAG_NETWORKLINK);
+        makeText(networkLink, TAG_NAME, name);
+        Element link = makeElement(networkLink, TAG_LINK);
+        makeText(link, TAG_HREF, url);
         //        makeElement(link,TAG_HREF);
         return networkLink;
     }
 
-    /*        
+    /*
 <NetworkLink>
-	<name>SVP Drifter 82224</name>
-	<visibility>1</visibility>
-	<flyToView>0</flyToView>
-	<Link>
-		<href>http://dataserver.imedea.uib-csic.es:8080/repository/entry/get/20090511_sinocop_b82224.kmz?entryid=0b13318a-2520-4fcb-915e-55af83c1fede</href>
+        <name>SVP Drifter 82224</name>
+        <visibility>1</visibility>
+        <flyToView>0</flyToView>
+        <Link>
+                <href>http://dataserver.imedea.uib-csic.es:8080/repository/entry/get/20090511_sinocop_b82224.kmz?entryid=0b13318a-2520-4fcb-915e-55af83c1fede</href>
 
     */
 
-    public static Element document(Element parent, String name, boolean visible) {
-        Element node = makeElement(parent,TAG_DOCUMENT);
-        name(node,name);
-        visible(node,visible);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static Element document(Element parent, String name,
+                                   boolean visible) {
+        Element node = makeElement(parent, TAG_DOCUMENT);
+        name(node, name);
+        visible(node, visible);
         return node;
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param tag _more_
+     * @param text _more_
+     *
+     * @return _more_
+     */
     public static Element makeText(Element parent, String tag, String text) {
-        Element node = makeElement(parent,tag);
-        Text textNode = parent.getOwnerDocument().createTextNode(text);
+        Element node     = makeElement(parent, tag);
+        Text    textNode = parent.getOwnerDocument().createTextNode(text);
         node.appendChild(textNode);
         return node;
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
     public static Element visible(Element parent, boolean visible) {
-        return makeText(parent,TAG_VISIBILITY, (visible?"1":"0"));
+        return makeText(parent, TAG_VISIBILITY, (visible
+                ? "1"
+                : "0"));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
     public static Element open(Element parent, boolean visible) {
-        return makeText(parent,TAG_OPEN, (visible?"1":"0"));
+        return makeText(parent, TAG_OPEN, (visible
+                                           ? "1"
+                                           : "0"));
     }
 
 
@@ -196,30 +279,58 @@ public class KmlUtil {
         }*/
 
 
+    /** _more_          */
     private static SimpleDateFormat sdf1;
+
+    /** _more_          */
     private static SimpleDateFormat sdf2;
+
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param dttm _more_
+     *
+     * @return _more_
+     */
     public static Element timestamp(Element parent, Date dttm) {
-        if(sdf1 == null) {
+        if (sdf1 == null) {
             sdf1 = new SimpleDateFormat("yyyy-MM-dd");
             sdf2 = new SimpleDateFormat("HH:mm:ss");
             sdf1.setTimeZone(DateUtil.TIMEZONE_GMT);
             sdf2.setTimeZone(DateUtil.TIMEZONE_GMT);
 
         }
-        String when = sdf1.format(dttm)+"T" + sdf2.format(dttm)+"Z";
+        String  when      = sdf1.format(dttm) + "T" + sdf2.format(dttm) + "Z";
         Element timestamp = makeElement(parent, TAG_TIMESTAMP);
-        makeText(timestamp,TAG_WHEN, when);
+        makeText(timestamp, TAG_WHEN, when);
         return timestamp;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public static Element styleurl(Element parent, String url) {
         //<styleUrl>#linestyleExample</styleUrl>
         return makeText(parent, TAG_STYLEURL, url);
     }
 
-    public  static Element style(Element parent, String id) {
-        Element style =  makeElement(parent, TAG_STYLE);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    public static Element style(Element parent, String id) {
+        Element style = makeElement(parent, TAG_STYLE);
         style.setAttribute(ATTR_ID, id);
         return style;
     }
@@ -233,56 +344,117 @@ public class KmlUtil {
         </Icon>
       </IconStyle>
       </Style>*/
-    public  static Element iconstyle(Element parent, String id, String url) {
-        Element style = style(parent, id);
+
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param id _more_
+     * @param url _more_
+     *
+     * @return _more_
+     */
+    public static Element iconstyle(Element parent, String id, String url) {
+        Element style     = style(parent, id);
         Element iconstyle = makeElement(style, TAG_ICONSTYLE);
-        Element icon = makeElement(iconstyle, TAG_ICON);
-        Element href = makeText(icon, TAG_HREF,url);
+        Element icon      = makeElement(iconstyle, TAG_ICON);
+        Element href      = makeText(icon, TAG_HREF, url);
         return style;
     }
 
 
 
-    public  static Element iconstyle(Element parent, String id, String url, double scale) {
-        Element style = style(parent, id);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param id _more_
+     * @param url _more_
+     * @param scale _more_
+     *
+     * @return _more_
+     */
+    public static Element iconstyle(Element parent, String id, String url,
+                                    double scale) {
+        Element style     = style(parent, id);
         Element iconstyle = makeElement(style, TAG_ICONSTYLE);
-        Element icon = makeElement(iconstyle, TAG_ICON);
-        Element href = makeText(icon, TAG_HREF,url);
-        makeText(iconstyle, TAG_SCALE,""+scale);
+        Element icon      = makeElement(iconstyle, TAG_ICON);
+        Element href      = makeText(icon, TAG_HREF, url);
+        makeText(iconstyle, TAG_SCALE, "" + scale);
 
         return style;
     }
 
 
-    public  static Element linestyle(Element parent, String id, Color color, int width) {
-        Element style = style(parent, id);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param id _more_
+     * @param color _more_
+     * @param width _more_
+     *
+     * @return _more_
+     */
+    public static Element linestyle(Element parent, String id, Color color,
+                                    int width) {
+        Element style     = style(parent, id);
         Element linestyle = makeElement(style, TAG_LINESTYLE);
-        if(color!=null) {
-            makeText(linestyle, TAG_COLOR, "ff"+StringUtil.toHexString(color).substring(1));
+        if (color != null) {
+            makeText(linestyle, TAG_COLOR,
+                     "ff" + StringUtil.toHexString(color).substring(1));
             makeText(linestyle, TAG_COLORMODE, "normal");
         }
-        if(width>0)
-            makeText(linestyle, TAG_WIDTH,""+width);
+        if (width > 0) {
+            makeText(linestyle, TAG_WIDTH, "" + width);
+        }
         return linestyle;
         /*<LineStyle id="ID">
   <color>ffffffff</color>            <!-- kml:color -->
   <colorMode>normal</colorMode>      <!-- colorModeEnum: normal or random -->
   <width>1</width>                   <!-- float -->
   </LineStyle>*/
-     }
+    }
 
-    public static Element linestring(Element parent, boolean extrude, boolean tesselate, String coordinates) {        Element node = makeElement(parent, TAG_LINESTRING);
-        makeText(node,TAG_EXTRUDE, (extrude?"1":"0"));
-        makeText(node,TAG_TESSELATE, (tesselate?"1":"0"));
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param extrude _more_
+     * @param tesselate _more_
+     * @param coordinates _more_
+     *
+     * @return _more_
+     */
+    public static Element linestring(Element parent, boolean extrude,
+                                     boolean tesselate, String coordinates) {
+        Element node = makeElement(parent, TAG_LINESTRING);
+        makeText(node, TAG_EXTRUDE, (extrude
+                                     ? "1"
+                                     : "0"));
+        makeText(node, TAG_TESSELATE, (tesselate
+                                       ? "1"
+                                       : "0"));
         coordinates(node, coordinates);
         return node;
 
     }
 
 
-    public static Element linestring(Element parent, boolean extrude, boolean tesselate, float[][]coords) {
-        StringBuffer sb= new StringBuffer();
-        for(int i=0;i<coords[0].length;i++) {
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param extrude _more_
+     * @param tesselate _more_
+     * @param coords _more_
+     *
+     * @return _more_
+     */
+    public static Element linestring(Element parent, boolean extrude,
+                                     boolean tesselate, float[][] coords) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < coords[0].length; i++) {
             sb.append(coords[1][i]);
             sb.append(",");
             sb.append(coords[0][i]);
@@ -294,43 +466,97 @@ public class KmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param coordinates _more_
+     *
+     * @return _more_
+     */
     public static Element coordinates(Element parent, String coordinates) {
-        Element node = makeElement(parent, TAG_COORDINATES);
+        Element node  = makeElement(parent, TAG_COORDINATES);
         Text textNode = parent.getOwnerDocument().createTextNode(coordinates);
         node.appendChild(textNode);
         return node;
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static Element name(Element parent, String name) {
-        Element node = makeElement(parent,TAG_NAME);
-        CDATASection cdata = parent.getOwnerDocument().createCDATASection(name);
+        Element node = makeElement(parent, TAG_NAME);
+        CDATASection cdata =
+            parent.getOwnerDocument().createCDATASection(name);
         node.appendChild(cdata);
         return node;
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param description _more_
+     *
+     * @return _more_
+     */
     public static Element description(Element parent, String description) {
-        Element node = makeElement(parent,TAG_DESCRIPTION);
-        CDATASection cdata = parent.getOwnerDocument().createCDATASection(description);
+        Element node = makeElement(parent, TAG_DESCRIPTION);
+        CDATASection cdata =
+            parent.getOwnerDocument().createCDATASection(description);
         node.appendChild(cdata);
         return node;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static Element folder(Element parent, String name) {
         return folder(parent, name, false);
     }
 
-    public static Element folder(Element parent, String name, boolean visible) {
-        Element node = makeElement(parent,TAG_FOLDER);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static Element folder(Element parent, String name,
+                                 boolean visible) {
+        Element node = makeElement(parent, TAG_FOLDER);
         name(node, name);
-        visible(node,visible);
+        visible(node, visible);
         return node;
     }
 
 
 
-    public static Element placemark(Element parent, String name, String description) {
-        Element node = makeElement(parent,TAG_PLACEMARK);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param description _more_
+     *
+     * @return _more_
+     */
+    public static Element placemark(Element parent, String name,
+                                    String description) {
+        Element node = makeElement(parent, TAG_PLACEMARK);
         name(node, name);
         description(node, description);
         return node;
@@ -341,48 +567,111 @@ public class KmlUtil {
 
     /*
     public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) throws Exception {
-        return placemark(parent, name, description, 
+        return placemark(parent, name, description,
                          el.getLatitude().getValue(),
                          el.getLongitude().getValue(visad.CommonUnit.degree),
                          (el.getAltitude()!=null?el.getAltitude().getValue():0), style);
                          }*/
 
-    public static Element placemark(Element parent, String name, String description, double lat, double lon, double alt, String style) {
+
+    /**
+     * _more_
+     *
+     * @param lat _more_
+     * @param lon _more_
+     * @param alt _more_
+     * @param style _more_
+     *
+     * @return _more_
+     */
+    public static String point(double lat, double lon, double alt,
+                               String style) {
+        return "<Placemark><Point><coordinates>" + lon + "," + lat + ","
+               + alt + "</coordinates></Point></Placemark>";
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param description _more_
+     * @param lat _more_
+     * @param lon _more_
+     * @param alt _more_
+     * @param style _more_
+     *
+     * @return _more_
+     */
+    public static Element placemark(Element parent, String name,
+                                    String description, double lat,
+                                    double lon, double alt, String style) {
         Element placemark = placemark(parent, name, description);
-        if(style!=null) {
+        if (style != null) {
             makeText(placemark, TAG_STYLEURL, style);
         }
         visible(placemark, true);
         Element point = makeElement(placemark, TAG_POINT);
-        makeText(point, TAG_COORDINATES, lon +"," +
-                 lat +"," +
-                 alt +" ");
+        makeText(point, TAG_COORDINATES, lon + "," + lat + "," + alt + " ");
         return placemark;
     }
 
 
 
 
-    public static Element groundOverlay(Element parent, String name, String description, String url, double north, double south, double east, double west) {
-        Element node = makeElement(parent,TAG_GROUNDOVERLAY);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param description _more_
+     * @param url _more_
+     * @param north _more_
+     * @param south _more_
+     * @param east _more_
+     * @param west _more_
+     *
+     * @return _more_
+     */
+    public static Element groundOverlay(Element parent, String name,
+                                        String description, String url,
+                                        double north, double south,
+                                        double east, double west) {
+        Element node = makeElement(parent, TAG_GROUNDOVERLAY);
         name(node, name);
         description(node, description);
         visible(node, false);
         Element icon = makeElement(node, TAG_ICON);
-        Element href = makeText(icon, TAG_HREF,url);
-        Element llb = makeElement(node, TAG_LATLONBOX);
-        makeText(llb,TAG_NORTH,""+north);
-        makeText(llb,TAG_SOUTH,""+south);
-        makeText(llb,TAG_EAST,""+east);
-        makeText(llb,TAG_WEST,""+west);
+        Element href = makeText(icon, TAG_HREF, url);
+        Element llb  = makeElement(node, TAG_LATLONBOX);
+        makeText(llb, TAG_NORTH, "" + north);
+        makeText(llb, TAG_SOUTH, "" + south);
+        makeText(llb, TAG_EAST, "" + east);
+        makeText(llb, TAG_WEST, "" + west);
         return node;
     }
 
-    public static Element placemark(Element parent, String name, String description, float[][]coords, Color color, int width) {
-        Element placemark = placemark(parent, name, description);
-        Element linestring = linestring(placemark,false,false, coords);
-        String randomStyle = System.currentTimeMillis() +"_" + (int)(Math.random()*1000);
-        linestyle(placemark, randomStyle,color, width);
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param description _more_
+     * @param coords _more_
+     * @param color _more_
+     * @param width _more_
+     *
+     * @return _more_
+     */
+    public static Element placemark(Element parent, String name,
+                                    String description, float[][] coords,
+                                    Color color, int width) {
+        Element placemark  = placemark(parent, name, description);
+        Element linestring = linestring(placemark, false, false, coords);
+        String randomStyle = System.currentTimeMillis() + "_"
+                             + (int) (Math.random() * 1000);
+        linestyle(placemark, randomStyle, color, width);
         return placemark;
     }
 
@@ -409,4 +698,3 @@ public class KmlUtil {
 
 
 }
-
