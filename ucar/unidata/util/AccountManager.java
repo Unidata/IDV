@@ -24,6 +24,8 @@ package ucar.unidata.util;
 
 
 
+
+/*
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScheme;
@@ -31,6 +33,16 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.httpclient.auth.RFC2617Scheme;
+*/
+
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.AuthScheme;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.InvalidCredentialsException;
+import org.apache.http.client.CredentialsProvider;
+
+import org.apache.http.impl.auth.RFC2617Scheme;
 
 
 
@@ -108,6 +120,10 @@ public class AccountManager implements CredentialsProvider,
         this.stateDir = stateDir;
     }
 
+    public void clear() {
+        //TODO: Figure out what this should do
+    }
+
     /**
      * Get the account manager
      *
@@ -133,6 +149,10 @@ public class AccountManager implements CredentialsProvider,
 
 
 
+    public void setCredentials(AuthScope scope, Credentials credentials) {
+        //TODO: What should this do?
+    }
+
     /**
      * Do the authentication
      *
@@ -143,25 +163,32 @@ public class AccountManager implements CredentialsProvider,
      *
      * @return Null if the user presses cancel. Else return the credentials
      *
-     * @throws CredentialsNotAvailableException On badness
      */
-    public Credentials getCredentials(AuthScheme scheme, String host,
-                                      int port, boolean proxy)
-            throws CredentialsNotAvailableException {
+    public Credentials getCredentials(AuthScope scope) {
+        //String host,                                   int port, boolean proxy
+        String host = scope.getHost();
+        int port  =scope.getPort();
+        String realm = scope.getRealm();
 
-        if (scheme == null) {
-            throw new CredentialsNotAvailableException(
-                "Null authentication scheme: ");
+        //    public Credentials getCredentials(AuthScheme scheme, String host,
+        //                                      int port, boolean proxy)
+        //            throws InvalidCredentialsException {
+
+        if (scope == null) {
+            throw new IllegalArgumentException(
+                "Null scope");
         }
 
+        /*
+          //TODO: check if the scheme in the auth is rfc26217
         if ( !(scheme instanceof RFC2617Scheme)) {
-            throw new CredentialsNotAvailableException(
+            throw new InvalidCredentialsException(
                 "Unsupported authentication scheme: "
                 + scheme.getSchemeName());
         }
+        */
 
-
-        String key = host + ":" + port + ":" + scheme.getRealm();
+        String key = host + ":" + port + ":" + realm;
         //        System.err.println ("got auth call " + key);
         UserInfo userInfo = getUserNamePassword(key,
                                 "The server " + host + ":" + port
