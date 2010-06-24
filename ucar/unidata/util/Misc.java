@@ -2576,10 +2576,12 @@ public class Misc {
      * @return adjusted value.
      */
     public static double normalizeLongitude(double lonValue) {
+        int cnt = 0;
         while ((lonValue < -180.) || (lonValue > 180.)) {
             lonValue = (lonValue < -180)
                        ? lonValue + 360.
                        : lonValue - 360.;
+            if(cnt++>10000) throw new IllegalArgumentException("Bad longitude value:" + lonValue);
         }
         return lonValue;
     }
