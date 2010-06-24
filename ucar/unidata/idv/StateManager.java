@@ -413,6 +413,19 @@ public class StateManager extends IdvManager {
 
 
 
+        //Set the cacert property to ssl connections to 
+        //self signed certificates can work
+        if(System.getProperty("javax.net.ssl.trustStore")==null) {
+            System.setProperty("javax.net.ssl.trustStore",
+                               getProperty("javax.net.ssl.trustStore", 
+                                           store.getUserDirectory()+"/cacerts"));
+        }
+        if(System.getProperty("javax.net.ssl.trustStorePassword") == null) {
+            System.setProperty("javax.net.ssl.trustStorePassword",
+                               getProperty("javax.net.ssl.trustStorePassword",
+                                           "somepassword"));
+        }
+
         //Have the resource manager load up the resources
         getResourceManager().init(propertyRbiFiles);
         //Trace.msg("initState-4");
@@ -424,7 +437,6 @@ public class StateManager extends IdvManager {
         ucar.unidata.util.Msg.init(
             getResourceManager().getResources(
                 IdvResourceManager.RSC_MESSAGES));
-
 
 
 
