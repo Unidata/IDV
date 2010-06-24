@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -21,6 +21,10 @@
 // $Id: IdvAuthenticator.java,v 1.3 2007/05/09 21:59:26 dmurray Exp $
 
 package ucar.unidata.util;
+
+
+import org.apache.http.auth.AuthScheme;
+import org.apache.http.auth.AuthScope;
 
 
 
@@ -36,10 +40,8 @@ import org.apache.commons.httpclient.auth.RFC2617Scheme;
 */
 
 import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.AuthScheme;
-import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.InvalidCredentialsException;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 
 import org.apache.http.impl.auth.RFC2617Scheme;
@@ -76,7 +78,7 @@ public class AccountManager implements CredentialsProvider,
                                        IOUtil.UserAccountManager {
 
 
-    /** The global account manager   */
+    /** The global account manager */
     private static AccountManager accountManager;
 
     /** for the gui */
@@ -106,8 +108,11 @@ public class AccountManager implements CredentialsProvider,
      */
     private Hashtable currentlyUsedOnes = new Hashtable();
 
-    /** This is where we write and read the persistent state   */
+    /** This is where we write and read the persistent state */
     private File stateDir;
+
+    /** Save last created credentials */
+    private Credentials currentCredentials = null;
 
 
     /**
@@ -120,8 +125,12 @@ public class AccountManager implements CredentialsProvider,
         this.stateDir = stateDir;
     }
 
+    /**
+     * _more_
+     */
     public void clear() {
         //TODO: Figure out what this should do
+        currentCredentials = null;
     }
 
     /**
@@ -149,25 +158,72 @@ public class AccountManager implements CredentialsProvider,
 
 
 
+    /**
+     * _more_
+     *
+     * @param scope _more_
+     * @param credentials _more_
+     */
     public void setCredentials(AuthScope scope, Credentials credentials) {
         //TODO: What should this do?
+        if (scope == null) {
+            throw new IllegalArgumentException(
+                "Authentication scope may not be null");
+        }
+
+
+        String key = scope.getHost() + ":" + scope.getPort() + ":"
+                     + scope.getRealm();
+        //        System.err.println ("got auth call " + key);
+
+        UserInfo userInfo = getUserNamePassword(key,
+                                "The server " + scope.getHost() + ":"
+                                + scope.getPort()
+                                + " requires a username/password");
+        if (userInfo == null) {
+            return;
+        }
+
+        if (credentials == null) {
+            currentCredentials =
+                new UsernamePasswordCredentials(userInfo.getUserId(),
+                    userInfo.getPassword());
+        } else {
+            currentCredentials = credentials;
+        }
     }
 
     /**
      * Do the authentication
-     *
-     * @param scheme scheme
-     * @param host host
-     * @param port port
-     * @param proxy proxy
+     * @param authscope authscope
      *
      * @return Null if the user presses cancel. Else return the credentials
      *
      */
-    public Credentials getCredentials(AuthScope scope) {
+    public Credentials getCredentials(AuthScope authscope) {
+        if (authscope == null) {
+            throw new IllegalArgumentException(
+                "Authentication scope may not be null");
+        }
+
+        if (currentCredentials == null) {
+            setCredentials(authscope, null);
+        }
+
+        return currentCredentials;
+    }
+
+    /**
+     * _more_
+     *
+     * @param scope _more_
+     *
+     * @return _more_
+     */
+    public Credentials getCredentialsOld(AuthScope scope) {
         //String host,                                   int port, boolean proxy
-        String host = scope.getHost();
-        int port  =scope.getPort();
+        String host  = scope.getHost();
+        int    port  = scope.getPort();
         String realm = scope.getRealm();
 
         //    public Credentials getCredentials(AuthScheme scheme, String host,
@@ -175,8 +231,7 @@ public class AccountManager implements CredentialsProvider,
         //            throws InvalidCredentialsException {
 
         if (scope == null) {
-            throw new IllegalArgumentException(
-                "Null scope");
+            throw new IllegalArgumentException("Null scope");
         }
 
         /*
@@ -362,4 +417,3 @@ public class AccountManager implements CredentialsProvider,
 
 
 }
-

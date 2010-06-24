@@ -21,6 +21,11 @@
 package ucar.unidata.data;
 
 
+import opendap.dap.HttpWrap;
+
+
+import org.apache.http.client.CredentialsProvider;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -374,15 +379,17 @@ public class DataManager {
                     dataContext.getIdv().getStore().getUserDirectory());
                 AccountManager.setGlobalAccountManager(accountManager);
             }
-            /*** TODO
-            org.apache.http.client.CredentialsProvider provider =
-                accountManager;
-            //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
-            org.apache.http.client.HttpClient client =
-                ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
-            opendap.dap.DConnect2.setHttpClient(client);
-            ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
-            ****/
+            CredentialsProvider provider = accountManager;
+            try {
+                HttpWrap client = new HttpWrap();
+                client.setCredentialsProvider(provider);
+                // fix opendap.dap.DConnect2.setHttpClient(client);
+                ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(
+                    client);
+            } catch (Exception exc) {
+                LogUtil.printException(log_, "Cannot create http client",
+                                       exc);
+            }
         }
 
 
