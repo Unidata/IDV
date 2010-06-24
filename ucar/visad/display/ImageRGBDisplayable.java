@@ -256,10 +256,30 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
     private void setColorMaps() throws RemoteException, VisADException {
 
         ScalarMapSet set = new ScalarMapSet();
+        String []pattern = {"red","green","blue"};
         for (int i = 0; i < colorMaps.length; i++) {
-            colorMaps[i] =
-                new ScalarMap((RealType) colorTupleType.getComponent(i),
-                              mapType);
+            colorMaps[i] = null;
+        }
+        //First look for red, green, blue
+        if(colorTupleType.getDimension()>3) {
+            for(int i=0;i<pattern.length;i++) {
+                for(int tupleIdx=0;tupleIdx<colorTupleType.getDimension();tupleIdx++) {
+                    RealType rt = (RealType)colorTupleType.getComponent(tupleIdx);
+                    if(rt.toString().indexOf(pattern[i])>=0) {
+                        colorMaps[i] = new ScalarMap(rt, mapType);
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < colorMaps.length; i++) {
+            //Did we already get it?
+            if(colorMaps[i]==null) {
+                colorMaps[i] =
+                    new ScalarMap((RealType) colorTupleType.getComponent(i),
+                                  mapType);
+            }
             /* TODO: maybe allow user to set range.  If so, just copy
                logic from RGBDisplayable */
             colorMaps[i].setRange(0, 255);
@@ -311,7 +331,6 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
      */
     public void setColorPalette(float[][] colorPalette)
             throws RemoteException, VisADException {
-
         setColorsInControls(colorPalette);
         this.colorPalette = colorPalette;
     }
