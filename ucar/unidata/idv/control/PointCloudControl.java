@@ -447,7 +447,7 @@ public class PointCloudControl extends DrawingControl {
         if(myDisplay!=null || myRGBDisplay!=null) return;
 
         if(hasRGB) {
-            setAttributeFlags(FLAG_DATACONTROL
+            reallySetAttributeFlags(FLAG_DATACONTROL
                               | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
             myRGBDisplay = new ImageRGBDisplayable("pointcloudrgb_" + getDataInstance().getDataChoice().getName());
             myRGBDisplay.addConstantMap(
@@ -458,7 +458,7 @@ public class PointCloudControl extends DrawingControl {
             myRGBDisplay.setPointSize(getPointSize());
             addDisplayable(myRGBDisplay, getAttributeFlags());
         } else {
-            setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
+            reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
                               | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
 
             myDisplay = new VolumeDisplayable("pointcloud_" + getDataInstance().getDataChoice().getName());

@@ -1542,12 +1542,25 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
+     * Set the attribute flag map to the given value. Note: this really should just set the flags
+     * but instead it OR's the attributeFlags with the given set of flags in the f parameter.
+     * Lets keep this logic because changing it now breaks lotsof things.
+     * If you want to actually set the flags call reallySetAttributeFlags
+     *
+     * @param f The value of the attribute flag map
+     */
+    protected void setAttributeFlags(int f) {
+        attributeFlags = attributeFlags | f;
+    }
+
+
+    /**
      * Set the attribute flag map to the given value.
      *
      * @param f THe value of the attribute flag map
      */
-    protected void setAttributeFlags(int f) {
-        attributeFlags = attributeFlags | f;
+    protected void reallySetAttributeFlags(int f) {
+        attributeFlags = f;
     }
 
     /**
