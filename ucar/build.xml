@@ -121,6 +121,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/render.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
@@ -264,7 +265,6 @@ argument -Dfoo=bar) -->
             <include name="ucar/**/*.class"/>
        </jar>
    </target>
-
 
 
     <target name="idv" depends="init">
