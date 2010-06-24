@@ -7201,4 +7201,145 @@ public class GridUtil {
         System.out.println("not linear = " + notLinear);
         return notLinear;
     }
+
+
+    public static float[][] makeGrid(float[][] grid2D,  int  numCols, int numRows, float missingValue) {
+        return makeGrid(new float[][][]{grid2D}, numCols, numRows, missingValue);
+    }
+
+
+    public static float[][] makeGrid(float[][][] grid2D,  int  numCols, int numRows, float missingValue) {
+        int numFields = grid2D.length;
+        float[][] gridValues = new float[numFields][numCols * numRows];
+        int       m          = 0;
+        for(int fieldIdx=0;fieldIdx<numFields;fieldIdx++) {
+            for (int j = 0; j < numRows; j++) {
+                for (int i = 0; i < numCols; i++) {
+                    float value = (float) grid2D[fieldIdx][j][i];
+                    if (value == missingValue) {
+                        value = Float.NaN;
+                    }
+                    gridValues[fieldIdx][m] = value;
+                    m++;
+                }
+            }
+        }
+        return gridValues;
+    }
+
+    public static void fillMissing(float[][]grid2D, float missingValue) {
+        int numCols = grid2D[0].length;
+        int numRows = grid2D.length;
+        for (int x = 0; x < numCols; x++) {
+            for (int y = 0; y < numRows; y++) {
+                if (grid2D[y][x] != grid2D[y][x]) {
+                    int     delta                 = numCols / 100;
+                    boolean foundNonMissingNearby = false;
+                    for (int dx = -delta; dx < delta; dx++) {
+                        for (int dy = -delta; dy < delta; dy++) {
+                            int nx = x + dx;
+                            int ny = y + dy;
+                            if ((nx >= 0) && (nx < grid2D[0].length)
+                                && (ny >= 0)
+                                && (ny < grid2D.length)) {
+                                if ((grid2D[ny][nx]
+                                     == grid2D[ny][nx]) && (grid2D[ny][nx]
+                                                            != missingValue)) {
+                                    foundNonMissingNearby = true;
+                                }
+                            }
+                        }
+                    }
+                    if ( !foundNonMissingNearby) {
+                        grid2D[y][x] = missingValue;
+                    }
+                }
+            }
+        }
+
+        for (int pass = 0; pass < 1; pass++) {
+            boolean anyMissing = false;
+            for (int x = 0; x < numCols; x++) {
+                for (int y = 0; y < numRows; y++) {
+                    if (fillMissingFromNeighbors(grid2D, x, y,missingValue)) {
+                        anyMissing = true;
+                    }
+                }
+            }
+            if (anyMissing) {
+                for (int y = 0; y < numRows; y++) {
+                    for (int x = 0; x < numCols; x++) {
+                        if (fillMissingFromNeighbors(grid2D, x, y,missingValue)) {
+                            anyMissing = true;
+                        }
+                    }
+                }
+            }
+            if (anyMissing) {
+                for (int y = numRows - 1; y >= 0; y--) {
+                    for (int x = numCols - 1; x >= 0; x--) {
+                        if (fillMissingFromNeighbors(grid2D, x, y,missingValue)) {
+                            anyMissing = true;
+                        }
+                    }
+                }
+            }
+            if (anyMissing) {
+                for (int x = numCols - 1; x >= 0; x--) {
+                    for (int y = numRows - 1; y >= 0; y--) {
+                        if (fillMissingFromNeighbors(grid2D, x, y,missingValue)) {
+                            anyMissing = true;
+                        }
+                    }
+                }
+            }
+            if ( !anyMissing) {
+                break;
+            }
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     * @param x _more_
+     * @param y _more_
+     *
+     * @return _more_
+     */
+    private static boolean fillMissingFromNeighbors(float[][] grid, int x,
+                                                    int y, float missingValue) {
+        if (grid[y][x] == grid[y][x]) {
+            return false;
+        }
+        if (grid[y][x] == missingValue) {
+            return false;
+        }
+        float sum = 0;
+        int   cnt = 0;
+        for (int dx = -1; dx < 2; dx++) {
+            for (int dy = -1; dy < 2; dy++) {
+                int nx = x + dx;
+                int ny = y + dy;
+                if ((nx >= 0) && (nx < grid[0].length) && (ny >= 0)
+                        && (ny < grid.length)) {
+                    if ((grid[ny][nx] == grid[ny][nx])
+                        && (grid[ny][nx] != missingValue)) {
+                        sum += grid[ny][nx];
+                        cnt++;
+                    }
+                }
+            }
+        }
+        if (cnt > 0) {
+            grid[y][x] = sum / cnt;
+        }
+        return true;
+    }
+
+
+
 }
