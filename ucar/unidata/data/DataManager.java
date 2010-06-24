@@ -374,13 +374,15 @@ public class DataManager {
                     dataContext.getIdv().getStore().getUserDirectory());
                 AccountManager.setGlobalAccountManager(accountManager);
             }
-            org.apache.commons.httpclient.auth.CredentialsProvider provider =
+            /*** TODO
+            org.apache.http.client.CredentialsProvider provider =
                 accountManager;
             //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
-            org.apache.commons.httpclient.HttpClient client =
+            org.apache.http.client.HttpClient client =
                 ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
             opendap.dap.DConnect2.setHttpClient(client);
             ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
+            ****/
         }
 
 
