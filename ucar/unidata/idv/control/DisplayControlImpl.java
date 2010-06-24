@@ -1547,9 +1547,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param f THe value of the attribute flag map
      */
     protected void setAttributeFlags(int f) {
-        //jeffmc: We used to add the flag map to the existing but I think that is wrong
-        //        attributeFlags = attributeFlags | f;
-        attributeFlags = f;
+        attributeFlags = attributeFlags | f;
     }
 
     /**
