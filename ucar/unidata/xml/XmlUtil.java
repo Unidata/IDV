@@ -2071,10 +2071,12 @@ public abstract class XmlUtil {
 
           case Node.CDATA_SECTION_NODE : {
               String value = node.getNodeValue();
-              if (value.startsWith("XmlUtil.COMMENT:")) {
-                  xml.append("\n<!--" + value.substring(16) + " -->\n");
-              } else {
-                  xml.append("<![CDATA[" + value + "]]>");
+              if(value!=null) {
+                  if (value.startsWith("XmlUtil.COMMENT:")) {
+                      xml.append("\n<!--" + value.substring(16) + " -->\n");
+                  } else {
+                      xml.append("<![CDATA[" + value + "]]>");
+                  }
               }
               break;
           }
