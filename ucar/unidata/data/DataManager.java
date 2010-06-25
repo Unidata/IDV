@@ -21,9 +21,6 @@
 package ucar.unidata.data;
 
 
-import opendap.dap.HttpWrap;
-
-
 import org.apache.http.client.CredentialsProvider;
 
 import org.w3c.dom.Attr;
@@ -87,6 +84,8 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.swing.filechooser.FileFilter;
+
+import opendap.dap.HttpWrap;
 
 
 /**
@@ -382,7 +381,7 @@ public class DataManager {
             CredentialsProvider provider = accountManager;
             try {
                 HttpWrap client = new HttpWrap();
-                client.setCredentialsProvider(provider);
+                client.setGlobalCredentialsProvider(provider);
                 // fix opendap.dap.DConnect2.setHttpClient(client);
                 ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(
                     client);

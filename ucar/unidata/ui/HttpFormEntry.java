@@ -21,8 +21,9 @@
 package ucar.unidata.ui;
 
 
-import opendap.dap.HttpWrap;
+
 import opendap.dap.HttpWrapException;
+import opendap.dap.HttpWrap;
 
 import org.apache.http.Header;
 
@@ -37,11 +38,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.WrapperException;
+import ucar.unidata.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -112,8 +109,7 @@ public class HttpFormEntry {
     /** file part source */
     private ContentBody filePartSource;
 
-    /** filename */
-    private String fileName;
+     
 
 
     /**
@@ -129,7 +125,10 @@ public class HttpFormEntry {
         this.name = name;
         type      = TYPE_FILE;
         this.filePartSource =
-            new InputStreamBody(new ByteArrayInputStream(bytes), fileName);
+            new InputStreamKnownSizeBody(new ByteArrayInputStream(bytes),
+                                         bytes.length,
+                                         "application/octect-stream",
+                                         fileName);
 
     }
 
@@ -547,9 +546,32 @@ public class HttpFormEntry {
      *
      * @return the file part
      */
+    private ContentBody getFilePart1() {
+        InputStream is = null;
+        if (filePartSource == null) {
+            final String file = getValue();
+            try {
+                is             = IOUtil.getInputStream(file);
+                filePartSource = new InputStreamBody(is, getName());
+            } catch (Exception exc) {
+                throw new WrapperException("Reading file:" + file, exc);
+            }
+
+        }
+        return filePartSource;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private ContentBody getFilePart() {
         if (filePartSource == null) {
             final String file = getValue();
+            if (file.length() == 0) {
+                return null;
+            }
             return new FileBody(new File(file));
 
         }
@@ -566,11 +588,11 @@ public class HttpFormEntry {
             return false;
         }
 
-        if (type == TYPE_FILE) {
-            if (filePartSource == null) {
-                return new File(getValue()).exists();
-            }
-        }
+        //  if (type == TYPE_FILE) {
+        //      if (filePartSource == null) {
+        //         return new File(getValue()).exists();
+        //      }
+        //  }
         return true;
     }
 
@@ -586,30 +608,10 @@ public class HttpFormEntry {
      */
     public static String[] doPost(List entries, String urlPath) {
         try {
-            HttpWrap        client = new HttpWrap();
-            MultipartEntity me     = new MultipartEntity();
-            for (int i = 0; i < entries.size(); i++) {
-                HttpFormEntry e = (HttpFormEntry) entries.get(i);
-                switch (e.type) {
-
-                  case TYPE_INPUT :
-                  case TYPE_AREA :
-                      me.addPart(e.getName(), new StringBody(e.getValue()));
-                      break;
-
-                  case TYPE_FILE :
-                      me.addPart(e.getName(), e.getFilePart());
-                      break;
-
-                  default :
-                      continue;
-                }
-
-            }
-            int numTries = 0;
+            HttpWrap client   = new HttpWrap();
+            int         numTries = 0;
             while (numTries++ < 5) {
-
-                client.setMethodPost(urlPath);
+                client = getMethod(entries, urlPath);
                 client.execute();
                 if ((client.getStatusCode() >= 300)
                         && (client.getStatusCode() <= 399)) {
@@ -658,9 +660,11 @@ public class HttpFormEntry {
             throws HttpWrapException {
         HttpWrap client = new HttpWrap();
         client.setMethodPost(urlPath);
-        boolean anyFiles    = false;
-        int     count       = 0;
-        List    goodEntries = new ArrayList();
+        boolean anyFiles        = false;
+        int     count           = 0;
+        List    goodEntries     = new ArrayList();
+        boolean alwaysmultipart = false;
+
         for (int i = 0; i < entries.size(); i++) {
             HttpFormEntry formEntry = (HttpFormEntry) entries.get(i);
             if ( !formEntry.okToPost()) {
@@ -672,15 +676,16 @@ public class HttpFormEntry {
             }
         }
 
-
-        if (anyFiles) {
+        if (anyFiles || alwaysmultipart) {
             MultipartEntity entity =
                 new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
             for (int i = 0; i < goodEntries.size(); i++) {
                 HttpFormEntry formEntry = (HttpFormEntry) goodEntries.get(i);
                 if (formEntry.type == TYPE_FILE) {
-                    entity.addPart(formEntry.getName(),
-                                   formEntry.getFilePart());
+                    if (formEntry.getFilePart() != null) {
+                        entity.addPart(formEntry.getName(),
+                                       formEntry.getFilePart());
+                    }
                 } else {
                     //Not sure why but we have seen a couple of times
                     //the byte value '0' gets into one of these strings
@@ -691,6 +696,7 @@ public class HttpFormEntry {
                     while (value.indexOf(0) >= 0) {
                         value = value.replace((char) 0, with);
                     }
+                    //client.setParameter(formEntry.getName(),formEntry.getValue());
                     try {
                         entity.addPart(formEntry.getName(),
                                        new StringBody(value));
@@ -711,5 +717,42 @@ public class HttpFormEntry {
         return client;
     }
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Fri, Jun 25, '10
+     * @author         Enter your name here...    
+     */
+    class InputStreamKnownSizeBody extends InputStreamBody {
 
+        /** _more_          */
+        private int lenght;
+
+        /**
+         * _more_
+         *
+         * @param in _more_
+         * @param lenght _more_
+         * @param mimeType _more_
+         * @param filename _more_
+         */
+        public InputStreamKnownSizeBody(final InputStream in,
+                                        final int lenght,
+                                        final String mimeType,
+                                        final String filename) {
+            super(in, mimeType, filename);
+            this.lenght = lenght;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        @Override
+        public long getContentLength() {
+            return this.lenght;
+        }
+    }
 }

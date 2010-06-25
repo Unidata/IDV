@@ -200,7 +200,7 @@ public class AccountManager implements CredentialsProvider,
      * @return Null if the user presses cancel. Else return the credentials
      *
      */
-    public Credentials getCredentials(AuthScope authscope) {
+    public Credentials getCredentialsooo(AuthScope authscope) {
         if (authscope == null) {
             throw new IllegalArgumentException(
                 "Authentication scope may not be null");
@@ -220,7 +220,7 @@ public class AccountManager implements CredentialsProvider,
      *
      * @return _more_
      */
-    public Credentials getCredentialsOld(AuthScope scope) {
+    public Credentials getCredentials(AuthScope scope) {
         //String host,                                   int port, boolean proxy
         String host  = scope.getHost();
         int    port  = scope.getPort();
