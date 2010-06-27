@@ -411,20 +411,10 @@ public class StateManager extends IdvManager {
         propertyRbiFiles.addAll(0, getArgsManager().argRbiFiles);
 
 
-
-
-        //Set the cacert property to ssl connections to 
-        //self signed certificates can work
+        //If there is no trustStore property defined then always trust self-signed certificates
         if(System.getProperty("javax.net.ssl.trustStore")==null) {
-            System.setProperty("javax.net.ssl.trustStore",
-                               getProperty("javax.net.ssl.trustStore", 
-                                           store.getUserDirectory()+"/cacerts"));
-        }
-        if(System.getProperty("javax.net.ssl.trustStorePassword") == null) {
-            System.setProperty("javax.net.ssl.trustStorePassword",
-                               getProperty("javax.net.ssl.trustStorePassword",
-                                           "somepassword"));
-        }
+            ucar.unidata.util.NaiveTrustProvider.setAlwaysTrust(true);
+        } 
 
         //Have the resource manager load up the resources
         getResourceManager().init(propertyRbiFiles);
