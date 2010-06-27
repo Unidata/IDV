@@ -142,45 +142,6 @@ Please see the <a href=#memory>FAQ item below</a> for more information on
 changing the memory allocation.
 </faqitem>
 
-<faqitem q="When I try to access a server via ssl I get an error about certificates" id="ssl">
-The IDV needs to be able to tell Java that its OK to use self-signed certificates from that server. 
-From <a href="http://paulszulc.wordpress.com/2009/08/05/headache-pill-unable-to-find-valid-certification-path-to-requested-target/"> this reference</a> you can take the following steps:
-<ul>
-<li>  Find the servers .cer file. This is most easily done by hitting the server with your browser and then exporting the cer file from your browser to your machine. On firefox go to:<pre>
-Tools -&gt; Options -&gt; Advanced -&gt; Cryptography -&gt; List certificates -&gt; Export
-</pre>
-Or under Preferences:
-<pre>
-Advanced -&gt; Encryption -&gt; View Certificates
-</pre>
-Save it as "cert.cer"
-
-<li> Generate a keystore:<pre>
-Keystore can be generated using tool called “keytool”, that is included with every JDK. In command line type:
-keytool -import -trustcacerts -keystore cacerts -storepass somepassword -noprompt -file cert.cer
-where:
--file points to .cer file you generated a moment ago (here “cert.cer”)
--keystore is name of the generated keystore file, any name will suffice (here “cacerts”)
--storepass is password for the keystore (here “somepassword”)
-</pre>
-
-<li> Configure the IDV to use the "cacerts" file: <ul>
-
-<li> You can add a .properties file to your IDV plugins directory (under &lt;home&gt;/.unidata/idv/DefaultIdv) with the following:<pre>
-javax.net.ssl.trustStore=/path/to/your/cacerts/file
-javax.net.ssl.trustStorePassword=somepassword
-</pre>
-Or if these properties are not set the IDV will look for the file:<pre>
-&lt;home&gt;/.unidata/idv/DefaultIdv/cacerts
-</pre>
-and set the password to (literally) "somepassword".
-</ul>
-
-</ul>
-
-</faqitem>
-
-
 
 <faqitem q="What is &quot;there is no disk in drive A&quot; message in Web Start?" id="nodisk">
 Sometimes starting a program  on a Windows system with Web Start will
