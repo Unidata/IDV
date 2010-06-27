@@ -169,24 +169,12 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+    /**
+     * If there is no trustStore property defined then always trust self-signed certificates
+     */
     private void initCertificates() {
         if(System.getProperty("javax.net.ssl.trustStore")==null) {
-            String userHome = System.getProperty("user.home");
-            if(userHome == null) userHome = ".";
-            String ramaddaHome = userHome +"/" + ".unidata/repository"; 
-            File[]files = {new File(ramaddaHome+"/cacerts"), new File("./cacerts"),new File(userHome+"/cacerts")}; 
-            for(File f: files) {
-                if(f.exists()) {
-                    System.setProperty("javax.net.ssl.trustStore",
-                                       getProperty("javax.net.ssl.trustStore", 
-                                                   f.toString()));
-                    break;
-                }
-            }
-        }
-        if(System.getProperty("javax.net.ssl.trustStorePassword") == null) {
-            System.setProperty("javax.net.ssl.trustStorePassword",
-                               "somepassword");
+            ucar.unidata.util.NaiveTrustProvider.setAlwaysTrust(true);
         }
     }
 
