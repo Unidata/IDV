@@ -185,7 +185,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** igml xml attributes */
     public static final String ATTR_STEPS = "steps";
 
-    /** _more_          */
+    /** the viewpoint file */
     public static final String ATTR_VIEWPOINTFILE = "viewpointfile";
 
 
@@ -255,7 +255,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private boolean capturingAuto = false;
 
-    /** _more_          */
+    /** annoying beep checkbox  */
     private JCheckBox beepCbx = new JCheckBox("Beep", false);
 
     /** The window for the main gui */
@@ -329,7 +329,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Button  to delete a frame */
     JButton deleteFrameButton;
 
-    /** _more_          */
+    /** preview rate field */
     JTextField previewRateFld;
 
     /** Button  to play preview */
@@ -354,7 +354,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Captures one frame */
     JButton grabBtn;
 
-    /** _more_          */
+    /** capture flythrough */
     private JCheckBox grabFlythroughCbx = new JCheckBox("Capture Flythrough",
                                               false);
 
@@ -376,7 +376,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Capture full window */
     JRadioButton fullWindowBtn;
 
-    /** _more_          */
+    /** fullscreen mode */
     JRadioButton fullScreenBtn;
 
 
@@ -411,7 +411,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** The IDV */
     private IntegratedDataViewer idv;
 
-    /** _more_          */
+    /** imagesize */
     Dimension imageSize;
 
     /**
@@ -594,9 +594,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
     /**
-     * _more_
+     * Get the animation widget
      *
-     * @return _more_
+     * @return the animation widget
      */
     private AnimationWidget getAnimationWidget() {
         if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected()
@@ -616,9 +616,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
     /**
-     * _more_
+     * Get the Animation
      *
-     * @return _more_
+     * @return the Animation
      */
     private Animation getAnimation() {
         if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected()
@@ -1330,10 +1330,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
 
-    /** _more_          */
+    /** publish checkbox */
     private JComboBox publishCbx;
 
-    /** _more_          */
+    /** write positions */
     private boolean writePositions = false;
 
     /**
@@ -1745,10 +1745,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
     /**
-     * _more_
+     * Subset bounds
      *
-     * @param bounds _more_
-     * @param returnProps _more_
+     * @param bounds the bounds
+     * @param returnProps  the return properties
      */
     public static void subsetBounds(GeoLocationInfo bounds,
                                     Hashtable returnProps) {
@@ -1817,6 +1817,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         double displayRate =
             (new Double(displayRateFld.getText())).doubleValue();
+        if (scriptingNode != null) {
+            displayRate = imageGenerator.applyMacros(scriptingNode,
+                    imageGenerator.ATTR_FRAMERATE, displayRate);
+        }
 
         createMovie(movieFile, images, size, displayRate, scriptingNode);
     }
@@ -2137,7 +2141,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @param movieFile file name
      * @param images list of images
-     * @param size _more_
+     * @param size the size
      * @param displayRate rate
      * @param scriptingNode isl node
      */
