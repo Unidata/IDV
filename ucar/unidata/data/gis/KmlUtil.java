@@ -35,6 +35,7 @@ import java.awt.Color;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -695,6 +696,63 @@ public class KmlUtil {
           <coordinates>-122.084075,37.4220033612141,50</coordinates>
         </Point>
         </Placemark>*/
+
+
+    public static double[][] parseCoordinates(String coords) {
+        coords = StringUtil.replace(coords, "\n", " ");
+        while (true) {
+            String newCoords = StringUtil.replace(coords, " ,", ",");
+            if (newCoords.equals(coords)) {
+                break;
+            }
+            coords = newCoords;
+        }
+        while (true) {
+            String newCoords = StringUtil.replace(coords, ", ", ",");
+            if (newCoords.equals(coords)) {
+                break;
+            }
+            coords = newCoords;
+        }
+
+        List       tokens = StringUtil.split(coords, " ", true, true);
+        double[][] result = null;
+        for (int pointIdx = 0; pointIdx < tokens.size(); pointIdx++) {
+            String tok     = (String) tokens.get(pointIdx);
+            List   numbers = StringUtil.split(tok, ",");
+            if ((numbers.size() != 2) && (numbers.size() != 3)) {
+                //Maybe its just comma separated
+                if ((numbers.size() > 3) && (tokens.size() == 1)
+                        && ((int) numbers.size() / 3) * 3 == numbers.size()) {
+                    result = new double[3][numbers.size() / 3];
+                    int cnt = 0;
+                    for (int i = 0; i < numbers.size(); i += 3) {
+                        result[0][cnt] = new Double(
+                            numbers.get(i).toString()).doubleValue();
+                        result[1][cnt] = new Double(numbers.get(i
+                                + 1).toString()).doubleValue();
+                        result[2][cnt] = new Double(numbers.get(i
+                                + 2).toString()).doubleValue();
+                        cnt++;
+                    }
+                    return result;
+                }
+                throw new IllegalStateException(
+                    "Bad number of coordinate values:" + numbers);
+            }
+            if (result == null) {
+                result = new double[numbers.size()][tokens.size()];
+            }
+            for (int coordIdx = 0;
+                    (coordIdx < numbers.size());
+                    coordIdx++) {
+                result[coordIdx][pointIdx] = new Double(
+                    numbers.get(coordIdx).toString()).doubleValue();
+            }
+        }
+        return result;
+    }
+
 
 
 }
