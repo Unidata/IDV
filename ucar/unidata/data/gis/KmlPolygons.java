@@ -130,7 +130,11 @@ public class KmlPolygons extends KmlInfo {
         StringBuffer sb = new StringBuffer("<shapes>\n");
         Element multiGeometryNode = (Element) XmlUtil.findChild(node,
                                         KmlDataSource.TAG_MULTIGEOMETRY);
-        if (multiGeometryNode != null) {
+        Element linestringNode = 
+            (Element) XmlUtil.findChild(node, KmlDataSource.TAG_LINESTRING);
+        if (linestringNode != null) {
+            processPolygonNode(linestringNode, sb);
+        } else   if (multiGeometryNode != null) {
             NodeList children = XmlUtil.getElements(multiGeometryNode);
             for (int childIdx = 0; childIdx < children.getLength();
                     childIdx++) {
@@ -176,23 +180,30 @@ public class KmlPolygons extends KmlInfo {
                     TAG_LINESTRING + "." + TAG_COORDINATES);
         }
         if (coordNode == null) {
+            coordNode = XmlUtil.findDescendantFromPath(node,
+                                                       TAG_COORDINATES);
+        }
+        if (coordNode == null) {
             System.err.println("Could not find coord node: "
                                + XmlUtil.toString(node));
         } else {
             String     coordText = XmlUtil.getChildText(coordNode);
-            double[][] coords    = StringUtil.parseCoordinates(coordText);
-            for (int coordIdx = 0; coordIdx < coords.length; coordIdx++) {
+            double[][] coords    = KmlUtil.parseCoordinates(coordText);
+            for (int coordIdx = 0; coordIdx < coords[0].length; coordIdx++) {
                 if (coordIdx != 0) {
                     sb.append(",");
                 }
-                sb.append("" + coords[coordIdx][1] + ","
-                          + coords[coordIdx][0] + ","
-                          + 0.3048 * coords[coordIdx][2]);
+                if(coords.length==3)
+                    sb.append(coords[1][coordIdx] + ","
+                              + coords[0][coordIdx] + ","
+                              + 0.3048 * coords[2][coordIdx]);
+                else
+                    sb.append(coords[1][coordIdx] + ","
+                              + coords[0][coordIdx]);
             }
         }
         sb.append("\" ");
         sb.append("/>");
-
     }
 
 

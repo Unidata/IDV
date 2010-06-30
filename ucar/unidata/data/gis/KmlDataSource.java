@@ -119,6 +119,7 @@ public class KmlDataSource extends FilesDataSource {
 
     /** xml tag */
     public static final String TAG_LINK = "Link";
+    public static final String TAG_LINESTRING = "LineString";
 
 
     /** xml tag */
@@ -758,7 +759,9 @@ public class KmlDataSource extends FilesDataSource {
                 if (childTagName.equals(TAG_PLACEMARK)) {
                     Element multiGeometryNode =
                         (Element) XmlUtil.findChild(child, TAG_MULTIGEOMETRY);
-                    if (multiGeometryNode != null) {
+                    Element linestringNode = 
+                        (Element) XmlUtil.findChild(child, TAG_LINESTRING);
+                    if (multiGeometryNode != null || linestringNode!=null) {
                         String name =
                             XmlUtil.getChildText(XmlUtil.findChild(child,
                                 TAG_NAME));
@@ -805,7 +808,6 @@ public class KmlDataSource extends FilesDataSource {
                     if (ptnode != null) {
                         String coords = XmlUtil.getGrandChildText(ptnode,
                                             "coordinates");
-                        System.out.println(coords + "," + name);
                     }
                 }
 
