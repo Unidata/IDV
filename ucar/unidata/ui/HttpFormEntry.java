@@ -1,18 +1,20 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * $Id: HttpFormEntry.java,v 1.18 2007/07/06 20:45:31 jeffmc Exp $
+ *
+ * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -22,23 +24,17 @@ package ucar.unidata.ui;
 
 
 
-import opendap.dap.HttpWrapException;
-import opendap.dap.HttpWrap;
-
-import org.apache.http.Header;
-
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.*;
 
 
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity
-;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-import org.apache.http.entity.mime.content.StringBody;
 
-import ucar.unidata.util.*;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.WrapperException;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -107,9 +103,10 @@ public class HttpFormEntry {
     private boolean required = true;
 
     /** file part source */
-    private ContentBody filePartSource;
+    private PartSource filePartSource;
 
-     
+    /** filename */
+    private String fileName;
 
 
     /**
@@ -122,39 +119,29 @@ public class HttpFormEntry {
      */
     public HttpFormEntry(String name, final String fileName,
                          final byte[] bytes) {
-        this.name = name;
-        type      = TYPE_FILE;
-        this.filePartSource =
-            new InputStreamKnownSizeBody(new ByteArrayInputStream(bytes),
-                                         bytes.length,
-                                         "application/octect-stream",
-                                         fileName);
-
+        this.name           = name;
+        type                = TYPE_FILE;
+        this.filePartSource = new PartSource() {
+            public InputStream createInputStream() {
+                return new ByteArrayInputStream(bytes);
+            }
+            public String getFileName() {
+                return fileName;
+            }
+            public long getLength() {
+                return bytes.length;
+            }
+        };
     }
 
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param label _more_
-     * @param value _more_
-     */
     public HttpFormEntry(String name, String label, String value) {
-        this(TYPE_INPUT, name, label, value);
+        this(TYPE_INPUT, name, label,value);
     }
 
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
     public static HttpFormEntry hidden(String name, String value) {
-        return new HttpFormEntry(TYPE_HIDDEN, name, "", value);
+        return new HttpFormEntry(TYPE_HIDDEN,name,"",value);
     }
 
     /**
@@ -288,7 +275,7 @@ public class HttpFormEntry {
             guiComps.add(GuiUtils.top(GuiUtils.rLabel(label)));
             if (component == null) {
                 component = new JTextArea(value, rows, cols);
-                ((JTextArea) component).setLineWrap(true);
+                ((JTextArea)component).setLineWrap(true);
             }
             JScrollPane sp = new JScrollPane(component);
             sp.setPreferredSize(new Dimension(500, 200));
@@ -345,7 +332,7 @@ public class HttpFormEntry {
         if (type == TYPE_LABEL) {
             return null;
         }
-        if (component != null) {
+        if(component!=null) {
             return ((JTextComponent) component).getText();
         }
         return value;
@@ -360,10 +347,10 @@ public class HttpFormEntry {
         if (type == TYPE_HIDDEN) {
             this.value = newValue;
         }
-        if (type == TYPE_LABEL) {}
-        else if (component != null) {
+        if (type == TYPE_LABEL) {
+        } else if(component!=null) {
             ((JTextComponent) component).setText(newValue);
-        }
+        } 
     }
 
     /**
@@ -546,36 +533,27 @@ public class HttpFormEntry {
      *
      * @return the file part
      */
-    private ContentBody getFilePart1() {
-        InputStream is = null;
+    private FilePart getFilePart() {
         if (filePartSource == null) {
             final String file = getValue();
-            try {
-                is             = IOUtil.getInputStream(file);
-                filePartSource = new InputStreamBody(is, getName());
-            } catch (Exception exc) {
-                throw new WrapperException("Reading file:" + file, exc);
-            }
-
+            return new FilePart(getName(), new PartSource() {
+                public InputStream createInputStream() {
+                    try {
+                        return IOUtil.getInputStream(file);
+                    } catch (Exception exc) {
+                        throw new WrapperException("Reading file:" + file,
+                                exc);
+                    }
+                }
+                public String getFileName() {
+                    return new File(file).getName();
+                }
+                public long getLength() {
+                    return new File(file).length();
+                }
+            });
         }
-        return filePartSource;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private ContentBody getFilePart() {
-        if (filePartSource == null) {
-            final String file = getValue();
-            if (file.length() == 0) {
-                return null;
-            }
-            return new FileBody(new File(file));
-
-        }
-        return filePartSource;
+        return new FilePart(getName(), filePartSource);
     }
 
     /**
@@ -588,11 +566,11 @@ public class HttpFormEntry {
             return false;
         }
 
-        //  if (type == TYPE_FILE) {
-        //      if (filePartSource == null) {
-        //         return new File(getValue()).exists();
-        //      }
-        //  }
+        if (type == TYPE_FILE) {
+            if (filePartSource == null) {
+                return new File(getValue()).exists();
+            }
+        }
         return true;
     }
 
@@ -608,33 +586,30 @@ public class HttpFormEntry {
      */
     public static String[] doPost(List entries, String urlPath) {
         try {
-            HttpWrap client   = new HttpWrap();
-            int         numTries = 0;
-            while (numTries++ < 5) {
-                client = getMethod(entries, urlPath);
-                client.execute();
-                if ((client.getStatusCode() >= 300)
-                        && (client.getStatusCode() <= 399)) {
-                    Header locationHeader = client.getHeader("location");
+            PostMethod postMethod = null;
+            int numTries = 0;
+            while(numTries++<5) {
+                postMethod =  getMethod(entries, urlPath);
+                HttpClient client      = new HttpClient();
+                client.executeMethod(postMethod);
+                if (postMethod.getStatusCode() >= 300 && postMethod.getStatusCode()<=399) {
+                    Header locationHeader = postMethod.getResponseHeader("location");
                     if (locationHeader == null) {
-                        return new String[] {
-                            "Error: No 'location' given on the redirect",
-                            null };
+                        return new String[] {"Error: No 'location' given on the redirect", null };
                     }
                     //Keep trying with the new location
                     urlPath = locationHeader.getValue();
-                    if (client.getStatusCode() == 301) {
-                        System.err.println(
-                            "Warning: form post has been permanently moved to:"
-                            + urlPath);
+                    if(postMethod.getStatusCode() == 301) {
+                        System.err.println("Warning: form post has been permanently moved to:" + urlPath);
                     }
                     continue;
                 }
                 //Done
                 break;
             }
-            String result = IOUtil.readContents(client.getContentStream());
-            if (client.getStatusCode() >= 300) {
+            String result =
+                IOUtil.readContents(postMethod.getResponseBodyAsStream());
+            if (postMethod.getStatusCode() >= 300) {
                 return new String[] { result, null };
             } else {
                 return new String[] { null, result };
@@ -646,25 +621,11 @@ public class HttpFormEntry {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param entries _more_
-     * @param urlPath _more_
-     *
-     * @return _more_
-     *
-     * @throws HttpWrapException _more_
-     */
-    private static HttpWrap getMethod(List entries, String urlPath)
-            throws HttpWrapException {
-        HttpWrap client = new HttpWrap();
-        client.setMethodPost(urlPath);
-        boolean anyFiles        = false;
-        int     count           = 0;
-        List    goodEntries     = new ArrayList();
-        boolean alwaysmultipart = false;
-
+    private static PostMethod getMethod(List entries, String urlPath) {
+        PostMethod postMethod  = new PostMethod(urlPath);
+        boolean    anyFiles    = false;
+        int        count       = 0;
+        List       goodEntries = new ArrayList();
         for (int i = 0; i < entries.size(); i++) {
             HttpFormEntry formEntry = (HttpFormEntry) entries.get(i);
             if ( !formEntry.okToPost()) {
@@ -676,16 +637,14 @@ public class HttpFormEntry {
             }
         }
 
-        if (anyFiles || alwaysmultipart) {
-            MultipartEntity entity =
-                new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+            
+        if (anyFiles) {
+            Part[] parts = new Part[goodEntries.size()];
             for (int i = 0; i < goodEntries.size(); i++) {
-                HttpFormEntry formEntry = (HttpFormEntry) goodEntries.get(i);
+                HttpFormEntry formEntry =
+                    (HttpFormEntry) goodEntries.get(i);
                 if (formEntry.type == TYPE_FILE) {
-                    if (formEntry.getFilePart() != null) {
-                        entity.addPart(formEntry.getName(),
-                                       formEntry.getFilePart());
-                    }
+                    parts[i] = formEntry.getFilePart();
                 } else {
                     //Not sure why but we have seen a couple of times
                     //the byte value '0' gets into one of these strings
@@ -696,63 +655,24 @@ public class HttpFormEntry {
                     while (value.indexOf(0) >= 0) {
                         value = value.replace((char) 0, with);
                     }
-                    //client.setParameter(formEntry.getName(),formEntry.getValue());
-                    try {
-                        entity.addPart(formEntry.getName(),
-                                       new StringBody(value));
-                    } catch (UnsupportedEncodingException uee) {
-                        throw new HttpWrapException(uee);
-                    }
+                    parts[i] = new StringPart(formEntry.getName(), value);
                 }
             }
-            client.setContent(entity);
+            postMethod.setRequestEntity(new MultipartRequestEntity(parts,
+                                                                   postMethod.getParams()));
         } else {
             for (int i = 0; i < goodEntries.size(); i++) {
-                HttpFormEntry formEntry = (HttpFormEntry) goodEntries.get(i);
-                client.setParameter(formEntry.getName(),
-                                    formEntry.getValue());
+                HttpFormEntry formEntry =
+                    (HttpFormEntry) goodEntries.get(i);
+                postMethod.addParameter(
+                                        new NameValuePair(
+                                                          formEntry.getName(), formEntry.getValue()));
             }
         }
 
-        return client;
+        return postMethod;
     }
 
-    /**
-     * Class description
-     *
-     *
-     * @version        Enter version here..., Fri, Jun 25, '10
-     * @author         Enter your name here...    
-     */
-    class InputStreamKnownSizeBody extends InputStreamBody {
 
-        /** _more_          */
-        private int lenght;
-
-        /**
-         * _more_
-         *
-         * @param in _more_
-         * @param lenght _more_
-         * @param mimeType _more_
-         * @param filename _more_
-         */
-        public InputStreamKnownSizeBody(final InputStream in,
-                                        final int lenght,
-                                        final String mimeType,
-                                        final String filename) {
-            super(in, mimeType, filename);
-            this.lenght = lenght;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        @Override
-        public long getContentLength() {
-            return this.lenght;
-        }
-    }
 }
+
