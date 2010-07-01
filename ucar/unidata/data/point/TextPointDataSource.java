@@ -1246,7 +1246,7 @@ public class TextPointDataSource extends PointDataSource {
                     unit = "";
                 }
                 if (cnt > 0) {
-                    map = map + delimiter;
+                    map = map + ",";
                 }
                 map = map + name;
                 cnt++;
@@ -1260,28 +1260,30 @@ public class TextPointDataSource extends PointDataSource {
                 params = params + delimiter;
             }
             params = params + name + "[";
+            String attrs = "";
             if (name.equals("Time")) {
                 if (unit.trim().length() > 0) {
-                    params = params + " fmt=\"" + unit + "\" ";
+                    attrs = attrs + " fmt=\"" + unit + "\" ";
                 }
 
             } else {
                 if (unit.trim().length() > 0) {
-                    params = params + " unit=\"" + unit + "\" ";
+                    attrs = attrs + " unit=\"" + unit + "\" ";
                 }
             }
             if (missing.length() > 0) {
-                params = params + " missing=\"" + missing + "\" ";
+                attrs = attrs + " missing=\"" + missing + "\" ";
             }
             if (extra.length() > 0) {
-                params = params + " " + extra;
+                attrs = attrs + " " + extra;
                 String colspan = StringUtil.findPattern(extra,
                                      "colspan *= *\"([^\"]+)\"");
                 if (colspan != null) {
                     skip = new Integer(colspan).intValue() - 1;
                 }
             }
-            params = params + "]";
+            attrs  = attrs.trim();
+            params = params + attrs + "]";
         }
         map = map + ")";
         return new String[] { map, params };
@@ -1979,6 +1981,9 @@ public class TextPointDataSource extends PointDataSource {
             int numNotRequired = numVars - ((altIndex != -1)
                                             ? 4
                                             : 3);
+            if (timeIndex == -1) {
+                numNotRequired++;
+            }
             //System.out.println("Of " + numVars + " vars, " + numNotRequired + 
             //                   " are not required");
 
