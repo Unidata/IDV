@@ -306,7 +306,7 @@ public class GenericTypeHandler extends TypeHandler {
         return new Object[numberOfValues];
     }
 
-    private Object[] getEntryValues(Entry entry) {
+    public Object[] getEntryValues(Entry entry) {
         Object[]values = entry.getValues();
         if(values == null)  {
             values = makeEntryValueArray();
@@ -676,6 +676,11 @@ public class GenericTypeHandler extends TypeHandler {
             return;
         }
         getValues(Clause.eq(COL_ID, entry.getId()), values);
+    }
+
+
+    public Object[] getValues(Clause clause) throws Exception {
+        return getValues(clause, makeEntryValueArray());
     }
 
 
