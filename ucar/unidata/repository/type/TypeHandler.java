@@ -77,6 +77,7 @@ import java.util.Properties;
  */
 public class TypeHandler extends RepositoryManager {
 
+    public static final String CATEGORY_DEFAULT = "General";
     /** _more_ */
     public static final String TYPE_ANY = Constants.TYPE_ANY;
 
@@ -146,15 +147,20 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-    /** _more_ */
-    String type;
+    private TypeHandler parent;
+
+    private List<TypeHandler> childrenTypes = new ArrayList<TypeHandler>();
+
 
     /** _more_ */
-    String description;
+    private String type;
+
+    /** _more_ */
+    private String description;
 
 
     /** _more_          */
-    String category = "General";
+    private String category = CATEGORY_DEFAULT;
 
     /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();
@@ -171,6 +177,8 @@ public class TypeHandler extends RepositoryManager {
 
     /** _more_          */
     private List<String> requiredMetadata = new ArrayList<String>();
+
+    private boolean forUser = true;
 
     /**
      * _more_
@@ -228,6 +236,86 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public int getTotalNumberOfValues() {
+        int cnt = getNumberOfMyValues();
+        if(parent!=null) {
+            cnt+= parent.getTotalNumberOfValues();
+        }
+        return cnt;
+    }
+
+    public int getNumberOfMyValues() {
+        return 0;
+    }
+
+    public int getValuesOffset()  {
+        if(parent!=null) return parent.getTotalNumberOfValues();
+        return 0;
+    }
+
+
+    protected void init(Element entryNode) throws Exception {
+        forUser  = XmlUtil.getAttribute(entryNode, ATTR_FORUSER, forUser);
+        setType(XmlUtil.getAttribute(entryNode, ATTR_DB_NAME));
+        setProperties(entryNode);
+        setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
+                                            getType()));
+
+        String superType = XmlUtil.getAttribute(entryNode, ATTR_SUPER,(String)null);
+        if(superType!=null) {
+            parent = getRepository().getTypeHandler(superType,false,false);
+            if(parent == null) {
+                throw new IllegalArgumentException("Cannot find parent type:" + superType);
+            }
+            parent.addChildTypeHandler(this);
+        }
+    }
+
+    public void getTableNames(List<String> tableNames) {
+        String tableName = getTableName();
+        if(!tableNames.contains(tableName)) {
+            tableNames.add(tableName);
+        }
+        //        for(TypeHandler child: childrenTypes) {
+            //            child.getTableNames(tableNames);
+        //        }
+        if(getParent()!=null) {
+            getParent().getTableNames(tableNames);
+        }
+    }
+
+    public void getChildTypes(List<String> types) {
+        if(!types.contains(getType())) {
+            types.add(getType());
+        }
+        for(TypeHandler child: childrenTypes) {
+            child.getChildTypes(types);
+        }
+    }
+
+    public void addChildTypeHandler(TypeHandler child) {
+        if(!childrenTypes.contains(child)) {
+            childrenTypes.add(child);
+        }
+    }
+
+    /**
+       Set the Parent property.
+
+       @param value The new value for Parent
+    **/
+    public void xxxsetParent (TypeHandler value) {
+	parent = value;
+    }
+
+    /**
+       Get the Parent property.
+
+       @return The Parent
+    **/
+    public TypeHandler getParent () {
+	return parent;
+    }
 
 
     /**
@@ -290,6 +378,9 @@ public class TypeHandler extends RepositoryManager {
      */
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
+        if(parent!=null) {
+            return parent.getHtmlDisplay(request, entry);
+        }
         return null;
     }
 
@@ -306,6 +397,9 @@ public class TypeHandler extends RepositoryManager {
      */
     public String getInlineHtml(Request request, Entry entry)
             throws Exception {
+        if(parent!=null) {
+            return parent.getInlineHtml(request,entry);
+        }
         return null;
     }
 
@@ -318,6 +412,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean canBeCreatedBy(Request request) {
+        if(parent!=null) {
+            return parent.canBeCreatedBy(request);
+        }
         return true;
     }
 
@@ -328,6 +425,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean adminOnly() {
+        if(parent!=null) {
+            return parent.adminOnly();
+        }
         return false;
     }
 
@@ -337,6 +437,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean isSynthType() {
+        if(parent!=null) {
+            return parent.isSynthType();
+        }
         return false;
     }
 
@@ -355,6 +458,9 @@ public class TypeHandler extends RepositoryManager {
     public List<String> getSynthIds(Request request, Group mainEntry,
                                     Group group, String synthId)
             throws Exception {
+        if(parent!=null) {
+            return parent.getSynthIds(request, mainEntry, group, synthId);
+        }
         throw new IllegalArgumentException(
             "getSynthIds  not implemented in class:" + getClass().getName());
     }
@@ -372,6 +478,9 @@ public class TypeHandler extends RepositoryManager {
      */
     public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
             throws Exception {
+        if(parent!=null) {
+            return parent.makeSynthEntry(request, parentEntry, id);
+        }
         throw new IllegalArgumentException("makeSynthEntry  not implemented");
     }
 
@@ -384,7 +493,12 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public String getProperty(String name) {
-        return (String) properties.get(name);
+        String result =  (String) properties.get(name);
+        if(result!=null) return result;
+        if(parent!=null) {
+            return parent.getProperty(name);
+        }
+        return null;
     }
 
 
@@ -397,7 +511,12 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public String getProperty(String name, String dflt) {
-        return Misc.getProperty(properties, name, dflt);
+        String result = (String) properties.get(name);
+        if(result!=null) return result;
+        if(parent!=null) {
+            return parent.getProperty(name, dflt);
+        }
+        return dflt;
     }
 
     /**
@@ -409,6 +528,7 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public int getProperty(String name, int dflt) {
+        //TODO:check for parent
         return Misc.getProperty(properties, name, dflt);
     }
 
@@ -470,8 +590,10 @@ public class TypeHandler extends RepositoryManager {
     }
 
     public boolean okToShowInForm(String arg, boolean dflt) {
-        return getProperty("form.show." + arg, dflt);
+        String value = getProperty("form.show." + arg, ""+dflt);
+        return value.equals("true");
     }
+
 
     /**
      * _more_
@@ -504,24 +626,12 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initializeEntry(Request request, Entry entry, Group parent,
-                                boolean newEntry)
-            throws Exception {}
-
-
-    /**
-     * _more_
-     *
      * @return _more_
      */
     public boolean returnToEditForm() {
+        if(parent!=null) {
+            return parent.returnToEditForm();
+        }
         return false;
     }
 
@@ -534,8 +644,12 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry, Element node)
-            throws Exception {}
+    public void initializeEntryFromXml(Request request, Entry entry, Element node)
+            throws Exception {
+        if(parent!=null) {
+            parent.initializeEntryFromXml(request, entry, node);    
+        }
+    }
 
 
     /**
@@ -546,7 +660,11 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToEntryNode(Entry entry, Element node) throws Exception {}
+    public void addToEntryNode(Entry entry, Element node) throws Exception {
+        if(parent!=null) {
+            parent.addToEntryNode(entry, node);
+        }
+    }
 
 
 
@@ -570,6 +688,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public String getNodeType() {
+        if(parent!=null) {
+            return parent.getNodeType();
+        }
         return NODETYPE_ENTRY;
     }
 
@@ -582,6 +703,11 @@ public class TypeHandler extends RepositoryManager {
         return type;
     }
 
+
+    public void setType(String value) {
+        this.type = value;
+    }
+
     /**
      * _more_
      *
@@ -590,7 +716,11 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean isType(String type) {
-        return this.type.equals(type);
+        if(this.type.equals(type)) return true;
+        if(parent!=null) {
+            return parent.isType(type);
+        }
+        return false;
     }
 
 
@@ -603,9 +733,29 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public final Entry getEntry(ResultSet results) throws Exception {
-        return getEntry(results, false);
+    public final Entry createEntryFromDatabase(ResultSet results) throws Exception {
+        return createEntryFromDatabase(results, false);
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeEntryFromForm(Request request, Entry entry, Group parent,
+                                boolean newEntry)
+            throws Exception {
+        if(this.parent!=null) {
+            this.parent.initializeEntryFromForm(request, entry, parent, newEntry);
+        }
+    }
+
+
 
 
     /**
@@ -618,8 +768,11 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(ResultSet results, boolean abbreviated)
-            throws Exception {
+    public final Entry createEntryFromDatabase(ResultSet results, boolean abbreviated)
+        throws Exception {
+        if(parent!=null) {
+        }
+
         //id,type,name,desc,group, user,file,createdata,fromdate,todate
         int    col   = 3;
         String id    = results.getString(1);
@@ -646,7 +799,18 @@ public class TypeHandler extends RepositoryManager {
         entry.setWest(results.getDouble(col++));
         entry.setAltitudeTop(results.getDouble(col++));
         entry.setAltitudeBottom(results.getDouble(col++));
+
+        if(!abbreviated) {
+            initializeEntryFromDatabase(entry);
+        }
         return entry;
+    }
+
+    public void initializeEntryFromDatabase(Entry entry)
+        throws Exception {
+        if(parent!=null) {
+            parent.initializeEntryFromDatabase(entry);
+        }
     }
 
 
@@ -673,7 +837,7 @@ public class TypeHandler extends RepositoryManager {
                 }
             }
         }
-        System.err.println("Added:" + metadataList);
+        //        System.err.println("Added:" + metadataList);
     }
 
 
@@ -731,6 +895,9 @@ public class TypeHandler extends RepositoryManager {
                                         boolean showDescription,
                                         boolean showResource)
             throws Exception {
+        if(parent!=null) {
+            //            return parent.getEntryContent(entry, request, showDescription, showResource);
+        }
 
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
@@ -820,6 +987,11 @@ public class TypeHandler extends RepositoryManager {
      */
     public void getEntryLinks(Request request, Entry entry, List<Link> links)
             throws Exception {
+        if(parent!=null) {
+            parent.getEntryLinks(request, entry, links);
+            return;
+        }
+
 
         boolean isGroup = entry.isGroup();
         boolean canDoNew = isGroup
@@ -1000,6 +1172,11 @@ public class TypeHandler extends RepositoryManager {
      */
     public boolean canDownload(Request request, Entry entry)
             throws Exception {
+        if(parent!=null) {
+            return parent.canDownload(request, entry); 
+        }
+
+
         if ( !entry.isFile()) {
             return false;
         }
@@ -1081,6 +1258,11 @@ public class TypeHandler extends RepositoryManager {
                                              boolean showResource,
                                              boolean linkToDownload)
             throws Exception {
+
+        if(parent!=null) {
+            return parent.getInnerEntryContent(entry, request, output, showDescription,
+                                               showResource, linkToDownload);
+        }
 
         boolean showImage = false;
         if (showResource && entry.getResource().isImage()) {
@@ -1307,7 +1489,11 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Entry entry) throws Exception {}
+    public void initializeNewEntry(Entry entry) throws Exception {
+        if(parent!=null){ 
+            parent.initializeNewEntry(entry);
+        }
+    }
 
     /**
      * _more_
@@ -1318,7 +1504,11 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void intializeCopiedEntry(Entry newEntry, Entry oldEntry)
-            throws Exception {}
+            throws Exception {
+        if(parent!=null) {
+            parent.intializeCopiedEntry(newEntry, oldEntry);
+        }
+    }
 
 
     /**
@@ -1416,38 +1606,44 @@ public class TypeHandler extends RepositoryManager {
         String whatString  = cleanQueryString(what);
         String extraString = cleanQueryString(extra);
 
-        String[] tableNames = { Tables.ENTRIES.NAME, getTableName(),
-                                Tables.METADATA.NAME, Tables.USERS.NAME,
-                                Tables.ASSOCIATIONS.NAME };
-        //        String[] tableNames = { Tables.ENTRIES.NAME, getTableName(), Tables.METADATA.NAME,
-        //                                Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME };
+        List<String> myTableNames = new ArrayList<String>();
+        getTableNames(myTableNames);
+
+        List<String> tableNames = (List<String>)Misc.toList(new String[]{ 
+                Tables.ENTRIES.NAME, 
+                Tables.METADATA.NAME, 
+                Tables.USERS.NAME,
+                Tables.ASSOCIATIONS.NAME });
+        tableNames.addAll(myTableNames);
+        HashSet seenTables = new HashSet();
+
         List    tables     = new ArrayList();
         boolean didEntries = false;
-        boolean didOther   = false;
         boolean didMeta    = false;
 
-        for (int i = 0; i < tableNames.length; i++) {
-            String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
-            //            System.out.println("pattern:" + pattern);
-            if (Clause.isColumnFromTable(clauses, tableNames[i])
+        int cnt =0;
+        for (String tableName: tableNames) {
+            String pattern = ".*[, =\\(]+" + tableName + "\\..*";
+            if (Clause.isColumnFromTable(clauses, tableName)
                     || whatString.matches(pattern)
                     || (extraString.matches(pattern))) {
-                //                System.out.println("    ***** match");
-                tables.add(tableNames[i]);
-                if (i == 0) {
+                tables.add(tableName);
+                if (tableName.equals(Tables.ENTRIES.NAME)) {
                     didEntries = true;
-                } else if (i == 1) {
-                    didOther = true;
-                } else if (i == 2) {
+                } else if (tableName.equals(Tables.METADATA.NAME)) {
                     didMeta = true;
+                } else if (myTableNames.contains(tableName)) {
+                    seenTables.add(tableName);
                 }
             }
+            cnt++;
         }
 
         if (didMeta) {
             tables.add(Tables.METADATA.NAME);
             didEntries = true;
         }
+
 
         int metadataCnt = 0;
 
@@ -1460,19 +1656,22 @@ public class TypeHandler extends RepositoryManager {
             tables.add(Tables.METADATA.NAME + " " + subTable);
         }
 
-
         if (didEntries) {
-            List typeList = request.get(ARG_TYPE, new ArrayList());
+            List<String> typeList = (List<String>) request.get(ARG_TYPE, new ArrayList());
             typeList.remove(TYPE_ANY);
             if (typeList.size() > 0) {
+                List<String> types = new ArrayList<String>();
+                for(String type: typeList) {
+                    TypeHandler typeHandler = getRepository().getTypeHandler(type,false,false);
+                    if(typeHandler == null) continue;
+                    typeHandler.getChildTypes(types);
+                }
                 String typeString;
                 if (request.get(ARG_TYPE_EXCLUDE, false)) {
-                    typeString = "!" + StringUtil.join(",!", typeList);
+                    typeString = "!" + StringUtil.join(",!", types);
                 } else {
-                    typeString = StringUtil.join(",", typeList);
+                    typeString = StringUtil.join(",", types);
                 }
-
-
                 if ( !Clause.isColumn(clauses, Tables.ENTRIES.COL_TYPE)) {
                     addOrClause(Tables.ENTRIES.COL_TYPE, typeString, clauses);
                 }
@@ -1484,14 +1683,17 @@ public class TypeHandler extends RepositoryManager {
             Clause clause = Clause.or(clauses);
             clauses = new ArrayList<Clause>();
             clauses.add(clause);
-            System.err.println("clauses:" + clauses);
         }
 
         //The join
-        if (didEntries && didOther
-                && !Tables.ENTRIES.NAME.equalsIgnoreCase(getTableName())) {
-            clauses.add(0, Clause.join(Tables.ENTRIES.COL_ID,
-                                       getTableName() + ".id"));
+        if (didEntries) { 
+            for(String otherTableName: myTableNames) {
+                if(seenTables.contains(otherTableName) &&
+                   !Tables.ENTRIES.NAME.equalsIgnoreCase(otherTableName)) {
+                    clauses.add(0, Clause.join(Tables.ENTRIES.COL_ID,
+                                               otherTableName + ".id"));
+                }
+            }
         }
 
 
@@ -1513,6 +1715,23 @@ public class TypeHandler extends RepositoryManager {
      */
     public void addToEntryForm(Request request, StringBuffer sb, Entry entry)
             throws Exception {
+        addBasicToEntryForm(request, sb, entry);
+        addSpecialToEntryForm(request, sb, entry);
+    }
+
+
+    public void addSpecialToEntryForm(Request request, StringBuffer sb, Entry entry)
+            throws Exception {
+        if(parent!=null) {
+            parent.addSpecialToEntryForm(request, sb, entry);
+            return;
+        }
+    }
+
+
+    public void addBasicToEntryForm(Request request, StringBuffer sb, Entry entry)
+            throws Exception {
+
 
         String size = HtmlUtil.SIZE_70;
 
@@ -1580,6 +1799,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
         boolean showFile      = okToShowInForm(ARG_FILE);
+        //        System.err.println(type +" show file:" + showFile +" Props:" + properties);
         boolean showLocalFile = showFile && request.getUser().getAdmin();
         boolean showUrl       = (forUpload
                                  ? false
@@ -1646,13 +1866,15 @@ public class TypeHandler extends RepositoryManager {
                 if (forUpload) {
                     extra = "";
                 }
-
+                if(!okToShowInForm("resource.extra")) {
+                    extra = "";
+                }
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
                                 "tab_content",
                                 "tab_contents_noborder") + extra));
-                } else {
+                } else if (tabTitles.size() == 1) {
                     sb.append(HtmlUtil.formEntry(tabTitles.get(0) + ":",
                             tabContent.get(0) + extra));
                 }
@@ -1751,12 +1973,26 @@ public class TypeHandler extends RepositoryManager {
 
         }
 
-
-        if (okToShowInForm(ARG_AREA)) {
+        if (okToShowInForm(ARG_LOCATION,false)) {
+            String lat = "";
+            String lon = "";
+            if(entry!=null) {
+                if(entry.hasNorth()) 
+                    lat = "" + entry.getNorth();
+                if(entry.hasWest()) 
+                    lon = "" + entry.getWest();
+            }
+            String locationWidget = msgLabel("Latitude") +" " +
+                HtmlUtil.input(ARG_LOCATION_LATITUDE, lat,HtmlUtil.SIZE_6) +
+                "  " +
+                msgLabel("Longitude") +" " +
+                HtmlUtil.input(ARG_LOCATION_LONGITUDE, lon,HtmlUtil.SIZE_6);
+            sb.append(HtmlUtil.formEntry("Location:", locationWidget));
+        } else     if (okToShowInForm(ARG_AREA)) {
             StringBuffer mapSB = new StringBuffer();
             MapOutputHandler mapOutputHandler =
                 (MapOutputHandler) getRepository().getOutputHandler(
-                    MapOutputHandler.OUTPUT_MAP.getId());
+                                                                    MapOutputHandler.OUTPUT_MAP.getId());
             if (mapOutputHandler != null) {
                 List<Entry> entries = new ArrayList<Entry>();
                 if (entry != null) {
@@ -1777,7 +2013,7 @@ public class TypeHandler extends RepositoryManager {
 
             sb.append(HtmlUtil.formEntry("Location:", mapSelector));
 
-        }
+        } 
 
 
         
@@ -1901,6 +2137,10 @@ public class TypeHandler extends RepositoryManager {
     public void addToSearchForm(Request request, StringBuffer formBuffer,
                                 List<Clause> where, boolean advancedForm)
             throws Exception {
+        if(parent!=null) {
+            parent.addToSearchForm(request, formBuffer, where, advancedForm);
+            return;
+        }
 
         List dateSelect = new ArrayList();
         dateSelect.add(new TwoFacedObject(msg("---"), "none"));
@@ -2150,7 +2390,7 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().getMapManager().makeMapSelector(request,
                     ARG_AREA, true, "", radio);
 
-            basicSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Area"),
                     mapSelector));
             basicSB.append("\n");
         }
@@ -2237,8 +2477,11 @@ public class TypeHandler extends RepositoryManager {
                                             StringBuffer searchCriteria)
             throws Exception {
 
-        List<Clause> where    = new ArrayList<Clause>();
+        if(parent!=null) {
+            return parent.assembleWhereClause(request, searchCriteria);
+        }
 
+        List<Clause> where    = new ArrayList<Clause>();
         List         typeList = request.get(ARG_TYPE, new ArrayList());
         typeList.remove(TYPE_ANY);
         if (typeList.size() > 0) {
@@ -2788,34 +3031,44 @@ public class TypeHandler extends RepositoryManager {
      * @param isNew _more_
      * @return _more_
      */
-    public String getInsertSql(boolean isNew) {
-        return null;
+    public void getInsertSql(boolean isNew, List<TypeInsertInfo> typeInserts) {
+        if(parent!=null) {
+            parent.getInsertSql(isNew, typeInserts);
+        }
     }
 
     /**
      * _more_
      *
-     * @param requess _more_
+     * @param request _more_
      * @param statement _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-    public void deleteEntry(Request requess, Statement statement, Entry entry)
-            throws Exception {}
+    public void deleteEntry(Request request, Statement statement, Entry entry)
+            throws Exception {
+        if(parent!=null) {
+            parent.deleteEntry(request, statement, entry);
+        }
+    }
 
 
     /**
      * _more_
      *
-     * @param requess _more_
+     * @param request _more_
      * @param statement _more_
      * @param id _more_
      *
      * @throws Exception _more_
      */
-    public void deleteEntry(Request requess, Statement statement, String id)
-            throws Exception {}
+    public void deleteEntry(Request request, Statement statement, String id)
+            throws Exception {
+        if(parent!=null) {
+            parent.deleteEntry(request, statement, id);
+        }
+    }
 
     /**
      * _more_
@@ -2837,7 +3090,12 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     protected List getTablesForQuery(Request request, List initTables) {
-        initTables.add(Tables.ENTRIES.NAME);
+        if(parent!=null) {
+            parent.getTablesForQuery(request, initTables);
+        }
+        if(!initTables.contains(Tables.ENTRIES.NAME)) {
+            initTables.add(Tables.ENTRIES.NAME);
+        }
         return initTables;
     }
 
@@ -2852,6 +3110,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public Object convert(String columnName, String value) {
+        if(parent!=null) {
+            return parent.convert(columnName, value);
+        }
         return value;
     }
 
@@ -2863,6 +3124,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public Object[] makeValues(Hashtable map) {
+        if(parent!=null) {
+            return parent.makeValues(map);
+        }
         return null;
     }
 
@@ -2872,6 +3136,9 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public String[] getValueNames() {
+        if(parent!=null) {
+            return parent.getValueNames();
+        }
         return null;
     }
 
@@ -3115,7 +3382,20 @@ public class TypeHandler extends RepositoryManager {
      *  @return The Category
      */
     public String getCategory() {
+        if(Misc.equals(this.category, CATEGORY_DEFAULT) && parent!=null) {
+            return parent.getCategory();
+        }
         return this.category;
+    }
+
+
+    /**
+       Get the ForUser property.
+
+       @return The ForUser
+    **/
+    public boolean getForUser () {
+	return forUser;
     }
 
 

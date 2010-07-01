@@ -22,6 +22,7 @@
    </type>
 
 
+
   <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.type.LocalFileTypeHandler">
      <property name="icon" value="/icons/folder_page.png"/>
      <property name="form.show.resource" value="false"/>

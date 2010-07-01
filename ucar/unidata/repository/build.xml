@@ -100,12 +100,8 @@
     </target>
 
 
-<!--
-     <target name="idvplugin" depends="init,clean">
--->
-     <target name="idvplugin" depends="init">
+    <target name="idvplugin" depends="init,clean">
         <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
-<!--
         <javac
             verbose="false"
             classpath="${pluginclasspath}"
@@ -123,15 +119,12 @@
         <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
         <include name="ucar/unidata/repository/client/InteractiveRepositoryClient.java"/>
         </javac>
--->
         <jar 
             basedir="${compiledir}"
             update="false"
             compress="true"
             jarfile="${jars_dest}/ramaddaplugin.jar">
-<!--
             <include name="ucar/unidata/repository/**/*.class"/> 
--->
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
             <include name="ucar/unidata/repository/idv/publishers.xml"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>

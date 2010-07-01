@@ -283,8 +283,7 @@ public class WebHarvester extends Harvester {
 
 
         int cnt = 1;
-        String templateHelp =
-            "Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
+
         StringBuffer entrySB;
         for (HarvesterEntry urlEntry : urlEntries) {
             entrySB = new StringBuffer();
@@ -301,50 +300,7 @@ public class WebHarvester extends Harvester {
 
             entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
                     urlInput));
-            entrySB.append(
-                RepositoryManager.tableSubHeader(
-                    "Then create an entry with"));
-
-
-
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Name"),
-                    HtmlUtil.input(ATTR_NAME + cnt, urlEntry.name,
-                                   HtmlUtil.SIZE_80
-                                   + HtmlUtil.title(templateHelp))));
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Description"),
-                    HtmlUtil.input(ATTR_DESCRIPTION + cnt,
-                                   urlEntry.description,
-                                   HtmlUtil.SIZE_80
-                                   + HtmlUtil.title(templateHelp))));
-
-            String baseGroupFieldId = ATTR_BASEGROUP + cnt;
-            Group  baseGroup        = ((urlEntry.baseGroupId.length() == 0)
-                                       ? null
-                                       : getEntryManager().findGroup(request,
-                                           urlEntry.baseGroupId));
-            String baseSelect = OutputHandler.getGroupSelect(request,
-                                    baseGroupFieldId);
-            entrySB.append(HtmlUtil.hidden(baseGroupFieldId + "_hidden",
-                                           urlEntry.baseGroupId,
-                                           HtmlUtil.id(baseGroupFieldId
-                                               + "_hidden")));
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Base Folder"),
-                    HtmlUtil.disabledInput(baseGroupFieldId,
-                                           ((baseGroup != null)
-                                            ? baseGroup.getFullName()
-                                            : ""), HtmlUtil
-                                            .id(baseGroupFieldId) + HtmlUtil
-                                            .SIZE_60) + baseSelect));
-
-
-            String fieldId = ATTR_GROUP + cnt;
-            entrySB.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Sub-Folder Template"),
-                    HtmlUtil.input(
-                        fieldId, urlEntry.group,
-                        HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId)
-                        + HtmlUtil.title(templateHelp))));
+            addEntryToForm(request, entrySB, urlEntry,cnt);
             entrySB.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
                     entrySB.toString(), true));
@@ -392,6 +348,67 @@ public class WebHarvester extends Harvester {
         formSB.append(HtmlUtil.formTable());
 
     }
+
+
+    public static final String templateHelp =
+        "Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
+
+
+    protected void addEntryToForm(Request request, StringBuffer  entrySB, HarvesterEntry urlEntry, int cnt) throws Exception {
+        entrySB.append(
+                       RepositoryManager.tableSubHeader(
+                                                        "Then create an entry with"));
+
+
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Name"),
+                                          HtmlUtil.input(ATTR_NAME + cnt, urlEntry.name,
+                                                         HtmlUtil.SIZE_80
+                                                         + HtmlUtil.title(templateHelp))));
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Description"),
+                                          HtmlUtil.input(ATTR_DESCRIPTION + cnt,
+                                                         urlEntry.description,
+                                                         HtmlUtil.SIZE_80
+                                                         + HtmlUtil.title(templateHelp))));
+
+        addBaseFolderToForm(request, entrySB, urlEntry, cnt);
+
+        String fieldId = ATTR_GROUP + cnt;
+        entrySB.append(
+                       HtmlUtil.formEntry(
+                                          msgLabel("Sub-Folder Template"),
+                                          HtmlUtil.input(
+                                                         fieldId, urlEntry.group,
+                                                         HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId)
+                                                         + HtmlUtil.title(templateHelp))));
+
+    }
+
+
+    protected void addBaseFolderToForm(Request request, StringBuffer  entrySB, HarvesterEntry urlEntry, int cnt) throws Exception {
+        String baseGroupFieldId = ATTR_BASEGROUP + cnt;
+        Group  baseGroup        = ((urlEntry.baseGroupId.length() == 0)
+                                   ? null
+                                   : getEntryManager().findGroup(request,
+                                                                 urlEntry.baseGroupId));
+        String baseSelect = OutputHandler.getGroupSelect(request,
+                                                         baseGroupFieldId);
+        entrySB.append(HtmlUtil.hidden(baseGroupFieldId + "_hidden",
+                                       urlEntry.baseGroupId,
+                                       HtmlUtil.id(baseGroupFieldId
+                                                   + "_hidden")));
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Base Folder"),
+                                          HtmlUtil.disabledInput(baseGroupFieldId,
+                                                                 ((baseGroup != null)
+                                                                  ? baseGroup.getFullName()
+                                                                  : ""), HtmlUtil
+                                                                 .id(baseGroupFieldId) + HtmlUtil
+                                                                 .SIZE_60) + baseSelect));
+
+
+    }
+
+
+
 
 
 

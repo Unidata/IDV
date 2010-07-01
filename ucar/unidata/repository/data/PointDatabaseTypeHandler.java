@@ -396,7 +396,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                Entry entry = this.getEntry(results, false);
+                Entry entry = this.createEntryFromDatabase(results, false);
 
                 List<Metadata> metadataList =
                     getMetadataManager().findMetadata(entry,

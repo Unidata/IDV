@@ -475,7 +475,7 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    private String toString(Object[] values, int idx) {
+    public String toString(Object[] values, int idx) {
         if (values == null) {
             return ((dflt != null)
                     ? dflt
@@ -1419,7 +1419,9 @@ public class Column implements Constants {
         if ( !addToForm) {
             return;
         }
+
         String id = getFullName();
+
         if (isType(TYPE_LATLON)) {
             if (request.exists(id + "_lat")) {
                 values[offset] = new Double(request.getString(id + "_lat",

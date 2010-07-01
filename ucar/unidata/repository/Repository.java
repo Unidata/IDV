@@ -4113,7 +4113,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             Element  info = getServerInfo().toXml(this, doc);
             info.setAttribute(ATTR_CODE, CODE_OK);
             String xml = XmlUtil.toString(info);
-            System.err.println("returning xml:" + xml);
+            //            System.err.println("returning xml:" + xml);
             return new Result(xml, MIME_XML);
         }
         StringBuffer sb = new StringBuffer("");

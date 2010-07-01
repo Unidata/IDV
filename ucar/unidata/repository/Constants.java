@@ -351,6 +351,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_DB_DESCRIPTION = "description";
 
+    public static final String ATTR_FORUSER = "foruser";
+
     /** _more_ */
     public static final String ATTR_DB_NAME = "name";
 
@@ -396,6 +398,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_PARENT = "parent";
 
+    public static final String ATTR_SUPER = "super";
+
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
 
@@ -437,6 +441,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+
     /** _more_ */
     public static final String ATTR_ISGROUP = "isgroup";
 
@@ -446,9 +451,9 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_WEST = "west";
 
-    public static final String ATTR_ALTITUDE = "altiude";
-    public static final String ATTR_ALTITUDE_TOP = "altiudetop";
-    public static final String ATTR_ALTITUDE_BOTTOM = "altiudebottom";
+    public static final String ATTR_ALTITUDE = "altitude";
+    public static final String ATTR_ALTITUDE_TOP = "altitudetop";
+    public static final String ATTR_ALTITUDE_BOTTOM = "altitudebottom";
 
 
     /** _more_ */
@@ -510,6 +515,10 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_AREA = "area";
+
+    public static final String ARG_LOCATION = "location";
+    public static final String ARG_LOCATION_LATITUDE = "location.latitude";
+    public static final String ARG_LOCATION_LONGITUDE = "location.longitude";
 
     public static final String ARG_BBOX = "bbox";
 

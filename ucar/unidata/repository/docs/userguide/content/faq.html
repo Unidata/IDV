@@ -32,48 +32,6 @@ See <a href="installing.html#ssljetty">here</a> if you are running stand-alone.
 </faqitem>
 
 
-<faqitem q="When I am using the command line client to publish to RAMADDA I get a error about SSL certificates" id="ssl">
-The repository client needs to be able to tell Java that its OK to use self-signed certificates from that server. 
-From <a href="http://paulszulc.wordpress.com/2009/08/05/headache-pill-unable-to-find-valid-certification-path-to-requested-target/"> this reference</a> you can take the following steps:
-<ul>
-<li>  Find the servers .cer file. This is most easily done by hitting the server with your browser and then exporting the cer file from your browser to your machine. On firefox go to:<pre>
-Tools -&gt; Options -&gt; Advanced -&gt; Cryptography -&gt; List certificates -&gt; Export
-</pre>
-Or under Preferences:
-<pre>
-Advanced -&gt; Encryption -&gt; View Certificates
-</pre>
-Save it as "cert.cer"
-
-<li> Generate a keystore:<pre>
-Keystore can be generated using tool called “keytool”, that is included with every JDK. In command line type:
-keytool -import -trustcacerts -keystore cacerts -storepass somepassword -noprompt -file cert.cer
-where:
--file points to .cer file you generated a moment ago (here “cert.cer”)
--keystore is name of the generated keystore file, any name will suffice (here “cacerts”)
--storepass is password for the keystore (here “somepassword”)
-</pre>
-
-<li> Configure the client to use the "cacerts" file: <ul>
-
-<li> From the Java command line you can specify system properties:
-<pre>
-java -Djavax.net.ssl.trustStore=/path/to/your/cacerts/file -Djavax.net.ssl.trustStorePassword=somepassword ...
-</pre>
-Or by default the client will look in:<pre>
-&lt;home&gt;/.unidata/repository/cacerts
-&lt;current working directory&gt;/cacerts
-&lt;home&gt;/cacerts
-</pre>
-and will set the password to (literally) "somepassword" if its not set with the -D option.
-</ul>
-
-</ul>
-
-</faqitem>
-
-
-
 
 <faqitem cat="Administration" id="allowedlogin" q="I want to restrict where users can login from" >
 For security reasons you can configure what IP addresses users are allowed to login from.
