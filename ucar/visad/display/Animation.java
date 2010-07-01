@@ -744,6 +744,18 @@ public class Animation extends Displayable {
             int index = animationSet.doubleToIndex(new double[][] {
                 { newTime.getValue(animationSet.getSetUnits()[0]) }
             })[0];
+            // if animation value is not in the time set, set it to one end or the other
+            if (index == -1) {
+                double[] aniValues = animationSet.getDoubles(false)[0];
+                double anitime =
+                    newTime.getValue(animationSet.getSetUnits()[0]);
+                int lastIndex = aniValues.length - 1;
+                if (anitime >= aniValues[lastIndex]) {
+                    index = lastIndex;
+                } else {
+                    index = 0;
+                }
+            }
             if (index != getCurrent()) {
                 setCurrent(index, false);
             }
