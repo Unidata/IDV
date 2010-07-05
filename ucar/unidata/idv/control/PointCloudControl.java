@@ -714,7 +714,17 @@ public class PointCloudControl extends DrawingControl {
             colorRangeIndex = pts.length - 1;
         }
 
-        hasRGB = (pts.length ==6);
+        if(pts.length ==6) {
+            boolean hasRed  =false, hasGreen  =false,hasBlue  =false;
+            for (int i = 0; i < rangeTypes.length; i++) {
+                String typeName = rangeTypes[i].toString().toLowerCase();
+                if (typeName.indexOf("red")>=0) hasRed = true; 
+                else if (typeName.indexOf("green")>=0) hasGreen = true; 
+                else if (typeName.indexOf("blue")>=0) hasBlue = true; 
+            }
+            hasRGB = hasRed && hasGreen && hasBlue;
+        }
+
         if(hasRGB) {
             colorRangeIndex = altIndex;
         }
