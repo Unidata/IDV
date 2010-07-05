@@ -23,13 +23,6 @@
 package ucar.unidata.util;
 
 
-import org.apache.http.auth.AuthScheme;
-import org.apache.http.auth.AuthScope;
-
-
-
-
-/*
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScheme;
@@ -37,15 +30,16 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.httpclient.auth.RFC2617Scheme;
-*/
 
+/*
+import org.apache.http.auth.AuthScheme;
+import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.InvalidCredentialsException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-
 import org.apache.http.impl.auth.RFC2617Scheme;
-
+*/
 
 
 import ucar.unidata.util.GuiUtils;
@@ -200,14 +194,15 @@ public class AccountManager implements CredentialsProvider,
      * @return Null if the user presses cancel. Else return the credentials
      *
      */
-    public Credentials getCredentialsooo(AuthScope authscope) {
+    //jeffmc:    public Credentials getCredentials(AuthScope authscope, String s,int x, boolean y) {
+    public Credentials getCredentials(AuthScheme authscope, String s,int x, boolean y) {
         if (authscope == null) {
             throw new IllegalArgumentException(
                 "Authentication scope may not be null");
         }
 
         if (currentCredentials == null) {
-            setCredentials(authscope, null);
+            //jeffmc: skip for now            setCredentials(authscope, null);
         }
 
         return currentCredentials;
@@ -220,7 +215,7 @@ public class AccountManager implements CredentialsProvider,
      *
      * @return _more_
      */
-    public Credentials getCredentials(AuthScope scope) {
+    public Credentials getCredentialsnew(AuthScope scope) {
         //String host,                                   int port, boolean proxy
         String host  = scope.getHost();
         int    port  = scope.getPort();
