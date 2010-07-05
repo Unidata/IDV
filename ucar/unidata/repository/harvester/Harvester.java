@@ -1103,6 +1103,98 @@ public abstract class Harvester extends RepositoryManager {
         }
 
 
+        
+        /**
+           Set the Url property.
+
+           @param value The new value for Url
+        **/
+        public void setUrl (String value) {
+            url = value;
+        }
+
+        /**
+           Get the Url property.
+
+           @return The Url
+        **/
+        public String getUrl () {
+            return url;
+        }
+
+        /**
+           Set the Name property.
+
+           @param value The new value for Name
+        **/
+        public void setName (String value) {
+            name = value;
+        }
+
+        /**
+           Get the Name property.
+
+           @return The Name
+        **/
+        public String getName () {
+            return name;
+        }
+
+        /**
+           Set the Description property.
+
+           @param value The new value for Description
+        **/
+        public void setDescription (String value) {
+            description = value;
+        }
+
+        /**
+           Get the Description property.
+
+           @return The Description
+        **/
+        public String getDescription () {
+            return description;
+        }
+
+        /**
+           Set the BaseGroupId property.
+
+           @param value The new value for BaseGroupId
+        **/
+        public void setBaseGroupId (String value) {
+            baseGroupId = value;
+        }
+
+        /**
+           Get the BaseGroupId property.
+
+           @return The BaseGroupId
+        **/
+        public String getBaseGroupId () {
+            return baseGroupId;
+        }
+
+        /**
+           Set the Group property.
+
+           @param value The new value for Group
+        **/
+        public void setGroup (String value) {
+            group = value;
+        }
+
+        /**
+           Get the Group property.
+
+           @return The Group
+        **/
+        public String getGroup () {
+            return group;
+        }
+
+
     }
 
     /**

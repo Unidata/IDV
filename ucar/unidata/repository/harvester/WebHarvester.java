@@ -458,10 +458,6 @@ public class WebHarvester extends Harvester {
         }
 
         while (canContinueRunning(timestamp)) {
-            doPause();
-            if ( !canContinueRunning(timestamp)) {
-                return;
-            }
             long t1 = System.currentTimeMillis();
             collectEntries((cnt == 0));
             long t2 = System.currentTimeMillis();
@@ -472,6 +468,10 @@ public class WebHarvester extends Harvester {
             }
 
             status = new StringBuffer();
+            doPause();
+            if ( !canContinueRunning(timestamp)) {
+                return;
+            }
         }
     }
 
@@ -492,28 +492,35 @@ public class WebHarvester extends Harvester {
             if ( !getActive()) {
                 return;
             }
-            Group baseGroup = ((urlEntry.baseGroupId.length() == 0)
-                               ? null
-                               : getEntryManager().findGroup(null,
-                                   urlEntry.baseGroupId));
-            Entry entry = processUrl(urlEntry.url, urlEntry.name,
-                                     urlEntry.description, baseGroup,
-                                     urlEntry.group);
-            if (entry != null) {
-                entries.add(entry);
-                if (statusMessages.size() > 100) {
-                    statusMessages = new ArrayList<String>();
-                }
-                String crumbs = getEntryManager().getBreadCrumbs(null, entry,
-                                    true)[1];
-                crumbs = crumbs.replace("class=", "xclass=");
-                statusMessages.add(crumbs);
-                entryCnt++;
-            }
+            processEntry(urlEntry,entries);
         }
-
         newEntryCnt += entries.size();
-        getEntryManager().insertEntries(entries, true, true);
+        if(entries.size()>0) {
+            getEntryManager().insertEntries(entries, true, true);
+        }
+    }
+
+
+    protected void processEntry(HarvesterEntry urlEntry, List<Entry> entries) throws Exception {
+
+        Group baseGroup = ((urlEntry.baseGroupId.length() == 0)
+                           ? null
+                           : getEntryManager().findGroup(null,
+                                                         urlEntry.baseGroupId));
+        Entry entry = processUrl(urlEntry.url, urlEntry.name,
+                                 urlEntry.description, baseGroup,
+                                 urlEntry.group);
+        if (entry != null) {
+            entries.add(entry);
+            if (statusMessages.size() > 100) {
+                statusMessages = new ArrayList<String>();
+            }
+            String crumbs = getEntryManager().getBreadCrumbs(null, entry,
+                                                             true)[1];
+            crumbs = crumbs.replace("class=", "xclass=");
+            statusMessages.add(crumbs);
+            entryCnt++;
+        }
     }
 
 

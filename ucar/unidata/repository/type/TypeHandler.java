@@ -2689,9 +2689,6 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-
-
-
         if (dateClauses.size() > 1) {
             where.add(Clause.and(dateClauses));
         } else if (dateClauses.size() == 1) {

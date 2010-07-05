@@ -377,8 +377,6 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     }
                 }
             }
-
-
         } finally {
             if ((repositoryResult != null)
                     && (repositoryResult.getInputStream() != null)) {

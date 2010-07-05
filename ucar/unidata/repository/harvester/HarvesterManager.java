@@ -193,14 +193,16 @@ public class HarvesterManager extends RepositoryManager {
 
                 try {
                     c = Misc.findClass(className);
-                } catch (ClassNotFoundException cnfe) {
+                } catch (ClassNotFoundException cnfe1) {
                     className = className.replace("repository.",
                             "repository.harvester.");
-                    c = Misc.findClass(className);
+                    try {
+                        c = Misc.findClass(className);
+                    }  catch (ClassNotFoundException cnfe2) {
+                        getRepository().getLogManager().logError("HarvesterManager: Could not load harvester class: " + className);
+                        continue;
+                    }
                 }
-
-
-
                 Constructor ctor = Misc.findConstructor(c,
                                        new Class[] { Repository.class,
                         String.class });
