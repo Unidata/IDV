@@ -87,7 +87,7 @@
   </derived>
   <derived
      description="Simple difference a-b"
-     formula="a - b"
+     formula="sub(a,b)"
      id="simpleDifference"
      isdefault="false"
      isenduser="true">
