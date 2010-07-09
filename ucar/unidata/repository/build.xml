@@ -163,7 +163,6 @@
         <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
         </javac>
         <jar 
-            basedir="${compiledir}"
             update="false"
             compress="true"
             jarfile="${jars_dest}/usersworkshop.jar">

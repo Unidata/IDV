@@ -2881,8 +2881,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void decorateResult(Request request, Result result)
-            throws Exception {
+    public void decorateResult(Request request, Result result)
+        throws Exception {
 
         String   template     = null;
         Metadata metadata     = null;
@@ -3047,9 +3047,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         };
 
 
-
-
-
         for (int i = 0; i < macros.length; i += 2) {
             html = html.replace("${" + macros[i] + "}", macros[i + 1]);
         }
@@ -3060,8 +3057,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             html = StringUtil.replace(html, "${sublinks}", BLANK);
         }
         html = translate(request, html);
-
-
         result.setContent(html.getBytes());
 
     }

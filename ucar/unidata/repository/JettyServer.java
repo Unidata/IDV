@@ -91,13 +91,6 @@ public class JettyServer extends RepositoryServlet implements Constants {
         RepositoryServlet repositoryServlet = new RepositoryServlet(this,
                                                   args, port);
 
-
-
-
-
-
-
-
         Server                   server   = new Server(port);
         Repository repository             = repositoryServlet.getRepository();
         HandlerCollection        handlers = new HandlerCollection();
