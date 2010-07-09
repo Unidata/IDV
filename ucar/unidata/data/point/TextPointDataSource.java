@@ -856,6 +856,10 @@ public class TextPointDataSource extends PointDataSource {
                 if (line == null) {
                     break;
                 }
+                if (getDelimiter().equals(" ")) {
+                	line = line.replaceAll("\\s++", " ");
+                	line = line.trim();
+                }
                 List toks = StringUtil.split(line, getDelimiter(), false,
                                              false);
                 lines.add(line);
