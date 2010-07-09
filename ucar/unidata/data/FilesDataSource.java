@@ -398,6 +398,7 @@ public abstract class FilesDataSource extends DataSourceImpl {
      * @param files Files to use
      */
     public void setNewFiles(List files) {
+    	setTmpPaths(null);
         sources = new ArrayList();
         for (int i = 0; i < files.size(); i++) {
             sources.add(files.get(i).toString());
