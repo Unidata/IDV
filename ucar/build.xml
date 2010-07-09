@@ -773,4 +773,48 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
         </delete>
     </target>
 
+    <target name="unidatautil" depends="init,clean" >
+        <delete dir="${tmpjardir}"/>
+        <mkdir dir="${tmpjardir}"/>
+        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            target="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            srcdir="${srcdir}"
+            fork="${fork}"
+            memoryMaximumSize="${maxmemory}">
+            <include name="ucar/unidata/util/HtmlUtil.java"/>
+            <include name="ucar/unidata/util/IOUtil.java"/>
+            <include name="ucar/unidata/util/GuiUtils.java"/>
+            <include name="ucar/unidata/util/LogUtil.java"/>
+            <include name="ucar/unidata/xml/*.java"/>
+            <include name="ucar/unidata/sql/*.java"/>
+           </javac>
+
+
+
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/unidatautil.jar">
+            <include name="ucar/**/*.class"/>
+        </jar>
+
+        <jar 
+           update="yes"
+            basedir="${tmpjardir}"
+            compress="true"
+            jarfile="${jars_dest}/unidatautil.jar">
+            <include name="ucar/**/*.class"/>
+        </jar>
+       </target>
+
+
+
+
 </project>
