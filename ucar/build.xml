@@ -794,6 +794,8 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/unidata/util/LogUtil.java"/>
             <include name="ucar/unidata/xml/*.java"/>
             <include name="ucar/unidata/sql/*.java"/>
+            <include name="ucar/unidata/gis/epsg/*.java"/>
+            <include name="ucar/unidata/gis/geotiff/*.java"/>
            </javac>
 
 
@@ -803,10 +805,12 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             compress="true"
             jarfile="${jars_dest}/unidatautil.jar">
             <include name="ucar/**/*.class"/>
+            <include name="ucar/unidata/gis/epsg/csv/*"/>
+            <include name="ucar/unidata/gis/geotiff/tables/*"/>
         </jar>
 
         <jar 
-           update="yes"
+            update="yes"
             basedir="${tmpjardir}"
             compress="true"
             jarfile="${jars_dest}/unidatautil.jar">
