@@ -562,7 +562,30 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
-<!--    -->
+  <control
+     id="planviewcontourasz"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ContourPlanViewControl"
+     doeslevels="true"
+     label="Contours As Topography"
+     code="makeTopographyFromField(D1)"
+     displaycategory="3D Surface"
+     properties="multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    
+  <control
+     id="planviewcontourfilledasz"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ContourPlanViewControl"
+     label="Color-Filled Contour As Topography"
+     code="makeTopographyFromField(D1)"
+     doeslevels="true"
+     displaycategory="3D Surface"
+     properties="colorFill=true;multipleIsTopography=true">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
   <control
      id="radarsweepasz"
      categories="SWEEP-2D-*"
