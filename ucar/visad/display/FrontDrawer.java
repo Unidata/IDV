@@ -1370,9 +1370,14 @@ public class FrontDrawer extends DisplayableData {
 
         // resample curve uniformly along length
         float     increment = rsegment_length / (rprofile_length * zoom);
-        float[][] oldCurve  = resample_curve(curve, increment);
+        float[][] oldCurve  = null;
+        try {
+            oldCurve = resample_curve(curve, increment);
+        } catch (VisADError ve) {  // bad curve
+            return null;
+        }
 
-        int       fw        = filter_window;
+        int fw = filter_window;
         fw = 1;
         FieldImpl front         = null;
 
