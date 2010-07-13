@@ -146,7 +146,7 @@ public class TextPointDataSource extends PointDataSource {
 
     /** variables for altitude */
     private static String[] altVars = { "altitude", "Altitude", "elevation",
-                                        "Elevation" };
+                                        "Elevation", "Depth" };
 
 
     /** variables for index */
@@ -171,6 +171,9 @@ public class TextPointDataSource extends PointDataSource {
 
     /** widget panel */
     JComponent widgetPanel;
+
+    /** delimiter radio buttons */
+    JRadioButton[] delimiterButtons;
 
     /** skip pattern text field */
     private JTextField skipPatternFld;
@@ -199,8 +202,43 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     List lines;
 
+    /** Comma delimiter */
+    public final static String COMMA_DELIM = ",";
+
+    /** Semicolon delimiter */
+    public final static String SEMICOLON_DELIM = ";";
+
+    /** Tab delimiter */
+    public final static String TAB_DELIM = "\t";
+
+    /** Blank delimiter */
+    public final static String BLANK_DELIM = " ";
+
+    /** Comma name */
+    private final static String COMMA_NAME = "Comma";
+
+    /** Semicolon name */
+    private final static String SEMICOLON_NAME = "Semicolon";
+
+    /** Tab name */
+    private final static String TAB_NAME = "Tab";
+
+    /** Blank name */
+    private final static String BLANK_NAME = "Space";
+
+    /** list of delimiters for metadata gui */
+    private final String[] delims = { COMMA_DELIM, SEMICOLON_DELIM, TAB_DELIM,
+                                      BLANK_DELIM };
+
+    /** list of delimiter names for metadata gui */
+    private final String[] delimNames = { COMMA_NAME, SEMICOLON_NAME,
+                                          TAB_NAME, BLANK_NAME };
+
     /** the stream processor */
     private TextAdapter.StreamProcessor streamProcessor;
+
+    /** the delimiter */
+    private String delimiter;
 
 
     /**
@@ -435,9 +473,11 @@ public class TextPointDataSource extends PointDataSource {
         //        System.out.println("URL:"+source);
         String contents = getContents(source, sampleIt);
         //      System.out.println(contents);
-        String delimiter = getDelimiter(source);
-        return makeObs(contents, delimiter, subset, bbox, trackParam,
-                       sampleIt, showAttributeGuiIfNeeded);
+        String delim = (delimiter != null)
+                       ? delimiter
+                       : getDelimiter(source);
+        return makeObs(contents, delim, subset, bbox, trackParam, sampleIt,
+                       showAttributeGuiIfNeeded);
     }
 
 
@@ -453,7 +493,8 @@ public class TextPointDataSource extends PointDataSource {
         if (source.endsWith(".xls")) {
             return ",";
         } else {
-            return TextAdapter.getDelimiter(source);
+            String delim = TextAdapter.getDelimiter(source);
+            return delim;
         }
     }
 
@@ -560,7 +601,8 @@ public class TextPointDataSource extends PointDataSource {
                     Object object =
                         getDataContext().getIdv().decodeObject(blob);
                     if (object instanceof List) {
-                        object = new Metadata(-1, null, (List) object);
+                        object = new Metadata(-1, delimiter, null,
+                                (List) object);
                     }
                     Metadata metadata = (Metadata) object;
                     metaDataFields = metadata.getItems();
@@ -701,11 +743,81 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @return delimiter
      */
-    private String getDelimiter() {
+    public String getDelimiter() {
+        if (delimiter != null) {
+            return delimiter;
+        }
         String delim = TextAdapter.getDelimiter(getFilePath());
         return (delim == null)
                ? ","
                : delim;
+    }
+
+    /**
+     * Get the delimiter used in the text file
+     *
+     * @param delim delimiter
+     */
+    public void setDelimiter(String delim) {
+        delimiter = decodeDelimiter(delim);
+        if (metaDataComp != null) {
+            updateDelimiterButton(delimiter);
+            setLineText(lineLbl, skipRows, lines);
+            applySavedMetaData(new Metadata(skipRows, delimiter, skipPattern,
+                                            metaDataFields));
+        }
+    }
+
+    /**
+     * Update the delimiter button in the gui
+     *
+     * @param delimiter  the delimiter to use
+     */
+    private void updateDelimiterButton(String delimiter) {
+        if (delimiterButtons != null) {
+            for (int i = 0; i < delimiterButtons.length; i++) {
+                JRadioButton btn = delimiterButtons[i];
+                if (btn.getText().equals(getDelimiterName(delimiter))) {
+                    btn.setSelected(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the delimiter name given a delimiter.
+     * @param delim  the delimiter name or a delimiter
+     * @return the delimiter name
+     */
+    private String getDelimiterName(String delim) {
+        if (delim.equals(COMMA_DELIM)) {
+            return COMMA_NAME;
+        } else if (delim.equalsIgnoreCase(SEMICOLON_DELIM)) {
+            return SEMICOLON_NAME;
+        } else if (delim.equalsIgnoreCase(TAB_DELIM)) {
+            return TAB_NAME;
+        } else if (delim.equalsIgnoreCase(BLANK_DELIM)) {
+            return BLANK_NAME;
+        }
+        return delim;
+    }
+
+    /**
+     * Get the delimiter given a name
+     * @param delim  the delimiter or the name of a delimiter
+     * @return the true delimiter
+     */
+    private String decodeDelimiter(String delim) {
+        if (delim.equals(COMMA_NAME)) {
+            return COMMA_DELIM;
+        } else if (delim.equalsIgnoreCase(SEMICOLON_NAME)) {
+            return SEMICOLON_DELIM;
+        } else if (delim.equalsIgnoreCase(TAB_NAME)) {
+            return TAB_DELIM;
+        } else if (delim.equalsIgnoreCase(BLANK_NAME)) {
+            return BLANK_DELIM;
+        }
+        return delim;
     }
 
 
@@ -755,9 +867,11 @@ public class TextPointDataSource extends PointDataSource {
         lbl.setText(sb.toString());
 
 
-        String line  = (String) lines.get(index);
-        List   toks  = StringUtil.split(line, getDelimiter(), false, false);
-        List   comps = new ArrayList();
+        String line = (String) lines.get(index);
+        line = cleanLine(line);
+
+        List toks  = StringUtil.split(line, getDelimiter(), false, false);
+        List comps = new ArrayList();
         /*        comps.add(
                   new GraphPaperLayout.Location(
                                                 new JLabel("Sample Value"), 0, 0));
@@ -802,7 +916,7 @@ public class TextPointDataSource extends PointDataSource {
         }
 
 
-        applySavedMetaData(new Metadata(skipRows, skipPattern,
+        applySavedMetaData(new Metadata(skipRows, delimiter, skipPattern,
                                         metaDataFields));
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
         double[]   stretch = { 0.0, 1.0, 0.5, 0.0, 0.5 };
@@ -814,6 +928,18 @@ public class TextPointDataSource extends PointDataSource {
                                     200, 200);
         widgetSP.setPreferredSize(new Dimension(200, 200));
         widgetPanel.add(BorderLayout.CENTER, widgetSP);
+    }
+
+    /**
+     * Clean up extra stuff (e.g. blanks) in the line
+     * @param line the line to clean
+     * @return  the cleaned line
+     */
+    private String cleanLine(String line) {
+        if (getDelimiter().equals(" ")) {
+            line = line.replaceAll("\\s++", " ").trim();
+        }
+        return line;
     }
 
     /**
@@ -842,6 +968,7 @@ public class TextPointDataSource extends PointDataSource {
      */
     private JComponent getMetaDataComponent(String contents)
             throws IOException {
+
         if (metaDataComp == null) {
             if (contents == null) {
                 contents = IOUtil.readContents(getFilePath(), getClass());
@@ -856,10 +983,7 @@ public class TextPointDataSource extends PointDataSource {
                 if (line == null) {
                     break;
                 }
-                if (getDelimiter().equals(" ")) {
-                	line = line.replaceAll("\\s++", " ");
-                	line = line.trim();
-                }
+                line = cleanLine(line);
                 List toks = StringUtil.split(line, getDelimiter(), false,
                                              false);
                 lines.add(line);
@@ -876,7 +1000,7 @@ public class TextPointDataSource extends PointDataSource {
                 "Use column values as the field names");
             applyNamesBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    applyNames(lines.get(skipRows).toString());
+                    applyNames(cleanLine(lines.get(skipRows).toString()));
                 }
             });
 
@@ -908,18 +1032,23 @@ public class TextPointDataSource extends PointDataSource {
             JComponent buttons = GuiUtils.vbox(prevBtn, nextBtn);
             JComponent skipInner = GuiUtils.leftCenter(GuiUtils.top(buttons),
                                        lineLbl);
+            //skipInner = GuiUtils.topCenter(new JLabel("Start line: "), skipInner);
 
+            delimiterButtons = makeDelimiterButtons();
 
-            skipCntFld     = new JTextField("", 4);
-            skipPatternFld = new JTextField(((skipPattern != null)
-                                             ? skipPattern
-                                             : ""), 20);
+            skipCntFld       = new JTextField("", 4);
+            skipPatternFld   = new JTextField(((skipPattern != null)
+                    ? skipPattern
+                    : ""), 20);
             skipPatternFld.setToolTipText("Pattern to use to skip lines");
-            JComponent topComp = GuiUtils.leftRight(
-                                     new JLabel("Start Line: "),
-                                     GuiUtils.hbox(
-                                         new JLabel("Skip Pattern: "),
-                                         skipPatternFld));
+            JComponent topComp =
+                GuiUtils.vbox(
+                    GuiUtils.hbox(
+                        new JLabel("Delimiter: "),
+                        GuiUtils.flow(delimiterButtons)), GuiUtils.hbox(
+                            new JLabel("Skip Pattern: "),
+                            skipPatternFld), new JLabel("Start line:"));
+            topComp = GuiUtils.leftRight(topComp, GuiUtils.filler());
 
 
             JComponent skipContents = GuiUtils.topCenter(topComp, skipInner);
@@ -944,6 +1073,34 @@ public class TextPointDataSource extends PointDataSource {
         }
         return metaDataComp;
 
+
+    }
+
+    /**
+     * Make the delimiter buttons
+     *
+     * @return the buttons
+     */
+    private JRadioButton[] makeDelimiterButtons() {
+        ButtonGroup    bg      = new ButtonGroup();
+        int            numBtns = delimNames.length;
+        JRadioButton[] btns    = new JRadioButton[numBtns];
+        for (int i = 0; i < numBtns; i++) {
+            JRadioButton btn = new JRadioButton(delimNames[i],
+                                   getDelimiter().equals(delims[i]));
+            bg.add(btn);
+            final int myIndex = i;
+            btn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    JRadioButton btn = (JRadioButton) ae.getSource();
+                    if (btn.isSelected()) {
+                        setDelimiter(delims[myIndex]);
+                    }
+                }
+            });
+            btns[i] = btn;
+        }
+        return btns;
     }
 
 
@@ -965,7 +1122,7 @@ public class TextPointDataSource extends PointDataSource {
             String key   = (String) keys.nextElement();
             Object value = tmp.get(key);
             if (value instanceof List) {
-                value = new Metadata(-1, null, (List) value);
+                value = new Metadata(-1, delimiter, null, (List) value);
             }
             pointMetaDataMap.put(key, (Metadata) value);
         }
@@ -1022,7 +1179,7 @@ public class TextPointDataSource extends PointDataSource {
                 : "", "dataistrajectory", trajectory,
                 PROP_HEADER_BLOB,
                 getDataContext().getIdv().encodeObject(new Metadata(skipRows,
-                    skipPattern, metaDataFields), false)
+                    delimiter, skipPattern, metaDataFields), false)
             }), new String[] { DataManager.ATTR_DOESMULTIPLES, "true" });
             getDataContext().getIdv().getPluginManager().addText(xml,
                     lastType + "datasource.xml");
@@ -1113,8 +1270,8 @@ public class TextPointDataSource extends PointDataSource {
         String tmpSkipPattern = skipPatternFld.getText().trim();
 
         pointMetaDataMap.put(prefname,
-                             new Metadata(skipRows, tmpSkipPattern,
-                                          metaDataFields));
+                             new Metadata(skipRows, delimiter,
+                                          tmpSkipPattern, metaDataFields));
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
                 pointMetaDataMap);
     }
@@ -1324,6 +1481,10 @@ public class TextPointDataSource extends PointDataSource {
                                    ? ""
                                    : skipPattern);
         }
+        if (metadata.getDelimiter() != null) {
+            delimiter = metadata.getDelimiter();
+            updateDelimiterButton(delimiter);
+        }
 
         setLineText(lineLbl, skipRows, lines);
         applySavedMetaData(metadata);
@@ -1332,13 +1493,15 @@ public class TextPointDataSource extends PointDataSource {
     /**
      * Init the widgets
      *
-     *
      * @param metadata The metadata
      */
     public void applySavedMetaData(Metadata metadata) {
         List fieldList = metadata.getItems();
         if (metadata.getSkipRows() >= 0) {
             skipRows = metadata.getSkipRows();
+        }
+        if (metadata.getDelimiter() != null) {
+            delimiter = metadata.getDelimiter();
         }
 
         for (int tokIdx = 0;
@@ -3139,6 +3302,8 @@ public class TextPointDataSource extends PointDataSource {
         /** the skip pattern */
         private String skipPattern;
 
+        /** the delimiter */
+        private String delimiter;
 
         /** metadata items */
         private List items;
@@ -3152,11 +3317,14 @@ public class TextPointDataSource extends PointDataSource {
          * ctor
          *
          * @param rows rows to skip
+         * @param delimiter the delimiter
          * @param skipPattern the skip pattern
          * @param items metadata items
          */
-        public Metadata(int rows, String skipPattern, List items) {
+        public Metadata(int rows, String delimiter, String skipPattern,
+                        List items) {
             this.skipRows    = rows;
+            this.delimiter   = delimiter;
             this.skipPattern = skipPattern;
             this.items       = items;
         }
@@ -3218,9 +3386,21 @@ public class TextPointDataSource extends PointDataSource {
             return this.skipPattern;
         }
 
+        /**
+         * Get the delimiter
+         * @return the delimiter
+         */
+        public String getDelimiter() {
+            return delimiter;
+        }
 
-
-
+        /**
+         * Set the delimiter
+         * @param delimiter the delimiter to set
+         */
+        public void setDelimiter(String delimiter) {
+            this.delimiter = delimiter;
+        }
 
 
     }
