@@ -3231,20 +3231,27 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return getProperty(PROP_DB_CANCACHE, true);
     }
 
+    private Boolean cacheResources = null;
+
     /**
      * _more_
      *
      * @return _more_
      */
     public boolean cacheResources() {
-        String test = (String) properties.get("ramadda.cacheresources");
-        if (test == null) {
-            return true;
+        if(cacheResources==null) {
+            String test = (String) cmdLineProperties.get("ramadda.cacheresources");
+
+            if (test == null) {
+                test = (String) properties.get("ramadda.cacheresources");
+            }
+
+            if (test == null) {
+                test = "true";
+            }
+            cacheResources = new Boolean(test.equals("true"));
         }
-        if (test != null) {
-            return test.equals("true");
-        }
-        return true;
+        return cacheResources.booleanValue();
     }
 
 
@@ -3368,7 +3375,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
                      "/ucar/unidata/repository/resources/repository.properties");
             } catch (Exception exc) {}
         }
-
 
         String override = "override." + name;
         //Check if there is an override 

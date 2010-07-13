@@ -86,6 +86,56 @@ a SMTP server that RAMADDA will use to send email.
 </faqitem>
 
 
+<faqitem cat="Administration" id="template" q="I want to change the html design of RAMADDA" >
+The HTML pages that RAMADDA generates are based on a template mechanism.
+Here is an example template: <a href="template.html.txt">template.html.txt</a>.
+Copy the example to your local RAMADDA directory (strip off the .txt):<pre>
+&lt;user home&gt;/.unidata/repository/resources/template.html
+</pre>
+This is one of the places where RAMADDA looks for templates.
+<p>
+In the template are a set of properties. You should change the id and name property.
+There are a number of other  macros shown as <i>${macro}</i> that are used to 
+instantiate a web page.  The ${content} is where the generated html is placed.
+<p>
+The ${root} is the root directory path used by RAMADDA, e.g., &quot;repository&quot;. You can reference 
+files (e.g., style sheets, images) with this path, e.g.:<pre>
+    &lt;img src="${root}/someimage.png"&gt;
+</pre>
+When RAMADDA is serving a file (e.g., someimage.png) it will look in:
+    &lt;user home&gt;/htdocs</pre>
+So place any files you want served in that directory.
+<p>
+
+
+RAMADDA uses the &quot;ramadda.html.templates&quot; property, a semi-colon delimited list of
+file paths,  to find where the templates are.
+The default value for this property is:
+<pre>
+    ramadda.html.templates=%repositorydir%/resources/template.html;%resourcedir%/templates/wikipedia.html;...
+</pre>
+
+If you wanted to change this then make some <i>.properties</i> file with the new paths, e.g.,:<pre>
+    ramadda.html.templates=%repositorydir%/resources/template1.html;%repositorydir%/resources/template2.html;...
+</pre>
+and place the .properties file in the plugins directory:<pre>
+    &lt;user home&gt;/plugins
+</pre>
+
+Normally, RAMADDA will cache template in memory so if you are modifying the template
+you can't just hit reload in your browser. You would need to restart RAMADDA.
+To get around this you can run set the property:<pre>
+    ramadda.cacheresources=false
+</pre> in your properties file or specify this property on the command line:
+<pre>
+    java -Xmx1024m -server   ucar.unidata.repository.RepositoryServer -Dramadda.cacheresources=false
+</pre>
+
+Don't forget to unset this property when in production.
+
+</faqitem>
+
+
 </faq>
 
 
