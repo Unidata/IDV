@@ -5,6 +5,8 @@
   <outputhandler class="ucar.unidata.repository.data.LasOutputHandler" name="LAS XML"/>
   <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="true"/>
   <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
+<!--
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="IDV Preview"/>
+-->
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 </outputhandlers>

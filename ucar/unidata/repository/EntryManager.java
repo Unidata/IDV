@@ -4982,15 +4982,26 @@ return new Result(title, sb);
      */
     public Entry addFileEntry(Request request, File newFile, Group group,
                               String name, User user)
-            throws Exception {
+	throws Exception {
+	return addFileEntry(request, newFile, group, name, user, 
+			    null, null);
+    }
+
+    public Entry addFileEntry(Request request, File newFile, Group group,
+                              String name, User user,TypeHandler typeHandler,
+			      EntryInitializer initializer)
+	throws Exception {
+
 
         if ( !getRepository().getAccessManager().canDoAction(request, group,
                 Permission.ACTION_NEW)) {
             throw new AccessException("Cannot add to folder", request);
         }
 
-        TypeHandler typeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+	if(typeHandler == null) {
+	    typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+	}
+
         Entry entry = typeHandler.createEntry(getRepository().getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
@@ -4998,6 +5009,9 @@ return new Result(title, sb);
         entry.initEntry(name, "", group, request.getUser(), resource, "",
                         dttm.getTime(), dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
         typeHandler.initializeNewEntry(entry);
+	if(initializer!=null) {
+	    initializer.initEntry(entry);
+	}
         List<Entry> newEntries = new ArrayList<Entry>();
         newEntries.add(entry);
         insertEntries(newEntries, true, true);
