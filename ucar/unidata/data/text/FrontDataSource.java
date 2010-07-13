@@ -1,26 +1,22 @@
 /*
- * $Id: FrontDataSource.java,v 1.15 2007/04/17 22:22:52 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.data.text;
 
@@ -56,7 +52,6 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import ucar.visad.display.FrontDrawer;
-import java.text.SimpleDateFormat;
 
 
 import visad.*;
@@ -67,6 +62,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 
 import java.rmi.RemoteException;
+
+import java.text.SimpleDateFormat;
 
 
 
@@ -93,7 +90,8 @@ import javax.swing.event.*;
 public class FrontDataSource extends FilesDataSource {
 
 
-    private static final String TIME_FORMAT =  "yyyy_MM_dd_HH_mm";
+    /** time format */
+    private static final String TIME_FORMAT = "yyyy_MM_dd_HH_mm";
 
 
     /** Property to show the time selection window */
@@ -137,7 +135,8 @@ public class FrontDataSource extends FilesDataSource {
     private List warnings;
 
 
-    private  SimpleDateFormat sdf;
+    /** data formatter */
+    private SimpleDateFormat sdf;
 
 
     /** for parsing */
@@ -344,8 +343,8 @@ public class FrontDataSource extends FilesDataSource {
         sb.append("<shapes "
                   + XmlUtil.attrs("title", "Fronts",
                                   DrawingControl.ATTR_USETIMESINANIMATION,
-                                  "true",
-                                  DrawingControl.ATTR_FRONTDISPLAY,"true") + ">\n");
+                                  "true", DrawingControl.ATTR_FRONTDISPLAY,
+                                  "true") + ">\n");
 
         errors   = new ArrayList();
         warnings = new ArrayList();
@@ -606,8 +605,16 @@ public class FrontDataSource extends FilesDataSource {
      * @return lat/lon
      */
     double[] getLatLon(String s) {
-        double lat = new Double(s.substring(0, 2)).doubleValue();
-        double lon = -new Double(s.substring(2)).doubleValue();
+        int    splitIndex = 2;
+        double divisor    = 1.;
+        if (s.length() > 5) {  // new format
+            splitIndex = 3;
+            divisor    = 10.;
+        }
+        double lat = new Double(s.substring(0, splitIndex)).doubleValue()
+                     / divisor;
+        double lon = -new Double(s.substring(splitIndex)).doubleValue()
+                     / divisor;
         return new double[] { lat, lon };
     }
 
@@ -630,7 +637,7 @@ public class FrontDataSource extends FilesDataSource {
 
 
         if (validTime != null) {
-            if(sdf == null) {
+            if (sdf == null) {
                 sdf = new SimpleDateFormat();
                 sdf.applyPattern(TIME_FORMAT);
                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
@@ -639,7 +646,8 @@ public class FrontDataSource extends FilesDataSource {
 
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTime(validTime);
-            dttms.append(" " + DrawingGlyph.ATTR_TIMEFORMAT + "=\"" + TIME_FORMAT+"\" ");
+            dttms.append(" " + DrawingGlyph.ATTR_TIMEFORMAT + "=\""
+                         + TIME_FORMAT + "\" ");
 
             dttms.append(" " + DrawingGlyph.ATTR_TIMES + "=\"");
 
@@ -690,7 +698,7 @@ public class FrontDataSource extends FilesDataSource {
 
                 //Now check the location
                 String pos = (String) toks.get(i);
-                if ((pos.length() < 4) || (pos.length() > 5)) {
+                if ((pos.length() < 4) || (pos.length() > 7)) {
                     warnings.add("Bad location value: " + pos + " in " + type
                                  + " list: " + StringUtil.join(" ", toks));
                     continue;
@@ -856,4 +864,3 @@ public class FrontDataSource extends FilesDataSource {
         }
     }
 }
-
