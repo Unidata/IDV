@@ -167,7 +167,7 @@ public class AddeFrontChooser extends AddeChooser {
         String server = getServer();
         String type   = (forecastBtn.isSelected()
                          ? "SRP"
-                         : "SUS");
+                         : "SUS&wmo=ASUS01");
         for (int i = 0; i <= index; i++) {
             String url = "adde://" + server
                          + "/wxtext?group=RTWXTEXT&apro=COD&astn=" + type
