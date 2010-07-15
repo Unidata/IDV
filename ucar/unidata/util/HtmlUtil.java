@@ -2145,6 +2145,7 @@ public class HtmlUtil {
             Color  c     = GuiUtils.COLORS[i];
             String label = GuiUtils.COLORNAMES[i];
             value = StringUtil.toHexString(c);
+            value = value.replace("#","");
             String selectedAttr = "";
             if (Misc.equals(value, selected)) {
                 selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
