@@ -186,8 +186,17 @@ public class Misc {
             dirIndex    = latlon.indexOf("W");
         } else if (latlon.indexOf("N") > 0) {
             dirIndex = latlon.indexOf("N");
-        } else if (latlon.indexOf("E") > 0) {
+        } else if (latlon.indexOf("E") > 0) {  // E could be the Exponent, e.g., -9E-3
             dirIndex = latlon.indexOf("E");
+            String tmp = latlon.substring(dirIndex).trim();
+            if (tmp.length() > 0) {  // check for another E for East
+                int newIndex = latlon.lastIndexOf("E");
+                if (dirIndex != newIndex) {
+                    dirIndex = newIndex;
+                } else {
+                    dirIndex = 0;
+                }
+            }
         }
         if (dirIndex > 0) {
             latlon = latlon.substring(0, dirIndex).trim();
@@ -2581,7 +2590,10 @@ public class Misc {
             lonValue = (lonValue < -180)
                        ? lonValue + 360.
                        : lonValue - 360.;
-            if(cnt++>10000) throw new IllegalArgumentException("Bad longitude value:" + lonValue);
+            if (cnt++ > 10000) {
+                throw new IllegalArgumentException("Bad longitude value:"
+                        + lonValue);
+            }
         }
         return lonValue;
     }
@@ -4056,13 +4068,20 @@ public class Misc {
 
 
 
+    /**
+     * _more_
+     *
+     * @param a _more_
+     *
+     * @return _more_
+     */
     public static float[] getRange(float[][] a) {
-        float[]range = {Float.MAX_VALUE,Float.MIN_VALUE};
+        float[] range = { Float.MAX_VALUE, Float.MIN_VALUE };
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a[i].length; j++) {
-                if(a[i][j]==a[i][j]) {
-                    range[0] = (float)Math.min(range[0],a[i][j]);
-                    range[1] = (float)Math.max(range[1],a[i][j]);
+                if (a[i][j] == a[i][j]) {
+                    range[0] = (float) Math.min(range[0], a[i][j]);
+                    range[1] = (float) Math.max(range[1], a[i][j]);
                 }
             }
         }
@@ -4417,22 +4436,37 @@ public class Misc {
         return vals;
     }
 
-    public static float[][]copy(float[][]pts, int pointCnt) {
-        int numFields = pts.length;
-        float[][]newPts = new float[numFields][pointCnt];
-        for(int i=0;i<pointCnt;i++) {
-            for(int fieldIdx = 0;fieldIdx<numFields;fieldIdx++) {
-                    newPts[fieldIdx][i] = pts[fieldIdx][i];
-                }
+    /**
+     * _more_
+     *
+     * @param pts _more_
+     * @param pointCnt _more_
+     *
+     * @return _more_
+     */
+    public static float[][] copy(float[][] pts, int pointCnt) {
+        int       numFields = pts.length;
+        float[][] newPts    = new float[numFields][pointCnt];
+        for (int i = 0; i < pointCnt; i++) {
+            for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+                newPts[fieldIdx][i] = pts[fieldIdx][i];
             }
+        }
         return newPts;
     }
 
-    public static float[][] expand(float[][]pts) {
-        int numFields = pts.length;
-        float[][]newPts = new float[numFields][pts[0].length*2];
-        for(int i=0;i<pts[0].length;i++) {
-            for(int fieldIdx = 0;fieldIdx<numFields;fieldIdx++) {
+    /**
+     * _more_
+     *
+     * @param pts _more_
+     *
+     * @return _more_
+     */
+    public static float[][] expand(float[][] pts) {
+        int       numFields = pts.length;
+        float[][] newPts    = new float[numFields][pts[0].length * 2];
+        for (int i = 0; i < pts[0].length; i++) {
+            for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 newPts[fieldIdx][i] = pts[fieldIdx][i];
             }
         }
