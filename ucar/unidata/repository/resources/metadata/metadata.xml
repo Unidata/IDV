@@ -17,6 +17,10 @@
 
   </handler>
 
+  <handler class="ucar.unidata.repository.metadata.JpegMetadataHandler"    >
+  </handler>
+
+
   <handler class="ucar.unidata.repository.metadata.ContentMetadataHandler"        category="Attachments, Contact, Etc.">
     <type
        name="Thumbnail Image"

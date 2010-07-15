@@ -190,6 +190,12 @@ public class MetadataType extends MetadataTypeBase {
             throws Exception {
 
         NodeList children = XmlUtil.getElements(root);
+        if(children.getLength()==0 && root.getTagName().equals(TAG_HANDLER)) {
+            Class c =
+                Misc.findClass(XmlUtil.getAttribute(root, ATTR_CLASS));
+            MetadataHandler handler      = manager.getHandler(c);
+        }
+
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_HANDLER)) {

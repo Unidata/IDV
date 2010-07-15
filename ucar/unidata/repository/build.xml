@@ -410,7 +410,7 @@
         <unjar src="${libsrc}/commons-pool-1.5.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
-
+        <unjar src="${libsrc}/metadata-extractor-2.4.0-beta-1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libsrc}/ftplet-api-1.0.3.jar" dest="${tmpjardir}"/>

@@ -253,6 +253,18 @@ public class MapOutputHandler extends OutputHandler {
                     + entry.getTypeHandler().getInnerEntryContent(entry,
                         request, OutputHandler.OUTPUT_HTML, true, false,
                         false) + "</table>";
+
+
+                if (entry.getResource().isImage()) {
+                    String thumbUrl = getRepository().absoluteUrl(HtmlUtil.url(
+                                      request.url(repository.URL_ENTRY_GET)
+                                      + "/"
+                                      + getStorageManager().getFileTail(
+                                          entry), ARG_ENTRYID, entry.getId(),
+                                      ARG_IMAGEWIDTH, "300"));
+                    info = info+HtmlUtil.img(thumbUrl,"","");
+                }
+
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");

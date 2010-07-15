@@ -492,7 +492,8 @@ public class IdvOutputHandler extends OutputHandler {
             exc.printStackTrace();
         }
         //Call this in a thread because if there is any problem with xvfb this will just hang
-        Misc.run(this, "checkIdv");
+        //Run in a couple of seconds because we are deadlocking deep down in Java on the mac
+        Misc.runInABit(2000,this, "checkIdv",null);
     }
 
 

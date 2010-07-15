@@ -35,6 +35,21 @@
      <property name="icon" value="/icons/map.png"/>
   </type>
 
+
+<!--
+  <type name="photooverlay"  description="Photo Overlay" datatype="photooverlay" category="Geo Data">
+     <property name="icon" value="/icons/gif.png"/>
+     <column name="heading" type="double" default="180"  label="Heading" cansearch="false" showinhtml="true"/>
+     <column name="tilt" type="double" default="90"  label="Tilt" cansearch="false" showinhtml="true"/>
+     <column name="roll" type="double" default="0"  label="Roll" cansearch="false" showinhtml="true"/>
+     <column name="near" type="double" default="50"  label="Distance (meters)" cansearch="false" showinhtml="true"/>
+     <column name="leftfov" type="double" default="-45"  label="Left FOV" cansearch="false" showinhtml="true"/>
+     <column name="rightfov" type="double" default="45"  label="Right FOV" cansearch="false" showinhtml="true"/>
+     <column name="topfov" type="double" default="30"  label="Top FOV" cansearch="false" showinhtml="true"/>
+     <column name="bottomfov" type="double" default="-30"  label="Bottom FOV" cansearch="false" showinhtml="true"/>
+  </type>
+-->
+
   <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/database.png"/>
      <property name="form.show.date" value="false"/>

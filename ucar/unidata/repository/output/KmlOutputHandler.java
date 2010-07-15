@@ -103,7 +103,11 @@ public class KmlOutputHandler extends OutputHandler {
                     return;
                 }
             }
-            links.add(makeLink(request, state.getEntry(), OUTPUT_KML));
+            links.add(
+                makeLink(
+                    request, state.getEntry(), OUTPUT_KML,
+                    "/" + IOUtil.stripExtension(state.getEntry().getName())
+                    + ".kml"));
         }
     }
 
@@ -214,44 +218,59 @@ public class KmlOutputHandler extends OutputHandler {
             }
 
             String resource = entry.getResource().getPath();
-            if (resource == null) {
-                continue;
-            }
-
-
-
-            if ( !IOUtil.hasSuffix(resource, "kml")
-                    && !IOUtil.hasSuffix(resource, "kmz")) {
-                continue;
-            }
-
-            String url;
-            if (entry.getResource().isFile()) {
-                String fileTail = getStorageManager().getFileTail(entry);
-                url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET)
-                                   + "/" + fileTail, ARG_ENTRYID,
+            if (resource != null &&  
+                (IOUtil.hasSuffix(resource, "kml") || IOUtil.hasSuffix(resource, "kmz"))) {
+                String url;
+                if (entry.getResource().isFile()) {
+                    String fileTail = getStorageManager().getFileTail(entry);
+                    url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET)
+                                       + "/" + fileTail, ARG_ENTRYID,
                                        entry.getId());
-                url = getRepository().absoluteUrl(url);
-            } else if (entry.getResource().isUrl()) {
-                url = entry.getResource().getPath();
-            } else {
-                continue;
+                    url = getRepository().absoluteUrl(url);
+                } else if (entry.getResource().isUrl()) {
+                    url = resource;
+                } else {
+                    continue;
+                }
+                Element link = KmlUtil.networkLink(folder, entry.getName(), url);
+
+                if (entry.getDescription().length() > 0) {
+                    KmlUtil.description(link, entry.getDescription());
+                }
+                KmlUtil.visible(link, false);
+                KmlUtil.open(link, false);
+                link.setAttribute(KmlUtil.ATTR_ID, entry.getId());
+            } else if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
+                double []lonlat;
+                if(entry.hasAreaDefined()) {
+                    lonlat = entry.getCenter();
+                } else {
+                    lonlat = entry.getLocation();
+                }
+                String link =  HtmlUtil.href(
+                                             getRepository().absoluteUrl(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry)),
+                                             entry.getName());
+                String desc =  link + entry.getDescription();
+                if (entry.getResource().isImage()) {
+                    String thumbUrl = getRepository().absoluteUrl(HtmlUtil.url(
+                                      request.url(repository.URL_ENTRY_GET)
+                                      + "/"
+                                      + getStorageManager().getFileTail(
+                                          entry), ARG_ENTRYID, entry.getId(),
+                                      ARG_IMAGEWIDTH, "500"));
+                    desc = desc +"<br>" + HtmlUtil.img(thumbUrl,"","");
+                }
+                Element placemark = KmlUtil.placemark(folder, entry.getName(),
+                                                      desc,
+                                                      lonlat[0], lonlat[1], entry.hasAltitudeTop()?entry.getAltitudeTop():(entry.hasAltitudeBottom()?entry.getAltitudeBottom():0),null);
+                
+                KmlUtil.visible(placemark, true);
             }
-            Element link = KmlUtil.networkLink(folder, entry.getName(), url);
-
-            if (entry.getDescription().length() > 0) {
-                KmlUtil.description(link, entry.getDescription());
-            }
-            KmlUtil.visible(link, false);
-            KmlUtil.open(link, false);
-            link.setAttribute(KmlUtil.ATTR_ID, entry.getId());
-
-
         }
 
         StringBuffer sb = new StringBuffer(XmlUtil.XML_HEADER);
         sb.append(XmlUtil.toString(root));
-        return new Result(title, sb, "text/xml");
+        return new Result(title, sb, "application/vnd.google-earth.kml+xml");
 
     }
 

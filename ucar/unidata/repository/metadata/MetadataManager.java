@@ -401,6 +401,7 @@ public class MetadataManager extends RepositoryManager {
                 changed = true;
             }
         }
+        if(extra.size()>0) changed=true;
         return changed;
     }
 
