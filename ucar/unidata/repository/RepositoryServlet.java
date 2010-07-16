@@ -170,7 +170,14 @@ public class RepositoryServlet extends HttpServlet implements Constants {
         if (repository != null) {
             return;
         }
-        Repository tmp = new Repository(getInitParams(), port, true);
+        String repositoryClassName =System.getProperty("repository.classname");
+        if(repositoryClassName==null) {
+            repositoryClassName = "ucar.unidata.repository.Repository";
+        }
+        Class repositoryClass = Misc.findClass(repositoryClassName);
+        Repository tmp = (Repository)repositoryClass.newInstance();
+        tmp.init(getInitParams(), port);
+        //        Repository tmp = new Repository(getInitParams(), port);
         tmp.init(webAppProperties);
         if (checkSsl) {
             int sslPort = -1;

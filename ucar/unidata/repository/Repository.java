@@ -382,11 +382,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     /** _more_ */
-    private boolean inTomcat = false;
-
-
-
-    /** _more_ */
     public static boolean debug = true;
 
     /** _more_ */
@@ -497,29 +492,36 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_          */
     private String pluginHelpToc;
 
+    public Repository()
+            throws Exception {
+    }
+
+
 
     /**
      * _more_
      *
      * @param args _more_
      * @param port _more_
-     * @param inTomcat _more_
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, int port, boolean inTomcat)
+    public Repository(String[] args, int port)
             throws Exception {
         super(port);
+        init(args,port);
+    }
 
+    public void init(String[]args, int port) 
+        throws Exception {
+        setPort(port);
         LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
         setHostname(localMachine.getHostName());
-        this.inTomcat = inTomcat;
         this.args     = args;
+
     }
-
-
 
 
     /**
@@ -2867,11 +2869,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return null;
     }
 
-
-
-
-
-
     /**
      * _more_
      *
@@ -3001,7 +2998,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             favorites.append(cartTemplate.replace("${entries}",
                     StringUtil.join(favoritesSeparator, cartLinks)));
         }
-
 
         String content = new String(result.getContent());
         if (sessionMessage != null) {
