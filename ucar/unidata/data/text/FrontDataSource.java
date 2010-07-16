@@ -746,7 +746,19 @@ public class FrontDataSource extends FilesDataSource {
             int          cnt     = 0;
             String       subType = null;
             for (int i = 0; i < toks.size(); i++) {
-                String tok = (String) toks.get(i);
+                String tok  = (String) toks.get(i);
+                int    size = tok.length();
+                //Now check the location and possible split line
+                if (size < 4) {
+                    if (i < toks.size() - 1) {
+                        String newTok  = (String) toks.get(i + 1);
+                        int    newSize = size + newTok.length();
+                        if ((newSize >= 4) && (newSize < 8)) {  // have split bulletin
+                            tok = tok + newTok;
+                            i++;
+                        }
+                    }
+                }
                 try {
                     double[] ll = getLatLon(tok);
                     if (cnt > 0) {
