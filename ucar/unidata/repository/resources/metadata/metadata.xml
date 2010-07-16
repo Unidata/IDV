@@ -17,8 +17,7 @@
 
   </handler>
 
-  <handler class="ucar.unidata.repository.metadata.JpegMetadataHandler"    >
-  </handler>
+
 
 
   <handler class="ucar.unidata.repository.metadata.ContentMetadataHandler"        category="Attachments, Contact, Etc.">
@@ -101,6 +100,14 @@
     <type name="Anonymous Upload" id="admin.anonymousupload">
       <element name="From" />
       <element name="IP" />
+    </type>
+  </handler>
+
+  <handler class="ucar.unidata.repository.metadata.JpegMetadataHandler"    >
+    <type
+       name="Camera direction"
+       id="camera.direction">
+      <element name="Direction" datatype="double" suffix="Degrees"/>
     </type>
   </handler>
 

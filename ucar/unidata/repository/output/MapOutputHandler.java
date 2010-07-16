@@ -25,8 +25,12 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
+import ucar.unidata.repository.metadata.Metadata;
+import ucar.unidata.repository.metadata.JpegMetadataHandler;
 import ucar.unidata.repository.type.*;
 
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -140,7 +144,7 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
         StringBuffer sb = new StringBuffer();
-        getMap(request, entriesToUse, sb, 700, 500, true);
+        getMap(request, entriesToUse, sb, 700, 500, true,new boolean[]{false});
         return makeLinksResult(request, msg("Map"), sb, new State(entry));
     }
 
@@ -174,8 +178,16 @@ public class MapOutputHandler extends OutputHandler {
 
         sb.append(
             "<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        String mapVarName = getMap(request, entriesToUse, sb, 700, 500, true);
+        boolean [] haveBearingLines = {false};
+        String mapVarName = getMap(request, entriesToUse, sb, 700, 500, true,haveBearingLines);
         sb.append("</td><td>");
+        if(haveBearingLines[0]) {
+            sb.append(HtmlUtil.checkbox("dummy", "true", false, HtmlUtil.onMouseClick("toggleBearingLines(" + mapVarName+");")));
+            sb.append("  ");
+            sb.append(msg("Show bearing lines"));
+            sb.append(HtmlUtil.br());
+        }
+
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 sb.append(HtmlUtil.img(getEntryManager().getIconUrl(request,
@@ -209,7 +221,7 @@ public class MapOutputHandler extends OutputHandler {
      */
     public String getMap(Request request, List<Entry> entriesToUse,
                          StringBuffer sb, int width, int height,
-                         boolean normalControls)
+                         boolean normalControls, boolean []haveBearingLines)
             throws Exception {
         StringBuffer js         = new StringBuffer();
         String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
@@ -255,6 +267,13 @@ public class MapOutputHandler extends OutputHandler {
                         false) + "</table>";
 
 
+                double[]location;
+                if (makeRectangles || !entry.hasAreaDefined()) {
+                    location = entry.getLocation();
+                } else {
+                    location = entry.getCenter();
+                }
+
                 if (entry.getResource().isImage()) {
                     String thumbUrl = getRepository().absoluteUrl(HtmlUtil.url(
                                       request.url(repository.URL_ENTRY_GET)
@@ -263,26 +282,39 @@ public class MapOutputHandler extends OutputHandler {
                                           entry), ARG_ENTRYID, entry.getId(),
                                       ARG_IMAGEWIDTH, "300"));
                     info = info+HtmlUtil.img(thumbUrl,"","");
+
+                    List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+                    for(Metadata metadata: metadataList) {
+                        if(metadata.getType().equals(JpegMetadataHandler.TYPE_CAMERA_DIRECTION)) {
+                            double dir = Double.parseDouble(metadata.getAttr1());
+                            LatLonPointImpl fromPt = new LatLonPointImpl(location[0],location[1]);
+                            LatLonPointImpl pt = Bearing.findPoint(fromPt,dir,0.25,null);
+                            js.append("var bearingLine = new Polyline([");
+                            js.append(llp(location[0],location[1]));
+                            js.append(",");
+                            js.append(llp(pt.getLatitude(), pt.getLongitude()));
+                            js.append("]);");
+                            js.append("bearingLine.setColor(bearingLineColor);\n");
+                            js.append("bearingLine.setWidth(1);\n");
+                            js.append("bearingLines[bearingLines.length] = bearingLine;\n");
+                            if(entriesToUse.size()==1) {
+                                js.append(mapVarName +".addPolyline(bearingLine);\n");
+                            }
+                            haveBearingLines[0] = true;
+                            break;
+                        } 
+                    }
                 }
 
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");
                 String icon = getEntryManager().getIconUrl(request, entry);
-                if (makeRectangles || !entry.hasAreaDefined()) {
-                    js.append("marker = new Marker("
-                              + llp(entry.getSouth(), entry.getEast())
+                js.append("marker = new Marker("
+                          + llp(location[0], location[1])
                               + ");\n");
-                } else {
-                    js.append(
-                        "marker = new Marker("
-                        + llp(entry.getSouth()
-                              + (entry.getNorth() - entry.getSouth())
-                                / 2, entry.getWest()
-                                     + (entry.getEast() - entry.getWest())
-                                       / 2) + ");\n");
-                }
 
+                
                 js.append("marker.setIcon(" + qt(icon) + ");\n");
                 js.append("marker.setInfoBubble(\"" + info + "\");\n");
                 js.append("initMarker(marker," + qt(entry.getId()) + ","

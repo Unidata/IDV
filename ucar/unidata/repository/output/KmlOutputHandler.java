@@ -23,11 +23,17 @@ package ucar.unidata.repository.output;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.metadata.Metadata;
+import ucar.unidata.repository.metadata.JpegMetadataHandler;
 import ucar.unidata.repository.auth.*;
+
+import java.awt.Color;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -251,7 +257,8 @@ public class KmlOutputHandler extends OutputHandler {
                                              getRepository().absoluteUrl(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry)),
                                              entry.getName());
                 String desc =  link + entry.getDescription();
-                if (entry.getResource().isImage()) {
+                boolean isImage  =  entry.getResource().isImage();
+                if (isImage) {
                     String thumbUrl = getRepository().absoluteUrl(HtmlUtil.url(
                                       request.url(repository.URL_ENTRY_GET)
                                       + "/"
@@ -265,6 +272,26 @@ public class KmlOutputHandler extends OutputHandler {
                                                       lonlat[0], lonlat[1], entry.hasAltitudeTop()?entry.getAltitudeTop():(entry.hasAltitudeBottom()?entry.getAltitudeBottom():0),null);
                 
                 KmlUtil.visible(placemark, true);
+
+                if (isImage) {
+                    List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+                    for(Metadata metadata: metadataList) {
+                        if(metadata.getType().equals(JpegMetadataHandler.TYPE_CAMERA_DIRECTION)) {
+                            double dir = Double.parseDouble(metadata.getAttr1());
+                            LatLonPointImpl fromPt = new LatLonPointImpl(lonlat[0],lonlat[1]);
+                            LatLonPointImpl pt = Bearing.findPoint(fromPt,dir,0.25,null);
+                            Element bearingPlacemark = KmlUtil.placemark(folder, "Bearing",null,
+                                                                         new float[][] {{(float)fromPt.getLatitude(),(float)pt.getLatitude()},
+                                                                                        { (float)fromPt.getLongitude(), (float)pt.getLongitude()}},
+                                                                         Color.red,2);
+                            KmlUtil.visible(bearingPlacemark, false);
+                            break;
+                        }
+                    }
+
+                }
+
+
             }
         }
 

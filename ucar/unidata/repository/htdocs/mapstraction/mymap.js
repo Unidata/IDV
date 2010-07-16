@@ -1,8 +1,11 @@
 
 var lineColor="#00FF00";
+var bearingLineColor="#00FF00";
+
 var lastLine;
 
 var lines = new Object();
+var bearingLines = new Array();
 var addedToMap = new Object();
 var markers = new Object();
 
@@ -24,7 +27,6 @@ function MapInitialize(addControls,mapProvider,divname) {
 	if(mapProvider=='google') {
             mapstraction.setCenterAndZoom(new LatLonPoint(0,0), 1);
 	}	
-
 
 	mapstraction.addControls({
                 pan: true, 
@@ -62,16 +64,31 @@ function initLine(line,id,addItToMap,theMap) {
 	line.setWidth(3);
 	lines[id]=line;
 	addedToMap[id]=addItToMap;
-        
         if (addItToMap) {
             theMap.addPolyline(line);
         }
 }
 
+var showBearingLines = 0;
+
+function toggleBearingLines(map) {
+    showBearingLines = !showBearingLines;
+    for (var i = 0; i < bearingLines.length; i++) {
+        var bearingLine = bearingLines[i];
+        if(showBearingLines) {
+            map.addPolyline(bearingLine);
+        } else {
+            map.removePolyline(bearingLine);
+        }
+    }
+}
+
+
+
 function hiliteEntry(map,id) {
 	var marker = markers[id];
 	if(marker) {
-		marker.openBubble();
+            marker.openBubble();
 	}
 	if(lastLine) {
 		lastLine.setColor(lineColor);
@@ -82,9 +99,9 @@ function hiliteEntry(map,id) {
 	}
 	lastLine = lines[id];
 	if(lastLine) {
-		lastLine.setColor("#FF0000");
-		map.removePolyline(lastLine);
-		map.addPolyline(lastLine);
+            lastLine.setColor("#FF0000");
+            map.removePolyline(lastLine);
+            map.addPolyline(lastLine);
 	}
 }
 

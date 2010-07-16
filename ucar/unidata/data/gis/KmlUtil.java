@@ -459,8 +459,10 @@ public class KmlUtil {
             sb.append(coords[1][i]);
             sb.append(",");
             sb.append(coords[0][i]);
-            sb.append(",");
-            sb.append(coords[2][i]);
+            if(coords.length>2) {
+                sb.append(",");
+                sb.append(coords[2][i]);
+            }
             sb.append(" ");
         }
         return linestring(parent, extrude, tesselate, sb.toString());

@@ -43,6 +43,9 @@ import java.util.List;
  */
 public class JpegMetadataHandler extends MetadataHandler {
 
+    public static final String TYPE_CAMERA_DIRECTION = "camera.direction";
+
+
     /**
      * _more_
      *
@@ -64,7 +67,22 @@ public class JpegMetadataHandler extends MetadataHandler {
             File jpegFile = new File(path); 
             com.drew.metadata.Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
             com.drew.metadata.Directory dir = metadata.getDirectory(GpsDirectory.class); 
-            System.err.println("checking jpg");
+
+
+            if(dir.containsTag(GpsDirectory.TAG_GPS_IMG_DIRECTION)) {
+                Metadata dirMetadata =
+                    new Metadata(getRepository().getGUID(),
+                                 entry.getId(), TYPE_CAMERA_DIRECTION,
+                                 DFLT_INHERITED, ""+getValue(dir,GpsDirectory.TAG_GPS_IMG_DIRECTION),
+                                 Metadata.DFLT_ATTR,
+                                 Metadata.DFLT_ATTR,
+                                 Metadata.DFLT_ATTR,
+                                 Metadata.DFLT_EXTRA);
+                
+                metadataList.add(dirMetadata);
+            }
+
+
             if(!dir.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) return;
 
             double latitude =  getValue(dir,GpsDirectory.TAG_GPS_LATITUDE);
