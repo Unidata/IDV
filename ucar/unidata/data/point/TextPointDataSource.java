@@ -2583,10 +2583,32 @@ public class TextPointDataSource extends PointDataSource {
         if ((id instanceof String)
                 && (id.toString().startsWith("pointcloud:"))) {
             try {
-                FieldImpl obs = (FieldImpl) super.getDataInner(dataChoice,
-                                    category, dataSelection,
-                                    requestProperties);
-                FieldImpl cloud = PointObFactory.makePointCloud(obs,
+                Hashtable properties = dataChoice.getProperties();
+                if (properties == null) {
+                    properties = new Hashtable();
+                }
+                FieldImpl pointObs = null;
+                List      datas    = new ArrayList();
+                for (int i = 0; i < sources.size(); i++) {
+                    DataChoice choice = new DirectDataChoice(this,
+                                            new Integer(i), "", "",
+                                            dataChoice.getCategories(),
+                                            properties);
+                    pointObs = (FieldImpl) getDataInner(choice, category,
+                            dataSelection, requestProperties);
+                    if (pointObs != null) {
+                        datas.add(pointObs);
+                    }
+                }
+                if (datas.size() == 0) {
+                    return null;
+                }
+                pointObs = PointObFactory.mergeData(datas);
+                if (pointObs == null) {
+                    return null;
+                }
+
+                FieldImpl cloud = PointObFactory.makePointCloud(pointObs,
                                       id.toString().substring(11));
                 return cloud;
             } catch (Exception exc) {
