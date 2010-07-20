@@ -3079,14 +3079,17 @@ public class HtmlUtil {
                                ? hideImg
                                : showImg, "",
                                           " id='" + id
-                                          + "img' ") + HtmlUtil.space(1);
+                               + "img' ");
         }
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
                 + "')"), img /* + label*/,
                          HtmlUtil.cssClass("toggleblocklabellink"));
-        link = link + label;
+
+
+        link = link + " " + label;
+
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div  " + blockExtra + ">");
