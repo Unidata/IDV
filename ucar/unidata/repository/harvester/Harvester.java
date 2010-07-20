@@ -23,6 +23,7 @@ package ucar.unidata.repository.harvester;
 
 import org.w3c.dom.*;
 
+import org.apache.log4j.Logger;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.output.OutputHandler;
@@ -76,6 +77,8 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public abstract class Harvester extends RepositoryManager {
+
+    private static final Logger LOG = Logger.getLogger("ucar.unidata.repository.harvester.Harvester");
 
     /** _more_ */
 
@@ -800,10 +803,26 @@ public abstract class Harvester extends RepositoryManager {
             setActive(true);
             runInner(++timestamp);
         } catch (Exception exc) {
-            getRepository().getLogManager().logError("In harvester", exc);
+            logHarvesterError("Error in harvester.run", exc);
             error = "Error: " + exc + "<br>" + LogUtil.getStackTrace(exc);
         }
         setActive(false);
+    }
+
+
+    public void logHarvesterError(String message, Exception exc) {
+        getRepository().getLogManager().logError(LOG,  "harvester:" + getName() +" " +message,
+                exc);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
+    public void logHarvesterInfo(String message) {
+        LOG.info( "harvester:" + getName() +" " +message);
     }
 
 
@@ -1223,7 +1242,7 @@ public abstract class Harvester extends RepositoryManager {
      */
     public void debug(String msg) {
         if (getTestMode()) {
-            getRepository().getLogManager().logInfo(msg);
+            logHarvesterInfo(msg);
             msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
             msg = msg.replace("\n", "<br>");
             status.append(msg);

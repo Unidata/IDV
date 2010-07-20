@@ -213,7 +213,25 @@ public class SessionManager extends RepositoryManager {
     }
 
 
+    public void putSessionProperty(Request request, Object key, Object value) throws Exception {
+        String id = request.getSessionId();
+        if(id==null) return;
+        Session session = getSession(id);
+        if(session == null) return;
+        session.putProperty(key,value);
+    }
+
+    public Object getSessionProperty(Request request, Object key) throws Exception {
+        String id = request.getSessionId();
+        if(id==null) return null;
+        Session session = getSession(id);
+        if(session == null) return null;
+        return session.getProperty(key);
+    }
+
+
     //TODO: we need to clean out old sessions every once in a while
+
 
     /**
      * _more_
@@ -645,7 +663,6 @@ public class SessionManager extends RepositoryManager {
 
 
 
-
     /**
      * Class Session _more_
      *
@@ -666,6 +683,8 @@ public class SessionManager extends RepositoryManager {
 
         /** _more_ */
         Date lastActivity;
+
+        private Hashtable properties = new Hashtable();
 
         /**
          * _more_
@@ -694,6 +713,13 @@ public class SessionManager extends RepositoryManager {
             this.lastActivity = lastActivity;
         }
 
+        public void putProperty(Object key, Object value) {
+            properties.put(key, value);
+        }
+
+        public Object getProperty(Object key) {
+            return properties.get(key);
+        }
 
         /**
          *  Set the Id property.

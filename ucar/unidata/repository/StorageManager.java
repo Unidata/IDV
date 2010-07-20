@@ -586,7 +586,9 @@ public class StorageManager extends RepositoryManager {
             File f = new File(logDir);
             IOUtil.makeDirRecursive(f);
             File log4JFile = new File(f + "/" + "log4j.properties");
-            if ( !log4JFile.exists()) {
+            
+            //For now always write out the log from the jar
+            if (true || !log4JFile.exists()) {
                 try {
                     String c =
                         IOUtil.readContents(

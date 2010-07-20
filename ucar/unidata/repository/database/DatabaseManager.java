@@ -2072,7 +2072,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     public Statement select(final String what, final List tables,
                             final Clause clause, String extra, final int max)
             throws Exception {
-        if (extra != null) {
+       if (extra != null) {
             extra = escapeString(extra);
         }
         SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra,
@@ -2102,7 +2102,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         try {
             numberOfSelects.incr();
             Statement statement = SqlUtil.select(connection, what, tables,
-                                      clause, extra, max, TIMEOUT);
+                                                 clause, extra, max, TIMEOUT);
 
             done[0] = true;
             return statement;

@@ -492,6 +492,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_          */
     private String pluginHelpToc;
 
+    private List<PageDecorator> pageDecorators =  new ArrayList<PageDecorator>();
+
+
     public Repository()
             throws Exception {
     }
@@ -1670,6 +1673,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                         + c.getName());
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
+            } else if (PageDecorator.class.isAssignableFrom(c)) {
+                PageDecorator pageDecorator = (PageDecorator) c.newInstance();
+                pageDecorators.add(pageDecorator);
             } else if (AdminHandler.class.isAssignableFrom(c)) {
                 adminHandlerClasses.add(c);
             } else if (Harvester.class.isAssignableFrom(c)) {
@@ -1971,6 +1977,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 handler = getOaiManager();
             } else if (handlerName.equals("admin")) {
                 handler = getAdmin();
+            } else if (handlerName.equals("logmanager")) {
+                handler = getLogManager();
             } else if (handlerName.equals("harvestermanager")) {
                 handler = getHarvesterManager();
             } else if (handlerName.equals("actionmanager")) {
@@ -2881,6 +2889,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public void decorateResult(Request request, Result result)
         throws Exception {
 
+        Entry currentEntry = (Entry)getSessionManager().getSessionProperty(request, "lastentry");
         String   template     = null;
         Metadata metadata     = null;
         String sessionMessage =
@@ -3027,6 +3036,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             pageTitle = getProperty(PROP_REPOSITORY_NAME, "Repository");
         }
 
+        for(PageDecorator pageDecorator: pageDecorators) {
+            template = pageDecorator.decoratePage(this, request, template, currentEntry);
+        }
         String   html   = template;
         String[] macros = new String[] {
             MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,
@@ -3052,6 +3064,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         } else {
             html = StringUtil.replace(html, "${sublinks}", BLANK);
         }
+
+
+
         html = translate(request, html);
         result.setContent(html.getBytes());
 

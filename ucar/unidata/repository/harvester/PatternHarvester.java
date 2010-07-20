@@ -524,9 +524,14 @@ public class PatternHarvester extends Harvester {
         status = new StringBuffer("Looking for initial directory listing");
         long tt1 = System.currentTimeMillis();
         dirs = new ArrayList<FileInfo>();
+        logHarvesterInfo("Looking for initial directory listing:" + rootDir);
+        if(!rootDir.exists()) {
+            logHarvesterInfo("Root directory does not exist:" + rootDir);
+        }
         dirs.add(new FileInfo(rootDir));
         dirs.addAll(FileInfo.collectDirs(rootDir));
 
+        logHarvesterInfo("Found " + dirs.size() +" directories");
 
         long tt2 = System.currentTimeMillis();
         status = new StringBuffer("");
@@ -541,7 +546,9 @@ public class PatternHarvester extends Harvester {
 
         while (canContinueRunning(timestamp)) {
             long t1 = System.currentTimeMillis();
+            logHarvesterInfo("Looking for new files");
             collectEntries((cnt == 0), timestamp);
+            logHarvesterInfo("Done looking for new files");
             lastRunTime = System.currentTimeMillis();
             long t2 = System.currentTimeMillis();
             cnt++;
@@ -549,18 +556,18 @@ public class PatternHarvester extends Harvester {
             //                               + (t2 - t1) + "ms");
             if ( !getMonitor()) {
                 status.append("Done<br>");
+                logHarvesterInfo("Ran one time only. Exiting loop");
                 break;
             }
 
             status.append("Done... sleeping for " + getSleepMinutes()
                           + " minutes<br>");
+            logHarvesterInfo("Sleeping for " + getSleepMinutes() + " minutes");
             doPause();
             status = new StringBuffer();
         }
+        logHarvesterInfo("Done running");
     }
-
-
-
 
 
     /**
@@ -574,13 +581,14 @@ public class PatternHarvester extends Harvester {
      */
     private void collectEntries(boolean firstTime, int timestamp)
             throws Exception {
-
         long           t1        = System.currentTimeMillis();
         List<Entry>    entries   = new ArrayList<Entry>();
         List<Entry>    needToAdd = new ArrayList<Entry>();
         List<FileInfo> tmpDirs   = new ArrayList<FileInfo>(dirs);
         entryCnt    = 0;
         newEntryCnt = 0;
+        boolean anyNewThingsToLookAt = false;
+
         for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
             if ( !fileInfo.exists()) {
@@ -603,6 +611,7 @@ public class PatternHarvester extends Harvester {
                     //If this is a directory then check if we already have it 
                     //in the list. If not then add it to the main list and the local list
                     if ( !hasDir(f)) {
+                        logHarvesterInfo("Found new directory:" + f);
                         FileInfo newFileInfo = addDir(f);
                         tmpDirs.add(newFileInfo);
                     }
@@ -613,7 +622,14 @@ public class PatternHarvester extends Harvester {
                     debug("We've seen this file:" + f);
                     continue;
                 }
-                Entry entry = processFile(f);
+                anyNewThingsToLookAt = true;
+                logHarvesterInfo("Found file:" + f);
+                Entry entry = null;
+                try {
+                    entry = processFile(f);
+                } catch(Exception exc) {
+                    logHarvesterError("Error creating entry:" + f, exc);
+                }
                 if (entry == null) {
                     continue;
                 }
@@ -624,55 +640,66 @@ public class PatternHarvester extends Harvester {
                 }
                 if ( !getTestMode()) {
                     if (entries.size() > 1000) {
+                        List<Entry> nonUniqueOnes  = new ArrayList<Entry>();
                         List uniqueEntries =
-                            getEntryManager().getUniqueEntries(entries);
+                            getEntryManager().getUniqueEntries(entries, nonUniqueOnes);
+                        for(Entry e: nonUniqueOnes) {
+                            logHarvesterInfo("Already have created entry:" + e.getResource());
+                        }
                         newEntryCnt += uniqueEntries.size();
                         needToAdd.addAll(uniqueEntries);
                         entries = new ArrayList();
                     }
                     if (needToAdd.size() > 1000) {
-                        if ( !getTestMode()) {
-                            for(Entry newEntry:needToAdd) 
-                                newEntry.getTypeHandler().initializeNewEntry(newEntry);
-
-                            if (getAddMetadata() || getAddShortMetadata()) {
-                                getEntryManager().addInitialMetadata(null,
-                                        needToAdd, true,
-                                        getAddShortMetadata());
-                            }
-                            getEntryManager().insertEntries(needToAdd, true,
-                                    true);
-                        }
+                        addEntries(needToAdd);
                         needToAdd = new ArrayList<Entry>();
                     }
                 }
-                //                if(true) break;
                 if ( !canContinueRunning(timestamp)) {
                     return;
                 }
-                //                if(true) break;
             }
         }
 
         if ( !getTestMode()) {
-            List uniqueEntries = getEntryManager().getUniqueEntries(entries);
+            List<Entry> nonUniqueOnes  = new ArrayList<Entry>();
+            List<Entry> uniqueEntries = getEntryManager().getUniqueEntries(entries,nonUniqueOnes);
+            for(Entry e: nonUniqueOnes) {
+                logHarvesterInfo("Already have created entry:" + e.getResource());
+            }
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
-            if (needToAdd.size() > 0) {
-                System.err.println("Initializing new entry");
-                for(Entry newEntry:needToAdd) 
-                    newEntry.getTypeHandler().initializeNewEntry(newEntry);
-                if (getAddMetadata() || getAddShortMetadata()) {
-                    getEntryManager().addInitialMetadata(null, needToAdd,
-                            true, getAddShortMetadata());
-                }
-                getEntryManager().insertEntries(needToAdd, true, true);
-            }
+            addEntries(needToAdd);
+        }
+
+        if(!anyNewThingsToLookAt) {
+            logHarvesterInfo("Nothing on disk has changed since last time");
         }
     }
 
 
-
+    private void addEntries(List<Entry> entries) throws Exception {
+        if (getTestMode() || entries.size()==0) {
+            return;
+        }
+        List<Entry> entriesToAdd = new ArrayList<Entry>();
+        for(Entry newEntry:entries)  {
+            try {
+                newEntry.getTypeHandler().initializeNewEntry(newEntry);
+                entriesToAdd.add(newEntry);
+            } catch(Exception exc) {
+                logHarvesterError("Error initializing entry:" + newEntry, exc);
+            }
+        }
+        if (getAddMetadata() || getAddShortMetadata()) {
+            getEntryManager().addInitialMetadata(null,
+                                                 entriesToAdd, true,
+                                                 getAddShortMetadata());
+        }
+        logHarvesterInfo("Adding "  + entriesToAdd.size() +" new entries");
+        getEntryManager().insertEntries(entriesToAdd, true,
+                                        true);
+    }
 
     /**
      * _more_
@@ -765,6 +792,7 @@ public class PatternHarvester extends Harvester {
 
         //check if its a hidden file
         if (f.getName().startsWith(".")) {
+            logHarvesterInfo("File is hidden file:" + f);
             return null;
         }
 
@@ -803,7 +831,6 @@ public class PatternHarvester extends Harvester {
         String    groupName = groupTemplate;
         String    name      = nameTemplate;
         String    desc      = descTemplate;
-
 
         //        System.err.println("pattern names:" + patternNames);
         for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {

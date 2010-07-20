@@ -146,6 +146,20 @@ public class EntryManager extends RepositoryManager {
         return topGroup;
     }
 
+    public Entry getSecondToTopEntry(Entry descendent) {
+        Entry topEntry = null;
+        if(descendent!=null) {
+            topEntry = descendent;
+            while(topEntry!=null) {
+                Entry parent = topEntry.getParentGroup();
+                if(parent == null) break;
+                if(parent.isTopGroup()) break;
+                topEntry = parent;
+            }
+        }
+        return topEntry;
+    }
+
 
 
     /**
@@ -427,6 +441,8 @@ return new Result(title, sb);
             fatalError(request, "No entry specified");
         }
 
+        getSessionManager().putSessionProperty(request, "lastentry", entry);
+        
         if (entry.getIsRemoteEntry()) {
             String redirectUrl = entry.getRemoteServer()
                                  + getRepository().URL_ENTRY_SHOW.getPath();
@@ -4916,14 +4932,14 @@ return new Result(title, sb);
      * _more_
      */
     public void clearSeenResources() {
-        seenResources = new Hashtable();
+        seenResources = new HashSet();
     }
 
 
 
 
     /** _more_ */
-    private Hashtable seenResources = new Hashtable();
+    private HashSet seenResources = new HashSet();
 
 
 
@@ -5334,6 +5350,21 @@ return new Result(title, sb);
      */
     public List<Entry> getUniqueEntries(List<Entry> entries)
             throws Exception {
+        return getUniqueEntries(entries, new ArrayList<Entry>());
+    }
+
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+
+    public List<Entry> getUniqueEntries(List<Entry> entries, List<Entry>nonUniqueOnes)
+        throws Exception {
         List<Entry> needToAdd = new ArrayList();
         String      query     = BLANK;
         try {
@@ -5341,7 +5372,7 @@ return new Result(title, sb);
                 return needToAdd;
             }
             if (seenResources.size() > 10000) {
-                seenResources = new Hashtable();
+                seenResources = new HashSet();
             }
             Connection connection = getDatabaseManager().getConnection();
             PreparedStatement select =
@@ -5357,11 +5388,13 @@ return new Result(title, sb);
                 String path = getStorageManager().resourceToDB(
                                   entry.getResource().getPath());
                 String key = entry.getParentGroup().getId() + "_" + path;
-                if (seenResources.get(key) != null) {
+                if (seenResources.contains(key)) {
+                    nonUniqueOnes.add(entry);
                     //                    System.out.println("seen resource:" + path);
                     continue;
                 }
-                seenResources.put(key, key);
+                seenResources.add(key);
+                
                 select.setString(1, path);
                 select.setString(2, entry.getParentGroup().getId());
                 //                select.addBatch();
@@ -5371,6 +5404,7 @@ return new Result(title, sb);
                     if (found == 0) {
                         needToAdd.add(entry);
                     } else {
+                        nonUniqueOnes.add(entry);
                         //                        System.out.println("in db:" + path + " " + entry.getParentGroup().getId());
                     }
                 }

@@ -24,6 +24,7 @@ package ucar.unidata.repository.harvester;
 import org.w3c.dom.*;
 
 
+
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.database.*;
@@ -70,6 +71,8 @@ import java.util.Properties;
  * @version $Revision: 1.3 $
  */
 public class HarvesterManager extends RepositoryManager {
+
+
 
     /** _more_ */
     public RequestUrl URL_HARVESTERS_IMPORTCATALOG =
@@ -129,6 +132,10 @@ public class HarvesterManager extends RepositoryManager {
             logError("Error creating harvester: " + c.getName(), exc);
         }
     }
+
+
+
+
 
 
     /**
