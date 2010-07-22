@@ -620,6 +620,10 @@ public class MapViewManager extends NavigatedViewManager {
         notifyDisplayControls(SHARE_PROJECTION);
     }
 
+    public boolean shouldAnimateViewChanges() {
+        return !getStateManager().getRunningIsl();
+    }
+
     /**
      * Handle the event
      *
@@ -654,13 +658,13 @@ public class MapViewManager extends NavigatedViewManager {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
             if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_N)) {
                 EarthLocation center = getScreenCenter();
-                getMapDisplay().centerAndZoom(center, null, 1.0, true, true);
+                getMapDisplay().centerAndZoom(center, null, 1.0, shouldAnimateViewChanges(), true);
                 return;
             }
 
             if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_S)) {
                 EarthLocation center = getScreenCenter();
-                getMapDisplay().centerAndZoom(center, null, 1.0, true, false);
+                getMapDisplay().centerAndZoom(center, null, 1.0, shouldAnimateViewChanges(), false);
                 return;
             }
 
@@ -1428,7 +1432,7 @@ public class MapViewManager extends NavigatedViewManager {
 
                 setMapProjection(mp, true);
             } else {
-                getMapDisplay().center(GeoUtils.toEarthLocation(llp), true);
+                getMapDisplay().center(GeoUtils.toEarthLocation(llp), shouldAnimateViewChanges() );
                 //                getMapDisplay().center(GeoUtils.toEarthLocation(llp), false);
             }
         } catch (Exception e) {
