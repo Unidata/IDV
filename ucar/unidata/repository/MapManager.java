@@ -163,7 +163,7 @@ public class MapManager extends RepositoryManager {
                                        + HtmlUtil.id(mapVarName)));
         sb.append(HtmlUtil.script(mapVarName + "="
                                   + HtmlUtil.call("MapInitialize",
-                                      normalControls + ","
+                                                  normalControls + ","
                                       + HtmlUtil.squote(mapProvider) + ","
                                       + HtmlUtil.squote(mapVarName)) + ";"));
     }

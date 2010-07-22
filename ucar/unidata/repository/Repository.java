@@ -522,6 +522,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
         setHostname(localMachine.getHostName());
+        setIpAddress(localMachine.getHostAddress());
         this.args     = args;
 
     }
@@ -535,6 +536,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getHostname() {
         String hostname = getProperty(PROP_HOSTNAME, (String) null);
         if ((hostname != null) && (hostname.trim().length() > 0)) {
+            if(hostname.equals("ipaddress")) {
+                return getIpAddress();
+            }
             return hostname;
         }
         return super.getHostname();

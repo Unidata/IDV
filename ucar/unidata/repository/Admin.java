@@ -482,7 +482,7 @@ public class Admin extends RepositoryManager {
 
             sb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
                                          HtmlUtil.input(PROP_HOSTNAME,
-                                             hostname, HtmlUtil.SIZE_60)));
+                                                        hostname, HtmlUtil.SIZE_60)+" (Use  &quot;ipadaddress&quot; for dynamic ips)"));
             sb.append(HtmlUtil.formEntry(msgLabel("Port"),
                                          HtmlUtil.input(PROP_PORT, port,
                                              HtmlUtil.SIZE_10)));

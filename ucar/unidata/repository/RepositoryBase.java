@@ -312,6 +312,8 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     private String hostname = "";
 
+    private String ipAddress = "";
+
     /** _more_ */
     private int httpPort = 80;
 
@@ -630,6 +632,14 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public void setHostname(String value) {
         hostname = value;
+    }
+
+    public void setIpAddress(String ip) {
+        ipAddress= ip;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
     }
 
     /**
