@@ -8,11 +8,11 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="TEMP"
      label="Temperature"
-     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2,TMPK_PRES,TMPK,TMPC,TMPF,Temperature_weightedMean_pressure,TMP_2maboveground,Temperature_surface,Temperature_tropopause,Temperature_middle_cloud_top"/>
+     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2,TMPK_PRES,TMPK,TMPC,TMPF,Temperature_weightedMean_pressure,TMP_2maboveground,Temperature_surface,Temperature_tropopause,Temperature_middle_cloud_top,air"/>
   <alias
      name="RH"
      label="Relative humidity"
-     aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES,RELH,Relative_humidity_weightedMean_pressure,SPFH_2maboveground,RelativeHumidity"/>
+     aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES,RELH,Relative_humidity_weightedMean_pressure,SPFH_2maboveground,RelativeHumidity,rhum"/>
   <alias
      name="MIXR"
      label="Mixing Ratio"
@@ -104,7 +104,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="Z"
      label="Z"
-     aliases="z,Z,Geopotential_height,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA,thickness_1000_500,Anythickness,HGT_surface"/>
+     aliases="z,Z,Geopotential_height,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA,thickness_1000_500,Anythickness,HGT_surface,hgt"/>
   <alias
      name="GP"
      label="Geopotential"
