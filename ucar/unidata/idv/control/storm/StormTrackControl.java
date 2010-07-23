@@ -28,13 +28,11 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.data.*;
-import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.*;
 import ucar.unidata.data.storm.*;
-import ucar.unidata.data.storm.StormInfo;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
@@ -882,6 +880,17 @@ public class StormTrackControl extends DisplayControlImpl {
         return null;
     }
 
+   
+    /**
+     * This gets called when the control has received notification of a
+     * dataChange event. In this class, it reloads the storm tracks.
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    protected void resetData() throws VisADException, RemoteException {
+        reloadStormTracks();
+    }
 
 
     /**

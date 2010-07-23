@@ -1,26 +1,22 @@
 /*
- * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.data.storm;
 
@@ -59,9 +55,9 @@ import java.util.GregorianCalendar;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.TimeZone;
 
 import java.util.zip.*;
-import java.util.zip.GZIPInputStream;
 
 
 
@@ -70,119 +66,119 @@ import java.util.zip.GZIPInputStream;
  */
 public class AtcfStormDataSource extends StormDataSource {
 
-    /** _more_          */
+    /** _more_ */
     private int BASEIDX = 0;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_BASIN = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_CY = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_YYYYMMDDHH = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_TECHNUM = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_TECH = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_TAU = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_LAT = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_LON = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_VMAX = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_MSLP = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_TY = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RAD = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_WINDCODE = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RAD1 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RAD2 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RAD3 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RAD4 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RADP = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_RRP = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_MRD = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_GUSTS = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_EYE = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SUBREGION = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_MAXSEAS = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_INITIALS = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_DIR = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SPEED = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_STORMNAME = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_DEPTH = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEAS = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEASCODE = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEAS1 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEAS2 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEAS3 = BASEIDX++;
 
-    /** _more_          */
+    /** _more_ */
     private int IDX_SEAS4 = BASEIDX++;
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String PREFIX_ANALYSIS = "a";
 
-    /** _more_          */
+    /** _more_ */
     private static final String PREFIX_BEST = "b";
 
     /** _more_ */
@@ -301,8 +297,9 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
  00 WRNG   0      0     0      0        0         1                 Warning
                 */
                 int cnt = 0;
-                for (String line : StringUtil.split(new String(techs), "\n",
-                        true, true)) {
+                for (String line :
+                        StringUtil.split(new String(techs), "\n", true,
+                                         true)) {
                     if (cnt++ == 0) {
                         continue;
                     }
@@ -323,6 +320,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             List lines = StringUtil.split(stormTable, "\n", true, true);
 
             SimpleDateFormat fmt        = new SimpleDateFormat("yyyyMMddHH");
+            fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
             for (int i = 0; i < lines.size(); i++) {
                 String line   = (String) lines.get(i);
                 List   toks   = StringUtil.split(line, ",", true);
@@ -367,7 +365,9 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      * @return _more_
      */
     private double getDouble(String s) {
-        if(s == null)             return Double.NaN;
+        if (s == null) {
+            return Double.NaN;
+        }
         if (s.length() == 0) {
             return Double.NaN;
         }
@@ -445,8 +445,9 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         List             lines = StringUtil.split(trackData, "\n", true,
                                      true);
         SimpleDateFormat fmt       = new SimpleDateFormat("yyyyMMddHH");
-        Hashtable        trackMap  = new Hashtable();
-        Real             altReal   = new Real(RealType.Altitude, 0);
+        fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Hashtable trackMap = new Hashtable();
+        Real      altReal  = new Real(RealType.Altitude, 0);
         //        System.err.println("obs:" + lines.size());
         /*        Hashtable okWays = new Hashtable();
         okWays.put(WAY_CARQ, "");
@@ -483,17 +484,19 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             //            if (okWays.get(wayString) == null) {
             //                continue;
             //            }
-            boolean isBest       = wayString.equals(WAY_BEST);
-            boolean isWarning    = wayString.equals(WAY_WRNG);
-            boolean isCarq       = wayString.equals(WAY_CARQ);
+            boolean isBest    = wayString.equals(WAY_BEST);
+            boolean isWarning = wayString.equals(WAY_WRNG);
+            boolean isCarq    = wayString.equals(WAY_CARQ);
 
-            int category = (IDX_TY<toks.size()?getCategory((String) toks.get(IDX_TY)):CATEGORY_XX);
+            int     category  = ((IDX_TY < toks.size())
+                                 ? getCategory((String) toks.get(IDX_TY))
+                                 : CATEGORY_XX);
             if (category != CATEGORY_XX) {
                 //                System.err.println("cat:" + category);
             }
 
-            String  fhour        = (String) toks.get(IDX_TAU);
-            int     forecastHour = new Integer(fhour).intValue();
+            String fhour        = (String) toks.get(IDX_TAU);
+            int    forecastHour = new Integer(fhour).intValue();
             //A hack - we've seen some atfc files that have a 5 character forecast hour
             //right padded with "00", eg., 01200
             if ((fhour.length() == 5) && (forecastHour > 100)) {
@@ -562,8 +565,12 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
             List<Real> attributes = new ArrayList<Real>();
 
-            double     windspeed  = (IDX_VMAX<toks.size()?getDouble((String) toks.get(IDX_VMAX)):Double.NaN);
-            double     pressure   = (IDX_MSLP<toks.size()?getDouble((String) toks.get(IDX_MSLP)):Double.NaN);
+            double     windspeed  = ((IDX_VMAX < toks.size())
+                                     ? getDouble((String) toks.get(IDX_VMAX))
+                                     : Double.NaN);
+            double     pressure   = ((IDX_MSLP < toks.size())
+                                     ? getDouble((String) toks.get(IDX_MSLP))
+                                     : Double.NaN);
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
             attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(windspeed));
@@ -634,15 +641,19 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             try {
                 readTracks(stormInfo, tracks, trackFile, waysToUse, true);
             } catch (BadDataException bde) {
-                if(!aSubDir.equals("aid_public")) {
+                if ( !aSubDir.equals("aid_public")) {
                     try {
-                        trackFile = getFullPath("aid_public/" + PREFIX_ANALYSIS
-                                                + stormInfo.getBasin().toLowerCase()
-                                                + stormInfo.getNumber() + stormYear
-                                                + ".dat.gz");
-                        readTracks(stormInfo, tracks, trackFile, waysToUse, true);
+                        trackFile = getFullPath("aid_public/"
+                                + PREFIX_ANALYSIS
+                                + stormInfo.getBasin().toLowerCase()
+                                + stormInfo.getNumber() + stormYear
+                                + ".dat.gz");
+                        readTracks(stormInfo, tracks, trackFile, waysToUse,
+                                   true);
                     } catch (BadDataException bde2) {
-                        System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
+                        System.err.println(
+                            "Failed reading 'A' file for storm:" + stormInfo
+                            + " file:" + trackFile);
                     }
                 }
                 //                System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
@@ -656,19 +667,21 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         try {
             readTracks(stormInfo, tracks, trackFile, null, true);
         } catch (BadDataException bde) {
-                if(!bSubDir.equals("btk")) {
-                    try {
-                        trackFile = getFullPath("btk/" + PREFIX_BEST
-                                                + stormInfo.getBasin().toLowerCase()
-                                                + stormInfo.getNumber() + stormYear
-                                                + ".dat.gz");
-                        readTracks(stormInfo, tracks, trackFile, null, true);
-                    } catch (BadDataException bde2) {
-                        System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
-                    }
-
+            if ( !bSubDir.equals("btk")) {
+                try {
+                    trackFile =
+                        getFullPath("btk/" + PREFIX_BEST
+                                    + stormInfo.getBasin().toLowerCase()
+                                    + stormInfo.getNumber() + stormYear
+                                    + ".dat.gz");
+                    readTracks(stormInfo, tracks, trackFile, null, true);
+                } catch (BadDataException bde2) {
+                    System.err.println("Failed reading 'B' file for storm:"
+                                       + stormInfo + " file:" + trackFile);
                 }
-                //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
+
+            }
+            //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
         }
         long t2 = System.currentTimeMillis();
         //        System.err.println("time: " + (t2 - t1));
@@ -758,4 +771,3 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
 
 }
-
