@@ -298,6 +298,9 @@ public class DrawingControl extends DisplayControlImpl {
     /** front scale */
     private double frontScale = 1.0;
 
+    /** the autoscroll counter */
+    private int autoScrollCnt = 0;
+
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -330,9 +333,14 @@ public class DrawingControl extends DisplayControlImpl {
     public String formatDistance(Real distance)
             throws VisADException, RemoteException {
         return getDisplayConventions().formatDistance(
-                                                      distance.getValue(getDistanceUnit())) + " " + getDistanceUnit();
+            distance.getValue(getDistanceUnit())) + " " + getDistanceUnit();
     }
 
+    /**
+     * Get the distance unit
+     *
+     * @return the distance unit
+     */
     public Unit getDistanceUnit() {
         return getDisplayUnit();
     }
@@ -386,6 +394,9 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * Initialize the display unit
+     */
     protected void initDisplayUnit() {
         if (getDisplayUnit() == null) {
             setDisplayUnit(getDefaultDistanceUnit());
@@ -466,7 +477,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    private void processData(Data data)
+    protected void processData(Data data)
             throws VisADException, RemoteException {
         if (data instanceof visad.Text) {
             String  contents = ((visad.Text) data).getValue();
@@ -901,10 +912,10 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
     /**
-     * _more_
+     * Do the flythrough
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD problem
      */
     public void doFlythrough() throws VisADException, RemoteException {
         for (int i = 0; i < selectedGlyphs.size(); i++) {
@@ -915,9 +926,6 @@ public class DrawingControl extends DisplayControlImpl {
         }
 
     }
-
-    /** _more_          */
-    private int autoScrollCnt = 0;
 
     /**
      * Listen for DisplayEvents
