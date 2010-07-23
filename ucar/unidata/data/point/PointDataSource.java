@@ -850,6 +850,17 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
     /**
+     *  Reload the data
+     */
+    public void reloadData() {
+        dataChoices = null;
+        getDataChoices();
+        super.reloadData();
+    }
+
+
+
+    /**
      * Make the <code>DataChoices</code> for this <code>DataSource</code>.
      */
     public void doMakeDataChoices() {
