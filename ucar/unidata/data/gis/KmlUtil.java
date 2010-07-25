@@ -90,6 +90,7 @@ public class KmlUtil {
     public static final String TAG_ROLL = "roll";
     public static final String TAG_ROTATION = "rotation";
     public static final String TAG_SCHEMA = "Schema";
+    public static final String TAG_SNIPPET = "Snippet";
     public static final String TAG_SOUTH = "south";
     public static final String TAG_STYLE = "Style";
     public static final String TAG_STYLEURL = "styleUrl";
@@ -250,6 +251,12 @@ public class KmlUtil {
         return makeText(parent, TAG_VISIBILITY, (visible
                 ? "1"
                 : "0"));
+    }
+
+
+
+    public static Element snippet(Element parent, String snippet) {
+        return makeText(parent, TAG_SNIPPET, snippet);
     }
 
 
