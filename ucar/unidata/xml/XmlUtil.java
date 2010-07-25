@@ -38,7 +38,9 @@ import ucar.unidata.util.Trace;
 
 import java.awt.Color;
 
+
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 
 
@@ -136,8 +138,9 @@ public abstract class XmlUtil {
      *  @param value The attribute value.
      *  @param tab   The tab to prepend onto the result.
      */
-    public static void attr(StringBuffer buff, String name, String value,
+    public static void attr(Appendable buff, String name, String value,
                             String tab) {
+        try {
         buff.append(" ");
         buff.append(name);
         buff.append("=\"");
@@ -152,7 +155,9 @@ public abstract class XmlUtil {
 
         //TODO
         buff.append("\"");
-
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -1963,6 +1968,11 @@ public abstract class XmlUtil {
         return toStringWithHeader(node, tabSpacing, newLine, false);
     }
 
+    public static void toString(Node node, Appendable appendable) {
+        toString(appendable, node, "", "", "", false, true);
+    }
+
+
     /**
      * Convert the xml to a string. Add the xml header
      *
@@ -1995,11 +2005,12 @@ public abstract class XmlUtil {
      * @param prettifyAttrs Format attributes
      * @param recurse _more_
      */
-    private static void toString(StringBuffer xml, Node node,
+    private static void toString(Appendable xml, Node node,
                                  String currentTab, String tabSpacing,
                                  String newLine, boolean prettifyAttrs,
                                  boolean recurse) {
 
+        try {
         int type = node.getNodeType();
 
         switch (type) {
@@ -2101,7 +2112,9 @@ public abstract class XmlUtil {
               break;
           }
         }
-
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
 
     }
 
