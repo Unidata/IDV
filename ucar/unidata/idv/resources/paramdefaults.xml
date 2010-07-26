@@ -85,10 +85,11 @@ specified  -->
      unit="gpm"/>
   <param
      name="altitude"
-     table="Topographic"
-     range_min="0.0"
-     range_max="4000.0"
+     table="Topography/Bathymetry"
+     range_min="-12458"
+     range_max="8791"
      ci_interval="500"
+     ci_base="0"
      unit="m"/>
   <param
      name="sst"
