@@ -127,6 +127,9 @@ public class SelectRangeWidget extends ControlWidget {
                             + getDisplayConventions().format(r.getMin())
                             + " To: "
                             + getDisplayConventions().format(r.getMax()));
+            if (rangeDialog != null) {
+                rangeDialog.setRangeDialog(r);
+            }
         }
     }
 
