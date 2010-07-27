@@ -1638,7 +1638,7 @@ public class TextPointDataSource extends PointDataSource {
     private Real getDefaultValue() throws VisADException {
         if (dfltReal == null) {
             RealType dfltRealType = RealType.getRealType("Default");
-            dfltReal = new Real(dfltRealType, 1);
+            dfltReal = new Real(dfltRealType, 1, CommonUnit.promiscuous);
         }
         return dfltReal;
     }
@@ -1921,20 +1921,27 @@ public class TextPointDataSource extends PointDataSource {
                            ? (Real) tupleData[altIndex]
                            : dfltAlt;
 
-                if ( !lat.getType().equals(RealType.Latitude)) {
+                // for an EarthLocationLite, lat/lon have to be degrees and altitude has to be m
+                if ( !(lat.getType().equals(RealType.Latitude)
+                        && lat.getUnit().equals(
+                            RealType.Latitude.getDefaultUnit()))) {
                     lat = new Real(
                         RealType.Latitude,
                         lat.getValue(RealType.Latitude.getDefaultUnit()));
                 }
 
-                if ( !lon.getType().equals(RealType.Longitude)) {
+                if ( !(lon.getType().equals(RealType.Longitude)
+                        && lon.getUnit().equals(
+                            RealType.Longitude.getDefaultUnit()))) {
                     lon = new Real(
                         RealType.Longitude,
                         lon.getValue(RealType.Longitude.getDefaultUnit()));
                 }
 
                 if ((altIndex >= 0)
-                        && !alt.getType().equals(RealType.Altitude)) {
+                        && !(alt.getType().equals(RealType.Altitude)
+                             && alt.getUnit().equals(
+                                 RealType.Altitude.getDefaultUnit()))) {
                     alt = new Real(
                         RealType.Altitude,
                         alt.getValue(RealType.Altitude.getDefaultUnit()));
@@ -2222,8 +2229,10 @@ public class TextPointDataSource extends PointDataSource {
                         varNames.add(
                             ((RealType) dfltReal.getType()).getName());
                         numericTypes.add(dfltReal.getType());
-                        varUnits[0] =
-                            ((RealType) dfltReal.getType()).getDefaultUnit();
+                        varUnits[0] = (altIndex != -1)
+                                      ? ((RealType) dfltReal.getType())
+                                          .getDefaultUnit()
+                                      : CommonUnit.meter;
                         numericUnits.add(varUnits[0]);
                     }
 
@@ -2255,7 +2264,10 @@ public class TextPointDataSource extends PointDataSource {
                         }
                     }
                 } else {
-                    realArray[0] = 0;
+                    Real alt = (altIndex != -1)
+                               ? (Real) tupleData[altIndex]
+                               : dfltAlt;
+                    realArray[0] = alt.getValue(CommonUnit.meter);
                 }
 
                 Tuple tuple = (allReals
@@ -2277,20 +2289,26 @@ public class TextPointDataSource extends PointDataSource {
                            ? (Real) tupleData[altIndex]
                            : dfltAlt;
 
-                if ( !lat.getType().equals(RealType.Latitude)) {
+                if ( !(lat.getType().equals(RealType.Latitude)
+                        && lat.getUnit().equals(
+                            RealType.Latitude.getDefaultUnit()))) {
                     lat = new Real(
                         RealType.Latitude,
                         lat.getValue(RealType.Latitude.getDefaultUnit()));
                 }
 
-                if ( !lon.getType().equals(RealType.Longitude)) {
+                if ( !(lon.getType().equals(RealType.Longitude)
+                        && lon.getUnit().equals(
+                            RealType.Longitude.getDefaultUnit()))) {
                     lon = new Real(
                         RealType.Longitude,
                         lon.getValue(RealType.Longitude.getDefaultUnit()));
                 }
 
                 if ((altIndex >= 0)
-                        && !alt.getType().equals(RealType.Altitude)) {
+                        && !(alt.getType().equals(RealType.Altitude)
+                             && alt.getUnit().equals(
+                                 RealType.Altitude.getDefaultUnit()))) {
                     alt = new Real(
                         RealType.Altitude,
                         alt.getValue(RealType.Altitude.getDefaultUnit()));

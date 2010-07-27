@@ -116,10 +116,10 @@ public class PointCloudControl extends DrawingControl {
     private JTabbedPane tabbedPane;
 
     /** Which field in the data should be used for coloring */
-    private int colorRangeIndex;
+    private int colorRangeIndex = -1;
 
-    /** The data range */
-    private Range dataRange;
+    /** The data ranges */
+    private Range[] dataRanges;
 
     /** widget */
     private JComboBox colorParamsBox = null;
@@ -406,8 +406,13 @@ public class PointCloudControl extends DrawingControl {
      * @return the range of the data for coloring
      */
     public Range getColorRangeFromData() {
-        if (dataRange != null) {
-            return dataRange;
+        if (dataRanges != null) {
+            int rangeIndex = colorRangeIndex;
+            if ((colorRangeIndex < 0)
+                    || (colorRangeIndex >= rangeTypes.length)) {
+                rangeIndex = rangeTypes.length - 1;
+            }
+            return dataRanges[rangeIndex];
         }
         return super.getColorRangeFromData();
     }
@@ -588,12 +593,12 @@ public class PointCloudControl extends DrawingControl {
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        super.getControlWidgets(controlWidgets);
         if ( !hasRGB) {
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Color By:"),
                     GuiUtils.left(doMakeColorByWidget())));
         }
+        super.getControlWidgets(controlWidgets);
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Point Size:"),
@@ -633,6 +638,8 @@ public class PointCloudControl extends DrawingControl {
                             (RealType) colorParamsBox.getSelectedItem();
                         //System.err.println("type:" + colorType);
                         myDisplay.setRGBRealType(colorType);
+                        setRange(getColorRangeFromData());
+                        setSelectRange(getRange());
                     } catch (Exception excp) {
                         logException("Setting rgb type", excp);
                     }
@@ -749,10 +756,11 @@ public class PointCloudControl extends DrawingControl {
      */
     private void loadPointData(Data newData) throws Exception {
 
-        FieldImpl data   = (newData == null)
-                           ? (FieldImpl) getDataInstance().getData()
-                           : (FieldImpl) newData;
-        FlatField points = null;
+        FieldImpl data     = (newData == null)
+                             ? (FieldImpl) getDataInstance().getData()
+                             : (FieldImpl) newData;
+        String    dataName = getDataInstance().getDataChoice().getName();
+        FlatField points   = null;
         isSequence = GridUtil.isTimeSequence(data);
         if (isSequence) {
             points = (FlatField) data.getSample(0, false);
@@ -774,13 +782,18 @@ public class PointCloudControl extends DrawingControl {
             } else if (rangeTypes[i].equals(RealType.Altitude)) {
                 altIndex = i;
             }
+            if (rangeTypes[i].getName().equalsIgnoreCase(paramName)) {
+                colorRangeIndex = i;
+            }
         }
 
         float[][] pts = points.getFloats(false);
-        if (pts.length == 3) {  // just lat/lon/alt
-            colorRangeIndex = altIndex;
-        } else {
-            colorRangeIndex = pts.length - 1;
+        if (colorRangeIndex == -1) {  // hasn't been set from bundle
+            if (pts.length == 3) {    // just lat/lon/alt
+                colorRangeIndex = altIndex;
+            } else {
+                colorRangeIndex = pts.length - 1;
+            }
         }
 
         if (pts.length == 6) {
@@ -804,12 +817,18 @@ public class PointCloudControl extends DrawingControl {
             colorRangeIndex = altIndex;
         }
 
-        float minX     = Float.POSITIVE_INFINITY;
-        float minY     = Float.POSITIVE_INFINITY;
-        float maxX     = Float.NEGATIVE_INFINITY;
-        float maxY     = Float.NEGATIVE_INFINITY;
-        float minField = Float.POSITIVE_INFINITY;
-        float maxField = Float.NEGATIVE_INFINITY;
+        float   minX      = Float.POSITIVE_INFINITY;
+        float   minY      = Float.POSITIVE_INFINITY;
+        float   maxX      = Float.NEGATIVE_INFINITY;
+        float   maxY      = Float.NEGATIVE_INFINITY;
+        int     numFields = pts.length;
+        float[] maxFields = new float[numFields];
+        float[] minFields = new float[numFields];
+        for (int i = 0; i < numFields; i++) {
+            maxFields[i] = Float.NEGATIVE_INFINITY;
+            minFields[i] = Float.POSITIVE_INFINITY;
+        }
+        dataRanges = new Range[numFields];
         if (isSequence) {
             animationSet = data.getDomainSet();
         }
@@ -853,17 +872,19 @@ public class PointCloudControl extends DrawingControl {
             float timemaxX = Float.NEGATIVE_INFINITY;
             float timemaxY = Float.NEGATIVE_INFINITY;
 
-            for (int i = 0; i < pts[0].length; i++) {
-                timeminX = Math.min(timeminX, pts[lonIndex][i]);
-                timemaxX = Math.max(timemaxX, pts[lonIndex][i]);
-                timeminY = Math.min(timeminY, pts[latIndex][i]);
-                timemaxY = Math.max(timemaxY, pts[latIndex][i]);
-                if (pts.length == 3) {
-                    maxField = Math.max(maxField, pts[altIndex][i]);
-                    minField = Math.min(minField, pts[altIndex][i]);
-                } else {
-                    maxField = Math.max(maxField, pts[colorRangeIndex][i]);
-                    minField = Math.min(minField, pts[colorRangeIndex][i]);
+            for (int k = 0; k < pts.length; k++) {
+                float[] paramPts = pts[k];
+                for (int i = 0; i < paramPts.length; i++) {
+                    float value = paramPts[i];
+                    maxFields[k] = Math.max(maxFields[k], value);
+                    minFields[k] = Math.min(minFields[k], value);
+                    if (k == lonIndex) {
+                        timeminX = Math.min(timeminX, value);
+                        timemaxX = Math.max(timemaxX, value);
+                    } else if (k == latIndex) {
+                        timeminY = Math.min(timeminY, value);
+                        timemaxY = Math.max(timemaxY, value);
+                    }
                 }
             }
             EarthLocation el =
@@ -917,7 +938,9 @@ public class PointCloudControl extends DrawingControl {
         }
 
 
-        dataRange = new Range(minField, maxField);
+        for (int i = 0; i < numFields; i++) {
+            dataRanges[i] = new Range(minFields[i], maxFields[i]);
+        }
         //        System.err.println("Range:" + dataRange +" idx:" + colorRangeIndex);
 
         float width  = Math.max((maxX - minX), (maxY - minY));
@@ -941,7 +964,6 @@ public class PointCloudControl extends DrawingControl {
         }
 
     }
-
 
     /**
      * Is this a raster display
