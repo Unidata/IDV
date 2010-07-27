@@ -643,6 +643,10 @@ public abstract class RGBDisplayable extends DisplayableData {
 
         // ScalarMap is either mapping to Display.RGB (color only)
         // or to Display.RGBA color plus transparency.
+        ScalarMapSet maps = getScalarMapSet();  //new ScalarMapSet();
+        if (colorMap != null) {
+            maps.remove(colorMap);
+        }
         if ( !alphaflag) {
             colorMap = new ScalarMap(rgbRealType, Display.RGB);
         } else {
@@ -684,7 +688,6 @@ public abstract class RGBDisplayable extends DisplayableData {
                 }
             }
         });
-        ScalarMapSet maps = getScalarMapSet();  //new ScalarMapSet();
         maps.add(colorMap);
         setScalarMapSet(maps);
     }
@@ -824,6 +827,10 @@ public abstract class RGBDisplayable extends DisplayableData {
      */
     private void setSelectMaps() throws RemoteException, VisADException {
 
+        ScalarMapSet maps = getScalarMapSet();
+        if (selectMap != null) {
+            maps.remove(selectMap);  // remove the old one
+        }
         selectMap = new ScalarMap(selectRealType, Display.SelectRange);
 
         if (selectRealType.equals(rgbRealType)) {
@@ -860,7 +867,6 @@ public abstract class RGBDisplayable extends DisplayableData {
                 }
             }
         });
-        ScalarMapSet maps = getScalarMapSet();  //new ScalarMapSet();
         maps.add(selectMap);
         setScalarMapSet(maps);
     }
