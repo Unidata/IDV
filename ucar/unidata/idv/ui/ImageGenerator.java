@@ -1898,18 +1898,18 @@ public class ImageGenerator extends IdvManager {
                 MouseBehavior mb = vm.getMaster().getMouseBehavior();
                 mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
                 double[] matrix =
-                    mb.make_matrix(toDouble(node, ATTR_ROTX, rot[0]),
-                                   toDouble(node, ATTR_ROTY, rot[1]),
-                                   toDouble(node, ATTR_ROTZ, rot[2]),
-                                   toDouble(node, ATTR_SCALE, scale[0])
-                                   * a[0], toDouble(node, ATTR_SCALE,
-                                       scale[0]) * a[1], toDouble(node,
+                    mb.make_matrix(applyMacros(node, ATTR_ROTX, rot[0]),
+                                   applyMacros(node, ATTR_ROTY, rot[1]),
+                                   applyMacros(node, ATTR_ROTZ, rot[2]),
+                                   applyMacros(node, ATTR_SCALE, scale[0])
+                                   * a[0], applyMacros(node, ATTR_SCALE,
+                                       scale[0]) * a[1], applyMacros(node,
                                            ATTR_SCALE,
-                                           scale[0]) * a[2], toDouble(node,
+                                           scale[0]) * a[2], applyMacros(node,
                                                ATTR_TRANSX,
-                                               trans[0]), toDouble(node,
+                                               trans[0]), applyMacros(node,
                                                    ATTR_TRANSY,
-                                                   trans[1]), toDouble(node,
+                                                   trans[1]), applyMacros(node,
                                                        ATTR_TRANSZ,
                                                        trans[2]));
                 vm.setDisplayMatrix(matrix);
