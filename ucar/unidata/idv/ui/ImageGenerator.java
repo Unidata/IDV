@@ -1895,24 +1895,67 @@ public class ImageGenerator extends IdvManager {
                 double[]      trans         = { 0.0, 0.0, 0.0 };
                 double[]      rot           = { 0.0, 0.0, 0.0 };
                 double[]      scale         = { 0.0, 0.0, 0.0 };
+
                 MouseBehavior mb = vm.getMaster().getMouseBehavior();
                 mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
-                double[] matrix =
-                    mb.make_matrix(applyMacros(node, ATTR_ROTX, rot[0]),
-                                   applyMacros(node, ATTR_ROTY, rot[1]),
-                                   applyMacros(node, ATTR_ROTZ, rot[2]),
-                                   applyMacros(node, ATTR_SCALE, scale[0])
-                                   * a[0], applyMacros(node, ATTR_SCALE,
-                                       scale[0]) * a[1], applyMacros(node,
-                                           ATTR_SCALE,
-                                           scale[0]) * a[2], applyMacros(node,
-                                               ATTR_TRANSX,
-                                               trans[0]), applyMacros(node,
-                                                   ATTR_TRANSY,
-                                                   trans[1]), applyMacros(node,
-                                                       ATTR_TRANSZ,
-                                                       trans[2]));
-                vm.setDisplayMatrix(matrix);
+                double scaleValue = applyMacros(node, ATTR_SCALE, 0.0);
+                if(scaleValue!=0) {
+                    double scaleX =  scaleValue * a[0]; 
+                    double scaleY =  scaleValue * a[1]; 
+                    double scaleZ =  scaleValue * a[2]; 
+                    double[] scaleMatrix = mb.make_matrix(0.0, 0.0, 0.0,
+                                                          scaleX/scale[0], 
+                                                          scaleY/scale[1],
+                                                          scaleZ/scale[2],
+                                                          0.0, 0.0, 0.0);
+                    currentMatrix = mb.multiply_matrix(scaleMatrix,
+                                                       currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+                double []tmp;
+                double dummy = 0.0;
+                //TODO: the rotation maybe doesn't work
+                if (XmlUtil.hasAttribute(node, ATTR_ROTX)) {
+                    tmp  = mb.make_matrix(applyMacros(node, ATTR_ROTX, dummy), 0.0, 0.0,
+                                          1.0,0.0,0.0,0.0);
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+                if (XmlUtil.hasAttribute(node, ATTR_ROTY)) {
+                    tmp  = mb.make_matrix(0.0,applyMacros(node, ATTR_ROTY, dummy)-rot[1], 0.0,
+                                          1.0,0.0,0.0,0.0);
+
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+                if (XmlUtil.hasAttribute(node, ATTR_ROTZ)) {
+                    tmp  = mb.make_matrix(0.0,0.0, applyMacros(node, ATTR_ROTZ, dummy)-rot[2], 
+                                          1.0,0.0,0.0,0.0);
+
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+
+                if (XmlUtil.hasAttribute(node, ATTR_TRANSX)) {
+                    tmp = mb.make_translate(applyMacros(node, ATTR_TRANSX, dummy)-trans[0], 0.0, 0.0);
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+                if (XmlUtil.hasAttribute(node, ATTR_TRANSY)) {
+                    tmp = mb.make_translate(0.0, applyMacros(node, ATTR_TRANSY, dummy)-trans[1], 0.0);
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+
+                if (XmlUtil.hasAttribute(node, ATTR_TRANSZ)) {
+                    tmp = mb.make_translate(0.0, 0.0, applyMacros(node, ATTR_TRANSZ, dummy)-trans[2]);
+                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                }
+
+
+                vm.setDisplayMatrix(currentMatrix);
+
             }
         }
         return true;
