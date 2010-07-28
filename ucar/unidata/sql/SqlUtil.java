@@ -1382,7 +1382,7 @@ public class SqlUtil {
         private         Statement stmt;
 
         /** _more_ */
-        private         int cnt = 0;
+        private         int resultSetCnt = 0;
 
         /** _more_ */
         private         ResultSet lastResultSet;
@@ -1428,22 +1428,60 @@ public class SqlUtil {
             if (stmt == null) {
                 return null;
             }
-            if (cnt != 0) {
+            if (resultSetCnt != 0) {
                 stmt.getMoreResults();
             }
             if (lastResultSet != null) {
-                lastResultSet.close();
+		lastResultSet.close();
             }
-            cnt++;
+            resultSetCnt++;
             lastResultSet = stmt.getResultSet();
             if (lastResultSet == null) {
                 if(shouldCloseStatement) {
-                    close(stmt);
+		    close(stmt);
                 }
                 stmt = null;
             }
             return lastResultSet;
         }
+
+
+	public ResultSet getNext() throws SQLException {
+	    try {
+		if(lastResultSet == null) {
+		    lastResultSet = stmt.getResultSet();
+		    if(!lastResultSet.next()) {
+			checkClose();
+			return null;
+		    }
+		    return lastResultSet;
+		}  
+
+		if(lastResultSet.next()) {
+		    return lastResultSet;
+		}
+
+		if (lastResultSet != null) {
+		    lastResultSet.close();
+		}
+		lastResultSet = stmt.getResultSet();
+		if(lastResultSet.next()) {
+		    return lastResultSet;
+		}
+
+	    } catch(SQLException exc) {
+	    }
+	    checkClose();
+	    return null;
+	}
+
+
+	private void checkClose() throws SQLException {
+	    if(shouldCloseStatement) {
+		close(stmt);
+		stmt = null;
+	    }
+	}
 
         public void close() throws SQLException {
             if(stmt!=null) {
