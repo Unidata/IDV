@@ -110,6 +110,7 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
             throws VisADException, RemoteException {
         super(name);
         this.doAlpha = doAlpha;
+        this.colorPalette = colorPalette;
         if (doAlpha) {
             mapType   = Display.RGBA;
             colorMaps = new ScalarMap[] { null, null, null, null };
