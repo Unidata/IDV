@@ -1369,6 +1369,11 @@ public class SqlUtil {
     }
 
 
+    public static Iterator getIterator(Statement stmt, int offset, int limit) {
+        return new Iterator(stmt, offset, limit);
+    }
+
+
     /**
      * Class Iterator _more_
      *
@@ -1390,13 +1395,23 @@ public class SqlUtil {
         /** _more_ */
         private boolean shouldCloseStatement = true;
 
+	private int offset = 0;
+	private int limit = -1;
+	private int cnt=0;
+
         /**
          *
          * @param stmt _more_
          */
         public Iterator(Statement stmt) {
+	    this(stmt,0,-1);
+	}
+
+	public Iterator(Statement stmt, int offset, int limit) {
             this.stmt = stmt;
-        }
+	    this.offset = offset;
+            this.limit = limit;  
+      }
 
         /**
            Set the ShouldCloseStatement property.
@@ -1446,6 +1461,11 @@ public class SqlUtil {
         }
 
 
+	public ResultSet getResults() {
+	    return lastResultSet;
+	}
+
+
 	public ResultSet getNext() throws SQLException {
 	    try {
 		if(lastResultSet == null) {
@@ -1454,10 +1474,19 @@ public class SqlUtil {
 			checkClose();
 			return null;
 		    }
+		    //Run through the offset
+		    while(offset-->0) {
+			if(!lastResultSet.next()) {
+			    checkClose();
+			    return null;
+			}
+		    }
+		    cnt++;
 		    return lastResultSet;
 		}  
 
 		if(lastResultSet.next()) {
+		    cnt++;
 		    return lastResultSet;
 		}
 
@@ -1466,6 +1495,7 @@ public class SqlUtil {
 		}
 		lastResultSet = stmt.getResultSet();
 		if(lastResultSet.next()) {
+		    cnt++;
 		    return lastResultSet;
 		}
 
@@ -1476,9 +1506,18 @@ public class SqlUtil {
 	}
 
 
+	public int getCount() {
+	    return cnt;
+	}
+
+	public boolean countOK() {
+	    return cnt<limit;
+	}
+
 	private void checkClose() throws SQLException {
 	    if(shouldCloseStatement) {
 		close(stmt);
+		lastResultSet = null;
 		stmt = null;
 	    }
 	}
