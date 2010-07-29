@@ -506,7 +506,6 @@ public class PointCloudControl extends DrawingControl {
             myDisplay = new VolumeDisplayable("pointcloud_"
                     + getDataInstance().getDataChoice().getName());
             myDisplay.setUseRGBTypeForSelect(true);
-
             //myDisplay.addConstantMap(new ConstantMap(useTexture3D
             //                                         ? GraphicsModeControl.TEXTURE3D
             //                                       : GraphicsModeControl.STACK2D, Display.Texture3DMode));
@@ -520,10 +519,11 @@ public class PointCloudControl extends DrawingControl {
      * Get the initial color table
      *
      * @return the initial color table
-     */
     protected ColorTable getInitialColorTable() {
-        return getDisplayConventions().getParamColorTable("image");
+        return (hasRGB) ? getDisplayConventions().getParamColorTable("image")
+        		        : super.getInitialColorTable();
     }
+     */
 
 
     /**
