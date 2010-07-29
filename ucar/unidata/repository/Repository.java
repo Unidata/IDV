@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -82,13 +83,8 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
@@ -290,13 +286,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private long baseTime = System.currentTimeMillis();
 
 
-    /** _more_          */
+    /** _more_ */
     ucar.unidata.util.SocketConnection dummyConnection;
 
     /** _more_ */
     private List<String> loadFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<Class> adminHandlerClasses = new ArrayList<Class>();
 
     /** _more_ */
@@ -366,10 +362,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> pluginPropertyFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> pluginSqlFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> pluginFiles = new ArrayList<String>();
 
 
@@ -408,7 +404,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private SearchManager searchManager;
 
-    /** _more_          */
+    /** _more_ */
     private MapManager mapManager;
 
     /** _more_ */
@@ -486,18 +482,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private Hashtable<String, String> pluginHelpMap = new Hashtable<String,
                                                           String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> pluginHelpPaths = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private String pluginHelpToc;
 
-    private List<PageDecorator> pageDecorators =  new ArrayList<PageDecorator>();
+    /** _more_          */
+    private List<PageDecorator> pageDecorators =
+        new ArrayList<PageDecorator>();
 
 
-    public Repository()
-            throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public Repository() throws Exception {}
 
 
 
@@ -509,21 +510,27 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, int port)
-            throws Exception {
+    public Repository(String[] args, int port) throws Exception {
         super(port);
-        init(args,port);
+        init(args, port);
     }
 
-    public void init(String[]args, int port) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     * @param port _more_
+     *
+     * @throws Exception _more_
+     */
+    public void init(String[] args, int port) throws Exception {
         setPort(port);
         LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
         setHostname(localMachine.getHostName());
         setIpAddress(localMachine.getHostAddress());
-        this.args     = args;
+        this.args = args;
 
     }
 
@@ -536,7 +543,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getHostname() {
         String hostname = getProperty(PROP_HOSTNAME, (String) null);
         if ((hostname != null) && (hostname.trim().length() > 0)) {
-            if(hostname.equals("ipaddress")) {
+            if (hostname.equals("ipaddress")) {
                 return getIpAddress();
             }
             return hostname;
@@ -2012,8 +2019,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     this,
                     node });
             }
-            if(handler == null) {
-                getLogManager().logInfo("Could not find handler for:" + handlerName+":");
+            if (handler == null) {
+                getLogManager().logInfo("Could not find handler for:"
+                                        + handlerName + ":");
                 return;
             }
             handlers.put(handlerName, handler);
@@ -2891,9 +2899,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public void decorateResult(Request request, Result result)
-        throws Exception {
+            throws Exception {
 
-        Entry currentEntry = (Entry)getSessionManager().getSessionProperty(request, "lastentry");
+        Entry currentEntry =
+            (Entry) getSessionManager().getSessionProperty(request,
+                "lastentry");
         String   template     = null;
         Metadata metadata     = null;
         String sessionMessage =
@@ -3032,7 +3042,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             logoImage = "${root}/images/logo.png";
         }
         String logoUrl = (String) result.getProperty(PROP_LOGO_URL);
-        if (logoUrl == null || logoUrl.trim().length()==0) {
+        if ((logoUrl == null) || (logoUrl.trim().length() == 0)) {
             logoUrl = getProperty(PROP_LOGO_URL, "");
         }
         String pageTitle = (String) result.getProperty(PROP_REPOSITORY_NAME);
@@ -3040,8 +3050,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             pageTitle = getProperty(PROP_REPOSITORY_NAME, "Repository");
         }
 
-        for(PageDecorator pageDecorator: pageDecorators) {
-            template = pageDecorator.decoratePage(this, request, template, currentEntry);
+        for (PageDecorator pageDecorator : pageDecorators) {
+            template = pageDecorator.decoratePage(this, request, template,
+                    currentEntry);
         }
         String   html   = template;
         String[] macros = new String[] {
@@ -3246,6 +3257,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return getProperty(PROP_DB_CANCACHE, true);
     }
 
+    /** _more_          */
     private Boolean cacheResources = null;
 
     /**
@@ -3254,8 +3266,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public boolean cacheResources() {
-        if(cacheResources==null) {
-            String test = (String) cmdLineProperties.get("ramadda.cacheresources");
+        if (cacheResources == null) {
+            String test =
+                (String) cmdLineProperties.get("ramadda.cacheresources");
 
             if (test == null) {
                 test = (String) properties.get("ramadda.cacheresources");
@@ -3284,7 +3297,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             theTemplates = new ArrayList<HtmlTemplate>();
             for (String path :
                     StringUtil.split(getProperty(PROP_HTML_TEMPLATES,
-                    "%resourcedir%/template.html"), ";", true, true)) {
+                        "%resourcedir%/template.html"), ";", true, true)) {
                 path = getStorageManager().localizePath(path);
                 try {
                     String resource =
@@ -3624,12 +3637,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    protected void writeGlobal(Request request, String propName, boolean deleteIfNull)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param propName _more_
+     * @param deleteIfNull _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void writeGlobal(Request request, String propName,
+                               boolean deleteIfNull)
             throws Exception {
         String value = request.getString(propName, getProperty(propName, ""));
-        if(deleteIfNull && value.trim().length()==0) {
+        if (deleteIfNull && (value.trim().length() == 0)) {
             getDatabaseManager().delete(Tables.GLOBALS.NAME,
-                                        Clause.eq(Tables.GLOBALS.COL_NAME, propName));
+                                        Clause.eq(Tables.GLOBALS.COL_NAME,
+                                            propName));
             dbProperties.remove(propName);
         } else {
             writeGlobal(propName, value);
@@ -5046,72 +5070,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-
-    /**
-     * protected Result listTags(Request request) throws Exception {
-     *   TypeHandler typeHandler = getTypeHandler(request);
-     *   List        where       = typeHandler.assembleWhereClause(request);
-     *   if (where.size() == 0) {
-     *       String type = (String) request.getString(ARG_TYPE,(BLANK).trim();
-     *       if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
-     *           typeHandler.addOr(Tables.ENTRIES.COL_TYPE, type, where, true);
-     *       }
-     *   }
-     *   if (where.size() > 0) {
-     *       where.add(SqlUtil.eq(Tables.TAGS.COL_ENTRY_ID, Tables.ENTRIES.COL_ID));
-     *   }
-     *
-     *   Statement stmt;
-     *   String[] tags =
-     *       SqlUtil.readString(getDatabaseManager().getIterator(stmt =
-     *           typeHandler.select(request,
-     *                                     SqlUtil.distinct(Tables.TAGS.COL_NAME),
-     *                                     where,
-     *                                     " order by " + Tables.TAGS.COL_NAME)), 1);
-     *   getDatabaseManager().closeAndReleaseStatement(stmt);
-     *
-     *   List<Tag>     tagList = new ArrayList();
-     *   List<String>  names   = new ArrayList<String>();
-     *   List<Integer> counts  = new ArrayList<Integer>();
-     *   ResultSet     results;
-     *   int           max = -1;
-     *   int           min = -1;
-     *   for (int i = 0; i < tags.length; i++) {
-     *       String tag = tags[i];
-     *       Statement stmt2 = typeHandler.select(request,
-     *                             SqlUtil.count("*"),
-     *                             Misc.newList(SqlUtil.eq(Tables.TAGS.COL_NAME,
-     *                                 SqlUtil.quote(tag))));
-     *
-     *       ResultSet results2 = stmt2.getResultSet();
-     *       if ( !results2.next()) {
-     *           continue;
-     *       }
-     *       int count = results2.getInt(1);
-     *       getDatabaseManager().closeAndReleaseStatement(stmt2);
-     *       if ((max < 0) || (count > max)) {
-     *           max = count;
-     *       }
-     *       if ((min < 0) || (count < min)) {
-     *           min = count;
-     *       }
-     *       tagList.add(new Tag(tag, count));
-     *   }
-     *
-     *   return getOutputHandler(request).listTags(request, tagList);
-     * }
-     *
-     */
-
 
     /**
      * _more_
@@ -5479,7 +5437,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                             : " T:"
                                             + HtmlUtil.input(
                                                 name + ".time", timeString,
-                                                HtmlUtil.sizeAttr(6)
+                                                    HtmlUtil.sizeAttr(6)
                                                         + HtmlUtil.attr(
                                                             HtmlUtil.ATTR_TITLE,
                                                                 timeHelp)));

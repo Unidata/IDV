@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -62,14 +63,6 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
@@ -189,19 +182,20 @@ public class RepositoryManager implements RepositorySource, Constants,
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param sb _more_
      * @param label _more_
      * @param value _more_
      */
-    public void addCriteria(Request request, 
-                                   StringBuffer sb, String label,
-                                   Object value) {
+    public void addCriteria(Request request, StringBuffer sb, String label,
+                            Object value) {
         String sv;
-        if(value instanceof Date)  {
+        if (value instanceof Date) {
             Date dttm = (Date) value;
             sv = formatDate(request, dttm);
         } else {
-            sv  = value.toString();
+            sv = value.toString();
         }
         sv = sv.replace("<", "&lt;");
         sv = sv.replace(">", "&gt;");

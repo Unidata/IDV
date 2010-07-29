@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
-
 
 
 
@@ -30,58 +30,36 @@ import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
-
-
 import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
 
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.DateUtil;
+
+
+
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.JobManager;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-import java.awt.Image;
-
 
 
 import java.io.*;
 
-import java.io.File;
-
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import java.util.regex.*;
-
-import java.util.zip.*;
 
 
 

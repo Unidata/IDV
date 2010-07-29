@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -28,7 +29,7 @@ import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
 
-import ucar.unidata.util.DateUtil;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -45,38 +46,10 @@ import ucar.unidata.xml.XmlUtil;
 
 
 
-import java.io.*;
-
-import java.io.File;
-
-import java.lang.reflect.*;
-
-
-
-import java.net.*;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
-
-
-import java.util.regex.*;
-
-import java.util.zip.*;
 
 
 
