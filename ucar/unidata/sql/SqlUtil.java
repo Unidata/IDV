@@ -1575,18 +1575,24 @@ public class SqlUtil {
      * @throws Exception _more_
      */
     public static PreparedStatement getSelectStatement(Connection connection,
-            String what, List tables, Clause clause, String extra)
-            throws Exception {
+                                                       String what, List tables, Clause clause, String extra)
+        throws Exception {
+        return connection.prepareStatement(getSelectStatement(what, tables, clause,extra));
+    }
+
+
+    public static String getSelectStatement(
+                                            String what, List tables, Clause clause, String extra)
+        throws Exception {
         StringBuffer sb = new StringBuffer();
         if(clause!=null) {
             clause.addClause(sb);
         }
-        if (debug) {
-            System.err.println(sb);
-        }
-        String query = makeSelect(what, tables, sb.toString(), extra);
-        return connection.prepareStatement(query);
+        String sql =  makeSelect(what, tables, sb.toString(), extra);
+        System.err.println("SQL:" + sql);
+        return sql;
     }
+
 
 
     /**

@@ -85,6 +85,9 @@ public class Clause {
     /** _more_ */
     public static final String EXPR_ISNULL = "is null";
 
+
+    public static final String EXPR_IN = "IN";
+
     /** _more_ */
     public static final String EXPR_OR = "OR";
 
@@ -103,6 +106,8 @@ public class Clause {
 
     /** _more_ */
     private Object value;
+
+    private String extra;
 
     /** _more_ */
     private Clause[] subClauses;
@@ -252,6 +257,17 @@ public class Clause {
         return  new Clause(column, EXPR_LE, value);
     }
 
+    public static Clause in(String column, String inner) {
+        return  new Clause(column, EXPR_IN, inner);
+    }
+
+    public static Clause in(String column, String what, String from, Clause inner) {
+        Clause clause =  new Clause(EXPR_IN, new Clause[] { inner});
+        clause.column = column;
+        clause.extra = " select " + what +" from " + from +" ";
+        return clause;
+    }
+
     /**
      * _more_
      *
@@ -373,7 +389,7 @@ public class Clause {
         if (column == null) {
             if(subClauses!=null) {
                 for (int i = 0; i < subClauses.length; i++) {
-                    if(subClauses[i].isColumnFromTable(table)) {
+                    if(subClauses[i]!=null && subClauses[i].isColumnFromTable(table)) {
                         return true;
                     }
                 }
@@ -508,14 +524,25 @@ public class Clause {
             List toks = new ArrayList();
             for (int i = 0; i < subClauses.length; i++) {
                 StringBuffer buff = new StringBuffer();
-                subClauses[i].addClause(buff);
-                toks.add(buff.toString());
+                if(subClauses[i]!=null) {
+                    subClauses[i].addClause(buff);
+                    toks.add(buff.toString());
+                }
             }
-            if(toks.size()>1) 
-                sb.append("(");
-            sb.append(StringUtil.join(" " + expr + " ", toks));
-            if(toks.size()>1) 
-                sb.append(")");
+
+            if (expr.equals(EXPR_IN)) {
+                if(toks.size()==0) {
+                    sb.append(SqlUtil.group(column + "  IN ( " + extra +")"));
+                } else {
+                    sb.append(SqlUtil.group(column + "  IN ( " + extra +" WHERE "  + toks.get(0) +")"));
+                }
+            } else {
+                if(toks.size()>1) 
+                    sb.append("(");
+                sb.append(StringUtil.join(" " + expr + " ", toks));
+                if(toks.size()>1) 
+                    sb.append(")");
+            }
             return sb;
         }
 
@@ -525,6 +552,8 @@ public class Clause {
             sb.append(SqlUtil.group(column + " =  " + value));
         } else if (expr.equals(EXPR_LIKE)) {
             sb.append(SqlUtil.group(column + "  like ?"));
+        } else if (expr.equals(EXPR_IN)) {
+            sb.append(SqlUtil.group(column + "  IN (" + value +")"));
         } else if (expr.equals(EXPR_NOTLIKE)) {
             sb.append(SqlUtil.group("NOT " + column + "  like ?"));
         } else {
@@ -554,7 +583,9 @@ public class Clause {
         }
         if (subClauses != null) {
             for (int i = 0; i < subClauses.length; i++) {
-                col = subClauses[i].setValue(stmt, col);
+                if(subClauses[i]!=null) {
+                    col = subClauses[i].setValue(stmt, col);
+                }
             }
             return col;
         }
