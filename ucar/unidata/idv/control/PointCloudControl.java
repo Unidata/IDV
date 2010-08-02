@@ -519,10 +519,10 @@ public class PointCloudControl extends DrawingControl {
      * Get the initial color table
      *
      * @return the initial color table
-    protected ColorTable getInitialColorTable() {
-        return (hasRGB) ? getDisplayConventions().getParamColorTable("image")
-        		        : super.getInitialColorTable();
-    }
+     * protected ColorTable getInitialColorTable() {
+     *   return (hasRGB) ? getDisplayConventions().getParamColorTable("image")
+     *                           : super.getInitialColorTable();
+     * }
      */
 
 
@@ -876,6 +876,9 @@ public class PointCloudControl extends DrawingControl {
                 float[] paramPts = pts[k];
                 for (int i = 0; i < paramPts.length; i++) {
                     float value = paramPts[i];
+                    if (value != value) {
+                        continue;
+                    }
                     maxFields[k] = Math.max(maxFields[k], value);
                     minFields[k] = Math.min(minFields[k], value);
                     if (k == lonIndex) {
