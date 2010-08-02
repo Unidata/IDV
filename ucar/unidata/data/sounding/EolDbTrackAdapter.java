@@ -366,11 +366,9 @@ public class EolDbTrackAdapter extends TrackAdapter {
         try {
             stmt = select("*", TABLE_CATEGORIES);
             iter = SqlUtil.getIterator(stmt);
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
+            while ((results = iter.getNext()) != null) {
                     cats.put(results.getString(COL_VARIABLE),
                              results.getString(COL_CATEGORY));
-                }
             }
         } catch (Exception exc) {
             //                exc.printStackTrace();
@@ -382,8 +380,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
         boolean gotCoords = false;
         description = "<b>Globals</b><br>";
         iter        = SqlUtil.getIterator(stmt);
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 String globalName  = results.getString(1).trim();
                 String globalValue = results.getString(2).trim();
                 globals.put(globalName, globalValue);
@@ -414,7 +411,6 @@ public class EolDbTrackAdapter extends TrackAdapter {
                     trackInfo.setCoordinateVars("GGLON", "GGLAT", "GGALT",
                             "datetime");
                 }
-            }
         }
         description = description + "</table>";
 
@@ -431,8 +427,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
 
         stmt = select("*", TABLE_VARIABLE_LIST);
         iter = SqlUtil.getIterator(stmt);
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 String name    = results.getString(COL_NAME).trim();
                 String desc    = results.getString(COL_LONG_NAME).trim();
                 Unit   unit    = DataUtil.parseUnit(results.getString(COL_UNITS).trim());
@@ -440,7 +435,6 @@ public class EolDbTrackAdapter extends TrackAdapter {
                 double missing = results.getDouble(COL_MISSING_VALUE);
                 VarInfo variable = new VarInfo(name, desc, cat, unit, missing);
                 trackInfo.addVariable(variable);
-            }
         }
         addTrackInfo(trackInfo);
         return true;
@@ -500,10 +494,8 @@ public class EolDbTrackAdapter extends TrackAdapter {
                 ResultSet         results;
                 int               cnt  = 0;
                 SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-                while ((results = iter.next()) != null) {
-                    while (results.next()) {
-                        cnt++;
-                    }
+                while ((results = iter.getNext()) != null) {
+                    cnt++;
                 }
                 numberOfPoints = cnt;
             }

@@ -497,22 +497,19 @@ public class AssociationManager extends RepositoryManager {
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter = getDatabaseManager().getIterator(stmt);
         ResultSet         results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Association association =
-                    new Association(results.getString(1),
-                                    results.getString(2),
-                                    results.getString(3),
-                                    results.getString(4),
-                                    results.getString(5));
+        while ((results = iter.getNext()) != null) {
+            Association association = new Association(results.getString(1),
+                                          results.getString(2),
+                                          results.getString(3),
+                                          results.getString(4),
+                                          results.getString(5));
 
-                Entry fromEntry = getEntryManager().getEntry(request,
-                                      association.getFromId());
-                Entry toEntry = getEntryManager().getEntry(request,
-                                    association.getToId());
-                if ((fromEntry != null) && (toEntry != null)) {
-                    associations.add(association);
-                }
+            Entry fromEntry = getEntryManager().getEntry(request,
+                                  association.getFromId());
+            Entry toEntry = getEntryManager().getEntry(request,
+                                association.getToId());
+            if ((fromEntry != null) && (toEntry != null)) {
+                associations.add(association);
             }
         }
         return associations;

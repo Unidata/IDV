@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -158,13 +159,13 @@ public class Admin extends RepositoryManager {
     });
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String BLOCK_SITE = "block.site";
 
-    /** _more_          */
+    /** _more_ */
     public static final String BLOCK_ACCESS = "block.access";
 
-    /** _more_          */
+    /** _more_ */
     public static final String BLOCK_DISPLAY = "block.display";
 
 
@@ -178,10 +179,10 @@ public class Admin extends RepositoryManager {
     /** _more_ */
     StringBuffer cleanupStatus = new StringBuffer();
 
-    /** _more_          */
+    /** _more_ */
     private List<AdminHandler> adminHandlers = new ArrayList<AdminHandler>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, AdminHandler> adminHandlerMap =
         new Hashtable<String, AdminHandler>();
 
@@ -480,9 +481,11 @@ public class Admin extends RepositoryManager {
                         getProperty(PROP_REPOSITORY_DESCRIPTION, ""), 5,
                         60)));
 
-            sb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
-                                         HtmlUtil.input(PROP_HOSTNAME,
-                                                        hostname, HtmlUtil.SIZE_60)+" (Use  &quot;ipadaddress&quot; for dynamic ips)"));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Hostname"),
+                    HtmlUtil.input(PROP_HOSTNAME, hostname, HtmlUtil.SIZE_60)
+                    + " (Use  &quot;ipadaddress&quot; for dynamic ips)"));
             sb.append(HtmlUtil.formEntry(msgLabel("Port"),
                                          HtmlUtil.input(PROP_PORT, port,
                                              HtmlUtil.SIZE_10)));
@@ -697,7 +700,7 @@ public class Admin extends RepositoryManager {
         return makeResult(request, "Administration", sb);
     }
 
-    /** _more_          */
+    /** _more_ */
     private boolean amDumpingDb = false;
 
     /**
@@ -1294,18 +1297,19 @@ public class Admin extends RepositoryManager {
         getRepository().getRegistryManager().applyAdminConfig(request);
 
 
-        getRepository().writeGlobal(request, PROP_ADMIN_EMAIL,true);
-        getRepository().writeGlobal(request, PROP_ADMIN_SMTP,true);
-        getRepository().writeGlobal(request, PROP_LOGO_URL,true);
-        getRepository().writeGlobal(request, PROP_LOGO_IMAGE,true);
-        getRepository().writeGlobal(request, PROP_REPOSITORY_NAME,true);
-        getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION,true);
+        getRepository().writeGlobal(request, PROP_ADMIN_EMAIL, true);
+        getRepository().writeGlobal(request, PROP_ADMIN_SMTP, true);
+        getRepository().writeGlobal(request, PROP_LOGO_URL, true);
+        getRepository().writeGlobal(request, PROP_LOGO_IMAGE, true);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_NAME, true);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION,
+                                    true);
         getRepository().writeGlobal(request, PROP_ADMIN_PHRASES);
         getRepository().writeGlobal(request, PROP_HTML_FOOTER);
 
-        getRepository().writeGlobal(request, PROP_LDM_PQINSERT,true);
-        getRepository().writeGlobal(request, PROP_LDM_QUEUE,true);
-        getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS,true);
+        getRepository().writeGlobal(request, PROP_LDM_PQINSERT, true);
+        getRepository().writeGlobal(request, PROP_LDM_QUEUE, true);
+        getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS, true);
         getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
 
         String ratings = "" + request.get(PROP_RATINGS_ENABLE, false);
@@ -1415,18 +1419,16 @@ public class Admin extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         List<String>     ids = new ArrayList<String>();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id          = results.getString(1);
-                String action      = results.getString(2);
-                String role        = results.getString(3);
-                List   permissions = idToPermissions.get(id);
-                if (permissions == null) {
-                    idToPermissions.put(id, permissions = new ArrayList());
-                    ids.add(id);
-                }
-                permissions.add(new Permission(action, role));
+        while ((results = iter.getNext()) != null) {
+            String id          = results.getString(1);
+            String action      = results.getString(2);
+            String role        = results.getString(3);
+            List   permissions = idToPermissions.get(id);
+            if (permissions == null) {
+                idToPermissions.put(id, permissions = new ArrayList());
+                ids.add(id);
             }
+            permissions.add(new Permission(action, role));
         }
 
         sb.append("<table cellspacing=\"0\" cellpadding=\"0\">");
@@ -1667,59 +1669,56 @@ public class Admin extends RepositoryManager {
 
             SqlUtil.Iterator iter =
                 getDatabaseManager().getIterator(statement);
-            ResultSet results;
-            int       cnt    = 0;
-            Hashtable map    = new Hashtable();
-            int       unique = 0;
-            while ((results = iter.next()) != null) {
-                ResultSetMetaData rsmd = results.getMetaData();
-                while (results.next()) {
-                    cnt++;
-                    if (cnt > 1000) {
-                        continue;
-                    }
-                    int colcnt = 0;
-                    if (cnt == 1) {
-                        sb.append("<table><tr>");
-                        for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                            sb.append(
-                                HtmlUtil.col(
-                                    HtmlUtil.bold(
-                                        rsmd.getColumnLabel(i + 1))));
-                        }
-                        sb.append("</tr>");
-                    }
-                    sb.append("<tr valign=\"top\">");
-                    while (colcnt < rsmd.getColumnCount()) {
-                        colcnt++;
-                        if (rsmd.getColumnType(colcnt)
-                                == java.sql.Types.TIMESTAMP) {
-                            Date dttm = results.getTimestamp(colcnt,
-                                            Repository.calendar);
-                            sb.append(HtmlUtil.col(formatDate(request,
-                                    dttm)));
-                        } else {
-                            String s = results.getString(colcnt);
-                            if (s == null) {
-                                s = "_null_";
-                            }
-                            s = HtmlUtil.entityEncode(s);
-                            if (s.length() > 100) {
-                                sb.append(
-                                    HtmlUtil.col(
-                                        HtmlUtil.textArea(
-                                            "dummy", s, 5, 50)));
-                            } else {
-                                sb.append(HtmlUtil.col(HtmlUtil.pre(s)));
-                            }
-                        }
-                    }
-                    sb.append("</tr>\n");
-                    //                if (cnt++ > 1000) {
-                    //                    sb.append(HtmlUtil.row("..."));
-                    //                    break;
-                    //                }
+            ResultSet         results;
+            int               cnt    = 0;
+            Hashtable         map    = new Hashtable();
+            int               unique = 0;
+            ResultSetMetaData rsmd   = null;
+            while ((results = iter.getNext()) != null) {
+                if (rsmd == null) {
+                    rsmd = results.getMetaData();
                 }
+                cnt++;
+                if (cnt > 1000) {
+                    continue;
+                }
+                int colcnt = 0;
+                if (cnt == 1) {
+                    sb.append("<table><tr>");
+                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
+                        sb.append(
+                            HtmlUtil.col(
+                                HtmlUtil.bold(rsmd.getColumnLabel(i + 1))));
+                    }
+                    sb.append("</tr>");
+                }
+                sb.append("<tr valign=\"top\">");
+                while (colcnt < rsmd.getColumnCount()) {
+                    colcnt++;
+                    if (rsmd.getColumnType(colcnt)
+                            == java.sql.Types.TIMESTAMP) {
+                        Date dttm = results.getTimestamp(colcnt,
+                                        Repository.calendar);
+                        sb.append(HtmlUtil.col(formatDate(request, dttm)));
+                    } else {
+                        String s = results.getString(colcnt);
+                        if (s == null) {
+                            s = "_null_";
+                        }
+                        s = HtmlUtil.entityEncode(s);
+                        if (s.length() > 100) {
+                            sb.append(HtmlUtil.col(HtmlUtil.textArea("dummy",
+                                    s, 5, 50)));
+                        } else {
+                            sb.append(HtmlUtil.col(HtmlUtil.pre(s)));
+                        }
+                    }
+                }
+                sb.append("</tr>\n");
+                //                if (cnt++ > 1000) {
+                //                    sb.append(HtmlUtil.row("..."));
+                //                    break;
+                //                }
             }
             sb.append("</table>");
             long t2 = System.currentTimeMillis();
@@ -1754,20 +1753,17 @@ public class Admin extends RepositoryManager {
         ResultSet        results;
         int              cnt        = 0;
         List<Entry>      badEntries = new ArrayList<Entry>();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id       = results.getString(1);
-                String parentId = results.getString(2);
-                cnt++;
-                if (parentId != null) {
-                    Group group = getEntryManager().findGroup(request,
-                                      parentId);
-                    if (group == null) {
-                        Entry entry = getEntryManager().getEntry(request, id);
-                        sb.append("bad parent:" + entry.getName()
-                                  + " parent id=" + parentId + "<br>");
-                        badEntries.add(entry);
-                    }
+        while ((results = iter.getNext()) != null) {
+            String id       = results.getString(1);
+            String parentId = results.getString(2);
+            cnt++;
+            if (parentId != null) {
+                Group group = getEntryManager().findGroup(request, parentId);
+                if (group == null) {
+                    Entry entry = getEntryManager().getEntry(request, id);
+                    sb.append("bad parent:" + entry.getName() + " parent id="
+                              + parentId + "<br>");
+                    badEntries.add(entry);
                 }
             }
         }
@@ -1880,36 +1876,32 @@ public class Admin extends RepositoryManager {
             int         deleteCnt = 0;
             long        t1        = System.currentTimeMillis();
             List<Entry> entries   = new ArrayList<Entry>();
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    if ((cleanupTS != myTS) || !runningCleanup) {
-                        runningCleanup = false;
-                        break;
-                    }
-                    int    col = 1;
-                    String id  = results.getString(col++);
-                    String resource = getStorageManager().resourceFromDB(
-                                          results.getString(col++));
-                    Entry entry = getRepository().getTypeHandler(
-                                      results.getString(col++)).createEntry(
-                                      id);
-                    File f = new File(resource);
-                    if (f.exists()) {
-                        continue;
-                    }
-                    //TODO: differentiate the entries that are not files
-                    entries.add(entry);
-                    if (entries.size() % 1000 == 0) {
-                        System.err.print(".");
-                    }
-                    if (entries.size() > 1000) {
-                        getEntryManager().deleteEntries(request, entries,
-                                null);
-                        entries   = new ArrayList<Entry>();
-                        deleteCnt += 1000;
-                        cleanupStatus = new StringBuffer("Removed "
-                                + deleteCnt + " entries from database");
-                    }
+            while ((results = iter.getNext()) != null) {
+                if ((cleanupTS != myTS) || !runningCleanup) {
+                    runningCleanup = false;
+                    break;
+                }
+                int    col = 1;
+                String id  = results.getString(col++);
+                String resource = getStorageManager().resourceFromDB(
+                                      results.getString(col++));
+                Entry entry = getRepository().getTypeHandler(
+                                  results.getString(col++)).createEntry(id);
+                File f = new File(resource);
+                if (f.exists()) {
+                    continue;
+                }
+                //TODO: differentiate the entries that are not files
+                entries.add(entry);
+                if (entries.size() % 1000 == 0) {
+                    System.err.print(".");
+                }
+                if (entries.size() > 1000) {
+                    getEntryManager().deleteEntries(request, entries, null);
+                    entries   = new ArrayList<Entry>();
+                    deleteCnt += 1000;
+                    cleanupStatus = new StringBuffer("Removed " + deleteCnt
+                            + " entries from database");
                 }
                 if ((cleanupTS != myTS) || !runningCleanup) {
                     runningCleanup = false;

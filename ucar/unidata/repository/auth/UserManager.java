@@ -291,8 +291,7 @@ public class UserManager extends RepositoryManager {
                 getDatabaseManager().getIterator(statement);
             ResultSet results;
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
+            while ((results = iter.getNext()) != null) {
                     int    col    = 1;
                     String id     = results.getString(col++);
                     String userId = results.getString(col++);
@@ -312,7 +311,6 @@ public class UserManager extends RepositoryManager {
                     }
                     favorites.add(new FavoriteEntry(id, entry, name,
                             category));
-                }
             }
             user.setFavorites(favorites);
         }
@@ -1293,13 +1291,12 @@ public class UserManager extends RepositoryManager {
                                         " order by " + Tables.USERS.COL_ID);
 
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
-        ResultSet        results;
+
 
         List<User>       users = new ArrayList();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                users.add(getUser(results));
-            }
+        ResultSet        results;
+        while ((results = iter.getNext()) != null) {
+            users.add(getUser(results));
         }
 
 
@@ -2698,36 +2695,34 @@ public class UserManager extends RepositoryManager {
                        HtmlUtil.b(msg("IP Address")))));
 
         int cnt = 0;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int    col      = 1;
-                String userId   = results.getString(col++);
-                String firstCol = "";
-                if (theUser == null) {
-                    User user = findUser(userId);
-                    if (user == null) {
-                        firstCol = "No user:" + userId;
-                    } else {
-                        firstCol =
-                            HtmlUtil.href(
-                                request.url(
-                                    getRepositoryBase().URL_USER_ACTIVITY,
-                                    ARG_USER_ID, user.getId()), HtmlUtil.img(
-                                        getRepository().iconUrl(ICON_LOG),
-                                        msg("View user log")) + " "
-                                            + user.getLabel());
-                    }
-
+        while ((results = iter.getNext()) != null) {
+            int    col      = 1;
+            String userId   = results.getString(col++);
+            String firstCol = "";
+            if (theUser == null) {
+                User user = findUser(userId);
+                if (user == null) {
+                    firstCol = "No user:" + userId;
+                } else {
+                    firstCol =
+                        HtmlUtil.href(
+                                      request.url(
+                                                  getRepositoryBase().URL_USER_ACTIVITY,
+                                                  ARG_USER_ID, user.getId()), HtmlUtil.img(
+                                                                                           getRepository().iconUrl(ICON_LOG),
+                                                                                           msg("View user log")) + " "
+                                      + user.getLabel());
                 }
-                Date   dttm  = getDatabaseManager().getDate(results, col++);
-                String what  = results.getString(col++);
-                String extra = results.getString(col++);
-                String ip    = results.getString(col++);
-                sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol, what,
-                        getRepository().formatDate(dttm), ip)));
 
-                cnt++;
             }
+            Date   dttm  = getDatabaseManager().getDate(results, col++);
+            String what  = results.getString(col++);
+            String extra = results.getString(col++);
+            String ip    = results.getString(col++);
+            sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol, what,
+                                                 getRepository().formatDate(dttm), ip)));
+
+            cnt++;
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         if (cnt == 0) {

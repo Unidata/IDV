@@ -190,39 +190,36 @@ public class HarvesterManager extends RepositoryManager {
                                         Tables.HARVESTERS.NAME,
                                         new Clause()));;
         ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id        = results.getString(1);
-                String className = results.getString(2);
-                String content   = results.getString(3);
+        while ((results = iter.getNext()) != null) {
+            String id        = results.getString(1);
+            String className = results.getString(2);
+            String content   = results.getString(3);
 
-                Class  c         = null;
+            Class  c         = null;
 
+            try {
+                c = Misc.findClass(className);
+            } catch (ClassNotFoundException cnfe1) {
+                className = className.replace("repository.",
+                                              "repository.harvester.");
                 try {
                     c = Misc.findClass(className);
-                } catch (ClassNotFoundException cnfe1) {
-                    className = className.replace("repository.",
-                            "repository.harvester.");
-                    try {
-                        c = Misc.findClass(className);
-                    }  catch (ClassNotFoundException cnfe2) {
-                        getRepository().getLogManager().logError("HarvesterManager: Could not load harvester class: " + className);
-                        continue;
-                    }
+                }  catch (ClassNotFoundException cnfe2) {
+                    getRepository().getLogManager().logError("HarvesterManager: Could not load harvester class: " + className);
+                    continue;
                 }
-                Constructor ctor = Misc.findConstructor(c,
-                                       new Class[] { Repository.class,
-                        String.class });
-                Harvester harvester =
-                    (Harvester) ctor.newInstance(new Object[] {
+            }
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class,
+                                                                  String.class });
+            Harvester harvester =
+                (Harvester) ctor.newInstance(new Object[] {
                         getRepository(),
                         id });
 
-                harvester.initFromContent(content);
-                harvesters.add(harvester);
-                harvesterMap.put(harvester.getId(), harvester);
-
-            }
+            harvester.initFromContent(content);
+            harvesters.add(harvester);
+            harvesterMap.put(harvester.getId(), harvester);
         }
 
 

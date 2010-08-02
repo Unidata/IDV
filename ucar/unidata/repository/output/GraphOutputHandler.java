@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.output;
@@ -454,34 +455,32 @@ public class GraphOutputHandler extends OutputHandler {
         ResultSet        results;
         cnt       = 0;
         actualCnt = 0;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                cnt++;
-                if (cnt <= skip) {
-                    continue;
-                }
-                actualCnt++;
-                sb.append(getEntryNodeXml(request, results));
-                String entryId = results.getString(1);
+        while ((results = iter.getNext()) != null) {
+            cnt++;
+            if (cnt <= skip) {
+                continue;
+            }
+            actualCnt++;
+            sb.append(getEntryNodeXml(request, results));
+            String entryId = results.getString(1);
+            sb.append(XmlUtil.tag(TAG_EDGE,
+                                  XmlUtil.attrs(ATTR_TYPE, "groupedby",
+                                      ATTR_FROM, (haveSkip
+                    ? originalId
+                    : group.getId()), ATTR_TO, entryId)));
+            sb.append("\n");
+            if (actualCnt >= MAX_EDGES) {
+                String skipId = "skip_" + type + "_" + (actualCnt + skip)
+                                + "_" + id;
+                sb.append(XmlUtil.tag(TAG_NODE,
+                                      XmlUtil.attrs(ATTR_TYPE, "skip",
+                                          ATTR_ID, skipId, ATTR_TITLE,
+                                          "...")));
                 sb.append(XmlUtil.tag(TAG_EDGE,
-                                      XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                          ATTR_FROM, (haveSkip
-                        ? originalId
-                        : group.getId()), ATTR_TO, entryId)));
-                sb.append("\n");
-                if (actualCnt >= MAX_EDGES) {
-                    String skipId = "skip_" + type + "_" + (actualCnt + skip)
-                                    + "_" + id;
-                    sb.append(XmlUtil.tag(TAG_NODE,
-                                          XmlUtil.attrs(ATTR_TYPE, "skip",
-                                              ATTR_ID, skipId, ATTR_TITLE,
-                                                  "...")));
-                    sb.append(XmlUtil.tag(TAG_EDGE,
-                                          XmlUtil.attrs(ATTR_TYPE, "etc",
-                                              ATTR_FROM, originalId, ATTR_TO,
-                                                  skipId)));
-                    break;
-                }
+                                      XmlUtil.attrs(ATTR_TYPE, "etc",
+                                          ATTR_FROM, originalId, ATTR_TO,
+                                          skipId)));
+                break;
             }
         }
 

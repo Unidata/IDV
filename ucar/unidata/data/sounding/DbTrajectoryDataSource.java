@@ -319,8 +319,7 @@ public class DbTrajectoryDataSource extends PointDataSource {
         sdf.applyPattern("yyyy/MM/dd HH");
 
 
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 //                System.err.println ("row " + cnt);
                 cnt++;
                 int col = 1;
@@ -366,7 +365,6 @@ public class DbTrajectoryDataSource extends PointDataSource {
 
                 }
                 obs.add(pot);
-            }
         }
 
 

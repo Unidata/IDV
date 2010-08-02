@@ -303,8 +303,7 @@ public class DbPointDataSource extends PointDataSource {
 
         //TODO: How do we handle no data???
         int cnt = 0;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 //                System.err.println ("row " + cnt);
                 cnt++;
                 int col = 1;
@@ -341,7 +340,6 @@ public class DbPointDataSource extends PointDataSource {
 
                 }
                 obs.add(pot);
-            }
         }
 
 

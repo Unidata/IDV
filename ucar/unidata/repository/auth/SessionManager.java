@@ -196,15 +196,13 @@ public class SessionManager extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         double           timeDiff = DateUtil.daysToMillis(SESSION_DAYS);
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Session session        = makeSession(results);
-                Date    lastActiveDate = session.getLastActivity();
-                //Check if the last activity was > 24 hours ago
-                if ((now - lastActiveDate.getTime()) > timeDiff) {
-                    sessionsToDelete.add(session);
-                } else {}
-            }
+        while ((results = iter.getNext()) != null) {
+            Session session        = makeSession(results);
+            Date    lastActiveDate = session.getLastActivity();
+            //Check if the last activity was > 24 hours ago
+            if ((now - lastActiveDate.getTime()) > timeDiff) {
+                sessionsToDelete.add(session);
+            } else {}
         }
         for (Session session : sessionsToDelete) {
             removeSession(session.getId());
@@ -257,8 +255,7 @@ public class SessionManager extends RepositoryManager {
                 ResultSet results;
                 //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
                 boolean ok = true;
-                while ((results = iter.next()) != null && ok) {
-                    while (results.next() && ok) {
+                while ((results = iter.getNext()) != null && ok) {
                         session = makeSession(results);
                         session.setLastActivity(new Date());
                         //Remove it from the DB and then readd it so we update the lastActivity
@@ -266,7 +263,6 @@ public class SessionManager extends RepositoryManager {
                         addSession(session);
                         sessionMap.put(sessionId, session);
                         ok = false;
-                    }
                 }
             } finally {
                 getDatabaseManager().closeAndReleaseConnection(stmt);
@@ -346,10 +342,8 @@ public class SessionManager extends RepositoryManager {
                              Tables.SESSIONS.NAME, (Clause) null);
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                sessions.add(makeSession(results));
-            }
+        while ((results = iter.getNext()) != null) {
+            sessions.add(makeSession(results));
         }
         return sessions;
     }

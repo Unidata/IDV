@@ -745,18 +745,16 @@ public class AccessManager extends RepositoryManager {
 
         ResultSet results;
         Hashtable actions = new Hashtable();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id     = results.getString(1);
-                String action = results.getString(2);
-                String role   = results.getString(3);
-                List   roles  = (List) actions.get(action);
-                if (roles == null) {
-                    actions.put(action, roles = new ArrayList());
-                    permissions.add(new Permission(action, roles));
-                }
-                roles.add(role);
+        while ((results = iter.getNext()) != null) {
+            String id     = results.getString(1);
+            String action = results.getString(2);
+            String role   = results.getString(3);
+            List   roles  = (List) actions.get(action);
+            if (roles == null) {
+                actions.put(action, roles = new ArrayList());
+                permissions.add(new Permission(action, roles));
             }
+            roles.add(role);
         }
         entry.setPermissions(permissions);
         return permissions;

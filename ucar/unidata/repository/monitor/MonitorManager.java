@@ -109,8 +109,7 @@ public class MonitorManager extends RepositoryManager {
                                         + Tables.MONITORS.COL_NAME);
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 String       xml        = results.getString(1);
                 XmlEncoder   xmlEncoder = new XmlEncoder();
                 EntryMonitor monitor =
@@ -127,7 +126,6 @@ public class MonitorManager extends RepositoryManager {
                     }
                     */
                 }
-            }
         }
     }
 

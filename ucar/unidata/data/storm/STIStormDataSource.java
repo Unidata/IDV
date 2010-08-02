@@ -730,71 +730,69 @@ public class STIStormDataSource extends StormDataSource {
         List<StormTrackPoint> pts     = new ArrayList();
 
         Real                  altReal = new Real(RealType.Altitude, 0);
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                //                System.err.println ("row " + cnt);
-                List<Real> attrs    = new ArrayList<Real>();
-                int        col      = 1;
-                int        year     = results.getInt(col++);
-                int        month    = results.getInt(col++);
-                int        day      = results.getInt(col++);
-                int        hour     = results.getInt(col++);
-                int        fhour    = results.getInt(col++);
+        while ((results = iter.getNext()) != null) {
+            //                System.err.println ("row " + cnt);
+            List<Real> attrs    = new ArrayList<Real>();
+            int        col      = 1;
+            int        year     = results.getInt(col++);
+            int        month    = results.getInt(col++);
+            int        day      = results.getInt(col++);
+            int        hour     = results.getInt(col++);
+            int        fhour    = results.getInt(col++);
 
-                double     latitude =
-                    getLatLonValue(results.getDouble(col++));
-                if ((latitude > 90) || (latitude < -90)) {
-                    continue;
-                }
-                double longitude = getLatLonValue(results.getDouble(col++));
-                if ((longitude > 360) || (longitude < -180)) {
-                    continue;
-                }
-                attrs.add(
-                    PARAM_MAXWINDSPEED.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MAXWINDSPEED.getName())));
-                attrs.add(
-                    PARAM_MINPRESSURE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MINPRESSURE.getName())));
-                attrs.add(
-                    PARAM_RADIUSMODERATEGALE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_RADIUSMODERATEGALE.getName())));
-                attrs.add(
-                    PARAM_RADIUSWHOLEGALE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_RADIUSWHOLEGALE.getName())));
-                attrs.add(
-                    PARAM_MOVEDIRECTION.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MOVEDIRECTION.getName())));
-                attrs.add(
-                    PARAM_MOVESPEED.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MOVESPEED.getName())));
-                float[] radiuses = getProbabilityRadius(forecastWay, fhour);
-                DateTime dttm = getDateTime(year, month, day, hour + fhour);
-                EarthLocation elt =
-                    new EarthLocationLite(new Real(RealType.Latitude,
-                        latitude), new Real(RealType.Longitude, longitude),
-                                   altReal);
-                if (true) {  //radiuses != null) {
-                    //radius = fhour * 50.0f / 24.0f;
-                    addProbabilityRadiusAttrs(attrs, radiuses);
-                }
-                StormTrackPoint stp = new StormTrackPoint(elt, dttm, fhour,
-                                          attrs);
-                if ( !elt.isMissing()) {
-                    pts.add(stp);
-                }
+            double     latitude =
+                getLatLonValue(results.getDouble(col++));
+            if ((latitude > 90) || (latitude < -90)) {
+                continue;
+            }
+            double longitude = getLatLonValue(results.getDouble(col++));
+            if ((longitude > 360) || (longitude < -180)) {
+                continue;
+            }
+            attrs.add(
+                      PARAM_MAXWINDSPEED.getReal(
+                                                 getValue(
+                                                          results.getDouble(col++),
+                                                          PARAM_MAXWINDSPEED.getName())));
+            attrs.add(
+                      PARAM_MINPRESSURE.getReal(
+                                                getValue(
+                                                         results.getDouble(col++),
+                                                         PARAM_MINPRESSURE.getName())));
+            attrs.add(
+                      PARAM_RADIUSMODERATEGALE.getReal(
+                                                       getValue(
+                                                                results.getDouble(col++),
+                                                                PARAM_RADIUSMODERATEGALE.getName())));
+            attrs.add(
+                      PARAM_RADIUSWHOLEGALE.getReal(
+                                                    getValue(
+                                                             results.getDouble(col++),
+                                                             PARAM_RADIUSWHOLEGALE.getName())));
+            attrs.add(
+                      PARAM_MOVEDIRECTION.getReal(
+                                                  getValue(
+                                                           results.getDouble(col++),
+                                                           PARAM_MOVEDIRECTION.getName())));
+            attrs.add(
+                      PARAM_MOVESPEED.getReal(
+                                              getValue(
+                                                       results.getDouble(col++),
+                                                       PARAM_MOVESPEED.getName())));
+            float[] radiuses = getProbabilityRadius(forecastWay, fhour);
+            DateTime dttm = getDateTime(year, month, day, hour + fhour);
+            EarthLocation elt =
+                new EarthLocationLite(new Real(RealType.Latitude,
+                                               latitude), new Real(RealType.Longitude, longitude),
+                                      altReal);
+            if (true) {  //radiuses != null) {
+                //radius = fhour * 50.0f / 24.0f;
+                addProbabilityRadiusAttrs(attrs, radiuses);
+            }
+            StormTrackPoint stp = new StormTrackPoint(elt, dttm, fhour,
+                                                      attrs);
+            if ( !elt.isMissing()) {
+                pts.add(stp);
             }
         }
 
@@ -967,15 +965,13 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
         List<DateTime>   startDates = new ArrayList<DateTime>();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int col   = 1;
-                int year  = results.getInt(col++);
-                int month = results.getInt(col++);
-                int day   = results.getInt(col++);
-                int hour  = results.getInt(col++);
-                startDates.add(getDateTime(year, month, day, hour));
-            }
+        while ((results = iter.getNext()) != null) {
+            int col   = 1;
+            int year  = results.getInt(col++);
+            int month = results.getInt(col++);
+            int day   = results.getInt(col++);
+            int hour  = results.getInt(col++);
+            startDates.add(getDateTime(year, month, day, hour));
         }
         return startDates;
     }
@@ -1005,26 +1001,23 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
         wayfhourToRadius = new HashMap();
-        while ((results = iter.next()) != null) {
-
-            while (results.next()) {
-                float[] wp      = new float[11];
-                int     col     = 1;
-                String  wayName = results.getString(col++);
-                int     fhour   = results.getInt(col++);
-                wp[0]  = results.getFloat(col++);
-                wp[1]  = results.getFloat(col++);
-                wp[2]  = results.getFloat(col++);
-                wp[3]  = results.getFloat(col++);
-                wp[4]  = results.getFloat(col++);
-                wp[5]  = results.getFloat(col++);
-                wp[6]  = results.getFloat(col++);
-                wp[7]  = results.getFloat(col++);
-                wp[8]  = results.getFloat(col++);
-                wp[9]  = results.getFloat(col++);
-                wp[10] = results.getFloat(col++);
-                putProbabilityRadius(new Way(wayName), fhour, wp);
-            }
+        while ((results = iter.getNext()) != null) {
+            float[] wp      = new float[11];
+            int     col     = 1;
+            String  wayName = results.getString(col++);
+            int     fhour   = results.getInt(col++);
+            wp[0]  = results.getFloat(col++);
+            wp[1]  = results.getFloat(col++);
+            wp[2]  = results.getFloat(col++);
+            wp[3]  = results.getFloat(col++);
+            wp[4]  = results.getFloat(col++);
+            wp[5]  = results.getFloat(col++);
+            wp[6]  = results.getFloat(col++);
+            wp[7]  = results.getFloat(col++);
+            wp[8]  = results.getFloat(col++);
+            wp[9]  = results.getFloat(col++);
+            wp[10] = results.getFloat(col++);
+            putProbabilityRadius(new Way(wayName), fhour, wp);
         }
     }
 
@@ -1120,73 +1113,71 @@ public class STIStormDataSource extends StormDataSource {
         //Hashtable seenDate = new Hashtable();
         Real altReal = new Real(RealType.Altitude, 0);
 
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                List<Real> attrs    = new ArrayList();
-                int        col      = 1;
-                int        year     = results.getInt(col++);
-                int        month    = results.getInt(col++);
-                int        day      = results.getInt(col++);
-                int        hour     = results.getInt(col++);
-                double     latitude =
-                    getLatLonValue(results.getDouble(col++));
-                if ((latitude > 90) || (latitude < -90)) {
-                    continue;
-                }
-                double longitude = getLatLonValue(results.getDouble(col++));
-                if ((longitude > 360) || (longitude < -180)) {
-                    continue;
-                }
-                attrs.add(
-                    PARAM_MAXWINDSPEED.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MAXWINDSPEED.getName())));
-                attrs.add(
-                    PARAM_MINPRESSURE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MINPRESSURE.getName())));
-                attrs.add(
-                    PARAM_RADIUSMODERATEGALE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_RADIUSMODERATEGALE.getName())));
-                attrs.add(
-                    PARAM_RADIUSWHOLEGALE.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_RADIUSWHOLEGALE.getName())));
-                attrs.add(
-                    PARAM_MOVEDIRECTION.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MOVEDIRECTION.getName())));
-                attrs.add(
-                    PARAM_MOVESPEED.getReal(
-                        getValue(
-                            results.getDouble(col++),
-                            PARAM_MOVESPEED.getName())));
-
-                EarthLocation elt =
-                    new EarthLocationLite(new Real(RealType.Latitude,
-                        latitude), new Real(RealType.Longitude, longitude),
-                                   altReal);
-
-                DateTime date = getDateTime(year, month, day, hour);
-                String   key  = "" + latitude + " " + longitude;
-                // if(seenDate.get(date)!=null) {
-                //     if(!seenDate.get(date).equals(key)) {
-                //                        System.err.println ("seen: " + date + " " + seenDate.get(date) + " != " + key);
-                //    }
-                //    continue;
-                // }
-                //                                seenDate.put(date,date);
-                // seenDate.put(date,key);
-                StormTrackPoint stp = new StormTrackPoint(elt, date, 0,
-                                          attrs);
-                obsPts.add(stp);
+        while ((results = iter.getNext()) != null) {
+            List<Real> attrs    = new ArrayList();
+            int        col      = 1;
+            int        year     = results.getInt(col++);
+            int        month    = results.getInt(col++);
+            int        day      = results.getInt(col++);
+            int        hour     = results.getInt(col++);
+            double     latitude =
+                getLatLonValue(results.getDouble(col++));
+            if ((latitude > 90) || (latitude < -90)) {
+                continue;
             }
+            double longitude = getLatLonValue(results.getDouble(col++));
+            if ((longitude > 360) || (longitude < -180)) {
+                continue;
+            }
+            attrs.add(
+                      PARAM_MAXWINDSPEED.getReal(
+                                                 getValue(
+                                                          results.getDouble(col++),
+                                                          PARAM_MAXWINDSPEED.getName())));
+            attrs.add(
+                      PARAM_MINPRESSURE.getReal(
+                                                getValue(
+                                                         results.getDouble(col++),
+                                                         PARAM_MINPRESSURE.getName())));
+            attrs.add(
+                      PARAM_RADIUSMODERATEGALE.getReal(
+                                                       getValue(
+                                                                results.getDouble(col++),
+                                                                PARAM_RADIUSMODERATEGALE.getName())));
+            attrs.add(
+                      PARAM_RADIUSWHOLEGALE.getReal(
+                                                    getValue(
+                                                             results.getDouble(col++),
+                                                             PARAM_RADIUSWHOLEGALE.getName())));
+            attrs.add(
+                      PARAM_MOVEDIRECTION.getReal(
+                                                  getValue(
+                                                           results.getDouble(col++),
+                                                           PARAM_MOVEDIRECTION.getName())));
+            attrs.add(
+                      PARAM_MOVESPEED.getReal(
+                                              getValue(
+                                                       results.getDouble(col++),
+                                                       PARAM_MOVESPEED.getName())));
+
+            EarthLocation elt =
+                new EarthLocationLite(new Real(RealType.Latitude,
+                                               latitude), new Real(RealType.Longitude, longitude),
+                                      altReal);
+
+            DateTime date = getDateTime(year, month, day, hour);
+            String   key  = "" + latitude + " " + longitude;
+            // if(seenDate.get(date)!=null) {
+            //     if(!seenDate.get(date).equals(key)) {
+            //                        System.err.println ("seen: " + date + " " + seenDate.get(date) + " != " + key);
+            //    }
+            //    continue;
+            // }
+            //                                seenDate.put(date,date);
+            // seenDate.put(date,key);
+            StormTrackPoint stp = new StormTrackPoint(elt, date, 0,
+                                                      attrs);
+            obsPts.add(stp);
         }
 
         return obsPts;
@@ -1239,8 +1230,7 @@ public class STIStormDataSource extends StormDataSource {
         List<StormTrackPoint> obsPts2 = new ArrayList();
         Real                  altReal = new Real(RealType.Altitude, 0);
 
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 List<Real> attrs    = new ArrayList();
                 int        col      = 1;
                 int        year     = results.getInt(col++);
@@ -1307,8 +1297,6 @@ public class STIStormDataSource extends StormDataSource {
                     obsPts2.add(stp);
                 }
 
-
-            }
         }
 
         if (obsPts1.size() > 0) {
@@ -1364,14 +1352,12 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter = SqlUtil.getIterator(evaluate(query));
         ResultSet        results;
         List<StormInfo>  stormInfos = new ArrayList<StormInfo>();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String   id        = results.getString(1);
-                DateTime startTime = getStormStartTime(id);
-                //                System.err.println(id + " " + startTime);
-                StormInfo sinfo = new StormInfo(id, startTime);
-                stormInfos.add(sinfo);
-            }
+        while ((results = iter.getNext()) != null) {
+            String   id        = results.getString(1);
+            DateTime startTime = getStormStartTime(id);
+            //                System.err.println(id + " " + startTime);
+            StormInfo sinfo = new StormInfo(id, startTime);
+            stormInfos.add(sinfo);
         }
         return stormInfos;
     }
@@ -1399,17 +1385,15 @@ public class STIStormDataSource extends StormDataSource {
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int col   = 1;
-                int year  = results.getInt(col++);
-                int month = results.getInt(col++);
-                int day   = results.getInt(col++);
-                int hour  = results.getInt(col++);
-                statement.close();
-                //Just get the first one since we sorted the results with the order by
-                return getDateTime(year, month, day, hour);
-            }
+        while ((results = iter.getNext()) != null) {
+            int col   = 1;
+            int year  = results.getInt(col++);
+            int month = results.getInt(col++);
+            int day   = results.getInt(col++);
+            int hour  = results.getInt(col++);
+            statement.close();
+            //Just get the first one since we sorted the results with the order by
+            return getDateTime(year, month, day, hour);
         }
         return null;
     }
@@ -1442,12 +1426,10 @@ public class STIStormDataSource extends StormDataSource {
         List<Way>        forecastWays = new ArrayList<Way>();
 
         //TODO: How do we handle no data???
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Way way = new Way(results.getString(1));
-                addWay(way);
-                forecastWays.add(way);
-            }
+        while ((results = iter.getNext()) != null) {
+            Way way = new Way(results.getString(1));
+            addWay(way);
+            forecastWays.add(way);
         }
 
         //        System.err.println ("ways:" + forecastWays);

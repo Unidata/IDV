@@ -394,8 +394,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(entryStmt);
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 Entry entry = this.createEntryFromDatabase(results, false);
 
                 List<Metadata> metadataList =
@@ -427,7 +426,6 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                     cnt++;
                 }
 
-            }
         }
     }
 
@@ -1264,8 +1262,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
 
         int              skipHowMany   = 0;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 if (skipHowMany > 0) {
                     skipHowMany--;
                     continue;
@@ -1304,7 +1301,6 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                     col++;
                 }
                 pointDataList.add(pointData);
-            }
         }
 
 
@@ -3083,8 +3079,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             SqlUtil.Iterator iter =
                 getDatabaseManager().getIterator(statement);
             ResultSet results;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
+            while ((results = iter.getNext()) != null) {
                     int col = 1;
                     metadata.add(
                         new PointDataMetadata(
@@ -3094,7 +3089,6 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                             results.getString(col++),
                             results.getString(col++),
                             results.getString(col++)));
-                }
             }
             if (checkCache && (metadata.size() > 0)) {
                 metadataCache.put(tableName, metadata);

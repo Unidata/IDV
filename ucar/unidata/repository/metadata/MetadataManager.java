@@ -338,8 +338,7 @@ public class MetadataManager extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         metadataList = new ArrayList();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
+        while ((results = iter.getNext()) != null) {
                 int             col     = 1;
                 String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
@@ -352,7 +351,6 @@ public class MetadataManager extends RepositoryManager {
                         results.getString(col++), results.getString(col++),
                         results.getString(col++)));
             }
-        }
 
         entry.setMetadata(metadataList);
         return metadataList;

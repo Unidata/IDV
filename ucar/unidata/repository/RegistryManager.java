@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -533,17 +534,15 @@ public class RegistryManager extends RepositoryManager {
         SqlUtil.Iterator iter     = getDatabaseManager().getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                URL     url        = new URL(results.getString(1));
-                String  title      = results.getString(2);
-                String  desc       = results.getString(3);
-                String  email      = results.getString(4);
-                boolean isRegistry = results.getInt(5) != 0;
-                servers.add(new ServerInfo(url.getHost(), url.getPort(), -1,
-                                           url.getPath(), title, desc, email,
-                                           isRegistry, false));
-            }
+        while ((results = iter.getNext()) != null) {
+            URL     url        = new URL(results.getString(1));
+            String  title      = results.getString(2);
+            String  desc       = results.getString(3);
+            String  email      = results.getString(4);
+            boolean isRegistry = results.getInt(5) != 0;
+            servers.add(new ServerInfo(url.getHost(), url.getPort(), -1,
+                                       url.getPath(), title, desc, email,
+                                       isRegistry, false));
         }
         registeredServers = servers;
         return servers;
@@ -679,12 +678,10 @@ public class RegistryManager extends RepositoryManager {
                                         + Tables.REMOTESERVERS.COL_URL);
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                ServerInfo serverInfo = makeRemoteServer(results);
-                map.put(serverInfo.getId(), serverInfo);
-                servers.add(serverInfo);
-            }
+        while ((results = iter.getNext()) != null) {
+            ServerInfo serverInfo = makeRemoteServer(results);
+            map.put(serverInfo.getId(), serverInfo);
+            servers.add(serverInfo);
         }
         clearRemoteServers();
         remoteServerMap = map;

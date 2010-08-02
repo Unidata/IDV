@@ -140,9 +140,11 @@ public class SqlShell extends InteractiveShell {
             ResultSet results;
             int cnt = 0;
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-            while((results = iter.next())!=null) {
-                ResultSetMetaData rsmd = results.getMetaData();
-                while(results.next()) {
+            ResultSetMetaData rsmd = null;
+            while((results = iter.getNext())!=null) {
+                if(rsmd==null) {
+                    rsmd = results.getMetaData();
+                }
                     int colcnt = 0;
                     while(colcnt<rsmd.getColumnCount()) {
                         String s =results.getString(++colcnt); 
@@ -155,7 +157,6 @@ public class SqlShell extends InteractiveShell {
                         sb.append("...");
                         break;
                     }
-                }
             }
             if(cnt == 0) {
                 sb.append("No data retreived<br>");

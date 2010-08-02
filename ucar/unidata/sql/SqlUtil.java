@@ -1526,7 +1526,7 @@ public class SqlUtil {
          *
          * @throws SQLException _more_
          */
-        public ResultSet next() throws SQLException {
+        public ResultSet xxxnext() throws SQLException {
             if (stmt == null) {
                 return null;
             }

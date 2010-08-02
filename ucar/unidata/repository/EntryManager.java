@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -146,14 +147,25 @@ public class EntryManager extends RepositoryManager {
         return topGroup;
     }
 
+    /**
+     * _more_
+     *
+     * @param descendent _more_
+     *
+     * @return _more_
+     */
     public Entry getSecondToTopEntry(Entry descendent) {
         Entry topEntry = null;
-        if(descendent!=null) {
+        if (descendent != null) {
             topEntry = descendent;
-            while(topEntry!=null) {
+            while (topEntry != null) {
                 Entry parent = topEntry.getParentGroup();
-                if(parent == null) break;
-                if(parent.isTopGroup()) break;
+                if (parent == null) {
+                    break;
+                }
+                if (parent.isTopGroup()) {
+                    break;
+                }
                 topEntry = parent;
             }
         }
@@ -192,12 +204,10 @@ public class EntryManager extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id = results.getString(1);
-                iter.close();
-                return getEntry(request, id);
-            }
+        while ((results = iter.getNext()) != null) {
+            String id = results.getString(1);
+            iter.close();
+            return getEntry(request, id);
         }
         return null;
     }
@@ -442,7 +452,7 @@ return new Result(title, sb);
         }
 
         getSessionManager().putSessionProperty(request, "lastentry", entry);
-        
+
         if (entry.getIsRemoteEntry()) {
             String redirectUrl = entry.getRemoteServer()
                                  + getRepository().URL_ENTRY_SHOW.getPath();
@@ -1287,8 +1297,7 @@ return new Result(title, sb);
 
                 entry.initEntry(name, description, parent, request.getUser(),
                                 new Resource(theResource, resourceType),
-                                dataType, 
-                                createDate.getTime(),
+                                dataType, createDate.getTime(),
                                 createDate.getTime(),
                                 theDateRange[0].getTime(),
                                 theDateRange[1].getTime(), null);
@@ -1330,9 +1339,9 @@ return new Result(title, sb);
             }
             if (request.defined(ARG_URL)) {
                 entry.setResource(new Resource(request.getString(ARG_URL,
-                                                                 BLANK),  
-                                               Resource.TYPE_URL,
-                                               request.getString(ARG_MD5, null),request.get(ARG_FILESIZE,(long)-1)));
+                        BLANK), Resource.TYPE_URL,
+                                request.getString(ARG_MD5, null),
+                                request.get(ARG_FILESIZE, (long) -1)));
             }
 
 
@@ -1570,36 +1579,44 @@ return new Result(title, sb);
     private void setEntryState(Request request, Entry entry, Group parent,
                                boolean newEntry)
             throws Exception {
-        if (request.defined(ARG_LOCATION_LATITUDE) &&
-            request.defined(ARG_LOCATION_LONGITUDE)) {
-            entry.setNorth(request.get(ARG_LOCATION_LATITUDE, entry.getNorth()));
-            entry.setWest(request.get(ARG_LOCATION_LONGITUDE, entry.getWest()));
-            entry.setSouth(request.get(ARG_LOCATION_LATITUDE, entry.getSouth()));
-            entry.setEast(request.get(ARG_LOCATION_LONGITUDE, entry.getEast()));
+        if (request.defined(ARG_LOCATION_LATITUDE)
+                && request.defined(ARG_LOCATION_LONGITUDE)) {
+            entry.setNorth(request.get(ARG_LOCATION_LATITUDE,
+                                       entry.getNorth()));
+            entry.setWest(request.get(ARG_LOCATION_LONGITUDE,
+                                      entry.getWest()));
+            entry.setSouth(request.get(ARG_LOCATION_LATITUDE,
+                                       entry.getSouth()));
+            entry.setEast(request.get(ARG_LOCATION_LONGITUDE,
+                                      entry.getEast()));
         } else {
-            entry.setSouth(request.get(ARG_AREA + "_south", entry.getSouth()));
-            entry.setNorth(request.get(ARG_AREA + "_north", entry.getNorth()));
+            entry.setSouth(request.get(ARG_AREA + "_south",
+                                       entry.getSouth()));
+            entry.setNorth(request.get(ARG_AREA + "_north",
+                                       entry.getNorth()));
             entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
             entry.setEast(request.get(ARG_AREA + "_east", entry.getEast()));
         }
 
-        double altitudeTop = Entry.NONGEO;
+        double altitudeTop    = Entry.NONGEO;
         double altitudeBottom = Entry.NONGEO;
-        if(request.defined(ARG_ALTITUDE)) {
-            altitudeTop = altitudeBottom =   request.get(ARG_ALTITUDE, Entry.NONGEO);
+        if (request.defined(ARG_ALTITUDE)) {
+            altitudeTop = altitudeBottom = request.get(ARG_ALTITUDE,
+                    Entry.NONGEO);
         } else {
-            if(request.defined(ARG_ALTITUDE_TOP)) {
+            if (request.defined(ARG_ALTITUDE_TOP)) {
                 altitudeTop = request.get(ARG_ALTITUDE_TOP, Entry.NONGEO);
             }
-            if(request.defined(ARG_ALTITUDE_BOTTOM)) {
-                altitudeBottom = request.get(ARG_ALTITUDE_BOTTOM, Entry.NONGEO);
+            if (request.defined(ARG_ALTITUDE_BOTTOM)) {
+                altitudeBottom = request.get(ARG_ALTITUDE_BOTTOM,
+                                             Entry.NONGEO);
             }
         }
         entry.setAltitudeTop(altitudeTop);
         entry.setAltitudeBottom(altitudeBottom);
 
-        entry.getTypeHandler().initializeEntryFromForm(request, entry, parent,
-                                                       newEntry);
+        entry.getTypeHandler().initializeEntryFromForm(request, entry,
+                parent, newEntry);
     }
 
 
@@ -2207,7 +2224,7 @@ return new Result(title, sb);
         //        exclude.add(TYPE_GROUP);
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         for (TypeHandler typeHandler : typeHandlers) {
-            if(!typeHandler.getForUser()) {
+            if ( !typeHandler.getForUser()) {
                 continue;
             }
             if (typeHandler.isAnyHandler()) {
@@ -3280,8 +3297,8 @@ return new Result(title, sb);
         Entry entry = typeHandler.createEntry(id);
         entry.initEntry(name, description, parentGroup, request.getUser(),
                         resource, dataType, createDate.getTime(),
-                        new Date().getTime(),
-                        fromDate.getTime(), toDate.getTime(), null);
+                        new Date().getTime(), fromDate.getTime(),
+                        toDate.getTime(), null);
 
         if (doAnonymousUpload) {
             initUploadedEntry(request, entry, parentGroup);
@@ -3296,14 +3313,14 @@ return new Result(title, sb);
                 entry.getWest() + "")));
 
         entry.setAltitudeTop(XmlUtil.getAttribute(node, ATTR_ALTITUDE_TOP,
-                                                  entry.getAltitudeTop()));
-        entry.setAltitudeBottom(XmlUtil.getAttribute(node, ATTR_ALTITUDE_BOTTOM,
-                                                     entry.getAltitudeBottom()));
+                entry.getAltitudeTop()));
+        entry.setAltitudeBottom(XmlUtil.getAttribute(node,
+                ATTR_ALTITUDE_BOTTOM, entry.getAltitudeBottom()));
         entry.setAltitudeTop(XmlUtil.getAttribute(node, ATTR_ALTITUDE,
-                                                  entry.getAltitudeTop()));
+                entry.getAltitudeTop()));
         entry.setAltitudeBottom(XmlUtil.getAttribute(node, ATTR_ALTITUDE,
-                                                     entry.getAltitudeBottom()));
-                                                   
+                entry.getAltitudeBottom()));
+
         NodeList entryChildren = XmlUtil.getElements(node);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
@@ -3468,17 +3485,13 @@ return new Result(title, sb);
         SqlUtil.Iterator iter     = getDatabaseManager().getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                comments.add(
-                    new Comment(
-                        results.getString(1), entry,
-                        getUserManager().findUser(
-                            results.getString(3),
-                            true), getDatabaseManager().getDate(results, 4),
-                                   results.getString(5),
-                                   results.getString(6)));
-            }
+        while ((results = iter.getNext()) != null) {
+            comments.add(
+                new Comment(
+                    results.getString(1), entry,
+                    getUserManager().findUser(results.getString(3), true),
+                    getDatabaseManager().getDate(results, 4),
+                    results.getString(5), results.getString(6)));
         }
         entry.setComments(comments);
         return comments;
@@ -4038,19 +4051,32 @@ return new Result(title, sb);
     public String getEntryActionsTable(Request request, Entry entry,
                                        int typeMask)
             throws Exception {
-        List<Link>   links  = getEntryLinks(request, entry);
+        List<Link> links = getEntryLinks(request, entry);
         return getEntryActionsTable(request, entry, typeMask, links);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param typeMask _more_
+     * @param links _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getEntryActionsTable(Request request, Entry entry,
                                        int typeMask, List<Link> links)
             throws Exception {
+
         StringBuffer
             htmlSB          = null,
             nonHtmlSB       = null,
             actionSB        = null,
-            categorySB         = null,
+            categorySB      = null,
             fileSB          = null;
         int     cnt         = 0;
         boolean needToAddHr = false;
@@ -4126,7 +4152,8 @@ return new Result(title, sb);
         }
         if (categorySB != null) {
             categorySB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", categorySB.toString()));
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
+                                     categorySB.toString()));
         }
         if (actionSB != null) {
             actionSB.append("</table>");
@@ -4148,6 +4175,7 @@ return new Result(title, sb);
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         return menu.toString();
+
 
     }
 
@@ -4197,34 +4225,32 @@ return new Result(title, sb);
     public String getEntryMenubar(Request request, Entry entry,
                                   String rightSide)
             throws Exception {
-        List<Link>   links  = getEntryLinks(request, entry);
+        List<Link> links = getEntryLinks(request, entry);
         StringBuffer fileMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_FILE,links));
+                OutputType.TYPE_FILE, links));
         StringBuffer editMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_EDIT,links));
+                OutputType.TYPE_EDIT, links));
         StringBuffer viewMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_HTML | OutputType.TYPE_NONHTML,links));
+                OutputType.TYPE_HTML | OutputType.TYPE_NONHTML, links));
 
         StringBuffer categoryMenuInner = null;
-        String categoryMenu =null;
+        String       categoryMenu      = null;
 
         for (Link link : links) {
             if (link.isType(OutputType.TYPE_CATEGORY)) {
                 categoryMenuInner =
                     new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_CATEGORY,links));
+                        OutputType.TYPE_CATEGORY, links));
                 String categoryName = link.getOutputType().getCategory();
                 categoryMenu =
-                    getRepository().makePopupLink(
-                                                  HtmlUtil.span(
-                                                                msg(categoryName),
-                                                                HtmlUtil.cssClass(
-                                                                                  "entrymenulink")), 
-                                                  categoryMenuInner.toString(), false,
-                                                  true);
+                    getRepository()
+                        .makePopupLink(HtmlUtil
+                            .span(msg(categoryName), HtmlUtil
+                                .cssClass("entrymenulink")), categoryMenuInner
+                                    .toString(), false, true);
                 break;
             }
         }
@@ -4255,15 +4281,17 @@ return new Result(title, sb);
         String sep = HtmlUtil.div("&nbsp;|&nbsp;",
                                   HtmlUtil.cssClass("menuseparator"));
         String leftTable;
-        if(categoryMenu==null)
-            leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu, sep,
-                                                                  editMenu, sep,
-                                                                  viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
+        if (categoryMenu == null) {
+            leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu,
+                    sep, editMenu, sep,
+                    viewMenu)), " cellpadding=0 cellspacing=0 border=0 ");
 
-        else
-            leftTable = HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(new String[]{fileMenu, sep,
-                                                                  editMenu, sep,
-                                                                               viewMenu, sep, categoryMenu})), " cellpadding=0 cellspacing=0 border=0 ");
+        } else {
+            leftTable =
+                HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(new String[] {
+                fileMenu, sep, editMenu, sep, viewMenu, sep, categoryMenu
+            })), " cellpadding=0 cellspacing=0 border=0 ");
+        }
 
 
         String table = HtmlUtil.leftRight(leftTable, rightSide,
@@ -4778,7 +4806,8 @@ return new Result(title, sb);
                     String entryType = results.getString(2);
                     TypeHandler typeHandler =
                         getRepository().getTypeHandler(entryType);
-                    entry = typeHandler.createEntryFromDatabase(results, abbreviated);
+                    entry = typeHandler.createEntryFromDatabase(results,
+                            abbreviated);
                     checkEntryFileTime(entry);
                 } finally {
                     getDatabaseManager().closeAndReleaseConnection(entryStmt);
@@ -4850,27 +4879,24 @@ return new Result(title, sb);
 
         long             t1   = System.currentTimeMillis();
         try {
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    if ( !canDoSelectOffset && (skipCnt-- > 0)) {
-                        continue;
-                    }
-                    String id    = results.getString(1);
-                    Entry  entry = getEntryFromCache(id);
-                    if (entry == null) {
-                        //id,type,name,desc,group,user,file,createdata,fromdate,todate
-                        TypeHandler localTypeHandler =
-                            getRepository().getTypeHandler(
-                                results.getString(2));
-                        entry = localTypeHandler.createEntryFromDatabase(results);
-                        cacheEntry(entry);
-                    }
-                    if (seen.get(entry.getId()) != null) {
-                        continue;
-                    }
-                    seen.put(entry.getId(), BLANK);
-                    allEntries.add(entry);
+            while ((results = iter.getNext()) != null) {
+                if ( !canDoSelectOffset && (skipCnt-- > 0)) {
+                    continue;
                 }
+                String id    = results.getString(1);
+                Entry  entry = getEntryFromCache(id);
+                if (entry == null) {
+                    //id,type,name,desc,group,user,file,createdata,fromdate,todate
+                    TypeHandler localTypeHandler =
+                        getRepository().getTypeHandler(results.getString(2));
+                    entry = localTypeHandler.createEntryFromDatabase(results);
+                    cacheEntry(entry);
+                }
+                if (seen.get(entry.getId()) != null) {
+                    continue;
+                }
+                seen.put(entry.getId(), BLANK);
+                allEntries.add(entry);
             }
         } finally {
             long t2 = System.currentTimeMillis();
@@ -4998,15 +5024,30 @@ return new Result(title, sb);
      */
     public Entry addFileEntry(Request request, File newFile, Group group,
                               String name, User user)
-	throws Exception {
-	return addFileEntry(request, newFile, group, name, user, 
-			    null, null);
+            throws Exception {
+        return addFileEntry(request, newFile, group, name, user, null, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param newFile _more_
+     * @param group _more_
+     * @param name _more_
+     * @param user _more_
+     * @param typeHandler _more_
+     * @param initializer _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Entry addFileEntry(Request request, File newFile, Group group,
-                              String name, User user,TypeHandler typeHandler,
-			      EntryInitializer initializer)
-	throws Exception {
+                              String name, User user,
+                              TypeHandler typeHandler,
+                              EntryInitializer initializer)
+            throws Exception {
 
 
         if ( !getRepository().getAccessManager().canDoAction(request, group,
@@ -5014,20 +5055,22 @@ return new Result(title, sb);
             throw new AccessException("Cannot add to folder", request);
         }
 
-	if(typeHandler == null) {
-	    typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
-	}
+        if (typeHandler == null) {
+            typeHandler =
+                getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        }
 
         Entry entry = typeHandler.createEntry(getRepository().getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
         Date dttm = new Date();
         entry.initEntry(name, "", group, request.getUser(), resource, "",
-                        dttm.getTime(), dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
+                        dttm.getTime(), dttm.getTime(), dttm.getTime(),
+                        dttm.getTime(), null);
         typeHandler.initializeNewEntry(entry);
-	if(initializer!=null) {
-	    initializer.initEntry(entry);
-	}
+        if (initializer != null) {
+            initializer.initEntry(entry);
+        }
         List<Entry> newEntries = new ArrayList<Entry>();
         newEntries.add(entry);
         insertEntries(newEntries, true, true);
@@ -5069,8 +5112,7 @@ return new Result(title, sb);
         statement.setLong(col++, entry.getResource().getFileSize());
         statement.setString(col++, entry.getDataType());
         //create date
-        getDatabaseManager().setDate(statement, col++,
-                                     entry.getCreateDate());
+        getDatabaseManager().setDate(statement, col++, entry.getCreateDate());
 
         //change date
         getDatabaseManager().setDate(statement, col++,
@@ -5216,11 +5258,13 @@ return new Result(title, sb);
             TypeHandler typeHandler = entry.getTypeHandler();
             typeHandler = typeHandler.getTypeHandlerForCopy(entry);
 
-            List<TypeInsertInfo> typeInserts= new ArrayList<TypeInsertInfo>();
+            List<TypeInsertInfo> typeInserts =
+                new ArrayList<TypeInsertInfo>();
             //            String            sql           = typeHandler.getInsertSql(isNew);
             typeHandler.getInsertSql(isNew, typeInserts);
-            for(TypeInsertInfo tif: typeInserts) {
-                PreparedStatement typeStatement =  (PreparedStatement) typeStatements.get(tif.getSql());
+            for (TypeInsertInfo tif : typeInserts) {
+                PreparedStatement typeStatement =
+                    (PreparedStatement) typeStatements.get(tif.getSql());
                 if (typeStatement == null) {
                     typeStatement = connection.prepareStatement(tif.getSql());
                     typeStatements.put(tif.getSql(), typeStatement);
@@ -5232,10 +5276,11 @@ return new Result(title, sb);
             batchCnt++;
             entryStmt.addBatch();
 
-            for(TypeInsertInfo tif: typeInserts) {
+            for (TypeInsertInfo tif : typeInserts) {
                 PreparedStatement typeStatement = tif.getStatement();
                 batchCnt++;
-                tif.getTypeHandler().setStatement(entry, typeStatement, isNew);
+                tif.getTypeHandler().setStatement(entry, typeStatement,
+                        isNew);
                 typeStatement.addBatch();
             }
 
@@ -5276,8 +5321,9 @@ return new Result(title, sb);
                 }
                 for (Enumeration keys = typeStatements.keys();
                         keys.hasMoreElements(); ) {
-                    PreparedStatement typeStatement = (PreparedStatement) typeStatements.get(
-                                                                                             keys.nextElement());
+                    PreparedStatement typeStatement =
+                        (PreparedStatement) typeStatements.get(
+                            keys.nextElement());
                     //                        if(isNew)
                     typeStatement.executeBatch();
                     //                        else                            typeStatement.executeUpdate();
@@ -5357,14 +5403,16 @@ return new Result(title, sb);
      * _more_
      *
      * @param entries _more_
+     * @param nonUniqueOnes _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
 
-    public List<Entry> getUniqueEntries(List<Entry> entries, List<Entry>nonUniqueOnes)
-        throws Exception {
+    public List<Entry> getUniqueEntries(List<Entry> entries,
+                                        List<Entry> nonUniqueOnes)
+            throws Exception {
         List<Entry> needToAdd = new ArrayList();
         String      query     = BLANK;
         try {
@@ -5394,7 +5442,7 @@ return new Result(title, sb);
                     continue;
                 }
                 seenResources.add(key);
-                
+
                 select.setString(1, path);
                 select.setString(2, entry.getParentGroup().getId());
                 //                select.addBatch();
@@ -5613,14 +5661,12 @@ return new Result(title, sb);
         ResultSet        results;
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
 
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id = results.getString(1);
-                if ( !canDoSelectOffset && (skipCnt-- > 0)) {
-                    continue;
-                }
-                ids.add(id);
+        while ((results = iter.getNext()) != null) {
+            String id = results.getString(1);
+            if ( !canDoSelectOffset && (skipCnt-- > 0)) {
+                continue;
             }
+            ids.add(id);
         }
         group.addChildrenIds(ids);
         return ids;
@@ -6092,7 +6138,19 @@ return new Result(title, sb);
     }
 
 
-    public String[] findEntryIdsWithName(Request request, Group parent, String name)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] findEntryIdsWithName(Request request, Group parent,
+                                         String name)
             throws Exception {
         String[] ids =
             SqlUtil.readString(
@@ -6559,15 +6617,14 @@ return new Result(title, sb);
             SqlUtil.Iterator iter =
                 getDatabaseManager().getIterator(statement);
             ResultSet results;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    String entryType = results.getString(2);
-                    TypeHandler typeHandler =
-                        getRepository().getTypeHandler(entryType);
-                    Entry entry = (Entry) typeHandler.createEntryFromDatabase(results);
-                    entries.add(entry);
-                    cacheEntry(entry);
-                }
+            while ((results = iter.getNext()) != null) {
+                String entryType = results.getString(2);
+                TypeHandler typeHandler =
+                    getRepository().getTypeHandler(entryType);
+                Entry entry =
+                    (Entry) typeHandler.createEntryFromDatabase(results);
+                entries.add(entry);
+                cacheEntry(entry);
             }
         } finally {
             getDatabaseManager().closeAndReleaseConnection(statement);
@@ -6838,21 +6895,19 @@ return new Result(title, sb);
             //Don't close the statement because that ends up closing the connection
             iter.setShouldCloseStatement(false);
             ResultSet results;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    int    col       = 1;
-                    String childId   = results.getString(col++);
-                    String childType = results.getString(col++);
-                    String resource = getStorageManager().resourceFromDB(
-                                          results.getString(col++));
-                    String resourceType = results.getString(col++);
-                    children.add(new String[] { childId, childType, resource,
-                            resourceType });
-                    if (childType.equals(TypeHandler.TYPE_GROUP)) {
-                        children.addAll(getDescendents(request,
-                                (List<Entry>) Misc.newList(findGroup(request,
-                                    childId)), connection, false));
-                    }
+            while ((results = iter.getNext()) != null) {
+                int    col       = 1;
+                String childId   = results.getString(col++);
+                String childType = results.getString(col++);
+                String resource = getStorageManager().resourceFromDB(
+                                      results.getString(col++));
+                String resourceType = results.getString(col++);
+                children.add(new String[] { childId, childType, resource,
+                                            resourceType });
+                if (childType.equals(TypeHandler.TYPE_GROUP)) {
+                    children.addAll(getDescendents(request,
+                            (List<Entry>) Misc.newList(findGroup(request,
+                                childId)), connection, false));
                 }
             }
             getDatabaseManager().closeStatement(stmt);

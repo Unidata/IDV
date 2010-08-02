@@ -915,8 +915,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 int              rowCnt    = 0;
                 List             valueList = new ArrayList();
                 boolean          didDelete = false;
-                while ((results = iter.next()) != null) {
-                    while (results.next()) {
+                while ((results = iter.getNext()) != null) {
                         if ( !didDelete) {
                             didDelete = true;
                             IOUtil.write(os,
@@ -971,7 +970,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             IOUtil.write(os, ";\n");
                             valueList = new ArrayList();
                         }
-                    }
                 }
                 if (valueList.size() > 0) {
                     if ( !didDelete) {
@@ -1353,8 +1351,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 ResultSet        results;
                 dos.writeInt(DUMPTAG_TABLE);
                 writeString(dos, tableInfo.getName());
-                while ((results = iter.next()) != null) {
-                    while (results.next()) {
+                while ((results = iter.getNext()) != null) {
                         dos.writeInt(DUMPTAG_ROW);
                         rowCnt++;
                         if ((rowCnt % 1000) == 0) {
@@ -1392,7 +1389,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                                     + object.getClass().getName());
                             }
                         }
-                    }
                 }
             }
             System.err.println("Wrote " + rowCnt + " rows");
