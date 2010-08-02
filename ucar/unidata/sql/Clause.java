@@ -1,25 +1,23 @@
-/**
- * $Id: TrackDataSource.java,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
-
 
 package ucar.unidata.sql;
 
@@ -86,6 +84,7 @@ public class Clause {
     public static final String EXPR_ISNULL = "is null";
 
 
+    /** _more_ */
     public static final String EXPR_IN = "IN";
 
     /** _more_ */
@@ -95,7 +94,7 @@ public class Clause {
     public static final String EXPR_AND = "AND";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String EXPR_JOIN = "join";
 
     /** _more_ */
@@ -107,6 +106,7 @@ public class Clause {
     /** _more_ */
     private Object value;
 
+    /** _more_ */
     private String extra;
 
     /** _more_ */
@@ -155,6 +155,8 @@ public class Clause {
         return new Clause(EXPR_OR, new Clause[] { clause1, clause2 });
     }
 
+
+
     /**
      * _more_
      *
@@ -175,7 +177,9 @@ public class Clause {
      * @return _more_
      */
     public static Clause or(Clause[] clauses) {
-        if(clauses == null || clauses.length==0) return null;
+        if ((clauses == null) || (clauses.length == 0)) {
+            return null;
+        }
         return new Clause(EXPR_OR, clauses);
     }
 
@@ -187,7 +191,9 @@ public class Clause {
      * @return _more_
      */
     public static Clause and(Clause[] clauses) {
-        if(clauses == null || clauses.length==0) return null;
+        if ((clauses == null) || (clauses.length == 0)) {
+            return null;
+        }
         return new Clause(EXPR_AND, clauses);
     }
 
@@ -215,9 +221,63 @@ public class Clause {
     }
 
 
-    public static Clause eq(String column, Object value,boolean not) {
-        if(not) return neq(column,value);
-        return eq(column,value);
+    /**
+     * _more_
+     *
+     * @param colName _more_
+     * @param values _more_
+     *
+     * @return _more_
+     */
+    public static List<Clause> makeIntClauses(String colName,
+            List<String> values) {
+        List<Clause> clauses = new ArrayList<Clause>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+            value = value.trim();
+            clauses.add(Clause.eq(colName, new Integer(value).intValue()));
+        }
+        return clauses;
+    }
+
+    /**
+     * _more_
+     *
+     * @param colName _more_
+     * @param values _more_
+     *
+     * @return _more_
+     */
+    public static List<Clause> makeStringClauses(String colName,
+            List<String> values) {
+        List<Clause> clauses = new ArrayList<Clause>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+            value = value.trim();
+            clauses.add(Clause.eq(colName, value));
+        }
+        return clauses;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param value _more_
+     * @param not _more_
+     *
+     * @return _more_
+     */
+    public static Clause eq(String column, Object value, boolean not) {
+        if (not) {
+            return neq(column, value);
+        }
+        return eq(column, value);
     }
 
 
@@ -242,7 +302,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause ge(String column, Object value) {
-        return   new Clause(column, EXPR_GE, value);
+        return new Clause(column, EXPR_GE, value);
     }
 
     /**
@@ -254,17 +314,36 @@ public class Clause {
      * @return _more_
      */
     public static Clause le(String column, Object value) {
-        return  new Clause(column, EXPR_LE, value);
+        return new Clause(column, EXPR_LE, value);
     }
 
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static Clause in(String column, String inner) {
-        return  new Clause(column, EXPR_IN, inner);
+        return new Clause(column, EXPR_IN, inner);
     }
 
-    public static Clause in(String column, String what, String from, Clause inner) {
-        Clause clause =  new Clause(EXPR_IN, new Clause[] { inner});
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param what _more_
+     * @param from _more_
+     * @param inner _more_
+     *
+     * @return _more_
+     */
+    public static Clause in(String column, String what, String from,
+                            Clause inner) {
+        Clause clause = new Clause(EXPR_IN, new Clause[] { inner });
         clause.column = column;
-        clause.extra = " select " + what +" from " + from +" ";
+        clause.extra  = " select " + what + " from " + from + " ";
         return clause;
     }
 
@@ -332,9 +411,20 @@ public class Clause {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param value _more_
+     * @param not _more_
+     *
+     * @return _more_
+     */
     public static Clause like(String column, Object value, boolean not) {
-        if(not) return notLike(column,value);
-        return like(column,value);
+        if (not) {
+            return notLike(column, value);
+        }
+        return like(column, value);
     }
 
 
@@ -387,9 +477,10 @@ public class Clause {
      */
     public boolean isColumnFromTable(String table) {
         if (column == null) {
-            if(subClauses!=null) {
+            if (subClauses != null) {
                 for (int i = 0; i < subClauses.length; i++) {
-                    if(subClauses[i]!=null && subClauses[i].isColumnFromTable(table)) {
+                    if ((subClauses[i] != null)
+                            && subClauses[i].isColumnFromTable(table)) {
                         return true;
                     }
                 }
@@ -452,7 +543,7 @@ public class Clause {
 
         for (int i = 0; i < notNots.size(); i++) {
             String value = notNots.get(i).toString();
-            if(value.startsWith("%") || value.endsWith("%")) {
+            if (value.startsWith("%") || value.endsWith("%")) {
                 clauses.add(Clause.like(column, value));
             } else {
                 clauses.add(Clause.eq(column, value));
@@ -486,7 +577,9 @@ public class Clause {
      * @return _more_
      */
     public boolean isColumn(String col) {
-        if(column==null) return false;
+        if (column == null) {
+            return false;
+        }
         return column.equals(col);
     }
 
@@ -524,24 +617,28 @@ public class Clause {
             List toks = new ArrayList();
             for (int i = 0; i < subClauses.length; i++) {
                 StringBuffer buff = new StringBuffer();
-                if(subClauses[i]!=null) {
+                if (subClauses[i] != null) {
                     subClauses[i].addClause(buff);
                     toks.add(buff.toString());
                 }
             }
 
             if (expr.equals(EXPR_IN)) {
-                if(toks.size()==0) {
-                    sb.append(SqlUtil.group(column + "  IN ( " + extra +")"));
+                if (toks.size() == 0) {
+                    sb.append(SqlUtil.group(column + "  IN ( " + extra
+                                            + ")"));
                 } else {
-                    sb.append(SqlUtil.group(column + "  IN ( " + extra +" WHERE "  + toks.get(0) +")"));
+                    sb.append(SqlUtil.group(column + "  IN ( " + extra
+                                            + " WHERE " + toks.get(0) + ")"));
                 }
             } else {
-                if(toks.size()>1) 
+                if (toks.size() > 1) {
                     sb.append("(");
+                }
                 sb.append(StringUtil.join(" " + expr + " ", toks));
-                if(toks.size()>1) 
+                if (toks.size() > 1) {
                     sb.append(")");
+                }
             }
             return sb;
         }
@@ -553,12 +650,13 @@ public class Clause {
         } else if (expr.equals(EXPR_LIKE)) {
             sb.append(SqlUtil.group(column + "  like ?"));
         } else if (expr.equals(EXPR_IN)) {
-            sb.append(SqlUtil.group(column + "  IN (" + value +")"));
+            sb.append(SqlUtil.group(column + "  IN (" + value + ")"));
         } else if (expr.equals(EXPR_NOTLIKE)) {
             sb.append(SqlUtil.group("NOT " + column + "  like ?"));
         } else {
-            if(SqlUtil.debug)
-                System.err.println (toString());
+            if (SqlUtil.debug) {
+                System.err.println(toString());
+            }
             String theExpr = column + " " + expr + " ?";
             sb.append(SqlUtil.group(theExpr));
         }
@@ -583,7 +681,7 @@ public class Clause {
         }
         if (subClauses != null) {
             for (int i = 0; i < subClauses.length; i++) {
-                if(subClauses[i]!=null) {
+                if (subClauses[i] != null) {
                     col = subClauses[i].setValue(stmt, col);
                 }
             }
@@ -593,8 +691,9 @@ public class Clause {
         if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_JOIN)) {
             return col;
         }
-        if(SqlUtil.debug)
-            System.err.println("   value:"  + value + " " + col);
+        if (SqlUtil.debug) {
+            System.err.println("   value:" + value + " " + col);
+        }
         SqlUtil.setValue(stmt, value, col);
         return col + 1;
     }
@@ -670,4 +769,3 @@ public class Clause {
     }
 
 }
-

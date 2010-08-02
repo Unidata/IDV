@@ -1,25 +1,23 @@
-/**
- * $Id: TrackDataSource.java,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
-
 
 package ucar.unidata.sql;
 
@@ -533,8 +531,15 @@ public class SqlUtil {
     }
 
 
-    public static String makeInsert(String table, 
-                                    String[] names) {
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param names _more_
+     *
+     * @return _more_
+     */
+    public static String makeInsert(String table, String[] names) {
         StringBuffer sb = new StringBuffer();
         sb.append("INSERT INTO ");
         sb.append(table);
@@ -603,7 +608,6 @@ public class SqlUtil {
      * @param names _more_
      * @param values _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -622,14 +626,23 @@ public class SqlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param table _more_
+     * @param clause _more_
+     * @param names _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
     public static void update(Connection connection, String table,
-                              Clause clause, 
-                              String[] names,
-                              Object[] values)
+                              Clause clause, String[] names, Object[] values)
             throws Exception {
-        String            query = makeUpdate(table, clause, names);
-        PreparedStatement stmt  = connection.prepareStatement(query);
-        int colCnt=1;
+        String            query  = makeUpdate(table, clause, names);
+        PreparedStatement stmt   = connection.prepareStatement(query);
+        int               colCnt = 1;
         for (int i = 0; i < values.length; i++) {
             SqlUtil.setValue(stmt, values[i], colCnt);
             colCnt++;
@@ -698,6 +711,15 @@ public class SqlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param clause _more_
+     * @param names _more_
+     *
+     * @return _more_
+     */
     public static String makeUpdate(String table, Clause clause,
                                     String[] names) {
         StringBuffer sb = new StringBuffer();
@@ -916,7 +938,9 @@ public class SqlUtil {
         return "SELECT " + what + " FROM " + tableClause
                + ((where.trim().length() > 0)
                   ? " \nWHERE " + where
-                  : "") + (extra==null?"":" " + extra);
+                  : "") + ((extra == null)
+                           ? ""
+                           : " " + extra);
     }
 
 
@@ -964,47 +988,78 @@ public class SqlUtil {
         loadSql(sql, statement, ignoreErrors, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param statement _more_
+     * @param ignoreErrors _more_
+     * @param printStatus _more_
+     *
+     * @throws Exception _more_
+     */
     public static void loadSql(String sql, Statement statement,
                                boolean ignoreErrors, boolean printStatus)
             throws Exception {
 
-        loadSql(sql, statement, ignoreErrors, printStatus, new ArrayList<SqlError>());
+        loadSql(sql, statement, ignoreErrors, printStatus,
+                new ArrayList<SqlError>());
     }
 
 
+    /** _more_ */
     public static boolean showLoadingSql = false;
 
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param statement _more_
+     * @param ignoreErrors _more_
+     * @param printStatus _more_
+     * @param errors _more_
+     *
+     * @throws Exception _more_
+     */
     public static void loadSql(String sql, Statement statement,
-                               boolean ignoreErrors, boolean printStatus, List<SqlError> errors)
+                               boolean ignoreErrors, boolean printStatus,
+                               List<SqlError> errors)
             throws Exception {
 
-        int cnt=0;
+        int cnt = 0;
         for (String command : parseSql(sql)) {
-            if(printStatus) {
+            if (printStatus) {
                 cnt++;
-                if(cnt%100==0) System.err.print(".");
-                if(cnt%1000==0) System.err.println("\n" + cnt);
+                if (cnt % 100 == 0) {
+                    System.err.print(".");
+                }
+                if (cnt % 1000 == 0) {
+                    System.err.println("\n" + cnt);
+                }
             }
             try {
                 command = command.trim();
                 if (command.length() > 0) {
                     statement.execute(command);
-                    if(showLoadingSql) {
-                        System.err.println("SqlUtil.loadSql:" + command.replace("\n"," "));
+                    if (showLoadingSql) {
+                        System.err.println("SqlUtil.loadSql:"
+                                           + command.replace("\n", " "));
                     }
                 }
             } catch (Exception exc) {
                 errors.add(new SqlError(command, exc));
                 String msg = exc.toString().toLowerCase();
-                if(msg.indexOf("duplicate")<0 && 
-                   msg.indexOf("already exists")<0 && 
-                   msg.indexOf("can't drop")<0 &&
-                   msg.indexOf("doesn't exist")<0 &&
-                   msg.indexOf("is not a column in table")<0) {
-                    System.err.println("\n*********************************************");
-                    System.err.println("Bad sql:" + command); 
+                if ((msg.indexOf("duplicate") < 0)
+                        && (msg.indexOf("already exists") < 0)
+                        && (msg.indexOf("can't drop") < 0)
+                        && (msg.indexOf("doesn't exist") < 0)
+                        && (msg.indexOf("is not a column in table") < 0)) {
+                    System.err.println(
+                        "\n*********************************************");
+                    System.err.println("Bad sql:" + command);
                     System.err.println(exc);
-                    System.err.println("********************************************\n");
+                    System.err.println(
+                        "********************************************\n");
                 }
                 if ( !ignoreErrors) {
                     throw exc;
@@ -1051,7 +1106,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      *
      * @return _more_
@@ -1060,19 +1116,18 @@ public class SqlUtil {
      */
     public static double[] readTime(Iterator iter, int column)
             throws Exception {
-        ResultSet results;
+
         double[]  current = new double[10000];
         int       cnt     = 0;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Date   dttm  = results.getDate(column, calendar);
-                double value = dttm.getTime();
-                current[cnt++] = value;
-                if (cnt >= current.length) {
-                    double[] tmp = current;
-                    current = new double[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+        ResultSet results;
+        while ((results = iter.getNext()) != null) {
+            Date   dttm  = results.getDate(column, calendar);
+            double value = dttm.getTime();
+            current[cnt++] = value;
+            if (cnt >= current.length) {
+                double[] tmp = current;
+                current = new double[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
 
@@ -1087,7 +1142,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      * @param missing _more_
      *
@@ -1100,20 +1156,19 @@ public class SqlUtil {
         float[]   current = new float[10000];
         int       cnt     = 0;
         ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                float value = results.getFloat(column);
-                if (value == missing) {
-                    value = Float.NaN;
-                }
-                current[cnt++] = value;
-                if (cnt >= current.length) {
-                    float[] tmp = current;
-                    current = new float[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+        while ((results = iter.getNext()) != null) {
+            float value = results.getFloat(column);
+            if (value == missing) {
+                value = Float.NaN;
+            }
+            current[cnt++] = value;
+            if (cnt >= current.length) {
+                float[] tmp = current;
+                current = new float[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
+
         float[] actual = new float[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -1121,46 +1176,55 @@ public class SqlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param iter _more_
+     * @param missing _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static List<float[]> readFloats(Iterator iter, float missing)
             throws Exception {
-        List<float[]> arrays = new ArrayList<float[]>();
-        int numCols =  -1;
-        int       cnt     = 0;
-        ResultSet results;
-        while ((results = iter.next()) != null) {
-            if(numCols == -1) {
+        List<float[]> arrays  = new ArrayList<float[]>();
+        int           numCols = -1;
+        int           cnt     = 0;
+        ResultSet     results;
+        while ((results = iter.getNext()) != null) {
+            if (numCols == -1) {
                 ResultSetMetaData rsmd = results.getMetaData();
                 numCols = rsmd.getColumnCount();
-                for(int column=0;column<numCols;column++) {
+                for (int column = 0; column < numCols; column++) {
                     arrays.add(new float[1000]);
                 }
             }
-            while (results.next()) {
-                for(int column=0;column<numCols;column++) {
-                    float[]current = arrays.get(column);
-                    float value = results.getFloat(column+1);
-                    if (value == missing) {
-                        value = Float.NaN;
-                    }
-                    current[cnt] = value;
-                    if (cnt+1 >= current.length) {
-                        float[] tmp = current;
-                        current = new float[current.length *2];
-                        System.arraycopy(tmp, 0, current, 0, tmp.length);
-                        arrays.set(column, current);
-                    }
+            for (int column = 0; column < numCols; column++) {
+                float[] current = arrays.get(column);
+                float   value   = results.getFloat(column + 1);
+                if (value == missing) {
+                    value = Float.NaN;
                 }
-                cnt++;
+                current[cnt] = value;
+                if (cnt + 1 >= current.length) {
+                    float[] tmp = current;
+                    current = new float[current.length * 2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                    arrays.set(column, current);
+                }
             }
+            cnt++;
         }
+
 
 
         if (debug) {
             //            System.err.println ("arrays: " + arrays.size() + " cnt=" + cnt);
         }
-        for(int column=0;column<numCols;column++) {
-            float[]current = arrays.get(column);
-            float[] actual = new float[cnt];
+        for (int column = 0; column < numCols; column++) {
+            float[] current = arrays.get(column);
+            float[] actual  = new float[cnt];
             System.arraycopy(current, 0, actual, 0, cnt);
             arrays.set(column, actual);
         }
@@ -1173,7 +1237,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      *
      * @return _more_
@@ -1184,20 +1249,19 @@ public class SqlUtil {
         int[]     current = new int[10000];
         int       cnt     = 0;
         ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int value = results.getInt(column);
-                //                if (value == missing) {
-                //                    value = Integer.NaN;
-                //                }
-                current[cnt++] = value;
-                if (cnt >= current.length) {
-                    int[] tmp = current;
-                    current = new int[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+        while ((results = iter.getNext()) != null) {
+            int value = results.getInt(column);
+            //                if (value == missing) {
+            //                    value = Integer.NaN;
+            //                }
+            current[cnt++] = value;
+            if (cnt >= current.length) {
+                int[] tmp = current;
+                current = new int[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
+
         int[] actual = new int[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -1207,7 +1271,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param columnName _more_
      *
      * @return _more_
@@ -1224,7 +1289,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      *
      * @return _more_
      *
@@ -1237,7 +1303,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      *
      * @return _more_
@@ -1253,7 +1320,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      * @param name _more_
      *
@@ -1261,24 +1329,21 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    private static String[] readString(Iterator iter, int column,
-                                       String name)
+    private static String[] readString(Iterator iter, int column, String name)
             throws Exception {
         String[]  current = new String[10000];
         int       cnt     = 0;
         ResultSet results;
-        while ((results = iter.next()) != null) {
+        while ((results = iter.getNext()) != null) {
             if (name != null) {
                 column = results.findColumn(name);
                 name   = null;
             }
-            while (results.next()) {
-                current[cnt++] = results.getString(column);
-                if (cnt >= current.length) {
-                    String[] tmp = current;
-                    current = new String[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+            current[cnt++] = results.getString(column);
+            if (cnt >= current.length) {
+                String[] tmp = current;
+                current = new String[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
         String[] actual = new String[cnt];
@@ -1292,7 +1357,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      * @param missing _more_
      *
@@ -1306,20 +1372,19 @@ public class SqlUtil {
         double[]  current = new double[10000];
         int       cnt     = 0;
         ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                double value = results.getDouble(column);
-                if (value == missing) {
-                    value = Double.NaN;
-                }
-                current[cnt++] = value;
-                if (cnt >= current.length) {
-                    double[] tmp = current;
-                    current = new double[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+        while ((results = iter.getNext()) != null) {
+            double value = results.getDouble(column);
+            if (value == missing) {
+                value = Double.NaN;
+            }
+            current[cnt++] = value;
+            if (cnt >= current.length) {
+                double[] tmp = current;
+                current = new double[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
+
         double[] actual = new double[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -1328,7 +1393,8 @@ public class SqlUtil {
     /**
      * _more_
      *
-     * @param stmt _more_
+     *
+     * @param iter _more_
      * @param column _more_
      *
      * @return _more_
@@ -1340,17 +1406,16 @@ public class SqlUtil {
         Date[]    current = new Date[10000];
         int       cnt     = 0;
         ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Date value = results.getDate(column, calendar);
-                current[cnt++] = value;
-                if (cnt >= current.length) {
-                    Date[] tmp = current;
-                    current = new Date[current.length * 2];
-                    System.arraycopy(tmp, 0, current, 0, tmp.length);
-                }
+        while ((results = iter.getNext()) != null) {
+            Date value = results.getDate(column, calendar);
+            current[cnt++] = value;
+            if (cnt >= current.length) {
+                Date[] tmp = current;
+                current = new Date[current.length * 2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
+
         Date[] actual = new Date[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -1369,7 +1434,17 @@ public class SqlUtil {
     }
 
 
-    public static Iterator getIterator(Statement stmt, int offset, int limit) {
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param offset _more_
+     * @param limit _more_
+     *
+     * @return _more_
+     */
+    public static Iterator getIterator(Statement stmt, int offset,
+                                       int limit) {
         return new Iterator(stmt, offset, limit);
     }
 
@@ -1384,50 +1459,62 @@ public class SqlUtil {
     public static class Iterator {
 
         /** _more_ */
-        private         Statement stmt;
+        private Statement stmt;
 
         /** _more_ */
-        private         int resultSetCnt = 0;
+        private int resultSetCnt = 0;
 
         /** _more_ */
-        private         ResultSet lastResultSet;
+        private ResultSet lastResultSet;
 
         /** _more_ */
         private boolean shouldCloseStatement = true;
 
-	private int offset = 0;
-	private int limit = -1;
-	private int cnt=0;
+        /** _more_ */
+        private int offset = 0;
+
+        /** _more_ */
+        private int limit = -1;
+
+        /** _more_ */
+        private int cnt = 0;
 
         /**
          *
          * @param stmt _more_
          */
         public Iterator(Statement stmt) {
-	    this(stmt,0,-1);
-	}
-
-	public Iterator(Statement stmt, int offset, int limit) {
-            this.stmt = stmt;
-	    this.offset = offset;
-            this.limit = limit;  
-      }
+            this(stmt, 0, -1);
+        }
 
         /**
-           Set the ShouldCloseStatement property.
+         * _more_
+         *
+         * @param stmt _more_
+         * @param offset _more_
+         * @param limit _more_
+         */
+        public Iterator(Statement stmt, int offset, int limit) {
+            this.stmt   = stmt;
+            this.offset = offset;
+            this.limit  = limit;
+        }
 
-           @param value The new value for ShouldCloseStatement
-        **/
-        public void setShouldCloseStatement (boolean value) {
+        /**
+         *  Set the ShouldCloseStatement property.
+         *
+         *  @param value The new value for ShouldCloseStatement
+         */
+        public void setShouldCloseStatement(boolean value) {
             shouldCloseStatement = value;
         }
 
         /**
-           Get the ShouldCloseStatement property.
-
-           @return The ShouldCloseStatement
-        **/
-        public boolean getShouldCloseStatement () {
+         *  Get the ShouldCloseStatement property.
+         *
+         *  @return The ShouldCloseStatement
+         */
+        public boolean getShouldCloseStatement() {
             return shouldCloseStatement;
         }
 
@@ -1447,13 +1534,13 @@ public class SqlUtil {
                 stmt.getMoreResults();
             }
             if (lastResultSet != null) {
-		lastResultSet.close();
+                lastResultSet.close();
             }
             resultSetCnt++;
             lastResultSet = stmt.getResultSet();
             if (lastResultSet == null) {
-                if(shouldCloseStatement) {
-		    close(stmt);
+                if (shouldCloseStatement) {
+                    close(stmt);
                 }
                 stmt = null;
             }
@@ -1461,90 +1548,141 @@ public class SqlUtil {
         }
 
 
-	public ResultSet getResults() {
-	    return lastResultSet;
-	}
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public ResultSet getResults() {
+            return lastResultSet;
+        }
 
 
-	public ResultSet getNext() throws SQLException {
-	    try {
-		if(lastResultSet == null) {
-		    lastResultSet = stmt.getResultSet();
-		    if(!lastResultSet.next()) {
-			checkClose();
-			return null;
-		    }
-		    //Run through the offset
-		    while(offset-->0) {
-			if(!lastResultSet.next()) {
-			    checkClose();
-			    return null;
-			}
-		    }
-		    cnt++;
-		    return lastResultSet;
-		}  
-
-		if(lastResultSet.next()) {
-		    cnt++;
-		    return lastResultSet;
-		}
-
-		if (lastResultSet != null) {
-		    lastResultSet.close();
-		}
-		lastResultSet = stmt.getResultSet();
-		if(lastResultSet.next()) {
-		    cnt++;
-		    return lastResultSet;
-		}
-
-	    } catch(SQLException exc) {
-	    }
-	    checkClose();
-	    return null;
-	}
-
-
-	public int getCount() {
-	    return cnt;
-	}
-
-	public boolean countOK() {
-	    return cnt<limit;
-	}
-
-	private void checkClose() throws SQLException {
-	    if(shouldCloseStatement) {
-		close(stmt);
-		lastResultSet = null;
-		stmt = null;
-	    }
-	}
-
-        public void close() throws SQLException {
-            if(stmt!=null) {
-                if(shouldCloseStatement) {
-                    close(stmt);
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws SQLException _more_
+         */
+        public ResultSet getNext() throws SQLException {
+            try {
+                if (lastResultSet == null) {
+                    lastResultSet = stmt.getResultSet();
+                    if ( !lastResultSet.next()) {
+                        checkClose();
+                        return null;
+                    }
+                    //Run through the offset
+                    while (offset-- > 0) {
+                        if ( !lastResultSet.next()) {
+                            checkClose();
+                            return null;
+                        }
+                    }
+                    cnt++;
+                    return lastResultSet;
                 }
-                stmt  = null;
+
+                if (lastResultSet.next()) {
+                    cnt++;
+                    return lastResultSet;
+                }
+
+                if (lastResultSet != null) {
+                    lastResultSet.close();
+                }
+                lastResultSet = stmt.getResultSet();
+                if (lastResultSet.next()) {
+                    cnt++;
+                    return lastResultSet;
+                }
+
+            } catch (SQLException exc) {}
+            checkClose();
+            return null;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int getCount() {
+            return cnt;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean countOK() {
+            return cnt < limit;
+        }
+
+        /**
+         * _more_
+         *
+         * @throws SQLException _more_
+         */
+        private void checkClose() throws SQLException {
+            if (shouldCloseStatement) {
+                close(stmt);
+                lastResultSet = null;
+                stmt          = null;
             }
         }
 
+        /**
+         * _more_
+         *
+         * @throws SQLException _more_
+         */
+        public void close() throws SQLException {
+            if (stmt != null) {
+                if (shouldCloseStatement) {
+                    close(stmt);
+                }
+                stmt = null;
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param stmt _more_
+         *
+         * @throws SQLException _more_
+         */
         protected void close(Statement stmt) throws SQLException {
             SqlUtil.close(stmt);
         }
     }
 
 
+    /** _more_ */
     private static ConnectionManager connectionManager;
 
+    /**
+     * _more_
+     *
+     * @param mgr _more_
+     */
     public static void setConnectionManager(ConnectionManager mgr) {
         connectionManager = mgr;
     }
 
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     *
+     * @throws SQLException _more_
+     */
     public static void close(Statement stmt) throws SQLException {
-        if(connectionManager!=null) {
+        if (connectionManager != null) {
             connectionManager.closeStatement(stmt);
         } else {
             stmt.close();
@@ -1552,7 +1690,19 @@ public class SqlUtil {
     }
 
 
+    /**
+     * Interface description
+     *
+     *
+     * @author         Enter your name here...
+     */
     public static interface ConnectionManager {
+
+        /**
+         * _more_
+         *
+         * @param stmt _more_
+         */
         public void closeStatement(Statement stmt);
     }
 
@@ -1593,9 +1743,16 @@ public class SqlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String cleanName(String value) {
-        value = value.replaceAll(" ","_");
-        value = value.replaceAll("\\.","_");
+        value = value.replaceAll(" ", "_");
+        value = value.replaceAll("\\.", "_");
         return value;
     }
 
@@ -1614,21 +1771,34 @@ public class SqlUtil {
      * @throws Exception _more_
      */
     public static PreparedStatement getSelectStatement(Connection connection,
-                                                       String what, List tables, Clause clause, String extra)
-        throws Exception {
-        return connection.prepareStatement(getSelectStatement(what, tables, clause,extra));
+            String what, List tables, Clause clause, String extra)
+            throws Exception {
+        return connection.prepareStatement(getSelectStatement(what, tables,
+                clause, extra));
     }
 
 
-    public static String getSelectStatement(
-                                            String what, List tables, Clause clause, String extra)
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String getSelectStatement(String what, List tables,
+                                            Clause clause, String extra)
+            throws Exception {
         StringBuffer sb = new StringBuffer();
-        if(clause!=null) {
+        if (clause != null) {
             clause.addClause(sb);
         }
-        String sql =  makeSelect(what, tables, sb.toString(), extra);
-        System.err.println("SQL:" + sql);
+        String sql = makeSelect(what, tables, sb.toString(), extra);
+        //        System.err.println("SQL:" + sql);
         return sql;
     }
 
@@ -1673,9 +1843,24 @@ public class SqlUtil {
                                    int max)
             throws Exception {
 
-        return select(connection, what, tables, clause, extra, max,0);
+        return select(connection, what, tables, clause, extra, max, 0);
     }
 
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static Statement select(Connection connection, String what,
                                    List tables, Clause clause, String extra,
                                    int max, int timeout)
@@ -1685,11 +1870,11 @@ public class SqlUtil {
         if (max > 0) {
             stmt.setMaxRows(max);
         }
-        if(clause!=null) {
+        if (clause != null) {
             clause.setValue(stmt, 1);
         }
         //        System.err.println ("stmt: " + stmt);
-        if(timeout>0) {
+        if (timeout > 0) {
             stmt.setQueryTimeout(timeout);
         }
         stmt.execute();
@@ -1772,7 +1957,9 @@ public class SqlUtil {
     public static Statement select(Connection connection, String what,
                                    List tables, Clause[] clauses)
             throws Exception {
-        return select(connection, what, tables, (clauses==null?null:Clause.and(clauses)));
+        return select(connection, what, tables, ((clauses == null)
+                ? null
+                : Clause.and(clauses)));
     }
 
     /**
@@ -1792,7 +1979,9 @@ public class SqlUtil {
                                    List tables, Clause[] clauses,
                                    String extra)
             throws Exception {
-        return select(connection, what, tables, (clauses==null?null:Clause.and(clauses)), extra);
+        return select(connection, what, tables, ((clauses == null)
+                ? null
+                : Clause.and(clauses)), extra);
     }
 
 
@@ -1820,32 +2009,49 @@ public class SqlUtil {
 
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Mon, Aug 2, '10
+     * @author         Enter your name here...
+     */
     public static final class SqlError {
+
+        /** _more_ */
         private String sql;
+
+        /** _more_ */
         private Exception exception;
 
 
-        public SqlError(String  sql, Exception exc) {
-            this.sql = sql;
+        /**
+         * _more_
+         *
+         * @param sql _more_
+         * @param exc _more_
+         */
+        public SqlError(String sql, Exception exc) {
+            this.sql       = sql;
             this.exception = exc;
         }
-        
-        /**
-           Get the Sql property.
 
-           @return The Sql
-        **/
-        public String getSql () {
+        /**
+         *  Get the Sql property.
+         *
+         *  @return The Sql
+         */
+        public String getSql() {
             return this.sql;
         }
 
 
         /**
-           Get the Exception property.
-
-           @return The Exception
-        **/
-        public Exception getException () {
+         *  Get the Exception property.
+         *
+         *  @return The Exception
+         */
+        public Exception getException() {
             return this.exception;
         }
 
@@ -1856,4 +2062,3 @@ public class SqlUtil {
 
 
 }
-
