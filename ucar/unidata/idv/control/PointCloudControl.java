@@ -942,7 +942,12 @@ public class PointCloudControl extends DrawingControl {
 
 
         for (int i = 0; i < numFields; i++) {
-            dataRanges[i] = new Range(minFields[i], maxFields[i]);
+            if (Float.isInfinite(minFields[i])
+                    || Float.isInfinite(maxFields[i])) {
+                dataRanges[i] = new Range(Double.NaN, Double.NaN);
+            } else {
+                dataRanges[i] = new Range(minFields[i], maxFields[i]);
+            }
         }
         //        System.err.println("Range:" + dataRange +" idx:" + colorRangeIndex);
 
