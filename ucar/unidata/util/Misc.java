@@ -1819,6 +1819,9 @@ public class Misc {
     /** decimal format for 5.1 format */
     static DecimalFormat format6 = new DecimalFormat("#####.#");
 
+    /** decimal format for scientific notation of large numbers */
+    static DecimalFormat format7 = new DecimalFormat("0.###E0");
+
     /**
      * Return different pre-defined DecimalFormat objects depending
      * on the value of the given double
@@ -1842,6 +1845,9 @@ public class Misc {
         }
         if (v < 10.0) {
             return format4;
+        }
+        if (v > 999999.0) {
+            return format7;
         }
         if (v > 9999.0) {
             return format6;
