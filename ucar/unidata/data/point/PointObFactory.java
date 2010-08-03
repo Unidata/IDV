@@ -167,6 +167,7 @@ public class PointObFactory {
      */
     public static FieldImpl makePointCloud(FieldImpl pointObs, String param)
             throws VisADException, RemoteException {
+        /* TODO: subset parameter if we want - use extractParameter
         int paramIndex = -1;
         if (param != null) {
             PointObTuple ob = (PointObTuple) pointObs.getSample(0, false);
@@ -178,39 +179,86 @@ public class PointObFactory {
                 paramIndex = index;
             }
         }
-        FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs, paramIndex);
+        */
+        Trace.call1("PointObFactory: makingTimeSequence");
+        FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs);
+        Trace.call2("PointObFactory: makingTimeSequence");
         FieldImpl    cloudData     = null;
         Set          timeSet       = timeObs.getDomainSet();
         FunctionType cloudType     = null;
+        TupleType    cloudDataType = null;
         FunctionType timeCloudType = null;
+        Trace.call1("PointObFactory: makingCloudFI");
+        float[][] timeStepVals = null;
+        Unit[] dataUnits = null;
+        Unit[] rangeUnits = null;
+        boolean needToConvert = false;
         for (int i = 0; i < timeSet.getLength(); i++) {
             FieldImpl    obs      = (FieldImpl) timeObs.getSample(i, false);
             Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
             FlatField    timeStep = null;
+            //Trace.call1("PointObFactory: makingCloudFF", "numObs for time " + i + " is " + indexSet.getLength());
             for (int j = 0; j < indexSet.getLength(); j++) {
                 PointOb ob = (PointOb) obs.getSample(j, false);
                 if (cloudType == null) {
+                    cloudDataType = new TupleType(new MathType[] {
+                        ob.getEarthLocation().getType(),
+                        ob.getData().getType() });
                     cloudType =
                         new FunctionType(DataUtility.getDomainType(indexSet),
-                                         new TupleType(new MathType[] {
-                                             ob.getEarthLocation().getType(),
-                                             ob.getData().getType() }));
+                                         cloudDataType);
                 }
-                if (timeStep == null) {
+                double[] elVals =
+                    ((RealTuple) ob.getEarthLocation()).getValues();
+                double[] dataVals = ((RealTuple) ob.getData()).getValues();
+                if (timeStep == null) {  // first time through
                     timeStep = new FlatField(cloudType, indexSet);
+                    timeStepVals =
+                        new float[elVals.length + dataVals.length][timeStep.getLength()];
+                    Unit[] elUnits = ((RealTuple) ob.getEarthLocation()).getTupleUnits();
+                    if (elUnits == null) {
+                    	elUnits = new Unit[] {CommonUnit.degree, CommonUnit.degree, CommonUnit.meter};
+                    }
+                    Unit[] valUnits = ((RealTuple) ob.getData()).getTupleUnits();
+                    dataUnits = new Unit[elUnits.length + valUnits.length];
+                    for (int k = 0; k < elUnits.length; k++) {
+                        dataUnits[k] = elUnits[k];
+                    }
+                    for (int k = 0; k < valUnits.length; k++) {
+                        dataUnits[k + elUnits.length] = valUnits[k];
+                    }
+                    rangeUnits =  Util.getDefaultRangeUnits(timeStep);
+                    needToConvert =  !java.util.Arrays.equals(dataUnits, rangeUnits);
                 }
-                timeStep.setSample(j, new Tuple(new Data[] {
+                for (int k = 0; k < elVals.length; k++) {
+                    timeStepVals[k][j] = (float) elVals[k];
+                }
+                for (int k = 0; k < dataVals.length; k++) {
+                    timeStepVals[k + elVals.length][j] = (float) dataVals[k];
+                }
+
+
+                /*  Setting the samples on a FlatField using Data objects is really expensive
+                timeStep.setSample(j, new Tuple(cloudDataType, new Data[] {
                     ob.getEarthLocation(),
-                    ob.getData() }), false);
+                    ob.getData() }, false, false), false);
+                    */
             }
+            // TODO:  this assumes that the values are the same units as the default units.
+            if (needToConvert) {
+               timeStepVals = Unit.convertTuple(timeStepVals, dataUnits, rangeUnits);
+            }
+            timeStep.setSamples(timeStepVals, false);
             if (timeCloudType == null) {
                 timeCloudType =
                     new FunctionType(DataUtility.getDomainType(timeSet),
                                      timeStep.getType());
                 cloudData = new FieldImpl(timeCloudType, timeSet);
             }
+            //Trace.call2("PointObFactory: makingCloudFF");
             cloudData.setSample(i, timeStep, false, false);
         }
+        Trace.call2("PointObFactory: makingCloudFI");
         return cloudData;
     }
 
@@ -245,10 +293,12 @@ public class PointObFactory {
             int lumpMinutes)
             throws VisADException, RemoteException {
         int  numObs = pointObs.getDomainSet().getLength();
-        List obs    = new ArrayList();
+        List obs    = new ArrayList(numObs);
+        Trace.call1("makeTimeSequence: get list of obs");
         for (int i = 0; i < numObs; i++) {
-            obs.add(pointObs.getSample(i));
+            obs.add(pointObs.getSample(i, false));
         }
+        Trace.call2("makeTimeSequence: get list of obs");
         return makeTimeSequenceOfPointObs(obs, lumpMinutes, -1);
     }
 
@@ -280,7 +330,8 @@ public class PointObFactory {
         Hashtable timeToObs   = new Hashtable();
         // loop through and find all the unique times
         Trace.call1("makeTimeSequence-loop1",
-                    " " + lumpMinutes + " num obs:" + numObs);
+                    " " + lumpMinutes + " component " + componentIndex
+                    + ", num obs:" + numObs);
         Hashtable seenTime = new Hashtable();
         for (int i = 0; i < numObs; i++) {
             PointObTuple ob = (PointObTuple) pointObs.get(i);
@@ -339,9 +390,9 @@ public class PointObFactory {
 
             Double   dValue = new Double(dttm.getValue());
             List     v      = (List) timeToObs.get(dValue);
-            Data[]   obs;
+            Data[]   obs    = null;
             if (componentIndex < 0) {
-                obs = (Data[]) v.toArray(new PointOb[v.size()]);
+                //obs = (Data[]) v.toArray(new PointOb[v.size()]);
             } else {
                 obs = new Data[v.size()];
                 for (int obIdx = 0; obIdx < v.size(); obIdx++) {
@@ -352,7 +403,10 @@ public class PointObFactory {
             Integer1DSet set = new Integer1DSet(index, v.size());
             if (componentIndex < 0) {
                 FieldImpl sample = new FieldImpl(sampleType, set);
-                sample.setSamples(obs, false, false);
+                //sample.setSamples(obs, false, false);
+                for (int j = 0; j < v.size(); j++) {
+                    sample.setSample(j, (Data) v.get(j), false, false);
+                }
                 timeSamples[i] = sample;
             } else {
                 timeSamples[i] = obs[0];
@@ -1968,7 +2022,8 @@ public class PointObFactory {
 
                 int length = data.getDomainSet().getLength();
                 for (int j = 0; j < length; j++) {
-                    retField.setSample(curPos, data.getSample(j), false);
+                    retField.setSample(curPos, data.getSample(j), false,
+                                       false);
                     curPos++;
                 }
             }
