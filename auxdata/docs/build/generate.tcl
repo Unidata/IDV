@@ -163,6 +163,9 @@ proc ht::tblimg {args} {
 }
 
 
+proc gen::finish  {} {
+}
+
 proc gen::thumbName {img} {
     set ext [file extension $img]
     set thumb [file root $img]_thumb$ext
@@ -2884,8 +2887,7 @@ if {[gen::getDoGlossary]} {
 }
 
 
-proc gen::finish  {} {
-}
+
 
 gen::writeFiles 
 
