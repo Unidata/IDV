@@ -535,6 +535,13 @@
      fileselection="false"
      doesmultiples="false"
      label="EOL netCDF Profiler files"/>
+    <datasource
+     id="FILE.PROFILER2"
+     factory="ucar.unidata.data.profiler.CDMProfilerDataSource"
+     patterns="mapr.*,prof.*\.nc$,prof.*\.cdf$,rass.*\.nc$"
+     fileselection="true"
+     doesmultiples="false"
+     label="CDM netCDF Profiler files"/>
 <!--
   <datasource
      id="FILE.LEVEL2RADAR"
