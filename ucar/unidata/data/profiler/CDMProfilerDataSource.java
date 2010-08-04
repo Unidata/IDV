@@ -17,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.data.profiler;
 
 
@@ -36,6 +37,8 @@ import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.*;
+
+import ucar.visad.Util;
 
 
 import visad.*;
@@ -89,21 +92,47 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     /** flag for user set location */
     private boolean locationSetByUser = false;
 
-    /** _more_          */
+    /** _more_ */
     private float CAPMissing = 2147483647;
+
+    /** _more_          */
     private float WPDNissing = 1.0E38f;
+
+    /** _more_          */
     String source;
+
     /**
      * Read in the data.
      *
      */
     private Hashtable stationsToProfiles;
 
-    /** _more_          */
+    /** _more_ */
     private List<NamedStation> selectedStations;
 
     /** _more_          */
+    private List allProfiles;
+
+    /** _more_ */
     private List<Station> stations;
+
+    /** _more_          */
+    private List<Double> times;
+    //  "LAT", "LON", "Z", "TIME", "SPD", "DIR"
+
+    /** _more_          */
+    RealType[] rTypes = {
+        RealType.Latitude, RealType.Longitude, RealType.Altitude,
+        RealType.Time,
+        DataUtil.makeRealType("SPD", DataUtil.parseUnit("knots")),
+        DataUtil.makeRealType("DIR", DataUtil.parseUnit("degree_N"))
+    };
+
+    /** _more_          */
+    String[] params = {
+        "LAT", "LON", "Z", "TIME", "SPD", "DIR"
+    };
+
     /**
      * No argument XML persistence constructor
      *
@@ -129,11 +158,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                                  String source, Hashtable properties)
             throws VisADException, IOException {
         super(descriptor,
-              "CDM Profiler (" + IOUtil.getFileTail(source) + ")",
-              source, properties);
+              "CDM Profiler (" + IOUtil.getFileTail(source) + ")", source,
+              properties);
         this.source = source;
         setFileNameOrUrl(source);
-        String nam =  "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
+        String nam = "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
         initProfiler(nam);
     }
 
@@ -142,7 +171,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
-        String nam =  "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
+        String nam = "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
         try {
             initProfiler(nam);
         } catch (IOException ee) {}
@@ -289,6 +318,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             throws IOException, visad.VisADException {
 
         stationsToProfiles = new Hashtable();
+        times              = new ArrayList();
+        allProfiles        = new ArrayList();
         Formatter log = new Formatter();
         FeatureDatasetPoint dataset =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
@@ -335,6 +366,171 @@ public class CDMProfilerDataSource extends DataSourceImpl {
 
         stations         = spc.getStations();
         selectedStations = getNamedStations(stations);
+
+        int size = stations.size();
+        if (size < 3) {
+            name = name + StringUtil.join(", ", selectedStations);
+        } else {
+            name = name + size + " stations";
+        }
+
+        setName(name);
+        setDescription(name);
+
+        String[] units = new String[6];
+
+        spc.resetIteration();
+        int ii = 0;
+        int j0 = 0;
+        while (ii < size) {
+            Station               st  = stations.get(ii);
+            StationProfileFeature spf = spc.getStationProfileFeature(st);
+            //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
+            PointFeatureCollectionIterator iter =
+                spf.getPointFeatureCollectionIterator(-1);  // not multiple
+
+            List<Date> tList         = spf.getTimes();
+            int        tsize         = tList.size();
+            List       latVector     = new Vector();
+            List       lonVector     = new Vector();
+            List       altVector     = new Vector();
+
+            List       timeVector    = new Vector();
+            List       windSpdVector = new Vector();
+            List       windDirVector = new Vector();
+            int        jj            = 0;
+            while (jj < tsize) {  //iter.hasNext()) {
+                //ProfileFeature pf0 =  (ProfileFeature)iter.next();
+                List           latList  = new ArrayList<Double>();
+                List           lonList  = new ArrayList<Double>();
+                List           altList  = new ArrayList<Double>();
+
+                List           timeList = new ArrayList<Double>();
+                List           uSpdList = new ArrayList<Double>();
+                List           vSpdList = new ArrayList<Double>();
+                Date           dt       = tList.get(jj);
+
+                DateTime       dateTime = new DateTime(dt);
+
+                ProfileFeature pf0      = spf.getProfileByDate(dt);
+                while (pf0.hasNext()) {
+                    PointFeature  p0   = pf0.next();
+                    StructureData sd   = p0.getData();
+                    float         uspd = sd.convertScalarFloat("uComponent");
+                    float         vspd = sd.convertScalarFloat("vComponent");
+                    if ((uspd != McIDASUtil.MCMISSING)
+                            && (uspd != WPDNissing)
+                            && (vspd != McIDASUtil.MCMISSING)
+                            && (vspd != WPDNissing)) {
+                        latList.add(sd.convertScalarDouble("staLat"));
+                        lonList.add(sd.convertScalarDouble("staLon"));
+                        altList.add(sd.convertScalarDouble("levels")
+                                    + sd.convertScalarDouble("staElev"));
+                        timeList.add((double) dateTime.getValue());  //sd.convertScalarFloat("observationTime"));
+                        uSpdList.add((double) uspd);
+                        vSpdList.add((double) vspd);
+                    }
+                    if (ii == 0) {
+                        units[0] = sd.findMember("staLat").getUnitsString();
+                        units[1] = sd.findMember("staLon").getUnitsString();
+                        units[2] = "meter";  //sd.findMember("levels").getUnitsString();
+                        units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
+                        units[4] = "knots";
+                        units[5] = "degree_N";
+
+                    }
+
+                }
+                FieldImpl  dataFieldImpl = null;
+
+                int        dsize         = latList.size();
+
+                double[][] data          = new double[dsize][6];
+
+                for (int i = 0; i < dsize; i++) {
+                    data[i][0] = (Double) latList.get(i);
+                    data[i][1] = (Double) lonList.get(i);
+                    data[i][2] = (Double) altList.get(i);
+                    data[i][3] = (Double) timeList.get(i);
+                    data[i][4] = getWindSpd((Double) uSpdList.get(i),
+                                            (Double) vSpdList.get(i));
+                    data[i][5] = getWindDir((Double) uSpdList.get(i),
+                                            (Double) vSpdList.get(i));
+                    latVector.add(latList.get(i));
+                    lonVector.add(lonList.get(i));
+                    altVector.add(altList.get(i));
+                    timeVector.add(timeList.get(i));
+                    windSpdVector.add(data[i][4]);
+                    windDirVector.add(data[i][5]);
+                }
+
+                PointFeature   p0 = null;
+                ProfileFeature pf = null;
+
+
+                // {"latitude","longitude", "levels",  "time", "windSpeed", "windDir" };
+                int[] scalingFactors = {
+                    1, 1, 1, 1, 1, 1
+                };
+
+                if (data.length > 0) {
+                    dataFieldImpl = makeField(data, units, scalingFactors);
+                }
+
+                if (dataFieldImpl != null) {
+                    times.add(Double.valueOf(data[0][3]));
+                    allProfiles.add(dataFieldImpl);
+                    if (allProfiles.size() == 89) {
+                        System.out.println("kkkkkk");
+                    }
+
+                }
+                jj++;
+            }
+
+            FieldImpl  dataFieldImpl = null;
+            int        dsize         = latVector.size();
+            double[][] data1         = new double[dsize][6];
+
+            for (int i = 0; i < dsize; i++) {
+                data1[i][0] = (Double) latVector.get(i);
+                data1[i][1] = (Double) lonVector.get(i);
+                data1[i][2] = (Double) altVector.get(i);
+                data1[i][3] = (Double) timeVector.get(i);
+                data1[i][4] = (Double) windSpdVector.get(i);
+                data1[i][5] = (Double) windDirVector.get(i);
+            }
+
+
+
+            // String [] params = {"latitude","longitude", "levels",  "time", "windSpeed", "windDir" };
+            int[] scalingFactors = {
+                1, 1, 1, 1, 1, 1
+            };
+            if (data1.length > 0) {
+                dataFieldImpl = makeField(data1, units, scalingFactors);
+            }
+            if (dataFieldImpl != null) {
+                stationsToProfiles.put(st.getName(), dataFieldImpl);
+            }
+            ii++;
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param spc _more_
+     * @param name _more_
+     *
+     * @throws IOException _more_
+     * @throws visad.VisADException _more_
+     */
+    private void initWPDNOld(StationProfileFeatureCollection spc, String name)
+            throws IOException, visad.VisADException {
+
+        stations         = spc.getStations();
+        selectedStations = getNamedStations(stations);
         int size = stations.size();
         if (size < 3) {
             name = name + StringUtil.join(", ", selectedStations);
@@ -346,8 +542,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         setDescription(name);
 
 
-        String[]   units  = new String[6];
-        RealType[] rTypes = new RealType[6];
+        String[] units = new String[6];
+
         spc.resetIteration();
         int ii = 0;
         while (ii < size) {
@@ -380,7 +576,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                     StructureData sd   = p0.getData();
                     float         uspd = sd.convertScalarFloat("uComponent");
                     float         vspd = sd.convertScalarFloat("vComponent");
-                    if ((uspd != McIDASUtil.MCMISSING) && (uspd != WPDNissing)
+                    if ((uspd != McIDASUtil.MCMISSING)
+                            && (uspd != WPDNissing)
                             && (vspd != McIDASUtil.MCMISSING)
                             && (vspd != WPDNissing)) {
                         latList.add(sd.convertScalarDouble("staLat"));
@@ -394,7 +591,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                     if (ii == 0) {
                         units[0] = sd.findMember("staLat").getUnitsString();
                         units[1] = sd.findMember("staLon").getUnitsString();
-                        units[2] = sd.findMember("levels").getUnitsString();
+                        units[2] = "meter";  //sd.findMember("levels").getUnitsString();
                         units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
                         units[4] = "knots";
                         units[5] = "degree_N";
@@ -415,30 +612,22 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                 data[i][2] = (Double) altList.get(i);
                 data[i][3] = (Double) timeList.get(i);
                 data[i][4] = (Double) getWindSpd((Double) uSpdList.get(i),
-                       (Double) vSpdList.get(i));
-                data[i][5] =  (Double) getWindDir((Double) uSpdList.get(i),
-                       (Double) vSpdList.get(i));
+                        (Double) vSpdList.get(i));
+                data[i][5] = (Double) getWindDir((Double) uSpdList.get(i),
+                        (Double) vSpdList.get(i));
             }
 
-            PointFeature   p0     = null;
-            ProfileFeature pf     = null;
+            PointFeature   p0 = null;
+            ProfileFeature pf = null;
 
-            String[]       params = {
-                "LAT", "LON", "Z", "TIME", "SPD", "DIR"
-            };
             // String [] params = {"latitude","longitude", "levels",  "time", "windSpeed", "windDir" };
             int[] scalingFactors = {
                 1, 1, 1, 1, 1, 1
             };
 
 
-            try {
-                if (ii == 0) {
-                    rTypes = getTypes(params, units);
-                }
-                dataFieldImpl = makeField(data, units, params,
-                                          scalingFactors, rTypes);
-            } catch (VisADException ss) {}
+            dataFieldImpl = makeField(data, units, scalingFactors);
+
             if (dataFieldImpl != null) {
                 stationsToProfiles.put(st.getName(), dataFieldImpl);
             }
@@ -500,6 +689,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
 
         stations         = spc.getStations();
         selectedStations = getNamedStations(stations);
+
         int size = stations.size();
         if (size < 3) {
             name = name + StringUtil.join(", ", selectedStations);
@@ -510,11 +700,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         setName(name);
         setDescription(name);
 
+        String[] units = new String[6];
 
-        String[]   units  = new String[6];
-        RealType[] rTypes = new RealType[6];
         spc.resetIteration();
         int ii = 0;
+        int j0 = 0;
         while (ii < size) {
             Station               st  = stations.get(ii);
             StationProfileFeature spf = spc.getStationProfileFeature(st);
@@ -524,22 +714,30 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             if (st.getName().endsWith("MLNFL")) {
                 System.out.println("HHHH");
             }
-            List<Date> tList       = spf.getTimes();
-            int        tsize       = tList.size();
-            List       latList     = new ArrayList<Double>();
-            List       lonList     = new ArrayList<Double>();
-            List       altList     = new ArrayList<Double>();
+            List<Date> tList         = spf.getTimes();
+            int        tsize         = tList.size();
+            List       latVector     = new Vector();
+            List       lonVector     = new Vector();
+            List       altVector     = new Vector();
 
-            List       timeList    = new ArrayList<Double>();
-            List       windSpdList = new ArrayList<Double>();
-            List       windDirList = new ArrayList<Double>();
-            int        jj          = 0;
+            List       timeVector    = new Vector();
+            List       windSpdVector = new Vector();
+            List       windDirVector = new Vector();
+            int        jj            = 0;
             while (jj < tsize) {  //iter.hasNext()) {
                 //ProfileFeature pf0 =  (ProfileFeature)iter.next();
-                Date           dt       = tList.get(jj);
+                List           latList     = new ArrayList<Double>();
+                List           lonList     = new ArrayList<Double>();
+                List           altList     = new ArrayList<Double>();
 
-                DateTime       dateTime = new DateTime(dt);
-                ProfileFeature pf0      = spf.getProfileByDate(dt);
+                List           timeList    = new ArrayList<Double>();
+                List           windSpdList = new ArrayList<Double>();
+                List           windDirList = new ArrayList<Double>();
+                Date           dt          = tList.get(jj);
+
+                DateTime       dateTime    = new DateTime(dt);
+
+                ProfileFeature pf0         = spf.getProfileByDate(dt);
                 while (pf0.hasNext()) {
                     PointFeature  p0  = pf0.next();
                     StructureData sd  = p0.getData();
@@ -550,61 +748,95 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                             && (dir != CAPMissing)) {
                         latList.add(sd.convertScalarDouble("latitude"));
                         lonList.add(sd.convertScalarDouble("longitude"));
-                        altList.add(sd.convertScalarDouble("levels") + st.getAltitude());
+                        altList.add(sd.convertScalarDouble("levels")
+                                    + st.getAltitude());
                         timeList.add((double) dateTime.getValue());  //sd.convertScalarFloat("observationTime"));
                         windSpdList.add(sd.convertScalarDouble("windSpeed"));
                         windDirList.add(sd.convertScalarDouble("windDir"));
                     }
                     if (ii == 0) {
                         units[0] = sd.findMember("latitude").getUnitsString();
-                        units[1] = sd.findMember("longitude").getUnitsString();
+                        units[1] =
+                            sd.findMember("longitude").getUnitsString();
                         units[2] = sd.findMember("levels").getUnitsString();
                         units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
-                        units[4] = sd.findMember("windSpeed").getUnitsString();
+                        units[4] =
+                            sd.findMember("windSpeed").getUnitsString();
                         units[5] = sd.findMember("windDir").getUnitsString();
 
                     }
 
                 }
+                FieldImpl  dataFieldImpl = null;
 
+                int        dsize         = latList.size();
+
+                double[][] data          = new double[dsize][6];
+
+                for (int i = 0; i < dsize; i++) {
+                    data[i][0] = (Double) latList.get(i);
+                    data[i][1] = (Double) lonList.get(i);
+                    data[i][2] = (Double) altList.get(i);
+                    data[i][3] = (Double) timeList.get(i);
+                    data[i][4] = (Double) windSpdList.get(i);
+                    data[i][5] = (Double) windDirList.get(i);
+                    latVector.add(latList.get(i));
+                    lonVector.add(lonList.get(i));
+                    altVector.add(altList.get(i));
+                    timeVector.add(timeList.get(i));
+                    windSpdVector.add(windSpdList.get(i));
+                    windDirVector.add(windDirList.get(i));
+                }
+
+                PointFeature   p0 = null;
+                ProfileFeature pf = null;
+
+
+                // {"latitude","longitude", "levels",  "time", "windSpeed", "windDir" };
+                int[] scalingFactors = {
+                    1, 1, 1, 1, 1, 1
+                };
+
+                if (data.length > 0) {
+                    dataFieldImpl = makeField(data, units, scalingFactors);
+                }
+
+                if (dataFieldImpl != null) {
+                    times.add(Double.valueOf(data[0][3]));
+                    allProfiles.add(dataFieldImpl);
+                    if (allProfiles.size() == 89) {
+                        System.out.println("kkkkkk");
+                    }
+
+                }
                 jj++;
             }
+
             FieldImpl  dataFieldImpl = null;
-            int        dsize         = latList.size();
-            double[][] data          = new double[dsize][6];
+            int        dsize         = latVector.size();
+            double[][] data1         = new double[dsize][6];
 
             for (int i = 0; i < dsize; i++) {
-                data[i][0] = (Double) latList.get(i);
-                data[i][1] = (Double) lonList.get(i);
-                data[i][2] = (Double) altList.get(i);
-                data[i][3] = (Double) timeList.get(i);
-                data[i][4] = (Double) windSpdList.get(i);
-                data[i][5] = (Double) windDirList.get(i);
+                data1[i][0] = (Double) latVector.get(i);
+                data1[i][1] = (Double) lonVector.get(i);
+                data1[i][2] = (Double) altVector.get(i);
+                data1[i][3] = (Double) timeVector.get(i);
+                data1[i][4] = (Double) windSpdVector.get(i);
+                data1[i][5] = (Double) windDirVector.get(i);
             }
 
-            PointFeature   p0     = null;
-            ProfileFeature pf     = null;
 
-            String[]       params = {
-                "LAT", "LON", "Z", "TIME", "SPD", "DIR"
-            };
+
             // String [] params = {"latitude","longitude", "levels",  "time", "windSpeed", "windDir" };
             int[] scalingFactors = {
                 1, 1, 1, 1, 1, 1
             };
-
-
-            try {
-                if (ii == 0) {
-                    rTypes = getTypes(params, units);
-                }
-                dataFieldImpl = makeField(data, units, params,
-                                          scalingFactors, rTypes);
-            } catch (VisADException ss) {}
+            if (data1.length > 0) {
+                dataFieldImpl = makeField(data1, units, scalingFactors);
+            }
             if (dataFieldImpl != null) {
                 stationsToProfiles.put(st.getName(), dataFieldImpl);
             }
-
             ii++;
         }
     }
@@ -615,15 +847,13 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     /**
      * _more_
      *
-     * @param params _more_
      * @param units _more_
      *
      * @return _more_
      *
      * @throws VisADException _more_
      */
-    RealType[] getTypes(String[] params, String[] units)
-            throws VisADException {
+    RealType[] getTypes(String[] units) {
 
         int        numParams = params.length;
         RealType[] types     = new RealType[numParams];
@@ -633,10 +863,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             String name = params[i];
             // make the unit
             Unit unit = DataUtil.parseUnit(units[i]);
+            types[i] = DataUtil.makeRealType(name, unit);
 
-
-
-            types[i] = new RealType(name, unit);
         }
 
         return types;
@@ -644,7 +872,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
     /**
@@ -652,17 +880,14 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      *
      * @param data _more_
      * @param units _more_
-     * @param params _more_
      * @param scalingFactors _more_
-     * @param types _more_
      *
      * @return _more_
      *
      * @throws VisADException _more_
      */
     private FieldImpl makeField(double[][] data, String[] units,
-                                String[] params, int[] scalingFactors,
-                                RealType[] types)
+                                int[] scalingFactors)
             throws VisADException {
 
         FieldImpl field = null;
@@ -704,14 +929,14 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         TupleType rangeType;
         if (noText)  // all Reals
         {
-            RealType[] newTypes = new RealType[types.length];
-            for (int i = 0; i < types.length; i++) {
-                newTypes[i] = (RealType) types[i];
+            RealType[] newTypes = new RealType[rTypes.length];
+            for (int i = 0; i < rTypes.length; i++) {
+                newTypes[i] = (RealType) rTypes[i];
             }
             rangeType = new RealTupleType(newTypes);
         } else       // all Texts or mixture of Text and Reals
         {
-            rangeType = new TupleType(types);
+            rangeType = new TupleType(rTypes);
         }
 
         // make the field
@@ -741,10 +966,10 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                                : data[i][j];
                 if (firstTuple == null) {  //
                     try {
-                        scalars[j] = new Real((RealType) types[j], value,
+                        scalars[j] = new Real((RealType) rTypes[j], value,
                                 defaultUnits[j]);
                     } catch (VisADException excp) {  // units problem
-                        scalars[j] = new Real((RealType) types[j], value);
+                        scalars[j] = new Real((RealType) rTypes[j], value);
 
                     }
                     usedUnits.add(((Real) scalars[j]).getUnit());
@@ -883,27 +1108,40 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         boolean singleStation = !(dataChoice instanceof CompositeDataChoice);
 
         //Recast the field into a different FieldImpl we can use.
-        FieldImpl obs = null;
-        FieldImpl dataFieldImpl =
-            (FieldImpl) stationsToProfiles.get(dataChoice.toString());
+        FieldImpl obs           = null;
+        FieldImpl dataFieldImpl = null;
         if (dataChoice.toString().endsWith("MLNFL")) {
             System.out.println("HHHHHHHHHH");
         }
         if (singleStation) {
+            dataFieldImpl =
+                (FieldImpl) stationsToProfiles.get(dataChoice.toString());
+            if (dataFieldImpl == null) {
+                try {
+                    initProfiler(" ");
+                } catch (IOException ei) {}
+                dataFieldImpl =
+                    (FieldImpl) stationsToProfiles.get(dataChoice.toString());
+            }
             obs = recastProfilerSingleStationData(dataFieldImpl, 1);
         } else {
             Vector           datas = new Vector();
             PointDataAdapter pda   = null;
-            int              ssize = selectedStations.size();
+            int              ssize = times.size();
             FieldImpl        data  = null;
+            double[]         dt    = new double[ssize];
             for (int i = 0; i < ssize; i++) {
-                NamedStation nst = selectedStations.get(i);
-                data = (FieldImpl) stationsToProfiles.get(nst.getName());
+                dt[i] = times.get(i);
+            }
+            int[]      sortedAzs = QuickSort.sort(dt);
+            DateTime[] dts       = new DateTime[ssize];
+            for (int i = 0; i < ssize; i++) {
 
+                data   = (FieldImpl) allProfiles.get(sortedAzs[i]);
+                dts[i] = new DateTime(dt[i]);
                 if (data != null) {
                     datas.add(data);
                 }
-
 
             }
             dataFieldImpl = PointObFactory.mergeData(datas);
@@ -927,8 +1165,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      *
      * @throws VisADException _more_
      */
-    protected static FieldImpl recastProfilerSingleStationData(
-            FieldImpl input, int obInt)
+    protected FieldImpl recastProfilerSingleStationData(FieldImpl input,
+            int obInt)
             throws VisADException {
 
         //long millis = System.currentTimeMillis();
@@ -963,7 +1201,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             //boolean allReals = (rangetype instanceof RealTupleType);
             // if (allReals) System.out.println("  range is all reals");
 
-            int     timeIndex  = rangetype.getIndex("TIME");
+            int     timeIndex  = rangetype.getIndex(rTypes[3].toString());
             boolean hasDayTime = (timeIndex != -1);
             boolean hasDateHMS = false;
             if ( !hasDayTime && !hasDateHMS) {
@@ -972,13 +1210,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             }
 
             // get Z DIR SPD indices
-            int zIndex   = rangetype.getIndex("Z");
-            int dirIndex = rangetype.getIndex("DIR");
-            int spdIndex = rangetype.getIndex("SPD");
+            int zIndex   = rangetype.getIndex(rTypes[2].toString());
+            int dirIndex = rangetype.getIndex(rTypes[5].toString());
+            int spdIndex = rangetype.getIndex(rTypes[4].toString());
 
-            if (zIndex == -1) {
-                throw new IllegalArgumentException("can't find Z index");
-            }
+
 
             // check for time groups; time value = first Real component in each ob;
             // there are several obs in a row with the same time
@@ -1323,8 +1559,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      * @throws VisADException     VisAD problem
      */
 
-    protected static FieldImpl recastProfilerMultiStationData(
-            FieldImpl input, int obInt)
+    protected FieldImpl recastProfilerMultiStationData(FieldImpl input,
+            int obInt)
             throws VisADException, RemoteException {
 
         //long millis = System.currentTimeMillis(); //mmm
@@ -1365,7 +1601,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         // if (allReals) System.out.println("  range is all reals");
         // "latitude","longitude", "levels", "day", "time", "windSpeed", "windDir"
 
-        int     timeIndex  = rangetype.getIndex("TIME");
+        int     timeIndex  = rangetype.getIndex(rTypes[3].toString());
         boolean hasDayTime = (timeIndex != -1);
         boolean hasDateHMS = false;
         if ( !hasDayTime && !hasDateHMS) {
@@ -1374,11 +1610,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         }
 
         // get Z DIR SPD indices    {"LAT", "LON", "Z", "TIME", "SPD", "DIR" };
-        int latIndex = rangetype.getIndex("LAT");
-        int lonIndex = rangetype.getIndex("LON");
-        int zIndex   = rangetype.getIndex("Z");
-        int dirIndex = rangetype.getIndex("SPD");
-        int spdIndex = rangetype.getIndex("DIR");
+        int latIndex = rangetype.getIndex(rTypes[0].toString());
+        int lonIndex = rangetype.getIndex(rTypes[1].toString());
+        int zIndex   = rangetype.getIndex(rTypes[2].toString());
+        int dirIndex = rangetype.getIndex(rTypes[4].toString());
+        int spdIndex = rangetype.getIndex(rTypes[5].toString());
 
         if (zIndex == -1) {
             throw new IllegalArgumentException("can't find Z index");
@@ -1438,9 +1674,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
 
             // make DateTime from TIME and DAY real values
 
-            double time =
-                (double) ((Real) ob.getComponent(timeIndex)).getValue();
-            thisobsdatetime = new DateTime(time);
+            Real ti = (Real) ob.getComponent(timeIndex);
+            thisobsdatetime = new DateTime(ti);
 
             //System.out.println("       this obs time "+thisobstime);
             //System.out.println("       this    ctime "+ctime);
@@ -1449,7 +1684,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             // if so, group up the ob data for this one, a single
             //    height-dir-spd obs for this time (smallest unit of data)
             //if (thisobstime.getValue () == ctime.getValue()) {
-            if (thisobsdatetime.equals(cdatetime)) {
+            if ((cdatetime != null)
+                    && (thisobsdatetime.getValue() == cdatetime.getValue())) {  //.equals(cdatetime)) {
                 // check altitude of this ob
                 zvalue = (Real) ob.getComponent(zIndex);
 
@@ -1555,8 +1791,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                                 (float) ((Real) ((RealTuple) locList.get(
                                     curPoint)).getComponent(0)).getValue();
                             points[1][curPoint] =
-                                -1.0f
-                                * (float) ((Real) ((RealTuple) locList.get(
+                                (float) ((Real) ((RealTuple) locList.get(
                                     curPoint)).getComponent(1)).getValue();
                             points[2][curPoint] =
                                 (float) ((Real) ((RealTuple) locList.get(
@@ -1705,8 +1940,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                     (float) ((Real) ((RealTuple) locList.get(
                         curPoint)).getComponent(0)).getValue();
                 points[1][curPoint] =
-                    -1.0f
-                    * (float) ((Real) ((RealTuple) locList.get(
+                    (float) ((Real) ((RealTuple) locList.get(
                         curPoint)).getComponent(1)).getValue();
                 points[2][curPoint] =
                     (float) ((Real) ((RealTuple) locList.get(
@@ -1921,23 +2155,22 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         reloadData();
         return true;
     }
+
     /**
      * Called when Datasource is removed.
      */
     public void doRemove() {
-        super.doRemove();
-        dataChoices = null;
-        DataSource ds = this.getDataSource();
-        ds.doRemove();
-        stationsToProfiles   = null;
-        selectedStations = null;
-        stations = null;
+        stationsToProfiles = null;
+        allProfiles = null;
+        selectedStations   = null;
+        stations           = null;
         this.fileNameOrUrl = null;
-        this.dataCacheKey = null;
+        this.dataCacheKey  = null;
 
         this.clearFileCache();
         this.clearCachedData();
-        System.out.println("anything left");
+        super.doRemove();
+        //  System.out.println("anything left");
     }
 
 
