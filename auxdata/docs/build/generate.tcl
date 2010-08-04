@@ -2884,7 +2884,10 @@ if {[gen::getDoGlossary]} {
 }
 
 
-
+proc gen::finish  {} {
+}
 
 gen::writeFiles 
+
+gen::finish
 
