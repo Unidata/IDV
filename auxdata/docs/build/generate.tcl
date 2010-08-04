@@ -2669,13 +2669,16 @@ proc gen::writeFiles  {} {
         }
     }
 
-    gen::createGeneralFile [file join [gen::getTargetDir] imageindex.html] "Images" $imageHtml
-
+    if {[gen::getDoAncillaryFiles]} {
+            gen::createGeneralFile [file join [gen::getTargetDir] imageindex.html] "Images" $imageHtml
+    }
 
 
     foreach {toc fulltoc  frametoc} [gen::getToc [gen::getTopFile] 1] break
-    gen::createGeneralFile [file join [gen::getTargetDir] toc.html] "Table of Contents" $toc
-    gen::createGeneralFile [file join [gen::getTargetDir] fulltoc.html] "Full Table of Contents" $fulltoc
+    if {[gen::getDoAncillaryFiles]} {
+            gen::createGeneralFile [file join [gen::getTargetDir] toc.html] "Table of Contents" $toc
+            gen::createGeneralFile [file join [gen::getTargetDir] fulltoc.html] "Full Table of Contents" $fulltoc
+    }
 
     if {[gen::getDoFrames]} {
         set html "<frameset cols=\"200,*\" > <frame name=\"left\" src=\"frameleft.html\"><frame name=\"right\" src=\"[gen::getTopFile]\"></frameset>"
@@ -2685,6 +2688,7 @@ proc gen::writeFiles  {} {
         append html [html::page {Frame navigation} "<div class=\"framenav\"><table>$frametoc</table></div>"]
         gen::writeFile  [file join [gen::getTargetDir] frameleft.html]  $html
     }
+
 
     if {[gen::getDoIndex]} {
         gen::writeMainIndex
@@ -2746,6 +2750,23 @@ proc gen::setPageTemplateName {templateName} {
 }
 
 
+proc gen::copyDefaultImages {} {
+##Copy the default images
+if {![info exists images/TOCIcon.gif]} {
+    set scriptDir [file dirname [info script]]
+    set newImgDir [file join [gen::getTargetDir] images]
+    file mkdir $newImgDir
+    foreach img [glob [file join $scriptDir/images/*.gif]] {
+        if {![file exists [file join $newImgDir [file tail $img]]]} {
+            file copy -force $img $newImgDir
+        }
+    }
+}
+}
+
+
+
+
 ##Read in the different header and footer templates
 gen::setPageTemplateName Template.tml
 set generalTemplate [gen::findTemplate GeneralTemplate.html Template.html]
@@ -2758,7 +2779,8 @@ set state(topDir) ""
 
 
 
-foreach {var dflt} [list  UrlRoot {} DoClean 0 Verbose 0 DoChildOverview 1 DoFinalVersion 1 AllFileName all.html TargetDir [file join $state(topDir) ../processed]  DoGlossary 1 DoImages 1 DoFrames 1 DoIcons 1 DoIndex 1  NumberTop 0 Numbering 1 DoTclEvaluation 0 DoTranslateLinks 0 DoAll 0 DoLinkCheck 0 CssFiles [list] AllNavFiles [list] AllNonNavFiles [list]    DoJSNav 0 DoJSBorder 1 DoJSBG 1 DoStrictIndex 1 IconWidth "" Format 0 JustExtraFormat 0 SkipIndex 0 IndexFile main.index TopFile {} UniqueId 1 DoThumbnails 0 DoImageoverview 0 DoImageLinks 1]   {
+
+foreach {var dflt} [list  UrlRoot {} DoClean 0 Verbose 0 DoChildOverview 1 DoFinalVersion 1 AllFileName all.html TargetDir [file join $state(topDir) ../processed]  DoGlossary 1 DoImages 1 DoFrames 1 DoIcons 1 DoIndex 1 DoAncillaryFiles 1  NumberTop 0 Numbering 1 DoTclEvaluation 0 DoTranslateLinks 0 DoAll 0 DoLinkCheck 0 CssFiles [list] AllNavFiles [list] AllNonNavFiles [list]    DoJSNav 0 DoJSBorder 1 DoJSBG 1 DoStrictIndex 1 IconWidth "" Format 0 JustExtraFormat 0 SkipIndex 0 IndexFile main.index TopFile {} UniqueId 1 DoThumbnails 0 DoImageoverview 0 DoImageLinks 1]   {
     set state($var) $dflt
     proc gen::get$var {} "set ::state($var)"
     proc gen::set$var {v} "set ::state($var) \$v"
@@ -2834,13 +2856,14 @@ if {![file exists [gen::getTargetDir]]} {
 }
 
 
+if {[gen::getDoAncillaryFiles]} {
 ##Copy over any top level css files
-foreach cssFile  $cssFiles {
-    catch {file copy -force $cssFile [gen::getTargetDir]}
+        foreach cssFile  $cssFiles {
+            catch {file copy -force $cssFile [gen::getTargetDir]}
+        }
+        catch {file copy  [file join $scriptDir/default.css]  [gen::getTargetDir]}
+        catch {file copy  [file join $scriptDir/unidata.js]  [gen::getTargetDir]}
 }
-
-catch {file copy  [file join $scriptDir/default.css]  [gen::getTargetDir]}
-catch {file copy  [file join $scriptDir/unidata.js]  [gen::getTargetDir]}
 
 if {[llength [gen::getCssFiles]] == 0} {
     puts "Adding default.css"
@@ -2848,17 +2871,7 @@ if {[llength [gen::getCssFiles]] == 0} {
 }
 
 
-##Copy the default images
-if {![info exists images/TOCIcon.gif]} {
-    set scriptDir [file dirname [info script]]
-    set newImgDir [file join [gen::getTargetDir] images]
-    file mkdir $newImgDir
-    foreach img [glob [file join $scriptDir/images/*.gif]] {
-        if {![file exists [file join $newImgDir [file tail $img]]]} {
-            file copy -force $img $newImgDir
-        }
-    }
-}
+gen::copyDefaultImages
 
 
 
