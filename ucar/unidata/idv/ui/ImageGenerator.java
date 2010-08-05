@@ -136,13 +136,13 @@ public class ImageGenerator extends IdvManager {
     /** macro property */
     public static final String PROP_LOOPINDEX = "loopindex";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_LOOPINDEX_PAD2 = "loopindex_pad2";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_LOOPINDEX_PAD3 = "loopindex_pad3";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_LOOPINDEX_PAD4 = "loopindex_pad4";
 
 
@@ -166,19 +166,19 @@ public class ImageGenerator extends IdvManager {
     public static final String PROP_IMAGEPATH = "imagepath";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FILENOSUFFIX = "filenosuffix";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FILETAIL = "filetail";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FILETAILNOSUFFIX = "filetailnosuffix";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FILEPREFIX = "fileprefix";
 
     /** macro property */
@@ -207,7 +207,7 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_FILESET = "fileset";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VIEW = "view";
 
     /** isl tag */
@@ -258,22 +258,22 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_CLIP = "clip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PUBLISH = "publish";
 
     /** isl tag */
     public static final String TAG_DISPLAY = "display";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATASOURCE = "datasource";
 
     /** isl tag */
     public static final String TAG_MATTE = "matte";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SHOW = "show";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DISPLAYLIST = "displaylist";
 
     /** isl tag */
@@ -287,7 +287,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_KML = "kml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_KML_COLORBAR = "kmlcolorbar";
 
     /** isl tag */
@@ -305,87 +305,87 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STRIDE = "stride";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STRIDEX = "stridex";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STRIDEY = "stridey";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STRIDEZ = "stridez";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LEVEL_FROM = "levelfrom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LEVEL_TO = "levelto";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_AZIMUTH = "azimuth";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TILT = "tilt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ASPECTX = "aspectx";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ASPECTY = "aspecty";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ASPECTZ = "aspectz";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROTX = "rotx";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROTY = "roty";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROTZ = "rotz";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SCALE = "scale";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TRANSX = "transx";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TRANSY = "transy";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TRANSZ = "transz";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SUFFIX = "suffix";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TRANSPARENCY = "transparency";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TOP = "top";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SPACE_LEFT = "space_left";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SPACE_RIGHT = "space_right";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SPACE_TOP = "space_top";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SPACE_BOTTOM = "space_bottom";
 
 
@@ -559,7 +559,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_MESSAGE = "message";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MATTEBG = "mattebg";
 
     /** isl tag */
@@ -583,7 +583,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_BOTTOM = "bottom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALIGN = "valign";
 
     /** isl tag */
@@ -703,7 +703,7 @@ public class ImageGenerator extends IdvManager {
     /** Keep around the last image captured */
     private Image lastImage;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable objectMap;
 
 
@@ -995,8 +995,17 @@ public class ImageGenerator extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
+     */
     protected boolean processTagTrace(Element node) throws Throwable {
-        String pattern     = applyMacros(node, ATTR_PATTERN);
+        String pattern = applyMacros(node, ATTR_PATTERN);
         debug("turning trace on for:" + pattern);
         Trace.startTrace();
         Trace.clearOnly();
@@ -1612,12 +1621,14 @@ public class ImageGenerator extends IdvManager {
         for (int i = 0; i < files.size(); i++) {
             try {
                 String filePath = files.get(i).toString();
-                String tail = IOUtil.getFileTail(filePath);
+                String tail     = IOUtil.getFileTail(filePath);
                 putProperty(PROP_FILE, filePath);
                 putProperty(PROP_FILEPREFIX, IOUtil.stripExtension(filePath));
-                putProperty(PROP_FILENOSUFFIX, IOUtil.stripExtension(filePath));
+                putProperty(PROP_FILENOSUFFIX,
+                            IOUtil.stripExtension(filePath));
                 putProperty(PROP_FILETAIL, tail);
-                putProperty(PROP_FILETAILNOSUFFIX, IOUtil.stripExtension(tail));
+                putProperty(PROP_FILETAILNOSUFFIX,
+                            IOUtil.stripExtension(tail));
                 if ( !processChildren(node)) {
                     return false;
                 }
@@ -1851,6 +1862,7 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable _more_
      */
     protected boolean processTagViewpoint(Element node) throws Throwable {
+
         List vms = getViewManagers(node);
         if (vms.size() == 0) {
             debug("Could not find view managers processing:"
@@ -1899,58 +1911,72 @@ public class ImageGenerator extends IdvManager {
                 MouseBehavior mb = vm.getMaster().getMouseBehavior();
                 mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
                 double scaleValue = applyMacros(node, ATTR_SCALE, 0.0);
-                if(scaleValue!=0) {
-                    double scaleX =  scaleValue * a[0]; 
-                    double scaleY =  scaleValue * a[1]; 
-                    double scaleZ =  scaleValue * a[2]; 
+                if (scaleValue != 0) {
+                    double scaleX = scaleValue * a[0];
+                    double scaleY = scaleValue * a[1];
+                    double scaleZ = scaleValue * a[2];
                     double[] scaleMatrix = mb.make_matrix(0.0, 0.0, 0.0,
-                                                          scaleX/scale[0], 
-                                                          scaleY/scale[1],
-                                                          scaleZ/scale[2],
-                                                          0.0, 0.0, 0.0);
+                                               scaleX / scale[0],
+                                               scaleY / scale[1],
+                                               scaleZ / scale[2], 0.0, 0.0,
+                                               0.0);
                     currentMatrix = mb.multiply_matrix(scaleMatrix,
-                                                       currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                            currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
-                double []tmp;
-                double dummy = 0.0;
+                double[] tmp;
+                double   dummy = 0.0;
                 //TODO: the rotation maybe doesn't work
                 if (XmlUtil.hasAttribute(node, ATTR_ROTX)) {
-                    tmp  = mb.make_matrix(applyMacros(node, ATTR_ROTX, dummy), 0.0, 0.0,
-                                          1.0,0.0,0.0,0.0);
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    tmp = mb.make_matrix(applyMacros(node, ATTR_ROTX, dummy),
+                                         0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
                 if (XmlUtil.hasAttribute(node, ATTR_ROTY)) {
-                    tmp  = mb.make_matrix(0.0,applyMacros(node, ATTR_ROTY, dummy)-rot[1], 0.0,
-                                          1.0,0.0,0.0,0.0);
+                    tmp = mb.make_matrix(0.0,
+                                         applyMacros(node, ATTR_ROTY, dummy)
+                                         - rot[1], 0.0, 1.0, 0.0, 0.0, 0.0);
 
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
                 if (XmlUtil.hasAttribute(node, ATTR_ROTZ)) {
-                    tmp  = mb.make_matrix(0.0,0.0, applyMacros(node, ATTR_ROTZ, dummy)-rot[2], 
-                                          1.0,0.0,0.0,0.0);
+                    tmp = mb.make_matrix(0.0, 0.0,
+                                         applyMacros(node, ATTR_ROTZ, dummy)
+                                         - rot[2], 1.0, 0.0, 0.0, 0.0);
 
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
 
                 if (XmlUtil.hasAttribute(node, ATTR_TRANSX)) {
-                    tmp = mb.make_translate(applyMacros(node, ATTR_TRANSX, dummy)-trans[0], 0.0, 0.0);
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    tmp = mb.make_translate(applyMacros(node, ATTR_TRANSX,
+                            dummy) - trans[0], 0.0, 0.0);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
                 if (XmlUtil.hasAttribute(node, ATTR_TRANSY)) {
-                    tmp = mb.make_translate(0.0, applyMacros(node, ATTR_TRANSY, dummy)-trans[1], 0.0);
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    tmp = mb.make_translate(0.0,
+                                            applyMacros(node, ATTR_TRANSY,
+                                                dummy) - trans[1], 0.0);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
 
                 if (XmlUtil.hasAttribute(node, ATTR_TRANSZ)) {
-                    tmp = mb.make_translate(0.0, 0.0, applyMacros(node, ATTR_TRANSZ, dummy)-trans[2]);
-                    currentMatrix = mb.multiply_matrix(tmp,currentMatrix);
-                    mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+                    tmp = mb.make_translate(0.0, 0.0,
+                                            applyMacros(node, ATTR_TRANSZ,
+                                                dummy) - trans[2]);
+                    currentMatrix = mb.multiply_matrix(tmp, currentMatrix);
+                    mb.instance_unmake_matrix(rot, scale, trans,
+                            currentMatrix);
                 }
 
 
@@ -1959,6 +1985,7 @@ public class ImageGenerator extends IdvManager {
             }
         }
         return true;
+
     }
 
 
@@ -3440,15 +3467,17 @@ public class ImageGenerator extends IdvManager {
             }*/
 
 
-        s = StringUtil.replaceDate(s, "now:", now);
+        TimeZone tz = getIdv().getPreferenceManager().getDefaultTimeZone();
+
+        s = StringUtil.replaceDate(s, "now:", now, tz);
         Date animationTime = getAnimationTime();
         if (animationTime == null) {
             animationTime = now;
         }
         if (doTime) {
-            s = StringUtil.replaceDate(s, "anim:", animationTime);
-            s = StringUtil.replaceDate(s, "time:", animationTime);
-            s = StringUtil.replaceDate(s, "now:", now);
+            s = StringUtil.replaceDate(s, "anim:", animationTime, tz);
+            s = StringUtil.replaceDate(s, "time:", animationTime, tz);
+            s = StringUtil.replaceDate(s, "now:", now, tz);
         }
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
@@ -4567,7 +4596,7 @@ public class ImageGenerator extends IdvManager {
 
                 for (String attr :
                         (List<String>) Misc.newList(ATTR_NORTH, ATTR_SOUTH,
-                        ATTR_EAST, ATTR_WEST)) {
+                            ATTR_EAST, ATTR_WEST)) {
                     String kmlAttr = "kml." + attr;
                     if (XmlUtil.hasAttribute(child, kmlAttr)) {
                         imageProps.put(attr,
@@ -5173,7 +5202,7 @@ public class ImageGenerator extends IdvManager {
      *
      *
      * @version        Enter version here..., Tue, Jan 12, '10
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     protected static class MyQuitException extends Exception {}
 
