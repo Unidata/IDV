@@ -491,15 +491,17 @@ public class Clause {
         return column.startsWith(table + ".");
     }
 
+    public List<String> getTableNames() {
+	return getTableNames(new ArrayList<String>());
+    }
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public List<String> getTableNames() {
-        List<String> names = new ArrayList<String>();
-        getTableNames(names);
+    public List<String> getTableNames(List<String> names) {
+        doGetTableNames(names);
         return names;
     }
 
@@ -508,10 +510,11 @@ public class Clause {
      *
      * @param names _more_
      */
-    private void getTableNames(List<String> names) {
+    private void doGetTableNames(List<String> names) {
         if (subClauses != null) {
             for (Clause clause : subClauses) {
-                clause.getTableNames(names);
+		if(clause ==null) continue;
+                clause.doGetTableNames(names);
             }
             return;
         }

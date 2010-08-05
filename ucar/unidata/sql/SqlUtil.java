@@ -935,12 +935,13 @@ public class SqlUtil {
             }
             tableClause += table;
         }
-        return "SELECT " + what + " FROM " + tableClause
+        String sql= "SELECT " + what + " FROM " + tableClause
                + ((where.trim().length() > 0)
                   ? " \nWHERE " + where
                   : "") + ((extra == null)
                            ? ""
                            : " " + extra);
+	return sql;
     }
 
 
@@ -1829,8 +1830,9 @@ public class SqlUtil {
         if (clause != null) {
             clause.addClause(sb);
         }
+
         String sql = makeSelect(what, tables, sb.toString(), extra);
-        //        System.err.println("SQL:" + sql);
+	//	System.err.println("sql: " + sql);
         return sql;
     }
 
@@ -1903,9 +1905,10 @@ public class SqlUtil {
             stmt.setMaxRows(max);
         }
         if (clause != null) {
+
             clause.setValue(stmt, 1);
         }
-        //        System.err.println ("stmt: " + stmt);
+
         if (timeout > 0) {
             stmt.setQueryTimeout(timeout);
         }
