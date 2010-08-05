@@ -70,7 +70,7 @@ import javax.swing.*;
  * Time: 3:36:26 PM
  * To change this template use File | Settings | File Templates.
  */
-public class CDMProfilerDataSource extends DataSourceImpl {
+public class CDMProfilerDataSource extends FilesDataSource {
 
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
@@ -78,7 +78,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             CDMProfilerDataSource.class.getName());
 
     /** source file */
-    private String fileNameOrUrl;
+    private List<String> fileNameOrUrls;
 
     /** location */
     EarthLocation location = null;
@@ -95,32 +95,33 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     /** _more_ */
     private float CAPMissing = 2147483647;
 
-    /** _more_          */
+    /** _more_ */
     private float WPDNissing = 1.0E38f;
 
-    /** _more_          */
+    /** _more_ */
     String source;
 
     /**
      * Read in the data.
      *
      */
-    private Hashtable stationsToProfiles;
+    private Hashtable<String, List> stationsToProfiles;
 
     /** _more_ */
     private List<NamedStation> selectedStations;
 
-    /** _more_          */
+    /** _more_ */
     private List allProfiles;
 
     /** _more_ */
     private List<Station> stations;
 
-    /** _more_          */
+    /** _more_ */
     private List<Double> times;
+
     //  "LAT", "LON", "Z", "TIME", "SPD", "DIR"
 
-    /** _more_          */
+    /** _more_ */
     RealType[] rTypes = {
         RealType.Latitude, RealType.Longitude, RealType.Altitude,
         RealType.Time,
@@ -128,7 +129,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         DataUtil.makeRealType("DIR", DataUtil.parseUnit("degree_N"))
     };
 
-    /** _more_          */
+    /** _more_ */
     String[] params = {
         "LAT", "LON", "Z", "TIME", "SPD", "DIR"
     };
@@ -157,25 +158,38 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     public CDMProfilerDataSource(DataSourceDescriptor descriptor,
                                  String source, Hashtable properties)
             throws VisADException, IOException {
-        super(descriptor,
-              "CDM Profiler (" + IOUtil.getFileTail(source) + ")", source,
-              properties);
-        this.source = source;
-        setFileNameOrUrl(source);
-        String nam = "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
-        initProfiler(nam);
+        this(descriptor, Misc.newList(source), properties);
+
     }
+
+    /**
+     * Create a new FrontDataSource
+     *
+     * @param descriptor    Descriptor for this DataSource
+     * @param files         List of files or urls
+     * @param properties    Extra data source properties
+     *
+     * @throws IOException _more_
+     * @throws VisADException _more_
+     */
+    public CDMProfilerDataSource(DataSourceDescriptor descriptor, List files,
+                                 Hashtable properties)
+            throws VisADException, IOException {
+        super(descriptor, files, (String) files.get(0),
+              "CDM Profiler data source", properties);
+        this.fileNameOrUrls = files;
+        setFileNameOrUrls(files);
+        String nam = "CDM Profiler Data Source";
+        initProfilerAll(files, nam);
+    }
+
 
     /**
      * Extends method in DataSourceImpl to call local initProfiler ()
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
-        String nam = "CDM Profiler (" + IOUtil.getFileTail(source) + ")";
-        try {
-            initProfiler(nam);
-        } catch (IOException ee) {}
-        catch (VisADException ee) {}
+
 
     }
 
@@ -189,17 +203,17 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     public void newFileFromPolling(File f) {
         String newFilename = f.getPath();
         System.out.println("new file: " + newFilename);
-        if ( !newFilename.equals(getFileNameOrUrl())) {
+        if ( !getFileNameOrUrls().contains(newFilename)) {
             locationSetByUser = false;
         }
         try {
-            initProfiler("CDM Profiler");
+            initProfiler(newFilename, "CDM Profiler");
         } catch (Exception exc) {
             LogUtil.printException(log_, "Creating new file", exc);
             return;
         }
         setFileNameOrUrl(f.getPath());
-        setName(getFileNameOrUrl());
+        setName(newFilename);
         flushCache();
         notifyDataChange();
     }
@@ -210,7 +224,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      * @return File to poll on.
      */
     protected List getLocationsForPolling() {
-        return Misc.newList(getFileNameOrUrl());
+        return Misc.newList(getFileNameOrUrls());
     }
 
 
@@ -239,6 +253,29 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             nstations.add(nstation);
         }
         return nstations;
+    }
+
+    /**
+     * _more_
+     *
+     * @param st _more_
+     *
+     * @return _more_
+     */
+    private NamedStation getNamedStation(Station st) {
+        Unit         unit     = DataUtil.parseUnit("meter");
+        NamedStation nstation = null;
+
+
+        try {
+            nstation = new NamedStationImpl(st.getName(), st.getName(),
+                                            st.getLatitude(),
+                                            st.getLongitude(),
+                                            st.getAltitude(), unit);
+        } catch (VisADException ss) {}
+        catch (RemoteException re) {}
+
+        return nstation;
     }
 
     /**
@@ -309,25 +346,45 @@ public class CDMProfilerDataSource extends DataSourceImpl {
     /**
      * _more_
      *
-     * @param name _more_
+     *
+     * @param sources _more_
+     * @param sname _more_
      *
      * @throws IOException _more_
      * @throws visad.VisADException _more_
      */
-    private void initProfiler(String name)
+    private void initProfilerAll(List<String> sources, String sname)
             throws IOException, visad.VisADException {
-
         stationsToProfiles = new Hashtable();
         times              = new ArrayList();
         allProfiles        = new ArrayList();
+        int size = sources.size();
+        for (int i = 0; i < size; i++) {
+            initProfiler(sources.get(i), sname);
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param fileNameOrUrl _more_
+     * @param sname _more_
+     *
+     * @throws IOException _more_
+     * @throws visad.VisADException _more_
+     */
+    private void initProfiler(String fileNameOrUrl, String sname)
+            throws IOException, visad.VisADException {
+
         Formatter log = new Formatter();
         FeatureDatasetPoint dataset =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                FeatureType.STATION_PROFILE, getFileNameOrUrl(), null, log);
+                FeatureType.STATION_PROFILE, fileNameOrUrl, null, log);
 
         if (dataset == null) {
             throw new BadDataException("Could not open trajectory file:"
-                                       + getFileNameOrUrl());
+                                       + fileNameOrUrl);
         }
 
 
@@ -346,9 +403,30 @@ public class CDMProfilerDataSource extends DataSourceImpl {
 
         //(index -> (lat, lon, day, TIME, Z, DIR, SPD));
         if (ismadis) {
-            initMadis(spc, name);
+            initMadis(spc, sname);
         } else if (iswpdn) {
-            initWPDN(spc, name);
+            initWPDN(spc, sname);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param sts _more_
+     */
+    private void addStations(List<Station> sts) {
+        if (stations == null) {
+            stations         = sts;
+            selectedStations = getNamedStations(sts);
+        } else {
+            int size = sts.size();
+            for (int i = 0; i < size; i++) {
+                Station s = sts.get(i);
+                if ( !selectedStations.contains(getNamedStation(s))) {
+                    stations.add(s);
+                    selectedStations.contains(getNamedStation(s));
+                }
+            }
         }
     }
 
@@ -356,26 +434,27 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      * _more_
      *
      * @param spc _more_
-     * @param name _more_
+     * @param sname _more_
      *
      * @throws IOException _more_
      * @throws visad.VisADException _more_
      */
-    private void initWPDN(StationProfileFeatureCollection spc, String name)
+    private void initWPDN(StationProfileFeatureCollection spc, String sname)
             throws IOException, visad.VisADException {
 
-        stations         = spc.getStations();
-        selectedStations = getNamedStations(stations);
+        List<Station>      lstations  = spc.getStations();
+        List<NamedStation> lnstations = getNamedStations(lstations);
+        addStations(lstations);
 
-        int size = stations.size();
+        int size = lstations.size();
         if (size < 3) {
-            name = name + StringUtil.join(", ", selectedStations);
+            sname = sname + StringUtil.join(", ", lnstations);
         } else {
-            name = name + size + " stations";
+            sname = sname + size + " stations";
         }
 
-        setName(name);
-        setDescription(name);
+        setName(sname);
+        setDescription(sname);
 
         String[] units = new String[6];
 
@@ -383,7 +462,7 @@ public class CDMProfilerDataSource extends DataSourceImpl {
         int ii = 0;
         int j0 = 0;
         while (ii < size) {
-            Station               st  = stations.get(ii);
+            Station               st  = lstations.get(ii);
             StationProfileFeature spf = spc.getStationProfileFeature(st);
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
@@ -511,7 +590,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                 dataFieldImpl = makeField(data1, units, scalingFactors);
             }
             if (dataFieldImpl != null) {
-                stationsToProfiles.put(st.getName(), dataFieldImpl);
+                if (stationsToProfiles.get(st.getName()) == null) {
+                    List<FieldImpl> alist = new ArrayList<FieldImpl>();
+                    stationsToProfiles.put(st.getName(), alist);
+                }
+                stationsToProfiles.get(st.getName()).add(dataFieldImpl);
             }
             ii++;
         }
@@ -629,7 +712,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             dataFieldImpl = makeField(data, units, scalingFactors);
 
             if (dataFieldImpl != null) {
-                stationsToProfiles.put(st.getName(), dataFieldImpl);
+                if (stationsToProfiles.get(st.getName()) == null) {
+                    List<FieldImpl> alist = new ArrayList<FieldImpl>();
+                    stationsToProfiles.put(st.getName(), alist);
+                }
+                stationsToProfiles.get(st.getName()).add(dataFieldImpl);
             }
 
             ii++;
@@ -835,7 +922,11 @@ public class CDMProfilerDataSource extends DataSourceImpl {
                 dataFieldImpl = makeField(data1, units, scalingFactors);
             }
             if (dataFieldImpl != null) {
-                stationsToProfiles.put(st.getName(), dataFieldImpl);
+                if (stationsToProfiles.get(st.getName()) == null) {
+                    List<FieldImpl> alist = new ArrayList<FieldImpl>();
+                    stationsToProfiles.put(st.getName(), alist);
+                }
+                stationsToProfiles.get(st.getName()).add(dataFieldImpl);
             }
             ii++;
         }
@@ -1114,14 +1205,14 @@ public class CDMProfilerDataSource extends DataSourceImpl {
             System.out.println("HHHHHHHHHH");
         }
         if (singleStation) {
-            dataFieldImpl =
-                (FieldImpl) stationsToProfiles.get(dataChoice.toString());
-            if (dataFieldImpl == null) {
-                try {
-                    initProfiler(" ");
-                } catch (IOException ei) {}
-                dataFieldImpl =
-                    (FieldImpl) stationsToProfiles.get(dataChoice.toString());
+            List dataFieldImplList =
+                stationsToProfiles.get(dataChoice.toString());
+            if (dataFieldImplList.size() > 0) {
+                Vector datas = new Vector();
+                for (int i = 0; i < dataFieldImplList.size(); i++) {
+                    datas.add(dataFieldImplList.get(i));
+                }
+                dataFieldImpl = PointObFactory.mergeData(datas);
             }
             obs = recastProfilerSingleStationData(dataFieldImpl, 1);
         } else {
@@ -2060,8 +2151,17 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      *
      * @param value The new value for FileNameOrUrl
      */
+    public void setFileNameOrUrls(List<String> value) {
+        fileNameOrUrls = value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void setFileNameOrUrl(String value) {
-        fileNameOrUrl = value;
+        fileNameOrUrls.add(value);
     }
 
     /**
@@ -2069,8 +2169,8 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      *
      * @return The FileNameOrUrl
      */
-    public String getFileNameOrUrl() {
-        return fileNameOrUrl;
+    public List<String> getFileNameOrUrls() {
+        return fileNameOrUrls;
     }
 
     /**
@@ -2160,12 +2260,12 @@ public class CDMProfilerDataSource extends DataSourceImpl {
      * Called when Datasource is removed.
      */
     public void doRemove() {
-        stationsToProfiles = null;
-        allProfiles = null;
-        selectedStations   = null;
-        stations           = null;
-        this.fileNameOrUrl = null;
-        this.dataCacheKey  = null;
+        stationsToProfiles  = null;
+        allProfiles         = null;
+        selectedStations    = null;
+        stations            = null;
+        this.fileNameOrUrls = null;
+        this.dataCacheKey   = null;
 
         this.clearFileCache();
         this.clearCachedData();
