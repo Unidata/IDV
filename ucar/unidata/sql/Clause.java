@@ -491,6 +491,43 @@ public class Clause {
         return column.startsWith(table + ".");
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<String> getTableNames() {
+        List<String> names = new ArrayList<String>();
+        getTableNames(names);
+        return names;
+    }
+
+    /**
+     * _more_
+     *
+     * @param names _more_
+     */
+    private void getTableNames(List<String> names) {
+        if (subClauses != null) {
+            for (Clause clause : subClauses) {
+                clause.getTableNames(names);
+            }
+            return;
+        }
+
+        if (column != null) {
+            int idx = column.indexOf(".");
+            if (idx >= 0) {
+                String name = column.substring(0, idx);
+                if ( !names.contains(name)) {
+                    names.add(name);
+                }
+            }
+        }
+    }
+
+
     /**
      * _more_
      *

@@ -1339,7 +1339,11 @@ public class SqlUtil {
                 column = results.findColumn(name);
                 name   = null;
             }
-            current[cnt++] = results.getString(column);
+            String value = results.getString(column);
+            if (value == null) {
+                continue;
+            }
+            current[cnt++] = value;
             if (cnt >= current.length) {
                 String[] tmp = current;
                 current = new String[current.length * 2];
@@ -1349,6 +1353,34 @@ public class SqlUtil {
         String[] actual = new String[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * 
+     *
+     * @param iter _more_
+     * @param cnt _more_
+     *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    public static List<String[]> readStringTuples(Iterator iter, int cnt)
+            throws Exception {
+        List<String[]> values = new ArrayList<String[]>();
+        ResultSet      results;
+        while ((results = iter.getNext()) != null) {
+            String[] tuple = new String[cnt];
+            for (int col = 1; col <= cnt; col++) {
+                tuple[col - 1] = results.getString(col);
+            }
+            values.add(tuple);
+        }
+        return values;
     }
 
 
