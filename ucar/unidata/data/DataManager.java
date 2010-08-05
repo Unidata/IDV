@@ -21,29 +21,12 @@
 package ucar.unidata.data;
 
 
-
-//import org.apache.http.client.CredentialsProvider;
-//import opendap.dap.HttpWrap;
-
-
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import ucar.grib.grib2.Grib2Indexer;
-
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.util.DiskCache;
-
-import ucar.unidata.idv.IdvConstants;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
-import ucar.unidata.util.AccountManager;
-
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -54,20 +37,28 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
-
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-
-import visad.*;
-
+import visad.DateTime;
+import visad.Real;
+import visad.RealType;
+import visad.SampledSet;
+import visad.Unit;
 import visad.VisADException;
 
 import visad.data.text.TextAdapter;
 
-import java.io.*;
 
+
+//import org.apache.http.client.CredentialsProvider;
+//import opendap.dap.HttpWrap;
+
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.lang.reflect.Constructor;
 
@@ -76,17 +67,11 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
-import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-
 import java.util.TimeZone;
-
-import javax.swing.filechooser.FileFilter;
 
 
 
@@ -360,9 +345,6 @@ public class DataManager {
             ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
             ucar.nc2.util.DiskCache.setCachePolicy(true);
             // have to do this since nj2.2.20
-            ucar.nc2.iosp.grib.GribServiceProvider
-                .setIndexAlwaysInCache(dataContext.getIdv().getStateManager()
-                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true));
             ucar.nc2.iosp.grid.GridServiceProvider
                 .setIndexAlwaysInCache(dataContext.getIdv().getStateManager()
                     .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true));
@@ -1776,7 +1758,6 @@ public class DataManager {
      * @throws Exception On error
      */
     public static void main(String[] args) throws Exception {
-        Grib2Indexer indexer;
 
         Trace.startTrace();
         Unit     unit     = DataUtil.parseUnit("k");
