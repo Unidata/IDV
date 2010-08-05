@@ -559,11 +559,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
                 if (dataFieldImpl != null) {
                     times.add(Double.valueOf(data[0][3]));
                     allProfiles.add(dataFieldImpl);
-                    if (allProfiles.size() == 89) {
-                        System.out.println("kkkkkk");
-                    }
-
-                }
+                                    }
                 jj++;
             }
 
@@ -635,9 +631,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
                 spf.getPointFeatureCollectionIterator(-1);  // not multiple
-            if (st.getName().endsWith("AZCN5 ")) {
-                System.out.println("HHHH");
-            }
+
             List<Date> tList    = spf.getTimes();
             int        tsize    = tList.size();
             List       latList  = new ArrayList<Double>();
@@ -798,9 +792,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
                 spf.getPointFeatureCollectionIterator(-1);  // not multiple
-            if (st.getName().endsWith("MLNFL")) {
-                System.out.println("HHHH");
-            }
+
             List<Date> tList         = spf.getTimes();
             int        tsize         = tList.size();
             List       latVector     = new Vector();
@@ -1201,9 +1193,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
         //Recast the field into a different FieldImpl we can use.
         FieldImpl obs           = null;
         FieldImpl dataFieldImpl = null;
-        if (dataChoice.toString().endsWith("MLNFL")) {
-            System.out.println("HHHHHHHHHH");
-        }
+         
         if (singleStation) {
             List dataFieldImplList =
                 stationsToProfiles.get(dataChoice.toString());
