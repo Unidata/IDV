@@ -540,7 +540,7 @@
      factory="ucar.unidata.data.profiler.CDMProfilerDataSource"
      patterns="mapr.*,prof.*\.nc$,prof.*\.cdf$,rass.*\.nc$"
      fileselection="true"
-     doesmultiples="false"
+     doesmultiples="true"
      label="CDM netCDF Profiler files"/>
 <!--
   <datasource
