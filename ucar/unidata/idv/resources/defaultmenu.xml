@@ -270,7 +270,7 @@
        action="action:help.showsupportform"
        mnemonic="F"/>
      <separator/>
-
+<!--
      <menu label="Install">
      <menuitem
        label="Check for Updates"
@@ -283,7 +283,7 @@
 
 
      <separator/>
-
+-->
      <menuitem
        label="Release Notes"
        icon="/auxdata/ui/icons/note.png"
