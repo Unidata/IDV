@@ -519,6 +519,16 @@ public class Clause {
             return;
         }
 
+	if(expr.equals(EXPR_JOIN)) {
+            int idx = value.toString().indexOf(".");
+            if (idx >= 0) {
+                String name = value.toString().substring(0, idx);
+                if ( !names.contains(name)) {
+                    names.add(name);
+                }
+            }
+	}
+
         if (column != null) {
             int idx = column.indexOf(".");
             if (idx >= 0) {
@@ -529,6 +539,8 @@ public class Clause {
             }
         }
     }
+
+
 
 
     /**
