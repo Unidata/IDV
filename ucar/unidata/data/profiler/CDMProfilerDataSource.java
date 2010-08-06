@@ -83,9 +83,6 @@ public class CDMProfilerDataSource extends FilesDataSource {
     /** location */
     EarthLocation location = null;
 
-    /** data */
-    FieldImpl dat1a = null;
-
     /** Input for lat/lon center point */
     private LatLonWidget locWidget;
 
@@ -189,8 +186,15 @@ public class CDMProfilerDataSource extends FilesDataSource {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
+        List files = getFileNameOrUrls();
+        String nam = "CDM Profiler Data Source";
+        try{
+            initProfilerAll(files, nam);
+        } catch (VisADException e){
 
+        } catch (IOException a) {
 
+        }
     }
 
     /**
@@ -212,7 +216,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
             LogUtil.printException(log_, "Creating new file", exc);
             return;
         }
-        setFileNameOrUrl(f.getPath());
+        setFileNameOrUrls(Misc.newList(f.getPath()));
         setName(newFilename);
         flushCache();
         notifyDataChange();
@@ -2145,14 +2149,6 @@ public class CDMProfilerDataSource extends FilesDataSource {
         fileNameOrUrls = value;
     }
 
-    /**
-     * _more_
-     *
-     * @param value _more_
-     */
-    public void setFileNameOrUrl(String value) {
-        fileNameOrUrls.add(value);
-    }
 
     /**
      * Get the FileNameOrUrl property.
@@ -2246,22 +2242,6 @@ public class CDMProfilerDataSource extends FilesDataSource {
         return true;
     }
 
-    /**
-     * Called when Datasource is removed.
-     */
-    public void doRemove() {
-        stationsToProfiles  = null;
-        allProfiles         = null;
-        selectedStations    = null;
-        stations            = null;
-        this.fileNameOrUrls = null;
-        this.dataCacheKey   = null;
-
-        this.clearFileCache();
-        this.clearCachedData();
-        super.doRemove();
-        //  System.out.println("anything left");
-    }
 
 
 }
