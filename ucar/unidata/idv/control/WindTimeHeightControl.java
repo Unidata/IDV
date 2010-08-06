@@ -205,6 +205,7 @@ public class WindTimeHeightControl extends ProfilerControl {
                                        RealType.Time, RealType.Altitude);
         profileDisplay.setDisplayAspect(new double[] { .65, .65, 1.0 });
         profileDisplay.setAspect(1.0, 1.0);
+        profileDisplay.setYRange(0,16000);
         addDisplayMaster(profileDisplay);
         profileDisplay.showAxisScales(true);
         xScale = profileDisplay.getXAxisScale();
