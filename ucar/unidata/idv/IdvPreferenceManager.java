@@ -867,9 +867,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
             { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES,
               Boolean.FALSE },
+            /* 
             { "Check for Updates", InstallManager.PREF_CHECKFORNEWRELEASE,
               Boolean.TRUE },
-            /*            { "Dock in Dashboard:", null },
+            { "Dock in Dashboard:", null },
             { "Quick Links", PREF_EMBEDQUICKLINKSINDASHBOARD, Boolean.TRUE },
             { "Data Chooser", PREF_EMBEDDATACHOOSERINDASHBOARD,
               Boolean.TRUE },
