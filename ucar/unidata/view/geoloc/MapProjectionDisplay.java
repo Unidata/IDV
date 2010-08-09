@@ -1344,7 +1344,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @param el    earth location to transform
      * @param xyz    The in value to set. May be null.
-     * @param altitude _more_
+     * @param altitude altitude value
      *
      * @return  xyz array
      *
@@ -1432,12 +1432,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * lat/lon to Display.DisplaySpatialCartesianTuple (XYZ).
      * Altitude (z) values are held constant.
      */
-    protected class MapProjection3DAdapter extends CoordinateSystem {
+    protected class MapProjection3DAdapter extends CoordinateSystem implements InverseLinearScaledCS {
 
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;
 
-        /** _more_ */
+        /** the coordinate system */
         private CoordinateSystem theCoordinateSystem;
 
         /** index of the latitude coordinate */
@@ -1764,6 +1764,33 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
          */
         public MapProjection getMapProjection() {
             return mapProjection;
+        }
+
+        /**
+         * Get the scale
+         *
+         * @return  the scale (x,y)
+         */
+        public double[] getScale() {
+            return new double[] { scaleX, scaleY };
+        }
+
+        /**
+         * Get the offset
+         *
+         * @return  the offset (x_off, y_off)
+         */
+        public double[] getOffset() {
+            return new double[] { offsetX, offsetY };
+        }
+
+        /**
+         * Get the inverted coordinate system
+         *
+         * @return the inverted coordinate system
+         */
+        public CoordinateSystem getInvertedCoordinateSystem() {
+            return this.mapProjection;
         }
     }
 
