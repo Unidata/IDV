@@ -381,6 +381,11 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
 
+	  <exec failifexecutionfails="false"
+	        dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+	        executable="/usr/bin/tclsh" os="Mac OS X" >
+	    <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
+	  </exec>
 
       <exec failifexecutionfails="false"
             dir="${srcdir}/auxdata/docs/${docgen_dir}" 
