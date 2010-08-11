@@ -160,6 +160,7 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
                     // Set x (time) axis limits
                     // depending on data loaded in displayable.
                     setXAxisValues(fieldImpl.getDomainSet());
+                    setYAxisValues(fieldImpl);
                     // mark Profiler location on the main IDV display
                     //lineProbe.setPosition 
                     //    (getRealTupleForPoint (latitude, longitude));
@@ -228,6 +229,7 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
                 isLatestOnLeft = ((JCheckBox) e.getSource()).isSelected();
                 try {
                     setXAxisValues();
+                    setYAxisValues();
                 } catch (VisADException ve) {
                     userMessage("couldn't set order");
                 }
