@@ -110,6 +110,9 @@ public class WindTimeHeightControl extends ProfilerControl {
     /** scale for X axis */
     protected AxisScale xScale;
 
+    /** _more_          */
+    protected AxisScale yScale;
+
     /** data choice */
     protected CompositeDataChoice compositeDataChoice;
 
@@ -205,7 +208,7 @@ public class WindTimeHeightControl extends ProfilerControl {
                                        RealType.Time, RealType.Altitude);
         profileDisplay.setDisplayAspect(new double[] { .65, .65, 1.0 });
         profileDisplay.setAspect(1.0, 1.0);
-        profileDisplay.setYRange(0,16000);
+        //profileDisplay.setYRange(0,16000);
         addDisplayMaster(profileDisplay);
         profileDisplay.showAxisScales(true);
         xScale = profileDisplay.getXAxisScale();
@@ -213,10 +216,7 @@ public class WindTimeHeightControl extends ProfilerControl {
         xScale.setTitle("Time of day, UT");
         xScale.setSnapToBox(true);
         setXAxisValues(((FieldImpl) data).getDomainSet());
-        AxisScale yScale = profileDisplay.getYAxisScale();
-        yScale.setMajorTickSpacing(2000);
-        yScale.setMinorTickSpacing(500);
-        yScale.createStandardLabels(16000, 0, 0, 2000);
+        setYAxisValues((FieldImpl)data);
         yScale.setTitle("Height above MSL, meters");
         yScale.setSnapToBox(true);
         wbDisplayable.setVisible(true);
@@ -361,6 +361,69 @@ public class WindTimeHeightControl extends ProfilerControl {
             Set timeSet =
                 ((FieldImpl) wbDisplayable.getData()).getDomainSet();
             setXAxisValues(timeSet);
+        } catch (RemoteException re) {}
+    }
+
+    /**
+     * Set the YAxis values
+     *
+     * @throws VisADException  couldn't set the values
+     */
+    protected void setYAxisValues() throws VisADException {
+        try {
+            FieldImpl data = (FieldImpl) wbDisplayable.getData();
+            setYAxisValues(data);
+        } catch (RemoteException re) {}
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param data _more_
+     *
+     * @throws VisADException _more_
+     */
+    protected void setYAxisValues(FieldImpl data) throws VisADException {
+        try {
+            Set   tset = data.getDomainSet();
+            int   size = tset.getLength();
+
+            int   step = 5;  //no more than 5 labels;
+
+            float hii  = 0;
+            float loo  = 10000;
+            for (int i = 0; i < size; i++) {
+                FlatField    sfd  = (FlatField) data.getSample(i);
+                Gridded1DSet dset = (Gridded1DSet) sfd.getDomainSet();
+                float[]      hi   = dset.getHi();
+                float[]      lo   = dset.getLow();
+                if (hi[0] > hii) {
+                    hii = hi[0];
+                }
+                if (lo[0] < loo) {
+                    loo = lo[0];
+                }
+            }
+
+            yScale = profileDisplay.getYAxisScale();
+
+            if (hii < 5000) {
+                double averageSpacing = (hii - loo) / (double) (step);
+                yScale.setTickBase(loo);
+                yScale.setMajorTickSpacing(averageSpacing * step);
+                yScale.setMinorTickSpacing(averageSpacing);
+                yScale.setMajorTickSpacing(500);
+                yScale.setMinorTickSpacing(100);
+                yScale.createStandardLabels(4000, 0, 0, 500);
+                profileDisplay.setYRange(loo, hii);
+            } else {
+                yScale.setMajorTickSpacing(2000);
+                yScale.setMinorTickSpacing(500);
+                yScale.createStandardLabels(16000, 0, 0, 2000);
+                profileDisplay.setYRange(loo, hii);
+            }
+
         } catch (RemoteException re) {}
     }
 
