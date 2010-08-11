@@ -186,6 +186,8 @@ public class Misc {
             dirIndex    = latlon.indexOf("W");
         } else if (latlon.indexOf("N") > 0) {
             dirIndex = latlon.indexOf("N");
+        } else if (latlon.endsWith("E")) {
+            dirIndex = latlon.lastIndexOf("E");
         } else if (latlon.indexOf("E") > 0) {  // E could be the Exponent, e.g., -9E-3
             dirIndex = latlon.indexOf("E");
             String tmp = latlon.substring(dirIndex).trim();
