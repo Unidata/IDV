@@ -887,9 +887,6 @@ public class CDMProfilerDataSource extends FilesDataSource {
                 if (dataFieldImpl != null) {
                     times.add(Double.valueOf(data[0][3]));
                     allProfiles.add(dataFieldImpl);
-                    if (allProfiles.size() == 89) {
-                        System.out.println("kkkkkk");
-                    }
 
                 }
                 jj++;
