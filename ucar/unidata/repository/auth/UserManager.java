@@ -75,9 +75,13 @@ import java.util.Properties;
 public class UserManager extends RepositoryManager {
 
     /** _more_ */
-    public static final OutputType OUTPUT_CART =
-        new OutputType("Add to Cart", "user.cart", OutputType.TYPE_FILE, "",
+    public static final OutputType OUTPUT_CART_ADD =
+        new OutputType("Add to Cart", "user.cart.add", OutputType.TYPE_FILE, "",
                        ICON_CART_ADD);
+
+    public static final OutputType OUTPUT_CART_REMOVE =
+        new OutputType("Remove from Cart", "user.cart.remove", OutputType.TYPE_FILE, "",
+                       ICON_CART_DELETE);
 
     /** _more_ */
     public static final OutputType OUTPUT_FAVORITE =
@@ -1483,6 +1487,13 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    private void removeFromCart(Request request, List<Entry> entries)
+            throws Exception {
+        List<Entry> cart = getCart(request);
+        for (Entry entry : entries) {
+            cart.remove(entry);
+        }
+    }
 
 
 
@@ -2534,10 +2545,17 @@ public class UserManager extends RepositoryManager {
                                       List<Link> links)
                     throws Exception {
                 if (state.getEntry() != null) {
+                    List<Entry> cart = getCart(request);
                     Link link = makeLink(request, state.getEntry(),
-                                         OUTPUT_CART);
+                                         OUTPUT_CART_ADD);
                     link.setLinkType(OutputType.TYPE_ACTION);
                     links.add(link);
+
+                    link = makeLink(request, state.getEntry(),
+                                    OUTPUT_CART_REMOVE);
+                    link.setLinkType(OutputType.TYPE_ACTION);
+                    links.add(link);
+
                     if ( !request.getUser().getAnonymous()) {
                         link = makeLink(request, state.getEntry(),
                                         OUTPUT_FAVORITE);
@@ -2548,7 +2566,8 @@ public class UserManager extends RepositoryManager {
             }
 
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_CART)
+                return output.equals(OUTPUT_CART_ADD) 
+                    || output.equals(OUTPUT_CART_REMOVE)
                        || output.equals(OUTPUT_FAVORITE);
             }
 
@@ -2557,13 +2576,22 @@ public class UserManager extends RepositoryManager {
                                       List<Entry> entries)
                     throws Exception {
                 OutputType output = request.getOutput();
-                if (output.equals(OUTPUT_CART)) {
+                if (output.equals(OUTPUT_CART_ADD)) {
                     if (group.isDummy()) {
                         addToCart(request, entries);
                         addToCart(request,
                                   (List<Entry>) new ArrayList(subGroups));
                     } else {
                         addToCart(request, (List<Entry>) Misc.newList(group));
+                    }
+                    return showCart(request);
+                } else if (output.equals(OUTPUT_CART_REMOVE)) {
+                    if (group.isDummy()) {
+                        removeFromCart(request, entries);
+                        removeFromCart(request,
+                                  (List<Entry>) new ArrayList(subGroups));
+                    } else {
+                        removeFromCart(request, (List<Entry>) Misc.newList(group));
                     }
                     return showCart(request);
                 } else {

@@ -65,6 +65,9 @@ public interface Constants {
     public static final String ICON_CART_ADD = "ramadda.icon.cart.add";
 
     /** _more_ */
+    public static final String ICON_CART_DELETE = "ramadda.icon.cart.delete";
+
+    /** _more_ */
     public static final String ICON_CATALOG = "ramadda.icon.catalog";
 
     /** _more_ */
