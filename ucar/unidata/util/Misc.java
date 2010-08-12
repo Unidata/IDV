@@ -186,20 +186,10 @@ public class Misc {
             dirIndex    = latlon.indexOf("W");
         } else if (latlon.indexOf("N") > 0) {
             dirIndex = latlon.indexOf("N");
-        } else if (latlon.endsWith("E")) {
+        } else if (latlon.endsWith("E")) {  // account for 9E-3, 9E-3E, etc
             dirIndex = latlon.lastIndexOf("E");
-        } else if (latlon.indexOf("E") > 0) {  // E could be the Exponent, e.g., -9E-3
-            dirIndex = latlon.indexOf("E");
-            String tmp = latlon.substring(dirIndex).trim();
-            if (tmp.length() > 0) {  // check for another E for East
-                int newIndex = latlon.lastIndexOf("E");
-                if (dirIndex != newIndex) {
-                    dirIndex = newIndex;
-                } else {
-                    dirIndex = 0;
-                }
-            }
         }
+
         if (dirIndex > 0) {
             latlon = latlon.substring(0, dirIndex).trim();
         }
