@@ -707,7 +707,7 @@ public class Clause {
             sb.append(SqlUtil.group("NOT " + column + "  like ?"));
         } else {
             if (SqlUtil.debug) {
-                System.err.println(toString());
+		//                System.err.println(toString());
             }
             String theExpr = column + " " + expr + " ?";
             sb.append(SqlUtil.group(theExpr));

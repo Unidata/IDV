@@ -1219,7 +1219,6 @@ public class SqlUtil {
         }
 
 
-
         if (debug) {
             //            System.err.println ("arrays: " + arrays.size() + " cnt=" + cnt);
         }
@@ -1832,7 +1831,9 @@ public class SqlUtil {
         }
 
         String sql = makeSelect(what, tables, sb.toString(), extra);
-	//	System.err.println("sql: " + sql);
+	if(debug) {
+	    System.err.println("sql: " + sql);
+	}
         return sql;
     }
 
