@@ -820,7 +820,12 @@ public class Clause {
                     return  column + " " + expr + " (" + extra+")";
                 }
             } 
-            return  column + " " + expr + " " + value;
+	    String svalue;
+	    if(value instanceof String)
+		svalue = "'" + value +"'";
+	    else
+		svalue  =""+value;
+            return  column + " " + expr + " " + svalue;
         } else if (subClauses != null) {
             if(subClauses.length==1) {
                 return subClauses[0].toString();
