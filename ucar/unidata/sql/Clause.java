@@ -813,9 +813,19 @@ public class Clause {
      */
     public String toString() {
         if (column != null) {
-            return "column:" + column + " " + expr + " " + value;
+            if(expr.equals(EXPR_IN)) {
+                if(subClauses!=null && subClauses.length>0) {
+                    return  column + " " + expr + " (" + extra+" WHERE " + subClauses[0] +")";
+                } else {
+                    return  column + " " + expr + " (" + extra+")";
+                }
+            } 
+            return  column + " " + expr + " " + value;
         } else if (subClauses != null) {
-            return expr + " " + Misc.toList(subClauses);
+            if(subClauses.length==1) {
+                return subClauses[0].toString();
+            }
+            return  "("+Misc.join(" " + expr+" ",subClauses)+")";
         }
         return "clause:null";
     }
