@@ -511,7 +511,12 @@ public class Clause {
      * @param names _more_
      */
     private void doGetTableNames(List<String> names) {
+	if(expr.equals(EXPR_IN)) {
+            return;
+        }
         if (subClauses != null) {
+
+
             for (Clause clause : subClauses) {
 		if(clause ==null) continue;
                 clause.doGetTableNames(names);
