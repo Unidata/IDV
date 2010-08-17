@@ -110,11 +110,17 @@ svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/b
 where <version> is the version (e.g., 2.8).
 
 ***********************************************************************
-Flip the current link:
+Update the current and stable links:
 
 cd /content/software/idv
 rm current
-ln -s <version> current
+ln -s <current IDV version> current
+
+cd release
+rm stable
+rm current
+ln -s ../<current IDV version> current
+ln -s ../<stable IDV version> stable    (or simply point stable to current)
 
 Go to the IDV homepage and make sure it is pointing to the updated directory.  Make 
 sure all the links on the page work correctly.
