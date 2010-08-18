@@ -1612,7 +1612,7 @@ public class HtmlUtil {
      */
     public static String uploadForm(String url, String extra) {
         return open(TAG_FORM,
-                    attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url,
+                    " accept-charset=\"UTF-8\" " + attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url,
                           ATTR_ENCTYPE, VALUE_MULTIPART) + " " + extra);
     }
 
