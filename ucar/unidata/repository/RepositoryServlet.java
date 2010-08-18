@@ -270,7 +270,8 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 return;
             }
         }
-
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         RequestHandler handler          = new RequestHandler(request);
         Result         repositoryResult = null;
@@ -459,8 +460,8 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 ServletFileUpload upload =
                     new ServletFileUpload(new DiskFileItemFactory());
                 try {
-                    List     items = upload.parseRequest(request);
                     upload.setHeaderEncoding("UTF-8");
+                    List     items = upload.parseRequest(request);
                     Iterator iter  = items.iterator();
                     while (iter.hasNext()) {
                         FileItem item = (FileItem) iter.next();
@@ -508,8 +509,11 @@ public class RepositoryServlet extends HttpServlet implements Constants {
             String name  = item.getFieldName();
             byte[] bytes = item.get();
             //Don't do this for now since it screws up utf-8 character encodings
-            //            String value = item.getString();
+            //String value = item.getString();
             String value = new String(bytes);
+            //            if(name.startsWith("desc")) {
+            //                System.err.println ("value:" + value);
+            //            }
             formArgs.put(name, value);
         }
 
