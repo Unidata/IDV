@@ -286,6 +286,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
 
                 // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
 
+
                 Request repositoryRequest = new Request(repository,
                                                 request.getRequestURI(),
                                                 handler.formArgs, request,
@@ -459,6 +460,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     new ServletFileUpload(new DiskFileItemFactory());
                 try {
                     List     items = upload.parseRequest(request);
+                    upload.setHeaderEncoding("UTF-8");
                     Iterator iter  = items.iterator();
                     while (iter.hasNext()) {
                         FileItem item = (FileItem) iter.next();
@@ -504,8 +506,10 @@ public class RepositoryServlet extends HttpServlet implements Constants {
          */
         public void processFormField(FileItem item) {
             String name  = item.getFieldName();
-            String value = item.getString();
-            //            System.err.println("name:" + name);
+            byte[] bytes = item.get();
+            //Don't do this for now since it screws up utf-8 character encodings
+            //            String value = item.getString();
+            String value = new String(bytes);
             formArgs.put(name, value);
         }
 
