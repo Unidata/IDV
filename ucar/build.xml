@@ -122,7 +122,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/render.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-fileupload-1.2.2.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
