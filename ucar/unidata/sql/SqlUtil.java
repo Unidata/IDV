@@ -935,13 +935,13 @@ public class SqlUtil {
             }
             tableClause += table;
         }
-        String sql= "SELECT " + what + " FROM " + tableClause
-               + ((where.trim().length() > 0)
-                  ? " \nWHERE " + where
-                  : "") + ((extra == null)
-                           ? ""
-                           : " " + extra);
-	return sql;
+        String sql = "SELECT " + what + " FROM " + tableClause
+                     + ((where.trim().length() > 0)
+                        ? " \nWHERE " + where
+                        : "") + ((extra == null)
+                                 ? ""
+                                 : " " + extra);
+        return sql;
     }
 
 
@@ -1361,7 +1361,7 @@ public class SqlUtil {
      * _more_
      *
      *
-     * 
+     *
      *
      * @param iter _more_
      * @param cnt _more_
@@ -1831,9 +1831,9 @@ public class SqlUtil {
         }
 
         String sql = makeSelect(what, tables, sb.toString(), extra);
-	if(debug) {
-	    System.err.println("sql: " + sql);
-	}
+        if (debug) {
+            System.err.println("sql: " + sql);
+        }
         return sql;
     }
 
@@ -2094,7 +2094,38 @@ public class SqlUtil {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String wildCardBefore(String s) {
+        return "%" + s;
+    }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String wildCardAfter(String s) {
+        return s + "%";
+    }
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String wildCardBoth(String s) {
+        return "%" + s + "%";
+    }
 
 
 }
