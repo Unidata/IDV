@@ -29,6 +29,7 @@ import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.type.*;
+import ucar.unidata.repository.data.CatalogHarvester;
 
 import ucar.unidata.sql.Clause;
 
@@ -112,6 +113,7 @@ public class HarvesterManager extends RepositoryManager {
         addHarvesterType(PatternHarvester.class);
         addHarvesterType(WebHarvester.class);
         addHarvesterType(DirectoryHarvester.class);
+        addHarvesterType(CatalogHarvester.class);
     }
 
     

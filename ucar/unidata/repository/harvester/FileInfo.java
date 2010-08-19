@@ -116,7 +116,7 @@ public class FileInfo {
         if ( !hasInitialized) {
             if (file.exists()) {
                 time = file.lastModified();
-                if ( !isDir) {
+                if (!isDir) {
                     size = file.length();
                 }
                 hasInitialized = true;

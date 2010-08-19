@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -121,8 +122,7 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private Hashtable dirMap = new Hashtable();
 
-
-
+    private HashSet seenFiles = new HashSet();
 
     /** _more_ */
     private int entryCnt = 0;
@@ -167,8 +167,18 @@ public class PatternHarvester extends Harvester {
         init();
     }
 
+    private boolean haveProcessedFile(String f) {
+        if(seenFiles.contains(f)) return true;
+        return false;
+    }
 
-
+    private void putProcessedFile(String f) {
+        //Limit the size to 10000
+        if(seenFiles.size()>10000) {
+            seenFiles = new HashSet();
+        }
+        seenFiles.add(f);
+    }
 
     /**
      * _more_
@@ -224,6 +234,10 @@ public class PatternHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
+
+        //Reset the seen files
+        seenFiles = new HashSet();
+
         lastRunTime = 0;
         filePatternString = request.getUnsafeString(ATTR_FILEPATTERN,
                 filePatternString);
@@ -589,19 +603,24 @@ public class PatternHarvester extends Harvester {
         newEntryCnt = 0;
         boolean anyNewThingsToLookAt = false;
 
+        //For now lets always look at each dir even if it hasn't changed
+        //It seems as though sometimes files come in or have been changed
+        //and we skip them then we miss them the next time through
+        boolean alwaysLookAtDirs = false;
         for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
             if ( !fileInfo.exists()) {
                 removeDir(fileInfo);
                 continue;
             }
-            if ( !firstTime && !fileInfo.hasChanged()) {
-                continue;
+            if(!alwaysLookAtDirs) {
+                if (!firstTime && !fileInfo.hasChanged()) {
+                    continue;
+                }
             }
             File[] files = fileInfo.getFile().listFiles();
             if (files == null) {
                 continue;
-
             }
             files = IOUtil.sortFilesOnName(files);
 
@@ -610,7 +629,7 @@ public class PatternHarvester extends Harvester {
                 if (f.isDirectory()) {
                     //If this is a directory then check if we already have it 
                     //in the list. If not then add it to the main list and the local list
-                    if ( !hasDir(f)) {
+                    if (!hasDir(f)) {
                         logHarvesterInfo("Found new directory:" + f);
                         FileInfo newFileInfo = addDir(f);
                         tmpDirs.add(newFileInfo);
@@ -619,11 +638,11 @@ public class PatternHarvester extends Harvester {
                 }
                 long fileTime = f.lastModified();
                 if ((fileTime - lastRunTime) < 1000) {
-                    debug("We've seen this file:" + f);
+                    logHarvesterInfo("Skipping this file since its recently changed:" + f);
                     continue;
                 }
                 anyNewThingsToLookAt = true;
-                logHarvesterInfo("Found file:" + f);
+
                 Entry entry = null;
                 try {
                     entry = processFile(f);
@@ -638,7 +657,7 @@ public class PatternHarvester extends Harvester {
                 if (getTestMode() && (entryCnt >= getTestCount())) {
                     return;
                 }
-                if ( !getTestMode()) {
+                if (!getTestMode()) {
                     if (entries.size() > 1000) {
                         List<Entry> nonUniqueOnes  = new ArrayList<Entry>();
                         List uniqueEntries =
@@ -671,7 +690,6 @@ public class PatternHarvester extends Harvester {
             needToAdd.addAll(uniqueEntries);
             addEntries(needToAdd);
         }
-
         if(!anyNewThingsToLookAt) {
             logHarvesterInfo("Nothing on disk has changed since last time");
         }
@@ -789,7 +807,6 @@ public class PatternHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry processFile(File f) throws Exception {
-
         //check if its a hidden file
         if (f.getName().startsWith(".")) {
             logHarvesterInfo("File is hidden file:" + f);
@@ -799,22 +816,35 @@ public class PatternHarvester extends Harvester {
         String fileName = f.toString();
         fileName = fileName.replace("\\", "/");
         //        System.err.println("dir group:" + dirGroup);
+        //Call init so we get the filePattern
         init();
 
         Matcher matcher = filePattern.matcher(fileName);
-
         if ( !matcher.find()) {
             debug("file:<i>" + fileName + "</i> does not match pattern");
+            logHarvesterInfo("file:" + fileName + " does not match pattern");
             return null;
         }
+
         debug("file:<i>" + fileName + "</i> matches pattern");
+
+        if (!getTestMode()) {
+            if(haveProcessedFile(fileName)) {
+                logHarvesterInfo("Already processed file:" + fileName);
+                debug("Already harvested file:" + fileName);
+                return null;
+            }
+            putProcessedFile(fileName);
+        }
+
+        logHarvesterInfo("Harvesting file:" + fileName);
+
         String dirPath = f.getParent().toString();
         dirPath = dirPath.substring(rootDir.toString().length());
         dirPath = dirPath.replace("\\", "/");
         List dirToks = (List<String>) StringUtil.split(dirPath, "/", true,
                            true);
         //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
-
         Group baseGroup = getBaseGroup();
         String dirGroup =
             getDirNames(rootDir, baseGroup, dirToks,
@@ -869,16 +899,12 @@ public class PatternHarvester extends Harvester {
             toDate = createDate;
         }
 
-
-
         String ext = IOUtil.getFileExtension(fileName);
         if (ext.startsWith(".")) {
             ext = ext.substring(1);
         }
         tag       = tag.replace("${extension}", ext);
         groupName = groupName.replace("${dirgroup}", dirGroup);
-
-
         groupName = applyMacros(groupName, createDate, fromDate, toDate,
                                 f.getName());
         name = applyMacros(name, createDate, fromDate, toDate, f.getName());

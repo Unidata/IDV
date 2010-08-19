@@ -822,6 +822,7 @@ public abstract class Harvester extends RepositoryManager {
      * @param message _more_
      */
     public void logHarvesterInfo(String message) {
+        //        System.err.println (message);
         LOG.info( "harvester:" + getName() +" " +message);
     }
 

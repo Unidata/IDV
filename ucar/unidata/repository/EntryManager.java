@@ -1203,6 +1203,7 @@ return new Result(title, sb);
             String description = request.getString(ARG_DESCRIPTION, BLANK);
 
 
+
             Date   createDate  = new Date();
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                    createDate);
@@ -1327,6 +1328,9 @@ return new Result(title, sb);
             String newName = request.getString(ARG_NAME, entry.getLabel());
 
             entry.setName(newName);
+            String tmp = request.getString(ARG_DESCRIPTION,
+                                           entry.getDescription());
+
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                     entry.getDescription()));
 
@@ -3576,6 +3580,7 @@ return new Result(title, sb);
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
+        //        sb.append(request.form(getRepository().URL_COMMENTS_ADD, BLANK));
         sb.append(request.form(getRepository().URL_COMMENTS_ADD, BLANK));
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.formTable());
@@ -6138,6 +6143,30 @@ return new Result(title, sb);
     }
 
 
+
+    public List<Entry> findEntriesWithName(Request request, Group parent, String name)
+            throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        String groupName = ((parent == null)
+                            ? ""
+                            : parent.getFullName()) + Group.IDDELIMITER
+                                + name;
+        Group group = getGroupFromCache(groupName, false);
+        if (group != null) {
+            entries.add(group);
+            return entries;
+        }
+        String[] ids = findEntryIdsWithName(request, parent, name);
+        if (ids.length == 0) {
+            return entries;
+        }
+        for(String id: ids) {
+            entries.add(getEntry(request, id, false));
+        }
+        return entries;
+    }
+
+
     /**
      * _more_
      *
@@ -6162,6 +6191,25 @@ return new Result(title, sb);
                                 Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                 parent.getId()), Clause.eq(
                                     Tables.ENTRIES.COL_NAME, name)))));
+
+        return ids;
+    }
+
+
+
+    public String[] findEntryIdsWithResource(Request request, Group parent,
+                                         String resource)
+            throws Exception {
+        String[] ids =
+            SqlUtil.readString(
+                getDatabaseManager().getIterator(
+                    getDatabaseManager().select(
+                        Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
+                        Clause.and(
+                            Clause.eq(
+                                Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                parent.getId()), Clause.eq(
+                                    Tables.ENTRIES.COL_RESOURCE, resource)))));
 
         return ids;
     }
