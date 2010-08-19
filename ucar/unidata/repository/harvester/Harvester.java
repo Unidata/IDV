@@ -811,7 +811,7 @@ public abstract class Harvester extends RepositoryManager {
 
 
     public void logHarvesterError(String message, Exception exc) {
-        getRepository().getLogManager().logError(LOG,  "harvester:" + getName() +" " +message,
+        getRepository().getLogManager().logError(LOG,  getName() +" " +message,
                 exc);
     }
 
@@ -823,7 +823,7 @@ public abstract class Harvester extends RepositoryManager {
      */
     public void logHarvesterInfo(String message) {
         //        System.err.println (message);
-        LOG.info( "harvester:" + getName() +" " +message);
+        LOG.info(getName() +" " +message);
     }
 
 

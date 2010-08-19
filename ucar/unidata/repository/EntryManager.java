@@ -5439,7 +5439,7 @@ return new Result(title, sb);
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
                 String path = getStorageManager().resourceToDB(
-                                  entry.getResource().getPath());
+                                                               entry.getResource().getPath());
                 String key = entry.getParentGroup().getId() + "_" + path;
                 if (seenResources.contains(key)) {
                     nonUniqueOnes.add(entry);
@@ -5458,7 +5458,6 @@ return new Result(title, sb);
                         needToAdd.add(entry);
                     } else {
                         nonUniqueOnes.add(entry);
-                        //                        System.out.println("in db:" + path + " " + entry.getParentGroup().getId());
                     }
                 }
             }

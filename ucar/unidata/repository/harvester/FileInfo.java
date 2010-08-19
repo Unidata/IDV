@@ -21,6 +21,8 @@
 package ucar.unidata.repository.harvester;
 
 
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
@@ -53,6 +55,8 @@ public class FileInfo {
 
     /** _more_ */
     boolean isDir;
+
+    private List addedFiles;
 
     /**
      * _more_
@@ -153,13 +157,30 @@ public class FileInfo {
         return file.exists();
     }
 
+    public void clearAddedFiles() {
+        addedFiles = null;
+    }
+
+    public void addFile(Object f) {
+        if(addedFiles == null)
+            addedFiles = new ArrayList();
+        addedFiles.add(f);
+    }
+
     /**
      * _more_
      *
      * @return _more_
      */
     public String toString() {
-        return file.toString();
+        String s =  file.toString();
+        List tmp = addedFiles;
+        if(tmp!=null && tmp.size()>0) {
+            String fileBlock = HtmlUtil.insetDiv("Added files:<br>" +StringUtil.join("<br>", tmp),0,10,0,0);
+            return  HtmlUtil.makeShowHideBlock(s,
+                                               fileBlock, false);
+        }
+        return s;
     }
 
     /**
