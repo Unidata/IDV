@@ -902,7 +902,7 @@ proc gen::getTitleOverviewBody {path {canUseBodyForOverview 0} {htmlRaw 0}} {
 	set idx1 [string first <TITLE> $content]
     }
     if {$idx1<0} {
-	puts "No title found in: $path"
+##	puts "No title found in: $path"
     } else {
 	set idx2 [string first </title> $content $idx1]
 	if {$idx2<0} {
@@ -1160,6 +1160,9 @@ proc gen::walkTree {indexFile {parent ""}} {
 
 
 proc gen::definePage {file actualFilePath parent includeInNav includeInToc {pageType real} {title ""} {overview ""} {dfltBody ""}} {
+
+    gen::setDoTemplate $file 1
+
     if {[gen::getTopFile] == ""} {
         gen::setTopFile $file
     }
@@ -1268,8 +1271,6 @@ proc gen::definePage {file actualFilePath parent includeInNav includeInToc {page
         set body [gen::addSubHead $file $body ]
     }
 
-
-    gen::setDoTemplate $file 1
     gen::setBody $file $body
     gen::hook::definePage $file
 
