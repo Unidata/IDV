@@ -24,6 +24,9 @@ package ucar.unidata.idv.control;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.idv.TimeHeightViewManager;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.metdata.NamedStation;
 
@@ -32,15 +35,14 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 
-
-import ucar.visad.display.Displayable;
-import ucar.visad.display.LineProbe;
-import ucar.visad.display.SelectorPoint;
-import ucar.visad.display.WindBarbDisplayable;
+import ucar.visad.display.*;
 
 import visad.*;
 
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
+import visad.georef.LatLonPoint;
+import visad.georef.LatLonTuple;
 
 import visad.util.DataUtility;
 
@@ -49,11 +51,8 @@ import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
-import java.util.Hashtable;
-
+import java.util.*;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.swing.*;
 
@@ -81,6 +80,13 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
     /** stations combobox */
     private JComboBox stationsBox;
 
+    /** foreground color */
+    private Color foreground;
+
+    /** background color */
+    private Color background;
+
+
     /**
      *  Default Constructor; does nothing. See init() for creation actions.
      */
@@ -98,6 +104,10 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
         boolean result = super.init(dataChoice);
+
+        if (foreground != null) {
+            timeHeightView.setColors(foreground, background);
+        }
         return result;
     }
 
@@ -210,6 +220,72 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
     }
 
     /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void doMakeColorScales()
+            throws VisADException, RemoteException {
+        colorScales = new ArrayList();
+        if (colorScaleInfo == null) {
+            colorScaleInfo = getDefaultColorScaleInfo();
+        }
+        ColorScale colorScale = new ColorScale(getColorScaleInfo());
+        addDisplayable(colorScale, timeHeightView, FLAG_COLORTABLE);
+        colorScales.add(colorScale);
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
+
+        return GuiUtils.centerBottom(profileDisplay.getComponent(),
+                                     doMakeWidgetComponent());
+    }
+
+
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    public void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+
+        if (timeHeightView != null) {
+            jtp.add("Time Height View",
+                    timeHeightView.getPropertiesComponent());
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param menus _more_
+     * @param forMenuBar _more_
+     */
+    protected void getViewMenuItems(List menus, boolean forMenuBar) {
+        super.getViewMenuItems(menus, forMenuBar);
+        menus.add(GuiUtils.MENU_SEPARATOR);
+        ViewManager vm = timeHeightView;  //defaultViewManager; //
+        if (forMenuBar) {
+            JMenu csvMenu = vm.makeViewMenu();
+            csvMenu.setText("PROFILE");
+            menus.add(csvMenu);
+        }
+    }
+
+
+    /**
      * make widgets for check box for latest data time on left of x axis, and
      * make selector for one of  the different stations.
      *
@@ -287,4 +363,76 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
             logException("dataChanged", exc);
         }
     }
+
+
+    /**
+     * Apply the preferences.  Used to pick up the date format changes.
+     */
+    public void applyPreferences() {
+        super.applyPreferences();
+        try {
+            setXAxisValues();
+        } catch (Exception exc) {
+            logException("applyPreferences", exc);
+        }
+    }
+
+    /**
+     *  Set whether latest data is displayed on the left or right
+     *  side of the plot.  Used by XML persistence mainly.
+     *
+     *  @param yesorno  <code>true</code> if want latest is on left.
+     */
+    public void setLatestOnLeft(boolean yesorno) {
+        isLatestOnLeft = yesorno;
+    }
+
+    /**
+     * Get whether latest data is displayed on the left or right
+     * side of the plot.
+     *
+     * @return  <code>true</code> if latest is on left.
+     */
+    public boolean getLatestOnLeft() {
+        return isLatestOnLeft;
+    }
+
+    /**
+     * Get the foreground color
+     *
+     * @return the foreground color
+     */
+    public Color getForeground() {
+        return timeHeightView.getForeground();
+    }
+
+    /**
+     * Set the foreground color
+     *
+     * @param color    new color
+     */
+    public void setForeground(Color color) {
+        this.foreground = color;
+    }
+
+
+
+    /**
+     * Get the background color
+     *
+     * @return the background color
+     */
+    public Color getBackground() {
+        return timeHeightView.getBackground();
+    }
+
+    /**
+     * Set the background color
+     *
+     * @param color   new color
+     */
+    public void setBackground(Color color) {
+        this.background = color;
+    }
+
 }
