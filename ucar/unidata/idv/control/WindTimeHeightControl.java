@@ -25,6 +25,10 @@ import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.radar.RadarConstants;
+import ucar.unidata.idv.DisplayInfo;
+import ucar.unidata.idv.TimeHeightViewManager;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.util.GuiUtils;
@@ -32,13 +36,10 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 
-import ucar.visad.display.Displayable;
-import ucar.visad.display.LineProbe;
-import ucar.visad.display.SelectorPoint;
-import ucar.visad.display.WindBarbDisplayable;
-import ucar.visad.display.XYDisplay;
+import ucar.visad.display.*;
 
 import visad.*;
+import visad.Set;
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
@@ -50,11 +51,8 @@ import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
-import java.util.Hashtable;
-
+import java.util.*;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.swing.*;
 
@@ -79,6 +77,9 @@ public class WindTimeHeightControl extends ProfilerControl {
 
     /** profile display */
     protected XYDisplay profileDisplay;
+
+    /** _more_          */
+    protected TimeHeightViewManager timeHeightView;
 
     /** data */
     protected FieldImpl fieldImpl;
@@ -138,6 +139,24 @@ public class WindTimeHeightControl extends ProfilerControl {
         if ( !result) {
             return false;
         }
+        timeHeightView = new TimeHeightViewManager(getViewContext(),
+                new ViewDescriptor("timeheight_of_" + paramName),
+                "showControlLegend=false;") {
+            public boolean animationOk() {
+                return false;
+            }
+
+            public boolean getShowSideLegend() {
+                return false;
+            }
+        };
+
+        addViewManager(timeHeightView);
+        timeHeightView.setAnimationStringVisible(false);
+        profileDisplay = timeHeightView.getTimeHeightDisplay();
+        profileDisplay.setAspect(1.0, .6);
+
+        //If foreground is not null  then this implies we have been unpersisted
 
         if (dataChoice instanceof CompositeDataChoice) {
             compositeDataChoice = (CompositeDataChoice) dataChoice;
@@ -161,6 +180,21 @@ public class WindTimeHeightControl extends ProfilerControl {
         } else {
             return initStation(dataChoice);
         }
+    }
+
+    /**
+     * Apply the properties
+     *
+     * @return true if successful
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        if (timeHeightView != null) {
+            return timeHeightView.applyProperties();
+        }
+        return true;
     }
 
     /**
@@ -204,10 +238,10 @@ public class WindTimeHeightControl extends ProfilerControl {
         RealTupleType rtt   = (RealTupleType) obFT.getFlatRange();
         wbDisplayable = new WindBarbDisplayable("wsr 88d station", rtt);
         setFlowScale(getFlowScale());
-        profileDisplay = new XYDisplay("wind time height profile",
-                                       RealType.Time, RealType.Altitude);
-        profileDisplay.setDisplayAspect(new double[] { .65, .65, 1.0 });
-        profileDisplay.setAspect(1.0, 1.0);
+        // profileDisplay = new XYDisplay("wind time height profile",
+        //                                RealType.Time, RealType.Altitude);
+        //    profileDisplay.setDisplayAspect(new double[] { .65, .65, 1.0 });
+        //   profileDisplay.setAspect(1.0, 1.0);
         //profileDisplay.setYRange(0,16000);
         addDisplayMaster(profileDisplay);
         profileDisplay.showAxisScales(true);
