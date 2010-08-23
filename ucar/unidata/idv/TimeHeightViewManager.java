@@ -190,7 +190,7 @@ public class TimeHeightViewManager extends ViewManager {
     protected void getInitialBooleanProperties(List props) {
         super.getInitialBooleanProperties(props);
         props.add(new BooleanProperty(PREF_GRIDLINES, "Show Grid Lines", "",
-                                      true));
+                                      false));
     }
 
 
@@ -216,11 +216,11 @@ public class TimeHeightViewManager extends ViewManager {
         }
         bp = getBooleanProperty(PREF_GRIDLINES);
         if (bp != null) {
-            bp.setDefault(true);
+            bp.setDefault(false);
         }
         bp = getBooleanProperty(PREF_WIREFRAME);
         if (bp != null) {
-            bp.setDefault(false);
+            bp.setDefault(true);
         }
     }
 
@@ -255,13 +255,13 @@ public class TimeHeightViewManager extends ViewManager {
      * Just the map and view menu.
      *
      * @return List of menus.
+     * public ArrayList doMakeMenuList() {
+     *   ArrayList menus    = super.doMakeMenuList();
+     *   JMenu     viewMenu = makeViewMenu();
+     *   menus.add(viewMenu);
+     *   return menus;
+     * }
      */
-    public ArrayList doMakeMenuList() {
-        ArrayList menus    = super.doMakeMenuList();
-        JMenu     viewMenu = makeViewMenu();
-        menus.add(viewMenu);
-        return menus;
-    }
 
     /**
      * Get  the show cursor readout flag

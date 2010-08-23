@@ -145,14 +145,11 @@ public class TimeHeightControl extends LineProbeControl {
 
         timeHeightView = new TimeHeightViewManager(getViewContext(),
                 new ViewDescriptor("timeheight_of_" + paramName),
-                "showControlLegend=false;") {
+                "showControlLegend=false;wireframe=true;") {
             public boolean animationOk() {
                 return false;
             }
 
-            public boolean getShowSideLegend() {
-                return false;
-            }
         };
         timeHeightView.setAnimationStringVisible(false);
         profileDisplay = timeHeightView.getTimeHeightDisplay();
@@ -283,7 +280,7 @@ public class TimeHeightControl extends LineProbeControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
-        return GuiUtils.centerBottom(profileDisplay.getComponent(),
+        return GuiUtils.centerBottom(timeHeightView.getContents(),
                                      doMakeWidgetComponent());
     }
 

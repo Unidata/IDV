@@ -78,7 +78,7 @@ public class WindTimeHeightControl extends ProfilerControl {
     /** profile display */
     protected XYDisplay profileDisplay;
 
-    /** _more_          */
+    /** _more_ */
     protected TimeHeightViewManager timeHeightView;
 
     /** data */
@@ -111,7 +111,7 @@ public class WindTimeHeightControl extends ProfilerControl {
     /** scale for X axis */
     protected AxisScale xScale;
 
-    /** _more_          */
+    /** _more_ */
     protected AxisScale yScale;
 
     /** data choice */
@@ -141,14 +141,11 @@ public class WindTimeHeightControl extends ProfilerControl {
         }
         timeHeightView = new TimeHeightViewManager(getViewContext(),
                 new ViewDescriptor("timeheight_of_" + paramName),
-                "showControlLegend=false;") {
+                "showControlLegend=false;wireframe=true;") {
             public boolean animationOk() {
                 return false;
             }
 
-            public boolean getShowSideLegend() {
-                return false;
-            }
         };
 
         addViewManager(timeHeightView);
@@ -250,7 +247,7 @@ public class WindTimeHeightControl extends ProfilerControl {
         xScale.setTitle("Time of day, UT");
         xScale.setSnapToBox(true);
         setXAxisValues(((FieldImpl) data).getDomainSet());
-        setYAxisValues((FieldImpl)data);
+        setYAxisValues((FieldImpl) data);
         yScale.setTitle("Height above MSL, meters");
         yScale.setSnapToBox(true);
         wbDisplayable.setVisible(true);

@@ -111,8 +111,6 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
         return result;
     }
 
-    // get data field; load in displayable; make LineProbe in place
-
     /**
      * get data field; load in displayable; make LineProbe in place
      *
@@ -248,7 +246,7 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
-        return GuiUtils.centerBottom(profileDisplay.getComponent(),
+        return GuiUtils.centerBottom(timeHeightView.getContents(),
                                      doMakeWidgetComponent());
     }
 
@@ -276,10 +274,9 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
     protected void getViewMenuItems(List menus, boolean forMenuBar) {
         super.getViewMenuItems(menus, forMenuBar);
         menus.add(GuiUtils.MENU_SEPARATOR);
-        ViewManager vm = timeHeightView;  //defaultViewManager; //
         if (forMenuBar) {
-            JMenu csvMenu = vm.makeViewMenu();
-            csvMenu.setText("PROFILE");
+            JMenu csvMenu = timeHeightView.makeViewMenu();
+            csvMenu.setText("Profiler View");
             menus.add(csvMenu);
         }
     }
