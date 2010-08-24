@@ -290,5 +290,23 @@ public class TimeHeightViewManager extends ViewManager {
     public boolean getClipping() {
         return clipOn;
     }
+    
+    /**
+     * Do we support animation?
+     *
+     * @return false
+     */
+    public boolean animationOk() {
+        return false;
+    }
+
+    /**
+     * Don't show the side legend
+     *
+     * @return false
+     */
+    public boolean getShowSideLegend() {
+        return false;
+    }
 
 }

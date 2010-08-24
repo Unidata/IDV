@@ -142,14 +142,9 @@ public class WindTimeHeightControl extends ProfilerControl {
         timeHeightView = new TimeHeightViewManager(getViewContext(),
                 new ViewDescriptor("timeheight_of_" + paramName),
                 "showControlLegend=false;wireframe=true;") {
-            public boolean animationOk() {
-                return false;
-            }
-
         };
 
         addViewManager(timeHeightView);
-        timeHeightView.setAnimationStringVisible(false);
         profileDisplay = timeHeightView.getTimeHeightDisplay();
         profileDisplay.setAspect(1.0, .6);
 
@@ -218,6 +213,7 @@ public class WindTimeHeightControl extends ProfilerControl {
         if (wbDisplayable == null) {
             initDisplayables();
         }
+        updateLegendAndList();
 
         return true;
     }
@@ -240,7 +236,7 @@ public class WindTimeHeightControl extends ProfilerControl {
         //    profileDisplay.setDisplayAspect(new double[] { .65, .65, 1.0 });
         //   profileDisplay.setAspect(1.0, 1.0);
         //profileDisplay.setYRange(0,16000);
-        addDisplayMaster(profileDisplay);
+        //addDisplayMaster(profileDisplay);
         profileDisplay.showAxisScales(true);
         xScale = profileDisplay.getXAxisScale();
         xScale.setMinorTickSpacing(3600);
@@ -268,7 +264,8 @@ public class WindTimeHeightControl extends ProfilerControl {
         plotLabel = new JLabel(" ");
         setLabel();
         return GuiUtils.topCenterBottom(plotLabel,
-                                        profileDisplay.getComponent(),
+                                        timeHeightView.getContents(),
+                                        //profileDisplay.getComponent(),
                                         doMakeWidgetComponent());
     }
 

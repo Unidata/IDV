@@ -282,6 +282,8 @@ public class TimeHeightControl extends LineProbeControl {
 
         return GuiUtils.centerBottom(timeHeightView.getContents(),
                                      doMakeWidgetComponent());
+        //return GuiUtils.centerBottom(profileDisplay.getComponent(),
+        //                             doMakeWidgetComponent());
     }
 
 

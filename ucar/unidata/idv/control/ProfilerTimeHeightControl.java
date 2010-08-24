@@ -235,21 +235,6 @@ public class ProfilerTimeHeightControl extends WindTimeHeightControl {
 
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    protected Container doMakeContents()
-            throws VisADException, RemoteException {
-
-        return GuiUtils.centerBottom(timeHeightView.getContents(),
-                                     doMakeWidgetComponent());
-    }
-
 
     /**
      * Add tabs to the properties dialog.
