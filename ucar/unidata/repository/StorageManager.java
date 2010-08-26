@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository;
@@ -107,7 +108,7 @@ public class StorageManager extends RepositoryManager {
     public static final String DIR_PLUGINS = "plugins";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_BACKUPS = "backups";
 
     /** _more_ */
@@ -491,6 +492,22 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
+    public File getUniqueScratchFile(String file) {
+        File f = getScratchFile(file);
+        while (f.exists()) {
+            f = getScratchFile(getRepository().getGUID() + "_" + file);
+        }
+        return f;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     public File getScratchFile(String file) {
         return getTmpDirFile(getScratchDir(), file);
     }
@@ -586,7 +603,7 @@ public class StorageManager extends RepositoryManager {
             File f = new File(logDir);
             IOUtil.makeDirRecursive(f);
             File log4JFile = new File(f + "/" + "log4j.properties");
-            
+
             //For now always write out the log from the jar
             if (true || !log4JFile.exists()) {
                 try {
