@@ -783,6 +783,9 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
 
 
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(group.getType());
+
         if (outputType.equals(OUTPUT_INLINE)) {
             /*
             String wikiTemplate = getWikiText(request, group);
@@ -811,6 +814,15 @@ public class HtmlOutputHandler extends OutputHandler {
         if (outputType.equals(OUTPUT_LINKSXML)) {
             return getLinksXml(request, group);
         }
+
+        if(typeHandler!=null) {
+            Result typeResult = typeHandler.getHtmlDisplay(request, group,
+                                                           subGroups, entries);
+            if (typeResult != null) {
+                return typeResult;
+            }
+        }
+
 
         boolean      showApplet = outputType.equals(OUTPUT_TIMELINE);
 

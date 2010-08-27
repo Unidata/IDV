@@ -385,6 +385,17 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public Result getHtmlDisplay(Request request, 
+                              Group group, List<Group> subGroups,
+                              List<Entry> entries)
+            throws Exception {
+        if(parent!=null) {
+            return parent.getHtmlDisplay(request, group, subGroups, entries);
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *
