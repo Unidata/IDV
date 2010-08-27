@@ -1397,7 +1397,12 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String makeLatLonInput(String arg, String value) {
-        return input(arg, value, attrs(ATTR_SIZE, "5") + id(arg));
+	return makeLatLonInput(arg, value,null);
+    }
+
+
+    public static String makeLatLonInput(String arg, String value,String tip) {
+        return input(arg, value, attrs(ATTR_SIZE, "5") + id(arg) +(tip!=null?title(tip):""));
     }
 
 
@@ -1417,11 +1422,11 @@ public class HtmlUtil {
                                        String west) {
         //TODO: Clean this up
         return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
-               + makeLatLonInput(baseName + "_north", north) + "</td></tr>"
-               + "<tr><td>" + makeLatLonInput(baseName + "_west", west)
-               + "</td><td>" + makeLatLonInput(baseName + "_east", east)
+	    + makeLatLonInput(baseName + "_north", north,"North") + "</td></tr>"
+	    + "<tr><td>" + makeLatLonInput(baseName + "_west", west,"West")
+	    + "</td><td>" + makeLatLonInput(baseName + "_east", east,"East")
                + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
-               + makeLatLonInput(baseName + "_south", south) + "</table>";
+	    + makeLatLonInput(baseName + "_south", south,"South") + "</table>";
     }
 
     /**
