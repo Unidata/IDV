@@ -1991,7 +1991,7 @@ public class PluginManager extends IdvManager {
         }
     }
 
-    private void notifyUser() {
+    protected void notifyUser() {
         if(!getInstallManager().isRestartable()) {
             LogUtil.userMessage("You will need to restart the IDV for this change to take effect");
             return;
