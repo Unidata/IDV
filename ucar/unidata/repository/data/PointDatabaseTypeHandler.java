@@ -503,9 +503,9 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry)
+    public void initializeCopiedEntry(Entry newEntry, Entry oldEntry)
             throws Exception {
-        super.intializeCopiedEntry(newEntry, oldEntry);
+        super.initializeCopiedEntry(newEntry, oldEntry);
 
         //False says don't get the metadata objects from the cache.
         //Create them from the DB
