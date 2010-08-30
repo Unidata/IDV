@@ -145,13 +145,8 @@ public class TimeHeightControl extends LineProbeControl {
 
         timeHeightView = new TimeHeightViewManager(getViewContext(),
                 new ViewDescriptor("timeheight_of_" + paramName),
-                "showControlLegend=false;wireframe=true;") {
-            public boolean animationOk() {
-                return false;
-            }
-
-        };
-        timeHeightView.setAnimationStringVisible(false);
+                "showControlLegend=false;wireframe=true;") {}
+        ;
         profileDisplay = timeHeightView.getTimeHeightDisplay();
         profileDisplay.setAspect(1.0, .6);
 
@@ -180,7 +175,7 @@ public class TimeHeightControl extends LineProbeControl {
         } else {
             dataDisplay = createDataDisplay();
             addDisplayable(dataDisplay, timeHeightView,
-                           FLAG_COLORTABLE | FLAG_DISPLAYUNIT);
+                           getDataDisplayFlags());
         }
 
         if ( !setData(dataChoice)) {
@@ -188,6 +183,14 @@ public class TimeHeightControl extends LineProbeControl {
         }
 
         return true;
+    }
+
+    /**
+     * Get the attribute flags for the data display
+     * @return the flags
+     */
+    protected int getDataDisplayFlags() {
+        return FLAG_COLORTABLE | FLAG_DISPLAYUNIT;
     }
 
     /**
@@ -280,6 +283,7 @@ public class TimeHeightControl extends LineProbeControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
+        // TODO:  This is what should be done - however legends don't show up.
         return GuiUtils.centerBottom(timeHeightView.getContents(),
                                      doMakeWidgetComponent());
         //return GuiUtils.centerBottom(profileDisplay.getComponent(),

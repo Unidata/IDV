@@ -168,6 +168,15 @@ public class FlowTimeHeightControl extends TimeHeightControl implements FlowDisp
 
 
     /**
+     * Get the attribute flags for the data display
+     * @return the flags
+     */
+    protected int getDataDisplayFlags() {
+        // TODO Auto-generated method stub
+        return FLAG_DISPLAYUNIT;
+    }
+
+    /**
      * enable the barb size box
      */
     private void enableBarbSizeBox() {
