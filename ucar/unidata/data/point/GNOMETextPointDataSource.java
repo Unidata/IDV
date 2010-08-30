@@ -24,12 +24,14 @@ package ucar.unidata.data.point;
 import ucar.unidata.data.DataSourceDescriptor;
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import visad.VisADException;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -55,14 +57,15 @@ public class GNOMETextPointDataSource extends TextPointDataSource {
     /** Date line identifier */
     public static final String VALIDFOR = "VALIDFOR:";
 
-    /** Header for the contents 
-    public static final String HEADER =
-        "(index) -> (Time, Longitude, Latitude, LE, Type(Text), "
-        + "Pollutant(Text), Depth, mass, density, age, status(Text))\n"
-        + "Time[colspan=\"2\" fmt=\"HH:mm MM/dd/yyy\"], Longitude[unit=\"degrees_east\"], "
-        + "Latitude[unit=\"degrees_north\"], LE, Type(Text), Pollutant(Text), "
-        + "Depth[unit=\"m\"], mass, density[unit=\"kg/m3\"], "
-        + "age[unit=\"hr\"], status(Text)\n";
+    /**
+     * Header for the contents
+     * public static final String HEADER =
+     *   "(index) -> (Time, Longitude, Latitude, LE, Type(Text), "
+     *   + "Pollutant(Text), Depth, mass, density, age, status(Text))\n"
+     *   + "Time[colspan=\"2\" fmt=\"HH:mm MM/dd/yyy\"], Longitude[unit=\"degrees_east\"], "
+     *   + "Latitude[unit=\"degrees_north\"], LE, Type(Text), Pollutant(Text), "
+     *   + "Depth[unit=\"m\"], mass, density[unit=\"kg/m3\"], "
+     *   + "age[unit=\"hr\"], status(Text)\n";
      */
 
     public static final String HEADER =
@@ -105,8 +108,9 @@ public class GNOMETextPointDataSource extends TextPointDataSource {
     public GNOMETextPointDataSource(DataSourceDescriptor descriptor,
                                     List sources, Hashtable properties)
             throws VisADException {
-        super(descriptor, sources, properties);
+        super(descriptor, makeUniqueList(sources), properties);
     }
+
 
 
     /**
@@ -130,7 +134,27 @@ public class GNOMETextPointDataSource extends TextPointDataSource {
     public GNOMETextPointDataSource(DataSourceDescriptor descriptor,
                                     String source, Hashtable properties)
             throws VisADException {
-        super(descriptor, source, "GNOME Text Point Data", properties);
+        this(descriptor, Misc.newList(new Object[] { source }), properties);
+    }
+
+    /**
+     * Make a unique list of names in case the users selects more than one type for the same
+     * time period
+     *
+     * @param sources list of sources
+     *
+     * @return a unique list of .ms3 files
+     */
+    private static List makeUniqueList(List sources) {
+        List newSources = new ArrayList();
+        for (int i = 0; i < sources.size(); i++) {
+            String originalSource = (String) sources.get(i);
+            String testFile = originalSource.replaceAll("\\.ms.$", ".ms3");
+            if ( !(newSources.contains(testFile))) {
+                newSources.add(testFile);
+            }
+        }
+        return newSources;
     }
 
     /**
