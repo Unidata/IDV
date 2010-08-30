@@ -11504,15 +11504,25 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 String pref = PREF_DISPLAYLIST_TEMPLATE + (haveData
                         ? ".data"
                         : ".nodata");
-                displayListTemplate = getStore().get(pref, (haveData
-                        ? MACRO_SHORTNAME + " - " + MACRO_DISPLAYNAME + " "
-                          + MACRO_TIMESTAMP
-                        : MACRO_DISPLAYNAME));
+                displayListTemplate = getStore().get(pref,
+                        getDefaultDisplayListTemplate());
             }
         }
         return displayListTemplate;
     }
 
+
+    /**
+     * Get the default display list template for this control.  Subclasses can override
+     * @return the default template
+     */
+    protected String getDefaultDisplayListTemplate() {
+
+        return (getShortParamName() != null)  // haveData
+               ? MACRO_SHORTNAME + " - " + MACRO_DISPLAYNAME + " "
+                 + MACRO_TIMESTAMP
+               : MACRO_DISPLAYNAME;
+    }
 
 
     /**

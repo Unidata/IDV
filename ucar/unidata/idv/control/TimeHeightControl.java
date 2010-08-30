@@ -186,6 +186,15 @@ public class TimeHeightControl extends LineProbeControl {
     }
 
     /**
+     * Get the default display list template for this control.  Subclasses can override
+     * @return the default template
+     */
+    protected String getDefaultDisplayListTemplate() {
+        return MACRO_SHORTNAME + " - " + MACRO_POSITION + " "
+               + MACRO_TIMESTAMP;
+    }
+
+    /**
      * Get the attribute flags for the data display
      * @return the flags
      */
