@@ -723,7 +723,9 @@ Since this is confusing and needs more work lets remove this for now
      class="ucar.unidata.idv.control.ProfilerTimeHeightControl"
      label="Time/Height Display"
      displaycategory="Profiler"
-     properties="windowVisible=true;"/>
+     properties="windowVisible=true;">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
 
   <control
      id="profiler_planview"
