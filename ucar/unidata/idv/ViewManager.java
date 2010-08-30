@@ -978,7 +978,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             addRemovable(sideLegend);
         }
         synchronized (legends) {
-            legends.add(sideLegend);
+            if (getShowSideLegend()) {
+                legends.add(sideLegend);
+            }
         }
         sideLegendComponent = getSideComponent(sideLegend.getContents());
         sideLegendContainer = new JPanel(new BorderLayout());
