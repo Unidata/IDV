@@ -494,6 +494,16 @@ public class Entry extends Entity {
         return getTypeHandler().getLabel() + ": " + new Date(startDate);
     }
 
+    public void setLocation(Entry that) {
+        this.north = that.north;
+        this.south = that.south;
+        this.east = that.east;
+        this.west = that.west;
+        this.altitudeTop = that.altitudeTop;
+        this.altitudeBottom = that.altitudeBottom;
+    }
+
+
     public void setLocation(double lat, double lon, double alt) {
         this.north = lat;
         this.south = lat;

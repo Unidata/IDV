@@ -2533,7 +2533,6 @@ return new Result(title, sb);
                 sb.append(header("Please select a destination folder:"));
             }
 
-
             sb.append(request.formPost(getRepository().URL_ENTRY_COPY));
             sb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
             String select =
@@ -2782,7 +2781,8 @@ return new Result(title, sb);
                                    oldEntry.getEndDate(),
                                    oldEntry.getValues());
 
-                typeHandler.intializeCopiedEntry(newEntry, oldEntry);
+                newEntry.setLocation(oldEntry);
+                typeHandler.initializeCopiedEntry(newEntry, oldEntry);
 
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
                 for (Metadata oldMetadata :
@@ -5256,7 +5256,7 @@ return new Result(title, sb);
         int       batchCnt       = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
-
+            System.err.println ("Entry:" + entry.getNorth());
             // if (entry.isCollectionGroup()) {
             //                getTopGroup()s = null;
             //                }

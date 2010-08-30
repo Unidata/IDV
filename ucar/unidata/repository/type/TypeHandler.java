@@ -1514,10 +1514,10 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry)
+    public void initializeCopiedEntry(Entry newEntry, Entry oldEntry)
             throws Exception {
         if(parent!=null) {
-            parent.intializeCopiedEntry(newEntry, oldEntry);
+            parent.initializeCopiedEntry(newEntry, oldEntry);
         }
     }
 
