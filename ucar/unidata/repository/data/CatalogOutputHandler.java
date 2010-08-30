@@ -360,6 +360,7 @@ public class CatalogOutputHandler extends OutputHandler {
             topDataset = XmlUtil.create(doc, CatalogUtil.TAG_DATASET, root,
                                         new String[] { CatalogUtil.ATTR_NAME,
                     title });
+            addServices(group, request, catalogInfo, topDataset);
             addMetadata(request, group, catalogInfo, topDataset);
             int cnt  = subGroups.size() + entries.size();
             int max  = request.get(ARG_MAX, DB_MAX_ROWS);
