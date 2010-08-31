@@ -87,6 +87,8 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
      * @return The  non-local user that matches the given id or null
      */
     public User findUser(Repository repository, String userId) {
+
+
         //Create the xxx user
         debug("findUser: " + userId);
         if (userId.equals("xxx")) {
@@ -121,6 +123,14 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
     public User authenticateUser(Repository repository, Request request,
                                  StringBuffer extraLoginForm, String userId,
                                  String password) {
+        /** 
+            This is how to find the ldapadmin
+            LdapAdminHandler ldapAdmin = LdapAdminHandler.getLdapHandler(repository);
+            //            properties:
+            ldapAdmin.getServer(),             ldapAdmin.getPort(), etc
+        */
+
+
         debug("authenticateUser: " + userId);
         //This example will create a User for userid=xxx password=yyy
         if (userId.equals("xxx") && password.equals("yyy")) {
