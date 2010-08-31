@@ -30,16 +30,15 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public abstract class AdminHandlerImpl implements AdminHandler {
-
-    /** _more_          */
-    private Repository repository;
+public abstract class AdminHandlerImpl extends RepositoryManager implements AdminHandler {
 
 
     /**
      * _more_
      */
-    public AdminHandlerImpl() {}
+    public AdminHandlerImpl() {
+        super(null);
+    }
 
     /**
      * _more_
@@ -69,6 +68,8 @@ public abstract class AdminHandlerImpl implements AdminHandler {
      * @param sb _more_
      */
     public void addToSettingsForm(String blockId, StringBuffer sb) {}
+
+    public void applySettingsForm(Request request) throws Exception {}
 
     /**
      * _more_

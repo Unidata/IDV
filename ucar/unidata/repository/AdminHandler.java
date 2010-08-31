@@ -56,6 +56,9 @@ public interface AdminHandler {
      */
     public void addToSettingsForm(String blockId, StringBuffer sb);
 
+
+    public void applySettingsForm(Request request) throws Exception;
+
     /**
      * _more_
      *

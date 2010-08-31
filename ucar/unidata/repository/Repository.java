@@ -1013,9 +1013,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         for (Class adminHandlerClass : adminHandlerClasses) {
             AdminHandler adminHandler =
                 (AdminHandler) adminHandlerClass.newInstance();
-            adminHandler.setRepository(Repository.this);
             getAdmin().addAdminHandler(adminHandler);
         }
+        //        getAdmin().addAdminHandler(new LdapAdminHandler());
 
 
         //Load in any other sql files from the command line
@@ -1682,6 +1682,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (UserAuthenticator.class.isAssignableFrom(c)) {
                 getLogManager().logInfo("Adding authenticator:"
                                         + c.getName());
+                System.err.println("**** adding user auth");
                 getUserManager().addUserAuthenticator(
                     (UserAuthenticator) c.newInstance());
             } else if (PageDecorator.class.isAssignableFrom(c)) {
@@ -3618,7 +3619,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void writeGlobal(String name, boolean value) throws Exception {
+    public void writeGlobal(String name, boolean value) throws Exception {
         writeGlobal(name, BLANK + value);
     }
 
@@ -3630,7 +3631,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void writeGlobal(Request request, String propName)
+    public void writeGlobal(Request request, String propName)
             throws Exception {
         writeGlobal(request, propName, false);
     }
@@ -3646,7 +3647,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void writeGlobal(Request request, String propName,
+    public void writeGlobal(Request request, String propName,
                                boolean deleteIfNull)
             throws Exception {
         String value = request.getString(propName, getProperty(propName, ""));
@@ -3669,7 +3670,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void writeGlobal(String name, String value) throws Exception {
+    public void writeGlobal(String name, String value) throws Exception {
         getDatabaseManager().delete(Tables.GLOBALS.NAME,
                                     Clause.eq(Tables.GLOBALS.COL_NAME, name));
         getDatabaseManager().executeInsert(Tables.GLOBALS.INSERT,
@@ -3806,7 +3807,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String prop = outputType.getId() + ".ok";
         writeGlobal(prop, "" + ok);
     }
-
 
 
     /**

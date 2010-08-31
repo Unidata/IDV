@@ -105,6 +105,13 @@ public class UserManager extends RepositoryManager {
     public static final String ACTIVITY_LOGOUT = "logout";
     public static final String ACTIVITY_PASSWORD_CHANGE = "password.change";
 
+    /** _more_ */
+    private static final String USER_DEFAULT = "default";
+
+    /** _more_ */
+    public static final String USER_ANONYMOUS = "anonymous";
+
+
     /** _More_ */
     protected List<RequestUrl> userUrls =
         RepositoryUtil.toList(new RequestUrl[] {
@@ -447,11 +454,6 @@ public class UserManager extends RepositoryManager {
         return sb.toString();
     }
 
-    /** _more_ */
-    private static final String USER_DEFAULT = "default";
-
-    /** _more_ */
-    public static final String USER_ANONYMOUS = "anonymous";
 
     /**
      * _more_

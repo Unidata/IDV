@@ -18,7 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.auth;
+package ucar.unidata.repository.examples;
 
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;

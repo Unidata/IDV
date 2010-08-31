@@ -214,7 +214,7 @@ public class Admin extends RepositoryManager {
      *
      * @return _more_
      */
-    protected AdminHandler getAdminHandler(String id) {
+    public AdminHandler getAdminHandler(String id) {
         return adminHandlerMap.get(id);
     }
 
@@ -223,13 +223,14 @@ public class Admin extends RepositoryManager {
      *
      * @param adminHandler _more_
      */
-    public void addAdminHandler(AdminHandler adminHandler) {
+    public void addAdminHandler(AdminHandler adminHandler) throws Exception {
         if (adminHandlers.contains(adminHandler)) {
             return;
         }
         if (adminHandlerMap.get(adminHandler.getId()) != null) {
             return;
         }
+        adminHandler.setRepository(getRepository());
         adminHandlers.add(adminHandler);
         adminHandlerMap.put(adminHandler.getId(), adminHandler);
         List<RequestUrl> urls = adminHandler.getUrls();
@@ -268,15 +269,6 @@ public class Admin extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
 
     /**
      * _more_
@@ -1297,6 +1289,8 @@ public class Admin extends RepositoryManager {
         getRepository().getRegistryManager().applyAdminConfig(request);
 
 
+
+
         getRepository().writeGlobal(request, PROP_ADMIN_EMAIL, true);
         getRepository().writeGlobal(request, PROP_ADMIN_SMTP, true);
         getRepository().writeGlobal(request, PROP_LOGO_URL, true);
@@ -1383,6 +1377,10 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_ACCESS_NOBOTS,
                                     request.get(PROP_ACCESS_NOBOTS, false));
 
+
+        for (AdminHandler adminHandler : adminHandlers) {
+            adminHandler.applySettingsForm(request);
+        }
 
         return new Result(request.url(URL_ADMIN_SETTINGS));
     }
