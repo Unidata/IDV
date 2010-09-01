@@ -135,9 +135,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TYPE_VARIABLES = "thredds.variables";
 
-
     /** _more_ */
     public static final String TYPE_VARIABLE = "thredds.variable";
+
+    public static final String TYPE_STANDARDNAME = "thredds.standardname";
 
     /** _more_ */
     public static final String TYPE_PUBLISHER = "thredds.publisher";
@@ -613,7 +614,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         try {
                             metadata =
                                 new Metadata(getRepository().getGUID(),
-                                             entry.getId(), TYPE_VARIABLE,
+                                             entry.getId(), TYPE_STANDARDNAME,
                                              DFLT_INHERITED, varName,
                                              var.getName(),
                                              var.getUnitsString(),

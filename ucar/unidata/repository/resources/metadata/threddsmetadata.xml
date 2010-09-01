@@ -122,6 +122,31 @@
 
     </type>
 
+
+
+    <type
+       displaycategory="Standard Names"
+       name="Standard name"
+       id="thredds.standardname" searchable="true"   browsable="true">
+      <template type="html"><![CDATA[${Variable} (${Units}) ${Long_Name}]]></template>
+      <element name="Variable" />
+      <element name="Long Name" />
+      <element         columns="10"         name="Units"/>
+      <template type="dif"><![CDATA[
+<Parameters>
+<Category></Category>
+<Topic></Topic>
+<Term></Term>
+<Variable_Level_1>${Variable}</Variable_Level_1>
+<Variable_Level_2>${Long_Name}</Variable_Level_2>
+<Variable_Level_3></Variable_Level_3>
+<Detailed_Variable>${Long_Name} Units:${Units}</Detailed_Variable>
+</Parameters> 
+]]></template>
+
+
+    </type>
+
     <type name="Icon" id="thredds.icon">
       <element name="URL" datatype="url"/>
       <template type="thredds"><![CDATA[<documentation xlink:href="${URL}" xlink:title="icon"/>]]></template>
