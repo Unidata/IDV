@@ -128,10 +128,11 @@
        displaycategory="Standard Names"
        name="Standard name"
        id="thredds.standardname" searchable="true"   browsable="true">
-      <template type="html"><![CDATA[${Variable} (${Units}) ${Long_Name}]]></template>
       <element name="Variable" />
       <element name="Long Name" />
-      <element         columns="10"         name="Units"/>
+      <element columns="10"         name="Units"/>
+      <template type="html"><![CDATA[${Variable} (${Units}) ${Long_Name}]]></template>
+      <template type="thredds"><![CDATA[<property name="${Name}" value="${Value}"/>]]></template>
       <template type="dif"><![CDATA[
 <Parameters>
 <Category></Category>

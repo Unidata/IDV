@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+  <handler category="NOAA Metadata">
+
+<!-- This is how you define a new metadata element
+name is the human readable name
+id is the unique id (this is what is used in testmetadata.properties)
+Under type is any number of elements. Here we only have one - the model name
+The template tags allow you to define templates that determine how
+this metadata element is show in html, thredds, dif, etc.
+The templates can contain macros that reference the element names
+-->
+
+    <type
+       name="IOOS Model"
+       id="netcdf.ioosmodel" searchable="true"   browsable="true">
+      <element name="Model" />
+      <template type="html"><![CDATA[${Model}]]></template>
+      <template type="thredds"><![CDATA[<property name="IOOSMODEL" value="${Model}"/>]]></template>
+      </type>
+  </handler>
+
+
+</metadata>
