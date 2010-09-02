@@ -36,6 +36,36 @@ import java.util.List;
  */
 public abstract class UserAuthenticatorImpl implements UserAuthenticator {
 
+    private Repository repository;
+
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
+    }
+
+    public Repository getRepository() {
+        return this.repository;
+    }
+
+    public String getProperty(String name, String defaultValue) {
+        return repository.getProperty(name, defaultValue);
+    }
+
+    public void debug(String msg) {
+        System.err.println("UserAuthenticator: " + msg);
+    }
+
+
+
+    public void logError(String message, Exception exc) {
+        if(repository!=null) 
+            repository.getLogManager().logError(message, exc);
+        else {
+            System.err.println("ERROR:" + message);
+            exc.printStackTrace();
+        }
+    }
+
     /**
      * this gets called when we want to just get a User object from the ID.
      * return null if user is unknown

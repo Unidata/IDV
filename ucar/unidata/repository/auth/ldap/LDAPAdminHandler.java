@@ -21,7 +21,7 @@ public class LDAPAdminHandler extends AdminHandlerImpl {
 
 
     /** ??? This is the default ldap port       */
-    public static final int DEFAULT_PORT = 8080;
+    public static final int DEFAULT_PORT = 389;
 
     /** property id */
     public static final String LDAP_HANDLER_ID = "ldaphandler";

@@ -1,35 +1,24 @@
 /*
- * Copyright 2010 ramadda.org
- * 
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or (at
- * your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
- * General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Copyright 2010 ramadda.org 
  */
 
 package ucar.unidata.repository.auth.ldap;
 
 
-import javax.naming.NamingException;
+import ucar.unidata.repository.Repository;
+import ucar.unidata.repository.Request;
 import ucar.unidata.repository.auth.User;
 import ucar.unidata.repository.auth.UserAuthenticator;
 import ucar.unidata.repository.auth.UserAuthenticatorImpl;
-import ucar.unidata.repository.Repository;
-import ucar.unidata.repository.Request;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+
+import javax.naming.NamingException;
 
 
 /**
@@ -41,33 +30,53 @@ import java.util.List;
  */
 public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
 
-    private static final String GROUP_REPOSADMIN = "reposAdmin";
-    private static final String ATTR_GIVENNAME = "givenName";
+    /** property name          */
+    private static final String PROP_GROUP_ADMIN = "ldap.group.admin";
 
+    /** property name          */
+    private static final String PROP_ATTR_GIVENNAME = "ldap.attr.givenname";
 
-    // Manager for Ldap conection
+    /** property name          */
+    private static final String PROP_ATTR_SURNAME = "ldap.attr.surname";
+
+    /** default value for admin role          */
+    private static final String DFLT_GROUP_ADMIN = "reposAdmin";
+
+    /** default value for given name          */
+    private static final String DFLT_ATTR_GIVENNAME = "givenName";
+
+    /** default value for  surname         */
+    private static final String DFLT_ATTR_SURNAME = "sn";
+
+    /** Manager for Ldap conection        */
     private LDAPManager manager = null;
 
     /**
-     * constructor. 
+     * constructor.
      */
     public LDAPUserAuthenticator() {
         debug("created");
 
     }
 
+    /**
+     * If not already created create and return the LDAPManager. If manager fails then log the error
+     * and return null
+     *
+     * @return LDAPManager
+     */
     private LDAPManager getManager() {
-        if(manager == null) {
+        if (manager == null) {
             // Conection instance with ldap server. It's necessary the admin user and password.
             try {
-                LDAPAdminHandler adminHandler  = LDAPAdminHandler.getLDAPHandler(getRepository());
-                manager = LDAPManager.getInstance(
-                                                  adminHandler.getServer(),
-                                                  adminHandler.getPort(),
-                                                  adminHandler.getUserDirectory(),
-                                                  adminHandler.getGroupDirectory(),
-                                                  adminHandler.getAdminID(),
-                                                  adminHandler.getPassword());
+                LDAPAdminHandler adminHandler =
+                    LDAPAdminHandler.getLDAPHandler(getRepository());
+                manager = LDAPManager.getInstance(adminHandler.getServer(),
+                        adminHandler.getPort(),
+                        adminHandler.getUserDirectory(),
+                        adminHandler.getGroupDirectory(),
+                        adminHandler.getAdminID(),
+                        adminHandler.getPassword());
             } catch (Exception e) {
                 logError("LDAP Error: creating LDAPManager", e);
             }
@@ -75,6 +84,14 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
         return manager;
     }
 
+    /**
+     * do we have a valid manager
+     *
+     * @return has valid manager
+     */
+    public boolean hasManager() {
+        return getManager() != null;
+    }
 
     /**
      * this gets called when we want to  autheticate the given user/password
@@ -92,8 +109,11 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
                                  StringBuffer extraLoginForm, String userId,
                                  String password) {
         debug("authenticateUser: " + userId);
-        if (getManager().isValidUser(userId,password)){
-            return findUser(repository,userId);
+        if ( !hasManager()) {
+            return null;
+        }
+        if (getManager().isValidUser(userId, password)) {
+            return findUser(repository, userId);
         } else {
             return null;
         }
@@ -103,13 +123,16 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
      * this gets called when we want to just get a User object from the ID.
      * return null if user is unknown
      *
-     * @param repository the repository. Note: you can access properties with repository.getProperty("property name");
+     * @param repository the repository. 
      * @param userId The user to find
      *
      * @return The  non-local user that matches the given id or null
      */
     @Override
     public User findUser(Repository repository, String userId) {
+        if ( !hasManager()) {
+            return null;
+        }
         try {
             debug("findUser: " + userId);
             debug("creating local user");
@@ -117,7 +140,7 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
             // List of groups the user belongs
             List groupList = new LinkedList();
             // Group name
-            String group =  new String();
+            String group = new String();
             // List of user roles, defined by the user groups list
             ArrayList<String> roles = new ArrayList<String>();
 
@@ -128,24 +151,35 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
 
             userAttr = getManager().getUserAttributes(userId);
 
+            /*
+              NOTE: I moved the names of the givenname, admin role, etc, into the ldap.properties
+              file. The getProperty method looks up those values, if they are defined then return the value
+              else return the DFLT value
+            */
+
+
             // Attribute givenName only have one value
-            attrValues = (ArrayList) userAttr.get(ATTR_GIVENNAME);
+            attrValues =
+                (ArrayList) userAttr.get(getProperty(PROP_ATTR_GIVENNAME,
+                    DFLT_ATTR_GIVENNAME));
             String userName = (String) attrValues.get(0);
             // Attribute sn only have one value
-            attrValues = (ArrayList) userAttr.get("sn");
+            attrValues =
+                (ArrayList) userAttr.get(getProperty(PROP_ATTR_SURNAME,
+                    DFLT_ATTR_SURNAME));
             String userSurname = (String) attrValues.get(0);
 
             // Create the user with admin priviligies if user is in group reposAdmin
-            User user = new User(userId, userName + " " + userSurname ,getManager().userInGroup(userId, GROUP_REPOSADMIN)));
+            String adminGroup = getProperty(PROP_GROUP_ADMIN, DFLT_GROUP_ADMIN);
+            boolean isAdmin = getManager().userInGroup(userId,adminGroup);
+            User user = new User(userId, userName + " " + userSurname, isAdmin);
 
             groupList = getManager().getGroups(userName);
-            List groups = new ArrayList(groupList);
-
-            Iterator iter = groups.iterator();
-
-            while (iter.hasNext()){
-              group = (String) iter.next();
-              roles.add(group);
+            List     groups = new ArrayList(groupList);
+            Iterator iter   = groups.iterator();
+            while (iter.hasNext()) {
+                group = (String) iter.next();
+                roles.add(group);
             }
             user.setRoles(roles);
             return user;
@@ -167,8 +201,6 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
     @Override
     public List<String> getAllRoles() {
         ArrayList<String> roles = new ArrayList<String>();
-        roles.add("some role1");
-        roles.add("some role2");
         return roles;
     }
 

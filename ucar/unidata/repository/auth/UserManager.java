@@ -155,6 +155,9 @@ public class UserManager extends RepositoryManager {
      */
     public void addUserAuthenticator(UserAuthenticator userAuthenticator) {
         userAuthenticators.add(userAuthenticator);
+        if(userAuthenticator instanceof UserAuthenticatorImpl) {
+            ((UserAuthenticatorImpl)userAuthenticator).setRepository(getRepository());
+        }
     }
 
 
