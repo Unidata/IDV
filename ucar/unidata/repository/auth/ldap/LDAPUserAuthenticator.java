@@ -51,6 +51,7 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
     /** Manager for Ldap conection        */
     private LDAPManager manager = null;
 
+    private int lastLDAPServerVersion = -1;
     /**
      * constructor.
      */
@@ -66,11 +67,16 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
      * @return LDAPManager
      */
     private LDAPManager getManager() {
-        if (manager == null) {
-            // Conection instance with ldap server. It's necessary the admin user and password.
+        LDAPAdminHandler adminHandler =
+            LDAPAdminHandler.getLDAPHandler(getRepository());
+
+        //Check if the admin handler has changed its state
+        if (lastLDAPServerVersion!=adminHandler.getVersion() ||
+            manager == null) {
+            //Connection instance with ldap server. 
+            //It's necessary the admin user and password.
             try {
-                LDAPAdminHandler adminHandler =
-                    LDAPAdminHandler.getLDAPHandler(getRepository());
+                lastLDAPServerVersion=adminHandler.getVersion();
                 manager = LDAPManager.getInstance(adminHandler.getServer(),
                         adminHandler.getPort(),
                         adminHandler.getUserDirectory(),

@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class LDAPAdminHandler extends AdminHandlerImpl {
 
+    private int version = 0;
 
     /** ??? This is the default ldap port       */
     public static final int DEFAULT_PORT = 389;
@@ -153,6 +154,14 @@ public class LDAPAdminHandler extends AdminHandlerImpl {
     }
 
     /**
+     * Returns a integer timestamp to indicate whether anything has changed
+     * since the last access to the server info
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    /**
      * apply the form submit
      *
      * @param request the request
@@ -160,6 +169,7 @@ public class LDAPAdminHandler extends AdminHandlerImpl {
      * @throws Exception On badness
      */
     public void applySettingsForm(Request request) throws Exception {
+        version++;
         for (int i = 0; i < PROPERTY_IDS.length; i++) {
             String prop  = PROPERTY_IDS[i];
             String value = request.getString(PROPERTY_IDS[i], "");

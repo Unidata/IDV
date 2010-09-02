@@ -552,7 +552,10 @@
             jarfile="${jars_dest}/ldapplugin.jar">
             <include name="ucar/unidata/repository/auth/ldap/*.class"/> 
          </jar>
+    </target>
 
+
+    <target name="ldapplugininstall" depends="ldapplugin">
         <copy overwrite="true"  todir="${user.home}/.unidata/repository/plugins">
              <fileset file="${jars_dest}/ldapplugin.jar"/>
         </copy>
