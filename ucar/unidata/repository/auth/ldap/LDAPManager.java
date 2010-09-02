@@ -41,7 +41,9 @@
  SUCH DAMAGE.
 
  */
-package ldap;
+//jeffmc: change the package name to a ramadda package
+//package ldap;
+package ucar.unidata.repository.auth.ldap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,14 +143,12 @@ public class LDAPManager {
 
     public static LDAPManager getInstance(String hostname, int port)
         throws NamingException {
-
-        return getInstance(hostname, port, null, null);
+        return getInstance(hostname, port, null, null,null,null);
     }
 
     public static LDAPManager getInstance(String hostname)
         throws NamingException {
-
-        return getInstance(hostname, DEFAULT_PORT, null, null);
+        return getInstance(hostname, DEFAULT_PORT, null, null,null, null);
     }
 
     public boolean isValidUser(String username, String password) {

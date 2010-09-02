@@ -1,7 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+ * Copyright 2010 ramadda.org
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -18,11 +16,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.auth;
+package ucar.unidata.repository.auth.ldap;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.naming.NamingException;
+import ucar.unidata.repository.auth.User;
+import ucar.unidata.repository.auth.UserAuthenticator;
+import ucar.unidata.repository.auth.UserAuthenticatorImpl;
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
 import java.util.ArrayList;
@@ -33,34 +33,17 @@ import java.util.List;
 
 
 /**
- * This is an example of an implementation of the UserAuthenticator interface.
- * This allows one to plugin their own user authentication. To use this make your 
- * own class just like this one and implement the below methods. Put the compiled .class
- * files into your RAMADDA home plugins directory and restart RAMADDA. (Or make a jar file of
- * the classes and put the jar in the plugins dir.). RAMADDA will instantiate of of these
- * classes and use it to do user authentication and management.
+ * This is a user authenticator to implement LDAP authentication
  *
- * The way this works is that if ramadda sees a .class file in the plugins directory 
- * (or in a jar in the plugins dir)
- * it will load the class at runtime. If the class is an instanceof UserAuthenticator interface
- * then ramadda will instantiate a version of this class and use it (in UserManager) to
- * do authentication. When authenticating ramadda first looks at its own user database
- * If the user is there then it autheticates normally. If not then it defers to the UserAuthenticator
- * So you will at least need to create one admin user account in ramadda that is separate
- * from the external authenication
- * 
- * To compile this: in the main repository src directory (e.g., ../) you can run:<pre>
- * ant userauthenticator
- *</pre>
  *
- * This will compile this class, make a userauthenticator.jar and echo a message of
- * where the jar is (../../../../lib/userauthenticator.jar) and where to put it
- *
- * This example authenticator handles a user with id=xxx and password=yyy
- *
- * @author Jeff McWhirter
+ * @author Kristian Sebastián Blalid Coastal Ocean Observing and Forecast System, Balearic Islands ICTS
+ * @autho Jeff McWhirter ramadda.org
  */
-public class TestUserAuthenticator extends UserAuthenticatorImpl {
+public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
+
+    private static final String GROUP_REPOSADMIN = "reposAdmin";
+    private static final String ATTR_GIVENNAME = "givenName";
+
 
     // Manager for Ldap conection
     private LDAPManager manager = null;
@@ -69,23 +52,27 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
      * constructor. 
      */
     public LDAPUserAuthenticator() {
-        
         debug("created");
-
-        // Conection instance with ldap server. It's necessary the admin user and password.
-        try{
-            manager = LDAPManager.getInstance(
-                    "172.16.135.62", 389,
-                    "ou=Users,dc=socib,dc=es", "ou=Groups,dc=socib,dc=es",
-                    "cn=admin,dc=socib,dc=es","oceanbit2009");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
-    public void debug(String msg) {
-        System.err.println("TestUserAuthenticator: " + msg);
+    private LDAPManager getManager() {
+        if(manager == null) {
+            // Conection instance with ldap server. It's necessary the admin user and password.
+            try {
+                LDAPAdminHandler adminHandler  = LDAPAdminHandler.getLDAPHandler(getRepository());
+                manager = LDAPManager.getInstance(
+                                                  adminHandler.getServer(),
+                                                  adminHandler.getPort(),
+                                                  adminHandler.getUserDirectory(),
+                                                  adminHandler.getGroupDirectory(),
+                                                  adminHandler.getAdminID(),
+                                                  adminHandler.getPassword());
+            } catch (Exception e) {
+                logError("LDAP Error: creating LDAPManager", e);
+            }
+        }
+        return manager;
     }
 
 
@@ -105,8 +92,7 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
                                  StringBuffer extraLoginForm, String userId,
                                  String password) {
         debug("authenticateUser: " + userId);
-
-        if (manager.isValidUser(userId,password)){
+        if (getManager().isValidUser(userId,password)){
             return findUser(repository,userId);
         } else {
             return null;
@@ -140,19 +126,19 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
             // List of attribute values
             List attrValues = new ArrayList();
 
-            userAttr = manager.getUserAttributes(userId);
+            userAttr = getManager().getUserAttributes(userId);
 
             // Attribute givenName only have one value
-            attrValues = (ArrayList) userAttr.get("givenName");
+            attrValues = (ArrayList) userAttr.get(ATTR_GIVENNAME);
             String userName = (String) attrValues.get(0);
             // Attribute sn only have one value
             attrValues = (ArrayList) userAttr.get("sn");
             String userSurname = (String) attrValues.get(0);
 
             // Create the user with admin priviligies if user is in group reposAdmin
-            User user = new User(userId, userName + " " + userSurname ,manager.userInGroup(userId, "reposAdmin"));
+            User user = new User(userId, userName + " " + userSurname ,getManager().userInGroup(userId, GROUP_REPOSADMIN)));
 
-            groupList = manager.getGroups(userName);
+            groupList = getManager().getGroups(userName);
             List groups = new ArrayList(groupList);
 
             Iterator iter = groups.iterator();
@@ -165,7 +151,7 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
             return user;
 
         } catch (NamingException ex) {
-            Logger.getLogger(TestUserAuthenticator.class.getName()).log(Level.SEVERE, null, ex);
+            logError("LDAP Error: finding user", ex);
             return null;
         }
     }

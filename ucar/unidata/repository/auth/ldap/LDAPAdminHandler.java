@@ -2,7 +2,7 @@
  * Copyright 2010 ramadda.org 
  */
 
-package ucar.unidata.repository.examples;
+package ucar.unidata.repository.auth.ldap;
 
 
 import ucar.unidata.repository.*;
@@ -17,7 +17,7 @@ import java.util.List;
  * And example class to add ldap configuration options to the admin screen
  *
  */
-public class LdapAdminHandler extends AdminHandlerImpl {
+public class LDAPAdminHandler extends AdminHandlerImpl {
 
 
     /** ??? This is the default ldap port       */
@@ -82,7 +82,7 @@ public class LdapAdminHandler extends AdminHandlerImpl {
     /**
      * ctor. The repository gets set after the ctor
      */
-    public LdapAdminHandler() {}
+    public LDAPAdminHandler() {}
 
 
     /**
@@ -92,8 +92,8 @@ public class LdapAdminHandler extends AdminHandlerImpl {
      *
      * @return this object
      */
-    public static LdapAdminHandler getLdapHandler(Repository repository) {
-        return (LdapAdminHandler) repository.getAdmin().getAdminHandler(
+    public static LDAPAdminHandler getLDAPHandler(Repository repository) {
+        return (LDAPAdminHandler) repository.getAdmin().getAdminHandler(
             LDAP_HANDLER_ID);
     }
 
