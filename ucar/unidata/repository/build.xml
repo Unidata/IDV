@@ -8,8 +8,8 @@
        <tstamp>
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
-        <property  name="version" value="1.1"/>
-        <property  name="_version" value="1_1"/>
+        <property  name="version" value="1.2"/>
+        <property  name="_version" value="1_2"/>
         <property name="srcreleasedir" value="repositorysrc${_version}" />
         <property  name="build.sysclasspath" value="ignore"/>
         <property name="srcdir" value="${basedir}"/>
@@ -526,5 +526,38 @@
         <echo message="Copy the jar to &lt;ramadda home&gt;/plugins"/>
 
      </target>
+
+
+    <target name="ldapplugin" depends="init,clean">
+        <javac
+            verbose="false"
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+            fork="true"
+            memoryMaximumSize="256m"
+            target="${javatarget}"
+        >
+        <include name="ucar/unidata/repository/auth/ldap/*.java"/>
+        </javac>
+        <jar 
+            basedir="${compiledir}"
+            update="false"
+            compress="true"
+            jarfile="${jars_dest}/ldapplugin.jar">
+            <include name="ucar/unidata/repository/auth/ldap/*.class"/> 
+         </jar>
+
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="${jars_dest}/ldapplugin.jar"/>
+        </copy>
+    </target>
+
+
 
 </project>
