@@ -482,7 +482,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
 
         Date now = new Date();
         entry.initEntry(name, "", (Group) parentEntry,
-                        getUserManager().localFileUser, resource, "",
+                        getUserManager().getLocalFileUser(), resource, "",
                         now.getTime(), now.getTime(), now.getTime(), now.getTime(), null);
         return entry;
     }

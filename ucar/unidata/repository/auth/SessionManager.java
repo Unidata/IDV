@@ -396,13 +396,11 @@ public class SessionManager extends RepositoryManager {
                 throw new IllegalArgumentException(msgLabel("Unknown user")
                         + userId);
             }
-            if ( !user.getPassword().equals(
-                    getUserManager().hashPassword(password))) {
+            if (!getUserManager().isPasswordValid(user, password)) {
                 throw new IllegalArgumentException(msg("Incorrect password"));
             }
             setUserSession(request, user);
         }
-
 
         //Check for basic auth
         if (user == null) {
@@ -425,8 +423,7 @@ public class SessionManager extends RepositoryManager {
                         if (user == null) {
                             //                            throw new AccessException(
                             //                                msgLabel("Unknown user") + toks[0],request);
-                        } else if ( !user.getPassword().equals(
-                                getUserManager().hashPassword(toks[1]))) {
+                        } else if (!getUserManager().isPasswordValid(user, toks[1])) {
                             //                            throw new AccessException(
                             //                                msg("Incorrect password"),request);
                             user = null;
@@ -448,7 +445,7 @@ public class SessionManager extends RepositoryManager {
                     if (requestIp.matches(ip)) {
                         user = getUserManager().findUser(userName, false);
                         if (user == null) {
-                            user = new User(userName, false);
+                            user = new User(userName);
                             getUserManager().makeOrUpdateUser(user, false);
                         }
                     }

@@ -825,7 +825,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 i++;
             } else if (args[i].equals("-admin")) {
                 User user = new User(args[i + 1], true);
-                user.setPassword(UserManager.hashPassword(args[i + 2]));
+                user.setPasswords(args[i + 2], UserManager.hashPassword(args[i + 2]));
                 cmdLineUsers.add(user);
                 i += 2;
             } else if (args[i].equals("-port")) {
@@ -997,10 +997,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         createTypeHandlers();
-        getUserManager().makeUserIfNeeded(new User("default", "Default User",
-                false));
-        getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
-                false));
+
 
 
         readGlobals();

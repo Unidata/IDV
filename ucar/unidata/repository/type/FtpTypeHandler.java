@@ -725,7 +725,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
             }
             resource.setFileSize(ftpFile.getSize());
         }
-        entry.initEntry(name, "", parent, getUserManager().localFileUser,
+        entry.initEntry(name, "", parent, getUserManager().getLocalFileUser(),
                         resource, "", dttm, dttm, dttm, dttm, null);
 
 

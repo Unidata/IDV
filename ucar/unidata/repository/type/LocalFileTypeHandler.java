@@ -459,7 +459,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                     false, false);
         }
 
-        entry.initEntry(name, "", parent, getUserManager().localFileUser,
+        entry.initEntry(name, "", parent, getUserManager().getLocalFileUser(),
                         new Resource(targetFile, (targetFile.isDirectory()
                 ? Resource.TYPE_LOCAL_DIRECTORY
                 : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),

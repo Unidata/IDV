@@ -16,93 +16,81 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.auth;
 
-
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.database.*;
-
-
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
+
 import ucar.unidata.sql.Clause;
-
-
 import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.util.DateUtil;
 
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.HttpServer;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-import java.io.File;
-
 
 import java.io.UnsupportedEncodingException;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
-
-
 
 
 /**
+ * Handles user stuff
  *
- *
- * @author IDV Development Team
- * @version $Revision: 1.3 $
+ * @author Jeff McWhirter
  */
 public class UserManager extends RepositoryManager {
 
-    /** _more_ */
+    /** output type */
     public static final OutputType OUTPUT_CART_ADD =
-        new OutputType("Add to Cart", "user.cart.add", OutputType.TYPE_FILE, "",
-                       ICON_CART_ADD);
+        new OutputType("Add to Cart", "user.cart.add", OutputType.TYPE_FILE,
+                       "", ICON_CART_ADD);
 
+    /** output type          */
     public static final OutputType OUTPUT_CART_REMOVE =
-        new OutputType("Remove from Cart", "user.cart.remove", OutputType.TYPE_FILE, "",
-                       ICON_CART_DELETE);
+        new OutputType("Remove from Cart", "user.cart.remove",
+                       OutputType.TYPE_FILE, "", ICON_CART_DELETE);
 
-    /** _more_ */
+    /** output type */
     public static final OutputType OUTPUT_FAVORITE =
         new OutputType("Add as Favorite", "user.addfavorite",
                        OutputType.TYPE_FILE, "", ICON_FAVORITE);
 
-    /** _more_ */
+    /** role */
     public static final String ROLE_ANY = "any";
 
-    /** _more_ */
+    /** role */
     public static final String ROLE_NONE = "none";
 
 
-
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_LOGIN_ALLOWEDIPS =
         "ramadda.login.allowedips";
 
 
+    /** activity type for logging          */
     public static final String ACTIVITY_LOGIN = "login";
+
+    /** activity type for logging          */
     public static final String ACTIVITY_LOGOUT = "logout";
+
+    /** activity type for logging          */
     public static final String ACTIVITY_PASSWORD_CHANGE = "password.change";
 
     /** _more_ */
@@ -111,8 +99,11 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String USER_ANONYMOUS = "anonymous";
 
+    public static final String USER_LOCALFILE = "localuser";
 
-    /** _More_ */
+
+
+    /** urls to use when the user is logged in */
     protected List<RequestUrl> userUrls =
         RepositoryUtil.toList(new RequestUrl[] {
             getRepositoryBase().URL_USER_HOME,
@@ -121,35 +112,36 @@ public class UserManager extends RepositoryManager {
             getRepositoryBase().URL_USER_MONITORS });
 
 
-    /** _more_ */
+    /** urls to use with no user */
     protected List<RequestUrl> anonUserUrls =
         RepositoryUtil.toList(new RequestUrl[] {
             getRepositoryBase().URL_USER_CART });
 
 
-
-    /** _more_          */
+    /** List of ip addresses (or prefixes) that control where users can login from */
     private List<String> allowedIpsForLogin;
 
 
     /** _more_ */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
-    /** _more_ */
-    private Hashtable userCart = new Hashtable();
+    /** Holds the users data cart. This of course is ephemeral */
+    private Hashtable<String,List<Entry>> userCart = new Hashtable<String,List<Entry>>();
 
-    /** _more_ */
-    public final User localFileUser = new User("localuser", false);
 
-    /** _more_ */
+
+    /** any external user authenticators from plugins */
     private List<UserAuthenticator> userAuthenticators =
         new ArrayList<UserAuthenticator>();
 
+    /** holds password reset information */
+    private Hashtable<String,PasswordReset> passwordResets = new Hashtable<String,PasswordReset>();
+
 
     /**
-     * _more_
+     * ctor
      *
-     * @param repository _more_
+     * @param repository the repository 
      */
     public UserManager(Repository repository) {
         super(repository);
@@ -157,9 +149,9 @@ public class UserManager extends RepositoryManager {
 
 
     /**
-     * _more_
+     * add the user authenticator
      *
-     * @param userAuthenticator _more_
+     * @param userAuthenticator user authenticator
      */
     public void addUserAuthenticator(UserAuthenticator userAuthenticator) {
         userAuthenticators.add(userAuthenticator);
@@ -168,18 +160,19 @@ public class UserManager extends RepositoryManager {
 
 
     /**
-     * _more_
+     * Is login allowed for the given request. This checks the allowed ip addresses
      *
-     * @param request _more_
+     * @param request the request
      *
-     * @return _more_
+     * @return can do login
      */
     public boolean canDoLogin(Request request) {
         if (allowedIpsForLogin == null) {
             allowedIpsForLogin =
                 StringUtil.split(getProperty(PROP_LOGIN_ALLOWEDIPS, ""), ",",
                                  true, true);
-            getLogManager().logInfoAndPrint("UserManager: allowed ip addresses: " + allowedIpsForLogin);
+            getLogManager().logInfoAndPrint(
+                "UserManager: allowed ip addresses: " + allowedIpsForLogin);
         }
 
         if (allowedIpsForLogin.size() > 0) {
@@ -200,15 +193,18 @@ public class UserManager extends RepositoryManager {
     }
 
 
-
     /**
-     * _more_
+     * initial the list of users from the command line
      *
      *
-     * @param cmdLineUsers _more_
-     * @throws Exception _more_
+     * @param cmdLineUsers users to initialize
+     * @throws Exception On badness
      */
     public void initUsers(List<User> cmdLineUsers) throws Exception {
+        makeUserIfNeeded(new User(USER_DEFAULT, "Default User"));
+        makeUserIfNeeded(new User(USER_ANONYMOUS, "Anonymous"));
+        makeUserIfNeeded(new User(USER_LOCALFILE, "Local Files"));
+
         for (User user : cmdLineUsers) {
             makeOrUpdateUser(user, true);
         }
@@ -224,7 +220,8 @@ public class UserManager extends RepositoryManager {
                 return;
             }
             User user = new User(toks.get(0), "", false);
-            user.setPassword(UserManager.hashPassword(toks.get(1).trim()));
+            String rawPassword = toks.get(1).trim();
+            user.setPasswords(rawPassword, hashPassword(rawPassword));
             makeOrUpdateUser(user, true, true);
             logInfo("Password for:" + user.getId() + " has been updated");
         }
@@ -233,11 +230,11 @@ public class UserManager extends RepositoryManager {
 
 
     /**
-     * _more_
+     * hash the given raw text password for storage into the database
      *
-     * @param password _more_
+     * @param password raw text password
      *
-     * @return _more_
+     * @return hashed password
      */
     public static String hashPassword(String password) {
         try {
@@ -252,37 +249,16 @@ public class UserManager extends RepositoryManager {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @param password _more_
-     *
-     * @return _more_
-     */
-    public static String hashPasswordOld(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA");
-            md.update(password.getBytes("UTF-8"));
-            return XmlUtil.encodeBase64(md.digest()).trim();
-        } catch (NoSuchAlgorithmException nsae) {
-            throw new IllegalStateException(nsae.getMessage());
-        } catch (UnsupportedEncodingException uee) {
-            throw new IllegalStateException(uee.getMessage());
-        }
-    }
-
-
-
 
     /**
      * _more_
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public List<FavoriteEntry> getFavorites(Request request, User user)
             throws Exception {
@@ -303,25 +279,24 @@ public class UserManager extends RepositoryManager {
             ResultSet results;
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
             while ((results = iter.getNext()) != null) {
-                    int    col    = 1;
-                    String id     = results.getString(col++);
-                    String userId = results.getString(col++);
-                    Entry entry = getEntryManager().getEntry(request,
-                                      results.getString(col++));
-                    String name     = results.getString(col++);
-                    String category = results.getString(col++);
-                    if (entry == null) {
-                        getDatabaseManager().delete(
-                            Tables.FAVORITES.NAME,
-                            Clause.and(
-                                Clause.eq(
-                                    Tables.FAVORITES.COL_USER_ID,
-                                    user.getId()), Clause.eq(
-                                        Tables.FAVORITES.COL_ID, id)));
-                        continue;
-                    }
-                    favorites.add(new FavoriteEntry(id, entry, name,
-                            category));
+                int    col    = 1;
+                String id     = results.getString(col++);
+                String userId = results.getString(col++);
+                Entry entry = getEntryManager().getEntry(request,
+                                  results.getString(col++));
+                String name     = results.getString(col++);
+                String category = results.getString(col++);
+                if (entry == null) {
+                    getDatabaseManager().delete(
+                        Tables.FAVORITES.NAME,
+                        Clause.and(
+                            Clause.eq(
+                                Tables.FAVORITES.COL_USER_ID,
+                                user.getId()), Clause.eq(
+                                    Tables.FAVORITES.COL_ID, id)));
+                    continue;
+                }
+                favorites.add(new FavoriteEntry(id, entry, name, category));
             }
             user.setFavorites(favorites);
         }
@@ -333,7 +308,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param user _more_
+     * @param user The user
      *
      * @return _more_
      */
@@ -348,21 +323,10 @@ public class UserManager extends RepositoryManager {
         return user;
     }
 
-
-
-
-
-
-
-
-
-
-
-
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      */
@@ -389,7 +353,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      */
@@ -400,7 +364,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      * @param extra _more_
      *
      * @return _more_
@@ -460,10 +424,9 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User getDefaultUser() throws Exception {
-        makeUserIfNeeded(new User(USER_DEFAULT, "Default User", false));
         return findUser(USER_DEFAULT);
     }
 
@@ -472,10 +435,14 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User getAnonymousUser() throws Exception {
-        return new User();
+        return findUser(USER_ANONYMOUS);
+    }
+
+    public User getLocalFileUser() throws Exception {
+        return findUser(USER_LOCALFILE);
     }
 
 
@@ -486,7 +453,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User findUser(String id) throws Exception {
         return findUser(id, false);
@@ -500,7 +467,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User findUser(String id, boolean userDefaultIfNotFound)
             throws Exception {
@@ -550,7 +517,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User findUserFromEmail(String email) throws Exception {
         Statement statement =
@@ -567,43 +534,66 @@ public class UserManager extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param user _more_
-     * @param updateIfNeeded _more_
-     *
-     * @throws Exception _more_
-     */
-    public void makeOrUpdateUser(User user, boolean updateIfNeeded)
-            throws Exception {
-        makeOrUpdateUser(user, true, false);
-    }
 
     /**
      * _more_
      *
      * @param user _more_
-     * @param updateIfNeeded _more_
-     * @param onlyPassword _more_
+     *
+     * @return _more_
      *
      * @throws Exception _more_
+     */
+    public boolean userExistsInDatabase(User user) throws Exception {
+        return getDatabaseManager().tableContains(user.getId(),
+                Tables.USERS.NAME, Tables.USERS.COL_ID);
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param user The user
+     *
+     * @throws Exception On badness
+     */
+    private User makeUserIfNeeded(User user) throws Exception {
+        if (!userExistsInDatabase(user)) {
+            makeOrUpdateUser(user, true, false);
+        }
+        return user;
+    }
+
+
+    public void makeOrUpdateUser(User user, boolean updateIfNeeded)
+        throws Exception {
+        makeOrUpdateUser(user,  updateIfNeeded, false);
+    }
+
+    /**
+     * _more_
+     *
+     * @param user The user
+     * @param updateIfNeeded _more_
+     *
+     * @throws Exception On badness
      */
     public void makeOrUpdateUser(User user, boolean updateIfNeeded,
                                  boolean onlyPassword)
             throws Exception {
-        if (getDatabaseManager().tableContains(user.getId(),
-                Tables.USERS.NAME, Tables.USERS.COL_ID)) {
-            if ( !updateIfNeeded) {
-                throw new IllegalArgumentException(
-                    msgLabel("Database already contains user")
-                    + user.getId());
+        if (userExistsInDatabase(user)) {
+            if (!updateIfNeeded) {
+                throw new IllegalArgumentException("Database already contains user:"
+                                                   + user.getId());
             }
             if (onlyPassword) {
                 getDatabaseManager().update(
                     Tables.USERS.NAME, Tables.USERS.COL_ID, user.getId(),
                     new String[] { Tables.USERS.COL_PASSWORD },
-                    new Object[] { user.getPassword() });
+                    new Object[] { user.getHashedPassword() });
             } else {
                 getDatabaseManager().update(Tables.USERS.NAME,
                                             Tables.USERS.COL_ID,
@@ -614,7 +604,7 @@ public class UserManager extends RepositoryManager {
                     Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE,
                     Tables.USERS.COL_ISGUEST
                 }, new Object[] {
-                    user.getName(), user.getPassword(), user.getEmail(),
+                    user.getName(), user.getHashedPassword(), user.getEmail(),
                     user.getQuestion(), user.getAnswer(), user.getAdmin()
                             ? new Integer(1)
                             : new Integer(0), user.getLanguage(),
@@ -622,20 +612,16 @@ public class UserManager extends RepositoryManager {
                 });
                 userMap.remove(user.getId());
             }
-
-            return;
+        } else {
+            getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
+                    user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
+                    user.getAnswer(), user.getHashedPassword(),
+                    new Boolean(user.getAdmin()), user.getLanguage(),
+                    user.getTemplate(), new Boolean(user.getIsGuest())
+                });
+            userMap.put(user.getId(), user);
         }
-
-        getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
-            user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
-            user.getAnswer(), user.getPassword(),
-            new Boolean(user.getAdmin()), user.getLanguage(),
-            user.getTemplate(), new Boolean(user.getIsGuest())
-        });
-
-        userMap.put(user.getId(), user);
     }
-
 
 
 
@@ -643,23 +629,9 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param user _more_
+     * @param user The user
      *
-     * @throws Exception _more_
-     */
-    public void makeUserIfNeeded(User user) throws Exception {
-        if (findUser(user.getId()) == null) {
-            makeOrUpdateUser(user, true);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param user _more_
-     *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public void deleteUser(User user) throws Exception {
         userMap.remove(user.getId());
@@ -672,9 +644,9 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param user _more_
+     * @param user The user
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public void deleteRoles(User user) throws Exception {
         getDatabaseManager().delete(Tables.USERROLES.NAME,
@@ -683,18 +655,11 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /*
-      public List<String> getRoles(User user) throws Exception {
-      if(user.getRoles() == null) {
-      }
-      }*/
-
-
     /**
      * _more_
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      *
      * @return _more_
      */
@@ -705,7 +670,7 @@ public class UserManager extends RepositoryManager {
             if ( !password1.equals(password2)) {
                 return false;
             } else {
-                user.setPassword(hashPassword(password1));
+                user.setPasswords(password1, hashPassword(password1));
             }
         }
         return true;
@@ -713,15 +678,15 @@ public class UserManager extends RepositoryManager {
 
 
     /**
-     * _more_
+     * set the user state from the request
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      * @param doAdmin _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
-    private void applyState(Request request, User user, boolean doAdmin)
+    private void applyUserProperties(Request request, User user, boolean doAdmin)
             throws Exception {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
@@ -732,22 +697,7 @@ public class UserManager extends RepositoryManager {
                                            user.getQuestion()));
         user.setAnswer(request.getString(ARG_USER_ANSWER, user.getAnswer()));
         if (doAdmin) {
-            if ( !request.getUser().getAdmin()) {
-                throw new IllegalArgumentException("Need to be admin");
-            }
-            if ( !request.defined(ARG_USER_ADMIN)) {
-                user.setAdmin(false);
-            } else {
-                user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
-            }
-            user.setIsGuest(request.get(ARG_USER_ISGUEST, false));
-
-            List<String> roles =
-                StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
-                                 true, true);
-
-            user.setRoles(roles);
-            setRoles(request, user);
+            applyAdminState(request, user);
         }
         makeOrUpdateUser(user, true);
     }
@@ -760,6 +710,35 @@ public class UserManager extends RepositoryManager {
      * @param user _more_
      *
      * @throws Exception _more_
+     */
+    private void applyAdminState(Request request, User user)
+            throws Exception {
+        if ( !request.getUser().getAdmin()) {
+            throw new IllegalArgumentException("Need to be admin");
+        }
+        if ( !request.defined(ARG_USER_ADMIN)) {
+            user.setAdmin(false);
+        } else {
+            user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
+        }
+        user.setIsGuest(request.get(ARG_USER_ISGUEST, false));
+
+        List<String> roles =
+            StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
+                             true, true);
+
+        user.setRoles(roles);
+        setRoles(request, user);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request the request
+     * @param user The user
+     *
+     * @throws Exception On badness
      */
     private void setRoles(Request request, User user) throws Exception {
         deleteRoles(user);
@@ -776,11 +755,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result adminUserEdit(Request request) throws Exception {
         String userId = request.getString(ARG_USER_ID, "");
@@ -798,15 +777,11 @@ public class UserManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_USER_CHANGE)) {
-            boolean okToChangeUser = true;
-            okToChangeUser = checkPasswords(request, user);
-            if ( !okToChangeUser) {
+            if ( !checkPasswords(request, user)) {
                 sb.append(
                     getRepository().showDialogWarning("Incorrect passwords"));
-            }
-
-            if (okToChangeUser) {
-                applyState(request, user, true);
+            } else {
+                applyUserProperties(request, user, true);
             }
         }
 
@@ -847,12 +822,12 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      * @param sb _more_
      * @param includeAdmin _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private void makeUserForm(Request request, User user, StringBuffer sb,
                               boolean includeAdmin)
@@ -919,11 +894,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      * @param sb _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private void makePasswordForm(Request request, User user, StringBuffer sb)
             throws Exception {
@@ -941,14 +916,13 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result adminUserNew(Request request) throws Exception {
-
 
         List<String> roles;
 
@@ -992,6 +966,7 @@ public class UserManager extends RepositoryManager {
             User user = new User(id, name, email, "", "",
                                  hashPassword(password1), false, "", "",
                                  false);
+            user.setRawPassword(password1);
             users.add(user);
         }
 
@@ -1052,6 +1027,7 @@ public class UserManager extends RepositoryManager {
                 User newUser = new User(id, name, email, "", "",
                                         hashPassword(password1), admin, "",
                                         "", false);
+                newUser.setRawPassword(password1);
                 users.add(newUser);
             }
         }
@@ -1199,9 +1175,13 @@ public class UserManager extends RepositoryManager {
         String msg = "A new RAMADDA account has been created for you.";
         msgSB.append(HtmlUtil.checkbox(ARG_USER_SENDMAIL, "true", false));
         msgSB.append(HtmlUtil.space(1));
+
+        msgSB.append(HtmlUtil.space(1));
         msgSB.append(msg("Send an email to the new user with message:"));
         msgSB.append(HtmlUtil.br());
         msgSB.append(HtmlUtil.textArea(ARG_USER_MESSAGE, msg, 5, 50));
+
+
 
         msgSB.append(HtmlUtil.p());
         msgSB.append(msgLabel("User Roles"));
@@ -1239,7 +1219,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      * @param sb _more_
      * @param init _more_
      */
@@ -1265,11 +1245,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result adminUserList(Request request) throws Exception {
 
@@ -1296,7 +1276,7 @@ public class UserManager extends RepositoryManager {
                                         Tables.USERS.NAME, new Clause(),
                                         " order by " + Tables.USERS.COL_ID);
 
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
+        SqlUtil.Iterator iter  = getDatabaseManager().getIterator(statement);
 
 
         List<User>       users = new ArrayList();
@@ -1417,7 +1397,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public User getUser(ResultSet results) throws Exception {
         int col = 1;
@@ -1452,7 +1432,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      */
@@ -1462,7 +1442,7 @@ public class UserManager extends RepositoryManager {
         if (sessionId == null) {
             return new ArrayList<Entry>();
         }
-        List<Entry> cart = (List<Entry>) userCart.get(sessionId);
+        List<Entry> cart =  userCart.get(sessionId);
         if (cart == null) {
             cart = new ArrayList<Entry>();
             userCart.put(sessionId, cart);
@@ -1473,10 +1453,10 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      * @param entries _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private void addToCart(Request request, List<Entry> entries)
             throws Exception {
@@ -1489,6 +1469,14 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     *
+     * @throws Exception _more_
+     */
     private void removeFromCart(Request request, List<Entry> entries)
             throws Exception {
         List<Entry> cart = getCart(request);
@@ -1504,11 +1492,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processCart(Request request) throws Exception {
         String       action = request.getString(ARG_ACTION, "");
@@ -1536,11 +1524,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result showCart(Request request) throws Exception {
 
@@ -1726,7 +1714,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      * @param title _more_
      * @param sb _more_
      *
@@ -1734,18 +1722,17 @@ public class UserManager extends RepositoryManager {
      */
     public Result makeResult(Request request, String title, StringBuffer sb) {
         User user = request.getUser();
-        return getRepository().makeResult(
-            request, title, sb,
-            !request.getUser().canEditSettings()
-             ? anonUserUrls
-            : userUrls);
+        return getRepository().makeResult(request, title, sb,
+                                          !request.getUser().canEditSettings()
+                                          ? anonUserUrls
+                                          : userUrls);
     }
 
 
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      */
@@ -1823,23 +1810,23 @@ public class UserManager extends RepositoryManager {
         return StringUtil.join(separator, links);
     }
 
-    
+
 
 
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processFavorite(Request request) throws Exception {
         String message = "";
         User   user    = request.getUser();
-        
-        if (!request.getUser().canEditSettings()){ 
+
+        if ( !request.getUser().canEditSettings()) {
             return new Result(
                 msg("Favorites"),
                 new StringBuffer(
@@ -1886,11 +1873,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param user _more_
+     * @param request the request
+     * @param user The user
      * @param entries _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private void addFavorites(Request request, User user, List<Entry> entries)
             throws Exception {
@@ -1900,7 +1887,7 @@ public class UserManager extends RepositoryManager {
             throw new IllegalArgumentException(
                 "Need to be logged in to add favorites");
         }
-        if (!request.getUser().canEditSettings()) {
+        if ( !request.getUser().canEditSettings()) {
             throw new IllegalArgumentException("Cannot add favorites");
         }
 
@@ -1923,11 +1910,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processHome(Request request) throws Exception {
         boolean responseAsXml = request.getString(ARG_RESPONSE,
@@ -1986,10 +1973,10 @@ public class UserManager extends RepositoryManager {
 
         if (request.getUser().canEditSettings() && (cnt == 0)) {
             sb.append(
-                      getRepository().showDialogNote(
-                                                     "You have no favorite entries defined.<br>When you see an  entry or folder just click on the "
-                + HtmlUtil.img(iconUrl(ICON_FAVORITE))
-                                                     + " icon to add it to your list of favorites"));
+                getRepository().showDialogNote(
+                    "You have no favorite entries defined.<br>When you see an  entry or folder just click on the "
+                    + HtmlUtil.img(iconUrl(ICON_FAVORITE))
+                    + " icon to add it to your list of favorites"));
         }
         return makeResult(request, "User Home", sb);
     }
@@ -1999,11 +1986,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processProfile(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
@@ -2058,7 +2045,7 @@ public class UserManager extends RepositoryManager {
         /**
          * _more_
          *
-         * @param user _more_
+         * @param user The user
          * @param dttm _more_
          */
         public PasswordReset(String user, Date dttm) {
@@ -2070,11 +2057,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processFindUserId(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
@@ -2130,17 +2117,15 @@ public class UserManager extends RepositoryManager {
 
 
 
-    /** _more_ */
-    private Hashtable passwordResets = new Hashtable();
 
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processResetPassword(Request request) throws Exception {
 
@@ -2158,7 +2143,7 @@ public class UserManager extends RepositoryManager {
         PasswordReset resetInfo = null;
         StringBuffer  sb        = new StringBuffer();
         if (key != null) {
-            resetInfo = (PasswordReset) passwordResets.get(key);
+            resetInfo =  passwordResets.get(key);
             if (resetInfo != null) {
                 if (new Date().getTime() > resetInfo.dttm.getTime()) {
                     sb.append(
@@ -2187,12 +2172,13 @@ public class UserManager extends RepositoryManager {
         if (user != null) {
             if (request.exists(ARG_USER_PASSWORD1)) {
                 if (checkPasswords(request, user)) {
-                    applyState(request, user, false);
+                    applyUserProperties(request, user, false);
                     sb.append(
                         getRepository().showDialogNote(
                             msg("Your password has been reset")));
                     sb.append(makeLoginForm(request));
-                    addActivity(request, request.getUser(), ACTIVITY_PASSWORD_CHANGE, "");
+                    addActivity(request, request.getUser(),
+                                ACTIVITY_PASSWORD_CHANGE, "");
                     return new Result(msg("Password Reset"), sb);
                 }
                 sb.append(
@@ -2247,10 +2233,9 @@ public class UserManager extends RepositoryManager {
             return new Result(msg("Password Reset"), sb);
         }
 
-        if (!request.getUser().canEditSettings()) {
-            return new Result(
-                msg("Password Reset"),
-                new StringBuffer(msg("Cannot reset password")));
+        if ( !request.getUser().canEditSettings()) {
+            return new Result(msg("Password Reset"),
+                              new StringBuffer(msg("Cannot reset password")));
         }
 
         key = getRepository().getGUID() + "_" + Math.random();
@@ -2279,7 +2264,7 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      * @param sb _more_
      * @param name _more_
      */
@@ -2297,42 +2282,40 @@ public class UserManager extends RepositoryManager {
     }
 
 
+
     /**
      * _more_
      *
-     * @param request _more_
      * @param user _more_
-     * @param what _more_
-     * @param extra _more_
+     * @param rawPassword raw password
+     *
+     * @return _more_
      *
      * @throws Exception _more_
      */
-    private void addActivity(Request request, User user, String what,
-                             String extra)
+    public boolean isPasswordValid(User user, String rawPassword)
             throws Exception {
-        getDatabaseManager().executeInsert(Tables.USER_ACTIVITY.INSERT,
-                                           new Object[] { user.getId(),
-                new Date(), what, extra, request.getIp() });
+        return isPasswordValid(user.getId(), rawPassword);
     }
 
 
     /**
      * _more_
      *
-     * @param name _more_
-     * @param password _more_
+     * @param userId the user id
+     * @param rawPassword raw (unhashed) password
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
-    public boolean isPasswordValid(String name, String password)
+    public boolean isPasswordValid(String userId, String rawPassword)
             throws Exception {
-        String hashedPassword = hashPassword(password);
+        String hashedPassword = hashPassword(rawPassword);
         Statement statement = getDatabaseManager().select(
                                   Tables.USERS.COLUMNS, Tables.USERS.NAME,
                                   Clause.and(
-                                      Clause.eq(Tables.USERS.COL_ID, name),
+                                      Clause.eq(Tables.USERS.COL_ID, userId),
                                       Clause.eq(
                                           Tables.USERS.COL_PASSWORD,
                                           hashedPassword)));
@@ -2348,14 +2331,13 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processLogin(Request request) throws Exception {
-
 
         if ( !canDoLogin(request)) {
             return new Result(
@@ -2388,30 +2370,7 @@ public class UserManager extends RepositoryManager {
                                              hashedPassword)));
 
                 ResultSet results = statement.getResultSet();
-                if ( !results.next()) {
-                    //We changed the password hash function to a new one so
-                    //check if the DB has the old hashed password
-                    //If it does then insert the new one
-                    String oldHashedPassword = hashPasswordOld(password);
-                    Statement statement2 =
-                        getDatabaseManager().select(Tables.USERS.COLUMNS,
-                            Tables.USERS.NAME,
-                            Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
-                                       Clause.eq(Tables.USERS.COL_PASSWORD,
-                                           oldHashedPassword)));
-
-
-                    ResultSet results2 = statement2.getResultSet();
-                    if (results2.next()) {
-                        user = getUser(results2);
-                        getDatabaseManager().update(Tables.USERS.NAME,
-                                Tables.USERS.COL_ID, user.getId(),
-                                new String[] { Tables.USERS.COL_PASSWORD },
-                                new Object[] { hashedPassword });
-                    }
-                    getDatabaseManager().closeAndReleaseConnection(
-                        statement2);
-                } else {
+                if (results.next()) {
                     user = getUser(results);
                 }
                 getDatabaseManager().closeAndReleaseConnection(statement);
@@ -2430,7 +2389,6 @@ public class UserManager extends RepositoryManager {
                 }
             }
 
-
             if (user != null) {
                 addActivity(request, user, ACTIVITY_LOGIN, "");
                 getSessionManager().setUserSession(request, user);
@@ -2446,7 +2404,7 @@ public class UserManager extends RepositoryManager {
                         XmlUtil.decodeBase64(
                             request.getUnsafeString(ARG_REDIRECT, "")));
                     destMsg = msg("Continue");
-                } else if(!user.canEditSettings()) {
+                } else if ( !user.canEditSettings()) {
                     destUrl = getRepository().getUrlBase();
                     destMsg = msg("Continue");
                 } else {
@@ -2512,11 +2470,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
@@ -2525,20 +2483,16 @@ public class UserManager extends RepositoryManager {
         request.setSessionId(getSessionManager().getSessionId());
         sb.append(getRepository().showDialogNote(msg("You are logged out")));
         sb.append(makeLoginForm(request));
-
-
-
         Result result = new Result(msg("Logout"), sb);
         return result;
     }
 
 
 
-
     /**
      * _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
@@ -2568,8 +2522,8 @@ public class UserManager extends RepositoryManager {
             }
 
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_CART_ADD) 
-                    || output.equals(OUTPUT_CART_REMOVE)
+                return output.equals(OUTPUT_CART_ADD)
+                       || output.equals(OUTPUT_CART_REMOVE)
                        || output.equals(OUTPUT_FAVORITE);
             }
 
@@ -2590,10 +2544,11 @@ public class UserManager extends RepositoryManager {
                 } else if (output.equals(OUTPUT_CART_REMOVE)) {
                     if (group.isDummy()) {
                         removeFromCart(request, entries);
-                        removeFromCart(request,
-                                  (List<Entry>) new ArrayList(subGroups));
+                        removeFromCart(
+                            request, (List<Entry>) new ArrayList(subGroups));
                     } else {
-                        removeFromCart(request, (List<Entry>) Misc.newList(group));
+                        removeFromCart(request,
+                                       (List<Entry>) Misc.newList(group));
                     }
                     return showCart(request);
                 } else {
@@ -2627,7 +2582,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public List<String> getRoles() throws Exception {
         String[] roleArray =
@@ -2648,14 +2603,37 @@ public class UserManager extends RepositoryManager {
 
 
 
+
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
+     * @param user The user
+     * @param what _more_
+     * @param extra _more_
+     *
+     * @throws Exception On badness
+     */
+    private void addActivity(Request request, User user, String what,
+                             String extra)
+            throws Exception {
+        getDatabaseManager().executeInsert(Tables.USER_ACTIVITY.INSERT,
+                                           new Object[] { user.getId(),
+                new Date(), what, extra, request.getIp() });
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processActivityLog(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
@@ -2682,12 +2660,12 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param theUser _more_
+     * @param request the request
+     * @param theUser The user
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private String getUserActivities(Request request, User theUser)
             throws Exception {
@@ -2736,12 +2714,12 @@ public class UserManager extends RepositoryManager {
                 } else {
                     firstCol =
                         HtmlUtil.href(
-                                      request.url(
-                                                  getRepositoryBase().URL_USER_ACTIVITY,
-                                                  ARG_USER_ID, user.getId()), HtmlUtil.img(
-                                                                                           getRepository().iconUrl(ICON_LOG),
-                                                                                           msg("View user log")) + " "
-                                      + user.getLabel());
+                            request.url(
+                                getRepositoryBase().URL_USER_ACTIVITY,
+                                ARG_USER_ID, user.getId()), HtmlUtil.img(
+                                    getRepository().iconUrl(ICON_LOG),
+                                    msg("View user log")) + " "
+                                        + user.getLabel());
                 }
 
             }
@@ -2750,7 +2728,7 @@ public class UserManager extends RepositoryManager {
             String extra = results.getString(col++);
             String ip    = results.getString(col++);
             sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol, what,
-                                                 getRepository().formatDate(dttm), ip)));
+                    getRepository().formatDate(dttm), ip)));
 
             cnt++;
         }
@@ -2767,11 +2745,11 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
+     * @param request the request
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result processSettings(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
@@ -2785,7 +2763,7 @@ public class UserManager extends RepositoryManager {
             return new Result(msg("User Settings"), sb);
         }
 
-        if (!request.getUser().canEditSettings()) {
+        if ( !request.getUser().canEditSettings()) {
             sb.append(
                 getRepository().showDialogWarning(
                     msg("You cannot edit your settings")));
@@ -2803,12 +2781,13 @@ public class UserManager extends RepositoryManager {
                             msg("Incorrect passwords")));
                 }
                 message = "Your password has been changed";
-                addActivity(request, request.getUser(), ACTIVITY_PASSWORD_CHANGE, "");
+                addActivity(request, request.getUser(),
+                            ACTIVITY_PASSWORD_CHANGE, "");
             } else {
                 message = "Your settings have been changed";
             }
             if (settingsOk) {
-                applyState(request, user, false);
+                applyUserProperties(request, user, false);
                 String redirect;
                 //If we are under ssl then redirect to non-ssl
                 if (getRepository().isSSLEnabled(request)) {

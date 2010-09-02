@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.auth;
@@ -58,7 +59,10 @@ public class User {
     private String answer = "";
 
     /** _more_ */
-    private String password = "";
+    private String hashedPassword = "";
+
+    /** _more_ */
+    private String rawPassword = "";
 
     /** _more_ */
     private boolean admin = false;
@@ -95,6 +99,14 @@ public class User {
     }
 
 
+    public User(String id) {
+        this(id, id);
+    }
+
+    public User(String id, String name) {
+        this(id, name,false);
+    }
+
     /**
      * _more_
      *
@@ -128,23 +140,22 @@ public class User {
      * @param email _more_
      * @param question _more_
      * @param answer _more_
-     * @param password _more_
+     * @param hashedPassword _more_
      * @param admin _more_
      * @param language _more_
      * @param template _more_
      * @param isGuest _more_
      */
     public User(String id, String name, String email, String question,
-                String answer, String password, boolean admin,
+                String answer, String hashedPassword, boolean admin,
                 String language, String template, boolean isGuest) {
-
-        this.id       = id;
-        this.name     = name;
-        this.email    = email;
-        this.question = question;
-        this.answer   = answer;
-        this.password = password;
-        this.admin    = admin;
+        this.id             = id;
+        this.name           = name;
+        this.email          = email;
+        this.question       = question;
+        this.answer         = answer;
+        this.hashedPassword = hashedPassword;
+        this.admin          = admin;
         if (language == null) {
             language = "";
         }
@@ -347,26 +358,73 @@ public class User {
         return answer;
     }
 
+    public void setPasswords(String rawPassword, String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+        this.rawPassword = rawPassword;
+    }
+
+
     /**
      * Set the Password property.
+     * @deprecated use setHashedPassword
      *
      * @param value The new value for Password
      */
     public void setPassword(String value) {
-        password = value;
-        if (password == null) {
-            password = "";
-        }
+        setHashedPassword(value);
     }
 
     /**
      * Get the Password property.
      *
+     * @deprecated use getHashedPassword
      * @return The Password
      */
     public String getPassword() {
-        return password;
+        return getHashedPassword();
     }
+
+
+    /**
+     * Set the HashedPassword property.
+     *
+     * @param value The new value for HashedPassword
+     */
+    public void setHashedPassword(String value) {
+        hashedPassword = value;
+        if (hashedPassword == null) {
+            hashedPassword = "";
+        }
+    }
+
+    /**
+     * Get the HashedPassword property.
+     *
+     * @return The HashedPassword
+     */
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+
+    /**
+     * Set the RawPassword property.
+     *
+     * @param value The new value for RawPassword
+     */
+    public void setRawPassword(String value) {
+        rawPassword = value;
+    }
+
+    /**
+     * Get the RawPassword property.
+     *
+     * @return The RawPassword
+     */
+    public String getRawPassword() {
+        return rawPassword;
+    }
+
 
     /**
      *  Set the Roles property.
@@ -460,8 +518,13 @@ public class User {
         return template;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean canEditSettings() {
-        return ! (getAnonymous() || getIsGuest() || !getIsLocal());
+        return !(getAnonymous() || getIsGuest() || !getIsLocal());
     }
 
 

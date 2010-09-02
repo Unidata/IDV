@@ -458,6 +458,25 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (shortForm) {
                     continue;
                 }
+
+                String metadataType =getRepository().getProperty("metadata.type." + name);
+                if(metadataType!=null) {
+                    System.err.println ("name:" + "metadata.type." + name);
+                    metadata =
+                        new Metadata(getRepository().getGUID(),
+                                     entry.getId(), metadataType,
+                                     DFLT_INHERITED, value,
+                                     Metadata.DFLT_ATTR,
+                                     Metadata.DFLT_ATTR,
+                                     Metadata.DFLT_ATTR,
+                                     Metadata.DFLT_EXTRA);
+                    
+                    if ( !entry.hasMetadata(metadata)) {
+                        metadataList.add(metadata);
+                    }
+                    continue;
+                }
+
                 if (ATTR_KEYWORDS.equals(name)) {
                     for (String keyword :
                             (List<String>) StringUtil.split(value, ";", true,
