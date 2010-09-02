@@ -461,7 +461,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
                 String metadataType =getRepository().getProperty("metadata.type." + name);
                 if(metadataType!=null) {
-                    System.err.println ("name:" + "metadata.type." + name);
                     metadata =
                         new Metadata(getRepository().getGUID(),
                                      entry.getId(), metadataType,
