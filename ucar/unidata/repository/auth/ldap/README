@@ -1,0 +1,9 @@
+
+To build this:
+From the main repository directory (ucar/unidata/repository) do:
+ant ldapplugin
+
+
+Look at the ldap.properties file for information to provide initial
+configuration values.
+
