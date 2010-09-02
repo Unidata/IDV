@@ -52,7 +52,11 @@ cd /content/downloads/idv
 edit the toc.xml
   - change the %version% property value
   - change where the current and previous point to
+
 change the current link to point to the new release.
+cd /content/downloads/idv
+   rm current
+   ln -s <current IDV version> current
 
 ***********************************************************************
 Expand the javadoc
@@ -105,9 +109,10 @@ After the release of a version, you should make a brand in the SVN repository
 in case changes are needed later.  To branch the SVN repository,
 run:
 
-svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/branches/IDV_<version>
+svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/branches/IDV_<version>  -m "some info"
 
-where <version> is the version (e.g., 2.8).
+where <version> is the version (e.g., 2.8).  "some info" is needed, otherwise the svn copy would
+require some EDITOR env. setting.
 
 ***********************************************************************
 Update the current and stable links:
