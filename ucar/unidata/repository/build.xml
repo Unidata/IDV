@@ -528,7 +528,7 @@
      </target>
 
 
-    <target name="ldapplugin" depends="init,clean">
+    <target name="ldapplugin" depends="init">
         <javac
             verbose="false"
             classpath="${classpath}"
@@ -553,7 +553,7 @@
             <include name="ucar/unidata/repository/auth/ldap/*.class"/> 
          </jar>
 
-        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+        <copy overwrite="true"  todir="${user.home}/.unidata/repository/plugins">
              <fileset file="${jars_dest}/ldapplugin.jar"/>
         </copy>
     </target>
