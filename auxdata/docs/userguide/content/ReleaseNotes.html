@@ -74,14 +74,18 @@ be written to the same directory as the files and will not be scoured.
 </faqitem>
 
 <faqitem q="CDM profiler data type" id="cdmprf">
-A new profile data type is added to the IDV, it is based on the CDM feature type,
-including CAP and NPN dataset.
+A new profiler data source type was added to the IDV to support reading of local netCDF profiler data
+including CAP and NPN datasets.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
-Many bug fixes were made in this release.  
+Several bug fixes were made in this release, including:
+<ul>
+<li>netCDF-Java library not correctly handling scale/offset on 20th Century Reanalysis datasets
+<li>Mapping problems for global grids
+</ul>
 </faqitem>
 
 <faqitem q="Known Problems" id="problems">
