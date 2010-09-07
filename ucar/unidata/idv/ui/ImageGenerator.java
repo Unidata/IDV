@@ -310,6 +310,7 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
+    /** _more_          */
     public static final String ATTR_INDEX = "index";
 
     /** _more_ */
@@ -506,6 +507,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String ATTR_FRAMERATE = "framerate";
+
+    /** isl tag for ending frame pause for animated gifs */
+    public static final String ATTR_ENDFRAMEPAUSE = "endframepause";
 
     /** isl tag */
     public static final String ATTR_CAPTION = "caption";
@@ -1856,23 +1860,30 @@ public class ImageGenerator extends IdvManager {
 
     /**
      * handle the animation tag. The index attribute can either be a number or be "end"
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Throwable _more_
      */
     protected boolean processTagAnimation(Element node) throws Throwable {
-        String indexString = applyMacros(node, ATTR_INDEX, "0");
-        int index=-1;
-        boolean end = indexString.equals("end");
-        boolean step = indexString.equals("step");
-        if(!end && !step) {
+        String  indexString = applyMacros(node, ATTR_INDEX, "0");
+        int     index       = -1;
+        boolean end         = indexString.equals("end");
+        boolean step        = indexString.equals("step");
+        if ( !end && !step) {
             index = new Integer(indexString).intValue();
         }
-        for(ViewManager viewManager: getViewManagers(node)) {
-            AnimationWidget animationWidget = viewManager.getAnimationWidget();
-            if(animationWidget==null) {
+        for (ViewManager viewManager : getViewManagers(node)) {
+            AnimationWidget animationWidget =
+                viewManager.getAnimationWidget();
+            if (animationWidget == null) {
                 continue;
             }
-            if(end) {
+            if (end) {
                 animationWidget.gotoEnd();
-            } else if(step) {
+            } else if (step) {
                 animationWidget.stepForward();
             } else {
                 animationWidget.gotoIndex(index);
@@ -3581,7 +3592,8 @@ public class ImageGenerator extends IdvManager {
      * @return List of view managers
      */
     private List<ViewManager> getViewManagers(Element node) {
-        List<ViewManager> viewManagers = (List<ViewManager>)getVMManager().getViewManagers();
+        List<ViewManager> viewManagers =
+            (List<ViewManager>) getVMManager().getViewManagers();
         if ((node == null) || !XmlUtil.hasAttribute(node, ATTR_VIEW)) {
             return viewManagers;
         }
@@ -4921,11 +4933,16 @@ public class ImageGenerator extends IdvManager {
                                      ATTR_WIDTH,
                                      400), applyMacros(scriptingNode,
                                          ATTR_HEIGHT, 300));
-                ImageSequenceGrabber isg = new ImageSequenceGrabber(filename,
-                                               getIdv(), this, scriptingNode,
-                                               files, size,
-                                               applyMacros(scriptingNode,
-                                                   ATTR_FRAMERATE, 2));
+                ImageSequenceGrabber isg = new ImageSequenceGrabber(
+                                               filename, getIdv(), this,
+                                               scriptingNode, files, size,
+                                               applyMacros(
+                                                   scriptingNode,
+                                                   ATTR_FRAMERATE,
+                                                   2), applyMacros(
+                                                       scriptingNode,
+                                                       ATTR_ENDFRAMEPAUSE,
+                                                       -1));
                 return;
             }
         }

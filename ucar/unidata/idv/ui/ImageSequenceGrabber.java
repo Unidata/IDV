@@ -510,6 +510,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         startAnimationCapture();
     }
 
+
     /**
      *  This gets called when we automatically create a movie. It will not show the
      *  dialog window and will start up the animation capture
@@ -527,13 +528,34 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                 Element scriptingNode,
                                 List<ImageWrapper> imageFiles,
                                 Dimension size, double displayRate) {
+    	this(filename, idv, imageGenerator, scriptingNode, imageFiles, size, displayRate, -1);
+    }
+    
+    /**
+     *  This gets called when we automatically create a movie. It will not show the
+     *  dialog window and will start up the animation capture
+     *
+     * @param filename The file we are writing to
+     * @param idv The IDV
+     * @param scriptingNode The igml node
+     * @param imageGenerator  imageGenerator
+     * @param imageFiles List of files to write
+     * @param size Size of image
+     * @param displayRate Display rate
+     * @param endPause  end pause (seconds)
+     */
+    public ImageSequenceGrabber(String filename, IntegratedDataViewer idv,
+                                ImageGenerator imageGenerator,
+                                Element scriptingNode,
+                                List<ImageWrapper> imageFiles,
+                                Dimension size, double displayRate, double endPause) {
         this.idv            = idv;
         this.imageGenerator = imageGenerator;
         this.scriptingNode  = scriptingNode;
         this.images         = ImageWrapper.makeImageWrappers(imageFiles);
         this.idv            = idv;
         movieFileName       = filename;
-        createMovie(movieFileName, images, size, displayRate, scriptingNode);
+        createMovie(movieFileName, images, size, displayRate, scriptingNode, endPause);
     }
 
 
@@ -1817,12 +1839,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         double displayRate =
             (new Double(displayRateFld.getText())).doubleValue();
+        double endPause = -1;
         if (scriptingNode != null) {
             displayRate = imageGenerator.applyMacros(scriptingNode,
                     imageGenerator.ATTR_FRAMERATE, displayRate);
+            endPause = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_ENDFRAMEPAUSE, -1);
         }
 
-        createMovie(movieFile, images, size, displayRate, scriptingNode);
+        createMovie(movieFile, images, size, displayRate, scriptingNode, endPause);
     }
 
     /** widget for saving html */
@@ -1893,6 +1917,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void createMovie(String commaSeparatedFiles,
                              List<ImageWrapper> images, Dimension size,
                              double displayRate, Element scriptingNode) {
+    	createMovie(commaSeparatedFiles, images, size, displayRate, scriptingNode, -1);
+    }
+
+
+    /**
+     * actually create the movie
+     *
+     *
+     * @param commaSeparatedFiles This can be a list of comma separated files. eg: .mov, .kmz, etc
+     * @param images List of images to make a movie from
+     * @param size size
+     * @param displayRate display rate
+     * @param scriptingNode isl node. May be null
+     */
+    private void createMovie(String commaSeparatedFiles,
+                             List<ImageWrapper> images, Dimension size,
+                             double displayRate, Element scriptingNode, 
+                             double endPause) {
 
 
         List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
@@ -1936,7 +1978,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     AnimatedGifEncoder.createGif(movieFile,
                             ImageWrapper.makeFileList(images),
                             AnimatedGifEncoder.REPEAT_FOREVER,
-                            (int) (rate * 1000));
+                            (int) (rate * 1000), (int) ((endPause == -1) ? -1 : endPause*1000));
                 } else if (movieFile.toLowerCase().endsWith(".htm")
                            || movieFile.toLowerCase().endsWith(".html")) {
                     createAnisHtml(movieFile, images, size, displayRate,
