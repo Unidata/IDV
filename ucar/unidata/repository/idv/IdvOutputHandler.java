@@ -141,6 +141,10 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_PRODUCT = "product";
 
+    public static final String ARG_AZIMUTH = "azimuth";
+    public static final String ARG_TILT = "tilt";
+    public static final String ARG_WIREFRAME = "wireframe";
+
     /** _more_          */
     public static final String ARG_SUBMIT_SAVE = "submit.save";
 
@@ -919,6 +923,10 @@ public class IdvOutputHandler extends OutputHandler {
                                             projectionOptions)));
 
 
+        basic.append(HtmlUtil.formEntry(msgLabel("Azimuth/Tilt"), 
+                                        htmlInput(request, ARG_AZIMUTH, "", 6) +" " + 
+                                        htmlInput(request, ARG_TILT, "", 6)));
+
 
         /*
           basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
@@ -1038,6 +1046,10 @@ public class IdvOutputHandler extends OutputHandler {
                                            htmlSelect(request,
                                                ARG_VIEW_BACKGROUNDIMAGE,
                                                    backgrounds)));
+
+        mapAttrs.append(HtmlUtil.formEntry(msgLabel("Wireframe"),
+                                           HtmlUtil.checkbox(ARG_WIREFRAME,"true",
+                                                             request.get(ARG_WIREFRAME,false))));
 
         mapAttrs.append(HtmlUtil.formTableClose());
 
@@ -1979,7 +1991,7 @@ public class IdvOutputHandler extends OutputHandler {
 
         }
 
-        viewProps.append(makeProperty("wireframe", "false"));
+        viewProps.append(makeProperty("wireframe", request.get(ARG_WIREFRAME,false)+""));
         viewProps.append("\n");
         //      viewProps.append(makeProperty( "wireframe","true"));
 
@@ -2095,7 +2107,6 @@ public class IdvOutputHandler extends OutputHandler {
             isl.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY,
                                    attrs.toString(), propSB.toString()));
         }
-
 
 
 
@@ -2356,6 +2367,14 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("</datasource>\n");
         isl.append("<pause/>\n");
 
+        if(request.defined(ARG_AZIMUTH) && request.defined(ARG_TILT)) {
+            isl.append(
+                       XmlUtil.tag(
+                                   ImageGenerator.TAG_VIEWPOINT,
+                                   XmlUtil.attrs(
+                                                 ImageGenerator.ATTR_AZIMUTH, request.getString(ARG_AZIMUTH,""),
+                                                 ImageGenerator.ATTR_TILT, request.getString(ARG_TILT,""))));
+        }
 
 
         if ( !forIsl) {
@@ -2742,8 +2761,6 @@ public class IdvOutputHandler extends OutputHandler {
                                              "value", "true")));
 
 
-
-
             int width  = request.get(ARG_IMAGE_WIDTH, 400);
             int height = request.get(ARG_IMAGE_HEIGHT, 400);
             if (request.defined(ARG_VIEW_BOUNDS + "_south")
@@ -2817,6 +2834,8 @@ public class IdvOutputHandler extends OutputHandler {
                                    attrs.toString(), propSB.toString()));
             isl.append("</datasource>\n");
             isl.append("<pause/>\n");
+
+
 
             String clip = "";
             if (request.get(ARG_CLIP, false)) {
