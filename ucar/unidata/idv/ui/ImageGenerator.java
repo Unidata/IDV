@@ -225,6 +225,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_ISL = "isl";
 
+    public static final String TAG_VIEWPOINT = "viewpoint";
+
     /** isl tag */
     public static final String TAG_PROPERTY = "property";
 
