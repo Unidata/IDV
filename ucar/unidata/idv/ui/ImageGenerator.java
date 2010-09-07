@@ -68,6 +68,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
 import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationWidget;
 
 import ucar.visad.display.DisplayMaster;
 
@@ -308,6 +309,8 @@ public class ImageGenerator extends IdvManager {
     /** _more_ */
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
+
+    public static final String ATTR_INDEX = "index";
 
     /** _more_ */
     public static final String ATTR_STRIDE = "stride";
@@ -1845,6 +1848,34 @@ public class ImageGenerator extends IdvManager {
                 Element child = (Element) nodes.get(childIdx);
                 vm.setProperty(applyMacros(child, ATTR_NAME),
                                applyMacros(child, ATTR_VALUE), false);
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * handle the animation tag. The index attribute can either be a number or be "end"
+     */
+    protected boolean processTagAnimation(Element node) throws Throwable {
+        String indexString = applyMacros(node, ATTR_INDEX, "0");
+        int index=-1;
+        boolean end = indexString.equals("end");
+        boolean step = indexString.equals("step");
+        if(!end && !step) {
+            index = new Integer(indexString).intValue();
+        }
+        for(ViewManager viewManager: getViewManagers(node)) {
+            AnimationWidget animationWidget = viewManager.getAnimationWidget();
+            if(animationWidget==null) {
+                continue;
+            }
+            if(end) {
+                animationWidget.gotoEnd();
+            } else if(step) {
+                animationWidget.stepForward();
+            } else {
+                animationWidget.gotoIndex(index);
             }
         }
         return true;
@@ -3549,8 +3580,8 @@ public class ImageGenerator extends IdvManager {
      *
      * @return List of view managers
      */
-    private List getViewManagers(Element node) {
-        List viewManagers = getVMManager().getViewManagers();
+    private List<ViewManager> getViewManagers(Element node) {
+        List<ViewManager> viewManagers = (List<ViewManager>)getVMManager().getViewManagers();
         if ((node == null) || !XmlUtil.hasAttribute(node, ATTR_VIEW)) {
             return viewManagers;
         }
