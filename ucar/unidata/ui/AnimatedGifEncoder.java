@@ -259,7 +259,6 @@ public class AnimatedGifEncoder {
         createGif(filename, images, REPEAT_FOREVER, 500);
     }
 
-
     /**
      * _more_
      *
@@ -270,13 +269,36 @@ public class AnimatedGifEncoder {
      */
     public static void createGif(String filename, List images, int repeat,
                                  int delay) {
+    	createGif(filename, images, repeat, delay, -1);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param images _more_
+     * @param repeat _more_
+     * @param delay _more_
+     * @param endDelay _more_
+     */
+    public static void createGif(String filename, List images, int repeat,
+                                 int delay, int endDelay) {
         AnimatedGifEncoder e = new AnimatedGifEncoder();
         e.setRepeat(repeat);
         e.setDelay(delay);
         e.start(filename);
+        ImagePlus image = null;
         for (int i = 0; i < images.size(); i++) {
-            ImagePlus image = new ImagePlus(images.get(i).toString());
+            image = new ImagePlus(images.get(i).toString());
             e.addFrame(image);
+        }
+        if (endDelay != -1) {
+        	int endPause = endDelay - delay;
+        	if (endPause > 0) {
+               e.setDelay(endPause);
+               e.addFrame(image);
+        	}
         }
         e.finish();
     }
