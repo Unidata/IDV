@@ -370,10 +370,12 @@ public class Tables {
         /** _more_ */
         public static final String COL_ISGUEST = NAME + ".isguest";
 
+        public static final String COL_PROPERTIES = NAME + ".properties";
+
         /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_NAME, COL_EMAIL, COL_QUESTION, COL_ANSWER,
-            COL_PASSWORD, COL_ADMIN, COL_LANGUAGE, COL_TEMPLATE, COL_ISGUEST
+            COL_PASSWORD, COL_ADMIN, COL_LANGUAGE, COL_TEMPLATE, COL_ISGUEST, COL_PROPERTIES
         };
 
 

@@ -4307,7 +4307,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return new Result(AuthorizationMethod.AUTH_HTTP);
         }
 
-
         if (request.isAnonymous()) {
             throw new AccessException("Cannot access data", request);
         }

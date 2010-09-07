@@ -25,12 +25,15 @@ package ucar.unidata.repository.auth;
 import ucar.unidata.repository.*;
 
 
+import ucar.unidata.xml.XmlEncoder;
+
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -42,6 +45,11 @@ import java.util.List;
  * @version $Revision: 1.3 $
  */
 public class User {
+
+    public static final String PROP_CAN_CHANGE_PASSWORD = "prop.changepassword";
+
+    /** _more_          */
+    private static XmlEncoder xmlEncoder = new XmlEncoder();
 
     /** _more_ */
     private String id = "";
@@ -90,12 +98,14 @@ public class User {
     /** _more_ */
     private boolean isGuest = false;
 
+    private Hashtable properties = new Hashtable();
+
     /**
      * _more_
      */
     public User() {
         this.anonymous = true;
-        this.name      = "anonymous";
+        this.name      = UserManager.USER_ANONYMOUS;
     }
 
 
@@ -148,7 +158,8 @@ public class User {
      */
     public User(String id, String name, String email, String question,
                 String answer, String hashedPassword, boolean admin,
-                String language, String template, boolean isGuest) {
+                String language, String template, boolean isGuest,
+                String propertiesBlob) {
         this.id             = id;
         this.name           = name;
         this.email          = email;
@@ -162,7 +173,35 @@ public class User {
         this.language = language;
         this.template = template;
         this.isGuest  = isGuest;
+        if(propertiesBlob!=null && propertiesBlob.length()>0) {
+            try {
+            properties =
+                (Hashtable) xmlEncoder.toObject(propertiesBlob);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
     }
+
+    public String getPropertiesBlob() {
+        if (properties != null) {
+            return xmlEncoder.toXml(properties);
+        }
+        return null;
+    }
+
+
+    public Object getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public void putProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+
+
+
 
     /**
      * _more_
@@ -274,12 +313,14 @@ public class User {
         anonymous = value;
     }
 
+
     /**
      * Get the Anonymous property.
      *
      * @return The Anonymous
      */
     public boolean getAnonymous() {
+        if(Misc.equals(UserManager.USER_ANONYMOUS, id)) return true;
         return anonymous;
     }
 
@@ -528,6 +569,11 @@ public class User {
     }
 
 
+    public boolean canChangePassword() {
+        return canEditSettings() && getCanChangePassword();
+    }
+
+
     /**
      *  Set the Favorites property.
      *
@@ -583,6 +629,24 @@ public class User {
         return isGuest;
     }
 
+    /**
+       Set the CanChangePassword property.
 
+       @param value The new value for CanChangePassword
+    **/
+    public void setCanChangePassword (boolean value) {
+        putProperty(PROP_CAN_CHANGE_PASSWORD, ""+value);
+    }
+
+    /**
+       Get the CanChangePassword property.
+
+       @return The CanChangePassword
+    **/
+    public boolean getCanChangePassword () {
+        String v = (String) getProperty(PROP_CAN_CHANGE_PASSWORD);
+        if(v==null || Misc.equals(v,"true")) return  true;
+	return false;
+    }
 
 }

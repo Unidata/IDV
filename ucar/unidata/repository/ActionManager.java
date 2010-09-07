@@ -136,9 +136,11 @@ public class ActionManager extends RepositoryManager {
                 sb.append(HtmlUtil.href(request.url(URL_STATUS,
                         ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
+                if(action.getExtraHtml()!=null) {
+                    sb.append(action.getExtraHtml());
+                }
                 String msg = JobManager.getManager().getDialogLabel2(id);
                 if (msg != null) {
-
                     sb.append(msg);
                 } else {
                     sb.append(action.getMessage());
@@ -239,7 +241,7 @@ public class ActionManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected Object addAction(String msg, String continueHtml) {
+    private Object addAction(String msg, String continueHtml) {
         String id = getRepository().getGUID();
         actions.put(id, new ActionInfo(msg, continueHtml));
         return id;
@@ -256,7 +258,7 @@ public class ActionManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected Result doAction(Request request, final Action runnable,
+    public Result doAction(Request request, final Action runnable,
                               String name, String continueHtml) {
         Object actionId = runAction(runnable, name, continueHtml);
         return new Result(request.url(URL_STATUS, ARG_ACTION_ID,
@@ -320,7 +322,9 @@ public class ActionManager extends RepositoryManager {
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    public static class ActionInfo {
+    public  class ActionInfo {
+
+        private String id;
 
         /** _more_ */
         private String name;
@@ -338,6 +342,9 @@ public class ActionManager extends RepositoryManager {
         private String error = null;
 
 
+        private String extraHtml;
+
+
         /**
          * _more_
          *
@@ -347,7 +354,28 @@ public class ActionManager extends RepositoryManager {
         public ActionInfo(String name, String continueHtml) {
             this.name         = name;
             this.continueHtml = continueHtml;
+            this.id = getRepository().getGUID();
         }
+
+
+        /**
+           Set the Id property.
+
+           @param value The new value for Id
+        **/
+        public void setId (String value) {
+            id = value;
+        }
+
+        /**
+           Get the Id property.
+
+           @return The Id
+        **/
+        public String getId () {
+            return id;
+        }
+
 
 
         /**
@@ -404,6 +432,25 @@ public class ActionManager extends RepositoryManager {
          */
         public String getMessage() {
             return message;
+        }
+
+
+        /**
+           Set the ExtraHtml property.
+
+           @param value The new value for ExtraHtml
+        **/
+        public void setExtraHtml (String value) {
+            extraHtml = value;
+        }
+
+        /**
+           Get the ExtraHtml property.
+
+           @return The ExtraHtml
+        **/
+        public String getExtraHtml () {
+            return extraHtml;
         }
 
 

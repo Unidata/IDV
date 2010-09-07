@@ -259,7 +259,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected static String msgHeader(String h) {
+    public static String msgHeader(String h) {
         return Repository.msgHeader(h);
     }
 

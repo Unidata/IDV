@@ -383,7 +383,6 @@ public class UserManager extends RepositoryManager {
         }
 
 
-
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         sb.append(
@@ -810,7 +809,9 @@ public class UserManager extends RepositoryManager {
                 + HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             sb.append(buttons);
             makeUserForm(request, user, sb, true);
-            makePasswordForm(request, user, sb);
+            if(user.canChangePassword()) {
+                makePasswordForm(request, user, sb);
+            }
             sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());
@@ -968,7 +969,7 @@ public class UserManager extends RepositoryManager {
             }
             User user = new User(id, name, email, "", "",
                                  hashPassword(password1), false, "", "",
-                                 false);
+                                 false,null);
             user.setRawPassword(password1);
             users.add(user);
         }
@@ -1029,7 +1030,7 @@ public class UserManager extends RepositoryManager {
             if (okToAdd) {
                 User newUser = new User(id, name, email, "", "",
                                         hashPassword(password1), admin, "",
-                                        "", false);
+                                        "", false, null);
                 newUser.setRawPassword(password1);
                 users.add(newUser);
             }
@@ -1413,7 +1414,8 @@ public class UserManager extends RepositoryManager {
                              results.getBoolean(col++),
                              results.getString(col++),
                              results.getString(col++),
-                             results.getBoolean(col++));
+                             results.getBoolean(col++),
+                             results.getString(col++));
 
         Statement statement = getDatabaseManager().select(
                                   Tables.USERROLES.COL_ROLE,
@@ -2141,7 +2143,6 @@ public class UserManager extends RepositoryManager {
         }
 
 
-
         String key = request.getString(ARG_USER_PASSWORDKEY, (String) null);
         PasswordReset resetInfo = null;
         StringBuffer  sb        = new StringBuffer();
@@ -2818,7 +2819,9 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.p());
         sb.append(msgHeader("Password"));
         sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
-        makePasswordForm(request, user, sb);
+        if(user.canChangePassword()) {
+            makePasswordForm(request, user, sb);
+        }
         sb.append(HtmlUtil.submit(msg("Change Password"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
