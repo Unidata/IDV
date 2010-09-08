@@ -144,6 +144,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** initial ending point */
     private RealTuple initEndPoint;
 
+    private double initLat1= Double.NaN;
+    private double initLon1= Double.NaN;
+    private double initLat2= Double.NaN;
+    private double initLon2= Double.NaN;
+    private double initAlt=16000;
+
+    private boolean lineVisible = true;
+
     /** the control window's view manager */
     protected CrossSectionViewManager crossSectionView;
 
@@ -444,6 +452,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             if (csSelector != null) {
                 csSelector.setPointSize(getDisplayScale());
                 csSelector.setAutoSize(true);
+                csSelector.setVisible(lineVisible);
                 addDisplayable(csSelector, getSelectorAttributeFlags());
             } else {
                 System.err.println("NO CS SELECTOR " + getClass().getName());
@@ -544,6 +553,18 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         try {
             RealTuple start = initStartPoint;
             RealTuple end   = initEndPoint;
+
+            if(start == null && initLat1==initLat1 && initLon1 ==initLon1) {
+                start =
+                    new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                  new double[] { initLon1,initLat1, initAlt });
+            }
+
+            if(end == null && initLat2==initLat2 && initLon2 ==initLon2) {
+                end =
+                    new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                  new double[] { initLon2,initLat2, initAlt });
+            }
 
             if (csSelector != null) {
                 if (inGlobeDisplay()) {
@@ -1548,11 +1569,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         startLocation = elArray[0];
         endLocation   = elArray[1];
-        LatLonPoint      latlon1 = startLocation.getLatLonPoint();
-        LatLonPoint      latlon2 = endLocation.getLatLonPoint();
+        LatLonPoint      latLon1 = startLocation.getLatLonPoint();
+        LatLonPoint      latLon2 = endLocation.getLatLonPoint();
+
         GridDataInstance gdi     = getGridDataInstance();
         FieldImpl slice = gdi.sliceAlongLatLonLine(
-                              latlon1, latlon2,
+                              latLon1, latLon2,
                               getSamplingModeValue(
                                   getObjectStore().get(
                                       PREF_SAMPLING_MODE,
@@ -2275,6 +2297,69 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         return ((csSelector != null)
                 ? csSelector.getEndPoint()
                 : null);
+    }
+
+    /**
+       Set the LineVisible property.
+
+       @param value The new value for LineVisible
+    **/
+    public void setLineVisible (boolean value) {
+	lineVisible = value;
+    }
+
+    /**
+       Get the LineVisible property.
+
+       @return The LineVisible
+    **/
+    public boolean getLineVisible () {
+	return lineVisible;
+    }
+
+
+    public void setInitAlt (double value) {
+	initAlt = value;
+    }
+
+
+    /**
+       Set the Lat2 property.
+
+       @param value The new value for Lat2
+    **/
+    public void setInitLat2 (double value) {
+	initLat2 = value;
+    }
+
+
+    /**
+       Set the Lon2 property.
+
+       @param value The new value for Lon2
+    **/
+    public void setInitLon2 (double value) {
+	initLon2 = value;
+    }
+
+
+    /**
+       Set the InitLat1 property.
+
+       @param value The new value for InitLat1
+    **/
+    public void setInitLat1 (double value) {
+	initLat1 = value;
+    }
+
+
+    /**
+       Set the Lon1 property.
+
+       @param value The new value for Lon1
+    **/
+    public void setInitLon1 (double value) {
+	initLon1 = value;
     }
 
 
