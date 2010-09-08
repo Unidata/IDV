@@ -275,6 +275,14 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_ */
     private Color initMapColor = null;
 
+    private boolean initLatLonVisible = false;
+
+    private int initLatLonWidth = 1;
+
+    private float initLatLonSpacing = 15;
+
+    private Color initLatLonColor = Color.white;
+
     /** _more_ */
     private Rectangle2D.Float initLatLonBounds;
 
@@ -938,6 +946,17 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(xrc, false, true);
                 }
 
+                if(initLatLonVisible) {
+                    mapInfo.getLatData().setVisible(true);
+                    mapInfo.getLatData().setLineWidth(initLatLonWidth);
+                    mapInfo.getLatData().setSpacing(initLatLonSpacing);
+                    mapInfo.getLatData().setColor(initLatLonColor);
+
+                    mapInfo.getLonData().setVisible(true);
+                    mapInfo.getLonData().setLineWidth(initLatLonWidth);
+                    mapInfo.getLonData().setSpacing(initLatLonSpacing);
+                    mapInfo.getLonData().setColor(initLatLonColor);
+                }
 
                 if (initMapPaths != null) {
                     for (MapData mapData : mapInfo.getMapDataList()) {
@@ -3398,6 +3417,7 @@ public class MapViewManager extends NavigatedViewManager {
         this.initMapPaths = value;
     }
 
+
     /**
      *  Get the InitMapPaths property.
      *
@@ -3407,6 +3427,24 @@ public class MapViewManager extends NavigatedViewManager {
         return this.initMapPaths;
     }
 
+    public void setInitLatLonVisible(boolean v) {
+        initLatLonVisible = v;
+    }
+
+
+
+    public void setInitLatLonColor(Color v) {
+        initLatLonColor = v;
+    }
+
+
+    public void setInitLatLonWidth(int v) {
+        initLatLonWidth = v;
+    }
+
+    public void setInitLatLonSpacing(float v) {
+        initLatLonSpacing = v;
+    }
 
     /**
      * Set the InitMapWidth property.
