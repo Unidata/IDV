@@ -5515,13 +5515,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
             toFront();
             PrinterJob printJob = PrinterJob.getPrinterJob();
             printJob.setPrintable(
-                ((DisplayImpl) getMaster().getDisplay()).getPrintable());
+               ((DisplayImpl) getMaster().getDisplay()).getPrintable());
             if ( !printJob.printDialog()) {
                 return;
             }
             printJob.print();
         } catch (Exception exc) {
             logException("There was an error printing the image", exc);
+        }
+    }
+
+    public void setView(String view) {
+        if (getMaster() instanceof NavigatedDisplay) {
+            NavigatedDisplay navDisplay = (NavigatedDisplay) getMaster();
+            navDisplay.setView(view);
         }
     }
 
