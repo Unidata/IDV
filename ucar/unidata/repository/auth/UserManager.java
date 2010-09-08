@@ -619,7 +619,8 @@ public class UserManager extends RepositoryManager {
                     user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
                     user.getAnswer(), user.getHashedPassword(),
                     new Boolean(user.getAdmin()), user.getLanguage(),
-                    user.getTemplate(), new Boolean(user.getIsGuest())
+                    user.getTemplate(), new Boolean(user.getIsGuest()),
+		    user.getPropertiesBlob()
                 });
             userMap.put(user.getId(), user);
         }
