@@ -494,8 +494,6 @@ public class IdvOutputHandler extends OutputHandler {
         okControls.add("isosurface");
         okControls.add("volumerender");
         okControls.add("pointvolumerender");
-        addType(OUTPUT_IDV_GRID);
-        addType(OUTPUT_IDV_POINT);
         for (String notArg : NOTARGS) {
             exceptArgs.put(notArg, "");
         }
@@ -529,12 +527,16 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public void checkIdv() {
         try {
+            //See if we have a graphics environment
             java.awt.GraphicsEnvironment e =
                 java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
             e.getDefaultScreenDevice();
             idvServer =
                 new IdvServer(new File(getStorageManager().getDir("idv")));
             idvOk = true;
+            //Only add the output types after we create the server
+            addType(OUTPUT_IDV_GRID);
+            addType(OUTPUT_IDV_POINT);
         } catch (Throwable exc) {
             logError(
                 "To run the IdvOutputHandler a graphics environment is needed",
