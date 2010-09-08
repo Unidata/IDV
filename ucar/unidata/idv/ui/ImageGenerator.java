@@ -315,6 +315,7 @@ public class ImageGenerator extends IdvManager {
     /** _more_          */
     public static final String ATTR_INDEX = "index";
 
+
     /** _more_ */
     public static final String ATTR_STRIDE = "stride";
 
@@ -623,9 +624,10 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_PLACE = "place";
 
-
     /** isl tag */
     public static final String ATTR_VIEW = "view";
+
+    public static final String ATTR_VIEWDIR = "viewdir";
 
     /** isl tag */
     public static final String ATTR_URL = "url";
@@ -1917,6 +1919,10 @@ public class ImageGenerator extends IdvManager {
 
         for (int i = 0; i < vms.size(); i++) {
             ViewManager vm = (ViewManager) vms.get(i);
+            if (XmlUtil.hasAttribute(node, ATTR_VIEWDIR)) {
+                vm.setView(XmlUtil.getAttribute(node, ATTR_VIEWDIR));
+            }
+
             if (XmlUtil.hasAttribute(node, ATTR_AZIMUTH)
                     || XmlUtil.hasAttribute(node, ATTR_TILT)) {
                 viewpointInfo = new ViewpointInfo(toDouble(node,
@@ -3513,15 +3519,19 @@ public class ImageGenerator extends IdvManager {
 
         TimeZone tz = getIdv().getPreferenceManager().getDefaultTimeZone();
 
+
         s = StringUtil.replaceDate(s, "now:", now, tz);
-        Date animationTime = getAnimationTime();
-        if (animationTime == null) {
-            animationTime = now;
-        }
-        if (doTime) {
-            s = StringUtil.replaceDate(s, "anim:", animationTime, tz);
-            s = StringUtil.replaceDate(s, "time:", animationTime, tz);
-            s = StringUtil.replaceDate(s, "now:", now, tz);
+
+        if(s.indexOf("anim:")>=0 || s.indexOf("time:")>=0) {
+            Date animationTime = getAnimationTime();
+            if (animationTime == null) {
+                animationTime = now;
+            }
+            if (doTime) {
+                s = StringUtil.replaceDate(s, "anim:", animationTime, tz);
+                s = StringUtil.replaceDate(s, "time:", animationTime, tz);
+                s = StringUtil.replaceDate(s, "now:", now, tz);
+            }
         }
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
