@@ -227,7 +227,6 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
 
-
     /**
      * Special constructor  for creating a map display for a particular
      * MapViewManager
@@ -240,10 +239,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         super(mapViewManager.getIdv());
         setLockVisibilityToggle(true);
         defaultViewManager = mapViewManager;
-        //        this.mapPosition    = mapInfo.getMapPosition();
         this.mapPosition = getInitialZPosition();
-        //System.out.println("map pos = " + this.mapPosition + ", info: "
-        //                   + mapInfo.getMapPosition());
         this.defaultMapData = mapInfo.getMapDataList();
         this.defaultLatData = mapInfo.getLatData();
         this.defaultLonData = mapInfo.getLonData();
@@ -293,7 +289,6 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
             NavigatedDisplay navDisplay = getNavigatedDisplay();
             if ((navDisplay == null) || (navDisplay.getDisplay() == null)) {
-                System.err.println("skipping");
                 return;
             }
             Rectangle     screenBounds = navDisplay.getScreenBounds();
@@ -302,7 +297,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             EarthLocation p2           = screenToEarth(screenBounds.width, 0);
             double diff = Math.abs(p1.getLongitude().getValue()
                                    - p2.getLongitude().getValue());
-            System.err.println("diff:" + diff);
+
             if (diff != lastWidthDegrees) {
                 lastWidthDegrees = diff;
                 System.err.println("setting spacing:");
@@ -453,6 +448,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         int cnt = 0;
         Trace.call1("MapDisplayControl.init");
 
+
+
         if (initializeAsDefault) {
             initialMap          = null;
             initializeAsDefault = false;
@@ -506,6 +503,14 @@ public class MapDisplayControl extends DisplayControlImpl {
             lonState = new LatLonState(defaultLonData);
             lonState.init(this);
         }
+
+        if(latState!=null) {
+            latLonHolder.addDisplayable(latState.getLatLonLines());
+        }
+        if(lonState!=null) {
+            latLonHolder.addDisplayable(lonState.getLatLonLines());
+        }
+
 
         if (((initialMap != null) && (initialMap.trim().length() > 0))
                 && !isDefaultMap) {
@@ -914,7 +919,6 @@ public class MapDisplayControl extends DisplayControlImpl {
         JPanel llPanel = LatLonPanel.layoutPanels(latPanel, lonPanel);
 
         try {
-            //xxxx
             if (latLonHolder.displayableCount() == 0) {
                 latLonHolder.addDisplayable(latState.getLatLonLines());
                 latLonHolder.addDisplayable(lonState.getLatLonLines());
