@@ -649,6 +649,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public abstract void setView(int view);
 
+    public void setView(String view) {
+        view = view.toLowerCase();
+        if(view.equals("bottom")) setView(BOTTOM_VIEW);
+        else if(view.equals("north")) setView(NORTH_VIEW);
+        else if(view.equals("east")) setView(EAST_VIEW);
+        else if(view.equals("top")) setView(TOP_VIEW);
+        else if(view.equals("south")) setView(SOUTH_VIEW);
+        else if(view.equals("west")) setView(WEST_VIEW);
+    }
+
+
     /**
      * Set the view to perspective or parallel if this is a 3D display..
      *

@@ -415,6 +415,8 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
                : false;
     }
 
+
+
     /**
      * Set the view for 3D.  The views are based on the original display
      * as follows:
