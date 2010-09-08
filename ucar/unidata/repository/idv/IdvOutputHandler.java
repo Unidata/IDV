@@ -144,6 +144,16 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_AZIMUTH = "azimuth";
     public static final String ARG_TILT = "tilt";
     public static final String ARG_WIREFRAME = "wireframe";
+    public static final String ARG_VIEWDIR = "viewdir";
+
+    public static final String ARG_LATLON_VISIBLE = "latlon.visible";
+    public static final String ARG_LATLON_SPACING = "latlon.spacing";
+
+
+    public static final String ARG_LAT1 = "lat1";
+    public static final String ARG_LON1 = "lon1";
+    public static final String ARG_LAT2 = "lat2";
+    public static final String ARG_LON2 = "lon2";
 
     /** _more_          */
     public static final String ARG_SUBMIT_SAVE = "submit.save";
@@ -389,6 +399,12 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+    public static final String DISPLAY_XS_CONTOUR = "contourxs";
+    public static final String DISPLAY_XS_COLOR = "colorxs";
+    public static final String DISPLAY_XS_FILLEDCONTOUR = "contourxsfilled";
+
+
+
     /** _more_ */
     public static final String DISPLAY_PLANVIEWFLOW = "planviewflow";
 
@@ -397,7 +413,6 @@ public class IdvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String DISPLAY_WINDBARBPLAN = "windbarbplan";
-
 
     /** _more_ */
     public static final String DISPLAY_PLANVIEWCONTOUR = "planviewcontour";
@@ -439,7 +454,9 @@ public class IdvOutputHandler extends OutputHandler {
     private List backgrounds;
 
     /** _more_ */
-    private HashSet<String> okControls;
+    private HashSet<String> okControls = new HashSet<String>();
+
+    private HashSet<String> vertControls = new HashSet<String>();
 
 
     /** _more_ */
@@ -460,7 +477,13 @@ public class IdvOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
 
-        okControls = new HashSet<String>();
+        okControls.add(DISPLAY_XS_CONTOUR);
+        okControls.add(DISPLAY_XS_FILLEDCONTOUR);
+        okControls.add(DISPLAY_XS_COLOR);
+        vertControls.add(DISPLAY_XS_CONTOUR);
+        vertControls.add(DISPLAY_XS_FILLEDCONTOUR);
+        vertControls.add(DISPLAY_XS_COLOR);
+        vertControls.add(DISPLAY_ISOSURFACE);
         okControls.add("planviewflow");
         okControls.add("streamlines");
         okControls.add("windbarbplan");
@@ -884,8 +907,7 @@ public class IdvOutputHandler extends OutputHandler {
                                                 + viewPointHtml));
 
 
-        List projectionOptions = new ArrayList();
-        projectionOptions.add(new TwoFacedObject("--none--", ""));
+
         List projections =
             idvServer.getIdv().getIdvProjectionManager().getProjections();
 
@@ -912,6 +934,8 @@ public class IdvOutputHandler extends OutputHandler {
             tfos.add(new TwoFacedObject(HtmlUtil.space(4) + label, name));
         }
 
+        List projectionOptions = new ArrayList();
+        projectionOptions.add(new TwoFacedObject("--none--", ""));
         for (String projCat : projCats) {
             projectionOptions.add(new TwoFacedObject(projCat, ""));
             projectionOptions.addAll(projCatMap.get(projCat));
@@ -927,6 +951,20 @@ public class IdvOutputHandler extends OutputHandler {
                                         htmlInput(request, ARG_AZIMUTH, "", 6) +" " + 
                                         htmlInput(request, ARG_TILT, "", 6)));
 
+
+        List viewOptions = new ArrayList();
+        viewOptions.add(new TwoFacedObject("--none--", ""));
+        viewOptions.add(new TwoFacedObject("north"));
+        viewOptions.add(new TwoFacedObject("south"));
+        viewOptions.add(new TwoFacedObject("east"));
+        viewOptions.add(new TwoFacedObject("west"));
+        viewOptions.add(new TwoFacedObject("bottom"));
+        viewOptions.add(new TwoFacedObject("top"));
+
+        basic.append(HtmlUtil.formEntry(msgLabel("View"),
+                                        htmlSelect(request,
+                                            ARG_VIEWDIR,
+                                            viewOptions)));
 
         /*
           basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
@@ -1051,6 +1089,15 @@ public class IdvOutputHandler extends OutputHandler {
                                            HtmlUtil.checkbox(ARG_WIREFRAME,"true",
                                                              request.get(ARG_WIREFRAME,false))));
 
+        mapAttrs.append(HtmlUtil.formEntry(msgLabel("Lat/Lon Lines"),
+                                           HtmlUtil.checkbox(ARG_LATLON_VISIBLE,"true",
+                                                             request.get(ARG_LATLON_VISIBLE,false)) +"  " +
+                                           msgLabel("Spacing") + " " +
+                                           htmlInput(request, ARG_LATLON_SPACING, "")
+                                           ));
+
+
+
         mapAttrs.append(HtmlUtil.formTableClose());
 
         mapSB.append(HtmlUtil.table(new Object[] { mapSelect, mapAttrs },
@@ -1107,8 +1154,6 @@ public class IdvOutputHandler extends OutputHandler {
                     ControlDescriptor.getApplicableControlDescriptors(
                         choice.getCategories(),
                         idvServer.getIdv().getControlDescriptors(true)));
-
-
 
 
             List<TwoFacedObject> displays = new ArrayList<TwoFacedObject>();
@@ -1393,6 +1438,17 @@ public class IdvOutputHandler extends OutputHandler {
                                            htmlInput(request,
                                                ARG_ISOSURFACEVALUE
                                                    + displayIdx, "", 3)));
+            misc.append(HtmlUtil.formEntry(msgLabel("XS Selector"),
+                                           "Lat 1: " + 
+                                           htmlInput(request, ARG_LAT1 + displayIdx,"", 6) +
+                                           "Lon 1: " + 
+                                           htmlInput(request, ARG_LON1 + displayIdx,"", 6) +"     " +
+                                           "Lat 2: " + 
+                                           htmlInput(request, ARG_LAT2 + displayIdx,"", 6) +
+                                           "Lon 2: " + 
+                                           htmlInput(request, ARG_LON2 + displayIdx,"", 6)));
+
+
             misc.append(HtmlUtil.formEntry(msgLabel("Vector/Barb Size"),
                                            htmlInput(request,
                                                ARG_FLOW_SCALE + displayIdx,
@@ -1852,7 +1908,7 @@ public class IdvOutputHandler extends OutputHandler {
 
         sb.append("\n");
         sb.append(HtmlUtil.br());
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Form"), formSB.toString(),
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Image Settings"), formSB.toString(),
                                              showForm));
 
         return new Result("Grid Displays", sb);
@@ -1991,9 +2047,20 @@ public class IdvOutputHandler extends OutputHandler {
 
         }
 
-        viewProps.append(makeProperty("wireframe", request.get(ARG_WIREFRAME,false)+""));
+        viewProps.append(makeProperty("wireframe", ""+request.get(ARG_WIREFRAME,false)));
+
+
+
+        if(request.get(ARG_LATLON_VISIBLE,false)) {
+            viewProps.append(makeProperty("initLatLonVisible", "true"));
+            if(request.defined(ARG_LATLON_SPACING)) {
+                viewProps.append(makeProperty("initLatLonSpacing", ""+request.get(ARG_LATLON_SPACING,15.0)));
+            }
+        }
+
+
         viewProps.append("\n");
-        //      viewProps.append(makeProperty( "wireframe","true"));
+
 
 
         if (request.get(ARG_VIEW_GLOBE, false)) {
@@ -2224,6 +2291,12 @@ public class IdvOutputHandler extends OutputHandler {
                                                   s.toString())));
             }
 
+            /*
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY,
+                                          XmlUtil.attrs("name",
+                                              "contourInfoParams", "value",
+                                                  s.toString())));
+            */
 
 
             if (request.defined(ARG_RANGE_MIN + displayIdx)
@@ -2264,6 +2337,31 @@ public class IdvOutputHandler extends OutputHandler {
                                            + displayIdx, "")));
 
 
+            if(display.equals(DISPLAY_XS_FILLEDCONTOUR) ||
+               display.equals(DISPLAY_XS_CONTOUR) ||
+               display.equals(DISPLAY_XS_COLOR)) {
+                propSB.append(makeProperty("lineVisible","false"));
+                if(request.defined(ARG_LAT1+displayIdx) && 
+                   request.defined(ARG_LON1+displayIdx) && 
+                   request.defined(ARG_LAT2+displayIdx) && 
+                   request.defined(ARG_LON2+displayIdx)) {
+                    propSB.append(makeProperty("initLat1",
+                                               request.getString(ARG_LAT1
+                                                                 + displayIdx, "")));
+
+                    propSB.append(makeProperty("initLon1",
+                                               request.getString(ARG_LON1
+                                                                 + displayIdx, "")));
+                    propSB.append(makeProperty("initLat2",
+                                               request.getString(ARG_LAT2
+                                                                 + displayIdx, "")));
+
+                    propSB.append(makeProperty("initLon2",
+                                               request.getString(ARG_LON2
+                                                                 + displayIdx, "")));
+                }
+            }
+
             if (display.equals(DISPLAY_PLANVIEWFLOW)
                     || display.equals(DISPLAY_STREAMLINES)
                     || display.equals(DISPLAY_WINDBARBPLAN)) {
@@ -2294,7 +2392,8 @@ public class IdvOutputHandler extends OutputHandler {
                                 request.getString(
                                     ARG_ISOSURFACEVALUE + displayIdx, ""))));
                 }
-            } else {
+            } 
+            if(!vertControls.contains(display)) {
                 String level = request.getString(ARG_LEVELS + displayIdx,
                                    "0");
                 attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,
@@ -2374,6 +2473,14 @@ public class IdvOutputHandler extends OutputHandler {
                                    XmlUtil.attrs(
                                                  ImageGenerator.ATTR_AZIMUTH, request.getString(ARG_AZIMUTH,""),
                                                  ImageGenerator.ATTR_TILT, request.getString(ARG_TILT,""))));
+        }
+
+        if(request.defined(ARG_VIEWDIR)) {
+            isl.append(
+                       XmlUtil.tag(
+                                   ImageGenerator.TAG_VIEWPOINT,
+                                   XmlUtil.attrs(
+                                                 ImageGenerator.ATTR_VIEWDIR, request.getString(ARG_VIEWDIR,""))));
         }
 
 

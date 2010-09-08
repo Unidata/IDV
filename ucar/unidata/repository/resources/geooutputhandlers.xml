@@ -6,7 +6,7 @@
   <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="true"/>
   <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
 
-  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="Grid Visualization"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  xrequired="false" name="Grid Visualization"/>
 
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 </outputhandlers>
