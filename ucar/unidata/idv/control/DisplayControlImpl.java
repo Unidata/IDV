@@ -2166,7 +2166,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param properties Specification of the name=value properties.
      */
-    protected void applyProperties(Hashtable properties) {
+    public void applyProperties(Hashtable properties) {
         if (properties == null) {
             return;
         }
@@ -9996,6 +9996,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void setColorTableName(String n) {
         colorTableName = n;
+        if (haveInitialized) {
+            ColorTable ct = 
+                controlContext.getColorTableManager().getColorTable(
+                                                                    colorTableName);
+            try {
+                setColorTable(ct);
+            } catch (Exception exc) {
+                logException("Setting color table", exc);
+            }
+        }
     }
 
 
