@@ -220,6 +220,7 @@ public class PluginClassLoader extends ClassLoader {
             checkClass(c);
             return c;
         } catch (Exception exc) {
+            exc.printStackTrace();
             throw new IllegalArgumentException("Could not load class:"
                                                + entryName + "\n" + exc);
         }
