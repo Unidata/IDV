@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.idv.ui;
@@ -225,6 +226,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_ISL = "isl";
 
+    /** _more_          */
     public static final String TAG_VIEWPOINT = "viewpoint";
 
     /** isl tag */
@@ -312,7 +314,7 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_INDEX = "index";
 
 
@@ -627,6 +629,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_VIEW = "view";
 
+    /** _more_          */
     public static final String ATTR_VIEWDIR = "viewdir";
 
     /** isl tag */
@@ -2831,6 +2834,24 @@ public class ImageGenerator extends IdvManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     */
+    protected boolean processTagDisplayproperties(Element node) {
+        DisplayControlImpl display = findDisplayControl(node);
+        if (display == null) {
+            throw new IllegalArgumentException("Could not find display:"
+                    + XmlUtil.toString(node));
+        }
+        Hashtable properties = getProperties(node);
+        display.applyProperties(properties);
+        return true;
+    }
+
 
     /**
      * process the given node
@@ -3522,7 +3543,7 @@ public class ImageGenerator extends IdvManager {
 
         s = StringUtil.replaceDate(s, "now:", now, tz);
 
-        if(s.indexOf("anim:")>=0 || s.indexOf("time:")>=0) {
+        if ((s.indexOf("anim:") >= 0) || (s.indexOf("time:") >= 0)) {
             Date animationTime = getAnimationTime();
             if (animationTime == null) {
                 animationTime = now;
