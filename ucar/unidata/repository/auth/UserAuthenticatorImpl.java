@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.auth;
@@ -29,38 +30,98 @@ import java.util.List;
 
 
 /**
- * UserAuthenticator _more_
+ * Base implementation of the UserAuthenticator interface
  *
  *
- * @author IDV Development Team
+ * @author RAMADDA Development Team
  */
 public abstract class UserAuthenticatorImpl implements UserAuthenticator {
 
+    /** _more_          */
     private Repository repository;
 
+    /**
+     * _more_
+     */
+    public UserAuthenticatorImpl() {}
 
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
+    public UserAuthenticatorImpl(Repository repository) {
+        this.repository = repository;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initUsers() throws Exception {}
+
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository() {
         return this.repository;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public UserManager getUserManager() {
+        return this.repository.getUserManager();
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param defaultValue _more_
+     *
+     * @return _more_
+     */
     public String getProperty(String name, String defaultValue) {
         return repository.getProperty(name, defaultValue);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public void debug(String msg) {
         System.err.println("UserAuthenticator: " + msg);
     }
 
-
-
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
     public void logError(String message, Exception exc) {
-        if(repository!=null) 
+        if (repository != null) {
             repository.getLogManager().logError(message, exc);
-        else {
+        } else {
             System.err.println("ERROR:" + message);
             exc.printStackTrace();
         }

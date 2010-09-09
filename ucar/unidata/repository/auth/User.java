@@ -24,13 +24,13 @@ package ucar.unidata.repository.auth;
 
 import ucar.unidata.repository.*;
 
-
-import ucar.unidata.xml.XmlEncoder;
-
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
+
+import ucar.unidata.xml.XmlEncoder;
 
 import java.util.Date;
 import java.util.Hashtable;
@@ -41,14 +41,16 @@ import java.util.List;
  * Class FilesInfo _more_
  *
  *
- * @author IDV Development Team
+ * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
 public class User {
 
-    public static final String PROP_CAN_CHANGE_PASSWORD = "prop.changepassword";
-
     /** _more_          */
+    public static final String PROP_CAN_CHANGE_PASSWORD =
+        "prop.changepassword";
+
+    /** _more_ */
     private static XmlEncoder xmlEncoder = new XmlEncoder();
 
     /** _more_ */
@@ -98,6 +100,7 @@ public class User {
     /** _more_ */
     private boolean isGuest = false;
 
+    /** _more_          */
     private Hashtable properties = new Hashtable();
 
     /**
@@ -109,12 +112,23 @@ public class User {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public User(String id) {
         this(id, id);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     */
     public User(String id, String name) {
-        this(id, name,false);
+        this(id, name, false);
     }
 
     /**
@@ -155,6 +169,7 @@ public class User {
      * @param language _more_
      * @param template _more_
      * @param isGuest _more_
+     * @param propertiesBlob _more_
      */
     public User(String id, String name, String email, String question,
                 String answer, String hashedPassword, boolean admin,
@@ -173,16 +188,20 @@ public class User {
         this.language = language;
         this.template = template;
         this.isGuest  = isGuest;
-        if(propertiesBlob!=null && propertiesBlob.length()>0) {
+        if ((propertiesBlob != null) && (propertiesBlob.length() > 0)) {
             try {
-            properties =
-                (Hashtable) xmlEncoder.toObject(propertiesBlob);
-            } catch(Exception exc) {
+                properties = (Hashtable) xmlEncoder.toObject(propertiesBlob);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getPropertiesBlob() {
         if (properties != null) {
             return xmlEncoder.toXml(properties);
@@ -191,10 +210,23 @@ public class User {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public Object getProperty(String key) {
         return properties.get(key);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
     public void putProperty(String key, Object value) {
         properties.put(key, value);
     }
@@ -320,7 +352,9 @@ public class User {
      * @return The Anonymous
      */
     public boolean getAnonymous() {
-        if(Misc.equals(UserManager.USER_ANONYMOUS, id)) return true;
+        if (Misc.equals(UserManager.USER_ANONYMOUS, id)) {
+            return true;
+        }
         return anonymous;
     }
 
@@ -399,9 +433,15 @@ public class User {
         return answer;
     }
 
+    /**
+     * _more_
+     *
+     * @param rawPassword _more_
+     * @param hashedPassword _more_
+     */
     public void setPasswords(String rawPassword, String hashedPassword) {
         this.hashedPassword = hashedPassword;
-        this.rawPassword = rawPassword;
+        this.rawPassword    = rawPassword;
     }
 
 
@@ -569,6 +609,11 @@ public class User {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean canChangePassword() {
         return canEditSettings() && getCanChangePassword();
     }
@@ -630,23 +675,25 @@ public class User {
     }
 
     /**
-       Set the CanChangePassword property.
-
-       @param value The new value for CanChangePassword
-    **/
-    public void setCanChangePassword (boolean value) {
-        putProperty(PROP_CAN_CHANGE_PASSWORD, ""+value);
+     *  Set the CanChangePassword property.
+     *
+     *  @param value The new value for CanChangePassword
+     */
+    public void setCanChangePassword(boolean value) {
+        putProperty(PROP_CAN_CHANGE_PASSWORD, "" + value);
     }
 
     /**
-       Get the CanChangePassword property.
-
-       @return The CanChangePassword
-    **/
-    public boolean getCanChangePassword () {
+     *  Get the CanChangePassword property.
+     *
+     *  @return The CanChangePassword
+     */
+    public boolean getCanChangePassword() {
         String v = (String) getProperty(PROP_CAN_CHANGE_PASSWORD);
-        if(v==null || Misc.equals(v,"true")) return  true;
-	return false;
+        if ((v == null) || Misc.equals(v, "true")) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.examples;
+
 
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
@@ -35,13 +37,13 @@ import java.util.List;
 
 /**
  * This is an example of an implementation of the UserAuthenticator interface.
- * This allows one to plugin their own user authentication. To use this make your 
+ * This allows one to plugin their own user authentication. To use this make your
  * own class just like this one and implement the below methods. Put the compiled .class
  * files into your RAMADDA home plugins directory and restart RAMADDA. (Or make a jar file of
  * the classes and put the jar in the plugins dir.). RAMADDA will instantiate of of these
  * classes and use it to do user authentication and management.
  *
- * The way this works is that if ramadda sees a .class file in the plugins directory 
+ * The way this works is that if ramadda sees a .class file in the plugins directory
  * (or in a jar in the plugins dir)
  * it will load the class at runtime. If the class is an instanceof UserAuthenticator interface
  * then ramadda will instantiate a version of this class and use it (in UserManager) to
@@ -49,10 +51,10 @@ import java.util.List;
  * If the user is there then it autheticates normally. If not then it defers to the UserAuthenticator
  * So you will at least need to create one admin user account in ramadda that is separate
  * from the external authenication
- * 
+ *
  * To compile this: in the main repository src directory (e.g., ../) you can run:<pre>
  * ant userauthenticator
- *</pre>
+ * </pre>
  *
  * This will compile this class, make a userauthenticator.jar and echo a message of
  * where the jar is (../../../../lib/userauthenticator.jar) and where to put it
@@ -62,17 +64,40 @@ import java.util.List;
  * @author Jeff McWhirter
  */
 public class TestUserAuthenticator extends UserAuthenticatorImpl {
-    
-
 
     /**
-     * constructor. 
+     * constructor.
+     *
+     * @param repository _more_
      */
-    public TestUserAuthenticator() {
+    public TestUserAuthenticator(Repository repository) {
         debug("created");
 
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initUsers() throws Exception {
+        User user = getUserManager().findUser("testuser");
+        if (user == null) {
+            System.err.println("Making new test user");
+            user = new User("testuser", "Test user");
+        } else {
+            System.err.println("Updating existing test user");
+        }
+        user.setHashedPassword(getUserManager().hashPassword("password"));
+        user.setCanChangePassword(false);
+        getUserManager().makeOrUpdateUser(user, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public void debug(String msg) {
         System.err.println("TestUserAuthenticator: " + msg);
     }
@@ -87,8 +112,6 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
      * @return The  non-local user that matches the given id or null
      */
     public User findUser(Repository repository, String userId) {
-
-
         //Create the xxx user
         debug("findUser: " + userId);
         if (userId.equals("xxx")) {
@@ -109,7 +132,7 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
     }
 
     /**
-     * this gets called when we want to  autheticate the given user/password
+     * this gets called when we want to  authenticate the given user/password
      * return null if user/password is unknown or incorrect
      *
      * @param repository the repository
@@ -123,12 +146,13 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
     public User authenticateUser(Repository repository, Request request,
                                  StringBuffer extraLoginForm, String userId,
                                  String password) {
-        /** 
-            This is how to find the ldapadmin
-            LdapAdminHandler ldapAdmin = LdapAdminHandler.getLdapHandler(repository);
-            //            properties:
-            ldapAdmin.getServer(),             ldapAdmin.getPort(), etc
-        */
+
+        /**
+         *   This is how to find the ldapadmin
+         *   LdapAdminHandler ldapAdmin = LdapAdminHandler.getLdapHandler(repository);
+         *   //            properties:
+         *   ldapAdmin.getServer(),             ldapAdmin.getPort(), etc
+         */
 
 
         debug("authenticateUser: " + userId);

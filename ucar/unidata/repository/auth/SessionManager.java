@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.auth;
@@ -70,7 +71,7 @@ import java.util.Properties;
 /**
  *
  *
- * @author IDV Development Team
+ * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
 public class SessionManager extends RepositoryManager {
@@ -211,19 +212,48 @@ public class SessionManager extends RepositoryManager {
     }
 
 
-    public void putSessionProperty(Request request, Object key, Object value) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param key _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
+    public void putSessionProperty(Request request, Object key, Object value)
+            throws Exception {
         String id = request.getSessionId();
-        if(id==null) return;
+        if (id == null) {
+            return;
+        }
         Session session = getSession(id);
-        if(session == null) return;
-        session.putProperty(key,value);
+        if (session == null) {
+            return;
+        }
+        session.putProperty(key, value);
     }
 
-    public Object getSessionProperty(Request request, Object key) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param key _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Object getSessionProperty(Request request, Object key)
+            throws Exception {
         String id = request.getSessionId();
-        if(id==null) return null;
+        if (id == null) {
+            return null;
+        }
         Session session = getSession(id);
-        if(session == null) return null;
+        if (session == null) {
+            return null;
+        }
         return session.getProperty(key);
     }
 
@@ -256,13 +286,13 @@ public class SessionManager extends RepositoryManager {
                 //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
                 boolean ok = true;
                 while ((results = iter.getNext()) != null && ok) {
-                        session = makeSession(results);
-                        session.setLastActivity(new Date());
-                        //Remove it from the DB and then readd it so we update the lastActivity
-                        removeSession(session.getId());
-                        addSession(session);
-                        sessionMap.put(sessionId, session);
-                        ok = false;
+                    session = makeSession(results);
+                    session.setLastActivity(new Date());
+                    //Remove it from the DB and then readd it so we update the lastActivity
+                    removeSession(session.getId());
+                    addSession(session);
+                    sessionMap.put(sessionId, session);
+                    ok = false;
                 }
             } finally {
                 getDatabaseManager().closeAndReleaseConnection(stmt);
@@ -396,7 +426,7 @@ public class SessionManager extends RepositoryManager {
                 throw new IllegalArgumentException(msgLabel("Unknown user")
                         + userId);
             }
-            if (!getUserManager().isPasswordValid(user, password)) {
+            if ( !getUserManager().isPasswordValid(user, password)) {
                 throw new IllegalArgumentException(msg("Incorrect password"));
             }
             setUserSession(request, user);
@@ -423,7 +453,8 @@ public class SessionManager extends RepositoryManager {
                         if (user == null) {
                             //                            throw new AccessException(
                             //                                msgLabel("Unknown user") + toks[0],request);
-                        } else if (!getUserManager().isPasswordValid(user, toks[1])) {
+                        } else if ( !getUserManager().isPasswordValid(user,
+                                toks[1])) {
                             //                            throw new AccessException(
                             //                                msg("Incorrect password"),request);
                             user = null;
@@ -513,7 +544,7 @@ public class SessionManager extends RepositoryManager {
     //    String sessionMessage;
 
 
-    /** _more_          */
+    /** _more_ */
     private String sessionMessage = "";
 
     /**
@@ -658,7 +689,7 @@ public class SessionManager extends RepositoryManager {
      * Class Session _more_
      *
      *
-     * @author IDV Development Team
+     * @author RAMADDA Development Team
      * @version $Revision: 1.3 $
      */
     public static class Session {
@@ -675,6 +706,7 @@ public class SessionManager extends RepositoryManager {
         /** _more_ */
         Date lastActivity;
 
+        /** _more_          */
         private Hashtable properties = new Hashtable();
 
         /**
@@ -704,10 +736,23 @@ public class SessionManager extends RepositoryManager {
             this.lastActivity = lastActivity;
         }
 
+        /**
+         * _more_
+         *
+         * @param key _more_
+         * @param value _more_
+         */
         public void putProperty(Object key, Object value) {
             properties.put(key, value);
         }
 
+        /**
+         * _more_
+         *
+         * @param key _more_
+         *
+         * @return _more_
+         */
         public Object getProperty(Object key) {
             return properties.get(key);
         }

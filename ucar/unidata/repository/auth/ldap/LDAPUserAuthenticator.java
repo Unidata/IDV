@@ -52,12 +52,20 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
     private LDAPManager manager = null;
 
     private int lastLDAPServerVersion = -1;
+
+
+
     /**
      * constructor.
      */
     public LDAPUserAuthenticator() {
         debug("created");
 
+    }
+
+    public LDAPUserAuthenticator(Repository repository) {
+        super(repository);
+        debug("created");
     }
 
     /**

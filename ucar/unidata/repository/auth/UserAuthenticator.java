@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.repository.auth;
@@ -31,9 +32,16 @@ import java.util.List;
  * UserAuthenticator _more_
  *
  *
- * @author IDV Development Team
+ * @author RAMADDA Development Team
  */
 public interface UserAuthenticator {
+
+    /**
+     * this gets called at startup
+     *
+     * @throws Exception _more_
+     */
+    public void initUsers() throws Exception;
 
     /**
      * this gets called when we want to just get a User object from the ID.

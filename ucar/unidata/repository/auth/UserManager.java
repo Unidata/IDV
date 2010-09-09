@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository.auth;
 
+
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.database.*;
 import ucar.unidata.repository.output.*;
@@ -37,6 +38,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.io.UnsupportedEncodingException;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -62,7 +64,7 @@ public class UserManager extends RepositoryManager {
         new OutputType("Add to Cart", "user.cart.add", OutputType.TYPE_FILE,
                        "", ICON_CART_ADD);
 
-    /** output type          */
+    /** output type */
     public static final OutputType OUTPUT_CART_REMOVE =
         new OutputType("Remove from Cart", "user.cart.remove",
                        OutputType.TYPE_FILE, "", ICON_CART_DELETE);
@@ -84,13 +86,13 @@ public class UserManager extends RepositoryManager {
         "ramadda.login.allowedips";
 
 
-    /** activity type for logging          */
+    /** activity type for logging */
     public static final String ACTIVITY_LOGIN = "login";
 
-    /** activity type for logging          */
+    /** activity type for logging */
     public static final String ACTIVITY_LOGOUT = "logout";
 
-    /** activity type for logging          */
+    /** activity type for logging */
     public static final String ACTIVITY_PASSWORD_CHANGE = "password.change";
 
     /** _more_ */
@@ -99,6 +101,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String USER_ANONYMOUS = "anonymous";
 
+    /** _more_          */
     public static final String USER_LOCALFILE = "localuser";
 
 
@@ -126,7 +129,8 @@ public class UserManager extends RepositoryManager {
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
     /** Holds the users data cart. This of course is ephemeral */
-    private Hashtable<String,List<Entry>> userCart = new Hashtable<String,List<Entry>>();
+    private Hashtable<String, List<Entry>> userCart = new Hashtable<String,
+                                                          List<Entry>>();
 
 
 
@@ -135,13 +139,14 @@ public class UserManager extends RepositoryManager {
         new ArrayList<UserAuthenticator>();
 
     /** holds password reset information */
-    private Hashtable<String,PasswordReset> passwordResets = new Hashtable<String,PasswordReset>();
+    private Hashtable<String, PasswordReset> passwordResets =
+        new Hashtable<String, PasswordReset>();
 
 
     /**
      * ctor
      *
-     * @param repository the repository 
+     * @param repository the repository
      */
     public UserManager(Repository repository) {
         super(repository);
@@ -155,8 +160,9 @@ public class UserManager extends RepositoryManager {
      */
     public void addUserAuthenticator(UserAuthenticator userAuthenticator) {
         userAuthenticators.add(userAuthenticator);
-        if(userAuthenticator instanceof UserAuthenticatorImpl) {
-            ((UserAuthenticatorImpl)userAuthenticator).setRepository(getRepository());
+        if (userAuthenticator instanceof UserAuthenticatorImpl) {
+            ((UserAuthenticatorImpl) userAuthenticator).setRepository(
+                getRepository());
         }
     }
 
@@ -222,11 +228,20 @@ public class UserManager extends RepositoryManager {
                                          + " property is incorrect");
                 return;
             }
-            User user = new User(toks.get(0), "", false);
+            User   user        = new User(toks.get(0), "", false);
             String rawPassword = toks.get(1).trim();
             user.setPasswords(rawPassword, hashPassword(rawPassword));
-            makeOrUpdateUser(user, true, true);
+            if ( !userExistsInDatabase(user)) {
+                makeOrUpdateUser(user, true);
+            } else {
+                changePassword(user);
+            }
+
             logInfo("Password for:" + user.getId() + " has been updated");
+        }
+
+        for (UserAuthenticator userAuthenticator : userAuthenticators) {
+            userAuthenticator.initUsers();
         }
     }
 
@@ -443,6 +458,13 @@ public class UserManager extends RepositoryManager {
         return findUser(USER_ANONYMOUS);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public User getLocalFileUser() throws Exception {
         return findUser(USER_LOCALFILE);
     }
@@ -492,7 +514,6 @@ public class UserManager extends RepositoryManager {
             for (UserAuthenticator userAuthenticator : userAuthenticators) {
                 user = userAuthenticator.findUser(getRepository(), id);
                 if (user != null) {
-                    user.setIsLocal(false);
                     break;
                 }
             }
@@ -560,20 +581,32 @@ public class UserManager extends RepositoryManager {
      *
      * @param user The user
      *
+     *
+     * @return _more_
      * @throws Exception On badness
      */
-    private User makeUserIfNeeded(User user) throws Exception {
-        if (!userExistsInDatabase(user)) {
-            makeOrUpdateUser(user, true, false);
+    public User makeUserIfNeeded(User user) throws Exception {
+        if ( !userExistsInDatabase(user)) {
+            makeOrUpdateUser(user, false);
         }
         return user;
     }
 
 
-    public void makeOrUpdateUser(User user, boolean updateIfNeeded)
-        throws Exception {
-        makeOrUpdateUser(user,  updateIfNeeded, false);
+    /**
+     * _more_
+     *
+     * @param user _more_
+     *
+     * @throws Exception _more_
+     */
+    public void changePassword(User user) throws Exception {
+        getDatabaseManager().update(
+            Tables.USERS.NAME, Tables.USERS.COL_ID, user.getId(),
+            new String[] { Tables.USERS.COL_PASSWORD },
+            new Object[] { user.getHashedPassword() });
     }
+
 
     /**
      * _more_
@@ -583,47 +616,43 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    public void makeOrUpdateUser(User user, boolean updateIfNeeded,
-                                 boolean onlyPassword)
+    public void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (userExistsInDatabase(user)) {
-            if (!updateIfNeeded) {
-                throw new IllegalArgumentException("Database already contains user:"
-                                                   + user.getId());
-            }
-            if (onlyPassword) {
-                getDatabaseManager().update(
-                    Tables.USERS.NAME, Tables.USERS.COL_ID, user.getId(),
-                    new String[] { Tables.USERS.COL_PASSWORD },
-                    new Object[] { user.getHashedPassword() });
-            } else {
-                getDatabaseManager().update(Tables.USERS.NAME,
-                                            Tables.USERS.COL_ID,
-                                            user.getId(), new String[] {
-                    Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
-                    Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
-                    Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                    Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE,
-                    Tables.USERS.COL_ISGUEST
-                }, new Object[] {
-                    user.getName(), user.getHashedPassword(), user.getEmail(),
-                    user.getQuestion(), user.getAnswer(), user.getAdmin()
-                            ? new Integer(1)
-                            : new Integer(0), user.getLanguage(),
-                    user.getTemplate(), new Boolean(user.getIsGuest())
-                });
-                userMap.remove(user.getId());
-            }
-        } else {
-            getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
-                    user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
-                    user.getAnswer(), user.getHashedPassword(),
-                    new Boolean(user.getAdmin()), user.getLanguage(),
-                    user.getTemplate(), new Boolean(user.getIsGuest()),
-		    user.getPropertiesBlob()
-                });
+        if ( !userExistsInDatabase(user)) {
+            getDatabaseManager().executeInsert(Tables.USERS.INSERT,
+                    new Object[] {
+                user.getId(), user.getName(), user.getEmail(),
+                user.getQuestion(), user.getAnswer(),
+                user.getHashedPassword(), new Boolean(user.getAdmin()),
+                user.getLanguage(), user.getTemplate(),
+                new Boolean(user.getIsGuest()), user.getPropertiesBlob()
+            });
             userMap.put(user.getId(), user);
+            return;
         }
+
+        if ( !updateIfNeeded) {
+            throw new IllegalArgumentException(
+                "Database already contains user:" + user.getId());
+        }
+
+        getDatabaseManager().update(Tables.USERS.NAME, Tables.USERS.COL_ID,
+                                    user.getId(), new String[] {
+            Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
+            Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
+            Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
+            Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE,
+            Tables.USERS.COL_ISGUEST, Tables.USERS.COL_PROPERTIES
+        }, new Object[] {
+            user.getName(), user.getHashedPassword(), user.getEmail(),
+            user.getQuestion(), user.getAnswer(), user.getAdmin()
+                    ? new Integer(1)
+                    : new Integer(0), user.getLanguage(), user.getTemplate(),
+            new Boolean(user.getIsGuest()), user.getPropertiesBlob()
+        });
+        userMap.remove(user.getId());
+
+
     }
 
 
@@ -689,7 +718,8 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    private void applyUserProperties(Request request, User user, boolean doAdmin)
+    private void applyUserProperties(Request request, User user,
+                                     boolean doAdmin)
             throws Exception {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
@@ -810,7 +840,7 @@ public class UserManager extends RepositoryManager {
                 + HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             sb.append(buttons);
             makeUserForm(request, user, sb, true);
-            if(user.canChangePassword()) {
+            if (user.canChangePassword()) {
                 makePasswordForm(request, user, sb);
             }
             sb.append(buttons);
@@ -970,7 +1000,7 @@ public class UserManager extends RepositoryManager {
             }
             User user = new User(id, name, email, "", "",
                                  hashPassword(password1), false, "", "",
-                                 false,null);
+                                 false, null);
             user.setRawPassword(password1);
             users.add(user);
         }
@@ -1430,6 +1460,7 @@ public class UserManager extends RepositoryManager {
                                1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
         user.setRoles(roles);
+
         return user;
     }
 
@@ -1448,7 +1479,7 @@ public class UserManager extends RepositoryManager {
         if (sessionId == null) {
             return new ArrayList<Entry>();
         }
-        List<Entry> cart =  userCart.get(sessionId);
+        List<Entry> cart = userCart.get(sessionId);
         if (cart == null) {
             cart = new ArrayList<Entry>();
             userCart.put(sessionId, cart);
@@ -2037,7 +2068,7 @@ public class UserManager extends RepositoryManager {
      * Class PasswordReset _more_
      *
      *
-     * @author IDV Development Team
+     * @author RAMADDA Development Team
      * @version $Revision: 1.3 $
      */
     private static class PasswordReset {
@@ -2148,7 +2179,7 @@ public class UserManager extends RepositoryManager {
         PasswordReset resetInfo = null;
         StringBuffer  sb        = new StringBuffer();
         if (key != null) {
-            resetInfo =  passwordResets.get(key);
+            resetInfo = passwordResets.get(key);
             if (resetInfo != null) {
                 if (new Date().getTime() > resetInfo.dttm.getTime()) {
                     sb.append(
@@ -2380,6 +2411,7 @@ public class UserManager extends RepositoryManager {
                 }
                 getDatabaseManager().closeAndReleaseConnection(statement);
 
+                //Check  the authenticators
                 if (user == null) {
                     for (UserAuthenticator userAuthenticator :
                             userAuthenticators) {
@@ -2387,7 +2419,6 @@ public class UserManager extends RepositoryManager {
                             getRepository(), request, loginFormExtra, name,
                             password);
                         if (user != null) {
-                            user.setIsLocal(false);
                             break;
                         }
                     }
@@ -2817,14 +2848,15 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
-        sb.append(HtmlUtil.p());
-        sb.append(msgHeader("Password"));
-        sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
-        if(user.canChangePassword()) {
+        if (user.canChangePassword()) {
+            sb.append(HtmlUtil.p());
+            sb.append(msgHeader("Password"));
+            sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
             makePasswordForm(request, user, sb);
+            sb.append(HtmlUtil.submit(msg("Change Password"),
+                                      ARG_USER_CHANGE));
+            sb.append(HtmlUtil.formClose());
         }
-        sb.append(HtmlUtil.submit(msg("Change Password"), ARG_USER_CHANGE));
-        sb.append(HtmlUtil.formClose());
 
 
         sb.append(HtmlUtil.p());

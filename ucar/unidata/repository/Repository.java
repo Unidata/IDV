@@ -1679,9 +1679,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (UserAuthenticator.class.isAssignableFrom(c)) {
                 getLogManager().logInfo("Adding authenticator:"
                                         + c.getName());
-                System.err.println("**** adding user auth");
-                getUserManager().addUserAuthenticator(
-                    (UserAuthenticator) c.newInstance());
+                getLogManager().logInfo("Instantiating UserAuthenticator:" + c.getName());
+                Constructor ctor = Misc.findConstructor(c, new Class[]{Repository.class});
+                if(ctor!=null) {
+                    getUserManager().addUserAuthenticator(
+                                                          (UserAuthenticator) ctor.newInstance(new Object[]{Repository.this}));
+
+                } else {
+                    getUserManager().addUserAuthenticator(
+                                                          (UserAuthenticator) c.newInstance());
+                }
             } else if (PageDecorator.class.isAssignableFrom(c)) {
                 PageDecorator pageDecorator = (PageDecorator) c.newInstance();
                 pageDecorators.add(pageDecorator);

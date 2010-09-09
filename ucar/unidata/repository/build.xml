@@ -274,7 +274,9 @@
         <include name="ucar/unidata/repository/util/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
         <exclude name="ucar/unidata/repository/examples/*.java"/>
+<!--
         <exclude name="ucar/unidata/repository/auth/ldap/*.java"/>
+-->
 
         <include name="${includesrc1}"/>
         <include name="${includesrc2}"/>
