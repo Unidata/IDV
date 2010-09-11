@@ -378,6 +378,9 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
+    public static final String ATTR_SHOWUNIT = "showunit";
+
+    /** _more_ */
     public static final String ATTR_TRANSPARENCY = "transparency";
 
     /** _more_ */
@@ -685,6 +688,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl attribute */
     public static final String ATTR_WHAT = "what";
+
+    /** isl attribute */
+	private static final String ATTR_SUFFIXFREQUENCY = "suffixfrequency";
 
     /** Show debug messages */
     private boolean debug = false;
@@ -4337,8 +4343,11 @@ public class ImageGenerator extends IdvManager {
                     setFont(g, child);
                     FontMetrics fm     = g.getFontMetrics();
                     List        values = new ArrayList();
+                    String suffixFrequency  = XmlUtil.getAttribute(child, ATTR_SUFFIXFREQUENCY, 
+                    		XmlUtil.getAttribute(child, ATTR_SHOWUNIT, "false")).toLowerCase();
+                    String unitDefault = (!suffixFrequency.equals("false")) ? " %unit%" : "";
                     String labelSuffix = applyMacros(child, ATTR_SUFFIX,
-                                             " %unit%");
+                                             unitDefault);
                     if (unit != null) {
                         labelSuffix = labelSuffix.replace("%unit%",
                                 "" + unit);
@@ -4403,8 +4412,14 @@ public class ImageGenerator extends IdvManager {
                             }
                         }
                         String tickLabel =
-                            getIdv().getDisplayConventions().format(value)
-                            + labelSuffix;
+                            getIdv().getDisplayConventions().format(value);
+                        if (suffixFrequency.equals("last") && valueIdx == values.size()-1) {
+                        	tickLabel += labelSuffix;
+                        } else if (suffixFrequency.equals("first") && valueIdx == 0) {
+                        	tickLabel += labelSuffix;
+                        } else if (suffixFrequency.equals("all") || suffixFrequency.equals("true")) {
+                        	tickLabel += labelSuffix;
+                        }
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
