@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.idv.ui;
@@ -135,6 +134,18 @@ public class ImageGenerator extends IdvManager {
     /** attr value */
     public static final String VALUE_LEFT = "left";
 
+    /** attr value */
+    public static final String VALUE_ALL = "all";
+
+    /** attr value */
+    public static final String VALUE_NONE = "none";
+
+    /** attr value */
+    public static final String VALUE_FIRST = "first";
+
+    /** attr value */
+    public static final String VALUE_LAST = "last";
+
     /** macro property */
     public static final String PROP_LOOPINDEX = "loopindex";
 
@@ -226,7 +237,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_ISL = "isl";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VIEWPOINT = "viewpoint";
 
     /** isl tag */
@@ -632,7 +643,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_VIEW = "view";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VIEWDIR = "viewdir";
 
     /** isl tag */
@@ -690,7 +701,7 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_WHAT = "what";
 
     /** isl attribute */
-	private static final String ATTR_SUFFIXFREQUENCY = "suffixfrequency";
+    private static final String ATTR_SUFFIXFREQUENCY = "suffixfrequency";
 
     /** Show debug messages */
     private boolean debug = false;
@@ -4343,9 +4354,14 @@ public class ImageGenerator extends IdvManager {
                     setFont(g, child);
                     FontMetrics fm     = g.getFontMetrics();
                     List        values = new ArrayList();
-                    String suffixFrequency  = XmlUtil.getAttribute(child, ATTR_SUFFIXFREQUENCY, 
-                    		XmlUtil.getAttribute(child, ATTR_SHOWUNIT, "false")).toLowerCase();
-                    String unitDefault = (!suffixFrequency.equals("false")) ? " %unit%" : "";
+                    String suffixFrequency = XmlUtil.getAttribute(child,
+                                                 ATTR_SUFFIXFREQUENCY,
+                                                 XmlUtil.getAttribute(child,
+                                                     ATTR_SHOWUNIT,
+                                                     "false")).toLowerCase();
+                    String unitDefault = ( !suffixFrequency.equals("false"))
+                                         ? " %unit%"
+                                         : "";
                     String labelSuffix = applyMacros(child, ATTR_SUFFIX,
                                              unitDefault);
                     if (unit != null) {
@@ -4413,12 +4429,15 @@ public class ImageGenerator extends IdvManager {
                         }
                         String tickLabel =
                             getIdv().getDisplayConventions().format(value);
-                        if (suffixFrequency.equals("last") && valueIdx == values.size()-1) {
-                        	tickLabel += labelSuffix;
-                        } else if (suffixFrequency.equals("first") && valueIdx == 0) {
-                        	tickLabel += labelSuffix;
-                        } else if (suffixFrequency.equals("all") || suffixFrequency.equals("true")) {
-                        	tickLabel += labelSuffix;
+                        if (suffixFrequency.equals(VALUE_LAST)
+                                && (valueIdx == values.size() - 1)) {
+                            tickLabel += labelSuffix;
+                        } else if (suffixFrequency.equals(VALUE_FIRST)
+                                   && (valueIdx == 0)) {
+                            tickLabel += labelSuffix;
+                        } else if (suffixFrequency.equals(VALUE_ALL)
+                                   || suffixFrequency.equals("true")) {
+                            tickLabel += labelSuffix;
                         }
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
