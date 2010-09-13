@@ -352,9 +352,12 @@ The [isl::tag write] tag allows you to write out an intermediate image file at a
                tickmarks {number of tick marks} 
                interval {interval value} 
                values {comma separated list of values} 
-               place {rectangle location} 
-               anchor {rectangle location} 
+               place {rectangle location on image} 
+               anchor {rectangle location on colorbar} 
                showlines {'true' or 'false', draw tick lines} 
+               suffix {text to add to tick labels} 
+               suffixfrequency {'all', 'first', 'last' - frequeny of suffix plotting} 
+               showunit {'true' or 'false', use unit as suffix} 
                linecolor {line color} }]
 The [isl::tag colorbar] tag allows you to add a color bar from  the color tables in the display controls.
 Currently, it does not do a perfect job when there are more than one color tables present.
