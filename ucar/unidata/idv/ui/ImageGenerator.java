@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.idv.ui;
@@ -94,6 +95,8 @@ import java.awt.image.*;
 import java.io.*;
 
 import java.lang.reflect.*;
+
+import java.text.DecimalFormat;
 
 import java.text.SimpleDateFormat;
 
@@ -273,6 +276,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String TAG_CLIP = "clip";
+
+    /** _more_          */
+    public static final String TAG_LATLONLABELS = "latlonlabels";
 
     /** _more_ */
     public static final String TAG_PUBLISH = "publish";
@@ -469,6 +475,9 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_COPY = "copy";
 
+    /** _more_          */
+    public static final String ATTR_COUNT = "count";
+
     /** isl tag */
     public static final String ATTR_COLUMNS = "columns";
 
@@ -520,6 +529,13 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String ATTR_FONTFACE = "fontface";
+
+    /** isl attr */
+    public static final String ATTR_FORMAT = "format";
+
+
+    /** _more_          */
+    public static final String ATTR_DRAWLINES = "drawlines";
 
     /** isl tag */
     public static final String ATTR_FONTSIZE = "fontsize";
@@ -4584,16 +4600,9 @@ public class ImageGenerator extends IdvManager {
                     throw new MyQuitException();
                 }
             } else if (tagName.equals(TAG_MATTE)) {
-                int   space  = applyMacros(child, ATTR_SPACE, 0);
-                int   hspace = applyMacros(child, ATTR_HSPACE, space);
-                int   vspace = applyMacros(child, ATTR_VSPACE, space);
-                int   top    = applyMacros(child, ATTR_TOP, vspace);
-                int   bottom = applyMacros(child, ATTR_BOTTOM, vspace);
-                int   left   = applyMacros(child, ATTR_LEFT, hspace);
-                int   right  = applyMacros(child, ATTR_RIGHT, hspace);
-                Color bg = applyMacros(child, ATTR_BACKGROUND, Color.white);
-                newImage = ImageUtils.matte(image, top, bottom, left, right,
-                                            bg);
+                newImage = doMatte(image, child);
+            } else if (tagName.equals(TAG_LATLONLABELS)) {
+                newImage = doLatLonLabels(child, viewManager, image);
             } else if (tagName.equals(TAG_WRITE)) {
                 ImageUtils.writeImageToFile(
                     image, getImageFileName(applyMacros(child, ATTR_FILE)));
@@ -4891,6 +4900,91 @@ public class ImageGenerator extends IdvManager {
         }
         return image;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param child _more_
+     *
+     * @return _more_
+     */
+    public Insets getInsets(Element child) {
+        int space  = applyMacros(child, ATTR_SPACE, 0);
+        int hspace = applyMacros(child, ATTR_HSPACE, space);
+        int vspace = applyMacros(child, ATTR_VSPACE, space);
+        int top    = applyMacros(child, ATTR_TOP, vspace);
+        int bottom = applyMacros(child, ATTR_BOTTOM, vspace);
+        int left   = applyMacros(child, ATTR_LEFT, hspace);
+        int right  = applyMacros(child, ATTR_RIGHT, hspace);
+        return new Insets(top, left, bottom, right);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param child _more_
+     * @param viewManager _more_
+     * @param image _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public BufferedImage doLatLonLabels(Element child,
+                                        ViewManager viewManager,
+                                        BufferedImage image)
+            throws Exception {
+        if (viewManager == null) {
+            throw new IllegalArgumentException("Tag " + TAG_LATLONLABELS
+                    + " requires a view");
+        }
+        if ( !(viewManager instanceof MapViewManager)) {
+            throw new IllegalArgumentException("Tag " + TAG_LATLONLABELS
+                    + " requires a map view");
+        }
+        MapViewManager   mvm     = (MapViewManager) viewManager;
+        NavigatedDisplay display = (NavigatedDisplay) viewManager.getMaster();
+        DecimalFormat format = new DecimalFormat(applyMacros(child,
+                                   ATTR_FORMAT, "##0.0"));
+        boolean       drawLines = applyMacros(child, ATTR_DRAWLINES, false);
+        Insets        insets    = getInsets(child);
+        int           count     = applyMacros(child, ATTR_COUNT, 5);
+        int           width     = image.getWidth(null);
+        int           height    = image.getWidth(null);
+        int           centerX   = width / 2;
+        int           centerY   = height / 2;
+        EarthLocation nw        = display.screenToEarthLocation(0, 0);
+        EarthLocation ne        = display.screenToEarthLocation(width, 0);
+        EarthLocation se        = display.screenToEarthLocation(0, height);
+        EarthLocation sw        = display.screenToEarthLocation(width,
+                                      height);
+
+        image = doMatte(image, child);
+        Graphics2D g = (Graphics2D) image.getGraphics();
+
+        //TODO: actually do this...
+        for (int i = 0; i < count; i++) {}
+
+        return image;
+    }
+
+    /**
+     * _more_
+     *
+     * @param image _more_
+     * @param child _more_
+     *
+     * @return _more_
+     */
+    public BufferedImage doMatte(BufferedImage image, Element child) {
+        Insets insets = getInsets(child);
+        Color  bg     = applyMacros(child, ATTR_BACKGROUND, Color.white);
+        return ImageUtils.matte(image, insets.top, insets.bottom,
+                                insets.left, insets.right, bg);
+    }
+
 
 
     /*
