@@ -718,6 +718,12 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
 
+  <derived description="Merge Time Sequences" formula="mergeTimeSequences(field[multiple=true])" id="Merge Time Sequences" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
   <derived description="Difference from initial timestep (D(T)=D(T)-D(0))" formula="differenceFromBaseTime(field)" id="Difference from initial timestep" isdefault="false" isenduser="true">
     <categories>

@@ -296,6 +296,27 @@ def makeTimeSequence(g):
      fld.setSample(i,g[index[i]].getSample(0),0)
   return fld
 
+def mergeTimeSequences(g):
+  """ Merge a set of time sequences of grids/images into a single time sequence.
+      All grids/images must have the same parameter name """
+  from visad import FunctionType, FieldImpl, Gridded1DDoubleSet, Set, Unit
+  domain = getDomainSet(g[0])
+  newDomain = domain
+  dt = getDomainType(g[0])
+  rt = getRangeType(g[0])
+  for i in range(1,len(g)):
+     newDomain = newDomain.merge1DSets(getDomainSet(g[i]))
+  ft=FunctionType(dt, rt)
+  fld=FieldImpl(ft,newDomain)
+  for i in range(len(g)):
+     oldDomain = getDomainSet(g[i])
+     values = oldDomain.getDoubles(1)
+     values = Unit.convertTuple(values, oldDomain.getSetUnits(), newDomain.getSetUnits())
+     index = newDomain.doubleToIndex(values)
+     for j in range(len(index)):
+        if (index[j] >= 0):
+           fld.setSample(index[j], g[i].getSample(j), 0)
+  return fld
 
 
 def writeGridToXls(grid,filename='grid.xls'):
