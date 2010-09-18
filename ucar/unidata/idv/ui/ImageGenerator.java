@@ -277,8 +277,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_CLIP = "clip";
 
-    /** _more_          */
-    public static final String TAG_LATLONLABELS = "latlonlabels";
+
 
     /** _more_ */
     public static final String TAG_PUBLISH = "publish";
@@ -404,7 +403,6 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_TOP = "top";
 
 
-
     /** _more_ */
     public static final String ATTR_SPACE_LEFT = "space_left";
 
@@ -475,7 +473,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_COPY = "copy";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COUNT = "count";
 
     /** isl tag */
@@ -534,8 +532,67 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_FORMAT = "format";
 
 
+    /** _more_ */
+
+    /** _more_ */
+    public static final String TAG_LATLONLABELS = "latlonlabels";
+
     /** _more_          */
-    public static final String ATTR_DRAWLINES = "drawlines";
+    public static final String ATTR_LAT_VALUES = "latvalues";
+
+    /** _more_          */
+    public static final String ATTR_LAT_LABELS = "latlabels";
+
+    /** _more_          */
+    public static final String ATTR_LON_VALUES = "lonvalues";
+
+    /** _more_          */
+    public static final String ATTR_LON_LABELS = "lonlabels";
+
+
+
+    /** _more_          */
+    public static final String ATTR_DRAWLONLINES = "drawlonlines";
+
+    /** _more_          */
+    public static final String ATTR_DRAWLATLINES = "drawlatlines";
+
+    /** _more_          */
+    public static final String ATTR_DASHES = "dashes";
+
+    /** _more_          */
+    public static final String ATTR_LINEWIDTH = "linewidth";
+
+    /** _more_          */
+    public static final String ATTR_LINEOFFSET_RIGHT = "lineoffsetright";
+
+    /** _more_          */
+    public static final String ATTR_LINEOFFSET_LEFT = "lineoffsetleft";
+
+    /** _more_          */
+    public static final String ATTR_LINEOFFSET_TOP = "lineoffsettop";
+
+    /** _more_          */
+    public static final String ATTR_LINEOFFSET_BOTTOM = "lineoffsetbottom";
+
+    /** _more_          */
+    public static final String ATTR_LABELBACKGROUND = "labelbackground";
+
+    /** _more_          */
+    public static final String ATTR_SHOWTOP = "showtop";
+
+    /** _more_          */
+    public static final String ATTR_SHOWBOTTOM = "showbottom";
+
+    /** _more_          */
+    public static final String ATTR_SHOWLEFT = "showleft";
+
+    /** _more_          */
+    public static final String ATTR_SHOWRIGHT = "showright";
+
+
+
+
 
     /** isl tag */
     public static final String ATTR_FONTSIZE = "fontsize";
@@ -4455,6 +4512,8 @@ public class ImageGenerator extends IdvManager {
                                    || suffixFrequency.equals("true")) {
                             tickLabel += labelSuffix;
                         }
+
+
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
@@ -4600,7 +4659,7 @@ public class ImageGenerator extends IdvManager {
                     throw new MyQuitException();
                 }
             } else if (tagName.equals(TAG_MATTE)) {
-                newImage = doMatte(image, child);
+                newImage = doMatte(image, child, 0);
             } else if (tagName.equals(TAG_LATLONLABELS)) {
                 newImage = doLatLonLabels(child, viewManager, image);
             } else if (tagName.equals(TAG_WRITE)) {
@@ -4906,11 +4965,12 @@ public class ImageGenerator extends IdvManager {
      * _more_
      *
      * @param child _more_
+     * @param dflt _more_
      *
      * @return _more_
      */
-    public Insets getInsets(Element child) {
-        int space  = applyMacros(child, ATTR_SPACE, 0);
+    public Insets getInsets(Element child, int dflt) {
+        int space  = applyMacros(child, ATTR_SPACE, dflt);
         int hspace = applyMacros(child, ATTR_HSPACE, space);
         int vspace = applyMacros(child, ATTR_VSPACE, space);
         int top    = applyMacros(child, ATTR_TOP, vspace);
@@ -4936,6 +4996,7 @@ public class ImageGenerator extends IdvManager {
                                         ViewManager viewManager,
                                         BufferedImage image)
             throws Exception {
+
         if (viewManager == null) {
             throw new IllegalArgumentException("Tag " + TAG_LATLONLABELS
                     + " requires a view");
@@ -4948,26 +5009,190 @@ public class ImageGenerator extends IdvManager {
         NavigatedDisplay display = (NavigatedDisplay) viewManager.getMaster();
         DecimalFormat format = new DecimalFormat(applyMacros(child,
                                    ATTR_FORMAT, "##0.0"));
-        boolean       drawLines = applyMacros(child, ATTR_DRAWLINES, false);
-        Insets        insets    = getInsets(child);
-        int           count     = applyMacros(child, ATTR_COUNT, 5);
-        int           width     = image.getWidth(null);
-        int           height    = image.getWidth(null);
-        int           centerX   = width / 2;
-        int           centerY   = height / 2;
-        EarthLocation nw        = display.screenToEarthLocation(0, 0);
-        EarthLocation ne        = display.screenToEarthLocation(width, 0);
-        EarthLocation se        = display.screenToEarthLocation(0, height);
-        EarthLocation sw        = display.screenToEarthLocation(width,
-                                      height);
+        Color color     = applyMacros(child, ATTR_COLOR, Color.red);
+        Color lineColor = applyMacros(child, ATTR_LINECOLOR, color);
+        Color bg = applyMacros(child, ATTR_LABELBACKGROUND, (Color) null);
 
-        image = doMatte(image, child);
+        double[] latValues = Misc.parseDoubles(applyMacros(child,
+                                 ATTR_LAT_VALUES, ""));
+        List<String> latLabels = StringUtil.split(applyMacros(child,
+                                     ATTR_LAT_LABELS, ""), ",", true, true);
+        double[] lonValues = Misc.parseDoubles(applyMacros(child,
+                                 ATTR_LON_VALUES, ""));
+        List<String> lonLabels = StringUtil.split(applyMacros(child,
+                                     ATTR_LON_LABELS, ""), ",", true, true);
+
+        boolean drawLonLines = applyMacros(child, ATTR_DRAWLONLINES, false);
+        boolean drawLatLines = applyMacros(child, ATTR_DRAWLATLINES, false);
+        boolean       showTop    = applyMacros(child, ATTR_SHOWTOP, true);
+        boolean       showBottom = applyMacros(child, ATTR_SHOWBOTTOM, true);
+        boolean       showLeft   = applyMacros(child, ATTR_SHOWLEFT, true);
+        boolean       showRight  = applyMacros(child, ATTR_SHOWRIGHT, true);
+
+        int           width      = image.getWidth(null);
+        int           height     = image.getHeight(null);
+        int           centerX    = width / 2;
+        int           centerY    = height / 2;
+        EarthLocation nw         = display.screenToEarthLocation(0, 0);
+        EarthLocation ne         = display.screenToEarthLocation(width, 0);
+        EarthLocation se         = display.screenToEarthLocation(0, height);
+        EarthLocation sw = display.screenToEarthLocation(width, height);
+
+
+        double widthDegrees = ne.getLongitude().getValue()
+                              - nw.getLongitude().getValue();
+        double heightDegrees = ne.getLatitude().getValue()
+                               - se.getLatitude().getValue();
+
+        Insets insets = getInsets(child, 0);
+        int    delta  = 2;
+        int    bgPad  = 1;
+
+        image = doMatte(image, child, 0);
+
         Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setFont(getFont(child));
+        FontMetrics fm            = g.getFontMetrics();
 
-        //TODO: actually do this...
-        for (int i = 0; i < count; i++) {}
+        int lineOffsetRight = applyMacros(child, ATTR_LINEOFFSET_RIGHT, 0);
+        int lineOffsetLeft = applyMacros(child, ATTR_LINEOFFSET_LEFT, 0);
+        int         lineOffsetTop = applyMacros(child, ATTR_LINEOFFSET_TOP,
+                                        0);
+        int lineOffsetBottom = applyMacros(child, ATTR_LINEOFFSET_BOTTOM, 0);
+
+
+
+        Stroke      lineStroke;
+        if (XmlUtil.hasAttribute(child, ATTR_DASHES)) {
+            lineStroke = new BasicStroke((float) applyMacros(child,
+                    ATTR_LINEWIDTH, 1.0), BasicStroke.CAP_BUTT,
+                                          BasicStroke.JOIN_BEVEL, 1.0f,
+                                          Misc.parseFloats(applyMacros(child,
+                                              ATTR_DASHES, "8")), 0.0f);
+        } else {
+            lineStroke = new BasicStroke((float) applyMacros(child,
+                    ATTR_LINEWIDTH, 1.0));
+        }
+
+        g.setStroke(lineStroke);
+
+        for (int i = 0; i < lonValues.length; i++) {
+            double lon = lonValues[i];
+            double percent = (lon - nw.getLongitude().getValue())
+                             / widthDegrees;
+            //            if(percent<0 || percent>1) continue;
+            String label;
+            if (i < lonLabels.size()) {
+                label = lonLabels.get(i);
+            } else {
+                label = format.format(lon);
+            }
+            Rectangle2D rect  = fm.getStringBounds(label, g);
+            int         baseX = insets.left + (int) (percent * width);
+            int         x     = baseX - (int) rect.getWidth() / 2;
+            int         topY;
+            if (insets.top == 0) {
+                topY = (int) rect.getHeight() + delta;
+            } else {
+                topY = insets.top - delta;
+            }
+            if (drawLonLines) {
+                g.setColor(lineColor);
+                g.drawLine(baseX, insets.top + lineOffsetTop, baseX,
+                           insets.top + height - lineOffsetBottom);
+            }
+
+            if (showTop) {
+                if (bg != null) {
+                    g.setColor(bg);
+                    g.fillRect(x - bgPad,
+                               topY - (int) rect.getHeight() - bgPad,
+                               (int) rect.getWidth() + bgPad * 2,
+                               (int) rect.getHeight() + bgPad * 2);
+                }
+                g.setColor(color);
+                g.drawString(label, x, topY);
+            }
+            int bottomY;
+            if (insets.bottom == 0) {
+                bottomY = insets.top + height - delta;
+            } else {
+                bottomY = insets.top + height + (int) rect.getHeight()
+                          + delta;
+            }
+            if (showBottom) {
+                if (bg != null) {
+                    g.setColor(bg);
+                    g.fillRect(x - bgPad,
+                               bottomY - (int) rect.getHeight() - bgPad,
+                               (int) rect.getWidth() + bgPad * 2,
+                               (int) rect.getHeight() + bgPad * 2);
+                }
+                g.setColor(color);
+                g.drawString(label, x, bottomY);
+            }
+        }
+
+
+        for (int i = 0; i < latValues.length; i++) {
+            double lat = latValues[i];
+            double percent = 1.0
+                             - (lat - se.getLatitude().getValue())
+                               / heightDegrees;
+            int baseY = insets.top + (int) (percent * height);
+            //            if(percent<0 || percent>1) continue;
+            String label;
+            if (i < latLabels.size()) {
+                label = latLabels.get(i);
+            } else {
+                label = format.format(lat);
+            }
+            Rectangle2D rect = fm.getStringBounds(label, g);
+            int         y    = baseY + (int) rect.getHeight() / 2;
+            int         leftX;
+            if (insets.left == 0) {
+                leftX = 0 + delta;
+            } else {
+                leftX = insets.left - (int) rect.getWidth() - delta;
+            }
+            if (drawLonLines) {
+                g.setColor(lineColor);
+                g.drawLine(insets.left + lineOffsetRight, baseY,
+                           insets.left + width - lineOffsetRight, baseY);
+            }
+
+            if (showLeft) {
+                if (bg != null) {
+                    g.setColor(bg);
+                    g.fillRect(leftX - bgPad,
+                               y - (int) rect.getHeight() - bgPad,
+                               (int) rect.getWidth() + bgPad * 2,
+                               (int) rect.getHeight() + bgPad * 2);
+                }
+                g.setColor(color);
+                g.drawString(label, leftX, y);
+            }
+
+            if (insets.right == 0) {
+                leftX = insets.left + width - (int) rect.getWidth() - delta;
+            } else {
+                leftX = insets.left + width + delta;
+            }
+            if (showRight) {
+                if (bg != null) {
+                    g.setColor(bg);
+                    g.fillRect(leftX - bgPad,
+                               y - (int) rect.getHeight() - bgPad,
+                               (int) rect.getWidth() + bgPad * 2,
+                               (int) rect.getHeight() + bgPad * 2);
+                }
+                g.setColor(color);
+                g.drawString(label, leftX, y);
+            }
+        }
 
         return image;
+
     }
 
     /**
@@ -4975,12 +5200,28 @@ public class ImageGenerator extends IdvManager {
      *
      * @param image _more_
      * @param child _more_
+     * @param dfltSpace _more_
      *
      * @return _more_
      */
-    public BufferedImage doMatte(BufferedImage image, Element child) {
-        Insets insets = getInsets(child);
-        Color  bg     = applyMacros(child, ATTR_BACKGROUND, Color.white);
+    public BufferedImage doMatte(BufferedImage image, Element child,
+                                 int dfltSpace) {
+        return doMatte(image, child, getInsets(child, dfltSpace));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param image _more_
+     * @param child _more_
+     * @param insets _more_
+     *
+     * @return _more_
+     */
+    public BufferedImage doMatte(BufferedImage image, Element child,
+                                 Insets insets) {
+        Color bg = applyMacros(child, ATTR_BACKGROUND, Color.white);
         return ImageUtils.matte(image, insets.top, insets.bottom,
                                 insets.left, insets.right, bg);
     }
