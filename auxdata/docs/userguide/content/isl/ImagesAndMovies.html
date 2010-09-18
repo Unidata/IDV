@@ -292,6 +292,16 @@ of the image you do:
 }]
 
 
+[isl::tagdef latlonlabels {Add lat/lon labels to an image}]
+The [isl::tag latlonlabels] tag allows you to add lat/lon labels to an image.
+Note: For this to be correct your image needs to be in a geographic projection in an overhead view.
+
+[isl::importxml latlonlabels.isl]
+
+
+
+
+
 [isl::tagdef displaylist {Render the display list} -attrs {valign {'bottom' or 'top'} mattebg {<color> If defined then we matte the image with the given color the size that the display list takes up} fontsize {optional font size}  fontface {optional font face}} ]
 The [isl::tag displaylist] tag renders the display list (normally shown at the bottom of the view)
 directly into the image. The text rendering is a bit higher quality because we are using
