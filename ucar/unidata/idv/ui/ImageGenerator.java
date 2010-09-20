@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.idv.ui;
@@ -67,6 +66,7 @@ import ucar.unidata.view.geoloc.*;
 
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.GeoUtils;
 import ucar.visad.UtcDate;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
@@ -152,13 +152,13 @@ public class ImageGenerator extends IdvManager {
     /** macro property */
     public static final String PROP_LOOPINDEX = "loopindex";
 
-    /** _more_ */
+    /** padded loop index */
     public static final String PROP_LOOPINDEX_PAD2 = "loopindex_pad2";
 
-    /** _more_ */
+    /** padded loop index */
     public static final String PROP_LOOPINDEX_PAD3 = "loopindex_pad3";
 
-    /** _more_ */
+    /** padded loop index */
     public static final String PROP_LOOPINDEX_PAD4 = "loopindex_pad4";
 
 
@@ -182,19 +182,19 @@ public class ImageGenerator extends IdvManager {
     public static final String PROP_IMAGEPATH = "imagepath";
 
 
-    /** _more_ */
+    /** file property */
     public static final String PROP_FILE = "file";
 
-    /** _more_ */
+    /** filenosuffix property */
     public static final String PROP_FILENOSUFFIX = "filenosuffix";
 
-    /** _more_ */
+    /** filetail property */
     public static final String PROP_FILETAIL = "filetail";
 
-    /** _more_ */
+    /** filetailnosuffix property */
     public static final String PROP_FILETAILNOSUFFIX = "filetailnosuffix";
 
-    /** _more_ */
+    /** fileprefix property */
     public static final String PROP_FILEPREFIX = "fileprefix";
 
     /** macro property */
@@ -223,7 +223,7 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_FILESET = "fileset";
 
 
-    /** _more_ */
+    /** view tag */
     public static final String TAG_VIEW = "view";
 
     /** isl tag */
@@ -240,7 +240,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_ISL = "isl";
 
-    /** _more_ */
+    /** viewpoint tag */
     public static final String TAG_VIEWPOINT = "viewpoint";
 
     /** isl tag */
@@ -279,22 +279,22 @@ public class ImageGenerator extends IdvManager {
 
 
 
-    /** _more_ */
+    /** publish tag */
     public static final String TAG_PUBLISH = "publish";
 
     /** isl tag */
     public static final String TAG_DISPLAY = "display";
 
-    /** _more_ */
+    /** datasource tag */
     public static final String TAG_DATASOURCE = "datasource";
 
     /** isl tag */
     public static final String TAG_MATTE = "matte";
 
-    /** _more_ */
+    /** show tag */
     public static final String TAG_SHOW = "show";
 
-    /** _more_ */
+    /** displaylist tag */
     public static final String TAG_DISPLAYLIST = "displaylist";
 
     /** isl tag */
@@ -308,7 +308,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_KML = "kml";
 
-    /** _more_ */
+    /** kml colorbar tag */
     public static final String TAG_KML_COLORBAR = "kmlcolorbar";
 
     /** isl tag */
@@ -326,80 +326,80 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
 
-    /** _more_ */
+    /** background transparent tag */
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
-    /** _more_ */
+    /** index attribute */
     public static final String ATTR_INDEX = "index";
 
 
-    /** _more_ */
+    /** stride attribute */
     public static final String ATTR_STRIDE = "stride";
 
-    /** _more_ */
+    /** x stride attribute */
     public static final String ATTR_STRIDEX = "stridex";
 
-    /** _more_ */
+    /** y stride attribute */
     public static final String ATTR_STRIDEY = "stridey";
 
-    /** _more_ */
+    /** z stride attribute */
     public static final String ATTR_STRIDEZ = "stridez";
 
-    /** _more_ */
+    /** from level attribute */
     public static final String ATTR_LEVEL_FROM = "levelfrom";
 
-    /** _more_ */
+    /** to level attribute */
     public static final String ATTR_LEVEL_TO = "levelto";
 
-    /** _more_ */
+    /** azimuth attribute */
     public static final String ATTR_AZIMUTH = "azimuth";
 
-    /** _more_ */
+    /** tilt attribute */
     public static final String ATTR_TILT = "tilt";
 
-    /** _more_ */
+    /** x aspect attribute */
     public static final String ATTR_ASPECTX = "aspectx";
 
-    /** _more_ */
+    /** y aspect attribute_more_ */
     public static final String ATTR_ASPECTY = "aspecty";
 
-    /** _more_ */
+    /** z aspect attribute_more_ */
     public static final String ATTR_ASPECTZ = "aspectz";
 
 
-    /** _more_ */
+    /** x rotation attribute */
     public static final String ATTR_ROTX = "rotx";
 
-    /** _more_ */
+    /** y rotation attribute */
     public static final String ATTR_ROTY = "roty";
 
-    /** _more_ */
+    /** z rotation attribute */
     public static final String ATTR_ROTZ = "rotz";
 
-    /** _more_ */
+    /** scale attribute */
     public static final String ATTR_SCALE = "scale";
 
-    /** _more_ */
+    /** x translation attribute */
     public static final String ATTR_TRANSX = "transx";
 
-    /** _more_ */
+    /** y translation attribute */
     public static final String ATTR_TRANSY = "transy";
 
-    /** _more_ */
+    /** z translation attribute */
     public static final String ATTR_TRANSZ = "transz";
 
 
-    /** _more_ */
+    /** suffix attribute */
     public static final String ATTR_SUFFIX = "suffix";
 
-    /** _more_ */
+    /** showunit atttribute */
     public static final String ATTR_SHOWUNIT = "showunit";
 
-    /** _more_ */
+    /** transparency attribute */
     public static final String ATTR_TRANSPARENCY = "transparency";
 
-    /** _more_ */
+    /** top attribute */
     public static final String ATTR_TOP = "top";
 
 
@@ -537,57 +537,57 @@ public class ImageGenerator extends IdvManager {
     /** _more_ */
     public static final String TAG_LATLONLABELS = "latlonlabels";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LAT_VALUES = "latvalues";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LAT_LABELS = "latlabels";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LON_VALUES = "lonvalues";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LON_LABELS = "lonlabels";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DRAWLONLINES = "drawlonlines";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DRAWLATLINES = "drawlatlines";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DASHES = "dashes";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINEWIDTH = "linewidth";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINEOFFSET_RIGHT = "lineoffsetright";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINEOFFSET_LEFT = "lineoffsetleft";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINEOFFSET_TOP = "lineoffsettop";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINEOFFSET_BOTTOM = "lineoffsetbottom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LABELBACKGROUND = "labelbackground";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWTOP = "showtop";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWBOTTOM = "showbottom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWLEFT = "showleft";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWRIGHT = "showright";
 
 
@@ -862,12 +862,12 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Process the script file
      *
-     * @param islFile _more_
-     * @param properties _more_
+     * @param islFile  the ISL file
+     * @param properties optional properties
      *
-     * @return _more_
+     * @return true if successful
      */
     public synchronized boolean processScriptFile(String islFile,
             Hashtable properties) {
@@ -1100,13 +1100,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Process the tag trace
      *
-     * @param node _more_
+     * @param node  the node
      *
-     * @return _more_
+     * @return true if processed
      *
-     * @throws Throwable _more_
+     * @throws Throwable  on badness
      */
     protected boolean processTagTrace(Element node) throws Throwable {
         String pattern = applyMacros(node, ATTR_PATTERN);
@@ -1151,13 +1151,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Process the print cache tag
      *
-     * @param node _more_
+     * @param node  the XML node
      *
-     * @return _more_
+     * @return  true if successful
      *
-     * @throws Throwable _more_
+     * @throws Throwable  on badness
      */
     protected boolean processTagPrintcache(Element node) throws Throwable {
         visad.data.DataCacheManager.getCacheManager().printStats();
@@ -1401,13 +1401,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Get the property value
      *
-     * @param node _more_
+     * @param node the XML node
      *
-     * @return _more_
+     * @return  the values
      *
-     * @throws Throwable _more_
+     * @throws Throwable on badness
      */
     protected String[] getPropertyValue(Element node) throws Throwable {
         String name  = (String) applyMacros(node, ATTR_NAME);
@@ -1429,13 +1429,13 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Process IDV property tag
      *
-     * @param node _more_
+     * @param node  the XML node
      *
-     * @return _more_
+     * @return  true if successful
      *
-     * @throws Throwable _more_
+     * @throws Throwable  on badness
      */
     protected boolean processTagIdvproperty(Element node) throws Throwable {
         String[] tuple = getPropertyValue(node);
@@ -4661,7 +4661,8 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_MATTE)) {
                 newImage = doMatte(image, child, 0);
             } else if (tagName.equals(TAG_LATLONLABELS)) {
-                newImage = doLatLonLabels(child, viewManager, image, imageProps);
+                newImage = doLatLonLabels(child, viewManager, image,
+                                          imageProps);
             } else if (tagName.equals(TAG_WRITE)) {
                 ImageUtils.writeImageToFile(
                     image, getImageFileName(applyMacros(child, ATTR_FILE)));
@@ -4982,15 +4983,16 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Process the lat/lon labels tag
      *
-     * @param child _more_
-     * @param viewManager _more_
-     * @param image _more_
+     * @param child  the XML
+     * @param viewManager  the associated view manager
+     * @param image  the image to draw on
+     * @param imageProps  the image properties
      *
-     * @return _more_
+     * @return  a new image
      *
-     * @throws Exception _more_
+     * @throws Exception  on badness
      */
     public BufferedImage doLatLonLabels(Element child,
                                         ViewManager viewManager,
@@ -5025,39 +5027,39 @@ public class ImageGenerator extends IdvManager {
 
         boolean drawLonLines = applyMacros(child, ATTR_DRAWLONLINES, false);
         boolean drawLatLines = applyMacros(child, ATTR_DRAWLATLINES, false);
-        boolean       showTop    = applyMacros(child, ATTR_SHOWTOP, true);
+        boolean       showTop    = applyMacros(child, ATTR_SHOWTOP, false);
         boolean       showBottom = applyMacros(child, ATTR_SHOWBOTTOM, true);
         boolean       showLeft   = applyMacros(child, ATTR_SHOWLEFT, true);
-        boolean       showRight  = applyMacros(child, ATTR_SHOWRIGHT, true);
+        boolean       showRight  = applyMacros(child, ATTR_SHOWRIGHT, false);
 
         int           width      = image.getWidth(null);
         int           height     = image.getHeight(null);
         int           centerX    = width / 2;
         int           centerY    = height / 2;
-        EarthLocation nw,ne,se,sw;
+        EarthLocation nw, ne, se, sw;
 
         //don: this  what I added
-        Double north = (Double)imageProps.get(ATTR_NORTH);
-        Double south = (Double)imageProps.get(ATTR_SOUTH);
-        Double east = (Double)imageProps.get(ATTR_EAST);
-        Double west = (Double)imageProps.get(ATTR_WEST);
+        Double north = (Double) imageProps.get(ATTR_NORTH);
+        Double south = (Double) imageProps.get(ATTR_SOUTH);
+        Double east  = (Double) imageProps.get(ATTR_EAST);
+        Double west  = (Double) imageProps.get(ATTR_WEST);
         //Assume if we have one we have them all
-        if(north!=null) {
-            nw =  DisplayControlImpl.makeEarthLocation(north.doubleValue(),
-                                                       west.doubleValue(),0);
+        if (north != null) {
+            nw = DisplayControlImpl.makeEarthLocation(north.doubleValue(),
+                    west.doubleValue(), 0);
 
-            ne =  DisplayControlImpl.makeEarthLocation(north.doubleValue(),
-                                                       east.doubleValue(),0);
-            sw =  DisplayControlImpl.makeEarthLocation(south.doubleValue(),
-                                                       west.doubleValue(),0);
-            se =  DisplayControlImpl.makeEarthLocation(south.doubleValue(),
-                                                       east.doubleValue(),0);
+            ne = DisplayControlImpl.makeEarthLocation(north.doubleValue(),
+                    east.doubleValue(), 0);
+            sw = DisplayControlImpl.makeEarthLocation(south.doubleValue(),
+                    west.doubleValue(), 0);
+            se = DisplayControlImpl.makeEarthLocation(south.doubleValue(),
+                    east.doubleValue(), 0);
 
         } else {
-            nw  = display.screenToEarthLocation(0, 0);
-            ne  = display.screenToEarthLocation(width, 0);
-            se  = display.screenToEarthLocation(0, height);
-            sw  = display.screenToEarthLocation(width, height);
+            nw = display.screenToEarthLocation(0, 0);
+            ne = display.screenToEarthLocation(width, 0);
+            se = display.screenToEarthLocation(0, height);
+            sw = display.screenToEarthLocation(width, height);
         }
 
 
@@ -5097,9 +5099,12 @@ public class ImageGenerator extends IdvManager {
         }
 
         g.setStroke(lineStroke);
+        double leftLon  = nw.getLongitude().getValue(CommonUnit.degree);
+        double rightLon = ne.getLongitude().getValue(CommonUnit.degree);
+        Range  lonRange = new Range(leftLon, rightLon);
 
         for (int i = 0; i < lonValues.length; i++) {
-            double lon = lonValues[i];
+            double lon = GeoUtils.normalizeLongitude(lonRange, lonValues[i]);
             double percent = (lon - nw.getLongitude().getValue())
                              / widthDegrees;
             //            if(percent<0 || percent>1) continue;
@@ -5218,13 +5223,13 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Matte the image
      *
-     * @param image _more_
-     * @param child _more_
-     * @param dfltSpace _more_
+     * @param image  the image
+     * @param child  the XML defining the matting
+     * @param dfltSpace  default spacing
      *
-     * @return _more_
+     * @return a new image
      */
     public BufferedImage doMatte(BufferedImage image, Element child,
                                  int dfltSpace) {
@@ -5233,13 +5238,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Matte the image
      *
-     * @param image _more_
-     * @param child _more_
-     * @param insets _more_
+     * @param image  the image
+     * @param child  the matte specs
+     * @param insets the insets
      *
-     * @return _more_
+     * @return  a new image
      */
     public BufferedImage doMatte(BufferedImage image, Element child,
                                  Insets insets) {
@@ -5300,11 +5305,11 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Get the font from the XML
      *
-     * @param node _more_
+     * @param node  the XML
      *
-     * @return _more_
+     * @return  the font or null
      */
     private Font getFont(Element node) {
         if (XmlUtil.hasAttribute(node, ATTR_FONTSIZE)
@@ -5757,13 +5762,13 @@ public class ImageGenerator extends IdvManager {
         f.disconnect();
     }
 
-    /** _more_ */
+    /** abcdefg... */
     private static String[] alphabet = {
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
         "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
     };
 
-    /** _more_ */
+    /** roman numerals */
     private static String[] roman = {
         "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI",
         "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XX", "XXI",
@@ -5771,11 +5776,11 @@ public class ImageGenerator extends IdvManager {
     };
 
     /**
-     * _more_
+     * Get the letter for the index
      *
-     * @param i _more_
+     * @param i  the index
      *
-     * @return _more_
+     * @return  the letter
      */
     public String getLetter(int i) {
         if ((i >= 0) && (i < alphabet.length)) {
@@ -5787,11 +5792,11 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Get the roman numeral
      *
-     * @param i _more_
+     * @param i the index
      *
-     * @return _more_
+     * @return  the corresponding number
      */
     public String getRoman(int i) {
         if ((i >= 0) && (i < roman.length)) {
