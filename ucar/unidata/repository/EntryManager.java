@@ -5256,7 +5256,6 @@ return new Result(title, sb);
         int       batchCnt       = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
-            System.err.println ("Entry:" + entry.getNorth());
             // if (entry.isCollectionGroup()) {
             //                getTopGroup()s = null;
             //                }
