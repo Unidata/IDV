@@ -768,9 +768,6 @@ ul {
    position: absolute; 
    visibility: hidden; 
    z-index: 1;
-
-
-
 }
 
 
@@ -828,6 +825,15 @@ a.menulink {
    position: absolute; 
    visibility: hidden; 
    z-index: 1;
+//Shadow effect
+  /* offset left, top, thickness, color with alpha */
+  -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  /* IE */
+  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray');
+  /* slightly different syntax for IE8 */
+  -ms-filter:"progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray')";
 }
 
 
