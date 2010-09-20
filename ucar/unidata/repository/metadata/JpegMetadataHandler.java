@@ -31,6 +31,7 @@ import com.drew.lang.*;
 
 import java.io.File;
 
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -66,8 +67,21 @@ public class JpegMetadataHandler extends MetadataHandler {
         try {
             File jpegFile = new File(path); 
             com.drew.metadata.Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
+            com.drew.metadata.Directory exifDir = metadata.getDirectory(ExifDirectory.class); 
             com.drew.metadata.Directory dir = metadata.getDirectory(GpsDirectory.class); 
 
+            if(exifDir!=null) {
+                //This tells ramadda that something was added
+                if(exifDir.containsTag(ExifDirectory.TAG_DATETIME_ORIGINAL)) {
+                    Date dttm = exifDir.getDate(ExifDirectory.TAG_DATETIME_ORIGINAL);
+                    if(dttm!=null) {
+                        entry.setStartDate(dttm.getTime());
+                        entry.setEndDate(dttm.getTime());
+                        extra.put("1","");
+                    }
+                }
+
+            }
 
             if(dir.containsTag(GpsDirectory.TAG_GPS_IMG_DIRECTION)) {
                 Metadata dirMetadata =
@@ -82,16 +96,14 @@ public class JpegMetadataHandler extends MetadataHandler {
                 metadataList.add(dirMetadata);
             }
 
-
             if(!dir.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) return;
-
             double latitude =  getValue(dir,GpsDirectory.TAG_GPS_LATITUDE);
             double longitude =  getValue(dir,GpsDirectory.TAG_GPS_LONGITUDE);
             if(longitude>0) longitude = -longitude;
             double altitude = (dir.containsTag(GpsDirectory.TAG_GPS_ALTITUDE)?
                                getValue(dir,GpsDirectory.TAG_GPS_ALTITUDE):0);
-            System.err.println("lat/lon:" + latitude+"/" + longitude +"/" + altitude);
             entry.setLocation(latitude, longitude, altitude);
+            //This tells ramadda that something was added
             extra.put("1","");
         } catch(Exception exc) {
             getRepository().getLogManager().logError("Processing jpg:" + path,exc);
