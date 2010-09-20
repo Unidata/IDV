@@ -4661,7 +4661,7 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_MATTE)) {
                 newImage = doMatte(image, child, 0);
             } else if (tagName.equals(TAG_LATLONLABELS)) {
-                newImage = doLatLonLabels(child, viewManager, image);
+                newImage = doLatLonLabels(child, viewManager, image, imageProps);
             } else if (tagName.equals(TAG_WRITE)) {
                 ImageUtils.writeImageToFile(
                     image, getImageFileName(applyMacros(child, ATTR_FILE)));
@@ -4994,7 +4994,8 @@ public class ImageGenerator extends IdvManager {
      */
     public BufferedImage doLatLonLabels(Element child,
                                         ViewManager viewManager,
-                                        BufferedImage image)
+                                        BufferedImage image,
+                                        Hashtable imageProps)
             throws Exception {
 
         if (viewManager == null) {
@@ -5033,10 +5034,31 @@ public class ImageGenerator extends IdvManager {
         int           height     = image.getHeight(null);
         int           centerX    = width / 2;
         int           centerY    = height / 2;
-        EarthLocation nw         = display.screenToEarthLocation(0, 0);
-        EarthLocation ne         = display.screenToEarthLocation(width, 0);
-        EarthLocation se         = display.screenToEarthLocation(0, height);
-        EarthLocation sw = display.screenToEarthLocation(width, height);
+        EarthLocation nw,ne,se,sw;
+
+        //don: this  what I added
+        Double north = (Double)imageProps.get(ATTR_NORTH);
+        Double south = (Double)imageProps.get(ATTR_SOUTH);
+        Double east = (Double)imageProps.get(ATTR_EAST);
+        Double west = (Double)imageProps.get(ATTR_WEST);
+        //Assume if we have one we have them all
+        if(north!=null) {
+            nw =  DisplayControlImpl.makeEarthLocation(north.doubleValue(),
+                                                       west.doubleValue(),0);
+
+            ne =  DisplayControlImpl.makeEarthLocation(north.doubleValue(),
+                                                       east.doubleValue(),0);
+            sw =  DisplayControlImpl.makeEarthLocation(south.doubleValue(),
+                                                       west.doubleValue(),0);
+            se =  DisplayControlImpl.makeEarthLocation(south.doubleValue(),
+                                                       east.doubleValue(),0);
+
+        } else {
+            nw  = display.screenToEarthLocation(0, 0);
+            ne  = display.screenToEarthLocation(width, 0);
+            se  = display.screenToEarthLocation(0, height);
+            sw  = display.screenToEarthLocation(width, height);
+        }
 
 
         double widthDegrees = ne.getLongitude().getValue()
