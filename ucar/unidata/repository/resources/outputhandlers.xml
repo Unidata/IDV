@@ -12,6 +12,7 @@
   <outputhandler class="ucar.unidata.repository.output.GraphOutputHandler" name="Graph"/>
   <outputhandler class="ucar.unidata.repository.output.TextOutputHandler" name="Text"/>
   <outputhandler class="ucar.unidata.repository.output.ZipFileOutputHandler" name="Zip/Jar Listing"/>
+  <outputhandler class="ucar.unidata.repository.output.JpegMetadataOutputHandler" name="JPEG Metadata"/>
 <!--
   <outputhandler class="ucar.unidata.repository.output.ExampleOutputHandler"  name="Example"/>
 -->
