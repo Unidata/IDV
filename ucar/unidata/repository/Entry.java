@@ -106,8 +106,14 @@ public class Entry extends Entity {
     /** _more_          */
     private String propertiesString;
 
+    private Hashtable transientProperties = new Hashtable();
+
+
     /** _more_          */
     private static XmlEncoder xmlEncoder = new XmlEncoder();
+
+
+
 
     /**
      * _more_
@@ -785,6 +791,14 @@ public class Entry extends Entity {
      */
     public String getRemoteServer() {
         return remoteServer;
+    }
+
+    public Object getTransientProperty(Object key) {
+        return transientProperties.get(key);
+    }
+
+    public void putTransientProperty(Object key, Object value) {
+        transientProperties.put(key, value);
     }
 
     /**
