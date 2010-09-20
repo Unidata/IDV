@@ -259,6 +259,10 @@ public class MapOutputHandler extends OutputHandler {
                              : "0") + "," + mapVarName + ");\n");
 
             }
+
+            if(makeRectangles) {
+                entry.getTypeHandler().addToMap(request, entry, mapVarName, js);
+            }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =
                     "<table>"
