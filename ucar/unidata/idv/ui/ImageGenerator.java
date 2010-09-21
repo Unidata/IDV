@@ -5104,7 +5104,7 @@ public class ImageGenerator extends IdvManager {
         Range  lonRange = new Range(leftLon, rightLon);
 
         for (int i = 0; i < lonValues.length; i++) {
-            double lon = GeoUtils.normalizeLongitude(lonRange, lonValues[i]);
+        	double lon = lonValues[i];
             double percent = (lon - nw.getLongitude().getValue())
                              / widthDegrees;
             //            if(percent<0 || percent>1) continue;
