@@ -916,12 +916,45 @@ public class SqlUtil {
      * @param what _more_
      * @param tables _more_
      * @param where _more_
-     * @param extra _more_
+     * @param suffixSql _more_
      *
      * @return _more_
      */
     public static String makeSelect(String what, List tables, String where,
-                                    String extra) {
+                                    String suffixSql) {
+        return makeSelect(what, tables, where, null, suffixSql);
+    }
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param tables _more_
+     * @param where _more_
+     * @param sqlBetweenFromAndWhere _more_
+     * @param suffixSql _more_
+     *
+     * @return _more_
+     */
+    public static String makeSelect(String what, List tables, String where,
+                                    String sqlBetweenFromAndWhere,
+                                    String suffixSql) {
+
+
+
+
+        if (sqlBetweenFromAndWhere == null) {
+            sqlBetweenFromAndWhere = "";
+        } else {
+            sqlBetweenFromAndWhere = " " + sqlBetweenFromAndWhere;
+        }
+
+        if (suffixSql == null) {
+            suffixSql = "";
+        } else {
+            suffixSql = " " + suffixSql;
+        }
+
         String    tableClause = "";
         Hashtable seen        = new Hashtable();
         for (int i = 0; i < tables.size(); i++) {
@@ -936,11 +969,10 @@ public class SqlUtil {
             tableClause += table;
         }
         String sql = "SELECT " + what + " FROM " + tableClause
-                     + ((where.trim().length() > 0)
-                        ? " \nWHERE " + where
-                        : "") + ((extra == null)
-                                 ? ""
-                                 : " " + extra);
+                     + sqlBetweenFromAndWhere + ((where.trim().length() > 0)
+                ? " \nWHERE " + where
+                : "") + suffixSql;
+
         return sql;
     }
 
@@ -1601,7 +1633,9 @@ public class SqlUtil {
             try {
                 if (lastResultSet == null) {
                     lastResultSet = stmt.getResultSet();
-                    if(lastResultSet == null) return null;
+                    if (lastResultSet == null) {
+                        return null;
+                    }
                     if ( !lastResultSet.next()) {
                         checkClose();
                         return null;
@@ -1797,17 +1831,40 @@ public class SqlUtil {
      * @param what _more_
      * @param tables _more_
      * @param clause _more_
-     * @param extra _more_
+     * @param suffixSql _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public static PreparedStatement getSelectStatement(Connection connection,
-            String what, List tables, Clause clause, String extra)
+            String what, List tables, Clause clause, String suffixSql)
+            throws Exception {
+        return getSelectStatement(connection, what, tables, clause, null,
+                                  suffixSql);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param sqlBetweenFromAndWhere _more_
+     * @param suffixSql _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static PreparedStatement getSelectStatement(Connection connection,
+            String what, List tables, Clause clause,
+            String sqlBetweenFromAndWhere, String suffixSql)
             throws Exception {
         return connection.prepareStatement(getSelectStatement(what, tables,
-                clause, extra));
+                clause, sqlBetweenFromAndWhere, suffixSql));
     }
 
 
@@ -1817,21 +1874,44 @@ public class SqlUtil {
      * @param what _more_
      * @param tables _more_
      * @param clause _more_
-     * @param extra _more_
+     * @param suffixSql _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public static String getSelectStatement(String what, List tables,
-                                            Clause clause, String extra)
+                                            Clause clause, String suffixSql)
             throws Exception {
+        return getSelectStatement(what, tables, clause, null, suffixSql);
+    }
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param sqlBetweenFromAndWhere _more_
+     * @param suffixSql _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String getSelectStatement(String what, List tables,
+                                            Clause clause,
+                                            String sqlBetweenFromAndWhere,
+                                            String suffixSql)
+            throws Exception {
+
         StringBuffer sb = new StringBuffer();
         if (clause != null) {
             clause.addClause(sb);
         }
 
-        String sql = makeSelect(what, tables, sb.toString(), extra);
+        String sql = makeSelect(what, tables, sb.toString(),
+                                sqlBetweenFromAndWhere, suffixSql);
         if (debug) {
             System.err.println("sql: " + sql);
         }
@@ -1889,7 +1969,7 @@ public class SqlUtil {
      * @param what _more_
      * @param tables _more_
      * @param clause _more_
-     * @param extra _more_
+     * @param suffixSql _more_
      * @param max _more_
      * @param timeout _more_
      *
@@ -1898,11 +1978,37 @@ public class SqlUtil {
      * @throws Exception _more_
      */
     public static Statement select(Connection connection, String what,
-                                   List tables, Clause clause, String extra,
-                                   int max, int timeout)
+                                   List tables, Clause clause,
+                                   String suffixSql, int max, int timeout)
+            throws Exception {
+        return select(connection, what, tables, clause, null, suffixSql, max,
+                      timeout);
+    }
+
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param sqlBetweenFromAndWhere _more_
+     * @param suffixSql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause clause,
+                                   String sqlBetweenFromAndWhere,
+                                   String suffixSql, int max, int timeout)
             throws Exception {
         PreparedStatement stmt = getSelectStatement(connection, what, tables,
-                                     clause, extra);
+                                     clause, sqlBetweenFromAndWhere,
+                                     suffixSql);
         if (max > 0) {
             stmt.setMaxRows(max);
         }
