@@ -1601,6 +1601,7 @@ public class SqlUtil {
             try {
                 if (lastResultSet == null) {
                     lastResultSet = stmt.getResultSet();
+                    if(lastResultSet == null) return null;
                     if ( !lastResultSet.next()) {
                         checkClose();
                         return null;
