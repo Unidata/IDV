@@ -30,6 +30,7 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
@@ -467,7 +468,36 @@ public class GeoUtils {
         }
         return lonValues;
     }
+    
+    /**
+     *  Normalize a longitude between the range of the max/min
+     *  @param lonRange the range of the longitude
+     *  @param value the longitude value
+     *  return longitude normalized to range
+     */
+    public static double normalizeLongitude(Range lonRange, double value) {
+    	if (value > 180 && (lonRange.getMin() < 0 || lonRange.getMax() < 0)) {
+    		return normalizeLongitude(value);
+    	} else if (value < 0 && (lonRange.getMin() > 180 || lonRange.getMax() > 180))	{
+    		return normalizeLongitude360(value);
+    	} 
+    	return value;
+    }
 
+    /**
+     *  Normalize a longitude between the range of the max/min
+     *  @param lonRange the range of the longitude
+     *  @param value the longitude value
+     *  return longitude normalized to range
+     */
+    public static float normalizeLongitude(Range lonRange, float value) {
+    	if (value > 180.f && (lonRange.getMin() < 0 || lonRange.getMax() < 0)) {
+    		return (float) normalizeLongitude(value);
+    	} else if (value < 0 && (lonRange.getMin() > 180 || lonRange.getMax() > 180))	{
+    		return (float) normalizeLongitude360(value);
+    	} 
+    	return value;
+    }
 
     /**
      * Normalize longitude values to the range between -180 and 180.

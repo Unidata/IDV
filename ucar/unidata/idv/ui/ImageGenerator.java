@@ -5104,7 +5104,7 @@ public class ImageGenerator extends IdvManager {
         Range  lonRange = new Range(leftLon, rightLon);
 
         for (int i = 0; i < lonValues.length; i++) {
-        	double lon = lonValues[i];
+            double lon = GeoUtils.normalizeLongitude(lonRange, lonValues[i]);
             double percent = (lon - nw.getLongitude().getValue())
                              / widthDegrees;
             //            if(percent<0 || percent>1) continue;
@@ -5112,7 +5112,7 @@ public class ImageGenerator extends IdvManager {
             if (i < lonLabels.size()) {
                 label = lonLabels.get(i);
             } else {
-                label = format.format(lon);
+                label = format.format(lonValues[i]);
             }
             Rectangle2D rect  = fm.getStringBounds(label, g);
             int         baseX = insets.left + (int) (percent * width);
