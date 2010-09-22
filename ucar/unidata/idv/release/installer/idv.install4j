@@ -568,7 +568,7 @@
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getBooleanVariable("installJOGLActionAll") &amp;&amp; (((Integer) context.getVariable("glForUser")).intValue() == 1)</condition>
+                <condition>context.getBooleanVariable("installJOGLAction") &amp;&amp; (((Integer) context.getVariable("glForUser")).intValue() == 1)</condition>
               </action>
             </actions>
             <formComponents />
