@@ -279,10 +279,11 @@ public class DataOutputHandler extends OutputHandler {
             }
         }
 
-        public synchronized void put(String key, NetcdfDataset file) {
+        /*
+          public synchronized void put(String key, NetcdfDataset file) {
             ncPutCounter.incr();
             super.put(key, file);
-        }
+            }*/
 
         protected NetcdfDataset getFromPool(List<NetcdfDataset> list) {
             NetcdfDataset dataset = super.getFromPool(list);
@@ -326,10 +327,11 @@ public class DataOutputHandler extends OutputHandler {
             }
         }
 
+        /*
         public synchronized void put(String key, NetcdfFile ncFile) {
             ncPutCounter.incr();
             super.put(key, ncFile);
-        }
+            }*/
 
         protected NetcdfFile getFromPool(List<NetcdfFile> list) {
             NetcdfFile ncFile = super.getFromPool(list);
@@ -2195,9 +2197,16 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public synchronized Result outputOpendap(final Request request,
+
+    public Result outputOpendap(final Request request,
                                              final Entry entry)
             throws Exception {
+        //jeffmc: this used to be synchronized and I just don't know why
+        //whether there was a critical section here or what
+        //But it has the potential to lock all access to this object
+        //if opening a file hangs. So, lets remove the synchronized
+        //    public synchronized Result outputOpendap(final Request request,
+
         String     location = getPath(entry);
         NetcdfFile ncFile   = ncFilePool.get(location);
         opendapCounter.incr();

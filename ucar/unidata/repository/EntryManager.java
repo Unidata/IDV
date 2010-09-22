@@ -992,6 +992,17 @@ return new Result(title, sb);
             dataType = request.getString(ARG_DATATYPE_SELECT, "");
         }
 
+        boolean isLocalFile   = false;
+        String localFileName = null;
+        if (request.defined(ARG_LOCALFILE)) {
+            if ( !user.getAdmin()) {
+                fatalError(request,
+                           "Only administrators can add a local file");
+            }
+            localFileName = request.getString(ARG_LOCALFILE, (String) null);
+            getStorageManager().checkLocalFile(new File(localFileName));
+            isLocalFile = true;
+        }
 
 
 
@@ -1032,21 +1043,13 @@ return new Result(title, sb);
             String       resource      = "";
             String       urlArgument   = request.getString(ARG_URL, BLANK);
             String       filename      = request.getUploadedFile(ARG_FILE);
-            String       localFilename = null;
             boolean      unzipArchive  = false;
 
             boolean      isFile        = false;
-            boolean      isLocalFile   = false;
             String       resourceName  = request.getString(ARG_FILE, BLANK);
 
-            if (request.defined(ARG_LOCALFILE)) {
-                if ( !user.getAdmin()) {
-                    fatalError(request,
-                               "Only administrators can add a local file");
-                }
-                filename = request.getString(ARG_LOCALFILE, (String) null);
-                getStorageManager().checkLocalFile(new File(filename));
-                isLocalFile = true;
+            if (isLocalFile && localFileName!=null) {
+                filename = localFileName;
             }
 
 
@@ -1310,14 +1313,30 @@ return new Result(title, sb);
                 entries.add(entry);
             }
         } else {
-            String filename = request.getUploadedFile(ARG_FILE);
+            boolean fileUpload = false;
+            String newFileName = request.getUploadedFile(ARG_FILE);
+            String newResourceType = null;
+
             //Did they upload a new file???
-            if ((filename != null) && entry.getResource().isStoredFile()) {
-                filename = getStorageManager().moveToStorage(request,
-                        new File(filename)).toString();
-                getStorageManager().removeFile(entry.getResource());
-                entry.setResource(new Resource(filename,
-                        Resource.TYPE_STOREDFILE));
+            if (newFileName != null) {
+                newFileName = getStorageManager().moveToStorage(request,
+                                                             new File(newFileName)).toString();
+                newResourceType = Resource.TYPE_STOREDFILE;
+            } else if(isLocalFile) {
+                newFileName = localFileName;
+                newResourceType = Resource.TYPE_LOCAL_FILE;
+            } else  if (request.defined(ARG_URL)) {
+                newFileName = request.getString(ARG_URL,null);
+                newResourceType = Resource.TYPE_URL;
+            }
+
+            if (newFileName != null) {
+                //If it was a stored file then remove the old one
+                if(entry.getResource().isStoredFile()) {
+                    getStorageManager().removeFile(entry.getResource());
+                }
+                entry.setResource(new Resource(newFileName,
+                                               newResourceType));
             }
 
             if (entry.isTopGroup()) {
@@ -1341,6 +1360,9 @@ return new Result(title, sb);
             } else {
                 entry.setDataType(dataType);
             }
+
+
+
             if (request.defined(ARG_URL)) {
                 entry.setResource(new Resource(request.getString(ARG_URL,
                         BLANK), Resource.TYPE_URL,

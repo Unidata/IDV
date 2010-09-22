@@ -1814,7 +1814,6 @@ public class TypeHandler extends RepositoryManager {
         }
 
         boolean showFile      = okToShowInForm(ARG_FILE);
-        //        System.err.println(type +" show file:" + showFile +" Props:" + properties);
         boolean showLocalFile = showFile && request.getUser().getAdmin();
         boolean showUrl       = (forUpload
                                  ? false
@@ -1822,68 +1821,70 @@ public class TypeHandler extends RepositoryManager {
         if (okToShowInForm(ARG_RESOURCE)) {
             List<String> tabTitles  = new ArrayList<String>();
             List<String> tabContent = new ArrayList<String>();
+            //xxxxx
+            String urlLabel  = getFormLabel(ARG_URL, "URL");
+            String fileLabel = getFormLabel(ARG_FILE, "File");
+            if (showFile) {
+                String formContent = HtmlUtil.fileInput(ARG_FILE, size);
+                tabTitles.add(msg(fileLabel));
+                tabContent.add(HtmlUtil.inset(formContent, 8));
+            }
+            if (showUrl) {
+                String download = !okToShowInForm(ARG_RESOURCE_DOWNLOAD)
+                    ? ""
+                    : HtmlUtil.space(1)
+                    + HtmlUtil
+                    .checkbox(
+                              ARG_RESOURCE_DOWNLOAD) + HtmlUtil
+                    .space(1) + msg(
+                                    "Download");
+                String formContent = HtmlUtil.input(ARG_URL, "", size)
+                    + BLANK + download;
+                tabTitles.add(urlLabel);
+                tabContent.add(HtmlUtil.inset(formContent, 8));
+            }
+
+            if (showLocalFile) {
+                String formContent = HtmlUtil.input(ARG_LOCALFILE, "",
+                                                    size);
+                tabTitles.add(msg("Local File"));
+                tabContent.add(HtmlUtil.inset(formContent, 8));
+            }
+
+            String addMetadata =
+                HtmlUtil.checkbox(ARG_METADATA_ADD) + HtmlUtil.space(1)
+                + msg("Add Properties") + HtmlUtil.space(1)
+                + HtmlUtil.checkbox(ARG_METADATA_ADDSHORT)
+                + HtmlUtil.space(1)
+                + msg("Just Spatial/Temporal Properties");
+
+            List datePatterns = new ArrayList();
+            datePatterns.add(new TwoFacedObject("", BLANK));
+            for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
+                datePatterns.add(DateUtil.DATE_FORMATS[i]);
+            }
+
+            String unzip =
+                HtmlUtil.checkbox(ARG_FILE_UNZIP) + HtmlUtil.space(1)
+                + msg("Unzip archive")
+                + HtmlUtil.checkbox(ARG_FILE_PRESERVEDIRECTORY)
+                + HtmlUtil.space(1) + msg("Make folders from archive")
+                + HtmlUtil.space(3) + msgLabel("Date Pattern")
+                + HtmlUtil.space(1)
+                + HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) + " ("
+                + msg("use file name") + ")";
+
+            String extra = HtmlUtil.makeToggleInline("More...",
+                                                     addMetadata + HtmlUtil.space(3) + unzip,
+                                                     false);
+            if (forUpload) {
+                extra = "";
+            }
+            if(!okToShowInForm("resource.extra")) {
+                extra = "";
+            }
+
             if (entry == null) {
-                String urlLabel  = getFormLabel(ARG_URL, "URL");
-                String fileLabel = getFormLabel(ARG_FILE, "File");
-                if (showFile) {
-                    String formContent = HtmlUtil.fileInput(ARG_FILE, size);
-                    tabTitles.add(msg(fileLabel));
-                    tabContent.add(HtmlUtil.inset(formContent, 8));
-                }
-                if (showUrl) {
-                    String download = !okToShowInForm(ARG_RESOURCE_DOWNLOAD)
-                                      ? ""
-                                      : HtmlUtil.space(1)
-                                        + HtmlUtil
-                                            .checkbox(
-                                                ARG_RESOURCE_DOWNLOAD) + HtmlUtil
-                                                    .space(1) + msg(
-                                                        "Download");
-                    String formContent = HtmlUtil.input(ARG_URL, "", size)
-                                         + BLANK + download;
-                    tabTitles.add(urlLabel);
-                    tabContent.add(HtmlUtil.inset(formContent, 8));
-                }
-
-                if (showLocalFile) {
-                    String formContent = HtmlUtil.input(ARG_LOCALFILE, "",
-                                             size);
-                    tabTitles.add(msg("Local File"));
-                    tabContent.add(HtmlUtil.inset(formContent, 8));
-                }
-
-                String addMetadata =
-                    HtmlUtil.checkbox(ARG_METADATA_ADD) + HtmlUtil.space(1)
-                    + msg("Add Properties") + HtmlUtil.space(1)
-                    + HtmlUtil.checkbox(ARG_METADATA_ADDSHORT)
-                    + HtmlUtil.space(1)
-                    + msg("Just Spatial/Temporal Properties");
-
-                List datePatterns = new ArrayList();
-                datePatterns.add(new TwoFacedObject("", BLANK));
-                for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
-                    datePatterns.add(DateUtil.DATE_FORMATS[i]);
-                }
-
-                String unzip =
-                    HtmlUtil.checkbox(ARG_FILE_UNZIP) + HtmlUtil.space(1)
-                    + msg("Unzip archive")
-                    + HtmlUtil.checkbox(ARG_FILE_PRESERVEDIRECTORY)
-                    + HtmlUtil.space(1) + msg("Make folders from archive")
-                    + HtmlUtil.space(3) + msgLabel("Date Pattern")
-                    + HtmlUtil.space(1)
-                    + HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) + " ("
-                    + msg("use file name") + ")";
-
-                String extra = HtmlUtil.makeToggleInline("More...",
-                                   addMetadata + HtmlUtil.space(3) + unzip,
-                                   false);
-                if (forUpload) {
-                    extra = "";
-                }
-                if(!okToShowInForm("resource.extra")) {
-                    extra = "";
-                }
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
@@ -1893,32 +1894,44 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(HtmlUtil.formEntry(tabTitles.get(0) + ":",
                             tabContent.get(0) + extra));
                 }
-
             } else {
-                if (entry.getResource().isFile()) {
+                //                if (entry.getResource().isFile()) {
+                    //If its the admin then show the full path
                     if (request.getUser().getAdmin()) {
                         sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                entry.getResource().getPath()));
+                                                     entry.getResource().getPath()));
                     } else {
-                        String fileTail =
-                            getStorageManager().getFileTail(entry);
                         sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                fileTail));
+                                                     getStorageManager().getFileTail(entry)));
                     }
 
-                    if (entry.getResource().isStoredFile() && showFile) {
-                        String formContent = HtmlUtil.fileInput(ARG_FILE,
-                                                 size);
-                        sb.append(
-                            HtmlUtil.formEntry(
-                                msgLabel("Upload new file"), formContent));
-
+                    if (tabTitles.size() > 1) {
+                        sb.append(HtmlUtil.formEntry("",msg("Upload new resource")));
+                        sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                                     HtmlUtil.makeTabs(tabTitles, tabContent, true,
+                                                                       "tab_content",
+                                                                       "tab_contents_noborder") + extra));
+                    } else if (tabTitles.size() == 1) {
+                        sb.append(HtmlUtil.formEntry("",msg("Upload new resource")));
+                        sb.append(HtmlUtil.formEntry(tabTitles.get(0) + ":",
+                                                     tabContent.get(0) + extra));
                     }
 
-                } else {
+
+                    if(showFile) {
+                        if (entry.getResource().isStoredFile()) {
+                            String formContent = HtmlUtil.fileInput(ARG_FILE,
+                                                                    size);
+                            /*                            sb.append(
+                                      HtmlUtil.formEntry(
+                                                         msgLabel("Upload new file"), formContent));
+                            */
+                        }
+                    }
+                    /*                } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             entry.getResource().getPath()));
-                }
+                            }*/
             }
 
 
