@@ -259,7 +259,7 @@ example:
      id="pointcloud"
      categories="pointcloud"
      class="ucar.unidata.idv.control.PointCloudControl"
-     canstandalone="true"
+     canstandalone="false"
      label="Point Cloud"
      displaycategory="Volume Rendering"
     />
@@ -321,6 +321,7 @@ Since this is confusing and needs more work lets remove this for now
      label="Time Series Chart"
      properties="windowVisible=true;initialComponentClass=TimeSeriesChartWrapper;"/>
 
+<!--
   <control
      id="multidisplay.scatterplot"
      categories="trace;IMAGE-2D;IMAGE-BAND;"
@@ -329,6 +330,7 @@ Since this is confusing and needs more work lets remove this for now
      canstandalone="false"
      label="Scatter Plot Chart"
      properties="windowVisible=true;initialComponentClass=ScatterPlotChartWrapper;"/>
+-->
 
   <control
      id="multidisplay.statistics"
