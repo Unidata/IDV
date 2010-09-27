@@ -22,7 +22,7 @@ The IDV installers have been updated to Java 6 Update 20.
 </faqitem>
 
 <faqitem q="New netCDF-Java Version" id="nj42">
-This version of the IDV is using a preliminary release of version
+This version of the IDV is using the final release of version
 4.2 of the netCDF-Java library.  This new version includes several
 bug fixes for GRIB and point data reading.
 </faqitem>
@@ -41,8 +41,12 @@ when creating the display.
 </faqitem>
 
 <faqitem q="Capture Time Height Wind Profiler Images" id="prfImg">
-A new feature to capture time height wind profiler images has been added, user can now
+A new feature to capture time height wind profiler images has been added, users can now
 capture the wind profiler image in the IDV.
+</faqitem>
+
+<faqitem q="Point Cloud Display" id="pointcloud">
+A new point cloud display was added to the some point data sources to support displaying a large number of points quickly. 
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
@@ -82,17 +86,13 @@ including CAP and NPN datasets.
 A radar data type was added to the IDV to support for the WSI NOWrad images in our archive case studies datasets.
 </faqitem>
 
-<faqitem q="Point cloud data type" id="pointcloud">
-A new point cloud data type was added to the IDV to support for displaying a large number of points that are typically
-intended to be the representative of the external surface of an object .
-</faqitem>
-
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
 Several bug fixes were made in this release, including:
 <ul>
-<li>Java 3D bugs in the 2.9u1 release
+<li>Fix Java 3D installation in Mac OS-X installer
+<li>Remove dependency on Java 3D 1.5.2 that was added in the 2.9u1 release
 <li>netCDF-Java library not correctly handling scale/offset on 20th Century Reanalysis datasets
 <li>Mapping problems for global grids
 </ul>
