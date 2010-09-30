@@ -6,9 +6,9 @@
 
 <meta name="jhid" value="idv.controls.pointcloudrender">
 
-The Point Cloud control is a volume renderer of a set of vertices in a three-dimensional coordinate system. It shows
-a large number of points that are typically intended to be the representative of the external surface of an object. The
-control window contains three tabs. The first shows the point cloud control
+The Point Cloud control displays point data as a set of colored points.  It is more efficient than the Point Data Plot control for showing
+the locations of a large number (e.g. millions) of points.  It does not do automatic spatial decluttering, but you can subset by data value
+and drawing a clip region. The control window contains three tabs. The first shows the point cloud control
 
 
 [ht::cimg images/PointCloudControlGui1.gif]
@@ -25,7 +25,7 @@ The third tab shows the shape information of the clipping
 }
 
 {{Color By}  {
-You can select a parameter to be the color by value.
+You can select a parameter in the data to use to color the points.
 }}
 
 [ug::colortable]
@@ -39,6 +39,6 @@ You can change the size of the displayed points with the Point Size widget. Ente
 }}
 
 {{Clipping}  {
-You can enable the clipping by click the button and then reload the display to show the point cloud display inside or outside the
-clipping boundary. The clipping boundary is done in the clipping control.
+You can enable clipping by clicking the checkbox and then clicking the Reload button to display the point cloud inside or outside the
+clipping boundary. The clipping boundary is set by using the drawing items in the Clipping tab.
 }}
