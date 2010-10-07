@@ -143,47 +143,32 @@ changing the memory allocation.
 </faqitem>
 
 
-<faqitem q="What is &quot;there is no disk in drive A&quot; message in Web Start?" id="nodisk">
-Sometimes starting a program  on a Windows system with Web Start will
-produce a dialog box that says "There is no disk in drive A." Normally
-clicking the continue button will cause the program to start properly.
+<faqitem q="How do I use the Web Start Applications Manager?" id="wsmanager">
+For more control of the Java Web Start IDV installation, use the Web Start Applications
+Manager. Launch the Applications Manager by clicking <a href="http://www.unidata.ucar.edu/software/idv/webstart/IDV/player.jnlp">here</a>.
+You will see the IDV listed in the Applications Manager panel.
+You can use the Applications Manager to start
+the IDV without going to the Unidata Java Web Start
+link. In addition, with the Applications Manager, it is possible to remove broken
+or out-of-date IDV installations (see following FAQ item.)
 </faqitem>
 
-<faqitem q="How do I use the Web Start Applications Manager?" id="wsmanager">
-If you run the IDV from Web Start, for more control of the IDV, 
-use the Web Start Application Manager. You can launch it by clicking
-<a href="http://www.unidata.ucar.edu/software/idv/webstart/IDV/player.jnlp">
-here</a>. Alternatively, go to 
-http://java.sun.com/products/javawebstart/demos.html, and
-find the Web Start "Application Manager" on that page. Start the
-"Application Manager" by clicking on the "Launch" button.
+<faqitem q="How do I remove and re-install the IDV from Java Web Start?" id="wsreinstall">
+If your Java Web Start IDV installation is broken or out-of-date, remove it with
+the Applications Manager. The Applications Manager will have a panel showing
+&quot;Integrated Data Viewer &lt;version&gt;&quot; with an icon. Click to
+select it. Use the Remove (X) button located at the top of the panel. The IDV
+item be deleted.
+<p>
+In addition, it may be necessary to clear out Java Web Start
+cached resources. Delete the jar resources that are found beneath the Resources
+pull-down menu item (just below Applications menu item.)
 <p>
 
-In the Application Manager you will see the 
-IDV, if you do this after you have installed the IDV with Web Start.
-
-<p>
-
-You can use the Application Manager to start the IDV without going
-to the Unidata web page Web Start link, and to remove an old IDV to
-force a complete new IDV download next time you start the IDV with the
-Unidata web page 
-http://www.unidata.ucar.edu/software/idv/webstart/IDV/ .
-
-<p>
-
-If your Web Start IDV installation seems broken, remove it with the
-Application Manager and reload from the IDV Web Start Link. When you
-run the Application Manager it will have a panel showing "Integrated Data
-Viewer" with an icon. Click to select and it will highlight; it may already be
-selected. Use the 
-[ug::menu Application {Remove Application}] menu. The IDV item will
-go away. Reload the IDV from the Unidata web site.
-
-<p>
-
-You can see what Java version the IDV is using. Use the Application
-Manager's [ug::menu File Preferences  Java] menu and look at "Product version."
+Finally, reload the IDV from <a href="http://www.unidata.ucar.edu/software/idv/webstart/IDV/">Unidata</a>. 
+Note that you can verify the version of the
+IDV in the Applications Manager panel. The "Integrated Data Viewer" item is
+listed with a version number after it.
 </faqitem>
 
 <faqitem q="How can I show the Java console when running with Web Start?" id="wsconsole">
