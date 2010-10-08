@@ -995,7 +995,7 @@ return new Result(title, sb);
         boolean isLocalFile   = false;
         String localFileName = null;
         if (request.defined(ARG_LOCALFILE)) {
-            if ( !user.getAdmin()) {
+            if (!user.getAdmin()) {
                 fatalError(request,
                            "Only administrators can add a local file");
             }
@@ -1003,7 +1003,6 @@ return new Result(title, sb);
             getStorageManager().checkLocalFile(new File(localFileName));
             isLocalFile = true;
         }
-
 
 
         if (entry == null) {
@@ -1098,7 +1097,6 @@ return new Result(title, sb);
                     URL           fromUrl    = new URL(url);
                     URLConnection connection = fromUrl.openConnection();
                     InputStream   fromStream = connection.getInputStream();
-                    //                Object startLoad(String name) {
                     if (actionId != null) {
                         JobManager.getManager().startLoad("File copy",
                                 actionId);
@@ -1314,28 +1312,30 @@ return new Result(title, sb);
             }
         } else {
             boolean fileUpload = false;
-            String newFileName = request.getUploadedFile(ARG_FILE);
+            String newResourceName = request.getUploadedFile(ARG_FILE);
             String newResourceType = null;
 
+            //TODO: If they select a URL to download we don't handle that now
+
             //Did they upload a new file???
-            if (newFileName != null) {
-                newFileName = getStorageManager().moveToStorage(request,
-                                                             new File(newFileName)).toString();
+            if (newResourceName != null) {
+                newResourceName = getStorageManager().moveToStorage(request,
+                                                             new File(newResourceName)).toString();
                 newResourceType = Resource.TYPE_STOREDFILE;
             } else if(isLocalFile) {
-                newFileName = localFileName;
+                newResourceName = localFileName;
                 newResourceType = Resource.TYPE_LOCAL_FILE;
             } else  if (request.defined(ARG_URL)) {
-                newFileName = request.getString(ARG_URL,null);
+                newResourceName = request.getString(ARG_URL,null);
                 newResourceType = Resource.TYPE_URL;
             }
 
-            if (newFileName != null) {
+            if (newResourceName != null) {
                 //If it was a stored file then remove the old one
                 if(entry.getResource().isStoredFile()) {
                     getStorageManager().removeFile(entry.getResource());
                 }
-                entry.setResource(new Resource(newFileName,
+                entry.setResource(new Resource(newResourceName,
                                                newResourceType));
             }
 
@@ -2382,6 +2382,7 @@ return new Result(title, sb);
             InputStream inputStream =
                 getStorageManager().getFileInputStream(file);
             Result result = new Result(BLANK, inputStream, mimeType);
+            System.err.println("mime type:" + mimeType);
             result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
             result.setLastModified(new Date(file.lastModified()));
             result.setCacheOk(true);
