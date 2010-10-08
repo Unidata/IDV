@@ -141,7 +141,7 @@ public class MapManager extends RepositoryManager {
             mapJS       = MAP_JS_YAHOO;
         }
 
-        if (true || googleMapsKey != null) {
+        if (googleMapsKey != null) {
             mapJS = "http://maps.google.com/maps?file=api&v=2&key="
                     + googleMapsKey;
             mapJS = "http://maps.google.com/maps?file=api&v=3";
