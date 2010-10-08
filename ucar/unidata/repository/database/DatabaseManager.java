@@ -758,6 +758,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
 
 
+    public void initSelectStatement(Statement stmt) {
+    }
+
     /**
      * _more_
      *
