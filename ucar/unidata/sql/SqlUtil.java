@@ -1738,6 +1738,9 @@ public class SqlUtil {
      * @param mgr _more_
      */
     public static void setConnectionManager(ConnectionManager mgr) {
+        if(connectionManager !=null && connectionManager!= mgr) {
+            throw new IllegalArgumentException("Already have a connection manager:" + connectionManager.getClass().getName());
+        } 
         connectionManager = mgr;
     }
 
@@ -1771,6 +1774,8 @@ public class SqlUtil {
          * @param stmt _more_
          */
         public void closeStatement(Statement stmt);
+        public void initSelectStatement(Statement stmt);
+
     }
 
 
@@ -1863,8 +1868,12 @@ public class SqlUtil {
             String what, List tables, Clause clause,
             String sqlBetweenFromAndWhere, String suffixSql)
             throws Exception {
-        return connection.prepareStatement(getSelectStatement(what, tables,
+        PreparedStatement statement = connection.prepareStatement(getSelectStatement(what, tables,
                 clause, sqlBetweenFromAndWhere, suffixSql));
+        if(connectionManager!=null) {
+            connectionManager.initSelectStatement(statement);
+        }
+        return statement;
     }
 
 
