@@ -782,6 +782,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
         <delete dir="${tmpjardir}"/>
         <mkdir dir="${tmpjardir}"/>
         <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <javac
             classpath="${classpath}"
             debug="true"
@@ -819,7 +820,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             basedir="${tmpjardir}"
             compress="true"
             jarfile="${jars_dest}/unidatautil.jar">
-            <include name="ucar/**/*.class"/>
+            <include name="**/*.class"/>
         </jar>
        </target>
 
