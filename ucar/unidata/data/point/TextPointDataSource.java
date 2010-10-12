@@ -2229,10 +2229,8 @@ public class TextPointDataSource extends PointDataSource {
                         varNames.add(
                             ((RealType) dfltReal.getType()).getName());
                         numericTypes.add(dfltReal.getType());
-                        varUnits[0] = (altIndex != -1)
-                                      ? ((RealType) dfltReal.getType())
-                                          .getDefaultUnit()
-                                      : CommonUnit.meter;
+                        varUnits[0] =
+                            ((RealType) dfltReal.getType()).getDefaultUnit();
                         numericUnits.add(varUnits[0]);
                     }
 
