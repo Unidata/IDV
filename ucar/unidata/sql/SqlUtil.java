@@ -95,6 +95,18 @@ public class SqlUtil {
     /**
      * _more_
      *
+     * @param columns _more_
+     *
+     * @return _more_
+     */
+    public static String groupBy(String columns) {
+        return " GROUP BY " + columns;
+    }
+
+
+    /**
+     * _more_
+     *
      * @param toks _more_
      *
      * @return _more_
@@ -1631,6 +1643,9 @@ public class SqlUtil {
          */
         public ResultSet getNext() throws SQLException {
             try {
+                if (stmt == null) {
+                    return null;
+                }
                 if (lastResultSet == null) {
                     lastResultSet = stmt.getResultSet();
                     if (lastResultSet == null) {
@@ -1738,9 +1753,11 @@ public class SqlUtil {
      * @param mgr _more_
      */
     public static void setConnectionManager(ConnectionManager mgr) {
-        if(connectionManager !=null && connectionManager!= mgr) {
-            throw new IllegalArgumentException("Already have a connection manager:" + connectionManager.getClass().getName());
-        } 
+        if ((connectionManager != null) && (connectionManager != mgr)) {
+            throw new IllegalArgumentException(
+                "Already have a connection manager:"
+                + connectionManager.getClass().getName());
+        }
         connectionManager = mgr;
     }
 
@@ -1774,6 +1791,12 @@ public class SqlUtil {
          * @param stmt _more_
          */
         public void closeStatement(Statement stmt);
+
+        /**
+         * _more_
+         *
+         * @param stmt _more_
+         */
         public void initSelectStatement(Statement stmt);
 
     }
@@ -1868,9 +1891,10 @@ public class SqlUtil {
             String what, List tables, Clause clause,
             String sqlBetweenFromAndWhere, String suffixSql)
             throws Exception {
-        PreparedStatement statement = connection.prepareStatement(getSelectStatement(what, tables,
+        PreparedStatement statement =
+            connection.prepareStatement(getSelectStatement(what, tables,
                 clause, sqlBetweenFromAndWhere, suffixSql));
-        if(connectionManager!=null) {
+        if (connectionManager != null) {
             connectionManager.initSelectStatement(statement);
         }
         return statement;
