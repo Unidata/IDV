@@ -1,34 +1,34 @@
 /*
- * $Id: SharableManager.java,v 1.12 2005/09/21 17:13:21 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.collab;
+
+
+import ucar.unidata.util.LogUtil;
 
 
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
-import ucar.unidata.util.LogUtil;
 
 
 
@@ -42,6 +42,14 @@ public class SharableManager {
     /** Because these methods are static we use this to do synchronization */
 
     private static final Object MUTEX = new Object();
+
+    /** 
+        When a sharable receives a share we set the time when. When a sharable
+        does a doShare we check the last time it rcvd the share event. If its
+        less than this threshold (milliseconds) then we don't propagate the 
+        doShare
+    */
+    private static final long SHARE_TIME_THRESHOLD = 1000;
 
     /** _more_ */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
@@ -204,6 +212,16 @@ public class SharableManager {
     protected static void checkShareData(Sharable from, Object dataId,
                                          Object[] data, boolean internal,
                                          boolean external) {
+        //Check if the from object had rcvd a doShare in the last SHARE_TIME_THRESHOLD milliseconds
+        Long lastTime = from.getReceiveShareTime(dataId);
+        if (lastTime != null) {
+            if ((System.currentTimeMillis() - lastTime.longValue())
+                    < SHARE_TIME_THRESHOLD) {
+                return;
+            }
+        }
+
+
         if (internal) {
             if (from.getSharing()) {
                 sendShareData(from, dataId, data);
@@ -212,8 +230,8 @@ public class SharableManager {
         if (external) {
             if ((from != null) && (listeners != null)) {
                 for (int i = 0; i < listeners.size(); i++) {
-                    ((SharableListener) listeners.get(i)).checkShareData(from,
-                            dataId, data);
+                    ((SharableListener) listeners.get(i)).checkShareData(
+                        from, dataId, data);
                 }
             }
         }
@@ -264,6 +282,8 @@ public class SharableManager {
                 if ( !to.getSharing()) {
                     continue;
                 }
+                to.setReceiveShareTime(dataId,
+                                       new Long(System.currentTimeMillis()));
                 to.receiveShareData(from, dataId, data);
             }
         } catch (Exception e) {
@@ -301,11 +321,3 @@ public class SharableManager {
     }
 
 }
-
-
-
-
-
-
-
-

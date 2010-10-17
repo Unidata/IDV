@@ -1,26 +1,28 @@
 /*
- * $Id: SharableImpl.java,v 1.12 2005/10/06 15:19:37 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.collab;
+
+
+import ucar.unidata.util.GuiUtils;
 
 
 
@@ -30,8 +32,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
-
-import ucar.unidata.util.GuiUtils;
 
 
 
@@ -59,6 +59,10 @@ public class SharableImpl implements Sharable {
 
     /** _more_ */
     private JComboBox shareGroupBox;
+
+
+    /** Keeps track of the last time this object rcvd  shared data  */
+    private Hashtable<Object, Long> lastReceiveShareTime;
 
 
     /**
@@ -224,6 +228,34 @@ public class SharableImpl implements Sharable {
 
 
     /**
+     * Get the last time this object rcvd the share
+     *
+     * @param dataId data id
+     *
+     * @return last time or null
+     */
+    public Long getReceiveShareTime(Object dataId) {
+        if (lastReceiveShareTime == null) {
+            return null;
+        }
+        return lastReceiveShareTime.get(dataId);
+    }
+
+
+    /**
+     * Record the time when this object rcvd the share
+     *
+     * @param dataId data id
+     * @param time time
+     */
+    public void setReceiveShareTime(Object dataId, Long time) {
+        if (lastReceiveShareTime == null) {
+            lastReceiveShareTime = new Hashtable<Object, Long>();
+        }
+        lastReceiveShareTime.put(dataId, time);
+    }
+
+    /**
      *  Share the data identified by dataId.
      *
      *  @param dataId Identifies the attribute that is being shared
@@ -255,7 +287,7 @@ public class SharableImpl implements Sharable {
      *  @param data   The data that is being shared
      */
     public void doShare(Object dataId, Object data) {
-        doShare(dataId, new Object[]{ data });
+        doShare(dataId, new Object[] { data });
     }
 
 
@@ -267,7 +299,7 @@ public class SharableImpl implements Sharable {
      *  @param data   The data that is being shared
      */
     public void doShareExternal(Object dataId, Object data) {
-        doShare(dataId, new Object[]{ data }, false, true);
+        doShare(dataId, new Object[] { data }, false, true);
     }
 
     /**
@@ -277,7 +309,7 @@ public class SharableImpl implements Sharable {
      * @param data
      */
     public void doShareInternal(Object dataId, Object data) {
-        doShare(dataId, new Object[]{ data }, true, false);
+        doShare(dataId, new Object[] { data }, true, false);
     }
 
 
@@ -303,11 +335,3 @@ public class SharableImpl implements Sharable {
 
 
 }
-
-
-
-
-
-
-
-
