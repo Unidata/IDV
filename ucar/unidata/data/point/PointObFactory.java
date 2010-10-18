@@ -189,10 +189,10 @@ public class PointObFactory {
         TupleType    cloudDataType = null;
         FunctionType timeCloudType = null;
         Trace.call1("PointObFactory: makingCloudFI");
-        float[][] timeStepVals = null;
-        Unit[] dataUnits = null;
-        Unit[] rangeUnits = null;
-        boolean needToConvert = false;
+        float[][] timeStepVals  = null;
+        Unit[]    dataUnits     = null;
+        Unit[]    rangeUnits    = null;
+        boolean   needToConvert = false;
         for (int i = 0; i < timeSet.getLength(); i++) {
             FieldImpl    obs      = (FieldImpl) timeObs.getSample(i, false);
             Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
@@ -215,11 +215,14 @@ public class PointObFactory {
                     timeStep = new FlatField(cloudType, indexSet);
                     timeStepVals =
                         new float[elVals.length + dataVals.length][timeStep.getLength()];
-                    Unit[] elUnits = ((RealTuple) ob.getEarthLocation()).getTupleUnits();
+                    Unit[] elUnits =
+                        ((RealTuple) ob.getEarthLocation()).getTupleUnits();
                     if (elUnits == null) {
-                    	elUnits = new Unit[] {CommonUnit.degree, CommonUnit.degree, CommonUnit.meter};
+                        elUnits = new Unit[] { CommonUnit.degree,
+                                CommonUnit.degree, CommonUnit.meter };
                     }
-                    Unit[] valUnits = ((RealTuple) ob.getData()).getTupleUnits();
+                    Unit[] valUnits =
+                        ((RealTuple) ob.getData()).getTupleUnits();
                     dataUnits = new Unit[elUnits.length + valUnits.length];
                     for (int k = 0; k < elUnits.length; k++) {
                         dataUnits[k] = elUnits[k];
@@ -227,8 +230,9 @@ public class PointObFactory {
                     for (int k = 0; k < valUnits.length; k++) {
                         dataUnits[k + elUnits.length] = valUnits[k];
                     }
-                    rangeUnits =  Util.getDefaultRangeUnits(timeStep);
-                    needToConvert =  !java.util.Arrays.equals(dataUnits, rangeUnits);
+                    rangeUnits = Util.getDefaultRangeUnits(timeStep);
+                    needToConvert = !java.util.Arrays.equals(dataUnits,
+                            rangeUnits);
                 }
                 for (int k = 0; k < elVals.length; k++) {
                     timeStepVals[k][j] = (float) elVals[k];
@@ -246,7 +250,8 @@ public class PointObFactory {
             }
             // TODO:  this assumes that the values are the same units as the default units.
             if (needToConvert) {
-               timeStepVals = Unit.convertTuple(timeStepVals, dataUnits, rangeUnits);
+                timeStepVals = Unit.convertTuple(timeStepVals, dataUnits,
+                        rangeUnits);
             }
             timeStep.setSamples(timeStepVals, false);
             if (timeCloudType == null) {
@@ -1431,7 +1436,7 @@ public class PointObFactory {
                 stationFieldName = PointOb.PARAM_ID;
             }
             shortNamesList.add(stationFieldName);
-            types[0] = TextType.getTextType(stationFieldName);
+            types[0] = DataUtil.makeTextType(stationFieldName);
             stringTypes.add(types[0]);
             allReals = false;
         }
@@ -1460,7 +1465,7 @@ public class PointObFactory {
                 numericTypes.add(types[varIdx]);
                 numericUnits.add(unit);
             } else {
-                types[varIdx]    = TextType.getTextType(var.getShortName());
+                types[varIdx]    = DataUtil.makeTextType(var.getShortName());
                 varUnits[varIdx] = null;
                 stringTypes.add(types[varIdx]);
             }
@@ -1732,7 +1737,7 @@ public class PointObFactory {
                 stationFieldName = PointOb.PARAM_ID;
             }
             shortNamesList.add(stationFieldName);
-            types[0] = TextType.getTextType(stationFieldName);
+            types[0] = DataUtil.makeTextType(stationFieldName);
             stringTypes.add(types[0]);
             allReals = false;
         }
@@ -1757,7 +1762,7 @@ public class PointObFactory {
             DataChoice.addCurrentName(new TwoFacedObject("Point Data" + ">"
                     + var.getShortName(), var.getShortName()));
 
-            //            System.err.println("param "  + var.getShortName());
+            // System.err.println("param "  + var.getShortName());
 
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
@@ -1768,7 +1773,8 @@ public class PointObFactory {
                 numericTypes.add(types[varIdx]);
                 numericUnits.add(unit);
             } else {
-                types[varIdx]    = TextType.getTextType(var.getShortName());
+                types[varIdx] =
+                    DataUtil.makeTextType(Util.cleanName(var.getShortName()));
                 varUnits[varIdx] = null;
                 stringTypes.add(types[varIdx]);
             }

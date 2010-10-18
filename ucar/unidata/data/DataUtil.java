@@ -1,33 +1,28 @@
 /*
- * $Id: DataUtil.java,v 1.8 2006/12/01 20:41:22 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
 import org.apache.poi.hssf.usermodel.*;
-import java.util.Date;
 
-import java.text.SimpleDateFormat;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 
@@ -56,8 +51,11 @@ import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
 
+import java.text.SimpleDateFormat;
+
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -232,6 +230,15 @@ public class DataUtil {
         } catch (Exception exc) {
             return null;
         }
+    }
+
+    /**
+     * Try to create a TextType from the name.
+     * @param name name of type
+     * @return TextType or null
+     */
+    public static TextType makeTextType(String name) {
+        return TextType.getTextType(Util.cleanName(name));
     }
 
 
@@ -548,7 +555,7 @@ public class DataUtil {
      * @throws Exception On badness
      */
     public static String xlsToCsv(String filename) throws Exception {
-        return xlsToCsv(filename, false,null);
+        return xlsToCsv(filename, false, null);
     }
 
 
@@ -556,6 +563,7 @@ public class DataUtil {
      * Convert excel to csv
      *
      * @param filename excel file
+     * @param skipToFirstNumeric _more_
      * @param sdf If non null then use this to format any date cells
      *
      * @return csv
@@ -563,16 +571,19 @@ public class DataUtil {
      * @throws Exception On badness
      */
 
-    public static String xlsToCsv(String filename,boolean skipToFirstNumeric, SimpleDateFormat sdf) throws Exception {
-        StringBuffer sb    = new StringBuffer();
+    public static String xlsToCsv(String filename,
+                                  boolean skipToFirstNumeric,
+                                  SimpleDateFormat sdf)
+            throws Exception {
+        StringBuffer sb         = new StringBuffer();
         InputStream  myxls = IOUtil.getInputStream(filename, DataUtil.class);
-        HSSFWorkbook wb    = new HSSFWorkbook(myxls);
-        HSSFSheet    sheet = wb.getSheetAt(0);  // first sheet
-        boolean seenNumber = false;
+        HSSFWorkbook wb         = new HSSFWorkbook(myxls);
+        HSSFSheet    sheet      = wb.getSheetAt(0);  // first sheet
+        boolean      seenNumber = false;
         for (int rowIdx = sheet.getFirstRowNum();
                 rowIdx <= sheet.getLastRowNum(); rowIdx++) {
             HSSFRow row = sheet.getRow(rowIdx);
-            if(row==null) {
+            if (row == null) {
                 sb.append("\n");
                 continue;
             }
@@ -583,7 +594,7 @@ public class DataUtil {
                 if (cell == null) {
                     continue;
                 }
-                if(skipToFirstNumeric && !seenNumber) {
+                if (skipToFirstNumeric && !seenNumber) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC) {
                         rowOk = false;
                         break;
@@ -593,15 +604,18 @@ public class DataUtil {
 
                 String cellValue = null;
 
-                if (sdf!=null && cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                    if(HSSFDateUtil.isCellDateFormatted(cell)) {
+                if ((sdf != null)
+                        && (cell.getCellType()
+                            == HSSFCell.CELL_TYPE_NUMERIC)) {
+                    if (HSSFDateUtil.isCellDateFormatted(cell)) {
                         Date date = cell.getDateCellValue();
                         cellValue = sdf.format(date);
                     }
                 }
 
-                if(cellValue==null)
+                if (cellValue == null) {
                     cellValue = cell.toString();
+                }
 
                 if (colIdx > 0) {
                     sb.append(",");
@@ -615,7 +629,7 @@ public class DataUtil {
                     sb.append("("+str+")");
                     }*/
             }
-            if(rowOk) {
+            if (rowOk) {
                 sb.append("\n");
             }
         }
@@ -662,4 +676,3 @@ public class DataUtil {
 
 
 }
-
