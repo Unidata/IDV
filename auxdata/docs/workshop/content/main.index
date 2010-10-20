@@ -54,6 +54,11 @@ index.html
 >>>datadisplays/imagery/RadarOnSat.html
 >>>datadisplays/imagery/DoingMoreWithImagery.html
 
+>>resources/colortable/index.html
+>>>resources/colortable/Introduction.html
+>>>resources/colortable/CreatingANewTable.html
+>>>resources/colortable/UsingTheNewTable.html
+
 >>datadisplays/level2/index.html
 >>>datadisplays/level2/LoadingLevelIIData.html
 >>>datadisplays/level2/LevelIISweepDisplays.html
@@ -150,13 +155,9 @@ index.html
 #-advanced/WindSpeedTutorial.html
 #>>advanced/Collaboration.html
 
-
-
->>resources/colortable/index.html
->>>resources/colortable/Introduction.html
->>>resources/colortable/CreatingANewTable.html
->>>resources/colortable/UsingTheNewTable.html
-
+>>installandstart/Install.html
+>>>installandstart/Download.html
+>>>installandstart/Installer.html
 
 >>title:Configuring the IDV:In this section we will cover how to configure various aspects of the IDV
 >>>config/Preferences.html
@@ -201,9 +202,7 @@ index.html
 
 
 
-+>>installandstart/Install.html
-+>>>installandstart/Download.html
-+>>>installandstart/Installer.html
+
 
 >dev/index.html
 
