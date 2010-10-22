@@ -153,7 +153,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         //                    -> (DisplayFlow1Azimuth, DisplayFlow1Radial)))
         RealTupleType rtt = (RealTupleType) obFT.getFlatRange();
 
-        mappedDisplayable = new WindBarbDisplayable("profiler", rtt);
+        mappedDisplayable = new WindBarbDisplayable("profiler", rtt, true);
 
 
 

@@ -60,7 +60,23 @@ public class WindBarbDisplayable extends FlowDisplayable {
      */
     public WindBarbDisplayable(String name, RealTupleType rTT)
             throws VisADException, RemoteException {
-        super(name, rTT, 0.1f);
+    	this(name,rTT,false);
+    }
+
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * parameter.
+     *
+     * @param name           The name for the displayable.
+     * @param rTT        The VisAD RealTupleType of the parameter.  May be
+     *                          <code>null</code>.
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public WindBarbDisplayable(String name, RealTupleType rTT, boolean useSpeedForColor)
+            throws VisADException, RemoteException {
+        super(name, rTT, 0.1f, useSpeedForColor);
+        
     }
 
     /**

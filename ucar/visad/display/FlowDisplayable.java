@@ -93,6 +93,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** flag for coloring one param by another */
     private boolean coloredByAnother = false;
 
+    /** flag for coloring by wind speed */
+    private boolean useSpeedForColor = false;
+
     /** flag for autoscale */
     private boolean autoScale = false;
 
@@ -128,21 +131,41 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      * @param flowscale      A float size for the "flow scale".
      * @param rTT        The VisAD RealTupleType of the parameter.  May be
      *                          <code>null</code>.
+     * @param useSpeedForColor  set to true if you want to color by speed
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public FlowDisplayable(String name, RealTupleType rTT, float flowscale)
+    public FlowDisplayable(String name, RealTupleType rTT, float flowscale, boolean useSpeedForColor)
             throws VisADException, RemoteException {
 
         super(name, null, null, true);
 
         this.flowRealTupleType = rTT;  // immutable object
         this.flowscale         = flowscale;
+        this.useSpeedForColor  = useSpeedForColor;
 
         if (flowRealTupleType != null) {
             setFlowMaps();
         }
     }
+    
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * parameter, and the desired size of "scale"
+     *
+     * @param name           The name for the displayable.
+     * @param flowscale      A float size for the "flow scale".
+     * @param rTT        The VisAD RealTupleType of the parameter.  May be
+     *                          <code>null</code>.
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public FlowDisplayable(String name, RealTupleType rTT, float flowscale)
+            throws VisADException, RemoteException {
+
+        this(name, rTT, flowscale, false);
+    }
+
 
     /**
      * Constructs from a name for the Displayable and the type of the
@@ -448,20 +471,22 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             flowXMap    = new ScalarMap(realTypes[0], (useFlow1
                     ? Display.Flow1Azimuth
                     : Display.Flow2Azimuth));
-            flowYMap    = new ScalarMap(realTypes[1], (useFlow1
+            flowXMap.setRange(0, 360);
+            flowYMap = new ScalarMap(realTypes[1], (useFlow1
                     ? Display.Flow1Radial
                     : Display.Flow2Radial));
-            spdIndex    = 1;
+            spdIndex = 1;
         } else if (Unit.canConvert(units[0], CommonUnit.meterPerSecond)
                    && Unit.canConvert(units[1], CommonUnit.degree)) {
             isCartesian = false;
             flowXMap    = new ScalarMap(realTypes[1], (useFlow1
                     ? Display.Flow1Azimuth
                     : Display.Flow2Azimuth));
-            flowYMap    = new ScalarMap(realTypes[0], (useFlow1
+            flowXMap.setRange(0, 360);
+            flowYMap = new ScalarMap(realTypes[0], (useFlow1
                     ? Display.Flow1Radial
                     : Display.Flow2Radial));
-            spdIndex    = 0;
+            spdIndex = 0;
         } else {
             //throw new VisADException("Unknown units for flow types");
             flowXMap = new ScalarMap(realTypes[0], (useFlow1
@@ -488,7 +513,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
 
         // set RealType to color by speed
-        if ( !coloredByAnother && !isCartesian) {
+        if ( useSpeedForColor && !isCartesian) {
             //if ( !coloredByAnother) {
             setRGBRealType(
                 (RealType) flowRealTupleType.getComponent(spdIndex));
@@ -567,11 +592,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 if (get3DFlow()) {
                     flowZMap.setRange(flowMinValue, flowMaxValue);
                 }
-            }  /* else if (!isCartesianWind() && (flowYMap != null)) {
-                 flowXMap.setRange(0, 360);
-                 flowYMap.setRange(flowMinValue, flowMaxValue);
-             }
-             */
+            } else if ( !isCartesianWind() && (flowYMap != null)) {
+                flowYMap.setRange(0, flowMaxValue);
+            }
         }
     }
 
@@ -765,6 +788,16 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setColoredByAnother(boolean yesno) {
         coloredByAnother = yesno;
+    }
+
+    /**
+     * Set whether this GridDisplayable should have the data colored
+     * by speed.
+     *
+     * @param yesno true if colored by speed
+     */
+    public void setUseSpeedForColor(boolean yesno) {
+        useSpeedForColor = yesno;
     }
 
     /**

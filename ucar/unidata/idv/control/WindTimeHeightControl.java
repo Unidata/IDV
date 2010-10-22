@@ -229,7 +229,7 @@ public class WindTimeHeightControl extends ProfilerControl {
         FunctionType  ftype = (FunctionType) data.getType();
         FunctionType  obFT  = (FunctionType) ftype.getRange();
         RealTupleType rtt   = (RealTupleType) obFT.getFlatRange();
-        wbDisplayable = new WindBarbDisplayable("wsr 88d station", rtt);
+        wbDisplayable = new WindBarbDisplayable("profiler station", rtt, true);
         setFlowScale(getFlowScale());
         // profileDisplay = new XYDisplay("wind time height profile",
         //                                RealType.Time, RealType.Altitude);

@@ -807,12 +807,14 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     for (int i = startComp; i < numComps; i++) {
                         Range compRange = ranges[i];
                         max = Math.max(compRange.getMax(), max);
+                        //min = Math.min(compRange.getMin(), min);
                         min = Math.min(compRange.getMin(), min);
                     }
-                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)
-                            && isCartesian) {
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
                         max = Math.max(max, -min);
-                        min = -max;
+                        min = isCartesian
+                              ? -max
+                              : 0;
                     }
                     //System.out.println("setFlowRange: " + min + " to " + max);
                     //getGridDisplay().setFlowRange(min,max);
