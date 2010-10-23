@@ -6574,10 +6574,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 Toolkit.getDefaultToolkit().getScreenSize());
         } else {}
         fullScreenWindow.pack();
+        int yOffset = 0;
+        if(GuiUtils.isMac()) {
+            yOffset = 23;
+        }
         if (fixedSize == null) {
-            fullScreenWindow.setLocation(0, 0);
+            fullScreenWindow.setLocation(0, 0+yOffset);
         } else {
-            fullScreenWindow.setLocation(20, 20);
+            fullScreenWindow.setLocation(20, 20+yOffset);
         }
         fullScreenWindow.setVisible(true);
         navComponent.requestFocus();
