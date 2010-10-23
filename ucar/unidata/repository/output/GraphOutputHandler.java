@@ -250,7 +250,22 @@ public class GraphOutputHandler extends OutputHandler {
             getStorageManager().resourceFromDB(results.getString(col++));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         String      nodeType    = typeHandler.getNodeType();
-        if (ImageUtils.isImage(resource)) {
+        String imageUrl=null;
+        if(ImageUtils.isImage(resource)) {
+            imageUrl = HtmlUtil.url(
+                                    getRepository().URL_ENTRY_GET + entryId
+                                    + IOUtil.getFileExtension(
+                                                              resource), ARG_ENTRYID, entryId,
+                                    ARG_IMAGEWIDTH, "75");
+        } else {
+            /*            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+            for(Metadata metadata: metadataList) {
+                MetadataHandler handler = findMetadataHandler(metadata.getType());
+                handler.decorateEntry(request, entry, sb, metadata, forLink);
+                }*/
+        }
+
+        if (imageUrl!=null) {
             nodeType = "imageentry";
         }
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
@@ -262,12 +277,7 @@ public class GraphOutputHandler extends OutputHandler {
                                      getEntryManager().getIconUrl(request,
                                          entry));
         }
-        if (ImageUtils.isImage(resource)) {
-            String imageUrl = HtmlUtil.url(
-                                  getRepository().URL_ENTRY_GET + entryId
-                                  + IOUtil.getFileExtension(
-                                      resource), ARG_ENTRYID, entryId,
-                                          ARG_IMAGEWIDTH, "75");
+        if (imageUrl!=null) {
             attrs = attrs + " " + XmlUtil.attr("image", imageUrl);
         }
         //        System.err.println (XmlUtil.tag(TAG_NODE,attrs));

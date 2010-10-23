@@ -2382,7 +2382,6 @@ return new Result(title, sb);
             InputStream inputStream =
                 getStorageManager().getFileInputStream(file);
             Result result = new Result(BLANK, inputStream, mimeType);
-            System.err.println("mime type:" + mimeType);
             result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
             result.setLastModified(new Date(file.lastModified()));
             result.setCacheOk(true);

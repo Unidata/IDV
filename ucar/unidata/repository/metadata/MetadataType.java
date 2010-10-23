@@ -438,14 +438,12 @@ public class MetadataType extends MetadataTypeBase {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
-            if ( !element.showAsAttachment()) {
+            if (!element.showAsAttachment()) {
                 continue;
             }
-
             if (element.getThumbnail() || isThumbnail) {
                 String html = getFileHtml(request, entry, metadata, element,
                                           forLink);
-
                 if (html != null) {
                     sb.append(HtmlUtil.space(1));
                     sb.append(html);
@@ -588,7 +586,6 @@ public class MetadataType extends MetadataTypeBase {
         if ( !getShowInHtml()) {
             return null;
         }
-
         StringBuffer content = new StringBuffer();
         if (getSearchable()) {
             content.append(handler.getSearchLink(request, metadata));

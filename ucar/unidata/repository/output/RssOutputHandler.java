@@ -23,6 +23,7 @@ package ucar.unidata.repository.output;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.type.*;
@@ -80,10 +81,13 @@ public class RssOutputHandler extends OutputHandler {
     public static final String TAG_RSS_RSS = "rss";
 
     /** _more_ */
-    public static final String TAG_RSS_GEOLAT = "geo:lat";
+    public static final String TAG_RSS_GEOLAT = "georss:lat";
 
     /** _more_ */
-    public static final String TAG_RSS_GEOLON = "geo:lon";
+    public static final String TAG_RSS_GEOLON = "georss:lon";
+
+    public static final String TAG_RSS_GEOBOX = "georss:box";
+
 
     /** _more_ */
     public static final String TAG_RSS_LINK = "link";
@@ -202,7 +206,7 @@ public class RssOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
         entries.addAll(subGroups);
-        return outputEntries(request, entries);
+        return outputEntries(request, group, entries);
     }
 
 
@@ -217,7 +221,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntries(Request request, List<Entry> entries)
+    private Result outputEntries(Request request, Entry parentEntry, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
@@ -225,11 +229,23 @@ public class RssOutputHandler extends OutputHandler {
         sb.append(XmlUtil.openTag(TAG_RSS_RSS,
                                   XmlUtil.attrs(ATTR_RSS_VERSION, "2.0")));
         sb.append(XmlUtil.openTag(TAG_RSS_CHANNEL));
-        sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", "Repository Query"));
+        sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", parentEntry.getName()));
         StringBufferCollection sbc    = new StringBufferCollection();
         OutputType             output = request.getOutput();
         request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
         for (Entry entry : entries) {
+            StringBuffer extra = new StringBuffer();
+            String resource = entry.getResource().getPath();
+            if(ImageUtils.isImage(resource)) {
+                String imageUrl = repository.absoluteUrl(HtmlUtil.url(
+                                                                      getRepository().URL_ENTRY_GET + entry.getId()
+                                                                      + IOUtil.getFileExtension(
+                                                                                                resource), ARG_ENTRYID, entry.getId()
+                                                                      /*,                                                                    ARG_IMAGEWIDTH, "75"*/));
+                extra.append(HtmlUtil.br());
+                extra.append(HtmlUtil.img(imageUrl));
+            }
+
             sb.append(XmlUtil.openTag(TAG_RSS_ITEM));
             sb.append(
                 XmlUtil.tag(
@@ -247,9 +263,9 @@ public class RssOutputHandler extends OutputHandler {
                 XmlUtil.appendCdata(
                     sb,
                     entry.getTypeHandler().getEntryContent(
-                        entry, request, true, false).toString());
+                                                           entry, request, true, false).toString());
             } else {
-                XmlUtil.appendCdata(sb, entry.getDescription());
+                XmlUtil.appendCdata(sb, entry.getDescription()+extra);
             }
 
             sb.append(XmlUtil.closeTag(TAG_RSS_DESCRIPTION));
@@ -260,10 +276,10 @@ public class RssOutputHandler extends OutputHandler {
                                       "" + entry.getEast()));
             } else if (entry.hasAreaDefined()) {
                 //For now just include the southeast point
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT, "",
-                                      "" + entry.getSouth()));
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLON, "",
-                                      "" + entry.getEast()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOBOX, "",
+                                      entry.getSouth()+","+entry.getWest()+"," +
+                                      entry.getNorth() +"," +
+                                      entry.getEast()));
             }
 
 
