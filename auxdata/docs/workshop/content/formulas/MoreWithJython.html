@@ -49,6 +49,8 @@ def tempAnom(t):
     for i in range(len(p)):
       if p\[i\] &lt; 225.0: 
         tstd\[i\]=216.65
+    # change the units to K
+    tstd = newUnit(tstd,"tstd","K")
     # calculate the temperature anomaly
     tanom=t-tstd
     return tanom
