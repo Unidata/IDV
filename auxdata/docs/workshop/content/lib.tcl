@@ -342,7 +342,7 @@ proc ht::loadEtaGrid {} {
           <li> Open the [ht::dialog Catalog Chooser] by either:
           </li>
              <ul> 
-                 <li> Choose the [ht::menu Data {New Data Source} {From a Catalog}] menu item.
+                 <li> Choose the [ht::menu Data {Choose Data} {From a Catalog}] menu item.
                  <li> Click the [ht::command Catalogs] tab in the [ht::command {Data Chooser}].
                  </li>
              </ul>
