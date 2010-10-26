@@ -53,6 +53,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -436,6 +437,17 @@ public class XmlEncoder extends XmlUtil {
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
+
+        addDelegateForClass(Date.class, new XmlDelegateImpl() {
+            public Element createElement(XmlEncoder e, Object o) {
+                Date  p     = (Date) o;
+                List  args  = Misc.newList(new Long(p.getTime()));
+                List  types = Misc.newList(Long.TYPE);
+                return e.createObjectConstructorElement(o, args, types);
+            }
+        });
+
+
     }
 
 
@@ -553,7 +565,8 @@ public class XmlEncoder extends XmlUtil {
      * @throws Exception _more_
      */
     public static String encodeObject(Object object) throws Exception {
-        return new XmlEncoder().toXml(object, false);
+        String s = new XmlEncoder().toXml(object, false);
+        return s;
     }
 
 
@@ -2750,6 +2763,11 @@ public class XmlEncoder extends XmlUtil {
     public static void main(String[] args) {
 
         try {
+            XmlEncoder enc1 = new XmlEncoder();
+            String xml = enc1.toXml(new Date());
+            Date date = (Date) enc1.toObject(xml);
+            System.err.println ("Date:" + date);
+
             /*            String xmltest = IOUtil.readContents("test.xml",
                                  XmlEncoder.class, (String) null);
             XmlEncoder enc1 = new XmlEncoder();
