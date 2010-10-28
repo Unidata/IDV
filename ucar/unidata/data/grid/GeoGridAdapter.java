@@ -529,7 +529,7 @@ public class GeoGridAdapter {
         RealType         zType         = null;
 
         boolean          needToWrapLon = false;
-        if (yIsLinear) {
+        //if (yIsLinear) {
             if (isLatLon) {
                 xIsLinear = checkLinearity(xAxis, true);
                 if (xIsLinear) {
@@ -538,7 +538,7 @@ public class GeoGridAdapter {
             } else {
                 xIsLinear = checkLinearity(xAxis, false);
             }
-        }
+        //}
         isLinear = isLinear && xIsLinear;
 
         RealTupleType domainTemplate = null;
