@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>Level II CrossSection Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+The IDV makes a vertical Cross Section display from Level II radar volume data. The display
+is presented  in a conventional 2D plot, and in a 3D display at the correct position in the atmosphere.
+
+</div>
+  
+The vertical Cross Section display is constructed from the cross section line and radials from several
+azimuthal sweeps available in the WSR-88D Level II output files.
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<p>
+
+<ol class="step">
+
+<li>[ht::clearDisplays]
+
+<li>Make sure the menu item
+        [ht::menu Projections {Auto-set Projection}] option is checked on.
+
+<li>In the [ht::dialog Field Selector] window create a [ht::display {Radar Cross Section}]
+    display using the [ht::param Reflectivity] field.</li>
+<p>
+
+The Cross Section control window appears in the [ht::dialog Dashboard].
+The Cross Section display appears inside the Cross Section control window as a 2D plot.
+
+[ht::cimg  images/RadarCrossSectionControlGui1.gif]
+
+
+<li>The Cross Section also appears in the main 3D view window.
+    View the Cross Section in 3D, and change the Cross Section line position.</li>
+  <ul class="substep">
+   <li>Rotate, pan, and zoom  the 3D display as needed to see the
+    Cross Section in 3D.
+    <popup label="More about Cross Section displays">
+    Note the Cross Section display is not a replacement of the RHI dislplay, if the number of intersections
+    of the Cross Section line and radials of each sweep is low,
+    the Cross Section display will have very few pixel points.
+    </popups>
+    <li>Move the cross section selector so it cuts across the storm center
+    You can move the line by clicking and dragging the end selector point on the selector line.
+    <li>If desired, restore the initial overhead
+    viewpoint with the key combination Ctrl-r.
+        
+    [ht::cimg  images/RadarCrossSection3D.gif]
+  </ul>
+</li>
+
+
+<li>Working with the 2D Cross Section display</li>
+  <ul class="substep">
+    <li>Pan the 2D display with a right mouse button drag,
+    and zoom the display by dragging the right mouse button forward
+    and backward with the Shift key pressed.
+    <li>You can change the vertical scale of the 2D cross section view.
+    <li>You can change the selector location by entering lat/lon of the end points of the cross section.
+  </ul>
+</li>
+
+</ol>
+
+
+</body>
+</html>
