@@ -83,6 +83,9 @@ public class Clause {
     /** _more_ */
     public static final String EXPR_ISNULL = "is null";
 
+    /** _more_ */
+    public static final String EXPR_ISNOTNULL = "is not null";
+
 
     /** _more_ */
     public static final String EXPR_IN = "IN";
@@ -382,6 +385,10 @@ public class Clause {
      */
     public static Clause isNull(String column) {
         return new Clause(column, EXPR_ISNULL, null);
+    }
+
+    public static Clause isNotNull(String column) {
+        return new Clause(column, EXPR_ISNOTNULL, null);
     }
 
     /**
@@ -702,6 +709,8 @@ public class Clause {
 
         if (expr.equals(EXPR_ISNULL)) {
             sb.append(SqlUtil.group(column + " is null "));
+        } else if (expr.equals(EXPR_ISNOTNULL)) {
+            sb.append(SqlUtil.group(column + " is not null "));
         } else if (expr.equals(EXPR_JOIN)) {
             sb.append(SqlUtil.group(column + " =  " + value));
         } else if (expr.equals(EXPR_LIKE)) {
@@ -745,7 +754,7 @@ public class Clause {
             return col;
         }
 
-        if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_JOIN)) {
+        if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_ISNOTNULL) || expr.equals(EXPR_JOIN)) {
             return col;
         }
         if (SqlUtil.debug) {
