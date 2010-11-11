@@ -1260,6 +1260,7 @@ public class StationModelDisplayable extends DisplayableData {
                         }
                         workFlowValues[0][0] = workUV[0];
                         workFlowValues[1][0] = workUV[1];
+                        workFlowValues[2][0] = 0;  // zero out every time
                         if (Float.isNaN(workUV[0])
                                 || Float.isNaN(workUV[1])) {
                             continue;
