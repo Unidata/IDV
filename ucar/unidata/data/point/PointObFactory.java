@@ -1717,7 +1717,7 @@ public class PointObFactory {
             varIdxBase = 1;
         }
 
-        List shortNamesList = new ArrayList();
+        List<String> shortNamesList = new ArrayList<String>();
 
         log_.debug("number of data variables = " + numVars);
         boolean[]        isVarNumeric = new boolean[numVars];
@@ -1752,7 +1752,19 @@ public class PointObFactory {
                 numVars--;
                 continue;
             }
+            // make sure data is either numeric or string
+            if ( !((var.getDataType() == DataType.BYTE)
+                    || (var.getDataType() == DataType.INT)
+                    || (var.getDataType() == DataType.LONG)
+                    || (var.getDataType() == DataType.FLOAT)
+                    || (var.getDataType() == DataType.DOUBLE)
+                    || (var.getDataType() == DataType.STRING)
+                    || (var.getDataType() == DataType.CHAR))) {
+                numVars--;
+                continue;
+            }
             shortNamesList.add(shortName);
+
             isVarNumeric[varIdx] = !((var.getDataType() == DataType.STRING)
                                      || (var.getDataType() == DataType.CHAR));
             if ( !isVarNumeric[varIdx]) {
