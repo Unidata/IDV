@@ -758,6 +758,24 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
 
+  <derived
+     id="Z"
+     description="Height from Geopotential (%N1%)"
+     label="Height"
+     isdefault="true" 
+     isenduser="false"
+     formula="GP2Z(D1)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands>
+      <params categories="GRID-3D-*;"
+         p1="GP"/>
+    </operands>
+  </derived>
 
   <derived
      id="relh"

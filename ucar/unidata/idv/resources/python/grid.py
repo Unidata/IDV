@@ -359,3 +359,8 @@ def substitute(data, low, high, newValue):
 def maskGrid(grid, mask, value=0):
     """mask one grid by the values in the other.  value is the masking value"""
     return DerivedGridFactory.mask(grid, mask, value)
+
+def GP2Z(gp):
+    """Convert Geopotential (GP) to Height (Z)"""
+    return gp/DerivedGridFactory.GRAVITY
+
