@@ -592,6 +592,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>
     </operands>
   </derived>
+
   <derived 
      description="Geostrophic Wind Vectors (from %N1%)" 
      formula="geo(D1)" 
@@ -652,7 +653,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   <derived 
      description="AGeostrophic Wind (from %N1%, %N2%, and %N3%)" 
      formula="mag(vecr(D1,D2)-geo(D3))" 
-     id="ageostrophic_wind_vector" 
+     id="ageostrophic_wind" 
      isdefault="true" 
      isenduser="false">
     <categories>
@@ -662,6 +663,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          childidx="0" />
     </categories>
     <operands categories="GRID-3D-*;">
+      <paramgroup name="u_v_z"/>
       <paramgroup name="urel_vrel_z"/>
     </operands>
   </derived>
@@ -759,25 +761,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
 
   <derived
-     id="Z"
-     description="Height from Geopotential (%N1%)"
-     label="Height"
-     isdefault="true" 
-     isenduser="false"
-     formula="GP2Z(D1)">
-    <categories>
-      <category
-         value="inherit"
-         append="Derived"
-         childidx="0"/>
-    </categories>
-    <operands>
-      <params categories="GRID-3D-*;"
-         p1="GP"/>
-    </operands>
-  </derived>
-
-  <derived
      id="relh"
      description="Relative Humidity (from %N1% &amp; %N2%)"
      label="Relative Humidity"
@@ -797,6 +780,25 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <params categories="GRID-3D-*;"
          p1="TEMP"
          p2="MIXR"/>
+    </operands>
+  </derived>
+
+  <derived
+     id="Z"
+     description="Height from Geopotential (%N1%)"
+     label="Height"
+     isdefault="true" 
+     isenduser="false"
+     formula="GP2Z(D1)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands>
+      <params categories="GRID-3D-*;"
+         p1="GP"/>
     </operands>
   </derived>
 
