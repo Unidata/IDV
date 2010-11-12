@@ -1754,6 +1754,7 @@ public class PointObFactory {
             }
             // make sure data is either numeric or string
             if ( !((var.getDataType() == DataType.BYTE)
+                    || (var.getDataType() == DataType.SHORT)
                     || (var.getDataType() == DataType.INT)
                     || (var.getDataType() == DataType.LONG)
                     || (var.getDataType() == DataType.FLOAT)
