@@ -794,6 +794,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             srcdir="${srcdir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}">
+            <include name="ucar/unidata/ui/HttpFormEntry.java"/>
             <include name="ucar/unidata/util/HtmlUtil.java"/>
             <include name="ucar/unidata/util/IOUtil.java"/>
             <include name="ucar/unidata/util/GuiUtils.java"/>
