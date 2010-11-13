@@ -661,11 +661,16 @@ public class ProbeRowInfo {
                 String name =
                     StringUtil.replace(comps[i].getType().toString(),
                                        "(Text)", "").toLowerCase();
-                String canon = DataAlias.aliasToCanonical(name);
-                if ((canon != null)
-                        && (canon.equals("IDN") || canon.equals("ID"))) {
+                if(name.toLowerCase().equals("station")) {
                     stationName = comps[i].toString();
                     return;
+                } else {
+                    String canon = DataAlias.aliasToCanonical(name);
+                    if ((canon != null)
+                        && (canon.equals("IDN") || canon.equals("ID"))) {
+                        stationName = comps[i].toString();
+                        return;
+                    }
                 }
             }
         }
