@@ -329,10 +329,15 @@ public class ListDataChoice extends DataChoice {
             //If this is the first new category then replace the src
             DataCategory newCategory = (DataCategory) newCategories.get(i);
             if (src.getAppend() != null) {
-                newCategory =
-                    DataCategory.parseCategory(newCategory.toString()
-                        + DataCategory.DIVIDER
-                        + src.getAppend(), newCategory.getForDisplay());
+                String newCategoryString = newCategory.toString();
+                String newSuffix =  DataCategory.DIVIDER + src.getAppend();
+                //Don't append the same category onto the end
+                //This fixes the 3DGrid->Derived->Derived problem
+                if(!newCategoryString.endsWith(newSuffix)) {
+                    newCategory =
+                        DataCategory.parseCategory(newCategoryString+ newSuffix, 
+                                                   newCategory.getForDisplay());
+                } 
             }
             if (src.getReplace() != null) {
                 String catString = newCategory.toString()
