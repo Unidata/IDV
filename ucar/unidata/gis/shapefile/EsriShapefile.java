@@ -462,9 +462,10 @@ public class EsriShapefile {
 		//		if(features.size()>10) break;
             }
         }
-        //      System.err.println ("features:" + features.size());
+        //        System.err.println ("features:" + features.size() + " num points:" + NUMPOINTS);
     }
 
+    private  int NUMPOINTS = 0;
 
     /**
      * Return percent of file read, so far.
@@ -517,10 +518,10 @@ public class EsriShapefile {
      */
     private EsriFeature nextFeature() throws IOException {
 
+
         int recordNumber  = readInt();  // starts at 1, not 0
         int contentLength = readInt();  // in 16-bit words
         featureType = readLEInt();
-
 
         switch (featureType) {
 
@@ -542,6 +543,10 @@ public class EsriShapefile {
           case EsriShapefile.POLYGON :  // polygon
               // System.err.println ("polygon");
               return new EsriPolygon();
+
+          case EsriShapefile.POLYGONZ :  // polygon
+              // System.err.println ("polygon");
+              return new EsriPolygonZ();
 
           default :
               throw new IOException("can't handle shapefile shape type "
@@ -785,6 +790,80 @@ public class EsriShapefile {
                 xyPoints = new double[2 * numPoints];
             }
             readLEDoubles(xyPoints, 2 * numPoints);
+            discretize(xyPoints, 2 * numPoints);  // overwrites xyPoints
+
+            /* numPoints is reduced by removing dupl. discretized points */
+            numPoints = 0;
+            int ixy = 0;
+            int numPartsLeft = 0;  // may be < numParts after eliminating 1-point parts
+            for (int part = 0; part < numParts; part++) {
+                int pointsInPart = parts[part + 1] - parts[part];
+                /* remove duplicate discretized points in part constructor */
+                GisPart gp = new EsriPart(pointsInPart, xyPoints, ixy);
+                /* Only add a part if it has 2 or more points, after duplicate
+                   point removal */
+                if (gp.getNumPoints() > 1) {
+                    partsList.add(gp);
+                    numPoints += gp.getNumPoints();
+                    numPartsLeft++;
+                }
+                ixy += 2 * pointsInPart;
+            }
+            numParts = numPartsLeft;
+        }
+    }  // EsriPolygon
+
+
+
+
+    /**
+     * Represents a PolygonZ in an ESRI shapefile as a List of
+     * GisParts.  A PolygonZ is just an ordered set of vertices of 1 or
+     * more parts, where a part is a closed connected sequence of
+     * points. 
+     *
+     * Note: This reads the MRANGE and MPOINTS every time though, according to:
+     * http://en.wikipedia.org/wiki/Shapefile
+     * these fields are optional but how does one tell?
+     *
+     * @author Jeff McWhirter
+     */
+    public class EsriPolygonZ extends EsriFeature {
+
+        /**
+         * Create a new EsriPolygonZ
+         *
+         * @throws java.io.IOException
+         *
+         */
+        public EsriPolygonZ() throws java.io.IOException {
+            bounds    = readBoundingBox();
+            numParts  = readLEInt();
+            numPoints = readLEInt();
+            int[] parts = new int[numParts + 1];
+            for (int j = 0; j < numParts; j++) {
+                parts[j] = readLEInt();
+            }
+            parts[numParts] = numPoints;
+
+            //Mandatory: MBR, Number of parts, Number of points, Parts, Points, Z range, Z array
+            if (xyPoints.length <  2* numPoints) {
+                xyPoints = new double[2 * numPoints];
+            }
+            NUMPOINTS+=numPoints;
+
+            readLEDoubles(xyPoints, 2 * numPoints);
+            double[] zRange = {0,0};
+            double[] zPoints = new  double[numPoints];
+
+            readLEDoubles(zRange, 2);
+            readLEDoubles(zPoints, numPoints);
+
+            //Try reading this again to pick up the mrange and mpoints
+            //NOTE: the mrange/mpoints are optional but I don't know how to determine that
+            readLEDoubles(zRange, 2);
+            readLEDoubles(zPoints, numPoints);
+
             discretize(xyPoints, 2 * numPoints);  // overwrites xyPoints
 
             /* numPoints is reduced by removing dupl. discretized points */
@@ -1060,6 +1139,13 @@ public class EsriShapefile {
     public int getFeatureType() {
         return featureType;
     }
+
+    public static void main(String[]args) throws IOException {
+        for(String arg: args) {
+            EsriShapefile shapefile = new EsriShapefile(arg);
+        }
+    }
+
 
 }
 
