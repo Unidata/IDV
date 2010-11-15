@@ -977,6 +977,10 @@ public class NamedStationTable extends StationTableImpl {
                 altIndex = i;
                 //              int bracketIdx = name.indexOf("[");
             }
+            if(name.equals("id") || name.startsWith("station") || name.startsWith("site")) {
+                titleIndex = i;
+
+            }
             if ((i != latIndex) && (i != lonIndex) && (i != altIndex)
                     && (titleIndex == -1)) {
                 titleIndex = i;
