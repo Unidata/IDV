@@ -365,6 +365,26 @@ def ysum(S):
   """
   return GridMath.applyFunctionToAxis(S, GridMath.FUNC_SUM, GridMath.AXIS_Y)
 
+def zav(S):
+  """ Average across the levels of a grid at all points
+  <div class=jython>
+      ZAV (S) = ( S (Z1) + S (Z2) + ... + S (KZD) ) / KNT
+                KZD = number of levels
+                KNT = number of non-missing points in column
+  </div>
+  """
+  return GridMath.applyFunctionToLevels(S, GridMath.FUNC_AVERAGE)
+
+def zsum(S):
+  """ Sum across the levels of a grid at all points
+  <div class=jython>
+      ZSUM (S) = ( S (Z1) + S (Z2) + ... + S (KZD) )
+                 KYD = number of levels
+                 ZSUM for a vertical column is stored at every point
+  </div>
+  """
+  return GridMath.applyFunctionToLevels(S, GridMath.FUNC_SUM)
+
 def wshr(V, Z, top, bottom):
   """  Magnitude of the vertical wind shear in a layer
   <div class=jython>
