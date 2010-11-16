@@ -364,3 +364,7 @@ def GP2Z(gp):
     """Convert Geopotential (GP) to Height (Z)"""
     return gp/DerivedGridFactory.GRAVITY
 
+
+def sumLevels(field):
+    """sum the values in the levels and return a 2d field"""
+    return  GridMath.applyFunctionOverLevels(field, GridMath.FUNC_SUM)
