@@ -34,12 +34,9 @@ defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {
 
 
 defineGroup Alaska
-defineImage http://akweathercams.faa.gov/wxdata/7-61294.jpg {Anchorage, AK} -ll {61.21,-149.92} -dz {-9}
-defineImage http://akweathercams.faa.gov/wxdata/35-62245.jpg {Denali, AK} -dz -9 -ll {63.43,-149.54}
-
-
-
-
+defineImage http://akweathercams.faa.gov/wxdata/7-75160.jpg {Anchorage, AK} -ll {61.21,-149.92} -dz {-9}
+## Denali camera is down as far as I can tell.
+## defineImage http://akweathercams.faa.gov/wxdata/35-62245.jpg {Denali, AK} -dz -9 -ll {63.43,-149.54}
 
 defineGroup Southwest
 defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083}
