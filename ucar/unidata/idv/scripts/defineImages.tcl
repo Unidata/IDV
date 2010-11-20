@@ -27,7 +27,7 @@ defineImage http://www.unco.edu/liveview/images/UNC2.jpg {University of Northern
 
 defineImage http://www.9news.com/9live/images/cams/pic1.jpg {Denver, CO} -dz -7 -ll {39.75,-105}
 defineImage http://www.cotrip.org/images/camera?imageURL=60002.jpg {Eisenhower Tunnel, CO} -ll {39.68,-105.9} -dz -7
-defineImage http://clsp.utepasscams.com/cams/216.jpg {Pikes Peak, CO} -ll {38.84056,-105.04389} -dz -7
+defineImage http://utepasscams.com/cams/216.jpg {Pikes Peak, CO} -ll {38.84056,-105.04389} -dz -7
 
 defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.76} -heading {225}
 
