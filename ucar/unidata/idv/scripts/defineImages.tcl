@@ -41,7 +41,7 @@ defineImage {http://vmserver.net/webcams/bozeman/bozeman.jpg} {Bridger Mountains
 defineGroup {National Parks}
 defineImage {http://www.nps.gov/webcams-glac/ghcam.jpg} {Glacier NP - Goat Haunt, MT} -ll {48.95786,-113.89206} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/smcam.jpg} {Glacier NP - St. Mary, MT} -ll {48.729,-113.442} -dz -7
-defineImage {http://www.nps.gov/webcams-glac/mcdcam2.jpg} {Glacier NP - Lake McDonald, MT} -ll {48.52936,-113.99487} -dz -7
+defineImage {http://www.nps.gov/webcams-glac/mcdcam.jpg} {Glacier NP - Lake McDonald, MT} -ll {48.52936,-113.99487} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/tmcam.jpg} {Glacier NP - Two Medicine, MT} -ll {48.49859,-113.34755} -dz -7
 defineImage {http://www.nps.gov/webcams-yell/oldfaith2.jpg} {Old Faithful, WY} -ll {44.45972,-110.83139} -dz -7
 defineImage {http://nature.nps.gov/air/WebCams/parks/throcam/thro.jpg}  {Theodore Roosevelt National Park, ND} -ll {46.94889,-103.43306}  -dz -7
@@ -124,10 +124,11 @@ defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104
 
 defineImage http://belo.bimedia.net/WFAA/weather/stills/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
 
-###defineImage http://mms.nps.gov/glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
-defineImage http://mms.nps.gov/glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
+defineImage http://www.nps.gov/webcams-glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
+defineImage http://www.nps.gov/webcams-glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
 defineImage http://www.neng.usu.edu/webcam/latest/latest_bldcam2.jpg {Logan, UT} -ll {41.73444,-111.85361} -dz -7
-defineImage http://www.ewcd.org/webcams/images/Castle_Dale_N_View/800.jpg {Castle Dale,UT} -ll {39.222,-111.02} -dz -7
+###Cannot find URL for latest Castle Dale image.
+###defineImage http://www.ewcd.org/webcams/images/Castle_Dale_N_View/800.jpg {Castle Dale,UT} -ll {39.222,-111.02} -dz -7
 defineImage http://timecam.tv/upload_image_tc/metwest/MeteoWest.jpg {University of Utah at Salt Lake City, UT} -dz -7 -ll {40.76623,-111.84755}
 defineImage http://instacam.com/instacamimg/ZPRNG/ZPRNG_S.jpg {Zion National Park, UT} -dz -7 -ll {37,-113}
 defineImage http://www.cnha.org/webcam/image.jpg {Moab, UT} -dz -7 -ll {38.59,-109.55}
@@ -191,7 +192,7 @@ defineImage http://files.wtoc.com/camera/misc/misc.jpg {Savannah,GA} -ll {32,-81
 
 defineImage http://www.mymiamiview.com/images/webcam.jpg {Miami,FL} -ll {25.7,-80.1} -dz -5
 defineImage http://doppler.tbo.com/webcam/towercam.jpg {Tampa,FL} -ll {27.84806,-82.26333} -dz -5
-defineImage http://www.news-journalonline.com/webcam/dbcam.jpg {Daytona Beach,FL} -ll {29.2,-81.0} -dz -5
+###defineImage http://www.news-journalonline.com/webcam/dbcam.jpg {Daytona Beach,FL} -ll {29.2,-81.0} -dz -5
 
 defineImage http://instacam.com/instacamimg/NPLES/NPLES_S.jpg?14831739 {Naples,FL} -dz -5 -ll {26.145,-81.795}
 defineImage http://www.erh.noaa.gov/rah/weathercam/wxcam.image.jpg {Raleigh, NC} -dz -5 -ll {35,-78}
