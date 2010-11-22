@@ -2,21 +2,20 @@
  * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.data.gis;
@@ -110,25 +109,25 @@ public class KmlUtil {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TOUR = "gx:Tour";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PLAYLIST = "gx:Playlist";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_FLYTO = "gx:FlyTo";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_WAIT = "gx:Wait";
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
 
@@ -255,6 +254,14 @@ public class KmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param snippet _more_
+     *
+     * @return _more_
+     */
     public static Element snippet(Element parent, String snippet) {
         return makeText(parent, TAG_SNIPPET, snippet);
     }
@@ -287,10 +294,10 @@ public class KmlUtil {
         }*/
 
 
-    /** _more_          */
+    /** _more_ */
     private static SimpleDateFormat sdf1;
 
-    /** _more_          */
+    /** _more_ */
     private static SimpleDateFormat sdf2;
 
     /**
@@ -384,10 +391,41 @@ public class KmlUtil {
      */
     public static Element iconstyle(Element parent, String id, String url,
                                     double scale) {
+        return iconstyle(parent, id, url, scale, null);
+        /*
         Element style     = style(parent, id);
         Element iconstyle = makeElement(style, TAG_ICONSTYLE);
         Element icon      = makeElement(iconstyle, TAG_ICON);
         Element href      = makeText(icon, TAG_HREF, url);
+        makeText(iconstyle, TAG_SCALE, "" + scale);
+
+        return style;
+        */
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param id _more_
+     * @param url _more_
+     * @param scale _more_
+     * @param color _more_
+     *
+     * @return _more_
+     */
+    public static Element iconstyle(Element parent, String id, String url,
+                                    double scale, Color color) {
+        Element style     = style(parent, id);
+        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
+        if (color != null) {
+            makeText(iconstyle, TAG_COLOR,
+                     "ff" + toBGRHexString(color).substring(1));
+            makeText(iconstyle, TAG_COLORMODE, "normal");
+        }
+        Element icon = makeElement(iconstyle, TAG_ICON);
+        Element href = makeText(icon, TAG_HREF, url);
         makeText(iconstyle, TAG_SCALE, "" + scale);
 
         return style;
@@ -410,7 +448,7 @@ public class KmlUtil {
         Element linestyle = makeElement(style, TAG_LINESTYLE);
         if (color != null) {
             makeText(linestyle, TAG_COLOR,
-                     "ff" + StringUtil.toHexString(color).substring(1));
+                     "ff" + toBGRHexString(color).substring(1));
             makeText(linestyle, TAG_COLORMODE, "normal");
         }
         if (width > 0) {
@@ -466,7 +504,7 @@ public class KmlUtil {
             sb.append(coords[1][i]);
             sb.append(",");
             sb.append(coords[0][i]);
-            if(coords.length>2) {
+            if (coords.length > 2) {
                 sb.append(",");
                 sb.append(coords[2][i]);
             }
@@ -707,6 +745,13 @@ public class KmlUtil {
         </Placemark>*/
 
 
+    /**
+     * _more_
+     *
+     * @param coords _more_
+     *
+     * @return _more_
+     */
     public static double[][] parseCoordinates(String coords) {
         coords = StringUtil.replace(coords, "\n", " ");
         while (true) {
@@ -752,14 +797,30 @@ public class KmlUtil {
             if (result == null) {
                 result = new double[numbers.size()][tokens.size()];
             }
-            for (int coordIdx = 0;
-                    (coordIdx < numbers.size());
-                    coordIdx++) {
+            for (int coordIdx = 0; (coordIdx < numbers.size()); coordIdx++) {
                 result[coordIdx][pointIdx] = new Double(
                     numbers.get(coordIdx).toString()).doubleValue();
             }
         }
         return result;
+    }
+
+    /**
+     * Convert the given color to is string BGR hex representation.  KML uses
+     * ABGR instead of RGBA
+     *
+     * @param c color
+     *
+     * @return hex represenation
+     */
+    public static String toBGRHexString(java.awt.Color c) {
+        return "#"
+               + StringUtil.padRight(
+                   Integer.toHexString(c.getBlue()), 2,
+                   "0") + StringUtil.padRight(
+                       Integer.toHexString(c.getGreen()), 2,
+                       "0") + StringUtil.padRight(
+                           Integer.toHexString(c.getRed()), 2, "0");
     }
 
 
