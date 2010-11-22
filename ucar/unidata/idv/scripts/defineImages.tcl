@@ -154,7 +154,7 @@ defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  
 
 
 
-defineImage http://www.starcitymall.com/images/cam1l.jpg {Lincoln,NE} -dz -6 -ll {40.7,-96.66}
+defineImage http://www.starcity.com/images/cam1l.jpg {Lincoln,NE} -dz -6 -ll {40.7,-96.66}
 defineImage http://66.231.15.194/Weather/Files_Forecast/cam4.jpg {Watertown,SD}  -ll {44.900588,-97.105744}
 
 
@@ -220,7 +220,7 @@ defineImage http://www.scottcountyiowa.com/webcams/images/live/112/cam112_00051.
 defineImage http://sftp.clickability.com/ksbiwebftp/capture7.jpg {Moore,OK} -dz -5 -ll {35.48,-97.54}
 
 
-#defineImage http://webcam1.icorp.net/MardiGras.jpg {New Orleans,LA} -dz -5 -ll {29.95,-90.07}
+defineImage http://webcam.icorp.net/ar1.jpg {Metairie,LA} -dz -5 -ll {29.98,-90.15}
 
 
 
@@ -228,7 +228,7 @@ defineImage http://sftp.clickability.com/ksbiwebftp/capture7.jpg {Moore,OK} -dz 
 
 
 defineGroup {Antarctica}
-defineImage http://www.cmdl.noaa.gov/obop/spo/images/cmdlfullsize.jpg {South Pole}   -ll {-90, -105}
+defineImage http://www.esrl.noaa.gov/gmd/webdata/spo/webcam/cmdlfullsize.jpg {South Pole}   -ll {-90, -105}
 defineGroup {Europe}
 defineImage http://www.cardada.ch/webcam/Cardada_mittel.jpg {Locarno, Switzerland}  -dz +1 -ll {46.2, 8.8}
 defineImage http://www.knmi.nl/webcam/images/ispy.jpg {KNMI, Netherlands}  -dz +1 -ll {52,5}
