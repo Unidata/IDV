@@ -31,9 +31,9 @@ defineImage http://utepasscams.com/cams/216.jpg {Pikes Peak, CO} -ll {38.84056,-
 
 defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.76} -heading {225}
 
-defineImage {http://actbwebcam.uwyo.edu/axis-cgi/jpg/image.cgi?camera=&1144858368742} {Laramie, WY} -ll {41.31445,-105.58145} -dz -7
+defineImage {http://www-lib.uwyo.edu/conscam/netcam/netcam-0.jpg} {Laramie, WY} -ll {41.3124,-105.5792} -dz -7
 defineImage http://www2.tetoncam.com/tetonl.jpg {Grand Tetons, WY} -ll {43.74111,-110.80167} -dz -7
-###defineImage {http://cams.verticalmedia.com/bridger/bridger.jpg} {Bridger Mountains, MT} -ll {45.679722,-111.037778} -dz -7
+defineImage {http://vmserver.net/webcams/bozeman/bozeman.jpg} {Bridger Mountains, MT} -ll {45.71,-111.07} -dz -7
 
 
 
@@ -95,11 +95,11 @@ defineImage http://www.gbuapcd.org/dustcam/keelerv1.jpg {Owens Lake} -ll {36.501
 
 
 defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {Mount St. Helens, WA} -ll {46.272,-122.152} -dz -8
-defineImage http://weathercam.uoregon.edu/axis-cgi/jpg/image.cgi?resolution=640x480 {Eugene, OR} -ll {44.126,-123.214} -dz -8
-###defineImage http://bimedia.ftp.clickability.com/fishwebftp/KATU/ABANK.JPG {Portland, OR} -ll {45.59,-122.6} -dz -8
+defineImage http://webcam.uoregon.edu/jpg/image.jpg {Eugene, OR} -ll {44.04, -123.07} -dz -8
+defineImage http://bimedia.ftp.clickability.com/fishwebftp/KATU/ABANK.JPG {Portland, OR} -ll {45.59,-122.6} -dz -8
 defineImage http://centralmediaserver.com/koin/weathercams/koinsw.jpg {Portland, OR} -ll {45.59,-122.6} -dz -8
-defineImage  http://images.ibsys.com/sea/images/weather/auto/queenannecam_640x480.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
-defineImage  http://134.121.11.63/images/bryan/bryan_00001.jpg {Pullman,WA} -ll {46.73193,-117.165365} -dz -8
+defineImage http://images.ibsys.com/sea/images/weather/auto/queenannecam_640x480.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
+defineImage http://134.121.11.63/images/bryan/bryan_00001.jpg {Pullman,WA} -ll {46.73193,-117.165365} -dz -8
 
 
 
@@ -124,7 +124,7 @@ defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104
 
 defineImage http://www.wfaa.com/s/dws/img/standing/cams/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
 
-defineImage http://mms.nps.gov/glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
+###defineImage http://mms.nps.gov/glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
 defineImage http://mms.nps.gov/glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
 defineImage http://www.neng.usu.edu/webcam/latest/latest_bldcam2.jpg {Logan, UT} -ll {41.73444,-111.85361} -dz -7
 defineImage http://www.ewcd.org/webcams/images/Castle_Dale_N_View/800.jpg {Castle Dale,UT} -ll {39.222,-111.02} -dz -7
