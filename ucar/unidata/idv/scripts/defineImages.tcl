@@ -154,7 +154,7 @@ defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  
 
 
 
-defineImage http://www.starcity.com/images/cam1l.jpg {Lincoln,NE} -dz -6 -ll {40.7,-96.66}
+defineImage http://www.starcitywebcam.com/images/cam1l.jpg {Lincoln,NE} -dz -6 -ll {40.7,-96.66}
 defineImage http://66.231.15.194/Weather/Files_Forecast/cam4.jpg {Watertown,SD}  -ll {44.900588,-97.105744}
 
 
@@ -217,7 +217,7 @@ defineImage http://www.scottcountyiowa.com/webcams/images/live/112/cam112_00051.
 
 
 
-defineImage http://sftp.clickability.com/ksbiwebftp/capture7.jpg {Moore,OK} -dz -5 -ll {35.48,-97.54}
+defineImage http://ksbi.bimedia.net/mcc.jpg {Moore,OK} -dz -5 -ll {35.48,-97.54}
 
 
 defineImage http://webcam.icorp.net/ar1.jpg {Metairie,LA} -dz -5 -ll {29.98,-90.15}
