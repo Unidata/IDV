@@ -95,7 +95,7 @@ defineImage http://www.gbuapcd.org/dustcam/keelerv1.jpg {Owens Lake} -ll {36.501
 
 
 defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {Mount St. Helens, WA} -ll {46.272,-122.152} -dz -8
-defineImage http://webcam.uoregon.edu/jpg/image.jpg {Eugene, OR} -ll {44.04, -123.07} -dz -8
+defineImage http://webcam.uoregon.edu/jpg/image.jpg {Eugene, OR} -ll {44.04,-123.07} -dz -8
 defineImage http://bimedia.ftp.clickability.com/fishwebftp/KATU/ABANK.JPG {Portland, OR} -ll {45.59,-122.6} -dz -8
 defineImage http://centralmediaserver.com/koin/weathercams/koinsw.jpg {Portland, OR} -ll {45.59,-122.6} -dz -8
 defineImage http://images.ibsys.com/sea/images/weather/auto/queenannecam_640x480.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
@@ -116,13 +116,13 @@ defineImage http://www.avo.alaska.edu/webcam/augtst.jpg {Augustine Volcano, AK} 
 
 defineGroup Southwest
 defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083} 
-defineImage http://134.114.127.22/jpg/hugesize.jpg {Flagstaff, AZ} -ll {35.23258,-111.655083} 
-defineImage  http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
+defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ} -ll {35.24,-111.84} 
+defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
 
 defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104.229019}
 
 
-defineImage http://www.wfaa.com/s/dws/img/standing/cams/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
+defineImage http://belo.bimedia.net/WFAA/weather/stills/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
 
 ###defineImage http://mms.nps.gov/glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
 defineImage http://mms.nps.gov/glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
