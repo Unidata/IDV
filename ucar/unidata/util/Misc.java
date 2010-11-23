@@ -3909,7 +3909,9 @@ public class Misc {
      * @param cl The class loader
      */
     public static void addClassLoader(ClassLoader cl) {
-        classLoaders.add(cl);
+        synchronized(classLoaders) {
+            classLoaders.add(cl);
+        }
     }
 
 
@@ -3919,7 +3921,9 @@ public class Misc {
      * @return List of dynamic classloaders
      */
     public static List<ClassLoader> getClassLoaders() {
-        return classLoaders;
+        synchronized(classLoaders) {
+            return new ArrayList<ClassLoader>(classLoaders);
+        }
     }
 
 
@@ -3938,6 +3942,7 @@ public class Misc {
 
         //First look at the PluginClassLoaders. We do this because if we have 2 or more
         //of these we can get class conflicts
+        List<ClassLoader> classLoaders = getClassLoaders();
         for (ClassLoader classLoader : classLoaders) {
             if (classLoader instanceof PluginClassLoader) {
                 PluginClassLoader pcl = (PluginClassLoader) classLoader;
