@@ -43,7 +43,7 @@ defineImage {http://www.nps.gov/webcams-glac/ghcam.jpg} {Glacier NP - Goat Haunt
 defineImage {http://www.nps.gov/webcams-glac/smcam.jpg} {Glacier NP - St. Mary, MT} -ll {48.729,-113.442} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/mcdcam.jpg} {Glacier NP - Lake McDonald, MT} -ll {48.52936,-113.99487} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/tmcam.jpg} {Glacier NP - Two Medicine, MT} -ll {48.49859,-113.34755} -dz -7
-defineImage {http://www.nps.gov/webcams-yell/oldfaith2.jpg} {Old Faithful, WY} -ll {44.45972,-110.83139} -dz -7
+defineImage {http://www.nps.gov/webcams-yell/oldfaithvc.jpg} {Old Faithful, WY} -ll {44.45972,-110.83139} -dz -7
 defineImage {http://nature.nps.gov/air/WebCams/parks/throcam/thro.jpg}  {Theodore Roosevelt National Park, ND} -ll {46.94889,-103.43306}  -dz -7
 defineImage {http://www.nature.nps.gov/air/webcams/parks/bibecam/bibe.jpg}  {Big Bend National Park,TX} -ll {29.25,-103.25}  -dz -6
 defineImage {http://www.nps.gov/webcams-olym/current_ridgecam.jpg}  {Olympic National Park} -ll {47.934,-123.371}  -dz -8	
@@ -53,7 +53,7 @@ defineImage {http://www.nature.nps.gov/air/webcams/parks/olymcam/olym.jpg} {Lake
 defineImage {http://www.nature.nps.gov/air/WebCams/parks/moracam/mora.jpg}  {Mount Rainier National Park} -ll {46.88333,-121.88333}  -dz -8	
 defineImage {http://www.nature.nps.gov/air/webcams/parks/nocacam/noca.jpg}  {North Cascades National Park} -ll {48.66667,-121.25028}  -dz -8	
 defineImage {http://www.nature.nps.gov/air/WebCams/parks/porecam/pore.jpg}  {Point Reyes National Seashore} -ll {38.06667,-122.88333}  -dz -8	
-defineImage {http://www.yosemite.org/DSN/wwwyosemiteassociationorg/Content/Webcam/ahwahnee.jpg}  {Yosemite National Park} -ll {37.85,-119.56667}  -dz -8	
+defineImage {http://www.yosemiteconservancystore.com/DSN/wwwyosemiteassociationorg/Content/Webcam/ahwahnee.jpg}  {Yosemite National Park} -ll {37.85,-119.56667}  -dz -8
 defineImage {http://www.nature.nps.gov/air/webcams/parks/jotrcam/jotr.jpg}  {Joshua Tree National Park} -ll {35.12861,-116.03667}  -dz -8	
 defineImage {http://www.nature.nps.gov/air/WebCams/parks/nacccam/wash.jpg}  {Washington, D.C.} -ll {38.3,-77.0}  -dz -8	
 
@@ -78,7 +78,7 @@ defineImage {http://hvo.wr.usgs.gov/cams/KIcam/images/M.jpg} {Hawaii Volcanoes N
 defineGroup {West Coast}
 defineImage http://sv.berkeley.edu/view/images/current_view.jpg {Berkeley,CA} -ll {37.86972,-122.25778} -dz -8
 defineImage http://www.met.sjsu.edu/cam_directory/latest.jpg {San Jose State} -ll {37.3044,-121.85} -dz -8
-defineImage http://www.astro.ucla.edu/~obs/images/towercam.jpg {Mt. Wilson, CA} -ll {34.22583,-118.05639} -dz -8
+defineImage http://obs.astro.ucla.edu/images/towercam.jpg {Mt. Wilson, CA} -ll {34.22583,-118.05639} -dz -8
 defineImage http://abclocal.go.com/three/kabc/webcam/web1-2.jpg?1144856196725 {Los Angeles, CA} -ll {34,-118.24} -dz -8
 defineImage {http://hpwren.ucsd.edu/gphoto2-a2/CNMVCSD2/LAST.jpg} {San Diego,CA}  -ll {32.715685,-117.161724}
 defineImage {http://208.74.106.27/netcam.jpg} {Whiskey Town,CA}  -ll {44.30315,-118.324272}
