@@ -2349,6 +2349,7 @@ public abstract class XmlUtil {
      */
     public static void main(String[] args) throws Exception {
 
+
         /*
         Trace.startTrace();
         for (int i = 0; i < args.length; i++) {
@@ -2369,6 +2370,7 @@ public abstract class XmlUtil {
         Trace.stopTrace();
         if(true) return;
         */
+        HashSet<String> seen  = new HashSet<String>();
 
         boolean doFormat = true;
         for (int i = 0; i < args.length; i++) {
@@ -2383,7 +2385,7 @@ public abstract class XmlUtil {
             if (doFormat) {
                 format(args[i]);
             } else {
-                printTags(args[i]);
+                printTags(args[i],seen);
             }
         }
     }
@@ -2434,13 +2436,13 @@ public abstract class XmlUtil {
      *
      * @param f _more_
      */
-    private static void printTags(String f) {
+    private static void printTags(String f, HashSet<String> seen) {
         try {
             String       xml      = IOUtil.readContents(f, XmlUtil.class);
             Element      root     = getRoot(xml);
             StringBuffer tagBuff  = new StringBuffer();
             StringBuffer attrBuff = new StringBuffer();
-            printTags(root, new HashSet<String>(), tagBuff, attrBuff);
+            printTags(root, seen, tagBuff, attrBuff);
             System.out.println(tagBuff);
             System.out.println(attrBuff);
         } catch (Exception exc) {
