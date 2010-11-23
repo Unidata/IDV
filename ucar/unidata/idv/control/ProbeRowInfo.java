@@ -367,13 +367,18 @@ public class ProbeRowInfo {
      * @param value value of data
      */
     protected void playSound(double value) {
-        if ( !isGrid()) {
-            return;
-        }
+        Range range = null;
         if ((midiProperties == null) || midiProperties.getMuted()) {
             return;
         }
-        Range range = getGridDataInstance().getRange(0);
+
+        if (isGrid()) {
+            range = getGridDataInstance().getRange(0);
+        } else {
+            //For now just use a fixed data range for point data
+            range = new Range(0,100);
+        }
+ 
         int note = (int) (midiProperties.getLowNote()
                           + (range.getPercent(value)
                              * (midiProperties.getHighNote()
