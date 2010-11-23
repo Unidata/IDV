@@ -48,6 +48,7 @@ public class KmlUtil {
     //J-
     public static final String TAG_ALTITUDE = "altitude";
     public static final String TAG_ALTITUDEMODE = "altitudeMode";
+    public static final String TAG_BALLOONSTYLE = "BalloonStyle";
     public static final String TAG_BOTTOMFOV = "bottomFov";
     public static final String TAG_CAMERA = "Camera";
     public static final String TAG_COLOR = "color";
@@ -94,6 +95,7 @@ public class KmlUtil {
     public static final String TAG_STYLE = "Style";
     public static final String TAG_STYLEURL = "styleUrl";
     public static final String TAG_TESSELATE = "tesselate";
+    public static final String TAG_TEXT = "text";
     public static final String TAG_TILT = "tilt";
     public static final String TAG_TIMESTAMP = "TimeStamp";
     public static final String TAG_TOPFOV = "topFov";
@@ -429,6 +431,26 @@ public class KmlUtil {
         makeText(iconstyle, TAG_SCALE, "" + scale);
 
         return style;
+    }
+
+
+    /**
+     * Create a BalloonStyle element
+     *
+     * @param parent  parent element
+     * @param text  the balloon text
+     * @param bgColor  the background color
+     *
+     * @return the BalloonStyle element
+     */
+    public static Element balloonstyle(Element parent, String text, Color bgColor) {
+        Element bstyle = makeElement(parent, TAG_BALLOONSTYLE);
+        if (bgColor != null) {
+            makeText(bstyle, TAG_COLOR,
+                     "ff" + toBGRHexString(bgColor).substring(1));
+        }
+        makeText(bstyle, TAG_TEXT, text);
+        return bstyle;
     }
 
 
