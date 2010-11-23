@@ -31,7 +31,7 @@ defineImage http://utepasscams.com/cams/216.jpg {Pikes Peak, CO} -ll {38.84056,-
 
 defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.76} -heading {225}
 
-defineImage {http://www-lib.uwyo.edu/conscam/netcam/netcam-0.jpg} {Laramie, WY} -ll {41.3124,-105.5792} -dz -7
+defineImage {http://www-das.uwyo.edu/weathercam/weathercam.jpg} {Laramie, WY} -ll {41.316,-105.578} -dz -7
 defineImage http://www2.tetoncam.com/tetonl.jpg {Grand Tetons, WY} -ll {43.74111,-110.80167} -dz -7
 defineImage {http://vmserver.net/webcams/bozeman/bozeman.jpg} {Bridger Mountains, MT} -ll {45.71,-111.07} -dz -7
 
