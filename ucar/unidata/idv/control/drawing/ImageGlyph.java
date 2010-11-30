@@ -614,7 +614,7 @@ public class ImageGlyph extends DrawingGlyph {
                     //GuiUtils.showOkCancelDialog(null,"",lbl1,null);
                 }
                 imageData = (FlatField) ucar.visad.Util.makeField(theImage,
-								  -1f, true);
+							 99.f, true);
 		//		System.err.println ("image:" + imageData.getType());
 
             }
