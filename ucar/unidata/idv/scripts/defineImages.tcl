@@ -129,7 +129,7 @@ defineImage http://www.nps.gov/webcams-glca/ww1.jpg {Wahweap, Lake Powell, UT} -
 defineImage http://www.neng.usu.edu/webcam/latest/latest_bldcam2.jpg {Logan, UT} -ll {41.73444,-111.85361} -dz -7
 ###Cannot find URL for latest Castle Dale image.
 ###defineImage http://www.ewcd.org/webcams/images/Castle_Dale_N_View/800.jpg {Castle Dale,UT} -ll {39.222,-111.02} -dz -7
-defineImage http://timecam.tv/upload_image_tc/metwest/MeteoWest.jpg {University of Utah at Salt Lake City, UT} -dz -7 -ll {40.76623,-111.84755}
+defineImage http://155.98.55.200/image.jpg {University of Utah at Salt Lake City, UT} -dz -7 -ll {40.76623,-111.84755}
 defineImage http://instacam.com/instacamimg/ZPRNG/ZPRNG_S.jpg {Zion National Park, UT} -dz -7 -ll {37,-113}
 defineImage http://www.cnha.org/webcam/image.jpg {Moab, UT} -dz -7 -ll {38.59,-109.55}
 
