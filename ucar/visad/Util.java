@@ -2981,7 +2981,7 @@ public final class Util {
         int alphaCnt = 0;
         boolean opaque = true;
 
-        if ( !makeAlpha && (alphaThreshold >= 0)) {
+        if ( (alphaThreshold >= 0)) {
             float alphaValue;
             for (int i = 0; i < numPixels; i++) {
                 if (hasAlpha) {
