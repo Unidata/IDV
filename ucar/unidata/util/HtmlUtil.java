@@ -1410,23 +1410,42 @@ public class HtmlUtil {
      * _more_
      *
      * @param baseName _more_
-     * @param south _more_
-     * @param north _more_
-     * @param east _more_
-     * @param west _more_
+     * @param southValue _more_
+     * @param northValue _more_
+     * @param eastValue _more_
+     * @param westValue _more_
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseName, String south,
-                                       String north, String east,
-                                       String west) {
-        //TODO: Clean this up
+    public static String makeLatLonBox(String baseName, String southValue,
+                                       String northValue, String eastValue,
+                                       String westValue) {
+
+        return makeLatLonBox(baseName+"_south",
+                             baseName+"_north",
+                             baseName+"_east",
+                             baseName+"_west",
+                             southValue,
+                             northValue,
+                             eastValue,
+                             westValue);
+    }
+
+    public static String makeLatLonBox(
+                                       String southArg,
+                                       String northArg, 
+                                       String eastArg,
+                                       String westArg,
+                                       String southValue,
+                                       String northValue, 
+                                       String eastValue,
+                                       String westValue) {
         return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
-	    + makeLatLonInput(baseName + "_north", north,"North") + "</td></tr>"
-	    + "<tr><td>" + makeLatLonInput(baseName + "_west", west,"West")
-	    + "</td><td>" + makeLatLonInput(baseName + "_east", east,"East")
+	    + makeLatLonInput(northArg, northValue,"North") + "</td></tr>"
+	    + "<tr><td>" + makeLatLonInput(westArg, westValue,"West")
+	    + "</td><td>" + makeLatLonInput(eastArg, eastValue,"East")
                + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
-	    + makeLatLonInput(baseName + "_south", south,"South") + "</table>";
+	    + makeLatLonInput(southArg, southValue,"South") + "</table>";
     }
 
     /**
