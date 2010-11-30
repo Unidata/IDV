@@ -2026,7 +2026,7 @@ public class XmlEncoder extends XmlUtil {
             return createSerializedObject(element);
         }
 
-        if ( !(tagName.equals(TAG_OBJECT) || tagName.equals(TAG_FACTORY))) {
+        if ( !(tagName.equals(TAG_OBJECT) || tagName.equals("o") || tagName.equals(TAG_FACTORY))) {
             logException("Unknown tag: " + tagName,
                          new IllegalArgumentException(""));
             return null;
