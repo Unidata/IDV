@@ -261,6 +261,15 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
         for (int i = 0; i < colorMaps.length; i++) {
             colorMaps[i] = null;
         }
+
+        if(colorTupleType.__len__() == 3 && colorMaps.length== 4)
+        {
+             RealType[] c_all = new RealType[] { RealType.getRealType("Red"),
+                                               RealType.getRealType("Green"),
+                                               RealType.getRealType("Blue"),
+                                               RealType.getRealType("Alpha") };
+              colorTupleType  = new RealTupleType(c_all);
+        }
         //First look for red, green, blue
         if(colorTupleType.getDimension()>3) {
             for(int i=0;i<pattern.length;i++) {
@@ -273,6 +282,7 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
                 }
             }
         }
+
 
         for (int i = 0; i < colorMaps.length; i++) {
             //Did we already get it?
