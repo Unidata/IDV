@@ -65,7 +65,9 @@ public class KmlUtil {
     public static final String TAG_HREF = "href";
     public static final String TAG_ICON = "Icon";
     public static final String TAG_ICONSTYLE = "IconStyle";
+	public static final String TAG_KEY = "key";
     public static final String TAG_KML = "kml";
+	public static final String TAG_LABELSTYLE = "LabelStyle";
     public static final String TAG_LATITUDE = "latitude";
     public static final String TAG_LATLONBOX = "LatLonBox";
     public static final String TAG_LEFTFOV = "leftFov";
@@ -81,18 +83,21 @@ public class KmlUtil {
     public static final String TAG_NORTH = "north";
     public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
     public static final String TAG_OPEN = "open";
+    public static final String TAG_OVERLAYXY = "overlayXY";
+    public static final String TAG_PAIR = "Pair";
     public static final String TAG_PLACEMARK = "Placemark";
     public static final String TAG_POINT = "Point";
-
-
-
     public static final String TAG_RIGHTFOV = "rightFov";
     public static final String TAG_ROLL = "roll";
     public static final String TAG_ROTATION = "rotation";
     public static final String TAG_SCHEMA = "Schema";
+    public static final String TAG_SCREENOVERLAY = "ScreenOverlay";
+    public static final String TAG_SCREENXY = "screenXY";
+	private static final String TAG_SIZE = "size";
     public static final String TAG_SNIPPET = "Snippet";
     public static final String TAG_SOUTH = "south";
     public static final String TAG_STYLE = "Style";
+    public static final String TAG_STYLEMAP = "StyleMap";
     public static final String TAG_STYLEURL = "styleUrl";
     public static final String TAG_TESSELATE = "tesselate";
     public static final String TAG_TEXT = "text";
@@ -111,36 +116,47 @@ public class KmlUtil {
 
 
 
-    /** _more_ */
+    /** the Tour tag */
     public static final String TAG_TOUR = "gx:Tour";
 
-    /** _more_ */
+    /** the Playlist tag */
     public static final String TAG_PLAYLIST = "gx:Playlist";
 
-    /** _more_ */
+    /** the FlyTo tag */
     public static final String TAG_FLYTO = "gx:FlyTo";
 
-    /** _more_ */
+    /** the Wait tag */
     public static final String TAG_WAIT = "gx:Wait";
 
-
-
-
-    /** _more_ */
+    /** the id attribute */
     public static final String ATTR_ID = "id";
 
-    /** _more_ */
+    /** the name attribute */
     public static final String ATTR_NAME = "name";
 
+    /** the x attribute */
+    public static final String ATTR_X = "x";
 
+    /** the y attribute */
+    public static final String ATTR_Y = "y";
+
+    /** the xunits attribute */
+    public static final String ATTR_XUNITS = "xunits";
+
+    /** the yunits attribute */
+    public static final String ATTR_YUNITS = "yunits";
+
+    /** the KML 2.2 XML namespace */
+    public static final String XMLNS_KML2_2 =
+        "http://www.opengis.net/kml/2.2";
 
     /**
-     * _more_
+     * Make a Kml element
      *
-     * @param parent _more_
-     * @param tag _more_
+     * @param parent  the parent element
+     * @param tag  the tag name
      *
-     * @return _more_
+     * @return  the Element
      */
     public static Element makeElement(Element parent, String tag) {
         Element child = parent.getOwnerDocument().createElement(tag);
@@ -148,44 +164,59 @@ public class KmlUtil {
         return child;
     }
 
-
-
-
     /**
-     * _more_
+     * Make the kml element
      *
-     * @param name _more_
+     * @param name  the name of the element (not used)
      *
-     * @return _more_
+     * @return  the kml element
      */
     public static Element kml(String name) {
         Document doc   = XmlUtil.makeDocument();
         Element  child = doc.createElement(TAG_KML);
+        child.setAttribute("xmlns", XMLNS_KML2_2);
         return child;
     }
 
 
     /**
-     * _more_
+     * Make a KML Document
      *
-     * @param parent _more_
-     * @param name _more_
+     * @param parent  parent Element
+     * @param name  the name of the Document
      *
-     * @return _more_
+     * @return the Document element
      */
     public static Element document(Element parent, String name) {
         return document(parent, name, false);
     }
 
+    /**
+     * Make a KML Document Element
+     *
+     * @param parent  the parent node
+     * @param name  the name of the document
+     * @param visible  true if visible
+     *
+     * @return  the Document element
+     */
+    public static Element document(Element parent, String name,
+                                   boolean visible) {
+        Element node = makeElement(parent, TAG_DOCUMENT);
+        name(node, name);
+        visible(node, visible);
+        return node;
+    }
+
 
     /**
-     * _more_
+     * Make a NetworkLink element
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param url _more_
+     * @param parent parent node
+     * @param name  name of the link
+     * @param url   link URL
      *
-     * @return _more_
+     * @return  the NetworkLink element
      */
     public static Element networkLink(Element parent, String name,
                                       String url) {
@@ -208,30 +239,13 @@ public class KmlUtil {
     */
 
     /**
-     * _more_
+     * Make a text node in the parent element
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param visible _more_
+     * @param parent  the parent
+     * @param tag  the tag
+     * @param text  the text
      *
-     * @return _more_
-     */
-    public static Element document(Element parent, String name,
-                                   boolean visible) {
-        Element node = makeElement(parent, TAG_DOCUMENT);
-        name(node, name);
-        visible(node, visible);
-        return node;
-    }
-
-    /**
-     * _more_
-     *
-     * @param parent _more_
-     * @param tag _more_
-     * @param text _more_
-     *
-     * @return _more_
+     * @return  parent with the text element (e.g., <parent><tag>text</tag></parent>)
      */
     public static Element makeText(Element parent, String tag, String text) {
         Element node     = makeElement(parent, tag);
@@ -241,12 +255,12 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Set the visibility on an Element
      *
-     * @param parent _more_
-     * @param visible _more_
+     * @param parent  the parent element
+     * @param visible  true to be visible
      *
-     * @return _more_
+     * @return the parent
      */
     public static Element visible(Element parent, boolean visible) {
         return makeText(parent, TAG_VISIBILITY, (visible
@@ -257,12 +271,12 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Make a snippet Element
      *
-     * @param parent _more_
-     * @param snippet _more_
+     * @param parent  the parent
+     * @param snippet  the snippet text
      *
-     * @return _more_
+     * @return  the parent with the snippet
      */
     public static Element snippet(Element parent, String snippet) {
         return makeText(parent, TAG_SNIPPET, snippet);
@@ -270,15 +284,15 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Set the open flag on an elemenet
      *
-     * @param parent _more_
-     * @param visible _more_
+     * @param parent  the parent node
+     * @param open  true to be open
      *
-     * @return _more_
+     * @return  the parent node
      */
-    public static Element open(Element parent, boolean visible) {
-        return makeText(parent, TAG_OPEN, (visible
+    public static Element open(Element parent, boolean open) {
+        return makeText(parent, TAG_OPEN, (open
                                            ? "1"
                                            : "0"));
     }
@@ -296,19 +310,19 @@ public class KmlUtil {
         }*/
 
 
-    /** _more_ */
+    /** simple date format  for yyyy-MM-dd */
     private static SimpleDateFormat sdf1;
 
-    /** _more_ */
+    /** simple date format HH:mm:ss */
     private static SimpleDateFormat sdf2;
 
     /**
-     * _more_
+     * Make a timestamp from the date
      *
-     * @param parent _more_
-     * @param dttm _more_
+     * @param parent  the parent node
+     * @param dttm  the date
      *
-     * @return _more_
+     * @return  the timestamp
      */
     public static Element timestamp(Element parent, Date dttm) {
         if (sdf1 == null) {
@@ -324,14 +338,58 @@ public class KmlUtil {
         return timestamp;
     }
 
+    /**
+     * Make a pair element
+     *
+     * @param parent  the parent element
+     * @param key  the pair key
+     * @param styleUrl  the pair styleUrl
+     *
+     * @return  the Pair element
+     */
+    public static Element pair(Element parent, String key, String styleUrl) {
+        Element pair = makeElement(parent, TAG_PAIR);
+        makeText(pair, TAG_KEY, key);
+        makeText(pair, TAG_STYLEURL, styleUrl);
+        return pair;
+
+    }
 
     /**
-     * _more_
+     * Create a StyleMap for normal and highlighted styles
      *
-     * @param parent _more_
-     * @param url _more_
+     * @param parent  the parent element
+     * @param id  the id of the StyleMap
+     * @param normalStyleUrl  the styleUrl of the normal style
+     * @param highlightStyleUrl  the styleUrl of the highlighted style
      *
-     * @return _more_
+     * @return the StyleMap element
+     */
+    public static Element stylemap(Element parent, String id,
+                                   String normalStyleUrl,
+                                   String highlightStyleUrl) {
+        Element stylemap = makeElement(parent, TAG_STYLEMAP);
+        stylemap.setAttribute(ATTR_ID, id);
+        pair(stylemap, "normal", normalStyleUrl);
+        pair(stylemap, "highlight", highlightStyleUrl);
+        return stylemap;
+        /* <StyleMap id="ID">
+           <!-- extends StyleSelector -->
+          <!-- elements specific to StyleMap -->
+          <Pair id="ID">
+            <key>normal</key>              <!-- kml:styleStateEnum:  normal or highlight -->
+            <styleUrl>...</styleUrl> or <Style>...</Style>
+          </Pair>
+          </StyleMap>*/
+    }
+
+    /**
+     * Make a styleUrl element (why isn't the s capitalized?)
+     *
+     * @param parent  the parent element
+     * @param url  the url
+     *
+     * @return  the styleUrl element
      */
     public static Element styleurl(Element parent, String url) {
         //<styleUrl>#linestyleExample</styleUrl>
@@ -339,12 +397,12 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Make a Style element
      *
-     * @param parent _more_
-     * @param id _more_
+     * @param parent  the parent node
+     * @param id  the Style id
      *
-     * @return _more_
+     * @return  the Style element
      */
     public static Element style(Element parent, String id) {
         Element style = makeElement(parent, TAG_STYLE);
@@ -363,59 +421,44 @@ public class KmlUtil {
       </Style>*/
 
     /**
-     * _more_
+     * Create an IconStyle element
      *
-     * @param parent _more_
-     * @param id _more_
-     * @param url _more_
+     * @param parent  the parent Element
+     * @param id  name of the enclosing Style element
+     * @param url  the icon URL
      *
-     * @return _more_
+     * @return  the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url) {
-        Element style     = style(parent, id);
-        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
-        Element icon      = makeElement(iconstyle, TAG_ICON);
-        Element href      = makeText(icon, TAG_HREF, url);
-        return style;
+        return iconstyle(parent, id, url, -1);
     }
 
-
-
     /**
-     * _more_
+     * Create an IconStyle element
      *
-     * @param parent _more_
-     * @param id _more_
-     * @param url _more_
-     * @param scale _more_
+     * @param parent  the parent Element
+     * @param id  name of the enclosing Style element
+     * @param url  the icon URL
+     * @param scale  the size scale (>= 0, 1 = normal size)
      *
-     * @return _more_
+     * @return  the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url,
                                     double scale) {
         return iconstyle(parent, id, url, scale, null);
-        /*
-        Element style     = style(parent, id);
-        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
-        Element icon      = makeElement(iconstyle, TAG_ICON);
-        Element href      = makeText(icon, TAG_HREF, url);
-        makeText(iconstyle, TAG_SCALE, "" + scale);
-
-        return style;
-        */
     }
 
 
     /**
-     * _more_
+     * Create an IconStyle element
      *
-     * @param parent _more_
-     * @param id _more_
-     * @param url _more_
-     * @param scale _more_
-     * @param color _more_
+     * @param parent  the parent Element
+     * @param id  name of the enclosing Style element
+     * @param url  the icon URL
+     * @param scale  the size scale (>= 0, 1 = normal size)
+     * @param color  the icon color
      *
-     * @return _more_
+     * @return  the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url,
                                     double scale, Color color) {
@@ -428,7 +471,9 @@ public class KmlUtil {
         }
         Element icon = makeElement(iconstyle, TAG_ICON);
         Element href = makeText(icon, TAG_HREF, url);
-        makeText(iconstyle, TAG_SCALE, "" + scale);
+        if (scale >= 0) {
+            makeText(iconstyle, TAG_SCALE, "" + scale);
+        }
 
         return style;
     }
@@ -438,13 +483,16 @@ public class KmlUtil {
      * Create a BalloonStyle element
      *
      * @param parent  parent element
+     * @param id  of the enclosing Style element
      * @param text  the balloon text
      * @param bgColor  the background color
      *
      * @return the BalloonStyle element
      */
-    public static Element balloonstyle(Element parent, String text, Color bgColor) {
-        Element bstyle = makeElement(parent, TAG_BALLOONSTYLE);
+    public static Element balloonstyle(Element parent, String id,
+                                       String text, Color bgColor) {
+        Element style  = style(parent, id);
+        Element bstyle = makeElement(style, TAG_BALLOONSTYLE);
         if (bgColor != null) {
             makeText(bstyle, TAG_COLOR,
                      "ff" + toBGRHexString(bgColor).substring(1));
@@ -453,16 +501,50 @@ public class KmlUtil {
         return bstyle;
     }
 
+    /**
+     * Create a LabelStyle element
+     *
+     * @param parent The parent for the style
+     * @param id  the Style id
+     * @param color  the label color
+     * @param scale  the label size scale
+     *
+     * @return  the LabelStyle
+     */
+    public static Element labelstyle(Element parent, String id, Color color,
+                                     int scale) {
+        Element style      = style(parent, id);
+        Element labelstyle = makeElement(style, TAG_LABELSTYLE);
+        if (color != null) {
+            makeText(labelstyle, TAG_COLOR,
+                     "ff" + toBGRHexString(color).substring(1));
+            makeText(labelstyle, TAG_COLORMODE, "normal");
+        }
+        if (scale >= 0) {
+            makeText(labelstyle, TAG_SCALE, "" + scale);
+        }
+        return labelstyle;
+        /*
+        <LabelStyle id="ID">
+        <!-- inherited from ColorStyle -->
+        <color>ffffffff</color>            <!-- kml:color -->
+        <colorMode>normal</colorMode>      <!-- kml:colorModeEnum: normal or random -->
+
+        <!-- specific to LabelStyle -->
+        <scale>1</scale>                   <!-- float -->
+      </LabelStyle>*/
+    }
+
 
     /**
-     * _more_
+     * Create a LineStyle element
      *
-     * @param parent _more_
-     * @param id _more_
-     * @param color _more_
-     * @param width _more_
+     * @param parent  the parent node
+     * @param id  the id for the enclosing Style
+     * @param color  line color
+     * @param width  line width
      *
-     * @return _more_
+     * @return  the LineStyle Element
      */
     public static Element linestyle(Element parent, String id, Color color,
                                     int width) {
@@ -485,14 +567,14 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Create a LineString element
      *
-     * @param parent _more_
-     * @param extrude _more_
-     * @param tesselate _more_
-     * @param coordinates _more_
+     * @param parent  the parent node
+     * @param extrude  true to extrude
+     * @param tesselate  true to tesselate
+     * @param coordinates  comma separated list of coordinates (lon1,lat1,alt1,lon2,lat2,alt2,....lonN,latN,altN)
      *
-     * @return _more_
+     * @return  the LineString element
      */
     public static Element linestring(Element parent, boolean extrude,
                                      boolean tesselate, String coordinates) {
@@ -509,15 +591,16 @@ public class KmlUtil {
     }
 
 
+
     /**
-     * _more_
+     * Create a LineString element
      *
-     * @param parent _more_
-     * @param extrude _more_
-     * @param tesselate _more_
-     * @param coords _more_
+     * @param parent  the parent node
+     * @param extrude  true to extrude
+     * @param tesselate  true to tesselate
+     * @param coords   array of coordinates (coords[lon,lat] or coords[lon,lat,alt])
      *
-     * @return _more_
+     * @return  the LineString element
      */
     public static Element linestring(Element parent, boolean extrude,
                                      boolean tesselate, float[][] coords) {
@@ -537,12 +620,12 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Make a coordinates element
      *
-     * @param parent _more_
-     * @param coordinates _more_
+     * @param parent  the parent node
+     * @param coordinates  the coordinates (comma separated values)
      *
-     * @return _more_
+     * @return the coordinates element
      */
     public static Element coordinates(Element parent, String coordinates) {
         Element node  = makeElement(parent, TAG_COORDINATES);
@@ -552,12 +635,12 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Make a name element (wrapped in a CDATA structure)
      *
-     * @param parent _more_
-     * @param name _more_
+     * @param parent  the parent node
+     * @param name  the name text
      *
-     * @return _more_
+     * @return  the name element
      */
     public static Element name(Element parent, String name) {
         Element node = makeElement(parent, TAG_NAME);
@@ -568,12 +651,12 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Make a description element (wrapped in a CDATA structure)
      *
-     * @param parent _more_
-     * @param description _more_
+     * @param parent  the parent node
+     * @param description  the description
      *
-     * @return _more_
+     * @return  the description element
      */
     public static Element description(Element parent, String description) {
         Element node = makeElement(parent, TAG_DESCRIPTION);
@@ -585,25 +668,25 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Create a Folder element
      *
-     * @param parent _more_
-     * @param name _more_
+     * @param parent  the parent node
+     * @param name  the name of the folder
      *
-     * @return _more_
+     * @return  the Folder element
      */
     public static Element folder(Element parent, String name) {
         return folder(parent, name, false);
     }
 
     /**
-     * _more_
+     * Create a Folder element
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param visible _more_
+     * @param parent  the parent node
+     * @param name  the name of the folder
+     * @param visible  true to be visible.  (all children must be not visible if you want the folder turned off)
      *
-     * @return _more_
+     * @return  the Folder element
      */
     public static Element folder(Element parent, String name,
                                  boolean visible) {
@@ -614,15 +697,14 @@ public class KmlUtil {
     }
 
 
-
     /**
-     * _more_
+     * Create a Placemark
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param description _more_
+     * @param parent  the parent node
+     * @param name  the name of the placemark
+     * @param description  the description of the placemark
      *
-     * @return _more_
+     * @return  the Placemark element
      */
     public static Element placemark(Element parent, String name,
                                     String description) {
@@ -631,8 +713,6 @@ public class KmlUtil {
         description(node, description);
         return node;
     }
-
-
 
 
     /*
@@ -645,14 +725,14 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Make a point Element string
      *
-     * @param lat _more_
-     * @param lon _more_
-     * @param alt _more_
-     * @param style _more_
+     * @param lat  the point latitude
+     * @param lon  the point longitude
+     * @param alt  the point altitude
+     * @param style  the point style (not used)
      *
-     * @return _more_
+     * @return  the Point text
      */
     public static String point(double lat, double lon, double alt,
                                String style) {
@@ -660,49 +740,71 @@ public class KmlUtil {
                + alt + "</coordinates></Point></Placemark>";
     }
 
-
     /**
-     * _more_
+     * Make a Placemark element
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param description _more_
-     * @param lat _more_
-     * @param lon _more_
-     * @param alt _more_
-     * @param style _more_
+     * @param parent  the parent node
+     * @param name    the Placemark name
+     * @param description    the Placemark description
+     * @param lat  the latitude
+     * @param lon  the latitude
+     * @param alt  the latitude
+     * @param styleUrl  the styleUrl
      *
-     * @return _more_
+     * @return  the Placemark element
      */
     public static Element placemark(Element parent, String name,
                                     String description, double lat,
-                                    double lon, double alt, String style) {
+                                    double lon, double alt, String styleUrl) {
+        return placemark(parent, name, description, lat, lon, alt,
+                         new String[] { styleUrl }, true);
+    }
+
+
+    /**
+     * Make a Placemark element
+     *
+     * @param parent  the parent node
+     * @param name    the Placemark name
+     * @param description    the Placemark description
+     * @param lat  the latitude
+     * @param lon  the latitude
+     * @param alt  the latitude
+     * @param styleUrls  the array styleUrls
+     * @param visible  true for this to be showing
+     *
+     * @return  the Placemark element
+     */
+    public static Element placemark(Element parent, String name,
+                                    String description, double lat,
+                                    double lon, double alt,
+                                    String[] styleUrls, boolean visible) {
         Element placemark = placemark(parent, name, description);
-        if (style != null) {
-            makeText(placemark, TAG_STYLEURL, style);
+        if (styleUrls != null) {
+            for (int i = 0; i < styleUrls.length; i++) {
+                makeText(placemark, TAG_STYLEURL, styleUrls[i]);
+            }
         }
-        visible(placemark, true);
+        visible(placemark, visible);
         Element point = makeElement(placemark, TAG_POINT);
         makeText(point, TAG_COORDINATES, lon + "," + lat + "," + alt + " ");
         return placemark;
     }
 
 
-
-
     /**
-     * _more_
+     * Create a GroundOverlay element
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param description _more_
-     * @param url _more_
-     * @param north _more_
-     * @param south _more_
-     * @param east _more_
-     * @param west _more_
+     * @param parent  the parent node
+     * @param name    the name of the GroundOverlay
+     * @param description    the description of the GroundOverlay
+     * @param url    the URL of the overlay
+     * @param north  the north coordinate
+     * @param south  the south coordinate
+     * @param east   the east coordinate
+     * @param west   the west coordinate
      *
-     * @return _more_
+     * @return the GroundOverlay
      */
     public static Element groundOverlay(Element parent, String name,
                                         String description, String url,
@@ -723,16 +825,16 @@ public class KmlUtil {
     }
 
     /**
-     * _more_
+     * Make a Placemark with a Linestring
      *
-     * @param parent _more_
-     * @param name _more_
-     * @param description _more_
-     * @param coords _more_
-     * @param color _more_
-     * @param width _more_
+     * @param parent  the parent node
+     * @param name    the name of the Placemark
+     * @param description   the description of the Placemark
+     * @param coords    the line coordinates
+     * @param color     the line color
+     * @param width     the line width
      *
-     * @return _more_
+     * @return  the Placemark
      */
     public static Element placemark(Element parent, String name,
                                     String description, float[][] coords,
@@ -768,11 +870,11 @@ public class KmlUtil {
 
 
     /**
-     * _more_
+     * Parse coordinates
      *
-     * @param coords _more_
+     * @param coords  the string of space separated coordinates
      *
-     * @return _more_
+     * @return  the parsed coordinates
      */
     public static double[][] parseCoordinates(String coords) {
         coords = StringUtil.replace(coords, "\n", " ");
@@ -833,7 +935,7 @@ public class KmlUtil {
      *
      * @param c color
      *
-     * @return hex represenation
+     * @return hex representation (BGR) of the Color's r,g,b values
      */
     public static String toBGRHexString(java.awt.Color c) {
         return "#"
@@ -845,6 +947,117 @@ public class KmlUtil {
                            Integer.toHexString(c.getRed()), 2, "0");
     }
 
+    /**
+     * Create a ScreenOverlay Element
+     *
+     * @param parent parent Element
+     * @param name   the name of the element
+     * @param iconURL  the URL of the icon
+     * @param overlayX  x component of a point on the overlay image
+     * @param overlayY  y component of a point on the overlay image
+     * @param overlayXunits  units of overlayX, can be one of: fraction, pixels, or insetPixels
+     * @param overlayYunits  units of overlayY, can be one of: fraction, pixels, or insetPixels
+     * @param screenX x component of a point on the screen
+     * @param screenY y component of a point on the screen
+     * @param screenXunits units of screenX, can be one of: fraction, pixels, or insetPixels
+     * @param screenYunits units of screenY, can be one of: fraction, pixels, or insetPixels
+     *
+     * @return the ScreenOverlay Element
+     */
+    public static Element screenoverlay(Element parent, String name,
+                                        String iconURL, double overlayX,
+                                        double overlayY,
+                                        String overlayXunits,
+                                        String overlayYunits, double screenX,
+                                        double screenY, String screenXunits,
+                                        String screenYunits) {
+        return screenoverlay(parent, name, iconURL, overlayX, overlayY,
+                             overlayXunits, overlayYunits, screenX, screenY,
+                             screenXunits, screenYunits, -1, -1, "fraction",
+                             "fraction");
+    }
 
+    /**
+     * Create a ScreenOverlay Element
+     *
+     * @param parent parent Element
+     * @param name   the name of the element
+     * @param iconURL  the URL of the icon
+     * @param overlayX  x component of a point on the overlay image
+     * @param overlayY  y component of a point on the overlay image
+     * @param overlayXunits  units of overlayX, can be one of: fraction, pixels, or insetPixels
+     * @param overlayYunits  units of overlayY, can be one of: fraction, pixels, or insetPixels
+     * @param screenX x component of a point on the screen
+     * @param screenY y component of a point on the screen
+     * @param screenXunits units of screenX, can be one of: fraction, pixels, or insetPixels
+     * @param screenYunits units of screenY, can be one of: fraction, pixels, or insetPixels
+     * @param sizeX  the x size of the image for the screen overlay, as follows: 1 indicates to use the native dimension,
+     *               0 indicates to maintain the aspect ratio, a value of n sets the value of the dimension
+     * @param sizeY  the y size of the image for the screen overlay (see sizeX)
+     * @param sizeXunits   units of sizeX, fraction or pixels
+     * @param sizeYunits   units of sizeY, fraction or pixels
+     *
+     * @return the ScreenOverlay Element
+     */
+    public static Element screenoverlay(Element parent, String name,
+                                        String iconURL, double overlayX,
+                                        double overlayY,
+                                        String overlayXunits,
+                                        String overlayYunits, double screenX,
+                                        double screenY, String screenXunits,
+                                        String screenYunits, double sizeX,
+                                        double sizeY, String sizeXunits,
+                                        String sizeYunits) {
+        Element screenOlay = makeElement(parent, TAG_SCREENOVERLAY);
+        makeText(screenOlay, TAG_NAME, name);
+        olayElement(screenOlay, TAG_OVERLAYXY, overlayX, overlayY,
+                    overlayXunits, overlayYunits);
+        olayElement(screenOlay, TAG_SCREENXY, screenX, screenY, screenXunits,
+                    screenYunits);
+        olayElement(screenOlay, TAG_SIZE, sizeX, sizeY, sizeXunits,
+                    sizeYunits);
+        Element icon = makeElement(screenOlay, TAG_ICON);
+        makeText(icon, TAG_HREF, iconURL);
+        return screenOlay;
+    }
+    /*
+     <ScreenOverlay id="khScreenOverlay756">
+         <name>Simple crosshairs</name>
+         <description>This screen overlay uses fractional positioning
+         to put the image in the exact center of the screen</description>
+         <Icon>
+              <href>http://myserver/myimage.jpg</href>
+         </Icon>
+         <overlayXY x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+         <screenXY x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+         <size x="0" y="0" xunits="pixels" yunits="pixels"/>
+     </ScreenOverlay>
+     */
 
+    /**
+     * Create an overlay element of the form:
+     * <pre>
+     * &lt;tag x="x" y="y" xunits="xunits" yunits="yunits"/&gt;
+     * </pre>
+     *
+     * @param parent  the parent Element
+     * @param tag  the type of element (TAG_OVERLAYXY, TAG_SCREENXY, TAG_SIZE)
+     * @param x  the x attribute
+     * @param y  the y attribute
+     * @param xunits  the x units
+     * @param yunits  the y units
+     *
+     * @return the overlay element
+     */
+    private static Element olayElement(Element parent, String tag, double x,
+                                       double y, String xunits,
+                                       String yunits) {
+        Element olayElement = makeElement(parent, tag);
+        olayElement.setAttribute(ATTR_X, "" + x);
+        olayElement.setAttribute(ATTR_Y, "" + y);
+        olayElement.setAttribute(ATTR_XUNITS, xunits);
+        olayElement.setAttribute(ATTR_YUNITS, yunits);
+        return olayElement;
+
+    }
 }
