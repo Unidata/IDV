@@ -421,36 +421,35 @@ public class KmlUtil {
       </Style>*/
 
     /**
-     * Create an IconStyle element
+     * Create an IconStyle element enclosed in a Style element
      *
      * @param parent  the parent Element
      * @param id  name of the enclosing Style element
      * @param url  the icon URL
      *
-     * @return  the IconStyle element
+     * @return  the Style element enclosing the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url) {
         return iconstyle(parent, id, url, -1);
     }
 
     /**
-     * Create an IconStyle element
+     * Create an IconStyle element enclosed in a Style element
      *
      * @param parent  the parent Element
      * @param id  name of the enclosing Style element
      * @param url  the icon URL
      * @param scale  the size scale (>= 0, 1 = normal size)
      *
-     * @return  the IconStyle element
+     * @return  the Style element enclosing the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url,
                                     double scale) {
         return iconstyle(parent, id, url, scale, null);
     }
 
-
     /**
-     * Create an IconStyle element
+     * Create an IconStyle element enclosed in a Style element
      *
      * @param parent  the parent Element
      * @param id  name of the enclosing Style element
@@ -458,41 +457,55 @@ public class KmlUtil {
      * @param scale  the size scale (>= 0, 1 = normal size)
      * @param color  the icon color
      *
-     * @return  the IconStyle element
+     * @return  the Style element enclosing the IconStyle element
      */
     public static Element iconstyle(Element parent, String id, String url,
                                     double scale, Color color) {
         Element style     = style(parent, id);
-        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
+        Element iconstyle = iconstyle(style, url, scale, color);
+        return iconstyle;
+    }
+
+
+    /**
+     * Create an IconStyle element
+     *
+     * @param parent  the parent (Style) Element
+     * @param url  the icon URL
+     * @param scale  the size scale (>= 0, 1 = normal size)
+     * @param color  the icon color
+     *
+     * @return  the IconStyle element
+     */
+    public static Element iconstyle(Element parent, String url, double scale,
+                                    Color color) {
+        Element iconstyle = makeElement(parent, TAG_ICONSTYLE);
         if (color != null) {
             makeText(iconstyle, TAG_COLOR,
                      "ff" + toBGRHexString(color).substring(1));
             makeText(iconstyle, TAG_COLORMODE, "normal");
         }
         Element icon = makeElement(iconstyle, TAG_ICON);
-        Element href = makeText(icon, TAG_HREF, url);
+        makeText(icon, TAG_HREF, url);
         if (scale >= 0) {
             makeText(iconstyle, TAG_SCALE, "" + scale);
         }
 
-        return style;
+        return iconstyle;
     }
-
 
     /**
      * Create a BalloonStyle element
      *
-     * @param parent  parent element
-     * @param id  of the enclosing Style element
+     * @param parent  parent (Style) element
      * @param text  the balloon text
      * @param bgColor  the background color
      *
      * @return the BalloonStyle element
      */
-    public static Element balloonstyle(Element parent, String id,
-                                       String text, Color bgColor) {
-        Element style  = style(parent, id);
-        Element bstyle = makeElement(style, TAG_BALLOONSTYLE);
+    public static Element balloonstyle(Element parent, String text,
+                                       Color bgColor) {
+        Element bstyle = makeElement(parent, TAG_BALLOONSTYLE);
         if (bgColor != null) {
             makeText(bstyle, TAG_COLOR,
                      "ff" + toBGRHexString(bgColor).substring(1));
@@ -502,19 +515,50 @@ public class KmlUtil {
     }
 
     /**
-     * Create a LabelStyle element
+     * Create a BalloonStyle element wrapped in a Style element
+     *
+     * @param parent  parent element
+     * @param id  of the enclosing Style element
+     * @param text  the balloon text
+     * @param bgColor  the background color
+     *
+     * @return the Style Element with the BalloonStyle element included
+     */
+    public static Element balloonstyle(Element parent, String id,
+                                       String text, Color bgColor) {
+        Element style  = style(parent, id);
+        Element bstyle = balloonstyle(style, text, bgColor);
+        return bstyle;
+    }
+
+    /**
+     * Create a LabelStyle element enclosed in a Style Element
      *
      * @param parent The parent for the style
      * @param id  the Style id
      * @param color  the label color
      * @param scale  the label size scale
      *
-     * @return  the LabelStyle
+     * @return  the Style Element enclosing the LabelStyle
      */
     public static Element labelstyle(Element parent, String id, Color color,
                                      int scale) {
         Element style      = style(parent, id);
-        Element labelstyle = makeElement(style, TAG_LABELSTYLE);
+        Element labelstyle = labelstyle(style, color, scale);
+        return labelstyle;
+    }
+
+    /**
+     * Create a LabelStyle element
+     *
+     * @param parent The parent (Style) element
+     * @param color  the label color
+     * @param scale  the label size scale
+     *
+     * @return  the LabelStyle
+     */
+    public static Element labelstyle(Element parent, Color color, int scale) {
+        Element labelstyle = makeElement(parent, TAG_LABELSTYLE);
         if (color != null) {
             makeText(labelstyle, TAG_COLOR,
                      "ff" + toBGRHexString(color).substring(1));
@@ -524,16 +568,16 @@ public class KmlUtil {
             makeText(labelstyle, TAG_SCALE, "" + scale);
         }
         return labelstyle;
-        /*
-        <LabelStyle id="ID">
-        <!-- inherited from ColorStyle -->
-        <color>ffffffff</color>            <!-- kml:color -->
-        <colorMode>normal</colorMode>      <!-- kml:colorModeEnum: normal or random -->
-
-        <!-- specific to LabelStyle -->
-        <scale>1</scale>                   <!-- float -->
-      </LabelStyle>*/
     }
+    /*
+    <LabelStyle id="ID">
+    <!-- inherited from ColorStyle -->
+    <color>ffffffff</color>            <!-- kml:color -->
+    <colorMode>normal</colorMode>      <!-- kml:colorModeEnum: normal or random -->
+
+    <!-- specific to LabelStyle -->
+    <scale>1</scale>                   <!-- float -->
+  </LabelStyle>*/
 
 
     /**
