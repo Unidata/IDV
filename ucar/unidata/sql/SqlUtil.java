@@ -1754,9 +1754,9 @@ public class SqlUtil {
      */
     public static void setConnectionManager(ConnectionManager mgr) {
         if ((connectionManager != null) && (connectionManager != mgr)) {
-            throw new IllegalArgumentException(
+            /*            throw new IllegalArgumentException(
                 "Already have a connection manager:"
-                + connectionManager.getClass().getName());
+                + connectionManager.getClass().getName());*/
         }
         connectionManager = mgr;
     }
