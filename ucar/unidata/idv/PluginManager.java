@@ -1507,7 +1507,9 @@ public class PluginManager extends IdvManager {
                     continue;
                 }
                 String filename = files[jarFileIdx].toString();
-                if (filename.endsWith(".jar")) {
+                //                if (filename.endsWith(".jar")) {
+                String decodedFilename = decode(filename);
+                if (IOUtil.getFileTail(decodedFilename).endsWith(".jar")) {
                     loadJar(filename);
                 } else {
                     loadPlugin(filename, true);
@@ -1991,13 +1993,20 @@ public class PluginManager extends IdvManager {
         }
     }
 
+    /**
+     * Notify the users to restart the IDV
+     */
     protected void notifyUser() {
-        if(!getInstallManager().isRestartable()) {
-            LogUtil.userMessage("You will need to restart the IDV for this change to take effect");
+        if ( !getInstallManager().isRestartable()) {
+            LogUtil.userMessage(
+                "You will need to restart the IDV for this change to take effect");
             return;
         }
 
-        if(GuiUtils.askYesNo("Plugin Confirmation", new JLabel("<html>You will need to restart the IDV for this change to take effect<br>Do you want to restart?"))) {
+        if (GuiUtils.askYesNo(
+                "Plugin Confirmation",
+                new JLabel(
+                    "<html>You will need to restart the IDV for this change to take effect<br>Do you want to restart?"))) {
 
             try {
                 getInstallManager().restart();
@@ -2658,9 +2667,9 @@ public class PluginManager extends IdvManager {
 
 
         /**
-         * _more_
+         * Get the file path
          *
-         * @return _more_
+         * @return the file path
          */
         public String getFilePath() {
             String path = file.toString();
