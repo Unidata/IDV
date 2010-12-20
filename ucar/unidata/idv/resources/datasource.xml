@@ -532,7 +532,7 @@
      id="FILE.PROFILER"
      factory="ucar.unidata.data.profiler.EOLProfilerDataSource"
      patterns="mapr.*,prof.*\.nc$,prof.*\.cdf$,rass.*\.nc$"
-     fileselection="false"
+     fileselection="true"
      doesmultiples="false"
      label="EOL netCDF Profiler files"/>
     <datasource
