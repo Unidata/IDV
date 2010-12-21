@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.idv.chooser;
@@ -138,11 +139,11 @@ public class WmsHandler extends XmlHandler {
      * @param node The node the user clicked on
      */
     void doTreeClick(Element node) {
-        boolean isLoadable = isLoadable(node);
+        boolean isLoadable = WmsUtil.isLoadable(node);
         chooser.setHaveData(isLoadable);
         mapPanel.setDrawBounds(null, null);
         if (isLoadable) {
-            Element bboxNode = findBbox(node);
+            Element bboxNode = WmsUtil.findBbox(node);
             if (bboxNode != null) {
                 //              System.err.println ("bbox:" + XmlUtil.toString(bboxNode));
                 ProjectionRect rect =
@@ -207,7 +208,7 @@ public class WmsHandler extends XmlHandler {
 
         tree = new XmlTree(root, true, path) {
             public void doDoubleClick(XmlTree theTree, Element node) {
-                processNode(Misc.newList(node));
+                processNodes((List<Element>) Misc.newList(node));
             }
 
             public void doClick(XmlTree theTree, Element node) {
@@ -268,22 +269,6 @@ public class WmsHandler extends XmlHandler {
         */
     }
 
-    /**
-     * The given node is an Xml node that the user has clicked
-     * on. This method determines if the node is loadable, i.e.,
-     * if it is a layer or a style node that also has a
-     * loadable=1 attribute.
-     *
-     * @param node The node to check
-     * @return Is the node loadable
-     */
-    private boolean isLoadable(Element node) {
-        if (node.getTagName().equals(WmsUtil.TAG_STYLE)) {
-            return true;
-        }
-        //TODO: For now just return true 
-        return true;
-    }
 
 
     /**
@@ -300,33 +285,13 @@ public class WmsHandler extends XmlHandler {
         mi = new JMenuItem("Load");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                processNode(Misc.newList(node));
+                processNodes((List<Element>) Misc.newList(node));
             }
         });
         popup.add(mi);
     }
 
 
-    /**
-     * Find the bbox element
-     *
-     * @param node xml node
-     *
-     * @return bbox node
-     */
-    private Element findBbox(Element node) {
-        Element bboxNode = XmlUtil.findChildRecurseUp(node,
-                               WmsUtil.TAG_LATLONBOUNDINGBOX);
-
-        if (bboxNode == null) {
-            bboxNode = XmlUtil.findChildRecurseUp(node,
-                    WmsUtil.TAG_BOUNDINGBOX);
-
-
-        }
-        return bboxNode;
-
-    }
 
 
     /**
@@ -337,307 +302,21 @@ public class WmsHandler extends XmlHandler {
      * @param selectedNodes List of selected Element nodes
      * from the XmlTree.
      */
-    private void processNode(List selectedNodes) {
+    private void processNodes(List<Element> selectedNodes) {
 
         if (selectedNodes.size() == 0) {
             return;
         }
 
-        boolean mergeLayers = mergeLayerCbx.isSelected();
+        boolean  mergeLayers = mergeLayerCbx.isSelected();
+        String[] message     = { null };
 
-        String  format      = null;
-
-
-
-        Element getMapNode = XmlUtil.findDescendantFromPath(root,
-                                 "Capability.Request.GetMap");
-        if (getMapNode == null) {
-            getMapNode = XmlUtil.findDescendantFromPath(root,
-                    "Capability.Request.Map");
-        }
-
-
-        if (getMapNode == null) {
-            chooser.userMessage("No 'GetMap' section found");
+        List<WmsSelection> infos = WmsUtil.processNode(root, selectedNodes,
+                                       message, mergeLayers);
+        if (message[0] != null) {
+            chooser.userMessage(message[0]);
             return;
         }
-        //        System.err.println ("found:" + XmlUtil.toString (getMapNode));
-        Element httpNode = XmlUtil.findDescendantFromPath(getMapNode,
-                               "DCPType.HTTP");
-        if (httpNode == null) {
-            chooser.userMessage("No 'HTTP' section found");
-            return;
-        }
-
-        List formatNodes = XmlUtil.findChildren(getMapNode, "Format");
-        Hashtable<String, String> formatMap = new Hashtable<String, String>();
-        List                      formats   = new ArrayList();
-        for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
-            Element formatNode = (Element) formatNodes.get(i);
-            String  content = XmlUtil.getChildText(formatNode).toLowerCase();
-            formats.add(content);
-            formatMap.put(content, content);
-        }
-
-
-        if (format == null) {
-            format = formatMap.get("image/png; mode=24bit");
-        }
-        if (format == null) {
-            format = formatMap.get("image/png");
-        }
-        if (format == null) {
-            format = formatMap.get("image/jpeg");
-        }
-        if (format == null) {
-            format = formatMap.get("image/gif");
-        }
-        //        if(format ==null)
-        //            format = formatMap.get("image/tiff");
-        //        System.err.println("format:" + format);
-        if (format == null) {
-            for (int i = 0; (i < formatNodes.size()) && (format == null);
-                    i++) {
-                Element formatNode = (Element) formatNodes.get(i);
-                if (XmlUtil.findChildren(formatNode, "PNG").size() > 0) {
-                    format = "PNG";
-                    break;
-                } else if (XmlUtil.findChildren(formatNode, "JPEG").size()
-                           > 0) {
-                    format = "JPEG";
-                    break;
-                } else if (XmlUtil.findChildren(formatNode, "GIF").size()
-                           > 0) {
-                    format = "GIF";
-                    break;
-                }
-            }
-        }
-
-        if (format == null) {
-            chooser.userMessage("No compatible image format found");
-            return;
-        }
-
-
-        Element getNode = XmlUtil.findDescendantFromPath(httpNode,
-                              "Get.OnlineResource");
-        if (getNode == null) {
-            getNode = XmlUtil.findDescendantFromPath(httpNode, "Get");
-        }
-        Element postNode = XmlUtil.findDescendantFromPath(httpNode,
-                               "Post.OnlineResource");
-        if ((getNode == null) && (postNode == null)) {
-            chooser.userMessage("No 'Get' or 'Post'  section found");
-            return;
-        }
-        boolean doGet = (getNode != null);
-
-        //TODO: If we are using POST then we need to pass that info on to the 
-        //data source
-        if (getNode == null) {
-            getNode = postNode;
-        }
-        String url = XmlUtil.getAttribute(getNode, "xlink:href",
-                                          (String) null);
-        if (url == null) {
-            url = XmlUtil.getAttribute(getNode, "onlineResource",
-                                       (String) null);
-        }
-        if (url == null) {
-            chooser.userMessage("No 'href'  attribute found");
-            return;
-        }
-
-        double       minx         = -180,
-                     maxx         = 180,
-                     miny         = -90,
-                     maxy         = 90;
-        int          fixedWidth   = -1;
-        int          fixedHeight  = -1;
-        boolean      allowSubsets = true;
-
-        String       srsString    = null;
-        String       error        = null;
-        String       iconPath     = null;
-        List         timeList     = null;
-
-        String       version      = XmlUtil.getAttribute(root, "version");
-        List         infos        = new ArrayList();
-        WmsSelection wmsSelection = null;
-        for (int i = 0; i < selectedNodes.size(); i++) {
-            Element selectedNode = (Element) selectedNodes.get(i);
-            //      System.err.println ("selected:" + XmlUtil.toString(selectedNode));
-            if ( !isLoadable(selectedNode)) {
-                continue;
-            }
-            String title = tree.getLabel(selectedNode);
-            //      System.err.println ("style:" + XmlUtil.toString(styleNode));
-            Element layerNode = selectedNode;
-            Element styleNode;
-            if (layerNode.getTagName().equals(WmsUtil.TAG_STYLE)) {
-                styleNode = layerNode;
-                layerNode = (Element) layerNode.getParentNode();
-            } else {
-                styleNode = XmlUtil.findChild(layerNode, WmsUtil.TAG_STYLE);
-            }
-            if (styleNode == null) {
-                styleNode = layerNode;
-            }
-
-            Element iconElement = XmlUtil.findDescendantFromPath(styleNode,
-                                      "LegendURL.OnlineResource");
-            if (iconElement != null) {
-                iconPath = XmlUtil.getAttribute(iconElement, "xlink:href",
-                        (String) null);
-            }
-
-
-            //<Dimension name="time" units="ISO8601" default="2003-06-22T00:56Z">2003-06-20T02:44Z/2003-06-22T00:56Z/PT1H39M</Dimension>
-            Element timeDimension = XmlUtil.findElement(styleNode,
-                                        WmsUtil.TAG_DIMENSION,
-                                        WmsUtil.ATTR_NAME,
-                                        WmsUtil.VALUE_TIME);
-            if (timeDimension != null) {
-                String timeText = XmlUtil.getChildText(timeDimension);
-                timeList = StringUtil.split(timeText, "/");
-            }
-
-
-            Element styleNameNode = XmlUtil.findChild(styleNode, "Name");
-            if (styleNameNode == null) {
-                error = "No Name element found in Style element";
-                break;
-            }
-
-
-            Element nameNode = XmlUtil.getElement(layerNode, "Name");
-            if (nameNode == null) {
-                nameNode = XmlUtil.getElement(layerNode, "Title");
-                if (nameNode == null) {
-                    error = "No name node found";
-                    break;
-                }
-            }
-
-            //TODO: use the exceptions
-            String style = XmlUtil.getChildText(styleNameNode);
-            String layer = XmlUtil.getChildText(nameNode);
-
-            List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
-                                WmsUtil.TAG_SRS);
-            for (int srsIdx = 0;
-                    (srsIdx < srsNodes.size()) && (srsString == null);
-                    srsIdx++) {
-                String content =
-                    XmlUtil.getChildText((Element) srsNodes.get(srsIdx));
-                if (content == null) {
-                    continue;
-                }
-                List srsTokens = StringUtil.split(content, " ", true, true);
-                if (srsTokens.size() == 0) {
-                    srsString = "EPSG:4326";
-                }
-                for (int srsTokenIdx = 0; srsTokenIdx < srsTokens.size();
-                        srsTokenIdx++) {
-                    String token = (String) srsTokens.get(srsTokenIdx);
-                    //For now just look for epsg:4326
-                    if (token.equalsIgnoreCase("EPSG:4326")) {
-                        srsString = token;
-                        break;
-                    }
-                }
-            }
-
-            if (srsString == null) {
-                List crsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
-                                    WmsUtil.TAG_CRS);
-                for (int crsIdx = 0;
-                        (crsIdx < crsNodes.size()) && (srsString == null);
-                        crsIdx++) {
-                    String content =
-                        XmlUtil.getChildText((Element) crsNodes.get(crsIdx));
-                    if (content == null) {
-                        continue;
-                    }
-                    List crsTokens = StringUtil.split(content, " ", true,
-                                         true);
-                    for (int crsTokenIdx = 0; crsTokenIdx < crsTokens.size();
-                            crsTokenIdx++) {
-                        String token = (String) crsTokens.get(crsTokenIdx);
-                        //For now just look for crs:84
-                        if (token.equalsIgnoreCase("CRS:84")) {
-                            srsString = token;
-                            break;
-                        }
-                    }
-                }
-            }
-
-
-
-            if (srsString == null) {
-                error = "No compatible SRS found";
-                break;
-            }
-            Element bboxNode = findBbox(layerNode);
-            if (bboxNode == null) {
-                error = "No bbox node found";
-                break;
-            }
-            minx = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINX, minx);
-            maxx = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXX, maxx);
-            miny = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINY, miny);
-            maxy = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXY, maxy);
-
-            fixedWidth = XmlUtil.getAttribute(layerNode,
-                    WmsUtil.ATTR_FIXEDWIDTH, -1);
-            fixedHeight = XmlUtil.getAttribute(layerNode,
-                    WmsUtil.ATTR_FIXEDHEIGHT, -1);
-
-            allowSubsets = (XmlUtil.getAttribute(layerNode,
-                    WmsUtil.ATTR_NOSUBSETS, 0) != 1);
-
-
-            if ( !mergeLayers) {
-                wmsSelection = null;
-            }
-
-            if (wmsSelection == null) {
-                wmsSelection = new WmsSelection(url, layer, title, srsString,
-                        format, version,
-                        new GeoLocationInfo(miny, maxx, maxy, minx));
-
-                Element abstractNode = XmlUtil.getElement(layerNode,
-                                           WmsUtil.TAG_ABSTRACT);
-                if (abstractNode != null) {
-                    String text = XmlUtil.getChildText(abstractNode);
-                    wmsSelection.setDescription(text);
-                }
-
-                wmsSelection.setTimeList(timeList);
-                wmsSelection.setLegendIcon(iconPath);
-                wmsSelection.setAllowSubsets(allowSubsets);
-                wmsSelection.setFixedWidth(fixedWidth);
-                wmsSelection.setFixedHeight(fixedHeight);
-                infos.add(wmsSelection);
-            } else {
-                wmsSelection.appendLayer(layer,
-                                         new GeoLocationInfo(miny, maxx,
-                                             maxy, minx));
-            }
-        }
-
-        if (error != null) {
-            chooser.userMessage(error);
-            return;
-        }
-        if (infos.size() == 0) {
-            chooser.userMessage("None of the selected items are loadable");
-            return;
-        }
-
-
         String title = path;
         Element titleNode = XmlUtil.findDescendantFromPath(root,
                                 "Service.Title");
@@ -658,14 +337,19 @@ public class WmsHandler extends XmlHandler {
         */
 
         chooser.closeChooser();
+
+
     }
+
+
+
 
     /**
      *  The user  has pressed the 'Load' button. Check if a  node is selected
      * and if so create the WMS data source.
      */
     public void doLoad() {
-        processNode(tree.getSelectedElements());
+        processNodes((List<Element>) tree.getSelectedElements());
     }
 
 
