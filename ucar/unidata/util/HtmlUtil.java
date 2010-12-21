@@ -2,17 +2,17 @@
  * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -75,16 +75,16 @@ public class HtmlUtil {
     /** _more_ */
     public static final String SIZE_5 = "  size=\"5\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_6 = "  size=\"6\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_7 = "  size=\"7\" ";
 
     /** _more_ */
     public static final String SIZE_8 = "  size=\"8\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_9 = "  size=\"9\" ";
 
     /** _more_ */
@@ -343,7 +343,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String CLASS_FORMLABEL = "formlabel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_FORMLABEL_TOP = "formlabeltop";
 
     /** _more_ */
@@ -1397,12 +1397,25 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String makeLatLonInput(String arg, String value) {
-	return makeLatLonInput(arg, value,null);
+        return makeLatLonInput(arg, value, null);
     }
 
 
-    public static String makeLatLonInput(String arg, String value,String tip) {
-        return input(arg, value, attrs(ATTR_SIZE, "5") + id(arg) +(tip!=null?title(tip):""));
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param value _more_
+     * @param tip _more_
+     *
+     * @return _more_
+     */
+    public static String makeLatLonInput(String arg, String value,
+                                         String tip) {
+        return input(arg, value,
+                     attrs(ATTR_SIZE, "5") + id(arg) + ((tip != null)
+                ? title(tip)
+                : ""));
     }
 
 
@@ -1421,31 +1434,36 @@ public class HtmlUtil {
                                        String northValue, String eastValue,
                                        String westValue) {
 
-        return makeLatLonBox(baseName+"_south",
-                             baseName+"_north",
-                             baseName+"_east",
-                             baseName+"_west",
-                             southValue,
-                             northValue,
-                             eastValue,
-                             westValue);
+        return makeLatLonBox(baseName + "_south", baseName + "_north",
+                             baseName + "_east", baseName + "_west",
+                             southValue, northValue, eastValue, westValue);
     }
 
-    public static String makeLatLonBox(
-                                       String southArg,
-                                       String northArg, 
-                                       String eastArg,
-                                       String westArg,
-                                       String southValue,
-                                       String northValue, 
-                                       String eastValue,
-                                       String westValue) {
+    /**
+     * _more_
+     *
+     * @param southArg _more_
+     * @param northArg _more_
+     * @param eastArg _more_
+     * @param westArg _more_
+     * @param southValue _more_
+     * @param northValue _more_
+     * @param eastValue _more_
+     * @param westValue _more_
+     *
+     * @return _more_
+     */
+    public static String makeLatLonBox(String southArg, String northArg,
+                                       String eastArg, String westArg,
+                                       String southValue, String northValue,
+                                       String eastValue, String westValue) {
         return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
-	    + makeLatLonInput(northArg, northValue,"North") + "</td></tr>"
-	    + "<tr><td>" + makeLatLonInput(westArg, westValue,"West")
-	    + "</td><td>" + makeLatLonInput(eastArg, eastValue,"East")
-               + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
-	    + makeLatLonInput(southArg, southValue,"South") + "</table>";
+               + makeLatLonInput(northArg, northValue, "North")
+               + "</td></tr>" + "<tr><td>"
+               + makeLatLonInput(westArg, westValue, "West") + "</td><td>"
+               + makeLatLonInput(eastArg, eastValue, "East") + "</tr>"
+               + "<tr><td colspan=\"2\" align=\"center\">"
+               + makeLatLonInput(southArg, southValue, "South") + "</table>";
     }
 
     /**
@@ -1636,8 +1654,9 @@ public class HtmlUtil {
      */
     public static String uploadForm(String url, String extra) {
         return open(TAG_FORM,
-                    " accept-charset=\"UTF-8\" " + attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url,
-                          ATTR_ENCTYPE, VALUE_MULTIPART) + " " + extra);
+                    " accept-charset=\"UTF-8\" "
+                    + attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url,
+                            ATTR_ENCTYPE, VALUE_MULTIPART) + " " + extra);
     }
 
 
@@ -2169,7 +2188,7 @@ public class HtmlUtil {
             Color  c     = GuiUtils.COLORS[i];
             String label = GuiUtils.COLORNAMES[i];
             value = StringUtil.toHexString(c);
-            value = value.replace("#","");
+            value = value.replace("#", "");
             String selectedAttr = "";
             if (Misc.equals(value, selected)) {
                 selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
@@ -3101,9 +3120,7 @@ public class HtmlUtil {
         if ((showImg != null) && (showImg.length() > 0)) {
             img = HtmlUtil.img(visible
                                ? hideImg
-                               : showImg, "",
-                                          " id='" + id
-                               + "img' ");
+                               : showImg, "", " id='" + id + "img' ");
         }
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
@@ -3220,6 +3237,64 @@ public class HtmlUtil {
         sb.append(close(TAG_SPAN));
         return sb.toString();
     }
+
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static String makeToggleTable(String label, String content,
+                                         boolean visible) {
+
+        String hideImg = inlineHideImageUrl;
+        String showImg = inlineShowImageUrl;
+        if (hideImg == null) {
+            hideImg = blockHideImageUrl;
+        }
+        if (showImg == null) {
+            showImg = blockShowImageUrl;
+        }
+        String id = "block_" + (blockCnt++);
+        StringBuffer sb =
+            new StringBuffer(
+                "<table border=0 width=\"100%\"><tr valign=top>");
+        String img = "";
+        if ((showImg != null) && (showImg.length() > 0)) {
+            img = HtmlUtil.img(visible
+                               ? hideImg
+                               : showImg, "",
+                                          " id='" + id
+                                          + "img' ") + HtmlUtil.space(1);
+        }
+        String link =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleInlineVisibility('"
+                + id + "','" + id + "img','" + hideImg + "','" + showImg
+                + "')"), img + label,
+                         HtmlUtil.cssClass("toggleblocklabellink"));
+
+        //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append("<td width=1%>");
+        sb.append(link);
+        sb.append("</td><td>");
+        sb.append("<div " + HtmlUtil.cssClass("hideshowblock")
+                  + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:inline;visibility:visible")
+                  + ">");
+        if ( !visible) {
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",
+                    HtmlUtil.squote(id))));
+        }
+
+        sb.append(content.toString());
+        sb.append(close(TAG_DIV));
+        sb.append("</td></tr></table>");
+        return sb.toString();
+    }
+
 
 
     /**
