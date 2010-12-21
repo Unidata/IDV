@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.util;
@@ -3909,7 +3910,7 @@ public class Misc {
      * @param cl The class loader
      */
     public static void addClassLoader(ClassLoader cl) {
-        synchronized(classLoaders) {
+        synchronized (classLoaders) {
             classLoaders.add(cl);
         }
     }
@@ -3921,7 +3922,7 @@ public class Misc {
      * @return List of dynamic classloaders
      */
     public static List<ClassLoader> getClassLoaders() {
-        synchronized(classLoaders) {
+        synchronized (classLoaders) {
             return new ArrayList<ClassLoader>(classLoaders);
         }
     }
@@ -4020,6 +4021,21 @@ public class Misc {
         float[][] b = new float[a.length][a[0].length];
         for (int i = 0; i < a.length; i++) {
             System.arraycopy(a[i], 0, b[i], 0, a[0].length);
+        }
+        return b;
+    }
+
+    /**
+     * _more_
+     *
+     * @param a _more_
+     *
+     * @return _more_
+     */
+    public static float[] reverseArray(float[] a) {
+        float[] b = new float[a.length];
+        for (int i = 0; i < a.length; i++) {
+            b[a.length - i] = a[i];
         }
         return b;
     }
