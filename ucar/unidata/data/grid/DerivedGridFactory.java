@@ -744,15 +744,25 @@ public class DerivedGridFactory {
                 paramDomain = GridUtil.getSpatialDomain(grid);
 
                 // System.err.println("new param domain " +paramDomain);
-            }
-            // 3D grid on a 2D manifold over a 2D topography
-            if ((paramDomain.getDimension() == 2)
-                    && (topoDomain.getDimension() == 3)
-                    && (topoDomain.getManifoldDimension() == 2)) {
+                // 2D grid over a 3D topography on a 2D manifold
+            } else if ((paramDomain.getDimension() == 2)
+                       && (topoDomain.getDimension() == 3)
+                       && (topoDomain.getManifoldDimension() == 2)) {
                 topoGrid   = GridUtil.make2DGridFromSlice(topoGrid, true);
                 topoDomain = GridUtil.getSpatialDomain(topoGrid);
 
                 // System.err.println("new topo domain " +topoDomain);
+                // unequal 3D grid and topo with 2D manifolds
+            } else if (((paramDomain.getDimension() == 3)
+                        && (paramDomain.getManifoldDimension()
+                            == 2)) && ((topoDomain.getDimension() == 3)
+                                       && (topoDomain.getManifoldDimension()
+                                           == 2)) && !topoDomain.equals(
+                                               paramDomain)) {
+                grid        = GridUtil.make2DGridFromSlice(paramGrid, true);
+                paramDomain = GridUtil.getSpatialDomain(grid);
+                topoGrid    = GridUtil.make2DGridFromSlice(topoGrid, true);
+                topoDomain  = GridUtil.getSpatialDomain(topoGrid);
             }
 
 
