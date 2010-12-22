@@ -745,6 +745,16 @@ public class DerivedGridFactory {
 
                 // System.err.println("new param domain " +paramDomain);
             }
+            // 3D grid on a 2D manifold over a 2D topography
+            if ((paramDomain.getDimension() == 2)
+                    && (topoDomain.getDimension() == 3)
+                    && (topoDomain.getManifoldDimension() == 2)) {
+                topoGrid   = GridUtil.make2DGridFromSlice(topoGrid, true);
+                topoDomain = GridUtil.getSpatialDomain(topoGrid);
+
+                // System.err.println("new topo domain " +topoDomain);
+            }
+
 
             RealTupleType paramRef = null;
             RealTupleType topoRef  = null;
