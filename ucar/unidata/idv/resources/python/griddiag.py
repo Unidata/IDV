@@ -82,6 +82,17 @@ def avor(V):
   relv = vor(V)
   return add(relv,corl(relv))
 
+def circs(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a circular aperature smoothing to the grid points.  The weighting 
+ function is the circular aperature diffraction function.  D is
+ the radius of influence in grid increments, increasing D increases 
+ the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "CIRC", int(D))
+
 def corl(S):
   """ Coriolis Parameter for all points in a grid 
   <div class=jython>
@@ -89,6 +100,18 @@ def corl(S):
   </div>
   """
   return DerivedGridFactory.createCoriolisGrid(S)
+
+def cress(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a Cressman smoothing to the grid points.  The smoothed value
+ is given by a weighted average of surrounding grid points.  D is
+ the radius of influence in grid increments, 
+ increasing D increases the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "CRES", int(D))
+
 
 def cros(V1,V2):
   """ Vector cross product magnitude
@@ -219,6 +242,17 @@ def pvor(S,V):
   """ Potetial Vorticity (usually from theta and wind)
   """
   return DerivedGridFactory.createPotentialVorticity(S,V)
+
+def rects(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a rectangular aperature smoothing to the grid points.  The weighting 
+ function is the product of the rectangular aperature diffraction function
+ in the x and y directions.  D is the radius of influence in grid 
+ increments, increasing D increases the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "RECT", int(D))
 
 def savg(S):
   """ Average over whole grid
@@ -404,6 +438,29 @@ def age(obs,geo):
   """
   return sub(obs,geo)
 
+def circv(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a circular aperature smoothing to the grid points.  The weighting 
+ function is the circular aperature diffraction function.  D is
+ the radius of influence in grid increments, increasing D increases 
+ the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "CIRC", int(D))
+
+def cresv(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a Cressman smoothing to the grid points.  The smoothed value
+ is given by a weighted average of surrounding grid points.  D is
+ the radius of influence in grid increments, 
+ increasing D increases the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "CRES", int(D))
+
+
 def dvdx(V):
   """ Partial x derivative of a vector
   <div class=jython>
@@ -507,6 +564,17 @@ def qvcl(THTA,V):
   qvecudp = newName(quo(dot(dvdx(V),gradt),dtdp),"qvecudp")
   qvecvdp = newName(quo(dot(dvdy(V),gradt),dtdp),"qvecvdp")
   return vecr(qvecudp,qvecvdp)
+
+def rectv(S, D=2):
+  """ 
+  <div class=jython>
+ Apply a rectangular aperature smoothing to the grid points.  The weighting 
+ function is the product of the rectangular aperature diffraction function
+ in the x and y directions.  D is the radius of influence in grid 
+ increments, increasing D increases the smoothing. (default D=2)
+  </div>
+  """
+  return GridUtil.smooth(S, "RECT", int(D))
 
 def sm5v(V):
   """ Smooth a scalar grid using a 5-point smoother (see sm5s)
