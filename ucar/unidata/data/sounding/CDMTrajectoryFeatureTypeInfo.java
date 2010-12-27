@@ -17,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.data.sounding;
 
 
@@ -72,10 +73,10 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     /** The data type */
     TrajectoryFeatureCollection tfc;
 
-    /** _more_          */
+    /** _more_ */
     List<TrajectoryFeatureBean> obsList;
 
-    /** _more_          */
+    /** _more_ */
     double[] times;
 
     /**
@@ -183,18 +184,37 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 varTime = mb.getName();
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.KILOMETER)) {
-                addVariable(new VarInfo(mb.getName(), mb.getDescription(),
-                                        "Basic", unit));
-                varAltitude = mb.getName();
+                if (mb.getName().equalsIgnoreCase("ALTITUDE")
+                        || mb.getName().equalsIgnoreCase("DEPTH")
+                        || mb.getName().equalsIgnoreCase("ALT")) {
+
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), "Basic",
+                                            unit));
+                    varAltitude = mb.getName();
+                } else {
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), unit));
+                }
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.DEGREE)) {
-                addVariable(new VarInfo(mb.getName(), mb.getDescription(),
-                                        "Basic", unit));
 
-                if (mb.getName().equalsIgnoreCase("LATITUDE")) {
+
+                if (mb.getName().equalsIgnoreCase("LATITUDE")
+                        || mb.getName().equalsIgnoreCase("LAT")) {
                     varLatitude = mb.getName();
-                } else if (mb.getName().equalsIgnoreCase("LONGITUDE")) {
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), "Basic",
+                                            unit));
+                } else if (mb.getName().equalsIgnoreCase("LONGITUDE")
+                           || mb.getName().equalsIgnoreCase("LON")) {
                     varLongitude = mb.getName();
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), "Basic",
+                                            unit));
+                } else {
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), unit));
                 }
 
             } else {
@@ -435,14 +455,49 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception _more_
      */
     protected float[] getAltitude(Range range) throws Exception {
-        int     first = range.first();
-
         float[] fdata = null;  //getData("DEPTH");
-        // while (i <= obsList.size() && j < range.length()) {
-        TrajectoryFeatureBean tfb = obsList.get(0);
-        fdata = tfb.getFloatData(range, varAltitude);
 
-        // }
+        TrajectoryFeatureBean tfb = obsList.get(0);
+        fdata = tfb.getAltitudes(range);
+
+
+        return fdata;
+    }
+
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected float[] getLatitude(Range range) throws Exception {
+        float[] fdata = null;  //getData("DEPTH");
+
+        TrajectoryFeatureBean tfb = obsList.get(0);
+        fdata = tfb.getLatitudes(range);
+
+
+        return fdata;
+    }
+
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected float[] getLongitude(Range range) throws Exception {
+        float[] fdata = null;  //getData("DEPTH");
+
+        TrajectoryFeatureBean tfb = obsList.get(0);
+        fdata = tfb.getLongitudes(range);
+
 
         return fdata;
     }
@@ -756,14 +811,14 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      *
      *
      * @version        Enter version here..., Wed, Dec 22, '10
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class StationBean implements ucar.unidata.geoloc.Station {
 
-        /** _more_          */
+        /** _more_ */
         private Station s;
 
-        /** _more_          */
+        /** _more_ */
         private int npts = -1;
 
         /**
@@ -902,20 +957,20 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      *
      *
      * @version        Enter version here..., Wed, Dec 22, '10
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class TrajectoryFeatureBean extends StationBean {
 
-        /** _more_          */
+        /** _more_ */
         int npts;
 
-        /** _more_          */
+        /** _more_ */
         TrajectoryFeature pfc;
 
-        /** _more_          */
+        /** _more_ */
         PointFeature pf;
 
-        /** _more_          */
+        /** _more_ */
         List<PointFeature> pfs;
 
         /**
@@ -1053,9 +1108,13 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          *
          * @return _more_
          */
-        public float[] getLatitudes() {
+        public float[] getLatitudes(Range range) {
             float[] fdata = new float[npts];
-            for (int i = 0; i < npts; i++) {
+            int     first  = range.first();
+            int     stride = range.stride();
+            int     last   = range.last();
+
+            for (int i = first; i < last; i = i + stride) {
                 fdata[i] = (float) pfs.get(i).getLocation().getLatitude();
             }
             return fdata;
@@ -1066,10 +1125,31 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          *
          * @return _more_
          */
-        public float[] getLongitudes() {
+        public float[] getLongitudes(Range range) {
             float[] fdata = new float[npts];
-            for (int i = 0; i < npts; i++) {
+            int     first  = range.first();
+            int     stride = range.stride();
+            int     last   = range.last();
+
+            for (int i = first; i < last; i = i + stride) {
                 fdata[i] = (float) pfs.get(i).getLocation().getLongitude();
+            }
+            return fdata;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public float[] getAltitudes(Range range) {
+            float[] fdata = new float[npts];
+            int     first  = range.first();
+            int     stride = range.stride();
+            int     last   = range.last();
+
+            for (int i = first; i < last; i = i + stride) {
+                fdata[i] = (float) pfs.get(i).getLocation().getAltitude();
             }
             return fdata;
         }
