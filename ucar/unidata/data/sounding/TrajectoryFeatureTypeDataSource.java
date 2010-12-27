@@ -1,31 +1,31 @@
 /*
- * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.sounding;
 
 
 import ucar.ma2.Range;
+
+import ucar.nc2.constants.FeatureType;
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.FeatureDatasetPoint;
 
 import ucar.unidata.data.*;
 import ucar.unidata.util.IOUtil;
@@ -40,6 +40,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -76,6 +77,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     /** list of selected time index */
     private List selectTimes;
 
+    /** _more_          */
+    private boolean isCosmic = false;
+
     /**
      * Create a SondeDataSource from the specification given.
      *
@@ -85,9 +89,10 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      *
      * @throws VisADException  problem creating data
      */
-    public TrajectoryFeatureTypeDataSource(
-            DataSourceDescriptor descriptor, String source,
-            Hashtable properties) throws VisADException {
+    public TrajectoryFeatureTypeDataSource(DataSourceDescriptor descriptor,
+                                           String source,
+                                           Hashtable properties)
+            throws VisADException {
         this(descriptor, Misc.newList(source), properties);
     }
 
@@ -100,9 +105,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      *
      * @throws VisADException  problem creating data
      */
-    public TrajectoryFeatureTypeDataSource(
-            DataSourceDescriptor descriptor, List sources,
-            Hashtable properties) throws VisADException {
+    public TrajectoryFeatureTypeDataSource(DataSourceDescriptor descriptor,
+                                           List sources, Hashtable properties)
+            throws VisADException {
         super(descriptor, sources, "Trajectory Soundings", properties);
     }
 
@@ -185,9 +190,8 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws RemoteException _more_
      * @throws VisADException  problem in VisAD
      */
-    protected FieldImpl aggregateTracks(List tracks,
-                                        Object id0) throws VisADException,
-                                            RemoteException {
+    protected FieldImpl aggregateTracks(List tracks, Object id0)
+            throws VisADException, RemoteException {
 
         List         adapters = getAdapters();
         FunctionType fiType   = null;
@@ -315,59 +319,61 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
         }
 
-        if (f.getPath().contains("ionPrf") || f.getPath().contains("atmPhs")) {
+        if (f.getPath().contains("ionPrf")
+                || f.getPath().contains("atmPhs")) {
             return;
         }
 
         //List       adapters       = getAdapters();
-        DataChoice soundingChoice = null;
-        if ((adapters != null) && (adapters.size() > 1)) {
-            TrackAdapter    adapter = (TrackAdapter) adapters.get(0);
-            String          sName   = adapter.toString();
-            List<TrackInfo> tinfo   = adapter.getTrackInfos();
-            String          tName   = tinfo.get(0).trackName;
-            String          id;
-            List            category;
-            if (sName.contains("wetPrf") || sName.contains("atmPrf")) {
-                id       = ID_SOUNDINGTRACE;
-                category = getSoundingCategories();
+        if (isCosmic) {
+            DataChoice soundingChoice = null;
+            if ((adapters != null) && (adapters.size() > 1)) {
+                TrackAdapter    adapter = (TrackAdapter) adapters.get(0);
+                String          sName   = adapter.toString();
+                List<TrackInfo> tinfo   = adapter.getTrackInfos();
+                String          tName   = tinfo.get(0).trackName;
+                String          id;
+                List            category;
+                if (sName.contains("wetPrf") || sName.contains("atmPrf")) {
+                    id       = ID_SOUNDINGTRACE;
+                    category = getSoundingCategories();
+                } else {
+                    id       = ID_SOUNDINGOB;
+                    category = getRaobCategories();
+                }
+
+                soundingChoice = new CompositeDataChoice(this, id,
+                        getDataChoiceLabel(id), getDataChoiceLabel(id),
+                        category);
+                for (int i = 0; i < adapters.size(); i++) {
+                    TrackAdapter ta = (TrackAdapter) adapters.get(i);
+                    TrackInfo trackInfo =
+                        (TrackInfo) ta.getTrackInfos().get(0);
+                    String trackName = trackInfo.getTrackName() + i;
+                    // System.err.println("track name = " + trackName);
+                    ((CompositeDataChoice) soundingChoice).addDataChoice(
+                        new DirectDataChoice(
+                            this, id, trackName, ("Sonde " + i), category));
+                }
             } else {
-                id       = ID_SOUNDINGOB;
-                category = getRaobCategories();
+                soundingChoice = new DirectDataChoice(this, ID_SOUNDINGTRACE,
+                        getDataChoiceLabel(ID_SOUNDINGTRACE),
+                        getDataChoiceLabel(ID_SOUNDINGTRACE),
+                        getSoundingCategories());
             }
+            addDataChoice(soundingChoice);
 
-            soundingChoice = new CompositeDataChoice(this, id,
-                    getDataChoiceLabel(id), getDataChoiceLabel(id), category);
-            for (int i = 0; i < adapters.size(); i++) {
-                TrackAdapter ta        = (TrackAdapter) adapters.get(i);
-                TrackInfo    trackInfo =
-                    (TrackInfo) ta.getTrackInfos().get(0);
-                String       trackName = trackInfo.getTrackName() + i;
-                // System.err.println("track name = " + trackName);
-                ((CompositeDataChoice) soundingChoice).addDataChoice(
-                    new DirectDataChoice(
-                        this, id, trackName, ("Sonde " + i), category));
-            }
-        } else {
-            soundingChoice = new DirectDataChoice(this, ID_SOUNDINGTRACE,
-                    getDataChoiceLabel(ID_SOUNDINGTRACE),
-                    getDataChoiceLabel(ID_SOUNDINGTRACE),
-                    getSoundingCategories());
+
+
+
+            List locCats = DataCategory.parseCategories("locations", false);
+            //     addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
+            //                                        "Sonde Start Locations",
+            //                                        "Sonde Start Locations", locCats));
+            /*  End locations don't work now because lat/lon/alt values are NaN  */
+            addDataChoice(new DirectDataChoice(this, ID_SONDEENDLOCATIONS,
+                    "Sonde End Locations", "Sonde End Locations", locCats));
         }
-        addDataChoice(soundingChoice);
-
-
-
-
-        List locCats = DataCategory.parseCategories("locations", false);
-        //     addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
-        //                                        "Sonde Start Locations",
-        //                                        "Sonde Start Locations", locCats));
-        /*  End locations don't work now because lat/lon/alt values are NaN  */
-        addDataChoice(new DirectDataChoice(this, ID_SONDEENDLOCATIONS,
-                                           "Sonde End Locations",
-                                           "Sonde End Locations", locCats));
-
 
     }
 
@@ -385,11 +391,15 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      */
     protected TrackAdapter doMakeAdapter(String file,
                                          Hashtable pointDataFilter,
-                                         int stride,
-                                         int lastNMinutes) throws Exception {
+                                         int stride, int lastNMinutes)
+            throws Exception {
 
-        return new TrajectoryFeatureTypeAdapter(this, file, pointDataFilter,
-                stride, lastNMinutes);
+        TrajectoryFeatureTypeAdapter td =
+            new TrajectoryFeatureTypeAdapter(this, file, pointDataFilter,
+                                             stride, lastNMinutes);
+        isCosmic = td.isCosmic();
+        return td;
+
     }
 
 
@@ -408,11 +418,10 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws VisADException  unable to create Data object
      * @throws RemoteException (some kind of remote error.
      */
-    protected Data getDataInner(
-            DataChoice dataChoice, DataCategory category,
-            DataSelection dataSelection,
-            Hashtable requestProperties) throws VisADException,
-                RemoteException {
+    protected Data getDataInner(DataChoice dataChoice, DataCategory category,
+                                DataSelection dataSelection,
+                                Hashtable requestProperties)
+            throws VisADException, RemoteException {
         Object id = getChoiceId(dataChoice);
         selectTimes = dataSelection.getTimes();
         if (id.equals(ID_SONDESTARTLOCATIONS)
@@ -427,15 +436,20 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 for (int i = 0; i < adapters.size(); i++) {
                     TrajectoryFeatureTypeAdapter cta =
                         (TrajectoryFeatureTypeAdapter) adapters.get(i);
-                    List<CosmicTrajectoryFeatureTypeInfo> infos =
-                        cta.getTrackInfos();
+                    List infos = cta.getTrackInfos();
 
                     if (infos.size() == 0) {
                         continue;
                     }
-                    CosmicTrajectoryFeatureTypeInfo cfti   = infos.get(0);
+                    TrackInfo cfti;
 
-                    int                             numObs = 0;
+                    if (isCosmic) {
+                        cfti = (CosmicTrajectoryFeatureTypeInfo) infos.get(0);
+                    } else {
+                        cfti = (CDMTrajectoryFeatureTypeInfo) infos.get(0);
+                    }
+
+                    int numObs = 0;
                     try {
                         numObs = cfti.getNumberPoints();  //trackInfo.getNumberPoints();
                         Range    range = cfti.getFullRange();
@@ -494,4 +508,3 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
 
 }
-
