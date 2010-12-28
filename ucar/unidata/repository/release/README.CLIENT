@@ -1,6 +1,0 @@
-
-To run this from the command line do:
-java -Xmx512m -jar repositoryclient.jar
-to see the command line arguments.
-
-

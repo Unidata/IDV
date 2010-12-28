@@ -1,1 +1,0 @@
-tclsh ../../../../../../auxdata/docs/build/generate.tcl
