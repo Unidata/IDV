@@ -1077,11 +1077,11 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Get the domain for cloning
      *
-     * @param field _more_
+     * @param field  the field
      *
-     * @return _more_
+     * @return  the domain
      */
     public static Set getDomainSetForClone(Field field) {
         try {
@@ -1123,6 +1123,34 @@ public final class Util {
     public static Data clone(Data data, MathType type, boolean unitOverride,
                              boolean copy)
             throws UnimplementedException, VisADException, RemoteException {
+        return clone(data, type, unitOverride, copy, copy);
+    }
+
+    /**
+     * Clones a data object, replacing the MathType.  If the input data
+     * object is a FlatField, then the actual range units of the clone may
+     * differ from those of the input data object.<p>
+     *
+     * This method should probably become "abstract Data Data.clone(MathType)"
+     * with subclass-dependent implementations.<p>
+     *
+     * @param data              The data object to be cloned.
+     * @param type              The type for the returned data object.  Must be
+     *                          compatible with the current type of the data
+     *                          object.
+     * @param unitOverride      if the units are not compatible, if true,
+     *                          assume values are in units of new type.
+     * @param copy              if true, copy the data values for Fields.
+     * @param copyDomain        if true, make a copy of the domain as well
+     * @return                  The cloned data object with the new MathType.
+     * @throws UnimplementedException
+     *                          Method not yet implemented.
+     * @throws VisADException   Couldn't create necessary VisAD object.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public static Data clone(Data data, MathType type, boolean unitOverride,
+                             boolean copy, boolean copyDomain)
+            throws UnimplementedException, VisADException, RemoteException {
 
         Data result;
 
@@ -1146,11 +1174,11 @@ public final class Util {
                 FlatField oldFlatField = (FlatField) data;
                 //System.out.println("ff = " + oldFlatField.getType());
                 //System.out.println("new type = " + funcType);
-                // if copy == true, new set will be created by ensureMathType
+                // if copyDomain == true, new set will be created by ensureMathType
                 // because funcType.getDomain() is not a SetType
                 Set newDomain =
                     (Set) ensureMathType(getDomainSetForClone(oldFlatField),
-                                         (copy)
+                                         (copyDomain)
                                          ? (MathType) funcType.getDomain()
                                          : (MathType) new SetType(
                                              funcType.getDomain()));
@@ -2680,7 +2708,7 @@ public final class Util {
      * @return earth location
      *
      *
-     * @throws Exception _more_
+     * @throws Exception problem creating earth location	
      */
     public static EarthLocation makeEarthLocation(double lat, double lon)
             throws Exception {
@@ -2698,7 +2726,7 @@ public final class Util {
      * @return earth location
      *
      *
-     * @throws Exception _more_
+     * @throws Exception problem creating earth location	
      */
     public static EarthLocation makeEarthLocation(LatLonPoint llp)
             throws Exception {
@@ -2908,7 +2936,7 @@ public final class Util {
      * @param  alphaThreshold If there is an alpha channel in the image then set the field value to nan
      * for any alhpa greater than the given threshold. Do nothing if threshold<0
      *   value and we turn the other values into nan-s
-     * @param makeAlpha _more_
+     * @param makeAlpha  if true, make an alpha channel as well
      * @return a FlatField representation of the image
      *
      * @throws IOException  problem reading the image
@@ -2978,10 +3006,10 @@ public final class Util {
         }
 
 
-        int alphaCnt = 0;
-        boolean opaque = true;
+        int     alphaCnt = 0;
+        boolean opaque   = true;
 
-        if ( (alphaThreshold >= 0)) {
+        if ((alphaThreshold >= 0)) {
             float alphaValue;
             for (int i = 0; i < numPixels; i++) {
                 if (hasAlpha) {
