@@ -18,8 +18,8 @@ defineGroup Rockies
 defineImage http://www.eol.ucar.edu/webcam/latest.jpg {UCAR Boulder, CO} -ll {40.01,-105.26} -dz -7
 defineImage http://www.esrl.noaa.gov/gsd/webcam/flatiron.jpg {NOAA Boulder, CO} -ll {39.9917,-105.2618} -dz -7
 
-defineImage  http://boulderflatironcam.com/bfc/bfc.jpg {Flatirons Boulder, CO} -ll {40.0,-105.0} -dz -7 -heading {270}
-defineImage http://63.147.112.181:9595/axis-cgi/jpg/image.cgi?resolution=640x480 {Eldora Mountain, CO} -dz -7 -ll {39.94,-105.58} -heading {240}
+defineImage http://boulderflatironcam.com/bfc/bfc.jpg {Flatirons Boulder, CO} -ll {40.0,-105.0} -dz -7 -heading {270}
+defineImage http://63.147.112.178:9595/axis-cgi/jpg/image.cgi?resolution=640x480 {Eldora Mountain, CO} -dz -7 -ll {39.94,-105.58} -heading {240}
 defineImage http://www.windcliff.com/webcam/netcam.jpg {Rocky Mountain National Park, CO} -dz -7 -ll {40.426,-105.573}
 defineImage http://www.unco.edu/liveview/images/UNC2.jpg {University of NorthernColorado, Greeley, CO} -dz -7 -ll {40.42418,-104.693098}
 
@@ -117,6 +117,10 @@ defineImage http://www.avo.alaska.edu/webcam/augtst.jpg {Augustine Volcano, AK} 
 defineGroup Southwest
 defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083} 
 defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ} -ll {35.24,-111.84} 
+
+defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359} 
+defineImage http://www.noao.edu/kpno/kpcam/lastim2.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359} 
+
 defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
 
 defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104.229019}
