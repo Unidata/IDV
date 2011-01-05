@@ -35,6 +35,12 @@ def extractLatitudeFromNWPGrid(fieldimpl):
   ff = DerivedGridFactory.createLatitudeGrid(fieldimpl)
   return ff
 
+def extractLongitudeFromNWPGrid(fieldimpl):
+  """Get the longitude coordinate from a grid.  Return a grid
+  of the longitudes at each point.
+  """
+  ff = DerivedGridFactory.createLongitudeGrid(fieldimpl)
+  return ff
 
 
 def getNthTimeGrid(fieldimpl, Nth):
