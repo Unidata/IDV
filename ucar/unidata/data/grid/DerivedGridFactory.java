@@ -2599,6 +2599,83 @@ public class DerivedGridFactory {
         return latField;
     }
 
+        /**
+     * Every geo-located data grid can be used
+     * to make a grid with longitude with the grid values as well
+     *
+     * @param fi         Any geolocated grid
+     *
+     * @return extracted grid of longitudes at the grid points
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public static FieldImpl createLongitudeGrid(FieldImpl fi)
+            throws VisADException, RemoteException {
+        SampledSet ss = GridUtil.getSpatialDomain(fi);
+
+        // Determine the types latitude and longitude parameters.
+        RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
+        RealType latType = findComponent(spatialDomType, "lat",
+                                         RealType.Latitude);
+        RealType lonType = findComponent(spatialDomType, "lon",
+                                         RealType.Longitude);
+        boolean domIsLatLon = true;
+
+        if ((latType == null) || (lonType == null)) {
+            domIsLatLon = false;
+
+            CoordinateSystem cs = spatialDomType.getCoordinateSystem();
+
+            if (cs == null) {
+                throw new IllegalArgumentException("Not lat/lon domain "
+                        + spatialDomType.toString());
+            }
+
+            RealTupleType spatialDomRefType = cs.getReference();
+
+            latType = findComponent(spatialDomRefType, "lat",
+                                    RealType.Latitude);
+            lonType = findComponent(spatialDomRefType, "lon",
+                                    RealType.Longitude);
+
+            if ((latType == null) || (lonType == null)) {
+                throw new IllegalArgumentException("Not lat/lon domain "
+                        + spatialDomRefType.toString());
+            }
+        }
+
+        FieldImpl lonField = null;
+
+        if (GridUtil.isTimeSequence(fi)) {
+            Set       timeSet          = fi.getDomainSet();
+            boolean   isConstantDomain = GridUtil.isConstantSpatialDomain(fi);
+            FlatField lonFF            = null;
+
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                if ( !isConstantDomain || (lonFF == null)) {
+                    lonFF =
+                        createLongitudeBasedGrid((FlatField) fi.getSample(i,
+                            false), latType, domIsLatLon);
+                }
+
+                if (i == 0) {
+                    FunctionType latFIType =
+                        new FunctionType(DataUtility.getDomainType(timeSet),
+                                         (FunctionType) lonFF.getType());
+
+                    lonField = new FieldImpl(latFIType, timeSet);
+                }
+
+                lonField.setSample(i, lonFF);
+            }
+        } else {
+            lonField = createLongitudeBasedGrid((FlatField) fi, latType,
+                    domIsLatLon);
+        }
+
+        return lonField;
+    }
     /**
      * Every geo-located data grid can be used
      * to make a grid with latitude with the grid values as well
@@ -2675,7 +2752,63 @@ public class DerivedGridFactory {
 
         return latff;
     }
+    /**
+     * Every geo-located data grid can be used
+     * to make a grid with longitude with the grid values as well
+     *
+     * @param ff         Any geolocated grid
+     * @param lonType     The {@link visad.RealType} of the latitude parameter.
+     * @param domIsLatLon Whether or not the domain has latitude and longitude.
+     *                    If false, then the latitude and longitude
+     *                    are found in
+     *                    the reference {@link visad.RealTupleType} of the
+     *                     of the domain.
+     *
+     * @return extracted grid of longitudez at the grid points
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    private static FlatField createLongitudeBasedGrid(FlatField ff,
+            RealType lonType, boolean domIsLatLon)
+            throws VisADException, RemoteException {
+        SampledSet    g3dset = GridUtil.getSpatialDomain(ff);
+        RealTupleType rTT    = ((FunctionType) (ff.getType())).getDomain();
+        FunctionType  FT     = null;
 
+
+        FT = new FunctionType(rTT, RealType.Longitude);
+
+        FlatField lonff = new FlatField(FT, g3dset);
+        float[]   lons  = null;
+
+        if (domIsLatLon) {
+            int lonI = rTT.getIndex(lonType);
+
+            if (lonI == -1) {
+                throw new IllegalArgumentException(rTT.toString());
+            }
+
+            lons = (float[]) g3dset.getSamples(false)[lonI].clone();
+        } else {
+            CoordinateSystem cs      = g3dset.getCoordinateSystem();
+            RealTupleType    refType = cs.getReference();
+            int              lonI    = refType.getIndex(lonType);
+
+            if (lonI == -1) {
+                throw new IllegalArgumentException(refType.toString());
+            }
+
+            float[][] flatlon = cs.toReference(g3dset.getSamples(),
+                                    g3dset.getSetUnits());
+
+            lons = flatlon[lonI];
+        }
+
+        lonff.setSamples(new float[][] {lons}, false);
+
+        return lonff;
+    }
     /**
      * Take the partial derivative with respect to X of the given field.
      * @param grid   grid to parialize
