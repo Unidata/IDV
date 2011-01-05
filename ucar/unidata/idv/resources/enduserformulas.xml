@@ -125,6 +125,19 @@
     <operands/>
   </derived>
   <derived
+     description="Find longitude of grid points"
+     formula="extractLongitudeFromNWPGrid(fieldimpl)"
+     id="longitudeGrid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="Grids"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
      description="Speed from 2 components"
      formula="sqrt(x*x + y*y)"
      id="speed"
