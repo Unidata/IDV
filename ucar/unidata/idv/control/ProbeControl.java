@@ -2457,6 +2457,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             }
             Data rt = d[1];
             Real r  = info.getRealValue(rt);
+
             if ((r == null) || r.isMissing()) {
                 continue;
             }
@@ -2475,6 +2476,12 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             l.add("<tr><td>&nbsp;&nbsp;&nbsp;" + info.toString()
                   + ":</td><td align=\"right\">" + Misc.format(value) + "["
                   + unit + "]</td></tr>");
+            // add readout info
+            ReadoutInfo readoutInfo = new ReadoutInfo(this, r, elt,
+                                          animationValue);
+            readoutInfo.setUnit(unit);
+            readoutInfo.setRange(info.getLineState().getRange());
+            samples.add(readoutInfo);
         }
         return l;
     }
