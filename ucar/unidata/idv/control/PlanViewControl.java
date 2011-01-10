@@ -166,7 +166,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** polygon mode */
     int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
-
+    private String OldSmoothingType = LABEL_NONE;
     /**
      * Cstr; does nothing. See init() for creation actions.
      */
@@ -1177,7 +1177,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
             // apply smoothing
             if (checkFlag(FLAG_SMOOTHING)
-                    && !getSmoothingType().equals(LABEL_NONE)) {
+                    && !getSmoothingType().equals(OldSmoothingType)) {
+                OldSmoothingType = getSmoothingType();
+                if(OldSmoothingType.equals(LABEL_NONE)) {
+                    return retField;
+                }
                 retField = GridUtil.smooth(retField, getSmoothingType(),
                                            getSmoothingFactor());
             }
@@ -1193,10 +1197,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
-        if (checkFlag(FLAG_SMOOTHING)
-                && !getSmoothingType().equals(LABEL_NONE)) {
-
+        if (checkFlag(FLAG_SMOOTHING) ) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
+
                 try {
                     getGridDisplayable().loadData(
                         getSliceForDisplay(currentSlice));
