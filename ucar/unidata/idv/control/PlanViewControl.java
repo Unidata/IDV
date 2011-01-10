@@ -1208,6 +1208,18 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
     /**
+     * Test if the given flag is set in the attrbiuteFlags
+     *
+     * @param f The flag to check
+     * @return Is the given flag set
+     */
+    protected boolean checkFlag(int f) {
+        if (f == FLAG_SMOOTHING) {
+            return super.checkFlag(f) && !getMultipleIsTopography();
+        }
+        return super.checkFlag(f);
+    }
+    /**
      * Add any macro name/label pairs
      *
      * @param names List of macro names
