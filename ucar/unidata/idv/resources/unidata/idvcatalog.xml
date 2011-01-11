@@ -152,7 +152,7 @@
 </dataset>
 
 
-<catalogRef xlink:title="JPL-OnEarth" xlink:href="http://onearth.jpl.nasa.gov/wms.cgi?request=capabilities"/>
+<catalogRef xlink:title="NASA-NEOWMS" xlink:href="http://neowms.sci.gsfc.nasa.gov/wms/wms"/>
 
 <catalogRef xlink:title="Nasa-SVS" xlink:href="http://aes.gsfc.nasa.gov/cgi-bin/wms?"/>
 
