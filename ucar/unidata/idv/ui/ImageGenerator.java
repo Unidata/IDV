@@ -3806,23 +3806,42 @@ public class ImageGenerator extends IdvManager {
      */
     public void loadBundle(String bundleFile, List setFiles)
             throws Throwable {
-        loadBundle(bundleFile, setFiles, -1, -1);
+        loadBundle(bundleFile, setFiles, -1, -1, "", true);
     }
 
     /**
-     * _more_
+     * Load the given bundle file, list of datasets, width and height
      *
-     * @param bundleFile _more_
-     * @param setFiles _more_
-     * @param width _more_
-     * @param height _more_
+     * @param bundleFile The bundle
+     * @param setFiles This is a list, which may be null, of datasource patterns and file names to change
+     * @param width The width of the display area to use
+     * @param height The height of the display are to use
      *
      * @throws Throwable _more_
      */
     public void loadBundle(String bundleFile, List setFiles, int width,
                            int height)
             throws Throwable {
-        //        System.err.println ("width: " + width + " " + height);
+        loadBundle(bundleFile, setFiles, width, height, "", true);
+    }
+
+
+    /**
+     * Load the given bundle file, list of datasets, width and height
+     *
+     * @param bundleFile The bundle
+     * @param setFiles This is a list, which may be null, of datasource patterns and file names to change
+     * @param width The width of the display area to use
+     * @param height The height of the display are to use
+     * @param times A string of times to use from the bundle file
+     * @param clear If false then do not clear out the data sources and displays (which is otherwise the default)
+     *
+     * @throws Throwable _more_
+     */
+    public void loadBundle(String bundleFile, List setFiles, int width,
+                           int height, String times, boolean clear)
+            throws Throwable {
+
         StringBuffer extra = new StringBuffer();
         if (setFiles != null) {
             for (int i = 0; i < setFiles.size(); i += 2) {
@@ -3846,6 +3865,14 @@ public class ImageGenerator extends IdvManager {
             attrs.append(" ");
             attrs.append(ATTR_HEIGHT + "=" + quote("" + height));
             attrs.append(" ");
+        }
+        if (times != null && !times.isEmpty()) {
+            attrs.append(" ");
+            attrs.append(ATTR_TIMES + "=" + quote("" + times));
+        }
+        if (!clear) {
+            attrs.append(" ");
+            attrs.append(ATTR_CLEAR + "=" + quote("false") );
         }
 
         String xml = "<bundle " + attrs + ">" + extra + "</bundle>";
