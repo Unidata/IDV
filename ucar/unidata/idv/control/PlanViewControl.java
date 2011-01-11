@@ -167,6 +167,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
     int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
     private String OldSmoothingType = LABEL_NONE;
+
+    private int OldSmoothingFactor = 0;
     /**
      * Cstr; does nothing. See init() for creation actions.
      */
@@ -1177,11 +1179,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
             // apply smoothing
             if (checkFlag(FLAG_SMOOTHING)
-                    && !getSmoothingType().equals(OldSmoothingType)) {
-                OldSmoothingType = getSmoothingType();
-                if(OldSmoothingType.equals(LABEL_NONE)) {
-                    return retField;
-                }
+                    && !getSmoothingType().equals(LABEL_NONE)) {
                 retField = GridUtil.smooth(retField, getSmoothingType(),
                                            getSmoothingFactor());
             }
@@ -1200,11 +1198,16 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (checkFlag(FLAG_SMOOTHING) ) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
 
-                try {
-                    getGridDisplayable().loadData(
-                        getSliceForDisplay(currentSlice));
-                } catch (Exception ve) {
-                    logException("applySmoothing", ve);
+                if(!getSmoothingType().equals(OldSmoothingType)
+                    || (getSmoothingFactor() != OldSmoothingFactor)) {
+                    OldSmoothingType = getSmoothingType();
+                    OldSmoothingFactor = getSmoothingFactor();
+                    try {
+                        getGridDisplayable().loadData(
+                            getSliceForDisplay(currentSlice));
+                    } catch (Exception ve) {
+                        logException("applySmoothing", ve);
+                    }
                 }
             }
         }
