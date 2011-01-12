@@ -59,14 +59,9 @@ We have updated the IDV to point to the <a href="http://neowms.sci.gsfc.nasa.gov
 </faqitem>
 
 <faqitem q="Smoothing of grids" id="gridsmooth">
-Selected grid displays (contours, flow vectors, wind barbs) now have
-an option to perform smoothing functions on the grid.  The GEMPAK
-5-point (SM5S), 9-point (SM9S) and Gaussian Weighted Function (GWFS)
-smoothing functions have been implemented in the IDV.  Users can select
-one of these functions in the display <a href="controls/index.html">
-control window</a> and/or save these
-as a <a href="tools/DisplaySettings.html">Display Setting</a> to use
-when creating the display.
+In situations where users have smoothed a grid, they can now revert back to an unsmoothed grid without having
+ to reload the data. In addition, users can longer smooth grids over topography fields. In this specific situation
+ the user must smooth the grid via the IDV Jython formulas.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
