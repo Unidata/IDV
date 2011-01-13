@@ -110,6 +110,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.swing.*;
 
@@ -1090,7 +1091,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
             sb.append("</aggregation>\n</netcdf>\n");
             file = getDataContext().getObjectStore().getUniqueTmpFile(
-                "multigrid", ".ncml");
+                "multigrid_" + UUID.randomUUID().toString(), ".ncml");
             try {
                 IOUtil.writeFile(file, sb.toString());
             } catch (IOException ioe) {
