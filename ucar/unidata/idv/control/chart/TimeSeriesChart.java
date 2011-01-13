@@ -678,7 +678,7 @@ public class TimeSeriesChart extends XYChartManager {
                             new ArrayList<MyTimeSeries>();
 
                         MyTimeSeries series = new MyTimeSeries(name,
-                                                  Millisecond.class);
+                                                  FixedMillisecond.class);
 
                         //Set        timeSet   = field.getDomainSet();
                         //Unit[]     timeUnits = timeSet.getSetUnits();
@@ -723,9 +723,9 @@ public class TimeSeriesChart extends XYChartManager {
                             }
                             if (series == null) {
                                 series = new MyTimeSeries(name,
-                                        Millisecond.class);
+                                        FixedMillisecond.class);
                             }
-                            series.add(new Millisecond(date), valueArray[i]);
+                            series.add(new FixedMillisecond(date), valueArray[i]);
                             if ((i == 0) || (valueArray[i] > max)) {
                                 max = valueArray[i];
                             }
@@ -953,14 +953,14 @@ public class TimeSeriesChart extends XYChartManager {
                             if (series == null) {
                                 series =
                                     new MyTimeSeries(lineState.getName(),
-                                        Millisecond.class);
+                                        FixedMillisecond.class);
                             }
                             if ( !(dataElement instanceof Real)) {
                                 if (textList == null) {
                                     textList = new ArrayList<String>();
                                 }
                                 try {
-                                    series.add(new Millisecond(dttm), 0);
+                                    series.add(new FixedMillisecond(dttm), 0);
                                     textList.add(dataElement.toString());
                                 } catch (Exception exc) {
                                     //noop here. Its sortof bad form but this way we keep the text list in synch with the series
@@ -986,7 +986,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 if ((obIdx == 0) || (value < min)) {
                                     min = value;
                                 }
-                                series.addOrUpdate(new Millisecond(dttm),
+                                series.addOrUpdate(new FixedMillisecond(dttm),
                                         value);
                             }
                         }
@@ -1101,7 +1101,7 @@ public class TimeSeriesChart extends XYChartManager {
                     addLineState(lineState);
                     MyTimeSeries series =
                         new MyTimeSeries(lineState.getName(),
-                                         Millisecond.class);
+                                         FixedMillisecond.class);
                     List<DateTime> dates  = lineState.getTimes();
                     List<Real>     values = lineState.getValues();
                     if ((dates == null) || (values == null)) {
@@ -1111,7 +1111,7 @@ public class TimeSeriesChart extends XYChartManager {
                             pointIdx++) {
                         Date   dttm  = Util.makeDate(dates.get(pointIdx));
                         double value = values.get(pointIdx).getValue();
-                        series.addOrUpdate(new Millisecond(dttm), value);
+                        series.addOrUpdate(new FixedMillisecond(dttm), value);
                     }
                     XYItemRenderer renderer = null;
                     Axis axis = addSeries(series, lineState, paramIdx,

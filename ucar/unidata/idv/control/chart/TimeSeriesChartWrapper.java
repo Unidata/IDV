@@ -402,7 +402,7 @@ public class TimeSeriesChartWrapper extends PlotWrapper {
                                         + ((unit == null)
                                            ? ""
                                            : " [" + unit
-                                             + "]"), Millisecond.class);
+                                             + "]"), FixedMillisecond.class);
 
                 //TODO: Find the lat/lon/alt index in the domain
                 times = timeValues;
@@ -415,8 +415,8 @@ public class TimeSeriesChartWrapper extends PlotWrapper {
                 double max = 0;
                 for (int i = 0; i < var.length; i++) {
                     Date dttm = new Date((long) (timeValues[i]));
-                    //                    series.addOrUpdate(new Millisecond(dttm), var[i]);
-                    series.add(new Millisecond(dttm), var[i]);
+                    //                    series.addOrUpdate(new FixedMillisecond(dttm), var[i]);
+                    series.add(new FixedMillisecond(dttm), var[i]);
                     if ((i == 0) || (var[i] < min)) {
                         min = var[i];
                     }
