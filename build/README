@@ -1,6 +1,8 @@
 ***********************************************************************
 The release environment:
 
+Start releases in the morning. If there are problems, you have time to recover.
+
 On conan all release oriented directories and files point through the 
 symbolic link:
 
@@ -18,6 +20,10 @@ When you are ready to make a release, run:
 
 cd /share/idv/build
 ./buildIdv release
+
+Note that this script has a dependency on install4j which requires a license.
+The user running this script must have a valid license key associated with
+install4j. 
 
 That will run the build, generate the installers, move all relevant files 
 (installers, docs, webstart) to conan.  The following directories will be
@@ -79,6 +85,8 @@ from /share/idv/ucar
 This will generate the userguide.pdf and workshop.pdf and place them in the
 docs directory.
 
+Look at the ant output and you will see where these PDFs are located.
+
 Once this is done, copy them to conan:
  
 /content/software/idv/<release>/docs/userguide/userguide.pdf
@@ -109,7 +117,7 @@ After the release of a version, you should make a brand in the SVN repository
 in case changes are needed later.  To branch the SVN repository,
 run:
 
-svn copy http://sub.unidata.ucar.edu/idv/trunk http://sub.unidata.ucar.edu/idv/branches/IDV_<version>  -m "some info"
+svn copy https://sub.unidata.ucar.edu/idv/trunk https://sub.unidata.ucar.edu/idv/branches/IDV_<version>  -m "some info"
 
 where <version> is the version (e.g., 2.8).  "some info" is needed, otherwise the svn copy would
 require some EDITOR env. setting.
