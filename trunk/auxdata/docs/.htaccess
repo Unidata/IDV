@@ -1,3 +1,0 @@
-# the following will remove mod_layout header and footer formatting
-RemoveOutputFilter LAYOUT html htm php
-
