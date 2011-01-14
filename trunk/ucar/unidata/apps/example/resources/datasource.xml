@@ -1,0 +1,19 @@
+<?xml version="1.0"   encoding="ISO-8859-1"?>
+<datasources>
+
+  <datasource
+     id="ADDE.WXTEXT"
+     factory="ucar.unidata.apps.example.WxTextDataSource"
+     patterns="^adde://.*/wxtext.*"
+     fileselection="false"
+     label="ADDE Weather Text">
+<!--
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="textdisplay"/>
+-->
+  </datasource>
+</datasources>

@@ -1,0 +1,37 @@
+<html>
+<body width="500">
+
+<b><font color="green" size="+1"><center>
+How to Make an Interactive IDV Display of the U Component Of Wind<br>
+In an HTML Page</center></font></b>
+
+
+<b>The view window:</b>
+<br>
+
+<view id="uview1" props="size=300:300;">
+
+<p>
+
+<form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/%datetime%_%nwpmodel%.nc', 'u', 'planviewcontour', 'DefaultView=uview1;')">
+
+Date and Time:
+
+<select name="datetime">
+<option value="2002062800">28 Jun 2002 12Z</option>
+<option value="2002062812">28 Jun 2002 00Z</option>
+</select>
+
+NCEP Model:
+
+<select name="nwpmodel">
+<option value="ruc">RUC</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+</select>
+<p>
+
+<input type="submit" value="Create U display (plan view)">
+</form>
+
+

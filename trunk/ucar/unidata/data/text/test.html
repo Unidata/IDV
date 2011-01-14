@@ -1,0 +1,63 @@
+<view name="value"/>
+<p>
+<b>Displays:</b>
+<ul>
+<li>
+<a href="xidv:<idv><display datasource='dods://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/2002010718_avn-q.nc' param='T' type='surface'/></idv>">
+Isosurface T
+</a>
+<li>
+</ul>
+<a href="xidv:foo.xidv">
+
+<a href="idv:display(surface,T,test.nc)">
+
+
+
+<!-- The action on forms can contain macros of the form:
+%macroname%
+The names of the form inputs (e.g., "param") are used to do a string
+substition of the macros within the action.
+-->
+
+<form action="idv:<display datasource='%datasource%'
+param='%param%' type='%display%'/>">
+<table>
+<tr><td align=right>Data: </td><td> <input name=datasource value="
+dods://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/2002010718_avn-q.nc
+"></td>
+<tr><td align=right>Param:</td><td> 
+<input name="param" size=4>
+</td>
+<tr><td align=right>Display: </td><td>  
+<select name="display">
+<option value="profile"> Profile </option>
+<option value="surface"> Three-D Isosurface </option>
+<option value="planviewcontour"> Plan view- contour </option>
+<option value="planviewcolor"> Plan view- color </option>
+<option value="planviewflow"> Plan view- flow </option>
+<option value="contourxs"> Contour- cross section </option>
+<option value="contourcolor"> Contour- color </option>
+<option value="timeheight"> Timeheight </option>
+<option value="omni"> Omni </option>
+<option value="text"> Text </option>
+</select>
+</td>
+<tr><td align=right><input type="submit" value="Submit"></td>
+</table>
+</form>
+
+
+
+
+
+
+<h3>Zone forecast:</h3>
+<form action="idv:<display 
+datasource='adde://adde.ucar.edu/wxtext?apro=zfp&astn=%station%&day=2002010'
+param='' type='text'
+/>">
+Station: <input name="station" size=8> <input type="submit" value="Submit">
+</form>
+
+

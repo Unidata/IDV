@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel
+   layout="flow"
+   margin="4"
+   vspace="0"
+   hspace="2"
+   i:space="2"
+   i:width="5">
+  <button action="action:example.helloworld"/>
+</panel>

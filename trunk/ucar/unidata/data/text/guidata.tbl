@@ -1,0 +1,314 @@
+Observed_Data
+{
+	Surface_Hourlies|SFC_HRLY
+	Sounding_Data|SND_DATA
+	Synoptic_Data|SYN_DATA
+	Agriculture_Obs|AGRI_OBS
+	TAFs_Decoded|TAFS_DEC
+	RADAT|FZL_LVL
+}
+
+
+Public_Products
+{
+	Area_Fcst_Discussion|AREA_DISC
+	!State_Fcst_Discussion|STATE_DISC
+	State_Forecasts|STATE_FCST
+	Zone_Forecasts|ZONE_FCST
+	Local_Forecasts|LCL_FCST
+        Hazardous_Weather_Outlook|HZRD_WX_OTLK
+	Coded_Cities|CODED_CITY
+	Local_Storm_Reports|LCL_STRM_RPT
+	Record_Event_Statements|RECORD_RPT
+	Tabular_State_Forecasts|TBL_ST_FCST
+        Regional_Weather_Roundups|WX_RNDUP
+	Regional_Temp/Precip_Tables|REG_MX_MN_TM
+	Daily_Climo_Reports|DLY_CLIM_RPT
+	Monthly_Climo_Reports|MON_CLIM_RPT
+	NOW_casts|SHRT_TRM_FCT
+	Public_Info_Statement|PUB_INFO
+        Misc_Local_Statement|MIS_LCL_PROD
+        Alarm/Alert_Urgent_Message|ALM_ALRT_MSG
+}
+
+
+Pt_Fcst_Products
+{
+	Revised_Digital_Forecasts|DIGITAL_FCST
+        Point_Forecast_Matrices|PT_FCST
+        Area_Forecast_Matrices|AREA_MATRX
+}
+
+
+Watches/Warnings
+{
+	Severe_Thunderstorm_Warning|SVR_STORM
+	Tornado_Warning|TORN_WARN
+	Winter_Weather_Warning|WINTER_WWA
+	Severe_Local_Storms|LCL_STM_AREA
+	Watch_County_Notif|WTCH_CNTY
+	Non_Precipitating_Warning|NOPREC_WWA
+	Severe_Weather_Statements|SVR_WX_STAT
+	Special_Weather_Statements|SPCL_WX_STAT
+	State_Weather_Summaries|REG_WX_SUMM
+	Hurricane_Local_Statements|HURR_LOCAL
+}
+
+
+SPC_Products
+{
+	Day_1_Outlook|DAY_1
+	Day_2_Outlook|DAY_2
+	Day_3_Outlook|DAY_3
+	Meso_Discussions|MESO_DISC
+	Current_Svr_Tstm_Torn_Watches|WATCH_BOX
+	All_Svr_Tstm_Torn_Watches|ALL_WBOX
+	Watch_without_disc|WATCH_NDSC
+	Watch_County_List_SEV|WATCH_SEV
+	Watch_Summary_SEVMKC|WATCH_SEVMK
+	Status_Reports|STATUS
+	Severe_Wx_Summary|SVR_WX_SUMM
+	Public_Outlook|PUBLIC_OUT
+        Fire_Day_1_Otlk|FIRE_1
+        Fire_Day_2_Otlk|FIRE_2
+        Day_1_Outlook_Points|DAY_1_PT
+        Day_2_Outlook_Points|DAY_2_PT
+        Day_3_Outlook_Points|DAY_3_PT
+        Hourly_Statistics|STA_HRY
+        Daily_Statistics|STA_DTS
+	Watch_Outline_Update|WOU
+}
+
+
+NHC_Products
+{
+        Outlooks|HCNOLK
+        Hurricane_Discussions|HCNDSC
+        Public_Bulletins|HCNPUB
+        Marine_Bulletins|HCNMAR
+        Model_Forecasts|HCNMDL
+        Recon_Flights|RECON
+        Tropical_Discussions|TRPDSC
+        Strike_Probabilities|STRKPB
+}
+
+
+Tropical_Pacific
+{
+	Tropical_Wx_Outlook_&_Summary|TROP_OLK_SUM
+	Tropical_Weather_Summary|TROP_WX_SUMM
+	Tropical_Weather_Discussion|TROP_DISC
+	Mar/Avn_Trop_Cyclone_Advisory|TROP_MAR_ADV
+	Public_Trop_Cyclone_Advisory|TROP_PUB_ADV
+	Tropical_Cyclone_Discussion|TROP_CY_DISC
+	Trop_Cyclone_Pos_Estimate|TROP_POS_EST
+	Tropical_Cyclone_Update|TROP_CY_UPDT
+	Unnum_Depr_&_Susp_Area_Adv|UNNUM_DPRSN
+}
+
+
+Recon_CARCAH
+{
+        (-----PLAN_OF_THE_DAY-----)|XX
+        POD|POD
+        (-----ATLANTIC-----)|XX
+        RECCO_non-tropical|RECCO_OBS_NT
+        RECCO|RECCO_OBS
+        Vortex_Message|VORTEX_MES
+        Supp_Vortex_Message|SUPP_VORTEX
+        Dropsonde_data|DROPS
+        (-----PACIFIC-----)|XX
+        RECCO_non-tropical|RECCO_PAC_NT
+        RECCO|RECCO_PAC
+        Vortex_Message|PVORTEX_MES
+        Supp_Vortex_Message|PSUPP_VORTEX
+        Dropsonde_data|PDROPS
+        Dropsonde_data_WPAC|WPDROPS
+        (-----NOAA_SPECIFIC-----)|XX
+        P-3_ASDL_Atlantic|P3_AASDL
+        P-3_ASDL_Pacific|P3_PASDL
+}
+
+
+Flash_Flood
+{
+	FF_Guidance|FLSHFLD_GUID
+	Satellite_Precip_Estimates|SAT_EST
+	Flash_Flood_Watch|FLSHFLD_WTCH
+	Flash_Flood_Warning|FLSHFLD_WARN
+	Flash_Flood_Statements|FLSHFLD_STAT
+	Flood_Statements|FLOOD_STAT
+	Flood_Warning|FLOOD_WARN
+	National_Flood_Summary|NATL_FLD_SUM
+        Local_River_Statement|RVR_STATEMNT
+        Rainfall_Rate_Part1| HYDRO_RR1
+        Rainfall_Rate_Part2| HYDRO_RR2
+        Rainfall_Rate_Part3| HYDRO_RR3
+        Rainfall_Rate_Part4| HYDRO_RR4
+        Rainfall_Rate_Part5| HYDRO_RR5
+        Rainfall_Rate_Part6| HYDRO_RR6
+        Rainfall_Rate_Part7| HYDRO_RR7
+        Rainfall_Rate_Part8| HYDRO_RR8
+        Rainfall_Rate_Part9| HYDRO_RR9
+        Rainfall_Rate_AHOS | HYDRO_RRA
+        Rainfall_Misc_Data | HYDRO_RRM
+}
+
+
+Marine
+{
+	Coastal_Forecasts|CSTL_FCST
+	Offshore_Forecasts|OFFSH_FCST
+	High_Seas_Forecasts|HI_SEAS_FCST
+	Marine_Interpretation_Message|SEA_INTERP
+	Special_Marine_Warnings|SPCL_MAR_WRN
+        Coastal_Flood_Watch|CSTL_FLOOD
+	Marine_Weather_Statements|SEA_WX_STAT
+	Coast_Guard_Data|CGUARD_DATA
+	Plain_Language_Ship_Reports|SHP_PLAIN
+	Other_Marine_Reports|OTHR_MARS
+	Marine_Wind_Wave_Guidance|TDL_MAR_PROD
+}
+
+
+Aviation_Forecasts
+{
+	Area_Forecasts|AV8_AREA
+	TAFs|TAFS
+	Convective_SIGMETS|CONV_SIG
+	International_SIGMETS|INTL_SIG
+	SIGMETS|SIGMETS
+	AIRMETS|AIRMETS
+	Offshore_Area_Forecasts|OFFSH_AREA
+	CWA|CWA
+	Met_Impact_Statements|MIS
+}
+
+
+MOS
+{
+	NGM_MOS|NGM_MOS
+	ETA_MOS|ETA_MOS
+	GFS_MOS|GFS_MOS
+	GFSX_MOS|GFSX_MOS
+	NGM_GUID|NGM_GUID
+	ETA_GUID|ETA_GUID
+	MARINE_MOS|MARINE_MOS
+}
+
+
+HPC_Products
+{
+	Extended_Prelim|EXTENDP_DISC
+	Extended_Final|EXTEND_DISC
+	Basic_Wx|PROG_DISC
+	QPF|QPF_DISC
+	Excessive_Rain|EXRAIN_DISC
+	Heavy_Snow|HVYSNOW_DISC
+	Coded_Front_Fcst|BAWX_COD
+	Coded_Front_Anl|SFC_COD
+	Hawaii_Discussion|HAWAII_DISC
+	S_Amer_Discussion|SAM_DISC
+	Caribbean_Discussion|CRB_DISC
+	SDM_Messages|SDM_MSG
+	International_Messages|INTL_MSG
+	Storm_Summaries|STORM_SUM
+	Model_Diag_Discussion|MODEL_BIAS
+	Travelers|TRVL_FCT_TBL
+	Selected_Cities|SELECT_CITY
+}
+
+
+HPC_Heat_Index
+{
+	Mean_Heat_Index|HEAT_MEAN
+	Max_Heat_Index|HEAT_MAX
+	Min_Heat_Index|HEAT_MIN
+}
+
+
+CPC_Products
+{
+	6-10_Day_Discussion|NRTV_610
+	6-10_Day_Forecast|FCST_610
+	30_Day_Forecast|NRTV_30
+	90_Day_Forecast|NRTV_90
+	Hawaiian_30/90_Day_Forecast|HAWAII_3090
+	Threats_Assessment_Discussion|THREATS_PROG
+	US_Drought_Monitor_Analysis|DROUGHT_MON
+	UVI|UV_INDEX
+}
+
+Volcano_Products
+{
+	Volcano_Warnings|VOLCNO_SIG
+	Volcanic_Ash_Advisory|VOLCANO
+	Volcanic_Ash_Forecast|VLC_FCST
+}
+
+Fire_Weather_Products
+{
+	Fire_Wx_Forecasts|ROUT_FIRE_WX
+	Red_Flag_Warn/Fire_Wx_Watch|FIRE_RED_FLG
+        Fire_FWM|FIRE_NOTIF
+        Rangeland_Fire_Discussion|RNGLND_DNGR
+	SPC_DAY_1|FWDDY1
+	SPC_DAY_2|FWDDY2
+}
+
+Admin_Messages
+{
+        Alarm/Alert_Admin_Message|ALM_ALRT_MSG
+        Alert_Admin_Message|ALRT_ADMIN
+        NWS_Ext_Admin_Message|NWS_ADMIN
+        Admin_Alert_NORCPT|ALRT_NORCPT
+        Administrator|ADMINISTRTR
+        Forensic_reports|FORENSIC
+        Radar_free_text_messages|RADAR_FTM
+}
+
+SEISMIC/TSUNAMI
+{
+        Tsunami_Watch/Warning|TSUNAMI
+        Earthquake/Tsunami_Messages|SEISMIC
+}
+
+Agricultural_Products
+{
+        Agriculture_Forecast|AG_AGF
+        Agriculture_Observations|AGRI_OBS
+        Land_management_Forecasts|AG_FWL
+        Special_Agri_Wx_Fcst|AG_SAF
+        Weekly_Weather_and_Crop_Rpt|AG_WCR
+        Weekly_Data_for_Agriculture|AG_WDA
+}
+
+Air_Quality
+{
+        Air_Quality_Index_Statement|AQ_AQI
+        Air_Stagnation_Guidance_Narr|AQ_APG
+        Air_Stagnation_Advisory|AQ_ASA
+}
+
+Avalanche_Products
+{
+        Avalanche_Watch|AV_AVA
+        Avalanche_Warning|AV_AVW
+        Avalanche_Verification|AV_AVM
+        Snow_Avalanche_Bulletin|AV_SAB
+        Snow_Avalanche_Guidance|AV_SAG
+        Est_Snow_Water_Equivalent|AV_SWE
+        Winter_Weather_Bulletins|WINTER_WWA
+}
+
+Outlook_Products
+{
+        Local_Average_6_to_10_Day|OUT_EOL
+        National_Average_6_to_10_Day|OUT_EON
+        Hazardous_Weather_Outlook|HZRD_WX_OTLK
+}
+
+Precipitation_Products
+{
+        Mean_Areal_Precip|MAP
+}

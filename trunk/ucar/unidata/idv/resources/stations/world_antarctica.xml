@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Antarctica" category="World locations">
+<stn name="Adelie Land " lat="66:30:S" lon="139:00:E"/>
+<stn name="Alexander Island" lat="71:00:S" lon="70:00:W"/>
+<stn name="Balleny Islands" lat="67:00:S" lon="163:00:E"/>
+<stn name="Berkner Island" lat="79:30:S" lon="49:30:W"/>
+<stn name="Deception Island" lat="62:56:S" lon="60:34:W"/>
+<stn name="Ellsworth Land " lat="75:00:S" lon="92:00:W"/>
+<stn name="Graham Land " lat="65:00:S" lon="64:00:W"/>
+<stn name="Marie Byrd Land " lat="77:00:S" lon="130:00:W"/>
+<stn name="Peter I Island" lat="68:48:S" lon="90:35:W"/>
+<stn name="Queen Maud Land " lat="73:30:S" lon="12:00:E"/>
+<stn name="Roosevelt Island" lat="79:30:S" lon="162:00:W"/>
+<stn name="Ross Dependency " lat="80:00:S" lon="180:00:E"/>
+<stn name="Ross Island" lat="81:30:S" lon="175:00:W"/>
+<stn name="Ross Sea" lat="76:00:S" lon="175:00:W"/>
+<stn name="Scott Island" lat="67:24:S" lon="179:55:W"/>
+<stn name="South Orkney Islands" lat="61:00:S" lon="45:00:W"/>
+<stn name="South Shetland Islands" lat="62:00:S" lon="59:00:W"/>
+<stn name="Terre Adelie " lat="66:30:S" lon="139:00:E"/>
+<stn name="Thurston Island" lat="72:20:S" lon="99:00:W"/>
+<stn name="Victoria Land " lat="72:00:S" lon="155:00:E"/>
+<stn name="Wilkes Land " lat="71:00:S" lon="120:00:E"/>
+</stationtable>

@@ -1,0 +1,114 @@
+<title>More on the Layout Model Editor</title>
+
+[ht::desc More on the Layout Model Editor]
+
+<div class="overview">
+Let's find out why there isn't anything displayed.
+</div>
+
+
+
+<ol class="step">
+  
+  <li>Bring up the [ht::filename Workshop] layout model again.
+      
+  <ul class="substep">
+    
+    <li>From the [ht::display Point Data Plot] display control window
+       click on the edit image: [ht::img %dotpath%images/edit.gif].</li>
+    
+    <li>Bring up the [ht::dialog Properties] dialog for the
+        symbol by right clicking on it and selecting the
+        [ht::menu {Properties...}] menu item.</li>
+    
+    <li>Note that the name of the parameter we are using is [ht::qt IDN].</li>
+    
+    <li>Press the [ht::button Cancel] button to close the dialog.</li>
+  </ul>
+  
+  <li>Now, back to the [ht::display Point Data Plot] control window let's
+      see what parameters are available in the data set.</li>
+  
+  <ul class="substep">
+    
+    <li>Normally we would do the following but the current version of the IDV does not support  it. Select the [ht::menu Help {Details...}] menu item to bring up the
+        [ht::dialog Display Control Details] window. This lists the
+        fields available in the data set.</li>
+    
+    <li> So instead, we will look at [ht::command Details] tab in the [ht::command Properties Dialog] for the Point Data Source.
+
+    <li>Note there is no [ht::param IDN] field. However, there is an
+        [ht::param   ID]  field in the data.</li>
+    
+    <li>Close the [ht::dialog Properties] window.</li>
+  </ul>
+  
+  <li>Once again,  back to the [ht::dialog Layout Model Editor].</li>
+  
+  <ul class="substep">
+    
+    <li>Bring up the [ht::dialog Properties] dialog for the symbol.</li>
+    
+    <li> Click on the <img src="DownDown.gif"> button to bring up the list of 
+    all parameter names. Look for and select the  [ht::qt ID] parameter under the point data.
+<p>
+    <popup label="A note on the data source name">
+As an aside notice the really long name for the data source. 
+Its too late to change it in this menu but we could  change the name
+in the [ht::command Properties] dialog for the data source.
+</popup>
+
+</li>
+
+
+    <li>Aha! We were using the [ht::param IDN] when we should have been using
+        the [ht::param ID], the IACO Station ID.</li>
+    
+    <li>Select that parameter. Notice that the parameters can be a comma separated list.  Click the [ht::button OK] button and save
+        the layout model (select [ht::menu File Save]).</li>
+    
+    <li>You should now see the station identifiers  in the display.</li>
+  </ul>
+  
+  <li> Now, how do we handle the case where  
+we have lots of layout models for data that 
+has &quot;ID&quot; like fields and then we encounter data with some other
+field name, e.g., &quot;the_station_id&quot;? Do we go and change each and 
+every model?
+
+  </ul>
+
+
+
+</ul>
+
+<li> Now, let's spend some time in building some other layout models.
+
+<ul>
+<li>Start fresh. [ht::refresh]
+<li> Go to the CONUS projection with the [ht::menu Projections Set US CONUS] menu item.
+<li> Load in US city locations with the [ht::menu Displays Locations {US} {U.S. Cities}] menu item.
+<li> Select the [ht::button Layout Model] button.
+<li> Edit the [ht::command Location] layout model.
+<li> Try adding a [ht::command Shape] shape.
+<li> Select some shape and press [ht::button Apply]
+<li> The location has a [ht::param pop] attribute. Try scaling the shape this value. 
+<ul>
+<li> Go to the [ht::command Scale Size By] tab in the [ht::dialog Properties Dialog]
+<li> Enter [ht::param pop] for the parameter.
+<li> In [ht::command Data Range] enter 1000000 in the second field.
+<li> Enter some scale range. e.g., 0.5-5.0
+<li> Press [ht::button Apply]
+</ul>
+
+<li> Try doing a color by [ht::param pop]
+</ul>
+
+
+
+
+
+</ol>
+
+
+

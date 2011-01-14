@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<skin mainwindow="false" embedded="true">
+  <ui>
+     <panel 	    layout="border">
+        <panel embeddednode="true" layout="inset" place="Center" space="5">
+            ${contents}
+        </panel>
+        <panel layout="wrap" place="South">
+            <button label="Close" action="action:ui.closewindow"/>
+        </panel>
+     </panel>
+  </ui>
+</skin>

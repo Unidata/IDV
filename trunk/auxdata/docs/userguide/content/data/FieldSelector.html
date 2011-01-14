@@ -1,0 +1,172 @@
+<html><head>
+  <title>The Field Selector</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>                  
+<body>
+
+<%nochildlist%>
+
+The Field Selector is used to  list the loaded data sources, view
+their available fields, subset (time and space) the field
+and create displays. This is normally embedded in the Dashboard but
+multiple Field Selectors can be shown with the 
+[ug::menu File New {Field Selector Window}] menu.
+
+[ht::cimg images/FieldSelectorWindow.gif {Field Selector Window}]
+
+
+
+
+
+<subhead intoc="false" id="overview">Overview</subhead>
+After <a href="choosers/index.html">choosing</a> some data
+creating a display is just a couple of steps away:
+<ol>
+
+
+[ug::step {Click on the data source of interest in the Data Sources list:} images/SelectorStep1.gif]
+
+[ug::step {Select the field you want to display:}  images/SelectorStep2.gif]
+
+
+[ug::step {Select the display type:}  images/SelectorStep3.gif]
+
+[ug::step {Optionally subset the times by clicking off the Use Default button and selecting the times:}  images/SelectorStep4.gif]
+
+
+[ug::step {For grids, optionally subset the levels and/or spatial area:} images/SelectorStep5.gif]
+
+[ug::step {Press &quot;Create Display&quot;:} images/SelectorStep6.gif]
+
+</ol>
+
+
+<subhead intoc="false" id="datasources">Data Sources</subhead>
+
+The left panel shows <b>Data Sources</b>, chosen as described in 
+<a href="choosers/index.html">Choosing Data Sources</a>.
+You can right click on a data source in the list to show a popup menu:
+
+[ht::cimg images/DataSourceMenu.gif {Data Source Popup Menu}]
+
+This allows you to Remove the data source (also by pressing the Delete key),
+reload its data, show its <a href="DataSourceProperties.html">Properties window</a>,
+etc.
+<p>
+The [ug::menu {Save as Quick Link}] item will save this data source
+off as a <i>favorite</i> and make it available in the &quot;Favorite Data Sources&quot;
+tab of the Quick Links tab of the Dashboard.
+
+
+<subhead intoc="false" id="fields">Fields</subhead>
+
+Selecting a data source in the left panel will list the 
+available fields  in the <b>Fields</b> tree. 
+This list is usually hierarchical showing
+different categories of fields (e.g., 2D grids, 3D grids, image 
+sequences, etc.).
+To see the fields under a particular category
+click on the toggle icon <img src="images/TreeTagClosed.gif">.
+
+<p>
+
+Selecting a field will show the list of displays available
+in the <b>Displays</b> list and subsetting  information
+(e.g., times, spatial subset).
+
+
+<subhead intoc="false" id="subsetting">Subsetting</subhead>
+
+The &quot;Subsetting&quot; component of the Field Selector
+allows you to subset the data in both time and space (if possible).
+If there are times in the data source you are viewing they
+will be shown in this area. Likewise, if it is possible
+to do spatial subsetting or decimation a  &quot;Spatial Subset&quot;
+tab will be shown.
+
+<p>
+Time and spatial subsetting defaults can be applied to the data source
+itself through the <a href="DataSourceProperties.html">Data Source Properties</a>
+dialog or the defaults can be overwritten through the Field
+Selector window.
+
+
+<subhead intoc="false" id="displays">Creating Displays</subhead>
+
+The <b>Display</b> tree shows a hierarchical  list of the available
+displays for a particular field.
+Click on the type of display you want from the choices listed in the
+<b>Displays</b> tree. You can see examples of 
+<a href="../examples/index.html">Display Types</a> in this Users Guide.
+
+<p>
+
+You can select two or more displays (different display types) at
+one time. For an additional display, hold down the CTRL key and click on
+the second display type desired. Then go ahead and create the display
+as normal; all selected displays will be made.
+To make the display click on the button <b>Create display</b>(or double click
+on the display).
+
+
+<subhead  intoc="false" id="derivedparms">Derived Parameters</subhead>
+
+The IDV provides <b>derived parameters</b> -- 
+parameters not provided by the original source data, but made from 
+the source data with computations by the IDV.  The intent
+is to provide commonly used fields such as dewpoint  when
+dewpoint is not provided by the data source, but when it can be derived
+from source data such as humidity and temperature.
+
+<p>
+
+These automatic derived parameters are offered when the
+required data to compute them are available, based on parameter
+names.
+
+<p>
+
+Since few data sets use  the same names for parameters,
+the IDV keeps of a list of "aliases" or particular parameter names
+that match with "canonical" names which are generally understood by
+all IDV users and which the IDV uses for computations.
+You can add your special parameter names to the list of aliases.
+Read the <a href="../tools/AliasEditor.html">Parameter Alias</a> section
+in this guide for information on using that facility.
+
+<p>
+
+All needed source parameters for one derived parameter must
+come from one single data source, for example, from one single
+netCDF file. The IDV attempts to find derived parameters that can
+be made from data in each data source in the data source panel, but not from
+all possible combination of data sources.
+If you had separate files of u and v wind components, 
+for example, the parameter names or aliases will not
+create Derived wind vectors.
+
+
+
+<subhead  intoc="false" id="formula">Formula Data Source</subhead>
+
+You can create your own formulas
+using  the <a href="../tools/Formulas.html">IDV Formulas</a> facility.
+The <b>Formulas</b> data source in the Field Selector is a special
+data source and lists all of the available end user formulas.
+You can right-click on the data source to create new formulas 
+and  import and export formulas. The formulas are listed in the Fields
+tree.  Right clicking on one of the formulas listed in the Fields tree
+allows you to edit, copy or evaluate the formula.
+
+<p>
+You can select a formula just like any other field and create a display
+from it. However, the formula, when evaluated to create the display,
+usually  needs one or more other data fields to act on. In this case 
+a special Field Selector window is shown that allows the user to
+select the fields for the formula. (Note: the fields you select here
+can also be formula fields resulting in further field selection).
+
+
+</body>
+
+

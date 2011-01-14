@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<backgroundwms>
+
+  <image file="/auxdata/images/bluemarble2.jpg"
+         layer="fixed-bluemarble"
+         title="Blue Marble - Static"/>
+
+  <wms
+     server="http://neowms.sci.gsfc.nasa.gov/wms/wms"
+     layer="BlueMarbleNG"
+     title="Blue Marble - Dynamic"
+     srs="CRS:84"
+     format="image/png"
+     version="1.3.0"
+     bbox="90,-180,-90,180"/>
+
+
+  <image file="/auxdata/images/bathymetrytopo.jpg"
+         layer="fixed-bathymetrytopo"
+         title="Bathymetry/Topography - Static"/>
+
+
+  <image file="/auxdata/images/ssectopo.gif"
+         layer="fixed-ssectopo"
+         title="World Topography - Static"/>
+
+
+  <image file="/auxdata/images/Day.jpg"
+         layer="fixed-day"
+         title="World Day - Static"/>
+
+  <image file="/auxdata/images/earthlights.jpg"
+         layer="fixed-earthlights"
+         title="Lights - Static"/>
+
+
+  <image file="/auxdata/images/usgstopo.jpg"
+         layer="fixed-usgstopo"
+         title="USGS Topography - Static"/>
+
+
+  <image file="/auxdata/images/caida.jpg"
+         layer="fixed-caida"
+         title="Topography/Political - Static"/>
+
+
+  <image file="/auxdata/images/biosphere.jpg"
+         layer="fixed-biosphere"
+         title="Biosphere - Static"/>
+
+
+
+
+  <image file="/auxdata/images/landseamask.png"
+         layer="fixed-landseamask"
+         title="Land/Sea Mask - Static"/>
+
+  <image file="/auxdata/images/landmask.png"
+         layer="fixed-landmask"
+         title="Land Mask - Static"/>
+
+  <image file="/auxdata/images/seamask.png"
+         layer="fixed-seamask"
+         title="Sea Mask - Static"/>
+
+<!--
+  <image file="/auxdata/images/Topography.jpg"
+         layer="fixed-topography"
+         title="World Topography - Static"/>
+
+  <image file="/auxdata/images/ndvi.jpg"
+         layer="fixed-ndvi"
+         title="World NDVI - Static"/>
+
+  <image file="/auxdata/images/BigEarth.jpg"
+         layer="fixed-bigearth"
+         title="World Big Earth - Static"/>
+
+  <image file="/auxdata/images/Earth.EOSVid.jpg"
+         layer="fixed-eosvid"
+         title="World Earth.EOSVid - Static"/>
+
+  <image file="/auxdata/images/PathfinderMap.jpg"
+         layer="fixed-pathfinder"
+         title="World Pathfinder - Static"/>
+
+  <image file="/auxdata/images/etopo-land.png"
+         layer="fixed-etopoland"
+         title="World Etopo Land - Static"/>
+-->
+
+
+  <wms
+     server="http://cwcgom.aoml.noaa.gov/erddap/wms/request"
+     layer="etopo180:altitude"
+     title="Global Topography - Dynamic"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.3.0"
+     bbox="90,-180,-90,180"/>
+
+
+  <wms
+     server="http://msrmaps.com/ogcmap.ashx"
+     layer="DRG"
+     title="Topographic Map"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+  <wms
+     server="http://msrmaps.com/ogcmap.ashx"
+     layer="DOQ"
+     title="Digital Ortho-Quad"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+  <wms
+     server="http://toposervices.cr.usgs.gov/wmsconnector/com.esri.wms.Esrimap/USGS_EDNA_geo"
+     layer="SRTM_2000_SHADEDRELIEF"
+     title="Shaded Relief"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="49.99997399808, -125.0, 23.99999999808, -65.99561456"/>
+
+  <wms
+     server="http://msrmaps.com/ogcmap.ashx"
+     layer="UrbanArea"
+     title="Urban Area"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+
+  <image file="/auxdata/images/blue.jpg"
+         layer="fixed-solid-blue"
+         title="Solid Blue"/>
+
+  <image file="/auxdata/images/lightblue.jpg"
+         layer="fixed-solid-lightblue"
+         title="Solid Light Blue"/>
+
+  <image file="/auxdata/images/white.jpg"
+         layer="fixed-solid-white"
+         title="Solid White"/>
+
+  <image file="/auxdata/images/green.jpg"
+         layer="fixed-solid-green"
+         title="Solid Green"/>
+
+</backgroundwms>

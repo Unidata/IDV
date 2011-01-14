@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>Storm Tracks</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV can display tropical storm track data from the ATCF FTP database.
+</div>
+
+<p>
+
+
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load in the ATCF data and create the Storm Track display.
+    <ul>
+    <li> Normally selecting [ht::menu Data Special {ATCF Data}] will load in a data source with a predefined
+    path to the National Hurricane Center ftp site.
+    <li> But, for stability and speed in the workshop we copied over the data for 2008 and 2007 to our ftp site so...
+    <li> In the URL chooser type in:<br><i>ftp://ftp.unidata.ucar.edu/pub/idv/data/atcf/</i>
+    <li>Under [ht::command Data Sources of Type] select &quot;ATCF Tropical Storm Data&quot; (hint: click in the pull-down box and enter an 'a').
+    <li> Load in the data source.
+    <li> Create a [ht::display Storm Track] display.
+    </ul>
+
+    <li> Choose [ht::menu 2008 {Basin:AL} IKE] and select [ht::button Load Tracks]
+    <li> Note the huge number of forecasts. We want to pare this list down.
+    <ul>
+    <li> Bring up the Properties dialog for the display. ([ht::menu Edit Properties] menu).
+    <li> In the &quot;Techs to use&quot; tab select all of the Techs in the &quot;Use&quot; list. Click and press control-a.
+    <li> Press [ht::button Remove].
+    <li> Select a number of Techs in the &quot;Don't use&quot; list and press [ht::button Add]. Make sure you include  GFDL and HWRF in your selection.
+    <li> Apply these selections  by pressing [ht::button OK].
+    </ul>
+    <li> Turn on the [ht::button Forecasts] checkbox to show the forecast tracks.
+    <li> Note, the forecasts  tracks are showing forecast hours which results in a complicated display. Turn this off by selecting a &quot;None&quot; for the  Points Layout model.
+    <li> Turn off all but one Forecast and set the [ht::command Animation Mode] to &quot;Off&quot;.
+    <li> Let's look at charting the forecasts.
+    <ul>
+    <li> In the [ht::command Storm Chart] tab select GFDL and HWRF and Observation in the Techs list.
+    <li> Select one of the later times, e.g., 2008-09-10.
+    <li> Select both [ht::button Min Pressure] and [ht::button Max Windspeed].
+    <li> Turn on [ht::button Use Difference].
+    </ul>
+
+</ol>
+
+</body>
+</html>

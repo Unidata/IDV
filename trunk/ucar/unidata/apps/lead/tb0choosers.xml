@@ -1,0 +1,141 @@
+
+<!-- 
+
+Specifies which data choosers appear in the IDV "Data source selection" widget.
+
+The format  of the xml is:
+<choosers>
+     entries*
+</choosers>
+
+Where entries can be:
+<chooser chooser_attributes />
+
+<tabbedpane>
+    entries*
+</tabbedpane>
+
+<panel layout="vbox:hbox:border">
+   entries*
+</panel>
+
+<label text="label test" />
+
+
+All entries can have a title attribute. If defined and
+if the entry is part of a tabbed pane (the default top level 
+container is a tabbed pane) this is the title of the tab.
+
+If the container of the entry is a panel and the layout of the panel
+is border then a quadrant attribute can be specified:
+quadrant="North|South|East|West|Center"
+to determine the placement.
+
+
+The  chooser_attributes are:
+
+class="..."  required. IdvChooser class. e.g., ucar.unidata.idv.chooser.FileChooser
+
+id="..." can be used to uniquely identify a chooser. So for example,
+if you had more than one url choosers each one can have an id. Any preference
+values are saved using this id.
+
+Attributes
+for FileChooser: 
+	path="default file system path" 
+	filters="semi colon delimited list of file patterns. See unidata.util.PatternFileFilter"
+
+for UrlChooser:
+	url_label="the label to be used in front of the text field"
+
+-->
+
+
+<choosers>
+
+
+<!--
+This is an example of how one would add in a chooser into the gui.
+By default if you include an xml file this in your metapps directory:
+~/.metapps/DefaultIdv/choosers.xml
+the Idv will include this in the chooser ui. 
+This is inclusive so whatever is in your own file will be added to
+the chooser ui components that is in the system file. So, you should remove
+everything except what you want to add.
+
+
+    <chooser title="Skeleton test"    class="ucar.unidata.idv.chooser.SkeletonChooser" />
+
+If you want to override the default choosers and *just* use  your  own then look at the
+resource bundle file:
+~/.metapps/DefaultIdv/idv.rbi
+
+This file allows you to override the resources that are read in. Add in an entry like:
+
+
+  <resources name="application.resource.choosers" loadmore="false">
+        <resource location="%USERPATH%/choosers.xml" /> 
+  </resources>
+
+The loadmore="false" tells the Idv not to load in any system resources.
+-->
+
+
+
+<!--
+
+    <panel title="Files/URLs" layout="gridbag" cols="1" rowheights="0,0,1" vspace="6" colwidths="1" >
+      <chooser border="titled" border_title="Files" class="ucar.unidata.idv.chooser.FileChooser"  title="Files"/>
+      <chooser border="titled" border_title="URL"  class="ucar.unidata.idv.chooser.UrlChooser" anchor="nw" title="URLS"/>
+      <filler/>
+    </panel>
+
+
+-->
+
+
+
+
+    <chooser title="Cataloged Data"    class="ucar.unidata.idv.chooser.XmlChooser" />
+
+<!--
+    <chooser title="Image Data"      class="ucar.unidata.idv.chooser.ImageChooser" />
+    <tabbedpane  title="Radar Data">
+        <chooser title="Level III Radar Data"  class="ucar.unidata.idv.chooser.RadarChooser" />
+        <chooser title="Level II Radar Data"   class="ucar.unidata.idv.chooser.Level2RadarChooser" />
+    </tabbedpane>
+    <chooser title="Point Data"      class="ucar.unidata.idv.chooser.PointChooser" />
+    <tabbedpane  title="RAOB Data">
+      <tabbedpane  title="Sounding Data">
+        <chooser title="From ADDE Server"      class="ucar.unidata.idv.chooser.RaobChooser" showserver="true"/>
+        <chooser title="From File System"      class="ucar.unidata.idv.chooser.RaobChooser" showserver="false"/>
+      </tabbedpane>
+      <chooser title="Single Level Data"      class="ucar.unidata.idv.chooser.RaobPointChooser" showserver="true"/>
+    </tabbedpane>
+    <chooser title="Profiler Data"        class="ucar.unidata.idv.chooser.ProfilerChooser" />
+
+-->
+    <!--
+    <chooser title="ADDE Images"      class="ucar.unidata.idv.chooser.McidasImageChooser" />
+    -->
+
+    <!--
+     <tabbedpane  title="Test" tabplace="LEFT">
+        <chooser title="Test Catalog ref"      class="ucar.unidata.idv.chooser.XmlChooser" 
+	     url="/ucar/unidata/idv/chooser/catalogref.xml"/>
+
+        <chooser title="Menu"      class="ucar.unidata.idv.chooser.XmlChooser" 
+	     url="/ucar/unidata/idv/resources/defaultmenu.xml"/>
+
+        <chooser title="Catalog 0.4"      class="ucar.unidata.idv.chooser.XmlChooser" 
+	     url="/ucar/unidata/idv/chooser/catalog4.xml"/>
+
+        <chooser title="Catalog 0.6"      class="ucar.unidata.idv.chooser.XmlChooser" 
+	     url="/ucar/unidata/idv/chooser/catalog6.xml"/>
+
+        <chooser title="Dataset gui"      class="ucar.unidata.idv.chooser.XmlChooser" 
+         	     url="/ucar/unidata/idv/chooser/radarchooser.xml"/>
+    </tabbedpane>
+    -->
+
+</choosers>

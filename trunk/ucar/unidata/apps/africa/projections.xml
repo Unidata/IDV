@@ -1,0 +1,22 @@
+<object class="java.util.ArrayList">
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>8.951807142746558</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[Africa>Nigeria]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-2.083515186797591</double>
+            <double>8.378530214281216</double>
+            <double>19.987129472290707</double>
+            <double>25.625788954495913</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+</object>

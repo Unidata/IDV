@@ -1,0 +1,54 @@
+<BODY>
+
+<p>
+Provides support for hiding some of the complexity of the VisAD package.
+</p>
+
+<p>
+For the MetApps project, the most relevant top-level classes
+are probably {@link ucar.visad.display.DisplayAdapter},
+{@link ucar.visad.display.MapAdapter}, and {@link
+ucar.visad.display.DataAdapter}.
+Here's a simple example of their use (bold text is more important):
+
+<PRE>
+    import javax.swing.*;
+    <B>import ucar.visad.display.*;</B>
+    import visad.*;
+
+    public class MyTest
+    {
+        public static void main(String[] args)
+        {
+	    <B>private DisplayAdapter	display =
+		new DisplayAdapter(new DisplayImplJ3D("MyTest"));</B>
+	    <B>display.add(new XAxisScalarMap(xDataType, display));</B>
+	    <B>display.add(new YAxisScalarMap(yDataType, display));</B>
+	    <B>display.add(new ContourScalarMap(zDataType, display));</B>
+	    <B>display.add(new ConstantMapAdapter(-1, Display.ZAxis));</B>
+	    DataReferenceImpl	dataRef = new DataReferenceImpl("MyData");
+	    dataRef.setData(new MyData());
+	    <b>display.add(
+		new DataAdapter(
+		    display,
+		    dataRef,
+		    new RGBConstantMaps(Color.yellow)));</b>
+            JFrame    jframe = new JFrame("My Test");
+            <B>jframe.getContentPane().add(display.getComponent());</B>
+            jframe.pack();
+            jframe.setVisible(true);
+        }
+    }
+    ...
+</PRE>
+
+The above example creates a {@link ucar.visad.display.DisplayAdapter}
+from a VisAD {@link visad.DisplayImpl}.  It then adds to the adapted display
+the necessary {@link ucar.visad.display.ScalarMapAdapter}s and {@link
+ucar.visad.display.ConstantMapAdapter} to have contour lines of the
+data appear at Z = -1.	The data is then added to the display with
+a {@link ucar.visad.display.RGBConstantMaps} instance that
+causes the contour lines to appear in yellow.
+</P>
+
+</BODY>

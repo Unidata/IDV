@@ -1,0 +1,42 @@
+<maps>
+
+<map
+	category="China" 
+	source="/ucar/unidata/apps/sti/maps/chinacounty.shp"
+	description="China County Lines"
+	visible="false"
+	color="0x00CC00"
+	linewidth="1.0"
+	linestyle="0"
+/>
+
+<map
+	category="China" 
+	source="/ucar/unidata/apps/sti/maps/chinalake.shp"
+	description="China Lakes"
+	visible="false"
+	color="0x00CC00"
+	linewidth="1.0"
+	linestyle="0"
+/>
+
+<map
+	category="China" 
+	source="/ucar/unidata/apps/sti/maps/chinaprovince.shp"
+	description="China Province Boundary"
+	visible="false"
+	color="0x00CC00"
+	linewidth="1.0"
+	linestyle="0"
+/>
+
+<map
+	category="China" 
+	source="/ucar/unidata/apps/sti/maps/chinariver.shp"
+	description="China River"
+	visible="false"
+	color="0x00CC00"
+	linewidth="1.0"
+	linestyle="0"
+/>
+</maps>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+
+<!-- 
+<!DOCTYPE doc [
+<!ENTITY  % "threed"  "*-3D-*">
+]>
+
+<!ENTITY % twod  "*-2D-*">
+<!ENTITY % twodtime  "*-2D-TIME-*">
+<!ENTITY % threedtime  "*-3D-TIME-*">
+<!ENTITY % windvector  "*-windvector-*">
+-->
+
+
+
+<controls>
+  <control
+    categories="IMAGE-2D-TIME" 
+    class="ucar.unidata.idv.control.ImageSequenceControl" 
+    description="Image animation" 
+    id="imagesequence" 
+    label="Image animation" 
+    properties="windowVisible=true;displayName=Image animation;" />
+  <control
+    categories="*-2D-TIME-*" 
+    class="ucar.unidata.idv.control.TimeSeriesControl" 
+    valid="true"
+    description="Add a Time Series Display" 
+    id="timeseries" 
+    label="Time Series" 
+    properties="windowVisible=true;displayName=Time series;" />
+
+  <control
+    categories="IMAGE-2D-TIME" 
+    class="ucar.unidata.idv.control.RadarGridControl" 
+    description="Range rings and radials" 
+    canstandalone="true"
+    id="Range Rings" 
+    label="Range Rings" 
+    properties="displayName=Range Rings;" />
+
+  <control
+    categories="none" 
+    class="ucar.unidata.idv.control.RangeAndBearingControl" 
+    description="Range and Bearing between two points" 
+    id="rangeandbearing" 
+    canstandalone="true"
+    label="Range and Bearing" 
+    properties="displayName=Range and Bearing;windowVisible=true;" />
+
+  <control
+    categories="none" 
+    class="ucar.unidata.idv.control.StationLocationControl"
+    description="A display of station locations"
+    id="locationcontrol"
+    canstandalone="true"
+    label="Station locations" 
+    properties="displayName=Station locations;" />
+
+</controls>
+

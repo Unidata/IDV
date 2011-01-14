@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Profiler Sites" elevunit="meters" category="Weather">
+<!-- see NOAA Profiler Network Site Location Information  -->
+<!-- (Generated Wed Apr 09 19:06:48 GMT 2003) -->
+<!-- http://www.profiler.noaa.gov/jsp/npnSiteLocations.jsp -->
+<station idn="74630" id="AZCN5" name="Aztec" st="NM" co="US" lat="36.84" lon="-107.9" elev="1902"/>
+<station idn="74662" id="BLMM7" name="Bloomfield" st="MO" co="US" lat="36.88" lon="-89.97" elev="130"/>
+<station idn="74357" id="BLRW3" name="Blue River" st="WI" co="US" lat="43.22" lon="-90.53" elev="226"/>
+<station idn="70197" id="CENA2" name="Central" st="AK" co="US" lat="65.5" lon="-144.68" elev="259"/>
+<station idn="74550" id="CNMW7" name="Conway" st="MO" co="US" lat="37.52" lon="-92.7" elev="390"/>
+<station idn="74752" id="DQUA4" name="DeQueen" st="AR" co="US" lat="34.11" lon="-94.29" elev="195"/>
+<station idn="74440" id="FBYN1" name="Fairbury" st="NE" co="US" lat="40.08" lon="-97.31" elev="433"/>
+<station idn="70268" id="GNAA2" name="Glennallen" st="AK" co="US" lat="62.11" lon="-145.97" elev="564"/>
+<station idn="74530" id="GDAC2" name="Granada" st="CO" co="US" lat="37.77" lon="-102.17" elev="1155"/>
+<station idn="74546" id="HBRK1" name="Hillsboro" st="KS" co="US" lat="38.3" lon="-97.29" elev="447"/>
+<station idn="74648" id="HKLO2" name="Haskell" st="OK" co="US" lat="35.68" lon="-95.86" elev="219"/>
+<station idn="74541" id="HVLK1" name="Haviland" st="KS" co="US" lat="37.65" lon="-99.11" elev="648"/>
+<station idn="74735" id="JTNT2" name="Jayton" st="TX" co="US" lat="33.01" lon="-100.98" elev="707"/>
+<station idn="74647" id="LMNO2" name="Lamont" st="OK" co="US" lat="36.69" lon="-97.48" elev="306"/>
+<station idn="74551" id="LTHM7" name="Lathrop" st="MO" co="US" lat="39.57" lon="-94.18" elev="297"/>
+<station idn="72246" id="LDBT2" name="Ledbetter" st="TX" co="US" lat="30.09" lon="-96.78" elev="122"/>
+<station idn="74433" id="RWDN1" name="McCook" st="NE" co="US" lat="40.08" lon="-100.65" elev="800"/>
+<station idn="74431" id="MBWW4" name="Medicine Bow" st="WY" co="US" lat="41.9" lon="-106.18" elev="1997"/>
+<station idn="74437" id="MRRN1" name="Merriman" st="NE" co="US" lat="42.9" lon="-101.69" elev="991"/>
+<station idn="74445" id="NLGN1" name="Neligh" st="NE" co="US" lat="42.2" lon="-97.79" elev="524"/>
+<station idn="74542" id="NDSK1" name="Neodesha" st="KS" co="US" lat="37.3" lon="-95.6" elev="259"/>
+<station idn="74769" id="OKOM6" name="Okolona" st="MS" co="US" lat="34.08" lon="-88.86" elev="125"/>
+<station idn="74750" id="PATT2" name="Palestine" st="TX" co="US" lat="31.77" lon="-95.71" elev="119"/>
+<station idn="74533" id="PLTC2" name="Platteville" st="CO" co="US" lat="40.18" lon="-104.73" elev="1524"/>
+<station idn="74649" id="PRCO2" name="Purcell" st="OK" co="US" lat="34.97" lon="-97.51" elev="331"/>
+<station idn="74449" id="SLAI4" name="Slater" st="IA" co="US" lat="41.9" lon="-93.69" elev="315"/>
+<station idn="70252" id="TLKA2" name="Talkeetna" st="AK" co="US" lat="62.31" lon="-150.42" elev="137"/>
+<station idn="74731" id="TCUN5" name="Tucumcari" st="NM" co="US" lat="35.08" lon="-103.6" elev="1241"/>
+<station idn="74640" id="VCIO2" name="Vici" st="OK" co="US" lat="36.07" lon="-99.21" elev="648"/>
+<station idn="74629" id="WSMN5" name="White Sands" st="NM" co="US" lat="32.4" lon="-106.34" elev="1224"/>
+<station idn="74556" id="WNCI2" name="Winchester" st="IL" co="US" lat="39.65" lon="-90.48" elev="170"/>
+<station idn="74753" id="WNFL1" name="Winnfield" st="LA" co="US" lat="31.89" lon="-92.78" elev="93"/>
+<station idn="74466" id="WLCI3" name="Wolcott" st="IN" co="US" lat="40.81" lon="-87.05" elev="212"/>
+<station idn="74341" id="WDLM5" name="Wood Lake" st="MN" co="US" lat="44.67" lon="-95.44" elev="319"/>
+</stationtable>

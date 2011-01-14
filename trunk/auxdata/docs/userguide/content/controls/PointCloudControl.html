@@ -1,0 +1,44 @@
+{Point Cloud Control}
+
+
+
+{
+
+<meta name="jhid" value="idv.controls.pointcloudrender">
+
+The Point Cloud control displays point data as a set of colored points.  It is more efficient than the Point Data Plot control for showing
+the locations of a large number (e.g. millions) of points.  It does not do automatic spatial decluttering, but you can subset by data value
+and drawing a clip region. The control window contains three tabs. The first shows the point cloud control
+
+
+[ht::cimg images/PointCloudControlGui1.gif]
+
+
+The second shows the clipping control, it is a simplify version of draw control
+
+[ht::cimg images/PointCloudControlGui2.gif]
+
+The third tab shows the shape information of the clipping
+
+[ht::cimg images/PointCloudControlGui3.gif]
+
+}
+
+{{Color By}  {
+You can select a parameter in the data to use to color the points.
+}}
+
+[ug::colortable]
+
+{{Visible Range}  {
+You can set the range of data that is shown by clicking this button and changing the value in the pop up window.
+}}
+
+{{Point Size}  {
+You can change the size of the displayed points with the Point Size widget. Enter a point size and hit return.
+}}
+
+{{Clipping}  {
+You can enable clipping by clicking the checkbox and then clicking the Reload button to display the point cloud inside or outside the
+clipping boundary. The clipping boundary is set by using the drawing items in the Clipping tab.
+}}

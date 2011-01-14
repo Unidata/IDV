@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>Text (ASCII) Point Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+The IDV can read in point observation data in Comma Separated Value (CSV) form (as well as tab separated values and Excel xls files).
+</div>
+
+<p>
+<ul class="step">
+
+    <li> Here is an example file: <a target="_other" href="metar.csv.txt">metar.csv</a>.
+    The minimum data required by the IDV is time, latitude and longitude.
+
+    <li> Load the csv file in.
+    <ul>
+     <li> In the [ht::dialog Data Source Chooser] click on the
+         [ht::command Files] tab.
+     <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/point/].
+     <li> Select [ht::filename metar.csv] and press  [ht::button Add Source].
+     </ul>
+
+     <li> The Text Point Metadata Gui will pop up.    This allows you to define the metadata for the point data.
+
+
+[ht::cimg images/TextPointMetaDataGui.gif] 
+
+
+    <li>Using the Text Point Metadata Gui
+    <ul>
+    <li> At the top a number of the initial lines from the text data are shown.
+         The arrow buttons allow you to specify where the data starts. Skip the first line.
+
+    <li> For each column of text data there is a row that shows sample value and allows you to enter a name, unit, date format, missing
+        value and extra information. 
+
+    <li> We're going to skip the &quot;ROW&quot; parameter and define metadata for:<br>
+        &quot;Time &quot;,&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;T&quot;,
+        &quot;DIR&quot;,and &quot;SPD&quot;.
+
+    <li> Note that the time field spans two columns - year and time. The IDV needs to have the time in one column so we use:<br>
+<i>colspan="2"</i><br>
+This tells the IDV to concatenate columns 1 and 2 and treat them as a single column.
+
+    <li> Note: the unit for longitude is &quot;degrees_west&quot;
+   
+    <li> Enter the names and units as shown above.
+
+    <li> You can save these settings for future use.
+     <ul>
+       <li> 
+       Press the [ht::button Preferences] button and select  [ht::menu {Save Current}]. 
+       <li> Enter a name, e.g., &quot;workshop&quot;
+       <li> You can reapply these settings with the [ht::button Preferences] button.
+      </ul>
+
+     <li> When done press [ht::button OK]. You can also bring up this GUI in the Data Source Properties Dialog.
+
+    </ul>
+
+
+    <li> Create the [ht::display Point Data Plot] and change its layout model to &quot;METAR&quot;
+
+
+
+
+    <li> You can also add a special 2 line header to the top of your text file.
+ <pre>
+ (index) -> (Date,Time,Latitude,Longitude,T,DIR,SPD)
+  Time\[fmt="yyyy-MM-dd HH:mm:ss"\],Latitude\[unit="deg"\],Longitude\[unit="degrees west"\],T\[unit="celsius"\],
+        skip,DIR\[unit="deg"\],SPD\[unit="m/s"\]
+  2008-10-31, 14:00:00,36.773,98.670,9.0,43.0,320.0,1.5
+  2008-10-31, 14:00:00,30.317,97.767,16.7,43.0,0.0,0.0
+  2008-10-31, 14:00:00,34.398,96.148,13.0,43.0,0.0,0.0
+  2008-10-31, 14:00:00,28.973,95.863,17.0,43.0,60.0,1.5
+  2008-10-31, 14:00:00,45.150,89.150,8.0,43.0,310.0,2.6
+           .......
+ </pre>
+
+In the example above, the first line's structure is a VisAD type definition.
+The second line defines the formatting and units of the parameters.
+Starting the third line is the data section of this sample.
+There is more documentation in the <a target="_other" href="<%idv.website%>/docs/userguide/data/TextPointData.html">User Guide</a>.
+
+    <li> You can also create the data source plugin for your text file.
+      <ul>
+       <li>
+       Press the [ht::button Preferences] button and select  [ht::menu {Write Data Source Plugin}]. 
+       <li> Enter a name of type, e.g., &quot;workshopCSV&quot;, and a label, e.g., &quot;workshop csv&quot;, and click the [ht::button OK] button.
+
+          [ht::cimg images/TextPointDataSourceTypePlugin.gif]
+          
+       <li> Enter a plugin name,  e.g., &quot;workshop.jar&quot;,and check the install box, and click the [ht::button Write Plugin] button.
+
+          [ht::cimg images/TextPointPluginCreator.gif]
+          
+       <li> When the IDV is restarted, the  data type &quot;workshop csv&quot; is showing in the list.
+      </ul>
+</ul>
+
+</body>
+</html>

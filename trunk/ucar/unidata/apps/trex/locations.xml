@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtables>
+<stationtable category="TREX" name="Locations"  href="/ucar/unidata/apps/trex/data/cities.xml"/>
+<stationtable category="TREX" name="VOR"  href="/ucar/unidata/apps/trex/data/vor.xml"/>
+<stationtable category="TREX" name="Lidar, etc."  href="/ucar/unidata/apps/trex/data/sensors/sensors.xml"/>
+<stationtable category="TREX" name="Soil"  href="/ucar/unidata/apps/trex/data/sensors/soil.xml"/>
+<stationtable category="TREX" name="DRI"  href="/ucar/unidata/apps/trex/data/sensors/dri.xml"/>
+<stationtable category="TREX" name="Miscellaneous"  href="/ucar/unidata/apps/trex/data/sensors/misc.xml"/>
+<stationtable category="TREX" name="Hobos"  href="/ucar/unidata/apps/trex/data/sensors/hobos.xml"/>
+</stationtables>

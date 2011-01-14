@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-98.45856000000002</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[Kansas]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-102.51244800000002</double>
+                        <double>34.128288</double>
+                        <double>-94.40467200000002</double>
+                        <double>42.236064000000006</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+</object>

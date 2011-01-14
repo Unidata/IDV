@@ -1,0 +1,32 @@
+<html>
+<head>
+<tabtitle>Introduction</tabtitle>
+</head>
+
+<body>
+<h1 align="center">Welcome to the Simple IDV</h1>
+
+This version of the IDV has a simpler interface than the
+reference application.  It is designed to get you started with
+the IDV without exposing the myriad features available in
+the entire framework.
+
+Here are some quick links to get your started:<p>
+
+<ul>
+<li>Helpful tips on using the IDV are available through the
+<a href="jython:idv.getIdvUIManager().showHelpTips ()">Help Tips</a>
+<li>Load some sample displays from the 
+<a href="jython:idv.getIdvUIManager().showQuicklinksTab('Favorite Bundle');">Favorite Bundles</a> tab in the 
+Quick Links.
+<li>Choose from a variety of data sources using the
+<a href="jython:idv.showChooser()">Data Source Chooser</a>.
+</ul>
+
+When you feel comfortable with this simpler IDV, you can 
+move up to using the reference application to unleash the
+power of the IDV.
+</body>
+
+</html>
+

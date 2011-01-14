@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>Level II Isosurface Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>This IDV display shows isosurfaces of WSR-88D Level II volume scans.
+</p>
+</div>
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<ol class="step">
+
+<li>[ht::clearDisplays]
+
+<li>If you have not already done so, select one time from the data source. 
+  <ul class="substep">
+    <li>[ht::editDataSourceProperties [ht::dataset {Level II Radar Data (DVN)}]]
+    <li>From the [ht::tab Times] tab, 
+        select [ht::param {1998-06-29 21:29:59Z}] time.</li>
+    <li>Click the [ht::button OK] button.
+    </li>
+  </ul>
+</li>
+<li>In the [ht::dialog Field Selector] window create a 
+    [ht::display Radar Isosurface] display using the 
+    [ht::param Reflectivity] field.</li>
+
+<li>See the Display in 3D</li>
+  <ul class="substep">
+    <li>A 3D display of the isosurfaces  appears in the main  window.
+    It is complex because the initial isosurface value is low, and there
+    are many low values in the display.
+    <details link="What are Radar Reflectivity Isosurfaces?">
+    An isosurface is a 3D analog of a contour line. It shows the 
+    location of all data with a single data value. Interpolation is used 
+    between sweep altitudes in the IDV isosurface plot of Level II data. 
+    All data in a volume scan is used. 
+    <P>
+    A radar isosurface from a line of thunderstorms, with surface value
+    50 dBZ, shows the location and shape of the 50 dBZ cores, to the
+    precision permitted by several horizontal sweeps separated by
+    a thousand or more meters in most cases.
+    </details>
+
+ 
+    <li>Change the isosurface value to 50.0 dBZ 
+    with the [ht::command Isosurface Value] slider in the control window. 
+    <li>Rotate, pan, and zoom in as needed to see the new display in 3D.
+  
+    <li>What kind of weather system produced this radar result?
+    What are the vertical shapes with isosurface value 50.0 dBZ?
+    What does this arrangement of them mean?
+    The IDV's default view has vertical exaggeration.
+    
+  <p>
+  <div class="cimg"><img src="images/LevelIIIsosurface.gif"></div>
+  <p>
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

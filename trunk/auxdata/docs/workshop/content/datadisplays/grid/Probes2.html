@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>Probing Gridded Data (continued) </title>
+</head>
+
+<body>
+
+
+
+Now, let's look at other probes that can be used with 3D data -
+the Time/Height Display and the Grid Skew-T probe.  The Time/Height
+display will show the variation of a field with height over
+time.  The Grid Skew-T probe will display a model sounding generated from
+the data.<p>
+
+<ol>
+<li>First, let's create a time/height display of relative humidity.
+We'll also load in an isosurface of this field for comparison.  You
+can load in a probe without displaying the field in the main display.<p>
+
+  <ul class="substep">
+    <li>If you have not already done so, use the 
+        [ht::menu Edit {Remove All Displays}] menu to remove the displays
+        created in the previous exercise.</li>
+    <li>First, we'll load in a time/height display of relative humidity.
+        In the  [ht::command Fields] panel, expand the 
+         [ht::param 3D grid] tab. 
+        Select the  [ht::param relative humidity] field.</li>
+    <li>In the  [ht::command Displays] panel, select 
+         [ht::display Isosurface] (under the
+         [ht::display 3D Surface] tab).  Then, hold the 
+        [ht::command Ctrl] key down and click on
+         [ht::display Time/Height Display (Contours)] 
+         (under the [ht::display Probes] tab) to select both. 
+         Click the [ht::button Create Display] button.
+        Once the displays are created, set the isosurface value
+        to <b>80%</b> and minimize the isosurface control window.</li>
+    <li>Move the probe around to see how relative humidity varies
+        with time and height at a particular location.  Now, move the
+        probe over Iowa.</li>
+    <li>Tilt the main display so you can see the structure of the
+        relative humidity isosurface at the probe location, then
+        step through the animation and compare the structure you
+        see in the isosurface to the structure at the same time
+        in the time/height display.  How do they compare?</li>
+    <li>Stop the animation and return to the first time step.</li>
+  </ul>
+</li>
+<p>
+
+<li> Now, we'll create a Skew-T display of calculated model parameters.<p>
+  <ul class="substep">
+    <li>In the  [ht::command Fields] panel, expand the 
+         [ht::param 3D grid] tab. 
+        Expand the  [ht::param Derived] tab and select the 
+        [ht::param {Sounding Data (with true winds)}] field.  
+        This derived quantity will show up when the grid contains
+        temperature, dewpoint and wind fields or any of these
+        that can be derived from others.</li>
+    <li>In the [ht::command Displays] panel, select the
+        [ht::display Grid Skew-T] display.  Click
+        the [ht::button Create Display] button.</li>
+    <li>Undock the [ht::display Time/Height] and the
+        [ht::display Grid Skew-T] displays from the Dashboard.
+        Arrange your windows so you can see the main display, the
+        SkewT display and the Time/Height display.
+    <li>Now, share the probe position with the Time/Height Display.
+        In each of the control windows, use the
+        [ht::menu Edit Sharing {Sharing On}] menu to turn on
+        sharing of the probe position. Move the probe over Iowa slightly
+        to align the two probes.  </li>
+    <li>Step through the animation and compare model temperature and
+        dewpoint profiles with Time/Height display.  In regions of
+        high relative humidity, the temperature and dewpoint profiler
+        will be close together.</li>
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

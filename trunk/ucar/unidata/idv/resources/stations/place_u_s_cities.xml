@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="U.S. Cities">
+<stn name="New York" lat="40.67" lon="-73.944" pop="7322564"/>
+<stn name="Los Angeles" lat="34.113" lon="-118.412" pop="3485398"/>
+<stn name="Chicago" lat="41.838" lon="-87.685" pop="2783726"/>
+<stn name="Houston" lat="29.769" lon="-95.387" pop="1630553"/>
+<stn name="Philadelphia" lat="40.007" lon="-75.135" pop="1585577"/>
+<stn name="San Diego" lat="32.815" lon="-117.136" pop="1110549"/>
+<stn name="Detroit" lat="42.384" lon="-83.103" pop="1027974"/>
+<stn name="Dallas" lat="32.795" lon="-96.766" pop="1006877"/>
+<stn name="Phoenix" lat="33.543" lon="-112.072" pop="983403"/>
+<stn name="San Antonio" lat="29.458" lon="-98.506" pop="935933"/>
+<stn name="San Jose" lat="37.304" lon="-121.85" pop="782248"/>
+<stn name="Baltimore" lat="39.301" lon="-76.611" pop="736014"/>
+<stn name="Indianapolis city (remainder)" lat="39.777" lon="-86.147" pop="731327"/>
+<stn name="San Francisco" lat="37.794" lon="-122.555" pop="723959"/>
+<stn name="Jacksonville city (remainder)" lat="30.335" lon="-81.658" pop="635230"/>
+<stn name="Columbus" lat="39.989" lon="-82.988" pop="632910"/>
+<stn name="Milwaukee" lat="43.064" lon="-87.967" pop="628088"/>
+<stn name="Memphis" lat="35.106" lon="-90.007" pop="610337"/>
+<stn name="Washington" lat="38.906" lon="-77.017" pop="606900"/>
+<stn name="Boston" lat="42.337" lon="-71.018" pop="574283"/>
+<stn name="Seattle" lat="47.622" lon="-122.351" pop="516259"/>
+<stn name="El Paso" lat="31.85" lon="-106.438" pop="515342"/>
+<stn name="Cleveland" lat="41.48" lon="-81.679" pop="505616"/>
+<stn name="New Orleans" lat="30.066" lon="-89.932" pop="496938"/>
+<stn name="Nashville-Davidson (remainder)" lat="36.172" lon="-86.785" pop="488374"/>
+<stn name="Denver" lat="39.769" lon="-104.873" pop="467610"/>
+<stn name="Austin" lat="30.306" lon="-97.751" pop="465622"/>
+<stn name="Fort Worth" lat="32.754" lon="-97.337" pop="447619"/>
+<stn name="Oklahoma City" lat="35.468" lon="-97.514" pop="444719"/>
+<stn name="Portland" lat="45.539" lon="-122.657" pop="437319"/>
+<stn name="Kansas City" lat="39.123" lon="-94.553" pop="435146"/>
+<stn name="Long Beach" lat="33.789" lon="-118.16" pop="429433"/>
+<stn name="San Juan zona urbana" lat="18.409" lon="-66.065" pop="426832"/>
+<stn name="Tucson" lat="32.196" lon="-110.892" pop="405390"/>
+<stn name="St. Louis" lat="38.637" lon="-90.245" pop="396685"/>
+<stn name="Charlotte" lat="35.198" lon="-80.835" pop="395934"/>
+<stn name="Atlanta" lat="33.763" lon="-84.423" pop="394017"/>
+<stn name="Virginia Beach" lat="36.74" lon="-76.044" pop="393069"/>
+<stn name="Albuquerque" lat="35.118" lon="-106.625" pop="384736"/>
+<stn name="Oakland" lat="37.772" lon="-122.225" pop="372242"/>
+<stn name="Pittsburgh" lat="40.44" lon="-79.977" pop="369879"/>
+<stn name="Sacramento" lat="38.567" lon="-121.468" pop="369365"/>
+<stn name="Minneapolis" lat="44.962" lon="-93.267" pop="368383"/>
+<stn name="Tulsa" lat="36.128" lon="-95.917" pop="367302"/>
+<stn name="Honolulu" lat="21.318" lon="-157.805" pop="365272"/>
+<stn name="Cincinnati" lat="39.14" lon="-84.506" pop="364040"/>
+<stn name="Miami" lat="25.776" lon="-80.211" pop="358548"/>
+<stn name="Fresno" lat="36.781" lon="-119.793" pop="354202"/>
+<stn name="Omaha" lat="41.264" lon="-96.012" pop="335795"/>
+<stn name="Toledo" lat="41.664" lon="-83.582" pop="332943"/>
+<stn name="Buffalo" lat="42.89" lon="-78.86" pop="328123"/>
+<stn name="Wichita" lat="37.688" lon="-97.343" pop="304011"/>
+<stn name="Santa Ana" lat="33.737" lon="-117.883" pop="293742"/>
+<stn name="Mesa" lat="33.418" lon="-111.741" pop="288091"/>
+<stn name="Colorado Springs" lat="38.864" lon="-104.76" pop="281140"/>
+<stn name="Tampa" lat="27.959" lon="-82.483" pop="280015"/>
+<stn name="Newark" lat="40.725" lon="-74.174" pop="275221"/>
+<stn name="St. Paul" lat="44.948" lon="-93.104" pop="272235"/>
+<stn name="Louisville" lat="38.225" lon="-85.742" pop="269063"/>
+<stn name="Anaheim" lat="33.839" lon="-117.873" pop="266406"/>
+<stn name="Birmingham" lat="33.528" lon="-86.8" pop="265968"/>
+<stn name="Arlington" lat="32.695" lon="-97.128" pop="261721"/>
+<stn name="Norfolk" lat="36.924" lon="-76.245" pop="261229"/>
+<stn name="Las Vegas" lat="36.206" lon="-115.223" pop="258295"/>
+<stn name="Corpus Christi" lat="27.706" lon="-97.293" pop="257453"/>
+<stn name="St. Petersburg" lat="27.758" lon="-82.643" pop="238629"/>
+<stn name="Rochester" lat="43.169" lon="-77.616" pop="231636"/>
+<stn name="Jersey City" lat="40.712" lon="-74.065" pop="228537"/>
+<stn name="Riverside" lat="33.941" lon="-117.398" pop="226505"/>
+<stn name="Anchorage" lat="61.179" lon="-149.187" pop="226338"/>
+<stn name="Lexington-Fayette" lat="38.043" lon="-84.46" pop="225366"/>
+<stn name="Akron" lat="41.081" lon="-81.522" pop="223019"/>
+<stn name="Aurora" lat="39.713" lon="-104.73" pop="222103"/>
+<stn name="Baton Rouge" lat="30.449" lon="-91.127" pop="219531"/>
+<stn name="Stockton" lat="37.97" lon="-121.307" pop="210943"/>
+<stn name="Raleigh" lat="35.822" lon="-78.659" pop="207951"/>
+<stn name="Richmond" lat="37.532" lon="-77.475" pop="203056"/>
+<stn name="Bayamo]n zona urbana" lat="18.382" lon="-66.164" pop="202103"/>
+<stn name="Shreveport" lat="32.472" lon="-93.798" pop="198525"/>
+<stn name="Jackson" lat="32.321" lon="-90.208" pop="196637"/>
+<stn name="Mobile" lat="30.678" lon="-88.089" pop="196278"/>
+<stn name="Des Moines" lat="41.577" lon="-93.618" pop="193187"/>
+<stn name="Lincoln" lat="40.817" lon="-96.689" pop="191972"/>
+<stn name="Madison" lat="43.08" lon="-89.388" pop="191262"/>
+<stn name="Grand Rapids" lat="42.962" lon="-85.656" pop="189126"/>
+<stn name="Yonkers" lat="40.948" lon="-73.868" pop="188082"/>
+<stn name="Hialeah" lat="25.862" lon="-80.297" pop="188004"/>
+<stn name="Montgomery" lat="32.355" lon="-86.285" pop="187106"/>
+<stn name="Lubbock" lat="33.576" lon="-101.876" pop="186206"/>
+<stn name="Greensboro" lat="36.079" lon="-79.827" pop="183521"/>
+<stn name="Dayton" lat="39.78" lon="-84.198" pop="182044"/>
+<stn name="Huntington Beach" lat="33.692" lon="-118.009" pop="181519"/>
+<stn name="Garland" lat="32.911" lon="-96.63" pop="180650"/>
+<stn name="Glendale" lat="34.177" lon="-118.254" pop="180038"/>
+<stn name="Columbus city (remainder)" lat="32.511" lon="-84.875" pop="178681"/>
+<stn name="Spokane" lat="47.673" lon="-117.415" pop="177196"/>
+<stn name="Tacoma" lat="47.252" lon="-122.46" pop="176664"/>
+<stn name="Little Rock" lat="34.723" lon="-92.355" pop="175795"/>
+<stn name="Bakersfield" lat="35.358" lon="-119.005" pop="174820"/>
+<stn name="Fremont" lat="37.529" lon="-121.998" pop="173339"/>
+<stn name="Fort Wayne" lat="41.074" lon="-85.14" pop="173072"/>
+<stn name="Arlington" lat="38.879" lon="-77.102" pop="170936"/>
+<stn name="Newport News" lat="37.076" lon="-76.515" pop="170045"/>
+<stn name="Worcester" lat="42.27" lon="-71.809" pop="169759"/>
+<stn name="Knoxville" lat="35.975" lon="-83.947" pop="165121"/>
+<stn name="Modesto" lat="37.66" lon="-120.994" pop="164730"/>
+<stn name="Orlando" lat="28.505" lon="-81.375" pop="164693"/>
+<stn name="San Bernardino" lat="34.14" lon="-117.293" pop="164164"/>
+<stn name="Syracuse" lat="43.042" lon="-76.145" pop="163860"/>
+<stn name="Carolina zona urbana" lat="18.409" lon="-65.982" pop="162404"/>
+<stn name="Providence" lat="41.822" lon="-71.42" pop="160728"/>
+<stn name="Salt Lake City" lat="40.778" lon="-111.93" pop="159936"/>
+<stn name="Huntsville" lat="34.708" lon="-86.628" pop="159789"/>
+<stn name="Ponce zona urbana" lat="17.988" lon="-66.61" pop="159151"/>
+<stn name="Amarillo" lat="35.203" lon="-101.819" pop="157615"/>
+<stn name="Springfield" lat="42.116" lon="-72.54" pop="156983"/>
+<stn name="Irving" lat="32.858" lon="-96.97" pop="155037"/>
+<stn name="Chattanooga" lat="35.067" lon="-85.257" pop="152466"/>
+<stn name="Chesapeake" lat="36.679" lon="-76.309" pop="151976"/>
+<stn name="Kansas City" lat="39.119" lon="-94.728" pop="149767"/>
+<stn name="Metairie" lat="29.998" lon="-90.178" pop="149428"/>
+<stn name="Fort Lauderdale" lat="26.143" lon="-80.14" pop="149377"/>
+<stn name="Glendale" lat="33.585" lon="-112.202" pop="148134"/>
+<stn name="Warren" lat="42.493" lon="-83.029" pop="144864"/>
+<stn name="Winston-Salem" lat="36.103" lon="-80.263" pop="143485"/>
+<stn name="Garden Grove" lat="33.779" lon="-117.96" pop="143050"/>
+<stn name="Oxnard" lat="34.198" lon="-119.214" pop="142216"/>
+<stn name="Tempe" lat="33.389" lon="-111.931" pop="141865"/>
+<stn name="Bridgeport" lat="41.187" lon="-73.197" pop="141686"/>
+<stn name="Paterson" lat="40.915" lon="-74.164" pop="140891"/>
+<stn name="Flint" lat="43.023" lon="-83.693" pop="140761"/>
+<stn name="Springfield" lat="37.197" lon="-93.287" pop="140494"/>
+<stn name="Hartford" lat="41.766" lon="-72.684" pop="139739"/>
+<stn name="Rockford" lat="42.271" lon="-89.064" pop="139426"/>
+<stn name="Savannah" lat="32.025" lon="-81.132" pop="137560"/>
+<stn name="Durham" lat="35.981" lon="-78.915" pop="136611"/>
+<stn name="Chula Vista" lat="32.629" lon="-117.045" pop="135163"/>
+<stn name="Reno" lat="39.539" lon="-119.823" pop="133850"/>
+<stn name="Hampton" lat="37.05" lon="-76.295" pop="133793"/>
+<stn name="Ontario" lat="34.055" lon="-117.606" pop="133179"/>
+<stn name="Torrance" lat="33.835" lon="-118.341" pop="133107"/>
+<stn name="Pomona" lat="34.059" lon="-117.762" pop="131723"/>
+<stn name="Pasadena" lat="34.161" lon="-118.139" pop="131591"/>
+<stn name="New Haven" lat="41.311" lon="-72.925" pop="130474"/>
+<stn name="Scottsdale" lat="33.686" lon="-111.871" pop="130069"/>
+<stn name="Plano" lat="33.047" lon="-96.747" pop="128713"/>
+<stn name="Oceanside" lat="33.226" lon="-117.311" pop="128398"/>
+<stn name="Lansing" lat="42.71" lon="-84.554" pop="127321"/>
+<stn name="Lakewood" lat="39.696" lon="-105.114" pop="126481"/>
+<stn name="East Los Angeles" lat="34.033" lon="-118.169" pop="126379"/>
+<stn name="Evansville" lat="37.985" lon="-87.544" pop="126272"/>
+<stn name="Boise City" lat="43.607" lon="-116.227" pop="125738"/>
+<stn name="Tallahassee" lat="30.457" lon="-84.282" pop="124773"/>
+<stn name="Paradise" lat="36.081" lon="-115.134" pop="124682"/>
+<stn name="Laredo" lat="27.535" lon="-99.487" pop="122899"/>
+<stn name="Hollywood" lat="26.03" lon="-80.165" pop="121697"/>
+<stn name="Topeka" lat="39.038" lon="-95.692" pop="119883"/>
+<stn name="Pasadena" lat="29.661" lon="-95.153" pop="119363"/>
+<stn name="Moreno Valley" lat="33.927" lon="-117.211" pop="118779"/>
+<stn name="Sterling Heights" lat="42.581" lon="-83.031" pop="117810"/>
+<stn name="Sunnyvale" lat="37.386" lon="-122.026" pop="117229"/>
+<stn name="Gary" lat="41.596" lon="-87.345" pop="116646"/>
+<stn name="Beaumont" lat="30.088" lon="-94.145" pop="114323"/>
+<stn name="Fullerton" lat="33.885" lon="-117.929" pop="114144"/>
+<stn name="Peoria" lat="40.745" lon="-89.61" pop="113504"/>
+<stn name="Santa Rosa" lat="38.449" lon="-122.701" pop="113313"/>
+<stn name="Eugene" lat="44.053" lon="-123.113" pop="112669"/>
+<stn name="Independence" lat="39.09" lon="-94.354" pop="112301"/>
+<stn name="Overland Park" lat="38.915" lon="-94.685" pop="111790"/>
+<stn name="Hayward" lat="37.628" lon="-122.105" pop="111498"/>
+<stn name="Concord" lat="37.974" lon="-122.0" pop="111348"/>
+<stn name="Alexandria" lat="38.821" lon="-77.087" pop="111183"/>
+<stn name="Orange" lat="33.806" lon="-117.824" pop="110658"/>
+<stn name="Santa Clarita" lat="34.414" lon="-118.511" pop="110642"/>
+<stn name="Irvine" lat="33.663" lon="-117.796" pop="110330"/>
+<stn name="Elizabeth" lat="40.667" lon="-74.195" pop="110002"/>
+<stn name="Inglewood" lat="33.956" lon="-118.344" pop="109602"/>
+<stn name="Ann Arbor" lat="42.276" lon="-83.731" pop="109592"/>
+<stn name="Vallejo" lat="38.108" lon="-122.265" pop="109199"/>
+<stn name="Waterbury" lat="41.559" lon="-73.038" pop="108961"/>
+<stn name="Salinas" lat="36.685" lon="-121.636" pop="108777"/>
+<stn name="Cedar Rapids" lat="41.973" lon="-91.67" pop="108751"/>
+<stn name="Erie" lat="42.126" lon="-80.087" pop="108718"/>
+<stn name="Escondido" lat="33.137" lon="-117.072" pop="108635"/>
+<stn name="Stamford" lat="41.097" lon="-73.553" pop="108056"/>
+<stn name="Salem" lat="44.925" lon="-123.023" pop="107786"/>
+<stn name="Citrus Heights" lat="38.692" lon="-121.287" pop="107439"/>
+<stn name="Abilene" lat="32.455" lon="-99.739" pop="106654"/>
+<stn name="Macon" lat="32.837" lon="-83.657" pop="106612"/>
+<stn name="El Monte" lat="34.075" lon="-118.028" pop="106209"/>
+<stn name="South Bend" lat="41.676" lon="-86.266" pop="105511"/>
+<stn name="Springfield" lat="39.782" lon="-89.645" pop="105227"/>
+<stn name="Allentown" lat="40.597" lon="-75.478" pop="105090"/>
+<stn name="Thousand Oaks" lat="34.193" lon="-118.868" pop="104352"/>
+<stn name="Portsmouth" lat="36.856" lon="-76.357" pop="103907"/>
+<stn name="Waco" lat="31.569" lon="-97.184" pop="103590"/>
+<stn name="Lowell" lat="42.639" lon="-71.323" pop="103439"/>
+<stn name="Berkeley" lat="37.868" lon="-122.298" pop="102724"/>
+<stn name="Mesquite" lat="32.77" lon="-96.6" pop="101484"/>
+<stn name="Rancho Cucamonga" lat="34.124" lon="-117.571" pop="101409"/>
+<stn name="Albany" lat="42.666" lon="-73.8" pop="101082"/>
+<stn name="Livonia" lat="42.399" lon="-83.373" pop="100850"/>
+<stn name="Sioux Falls" lat="43.545" lon="-96.731" pop="100814"/>
+<stn name="Simi Valley" lat="34.264" lon="-118.752" pop="100217"/>
+<stn name="New Bedford" lat="41.662" lon="-70.939" pop="99922"/>
+<stn name="Grand Prairie" lat="32.693" lon="-97.017" pop="99616"/>
+<stn name="Aurora" lat="41.768" lon="-88.294" pop="99581"/>
+<stn name="Manchester" lat="42.984" lon="-71.445" pop="99567"/>
+<stn name="Brownsville" lat="25.926" lon="-97.483" pop="98962"/>
+<stn name="Clearwater" lat="27.98" lon="-82.766" pop="98784"/>
+<stn name="Pueblo" lat="38.274" lon="-104.621" pop="98640"/>
+<stn name="Columbia" lat="34.04" lon="-80.887" pop="98052"/>
+<stn name="Lancaster" lat="34.694" lon="-118.177" pop="97291"/>
+<stn name="Green Bay" lat="44.522" lon="-87.99" pop="96466"/>
+<stn name="Roanoke" lat="37.279" lon="-79.959" pop="96397"/>
+<stn name="Costa Mesa" lat="33.667" lon="-117.913" pop="96357"/>
+<stn name="Wichita Falls" lat="33.898" lon="-98.517" pop="96259"/>
+<stn name="West Covina" lat="34.055" lon="-117.91" pop="96086"/>
+<stn name="Cambridge" lat="42.376" lon="-71.119" pop="95802"/>
+<stn name="Youngstown" lat="41.1" lon="-80.647" pop="95732"/>
+<stn name="Sunrise Manor" lat="36.188" lon="-115.05" pop="95362"/>
+<stn name="Davenport" lat="41.557" lon="-90.605" pop="95333"/>
+<stn name="Lafayette" lat="30.216" lon="-92.03" pop="94440"/>
+<stn name="Norwalk" lat="33.907" lon="-118.083" pop="94279"/>
+<stn name="Burbank" lat="34.192" lon="-118.326" pop="93643"/>
+<stn name="Santa Clara" lat="37.365" lon="-121.967" pop="93613"/>
+<stn name="Brockton" lat="42.082" lon="-71.026" pop="92788"/>
+<stn name="Fall River" lat="41.715" lon="-71.106" pop="92703"/>
+<stn name="Miami Beach" lat="25.815" lon="-80.136" pop="92639"/>
+<stn name="San Buenaventura (Ventura)" lat="34.266" lon="-119.259" pop="92575"/>
+<stn name="Caguas zona urbana" lat="18.235" lon="-66.04" pop="92429"/>
+<stn name="Daly City" lat="37.687" lon="-122.468" pop="92311"/>
+<stn name="Arden-Arcade" lat="38.602" lon="-121.377" pop="92040"/>
+<stn name="Downey" lat="33.939" lon="-118.13" pop="91444"/>
+<stn name="Chandler" lat="33.295" lon="-111.867" pop="90533"/>
+<stn name="Compton" lat="33.893" lon="-118.227" pop="90454"/>
+<stn name="Odessa" lat="31.875" lon="-102.349" pop="89699"/>
+<stn name="Midland" lat="32.027" lon="-102.101" pop="89443"/>
+<stn name="Dearborn" lat="42.312" lon="-83.214" pop="89286"/>
+<stn name="Arvada" lat="39.822" lon="-105.107" pop="89235"/>
+<stn name="El Cajon" lat="32.803" lon="-116.961" pop="88693"/>
+<stn name="Edison" lat="40.529" lon="-74.37" pop="88680"/>
+<stn name="Trenton" lat="40.224" lon="-74.765" pop="88675"/>
+<stn name="Parma" lat="41.384" lon="-81.73" pop="87876"/>
+<stn name="Fort Collins" lat="40.556" lon="-105.069" pop="87758"/>
+<stn name="Fontana" lat="34.098" lon="-117.458" pop="87535"/>
+<stn name="Camden" lat="39.936" lon="-75.109" pop="87492"/>
+<stn name="Richmond" lat="37.952" lon="-122.361" pop="87425"/>
+<stn name="Kendall" lat="25.668" lon="-80.34" pop="87271"/>
+<stn name="West Valley City" lat="40.691" lon="-112.009" pop="86976"/>
+<stn name="Santa Monica" lat="34.014" lon="-118.494" pop="86905"/>
+<stn name="Bellevue" lat="47.604" lon="-122.156" pop="86874"/>
+<stn name="Provo" lat="40.248" lon="-111.643" pop="86835"/>
+<stn name="Bloomington" lat="44.83" lon="-93.316" pop="86335"/>
+<stn name="South Gate" lat="33.944" lon="-118.192" pop="86284"/>
+<stn name="Clinton" lat="42.587" lon="-82.921" pop="85866"/>
+<stn name="Santa Barbara" lat="34.429" lon="-119.722" pop="85571"/>
+<stn name="Duluth" lat="46.782" lon="-92.118" pop="85493"/>
+<stn name="San Mateo" lat="37.562" lon="-122.313" pop="85486"/>
+<stn name="Warwick" lat="41.703" lon="-71.422" pop="85427"/>
+<stn name="Naperville" lat="41.763" lon="-88.155" pop="85351"/>
+<stn name="Quincy" lat="42.262" lon="-71.008" pop="84985"/>
+<stn name="Gainesville" lat="29.675" lon="-82.337" pop="84770"/>
+<stn name="Westland" lat="42.319" lon="-83.381" pop="84724"/>
+<stn name="San Angelo" lat="31.447" lon="-100.453" pop="84474"/>
+<stn name="Cheektowaga" lat="42.909" lon="-78.751" pop="84387"/>
+<stn name="Racine" lat="42.729" lon="-87.808" pop="84298"/>
+<stn name="Hammond" lat="41.621" lon="-87.491" pop="84236"/>
+<stn name="Canton" lat="40.813" lon="-81.374" pop="84161"/>
+<stn name="McAllen" lat="26.216" lon="-98.24" pop="84021"/>
+<stn name="Carson" lat="33.837" lon="-118.258" pop="83995"/>
+<stn name="Decatur" lat="39.853" lon="-88.934" pop="83885"/>
+<stn name="Boulder" lat="40.027" lon="-105.252" pop="83312"/>
+<stn name="Mayagu[ez zona urbana" lat="18.204" lon="-67.144" pop="83010"/>
+<stn name="Newton" lat="42.332" lon="-71.208" pop="82585"/>
+<stn name="Carrollton" lat="32.989" lon="-96.897" pop="82169"/>
+<stn name="Alhambra" lat="34.084" lon="-118.135" pop="82106"/>
+<stn name="Scranton" lat="41.405" lon="-75.667" pop="81805"/>
+<stn name="Lynn" lat="42.475" lon="-70.963" pop="81245"/>
+<stn name="Billings" lat="45.792" lon="-108.539" pop="81151"/>
+<stn name="Lawton" lat="34.601" lon="-98.423" pop="80561"/>
+<stn name="Sioux City" lat="42.501" lon="-96.394" pop="80505"/>
+<stn name="Charleston" lat="32.786" lon="-79.995" pop="80414"/>
+<stn name="Kenosha" lat="42.585" lon="-87.855" pop="80352"/>
+<stn name="Kalamazoo" lat="42.275" lon="-85.589" pop="80277"/>
+<stn name="Norman" lat="35.226" lon="-97.344" pop="80071"/>
+<stn name="Nashua" lat="42.749" lon="-71.492" pop="79662"/>
+<stn name="Coral Springs" lat="26.269" lon="-80.26" pop="79443"/>
+<stn name="Reading" lat="40.339" lon="-75.927" pop="78380"/>
+<stn name="Norwalk" lat="41.094" lon="-73.421" pop="78331"/>
+<stn name="Albany" lat="31.578" lon="-84.176" pop="78122"/>
+<stn name="Westminster" lat="33.752" lon="-117.994" pop="78118"/>
+<stn name="Tuscaloosa" lat="33.238" lon="-87.541" pop="77759"/>
+<stn name="Whittier" lat="33.967" lon="-118.022" pop="77671"/>
+<stn name="Fairfield" lat="38.253" lon="-122.042" pop="77211"/>
+<stn name="Elgin" lat="42.04" lon="-88.288" pop="77010"/>
+<stn name="Joliet" lat="41.527" lon="-88.123" pop="76836"/>
+<stn name="Alameda" lat="37.753" lon="-122.276" pop="76459"/>
+<stn name="Somerville" lat="42.391" lon="-71.102" pop="76210"/>
+<stn name="Corona" lat="33.868" lon="-117.57" pop="76095"/>
+<stn name="Cranston" lat="41.767" lon="-71.482" pop="76060"/>
+<stn name="Silver Spring" lat="39.014" lon="-77.025" pop="76046"/>
+<stn name="Columbia" lat="39.203" lon="-76.858" pop="75883"/>
+<stn name="Southfield" lat="42.476" lon="-83.26" pop="75728"/>
+<stn name="Fayetteville" lat="35.072" lon="-78.9" pop="75695"/>
+<stn name="Visalia" lat="36.326" lon="-119.321" pop="75636"/>
+<stn name="Clarksville" lat="36.562" lon="-87.348" pop="75494"/>
+<stn name="New Britain" lat="41.676" lon="-72.788" pop="75491"/>
+<stn name="Arlington Heights" lat="42.095" lon="-87.983" pop="75460"/>
+<stn name="Tyler" lat="32.329" lon="-95.304" pop="75450"/>
+<stn name="Sandy" lat="40.57" lon="-111.855" pop="75058"/>
+</stationtable>

@@ -1,0 +1,82 @@
+
+[ug::head {Flythrough}]
+
+The Map views have a &quot;Flythrough&quot; facility that allows for flying through a 3D View.
+This is accessed through the [ug::menu View Flythrough] menu.
+The Flythrough operates in 2 modes - first the user can just bring up the Flythrough dialog
+and fly around the view interactively. The second mode is to define a set of points which defines
+the path to follow.
+
+<p>
+
+The Flythrough dialog consists of a set of tabs and flythrough controls. 
+The first tab is the Dashboard which gives a simulacrum  of an airplane dashboard:
+
+[ht::cimg images/FlythroughDashboard.gif  {Flythrough Dashboard}]
+
+In the Map View a small airplane icon is shown that denotes the current position. A vertical probe line
+is shown to indicate the location of the viewpoint. The map in the middle of the dashboard shows the current
+location and the red outline is (roughly) the lat/lon bounds of the Map View. A compass and location readout is alsoshown.
+
+
+
+<div class="pagesubtitle">Controlling the Viewpoint</div>
+The Viewpoint tab allows you to control the viewpoint of the flythrough. You can control the orientation, zoom and the animation 
+of the transitions.
+
+
+[ht::cimg images/FlythroughViewpoint.gif  {Flythrough Viewpoint}]
+
+
+<p>
+
+The other tabs will show text descriptions of the points, probed values and the actual points of the track.
+
+
+You can export and import the set of points in a flythrough with the [ug::menu File Export/Import] menu.
+This is a simple xml format that  
+
+
+<div class="pagesubtitle">Probing Data</div>
+If there are other displays in the same view that have data then as one flys through the view
+the data will be sampled at the location of the flythrough and be shown as gauges in the dashboard.
+The actual values will be listed under the Values tab. This operates the same way as when one interactively
+does a middle-mouse drag in the view. The IDV samples the data at the latitude/longitude/altitude of
+the flythrough point and the current animation time. A time series chart will also be shown in the dashboard 
+(you might have to enlarge the window to see it.
+
+<p>
+
+
+
+
+
+<div class="pagesubtitle">Background Images</div>
+If you have the IDV webcam display being shown then the nearest image to the current flythrough
+point will be shown as a background image in the Dashboard tab. This can be turned off
+with the [ug::menu View Dashboard {Show background images}] menu item.
+
+
+<div class="pagesubtitle">Flying along a Trajectory</div>
+The other to flythrough a view is by flying along a trajectory, i.e., a set of points in
+3D space and (possibly) time.  The set of points can come from a number of sources:
+
+<ul>
+<li> Storm Track Display Control: In the Table view the Flythrough button (lower right) will use the points of the
+current storm track.
+<li> Track Control: Use the [ug::menu View Flythrough] menu to fly along the track.
+<li> Drawing Control: For polygons that are drawn you can fly along them with Control-F (for the selected polygon) or
+from the polygon's properties dialog.
+<li> Station Locations: Use the [ug::menu View Flythrough] menu to fly from location to location.
+</ul>
+
+
+
+
+
+
+
+
+[ug::foot]
+
+

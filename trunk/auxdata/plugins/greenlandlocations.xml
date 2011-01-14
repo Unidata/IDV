@@ -1,0 +1,24 @@
+<stationtable name="Greenland Sites">
+<station idn="1" id="1" name="Swiss Camp" lat="69.5732" lon="-49.2952" elev="1149"/>
+<station idn="2" id="2" name="CP1" lat="69.8819" lon="-46.9736" elev="2022"/>
+<station idn="3" id="3" name="NASA-U" lat="73.8333" lon="-49.4953" elev="2368"/>
+<station idn="4" id="4" name="GITS" lat="77.1433" lon="-61.0950" elev="1887"/>
+<station idn="5" id="5" name="Humboldt Gl." lat="78.5266" lon="-56.8305" elev="1995"/>
+<station idn="6" id="6" name="Summit" lat="72.5794" lon="-38.5042" elev="3208"/>
+<station idn="7" id="7" name="Tunu-N" lat="78.0168" lon="-33.9939" elev="2020"/>
+<station idn="8" id="8" name="DYE-2" lat="66.4810" lon="-46.2800" elev="2165"/>
+<station idn="9" id="9" name="JAR1" lat="69.4984" lon="-49.6816" elev="962"/>
+<station idn="10" id="10" name="Saddle" lat="66.0006" lon="-44.5014" elev="2559"/>
+<station idn="11" id="11" name="South Dome" lat="63.1489" lon="-44.8167" elev="2922"/>
+<station idn="12" id="12" name="NASA-E" lat="75.0000" lon="-29.9997" elev="2631"/>
+<station idn="13" id="13" name="CP2" lat="69.9133" lon="-46.8547" elev="1990"/>
+<station idn="14" id="14" name="NGRIP" lat="75.0998" lon="-42.3326" elev="2950"/>
+<station idn="15" id="15" name="NASA-SE" lat="66.4797" lon="-42.5002" elev="2579"/>
+<station idn="16" id="16" name="KAR" lat="69.6995" lon="-32.9998" elev="2400"/>
+<station idn="17" id="17" name="JAR2" lat="69.4200" lon="-50.0575" elev="568"/>
+<station idn="18" id="18" name="KULU" lat="65.7584" lon="-39.6018" elev="878"/>
+<station idn="19" id="19" name="JAR3" lat="69.3954" lon="-50.3104" elev="323"/>
+<station idn="20" id="20" name="Aurora" lat="67.1352" lon="-47.2911" elev="1798"/>
+<station idn="21" id="21" name="Unknown" lat="67.1352" lon="-47.2911" elev="1798"/>
+<station idn="26" id="26" name="Unknown" lat="67.1352" lon="-47.2911" elev="1798"/>
+</stationtable>

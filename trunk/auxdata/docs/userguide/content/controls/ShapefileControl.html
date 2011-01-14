@@ -1,0 +1,42 @@
+
+{Shapefile  Control}
+
+{
+
+The IDV supports the ability to load and display GIS shapefiles. You can select
+and load a shape file (i.e., a file that ends with .shp) from the file chooser.
+The zipped (.zip) version of shapefiles can also be loaded.
+
+[ht::cimg images/ShapefileControlGui1.gif ]
+
+For shape files that also have a data base file (.dbf) 
+you can control what shape segments are shown with the [ug::tab Filters] tab.
+For a further description see <a href="StationModelControl.htl#filters">here</a>.
+<p>
+Note: The IDV supports a simple XML format for maps. The Shapefile Control can export
+the displayed shapes in this XML format the [ug::menu File Save {Export Displayed Shapes...}] menu.
+
+[ht::cimg images/ShapefileControlGui2.gif {Shape File Control Filters Tab}]
+
+
+When the shape file has an associated  data base file (.dbf) 
+a tabular listing of the attributes is shown in the [ug::tab Table]
+tab.
+Use the [ug::button Select Fields to Show] button to select what fields to show.
+The table can be exported as a CSV file with the [ug::menu File Save {Export Table...}] menu.
+[ht::cimg images/ShapefileControlGui3.gif {Shape File Control Table Tab}]
+
+
+}
+
+
+{[ug::vertical {Shapefile display}]}
+
+
+{ {Line width} {
+Use the  [ht::command {Line width} ] slider to change  the  width of the lines
+in the display. Note on some versions of Java3D on Windows platforms line width
+does not work.
+}}
+
+[ug::color] {map line color} {Line Color}

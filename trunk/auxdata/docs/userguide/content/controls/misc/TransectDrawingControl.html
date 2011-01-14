@@ -1,0 +1,63 @@
+{Transect Drawing Control}
+
+{
+<meta name="jhid" value="idv.controls.transectdrawingcontrol">
+
+The transect drawing control is a version
+of the <a href="DrawingControl.html">Drawing Control</a>
+that allows you to view, create and modify the transect lines
+that are used in the <a href="../../ui/TransectViewManager.html">Transect Views</a>.
+
+
+
+[ht::cimg images/TransectDrawingControlGui.gif]
+
+<p>
+This display is either created through the [ug::menu Displays Special] menu
+or through the [ug::menu Transects] menu in the Transect View.
+<p>
+This display control is a representation of the set of transects
+that are defined by the transect resource. Not only does it have
+its own state (that can be saved in a bundle for example) it also writes
+out any transects you may create or change into your local IDV state
+directory in a transects.xml file.
+<p>
+
+In this control there is  only one shape that you can draw with, the 
+Transect Line. This control also shows a non-editable Transect Shape
+which displays the full transect line used by any Transect Views.
+We call these the &quot;Active Transects&quot;.
+There are also a set of transect  lines that are non-editable that 
+are from the system transects property.
+<p>
+For an active transect, if the Transect View that it represents 
+has a  max distance set then the transect will show this max distance
+as a rectangular box.
+}
+
+
+{
+{Automatically update transects} 
+
+{
+When this is selected any changes you do are automatically
+applied to any Transect Views and are also written out
+into the transects.xml file.
+}
+}
+
+
+{
+{Show transects} 
+{
+This toggles the visibility of the regular transects.
+}
+}
+
+{
+{Show active transects} 
+{
+This toggles the visibility of the active transects.
+}
+}
+

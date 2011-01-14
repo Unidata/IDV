@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable elevunit="feet" name="Locations">
+<stn name="Bishop" lat="37.36361" lon="-118.39417" county="Inyo" pop="3575" elev="4147" />
+<stn name="Independence" lat="36.80278" lon="-118.19917" county="Inyo" pop="574" elev="3936" />
+<stn name="Lone Pine" lat="36.60611" lon="-118.06194" county="Inyo" pop="1655" elev="3733" />
+<stn name="Mammoth Lakes Airport" lat="37.62389" lon="-118.83861" county="Mono" elev="7128" />
+<stn name="Visalia" lat="36.33028" lon="-119.29111" county="Tulare" pop="91565" elev="331" />
+<stn name="Fresno" lat="36.74778" lon="-119.77139" county="Fresno" pop="427652" elev="296" />
+<stn name="Selma" lat="36.57083" lon="-119.61111" county="Fresno" pop="19444" elev="308" />
+<stn name="Tulare" lat="36.20778" lon="-119.34639" county="Tulare" pop="43994" elev="288" />
+<stn name="Delano" lat="35.76889" lon="-119.24611" county="Kern" pop="38824" elev="316" />
+<stn name="Lemoore" lat="36.30083" lon="-119.78194" county="Kings" pop="19712" elev="225" />
+<stn name="Porterville" lat="36.06528" lon="-119.01583" county="Tulare" pop="39615" elev="459" />
+</stationtable>

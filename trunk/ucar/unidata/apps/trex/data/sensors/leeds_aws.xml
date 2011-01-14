@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="leeds aws">
+<station name="leeds aws 1" lat="36.804472" lon="-118.227833"/>
+<station name="leeds aws 2" lat="36.82725" lon="-118.128472"/>
+<station name="leeds aws 3" lat="36.823222" lon="-118.152528"/>
+<station name="leeds aws 4" lat="36.82475" lon="-118.190611"/>
+<station name="leeds aws 5" lat="36.858694" lon="-118.170972"/>
+<station name="leeds aws 6" lat="36.890472" lon="-118.181639"/>
+<station name="leeds aws 7" lat="36.774167" lon="-118.337861"/>
+<station name="leeds aws 8" lat="36.775111" lon="-118.312833"/>
+<station name="leeds aws 9" lat="36.794389" lon="-118.302583"/>
+<station name="leeds aws 10" lat="36.879333" lon="-118.100583"/>
+<station name="leeds aws 11" lat="36.920056" lon="-118.121944"/>
+<station name="leeds aws 12" lat="36.974389" lon="-118.119389"/>
+</stationtable>

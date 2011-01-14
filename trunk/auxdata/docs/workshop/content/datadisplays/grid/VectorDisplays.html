@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>Vector Displays</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+<p> Vector components (e.g. winds, ocean currents, mantle plate
+velocities) can be displayed in the IDV in a variety of
+ways.<p>
+</div>
+
+<ol class="step">
+
+<li>First, let's create a display of wind barbs with geopotential heights.
+
+  <ul class="substep">
+    <li>Clear out any existing displays.
+    <li>In the [ht::dialog Field Selector]'s 
+        [ht::command Data Sources] panel, select
+        the [ht::dataset NCEP Model Data ETA] data source. </li>
+    <li>In the [ht::command Fields] panel, 
+        expand the [ht::param 3D grid] tab.  Select the 
+        [ht::param geopotential height], the 
+        [ht::display Contour Plan View] display and set the 
+        [ht::command Level] to be 500 hectopascals, then click
+        the [ht::command Create Display] button.  </li>
+    <li>In the [ht::command Fields] panel, 
+        expand the [ht::param 3D grid] tab. Scroll down to the
+        [ht::param Derived] tab and expand that.  Select the 
+        [ht::param {Flow Vectors (from GridRelative_u &amp; GridRelative_v)}]
+        field.</li>
+    <li>In the [ht::command Displays] panel, select 
+        [ht::display Wind Barb Plan View], in the
+        [ht::command Level] tab, select 500 hectopascals, then click
+        the [ht::command Create Display] button.  </li>
+    <li>The display is pretty cluttered.  You can change the
+        skip interval to declutter the display.  Try various
+        intervals.</li>
+    <li>Toggle between vectors and streamlines and play around
+        with the streamline density slider.</li>
+    <li>Link the two displays by selecting the
+        [ht::menu Edit Sharing {Sharing On}] menu.
+    <li>Change the level and see how the pattern changes.</li>
+    <li>Turn on the time animation.</li>
+        
+  </ul>
+</li>
+
+<li>Now, let's add a cross section display of wind vectors
+
+  <ul class="substep">
+    <li>Stop the time animation.</li>
+    <li>In the [ht::dialog Field Selector]'s
+        [ht::command Fields] panel, select the 
+        [ht::param {Flow Vectors (from GridRelative_u &amp; GridRelative_v)}]
+        field.</li>
+    <li>In the [ht::command Displays] panel of the 
+        [ht::dialog Field Selector], select 
+        [ht::display Vector Cross Section] and 
+        then click the [ht::button Create Display] button.</li>
+    <li>Move  the cross section around and see how the flow 
+        changes. 
+    <li>Start the animation.
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

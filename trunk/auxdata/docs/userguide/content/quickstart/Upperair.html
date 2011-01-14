@@ -1,0 +1,59 @@
+<html><head>
+  <title>Skew-T Plot of RAOB data (Balloon soundings)</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+This section describes how to make a Skew-T plot from RAOB data:
+[ht::cimg images/RaobSkewT.gif {RAOB Skew-T}]
+
+
+The set of steps include:
+
+<%childlist%>
+
+
+<subhead id="connecting" intoc="false">Choosing RAOB Data from a  Remote Server</subhead>
+
+In the <a href="../data/choosers/index.html">Data Source Chooser</a> select the
+<b>RAOB</b> tab.   
+
+[ht::cimg ../data/choosers/images/RaobServerChooser.gif]
+
+For <b>Server</b> select <b>adde.ucar.edu</b> and click on <b>Connect</b>.
+The <b>Available times</b> box fills in.  Select the times you want
+to use and then select the stations for those times.
+You can select one or more by clicking on them; hold down the
+Ctrl key to select more than one.
+You can use the [ht::command Declutter] check box
+to show all stations (not checked), or only a
+limited number of stations that do not overlap each other (checked).
+When in declutter mode you can zoom in (by dragging the left mouse) 
+to see more stations.
+The icons below the map allow you to zoom and pan.
+<p>
+
+After you select stations, 
+the box <b>Selected stations</b> will populate with station numbers
+and the selected data time.
+When you have made your selection click the <b>Add Source</b> button.
+
+
+<subhead id="display" intoc="false">Making the Skew-T Display</subhead>
+
+The RAOB data will be shown in  the
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+
+[ht::cimg images/RaobDSMenu.gif]
+
+Select "RAOB data" in the <b>Field</b> panel and "RAOB Skew-T" 
+in the <b>Displays</b> panel.
+Make the Skew-T  display by clicking on the <b>Create Display</b> button.
+For more about  the Skew-T and other aerological displays, see 
+<a href="../controls/AerologicalSoundingControl.html">Sounding Display and Controls</a>.
+
+ 
+</body>
+</html>

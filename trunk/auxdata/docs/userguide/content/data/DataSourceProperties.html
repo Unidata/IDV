@@ -1,0 +1,87 @@
+<html><head>
+  <title>Data Source Properties</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>                  
+<body>
+
+<%nochildlist%>
+
+To set the defaults for a data source bring up the 
+Properties dialog by right clicking  (or double clicking)
+on the data source name in the data sources panel
+of the Field Selector window and select [ug::menu Properties]:
+
+[ht::cimg images/DataSourceMenu.gif]
+
+The Properties Dialog is different for different types of data sources. Here is 
+the dialog window for a gridded data source:
+
+[ht::cimg images/DataSourceProperties.gif]
+
+Any displays that are showing data from a data source can be automatically
+updated by selecting the [ug::button Reload Displays] button. When this is selected
+all data will be reloaded and the displays will be updated when the user presses
+[ug::button Apply] or [ug::button OK].
+
+<subhead intoc="false" id="basicproperties">Basic Properties</subhead>
+You can change the displayed name with the [ug::button Name] field.
+
+<p>
+Some data sources can automatically update themselves by selecting
+the [ug::button Active] button. For example, if you had a set of most recent 
+satellite images you can turn on Polling and have the data update to the latest
+images every N minutes.
+<p>
+For point data you can define  <i>Time Binning</i> settings (not shown) by selecting
+a Bin Size (e.g., 5 minutes, 1 hour) and a Round To value (e.g., On the hour, 15 minutes after the
+hour). This will map all the observation times into the nearest bin.  The smallest time is rounded
+with the Round To value (e.g., if Round To was &quot;10 after&quot; and the smallest time was
+10:23 then this time would be rounded to 10:20). This is the base time. Each actual observation time
+is mapped into a set of bins of Bin Size starting at the base time.
+
+
+<subhead intoc="false" id="times">Times</subhead>
+The Times tab allows you to select the times to use. Click off the [ug::button Use All]
+button and select individual times. You can right mouse click in the list
+to show a popup menu that allows you to select different strides (e.g., every 3rd time).
+
+[ht::cimg images/DataSourceTimes.gif]
+
+
+
+<subhead intoc="false" id="spatialsubset">Spatial Subsetting</subhead>
+For grids and other data source types  the data can be subset and decimated
+with the [ug::button {Spatial Subset}] tab.
+The [ug::menu {X Stride}], [ug::menu {Y Stride}] and [ug::menu {Z Stride}] menus
+allow you to decimate a grid, selecting every Nth point.
+The [ug::button Bounding Box] allows you to define a spatial area to load.
+The default spatial domain of the data is shown by the blue outline box.
+To select an area just drag on the map. Once a subset is selected it can be
+resized (grab on the little black selection points) moved  (grab somewhere near the 
+box) and delete (press the Delete key).
+Specific lat/lon values can be entered in the fields on the left.
+
+[ht::cimg images/DataSourceSpatialSubset.gif]
+
+A version of this spatial subsetting window is used in the Field
+Selector. Here, you explicitly enable these settings. The decimation
+and spatial subset are shown in different tabs:
+
+[ht::cimg images/DataSourceSpatialSubsetField.gif]
+
+
+<subhead intoc="false" id="details">Details</subhead>
+The Details tab shows further information about the data source, e.g.:
+any documentation associated with the data, what files or urls are used, etc.
+
+
+<subhead intoc="false" id="metadata">Metadata</subhead>
+For grid data sources the Metadata tab shows the NetCDF metadata.
+
+
+
+
+
+</body>
+
+

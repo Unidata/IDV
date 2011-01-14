@@ -1,0 +1,190 @@
+<stationtable  name="africa" >
+<station  id="Mozambique"  name="Mozambique"  lat="-18.571300506591797"  lon="35.810699462890625"  elev="0.0" />
+<station  id="Zimbabwe"  name="Zimbabwe"  lat="-19.173799514770508"  lon="29.31450080871582"  elev="0.0" />
+<station  id="Madagascar"  name="Madagascar"  lat="-19.68320083618164"  lon="46.87369918823242"  elev="0.0" />
+<station  id="Benin"  name="Benin"  lat="9.248800277709961"  lon="2.148169994354248"  elev="0.0" />
+<station  id="Burkina Faso"  name="Burkina Faso"  lat="13.0"  lon="-2.0"  elev="0.0" />
+<station  id="Cabinda"  name="Cabinda"  lat="-5.0"  lon="12.0"  elev="0.0" />
+<station  id="Cameroon"  name="Cameroon"  lat="5.937170028686523"  lon="12.275699615478516"  elev="0.0" />
+<station  id="Congo"  name="Congo"  lat="-2.294640064239502"  lon="14.512399673461914"  elev="0.0" />
+<station  id="Equatorial Guinea"  name="Equatorial Guinea"  lat="1.6866799592971802"  lon="10.319100379943848"  elev="0.0" />
+<station  id="Gabon"  name="Gabon"  lat="-0.6032199859619141"  lon="11.481300354003906"  elev="0.0" />
+<station  id="Ghana"  name="Ghana"  lat="7.24429988861084"  lon="-0.9379510283470154"  elev="0.0" />
+<station  id="Niger"  name="Niger"  lat="13.82229995727539"  lon="5.1827898025512695"  elev="0.0" />
+<station  id="Nigeria"  name="Nigeria"  lat="8.79343032836914"  lon="7.5274200439453125"  elev="0.0" />
+<station  id="S?o Tom? and Pr?ncipe"  name="S?o Tom? and Pr?ncipe"  lat="0.6435329914093018"  lon="6.843530178070068"  elev="0.0" />
+<station  id="Togo"  name="Togo"  lat="7.9464898109436035"  lon="1.0165499448776245"  elev="0.0" />
+<station  id="Angola"  name="Angola"  lat="-10.607600212097168"  lon="16.260099411010742"  elev="0.0" />
+<station  id="Burundi"  name="Burundi"  lat="-3.343280076980591"  lon="29.947399139404297"  elev="0.0" />
+<station  id="Central African Republic"  name="Central African Republic"  lat="5.708940029144287"  lon="18.958200454711914"  elev="0.0" />
+<station  id="Chad"  name="Chad"  lat="11.37720012664795"  lon="17.49650001525879"  elev="0.0" />
+<station  id="Comoros"  name="Comoros"  lat="-12.005900382995605"  lon="43.854000091552734"  elev="0.0" />
+<station  id="Democratic Republic of Congo"  name="Democratic Republic of Congo"  lat="-2.0"  lon="22.0"  elev="0.0" />
+<station  id="Djibouti"  name="Djibouti"  lat="11.625499725341797"  lon="42.84239959716797"  elev="0.0" />
+<station  id="Ethiopia"  name="Ethiopia"  lat="9.728179931640625"  lon="38.849098205566406"  elev="0.0" />
+<station  id="Kenya"  name="Kenya"  lat="-1.1986000537872314"  lon="37.45289993286133"  elev="0.0" />
+<station  id="Malawi"  name="Malawi"  lat="-12.5"  lon="34.0"  elev="0.0" />
+<station  id="Rwanda"  name="Rwanda"  lat="-1.9416099786758423"  lon="29.757200241088867"  elev="0.0" />
+<station  id="Somalia"  name="Somalia"  lat="4.484479904174805"  lon="44.88949966430664"  elev="0.0" />
+<station  id="Sudan"  name="Sudan"  lat="11.775799751281738"  lon="30.662099838256836"  elev="0.0" />
+<station  id="Tanzania"  name="Tanzania"  lat="-5.0"  lon="34.0"  elev="0.0" />
+<station  id="Uganda"  name="Uganda"  lat="0.8456050157546997"  lon="32.23149871826172"  elev="0.0" />
+<station  id="Zambia"  name="Zambia"  lat="-13.844200134277344"  lon="27.75589942932129"  elev="0.0" />
+<station  id="Mayotte"  name="Mayotte"  lat="-12.800000190734863"  lon="45.20000076293945"  elev="0.0" />
+<station  id="Yemen"  name="Yemen"  lat="14.592399597167969"  lon="45.22439956665039"  elev="0.0" />
+<station  id="Eritrea"  name="Eritrea"  lat="15.091699600219727"  lon="39.04050064086914"  elev="0.0" />
+<station  id="Abuja"  name="Abuja"  lat="9.083330154418945"  lon="7.533329963684082"  elev="0.0" />
+<station  id="Accra"  name="Accra"  lat="5.550000190734863"  lon="-0.21666699647903442"  elev="0.0" />
+<station  id="Addis Ababa"  name="Addis Ababa"  lat="9.033329963684082"  lon="38.70000076293945"  elev="0.0" />
+<station  id="Adis Abeba"  name="Adis Abeba"  lat="9.033329963684082"  lon="38.70000076293945"  elev="0.0" />
+<station  id="Al Khartum"  name="Al Khartum"  lat="15.58810043334961"  lon="32.53419876098633"  elev="0.0" />
+<station  id="Antananarivo"  name="Antananarivo"  lat="-18.91670036315918"  lon="47.516700744628906"  elev="0.0" />
+<station  id="Asmara"  name="Asmara"  lat="15.33329963684082"  lon="38.93330001831055"  elev="0.0" />
+<station  id="Bangui"  name="Bangui"  lat="4.36667013168335"  lon="18.58329963684082"  elev="0.0" />
+<station  id="Brazzaville"  name="Brazzaville"  lat="-4.259170055389404"  lon="15.284700393676758"  elev="0.0" />
+<station  id="Bujumbura"  name="Bujumbura"  lat="-3.376110076904297"  lon="29.360000610351562"  elev="0.0" />
+<station  id="Dar es Salaam"  name="Dar es Salaam"  lat="-6.800000190734863"  lon="39.28329849243164"  elev="0.0" />
+<station  id="Djibouti"  name="Djibouti"  lat="11.595000267028809"  lon="43.148101806640625"  elev="0.0" />
+<station  id="Harare"  name="Harare"  lat="-17.817800521850586"  lon="31.044700622558594"  elev="0.0" />
+<station  id="Kampala"  name="Kampala"  lat="0.31555598974227905"  lon="32.56560134887695"  elev="0.0" />
+<station  id="Khartoum"  name="Khartoum"  lat="15.58810043334961"  lon="32.53419876098633"  elev="0.0" />
+<station  id="Kigali"  name="Kigali"  lat="-1.9536099433898926"  lon="30.06060028076172"  elev="0.0" />
+<station  id="Kinshasa"  name="Kinshasa"  lat="-4.3297200202941895"  lon="15.3149995803833"  elev="0.0" />
+<station  id="Libreville"  name="Libreville"  lat="0.3833329975605011"  lon="9.449999809265137"  elev="0.0" />
+<station  id="Lilongwe"  name="Lilongwe"  lat="-13.98330020904541"  lon="33.78329849243164"  elev="0.0" />
+<station  id="Lome"  name="Lome"  lat="6.131939888000488"  lon="1.2227799892425537"  elev="0.0" />
+<station  id="Luanda"  name="Luanda"  lat="-8.838330268859863"  lon="13.234399795532227"  elev="0.0" />
+<station  id="Lusaka"  name="Lusaka"  lat="-15.41670036315918"  lon="28.283300399780273"  elev="0.0" />
+<station  id="Malabo"  name="Malabo"  lat="3.3499999046325684"  lon="8.666669845581055"  elev="0.0" />
+<station  id="Mamoudzou"  name="Mamoudzou"  lat="-12.779399871826172"  lon="45.22719955444336"  elev="0.0" />
+<station  id="Mogadishu"  name="Mogadishu"  lat="2.0666699409484863"  lon="45.36669921875"  elev="0.0" />
+<station  id="Moroni"  name="Moroni"  lat="-11.70419979095459"  lon="43.240299224853516"  elev="0.0" />
+<station  id="Muqdisho"  name="Muqdisho"  lat="2.0666699409484863"  lon="45.36669921875"  elev="0.0" />
+<station  id="Nairobi"  name="Nairobi"  lat="-1.283329963684082"  lon="36.81669998168945"  elev="0.0" />
+<station  id="N'Djamena"  name="N'Djamena"  lat="12.113100051879883"  lon="15.049200057983398"  elev="0.0" />
+<station  id="Niamey"  name="Niamey"  lat="13.51669979095459"  lon="2.1166698932647705"  elev="0.0" />
+<station  id="Ouagadougou"  name="Ouagadougou"  lat="12.37030029296875"  lon="-1.5247199535369873"  elev="0.0" />
+<station  id="Porto-Novo"  name="Porto-Novo"  lat="6.483329772949219"  lon="2.6166698932647705"  elev="0.0" />
+<station  id="San`a'"  name="San`a'"  lat="15.354700088500977"  lon="44.20669937133789"  elev="0.0" />
+<station  id="Sanaa"  name="Sanaa"  lat="15.354700088500977"  lon="44.20669937133789"  elev="0.0" />
+<station  id="Sao Tome"  name="Sao Tome"  lat="0.33333298563957214"  lon="6.733329772949219"  elev="0.0" />
+<station  id="Yaounde"  name="Yaounde"  lat="3.8666698932647705"  lon="11.51669979095459"  elev="0.0" />
+<station  id="Lake Malawi"  name="Lake Malawi"  lat="-11.0"  lon="34.5"  elev="0.0" />
+<station  id="Lake Tanganyika"  name="Lake Tanganyika"  lat="-5.0"  lon="31.0"  elev="0.0" />
+<station  id="Lake Victoria"  name="Lake Victoria"  lat="-2.0"  lon="32.0"  elev="0.0" />
+<station  id="Gulf of Guinea"  name="Gulf of Guinea"  lat="3.0"  lon="3.0"  elev="0.0" />
+<station  id="Gulf of Aden"  name="Gulf of Aden"  lat="12.0"  lon="48.0"  elev="0.0" />
+<station  id="Botswana"  name="Botswana"  lat="-22.04759979248047"  lon="25.07939910888672"  elev="0.0" />
+<station  id="Lesotho"  name="Lesotho"  lat="-29.53190040588379"  lon="27.84040069580078"  elev="0.0" />
+<station  id="Namibia"  name="Namibia"  lat="-20.001399993896484"  lon="17.93939971923828"  elev="0.0" />
+<station  id="South Africa"  name="South Africa"  lat="-29.252899169921875"  lon="24.0"  elev="0.0" />
+<station  id="Swaziland"  name="Swaziland"  lat="-26.523399353027344"  lon="31.46310043334961"  elev="0.0" />
+<station  id="Gaborone"  name="Gaborone"  lat="-24.646400451660156"  lon="25.91189956665039"  elev="0.0" />
+<station  id="Lobamba"  name="Lobamba"  lat="-26.466699600219727"  lon="31.200000762939453"  elev="0.0" />
+<station  id="Maputo"  name="Maputo"  lat="-25.965299606323242"  lon="32.58919906616211"  elev="0.0" />
+<station  id="Maseru"  name="Maseru"  lat="-29.316699981689453"  lon="27.483299255371094"  elev="0.0" />
+<station  id="Mbabane"  name="Mbabane"  lat="-26.316699981689453"  lon="31.13330078125"  elev="0.0" />
+<station  id="Pretoria"  name="Pretoria"  lat="-25.706899642944336"  lon="28.229400634765625"  elev="0.0" />
+<station  id="Windhoek"  name="Windhoek"  lat="-22.56999969482422"  lon="17.083599090576172"  elev="0.0" />
+<station  id="Namib Desert"  name="Namib Desert"  lat="-24.0"  lon="15.0"  elev="0.0" />
+<station  id="Kalahari Desert"  name="Kalahari Desert"  lat="-23.0"  lon="21.0"  elev="0.0" />
+<station  id="Mozambique Channel"  name="Mozambique Channel"  lat="-20.0"  lon="40.0"  elev="0.0" />
+<station  id="Gambia"  name="Gambia"  lat="13.5"  lon="-16.0"  elev="0.0" />
+<station  id="Guinea-Bissau"  name="Guinea-Bissau"  lat="12.055999755859375"  lon="-15.096599578857422"  elev="0.0" />
+<station  id="Senegal"  name="Senegal"  lat="14.314399719238281"  lon="-15.424599647521973"  elev="0.0" />
+<station  id="Guinea"  name="Guinea"  lat="10.116600036621094"  lon="-10.883199691772461"  elev="0.0" />
+<station  id="Ivory Coast"  name="Ivory Coast"  lat="7.590980052947998"  lon="-5.596650123596191"  elev="0.0" />
+<station  id="Liberia"  name="Liberia"  lat="6.5694899559021"  lon="-9.611510276794434"  elev="0.0" />
+<station  id="Mali"  name="Mali"  lat="13.543600082397461"  lon="-7.047389984130859"  elev="0.0" />
+<station  id="Sierra Leone"  name="Sierra Leone"  lat="8.366669654846191"  lon="-11.80720043182373"  elev="0.0" />
+<station  id="Cape Verde"  name="Cape Verde"  lat="16.03569984436035"  lon="-24.187700271606445"  elev="0.0" />
+<station  id="Algeria"  name="Algeria"  lat="35.608299255371094"  lon="3.237299919128418"  elev="0.0" />
+<station  id="Gibraltar"  name="Gibraltar"  lat="36.13330078125"  lon="-5.338890075683594"  elev="0.0" />
+<station  id="Isle of Man"  name="Isle of Man"  lat="34.099998474121094"  lon="-4.5"  elev="0.0" />
+<station  id="Malta"  name="Malta"  lat="35.904998779296875"  lon="14.428400039672852"  elev="0.0" />
+<station  id="Mauritania"  name="Mauritania"  lat="16.277000427246094"  lon="-12.115699768066406"  elev="0.0" />
+<station  id="Morocco"  name="Morocco"  lat="32.40660095214844"  lon="-6.912469863891602"  elev="0.0" />
+<station  id="Tunisia"  name="Tunisia"  lat="35.630401611328125"  lon="9.950090408325195"  elev="0.0" />
+<station  id="Libya"  name="Libya"  lat="27.5"  lon="17.5"  elev="0.0" />
+<station  id="Alger"  name="Alger"  lat="36.763099670410156"  lon="3.0505599975585938"  elev="0.0" />
+<station  id="Algiers"  name="Algiers"  lat="36.763099670410156"  lon="3.0505599975585938"  elev="0.0" />
+<station  id="Bamako"  name="Bamako"  lat="12.649999618530273"  lon="-8.0"  elev="0.0" />
+<station  id="Banjul"  name="Banjul"  lat="13.453100204467773"  lon="-16.577499389648438"  elev="0.0" />
+<station  id="Bissau"  name="Bissau"  lat="11.850000381469727"  lon="-15.58329963684082"  elev="0.0" />
+<station  id="Conakry"  name="Conakry"  lat="9.509169578552246"  lon="-13.712200164794922"  elev="0.0" />
+<station  id="Dakar"  name="Dakar"  lat="14.67080020904541"  lon="-17.438100814819336"  elev="0.0" />
+<station  id="Freetown"  name="Freetown"  lat="8.489999771118164"  lon="-13.234199523925781"  elev="0.0" />
+<station  id="Monrovia"  name="Monrovia"  lat="6.31056022644043"  lon="-10.804699897766113"  elev="0.0" />
+<station  id="Nouakchott"  name="Nouakchott"  lat="18.08639907836914"  lon="-15.975299835205078"  elev="0.0" />
+<station  id="Praia"  name="Praia"  lat="14.91670036315918"  lon="-23.516700744628906"  elev="0.0" />
+<station  id="Rabat"  name="Rabat"  lat="34.025299072265625"  lon="-6.8361101150512695"  elev="0.0" />
+<station  id="Tarabulus"  name="Tarabulus"  lat="32.89250183105469"  lon="13.180000305175781"  elev="0.0" />
+<station  id="Tripoli"  name="Tripoli"  lat="32.89250183105469"  lon="13.180000305175781"  elev="0.0" />
+<station  id="Tunis"  name="Tunis"  lat="36.802799224853516"  lon="10.179699897766113"  elev="0.0" />
+<station  id="Valletta"  name="Valletta"  lat="35.89970016479492"  lon="14.514699935913086"  elev="0.0" />
+<station  id="Yamoussoukro"  name="Yamoussoukro"  lat="6.816669940948486"  lon="-5.283329963684082"  elev="0.0" />
+<station  id="Atlas Mountains"  name="Atlas Mountains"  lat="32.900001525878906"  lon="-4.0"  elev="0.0" />
+<station  id="Alboran Sea"  name="Alboran Sea"  lat="35.0"  lon="-6.0"  elev="0.0" />
+<station  id="Strait of Gibraltar"  name="Strait of Gibraltar"  lat="36.0"  lon="-5.5"  elev="0.0" />
+<station  id="Ionian Sea"  name="Ionian Sea"  lat="37.0"  lon="19.0"  elev="0.0" />
+<station  id="Mediterranean Sea"  name="Mediterranean Sea"  lat="35.0"  lon="20.0"  elev="0.0" />
+<station  id="Andorra"  name="Andorra"  lat="42.52790069580078"  lon="1.5373200178146362"  elev="0.0" />
+<station  id="Portugal"  name="Portugal"  lat="40.01240158081055"  lon="-8.9791898727417"  elev="0.0" />
+<station  id="Spain"  name="Spain"  lat="40.965999603271484"  lon="-4.476880073547363"  elev="0.0" />
+<station  id="Vatican City"  name="Vatican City"  lat="41.900001525878906"  lon="12.369999885559082"  elev="0.0" />
+<station  id="Albania"  name="Albania"  lat="41.090301513671875"  lon="20.01889991760254"  elev="0.0" />
+<station  id="Greece"  name="Greece"  lat="38.61880111694336"  lon="22.67930030822754"  elev="0.0" />
+<station  id="Macedonia"  name="Macedonia"  lat="41.5"  lon="21.5"  elev="0.0" />
+<station  id="Andorra la Vella"  name="Andorra la Vella"  lat="42.5"  lon="1.5166699886322021"  elev="0.0" />
+<station  id="Athens"  name="Athens"  lat="37.983299255371094"  lon="23.733299255371094"  elev="0.0" />
+<station  id="Athinai"  name="Athinai"  lat="37.983299255371094"  lon="23.733299255371094"  elev="0.0" />
+<station  id="Lisboa"  name="Lisboa"  lat="38.71670150756836"  lon="-9.133330345153809"  elev="0.0" />
+<station  id="Lisbon"  name="Lisbon"  lat="38.71670150756836"  lon="-9.133330345153809"  elev="0.0" />
+<station  id="Madrid"  name="Madrid"  lat="40.400001525878906"  lon="-3.6833300590515137"  elev="0.0" />
+<station  id="Roma"  name="Roma"  lat="41.900001525878906"  lon="12.48330020904541"  elev="0.0" />
+<station  id="Rome"  name="Rome"  lat="41.900001525878906"  lon="12.48330020904541"  elev="0.0" />
+<station  id="Skopje"  name="Skopje"  lat="42.0"  lon="21.433300018310547"  elev="0.0" />
+<station  id="Tirana"  name="Tirana"  lat="41.32749938964844"  lon="19.818899154663086"  elev="0.0" />
+<station  id="Tirane"  name="Tirane"  lat="41.32749938964844"  lon="19.818899154663086"  elev="0.0" />
+<station  id="Balearic Sea"  name="Balearic Sea"  lat="41.0"  lon="2.0"  elev="0.0" />
+<station  id="Tyrrhenian Sea"  name="Tyrrhenian Sea"  lat="40.0"  lon="13.0"  elev="0.0" />
+<station  id="Adriatic Sea"  name="Adriatic Sea"  lat="42.0"  lon="16.0"  elev="0.0" />
+<station  id="Aegean Sea"  name="Aegean Sea"  lat="39.0"  lon="25.0"  elev="0.0" />
+<station  id="Cyprus"  name="Cyprus"  lat="35.04869842529297"  lon="33.16270065307617"  elev="0.0" />
+<station  id="Egypt"  name="Egypt"  lat="29.660499572753906"  lon="31.20439910888672"  elev="0.0" />
+<station  id="Iraq"  name="Iraq"  lat="34.13209915161133"  lon="44.86970138549805"  elev="0.0" />
+<station  id="Israel"  name="Israel"  lat="31.200000762939453"  lon="34.79999923706055"  elev="0.0" />
+<station  id="Jordan"  name="Jordan"  lat="31.858600616455078"  lon="35.81039810180664"  elev="0.0" />
+<station  id="Lebanon"  name="Lebanon"  lat="33.9276008605957"  lon="35.73460006713867"  elev="0.0" />
+<station  id="Saudi Arabia"  name="Saudi Arabia"  lat="23.156200408935547"  lon="43.06589889526367"  elev="0.0" />
+<station  id="Syria"  name="Syria"  lat="35.0"  lon="38.5"  elev="0.0" />
+<station  id="Al Qahirah"  name="Al Qahirah"  lat="30.049999237060547"  lon="31.25"  elev="0.0" />
+<station  id="Amman"  name="Amman"  lat="31.950000762939453"  lon="35.93330001831055"  elev="0.0" />
+<station  id="`Amman"  name="`Amman"  lat="31.950000762939453"  lon="35.93330001831055"  elev="0.0" />
+<station  id="Baghdad"  name="Baghdad"  lat="33.338600158691406"  lon="44.39390182495117"  elev="0.0" />
+<station  id="Beirut"  name="Beirut"  lat="33.87189865112305"  lon="35.509700775146484"  elev="0.0" />
+<station  id="Beyrouth"  name="Beyrouth"  lat="33.87189865112305"  lon="35.509700775146484"  elev="0.0" />
+<station  id="Cairo"  name="Cairo"  lat="30.049999237060547"  lon="31.25"  elev="0.0" />
+<station  id="Damascus"  name="Damascus"  lat="33.5"  lon="36.29999923706055"  elev="0.0" />
+<station  id="Dimashq"  name="Dimashq"  lat="33.5"  lon="36.29999923706055"  elev="0.0" />
+<station  id="Nicosia"  name="Nicosia"  lat="35.16669845581055"  lon="33.36669921875"  elev="0.0" />
+<station  id="Nubian Desert"  name="Nubian Desert"  lat="21.0"  lon="33.0"  elev="0.0" />
+<station  id="Syrian Desert"  name="Syrian Desert"  lat="31.0"  lon="42.0"  elev="0.0" />
+<station  id="Red Sea"  name="Red Sea"  lat="20.0"  lon="37.0"  elev="0.0" />
+<station  id="Seychelles"  name="Seychelles"  lat="-2.3718700408935547"  lon="53.900001525878906"  elev="0.0" />
+<station  id="Bahrain"  name="Bahrain"  lat="26.15999984741211"  lon="50.5526008605957"  elev="0.0" />
+<station  id="Oman"  name="Oman"  lat="22.974899291992188"  lon="57.00429916381836"  elev="0.0" />
+<station  id="Qatar"  name="Qatar"  lat="25.60260009765625"  lon="51.28820037841797"  elev="0.0" />
+<station  id="United Arab Emirates"  name="United Arab Emirates"  lat="23.0"  lon="53.0"  elev="0.0" />
+<station  id="Abu Dhabi"  name="Abu Dhabi"  lat="24.466699600219727"  lon="54.36669921875"  elev="0.0" />
+<station  id="Abu Zaby"  name="Abu Zaby"  lat="24.466699600219727"  lon="54.36669921875"  elev="0.0" />
+<station  id="Ad Dawhah"  name="Ad Dawhah"  lat="25.286699295043945"  lon="51.53329849243164"  elev="0.0" />
+<station  id="Al Manamah"  name="Al Manamah"  lat="26.236099243164062"  lon="50.583099365234375"  elev="0.0" />
+<station  id="Ar Riyad"  name="Ar Riyad"  lat="24.64080047607422"  lon="46.77280044555664"  elev="0.0" />
+<station  id="Doha"  name="Doha"  lat="25.286699295043945"  lon="51.53329849243164"  elev="0.0" />
+<station  id="Manama"  name="Manama"  lat="26.236099243164062"  lon="50.583099365234375"  elev="0.0" />
+<station  id="Riyadh"  name="Riyadh"  lat="24.64080047607422"  lon="46.77280044555664"  elev="0.0" />
+<station  id="Victoria"  name="Victoria"  lat="-4.61667013168335"  lon="55.45000076293945"  elev="0.0" />
+<station  id="Persian Gulf"  name="Persian Gulf"  lat="26.0"  lon="51.0"  elev="0.0" />
+<station  id="Strait of Hormus"  name="Strait of Hormus"  lat="26.0"  lon="55.0"  elev="0.0" />
+</stationtable>

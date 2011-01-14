@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Shapefile</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV can display ESRI polygon shapefiles.
+</div>
+
+<ol class="step">
+<li> Clear all data and displays.
+
+<li> Load a shapefile. We'll use a catalog of shapefiles derived from  the  Census Tiger
+database provided by ESRI.
+
+<ul>
+    <li> Open the <code class="dialog">Data Source Chooser</code> window.</li>
+    <li> Click on the <code class="command">Catalogs</code> tab.</li>
+    <li> Go to the [ht::command Main IDV Catalog]
+    <li> Select [ht::dataset Tiger Shapefiles]-&gt;[ht::dataset Colorado]-&gt;[ht::dataset Roads]-&gt;[ht::dataset Boulder]
+    <li> Press [ht::button Add Source]
+    <li> The shapefile will be loaded and a [ht::display Shapefile Display] control will automatically be created.
+</ul>
+
+ <li> Add a background image with the 
+         [ht::menu Displays {Maps and Backgrounds} {Add Background Image}] menu item.
+ <li> Note the shapefile display is hidden. Raise it with the [ht::command Vertical Position] slider.
+
+ <li> This shapefile has an attribute database shown in the [ht::command Table] tab.
+ <ul>
+    <li> Select the [ht::command Table] tab.
+    <li> Press the [ht::command Select Fields to Show] button to subset the fields.
+    <li> Select all [ht::command Current Fields] by clicking in the list and pressing Control-A.
+    <li> Press the [ht::command Remove] button.
+    <li> In [ht::command All Fields] select [ht::param FENAME] (feature name)
+    <li> Press the [ht::command Add] button.
+    <li> Press [ht::button OK]
+ </ul>
+
+
+ <li> Let's just show Highway 119
+ <ul>
+    <li> Select the [ht::command Filters] tab.
+    <li> Under [ht::command Property] column select [ht::param FENAME]
+    <li> Select [ht::qt Contains String]
+    <li> Under [ht::command Value] column  enter [ht::qt 119]
+    <li> Press [ht::button Apply Filters]
+ </ul>
+
+
+</ol>
+
+</body>
+</html>

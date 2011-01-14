@@ -1,0 +1,103 @@
+List of IDV Bugs/Enhancements collected from workshops, user inquiries, and talking to users.
+
+==Bugs==
+
+* cached data does not remember time subsetting
+* dual monitor support doesn't work well.
+* decluttering with station names (or text glyphs in general) doesn't work
+* well in the  station model/location controls
+* color scales and labels sometimes disappear when loaded from a bundle.
+* Satellite image does not show up in NEXRCOMP projection (VisAD bug)
+* View->Capture->Print function doesn't work well
+* Radar Cross Section and RHI don't work in the globe display
+* make2D with a slice (to ignore the vertical dimension) doesn't give a slider in the plan view display
+* Barnes does not handle missing data well.  Radius of influence seems not to be setting values to NaN.
+* Values in text fields in the LocationIndicatorControl don't handle localization.
+* Cross sections through WRF native grids are usually empty
+* charts have problems with dates.  See Inquiry AHX-540298
+* can't load sounding data from NOMADs servers because they don't support units.  NCEP is supposed to be working on this, but is put on hold for new development
+* Stop loads doesn't really stop loads, needs to do more better
+* loading stations when zoomed has scaling issues
+
+== Enhancements==
+
+===Views===
+
+* Tabbed browsing.  Load bundles into tab groups.
+* Finish making all displays work well in the globe view.
+
+===Displays ===
+
+* meteorograms
+* charts
+* Flow visualization; Lagrangian vis:
+    ** balls, streamers, trajectories, ribbons from columns and rows; these should work in both the forward and reverse time sense.
+* lat/lon line labels
+* lat/lon scales on maps and improved vertical scale.
+* add mouse wheel support to Omni control
+* rewrite the sounding displays
+  ** overlay multiple soundings (e.g. grids and observed)
+  ** support for additional stability parameters
+  ** pre-select the location for sampling into grids
+* Plot upper air station obs at the appropriate level
+* Improve color scale and labelling in the displays
+* merge contours/color filled contours into one control where the user can select one or both.
+* Allow zooming of RHI control without axis changing (use TransectDisplay?)
+* Ignore the level dimension in PlanViewControls - allow either using levels or   Z value to place a display
+* Show the current timestep in the Time/Height Display
+* Observed sounding cross sections and time/height displays
+* ensemble model features (displays and diagnostics)
+* change "Layout Model" to "Plot Model"
+* In FlowXControl, change the range widget to be a ValueSelectorWidget
+* In CrossSectionControl and VerticalProfileControl, use native vertical dimension instead of Altitude
+* allow for formatting time variable in the Layout Model Editor
+* calculate radar max composite - or composite through levels in general
+* Move from using println to logging in GEMPAK IOSPs
+* Allow users to set the Weather Text Product server
+* Need to be able to capture the Profiler Displays - needs a ViewManager
+* Hodograph needs a display list label
+* support multiple parameter data transects
+* progressive disclosure of wind barbs.
+* allow user to set timezone on the %time:% macro in the display controls
+* update to Jython 2.5 to support JNumeric
+* adjust size of contour labels - need to implement label size in ContourInfo.  Should probably be done in conjunction with SSEC to support fonts for contour labels.
+* Add a circle shape and other shapes to the drawing control
+
+===Data===
+
+* improved time selection - select data based on existing displays (e.g. reference dataset).  Needs to work in bundles
+* auto subset of data (images/grids) based on the current projection
+* support for alternative vertical coordinates (e.g. theta, sigma, etc)
+* text grid import (e.g., Surfer format, GEON)
+* TIGGE Tropical Cyclone (CXML) products (https://dss.ucar.edu/datazone/dsszone/ds330.3/)
+* Web Map Server Time requests
+* Save NEXRAD/TDS data in a bundle
+* Watches/Warnings
+* create an extractLongitude method (akin to extractLatitude)
+* CF exporting - include lat/lon to be complete
+* CF exporting - handle cross section output
+* Support for grids with multiple projections (e.g. McIDAS).  This would be a major rewrite of the GeoGridDataSource to handle this in the properties.
+* subset across the grid boundary for global grids (needs to be supported in CDM first).
+* support for ideal WRF runs (without lat/lon info)
+* additional GEMPAK grid diagnostics
+* support calculations on point data
+* streamlines in cross sections
+* vector components normal to a cross section
+* if the FMRC is configurable, implement this in the IDV models catalog.  Only show best and constant forecast hour.
+* maintain the model run/forecast hour information instead of just the valid time.  Use that in the display labels.
+
+===System===
+
+* memory configuration ala Mc-V.  Write preference to a file, read in runIDV.bat  and runIDV.
+* Check for updates.
+* memory improvements (image caching, imageByRef)
+
+===Other===
+
+* Rewrite the Projection Manager
+* Improve color bars in PDF
+* improve export to vector graphics - right now it only shows what's displayed so you get screen resolution
+
+- Stop loads doesn't really stop loads, needs to do more better (Jeff)
+- loading stations when zoomed has scaling issues (Jeff)
+

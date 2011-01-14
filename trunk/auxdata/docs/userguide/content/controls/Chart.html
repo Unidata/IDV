@@ -1,0 +1,80 @@
+{Charts}
+
+{
+A number of the display controls make use of a charting facility. The charts
+have a common set of properties and facilities.
+
+Each of these display controls will show a thumbnail image of their charts
+in the legend. This can be toggled using the [ug::menu View Chart {Show Chart Thumbnail}] menu.
+
+
+There are  three levels of configuration available to the user.
+
+<subhead id="chartlines" intoc="false">Chart Line Properties</subhead>
+
+
+At the lowest level you can set the properties of how each parameter or
+field is shown.  This is done through the Chart Line properties dialog which
+is brought up typically through the [ug::menu View Chart] menu or by right clicking
+on the fields table.
+
+[ht::cimg images/ChartLineProperties.gif]
+
+This properties  dialog allows you to set the visibility of the line ([ug::button Full Plot])
+as well as the whether the axis label is shown. You can also specify a different [ug::button Chart Name]
+by selecting one from the pull-down list or typing one into the field. 
+This is how you create new charts. The display will automatically create a new chart with the given name.
+You can also specify what side of the chart the axis is shown. The
+[ug::button Range] fields allow you to fix the axis range. That way as the chart values change the axis
+range is maintained constant.
+
+There are a number of settings for the actual display of the line. It can be a line, area, shape, etc.
+You can also set the line stroke, width and color.
+The [ug::button Vertical Position] menu allows you to define where in the chart special shapes
+are shown (e.g., wind barbs, cloud coverage, text).
+
+
+
+<subhead id="chartproperties" intoc="false">Chart Properties</subhead>
+For each chart there are a number of settings that can be changed through the
+Chart Properties dialog. This is also accessed through the [ug::menu View Chart] 
+menu or by right clicking on the chart. 
+
+[ht::cimg images/ChartProperties.gif]
+You can change the name of the chart and set its background color and domain/range line 
+properties.  
+
+When right clicking on a chart you can also zoom in and out and write the chart as an image.
+There are also a number of key and mouse bindings on the chart:
+<ul>
+<li> Control-R: Reset any zooming.
+<li> Up/Down/Left/Right Arrows: Pan
+p<li> Left mouse drag - zoom
+</ul>
+
+
+<subhead id="chartlayout" intoc="false">Chart Layout</subhead>
+When you have multiple charts you can define different layouts for them
+using the [ug::menu View Chart {Layout}] menu. There are a number of
+pre-defined layouts: Vertical, Horizontal, 2 Column, 3 Column, Tabs.
+The Grid Layout allows for much flexibility in how the charts are organized
+and laid out. The [ug::menu View Chart {Layout} {Change Grid Layout}] menu
+brings up the Grid Layout Editor:
+[ht::cimg images/GridLayoutEditor.gif]
+
+The idea here is the overall window is divided up into a number of rows and columns. You can
+add/remove rows and columns with the &quot;+&quot; and &quot;-&quot;  buttons.
+You can then drag the little graphical representations of the charts to place
+them in the grid. A chart can also span multiple rows or columns. Just grab
+the little black square on one side of the chart image and drag it to change the
+row or column.
+
+
+
+
+
+
+<%nochildlist%>
+
+
+}

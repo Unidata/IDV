@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="South America" category="World locations">
+<stn name="Asuncion " lat="25:16:S" lon="57:40:W"/>
+<stn name="Atacama " lat="23:00:S" lon="70:10:W"/>
+<stn name="Atacama " lat="24:30:S" lon="69:15:W"/>
+<stn name="Barranquilla " lat="10:59:N" lon="74:48:W"/>
+<stn name="Bogota " lat="4:36:N" lon="74:05:W"/>
+<stn name="Brasilia " lat="15:47:S" lon="47:55:W"/>
+<stn name="British Guiana " lat="5:00:N" lon="59:00:W"/>
+<stn name="Buenos Aires " lat="34:36:S" lon="58:27:W"/>
+<stn name="Caracas " lat="10:30:N" lon="66:56:W"/>
+<stn name="Cayenne " lat="4:56:N" lon="52:20:W"/>
+<stn name="Chiloe " lat="42:50:S" lon="74:00:W"/>
+<stn name="Colon, Archipielago de " lat="0:00:N" lon="90:30:W"/>
+<stn name="Corocoro Island" lat="3:38:N" lon="66:50:W"/>
+<stn name="Corocoro Island" lat="3:38:N" lon="66:50:W"/>
+<stn name="Cotopaxi " lat="0:39:S" lon="78:26:W"/>
+<stn name="Courantyne River" lat="5:57:N" lon="57:06:W"/>
+<stn name="Courantyne River" lat="5:57:N" lon="57:06:W"/>
+<stn name="Devils Island " lat="5:17:N" lon="52:35:W"/>
+<stn name="Diego Ramirez " lat="56:30:S" lon="68:43:W"/>
+<stn name="Dutch Guiana " lat="4:00:N" lon="56:00:W"/>
+<stn name="Easter Island " lat="27:07:S" lon="109:22:W"/>
+<stn name="Essequibo " lat="6:59:N" lon="58:23:W"/>
+<stn name="Fernando de Noronha " lat="3:51:S" lon="32:25:W"/>
+<stn name="Galapagos Islands " lat="0:00:N" lon="90:30:W"/>
+<stn name="Georgetown " lat="6:48:N" lon="58:10:W"/>
+<stn name="Gran Chaco " lat="24:00:S" lon="60:00:W"/>
+<stn name="Gran Chaco " lat="24:00:S" lon="60:00:W"/>
+<stn name="Guyane Francaise " lat="4:00:N" lon="53:00:W"/>
+<stn name="Horn, Cape " lat="55:59:S" lon="67:16:W"/>
+<stn name="Inini " lat="4:00:N" lon="53:00:W"/>
+<stn name="Juan Fernandez, Islas de " lat="33:00:S" lon="80:00:W"/>
+<stn name="La Paz " lat="16:30:S" lon="68:09:W"/>
+<stn name="Lima " lat="12:03:S" lon="77:03:W"/>
+<stn name="Llanos " lat="8:00:N" lon="68:00:W"/>
+<stn name="Malpelo, Isla de " lat="4:00:N" lon="90:30:W"/>
+<stn name="Margarita, Isla " lat="10:00:N" lon="64:00:W"/>
+<stn name="Martin Vaz, Ilhas " lat="20:30:S" lon="28:51:W"/>
+<stn name="Mas a Tierra " lat="33:38:S" lon="78:52:W"/>
+<stn name="Montevideo " lat="34:53:S" lon="56:11:W"/>
+<stn name="Netherlands Guiana " lat="4:00:N" lon="56:00:W"/>
+<stn name="Pampas " lat="35:00:S" lon="63:00:W"/>
+<stn name="Paramaribo " lat="5:50:N" lon="55:10:W"/>
+<stn name="Pascua, Isla de " lat="27:07:S" lon="109:22:W"/>
+<stn name="Patagonia " lat="48:00:S" lon="61:00:W"/>
+<stn name="Quito " lat="0:13:S" lon="78:30:W"/>
+<stn name="Rapa Nui " lat="27:07:S" lon="109:22:W"/>
+<stn name="Robinson Crusoe Island " lat="33:38:S" lon="78:52:W"/>
+<stn name="Rocas, Atol das " lat="3:51:S" lon="33:49:W"/>
+<stn name="Roncador Cay " lat="13:32:N" lon="80:03:W"/>
+<stn name="Safety Islands " lat="5:20:N" lon="52:37:W"/>
+<stn name="Saint Peter and Saint Paul Rocks " lat="0:23:N" lon="29:23:W"/>
+<stn name="Sala y Gomez, Isla " lat="26:28:S" lon="105:00:W"/>
+<stn name="San Ambrosio, Isla " lat="26:21:S" lon="79:52:W"/>
+<stn name="San Andres y Providencia, Archipielago " lat="13:00:N" lon="81:30:W"/>
+<stn name="San Felix, Isla " lat="26:17:S" lon="80:05:W"/>
+<stn name="Santa Cruz " lat="17:48:S" lon="63:10:W"/>
+<stn name="Santiago " lat="33:27:S" lon="70:40:W"/>
+<stn name="Sao Pedro e Sao Paulo, Penedos de " lat="0:23:N" lon="29:23:W"/>
+<stn name="Serrana Bank " lat="14:25:N" lon="80:16:W"/>
+<stn name="Serranilla Bank " lat="15:51:N" lon="79:46:W"/>
+<stn name="Sucre " lat="19:02:S" lon="65:17:W"/>
+<stn name="Surinam " lat="4:00:N" lon="56:00:W"/>
+<stn name="Swan Islands" lat="17:25:S" lon="83:56:W"/>
+<stn name="Tierra del Fuego " lat="54:00:S" lon="69:00:W"/>
+<stn name="Tierra del Fuego " lat="54:00:S" lon="69:00:W"/>
+<stn name="Trindade, Ilha de " lat="20:31:S" lon="29:20:W"/>
+</stationtable>

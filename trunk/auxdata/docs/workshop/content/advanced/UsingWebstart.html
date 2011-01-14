@@ -1,0 +1,48 @@
+
+<title>Configuring using Web Start</title>
+
+
+<div class="overview">
+Using Web Start JNLP files  to configure the IDV.
+</div>
+
+<ol class="step">
+  
+<li>Using Web Start to pre-define plugins.</li>
+  
+  <ul class="substep">
+    
+    <li>You can create your own Web Start files that contain site configuration
+        information.</li>
+    
+    <li>Look [ht::popup workshop.jnlp.txt here -width 700] to view an example
+        [ht::filename JNLP] file.</li>
+    
+    <li>You can pass in command line arguments. e.g.:</li>
+<pre>
+&lt;argument&gt;-plugin&lt;/argument&gt;
+&lt;argument&gt;<%workshop.sitepath%>/myplugin.jar&lt;/argument&gt;
+</pre>
+    
+    <li>You can also define  bundles that are loaded at start up time:</li>
+<pre>
+&lt;argument&gt;<%workshop.sitepath%>/example.xidv&lt;/argument&gt;
+</pre>
+  </ul>
+
+<li> You can also configure the IDV to only have one running instance.  
+<ul>
+<li> In the jnlp file add the <i>-oneinstanceport</i> argument and provide some port number.
+<pre>
+&lt;argument&gt;-oneinstanceport&lt;/argument&gt;
+&lt;argument&gt;8888&lt;/argument&gt;
+</pre>
+<li> Now, once the IDV is running with this argument subsequent executions of the IDV will result
+in the command line arguments being passed to the initial IDV and the new IDV exits.
+</ul>
+
+
+</ol>
+
+
+

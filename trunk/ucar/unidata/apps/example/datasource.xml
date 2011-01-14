@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<datasources>
+
+<!-- 
+The patterns attrbiute is a comma separated list of regular 
+expressions to match the filename on. For example the patterns 
+here say this data source will be created with anything ending
+in .txt or .html
+-->
+
+	<datasource id="EXAMPLE.DATA" 
+               factory="ucar.unidata.apps.example.ExampleDataSource" 
+               patterns="\.txt$,\.html$"
+               label="Example data source"
+               />
+
+
+
+</datasources>
+
+
+
+

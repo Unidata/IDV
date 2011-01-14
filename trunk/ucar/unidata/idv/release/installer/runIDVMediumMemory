@@ -1,0 +1,22 @@
+#!/bin/sh
+
+dirname=`dirname $0`
+command="java -Xmx1024m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*"
+
+if test -f jre/bin/java; then
+##We are in the installer directory
+    ./jre/bin/${command}
+else
+##Try using the dirname of this script
+    if test -f ${dirname}/jre/bin/java; then
+       ${dirname}/jre/bin/${command}
+    else 
+       if test  ${JAVA_HOME}; then
+##Try using JAVA_HOME
+          ${JAVA_HOME}/bin/${command}
+       else 
+##Try just using java
+          ${command}
+      fi
+    fi
+fi

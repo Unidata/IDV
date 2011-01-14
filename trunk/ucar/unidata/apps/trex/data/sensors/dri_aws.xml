@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="dri aws">
+<station name="dri aws 1" lat="36.768333" lon="-118.276111"/>
+<station name="dri aws 2" lat="36.777778" lon="-118.243333"/>
+<station name="dri aws 3" lat="36.786389" lon="-118.207778"/>
+<station name="dri aws 4" lat="36.794722" lon="-118.166111"/>
+<station name="dri aws 5" lat="36.800556" lon="-118.132778"/>
+<station name="dri aws 6" lat="36.810833" lon="-118.091389"/>
+<station name="dri aws 7" lat="36.754167" lon="-118.254444"/>
+<station name="dri aws 8" lat="36.761111" lon="-118.229167"/>
+<station name="dri aws 9" lat="36.765833" lon="-118.189722"/>
+<station name="dri aws 10" lat="36.773056" lon="-118.163333"/>
+<station name="dri aws 11" lat="36.780833" lon="-118.1275"/>
+<station name="dri aws 12" lat="36.785278" lon="-118.106667"/>
+<station name="dri aws 13" lat="36.719167" lon="-118.204167"/>
+<station name="dri aws 14" lat="36.728611" lon="-118.171111"/>
+<station name="dri aws 15" lat="36.741111" lon="-118.115556"/>
+<station name="dri aws 16" lat="36.739722" lon="-118.088333"/>
+</stationtable>

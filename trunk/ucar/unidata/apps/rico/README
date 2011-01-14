@@ -1,0 +1,32 @@
+
+To make the Rico installers simply source the script:
+source makeInstaller.sh
+
+By default this script runs the makeia.tcl script with
+the source tree root being this directory tree. The destination
+is also this directory.
+
+When IA first comes up you need to select the project file to use.
+Select "Open Existing Project"
+
+If IA has been run before past project files will be listed.
+Note: This lists all project files  that have been used by 
+*all* users. Its best to select: "Open Other" and explicitly
+select the one to use, which is:
+ucar/unidata/apps/rico/scratch/generated_rico_1_0.iap_xml
+
+
+
+Once you select a project file just keep hitting "Next"
+
+
+
+When a dialog pops up asking  you to specify a main class just hit No.
+
+Finally hit "Build"
+
+When its done hit exit. The makeia.tcl script will now make the d3d windows
+installer. Repeat the above.
+
+When done all of the installers will be placed in this directory.
+

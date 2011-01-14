@@ -1,0 +1,29 @@
+
+README file for the local IDV store directory
+
+Contents:
+
+tmp: Stores local files, e.g., downloaded images from the Web Cam display
+This will get scoured of old files every time the  IDV runs
+
+python/: Holds the users local jython libraries
+
+plugins/: The local plugins directory. Any file in this directory will be loaded as a plugin
+
+bundles/: Holds the local "Favorites" bundles 
+
+datasources/:  The favorite data sources.
+
+displaytemplates/: Holds the local display template "Favorites"
+
+
+idv.rbi: An example resource definition file
+
+default.xidv: The users default bundle
+
+main.xml: preferences and saved state
+
+history.xml: A listing of all data sources and opened bundles
+
+
+

@@ -1,0 +1,8 @@
+<stationtable name="idd2 sites">
+<station idn="" id="NSF" name="NSF" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="UCAR" name="UCAR" lat="40:00:00" lon="-105:15:48" elev="0"/>
+<station idn="" id="SSEC" name="SSEC" lat="43:08:26" lon="-89:20:43" elev="0"/>
+<station idn="" id="LSU" name="LSU" lat="30:32:00" lon="-90:57:00" elev="0"/>
+<station idn="" id="WEUN" name="Weather Underground" lat="37:37:11" lon="-122:21:53" elev="0"/>
+</stationtable>
+

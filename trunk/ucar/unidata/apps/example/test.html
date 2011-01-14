@@ -1,0 +1,78 @@
+
+
+<h3><center>Example Idv/Html Interface</center></h3>
+
+<table width="100%">
+<tr valign="top"><td>
+<b>View 1</b><br>
+<view id="view1" props="ShowControlLegend=false;size=200:200;">
+<br>
+<form action="idv:idv.createDisplay ('/harpo/tmp/jeffmc/test.nc', '%param%', '%display%', 'DefaultView=view1;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Field:</td><td> 
+<select name="param">
+<option value="T"> Temperature</option>
+<option value="RH">Relative humidity</option>
+<option value="U">U component of wind</option>
+<option value="V">V component of wind</option>
+</select>
+</td></tr>
+<tr valign="bottom"><td align=right>Display:</td><td> 
+<select name="display">
+<option value="contourxs">Contour cross-section</option>
+<option value="colorxs">Color cross-section</option>
+<option value="planviewcontour">Plan view contour</option>
+<option value="planviewcolor" >Plan view color</option>
+<option value="surface">3D Isosurface</option>
+</select>
+
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create display"></td></tr>
+</table>
+
+</form>
+
+
+
+
+</td>
+<td>
+<b>View 2</b><br>
+<view id="view2"  props="ShowControlLegend=false;size=200:200;">
+<br>
+<form action="idv:idv.createDisplay ('/harpo/tmp/jeffmc/test.nc', '%param%', '%display%', 'DefaultView=view2;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Field:</td><td> 
+<select name="param">
+<option value="T"> Temperature</option>
+<option value="RH">Relative humidity</option>
+<option value="U">U component of wind</option>
+<option value="V">V component of wind</option>
+</select>
+</td></tr>
+<tr valign="bottom"><td align=right>Display:</td><td> 
+<select name="display">
+<option value="contourxs">Contour cross-section</option>
+<option value="colorxs">Color cross-section</option>
+<option value="planviewcontour">Plan view contour</option>
+<option value="planviewcolor">Plan view color</option>
+<option value="surface">3D Isosurface</option>
+</select>
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create display"></td></tr>
+</table>
+</form>
+</td></tr>
+</table>
+<p>
+
+
+<a href="idv:datamanager.createDataSource ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/2002031406_avn-q.nc');"> Load dods data source </a>
+<p>
+<a href="idv:idv.createDisplay ('/harpo/tmp/jeffmc/test.nc', 'T', 'planviewcontour', '')">
+Add contour to main view
+</a>
+<p>
+<a href="idv:idv.showChooser ();"> Select data </a>
+<p>
+

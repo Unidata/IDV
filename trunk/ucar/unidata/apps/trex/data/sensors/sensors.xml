@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Lidar, etc.">
+<station name="asu doppler lidar" lat="36.836" lon="-118.167"/>
+<station name="dlr doppler lidar" lat="36.774" lon="-118.209"/>
+<station name="houston flux tower" lat="37.23143" lon="-118.29702"/>
+<station name="houston sodar" lat="37.23143" lon="-118.29702"/>
+<station name="leeds flux towers 1" lat="36.768333" lon="-118.276111"/>
+<station name="leeds flux towers 2" lat="36.786389" lon="-118.207778"/>
+<station name="leeds sodars 1" lat="36.768333" lon="-118.276111"/>
+<station name="leeds sodars 2" lat="36.786389" lon="-118.207778"/>
+<station name="leeds sodars 3" lat="36.800556" lon="-118.132778"/>
+<station name="ncar isff 1" lat="36.802" lon="-118.154"/>
+<station name="ncar isff 2" lat="36.76" lon="-118.247"/>
+<station name="ncar isff 3" lat="36.734" lon="-118.121"/>
+<station name="ncar mapr" lat="36.78798333" lon="-118.1784167"/>
+<station name="ncar miss" lat="36.72166667" lon="-118.1416667"/>
+<station name="ncar real alt" lat="36.78113" lon="-118.22683"/>
+<station name="ncar real" lat="36.76996" lon="-118.22947"/>
+<station name="noaa doppler lidar" lat="36.787" lon="-118.146"/>
+<station name="nrl aerosol lidar" lat="36.8" lon="-118.228"/>
+</stationtable>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="soil moisture">
+<station name="soil moisture 1" lat="37.23143333" lon="-118.29701667"/>
+<station name="soil moisture 2" lat="36.94835" lon="-118.3260167"/>
+<station name="soil moisture 3" lat="36.9596" lon="-118.2307167"/>
+<station name="soil moisture 4" lat="36.87158333" lon="-118.2902333"/>
+<station name="soil moisture 5" lat="36.88698333" lon="-118.2365167"/>
+<station name="soil moisture 6" lat="36.92005" lon="-118.12195"/>
+<station name="soil moisture 7" lat="36.77511667" lon="-118.3128333"/>
+<station name="soil moisture 8" lat="36.79018333" lon="-118.30105"/>
+<station name="soil moisture 9" lat="36.7683" lon="-118.2761"/>
+<station name="soil moisture 10" lat="36.7778" lon="-118.2433"/>
+<station name="soil moisture 11" lat="36.7864" lon="-118.2078"/>
+<station name="soil moisture 12" lat="36.80071667" lon="-118.1328333"/>
+<station name="soil moisture 13" lat="36.82288333" lon="-118.0995167"/>
+<station name="soil moisture 14" lat="36.84425" lon="-118.0851333"/>
+<station name="soil moisture 15" lat="36.86105" lon="-118.0595"/>
+<station name="soil moisture 16" lat="36.86786667" lon="-118.03965"/>
+<station name="soil moisture 17" lat="36.698" lon="-118.2463333"/>
+<station name="soil moisture 18" lat="36.7193" lon="-118.2042333"/>
+<station name="soil moisture 19" lat="36.73216667" lon="-118.1470167"/>
+<station name="soil moisture 20" lat="36.75176667" lon="-118.0529333"/>
+<station name="soil moisture 21" lat="36.59443333" lon="-118.21895"/>
+<station name="soil moisture 22" lat="36.5959" lon="-118.1721333"/>
+<station name="soil moisture 23" lat="36.60663333" lon="-118.07665"/>
+<station name="soil moisture 24" lat="36.61935" lon="-118.0356333"/>
+<station name="soil moisture 25" lat="36.64013333" lon="-117.9958667"/>
+<station name="soil moisture 26" lat="37.03421667" lon="-117.9753833"/>
+<station name="soil moisture 27" lat="36.97193333" lon="-117.9303"/>
+<station name="soil moisture 28" lat="36.89933333" lon="-117.9035833"/>
+</stationtable>

@@ -1,0 +1,104 @@
+
+[ug::head {Jython Methods}]
+
+
+The IDV allows you to write your own Jython methods using the Jython Library editor.
+From the main menu bar, select the [ug::menu Edit Formulas {Jython Library}] menu item.
+
+
+
+[ht::cimg images/JythonLibraryEditor.gif]
+
+The Jython Library window has a tree view on the left that shows the different
+(categorized) library files available. The files that are listed under &quot;Local Jython&quot;
+are those that you can edit. The  System files  cannot be edited.
+On the right is the edit pane for the selected file. 
+<p>
+There is documentation  available for the <a href="JythonLib.html">System Jython Libraries</a>.
+
+<faq>
+
+<faqitem cat="FAQ"></faqitem>
+
+<faqitem q="What is Jython?">
+Jython is a Java implementation of the Python language. It is used within the IDV for data analysis.
+Complex routines can be written in the IDV Jython editor and called from the 
+<a href="Formulas.html">IDV Formulas</a>.
+</faqitem>
+
+
+<faqitem q="How do I learn to write Jython?" name="top" id="learn">
+There are a <a href="http://www.amazon.com/s/ref=nb_ss_gw/002-3107995-7532045?url=search-alias%3Daps&field-keywords=jython&x=0&y=0">number of books</a> available on the language as well as a number of web sites:
+<ul>
+<li> <a href="http://www.python.org">http://www.python.org</a>
+<li> <a href="http://www.jython.org">http://www.jython.org</a>
+</ul>
+</faqitem>
+
+<faqitem q="How does Jython work with my data in the IDV?">
+The IDV uses the <a href="http://www.ssec.wisc.edu/~billh/visad.html">VisAD</a> package as 
+as an underlying data model.
+There is a <a href="http://www.ssec.wisc.edu/~tomw/visadtutor/">VisAD/Jython Tutorial</a> available.
+There is also an <a href="http://www.unidata.ucar.edu/software/idv/docs/workshop/formulas/index.html">IDV Workshop Section</a> on writing Jython.
+</faqitem>
+
+<faqitem q="I don't like editing in this editor. How do I use  my own editor?">
+You can use this edit window or, 
+optionally you can define the path to an external text editor (e.g., emacs, vi, etc.) 
+through the main <a href="Preferences.html">User Preferences</a>. Once defined there will be a File menu entry
+in the Jython Library &quot;Edit in External Editor&quot;. The file that is being edited is monitored by the IDV
+and, when it is saved by the external editor is loaded and checked for correct syntax. When the external editor exits
+the file is reinserted into the internal IDV editor.
+
+<p>
+
+When you save the file thought the external editor or the IDV editor the code is checked
+for valid Jython syntax;  If there is an
+error, a pop-up window will appear with an error message.
+The actual error will also be printed in the console window running the IDV. Correct the error and
+try to save again. 
+
+
+</faqitem>
+
+<faqitem q="Creating/Removing library files">
+To create  a new file uses the [ht::menu File {New Jython Library...}] menu. To remove the currently displayed
+library file use the [ht::menu File {Remove Library}] menu. 
+</faqitem>
+
+<faqitem q="Calling procedures from formulas">
+
+When creating a formula with the <a href="Formulas.html">Formula Editor</a>
+you can call any routines you have defined in the Jython Library
+Simply enter the procedure name in the formula, with
+appropriate arguments, if any. For example a formula might be
+&quot;convertCToF(atemp)&quot;.  When evaluating  the formula for display,
+this will call the routine that you define in the Jython Library.
+
+
+</faqitem>
+<faqitem q="Create a formula from my procedure">
+Right click on a procedure definition within the IDV editor window and choose 
+[ht::menu {Make formula for ...}]. This is a convenience that brings up
+the  Formula creation dialog with a call to that procedure.
+
+<p>
+
+Also, as another convenience you can right click to show the [ht::menu {Insert Procedure Call}] menu. This
+lists all of the currently defined procedures in the other Jython libraries.
+
+</faqitem>
+
+
+</faq>
+
+
+
+
+
+
+
+
+[ug::foot]
+
+

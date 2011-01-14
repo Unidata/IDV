@@ -1,0 +1,28 @@
+
+To make the documentation do:
+source make.sh
+Or:
+tclsh ../../build/generate.tcl -clean
+
+This will generate the documentation and place it in ../processed
+
+
+
+To make the pdf file you first need to have htmldoc installed: 
+http://www.htmldoc.org/
+This is the utility that generates a pdf from a big html file.
+With htmldoc installed and in your path you can just do:
+source makepdf.sh
+This generates one big html file -doall:
+tclsh ../../build/generate.tcl -clean
+
+Then cd to ../processed
+Then source ../content/genpdf.sh
+Which results in a workshop.pdf file
+
+
+Note: There is a version of htmldoc in:
+/upc/share/idv/software
+that is compiled to run on harpo and the like
+ 
+

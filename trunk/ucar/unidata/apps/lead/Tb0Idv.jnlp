@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?> 
+     <!-- JNLP File for Integrated Data Viewer --> 
+     <jnlp 
+        spec="1.0+" 
+        codebase = "http://www.unidata.ucar.edu/content/software/idv/webstart/" href="http://www.unidata.ucar.edu/content/software/idv/webstart/LEAD/Tb0Idv.jnlp"> 
+       <information> 
+         <title>LEAD Integrated Data Viewer (IDV) </title> 
+         <vendor>Unidata</vendor> 
+         <homepage href="http://www.unidata.ucar.edu/content/software/idv/index.html"/> 
+         <description>LEAD IDV</description> 
+         <description kind="short">Version of the IDV for the LEAD TB0
+        </description> 
+        <icon href="LEAD/lead_logo.jpg"/> 
+        <offline-allowed/> 
+       </information> 
+       <resources> 
+         <j2se version="1.4+" max-heap-size="512m" /> 
+           <jar href="LEAD/lead.jar"/>
+           <jar href="IDV/idv.jar"/>
+           <extension name="IDV Base" href="IDV/idvbase.jnlp"/>
+       </resources>
+       <resources os="Linux"> 
+           <property name="j3d.sharedctx" value="false"/>
+       </resources>
+       <application-desc main-class="ucar.unidata.idv.DefaultIdv"> 
+            <argument>-properties</argument>
+            <argument>/ucar/unidata/apps/lead/tb0.properties</argument>
+        </application>
+       <security>
+           <all-permissions/>
+       </security>
+
+     </jnlp> 

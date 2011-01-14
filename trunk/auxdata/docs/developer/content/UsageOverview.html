@@ -1,0 +1,144 @@
+
+[header {Usage Overview}]
+
+The starting point of the IDV application (i.e., the main) is
+an application specific class derived
+from [dg::class ucar.unidata.idv.IntegratedDataViewer]. For example,
+in our example application the main class is
+[dg::class ucar.unidata.apps.example.ExampleIdv].
+In the reference application  the class is
+[dg::class ucar.unidata.idv.DefaultIdv].
+
+<p>
+
+<h3>Initialization</h3>
+When the IDV starts up  a singleton instance of this  
+main class is created and the init is called.
+The application is configured by first defining a set of
+property files in the code. See for example, 
+[dg::className ucar.unidata.apps.example.ExampleIdv {initPropertyFiles(String[])}].
+For more on property files see <a href="resources/Properties.html">here</a>.
+For more on how we define the location of property files and resource files
+see <a href="resources/index.html#paths">here</a>.
+
+<p>
+
+The IDV then processes its 
+<a href="CommandLine.html">command line arguments</a> using
+the [dg::className ucar.unidata.idv.ArgsManager] class.
+Among other things, these arguments may specify
+other property files (using -properties) and/or 
+specific properties (using -Dname=value) that override the
+system property files.
+
+<p>
+
+Once all of the command line arguments are parsed the idv loads in the 
+initial property files, any property files defined in those files 
+(by the <i>application.properties</i> property) and any of the command
+line properties.
+
+<p>
+Among other things, the property file defines a set of resource bundle files 
+(<i>.rbi</i>) 
+with the <i>application.resourcefiles</i> property. These are xml files that 
+define where the IDV can find various resources (typically xml, text and bundle files)
+
+
+<h3>Creating the GUI</h3>
+The IDV then creates the default window with a call to
+the <code>initGui</code> method in 
+[dg::class ucar.unidata.idv.ui.IdvUIManager {initGui()}].
+This creates the default user interface. This method will create 
+the gui using a <i>skin.xml</i> resource or, if none found, 
+with a call to  the method
+[dg::className ucar.unidata.idv.ui.IdvUIManager {doMakeDefaultContents(IdvWindow,ViewManager)}]
+
+
+
+<h3>The User</h3>
+
+So now all of the initialization is done and the user can begin using the application.
+
+<p>
+Usually, the  user first needs to choose  and load in sources of data.
+They do this with the <a href="Choosers.html">data choosers</a>.  
+This data source can be a file on the file system, a  
+url  (e.g., dods url, adde url), or a server specific data structure. 
+The IDV takes this specification of the source of data and, using some 
+descriptions in the  <a href="resources/index.html">data source descriptor resources</a>, 
+instantiates an object that implements the [dg::class ucar.unidata.data.DataSource] 
+interface (see <a href="Datasource.html">Datasource.html</a>).  
+For example, we have:<br>
+
+[dg::class ucar.unidata.data.grid.GeoGridDataSource] that handles
+gridded Netcdf files, 
+<br>
+
+[dg::class ucar.unidata.data.imagery.AddeImageDataSource] that handles
+Adde images and <br>
+
+[dg::class ucar.unidata.data.text.TextDataSource] that handles urls pointing
+to html or text files.
+
+<p>
+
+The set of fields or other specific  data that a DataSource 
+holds (e.g., temperature field, a sounding  at  a station, a html page, etc.) 
+are defined using the [dg::class ucar.unidata.data.DataChoice] class
+and its derived classes: [dg::class ucar.unidata.data.DirectDataChoice]
+and [dg::class ucar.unidata.data.CompositeDataChoice].
+
+<p>
+A DataChoice may represent anything: 
+a field in a gridded netcdf file, a sounding, a time step in an image 
+sequence, etc. The interpretation of the DataChoice is left to the DataSource.
+A DataChoice has a name, an object identifier (used by the the DataSource),
+and a list of <a href=datacategory.html>DataCategories</a>. A 
+[dg::class ucar.unidata.data.DataCategory]
+is an object that holds 
+a hierarchy of String names (e.g., GRID-2D-TIME). It is used to 
+display the DataChoice in a GUI and to match up DataChoice-s with 
+DisplayControls that are applicable.
+
+<p>
+When the DataSource creates its initial list of DataChoice-s this
+list is then processed by the [dg::class ucar.unidata.data.DerivedDataDescriptor]
+to have a set of  
+[dg::class ucar.unidata.data.DerivedDataChoice]-s added to it.
+These DerivedDataChoice-s are used to create new fields based
+on existing fields. For example, if a gridded data set has a 
+temperature (T) and a relative humidity (RH) data choice a 
+DerivedDataChoice will automagically get created that
+provides dewpoint.
+
+<p>
+The IDV  then adds  the DataSource and its list of DataChoices into
+any of the [dg::class ucar.unidata.idv.DataTree] (the JTree  GUI) or 
+menus in the gui.
+The user can then select a DataChoice to create a display with, or as 
+they are known <a href=displays.html>DisplayControl</a>-s.
+This selection can be a right mouse click in the DataTree or a double click.
+If a double click then a [dg::class ucar.unidata.idv.DataControlDialog] is
+shown that list the applicable  displays and also a set of times (if the selected
+DataChoice holds any times.
+If the user selects
+
+The IDV keeps around a list of  [dg::class ucar.unidata.idv.ControlDescriptor]-s 
+that it creates from
+the [dg::class ucar/unidata/idv/resources/controls.xml] resource files. 
+The ControlDescriptors that are applicable
+to the particular chosen DataChoice (using the DataCategory-s) are shown and
+the user can select one.
+
+<p>
+
+The DisplayControl is created. If it needs to place its displayable (e.g., contour, 
+cross section, etc.) into a common window (e.g., the main 3d window) it calls
+its [dg::className ucar.unidata.idv.ControlContext] to find a ViewManager.
+
+<p>
+
+Finally, the user may save off the current state of the application 
+using the <a href="Persistence.html">persistence</a> mechansim.
+

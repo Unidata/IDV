@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<symbols>
+
+<!-- 
+This xml allows you to specify new kinds of glyph symbols  in the layout model editor.
+These will show up in the drawing editor palette. This xml file (stationsymbols.xml) can
+be placed in a plugin or just copied into your ~/.unidata/idv/DefaultIdv directory.
+
+(Note: if you are not running the latest nightly build of the IDV (after October 15th, 2008)
+then the directory is ~/.metapps/DefaultIdv)
+
+Since we are in the 3D world you can create shapes with a set of lines, a set of triangles  or a set of quadrilaterals.
+
+Each symbol tag contains:
+
+The shapetype can be one of:
+line
+triangle
+quad
+
+The  points attribute is a set of comma separated points (x,y,z) that define
+a number of shapes. The number of points is dependent on the shapetype. For
+example, the line shapetype defines a set of line segments so you need 2 points
+for each line segment.
+
+For triangle shapetype you need 3 points. For quad you need 4.
+
+The scale allows you to set the scale
+
+The icon is just the icon used in the layout model editor
+
+Note: When you are working on creating a symbol you need to restart the IDV every time you change
+this file. Also, the layout model you create with a shape defined here will contain the original
+points from when you created the layout model. So, you need to delete the shape glyph and re-add it
+
+
+Note: we don't handle errors very well when instantiating a shape from the xml.
+So, if you create a shape in the layout model editor and nothing happens look for a 
+stack trace print out.
+
+-->
+
+   <symbol class="ucar.unidata.ui.symbol.ShapeSymbol" 
+            points="-1.0,-1.0,0.0,  1.0,-1.0,0.0,  -1.0,0.0,0.0,  1.0,0.0,-1.0,  -1.0,1.0,0.0, 1.0,1.0,0.0"
+	    shapetype="line"
+            name="Three horizontal lines"
+            icon="/auxdata/ui/icons/Shape16.gif" 
+            stretchy="true"
+   />
+
+
+   <symbol class="ucar.unidata.ui.symbol.ShapeSymbol" 
+            scale="1.5"
+            points="-1.0,-0.25,0.0,  -0.75,-0.25,0.0,  -0.75,0.25,0.0,  -1.0,0.25,0.0,  -0.125,-0.25,0.0,  0.125,-0.25,0.0,  0.125,0.25,0.0,  -0.125,0.25,0.0,  1.0,-0.25,0.0,  0.75,-0.25,0.0,  0.75,0.25,0.0,  1.0,0.25,0.0  "
+	    shapetype="quad"
+            name="Filled rectangles"
+            icon="/auxdata/ui/icons/Shape16.gif" 
+            stretchy="true"
+   />
+
+
+</symbols>

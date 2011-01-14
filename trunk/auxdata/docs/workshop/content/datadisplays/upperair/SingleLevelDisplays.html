@@ -1,0 +1,92 @@
+
+<html>
+<head>
+<title>Single Level Point Data Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>The IDV can plot upper level maps as point displays from
+the RAOB data.
+</p>
+</div>
+
+<p>
+
+<ol class="step">
+
+<li>Open the RAOB Single Level Data Source Chooser</li>
+  <ul class="substep">
+    <li> [ht::openDataSourceChooser] </li>
+    <li>In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command Point] tab. </li>
+    <li>Click on the [ht::command {Upper Air}] tab. </li>
+    <li>In the 
+    [ht::command Server:] entry box, select the remote ADDE server 
+    [ht::command adde.ucar.edu]. In the 
+    [ht::command Data Type:] entry box, select the
+    [ht::command Upper Air Data] entry.</li>
+    <li>Click on [ht::button Connect].</li>
+    <li>The IDV will connect to the ADDE server at adde.ucar.edu and
+    download metadata about available RAOB data. You can load data
+    in by relative times, or by absolute times. Select the
+    [ht::command Relative times] radio button and the
+    [ht::param {4 most recent}] times option.</li>
+    <li>From the [ht::command Station Model] list, select
+    [ht::command Upper Air].</li>
+    <li>From the [ht::command Level] list, select
+    [ht::command 500] for the 500 millibar level.</li>
+    <li>Click the [ht::command Add Source] button.
+
+  </ul>
+</li>
+
+<p>
+
+
+    <li>If the [ht::command {Create display}] option was checked in
+    the chooser, a [ht::display {Point Data Plot}]  will automatically
+    be created.  If not, create one. 
+      <ul>
+      <li>In the [ht::dialog Field Selector] window create a 
+          [ht::display Point Data Plot] display using 
+          the [ht::param RAOB Point Data] field.
+      </ul>
+     </li>
+<p>
+
+The point data plot appears in the main window.
+
+<p>
+[ht::cimg images/SingleLevelPlot.gif]
+<p>
+
+<li>Set the projection to the continental U.S. 
+([ht::menu Projections Set US CONUS] menu).</li>
+
+<li>Use the [ht::display Point Data Plot] control to change the
+plot density to show more stations.</li>
+
+<li>Remove the display</li>
+
+<li>Now, plot data at a different level and region.
+    <ul>
+    <li>In the [ht::dialog Field Selector] window select a different
+    level (e.g. 250 mbar) in the [ht::tab Level] tab of the
+    [ht::command Data Subset] panel.  </li>
+    <li>Under the [ht::tab Region] tab, select a region of interest.</li>
+    <li>Click the [ht::button Create Display] button.
+    </ul>
+<li>
+
+<li>Remove All Displays and Data</li>
+  <ul class="substep">
+    <li>[ht::clearDisplaysAndData]
+  </ul>
+</li>
+
+</OL>
+
+</body>
+</html>

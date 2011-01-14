@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../" default="plugin" name="AFRICA IDV">
+
+    <import file="../../../build.xml"/>
+
+    <target name="africa" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            fork="true"
+            memoryMaximumSize="256m"
+            srcdir="${srcdir}"
+        >
+
+        <include name="ucar/unidata/apps/africa/**"/>
+        </javac>
+    </target>
+
+
+    <target name="africajar" depends="africa">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/africaidv.jar"
+            >
+            <include name="ucar/unidata/apps/africa/**"/>
+           <manifest>
+              <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
+              <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
+              <attribute name="Main-class" value="ucar.unidata.apps.africa.Converter"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
+            </manifest> 
+
+        </jar>
+    </target>
+
+    <target name="plugin" depends="africajar">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="lib/africaidv.jar"/>
+        </copy>
+    </target>
+
+
+</project>

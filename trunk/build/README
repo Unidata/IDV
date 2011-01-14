@@ -1,0 +1,271 @@
+***********************************************************************
+The release environment:
+
+Start releases in the morning. If there are problems, you have time to recover.
+
+On conan all release oriented directories and files point through the 
+symbolic link:
+
+/content/software/idv/current
+
+So we have(in an abbreviated way):                            
+/content/software/idv/data  --> current/data
+/content/software/idv/docs  --> current/docs
+/content/software/idv/webstart/IDV  --> current/webstart/IDV
+
+Run the test suite (see below) and make sure to update and
+check in /ucar/unidata/idv/resources/version.properties.
+
+When you are ready to make a release, run:
+
+cd /share/idv/build
+./buildIdv release
+
+Note that this script has a dependency on install4j which requires a license.
+The user running this script must have a valid license key associated with
+install4j. 
+
+That will run the build, generate the installers, move all relevant files 
+(installers, docs, webstart) to conan.  The following directories will be
+created:
+
+/content/software/idv/<release_dir>
+/content/downloads/idv/<release_dir>
+
+where <release_dir> is the version number with underscores (e.g. version 2.8 will be
+in <release_dir> 2_8).
+
+Then (see below):
+
+  Update the downloads/idv/toc.xml (see below)
+
+  Expand the javadoc (see below).
+
+  Generate the User Guide and Workshop PDFs (see below)
+
+  Update the index.html page (see below).
+
+  branch the SVN repository
+
+  change the /content/software/idv/current to point to the new release.
+
+***********************************************************************
+Update the downloads toc.xml page
+
+On conan:
+
+cd /content/downloads/idv
+edit the toc.xml
+  - change the %version% property value
+  - change where the current and previous point to
+
+change the current link to point to the new release.
+cd /content/downloads/idv
+   rm current
+   ln -s <current IDV version> current
+
+***********************************************************************
+Expand the javadoc
+
+cd /content/software/idv/<release>/docs
+jar xvf ~ftp/pub/idv/<release_dir>/idv_javadoc_<version>.jar
+cd idv/docs
+mv javadoc ../..
+cd ../..
+rm -rf META-INF/ idv
+
+***********************************************************************
+Generate the PDFs
+
+You  need to build the userguide.pdf and workshop.pdf files.
+To do this you need to be on harpo (which has the htmldoc executable)
+and run:
+ant docs_pdf
+from /share/idv/ucar
+This will generate the userguide.pdf and workshop.pdf and place them in the
+docs directory.
+
+Look at the ant output and you will see where these PDFs are located.
+
+Once this is done, copy them to conan:
+ 
+/content/software/idv/<release>/docs/userguide/userguide.pdf
+/content/software/idv/<release>/docs/workshop/workshop.pdf
+
+***********************************************************************
+Changing the index.html page
+
+cd /content/software/idv/<release_dir> 
+
+cp ../<previous_release_dir>/index.html index.html.<release_dir>
+
+edit the index.html.<version> file and update the IDV News and Announcements
+section with information about the new release.
+
+cp index.html.<version> index.html
+
+(If you have to redo the release, index.html will get overwritten.  That's why
+we make the edits in index.html.<version>)
+
+Open http://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
+Test all the links to the docs.  Fix any broken links.
+
+***********************************************************************
+Branch the SVN repository:
+
+After the release of a version, you should make a brand in the SVN repository
+in case changes are needed later.  To branch the SVN repository,
+run:
+
+svn copy https://sub.unidata.ucar.edu/idv/trunk https://sub.unidata.ucar.edu/idv/branches/IDV_<version>  -m "some info"
+
+where <version> is the version (e.g., 2.8).  "some info" is needed, otherwise the svn copy would
+require some EDITOR env. setting.
+
+***********************************************************************
+Update the current and stable links:
+
+cd /content/software/idv
+rm current
+ln -s <current IDV version> current
+
+cd release
+rm stable
+rm current
+ln -s ../<current IDV version> current
+ln -s ../<stable IDV version> stable    (or simply point stable to current)
+
+Go to the IDV homepage and make sure it is pointing to the updated directory.  Make 
+sure all the links on the page work correctly.
+
+***********************************************************************
+Running the test suite
+
+Of course, running the tests should come first but  it comes last in the README
+due to its length.
+
+The cliff notes version of this section, i.e., to run the full 
+test suite on the results of the build simply:
+cd /share/idv/lib
+tclsh /share/idv/test/runtest.tcl 
+
+And look at:
+/share/idv/lib/results.html
+ 
+It is probably best to do this on harpo since the original archive images
+are generated on harpo. This should minimize false differences.
+
+
+The longer version:
+
+The set of test archives are in:
+/share/idv/test/archives
+Each archive has a directory there, e.g., dem, elnino, eta1, etc.
+The script:
+/share/idv/test/runtest.tcl
+runs the set of tests. You can give it the full directory name of a 
+test archive to run just one test:
+tclsh /share/idv/test/runtest.tcl /share/idv/test/archives/eta1
+or as a short hand:
+tclsh /share/idv/test/runtest.tcl eta1
+
+If no archive directories  are given on the command line it will run through
+all of the archives in /share/idv/test/archives
+
+The version of the idv that is used depends on where you are when you 
+run the test. If there is an idv.jar in the current working directory
+then the script will run:
+java -jar idv.jar
+else it will run from the classpath:
+java ucar.unidata.idv.DefaultIdv
+
+
+The script will iterate through the test archives. For each on it will run
+the idv in test mode and tell the idv to write to the <archive name>_results
+directory. The script will then compare the generated images in the
+original archive with the generated images in the _results directory.
+The script produces 3 output files in the working directory:
+   
+        results.html  resultsLeft.html  resultsRight.html
+
+Results is a frame set that contains resultsLeft.html and resultsRight.html
+Any stderr output is shown in resultsRight.html in red.
+resultsLeft.html  highlights the images that differ. 
+Note: We just do a "diff image1 image2" on the images. So
+it is always the case that we pick up differences between some of the 
+images.
+
+
+To create a test archive enable the "Test" menu. There should be 
+a "Write Test Archive" entry. Select that and you will be prompted
+for an archive name, an optional text description and the directory
+to place the archive in. Select /share/idv/test/archives.
+
+***********************************************************************
+Building/configuring the installers
+
+The installers are built automatically by ant using install4j
+which is located in /share/install4j.  We have a single,
+multi-platform license which means that only one copy can run at
+a time, but on any machine you want.  Website for install4j is
+http://www.ej-technologies.com/products/install4j/overview.html.
+The Unidata Admin staff has the license information.  The license server
+runs on zero.
+
+The configuration file is in svn:
+/ucar/unidata/idv/release/installer/idv.install4j.  This file is used
+as a template for the installer and copied to /share/idv/installers
+during the build process.  At that point, the version number is filled in.
+
+To make configuration changes, run /share/install4j/bin/install4j
+and open the template.  After making changes, test the build and if it
+works as you expect, save the changes back to the template.
+
+JRE bundles:
+
+The JREs that are included in the installers need to be updated
+periodically as new versions of Java come out.  On most platforms, it's
+a matter of:
+
+- downloading the JRE from java.sun.com
+- logging onto a machine of the particular OS
+- unpacking the OS specific JRE to the appropriate subdirectory of /share/idv/jre
+- installing Java 3D on top of the unpacked JRE (just unzip the version in the directory)
+- running install4j to create a new JRE bundles.  (Using install4j creates 
+smaller bundles than manually tar'ing and gzipping the JRE directory).
+
+The only platform that is problematic is Windows because when you install
+the JRE, it makes it the default on your system.  So, you have to install
+it on your system, not to a temporary directory.  You also have to install a
+copy of install4j on your system to run the bundle generator.  You can copy the
+c:/Program Files/Java/jre6 (or whereever the JRE was installed) over to
+/share/idv/windows, unzip the Java 3D on it and then pack it up using the
+Windows version of install4j.
+
+To create a JRE bundle in install4j, start it up and select the 
+Project->Create a JRE Bundle menu and step through the process. The important
+page is the Select a JRE:
+
+- select the top level of the unpacked JRE
+- Input the version of the JRE (e.g. 1.6.0_20)
+- For the custom id, use the java 3d version  (e.g., j3d1.5.2)
+
+The resulting JRE bundle will use this to create a name like:
+
+linux-i386-1.6.0_20.5.2.tar.gz
+
+The JRE bundles are automatically stored in /share/install4j/jres, except
+on Windows.  It will be stored in the jres directory of the Windows install4j
+installation and then has to be manually copied over to /share/install4j/jres.
+
+Once you have created the JRE bundles, you need to update the template to point
+to the new versions.  There are two ways to do this.  The most fool-proof way is
+to run install4j and update the Media instances to point to the new bundles.  The
+other is just to edit the template.  If you do the latter, just make sure you change
+all references.
+
+SSEC uses install4j for McIDAS-V, so you can contact them for help with the program.
+We also share the JRE bundles with them for platforms that we don't have.
+
+The Unidata admin staff has the information on licenses and passwords to get in
+to download new versions.

@@ -1,0 +1,45 @@
+<html><head> 
+  <title> Parameter Alias Editor</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+The Parameter Alias Editor is  opened through the
+<a href="../ui/Menus.html#tools">Tools menu</a>
+with 
+[ug::menu Tools  {Parameter Alias Editor}]  menu
+and allows for the  association
+between "canonical" parameter names used by the IDV for physical
+quantities, such as TEMP for
+temperature, and  parameter names used in particular  data
+sets for the same quantity, such as for example "jan_mean_temp."
+
+
+[ht::cimg images/AliasEditor.gif]
+
+Different data sets often have different names for the same
+physical quantity, such as for 
+the quantities temperature or easterly wind speed component.
+You can make the IDV recognize any particular data name as representing a
+standard quantity. The <b>Alias Editor</b> associates
+any particular variable name that may appear in a data set (right
+column) with a canonical or IDV name or alias (left column). 
+<p>
+The Alias Editor has a number of tabs that display the user editable
+aliases and the non-editable system aliases.
+You can right click on a row in the system alias tab to copy that row
+to the user's tab. You can also add a new alias with the
+[ug::button New Alias] button. You can edit a user's entry
+by right clicking on the table row.
+<p>
+When you do this the alias properties  dialog is shown where you can
+edit the name, label (descriptive text) and the aliases:
+
+[ht::cimg images/AliasEditorProperties.gif]
+
+
+</body>
+
+

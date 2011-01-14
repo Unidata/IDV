@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<choosers>
+  <chooser
+     id="sti.url"
+     title="STI Database"
+     menutitle="Typhoon Database URL"
+     showinmenu="true"
+     helppath="idv.data.choosers"
+     class="ucar.unidata.apps.sti.STIDatabaseChooser"
+     showpolling="false"
+     filepattern="jdbc:mysql://.*"
+  />
+</choosers>

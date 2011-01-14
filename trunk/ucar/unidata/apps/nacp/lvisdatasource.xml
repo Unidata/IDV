@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><datasources>
+  <datasource doesmultiples="true" factory="ucar.unidata.data.point.TextPointDataSource" fileselection="true" id="lvis" label="LVIS Track Data">
+    <property name="data.textpoint.skip">0</property>
+    <property name="dataistrajectory">true</property>
+    <property name="data.textpoint.params"><![CDATA[
+Time[fmt="yyyy-MM-dd"],lvisindex[],lfid[],shotnumber[],azimuth[unit="degrees"],incidentangle[unit="degrees"],range[],lvistime[],longitude[unit="degrees_west" offset="-360" ],latitude[unit="degrees"],Altitude[unit="m"],rh25[],rh50[],rh75[],rh100[]
+]]></property>
+    <property name="data.textpoint.map"><![CDATA[
+(index) -> (Time, lfid,shotnumber,azimuth,incidentangle,range,lvistime,longitude,latitude,Altitude,rh25,rh50,rh75,rh100)
+]]></property>
+    <property name="data.textpoint.skippattern"></property>
+  </datasource>
+</datasources>

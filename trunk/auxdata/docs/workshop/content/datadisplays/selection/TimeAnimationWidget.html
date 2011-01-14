@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>Time Animation Widget</title>
+  <link rel="stylesheet" type="text/css" href="../../workshop.css" title="Style">
+</head>
+
+<body>
+
+<div class="overview">
+This page summarizes use of the Time Animation Widget for controlling
+animations in IDV displays. 
+</div>
+
+<a name="animation"></a>
+<div class="pagesubtitle">Time Animation Widget</div>
+
+Each IDV view window has a set of time animation controls 
+above the view window.
+
+[ht::cimg images/AnimationWidget.gif]
+
+The [ht::command Time Animation Widget] controls 
+looping of displays through time when more than one data time is 
+loaded. The time of the data is displayed in the labeled 
+pull-down list on the left. The toolbar of button icons, on the right,
+controls time animation. Each button works as follows:
+
+<ul>
+<li><img src="images/Rewind16.gif"> - Show the first frame, 
+     and stop looping if looping is on.</li>
+<li><img src="images/StepBack16.gif"> - Step Back one frame.</li>
+<li><img src="images/Play16.gif">/<img src="images/Pause16.gif"> - Toggle 
+    looping on or off. The icon switches between <img src="images/Play16.gif">
+    (start looping) and <img src="images/Pause16.gif"> (stop looping).</li>
+<li><img src="images/StepForward16.gif"> - Step Forward one frame.</li>
+<li><img src="images/FastForward16.gif"> - Show the last frame, and 
+    stop looping if looping is on.</li>
+<li><img src="images/Information16.gif"> - Show the Animation Properties 
+    dialog box. </li>
+</ul>
+
+<p>
+
+<a name="animationprop">
+
+
+<div class="pagesubtitle">Time Animation Properties Dialog</div>
+
+Click on the <img src="images/Information16.gif"> in the 
+<code class="command">Time Animation Widget</code>
+to see the <code class="dialog">Time Animation Properties</code> editor.
+
+<p><center><img src="images/AnimationProperties.gif" ></center><p>
+
+The <code class="dialog">Time Animation Properties</code> editor allows you
+to change the values that control looping. Drag the top four
+scroll bars to change their value. The properties include:
+
+<ul>
+<li><code class="command">Forward Dwell </code> controls speed of 
+    looping forward (seconds/frame); dwell is how long each 
+    frame is seen when looping</li>
+
+<li><code class="command">Backward Dwell </code> controls speed of 
+    looping backwards (seconds/frame)</li>
+<li><code class="command">First Dwell </code> how long first frame 
+    is seen (seconds)</li>
+<li><code class="command">Last Dwell </code>  how long last 
+    frame is seen (seconds)</li>
+</ul>
+
+<p>
+
+You can set the loop Direction:
+<ul>
+
+<li>[ht::button Forward]  click this button to 
+    loop forward in time</li>
+
+<li>[ht::button Backward] click this button to 
+    loop backward in time</li>
+
+<li>[ht::button Rocking] click this button to 
+    enable rocking, where looping alternates between forward and 
+    backward directions.</li>
+
+</ul>
+
+
+The [ht::command Share Times] options are used 
+to toggle sharing of animations among displays.  You can disable
+sharing [ht::command None], share by [ht::command Absolute] time
+or by [ht::command Relative] indices between two displays.
+You can group different animation widgets and share among the group with 
+the [ht::command Group] box.
+
+The [ht::command Boxes Visible] checkbox is used 
+to show or hide the animation step boxes on the Time Animation Widget.<p>
+
+The [ht::command Skip Steps] boxes allow you to
+skip time steps in the sequence.  Right click on a yellow box to
+skip that step and it will turn red.  Right click on a red box
+and it will become yellow, indicating that the step is active.<p>
+
+The [ht::command Reset To] menu allows you to select what happens when new data/times
+are added to the display. e.g., reset to beginning time, reset to last time, keep 
+at orginal time.
+
+
+
+<div class="pagesubtitle">Defining Custom Animation Sets</div>
+Normally, all of the different times in a display are used to
+create the set of times that are looped through. However,
+the second tab in the Animation Properties dialog allows the user to define custom
+animation sets:
+
+[ht::cimg images/AnimationProperties2.gif -caption {Define Animation Times Tab}]
+
+
+To define your own time set select the [ht::button Define your own list of times] button. 
+The basic idea is that you define a start time, and end time and a time interval.
+These times can be set from the data, from a fixed time,  the current time and
+relative to each other. An offset (both positive and negative) can be defined as well
+by clicking on the edit button: <img src="%dotpath%/images/edit.gif">.
+
+<p>
+A simple case would be if you have a mix of satellite imagery (every 15 mintues) and radar (every 7 minutes).
+You could choose the start time and end time to be  set from the data. And you interval could be 5 minutes.
+This would provide a uniform animation.
+<p>
+Another example is if you are displaying  real time data (e.g., aircraft track) and you want
+to see the last hour at minute increments. In this case your end time  would be &quot;Current Time (Now)&quot;.
+You start time would be &quot;Relative to End Time&quot; with an offest of - 1 hour.
+Your interval would be 1 minute.
+<p> For real time you can define a refresh rate (e.g., every 5 minutes). This will automatically update the current time
+and rebuild the animation time set.
+
+<p> The [ht::command Round To] time can round the base times. e.g., to the nearest minute, hour, day, etc.
+ 
+
+
+
+</body>
+</html>

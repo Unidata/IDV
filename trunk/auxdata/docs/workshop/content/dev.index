@@ -1,0 +1,105 @@
+
+
+
+
+devindex.html
+
+
+>title: Development Environment
+>>advanced/SourceBuild.html
+>>dev/src/Overview.html
+>>dev/src/Lib.html
+>>dev/src/Auxdata.html
+>>title: Building with Ant::[gen::include advanced/SourceBuild.html antbuild]
+>>dev/src/ExampleIdv.html
+
+
+
+>dev/arch/index.html
+>>dev/arch/CoreIdv.html
+>>dev/arch/Managers.html
+>>dev/arch/MajorComponents.html
+>>dev/arch/Overview.html
+
+>>dev/arch/DataSources.html
+>>dev/arch/DataChoices.html
+>>title:Data Flow::[ht::cimg dev/arch/images/DataFlow.jpg -caption {Data Flow}]
+##>>title: JEFF - TBD - Current Display Controls
+##>>title: JEFF - TBD - Putting it all Together
+
+>title:IDV Startup
+>>dev/InitializationAndProperties.html
+-dev/idv.properties.txt
+>>installandstart/CommandLineArguments.html
+>>dev/ExampleArgsManager.html
+>>dev/Resources.html
+
+>title: Plugins:Plugins are way to easily add new resources or functionality to an IDV.
+>>advanced/PluginManager.html
+>>advanced/PluginCreator.html
+>>advanced/PluginExamples.html
+##>>title: TBD -         Building plugin from ant
+##>>title: TBD -         plugins.xml        
+##>>title: Plugin examples::Lets go look some of the available plugins.
+
+
+
+
+
+
+>title:IDV User Interfaces
+>>dev/ui/XmlUi.html
+>>dev/ui/IdvSkins.html
+>>dev/ui/ExampleUIManager.html
+>>dev/ui/ExampleMenubar.html
+-dev/ui/*.xml
+
+
+>title: Data Choosers
+>>dev/data/DataChooser.html
+-dev/data/choosers.xml.txt
+>>dev/data/WxTextDataChooser.html
+
+>title: Data Sources 
+>>dev/data/DataSource.html
+-dev/data/datasource.xml.txt
+>>dev/data/VisADDataModel.html
+>>dev/data/WxTextDataSource.html
+
+>title: Display controls
+>>dev/data/DisplayControls.html
+-dev/data/controls.xml.txt
+>>dev/data/VisADDisplayModel.html
+>>dev/data/ExampleDisplayControl.html
+
+
+>title:Bundles and Persistence
+>>savingstate/Bundles.html
+>>savingstate/MoreBundles.html
+>>savingstate/JnlpBundles.html
+>>savingstate/Favorites.html
+##>>title: TBD -  zidv
+>>dev/XmlEncoder.html
+-dev/example.xidv.txt
+
+>isl/main.index
+
+>formulas/index.html
+>>formulas/SimpleFormulas.html
+>>formulas/JythonMethods.html
+>>formulas/DoingMoreFormulas.html
+>>formulas/MoreWithJython.html
+>>formulas/JythonAndVisad.html
+>>formulas/RainFallRatesWithJython.html
+>>dev/data/DerivedData.html
+
+
+
+>title: Miscellaneous
+>>title: Jython Display Control
+>>title: Location Files::[gen::include ../../userguide/content/data/LocationXml.html]
+>>title: Text Point Data::[gen::include ../../userguide/content/data/TextPointData.html]
+>>title: ximg File Format::[gen::include ../../userguide/content/data/ImageXml.html]
+>>title: Image Movie Format::[gen::include ../../userguide/content/data/ImageMovie.html]
+
+

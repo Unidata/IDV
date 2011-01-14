@@ -1,0 +1,44 @@
+<stationtable name="netcdf sites">
+<station idn="" id="5AA" name="5 ar Argentina" lat="-34:29:00" lon="-64:43:45" elev="0"/>
+<station idn="" id="3AA" name="3 at Austria" lat="48:07:00" lon="--16:34:00" elev="0"/>
+<station idn="" id="5AA" name="59 au Australia" lat="-25:19:33" lon="--134:28:58" elev="0"/>
+<station idn="" id="2BB" name="2 be Belgium" lat="51:12:00" lon="--4:28:00" elev="0"/>
+<station idn="" id="5BB" name="5 br Brazil" lat="-10:26:43" lon="-51:43:27" elev="0"/>
+<station idn="" id="4CS" name="4 ch Switzerland" lat="46:33:00" lon="--7:59:00" elev="0"/>
+<station idn="" id="9CC" name="9 cn China" lat="34:29:00" lon="--100:47:17" elev="0"/>
+<station idn="" id="1CC" name="1 cu Cuba" lat="21:47:00" lon="-78:47:00" elev="0"/>
+<station idn="" id="9DG" name="99 de Germany" lat="50:47:42" lon="--9:27:29" elev="0"/>
+<station idn="" id="1ES" name="14 es Spain" lat="40:27:00" lon="-3:33:00" elev="0"/>
+<station idn="" id="5FF" name="58 fr France" lat="47:00:00" lon="--3:06:00" elev="0"/>
+<station idn="" id="3GG" name="3 gr Greece" lat="39:10:24" lon="--21:56:45" elev="0"/>
+<station idn="" id="1HH" name="1 hu Hungary" lat="46:53:59" lon="--19:21:35" elev="0"/>
+<station idn="" id="2II" name="2 id Indonesia" lat="-6:15:00" lon="--106:54:00" elev="0"/>
+<station idn="" id="1II" name="1 il Israel" lat="31:55:25" lon="--34:48:11" elev="0"/>
+<station idn="" id="1II" name="14 in India" lat="20:42:24" lon="--77:40:25" elev="0"/>
+<station idn="" id="4II" name="4 ir Iran" lat="32:11:38" lon="--53:29:51" elev="0"/>
+<station idn="" id="1II" name="1 is Iceland" lat="64:47:34" lon="-18:45:47" elev="0"/>
+<station idn="" id="1II" name="14 it Italy" lat="41:56:23" lon="--13:31:20" elev="0"/>
+<station idn="" id="2JJ" name="23 jp Japan" lat="35:54:51" lon="--138:19:30" elev="0"/>
+<station idn="" id="1KKRO" name="19 kr Korea, Republic of" lat="36:29:11" lon="--127:58:49" elev="0"/>
+<station idn="" id="1MM" name="1 mu Mauritius" lat="-20:26:00" lon="--57:40:00" elev="0"/>
+<station idn="" id="2MM" name="2 mx Mexico" lat="19:26:00" lon="-99:05:00" elev="0"/>
+<station idn="" id="2NNC" name="2 nc New Caledonia" lat="-20:34:00" lon="--164:17:00" elev="0"/>
+<station idn="" id="1NN" name="13 nl Netherlands" lat="51:57:20" lon="--5:41:23" elev="0"/>
+<station idn="" id="1NN" name="13 no Norway" lat="61:06:46" lon="--9:00:53" elev="0"/>
+<station idn="" id="1NNZ" name="15 nz New Zealand" lat="-42:46:56" lon="--172:01:11" elev="0"/>
+<station idn="" id="3PP" name="3 pl Poland" lat="51:57:20" lon="--18:59:25" elev="0"/>
+<station idn="" id="3PP" name="3 pt Portugal" lat="39:44:44" lon="-7:58:49" elev="0"/>
+<station idn="" id="1RR" name="1 ro Romania" lat="45:56:45" lon="--25:07:23" elev="0"/>
+<station idn="" id="4RR" name="4 ru Russia" lat="55:59:00" lon="--37:30:00" elev="0"/>
+<station idn="" id="6SS" name="6 se Sweden" lat="61:01:03" lon="--14:55:34" elev="0"/>
+<station idn="" id="3SS" name="3 sg Singapore" lat="1:22:00" lon="--103:55:00" elev="0"/>
+<station idn="" id="1SS" name="1 si Slovenia" lat="46:29:00" lon="--15:41:00" elev="0"/>
+<station idn="" id="1TT" name="1 th Thailand" lat="12:35:00" lon="--99:57:00" elev="0"/>
+<station idn="" id="6TT" name="6 tr Turkey" lat="39:20:53" lon="--34:52:37" elev="0"/>
+<station idn="" id="7TT" name="7 tw Taiwan" lat="23:53:42" lon="--120:53:12" elev="0"/>
+<station idn="" id="2UUK" name="26 uk United Kingdom" lat="52:14:30" lon="-1:28:40" elev="0"/>
+<station idn="" id="1WWS" name="1 ws Western Samoa" lat="-13:48:00" lon="-171:47:00" elev="0"/>
+<station idn="" id="3ZSA" name="3 za South Africa" lat="-30:12:01" lon="--23:31:02" elev="0"/>
+<station idn="" id="1AA" name="1 AA Antarctica" lat="-81:00:00" lon="-0:00:00" elev="0"/>
+</stationtable>
+

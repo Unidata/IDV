@@ -1,0 +1,69 @@
+<html><head>
+  <title>Choose Cataloged Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+The [ug::chooser Catalogs] chooser shows THREDDS catalogs of data holdings
+on remote data servers (typically TDS or OPeNDAP)
+and provides access to remote Web Map Server (WMS) image servers.
+The IDV provides an initial default catalog, idvcatalog.xml. It should appear 
+in the Catalogs menu. If not you can directly enter the URL of the catalog:
+<pre>http://www.unidata.ucar.edu/georesources/idvcatalog.xml</pre>
+This catalog has links to a catalog of real time model data, a collection
+of county level shapefiles for roads and hydrography features and a collection
+of useful Web Map Servers.
+
+[ht::cimg images/CatalogChooser.gif {Catalog Chooser}]
+
+To select cataloged data:
+<ol>
+
+<li> In the [ug::menu Catalogs] entry box enter the catalog URL (and press 
+[ug::button Update]) or select a catalog URL from the pull down list.  
+You can use the [ug::button {Select File...}] button to select a catalog on
+your local disk.
+
+<li> Navigate through the tree view to the desired data source.
+
+<li> Catalogs may show absolute or relative times. See below 
+for more information.
+
+<li> Select a data source by  clicking on the particular data
+desired (e.g.,  &quot;NCEP NAM 80km CONUS 2004-07-21 12:00:00 GMT&quot;
+under &quot;NCEP NAM 80km CONUS model data&quot;)
+
+<li> When done, load the selected data with the [ug::button Add Source] button.
+
+
+<li> Some catalogs contain documentation (shown under the &quot;Documentation&quot;
+nodes).  You can mouse over the nodes  or double click
+them to view the documentation.
+
+</ol>
+
+Catalogs may list both absolute time model runs 
+(e.g., &quot;NCEP NAM 80km CONUS 2004-07-21 12:00:00 GMT&quot;
+as well as relative time
+(e.g., &quot;Latest NCEP GFS...&quot;).
+You can choose to load the most  recent data for each of these groups
+of data. When you do this the IDV will query the remote server to determine
+what actual model run is the latest data. The IDV will use that particular
+model throughout the entire session. However, if you save the
+state of the application (using the <a href="../Bundles.html">bundles</a> 
+facility) then when the state is loaded back in the IDV will again determine 
+what is the actual latest data and use that data set.
+
+<p>
+The following image displays the WMS chooser:
+[ht::cimg images/WmsChooser.gif {WMS Chooser}]
+The tree view on the left shows the different image
+layers available. You can select one image or, using a control-click,
+select multiple images. The map on the right is intended to provide
+an overview of the bounding box area of a selected image.
+
+
+
+</body>
+</html>

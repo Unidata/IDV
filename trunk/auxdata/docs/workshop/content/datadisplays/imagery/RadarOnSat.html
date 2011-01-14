@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>Overlaying Radar on Satellite and other imagery</title>
+</head>
+
+<body>
+
+<div class="overview">
+You can create displays with both radar and satellite imagery
+in the same view as well as separate views.
+</div>
+
+<p>First, load up a couple of satellite images.
+
+<ol class="step">
+
+  <li>If you haven't already done so, remove all displays.
+
+  <li>From the [ht::dialog Field Selector] window,
+      select the [ht::dataset 1 km GOES-8 Visible]
+      data source.  </li>
+      
+  <li>Select the [ht::param 0.65 um Visible - Cloud Cover] 
+      field in the [ht::command Fields] panel,
+      and select [ht::display Image Sequence Display] 
+      in the [ht::command Displays] panel.</li>
+
+  <li>In the [ht::command Times] panel, uncheck
+      the [ht::command Use Default] checkbox and 
+      select the 1998-06-29 21:15:00Z and
+      1998-06-29 22:15:00Z entries in the list. [ht::listSelect]
+
+  <li>Click the [ht::button Create Display] button
+      to load in those two images.</li>
+
+</ol>
+
+Now, let's overlay some radar imagery.  
+
+<ol>
+
+  <li>First, let's keep the satellite projection for now.  Uncheck
+      the [ht::menu Projections {Auto-set Projection}] menu item.
+
+  <li>From the [ht::dialog Field Selector] window,
+      select the [ht::dataset {DVN (Base Reflectivity Tilt 1)}]
+      data source.  </li>
+      
+  <li>Select the [ht::param Image Sequence] field 
+      in the [ht::command Fields] panel,
+      and select [ht::display Image Sequence display] 
+      in the [ht::command Displays] panel.</li>
+
+  <li>In the [ht::command Times] panel, make
+      sure the [ht::command Use Default] checkbox
+      is checked.</li>
+
+  <li>Click the [ht::button Create Display] button
+      to load in the images.</li>
+
+  <li>Toggle between the two images by pressing the 
+      [ht::command F1] key.
+      [ht::popup /installandstart/basics/MouseAndKeyboard.html#viztoggle {} -useimg 1]
+      </li>
+
+  <li>Turn both images on by pressing the [ht::command F2]
+      key.</li>
+
+
+   [ht::cimg images/RadarOnSat.gif]
+
+  <li>You can reproject data into any projection you want.
+      Let's change to the local radar projection.
+      
+    <ul class="substep">
+      
+      <li>Select the base reflectivity display control's 
+          [ht::menu View {Use Native Image Projection}] menu item to
+          switch to the radar projection.</li>
+          
+      <li>Zoom in and out</li>
+
+    </ul>
+  </li>
+
+  <li>You can also change the time animation steps to be more regular.
+    <ul class="substep">
+       <li>Open the [ht::dialog Time Animation Properties] dialog.
+           <popup label="">
+           Click the information icon in the [ht::command {Time Animation Widget}]
+           toolbar.
+           </popup>
+       <li>Select the [ht::tab Define Animation Times] tab and then
+       select the [ht::button Define your own list of times] option.
+           [ht::cimg images/DefineTimes.gif]
+       </li>
+       <li>By default, the time animation is automatically determined from 
+       the times of each dataset used in the display.  You can change
+       the default using this widget.
+       <li>For the [ht::command End Time] select the 
+       [ht::command Relative to Start Time] option.  </li>
+       <li>Click the edit icon ([ht::img %dotpath%images/edit.gif])
+       to the right of the [ht::command Offset:] label to
+       set the offset from the start time. Set the offset to be
+       1 hour from the start time by typing <b>1</b> in the 
+       [ht::command hours] box, then click [ht::button OK].</li>
+       <li>Set the [ht::command Interval] to be <b>10</b> minutes and
+       set the [ht::command {Round to}] option to <b>5</b> minutes.</li>
+       <li>Click [ht::button Apply] and notice how this changes the time
+       steps in the display.</li>
+       <li>Try other combinations and see what effect they have.</li>
+       
+    </ul>
+   
+
+  <li>Remove all displays.
+</ol>
+
+You can also overlay radar and satellite images on top of a
+background image from a Web Map Server (WMS).
+        
+<ol>
+
+  <li> [ht::backgroundImage]
+
+
+  <li>Change the layer type for this
+      control to [ht::command Shaded Relief].</li>
+
+  <li>From the [ht::dialog Field Selector] window,
+      select the [ht::dataset {DVN (Base Reflectivity Tilt 1)}]
+      data source.  </li>
+      
+  <li>Select the [ht::param Image Sequence] field 
+      in the [ht::command Fields] panel,
+      and select [ht::display Image display] 
+      in the [ht::command Displays] panel.
+      In the [ht::command Times] panel, make
+      sure the [ht::command Use Default] checkbox
+      is checked and then click the 
+      [ht::button Create Display] button
+      to load in the images.</li>
+
+  <li>Toggle the images as you did above and use different layers in
+      the control.  We will look at this control in more detail later.
+
+  <li>Remove all displays.
+</ol>
+
+</body>
+</html>

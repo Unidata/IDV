@@ -1,0 +1,54 @@
+<html><head>
+  <title>3D Surface</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>                  
+<body>
+
+<div 
+
+<%childlist%>
+
+
+<subhead id="isosurface" intoc="false">Isosurfaces</subhead>
+
+An isosurface is a surface of a single value in a 3D parameter field.
+Isosurfaces are the 3D analog of a single-valued contour line in a 2D
+plot. The intersection of an isosurface and a plane is a contour line of
+the same value. Isosurfaces may form closed surfaces enclosing regions
+of higher or lower value, but not always.
+
+[ht::cimg images/IsosurfaceExample.gif {3D Isosurface for 50 m/s wind speed}]
+
+<p>
+
+The IDV also supports isosurface displays that are colored from another
+parameter, not the parameter used to make the shape of the surface.
+The example here shows an isosurface of 89% relative humidity over
+North America colored by air temperature. A useful plot is to color
+isosurfaces by height (geopotential height) to show height of features
+by color.
+
+[ht::cimg images/ColoredIsosurface.gif {Relative Humidity isosurface of 89%, colored by air temperature.}]
+
+<p>
+
+<subhead id="topography" intoc="false">Topography Display</subhead>
+ 
+For data sources that include topography or terrain data, such as the
+"terrain" parameter in Eta and RUC model output or DEM data, the IDV 
+can display a 3D relief map. Select "Topography" for the display type. 
+
+[ht::tblimg {images/DEMTopography.gif {DEM data of the Arno river basin in Italy}} {images/TopographyDisplay.gif {RUC model terrain}}]
+
+<subhead id="2dtopo" intoc="false">2D Data Draped Over Topography</subhead>
+
+Two dimensional grid data can be draped over a topography field to
+provide a terrain following representation of the data.
+
+[ht::cimg images/PressureOverTopography.gif {Sea level pressure over topography}]
+
+For more information see
+<a href="../quickstart/Grids.html">Getting Started: Plots from Gridded Data</a> .
+
+</body>
+

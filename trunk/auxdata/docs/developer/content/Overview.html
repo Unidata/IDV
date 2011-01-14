@@ -1,0 +1,148 @@
+
+
+[header {Core Framework}]
+
+The basic idea behind the IDV framework is there is a central application
+class derived from  the class:
+<br>[dg::class ucar.unidata.idv.IntegratedDataViewer].
+<br>
+The default IDV  reference application is [dg::class ucar.unidata.idv.DefaultIdv].
+This particular  class adds very little custom functionality.
+A IDV application consists of just one instance of this central 
+IDV class (a singleton pattern). This object is the central coordination
+point of the application and provides a set of <i>managers</i>
+and <i>editors</i> (which are also singleton patterns) that do
+most of the real work. For example, there is a manager,
+[dg::class ucar.unidata.idv.ArgsManager],
+that is responsible for processing command line arguments.
+Another manager is the 
+[dg::class ucar.unidata.idv.ui.IdvUIManager] that
+is responsible for much of the main user interface construction.
+
+[ht::cimg uml/Managers.jpg {Managers}]
+
+
+These managers and editors are accessed from the central IDV object
+with get... methods in the abstract base class
+[dg::class ucar.unidata.idv.IdvBase]. e.g.:
+<pre>public ArgsManager getArgsManager() {...}</pre>
+
+These getter methods follow the same pattern where, if the 
+particular manager has not been created yet, they are created with
+a doMake... factory methods. e.g.:
+<pre>
+protected ArgsManager doMakeArgsManager(String\[] args) {
+    return new ArgsManager(idv, args);
+}
+</pre>
+
+These factory methods can be overwritten in your instantiation 
+of the IntegratedDataViewer class to provide your own version
+of the manager and editor.
+
+
+<p>
+
+The class  [dg::className ucar.unidata.apps.example.ExampleIdv]
+serves as the application class for the example package.
+Note: you can add in much new functionality into the framework through the
+user of property resource files (described below). In this case you do not
+need to write your own application class. Rather, you simply  configure
+the DefaultIdv as described below.
+The IntegratedDataViewer class  does most of the "glue" work. 
+It manages the windows and user interfaces, data sources,  views and displays.
+
+<h2>Managers</h2>
+
+The IDV  is a central object for the construction and orchestration
+of a set of <i>Managers</i>, each of which is responsible for different
+areas  of functionality. For example, the [dg::class ucar.unidata.idv.ArgsManager]
+is responsible for
+the processing of the command line arguments. 
+The [dg::class ucar.unidata.idv.IdvResourceManager] is responsible for initializing 
+and managing the resources that configure the IDV.
+<p>
+The base class, [dg::class ucar.unidata.idv.IdvBase] contains
+references to the different managers and methods for accessing and creating
+them. These methods follow the pattern:<pre>
+   DataManager getDataManager()
+   DataManager doMakeDataManager()
+</pre>
+
+
+
+[
+namespace eval dg {}
+proc dg::manager {class name {desc {}}} {
+return "<a name=\"$name\"></a><li> [dg::className $class]<br>get$name/doMake$name <br>$desc"
+}
+]
+
+
+
+The factory methods and the managers are:
+<ul>
+
+[dg::manager ucar.unidata.idv.ArgsManager ArgsManager {
+Reads in and processes the command line arguments. }]
+
+[dg::manager ucar.unidata.ui.symbol.StationModelManager StationModelManager {
+
+}]
+
+[dg::manager ucar.unidata.idv.IdvPersistenceManager PersistenceManager {
+
+}]
+[dg::manager ucar.unidata.data.DataManager DataManager {
+
+}]
+[dg::manager ucar.unidata.idv.DisplayConventions DisplayConventions {
+
+}]
+[dg::manager ucar.unidata.ui.colortable.ColorTableManager ColorTableManager {
+
+}]
+[dg::manager ucar.unidata.idv.test.TestManager TestManager {
+
+}]
+[dg::manager ucar.unidata.idv.VMManager VMManager {
+
+}]
+[dg::manager ucar.unidata.idv.publish.PublishManager PublishManager {
+
+}]
+[dg::manager ucar.unidata.idv.ui.IdvUIManager IdvUIManager {
+
+}]
+[dg::manager ucar.unidata.idv.StateManager StateManager {
+
+}]
+[dg::manager ucar.unidata.idv.JythonManager JythonManager {
+
+}]
+[dg::manager ucar.unidata.idv.chooser.IdvChooserManager IdvChooserManager {
+
+}]
+[dg::manager ucar.unidata.idv.collab.CollabManager CollabManager {
+
+}]
+[dg::manager ucar.unidata.idv.ui.AliasEditor AliasEditor {
+
+}]
+[dg::manager ucar.unidata.idv.ui.AutoDisplayEditor AutoDisplayEditor {
+
+}]
+[dg::manager ucar.unidata.idv.ui.ParamDefaultsEditor ParamDefaultsEditor {
+
+}]
+[dg::manager ucar.unidata.ui.colortable.ColorTableEditor ColorTableEditor {
+
+}]
+[dg::manager ucar.unidata.idv.IdvPreferenceManager PreferenceManager {
+
+}]
+[dg::manager ucar.unidata.idv.IdvResourceManager ResourceManager {
+
+}]
+
+</ul>

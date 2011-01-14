@@ -1,0 +1,28 @@
+
+<title>Example Args Manager</title>
+
+
+<div class="overview">
+Let's go create our own ExampleArgsManager to parse application specific command
+line arguments.
+</div>
+
+<ol class="step">
+<li> cd to <i><%workshop.installdir%>/ucar/unidata/apps/example</i>
+<li> Uncomment the the doMakeArgsManager factory method in ExampleIdv.java:
+<pre>
+    protected ArgsManager doMakeArgsManager(String[] args) {
+        return new ExampleArgsManager(this, args);
+    }
+</pre>
+
+<li> Look at ExampleArgsManager.java. This handles the argument &quot;-examplearg&quot;
+
+</ol>
+
+
+<%nochildlist%>
+
+
+
+

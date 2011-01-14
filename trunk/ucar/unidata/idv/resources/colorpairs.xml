@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<colorpairs>
+  <colorpair
+     foreground="white"
+     background="black"
+     label="White on black"/>
+  <colorpair
+     foreground="black"
+     background="white"
+     label="Black on white"/>
+  <colorpair
+     foreground="blue"
+     background="white"
+     label="Blue on white"/>
+  <colorpair
+     foreground="blue"
+     background="black"
+     label="Blue on black"/>
+  <colorpair
+     foreground="red"
+     background="white"
+     label="Red on white"/>
+  <colorpair
+     foreground="red"
+     background="blue"
+     label="Red on blue"/>
+</colorpairs>

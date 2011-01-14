@@ -1,0 +1,72 @@
+<html><head> 
+  <title>Writing Text Files</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+[isl::tagdef output  {Write output to file} -attrs {file+ {the file to write to} template+ {inline text of 'file:filename' of the template file} fromfile {filename to read contents from} text {text to output}}]
+The [isl::tag output] tag allows you to generate text files. For example,
+this could be used to generate html pages, xml files, etc.
+
+<p>
+The output tag is used in two modes. First it is used to define the output file name,
+and possibly some templates.
+Then, the output tag is used to write text output  into that file.
+<p>
+You can write text a number of ways:
+[isl::importxml output.isl]
+
+
+
+<p>
+To be even more complicated the output tag can specify templates to write into.
+For example, in output1.isl below, we are writing  an output1.txt file. Its template
+has some text and a ${text} macro. The text macro corresponds to
+the text that gets written into the [isl::attr template:text] template.
+The two following output tags use the [isl::attr template:text] template, writing in
+the values of the [isl::attr thetext] attribute.
+
+[isl::importxml output1.isl]
+
+The result of running this is:
+<pre>
+Here is the text: The text I am writing More text I am writing 
+</pre>
+
+Here we have two different entry templates, place1 and place2.
+
+[isl::importxml output2.isl]
+
+The result of running this is:
+<pre>
+Place 1 text: the value 1 -- the value 2  Place 2 text:   some value    some other value  
+</pre>
+
+
+
+Here we are generating an html file showing the thumbnail images
+that are generated with links to the actual image and a caption
+for each thumbnail:
+[isl::importxml output3.isl]
+
+In this example the templates are defined as files:
+<a href="template.html">template.html</a>:
+[ht::pre {
+<html>
+<body>
+${header}
+${imagehtml}
+</body>
+}]
+
+
+
+and <a href="imagetemplate.html">imagetemplate.html</a>.
+[ht::pre {
+<a href="${image}"><img border="0" src="${thumb}"></a>
+${caption}
+<p>
+}]
+
+
+</body>

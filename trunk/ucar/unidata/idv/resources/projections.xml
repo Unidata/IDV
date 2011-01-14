@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<object class="java.util.ArrayList" >
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>25.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>25.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-95.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>CONUS]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id11" >
+          <property name="Frame" >
+            <object idref="id11" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-3718.9811314976646</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-1318.7048434428925</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>6278.23417910328</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>6278.23417910328</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>40.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>Northeastern U.S.]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id13" >
+          <property name="Frame" >
+            <object idref="id13" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>2209.3855386593705</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>2061.162079838977</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>859.872633795836</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>859.872633795836</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>40.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-95.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>Southeastern U.S.]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id15" >
+          <property name="Frame" >
+            <object idref="id15" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>413.8369539997084</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>33.307746053816345</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>1353.9825719568362</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>1353.9825719568362</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>40.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>Central U.S.]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id17" >
+          <property name="Frame" >
+            <object idref="id17" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-367.86401209338374</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>163.4766129765212</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>2563.6432563866597</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>2563.6432563866592</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>40.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>Southwestern U.S.]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id19" >
+          <property name="Frame" >
+            <object idref="id19" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-1840.748844898699</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>95.9399950302709</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>2116.4208175965196</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>2116.4208175965196</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>40.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>25.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[US>Northwestern U.S.]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id21" >
+          <property name="Frame" >
+            <object idref="id21" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-1947.348728639401</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>1348.2854525850246</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>1664.0147036270876</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>1664.0147036270878</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>60.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>40.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[North America]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id23" >
+          <property name="Frame" >
+            <object idref="id23" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-4935.84</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-4127.759999999998</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>10002.72</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>10002.72</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection" >
+      <property name="CenterLon" >
+        <double>-59.65166591999999</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[South America]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id25" >
+          <property name="Frame" >
+            <object idref="id25" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-97.701230592</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-59.32354867199999</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>76.09912934400002</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>76.09912934400002</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection" >
+      <property name="CenterLon" >
+        <double>21.6</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[Africa]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id3" >
+          <property name="Frame" >
+            <object idref="id3" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-21.599999999999994</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-42.47999999999998</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>86.39999999999999</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>86.39999999999999</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection" >
+      <property name="CenterLon" >
+        <double>114.49345653213604</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[Asia]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id31" >
+          <property name="Frame" >
+            <object idref="id31" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>36.23799694257326</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-38.386531145543046</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>156.51091917912555</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>156.51091917912555</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection" >
+      <property name="CenterLon" >
+        <double>132.87168</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[Australia]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id5" >
+          <property name="Frame" >
+            <object idref="id5" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>108.76032000000001</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-49.94496000000001</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>48.222719999999995</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>48.22272</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LambertConformal" >
+      <property name="ParellelTwo" >
+        <double>60.0</double>
+      </property>
+      <property name="ParellelOne" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLon" >
+        <double>20.0</double>
+      </property>
+      <property name="OriginLat" >
+        <double>40.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[Europe]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id27" >
+          <property name="Frame" >
+            <object idref="id27" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-2662.9019289599996</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-785.7312153599987</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>4529.87179008</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>4529.87179008</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection" >
+      <property name="CenterLon" >
+        <double>0.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[World]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id29" >
+          <property name="Frame" >
+            <object idref="id29" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-180.0</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-180.0</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>360.0</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>360.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.Stereographic" >
+      <property name="Scale" >
+        <double>1.0</double>
+      </property>
+      <property name="TangentLon" >
+        <double>-105.0</double>
+      </property>
+      <property name="TangentLat" >
+        <double>90.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[North Pole]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id7" >
+          <property name="Frame" >
+            <object idref="id7" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-7080.0</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-6560.0</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>13040.0</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>13040.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add" >
+    <object class="ucar.unidata.geoloc.projection.Stereographic" >
+      <property name="Scale" >
+        <double>1.0</double>
+      </property>
+      <property name="TangentLon" >
+        <double>135.0</double>
+      </property>
+      <property name="TangentLat" >
+        <double>-90.0</double>
+      </property>
+      <property name="Name" >
+        <string>
+<![CDATA[South Pole]]>        </string>
+      </property>
+      <property name="DefaultMapArea" >
+        <object class="ucar.unidata.geoloc.ProjectionRect"  id="id9" >
+          <property name="Frame" >
+            <object idref="id9" />
+          </property>
+          <field name="x" >
+            <java.lang.Double>-5693.032959999998</java.lang.Double>
+          </field>
+          <field name="y" >
+            <java.lang.Double>-5350.4396799999995</java.lang.Double>
+          </field>
+          <field name="width" >
+            <java.lang.Double>10811.673599999996</java.lang.Double>
+          </field>
+          <field name="height" >
+            <java.lang.Double>10811.673599999996</java.lang.Double>
+          </field>
+        </object>
+      </property>
+    </object>
+  </method>
+
+</object>

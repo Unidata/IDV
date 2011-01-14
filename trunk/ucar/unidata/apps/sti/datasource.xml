@@ -1,0 +1,33 @@
+<?xml version="1.0"   encoding="ISO-8859-1"?>
+<datasources>
+  <datasource
+     id="DB.STORMTRACK"
+     fileselection="true"
+     factory="ucar.unidata.data.storm.STIStormDataSource"
+     label="STI Storm Data"/>
+
+ <datasource
+     id="STORM.DIAMOND7"
+     fileselection="true"
+     standalone="true"
+     factory="ucar.unidata.data.storm.Diamond7StormDataSource"
+     label="Diamond 7 Tropical Storm Data"/>
+
+<datasource
+     id="ImageGrid.AWX"
+     factory="ucar.unidata.data.grid.ImageGridDataSource"
+     patterns="\.AWX$, \.awx$"
+     fileselection="true"
+     doesmultiples="true"
+     label="AWX Image files (AWX)"/>
+
+<datasource
+     id="FILE.DIAMONDPOINTTEXT"
+     factory="ucar.unidata.data.point.DiamondPointDataSource"
+     doesmultiples="true"
+     patterns="\.csv$,\.tsv$,\.txt$"
+     fileselection="true"
+     label="Diamond Point Data files"/>
+
+
+</datasources>

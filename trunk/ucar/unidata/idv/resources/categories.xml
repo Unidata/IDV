@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<categories>
+  <category
+     name="*-3D-*"
+     desc="Any 3D data"/>
+  <category
+     name="*-2D-*"
+     desc="Any 2D data"/>
+  <category
+     name="*-2D-TIME-*"
+     desc="2D data with time"/>
+  <category
+     name="IMAGE-2D-TIME"
+     desc="2D image with time"/>
+  <category
+     name="*-windvector-*"
+     desc="Windvector"/>
+  <category
+     name="skewt"
+     desc="Skew-T data"/>
+  <category
+     name="text"
+     desc="Text file"/>
+  <category
+     name="html"
+     desc="Html file"/>
+  <category
+     name="track"
+     desc="Airplane track data"/>
+  <category
+     name="trace"
+     desc="Trace data"/>
+  <category
+     name="*"
+     desc="Any data"/>
+  <category
+     name="none"
+     desc="No data"/>
+</categories>

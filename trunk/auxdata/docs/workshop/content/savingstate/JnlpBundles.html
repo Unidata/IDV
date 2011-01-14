@@ -1,0 +1,36 @@
+<title>Saving JNLP Files</title>
+
+
+<div class="overview">
+The IDV can directly write out Webstart JNLP files</div>
+
+
+<ol class="step">
+
+  <li>First, load in a data source and create a display.
+      
+  <ul>
+    
+    <li>[ht::loadBasicGrid]</li>
+    
+    <li>[ht::createBasicDisplay -display {Color-Shaded Plan View}]</li>
+  </ul>
+
+  <li>  Save the bundle with [ht::menu File {Save As}].
+
+  <li> Make sure you have all right side buttons turned on from the prior exercise.
+
+  <li> Select  [ht::filename workshop.jnlp] as the file and press [ht::button Save].
+
+  <li> From the JNLP dialog  press [ht::button OK].
+
+  <li> Now, lets look at this [ht::filename workshop.jnlp] file. From a terminal window type:<pre>less workshop.jnlp </pre>
+
+  <li> Back to the IDV save the bundle now as  [ht::filename workshop2.jnlp]. 
+  <li> From the  JNLP dialog turn off [ht::button Include bundle in JNLP file] and enter some
+base url in the text field. e.g., http://www.unidata.ucar.edu. Press [ht::button OK].
+  <li> From a terminal window type:<pre>less workshop2.jnlp </pre>
+</ol>
+
+
+

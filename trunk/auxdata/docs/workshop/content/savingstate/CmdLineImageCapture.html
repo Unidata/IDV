@@ -1,0 +1,30 @@
+<title>Command Line Image Capture</title>
+
+
+
+<div class="overview">
+In this section we will cover how to automatically capture JPEG images from the command line.
+</div>
+
+<ol class="step">
+
+  <li>To automatically capture a JPEG image from the command line we will use the bundle we created previously.</li>
+  <li>Exit the IDV if it is running and run the following command:
+<pre>
+    runIDV -image test.jpg <%workshop.homedir%>/workshop.xidv
+</pre>
+
+<li>You should see the IDV start up, load in the bundle and then exit.</li>
+
+<li>You should have the [ht::filename test.jpg] file created in the local directory.</li>
+
+<li>Caveats:</li>
+<ul class="substep">
+   <li> Bug: Capturing the image before the display is fully created.</li>
+   <li> The IDV needs to have a display to capture images.</li>
+   <li> Start-up time. </li>
+</ul>
+</ol>
+
+
+

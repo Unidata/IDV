@@ -1,0 +1,117 @@
+<html><head>
+  <title> Projection Manager</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+The Projection Manager allows you to choose, edit and save map projections
+for use in Unidata applications.
+
+<p>
+
+<a NAME="projection"></a>
+A <b>projection</b> is a way of mapping the surface
+of the earth (a curved 2D surface) onto a plane (a flat 2D surface). A
+projection transforms a point on the earth (specified by latitude, longitude)
+to a point on the <b>projection plane </b>.
+
+<p>
+
+In the Projection Manager, both the <b>projection</b> --
+which kind of mapping to use -- and the
+<b>area</b> of the Earth  can be specified. You can make a Lambert
+Conformal map of North America, and a Lambert Conformal map of
+Sedgwick County, Kansas. Same projection, different areas. 
+
+<p>
+
+The IDV provides four basic types of projections:
+<b>Lambert Conformal</b>,
+<b>Transverse Mercator</b>,
+<b>Stereographic</b>, and 
+<b>Cylindrical Equidistant</b> 
+(the last is a special projection for datasets in <b>Lat/Lon</b> 
+coordinates which
+deals with longitude wrapping around the cylinder). 
+Each of these can be parameterized (e.g., tangent point, origin longitude)
+to create a specific projection area of that
+type. When you define a projection and area, you specify the type 
+of projection and its parameters.
+
+<div class="pagesubtitle">Projection Manager Window</div>
+You can bring up the Projection Manager
+with the [ug::menu Projections {New/Edit}]
+menu option. Projections supplied with the IDV are shown in the list.
+There may be additional projections you have created and named.
+In the figure, the IDV North American projection is highlighted,
+and displayed on the left.
+
+[ht::cimg  images/ProjectionManager.gif {Projection Manager}]
+
+To use a projection in the application:</b> select it from the list
+by clicking on the name (it turns blue),
+and press <b>Apply</b> which leaves the projection manager on screen,
+or press <b>Ok</b> and the projection manager is removed.
+
+<p>
+
+To modify or create a new projection: choose <b>Edit</b> or <b>New</b>
+from the menu; the <b>Define/Edit Projection dialog box</b> appears (see
+below).</li>
+
+<p>
+
+The IDV starts with a default projection. 
+Use the <b>Default</b> pull-down menu to select the projection that
+will be shown each time your IDV starts. (The default projection may
+not be used
+if you are starting the IDV with a 
+<a href="../Bundles.html">Bundle</a> of
+configuration information.)
+
+<p>
+You can also <b>Export</b> a projection to a file.
+
+<div class="pagesubtitle">Define/Edit Projection Window</div>
+
+This allows you to define new projections, and
+to modify existing ones. Remember that a Projection not only consists of
+the mathematical projection, but also the area of the Earth that is seen.
+
+<p>
+
+Here is how to create a new or revised projection:
+
+[ht::cimg images/ProjectionManagerEditor.gif {Projection Editor}]
+
+<ul>
+<li> Choose <b>Edit</b> or <b>New</b> from Projection Manager Window.</li>
+<li> Choose a projection Type from the pull-down menu</li>
+<li> Fill in the projection parameters 
+<li> Press <b>Preview</b> to see what the Projection looks like</li>
+<li> Set the map area shown with this named 
+projection by zooming and panning the view on the
+left. To zoom, drag the left mouse button. Use the other buttons in
+the window to zoom out and move around.
+<li> Give it a new or revised name if necessary (projection names are unique).
+Use &quot;&gt;&quot; between names to create a category hierarchy.</li>
+<li> Press <b>Save</b> to move the projection to the main projection manager.
+</ul>
+
+<p>
+
+In the example shown,
+a Lambert Conformal projection is being defined with the projection
+parameters
+as shown in the figure.
+
+<p>
+
+You can remove any projection from the main list by clicking on its
+name to highlight it, and then clicking on the <b>Delete</b> button.
+
+
+</body>
+
+

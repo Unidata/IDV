@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="ncar isff">
+<station name="ncar isff 1" lat="36.802" lon="-118.154"/>
+<station name="ncar isff 2" lat="36.76" lon="-118.247"/>
+<station name="ncar isff 3" lat="36.734" lon="-118.121"/>
+</stationtable>

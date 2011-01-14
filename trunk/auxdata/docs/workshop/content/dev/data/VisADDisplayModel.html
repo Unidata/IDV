@@ -1,0 +1,73 @@
+<title>Using VisAD Displays in the IDV</title>
+
+<div class="overview">
+The IDV uses the VisAD Display system to render data in displays.
+</div><p>
+
+<h2>Overview of VisAD Display System</h2>
+
+An overview of the VisAD Display system is found 
+<a href="http://www.ssec.wisc.edu/~billh/guide.html#4."
+target="display">here</a>.
+
+<h2>DisplayMaster/Displayable</h2>
+
+The IDV encapulates the building of displays and data depictions 
+using a set of classes in [dg::class ucar.visad.display].
+
+<ul>
+<li>The [dg::class DisplayMaster] class is a wrapper
+around a [dg::class visad.DisplayImpl] and manages a list of
+[dg::class Displayable] objects. The
+[dg::class ucar.unidata.view.geoloc.MapProjectionDisplay] is
+the most commonly used DisplayMaster in the IDV.<p>
+
+<li>The [dg::class Displayable] class provides support 
+for encapsulating one or more displayed data objects together 
+with their display-dependent state.<p>
+
+<li>The [dg::class DisplayableData] class holds a
+[dg::class visad.DataReference], a set of [dg::class visad.ScalarMap]-s
+and a [dg::class visad.DataRenderer] that control the depiction of 
+the Data in the display.<p>
+
+Displayable subclasses used in the IDV include:
+
+<ul>
+  <li>[dg::className ucar.visad.display.Displayable]
+  <ul>
+    <li>[dg::className ucar.visad.display.CompositeDisplayable]
+    <li>[dg::className ucar.visad.display.DisplayableData]
+    <ul>
+      <li>[dg::className ucar.visad.display.RGBDisplayable]
+      <ul>
+        <li>[dg::className ucar.visad.display.Grid2DDisplayable]
+        <li>[dg::className ucar.visad.display.IsoSurface]
+        <li>[dg::className ucar.visad.display.TrackDisplayable]
+        <li>[dg::className ucar.visad.display.VolumeDisplayable]
+        <li>[dg::className ucar.visad.display.FlowDisplayable]
+      </ul>
+      <li>[dg::className ucar.visad.display.LineDrawing]
+      <ul>
+        <li>[dg::className ucar.visad.display.ContourLines]
+        <li>[dg::className ucar.visad.display.MapLines]
+        <li>[dg::className ucar.visad.display.LatLonLines]
+        <li>[dg::className ucar.visad.display.IndicatorPoint]
+        <li>[dg::className ucar.visad.display.TextDisplayable]
+      </ul>
+      <li>[dg::className ucar.visad.display.ImageRGBDisplayable]
+      <li>[dg::className ucar.visad.display.ColorScale]
+      <li>[dg::className ucar.visad.display.StationModelDisplayable]
+    </ul>
+  </ul>
+</ul>
+
+</ul>
+
+<h2>ViewManagers and DisplayControls</h2>
+
+A ViewManager is a wrapper around a DisplayMaster.  A DisplayControl
+can hold one or more Displayable objects and these can be added to
+one or more ViewManagers.
+
+<h3>MapViewManager Example</h3>

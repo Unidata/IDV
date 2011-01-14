@@ -1,0 +1,250 @@
+
+[header {Xml based UI construction}]
+
+The [dg::class ucar.unidata.ui.XmlUi] class creates a user interface from a "skin" xml. 
+The xml can take a variety of forms:
+[pre {
+  <skin>
+    <ui>
+        Some ui xml
+    </ui>
+    <components>
+         Multiple  ui xml
+    </components>
+ </skin>
+}]
+
+Or:
+[pre {
+  <ui>
+     Some ui xml
+ </ui>
+}]
+
+Or:
+[pre {
+  <panel>
+  ...
+ </panel>
+}]
+
+Or:
+[pre {
+  <tabbedpane>
+  ...
+ </tabbedpane>     
+}]
+
+
+The "ui xml", either under the ui tag or under the components tag,
+contains a set of nested container and component tags:
+[pre {
+  <panel id="someid" layout="LAYOUT_VALUES">
+       containers and components
+ </panel>
+}]
+      
+Each top-level tag under the components tag has an id attribute. One can then
+refer to this component in the ui tag with a:
+
+[pre {<component idref="the component id">}]
+
+This allows one to separate overall layout (defined in the ui) from that actual
+components. e.g.:
+
+[pre {<skin>
+<ui>
+...
+   <component idref="id1"/>
+...
+      <component idref="id2"/>
+...
+</ui>
+<components>
+   <button id="id1"/>
+   <panel id="id2"> .... </panel>
+</components>
+</skin>
+}]
+
+
+Note: any attributes defined in the component tag in the ui section
+will overwrite the attributes in the actual tag in the components section.
+
+[pre {
+TAGS:     
+component
+panel
+tabbedpane
+button  
+checkbox
+textinput
+menu
+image}]
+
+
+All tags can have these attributes:<p>
+bgcolor, fgcolor - background and foreground color. The value can be a color
+name, e.g.: red, blue, orange, white, etc. or a single numeric value
+or a comma separated list of rgb values: e.g.: "250,50,10"
+<p>
+fontsize - specify font size used.
+<p>
+fontface - specify font face used.
+<p>
+
+Tag: component<p>
+The component tag can either have an idref, which points to
+a component defined in the components section:
+
+[pre {<component idref="some id in the components section"
+           (and any attributes)/>}]
+
+Or it can have an id which should be held within
+the idToComponent Hashtable which the XmlUi is created with.
+This allows the use of any application specific Component-s
+
+[pre {<component id="some id in idToComponent Hasthable"
+           (and any attributes)/>}]
+
+Tag: panel
+[pre {
+<panel layout="border|card|grid|gridbag|inset"
+       hspace="int, hor. spacing "
+       vspace="int, vert. spacing "
+       rows="int"
+       cols="int" 	      	      
+       colwidths="int,int,...,int"
+       rowheights="int,int,...,int">}]
+
+
+The panel tags can have any number of children tags. 
+The layout of the children is defined with a "layout" attribute
+which can be one of: border, card, grid, gridbag, inset.
+<p>
+layout="border"  - java.awt.BorderLayout. The children components of this tag should have a
+"place" attribute which is one of the java.awt.BorderLayout places:
+North, South, East, West, Center. e.g.:
+[pre {
+<panel layout="border" >
+   <label id="top" place="North" />
+   <label id="bottom" place="South"/>
+   <label id="left" place="West"/>
+   ...
+</panel>}]
+ 
+
+
+layout="card"  - This is a card layout that can take any number of children components
+but only shows one at a time. You can "flip" through the children components
+with an action called ui.flip. For example you can have a panel:
+[pre {<panel layout="card" id="testpanel">
+   <label id="child1"/>
+   <label id="child2"/>
+   <label id="child3"/>   
+</panel>}]
+
+Now if some component has an action ui.flip:
+[pre {<button action="ui.flip(testpanel);" />}]
+
+this will hide the current child (e.g., child1) and show the next child.
+The action:
+[pre {<button action="ui.flip(testpanel,child3);" />}]
+
+Will show a specific child.
+
+<p>
+
+layout="grid"  This is the java.awt.GridLayout. You can specify a number of rows and/or
+columns:
+
+[pre {<panel layout="grid" rows="2"  cols="3">}]
+
+Will give 2 rows 1 columns.
+
+[pre {<panel layout="grid" rows="1">}]
+
+Will give a single row multiple column layout.
+The spacing used is  defined with: hspace=".." vspace="..." attributes.
+
+<p>
+
+layout="gridbag"  This uses the java.awt.GridBagLayout in a column oriented way.
+The spacing used is  defined with: hspace=".." vspace="..." attributes.
+You can specify the number of columns in the grid. You can also specify
+the column and row weights (As a comm separated string of numeric values)
+that determine stretchiness. e.g.:
+
+[pre {<panel layout="gridbag" cols="5" place="South" colwidths="0,0,0,1,0" >}]
+
+Will give 5 columns the first three have no stretch, the 4th does, the 5th does
+not.
+[pre {<panel layout="gridbag" cols="2" place="South" 
+        colwidths="1,0"  rowheight="0,0">}]
+
+Will give 2 columns by any number of rows. The first column has stretch in
+width while none of the rows stretch in height.
+
+<p>
+layout="inset" - This is a simple way to wrap a single child component.
+The spacing used is  defined with: hspace=".." vspace="..." attributes.
+
+
+<p>
+Tag: button
+
+[pre {<button  action="some action"  label="label to use"/>}]
+
+Creates a java.awt.Button. The action (like all actions) can be a semicolon
+(";") separted list of actions.
+<p>
+
+Tag: checkbox
+[pre {<checkbox  action="some action"  label="label to use"/>}]
+Just like the button tag. However, we convert the itemStateChanged event
+into an action event and pass it on to the actionListener.
+
+<p>
+Tag: textinput
+[pre {<textinput rows="optional number of rows"
+           cols="optional number of columns"
+	   value="initial text value" 
+           action="some action"/>}]
+Provides either a TextField or a TextArea depending on the number
+of rows (the default == 1, which gives a TextField).
+For TextField-s we add an actionListener if the action attribute is defined.
+<p>
+
+Tag: menu
+[pre {<menu label="Some menu label" image="some image url">
+     <menuitem label="some menu item"  action="some action" />
+     <menuitem label="some other menu item"  action="some other action" />     
+     <separator/>
+     <menu label="some sub menu">
+         <menuitem label="..."  action="..." />
+         <menuitem label="..."  action="..." />
+     </menu>
+</menu>}]
+
+If image attribute  is defined creates an image button, else creates a
+text button.
+When the  button is clicked a menu of menuitems, separators and sub-menus is
+popped up.
+
+<p>
+Tag: image
+[pre {<image url="some url"
+       width="Optional width of image"
+       height="Optional height of image"       
+       action="If defined the image acts like a button"
+       border="Optional true|false">}]
+
+This provides a simple image label or an image button (if action is defined).
+If it is a button and if border==true then the image is drawn with a border
+(that changes when clicked).
+
+
+
+
+
+

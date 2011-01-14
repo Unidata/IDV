@@ -1,0 +1,81 @@
+<title>Regular Expression Patterns</title>
+
+
+
+
+[ht::desc The IDV uses <i>regular expression</i> based patterns in a variety of       places.]
+
+
+This section provides a brief overview of regular expressions.
+For  more in depth  coverage there are excellent book
+(e.g., <a
+h
+h
+href="http://www.oreilly.com/catalog/regex">http://www.oreilly.com/catalog/regex/</a>)
+resources.
+<p>
+
+
+Here are some example patterns and a description of what they will match:
+
+<table><tr><td>Pattern</td><td>Description</td></tr>
+
+<tr valign="top">
+<td><i>some string</i></td>
+<td>Will match match any occurrence of:&quot;some string&quot;. e.g.:<br>
+&quot;Here is some string&quot; will match.<br>
+&quot;Here is some string in the middle of the text&quot; will match.<br>
+&quot;some string at the beginning&quot; will match.<br>
+</td></tr>
+
+<tr valign="top">
+<td><i>^some string</i></td>
+<td>Will match &quot;some string&quot; at the beginning of the text:<br>
+&quot;Here is some string&quot; will not match.<br>
+&quot;some string at the beginning&quot;will match<br>
+</td></tr>
+
+<tr valign="top">
+<td><i>some string$</i></td>
+<td>Will match &quot;some string&quot; at the end of the text:<br>
+&quot;Here is some string&quot; will match.<br>
+&quot;some string at the beginning&quot; will not match.<br>
+</td></tr>
+
+<tr valign="top">
+<td><i>^some string$</i></td>
+<td>Will only match exactly &quot;some string&quot;
+</td></tr>
+
+
+<tr valign="top">
+<td><i></i><i>a*</i></td>
+<td>Will match 0 or more occurrences of &quot;a&quot;
+</td></tr>
+
+<tr valign="top">
+<td><i>a+</i></td>
+<td>Will match 1 or more occurrences of &quot;a&quot;
+</td></tr>
+
+
+<tr valign="top">
+<td><i>.</i></td>
+<td>Will match any one character.
+</td></tr>
+
+<tr valign="top">
+<td><i>.*</i></td>
+<td>Will match 0 or more of anything.
+</td></tr>
+
+<tr valign="top">
+<td><i>.+</i></td>
+<td>Will match 1 or more of anything.
+</td></tr>
+
+
+</table>
+
+
+

@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>Doing More With Formulas</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+Formulas can be used to do simple arithmetic such as the simple difference, 
+or they can be used to call Jython procedures as in the previous excercise. 
+They can also be used to call Java methods and nest Jython procedures.  In
+this exercise, we will show how to create more complex formulas from the
+set of diagnostic functions in the IDV.
+</p>
+</div>
+
+<p>
+
+First review  
+[ht::popup "SimpleFormulas.html" "Basics of IDV Formulas"].
+
+<p>
+
+<ol class="step">
+
+<li>Calculating the ageostrophic wind
+  <ul class="substep">
+    <li>Clear all displays and data.
+    <li>[ht::loadEtaGrid]
+    <li>Create the following displays:
+        <ul>
+        <li>500 mb contours of geopotential height
+        <li>500 mb flow vectors of grid relative winds.  Set the skip interval 
+         to 2 and the range to be -30 to 30.  Save the display settings 
+         as [ht::param {Workshop-&gt;Flow fields}].
+        <li>500 mb flow vectors of the geostrophic wind.  Use the 
+        display settings saved in the previous step.
+        </ul>
+    <li>The ageostropic wind is the difference between the geostropic wind 
+    and the actual wind.
+
+   <ul><pre>AGEO = OBS - GEO</pre></ul>
+    
+    <li>We could simply create a formula that is OBS - GEO and select the
+    flow vector field and the geostropic wind.  For this exercise, we will 
+    look at how we can do this from the basic fields, on the fly.  
+    <li>Open the Jython Library and look at the 
+    [ht::menu System {Grid Diagnostics}] library.  This is a set 
+    of diagnostic functions that can be applied to 
+    grids.  The names closely match the set of grid diagnostics in GEMPAK.
+    Look at the page in the 
+    <a href="[ht::ug::url {/tools/JythonLib.html}]" target="userguide">
+    Jython Libraty</a> section of the User's Guide.  
+    <li>From the Formulas Data Source, select the 
+    [ht::menu Grids {Define a grid diagnostic}] formula.
+    <li>Select the [ht::menu {Flow Displays} {Vector Plan View}], 
+    the [ht::param {Workshop-&gt;Flow fields}] display 
+    setting and create the display. 
+    <li>You will be prompted for the formula. In the dialog, type in:
+
+    <ul><pre><b> vsub(vecr(u,v),geo(z)) </b></pre></ul>
+
+     This will take the vector difference (<b>vsub</b>) between the vector 
+     (<b>vecr</b>) defined by <b>u</b> and <b>v</b> components and the 
+     geostrophic wind (<b>geo</b>) calculated from the geopotential 
+     height field (<b>z</b>).
+     <li>Click the [ht::button OK] button.
+     <li>For the fields, select the u and v wind components and the 
+     geopotential height for u,v and z respectively.  Select the 500 hPa level
+     for each of the grids.
+     <li>Zoom in to see the detail of the plots.
+  </ul>
+</li>
+<li>Calculating the magnitude of the ageostrophic wind</li>
+<ul>
+     <li>The magnitude (speed) of the ageostrophic wind can be calulated using 
+     the mag function.  To save some steps, we'll save the ageostropic wind
+     field in the cache and use that.
+     <li>Use the ageostrophic vector control's 
+     [ht::menu File Save {Save Data in Cache}] menu to save the data in
+     the cache.  You can leave the name as is or change it to ageo.
+     <li>Select the [ht::menu Grid {Create a grid diagnostic}] formula
+     and the Contour Plan View Display.
+     <li>In the dialog, type:
+     <ul><pre><b>mag(v)</b></pre></ul>
+     <li>For the field, select the cached data.
+
+</ul>
+</ol>
+<p>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<choosers>
+  <panel
+     title="Model Data"
+     layout="border"
+     tabTooltip="For accessing remote gridded model data"
+     mnemonic="G">
+    <chooser
+       id="chooser.xml"
+       title="Model Data"
+       menutitle="Model Data"
+       helppath="idv.data.choosers.catalog"
+       class="ucar.unidata.idv.chooser.XmlChooser"/>
+  </panel>
+  <panel
+     title="Satellite Images"
+     layout="border"
+     tabtooltip="For accessing satellite imagery"
+     mnemonic="I">
+    <chooser
+       id="chooser.image"
+       title="Satellite Images"
+       menutitle="Satellite Imagery"
+       helppath="idv.data.choosers.image"
+       showdetails="false"
+       class="ucar.unidata.idv.chooser.ImageChooser"/>
+  </panel>
+  <panel
+     title="Radar"
+     layout="border"
+     tabtooltip="For accessing Level-II and Level-III radar data"
+     mnemonic="R">
+    <tabbedpane
+       place="Center"
+       tabnested="true">
+      <chooser
+         id="chooser.radar.level3"
+         title="Level III"
+         menutitle="Level III Radar"
+         helppath="idv.data.choosers.radar_level3"
+         showdetails="false"
+         class="ucar.unidata.idv.chooser.RadarChooser"/>
+      <chooser
+         id="chooser.radar.level2"
+         title="Level II"
+         menutitle="Level II Radar"
+         helppath="idv.data.choosers.radar_level2"
+         class="ucar.unidata.idv.chooser.Level2RadarChooser"
+         showdatasourcemenu="false"/>
+    </tabbedpane>
+  </panel>
+  <panel
+     title="Observations"
+     layout="border"
+     tabtooltip="For accessing surface and upper air observations"
+     mnemonic="O">
+     <tabbedpane
+       place="Center"
+       tabnested="true">
+       <chooser
+          id="chooser.point"
+          title="Surface"
+          menutitle="Surface Observations"
+          helppath="idv.data.choosers.point"
+          class="ucar.unidata.idv.chooser.PointChooser"/>
+      <chooser
+         id="chooser.raob.singlelevel"
+         title="Upper Air"
+         menutitle="Upper Air Observations"
+         helppath="idv.data.choosers.raob_singlelevel"
+         class="ucar.unidata.idv.chooser.RaobPointChooser"
+         showserver="true"/>
+     </tabbedpane>
+  </panel>
+  <panel
+     title="Soundings"
+     layout="border"
+     tabtooltip="For accessing RAOB data"
+     mnemonic="B">
+     <chooser
+         id="chooser.raob.remote"
+         title="Sounding"
+         menutitle="Sounding Data"
+         helppath="idv.data.choosers.raob"
+         class="ucar.unidata.idv.chooser.RaobChooser"
+         showserver="true"/>
+  </panel>
+  <panel
+     title="Advanced"
+     layout="border"
+     tabtooltip="For advanced choosing of data"
+     mnemonic="A">
+     <tabbedpane
+       place="Center"
+       tabnested="true">
+       <chooser
+          id="chooser.file"
+          title="Files"
+          menutitle="From the File System"
+          showinmenu="true"
+          helppath="idv.data.choosers.file"
+          class="ucar.unidata.idv.chooser.FileChooser"
+          showpolling="false"
+          filepattern=".*\.nc"
+          filters=".*\.xidv:IDV files (*.xidv);"/>
+       <chooser
+            id="chooser.url"
+            title="URLs"
+            menutitle="From a Web Server"
+            helppath="idv.data.choosers.url"
+            class="ucar.unidata.idv.chooser.UrlChooser"
+            tabTooltip="For accessing URLs"
+            mnemonic="U"/>
+       <chooser
+          id="chooser.polling.dir"
+          title="Directory"
+          showinmenu="true"
+          class="ucar.unidata.idv.chooser.PollingFileChooser"
+          filecount="1"/>
+    </tabbedpane>
+  </panel>
+  <styles>
+<!-- Define the style for the labels   -->
+    <style
+       class="toplabel"
+       margin="8,0,8,0"
+       fontsize="+1"
+       place="North"
+       align="center"
+       fontface="Dialog"
+       fontstyle="PLAIN"/>
+  </styles>
+</choosers>

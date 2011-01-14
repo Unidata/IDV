@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: ucar.unidata.idv.DefaultIdv
+Class-Path: leadidv.jar idv.jar  auxdata.jar local-visad.jar  visad.jar jython.jar external.jar  nc2.2.jar  

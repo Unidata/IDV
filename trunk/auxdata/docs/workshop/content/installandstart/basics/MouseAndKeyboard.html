@@ -1,0 +1,254 @@
+<html>
+<head>
+<title>Mouse and Keyboard Use</title>
+<link rel="stylesheet" type="text/css" href="../../default.css" title="Style">
+</head>
+
+<body>
+
+<div class="overview">
+This page summarizes use of the mouse and keyboard for 
+controlling IDV displays using the default mouse and keyboard
+assignments.  You can change the default behavior through
+the [ht::command Navigation] tab of the User Preferences accessed
+by the [ht::menu Edit Preferences] menu. 
+</div>
+
+<a name=conventions> </a>
+<div class="pagesubtitle">Mouse Conventions</div>
+
+<p>
+
+
+<p> "Click" the mouse means to press and release a mouse button once.</p>
+
+<p> "Double-click" means to click a mouse button twice quickly.</p>
+
+<p> "Drag" means to press and hold down a mouse button, 
+move the mouse and then release the mouse button. </p>
+
+<p> All references to mouse buttons are in respect to a 3-button 
+right-handed mouse: </p>
+
+<ul>
+  <li><b>MB1</b> (mouse button 1) is the <b>left</b> button. </li>
+  <li><b>MB2</b> (mouse button 2) is the <b>middle</b> button. </li>
+  <li><b>MB3</b> (mouse button 3) is the <b>right</b> button. </li>
+</ul>
+
+If you are using a left-handed mouse, MB1 is the right button and
+MB3 is the left-button.<p>
+
+If you are using a Mac with a single button mouse, MB3 is simulated
+using the <b>Option</b>+click combination.  Not all functions listed
+below (e.g., panning) work with this combination on a one button mouse.</p>
+
+This table summarizes the operations you can perform with the mouse:
+
+<table border=on>
+<tr valign="top"><th align="left" nowrap>Mouse Button</th><th align="left" nowrap>Key Modifier</th><th align="left" >Purpose</th></tr>
+
+<tr valign="top">
+<td><b>MB1</b></td>
+<td align="center">none</td>
+<td>Moving selector points in view windows, selecting items in lists 
+and widgets, clicking buttons, moving sliders.</td>
+</tr>
+
+<tr valign="top">
+<td>&nbsp;&nbsp;</td>
+<td align="center">Shift</td>
+<td>Rubber band zoom in view window</td>
+</tr>
+
+
+<tr valign="top">
+<td><b>MB3</b></td>
+<td align="center">none</td>
+<td>Rotate 3-D displays</td>
+</tr>
+
+<tr valign="top">
+<td>&nbsp;&nbsp;</td>
+<td align="center">Ctrl</td>
+<td>Panning in view windows</td>
+</tr>
+
+<tr valign="top">
+<td>&nbsp;&nbsp;</td>
+<td align="center">Shift</td>
+<td>Zoom in/out</td>
+</tr>
+
+</table>
+
+<a name="zoom"></a>
+<div class="pagesubtitle">Zoom, Pan, and Rotate</div>
+
+There are several methods to zoom, pan, and rotate in the IDV. You
+can use the mouse, the arrow keys, a rubber band box, or the Zoom/Pan
+Toolbar.
+
+<a name="rubberband"></a>
+<div class="pagesubtitle">Rubber Band Box to zoom in</div>
+
+You can zoom into an area by outlining it with a "rubber band box."
+Hold down the <b>Shift</b> key, then drag the left mouse button (MB1)
+to outline a box. The outline appears while you are dragging the mouse,
+before the zoom. If the display was significantly rotated before using
+the rubber band box, the new display may have the data area off screen;
+zoom out to find it, or use <b>Ctrl-r</b> key combination to reset to
+the initial overhead viewpoint.
+
+
+<a name="mousezoom"></a>
+<div class="pagesubtitle">Mouse controls to Zoom, Pan, and Rotate</div>
+
+You can zoom, rotate, and pan using the right mouse button (MB3). 
+
+<ul class="step">
+
+
+  <li>To <b>zoom</b> a 3D display hold down the Shift key and drag the right
+      mouse button (MB3). Moving the mouse forward zooms in; moving the mouse
+      backward zooms out. This method allows any amount of zooming and
+      precise control.</li>
+
+  <li>To <b>pan</b> a 3D display hold down the Ctrl key and drag the right
+      mouse button (MB3) in the direction you want to move the display. 
+      This method allows the most precise control over how much panning 
+      occurs and allows panning in any direction.</li>
+
+  <li>To <b>rotate</b> a 3D display in any direction, drag the mouse with
+      right button down over the display. Rotating the display with the
+      mouse takes some getting used to. </li>
+
+</ul>
+
+<a name="keyzoom"></a>
+<div class="pagesubtitle">Keyboard controls to Zoom, Pan, and Rotate</div>
+
+You can zoom, rotate, and pan using the arrow keys on the keyboard. 
+You must first click the mouse in the view window.
+
+<ul class="step">
+
+  <li>You can <b>zoom</b> by holding the <b>Shift</b> key and pressing
+      the up (zoom in) and down (zoom out) arrows on the keyboard.</li>
+            
+  <li>You can <b>pan</b> the display by holding the <b>Ctrl</b> key and
+      pressing the arrow keys on the keyboard.  Using the method,
+      the display will pan in the direction of the arrow.</li>
+
+  <li>You can <b>rotate</b> the 3D display using the arrow keys on
+      the keyboard.  Click in the window and use
+      the arrow keys to rotate the 3-D box.</li>
+
+  <li>Use the key combination <b>Ctrl-r</b> to reset the display to 
+      the initial view of this projection (overhead, centered on center 
+      of the map projection in use).</li>
+
+</ul>
+
+<p>
+
+<a name="listselect">
+<div class="pagesubtitle">List selection</div>
+
+The IDV uses the standard methods for selecting multiple items
+in a list (e.g., times list).  These are:
+
+<ul class="step">
+
+  <li><b>To select everything in the list:</b>:
+          
+    <ul class="substep">
+
+      <li>Click on the list to activate it.</li>
+
+      <li>Press <b>Ctrl-a</b>.
+
+    </ul>
+  </li>
+
+  <li><b>To select a continuous range</b>:
+
+    <ul class="substep">
+
+      <li>Click on one item in the list to start the range.</li>
+
+      <li>Hold the <b>Shift</b> key down and click on the last
+          item in the range.  All items between the first
+          and last are selected.</li>
+
+    </ul>
+  </li>
+
+  <li><b>To select a non-continuous range</b>:
+          
+    <ul class="substep">
+
+      <li>Click on one item in the list.</li>
+
+      <li>Hold the <b>Ctrl</b> key<b>**</b> down and click on other items
+          in the list.  As each item is clicked, it is highlighted
+          to indicate that it is selected.</li>
+
+      <li>To unselected an item, hold the <b>Ctrl</b> key<b>**</b> down and
+          click on the item.</li><p>
+
+      <b>**</b>On the Apple Mac, use the <b>Command</b> key instead of 
+               <b>Ctrl</b>
+
+    </ul>
+  </li>
+</ul>
+
+<a name="viztoggle">
+
+<div class="pagesubtitle">Toggling Visibility of Displays</div>
+
+There are several ways to toggle visibility of displays.
+
+<ol class="step">
+  <li>When using the side legends, the 
+      [ht::command {Display Visibility}] checkbox to the left
+      of the label can be used to toggle the visibility of that display.
+      When using the bottom legend, click on the legend label to 
+      toggle visibility of that one display.<p>
+
+  <li>The padlock icon <img src="images/unlock.gif"> on the right side of the 
+      [ht::command {legend bar}] is a toggle to lock visibility. 
+      Click on the padlock icon to toggle locking. When locked, the icon
+      will look like this. <img src="images/lock.gif">. This lock overrides 
+      most other actions which might change visibility, including 
+      using the keyboard number keys. Use this to lock one or more 
+      displays' visibility on or off while you change visibility of other 
+      displays. You can still toggle visibility of a 
+      locked display with a click on the legend label.</li><p>
+
+  <li>The function keys <code class="command">F1, F2, F3</code> can
+      be used to cycle visibility as follows:
+
+      <ul>
+
+        <li>The [ht::command {F1}] key cycles visibility through 
+            all non-locked displays, showing one at a time.</li>
+
+        <li>The [ht::command {F2}] turns on all non-locked 
+            displays.</li>
+
+        <li>The [ht::command {F3}] turns off all non-locked 
+            displays.</li>
+
+      </ul>
+   </li><p>
+
+
+   <li>Use the [ht::menu View Visible] checkbox
+       menu item in each display control's menu.</li><p>
+
+</ol>
+
+</body>
+</html>

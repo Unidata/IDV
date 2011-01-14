@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<choosers>
+  <panel
+     layout="border"
+     title="TREX Data">
+    <tabbedpane
+       tabnested="true"
+       place="North">
+      <panel
+         title="G5"
+         layout="gridbag"
+         cols="1">
+        <chooser
+           border="titled"
+           border_title="G5 Track"
+           tagclass="trexchooser"
+           id="trex.chooser.g5.track"
+           datasourceid="FILE.TRACK"
+           title="G5 Track"
+           showinmenu="true"
+           class="ucar.unidata.idv.chooser.PollingFileChooser"
+           interval="0.2"
+           directory="${trex.data.root}/gv"
+           filecount="1"
+           filepattern=".*\.nc"/>
+        <chooser
+           border="titled"
+           border_title="G5 Sondes"
+           tagclass="trexchooser"
+           id="trex.chooser.g5.sonde"
+           title="G5 Sonde"
+           datasourceid="FILE.SONDE"
+           showinmenu="true"
+           class="ucar.unidata.idv.chooser.PollingFileChooser"
+           directory="${trex.data.root}/gv_dropsonde"
+           filecount="10"
+           filepattern=".*\.nc"/>
+      </panel>
+      <panel
+         title="King Air"
+         layout="border">
+        <chooser
+           border="titled"
+           place="North"
+           border_title="King Air"
+           tagclass="trexchooser"
+           id="trex.chooser.kingair"
+           datasourceid="FILE.TRACK"
+           title="King Air Track"
+           interval="0.2"
+           showinmenu="true"
+           class="ucar.unidata.idv.chooser.PollingFileChooser"
+           directory="${trex.data.root}/kingair"
+           filecount="1"
+           filepattern=".*\.nc"/>
+      </panel>
+
+
+  <panel
+         layout="gridbag"
+         cols="1"
+         title="Satellite">
+      <chooser
+          border="titled"
+           border_title="Visible"
+         id="chooser.polling.sat.vis"
+         tagclass="trexchooser"
+         datasourceid="FILE.AREAFILE"
+         title="1km Visible Satellite"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="${trex.data.root}/sat/vis"
+         filepattern=".*vis_.*$"
+	 filecount="5"
+         loadlabel="Load Visible Satellite Imagery"/>
+      <chooser
+         id="chooser.polling.sat.ir"
+          border="titled"
+           border_title="IR"
+         tagclass="trexchooser"
+         datasourceid="FILE.AREAFILE"
+         title="IR Satellite"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="${trex.data.root}/sat/ir"
+         filepattern=".*ir_.*$"
+	 filecount="5"
+         loadlabel="Load IR Satellite Imagery"/>
+  </panel>
+  <chooser
+         id="chooser.polling"
+         title="Directory"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         mostrecent="1"/>
+
+
+    </tabbedpane>
+  </panel>
+
+
+
+  <styles>
+<!-- Define the style for the labels         -->
+    <style
+       class="toplabel"
+       margin="8,30,4,0"
+       fontsize="+1"
+       place="North"
+       align="left"
+       fontface="Dialog"
+       fontstyle="PLAIN"/>
+    <style
+       class="trexchooser"
+       margin="10,10,10,10"/>
+  </styles>
+</choosers>

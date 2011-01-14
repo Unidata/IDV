@@ -1,0 +1,93 @@
+
+{Web Map Server(WMS)/Background Image  Control}
+
+{
+<meta name="jhid" value="idv.controls.wmscontrol">
+The WMS Control displays imagery from WMS servers.
+A set of predefined links to WMS
+servers for topographic, shaded relief and aerial imagery
+is also provided with the Background Image control.
+<p>
+To use the pre-defined Background images simply select
+the [ug::menu Display Special {Background Image}] menu item.
+To choose imagery from other web map servers
+bring up the <a href="../../data/choosers/CatalogChooser.html">Data Source Chooser</a>,
+go to the Catalogs tab and enter the url that points to
+the <i>Capabilities</i> document of the desired WMS.
+We also provide links to a set of useful WMSs from the 
+<i>idvcatalog</i>. If it is not in the Catalog pull down menu
+simply enter the url:
+<pre>http://www.unidata.ucar.edu/georesources/idvcatalog.xml</pre>
+From this catalog open the <i>Web Map Servers</i> tab
+and select the WMS you would like to access.
+
+<p>
+The WMS Control makes request to the Web Map Server for an image
+that covers the area currently being displayed in the main display.
+Due to the time it takes to access remote servers the WMS Control 
+does not request new images when the user pans and zooms. 
+[ht::cimg images/WMSControlGui.gif]
+}
+
+{{Layer}
+{
+If multiple layers have been selected (using control-click in the
+WMS Chooser or in the Background Image control) you can choose
+which layer to view with this menu.
+}}
+
+
+
+{{Image Buttons}
+{
+You can reload the image from the server at the current screen location
+and scale and  set the projection in the display to the current image bounds.
+<p>
+When the [ug::button Auto-Reload] button is selected, the 
+WMS control will automatically fetch a new image every time the main display is panned or zoomed. 
+There is a slight delay so
+that successive zooms do not cause successive image requests.
+}}
+
+
+
+{{Resolution}
+{The [ht::command Resolution] menu allows you to make requests for lower
+resolution images. This results in a smaller image file size  and
+quicker requests from the server.
+}}
+
+{[ug::vertical {image}]}
+
+
+{{Transparency}
+{You can adjust the overall transparency of the image.
+Note: Some Web Map Servers provide images that contain transparent
+sections. Currently, the IDV does not support the display of transparent 
+sections.
+}}
+
+
+{{Dimension Scale} {
+By default the bounds of the image that is retrieved from the server is the size of the display.
+This slider allows you to fetch an even larger image.
+}}
+
+
+
+{{Save as Image Xml/Kml  File} {
+This is available under the [ug::menu File Save] menu. It takes the most
+recently displayed image and writes it out (e.g., as a jpeg file)
+and also writes out the IDV's <i>ximg</i> xml file that contains
+the reference to the image file and the lat/lon position of the image.
+<p>
+This  allows the user to load this image back in without being connected to
+the original web map server.
+<p>
+If a <i>.kml</i> or <i>.kmz</i> file suffix is given then the Google Earth
+file is created and the image can be loaded  into Google Earth.
+}}
+
+
+
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtables>
+
+  <stationtable
+     name="US Weather Stations"
+     category="Weather"
+     href="/ucar/unidata/idv/resources/stations/weatherstations.xml"/>
+
+  <stationtable 
+     name="Profiler Sites" elevunit="meters" 
+     category="Weather" 
+     href="/ucar/unidata/idv/resources/stations/profilerstns.xml"/>
+
+  <stationtable
+     name="States"
+     category="US"
+     href="/ucar/unidata/idv/resources/stations/states.xml"/>
+
+  <stationtable
+     name="U.S. Cities"
+     category="US"
+     href="/ucar/unidata/idv/resources/stations/place_u_s_cities.xml"/>
+
+</stationtables>

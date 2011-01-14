@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<skin>
+  <ui>
+    <panel layout="border">
+    <idv.menubar place="North"/>
+      <panel
+         place="Center"
+         layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+
+        <panel layout="border" place="Center">
+           <example.label text="Example Skin" place="North"/>
+           <idv.view place="Center" class="${view_class}"/>
+        </panel>
+
+      </panel>
+      <idv.statusbar place="South"/>
+    </panel>
+  </ui>
+</skin>

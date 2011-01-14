@@ -1,0 +1,25 @@
+#!/bin/sh
+
+dirname=`dirname $0`
+
+if test -f jre/bin/java; then
+##We are in the installer directory
+    ./jre/bin/java -Xmx512m -jar rico.jar $*
+else
+##Try using the dirname of this script
+    if test -f ${dirname}/jre/bin/java; then
+       pushd ${dirname} > /dev/null
+       ./jre/bin/java -Xmx512m -jar rico.jar $*
+       popd > /dev/null
+    else 
+       if test  ${JAVA_HOME}; then
+##Try using JAVA_HOME
+          ${JAVA_HOME}/bin/java -Xmx512m -jar rico.jar $*
+       else 
+##Try just using java
+          java -Xmx512m -jar rico.jar $*
+      fi
+    fi
+fi
+
+

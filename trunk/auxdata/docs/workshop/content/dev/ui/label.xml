@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<panel
+   bgcolor="green"
+   layout="border">
+  <label
+     fgcolor="red"
+     fontsize="24"
+     fontstyle="italic"
+     text="Hello there"/>
+</panel>

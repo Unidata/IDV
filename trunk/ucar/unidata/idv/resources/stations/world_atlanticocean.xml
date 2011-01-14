@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Atlantic Ocean" category="World locations">
+<stn name="Adriatic Sea" lat="42:30:N" lon="16:00:E"/>
+<stn name="Aegean Sea" lat="38:30:N" lon="25:00:E"/>
+<stn name="Alboran Sea" lat="36:00:N" lon="2:30:W"/>
+<stn name="Anegada Passage" lat="18:30:N" lon="63:40:W"/>
+<stn name="Ascension Island" lat="7:57:S" lon="14:22:W"/>
+<stn name="Azov, Sea of" lat="49:00:N" lon="36:00:E"/>
+<stn name="Balearic Sea " lat="40:30:N" lon="2:00:E"/>
+<stn name="Baltic Sea" lat="57:00:N" lon="19:00:E"/>
+<stn name="Beagle Channel" lat="54:53:S" lon="68:10:W"/>
+<stn name="Belle Isle, Strait of" lat="51:35:N" lon="56:30:W"/>
+<stn name="Biscay, Bay of" lat="44:00:N" lon="4:00:W"/>
+<stn name="Black Rock " lat="53:39:S" lon="41:48:W"/>
+<stn name="Black Sea" lat="43:00:N" lon="35:00:E"/>
+<stn name="Bonifacio, Strait of" lat="41:01:N" lon="14:00:E"/>
+<stn name="Bosporus " lat="41:00:N" lon="29:00:E"/>
+<stn name="Bothnia, Gulf of" lat="63:00:N" lon="20:00:E"/>
+<stn name="Bristol Channel" lat="51:18:N" lon="3:30:W"/>
+<stn name="Cabot Strait" lat="47:20:N" lon="59:30:W"/>
+<stn name="Campeche, Bay of" lat="20:00:N" lon="94:00:W"/>
+<stn name="Canarias Sea" lat="28:00:N" lon="16:00:W"/>
+<stn name="Caribbean Sea" lat="15:00:N" lon="73:00:W"/>
+<stn name="Celtic Sea" lat="51:00:N" lon="6:30:W"/>
+<stn name="Crooked Island Passage" lat="22:55:N" lon="74:35:W"/>
+<stn name="Danish Straits" lat="58:00:N" lon="11:00:E"/>
+<stn name="Dardanelles " lat="40:15:N" lon="26:25:E"/>
+<stn name="Davis Strait" lat="67:00:N" lon="57:00:W"/>
+<stn name="Denmark Strait" lat="67:00:N" lon="24:00:W"/>
+<stn name="Dover, Strait of" lat="51:00:N" lon="1:30:E"/>
+<stn name="Drake Passage" lat="60:00:S" lon="60:00:W"/>
+<stn name="English Channel" lat="50:20:N" lon="1:00:W"/>
+<stn name="Finland, Gulf of" lat="60:00:N" lon="27:00:E"/>
+<stn name="Florida, Straits of" lat="25:00:N" lon="79:45:W"/>
+<stn name="Fundy, Bay of" lat="45:00:N" lon="66:00:W"/>
+<stn name="Galleons Passage" lat="11:00:N" lon="60:55:W"/>
+<stn name="Gibraltar, Strait of" lat="35:57:N" lon="5:36:W"/>
+<stn name="Golfo San Jorge " lat="46:00:S" lon="66:00:W"/>
+<stn name="Golfo San Matias " lat="41:30:S" lon="64:00:W"/>
+<stn name="Gough Island" lat="40:20:S" lon="9:55:W"/>
+<stn name="Grand Banks " lat="47:06:N" lon="55:48:W"/>
+<stn name="Great Belt " lat="55:30:N" lon="11:00:E"/>
+<stn name="Grytviken " lat="54:15:S" lon="36:45:W"/>
+<stn name="Guinea, Gulf of" lat="3:00:N" lon="2:30:E"/>
+<stn name="Inaccessible Island" lat="37:17:S" lon="12:40:W"/>
+<stn name="Ionian Sea" lat="38:30:N" lon="18:00:E"/>
+<stn name="Irish Sea" lat="53:30:N" lon="5:20:W"/>
+<stn name="Islas Malvinas " lat="51:45:S" lon="59:00:W"/>
+<stn name="Jamestown " lat="15:56:S" lon="5:44:W"/>
+<stn name="Kattegat " lat="57:00:N" lon="11:00:E"/>
+<stn name="Kiel Canal " lat="53:53:N" lon="9:08:E"/>
+<stn name="Kithira Strait" lat="36:00:N" lon="23:00:E"/>
+<stn name="Labrador Sea" lat="60:00:N" lon="55:00:W"/>
+<stn name="Lake Erie" lat="42:30:N" lon="81:00:W"/>
+<stn name="Lake Huron" lat="45:00:N" lon="83:00:W"/>
+<stn name="Lake Michigan" lat="43:30:N" lon="87:30:W"/>
+<stn name="Lake Ontario" lat="43:30:N" lon="78:00:W"/>
+<stn name="Lake Superior" lat="48:00:N" lon="88:00:W"/>
+<stn name="Ligurian Sea" lat="43:30:N" lon="9:00:E"/>
+<stn name="Lion, Gulf of" lat="43:20:N" lon="4:00:E"/>
+<stn name="Little Belt " lat="55:05:N" lon="9:55:E"/>
+<stn name="Magellan, Strait of" lat="54:00:S" lon="71:00:W"/>
+<stn name="Malta Channel" lat="56:44:N" lon="26:53:E"/>
+<stn name="Malvinas, Islas " lat="51:45:S" lon="59:00:W"/>
+<stn name="Marmara, Sea of" lat="40:40:N" lon="28:15:E"/>
+<stn name="Mediterranean Sea" lat="36:00:N" lon="15:00:E"/>
+<stn name="Messina, Strait of" lat="38:15:N" lon="15:35:E"/>
+<stn name="Mexico, Gulf of" lat="25:00:N" lon="90:00:W"/>
+<stn name="Milwaukee Deep " lat="19:55:N" lon="65:27:W"/>
+<stn name="Mona Passage" lat="18:30:N" lon="67:45:W"/>
+<stn name="Nightingale Island" lat="37:25:S" lon="12:30:W"/>
+<stn name="North Atlantic Ocean" lat="30:00:N" lon="45:00:W"/>
+<stn name="North Channel" lat="55:10:N" lon="5:40:W"/>
+<stn name="North Sea" lat="56:00:N" lon="4:00:E"/>
+<stn name="Northeast Providence Channel" lat="25:40:N" lon="77:09:W"/>
+<stn name="Norwegian Sea" lat="66:00:N" lon="6:00:E"/>
+<stn name="Oresund " lat="55:50:N" lon="12:40:E"/>
+<stn name="Otranto, Strait of" lat="40:00:N" lon="19:00:E"/>
+<stn name="Pentland Firth " lat="58:44:N" lon="3:13:W"/>
+<stn name="Riga, Gulf of" lat="57:30:N" lon="23:30:E"/>
+<stn name="Rio de la Plata " lat="35:00:S" lon="59:00:W"/>
+<stn name="Saint George's Channel" lat="52:00:N" lon="6:00:W"/>
+<stn name="Saint Lawrence Seaway" lat="49:15:N" lon="67:00:W"/>
+<stn name="Saint Lawrence, Gulf of" lat="48:00:N" lon="62:00:W"/>
+<stn name="Saint Vincent Passage" lat="13:30:N" lon="61:00:W"/>
+<stn name="Sargasso Sea " lat="30:00:N" lon="55:00:W"/>
+<stn name="Scotia Sea" lat="56:00:S" lon="40:00:W"/>
+<stn name="Shag Rocks" lat="53:33:S" lon="42:02:W"/>
+<stn name="Sicily, Strait of" lat="37:20:N" lon="11:20:E"/>
+<stn name="Sidra, Gulf of" lat="31:30:N" lon="18:00:E"/>
+<stn name="Skagerrak " lat="57:45:N" lon="9:00:E"/>
+<stn name="Sound, The " lat="55:50:N" lon="12:40:E"/>
+<stn name="South Atlantic Ocean" lat="30:00:S" lon="15:00:W"/>
+<stn name="South Georgia " lat="54:15:S" lon="36:45:W"/>
+<stn name="South Sandwich Islands" lat="57:45:S" lon="26:30:W"/>
+<stn name="Stanley " lat="51:42:S" lon="57:41:W"/>
+<stn name="Tristan da Cunha Group " lat="37:04:S" lon="12:19:W"/>
+<stn name="Turks Island Passage" lat="21:40:N" lon="71:00:W"/>
+<stn name="Tyrrhenian Sea" lat="40:00:N" lon="12:00:E"/>
+<stn name="Windward Passage" lat="20:00:N" lon="73:50:W"/>
+<stn name="Yucatan Channel" lat="21:45:N" lon="85:45:W"/>
+</stationtable>

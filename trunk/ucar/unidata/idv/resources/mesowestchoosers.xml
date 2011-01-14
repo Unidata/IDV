@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<choosers>
+  <panel
+     title="MesoWest Point Data"
+     category="General"
+     layout="border"
+     tabTooltip="For accessing MesoWest data"
+     mnemonic="U">
+    <chooser
+       id="chooser.mesowest"
+       title="MesoWest"
+       menutitle="From MesoWest"
+       class="ucar.unidata.idv.chooser.MesoWestChooser"
+       anchor="nw"/>
+  </panel>
+</choosers>

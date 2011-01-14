@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<panel
+   cols="3"
+   layout="grid"
+   rows="2"
+   hspace="10"
+   vspace="20">
+  <label text="label1"/>
+  <panel bgcolor="red"/>
+  <panel bgcolor="green"/>
+  <panel bgcolor="blue"/>
+  <label text="a much wider label"/>
+  <panel bgcolor="black"/>
+</panel>

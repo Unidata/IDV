@@ -1,0 +1,89 @@
+<html><head>
+  <title>Plugin Jar Files</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+<%nochildlist%>
+
+Note: This page is intended for someone who wants to create an IDV 
+plugin. A description of installing and managing plugins is 
+<a href="../tools/Plugins.html">here</a>.
+
+<p>
+The IDV supports a plugin architecture that allows for the easy extension 
+and addition of functionality. A plugin is most commonly a Java Jar file
+that contains a set of resource files (e.g., color tables) and/or
+Java class files. The plugins are stored on a local directory or could be
+loaded form a web site. The IDV processes the plugin Jar file at run time
+loading in the contained resources and code.
+
+
+<subhead intoc="false" id="basics">Basic Plugin</subhead>
+Lets suppose you have created a set of color tables and some Jython
+code that you want to  make a plugin with. As described in the
+<a href="SiteConfiguration.html">Site Configuration</a> docs
+the IDV stores these user created files in &lt;user home&gt;/.metappps/DefaultIdv
+as colortables.xml and default.py.
+<p>
+To make these into a plugin, e.g., myplugin.jar, simply jar the the files (you need
+to get a Java SDK for this):
+<pre>
+jar -cvf myplugin.jar colortables.xml default.py
+</pre>
+
+Now this plugin can be distributed to others and loaded into their IDV environment.
+<p>
+So, you might ask how does the IDV recognize  these files in the plugin
+and treat them appropriately? The IDV loads in a set of resources (e.g.,
+color tables, Python libraries). Each resource type is identified by a 
+regular expression as shown in the 
+<a href="SiteConfiguration.html#resources">resource list</a>.
+In  our example above the file name <i>colortables.xml</i> matches
+the pattern for color table xml resources.
+
+<p>
+Now, what happens if you have some file whose name does not match a pattern?
+Say, you have a color table xml file called
+<i>myspecialtables.xml</i> that you want to include in a bundle.
+In that case you can add a <i>.rbi</i> file, as described
+<a href="SiteConfiguration.html">here</a>,
+that defines this file as a resource:
+[ug::xml {
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resourcebundle>
+  <resources name="idv.resource.colortables">
+    <resource location="/myspecialtables.xml"/>
+  </resources>
+</resourcebundle>
+}]
+
+
+This acts as a table of contents for the plugin. Make sure that the location
+is not relative. Note: Jar files can contain directory trees. e.g., /tables/myspecialtables.xml.
+In this case just have the location point to:
+[ug::xml {
+...
+    <resource location="/tables/myspecialtables.xml"/>
+...
+}]
+
+
+
+<subhead intoc="false" id="advanced">Including Code</subhead>
+You can also include code that implements certain functionality by just including
+the Java .class files in the Jar. When you do this you need to include them
+like a normal class containing Jar file, i.e., the package structure of
+your code (e.g., edu.ucar.app.Test) needs to be reflected in the
+directory structure of the Plugin Jar file:<pre>
+/edu/ucar/app/Test.class
+</pre>
+
+For a single class file this is not necessarily required but if there are multiple
+class files that have interdependency among themselves then you will get into
+trouble if you don't follow this structure.
+<p>
+Now, what this code does can be anything and is best left up to the developer's guide.
+
+</body>
+</html>

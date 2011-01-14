@@ -1,0 +1,81 @@
+
+[header {Command Line Arguments}]
+
+If you run the IDV standalone you can print out the following
+usage message:
+<pre>
+java ucar.unidata.idv.DefaultIdv -help
+Usage: IntegratedDataViewer 
+	-help (this message)
+	-properties &lt;property file&gt;
+	-nodefault (Don't read in the default bundle file)
+	-default &lt;.xidv file&gt;
+	-nopreferences (Don't read in the user preferences)
+	-nogui (Don't show the main window gui)
+	-chooser (show the data chooser on start up) 
+	-sitepath &lt;url path to find site resources&gt;
+	-userpath &lt;user directory to use&gt;
+	-display &lt;paramater&gt; &lt;display&gt;
+	-data &lt;data source&gt; 
+        (and any .xidv bundle files or .jnlp embedded bundle files)
+</pre>
+
+
+Each of these command line arguments can also be defined 
+in the jnlp webstart files (<a href=index.html#jnlp>See index.html</a>).
+<p>
+You can define  any number of property files with the
+-properties argument. Each successive property file will overwrite the
+previous values for properties defined in the property file.
+
+<p>
+The -data argument allows you to specify the url pointing
+to a data source. This could be a local file, a file on a web server
+or a dods or adde server url.
+
+<p>
+The -userpath allows you to overwrite the default location where
+the user's idv preferences are kept. Normally this is in a 
+directory: &lt;user home&gt;/.metapps/&lt;Idv application class name&gt;.
+
+<p>
+-nodefault says to not load in the default bundle.
+
+<p>
+-default &lt;.xidv file&gt; says to not load in the default bundle
+but do load in the given bundle.xidv file.
+
+
+<p>The -sitepath argument allows you to define where site specific resources
+are kept. This can be on the  local file system or it can be a base url.
+This value is used in the properties file 
+(see <a href=../example.properties>example.properties</a>)
+to substitute the %SITEPATH% macro.
+
+<p>
+The -display argument allows you to automatically create a display
+for the given parameter for any data sources that are loaded in.
+The display name should be one of those contained in the controls.xml
+file (/ucar/unidata/idv/resources/controls.xml).
+
+
+<p>
+You can also specify any number of  .xidv bundle files or .jnlp embedded 
+bundle files directly on the command line. These can be local files or can 
+be urls.
+
+
+<a name="processing"></a>
+<h2>Processing your own arguments</h2>
+If your application needs to read its own command line arguments
+you need to create your own ArgsManager class
+and create it by overriding the: <code>doMakeArgsManager</code>
+method.
+<p>
+Your ArgsManager class needs to overwrite the base class method:
+<pre>protected int parseArg (String arg, String \[] args, int idx)</pre>
+
+
+See the documentation of this method in [dg::class ucar.unidata.idv.ArgsManager]
+
+

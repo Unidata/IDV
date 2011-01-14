@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<controls>
+  <control
+     id="yahoolocations"
+     categories="none"
+     class="ucar.unidata.idv.control.YahooLocationControl"
+     description="Yahoo Query"
+     label="Yahoo Query"
+     canstandalone="true"
+     displaycategory="General"
+     properties="windowVisible=true; displayName=Yahoo Query;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+  <control
+     id="audiocontrol"
+     categories="audio"
+     class="ucar.unidata.idv.control.AudioControl"
+     description="Audio Display"
+     label="Audio Display"
+     canstandalone="true"
+     displaycategory="General"
+     properties="windowVisible=true; displayName=Audio Display;"/>
+
+
+</controls>

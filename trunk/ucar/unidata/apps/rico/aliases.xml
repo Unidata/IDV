@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<aliases>
+
+<alias name="ATX" label="Ambient Temperature, Reference"  aliases=""/>
+<alias name="DPXC" label="Dew Point Temperature, Reference"  aliases=""/>
+<alias name="DPLA" label="Dew Point Temperature, Lyman Alpha"  aliases=""/>
+<alias name="PSXC" label="Corrected Static Pressure, Reference"  aliases=""/>
+<alias name="THDG" label="Aircraft True Heading Angle"  aliases=""/>
+<alias name="PITCH" label="Aircraft Pitch Angle"  aliases=""/>
+<alias name="ROLL" label="Aircraft Roll Angle"  aliases=""/>
+<alias name="TKAT" label="IRS Track Angle, True"  aliases=""/>
+<alias name="GGVEW" label="GPS Ground Speed Vector, East Component"  aliases=""/>
+<alias name="GGVNS" label="GPS Ground Speed Vector, North Component"  aliases=""/>
+<alias name="GGSPD" label="GPS Ground Speed"  aliases=""/>
+<alias name="TASR" label="Aircraft True Airspeed, Radome"  aliases=""/>
+<alias name="TASF" label="Aircraft True Airspeed, Fuselage"  aliases=""/>
+<alias name="HGM232" label="Geometric (Radar) Altitude (APN-232)"  aliases=""/>
+<alias name="WSC" label="GPS-Corrected Horizontal Wind Speed"  aliases=""/>
+<alias name="WDC" label="GPS-Corrected Horizontal Wind Direction"  aliases=""/>
+<alias name="WIC" label="GPS-Corrected Wind Vector, Vertical Gust Component"  aliases=""/>
+<alias name="PLWCC" label="Corrected PMS-King Liquid Water Content"  aliases=""/>
+<alias name="CONCF" label="FSSP-100 Concentration (all cells)"  aliases=""/>
+<alias name="CONCN" label="Condensation Nuclei (CN) Concentration"  aliases=""/>
+
+</aliases>
+
+
+
+

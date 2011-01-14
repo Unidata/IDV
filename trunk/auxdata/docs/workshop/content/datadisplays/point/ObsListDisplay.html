@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>Observation List Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+The Observation List Display Control shows a textual listing of
+observation data. We are going to look at some earthquake point data.
+</div>
+
+<p>
+
+
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load some point data.
+    <ul>
+    <li> [ht::openDataSourceChooser] 
+    <li>In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command Files] tab. 
+    <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/point/].
+    <li> Select [ht::filename earthquake.nc] (Note: <b>not</b> [ht::filename earthquake.csv])
+    <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;Netcdf Point Data files&quot;
+    <li> Press [ht::button Add Source]
+    </ul>
+
+    <li>Create the display
+    <ul>
+    <li>In the [ht::command Fields] panel select [ht::param Point Data].
+    <li>In the [ht::command Displays]  select [ht::display Point Data List] and press
+    [ht::button Create Display]
+    </ul>
+
+    <li> Modify the displayed fields.
+    <ul>
+     <li> Press the [ht::button Select Fields] button
+     <li> We see there are 4 fields shown and one field ([ht::param var]) not shown.
+     <li> Select  [ht::param var]  and press [ht::button Add]
+     <li> Change the order of the fields - select [ht::param var]  and then press
+     the up arrow button.
+     <li> Press [ht::button OK].
+    </ul>
+
+    <li> Modify the listing.
+    <ul>
+      <li> Toggle [ht::button Show Raw Data] 
+      <li> Sort the columns by pressing the [ht::param var] column header.
+      <li> Figure out what is the maximum depth of the observations.
+    </ul>
+
+    <li> Export the data as a text CSV file.
+    <ul>
+    <li> Use [ht::menu File Save {Export Table}] in the  [ht::display Point Data List] display control.
+    <li> Enter [ht::filename earthquake.csv]
+    <li> Read in this file from the File Chooser. Make sure you set the [ht::command Data Source Type] to &quot;I'm Feeling Lucky&quot;  
+    <li> Create another  [ht::display Point Data List] display with this CSV data.
+    </ul>
+
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+
+
+<title>Creating a Weather Text Display Control</title>
+
+
+<div class="overview">
+Let's create a custom DisplayControl for our weather text that will
+use the category "wxtext" that we created in the Data Source.
+</div>
+
+<ol>
+<li>[ht::cdExample]
+<li>Open <a href="<%workshop.exampledir%>/WxTextDisplayControl.java">WxTextDisplayControl.java</a> in an editor and lets look what's there.
+<li>Copy <code>controls.xml</code> up from the resources subdirectory and
+take a look at that.
+<li>Compile the display control.
+<li>Start the IDV.
+<li>Select a product from the [ht::command {Weather Text}] chooser
+and click the [ht::command {Add Source}] button.
+<li>Display the data in the [ht::display {Weather Text}] display.
+</ol>
+
+<p>
+Now let's add in a widget that will highlight some text.
+<ol>
+<li>Exit the IDV.
+<li>Open <a href="<%workshop.exampledir%>/WxTextDisplayControl.java">WxTextDisplayControl.java</a> in an editor.
+<li>Uncomment:
+  <ul>
+  <li>the section in <code>doMakeContents</code> for the JTextField 
+      that allows user input.  
+  <li>the line in the default constructor to use the <code>FLAG_COLOR</code> 
+      attribute.
+  <li>the <code>getColorWidgetLabel()</code> method
+  </ul>
+<li>Start the IDV and load in some weather text.
+<li>Type in some text to hightlight and hit enter.  Does it get highlighted?
+<li>Notice that we have a new item in the Edit menu which allows us to
+change the highlight color.  Change it.  Does anything happen?  Hit
+return in the TextField.  Does it change then?
+<li>Exit the IDV.
+<li>Open <a href="<%workshop.exampledir%>/WxTextDisplayControl.java">WxTextDisplayControl.java</a> in an editor.
+<li>Uncomment the applyColor method.  This is called when the color
+changes.
+<li>Compile and restart the IDV and load in some weather text.
+<li>Type in some text to highlight and hit enter.  Change the color.  
+Does it change now?
+<li>Save this as your default bundle and then reload it.  Notice that the
+text is not hightlighted this time.  We need to add some bean property
+methods to save the selected text.  Add the following methods:
+<pre>
+    /**
+     * Get the highlighted text
+     *
+     * @return the highlighted text
+     */
+    public String getHighlightedText() {
+        return highlightedText;
+    }
+
+    /**
+     * Set the text to hightlight
+     *
+     * @param text the text to hightlight
+     */
+    public void setHighlightedText(String text) {
+        highlightedText = text;
+    }
+<li>Since we use the FLAG_COLOR attribute any color changes we make
+get saved automatically.
+</ol>
+Now, let's add in a point that shows where the station is.  Remember,
+we passed along the station as a property to the data source.  We can
+add those properties to the DataChoice by passing them along when we
+create the DirectDataChoice.
+<ol>
+<li>Edit the WxTextDataSource and where we create the DirectDataChoice, change:
+<pre>
+                             DataChoice.NULL_PROPERTIES);  //no properties
+</pre>
+to:
+<pre>
+                             getProperties());
+</pre>
+<li>Now, let's uncomment the section of code in the 
+[dg::method WxTextDisplayControl.init] that adds in
+a displayable to the default ViewManager.
+<li>Compile the files.
+<li>Start the ExampleIdv and remove the default bundle:
+<blockquote><i>idve -cleardefault</i></blockquote>
+<li>Load in some weather text.
+<li>Change the color.  What happens to the selector point?
+</ol>

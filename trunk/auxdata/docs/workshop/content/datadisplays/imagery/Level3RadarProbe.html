@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>Probing Level III Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+Just as we could probe gridded data, we can also probe the 
+satellite and radar images.
+</div>
+
+First, let's add a data probe to the display we created in
+the previous exercise.
+
+<ol class="step">
+
+  <li>Complete the previous two exercises.</li>
+
+  <li>In the [ht::dialog Field Selector] window, 
+      make sure the [ht::dataset DVN (Base Reflectivity Tilt 1)] 
+      dataset is selected in the [ht::command Data Sources]
+      panel and the [ht::display Image Sequence] field 
+      is selected in the [ht::command Fields] panel.
+      In the [ht::command Displays] panel, select
+      [ht::display Data Probe/Time Series], and then click the 
+      [ht::command Create Display] button.</li>
+      
+  <li>In the main view window, you will see a small red probe
+      in the middle.  Move the probe around over the echoes and
+      notice the value changing in the [ht::dialog Data Probe] control window.
+      <popup label="Can't find probe?">
+      If you can't see the probe, toggle off the radar image
+      by clicking off the legend visibility checkbox for that display.
+      </popup>
+
+  <li>Set the time animation to the first timestep.</li>
+
+  <li>Move the probe to the leading edge of the bow echo and turn
+      on the time animation.  Note that the value readout 
+      in the [ht::dialog Probe control] changes
+      to show the value at that position for each time step.</li>
+  
+  <li>Stop the animation and return to the first timestep.</li>
+
+  <li>Use the [ht::menu Displays Special {Range and Bearing}] menu
+      to add in the range and bearing tool.  Position the left end
+      point of the probe on the radar grid at 100km and 180 degrees.
+
+  <li>Animate through the time sequence one step at a time, keeping
+      track of where the cell that was under the left end point of the
+      probe has moved to.  Stop on the last timestep.</li>
+      
+  <li>Position the right end of the range and bearing probe at 
+      the point where the cell has moved to.  How fast did the storm move?
+
+  <li>Remove all displays.</li>
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jnlp
+   codebase="%CODEBASE%"
+   spec="1.0">
+  <information>
+    <title>%TITLE%</title>
+    <vendor>Unidata</vendor>
+    <description>%DESCRIPTION%</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se
+       max-heap-size="512m"
+       version="1.5+"/>
+    <jar href="IDV/idv.jar"/>
+    <extension
+       href="IDV/idvbase.jnlp"
+       name="IDV Base"/>
+  </resources>
+  <resources os="Linux">
+    <property
+       name="j3d.sharedctx"
+       value="false"/>
+  </resources>
+  <application-desc main-class="%IDVCLASS%">
+    <argument>-nodefault</argument>
+%ARGS%  </application-desc>
+  <security>
+    <all-permissions/>
+  </security>
+</jnlp>

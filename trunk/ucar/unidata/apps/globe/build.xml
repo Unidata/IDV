@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../" default="install_plugin" name="GlobeIdv">
+
+    <import file="../../../build.xml"/>
+
+    <target name="globeidv" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/apps/globe/**"/>
+        </javac>
+    </target>
+
+
+    <target name="jar" depends="globeidv">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/globeidv.jar">
+           <manifest>
+              <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
+              <attribute name="Implementation-Version" value="${idv.version}"/>
+              <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
+              <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
+            </manifest> 
+            <include name="ucar/unidata/apps/globe/**"/>
+        </jar>
+    </target>
+
+    <target name="install_plugin" depends="jar">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="${jars_dest}/globeidv.jar"/>
+        </copy>
+    </target>
+
+
+</project>

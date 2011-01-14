@@ -1,0 +1,195 @@
+[header {IDV Resources}]
+[
+  proc prop {p} {return "<i>$p</i>"}
+  proc resource {name prop file} {
+	set html "<p><a name=prop><b><font size=+1>$name</font></b><br></a>\n"
+	append html "Property: [prop $prop]<br>\n"
+	append html "System file: [dg::class ucar/unidata/idv/resources/$file]<br>\n"
+   }
+]
+
+The IDV makes use of the 
+[dg::class ucar.unidata.util.ResourceCollection]
+and
+[dg::class ucar.unidata.xml.XmlResourceCollection] classes
+to hold different collections of resources.
+These resources are defined in the <a href=property.html>property file</a>.
+The default IDV resources are kept in the package 
+[dg::package ucar.unidata.idv.resources].
+The <a href=../example.properties>example properties file</a> has documentation
+about how to define new paths to resources. 
+<p>
+In the properties file is a set of properties:<pre>
+application.resource.paramgroups=%IDVPATH%/paramgroups.xml;%SITEPATH%/paramgroups.xml;
+application.resource.derived=%USERPATH%/derived.xml;%IDVPATH%/derived.xml
+</pre>
+made up a of list of semi-color separated paths. These paths can refer
+to the local file system, to internal java resources or they can be urls.
+
+
+<p>
+Many of these resource files can be edited by the end user through the
+IDV, including colortables, parameter defaults, data aliases, derived data,
+Python libraries and users choosers.
+For these resources the first resource specified in 
+the properties 
+file is the one that is editable. For example, 
+from [dg::class ucar/unidata/idv/resources/idv.properties],
+is the line:<pre>
+application.resource.colortables=%USERPATH%/colortables.xml;%IDVPATH%/colortables.xml
+</pre>
+
+The first resource, %USERPATH%/colortables.xml,
+is where user created and edited color tables get stored.
+The macro %USERPATH% is replaced with the path to the idv preference
+directory:<br>
+<code> userhomedirectory/.metapps&lt;application class name&gt;</code><br>
+which is where all user created or modified data is stored.
+
+<p>
+If you want to release an application with some new or altered resource
+files you can simply bring up the IDV, edit the given resource (e.g., through the Edit
+menu). Then simply look in your .metapps directory for the relevant file and copy that
+into your application area (or on a web server).
+<p>
+
+
+
+[resource {Data source specifications} application.resource.datasource  datasource.xml]
+The Data source specification resources  define the set of DataSource classes
+available and what kinds of files and/or urls they can handle. 
+See  <a href=datasource.html>datasource.html</a> for more information.
+
+[resource {Display controls} application.resource.controls controls.xml]
+This resource defines the different displays available with the IDV
+and what kinds of data they are applicable to.
+See  <a href=displays.html>displays.html</a> for more information.
+
+[resource {Data aliases} application.resource.aliases aliases.xml]
+The data aliases file allows you to define a mapping between
+field names in the data sources you use to canonical field names 
+that the IDV can understand. The aliases.xml looks like:
+[pre {
+<aliases>
+ <alias name="the canonical name"     label="Temperature"   
+     aliases="comma separated list of aliases" />
+<!-- e.g.: -->
+ <alias name="TEMP"     
+        label="Temperature"   
+        aliases="T,t,Temperature,tdry" />
+</aliases>}]
+
+Note: the canonical names are not a fixed set. You can define your own
+and they can be used in other resource files.
+
+
+[resource {Parameter groups} application.resource.paramgroups paramgroups.xml]
+The paramgroups.xml resources allow you to define groups of parameter names.
+This is used in the Derived data creation (described below). 
+The format is:
+[pre {
+<paramgroups&gt;
+  <paramgroup  name="some group"&gt;
+    <params p1="param 1"  p2="param 2" ... pn="..." /&gt;      
+<!-- e.g.: --&gt;
+    <params p1="eU" p2="eV" label="El nino winds" /&gt;
+   </paramgroup&gt;
+  <paramgroup  name="u_and_v"&gt;
+      ...
+   </paramgroup&gt;
+</paramgroups&gt;
+}]
+
+Currently,  parameter groups cannot be created or changed through the IDV gui.
+
+
+[resource {Parameter defaults} application.resource.paramdefaults paramdefaults.xml]
+There are a variety of display conventions that can be used when showing
+data, e.g., contouring information, value ranges, units, color tables, etc.
+These can be defined in the paramsefaults.xml resource file.
+The format is:
+[pre {<params>    
+    <param name="^li$"  
+        table="DbZ"  range_min="-15.0"  range_max="15.0" 
+	ci_min="..." ci_max=".." ci_interval="-2" ci_base="0"
+        ci_dash="true|false" ci_label="true|false"/>
+</params>    
+}]
+
+Where the ci_... are the contouring information, range_... is the min and max range
+values to be used, table="..." is the name ofthe color table.
+Changing this file is best done through the IDV Gui (Edit menu).
+Note the name can contain regular expression patters.
+
+
+[resource {Derived data} application.resource.derived derived.xml]
+These resources are used  to define end-user formulas and
+default derived quantities. This is a pretty complicated piece of the
+IDV and is described more fully in <a href=derived.html>derived.html</a>
+
+
+[resource {Color tables} application.resource.colortables colortables.xml]
+The XML that this resource points to is not a custom XML format, rather
+it is the result of persisting (using 
+the <a href=persistence.html>XmlEncoder</a>
+persistence mechanism) a list of [dg::class ucar.unidata.util.ColorTable] objects
+that have been created with the color table editor (See the Edit-&gt;Color tables menu).
+
+[resource {Projections} application.resource.projections projections.xml]
+The projections.xml file is like the colortables.xml in that it too
+is the result of XmlEncoder persitence. To change projections or create new ones
+go to the View menu and choose Projections. Edit the list of projections.
+A new projections.xml file will be saved in your .metapps directory.
+
+
+
+
+[resource {Default bundles} application.resource.bundles default.xidv]
+This list of resources  points to where default bundles (those that are 
+automatically loaded by the IDV) are kept.
+
+[resource {Data choosers} application.resource.choosers choosers.xml]
+The choosers.xml file allows you to define what kinds of data choosers
+show up in the data chooser window. See <a href=choosers.html> for more detail</a>.
+
+
+[resource {User choosers} application.resource.userchooser userchooser.xml]
+This is probably going to become obsolescent in the future but the userchooser.xml
+holds the user created data chooser entries (See the "New pane" button on the data chooser
+window)
+
+
+[resource {Python libraries} application.resource.jython default.py]
+The Python library is used to initialize the Jython interpreter.
+
+
+[resource {Menu bar} application.resource.menubar defaultmenu.xml]
+The menu bar used within the IDV is defined via xml. The xml contains 
+<i>menus</i> and  <i>menuitem</i> nested tags and directly map to
+the menu hierarchy:
+[pre {<menus label="Commands">
+    <menu label="File" id="file">
+       <menu label="New">
+           <menuitem label="Display window" 
+                     action="jython:idv.createNewWindow ();" />
+           <menuitem label="Data source panel" 
+                     action="jython:idv.createDataTreeWindow();" />
+       </menu>
+   </menu>
+</menus>
+}]
+For menu items there is a (String) action which gets passed to the 
+[method IntegratedDataViewer.handleAction] method. If the action starts with
+"jython:" the rest of the string is executed by the  Jython interpreter (For security
+only methods calls of the form: idv.method(...) are allowed).
+If the action starts with "help:" the Java help application is launched.
+If the action is a bundle file (.xidv) and an embedded bundle jnlp file (.jnlp)
+the bundle is loaded. If the action can be handled by a DataSource then the DataSource
+is loaded.
+
+
+[resource {Help tips} application.resource.helptips helptips.xml]
+The initial help tips dialog is driven by the helptips.xml resource.
+
+[resource {Station locations} application.resource.locations nexradstns.xml]
+Holds the default nexrad stations.

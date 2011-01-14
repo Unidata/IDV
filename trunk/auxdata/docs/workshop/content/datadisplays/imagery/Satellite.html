@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>Loading Satellite Imagery</title>
+</head>
+
+<body>
+
+<div class="overview">
+Satellite imagery from geostationary and polar orbiting satellites
+is available through a network of servers supported by Unidata.
+Most of the imagery available on these servers covers the 
+North America region.  These servers use the Abstract Data
+Distribution Environment (ADDE) protocol.
+</div>
+
+<p>First, we'll load in some visible imagery from the Bow Echo
+Case Study that we used in the <b>Gridded Data</b> section of
+the workshop.</p>
+
+<ol class="step">
+  <li>[ht::clearDisplaysAndData]</li>
+
+  <li>[ht::openDataSourceChooser] 
+      Click on the [ht::command Images] tab.</li>
+
+  <li>We'll load in some visible satellite imagery.
+      In the [ht::command Server:] selector, choose
+      [ht::param adde.ucar.edu].  
+      In the [ht::command Dataset:] selector, choose
+      [ht::param CCS039].  If either of these is
+      not in the list, just type them in.  When you have made 
+      your selections, click the [ht::button Connect]
+      button.</li>
+
+  <li>The IDV connects to the specified server and retrieves 
+      the types of images available in the dataset.  From the
+      [ht::command Image Type:] selector, choose
+      the [ht::param 1 km GOES-8 Visible] type.</li>
+
+  <li>You can either load in the last &quot;<i>n</i>&quot; images, or
+      you can select by time.  For this exercise, we want to select
+      a subset of all available times, so click on the 
+      [ht::command Absolute times] radio button.
+      When this option is selected, the server is queried for a set of
+      available times for that type and these are listed in the
+      [ht::command Times:] panel. Select [ht::listSelect]
+      the 7 images from [ht::param 1998-06-29 16:15:00Z]
+      through [ht::param 1998-06-29 22:15:00Z].  Be sure that
+      the [ht::command Create display] checkbox is selected 
+      and click the [ht::button Add Source] button.</li>
+
+<!--
+  <li>In the [ht::dialog Field Selector] window, 
+      you should see [ht::dataset 1 km GOES-8 Visible]
+      dataset selected in the [ht::command Data Sources]
+      panel, the [ht::param 0.65 um Visible - Cloud Cover] field 
+      selected in the [ht::command Fields] panel,
+      and [ht::display Image Display] selected
+      in the [ht::command Displays] panel, and
+      [ht::command Use Default] checked
+      in the [ht::command Times] panel.  If not, 
+      select them, then click the 
+      [ht::command Create Display] button.</li>
+-->
+
+  <li>[ht::mapChange]  Turn on the 
+      [ht::command North & Central America] and
+      the [ht::command US Interstate Highways] maps.
+      Make sure all other maps are off.  When you are finished,
+      go back to the [ht::dialog View Window].</li>
+
+  <li>Use the [ht::menu Displays Locations US {U.S. Cities}] menu to
+      overlay some place names. Change the color of the location
+      text to be white using the display control's 
+      [ht::menu Edit Color] menu.
+
+  <li>Start the animation.  In this loop, you will see a large
+      super cell thunderstorm develop over Iowa during this period.
+      Stop the animation and show the 20:15Z image.</li>
+
+  <li>Zoom in over the super cell in eastern Iowa</li>
+
+  [ht::cimg images/VisImage.gif]
+
+  <li>This is visible imagery at 1 kilometer resolution.  You can
+      use the [ht::command Pixel Sampling] slider
+      to see what the image would look like at a lower resolution.
+      <ul class="substep">
+        <li>Move the slider to <b>5</b> to see the difference 
+            an image at 6 km resolution would look like.</li>
+
+        <li>Return the slider back to <b>0</b> before proceeding to 
+            the next exercise.</li>
+            
+        <li>Do not clear this display.</li>
+      </ul>
+
+</ol>
+
+</body>
+</html>

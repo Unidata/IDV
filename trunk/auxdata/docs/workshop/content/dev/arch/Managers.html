@@ -1,0 +1,128 @@
+<title>Managers and Editors</title>
+
+
+<div class="overview">
+
+</div>
+
+
+
+The IDV  is a central object for the construction and orchestration
+of a set of <i>Managers</i>, each of which is responsible for different
+areas  of functionality. For example, the  ucar.unidata.idv.ArgsManager
+is responsible for
+the processing of the command line arguments. 
+The  ucar.unidata.idv.IdvResourceManager is responsible for initializing 
+and managing the resources that configure the IDV.
+<p>
+The base class,  ucar.unidata.idv.IdvBase contains
+references to the different managers and methods for accessing and creating
+them. These methods follow the pattern:<pre>
+   DataManager getDataManager()
+   DataManager doMakeDataManager()
+</pre>
+
+
+
+[
+namespace eval dg {}
+proc dg::manager {class name {desc {}}} {
+return "<tr valign=\"top\"><td>  $class</td><td> $desc<br>&nbsp;</td>"
+##return "<a name=\"$name\"></a><li>  $class<br>get$name/doMake$name <br>$desc"
+}
+]
+
+
+
+
+<ul>
+<table>
+
+[dg::manager ucar.unidata.idv.ArgsManager ArgsManager {
+Reads in and processes the command line arguments. }]
+
+[dg::manager ucar.unidata.idv.IdvResourceManager ResourceManager {
+Handles resources.
+}]
+
+[dg::manager ucar.unidata.idv.IdvPreferenceManager PreferenceManager {
+Handles user preferences.
+}]
+
+
+[dg::manager ucar.unidata.idv.IdvPersistenceManager PersistenceManager {
+Bundles.
+}]
+
+[dg::manager ucar.unidata.data.DataManager DataManager {
+Data sources.
+}]
+
+[dg::manager ucar.unidata.idv.VMManager VMManager {
+View Managers
+}]
+
+[dg::manager ucar.unidata.idv.ui.IdvUIManager IdvUIManager {
+User interfaces.
+}]
+
+[dg::manager ucar.unidata.idv.StateManager StateManager {
+Properties and other  state.
+}]
+
+[dg::manager ucar.unidata.idv.JythonManager JythonManager {
+Jython.
+}]
+
+[dg::manager ucar.unidata.idv.chooser.IdvChooserManager IdvChooserManager {
+Choosers.
+}]
+
+
+[dg::manager ucar.unidata.ui.symbol.StationModelManager StationModelManager {
+Handles the layout models (i.e., station models) defined in the 
+stationmodels.xml and manages the Station Model Editor. 
+
+}]
+
+
+[dg::manager ucar.unidata.idv.DisplayConventions DisplayConventions {
+Provides defaults for how we display data, e.g., what color tables to use,
+what display unit to use, etc.
+}]
+
+[dg::manager ucar.unidata.ui.colortable.ColorTableManager ColorTableManager {
+Color tables. Processes the colortables.xml and manages the Color Table Editor.
+}]
+
+[dg::manager ucar.unidata.ui.colortable.ColorTableEditor ColorTableEditor {
+The color table editor.
+}]
+
+
+
+
+[dg::manager ucar.unidata.idv.ui.AliasEditor AliasEditor {
+Handles the data aliases (defined in aliases.xml ) the Alias Editor.
+}]
+
+
+[dg::manager ucar.unidata.idv.ui.ParamDefaultsEditor ParamDefaultsEditor {
+Handles parameter defaults (paramdefaults.xml).
+}]
+
+
+[dg::manager ucar.unidata.idv.ui.AutoDisplayEditor AutoDisplayEditor {
+Not really used right now.
+}]
+[dg::manager ucar.unidata.idv.publish.PublishManager PublishManager {
+Not really used right now.
+}]
+
+[dg::manager ucar.unidata.idv.collab.CollabManager CollabManager {
+Not really used right now.
+}]
+
+
+</table>
+</ul>

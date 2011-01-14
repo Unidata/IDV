@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="hobos">
+<stn name="VOR: Bishop/BIH"	lat="37.3769289"	lon="-118.3664981" 	elev="4110"		declination="15" />
+<stn name="VOR: Tonopah/TPH"	lat="38.0306567"	lon="-117.0335183" 	elev="5330"		declination="17" />
+<stn name="VOR: Coaldale/OAL"	lat="38.0032614"	lon="-117.7704458" 	elev="4800"		declination="17" />
+<stn name="VOR: Clovis/CZQ"	lat="36.8843208"	lon="-119.8151319" 	elev="363"		declination="15" />
+<stn name="VOR: Visalia/VIS"	lat="36.3673272"	lon="-119.4821589" 	elev="263"		declination="16" />
+</stationtable>
+

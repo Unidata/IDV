@@ -1,0 +1,209 @@
+
+<center>
+<h3>This is a simple "IDV HTML" tutorial.</h3>
+</center>
+
+<blockquote>
+
+
+<!--
+<P><b>The IDV can display any HTML page. Any normal HTML page can
+be presented. 
+<P>But you can also add fully interactive IDV displays 
+to an HTML page, even 3D.  Special "IDV" tags in the HTML page 
+create IDV displays inside the HTML page, with all display controls available.
+</b>These "IDV" HTML pages will not create IDV displays if viewed in 
+Netscape or Internet Explorer.
+-->
+
+<b><font color="green" size="+1"><center>
+  How U and V Components Of Wind Are Combined 
+<br>To Find the Wind Speed.</center></font></b>
+
+</blockquote>
+
+
+
+<br>
+<P>Under each of the two displays below, select a 
+time and model to show the analyses of the wind <b>u</b>  and <b>v</b>
+component. After selecting time and model, click on Create Display.
+</P>
+
+<P><b>U component:</b></p>
+
+<view id="view1" props="size=200:300;">
+
+<br>
+<form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc', 'u', 'planviewcontour', 'DefaultView=view1;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Date and Time:</td><td> 
+
+<select name="datetime">
+<option value="2002032212">22 Mar 2002  12Z</option>
+<option value="2002032700">27 Mar 2002  00Z</option>
+<option value="2002040212">02 Apr 2002  12Z</option>
+<option value="2002040712">07 Apr 2002  12Z</option>
+</select>
+
+</td></tr>
+<tr valign="bottom"><td align=right>NCEP Model:</td><td> 
+
+<select name="nwpmodel">
+<option value="avn-q">AVN, CONUS</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+<option value="ngm-q" >NGM</option>
+<option value="ruc">RUC</option>
+</select>
+
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create U display"></td></tr>
+</table>
+</form>
+
+
+
+
+</P>
+<br>
+<P><b>V component:</b></p>
+<view id="view2" props="size=200:300;">
+<br>
+<form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc', 'v', 'planviewcontour', 'DefaultView=view2;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Date and Time:</td><td> 
+
+<select name="datetime">
+<option value="2002032212">22 Mar 2002  12Z</option>
+<option value="2002032700">27 Mar 2002  00Z</option>
+<option value="2002040212">02 Apr 2002  12Z</option>
+<option value="2002040712">07 Apr 2002  12Z</option>
+</select>
+
+</td></tr>
+<tr valign="bottom"><td align=right>NCEP Model:</td><td> 
+
+<select name="nwpmodel">
+<option value="avn-q">AVN, CONUS</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+<option value="ngm-q" >NGM</option>
+<option value="ruc">RUC</option>
+</select>
+
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create V display"></td></tr>
+</table>
+</form>
+
+<p>Now change the level of the u and v displays to show u and v at 250
+mb. Change the color tables to Basic->Windspeed for colors to show the
+high and low values better. 
+
+<P><b>All IDV interactive controls are available</b>
+
+
+<P>Are there any negative values of wind speed component values?  
+Zoom in to see details if necessary. 
+How can "wind speed" be negative?
+
+<P>Note areas of high U and V.  If there a clear pattern related to
+today's weather?
+
+
+
+<br>
+<P>Now set the same time and model in the selectors for this
+display, and click on Create Display
+to see the wind speed made from u and v:
+</P>
+
+<P><b>Wind Speed:</b></p>
+<view id="view3" props="size=200:300;">
+
+<br>
+<form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc', 'windspeed', 'planviewcontour', 'DefaultView=view3;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Date and Time:</td><td> 
+
+<select name="datetime">
+<option value="2002032212">22 Mar 2002  12Z</option>
+<option value="2002032700">27 Mar 2002  00Z</option>
+<option value="2002040212">02 Apr 2002  12Z</option>
+<option value="2002040712">07 Apr 2002  12Z</option>
+</select>
+
+</td></tr>
+<tr valign="bottom"><td align=right>NCEP Model:</td><td> 
+
+<select name="nwpmodel">
+<option value="avn-q">AVN, CONUS</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+<option value="ngm-q" >NGM</option>
+<option value="ruc">RUC</option>
+</select>
+
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create Wind Speed display"></td></tr>
+</table>
+</form>
+
+<P>Where are the high speeds?  Is there a pattern or connection to
+today's weather?  
+
+<!--
+<P>Check out this
+<a href="http://www.rap.ucar.edu/weather/upper/">
+chart of upper air wind speed charts now, from UCAR</a>
+-->
+
+<br>
+<P>Use this display to see the windspeed as a 3D iso-surface:
+</P>
+
+<P><b>Wind Speed Isosurface:</b></p>
+<view id="view4" props="size=200:300;">
+
+<br>
+<form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc', 'windspeed', 'surface', 'DefaultView=view4;')">
+<table cellspacing="0" cellpadding="0">
+<tr valign="bottom"><td align=right>Date and Time:</td><td> 
+
+<select name="datetime">
+<option value="2002032212">22 Mar 2002  12Z</option>
+<option value="2002032700">27 Mar 2002  00Z</option>
+<option value="2002040212">02 Apr 2002  12Z</option>
+<option value="2002040712">07 Apr 2002  12Z</option>
+</select>
+
+</td></tr>
+<tr valign="bottom"><td align=right>NCEP Model:</td><td> 
+
+<select name="nwpmodel">
+<option value="avn-q">AVN, CONUS</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+<option value="ngm-q" >NGM</option>
+<option value="ruc">RUC</option>
+</select>
+
+</td></tr>
+<tr><td></td><td><input type="submit" value="Create Wind Speed Isosurface"></td></tr>
+</table>
+</form>
+
+
+<!--
+<a href="idv:datamanager.createDataSource ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/2002031406_avn-q.nc');"> Load dods data source </a>
+<p>
+<a href="idv:idv.createDisplay ('/harpo/tmp/jeffmc/test.nc', 'T', 'planviewcontour', '')">
+Add contour to main view
+</a>
+<p>
+<a href="idv:idv.showChooser ();"> Select data </a>
+<p>
+
+-->
+

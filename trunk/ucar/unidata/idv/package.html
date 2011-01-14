@@ -1,0 +1,567 @@
+<html>
+<body>
+
+The idv package.
+
+<h1>
+<center> 
+Unidata Integrated Data Viewer (IDV)
+</center>
+</h1>
+
+The idv package provides the glue between the data sources
+within data package and the displays in the
+control package.  
+The central class within this package
+is the <a href=IntegratedDataViewer.html>IntegratedDataViewer</a> (IDV).
+<p>
+How to  <a href=#howtodisplay>add a new display</a>, <a href=#howtodata> add a new data source</a>,
+<a href=#howtogui>create  a new gui</a>.
+
+
+<h3> Lions and tigers and bears...</h3>
+<h4>Packages:</h4>
+<ul> 
+<li><span class=package> {@link ucar.unidata.idv}</span> 
+The main package. 
+
+<li><span class=package>  ucar.unidata.idv.release</span>
+Holds the html, jnlp and image files used for releasing the IDV via Webstart.
+
+<li><span class=package> {@link ucar.unidata.idv.control}</span>
+Holds the set of concrete DisplayControl classes.
+
+<li><span class=package> {@link ucar.unidata.util}</span>
+Holds a set of utilities, including:
+{@link ucar.unidata.util.GuiUtils} Utilities for doing gui layout, etc.
+{@link ucar.unidata.util.LogUtil} Utilities for error messages and logging.
+{@link ucar.unidata.util.Misc} Catch all - provides string parsing, replacement, matching,
+properties file utils, etc.
+
+<li><span class=package> {@link ucar.unidata.xml}</span>
+Contains:<br>
+{@link ucar.unidata.xml.XmlUtil}, a collection of utilities for creating and accessing xml doms.
+<br>
+{@link ucar.unidata.xml.XmlEncoder}, used to encode and decode collections of objects to/from xml.
+<br>
+{@link ucar.unidata.xml.XmlObjectStore}, used to hold user preferences.
+
+
+
+<li><span class=package> {@link ucar.visad.display}</span> Holds the 
+{@link ucar.visad.display.DisplayMaster} and
+{@link ucar.visad.display.Displayable} wrappers around {@link visad.Display}
+mechanisms.
+
+<li><span class=package> {@link ucar.unidata.data}</span>
+Holds classes that know how to access and/or read in
+data sources (e.g., netCdf files, adde servers, etc.)
+<li><span class=package>{@link ucar.unidata.data.grid}</span>
+Deals with grid oriented data.
+<li><span class=package>{@link ucar.unidata.data.text}</span>
+Deals with text oriented data.
+<li><span class=package>{@link ucar.unidata.data.imagery}</span>
+Deals with image oriented data.
+</ul>
+
+<h4>Data sources</h4>
+<ul> 
+<li>{@link ucar.unidata.data.DataSource}
+An interface that represents a source of data. The most important method
+to the IDV is the getDataChoices method, which returns a list of DataChoice
+objects which represents the different choices of data (e.g., parameters, images, etc.)
+held by this DataSource.
+<li>{@link ucar.unidata.data.DataSourceImpl}
+ An abstract implementation of the DataSource interface. Currently used as
+the base class for all of our concrete DataSource  classes. It has as attributes
+the name and  description of the DataSource. It also holds the DataContext (described below)
+and manages the list of DataChoice-s.
+<li>{@link ucar.unidata.data.ListDataSource}
+
+<li> Data choices
+<ul>
+<li>{@link ucar.unidata.data.DataChoice}
+This is an abstract class that represents a particular piece of data
+within a DataSource.
+
+
+<li><span class=property>derived.xml</span>
+Holds a specification of a set of common derived quantities. The information contained
+within this property file is used to create a set of 
+{@link ucar.unidata.data.DerivedDataDescriptor}s.
+<li>{@link ucar.unidata.data.DerivedDataDescriptor}
+
+</ul>
+
+<p>
+
+<li>{@link ucar.unidata.data.DataCategory}
+This class is used to categorize DataChoice-s and to describe what
+{@link ucar.unidata.idv.DisplayControl}s are applicable to what data.
+<A href=#datacategories</a>See below for more detail</a>.
+
+
+<li><span class=interface><a href=../data/DataContext.html>DataContext</a></span> The DataContext
+is an interface (which the IDV implements). It is meant to represent an object
+in which a DataSource is used. There are just 2 methods:
+<code>
+<br>
+public ArrayList getDataSources ();
+</code>
+<br>
+Return the list of all DataSource objects managed by the DataContext.
+<br>
+<code>
+public ArrayList selectDataChoice (ArrayList labels);
+<br>
+</code>
+Select N DataChoice-s, one for each String label in the given labels list.
+<br>
+<p>
+
+<li><a href=../data/DataInstance.html>DataInstance</a>
+
+<li><a href=../data/DataSourceFactory.html>DataSourceFactory</a>
+    </ul>
+</ul>
+<p>
+
+
+
+<h4>Displays</h4>
+<ul>
+<li><span class=interface><a href=DisplayControl.html>DisplayControl</a></span>, 
+<span class=class><a href=ControlDescriptor.html>ControlDescriptor</a></span>, 
+<span class=class><a href=ControlContext.html>ControlContext</a></span>,
+<a href=control/DisplayControlImpl.html>control.DisplayControlImpl</a>.
+DisplayControl is an interface that represents all of the classes that can create 
+displays of data. 
+
+<li> 
+<span class=class><a href=ViewManager.html>ViewManager</a></span>,
+<span class=class><a href=MapViewManager.html>MapViewManager</a></span>, 
+<span class=class><a href=CrossSectionViewManager.html>CrossSectionViewManager</a></span>.
+These classes are self-contained  wrappers around {@link
+ucar.visad.display.DisplayMaster}s. They manage a set of DisplayControl-s and provide
+their own gui mechanisms: menus, drag-and-drop, etc. 
+The <span class=class><a href=ViewContext.html>ViewContext</a></span> is an interface,
+implemented by the IDV, that the ViewManager-s use to provide themselves context.
+<br>
+The  <span class=class><a href=ViewDescriptor.html>ViewDescriptor</a></span>
+class contains static names of ViewManagers used by the DisplayControls
+to find ViewManagers. This class may evolve over time to provide richer
+support for different types and identities of ViewManager-s.
+<br>
+<span class=class><a href=DisplayInfo.html>DisplayInfo</a></span>
+Holds the  triple: DisplayControl, Displayable and ViewManager.
+
+
+</ul>
+
+
+<h4>Property files</h4>
+<ul>
+<li><span class=property><a href=#datasource.xml>datasource.xml</a></span> 
+This defines the available data sources.
+
+<li><span class=property><a href=#controls.xml>controls.xml</a></span>
+This defines the set of display controls available. 
+Holds a set of "control" specifications:
+<pre>
+  <control
+    categories="*-3D-*" 
+    class="ucar.unidata.idv.control.ThreeDSurfaceControl" 
+    description="Add an isosurface" 
+    id="surface" 
+    label="Isosurface" 
+    icon="/ucar/unidata/idv/images/surface.jpg"
+    properties="displayName=3D Isosurface;alpha=1.0;" />
+</pre>
+
+that define the java class that implements the control, the categories the control
+is applicable to, a description, label, etc. The properties attribute is
+a semi-colon delimited list of name=value pairs. These are passed to the DisplayControl
+when it is created.
+
+The  data defined in this xml file is is held in the {@link ucar.unidata.idv.ControlDescriptor} class.
+
+
+<li><span class=property><a href=control/paramtocolor.html>paramtocolor.properties</a></span>
+Used by <a href=DisplayConventions.html>DisplayConventions</a> to find default
+color table names for different parameter names.
+
+<li><span class=property><a href=control/paramtorange.html>paramtorange.properties</a></span>
+Used by <a href=DisplayConventions.html>DisplayConventions</a> to find default
+range values for different parameter names.
+
+<li><span class=property><a href=control/contour.html>contour.properties</a></span>
+This property file is not used - but sometime it could be used to hold default
+contour information for parameters. The reason it isn't used  now is because the
+contour information lookup in <a href=DisplayConventions.html>DisplayConventions</a>
+uses calculations, not just a straight table lookup.
+
+</ul>
+
+<h4>Glue and Gui  classes</h4>
+<ul>
+<li><span class=class><a href=IntegratedDataViewer.html>IntegratedDataViewer</a></span>
+The main "glue" class. 
+
+<li><span class=class><a href=DefaultIdv.html>DefaultIdv</a></span>
+This is derived from IntegratedDataViewer and provides the default GUI.
+
+
+
+<li> 
+<span class=class><a href=DataTree.html>DataTree</a></span>, 
+<span class=class><a href=DataTreeNode.html>DataTreeNode</a></span>,
+<span class=class><a href=DataTreeDialog.html>DataTreeDialog</a></span>.
+JTree based display of DataSource-s and DataChoice-s. DataTreeNode is a JTree node
+and acts as a holder of references to other objects (e.g., DataSource, DataChoice, 
+DataCategory).
+
+
+
+<li><span class=class><a href=DisplayConventions.html>DisplayConventions</a></span>
+Encapsulates a variety of default display conventions, e.g.:,  color tables for
+parameters, colors for DisplayControl-s, display units for parameters, etc.
+
+
+<li><span class=class><a href=SharableImpl.html>SharableImpl</a></span>,
+<a href=Sharable.html>Sharable</a>,
+<span class=class><a href=SharableManager.html>SharableManager</a></span>.
+The IDV provides a "sharable data" framework. The idea is that sharable
+objects of certain "types" or "groups" can share data amongst themselves.  The 
+<a href=Sharable.html>Sharable</a> interface describes the minimal
+interface for "sharable" objects. 
+SharableImpl is an abstract class that implements this interface and interacts
+with the SharableManager, which has a set of static methods used to
+register a Sharable object, organize the Sharable-s based on their
+groups and propagate shared  data within  the groups.
+
+
+
+
+
+
+
+</ul>
+<hr>
+
+<a name=overview>
+<H3>The 30000 foot view</H3>
+</a>
+
+<p><b>Initialization</b><br>
+So, now that we know a bit about what's what here is a short overview of how all of this
+gets glued together. It starts by the IDV reading in an xml file (datasource.xml)
+that defines the different <a href=../data/DataSource.html>DataSource</a>-s available and what kinds of data (files, url)
+they manage and a property file (controls.xml) that defines the different
+<a href=control/DisplayControl.html>DisplayControl</a>-s that are available 
+(and the kind of data they are applicable to).
+
+<p><b>GUI</b><br>
+
+The IDV creates a <a href=DataTree.html>DataTree</a> (JTree) to 
+hold the list of instantiated DataSource-s 
+and DataChoice-s. The actual GUI is not created by the IntegratedDataViewer class. Rather
+it is created by a concrete derived class of IntegratedDataViewer (e.g., <a href=DefaultIdv.html>DefaultIdv</a>).
+This allows for us (in the future) to have different user interfaces. 
+
+<p><b>Loading data</b><br>
+When the user picks a file or url to load the pertinent DataSource is found and instantiated.
+When the the DataSource is asked for its list of DataChoice-s some of the DataSource-s
+will also automatically add <a href=../data/DerivedDataChoice.html>DerivedDataChoice</a>-s to their
+list. The DataSource and its list  of DataChoice-s  are then added to the DataTree.
+Each  DataChoice has a list of <a href=../data/DataCategory.html>DataCategory</a>-s that describe the flavor of data the DataChoice provides. For each DataChoice the 
+DataTree uses the first DataCategory in this list to create a hierarchy of JTree nodes (each one
+representing a component of the DataCategory) in which to place the JTree node that represents
+the DataChoice.
+
+<p><b>Selecting data</b><br>
+
+When the user clicks on  a particular DataChoice in 
+the DataTree  the list of <a href=control/DisplayControl.html>control.DisplayControl</a>-s 
+is checked and those DisplayControl-s
+which are applicable to any of the DataChoice's DataCategory-s is shown (by default in
+a popup menu). When the user selects one of these DisplayControl-s it is
+instantiated (through the ControlDescriptor) with the DataChoice and a reference to the
+IDV (as a <a href=ControlContext.html>ControlContext</a> interface object).
+
+<p><b>Displaying  data</b><br>
+
+Typically, when a DisplayControl is created
+it may have its own <a href=../../visad/display/DisplayMaster.html>DisplayMaster</a> 
+(e.g., <a href=control/ProfileControl.html>control.ProfileControl</a>) in its own window
+and/or it will want to display some Displayable within a common 
+window (e.g., <a href=control/ThreeDSurfaceControl.html>control.ThreeDSurfaceControl</a>). 
+For some cases (e.g., <a href=control/TextDisplayControl.html>control.TextDisplayControl</a>)
+there will be no use of  the DisplayMaster/Displayable-s.
+<p>
+The DisplayControl-s don't actually deal with DisplayMaster-s. Rather, they
+deal with <a href=ViewManager.html>ViewManager</a>-s which are wrappers
+aroung the DisplayMaster.
+For common display windows the DisplayControl asks the ControlContext for a 
+ViewManager through the:
+<br><code>
+public ViewManager getViewManager (ViewDescriptor viewDescriptor);
+</code><br>
+method. This uses an instance of the   <a href=ViewDescriptor.html>ViewDescriptor</a>
+to define what kind of ViewManager is needed. Currently we instantiate and
+use only one: <a href=MapViewManager.html>MapViewManager</a>.
+<p>
+The  DisplayControl uses the <a href=DisplayInfo.html>DisplayInfo</a> class to hold
+a reference to itself, its Displayable and the ViewManager in which the Displayable
+is displayed. This DisplayInfo object is also used by the ViewManager to keep
+a list of the DisplayControl-s that are being displayed within it. The ViewManager
+uses the DisplayControl method: 
+<br><code>Component getLegendComponent ();</code><br>
+to retrieve an AWT component to place within its GUI.
+This AWT component typically contains a button to popup the DisplayControl's
+window  and a checkbox for toggling the visibility of the DisplayControl's Displayable-s.
+<p>
+Whew!
+
+
+<A name=datasource.xml>
+<H3>Definining the data sources</H3>
+</a>
+The set of data sources available to the IDV is defined within  the 
+datasource.xml file.
+This file has the form:
+<table>
+<tr valign=top><td> <i>data type</i>.factory  </td><td>  The java class name of the DataSourceFactory that is used to create data sources of this type
+</td></tr>
+<tr valign=top><td><i>data type</i>.label </td><td> Text label used within the gui.
+</td></tr>
+<tr valign=top><td><i>data type</i>.patterns</td><td> A set of comma separated regular expression patterns to determine if this data source is applicable for a given file or url
+</td></tr>
+<tr valigntop><td><i>data type</i>.default_display </td><td>   Name of a default display control to create when data sources of this type are loaded.
+</td></tr>
+<tr valigntop><td><i>data type</i>.show_in_tree </td><td>   Optional boolean that defines if data sources of this type are placed within the gui.
+
+</table>
+<p>
+For example, for files or urls that are textual or html we have the <i>TEXT</i>
+data source type: 
+<pre>TEXT.label = Text or html files
+TEXT.factory  = ucar.unidata.data.text.TextDataSource
+TEXT.patterns=.htm$,.html$,.txt$,.text$,http
+TEXT.default_display = textdisplay
+TEXT.show_in_tree = false
+</pre>
+
+
+
+This data source type is applicable to anything that ends with .htm, .html,
+.txt or .text (The $ used in the patterns represents the end of line character
+in a regular expression.). For this data source the IDV will automatically
+create a DisplayControl of type <i>textdisplay</i> and the data source
+will not be placed within the GUI (e.g., within the JTree of DataSource-s).
+<p>
+On initialization the IDV reads in the properties file and a set of
+{@link ucar.unidata.util.PatternFileFilter}s are created
+which hold the regular expression patterns define in the properties file.
+These PatterFileFilters also hold an <code>Object id</code> attribute
+which the IDV uses to hold the String data type name.
+<p>
+This set of PatternFileFilters is used in two ways. The first way is when the user
+is selecting a local data set using a FileChooser. The  PatternFileFilters
+are used as filters for the FileChooser.
+
+
+<A name=controls.xml>
+<H3>Definining the display controls</H3>
+</A>
+The IDV reads in the controls.properties file to determine the set of DisplayControl-s
+available. This properties file holds a comma separated list
+(<i>displays</i>) of a set of display control names, e.g.:<pre>
+displays=planviewflow, surface, profile, contourxs, contourcolor, planviewcontour, ...
+</pre>
+These display control names are used to do subsequent lookups in the property
+file. We use this list (instead of enumerating across the keys of the Properties) so
+there is an ordering of the display controls when interacting with the user.
+It is important that when adding new displays to this list there are no line breaks.
+<p>
+
+Each control name in the list is used to look up the actual DisplayControl class  name, 
+its description and the data categories this DisplayControl  is applicable to, e.g.:
+<pre>
+windbarbplan.class=ucar.unidata.idv.control.FlowPlanViewControl
+windbarbplan.label=Wind Barb Plan View
+windbarbplan.desc = Add a wind barb plan view of flow vectors
+windbarbplan.categories = macro.windvector
+windbarbplan.properties = windbarbs=true;
+</pre>
+Here we have a display control with id <code>windbarbplan</code>. It is implemented by the 
+<a href=control/FlowPlanViewControl.html>control.FlowPlanViewControl</a> class.
+The <code>windbarbplan.categories</code> entry defines the data categories this
+display control is applicable to. Note the value is <code> macro.windvector</code>.
+This value is actually a reference to another entry  in the properties file:<pre>
+macro.windvector = *-windvector-*
+</pre>
+In general, when the IDV deals with property files it uses a macro substitution
+mechanism (defined in {@link ucar.unidata.util.Misc#getValue}). The value
+of a property is scanned for anything of the form: <code>macro.some_name</code>.
+The value of the property <code>macro.some_name</code> is  then used to do a
+textual substitution. Any macro's defined in the value of a macro property
+are <em>not</em> substituted. The value of the original  
+property can hold any number of macro strings. 
+<p>
+The categories  field is a semi-colon (";") delimited set of
+data category strings. Each data category specification
+is a dash ("-") delimited set of category components. So a data category
+can be viewed  as a hierarchy or path of components. 
+For example, you could have a  categories entry:<pre>
+textdisplay.categories = text;html
+</pre>
+This says that the <code>textdisplay</code> DisplayControl is applicable
+to any data which has data category of <code>text</code> or <code>html</code>.
+Now lets suppose we know there is data available that is html but has a more
+complex categorization, perhaps html that is weather related e.g.:<pre>
+html.weather
+</pre>
+In this case we might have a specialized display control that knows how to deal with
+these <code>html-weather</code> categorized data. In this case we would have
+a data category like:<pre>
+special_html_display.categories= html-weather
+</pre>
+This special category would only be applicable to the special "html-weather" data.
+However, this data is still "html" like data and we would also want the <code>textdisplay</code>
+DisplayControl to be able to display this data. To do this we can take advantage
+of the regular  expression capability of data categories. Each component of a data
+category can also be a regular expression. So we could change the category
+of the <code>textdisplay</code> to be:<pre>
+textdisplay.categories = *-text-*;*-html-*
+</pre> 
+This states that the  <code>textdisplay</code> is applicable to any data 
+that has a category that contains "text" as a component.  This can be read
+as: 0 or more (arbitrary) components followed by a "text" component followed by 0 or more 
+(arbitrary)  components.
+<br>
+Another example:<pre>
+2D-TIME-*
+</pre>
+is read as any category  that  begins with the components "2D" and "TIME" and ends
+with 0 or more components.
+<br>
+We can also use the "+" to represent 1 or more and the "." to represent one, e.g.:<pre>
+2D-TIME-+ (2D-TIME followed by one or more components)
+2D-TIME-. (2D-TIME followed by one component)
+2D-TIME-.-FOO (2D-TIME followed by one component followed by FOO)
+</pre>
+One could also use richer regular expressions here but it has not been thouroughly tested
+(and needed) yet. Note: currently a string representation of a category is parsed
+(in <a href=../data/DataCategory.html>DataCategory</a>) using a StringTokenizer,
+breaking on "-". So if you use a regular expression that contains a "-" (e.g., [A-Z]+),
+this will break. Sometime in the future we'll tokenize smarter to allow for
+escapes, e.g.: [A\-Z]+.
+<p>
+The control data read in from the controls.properties is held 
+in the <a href=ControlDescriptor.html>ControlDescriptor</a> class. This
+class has methods for testing whether the DisplayControl it represents
+is applicable to some DataCategory (ControlDescriptor.applicableTo) and
+for instantiating the DisplayControl (ControlDescriptor.doMakeDisplay).
+
+
+<H3>Creating a new DataSource object</H3>
+When the user selects some file or url the data type is found with the call
+to the IntegratedDataViewer method:
+<code> private String getDataType (String file);</code>
+This method iterates through the list of  PatternFileFilters 
+created with the <a href=#datasource.properties>datasource.properties</a> 
+to find the one that matches the file. If found then the id of the PatternFileFilter
+is returned. If no pattern matches the IDV has a special case of a url
+that points to an html file but does not match the ".html" pattern.
+If the string url begins with "http://" then it is assumed the data source
+of of type "TEXT".
+
+<p>
+Once the data type is found the factory class defined by the properties file
+is instantiated  by the IDV method:
+<p>
+<code>
+private DataSource createDataSource (Object dataName, String dataType, String globalId);
+</code>
+<p>
+This method takes a  specification of the data that is to be loaded
+in, <code>Object dataName</code> and the data type <code>String dataType</code>.
+The <code>globalId</code> is used for persistence and may evolve in the future.
+The dataName typically specifies a String file name or url but may hold anything
+(e.g., a list of images).
+The DataSource that handles this data is constructed using a reflection based factory pattern.
+The factory class name that creates this data source is found from the properties file.
+<br>
+<code>
+String factoryClassName  = (String) dataSourceProperties.get (dataType+".factory");
+<br>
+Class  factoryClass = Class.forName (factoryClassName);
+</code>
+
+<br>
+This class <em>must</em> provide a constructor that takes two arguments: a DataContext
+and the class of the dataName argument:<br>
+<code>
+Constructor ctor = factory.getConstructor (new Class[]{DataContext.class, dataName.getClass()});
+<br>
+DataSourceFactory factory= (DataSourceFactory) ctor.newInstance (new Object[]{(DataContext)this, dataName});<br>
+</code>
+<br>
+The <a href=../data/DataContext.html>DataContext</a> is an interface which the 
+IDV implements.
+The data source is then retrieved:
+<br>
+<code>
+DataSource dataSource = factory.getDataSource ();
+</code>
+<br>
+It turns out that so far all of the DataSourceFactory-ies are actually the concrete DataSource
+classes (e.g., <a href=../data/grid/GeoGridDataSource.html>GeoGridDataSource</a>,
+<a href=../data/imagery/ImageDataSource.html>ImageDataSource</a>). These classes all derive
+from <a href=../data/DataSourceImpl.html>DataSourceImpl</a> which implements the
+DataSourceFactory interface by just returning "this" for the getDataSource method.
+<p>
+Once  a DataSource has been instantiated the method 
+<code>IntegratedDataViewer.loadDataSource</code> is called.
+This method does a couple of things. First it runs through the  list of initial paramaters
+and displays (defined via the command line with the "-display" argument, see <a href=#commandline> Command line arguments</a>), creating the display for any matching parameters held by the
+DataSource.
+<br>
+Next, any default displays defined for that data source in the <a href=#datasource.properties>datasource.properties</a> are created. Finally, the dataSource is added to the <A href=DataTree.html>DataTree</a> if the "show_in_tree" property for that dataSource (defined in the <a href=#datasource.properties>datasource.properties</a> file) is true.
+<p>
+  
+
+<a name=datacategories>
+<h4>DataCategory</h4>
+</a>
+A data category is hierarchical and can be described as a string:
+<pre>component1-component2-...-componentN</pre>
+We use dashes ("-") to delimit each sub-component.
+An instance of a  DataCategory class represents one of the sub-components.
+A DataCategory has a reference to a parent DataCategory and a child DataCategory.
+For example, the string FOO-BAR-ZOO is represented by three DataCategory objects:
+<pre>
+ +-----+     +-----+     +-----+
+ | FOO |-->  | BAR | --> | ZOO |
+ +-----+     +-----+     +-----+
+</pre>
+The DataCategory class has a number of  static utility methods for parsing
+a string and returning a DataCategory object and for parsing a set of
+semi-colon delimited categories and returning a list of DataCategory objects.
+
+
+<h3> How to...</h3>
+
+<a name=howtodisplay>
+<h4>Add a new display</h4>
+</a>
+
+<a name=howtodata>
+<h4>Add a new data source</h4>
+</a>
+
+<a name=howtogui>
+<h4>Create a new GUI</h4>
+</a>
+
+</body>

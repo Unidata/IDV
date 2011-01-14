@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<panel
+   cols="1"
+   layout="gridbag">
+  <panel
+     bgcolor="red"
+     layout="flow">
+    <button label="Button 1"/>
+    <button label="Button 2"/>
+    <button label="Button 3"/>
+    <panel
+       bgcolor="green"
+       cols="1"
+       layout="gridbag">
+      <label text="Label 1"/>
+      <label text="Label 2"/>
+      <label text="Label 3"/>
+    </panel>
+  </panel>
+  <textinput value="text field 1"/>
+  <textinput
+     rows="2"
+     value="text field 2"/>
+  <textinput value="text field 3"/>
+</panel>

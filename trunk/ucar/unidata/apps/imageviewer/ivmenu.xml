@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+                <menuitem label="Show garbage" action="jython:idv.printAll ();" />
+-->
+
+<menus>
+        <menu label="File" id="file">
+             <menu label="New">
+                <menuitem label="Display window" action="jython:idv.createNewWindow ();" />
+                <menuitem label="Data set" action="jython:idv.showMultiChooser();" />
+                <menuitem label="Data source panel" action="jython:idv.createDataTreeWindow();" />
+
+             </menu>
+             <separator/>
+	     <menuitem label="Open..." action="jython:idv.doOpen ();" />
+	     <menuitem label="Import..." action="jython:idv.doImport ();" />
+             <separator />
+	     <menuitem id="save" label="Save " action="jython:idv.doSave ();" />
+	     <menuitem label="Save  as..." action="jython:idv.doSaveAs ();" />
+             <separator />
+             <menu label="Defaults">
+                   <menuitem label="Save as default" action="jython:idv.doSaveAsDefault ();" />
+                   <menuitem label="Clear default" action="jython:idv.doClearDefaults ();" />
+             </menu>
+             <separator />
+	     <menuitem label="Exit" action="jython:idv.quit ();" />
+         </menu>
+
+         <menu label="Edit">
+             <menuitem label="Clear all data sources" action="jython:idv.removeAllDataSources ();" />
+             <menuitem label="Clear all displays"     action="jython:idv.removeAllDisplays ();" />
+             <menuitem label="Clear all displays and data" action="jython:idv.removeAllDataSources ();idv.removeAllDisplays ();" />
+             <separator/>
+             <menuitem label="Create formula"          action="jython:idv.showFormulaDialog ();" />
+             <menuitem label="Jython library"          action="jython:idv.showJythonEditor ();" />
+             <separator/>
+             <menuitem label="User preferences" action="jython:idv.showPreferenceDialog ();" />
+             <menuitem label="Color tables" action="jython:idv.showColorTableEditor ();" />
+             <menuitem label="Parameter aliases"      action="jython:idv.showAliasEditor ();" />
+             <menuitem label="Parameter defaults"      action="jython:idv.showDefaultsEditor ();" />
+        </menu>
+ 
+        <menu id="displays" label="Displays">
+        </menu>
+
+         <menu id="data" label="Data">
+              <menuitem label="Load data source ..." action="jython:idv.showMultiChooser();" />
+              <separator />
+         </menu>
+
+        <menu label="Help">
+             <menuitem  label="User's Guide" action="jython:idv.showHelp ('idv.title');"/>
+             <menuitem  label="Tutorial" action="jython:idv.showHelp ('idv.quickview');"/>
+             <menuitem  label="Mouse and Keyboard" action="jython:idv.showHelp ('keys');"/>
+            <separator/>
+             <menuitem  label="Show console" action="jython:idv.showConsole ();"/>
+             <menuitem  label="Show help tips" action="jython:idv.showHelpTips ();"/>
+            <separator/>
+            <menuitem label="About" action="jython:idv.about ();" />
+        </menu>
+
+</menus>

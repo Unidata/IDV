@@ -1,0 +1,120 @@
+
+<html>
+<head>
+<title>Jython and VisAD</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+How the IDV uses the Jython language and the VisAD software library.
+</p>
+</div>
+
+
+<p>
+
+<div class="pagesubtitle">Jython and the IDV</div>
+
+<P>
+
+Jython  is  the Python computer language, implemented in Java. 
+The Jython user sees regular Python and no Java. You do not need
+to know Java to use Jython.
+Python is a new language in which simple things are usually simple to do.
+IDV formulas use syntax and methods from Jython.
+ Jython (Python) has a simple syntax, but this is a powerful computer language
+that can do most everything C++ and Java can do.
+
+<p>
+
+Jython has  an easy and intuitive syntax. 
+Jython is as easy to write as FORTRAN, and easier than C or C++. 
+If you have existing FORTRAN code, conversion should be 
+straightforward, with line by line conversions in most cases.
+In IDV formulas you can use any normal built-in Python (Jython)
+operator, such as +, -, / *, and 
+** for exponentiation, or numeric functions, such as abs, round, pow, or sqrt.
+Jython is also used in defining your own methods, described 
+in this section.
+
+<p>
+
+The IDV uses Jython for formulas for three reasons. One is that 
+Jython can call Java code, so there can be full integration between
+Jython methods and internal code in the IDV (you can see examples in the
+IDV Jython system library). Another reason is that the IDV uses VisAD software
+to store and manage data, and VisAD software is written in Java. 
+VisAD also 
+can be called directly by Jython. To work with data in the IDV you 
+ use VisAD. And finally, because Jython is easy as most any computer language.
+
+<p>
+
+You do not need to study Jython/Python in detail to use VisAD formulas.
+If you do wish to learn more about Jython and Python, we recommend these books
+<ul>
+<i>The Quick Python Book</i> by Daryl Harms, Manning, 2000, 
+<br><i>Jython for Java Programmers</i> by Robert Bill, New Riders, 2002, 
+<br><i>Python Essential Reference 2nd edition</i> by David Beazley, New Riders, 2001, 
+<br><i>Python Developers Handbook</i> by Andre Lessa, Sams,
+2001. 
+</ul>
+and these web sites:
+<br> 
+[ht::popup "http://www.python.org" "http://www.python.org"], 
+<BR>
+[ht::popup "http://www.jython.org" "http://www.jython.org"],
+<BR>
+[ht::popup "http://www.ssec.wisc.edu/~tomw/visadtutor/" "Using Python with VisAD (http://www.ssec.wisc.edu/~tomw/visadtutor/ )"].
+
+
+
+<div class="pagesubtitle">VisAD and the IDV</div>
+
+The IDV also provides and supports 
+[ht::popup "http://www.ssec.wisc.edu/~billh/visad.html" "VisAD"],
+a Java library to provide display and analysis code for
+multi-dimensional data. All data objects used by the IDV are actually,
+invisibly to the user, stored in VisAD data objects, which carry with
+them information about units, errors, navigation coordinate systems
+and transformations, and other metadata.
+
+<p>
+
+VisAD includes a package of code,
+visad.python.JPythonMethods,  to allow Jython calls to operate
+on VisAD data objects, such as 3D grids. That is why in the IDV you
+can write a simple formula such as (TC*1.8 + 32.0) - DewptF and it will
+automatically apply the calculation to every element in two large 3D
+grids referred to as TC and DewptF. 
+No "do loops" over all grid points are needed;
+and you don't even need to know anything about how the grid is 
+defined, or the data format, or the the grids's navigation on the Earth.   
+The same "IDV Formula" can be applied, without alteration,
+to a single value, to data from a vertical sounding or a balloon
+track, or  2D grids or other 3D grids. All you need is one line of code.
+You can even mix data sources in one calculation: 
+a temperature variable "TC" can come from Eta
+forecasts and another "DewptF" from GFS, mapped differently on the globe.
+All you need enter is a formula 
+such as "(TC*1.8 + 32.0) - DewptF" and the rest is automatic.
+
+<p>
+
+You may use the IDV and its computation features without knowing
+anything about VisAD. However, to do more, 
+you will want to see the documents 
+for visad.python.JPythonMethods in the 
+[ht::popup "http://www.ssec.wisc.edu/~dglo/visad/" "VisAD API Documentation"].
+In your web browser, in the upper left box in this page, scroll down
+to visad.python and click on it. In the lower left box click on
+JPythonMethods.
+For complete information about VisAD, see the 
+[ht::popup "http://www.ssec.wisc.edu/~billh/visad.html" "VisAD"] web site.
+
+<p>
+
+</body>
+</html>

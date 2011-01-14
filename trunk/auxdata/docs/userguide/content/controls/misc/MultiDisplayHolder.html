@@ -1,0 +1,49 @@
+{Mutli-Display Holder}
+
+
+{
+<meta name="jhid" value="idv.controls.multidisplayholder">
+
+The Multi-Display Holder can hold a group of other display controls,
+3D views, field selectors, etc. 
+<p>
+This display behaves a little differently from other displays. It is not
+a part of a 3D view and the IDV can run with just one of these displays without
+any other windows (i.e., normally when the last main window is closed the IDV
+will exit).
+<p>
+This display is also a bit different because it shows the main menu bar and the
+icon toolbar. The last menu in the menu bar is the normal Display Control
+menu. We do this because the IDV can run without any other main windows
+and the user may need to access the main menu bar.
+<p>
+
+The Multi-Display Holder contains a set of top-level <i>groups</i>.
+These groups can be shown as tabs or as documents in a desktop view.
+To switch between these top-level views choose the
+[ug::menu {Multi Display} View {Show Desktop}] menu item.
+You can add new top level groups by choosing the
+[ug::menu {Multi Display} File New Tab] menu item.
+
+<p>
+Each of these top level groups can contain any number of sub-displays.
+These sub-displays can themselves be groups, other display controls,
+3D views or the Field Selector GUI.
+
+<p>
+The [ug::menu {Multi Display} Edit {Manage Displays...}] menu item
+brings up the displays manager. This is a tree view of all of the
+groups and sub-displays.
+Right mouse clicking on any of the entries brings up a popup menu
+that allows you to remove the item, show the properties for the item, etc.
+You can drag an item and place it in a new group. Dragging does
+not change the order of an item within its group though. To do that
+use the group Properties dialog described below.
+
+<p>
+The Properties dialog for a Group allows to specify the kind of layout 
+for the group (e.g., in tabs, grid or column based). The  Displays list
+lists all of the sub-displays held by the group. You can change the 
+order of an item by selecting it in the list and pressing
+the up or down arrow button.
+}

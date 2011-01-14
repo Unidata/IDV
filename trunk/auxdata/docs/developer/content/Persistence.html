@@ -1,0 +1,190 @@
+[header {Bundles and Persistence}]
+
+The IDV can save off the state of the application
+using   the [dg::class ucar.unidata.xml.XmlEncoder]
+class.  This class  supports the serialization/de-serialization of
+objects from/to xml.  We use the term "bundle" to refer to
+the saved application state.
+<p>
+When the IDV saves off a "bundle" it saves off all of the current
+data sources, displays and the state of the various 2D and 3D views.
+The actual object that is saved off is a Hashtable, e.g.:
+
+<pre>
+Hashtable data= new Hashtable ();
+data.put (ID_DATASOURCES, sources);
+data.put (ID_DISPLAYCONTROLS, displayControls);
+data.put (ID_VIEWMANAGERS, viewManagers);
+</pre>
+
+If an application needs to add their own state into a bundle the methods:
+
+<pre>
+protected void addToBundle (Hashtable data) throws Exception {}
+protected void instantiateFromBundle  (Hashtable ht) throws Exception {}
+</pre>
+
+can be overwritten. Make sure you call the super class method if you overwrite
+these methods (or nothing will get saved).
+
+
+<h2>XmlEncoder</h2>
+The XmlEncoder class is used to save off and recreate bundles.
+It uses reflection on the object
+to write out an object tag and a set of property or method tags
+that define the persisted state of the object.
+
+<p>
+To encode/decode an object to/from xml there are certain requirements on the object's
+class. With just a vanilla class the class must have a parameter-less constructor.
+Any properties that are to be saved/restored must have associated public get and 
+set methods:
+
+<pre>
+public void setSomeProperty (type value)
+public type getSomeProperty ()
+</pre>
+
+If the class you want to persist does not have a parameterless constructor
+and/or you want to intervene somehow in the encoding/decoding process there 
+are a variety of ways to accomplish this using
+<a href=#XmlPersistable>XmlPersistable</a>,
+<a href=#XmlObjectFactory>XmlObjectFactory</a>,
+or 
+<a href=#XmlDelegate>XmlDelegate</a>.
+
+
+
+<p>
+Running [dg::class2 ucar.unidata.xml.XmlEncoder]
+standalone (i.e., java ucar.unidata.xml.XmlEncoder) will run a test. 
+Providing any command line argument
+will result in the test xml being printed out to stderr.
+<p>
+The relevant methods are:<br>
+[method XmlEncoder.toXml(Object object)]<br>
+[method XmlEncoder.toObject (String xml)]
+<p>
+For example, the result of: 
+
+<pre>
+String s = "just a test";
+XmlEncoder encoder = new XmlEncoder ();
+String xml = encoder.toXml (s);
+</pre>
+
+Will be  the xml: 
+[pre {<string>just a test</string>}]
+
+Now  calling:
+
+<pre>Object result = encoder.toObject (xml);
+System.err.println (result.toString ());</pre>
+
+Will result in the  String "just a test"
+<p>
+
+The following:
+<pre>
+public class Test {
+   int x;
+   public Test () {x=5;}
+   public int getX () {return x;}
+   public void setX (int x) {this.x =x;}
+}
+String xml = (new XmlEncoder()).toXml (new Test ());
+</pre>
+will result in:
+[pre {
+<object class="Test">
+   <property name="x">
+      <int>5</int>
+   </property>
+</object>
+}]
+
+We do special handling for List and Hashtable.
+In these cases we write out a set of <i>method</i>
+tags. e.g. for an ArrayList  of Strings we do:
+[pre {
+<object class="java.util.ArrayList">
+   <method name="add">
+       <string>Foo</string>
+    </method>
+   <method name="add">
+      <string>Bar</string>
+    </method>
+</object>
+</pre>}]
+
+
+<h2>Modifying general XmlEncoder functionality</h2>
+There are a variety of ways to modify how objects are encoded/decoded.
+
+
+<a name=XmlPersistable>
+<p><b>[dg::class ucar.unidata.xml.XmlPersistable]</b><br>
+</a>
+If the object that is being encoded implements XmlPersistable the encoder 
+will defer to it both when persisting the object and when re-instantiating the
+object. See [dg::class ucar.unidata.xml.test.Test2] for an example.
+
+<a name=XmlDelegate>
+<p><b>[dg::class ucar.unidata.xml.XmlDelegate]</b><br>
+</a>
+Second, you can define an XmlDelegate object that handles objects
+of a certain class:
+<code><pre>encoder.addDelegateForClass (theClassToHandle, theXmlDelegate);</pre></code>
+See [dg::class ucar.unidata.xml.test.Test] for an example.
+
+
+<a name=XmlObjectFactory>
+<p><b>[dg::class ucar.unidata.xml.XmlObjectFactory]</b><br>
+</a>
+Normally the encoding results in a set of nested object
+tags that contain method and property tags. You can also
+write out a factory tag that specifies a factory class, which implements
+the XmlObjectFactory interface. e.g:
+
+[pre {<factory class="Test2Factory">
+     ...anything here
+</factory>
+}]
+
+In this case the factory is instantiated but the actual object used
+is a result of:
+<code><pre>Object = factory.getObject (encoder, xml Element);</pre></code>
+
+<p><b>Constructor tags</b><br>
+Normally, the encoder instantiates an object through reflection
+using the "bean" (i.e., parameter-less) constructor. For  objects that do not
+have the bean constructor this presents a problem. To resolve this
+a constructor tag is looked for under the object tag. If found the correct
+construcor is found for the given class (using the types of the sub-components
+of the constructor tag. e.g., for Test2 we do:
+[pre {
+      <object class="ucar.unidata.xml.Test2">
+            <constructor>
+              <int>myX</int>
+            </constructor>
+       </object>
+}]
+
+
+<h2>Modifying XmlEncoder for an IDV application </h2>
+The IDV creates its XmlEncoder with the method getEncoder.
+In this method the encoder is initialized with a call to:
+
+<pre>protected void initEncoder (XmlEncoder encoder) {}</pre>
+
+You can overwrite this method to initialized  the encoder for any particular
+classes you need to have persisted.
+<p>
+To initialize the encoder the IDV calls the static method<br> 
+[method  VisADPersistence.init (encoder);] 
+<br>
+which is a method on the [dg::class ucar.visad.VisADPersistence] class.
+This method uses the XmlDelegate method coupled with  the constructor tag
+to define how to persist off the Visad objects encountered within the IDV.
+
+[footer]

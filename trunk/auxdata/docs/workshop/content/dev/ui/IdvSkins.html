@@ -1,0 +1,62 @@
+
+[ug::head {IDV Skins}]
+
+We're going to look at how skins work in the IDV now.
+
+<ul>
+<li> From a terminal window cd to:<br>
+[ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/idv/resources/skins}]
+
+<li> View the directory listing. 
+
+<li> View the skin.xml
+[ht::cmdline {java ucar.unidata.ui.XmlUi skin.xml<br>
+less skin.xml}]
+
+Note the &quot;idv.&quot; tags. We'll look at how these are handled in a bit.
+
+<li> View the <i>threeviewskin.xml</i>
+[ht::cmdline {java ucar.unidata.ui.XmlUi threeviewskin.xml}]
+
+
+<li> List out the skin.xml. Note the attribute in the idv.view tag:<br>
+<i>class=\${view_class}</i> attribute.
+<p>
+When the IDV reads these skin files in it replaces these macros with properties
+defined in the idv.rbi.
+
+<li> Look at the &quot;idv.resource.skin&quot; resources entry in the main RBI file:
+[ht::cmdline {less <%workshop.installdir%>/ucar/unidata/idv/resources/idv.rbi}]
+
+<li> Now, lets see how the IDV puts this all together
+<ul>
+<li> Bring up the IdvUIManager.java source code in an editor:
+[ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/idv/ui<br>&lt;your favorite editor&gt; IdvUIManager.java}]
+
+<li> Look for the doMakeIdvXmlUi method:
+<pre>
+    protected IdvXmlUi doMakeIdvXmlUi(IdvWindow window, List viewManagers,
+                                      Element skinRoot) {
+        return new IdvXmlUi(window, viewManagers, getIdv(), skinRoot);
+    }
+</pre>
+
+<li> This is a factory method for creating our own XmlUi class. This class
+handles the special &quot;idv.&quot; tags.
+
+<li> Look at The IdvXmlUi.java source:
+[ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/idv/ui<br>&lt;your favorite editor&gt; IdvXmlUi.java}]
+
+<li> Look at the createComponent method:
+<pre>
+    public Component createComponent(Element node, String id) {...}
+</pre>
+This is the method that the XmlUI class calls to create the components.
+
+</ul>
+
+
+</ul>
+
+
+
