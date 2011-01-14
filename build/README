@@ -85,6 +85,10 @@ from /share/idv/ucar
 This will generate the userguide.pdf and workshop.pdf and place them in the
 docs directory.
 
+Note that ant may not be on your path. Look for it in 
+
+/share/apache-ant/
+
 Look at the ant output and you will see where these PDFs are located.
 
 Once this is done, copy them to conan:
@@ -137,6 +141,27 @@ ln -s ../<stable IDV version> stable    (or simply point stable to current)
 
 Go to the IDV homepage and make sure it is pointing to the updated directory.  Make 
 sure all the links on the page work correctly.
+
+***********************************************************************
+Send out email to community:
+
+idvusers@unidata.ucar.edu
+idvdevelopers@unidata.ucar.edu
+support-announce@unidata.ucar.edu
+
+Dear IDV User Community,
+
+IDV XXXX is now available for download <http://www.unidata.ucar.edu/downloads/idv/XXXXX/>. 
+
+[Info about the release]
+
+See the release notes <http://www.unidata.ucar.edu/software/idv/docs/userguide/ReleaseNotes.html>
+for a complete list of new features.
+
+Best Regards,
+
+The Unidata IDV Team
+
 
 ***********************************************************************
 Running the test suite
