@@ -104,7 +104,7 @@ cd /content/software/idv/<release_dir>
 cp ../<previous_release_dir>/index.html index.html.<release_dir>
 
 edit the index.html.<version> file and update the IDV News and Announcements
-section with information about the new release.
+section with information about the new release. Also edit the "Posted" date.
 
 cp index.html.<version> index.html
 
