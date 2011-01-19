@@ -235,7 +235,7 @@ proc ht::openDataSourceChooser {} {
             <li> Select the [ht::command Data Chooser] tab in the 
                  [ht::dialog Dashboard]
             <li> Choose one of the menus under the 
-                 [ht::menu Data {New Data Source}] menu.
+                 [ht::menu Data {Choose Data}] menu.
             </popup>"
             
 }
@@ -317,7 +317,7 @@ proc ht::loadPointData {} {
              <ul> 
                  <li> Select the [ht::command Point] tab in the [ht::command Data Chooser].
                  </li>
-                 <li> Or, choose the [ht::menu Data {New Data Source} {Surface Observations}] menu item from the main menu bar.
+                 <li> Or, choose the [ht::menu Data {Choose Data} {Surface Observations}] menu item from the main menu bar.
                  </li>
              </ul>
          <li> Click on the [ht::button Connect] button.
