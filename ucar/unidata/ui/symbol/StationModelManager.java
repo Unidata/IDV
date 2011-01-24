@@ -77,12 +77,23 @@ public class StationModelManager extends ResourceManager {
     /** This defines where we get the symbol definition xml files */
     protected XmlResourceCollection symbolTypes;
 
+
+
     /**
      * ctor
      *
      */
     public StationModelManager() {}
 
+
+    /**
+     * ctor
+     *
+     * @param xmlEncoder The encoder to use
+     */
+    public StationModelManager(XmlEncoder encoder) {
+        super(encoder);
+    }
 
 
     /**

@@ -104,6 +104,26 @@ public abstract class ResourceManager {
     private int resourceTimestamp = 0;
 
 
+    /** My encoder */
+    private XmlEncoder xmlEncoder;
+
+    /**
+     * no param ctor
+     */
+    public ResourceManager() {
+    }
+
+
+    /**
+     * ctor
+     *
+     * @param xmlEncoder The encoder to use
+     */
+    public ResourceManager(XmlEncoder xmlEncoder) {
+        this.xmlEncoder = xmlEncoder;
+    }
+
+
     /**
      * _more_
      *
@@ -322,11 +342,14 @@ public abstract class ResourceManager {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * create if needed and return the XmlEncoder
+     * @return The xml encoder
      */
     protected XmlEncoder getEncoder() {
-        return new XmlEncoder();
+        if (xmlEncoder == null) {
+            xmlEncoder = new XmlEncoder();
+        }
+        return xmlEncoder;     
     }
 
 
@@ -403,7 +426,7 @@ public abstract class ResourceManager {
      * @return _more_
      */
     protected String getExportContents(NamedObject object, String file) {
-        return (new XmlEncoder()).toXml(object);
+        return (getEncoder()).toXml(object);
     }
 
 
@@ -497,7 +520,7 @@ public abstract class ResourceManager {
             if (xml == null) {
                 return null;
             }
-            Object o = (new XmlEncoder()).toObject(xml);
+            Object o = (getEncoder()).toObject(xml);
             return doImport(o, makeUnique);
         } catch (Exception exc) {
             LU.printException(log_, "Error reading file:" + file, exc);
@@ -637,9 +660,6 @@ public abstract class ResourceManager {
 
 
 
-    /** _more_ */
-    private XmlEncoder xmlEncoder;
-
 
     /**
      * _more_
@@ -662,11 +682,8 @@ public abstract class ResourceManager {
      */
     public Object toObject(String xml) {
         try {
-            if (xmlEncoder == null) {
-                xmlEncoder = new XmlEncoder();
-            }
             Element root = XmlUtil.getRoot(xml);
-            return xmlEncoder.toObject(root);
+            return getEncoder().toObject(root);
         } catch (Exception exc) {
             if (shouldWeIgnoreThisXml(xml)) {
                 return null;
