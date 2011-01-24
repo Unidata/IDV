@@ -2916,6 +2916,11 @@ Misc.run(new Runnable() {
     }
 
 
+    protected XmlEncoder getEncoder() {
+        return getEncoder(true);
+    }
+
+
     /**
      *  Create an {@link ucar.unidata.xml.XmlEncoder} and initialize it
      * with the VisADPersistence delegates.
@@ -2938,6 +2943,11 @@ Misc.run(new Runnable() {
         encoder.registerNewClassName(
             "ucar.unidata.idv.FlythroughPoint",
             "ucar.unidata.idv.flythrough.FlythroughPoint");
+        
+        //A hack to support the new geon package structure
+        //Sometime we need to have this be a property or some xml format
+        encoder.addClassPatternReplacement("ucar.unidata.apps.geon","org.unavco.idv.geon");
+
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
         return encoder;
