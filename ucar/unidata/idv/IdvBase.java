@@ -271,7 +271,7 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
      */
     protected StationModelManager doMakeStationModelManager() {
         return (StationModelManager) makeManager(StationModelManager.class,
-                null);
+                                                 new Object[]{getEncoder()});
     }
 
 
@@ -1238,6 +1238,10 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
 
     public Element createElement(XmlEncoder encoder) {
         return null;
+    }
+
+    protected XmlEncoder getEncoder() {
+        return new XmlEncoder();
     }
 
     /**
