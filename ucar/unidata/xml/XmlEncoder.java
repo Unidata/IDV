@@ -332,6 +332,9 @@ public class XmlEncoder extends XmlUtil {
                                                           String>();
 
 
+    /** _more_          */
+    private List<String[]> patterns = new ArrayList<String[]>();
+
     /**
      *  Keep a list of the exceptions that get throwing during the encoding or decoding step.
      */
@@ -1154,6 +1157,19 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+
+
+
+    /**
+     * This allows on to change package  paths of classes that are in bundles
+     * with a new path
+     */
+
+    public void addClassPatternReplacement(String pattern, String replace) {
+        patterns.add(new String[]{pattern, replace});
+    }
+
+
     /**
      *  Find the Class that corresponds to the given className. Lookup in the classNameToClass table
      *  to see if we have a different Class. If not then just used Class.forName (className);
@@ -1162,7 +1178,6 @@ public class XmlEncoder extends XmlUtil {
      *  @return The class found for the className.
      *  @throws ClassNotFoundException When we cannot find the class.
      */
-
     public Class getClass(String className) throws ClassNotFoundException {
         Class type = getPrimitiveClass(className);
         if (type != null) {
@@ -1173,6 +1188,10 @@ public class XmlEncoder extends XmlUtil {
         if (newClassName != null) {
             //            System.err.println("new class name: " + newClassName +" for:" + className);
             className = newClassName;
+        }
+
+        for(String[] patternTuple: patterns) {
+            className = className.replace(patternTuple[0], patternTuple[1]);
         }
 
 
