@@ -200,6 +200,19 @@ argument -Dfoo=bar) -->
     </target>
 
 
+
+    <target name="idvmaps" depends="init">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            jarfile="${jars_dest}/idvmaps.jar">
+              <include name="auxdata/maps/**"/>
+              <include name="auxdata/images/**"/>
+              <include name="auxdata/ui/icons/**"/>
+           </jar>
+    </target>
+
+
     <target name="jhindex" depends="init">
         <exec output="dummyfile"
             executable="/upc/share/jh/javahelp/bin/jhindexer"
