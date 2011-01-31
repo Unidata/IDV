@@ -21,38 +21,41 @@
 package ucar.unidata.idv.control;
 
 
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+
 import ucar.unidata.collab.Sharable;
-
 import ucar.unidata.data.DataChoice;
-
 import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-
 import ucar.visad.Util;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
-
-import visad.*;
-
+import visad.Data;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealTuple;
+import visad.Unit;
+import visad.VisADException;
 import visad.georef.EarthLocation;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 
 

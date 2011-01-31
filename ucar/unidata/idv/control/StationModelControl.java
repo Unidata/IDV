@@ -21,102 +21,114 @@
 package ucar.unidata.idv.control;
 
 
-import org.jfree.chart.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
-import ucar.unidata.data.DataAlias;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.data.point.*;
-
+import ucar.unidata.data.point.PointDataInstance;
+import ucar.unidata.data.point.PointDataSource;
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.Bearing;
-
 import ucar.unidata.gis.SpatialGrid;
-
 import ucar.unidata.idv.ControlContext;
-
 import ucar.unidata.idv.control.chart.LineState;
 import ucar.unidata.idv.control.chart.PointParam;
 import ucar.unidata.idv.control.chart.TimeSeriesChart;
 import ucar.unidata.ui.ImageUtils;
-
 import ucar.unidata.ui.PropertyFilter;
-import ucar.unidata.ui.symbol.*;
-
+import ucar.unidata.ui.symbol.CloudCoverageSymbol;
+import ucar.unidata.ui.symbol.MetSymbol;
+import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
-
+import ucar.unidata.ui.symbol.TextSymbol;
+import ucar.unidata.ui.symbol.ValueSymbol;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LayoutUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
-import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
-import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.LineDrawing;
 import ucar.visad.display.StationModelDisplayable;
-
-import visad.*;
-
+import visad.CommonUnit;
+import visad.Data;
+import visad.DisplayEvent;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.Integer1DSet;
+import visad.LinearLatLonSet;
+import visad.MathType;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SI;
+import visad.Set;
+import visad.SetType;
+import visad.TextType;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
-
-import visad.util.BaseRGBMap;
-import visad.util.ColorPreview;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
-import java.io.File;
-
-import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
 
 
 
