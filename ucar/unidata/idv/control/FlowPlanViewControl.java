@@ -630,10 +630,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      *
      * @param f   new flow scale
      */
-    public void setFlowScale(float f) {
+    public void setFlowScale(float f) throws RemoteException, VisADException {
         flowScaleValue = f;
         if (getGridDisplay() != null) {
-            getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
+            getGridDisplay().setFlowScale(getDisplayScale()* scaleFactor); //flowScaleValue * scaleFactor);
         }
         if (getHaveInitialized()) {
             doShare(SHARE_FLOWRANGE, flowRange);
