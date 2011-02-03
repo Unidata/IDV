@@ -812,6 +812,9 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/unidata/util/IOUtil.java"/>
             <include name="ucar/unidata/util/GuiUtils.java"/>
             <include name="ucar/unidata/util/LogUtil.java"/>
+            <include name="ucar/unidata/util/TemporaryDir.java"/>
+            <include name="ucar/unidata/util/WikiUtil.java"/>
+            <include name="ucar/unidata/ui/ImageUtils.java"/>
             <include name="ucar/unidata/data/gis/KmlUtil.java"/>
             <include name="ucar/unidata/xml/*.java"/>
             <include name="ucar/unidata/sql/*.java"/>
