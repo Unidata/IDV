@@ -2938,7 +2938,11 @@ Misc.run(new Runnable() {
         //For now put this here
         encoder.registerNewClassName(
             "ucar.unidata.repository.InteractiveRepositoryClient",
-            "ucar.unidata.repository.client.InteractiveRepositoryClient");
+            "org.ramadda.repository.client.InteractiveRepositoryClient");
+
+        encoder.registerNewClassName(
+                                     "org.ramadda.repository.InteractiveRepositoryClient",
+                                     "org.ramadda.repository.client.InteractiveRepositoryClient");
 
         encoder.registerNewClassName(
             "ucar.unidata.idv.FlythroughPoint",
@@ -2947,6 +2951,7 @@ Misc.run(new Runnable() {
         //A hack to support the new geon package structure
         //Sometime we need to have this be a property or some xml format
         encoder.addClassPatternReplacement("ucar.unidata.apps.geon","org.unavco.idv.geon");
+        encoder.addClassPatternReplacement("ucar.unidata.repository","org.ramadda.repository");
 
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
