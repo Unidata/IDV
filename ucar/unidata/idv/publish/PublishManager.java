@@ -131,6 +131,7 @@ public class PublishManager extends IdvManager {
                 }
                 publishers.addAll(tmp);
             } catch (Exception exc) {
+                exc.printStackTrace();
                 LogUtil.userErrorMessage(
                     "There was a problem loading the publishers file:\n"
                     + resources.get(resourceIdx)
