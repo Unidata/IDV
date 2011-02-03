@@ -107,7 +107,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     boolean autoSize = false;
 
     /** a scale factor */
-    protected final float scaleFactor = 0.02f;
+    protected final float scaleFactor = 0.01f;
 
     /** a scale value */
     float flowScaleValue = 4.0f;
@@ -634,7 +634,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         flowScaleValue = f;
         if (getGridDisplay() != null) {
             try {
-              getGridDisplay().setFlowScale(getDisplayScale()* scaleFactor);
+              getGridDisplay().setFlowScale(getDisplayScale()* scaleFactor * flowScaleValue);
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
