@@ -107,7 +107,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     boolean autoSize = false;
 
     /** a scale factor */
-    protected final float scaleFactor = 0.01f;
+    protected final float scaleFactor = 0.02f;
 
     /** a scale value */
     float flowScaleValue = 4.0f;
