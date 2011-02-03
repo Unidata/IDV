@@ -372,7 +372,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @throws Exception On badness
      */
     public String convertSourceFile(String source) throws Exception {
-        if (descriptor.getNcmlTemplate() != null) {
+        if (descriptor!=null && descriptor.getNcmlTemplate() != null) {
             String ncml = IOUtil.readContents(descriptor.getNcmlTemplate(),
                               getClass());
             String file = getDataContext().getObjectStore().getUniqueTmpFile(
