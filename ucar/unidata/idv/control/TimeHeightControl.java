@@ -36,10 +36,9 @@ import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.ui.LatLonWidget;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.ThreeDSize;
+import ucar.unidata.util.*;
+
+import ucar.visad.ShapeUtility;
 
 
 import ucar.visad.display.ColorScale;
@@ -643,6 +642,8 @@ public class TimeHeightControl extends LineProbeControl {
             JMenu xsMenu = timeHeightView.makeViewMenu();
             xsMenu.setText("Time Height View");
             items.add(xsMenu);
+            //adding some control of probe: size, etc
+            items.add(doMakeProbeMenu(new JMenu("Probe")));
         }
     }
 
