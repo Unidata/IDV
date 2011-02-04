@@ -21,71 +21,59 @@
 package ucar.unidata.idv;
 
 
-import org.w3c.dom.Element;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.Vector;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 
 import ucar.unidata.data.DataManager;
-
 import ucar.unidata.data.DataUtil;
-
 import ucar.unidata.idv.control.DisplayControlImpl;
-
-import ucar.unidata.idv.ui.*;
-
 import ucar.unidata.ui.CheckboxCategoryPanel;
 import ucar.unidata.ui.HelpTipDialog;
-import ucar.unidata.ui.ObjectTreeNode;
-
-import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
-import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.unidata.xml.PreferenceManager;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlUtil;
-
 import ucar.visad.display.EventMap;
-
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.io.*;
-
-import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.*;
+import visad.DateTime;
+import visad.Unit;
+import visad.VisADException;
 
 
 
@@ -154,11 +142,11 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
     private static DecimalFormat latlonFormat = new DecimalFormat();
 
     /** Date formats */
-    private String[] dateFormats = {
+    public static final List<String> DATE_FORMATS = Arrays.asList(
         DEFAULT_DATE_FORMAT, "MM/dd/yy HH:mm z", "dd.MM.yy HH:mm z",
         "yyyy-MM-dd", "EEE, MMM dd yyyy HH:mm z", "HH:mm:ss", "HH:mm",
         "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ssZ"
-    };
+    );
 
     /** Manager */
     private PreferenceManager navManager;
@@ -930,7 +918,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         String dateFormat = getStore().get(PREF_DATE_FORMAT,
                                            DEFAULT_DATE_FORMAT);
-        List formats = Misc.toList(dateFormats);
+        final List<String> formats = new LinkedList<String>(DATE_FORMATS);
         if ( !formats.contains(dateFormat)) {
             formats.add(dateFormat);
         }
