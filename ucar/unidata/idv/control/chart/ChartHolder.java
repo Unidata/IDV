@@ -22,102 +22,45 @@
 
 package ucar.unidata.idv.control.chart;
 
+import static ucar.unidata.idv.IdvPreferenceManager.DATE_FORMATS;
 
-import org.jfree.chart.*;
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.entity.*;
-import org.jfree.chart.event.*;
-import org.jfree.chart.labels.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.*;
-import org.jfree.data.general.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
-import ucar.unidata.data.DataAlias;
-import ucar.unidata.data.grid.GridUtil;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
-import ucar.unidata.data.point.*;
-
-
-import ucar.unidata.idv.ControlContext;
-
-
-import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.idv.control.ProbeRowInfo;
-
-
-import ucar.unidata.idv.control.chart.LineState;
-import ucar.unidata.ui.GraphPaperLayout;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.ChartChangeEvent;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.ui.symbol.*;
-
-
-import ucar.unidata.ui.symbol.StationModelManager;
-import ucar.unidata.ui.symbol.WindBarbSymbol;
-import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Resource;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.view.geoloc.NavigatedDisplay;
-
-
-import ucar.visad.ShapeUtility;
-
-import ucar.visad.Util;
-
-
-
-import ucar.visad.display.Animation;
-import ucar.visad.display.Animation;
-import ucar.visad.display.StationModelDisplayable;
-import ucar.visad.quantities.CommonUnits;
-
-
-import visad.*;
-
-import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
-
-import visad.georef.MapProjection;
-
-import visad.util.BaseRGBMap;
-import visad.util.ColorPreview;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-
-
-import java.rmi.RemoteException;
-
-
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.swing.*;
 
 
 
@@ -177,7 +120,9 @@ public class ChartHolder {
 
     /** The color to use for the data area */
     private Color dataAreaColor = Color.white;
-
+    
+    /** The date format to use for this chart */
+    private String dateFormat = null;
 
     /** for gui */
     protected JCheckBox showThumbnailCbx;
@@ -196,6 +141,9 @@ public class ChartHolder {
 
     /** my size */
     private Dimension preferredSize;
+    
+    /** Combo box containing date formats available for selection.*/
+    JComboBox dateFormatBox;
 
     /**
      * ctor
@@ -239,6 +187,9 @@ public class ChartHolder {
         if (showTitleCbx != null) {
             setShowTitle(showTitleCbx.isSelected());
         }
+        if (dateFormatBox != null) {
+        	dateFormat = (String)dateFormatBox.getSelectedItem();
+        }
         return true;
     }
 
@@ -279,17 +230,22 @@ public class ChartHolder {
             chart.setTitle((String) null);
         }
         if (plot instanceof XYPlot) {
-            ((XYPlot) plot).setDomainGridlinesVisible(
+        	final XYPlot p = (XYPlot) plot;
+            p.setDomainGridlinesVisible(
                 domainLineState.getVisible());
-            ((XYPlot) plot).setRangeGridlinesVisible(
+            p.setRangeGridlinesVisible(
                 rangeLineState.getVisible());
-            ((XYPlot) plot).setDomainGridlinePaint(
+            p.setDomainGridlinePaint(
                 domainLineState.getColor());
-            ((XYPlot) plot).setRangeGridlinePaint(rangeLineState.getColor());
-            ((XYPlot) plot).setDomainGridlineStroke(
+            p.setRangeGridlinePaint(rangeLineState.getColor());
+            p.setDomainGridlineStroke(
                 domainLineState.getStroke());
-            ((XYPlot) plot).setRangeGridlineStroke(
-                rangeLineState.getStroke());
+            p.setRangeGridlineStroke(
+                    rangeLineState.getStroke());
+            if (p.getDomainAxis() instanceof DateAxis && dateFormat != null){
+            	final DateAxis ax = (DateAxis)p.getDomainAxis();
+            	ax.setDateFormatOverride(new SimpleDateFormat(dateFormat));
+            }
         }
     }
 
@@ -832,6 +788,24 @@ public class ChartHolder {
         return dataAreaColor;
     }
 
+    
+    /**
+     * Get the date format for this plot.
+     * 
+     * @return the date format for this plot.
+     */
+    public String getDateFormat() {
+		return dateFormat;
+	}
+
+    /**
+     * Set the date format for this plot.
+     * 
+     * @param dateFormat The date format for this plot.
+     */
+	public void setDateFormat(final String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
 
     /**
      *  Set the ShowTitle property.

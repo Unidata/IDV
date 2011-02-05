@@ -23,44 +23,47 @@
 package ucar.unidata.idv.control.chart;
 
 
-import org.jfree.chart.*;
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.entity.*;
-import org.jfree.chart.event.*;
-import org.jfree.chart.labels.*;
-import org.jfree.chart.plot.*;
-import org.jfree.data.*;
-import org.jfree.data.general.*;
-import org.jfree.data.time.*;
-import org.jfree.ui.*;
+import static ucar.unidata.idv.IdvPreferenceManager.DATE_FORMATS;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
+import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.event.ChartChangeEvent;
+import org.jfree.chart.plot.Plot;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
-
 import ucar.unidata.ui.GraphPaperLayout;
-
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.ui.symbol.*;
-
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
-
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
+import visad.Real;
 
 
 
@@ -636,15 +639,24 @@ public abstract class ChartManager implements ImageObserver {
                                        chartHolder.dataAreaSwatch);
         comps.add(GuiUtils.left(GuiUtils.hbox(colorComps, 5)));
 
-
-
-
-
         comps.add(GuiUtils.rLabel("Domain Lines: "));
         comps.add(chartHolder.getDomainLineState().getPropertyContents());
         comps.add(GuiUtils.rLabel("Range Lines: "));
         comps.add(chartHolder.getRangeLineState().getPropertyContents());
+        
         chartHolder.getPropertiesComponents(comps);
+        comps.add(GuiUtils.rLabel("Date Format: "));
+		final String df = getControl().getIdv().getPreferenceManager()
+				.getDefaultDateFormat();
+		final List<String> l = new LinkedList<String>(DATE_FORMATS);
+		if (!l.contains(df)) {
+			l.add(df);
+		}
+		chartHolder.dateFormatBox = GuiUtils.getEditableBox(
+				new LinkedList<String>(DATE_FORMATS),
+				chartHolder.getDateFormat() == null ? df : chartHolder
+						.getDateFormat());
+		comps.add(chartHolder.dateFormatBox);
     }
 
 

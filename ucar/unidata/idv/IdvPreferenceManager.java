@@ -916,14 +916,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             timeLabel.setText("Can't format date: " + ve);
         }
 
-        String dateFormat = getStore().get(PREF_DATE_FORMAT,
-                                           DEFAULT_DATE_FORMAT);
-        final List<String> formats = new LinkedList<String>(DATE_FORMATS);
-        if ( !formats.contains(dateFormat)) {
-            formats.add(dateFormat);
-        }
-        final JComboBox dateFormatBox = GuiUtils.getEditableBox(formats,
-                                            dateFormat);
+		final JComboBox dateFormatBox = GuiUtils.getEditableBox(
+				new LinkedList<String>(DATE_FORMATS), getDefaultDateFormat());
         widgets.put(PREF_DATE_FORMAT, dateFormatBox);
 
         final JComboBox timeZoneBox = new JComboBox();
