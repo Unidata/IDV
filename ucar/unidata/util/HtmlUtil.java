@@ -2606,6 +2606,15 @@ public class HtmlUtil {
     }
 
 
+    public static String attrs(String[]pairs) {
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<pairs.length;i+=2) {
+            sb.append(attrs(pairs[i],pairs[i+1]));
+        }
+        return sb.toString();
+    }
+
+
     /**
      *  Return a String with n1=&quot;v1&quot n2=&quot;v2&quot.
      *
@@ -2615,7 +2624,6 @@ public class HtmlUtil {
      *  @param v2 The second attribute value.
      *  @return The attrbiute string.
      */
-
     public static String attrs(String n1, String v1, String n2, String v2) {
         return attr(n1, v1) + attr(n2, v2);
     }
