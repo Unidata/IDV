@@ -52,7 +52,7 @@
 <plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
 <plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
 <plugin name="RAMADDA Publisher" url="http://www.unidata.ucar.edu/software/idv/plugins/ramaddaplugin.jar" description="Supports publishing to a RAMADDA data repository" category="Miscellaneous"/>
-
+<plugin name="RAMADDA Publisher (nightly)" url="http://www.unidata.ucar.edu/software/idv/plugins/ramaddapluginNightly.jar" description="For latest nightly build" category="Miscellaneous"/>
 
 <plugin  category="Miscellaneous" name="UCAR Africa Initiative" description="A plugin for the UCAR Africa Initiative"  url="http://www.unidata.ucar.edu/software/idv/plugins/africaidv.jar"/>
 
