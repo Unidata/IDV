@@ -130,6 +130,14 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     public FlowPlanViewControl() {
         setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
+    
+	/**
+	 * Method to call if projection changes. Handle flowscale.
+	 */
+	public void projectionChanged() {
+		super.projectionChanged();
+		setFlowScale(flowScaleValue);
+	}
 
     /**
      * Get the color table widget label text.
