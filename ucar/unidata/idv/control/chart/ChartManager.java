@@ -656,7 +656,7 @@ public abstract class ChartManager implements ImageObserver {
 				new LinkedList<String>(DATE_FORMATS),
 				chartHolder.getDateFormat() == null ? df : chartHolder
 						.getDateFormat());
-		comps.add(chartHolder.dateFormatBox);
+		comps.add(GuiUtils.leftRight(chartHolder.dateFormatBox, GuiUtils.filler())); 
     }
 
 
