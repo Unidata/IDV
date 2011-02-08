@@ -172,6 +172,15 @@ public abstract class XmlUtil {
         return " " + name + "=" + quote(encodeString(value)) + " ";
     }
 
+    public static String attrs(String []attrs) {
+        StringBuffer a = new StringBuffer();
+        for (int i = 0; i < attrs.length; i += 2) {
+            a.append(attr(attrs[i],attrs[i+1]));
+        }
+        return a.toString();
+    }
+
+
     /**
      * _more_
      *
@@ -2400,7 +2409,8 @@ public abstract class XmlUtil {
      */
     private static void printTags(Element node, HashSet<String> seen,
                                   StringBuffer tagBuff,
-                                  StringBuffer attrBuff) {
+                                  StringBuffer attrBuff,
+                                  StringBuffer topBuff) {
         String tagName = node.getTagName();
         if ( !seen.contains("tag:" + tagName)) {
             seen.add("tag:" + tagName);
@@ -2413,6 +2423,17 @@ public abstract class XmlUtil {
             for (int i = 0; i < nnm.getLength(); i++) {
                 Attr   attr     = (Attr) nnm.item(i);
                 String attrName = attr.getName();
+                if (attrName.startsWith("xmlns")) {
+                    seen.add("attr:" + attrName);
+                    String value = attr.getNodeValue();
+                    attrName = attrName.replace(":","_");
+                    topBuff.append("public static final String XMLNS_"
+                                    + attrName.toUpperCase() + " = \""
+                                    + value+ "\";\n");
+                    
+                    continue;
+                }
+
                 if ((attrName.indexOf(":") < 0)
                         && !seen.contains("attr:" + attrName)) {
                     seen.add("attr:" + attrName);
@@ -2426,7 +2447,7 @@ public abstract class XmlUtil {
         NodeList elements = getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            printTags(child, seen, tagBuff, attrBuff);
+            printTags(child, seen, tagBuff, attrBuff,topBuff);
         }
     }
 
@@ -2442,7 +2463,9 @@ public abstract class XmlUtil {
             Element      root     = getRoot(xml);
             StringBuffer tagBuff  = new StringBuffer();
             StringBuffer attrBuff = new StringBuffer();
-            printTags(root, seen, tagBuff, attrBuff);
+            StringBuffer topBuff = new StringBuffer();
+            printTags(root, seen, tagBuff, attrBuff, topBuff);
+            System.out.println(topBuff);
             System.out.println(tagBuff);
             System.out.println(attrBuff);
         } catch (Exception exc) {
