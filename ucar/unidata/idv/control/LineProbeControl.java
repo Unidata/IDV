@@ -411,7 +411,7 @@ public abstract class LineProbeControl extends GridDisplayControl {
         probeMenu.add(posMenu);
         posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position", this,
                                           "resetProbePosition"));
-
+        probeMenu.add(doMakeChangeColorMenu());
         JMenu sizeMenu = new JMenu("Size");
         probeMenu.add(sizeMenu);
 
