@@ -72,6 +72,13 @@ public class Clause {
     public static final String EXPR_LE = "<=";
 
     /** _more_ */
+    public static final String EXPR_LT = "<";
+
+
+    /** _more_ */
+    public static final String EXPR_GT = ">";
+
+    /** _more_ */
     public static final String EXPR_NOTEQUALS = "<>";
 
     /** _more_ */
@@ -308,6 +315,13 @@ public class Clause {
         return new Clause(column, EXPR_GE, value);
     }
 
+    public static Clause gt(String column, Object value) {
+        return new Clause(column, EXPR_GT, value);
+    }
+
+    public static Clause lt(String column, Object value) {
+        return new Clause(column, EXPR_LT, value);
+    }
     /**
      * _more_
      *
