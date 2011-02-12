@@ -2952,6 +2952,8 @@ Misc.run(new Runnable() {
         //Sometime we need to have this be a property or some xml format
         encoder.addClassPatternReplacement("ucar.unidata.apps.geon","org.unavco.idv.geon");
         encoder.addClassPatternReplacement("ucar.unidata.repository","org.ramadda.repository");
+        encoder.addClassPatternReplacement("org.ramadda.repository.idv.RamaddaPublisher","org.ramadda.geodata.publisher.RamaddaPublisher");
+
 
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
