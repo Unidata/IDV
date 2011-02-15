@@ -530,14 +530,14 @@ public class GeoGridAdapter {
 
         boolean          needToWrapLon = false;
         //if (yIsLinear) {
-            if (isLatLon) {
-                xIsLinear = checkLinearity(xAxis, true);
-                if (xIsLinear) {
-                    needToWrapLon = checkNeedToWrapLon(xAxis);
-                }
-            } else {
-                xIsLinear = checkLinearity(xAxis, false);
+        if (isLatLon) {
+            xIsLinear = checkLinearity(xAxis, true);
+            if (xIsLinear) {
+                needToWrapLon = checkNeedToWrapLon(xAxis);
             }
+        } else {
+            xIsLinear = checkLinearity(xAxis, false);
+        }
         //}
         isLinear = isLinear && xIsLinear;
 
@@ -783,13 +783,36 @@ public class GeoGridAdapter {
                     }
                     lengths = new int[] { sizeX, sizeY };
                 } else {  // CoordinateAxis2D
-                    int[]      shape = xAxis.getShape();
-                    double[][] vals  = {
-                        ((CoordinateAxis2D) xAxis).getCoordValues(),
-                        ((CoordinateAxis2D) yAxis).getCoordValues()
-                    };
-                    coordData = Set.doubleToFloat(vals);
-                    lengths   = new int[] { shape[1], shape[0] };
+                    /*
+                int[]      shape = xAxis.getShape();
+                double[][] vals  = {
+                    ((CoordinateAxis2D) xAxis).getCoordValues(),
+                    ((CoordinateAxis2D) yAxis).getCoordValues()
+                };
+                coordData = Set.doubleToFloat(vals);
+                */
+                    int[]            shape   = xAxis.getShape();
+                    int              iBounds = shape[0];
+                    int              jBounds = shape[1];
+                    CoordinateAxis2D xAxis2D = (CoordinateAxis2D) xAxis;
+                    CoordinateAxis2D yAxis2D = (CoordinateAxis2D) yAxis;
+
+                    Trace.call1("GeoGridAdapter.getCoordValues");
+                    xAxis2D.getCoordValue(0, 0);
+                    yAxis2D.getCoordValue(0, 0);
+                    Trace.call2("GeoGridAdapter.getCoordValues");
+                    float[] coordData0 = coordData[0];
+                    float[] coordData1 = coordData[1];
+                    for (int i = 0; i < iBounds; i++) {
+                        for (int j = 0; j < jBounds; j++) {
+                            coordData0[idx] =
+                                (float) xAxis2D.getCoordValue(i, j);
+                            coordData1[idx] =
+                                (float) yAxis2D.getCoordValue(i, j);
+                            idx++;
+                        }
+                    }
+                    lengths = new int[] { shape[1], shape[0] };
                 }
                 units = new Unit[] { xUnit, yUnit };
             } else {  // 3D set
@@ -1005,7 +1028,7 @@ public class GeoGridAdapter {
                             jj        = i + j * (xl + 1);
                             valsT[jj] = vals[ii];
                         }
-                        valsT[jj + 1] = valsT[j*xl];
+                        valsT[jj + 1] = valsT[j * xl];
                     }
                 } else if (dl.length == 3) {
                     int yl = dl[1];
