@@ -1198,6 +1198,34 @@ public class GridUtil {
                     }
                 }
             }
+            int[] newSizes = (domainSet.getManifoldDimension() == 3)
+                             ? new int[] { newSizeX, newSizeY, newSizeZ }
+                             : new int[] { newSizeX, newSizeY };
+            try {
+                subDomain = GriddedSet.create(domainSet.getType(),
+                        subSamples, newSizes,
+                        domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors(),
+                        false, true);
+            } catch (SetException se) {
+                // if a SetException is thrown, then it's possible that the 
+                // samples are missing or inconsistent.  Try again with 
+                // test = false
+                String msg = se.getMessage();
+                if ((msg.indexOf("form a valid grid") >= 0)
+                        || (msg.indexOf("may not be missing") >= 0)) {
+                    subDomain = GriddedSet.create(domainSet.getType(),
+                            subSamples, newSizes,
+                            domainSet.getCoordinateSystem(),
+                            domainSet.getSetUnits(),
+                            domainSet.getSetErrors(), false, false);
+                } else {
+                    throw new VisADException(se);
+                }
+            }
+
+
+            /*
             if (domainSet.getDimension() == 2) {
                 subDomain = new Gridded2DSet(domainSet.getType(), subSamples,
                                              newSizeX, newSizeY,
@@ -1218,6 +1246,7 @@ public class GridUtil {
                                              domainSet.getSetUnits(),
                                              domainSet.getSetErrors(), false);
             }
+            */
         }
 
         return ((subDomain.getDimension() == 3)
