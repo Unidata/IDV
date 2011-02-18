@@ -74,11 +74,12 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     TrajectoryFeatureCollection tfc;
 
     /** _more_ */
-    List<TrajectoryFeatureBean> obsList;
+    List<PointFeature> obsList;
 
     /** _more_ */
     double[] times;
 
+    int positive = 1;
     /**
      * ctor
      *
@@ -142,16 +143,23 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
         PointFeatureCollectionIterator iter =
             tfc.getPointFeatureCollectionIterator(-1);
-        obsList = new ArrayList<TrajectoryFeatureBean>();
-
-
+        obsList = new ArrayList<PointFeature>();
+        TrajectoryFeatureBean trajBean = null;
+        int iii = 0;
         while (iter.hasNext()) {
             PointFeatureCollection pob = iter.next();
-            TrajectoryFeatureBean trajBean =
+            trajBean =
                 new TrajectoryFeatureBean((TrajectoryFeature) pob);
-            if (trajBean.pf != null) {  // may have missing values
-                obsList.add(trajBean);
+            List pfs = trajBean.pfs;
+            int psize = pfs.size();
+            for(int i=0; i<psize; i++) {
+                 obsList.add((PointFeature)pfs.get(i));
+                 iii++;
             }
+            //if (trajBean.pf != null) {  // may have missing values
+
+
+            //}
             /*    pob.resetIteration();
                 try {
                     while (pob.hasNext()) {
@@ -162,8 +170,8 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 }        */
         }
 
-        TrajectoryFeatureBean         pf      = obsList.get(0);
-        StructureData                 pfsd    = pf.pf.getData();
+       // TrajectoryFeatureBean         pf      = obsList.get(0);
+        StructureData                 pfsd    = trajBean.pf.getData();
         List<StructureMembers.Member> members = pfsd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             StructureMembers.Member mb   = members.get(i);
@@ -185,9 +193,14 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.KILOMETER)) {
                 if (mb.getName().equalsIgnoreCase("ALTITUDE")
-                        || mb.getName().equalsIgnoreCase("DEPTH")
                         || mb.getName().equalsIgnoreCase("ALT")) {
 
+                    addVariable(new VarInfo(mb.getName(),
+                                            mb.getDescription(), "Basic",
+                                            unit));
+                    varAltitude = mb.getName();
+                } else if ( mb.getName().equalsIgnoreCase("DEPTH")) {
+                    positive = -1;
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), "Basic",
                                             unit));
@@ -232,7 +245,9 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
 
-
+    protected Unit getTimeUnit() throws Exception {
+        return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
+    }
 
     /**
      * Get TrajectoryObsDatatype
@@ -251,9 +266,9 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected Range getDataRange() throws Exception {
-        TrajectoryFeatureBean tfb   = obsList.get(0);
-        List                  ls    = tfb.pfs;
-        Range                 range = new Range(0, ls.size() - 1);
+       // TrajectoryFeatureBean tfb   = obsList.get(0);
+       // List                  ls    = tfb.pfs;
+        Range                 range = new Range(0, obsList.size() - 1);
         return range;
     }
 
@@ -283,6 +298,15 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     }
 
+    public double[] getTimeVals(Range range) throws Exception {
+        /*double[] timeVals = (double[]) cachedTimeVals.get(range);
+        if (timeVals == null) {
+            timeVals = getTime(range);
+            cachedTimeVals.put(range, timeVals);
+        }    */
+
+        return getTime(range); //timeVals;
+    }
     /**
      * _more_
      *
@@ -291,7 +315,8 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[0]);
+                startTime = new DateTime(times[1],
+                                 getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
@@ -305,7 +330,7 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     public DateTime getEndTime() {
         if (endTime == null) {
             try {
-                endTime = new DateTime(times[times.length - 1]);
+                endTime = new DateTime(times[times.length - 1],getTimeUnit());
             } catch (Exception e) {}
         }
         return endTime;
@@ -455,11 +480,22 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception _more_
      */
     protected float[] getAltitude(Range range) throws Exception {
-        float[] fdata = null;  //getData("DEPTH");
+        float[]   fdata = new float[range.length()];
 
-        TrajectoryFeatureBean tfb = obsList.get(0);
-        fdata = tfb.getAltitudes(range);
+     //  TrajectoryFeatureBean tfb = obsList.get(0);
+     //   fdata = tfb.getAltitudes(range);
+        int      first  = range.first();
+        int      stride = range.stride();
+        int      last   = range.last();
 
+        int      i      = first;
+        int      j      = 0;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
+
+            fdata[j++] = (float)pf.getLocation().getAltitude() * positive;
+            i          = i + stride;
+        }
 
         return fdata;
     }
@@ -474,11 +510,23 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception _more_
      */
     protected float[] getLatitude(Range range) throws Exception {
-        float[] fdata = null;  //getData("DEPTH");
+        float[]   fdata = new float[range.length()];
 
-        TrajectoryFeatureBean tfb = obsList.get(0);
-        fdata = tfb.getLatitudes(range);
+        //TrajectoryFeatureBean tfb = obsList.get(0);
+        //fdata = tfb.getLatitudes(range);
 
+        int      first  = range.first();
+        int      stride = range.stride();
+        int      last   = range.last();
+
+        int      i      = first;
+        int      j      = 0;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
+
+            fdata[j++] = (float)pf.getLocation().getLatitude();
+            i          = i + stride;
+        }
 
         return fdata;
     }
@@ -493,13 +541,26 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception _more_
      */
     protected float[] getLongitude(Range range) throws Exception {
-        float[] fdata = null;  //getData("DEPTH");
+        float[]   fdata = new float[range.length()];
 
-        TrajectoryFeatureBean tfb = obsList.get(0);
-        fdata = tfb.getLongitudes(range);
+        //TrajectoryFeatureBean tfb = obsList.get(0);
+        //fdata = tfb.getLongitudes(range);
 
+        int      first  = range.first();
+        int      stride = range.stride();
+        int      last   = range.last();
+
+        int      i      = first;
+        int      j      = 0;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
+
+            fdata[j++] = (float)pf.getLocation().getLongitude();
+            i          = i + stride;
+        }
 
         return fdata;
+
     }
 
     /**
@@ -514,8 +575,22 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      */
     public float[] getFloatData(Range range, String var) throws Exception {
         float[]               fdata = new float[range.length()];
-        TrajectoryFeatureBean tfb   = obsList.get(0);
-        fdata = tfb.getFloatData(range, var);
+        //TrajectoryFeatureBean tfb   = obsList.get(0);
+        //fdata = tfb.getFloatData(range, var);
+        int      first  = range.first();
+        int      stride = range.stride();
+        int      last   = range.last();
+
+        int      i      = first;
+        int      j      = 0;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
+            StructureData pfsd = pf.getData();
+                      
+            fdata[j++] = pfsd.convertScalarFloat(var);
+            i          = i + stride;
+        }
+
         return fdata;
     }
 
@@ -532,8 +607,22 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     public double[] getDoubleData(Range range, String var) throws Exception {
         double[]              fdata = new double[range.length()];
-        TrajectoryFeatureBean tfb   = obsList.get(0);
-        fdata = tfb.getDoubleData(range, var);
+        //TrajectoryFeatureBean tfb   = obsList.get(0);
+        //fdata = tfb.getDoubleData(range, var);
+        int      first  = range.first();
+        int      stride = range.stride();
+        int      last   = range.last();
+
+        int      i      = first;
+        int      j      = 0;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
+            StructureData pfsd = pf.getData();
+
+            fdata[j++] = pfsd.getScalarDouble(var);
+            i          = i + stride;
+        }
+
         return fdata;
     }
 
@@ -556,8 +645,8 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
         int      i      = first;
         int      j      = 0;
-        while (i < last) {
-            PointFeature  pf   = obsList.get(i).pf;
+        while (i <= last) {
+            PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
             sdata[j++] = pfsd.getScalarString(var);
