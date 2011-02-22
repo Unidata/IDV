@@ -1143,9 +1143,20 @@ public class GeoGridAdapter {
      * @return data for all the times for a particular 2D field
      */
     public FieldImpl getSequence(int[] timeIndices, Object loadId) {
-        return makeSequence(timeIndices, loadId);
+        return makeSequence(timeIndices, null, loadId);
     }
 
+    /**
+     * Get a time ordered sequence of 2D flat fields
+     *
+     * @param timeIndices  indices of times in the data
+     * @param loadId  loadId
+     *
+     * @return data for all the times for a particular 2D field
+     */
+    public FieldImpl getSequence(int[] timeIndices, int[] memberIndices, Object loadId) {
+        return makeSequence(timeIndices, memberIndices, loadId);
+    }
     /**
      * Get all the data from this GeoGrid.
      *
@@ -1352,7 +1363,7 @@ public class GeoGridAdapter {
      * time order, for the particular parameter loaded in this GeoGridAdapter.
      */
     private FieldImpl makeSequence(int[] timeIndices) {
-        return makeSequence(timeIndices, null);
+        return makeSequence(timeIndices, null, null);
     }
 
     /**
@@ -1364,7 +1375,7 @@ public class GeoGridAdapter {
      * @return all grid data for all the times requested, in proper increasing
      * time order, for the particular parameter loaded in this GeoGridAdapter.
      */
-    private FieldImpl makeSequence(int[] timeIndices, Object loadId) {
+    private FieldImpl makeSequence(int[] timeIndices, int[] memberIndices, Object loadId) {
 
         FieldImpl data = null;
 
@@ -1434,11 +1445,12 @@ public class GeoGridAdapter {
 
                     final int      theTimeIndex = times[i];
                     final DateTime theTime      = time;
+                    final int[] theMemberIndices = memberIndices;
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             readTimeStep(theTimeIndex, theTime, readLabel,
                                          gridMap, sampleRanges,
-                                         lazyEvaluation);
+                                         lazyEvaluation, theMemberIndices);
                         }
                     });
                     try {
@@ -1515,20 +1527,22 @@ public class GeoGridAdapter {
      */
     private void readTimeStep(int timeIndex, DateTime time, String readLabel,
                               TreeMap gridMap, Range[][] sampleRanges,
-                              boolean lazyEvaluation)
+                              boolean lazyEvaluation, int[] memberIndices)
             throws Exception {
         Dimension    ensDim = geoGrid.getEnsembleDimension();
         Integer1DSet ensSet = null;
         FieldImpl    sample = null;
         int          numEns = 1;
-        if ((ensDim != null) && (ensDim.getLength() > 1)) {
-            numEns = ensDim.getLength();
+        if ((memberIndices != null) && (memberIndices.length > 1)) {
+            numEns = memberIndices.length; //ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
                                       numEns);
         }
         for (int i = 0; i < numEns; i++) {
-
-            CachedFlatField oneTime = getFlatField(timeIndex, i, readLabel);
+            int ii = i;
+            if(memberIndices != null)
+                ii = memberIndices[i];
+            CachedFlatField oneTime = getFlatField(timeIndex, ii, readLabel);
             synchronized (sampleRanges) {
                 if (sampleRanges[0] == null) {
                     sampleRanges[0] =

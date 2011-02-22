@@ -32,6 +32,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
+import ucar.nc2.util.NamedAnything;
 
 import ucar.nc2.dataset.*;
 import ucar.nc2.dt.GridCoordSystem;
@@ -68,21 +69,7 @@ import ucar.unidata.xml.*;
 import ucar.visad.Util;
 
 
-import visad.Data;
-import visad.DataReference;
-import visad.DateTime;
-import visad.Field;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FunctionType;
-import visad.Gridded3DSet;
-import visad.MathType;
-import visad.Real;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.Set;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -140,7 +127,8 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
-
+    /** grid ensemble members */
+    public static final String PROP_GRIDMEMBERS = "prop.gridmembers";
     /** property timesize */
     public static final String PROP_TIMESIZE = "prop.timesize";
 
@@ -1754,7 +1742,14 @@ public class GeoGridDataSource extends GridDataSource {
         Trace.call1("GeoGridDataSource.make times");
         List times = getTimesFromDataSelection(givenDataSelection,
                          dataChoice);
-
+        List members = (List)givenDataSelection.getProperty(PROP_GRIDMEMBERS);
+        int [] membersIndices = null;
+        if(members != null){
+            int msize = members.size();
+            membersIndices = new int[msize];
+            for(int i = 0; i< msize; i++)
+                membersIndices[i] = ((Integer) members.get(i)).intValue();
+        }
         int[] timeIndices = null;
         List  allTimes    = null;
         if (times != null) {
@@ -1794,7 +1789,10 @@ public class GeoGridDataSource extends GridDataSource {
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
         if (adapter != null) {
-            fieldImpl = adapter.getSequence(timeIndices, loadId);
+            if(membersIndices != null && membersIndices.length > 0)
+                fieldImpl = adapter.getSequence(timeIndices, membersIndices, loadId);
+            else
+                fieldImpl = adapter.getSequence(timeIndices, loadId);
         }
 
         if (fieldImpl == null) {
@@ -1946,6 +1944,7 @@ public class GeoGridDataSource extends GridDataSource {
                 //if (sizeZ == 0) {
                 int xLength = cfield.getXDimension().getLength();
                 int yLength = cfield.getYDimension().getLength();
+                ucar.nc2.Dimension ensDim = cfield.getEnsembleDimension();
                 if (twoDDimensionsLabel == null) {
                     twoDDimensionsLabel = "Total grid size:  x: " + xLength
                                           + "  y: " + yLength
@@ -1956,6 +1955,25 @@ public class GeoGridDataSource extends GridDataSource {
                 props.put(PROP_GRIDSIZE, new ThreeDSize(xLength, yLength));
                 if (geoTimes != null) {
                     props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                }
+                if( (ensDim != null)  && (ensDim.getLength() > 1)){
+                    List   ensMembers = null;
+                    CoordinateAxis1D eAxis    = gcs.getEnsembleAxis();
+                    int numEns = ensDim.getLength();
+                    if(ensMembers == null && eAxis != null){
+                          ensMembers = eAxis.getNames();
+                    }
+                    int [] ids = new int[numEns];
+                    String [] enames = new String[numEns];
+                    for(int i=0; i< numEns; i++) {
+                        ids[i] = i;
+                        NamedAnything na = (NamedAnything)ensMembers.get(i);
+                        enames[i] =  na.toString();
+                    }
+                    List ensSet =  TwoFacedObject.createList(ids, enames) ;
+                    props.put(PROP_GRIDMEMBERS,ensSet );
+
+
                 }
                 categories = (tAxis == null)
                              ? getTwoDCategories()
@@ -1973,6 +1991,7 @@ public class GeoGridDataSource extends GridDataSource {
                 int xLength = cfield.getXDimension().getLength();
                 int yLength = cfield.getYDimension().getLength();
                 int zLength = cfield.getZDimension().getLength();
+                ucar.nc2.Dimension ensDim = cfield.getEnsembleDimension();
                 if (xLength * yLength * zLength > max3D) {
                     max3D  = xLength * yLength * zLength;
                     max3DX = xLength;
@@ -1984,6 +2003,25 @@ public class GeoGridDataSource extends GridDataSource {
                 props.put(PROP_GRIDSIZE, size);
                 if (geoTimes != null) {
                     props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                }
+                if( (ensDim != null)  && (ensDim.getLength() > 1)){
+                    List   ensMembers = null;
+                    CoordinateAxis1D eAxis    = gcs.getEnsembleAxis();
+                    int numEns = ensDim.getLength();
+                    if(ensMembers == null && eAxis != null){
+                          ensMembers = eAxis.getNames();
+                    }
+                    int [] ids = new int[numEns];
+                    String [] enames = new String[numEns];
+                    for(int i=0; i< numEns; i++) {
+                        ids[i] = i;
+                        NamedAnything na = (NamedAnything)ensMembers.get(i);
+                        enames[i] =  na.toString();
+                    }
+                    List ensSet =  TwoFacedObject.createList(ids, enames) ;
+                    props.put(PROP_GRIDMEMBERS,ensSet );
+
+
                 }
                 /*
                 choice = new DirectDataChoice(this, parmName, pseudoName,

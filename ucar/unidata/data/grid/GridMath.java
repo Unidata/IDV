@@ -271,15 +271,14 @@ public class GridMath {
      * Average the grid over member
      *
      * @param grid   ensemble grid to average
-     * @param makeTimes If true then make a time field with the range being the same computed value
      * If false then just return a single field of the computed values
      * @return the new field
      *
      * @throws VisADException  On badness
      */
-    public static FieldImpl averageOverMembers(FieldImpl grid, boolean makeTimes)
+    public static FieldImpl averageOverMembers(FieldImpl grid)
             throws VisADException {
-        return applyFunctionOverMembers(grid, FUNC_AVERAGE, makeTimes);
+        return applyFunctionOverMembers(grid, FUNC_AVERAGE);
     }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
@@ -547,15 +546,13 @@ public class GridMath {
      *
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
-     * @param makeTimes If true then make a time field with the range
-     *                  being the same computed value. If false then just
-     *                  return a single field of the computed values
+     * 
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     public static FieldImpl applyFunctionOverMembers(FieldImpl grid,
-            String function, boolean makeTimes)
+            String function)
             throws VisADException {
         try {
 
@@ -642,10 +639,6 @@ public class GridMath {
 
             }
 
-            if (makeTimes) {
-                return (FieldImpl) Util.makeTimeField(newGrid,
-                        GridUtil.getDateTimeList(grid));
-            }
 
             return newGrid;
 
