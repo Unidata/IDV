@@ -101,6 +101,9 @@ public class DataSelectionWidget {
     /** JList that shows the times that can be selected */
     JList timesList;
 
+    /** JList that shows the members that can be selected */
+    JList membersList;
+
     /** The times list component */
     JComponent timesComponent;
 
@@ -130,14 +133,11 @@ public class DataSelectionWidget {
     /** Area Checkbox */
     private JCheckBox areaCbx;
 
-
     /** Stride Component */
     private JComponent strideComponent;
 
     /** Area Component */
     private JComponent areaComponent;
-
-
 
     /** Holds the area subset */
     private JPanel areaTab;
@@ -157,12 +157,17 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
+    /** Current list of ensemble members */
+    private List<TwoFacedObject> members;
+
     /** levels from display */
     private List levelsFromDisplay;
 
     /** default level to first */
     private boolean defaultLevelToFirst = true;
 
+    /** default member to all */
+    private boolean defaultMemberToAll = true;
 
     /** Shows the levels */
     private JList levelsList;
@@ -170,9 +175,14 @@ public class DataSelectionWidget {
     /** Scrolls the levels list */
     private JScrollPane levelsScroller;
 
+    /** Scrolls the ensemble members list */
+    private JScrollPane membersScroller;
 
     /** Holds the levels list */
     private JComponent levelsTab;
+
+    /** Holds the ensemble members list */
+    private JComponent membersTab;
 
     /** Last data source we were displaying for */
     private DataSource lastDataSource;
@@ -402,6 +412,53 @@ public class DataSelectionWidget {
         }
 
 
+        members = (List) dc.getProperty("prop.gridmembers");
+        if(members != null && (members.size() > 1)){
+            if (membersList == null) {
+                membersList = new JList();
+                //                lastLevel  = idv.getStore().get("idv.dataselector.level");
+                membersList.setSelectionMode(
+                    ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                membersScroller = GuiUtils.makeScrollPane(membersList, 300,
+                        100);
+                membersTab = membersScroller;
+            }
+            Vector membersForGui = new Vector();
+            if (levelsFromDisplay == null) {
+                membersForGui.add(new TwoFacedObject("All Members", null));
+            }
+            for (int i = 0; i < members.size(); i++) {
+                Object o = members.get(i);
+                membersForGui.add(o);
+            }
+
+            Object[] selectedMembers = membersList.getSelectedValues();
+            if ((selectedMembers == null) || (selectedMembers.length == 0)) {
+                List dcMembers =
+                    (List) dc.getProperty("prop.gridmembers");
+                if ((dcMembers != null) && !dcMembers.isEmpty()) {
+                    selectedMembers = dcMembers.toArray();
+                }
+            }
+
+
+            
+            membersList.setListData(membersForGui);
+
+            if (membersForGui.size() > 1) {
+                if (defaultMemberToAll) {
+                    membersList.setSelectedIndex(0);
+                } else {
+                    membersList.setSelectedIndex(1);
+                }
+            } else {
+                membersList.setSelectedIndex(0);
+            }
+
+            selectionTab.add(membersTab, "Ensemble", 0);
+        }
+
+
         levels = ((levelsFromDisplay != null)
                   ? levelsFromDisplay
                   : dc.getAllLevels(
@@ -615,6 +672,13 @@ public class DataSelectionWidget {
             }
         }
 
+        List selectedMembers = getSelectedMembers();
+        if(selectedMembers != null && selectedMembers.size() > 0){
+            Hashtable     props        = new Hashtable();
+            props.put("prop.gridmembers", selectedMembers);
+            dataSelection.setProperties(props);
+        }
+
         return dataSelection;
     }
 
@@ -778,7 +842,24 @@ public class DataSelectionWidget {
         return getSelectedDateTimesInList();
     }
 
+    /**
+     *  Return a list of Integer indices of the selected members.
+     *
+     *  @return List of indices.
+     */
+    public List getSelectedMembers() {
+        if(membersList == null)
+            return null;
+        List selected = Misc.toList(membersList.getSelectedValues());
 
+        int ssize = selected.size();
+        for(int i = 0; i<ssize; i++){
+            TwoFacedObject to = (TwoFacedObject)selected.get(i);
+            if( to.getLabel() == "All Members")
+                return Misc.getIndexList(members, members);
+        }
+        return Misc.getIndexList(selected, members);
+    }
     /**
      * Get selected times in the list
      *
@@ -998,7 +1079,7 @@ public class DataSelectionWidget {
                                   GuiUtils.topCenter(top, scroller) };
     }
 
-
+    
     /**
      * Set levels from the display
      *
@@ -1028,7 +1109,20 @@ public class DataSelectionWidget {
     public boolean getDefaultLevelToFirst() {
         return defaultLevelToFirst;
     }
-
-
-
+     /**
+     * Get the DefaultMemberToAll property.
+     *
+     * @return The DefaultMemberToAll
+     */
+    public void setDefaultMemberToAll(boolean value) {
+        defaultMemberToAll = value;
+    }
+     /**
+     * Get the DefaultMemberToAll property.
+     *
+     * @return The DefaultMemberToAll
+     */
+    public boolean getDefaultMemberToAll() {
+        return defaultMemberToAll;
+    }
 }
