@@ -267,7 +267,20 @@ public class GridMath {
         return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
     }
 
-
+    /**
+     * Average the grid over member
+     *
+     * @param grid   ensemble grid to average
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl averageOverMembers(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, FUNC_AVERAGE, makeTimes);
+    }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
      * Any time steps up to the offset time are set to missing
@@ -519,6 +532,123 @@ public class GridMath {
                         GridUtil.getDateTimeList(grid));
             }
             return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException(
+                "RemoteException in applyFunctionOverTime");
+        }
+
+    }
+
+    /**
+     * Apply the function to the ens members of the given grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @param makeTimes If true then make a time field with the range
+     *                  being the same computed value. If false then just
+     *                  return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverMembers(FieldImpl grid,
+            String function, boolean makeTimes)
+            throws VisADException {
+        try {
+
+            FieldImpl newGrid = null;
+            if ( !GridUtil.isTimeSequence(grid)) {
+                newGrid = (FlatField) grid.clone();
+                //todo
+                return newGrid;
+            }
+            final boolean doMax        = function.equals(FUNC_MAX);
+            final boolean doMin        = function.equals(FUNC_MIN);
+
+            final Set     timeDomain   = Util.getDomainSet(grid);
+            int           numMembers = 0;
+            TupleType    rangeType  = null;
+            TupleType    newRangeType = null;
+
+            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+                    timeStepIdx++) {
+                FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
+                FlatField newField ;
+                Set ensDomain = sample.getDomainSet();
+                numMembers = ensDomain.getLength();
+                GriddedSet newDomain  = null;
+                float[][]     values       = null;
+
+                for (int k = 0; k < numMembers; k++) {
+                    FlatField innerField = (FlatField) sample.getSample(k, false);
+                    if (innerField == null) {
+                        continue;
+                    }
+                    newDomain = (GriddedSet) GridUtil.getSpatialDomain(innerField);
+
+                    if (newRangeType == null) {
+                        newRangeType = GridUtil.makeNewParamType(GridUtil.getParamType(innerField),
+                                          "_" + function);
+                    }
+
+                    float[][] ensStepValues = innerField.getFloats(false);
+                    if (values == null) {
+                        values  = Misc.cloneArray(ensStepValues);
+                        continue;
+                    }
+                    for (int i = 0; i < ensStepValues.length; i++) {
+                        for (int j = 0; j < ensStepValues[i].length; j++) {
+                            float value = ensStepValues[i][j];
+                            if (value != value) {
+                                continue;
+                            }
+                            if (doMax) {
+                                values[i][j] = Math.max(values[i][j], value);
+                            } else if (doMin) {
+                                values[i][j] = Math.min(values[i][j], value);
+                            } else {
+                                values[i][j] += value;
+                            }
+                        }
+                    }
+
+                }
+                // do the math
+                if (function.equals(FUNC_AVERAGE) && (numMembers > 0)) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = values[i][j] / numMembers;
+                        }
+                    }
+                }
+                FunctionType newFT = new FunctionType(((SetType) newDomain.getType()).getDomain(),
+                                 newRangeType);
+                newField = new FlatField(newFT, newDomain);
+                newField.setSamples(values, false);
+
+
+                if (newGrid == null) {
+                    FunctionType newFieldType =
+                        new FunctionType(
+                            ((SetType) timeDomain.getType()).getDomain(),
+                            newField.getType());
+                    newGrid = new FieldImpl(newFieldType, timeDomain);
+                }
+
+                newGrid.setSample(timeStepIdx, newField, false);
+
+            }
+
+            if (makeTimes) {
+                return (FieldImpl) Util.makeTimeField(newGrid,
+                        GridUtil.getDateTimeList(grid));
+            }
+
+            return newGrid;
+
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
         } catch (RemoteException re) {
