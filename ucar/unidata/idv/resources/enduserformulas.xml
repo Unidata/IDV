@@ -112,6 +112,19 @@
     <operands/>
   </derived>
   <derived
+     description="Ensemble average of grid member"
+     formula="ensembleAverageOverMembers(fieldimpl)"
+     id="ensGrid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="Grids"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
      description="Find latitude of grid points"
      formula="extractLatitudeFromNWPGrid(fieldimpl)"
      id="latitudeGrid"

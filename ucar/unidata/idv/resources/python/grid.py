@@ -81,7 +81,9 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
   ff = GridUtil.sliceAtLevel(fieldimpl, altitude)
   return ff
 
-
+def ensembleAverageOverMembers(grid):
+   """ basic ensemble average """
+   return GridMath.averageOverMembers(grid)
 
 def layerAverage(grid, top, bottom):
    """ Wrapper for calculating layer average """
