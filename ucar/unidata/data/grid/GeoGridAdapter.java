@@ -1537,6 +1537,10 @@ public class GeoGridAdapter {
             numEns = memberIndices.length; //ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
                                       numEns);
+        } else if((ensDim != null) && (ensDim.getLength() > 1)) {
+            numEns = ensDim.getLength();
+            ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
+                                      numEns);
         }
         for (int i = 0; i < numEns; i++) {
             int ii = i;
