@@ -85,6 +85,10 @@ def ensembleAverageOverMembers(grid):
    """ basic ensemble average """
    return GridMath.averageOverMembers(grid)
 
+def ensembleStandardDeviation(grid):
+   """ basic ensemble average """
+   return GridMath.ensembleStandardDeviation(grid)
+
 def layerAverage(grid, top, bottom):
    """ Wrapper for calculating layer average """
    return DerivedGridFactory.createLayerAverage(grid, top, bottom)
