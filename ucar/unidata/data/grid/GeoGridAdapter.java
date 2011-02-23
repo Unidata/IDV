@@ -1533,7 +1533,7 @@ public class GeoGridAdapter {
         Integer1DSet ensSet = null;
         FieldImpl    sample = null;
         int          numEns = 1;
-        if ((memberIndices != null) && (memberIndices.length > 1)) {
+        if ((memberIndices != null) ){ //&& (memberIndices.length > 1)) {
             numEns = memberIndices.length; //ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
                                       numEns);
