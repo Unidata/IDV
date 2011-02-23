@@ -63,6 +63,8 @@ public class GridMath {
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_AVERAGE = "average";
 
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_STDEV = "standardDeviation";
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_SUM = "sum";
@@ -271,7 +273,7 @@ public class GridMath {
      * Average the grid over member
      *
      * @param grid   ensemble grid to average
-     * If false then just return a single field of the computed values
+     *
      * @return the new field
      *
      * @throws VisADException  On badness
@@ -279,6 +281,20 @@ public class GridMath {
     public static FieldImpl averageOverMembers(FieldImpl grid)
             throws VisADException {
         return applyFunctionOverMembers(grid, FUNC_AVERAGE);
+    }
+
+    /**
+     * ensemble Standard Deviation
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleStandardDeviation(FieldImpl grid)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, FUNC_STDEV);
     }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
@@ -578,7 +594,7 @@ public class GridMath {
                 numMembers = ensDomain.getLength();
                 GriddedSet newDomain  = null;
                 float[][]     values       = null;
-
+                float[][]     stdevs       = null;
                 for (int k = 0; k < numMembers; k++) {
                     FlatField innerField = (FlatField) sample.getSample(k, false);
                     if (innerField == null) {
@@ -621,6 +637,43 @@ public class GridMath {
                         }
                     }
                 }
+
+                if (function.equals(FUNC_STDEV) && (numMembers > 0)) {
+                    //cal the average
+                    stdevs = new float[values.length][values[0].length];
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = values[i][j] / numMembers;
+                        }
+                    }
+                    // diff * diff
+                    for (int k = 0; k < numMembers; k++) {
+                        FlatField innerField = (FlatField) sample.getSample(k, false);
+                        if (innerField == null) {
+                            continue;
+                        }
+
+                        float[][] ensStepValues = innerField.getFloats(false);
+                        for (int i = 0; i < ensStepValues.length; i++) {
+                            for (int j = 0; j < ensStepValues[i].length; j++) {
+                                float value = ensStepValues[i][j];
+                                if (value != value) {
+                                    continue;
+                                }
+                                stdevs[i][j] += (values[i][j] - value)*(values[i][j] - value);
+
+                            }
+                        }
+                    }
+                    values  = Misc.cloneArray(stdevs);
+                    // sqrt (v/n)
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = (float)Math.sqrt(values[i][j] / numMembers);
+                        }
+                    }
+                }
+
                 FunctionType newFT = new FunctionType(((SetType) newDomain.getType()).getDomain(),
                                  newRangeType);
                 newField = new FlatField(newFT, newDomain);
