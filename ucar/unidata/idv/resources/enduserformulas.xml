@@ -112,28 +112,28 @@
     <operands/>
   </derived>
   <derived
-     description="Ensemble average of grid member"
-     formula="ensembleAverageOverMembers(fieldimpl)"
-     id="ensGrid"
+     description="Ensemble average over all grid members"
+     formula="ens_savg(fieldimpl)"
+     id="ensSAVGGrid"
      isdefault="false"
      isenduser="true">
     <categories>
       <category
          display="true"
-         value="Grids"/>
+         value="Grids-Ensemble"/>
     </categories>
     <operands/>
   </derived>
   <derived
      description="Ensemble grid standard deviation"
-     formula="ensembleStandardDeviation(fieldimpl)"
-     id="ensGrid"
+     formula="ens_ssprd(fieldimpl)"
+     id="ensSTDEVGrid"
      isdefault="false"
      isenduser="true">
     <categories>
       <category
          display="true"
-         value="Grids"/>
+         value="Grids-Ensemble"/>
     </categories>
     <operands/>
   </derived>
