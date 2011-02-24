@@ -296,6 +296,34 @@ public class GridMath {
             throws VisADException {
         return applyFunctionOverMembers(grid, FUNC_STDEV);
     }
+
+    /**
+     * ensemble grid min values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleLowestValues(FieldImpl grid)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, FUNC_MIN);
+    }
+
+    /**
+     * ensemble grid max values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleHighestValues(FieldImpl grid)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, FUNC_MAX);
+    }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
      * Any time steps up to the offset time are set to missing
