@@ -630,7 +630,7 @@ public class GridMath {
 
                 }
                 // do the math
-                if (function.equals(FUNC_AVERAGE) && (numMembers > 0)) {
+                if (function.equals(FUNC_AVERAGE) && (numMembers > 1)) {
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
                             values[i][j] = values[i][j] / numMembers;
@@ -638,7 +638,7 @@ public class GridMath {
                     }
                 }
 
-                if (function.equals(FUNC_STDEV) && (numMembers > 0)) {
+                if (function.equals(FUNC_STDEV) && (numMembers > 1)) {
                     //cal the average
                     stdevs = new float[values.length][values[0].length];
                     for (int i = 0; i < values.length; i++) {
@@ -669,7 +669,7 @@ public class GridMath {
                     // sqrt (v/n)
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
-                            values[i][j] = (float)Math.sqrt(values[i][j] / numMembers);
+                            values[i][j] = (float)Math.sqrt(values[i][j] / (numMembers-1));
                         }
                     }
                 }
