@@ -114,7 +114,7 @@
   <derived
      description="Ensemble average over all grid members"
      formula="ens_savg(fieldimpl)"
-     id="ensSAVGGrid"
+     id="ENS_SAVG Grid"
      isdefault="false"
      isenduser="true">
     <categories>
@@ -127,7 +127,33 @@
   <derived
      description="Ensemble grid standard deviation"
      formula="ens_ssprd(fieldimpl)"
-     id="ensSTDEVGrid"
+     id="ENS_SSPRD Grid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="Grids-Ensemble"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Ensemble grid lowest values"
+     formula="ens_smin(fieldimpl)"
+     id="ENS_SMIN Grid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="Grids-Ensemble"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Ensemble grid highest values"
+     formula="ens_smax(fieldimpl)"
+     id="ENS_SMAX Grid"
      isdefault="false"
      isenduser="true">
     <categories>
