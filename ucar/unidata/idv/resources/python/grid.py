@@ -81,11 +81,11 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
   ff = GridUtil.sliceAtLevel(fieldimpl, altitude)
   return ff
 
-def ensembleAverageOverMembers(grid):
+def ens_savg(grid):
    """ basic ensemble average """
    return GridMath.averageOverMembers(grid)
 
-def ensembleStandardDeviation(grid):
+def ens_ssprd(grid):
    """ basic ensemble average """
    return GridMath.ensembleStandardDeviation(grid)
 
