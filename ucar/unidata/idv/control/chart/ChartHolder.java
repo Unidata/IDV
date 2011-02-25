@@ -29,10 +29,12 @@ import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -242,7 +244,10 @@ public class ChartHolder {
                     rangeLineState.getStroke());
             if (p.getDomainAxis() instanceof DateAxis && dateFormat != null){
             	final DateAxis ax = (DateAxis)p.getDomainAxis();
-            	ax.setDateFormatOverride(new SimpleDateFormat(dateFormat));
+            	final TimeZone tz = getChartManager().getControl().getIdv().getPreferenceManager().getDefaultTimeZone();
+            	final DateFormat df = new SimpleDateFormat(dateFormat);
+            	df.setTimeZone(tz);
+            	ax.setDateFormatOverride(df);
             }
         }
     }
