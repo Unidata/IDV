@@ -22,8 +22,6 @@
 
 package ucar.unidata.idv.control.chart;
 
-import static ucar.unidata.idv.IdvPreferenceManager.DATE_FORMATS;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
