@@ -456,6 +456,13 @@
          value="System"/>
     </resource>
     <resource
+       label="Ensemble grid routines"
+       location="%IDVPATH%/python/ensemble.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="Image routines"
        location="%IDVPATH%/python/image.py">
       <property
