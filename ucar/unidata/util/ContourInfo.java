@@ -1,26 +1,22 @@
 /*
- * $Id: ContourInfo.java,v 1.27 2007/05/03 19:29:42 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.util;
 
@@ -57,8 +53,11 @@ public class ContourInfo {
     /** Dash-Dot line */
     public static final int DASH_DOT_STYLE = 3;
 
-    /** Default contour line width */
+    /** Default contour line style */
     public final static int DEFAULT_DASHED_STYLE = DASH_STYLE;
+
+    /** Default label size */
+    public final static int DEFAULT_LABEL_SIZE = 12;
 
     /** contour interval */
     private float interval;
@@ -71,6 +70,12 @@ public class ContourInfo {
 
     /** Maximum contour value */
     private float max;
+
+    /** label (font) size */
+    private int labelSize = DEFAULT_LABEL_SIZE;
+
+    /** Font - uses Object because font may be a HersheyFont */
+    private Object font;
 
     /** Flag for labeled contours */
     private boolean isLabeled = DEFAULT_LABEL;
@@ -168,6 +173,30 @@ public class ContourInfo {
     public ContourInfo(String levelsString, float base, float min, float max,
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle) {
+        this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
+             width, DEFAULT_DASHED_STYLE, DEFAULT_LABEL_SIZE, null);
+    }
+
+    /**
+     * Construct an object to hold and transfer contour level settings,
+     * such as to and from the dialog box ContLevelDialog.
+     *
+     * @param levelsString   the contour levels as a string
+     * @param base           the contour level below which one line must have
+     * @param min            the lower limit of plotted contour values
+     * @param max            the upper limit of same
+     * @param labelOn        whether labels are
+     * @param dashOn         whether lines below base value are dashed or not
+     * @param isColorFilled  flag for color filling contours
+     * @param width          line width
+     * @param dashedStyle    dashedStyle
+     * @param labelSize      the label (font) size
+     * @param font           the font - Font or HersheyFont
+     */
+    public ContourInfo(String levelsString, float base, float min, float max,
+                       boolean labelOn, boolean dashOn,
+                       boolean isColorFilled, int width, int dashedStyle,
+                       int labelSize, Object font) {
 
         if (isIrregularInterval(levelsString)) {
             this.levelsString = levelsString;
@@ -184,7 +213,9 @@ public class ContourInfo {
         this.isColorFilled = isColorFilled;
         this.lineWidth     = width;
         this.dashedStyle   = dashedStyle;
+        this.font          = font;
     }
+
 
     /**
      * Construct an object to hold and transfer contour level settings,
@@ -316,6 +347,7 @@ public class ContourInfo {
      */
     public void processParamString(String params) {
         List toks = StringUtil.split(params, ";", true, true);
+        // TODO: how to specify font
         //interval=5;base=6;min=0;max=5
         if (params.indexOf("=") >= 0) {
             for (int i = 0; i < toks.size(); i++) {
@@ -340,6 +372,10 @@ public class ContourInfo {
                     lineWidth = new Integer(value).intValue();
                 } else if (name.equals("labels")) {
                     isLabeled = new Boolean(value).booleanValue();
+                } else if (name.equals("labelsize")) {
+                    labelSize = new Integer(value).intValue();
+                } else if (name.equals("font")) {
+                    //TODO: what should go here?
                 } else {
                     throw new IllegalArgumentException(
                         "Unknown ContourInfo parameter:" + name);
@@ -546,6 +582,8 @@ public class ContourInfo {
         this.isColorFilled = that.isColorFilled;
         this.lineWidth     = that.lineWidth;
         this.dashedStyle   = that.dashedStyle;
+        this.labelSize     = that.labelSize;
+        this.font          = that.font;
     }
 
 
@@ -577,6 +615,8 @@ public class ContourInfo {
         //??        this.isColorFilled = that.isColorFilled;
         this.lineWidth   = that.lineWidth;
         this.dashedStyle = that.dashedStyle;
+        this.labelSize   = that.labelSize;
+        this.font        = that.font;
     }
 
     /**
@@ -743,7 +783,43 @@ public class ContourInfo {
         return levels;
     }
 
+    /**
+     * Get the label (font) size.
+     *    
+     * @return the label (font) size
+     */
+    public int getLabelSize() {
+        return labelSize;
+    }
 
+    /**
+     * Get the label (font) size
+     *
+     * @param size the label (font) size
+     */
+    public void setLabelSize(int size) {
+        this.labelSize = size;
+    }
+
+
+
+    /**
+     *     Get the font.
+     *    
+     *     @return the font - null, Font, or HersheyFont
+     */
+    public Object getFont() {
+        return font;
+    }
+
+    /**
+     * Set the font.
+     *
+     * @param font the font to set - must be a Font or HersheyFont
+     */
+    public void setFont(Object font) {
+        this.font = font;
+    }
 
     /**
      * Clean up the user entered levels string
@@ -865,4 +941,3 @@ public class ContourInfo {
     }
 
 }
-

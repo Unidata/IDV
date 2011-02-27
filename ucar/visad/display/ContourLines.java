@@ -138,6 +138,16 @@ public abstract class ContourLines extends LineDrawing {
     /** dashed line style */
     private volatile int dashedStyle = GraphicsModeControl.DASH_STYLE;
 
+    /** default label scale factor */
+    private static final double DEFAULT_SIZE = 12.0;
+
+    /** label size factor */
+    private volatile double labelFactor = 1.;
+
+    /** label font */
+    private volatile Object labelFont = null;
+
+
     /**
      * The {@link visad.Unit} for the display.
      */
@@ -389,6 +399,7 @@ public abstract class ContourLines extends LineDrawing {
         setLabeling(contourInfo.getIsLabeled());
         setLineWidth(contourInfo.getLineWidth());
         setDashedStyle(contourInfo.getDashedStyle());
+        setFont(contourInfo.getFont(), contourInfo.getLabelSize());
         setActive(true);
     }
 
@@ -508,6 +519,33 @@ public abstract class ContourLines extends LineDrawing {
     }
 
     /**
+     * Set the font
+     * @param  font  the font name/weight
+     * @param  size  the label (font) size
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException Problem setting the dashed style
+     */
+    public void setFont(Object font, int size)
+            throws RemoteException, VisADException {
+
+        double factor = size / DEFAULT_SIZE;
+
+        if (font != null) {
+
+            if ((font != labelFont) || (factor != labelFactor)) {
+                labelFont   = font;
+                labelFactor = factor;
+
+                if (contourControl != null) {
+                    contourControl.setLabelFont(font);
+                    contourControl.setLabelSize(factor);
+                }
+            }
+        }
+    }
+
+    /**
      * Set the dashed style.
      * @return  dashed line style
      */
@@ -535,6 +573,8 @@ public abstract class ContourLines extends LineDrawing {
                         contourControl.enableLabels(labeling);
                         contourControl.setContourFill(colorFill);
                         contourControl.setDashedStyle(dashedStyle);
+                        contourControl.setLabelFont(labelFont);
+                        contourControl.setLabelSize(labelFactor);
                     }
                 }
             }

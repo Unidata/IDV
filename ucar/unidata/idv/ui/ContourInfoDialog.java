@@ -25,11 +25,17 @@ import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 import visad.Unit;
 
+import visad.util.HersheyFont;
+
 import java.awt.*;
 import java.awt.event.*;
+
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -88,6 +94,12 @@ public class ContourInfoDialog implements ActionListener {
 
     /** combobox for dash style */
     private JComboBox styleBox;
+
+    /** font selector */
+    private JComboBox fontBox;
+
+    /** font size selector */
+    private JComboBox fontSizeBox;
 
     /** title */
     private String title;
@@ -168,8 +180,6 @@ public class ContourInfoDialog implements ActionListener {
         }
 
 
-        toggleBtn = new JCheckBox("Labels");
-        toggleBtn.setToolTipText("Toggle contour labels");
         dashBtn = new JCheckBox("Dash:");
         dashBtn.setToolTipText("Dash contour lines if less than base");
 
@@ -188,6 +198,32 @@ public class ContourInfoDialog implements ActionListener {
                 styleBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
             }
         });
+        Vector   fonts  = GuiUtils.getFontList();
+        String[] hFonts = visad.util.TextControlWidget.getHersheyFontNames();
+        for (int i = 0; i < hFonts.length; i++) {
+            fonts.add(makeTwoFacedFont(new HersheyFont(hFonts[i])));
+        }
+        fonts.insertElementAt(makeTwoFacedFont(null), 0);
+        fontBox = new JComboBox(fonts);
+        fontBox.setToolTipText("Set the contour label font");
+        fontSizeBox = GuiUtils.doMakeFontSizeBox(12);
+        fontSizeBox.setToolTipText("Set the contour label size");
+
+        toggleBtn = new JCheckBox("Labels: ");
+        toggleBtn.setToolTipText("Toggle contour labels");
+        toggleBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                fontBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
+                fontSizeBox.setEnabled(
+                    ((JCheckBox) e.getSource()).isSelected());
+            }
+        });
+
+        Component[] labelcomps = new Component[] { GuiUtils.rLabel("Font:"),
+                GuiUtils.left(fontBox), GuiUtils.rLabel("Size:"),
+                GuiUtils.left(fontSizeBox), };
+        JPanel lp = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
+                                      GuiUtils.WT_N);
 
         Component[] comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
@@ -205,8 +241,7 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.rLabel("Line Width:"),
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
-            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn),
-            GuiUtils.filler()
+            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn), lp
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -290,6 +325,10 @@ public class ContourInfoDialog implements ActionListener {
                     "Contour interval too small for range");
                 return false;
             }
+            myInfo.setFont(
+                ((TwoFacedObject) fontBox.getSelectedItem()).getId());
+            myInfo.setLabelSize(
+                ((Integer) fontSizeBox.getSelectedItem()).intValue());
             return true;
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Incorrect number format");
@@ -352,6 +391,26 @@ public class ContourInfoDialog implements ActionListener {
         widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
         styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
         styleBox.setEnabled(myInfo.getDashOn());
+        fontBox.setSelectedItem(makeTwoFacedFont(myInfo.getFont()));
+        fontSizeBox.setSelectedItem(new Integer(myInfo.getLabelSize()));
+    }
+
+    /**
+     * Make a consistent TwoFacedFont object
+     *
+     * @param font  the font object (null, Font or HersheyFont)
+     *
+     * @return the corresponding TFO
+     */
+    private TwoFacedObject makeTwoFacedFont(Object font) {
+        if (font == null) {
+            return new TwoFacedObject("Default", font);
+        } else if (font instanceof Font) {
+            return GuiUtils.makeTwoFacedFont((Font) font);
+        } else if (font instanceof HersheyFont) {
+            return new TwoFacedObject(font.toString(), font);
+        }
+        return null;
     }
 
 
