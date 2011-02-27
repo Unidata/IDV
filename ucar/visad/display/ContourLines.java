@@ -531,7 +531,7 @@ public abstract class ContourLines extends LineDrawing {
 
         double factor = size / DEFAULT_SIZE;
 
-        if (font != null) {
+        //if (font != null) {
 
             if ((font != labelFont) || (factor != labelFactor)) {
                 labelFont   = font;
@@ -542,7 +542,7 @@ public abstract class ContourLines extends LineDrawing {
                     contourControl.setLabelSize(factor);
                 }
             }
-        }
+        //}
     }
 
     /**
