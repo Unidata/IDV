@@ -27,21 +27,7 @@ import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
 
-import visad.Data;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FunctionType;
-import visad.Gridded2DSet;
-import visad.GriddedSet;
-import visad.MathType;
-import visad.Real;
-import visad.RealType;
-import visad.SampledSet;
-import visad.Set;
-import visad.SetType;
-import visad.TupleType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.util.DataUtility;
 
@@ -65,6 +51,9 @@ public class GridMath {
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_STDEV = "standardDeviation";
+
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_PRCNTL = "ensemblePercentile";
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_SUM = "sum";
@@ -324,6 +313,34 @@ public class GridMath {
             throws VisADException {
         return applyFunctionOverMembers(grid, FUNC_MAX);
     }
+
+    /**
+     * ensemble grid min values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensemblePercentileValues(FieldImpl grid, String percent)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, percent, FUNC_PRCNTL);
+    }
+
+   /**
+     * ensemble grid min values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensemblePercentileValues(FieldImpl grid, int percent)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, percent, FUNC_PRCNTL);
+    }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
      * Any time steps up to the offset time are set to missing
@@ -575,6 +592,136 @@ public class GridMath {
                         GridUtil.getDateTimeList(grid));
             }
             return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException(
+                "RemoteException in applyFunctionOverTime");
+        }
+
+    }
+
+    /**
+     * Apply the function to the ens members of the given grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverMembers(FieldImpl grid, String percent,
+            String function)
+            throws VisADException {
+        return  applyFunctionOverMembers(grid, (int)Misc.parseNumber(percent),
+            function);
+    }
+
+    /**
+     * Apply the function to the ens members of the given grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverMembers(FieldImpl grid, int percent,
+            String function)
+            throws VisADException {
+        try {
+
+            FieldImpl newGrid = null;
+            if ( !GridUtil.isTimeSequence(grid)) {
+                newGrid = (FlatField) grid.clone();
+                //todo
+                return newGrid;
+            }
+
+
+            final Set     timeDomain   = Util.getDomainSet(grid);
+            int           numMembers = 0;
+            TupleType    rangeType  = null;
+            TupleType    newRangeType = null;
+            float[][][]     valuesAll       = null;
+
+            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+                    timeStepIdx++) {
+                FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
+                FlatField newField ;
+                Set ensDomain = sample.getDomainSet();
+                float[][]     values       = null;
+                numMembers = ensDomain.getLength();
+                GriddedSet newDomain  = null;
+
+                float[][]     stdevs       = null;
+                for (int k = 0; k < numMembers; k++) {
+                    FlatField innerField = (FlatField) sample.getSample(k, false);
+                    if (innerField == null) {
+                        continue;
+                    }
+                    newDomain = (GriddedSet) GridUtil.getSpatialDomain(innerField);
+
+                    if (newRangeType == null) {
+                        newRangeType = GridUtil.makeNewParamType(GridUtil.getParamType(innerField),
+                                          "_" + function);
+                    }
+
+                    float[][] ensStepValues = innerField.getFloats(false);
+                    if (values == null) {
+                        values  = Misc.cloneArray(ensStepValues);
+                        valuesAll = new float[values.length][values[0].length][numMembers];
+                        continue;
+                    }
+                    for (int i = 0; i < ensStepValues.length; i++) {
+                        for (int j = 0; j < ensStepValues[i].length; j++) {
+                            float value = ensStepValues[i][j];
+                            if (value != value) {
+                                continue;
+                            }
+                            valuesAll[i][j][k]= value;
+
+                        }
+                    }
+
+                }
+                // do the math
+                if (function.equals(FUNC_PRCNTL ) && (numMembers > 1)) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = evaluatePercentile(valuesAll[i][j], 0,
+                            numMembers, percent) ;
+                        }
+                    }
+                }
+
+
+
+                FunctionType newFT = new FunctionType(((SetType) newDomain.getType()).getDomain(),
+                                 newRangeType);
+                newField = new FlatField(newFT, newDomain);
+                newField.setSamples(values, false);
+
+
+                if (newGrid == null) {
+                    FunctionType newFieldType =
+                        new FunctionType(
+                            ((SetType) timeDomain.getType()).getDomain(),
+                            newField.getType());
+                    newGrid = new FieldImpl(newFieldType, timeDomain);
+                }
+
+                newGrid.setSample(timeStepIdx, newField, false);
+
+            }
+
+
+            return newGrid;
+
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
         } catch (RemoteException re) {
@@ -1402,5 +1549,45 @@ public class GridMath {
         return retField;
     }
 
+    /**
+     * evaluate percentile value
+     *
+     *
+     * @return the percentile
+     *
+     * @throws VisADException   VisAD Error
+     */
+    public static float evaluatePercentile(final float[] values, final int begin,
+            final int length, final double p) throws VisADException {
+
+
+        if ((p > 100) || (p <= 0)) {
+            throw new VisADException( "out of bounds percentile value:  must be in (0, 100)");
+        }
+        if (length == 0) {
+            return Float.NaN;
+        }
+        if (length == 1) {
+            return values[begin]; // always return single value for n = 1
+        }
+        double n = length;
+        double pos = p * (n + 1) / 100;
+        double fpos = Math.floor(pos);
+        int intPos = (int) fpos;
+        float dif = (float)(pos - fpos);
+        float[] sorted = new float[length];
+        System.arraycopy(values, begin, sorted, 0, length);
+        QuickSort.sort(sorted);
+
+        if (pos < 1) {
+            return sorted[0];
+        }
+        if (pos >= n) {
+            return sorted[length - 1];
+        }
+        float lower = sorted[intPos - 1];
+        float upper = sorted[intPos];
+        return lower + dif * (upper - lower);
+    }
 
 }
