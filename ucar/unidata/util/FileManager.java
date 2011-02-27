@@ -937,8 +937,11 @@ public class FileManager {
     /** Suffix for log files */
     public static final String SUFFIX_LOG = ".log";
 
-    /** Suffix for log files */
+    /** Suffix for netCDF files */
     public static final String SUFFIX_NETCDF = ".nc";
+
+    /** Suffix for JAR files */
+    public static final String SUFFIX_JAR = ".jar";
 
 
     /** null accessory */
