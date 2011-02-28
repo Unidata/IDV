@@ -209,21 +209,20 @@ public class ContourInfoDialog implements ActionListener {
         fontSizeBox = GuiUtils.doMakeFontSizeBox(12);
         fontSizeBox.setToolTipText("Set the contour label size");
 
+        Component[] labelcomps = new Component[] { GuiUtils.rLabel("Font:"),
+                GuiUtils.left(fontBox), GuiUtils.rLabel("Size:"),
+                GuiUtils.left(fontSizeBox), };
+        final JPanel lp = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
+                                            GuiUtils.WT_N);
+
         toggleBtn = new JCheckBox("Labels: ");
         toggleBtn.setToolTipText("Toggle contour labels");
         toggleBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                fontBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
-                fontSizeBox.setEnabled(
-                    ((JCheckBox) e.getSource()).isSelected());
+                GuiUtils.enableTree(lp,
+                                    ((JCheckBox) e.getSource()).isSelected());
             }
         });
-
-        Component[] labelcomps = new Component[] { GuiUtils.rLabel("Font:"),
-                GuiUtils.left(fontBox), GuiUtils.rLabel("Size:"),
-                GuiUtils.left(fontSizeBox), };
-        JPanel lp = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
-                                      GuiUtils.WT_N);
 
         Component[] comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
