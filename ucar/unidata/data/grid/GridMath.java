@@ -67,6 +67,9 @@ public class GridMath {
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_RNG = "range";
 
+     /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_MODE = "mode";
+
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
 
@@ -356,6 +359,20 @@ public class GridMath {
     public static FieldImpl ensemblePercentileValues(FieldImpl grid, int percent)
             throws VisADException {
         return applyFunctionOverMembers(grid, percent, FUNC_PRCNTL);
+    }
+
+   /**
+     * ensemble grid min values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleModeValues(FieldImpl grid)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, 0, FUNC_MODE);
     }
     /**
      * This creates a field where D(T) = D(T)-D(T+offset)
@@ -715,7 +732,13 @@ public class GridMath {
                     }
                 }
 
-
+                if (function.equals(FUNC_MODE ) && (numMembers > 1)) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = evaluateMode(valuesAll[i][j]) ;
+                        }
+                    }
+                }
 
                 FunctionType newFT = new FunctionType(((SetType) newDomain.getType()).getDomain(),
                                  newRangeType);
@@ -1619,6 +1642,34 @@ public class GridMath {
         float lower = sorted[intPos - 1];
         float upper = sorted[intPos];
         return lower + dif * (upper - lower);
+    }
+
+    /**
+     * evaluate mode value
+     *
+     * @return the percentile
+     *
+     */
+    public static float evaluateMode(float [] data)
+    {
+      int t, w;
+      float md, oldmd;
+      int count, oldcount;
+      int size = data.length;
+
+      oldmd = 0;
+      oldcount = 0;
+      for(t=0; t<size; t++) {
+        md = data[t];
+        count = 1;
+        for(w = t+1; w < size; w++)
+          if(md==data[w]) count++;
+        if(count > oldcount) {
+          oldmd = md;
+          oldcount = count;
+        }
+      }
+      return oldmd;
     }
 
 }
