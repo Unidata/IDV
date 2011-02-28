@@ -1758,6 +1758,8 @@ public abstract class XmlUtil {
         parent.appendChild(makeCDataNode(parent.getOwnerDocument(), text));
     }
 
+
+
     /**
      * _more_
      *
@@ -2382,19 +2384,35 @@ public abstract class XmlUtil {
         HashSet<String> seen  = new HashSet<String>();
 
         boolean doFormat = true;
+        boolean printTags = false;;
+        boolean generateCode = false;
+        String packageName = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-format")) {
                 doFormat = true;
                 continue;
             }
             if (args[i].equals("-printtags")) {
-                doFormat = false;
+                printTags = true;
                 continue;
             }
-            if (doFormat) {
-                format(args[i]);
-            } else {
+            if (args[i].equals("-package")) {
+                packageName = args[++i];
+                continue;
+            }
+
+
+            if (args[i].equals("-generate")) {
+                generateCode = true;
+                continue;
+            }
+
+            if(generateCode) {
+                generateCode(args[i], packageName);
+            } else if (printTags) {
                 printTags(args[i],seen);
+            } else {
+                format(args[i]);
             }
         }
     }
@@ -2471,6 +2489,21 @@ public abstract class XmlUtil {
         } catch (Exception exc) {
             System.err.println("Error processing:" + f);
             exc.printStackTrace();
+        }
+    }
+
+    private static void generateCode(String f, String packageName) throws Exception  {
+        HashSet<String> seen = new HashSet<String>();
+        String       xml      = IOUtil.readContents(f, XmlUtil.class);
+        Element      root     = getRoot(xml);
+        generateCode(root, seen, packageName);
+    }
+
+
+    private static void generateCode(Element element, HashSet<String> seen, String packageName) throws Exception  {
+        String className =  element.getTagName();
+        if(!seen.contains(className)) {
+            
         }
     }
 
