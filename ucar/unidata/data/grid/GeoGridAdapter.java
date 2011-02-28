@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1150,13 +1150,16 @@ public class GeoGridAdapter {
      * Get a time ordered sequence of 2D flat fields
      *
      * @param timeIndices  indices of times in the data
+     * @param memberIndices the member indices
      * @param loadId  loadId
      *
      * @return data for all the times for a particular 2D field
      */
-    public FieldImpl getSequence(int[] timeIndices, int[] memberIndices, Object loadId) {
+    public FieldImpl getSequence(int[] timeIndices, int[] memberIndices,
+                                 Object loadId) {
         return makeSequence(timeIndices, memberIndices, loadId);
     }
+
     /**
      * Get all the data from this GeoGrid.
      *
@@ -1197,7 +1200,7 @@ public class GeoGridAdapter {
      * cache if possible.
      *
      * @param timeIndex  index into set of times
-     * @param ensIndex _more_
+     * @param ensIndex the ensemble index
      * @param readLabel  label to write to
      * @return  the data at that time
      *
@@ -1370,12 +1373,14 @@ public class GeoGridAdapter {
      * Get a time ordered sequence of FlatFields
      *
      * @param timeIndices  indices of requested times
+     * @param memberIndices  the member indices
      * @param loadId  loadId
      *
      * @return all grid data for all the times requested, in proper increasing
      * time order, for the particular parameter loaded in this GeoGridAdapter.
      */
-    private FieldImpl makeSequence(int[] timeIndices, int[] memberIndices, Object loadId) {
+    private FieldImpl makeSequence(int[] timeIndices, int[] memberIndices,
+                                   Object loadId) {
 
         FieldImpl data = null;
 
@@ -1443,9 +1448,9 @@ public class GeoGridAdapter {
                                              + dataSource.toString();
 
 
-                    final int      theTimeIndex = times[i];
-                    final DateTime theTime      = time;
-                    final int[] theMemberIndices = memberIndices;
+                    final int      theTimeIndex     = times[i];
+                    final DateTime theTime          = time;
+                    final int[]    theMemberIndices = memberIndices;
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             readTimeStep(theTimeIndex, theTime, readLabel,
@@ -1522,6 +1527,7 @@ public class GeoGridAdapter {
      * @param gridMap where to store the grid
      * @param sampleRanges sample ranges
      * @param lazyEvaluation Are we using the CachedFlatField
+     * @param memberIndices  the member indices
      *
      * @throws Exception On badness
      */
@@ -1533,19 +1539,20 @@ public class GeoGridAdapter {
         Integer1DSet ensSet = null;
         FieldImpl    sample = null;
         int          numEns = 1;
-        if ((memberIndices != null) ){ //&& (memberIndices.length > 1)) {
-            numEns = memberIndices.length; //ensDim.getLength();
+        if ((memberIndices != null)) {      //&& (memberIndices.length > 1)) {
+            numEns = memberIndices.length;  //ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
                                       numEns);
-        } else if((ensDim != null) && (ensDim.getLength() > 1)) {
+        } else if ((ensDim != null) && (ensDim.getLength() > 1)) {
             numEns = ensDim.getLength();
             ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
                                       numEns);
         }
         for (int i = 0; i < numEns; i++) {
             int ii = i;
-            if(memberIndices != null)
+            if (memberIndices != null) {
                 ii = memberIndices[i];
+            }
             CachedFlatField oneTime = getFlatField(timeIndex, ii, readLabel);
             synchronized (sampleRanges) {
                 if (sampleRanges[0] == null) {
