@@ -17,5 +17,9 @@ def ens_smin(grid):
    return GridMath.ensembleLowestValues(grid)
 
 def ens_prcntl(grid, percent):
-   """ min value of all member """
+   """ percentile value """
    return GridMath.ensemblePercentileValues(grid, percent)
+
+def ens_srng(grid):
+   """ max - min grid value """
+   return GridMath.ensembleRangeValues(grid)
