@@ -23,3 +23,7 @@ def ens_prcntl(grid, percent):
 def ens_srng(grid):
    """ max - min grid value """
    return GridMath.ensembleRangeValues(grid)
+
+def ens_mode(grid):
+   """ mode value """
+   return GridMath.ensembleModeValues(grid)
