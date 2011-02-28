@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -146,6 +146,9 @@ public abstract class ContourLines extends LineDrawing {
 
     /** label font */
     private volatile Object labelFont = null;
+
+    /** label alignment */
+    private boolean alignLabels = true;
 
 
     /**
@@ -399,7 +402,8 @@ public abstract class ContourLines extends LineDrawing {
         setLabeling(contourInfo.getIsLabeled());
         setLineWidth(contourInfo.getLineWidth());
         setDashedStyle(contourInfo.getDashedStyle());
-        setFont(contourInfo.getFont(), contourInfo.getLabelSize());
+        setFont(contourInfo.getFont(), contourInfo.getLabelSize(),
+                contourInfo.getAlignLabels());
         setActive(true);
     }
 
@@ -522,26 +526,30 @@ public abstract class ContourLines extends LineDrawing {
      * Set the font
      * @param  font  the font name/weight
      * @param  size  the label (font) size
+     * @param align _more_
      *
      * @throws RemoteException Java RMI Exception
      * @throws VisADException Problem setting the dashed style
      */
-    public void setFont(Object font, int size)
+    public void setFont(Object font, int size, boolean align)
             throws RemoteException, VisADException {
 
         double factor = size / DEFAULT_SIZE;
 
         //if (font != null) {
 
-            if ((font != labelFont) || (factor != labelFactor)) {
-                labelFont   = font;
-                labelFactor = factor;
+        if ((font != labelFont) || (factor != labelFactor)
+                || (align != alignLabels)) {
+            labelFont   = font;
+            labelFactor = factor;
+            alignLabels = align;
 
-                if (contourControl != null) {
-                    contourControl.setLabelFont(font);
-                    contourControl.setLabelSize(factor);
-                }
+            if (contourControl != null) {
+                contourControl.setLabelFont(font);
+                contourControl.setLabelSize(factor);
+                contourControl.setAlignLabels(align);
             }
+        }
         //}
     }
 
@@ -575,6 +583,7 @@ public abstract class ContourLines extends LineDrawing {
                         contourControl.setDashedStyle(dashedStyle);
                         contourControl.setLabelFont(labelFont);
                         contourControl.setLabelSize(labelFactor);
+                        contourControl.setAlignLabels(alignLabels);
                     }
                 }
             }

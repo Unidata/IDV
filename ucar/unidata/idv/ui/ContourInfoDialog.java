@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -101,8 +101,20 @@ public class ContourInfoDialog implements ActionListener {
     /** font size selector */
     private JComboBox fontSizeBox;
 
+    /** font size selector */
+    private JComboBox alignBox;
+
+    /** label selectors */
+    private JPanel labelPanel;
+
     /** title */
     private String title;
+
+    /** contour alignments */
+    private TwoFacedObject[] aligns = { new TwoFacedObject("Along Contours",
+                                          new Boolean(true)),
+                                        new TwoFacedObject("Horizontal",
+                                            new Boolean(false)) };
 
     /**
      * Construct the widget.
@@ -208,18 +220,22 @@ public class ContourInfoDialog implements ActionListener {
         fontBox.setToolTipText("Set the contour label font");
         fontSizeBox = GuiUtils.doMakeFontSizeBox(12);
         fontSizeBox.setToolTipText("Set the contour label size");
+        alignBox = new JComboBox(aligns);
+        alignBox.setToolTipText("Set the contour label alignment");
 
-        Component[] labelcomps = new Component[] { GuiUtils.rLabel("Font:"),
-                GuiUtils.left(fontBox), GuiUtils.rLabel("Size:"),
-                GuiUtils.left(fontSizeBox), };
-        final JPanel lp = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
+        Component[] labelcomps = new Component[] {
+            GuiUtils.rLabel("Font:"), GuiUtils.left(fontBox),
+            GuiUtils.rLabel("Size:"), GuiUtils.left(fontSizeBox),
+            GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox)
+        };
+        labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
                                             GuiUtils.WT_N);
 
         toggleBtn = new JCheckBox("Labels: ");
         toggleBtn.setToolTipText("Toggle contour labels");
         toggleBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                GuiUtils.enableTree(lp,
+                GuiUtils.enableTree(labelPanel,
                                     ((JCheckBox) e.getSource()).isSelected());
             }
         });
@@ -240,7 +256,7 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.rLabel("Line Width:"),
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
-            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn), lp
+            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn), labelPanel
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -273,6 +289,15 @@ public class ContourInfoDialog implements ActionListener {
      */
     public JComponent getContents() {
         return contents;
+    }
+
+    /**
+     * get the label widget contents
+     *
+     * @return label widget contents
+     */
+    public JComponent getLabelPanel() {
+        return labelPanel;
     }
 
     /**
@@ -328,6 +353,8 @@ public class ContourInfoDialog implements ActionListener {
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId());
             myInfo.setLabelSize(
                 ((Integer) fontSizeBox.getSelectedItem()).intValue());
+            myInfo.setAlignLabels(((Boolean) ((TwoFacedObject) alignBox
+                .getSelectedItem()).getId()).booleanValue());
             return true;
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Incorrect number format");
@@ -392,6 +419,9 @@ public class ContourInfoDialog implements ActionListener {
         styleBox.setEnabled(myInfo.getDashOn());
         fontBox.setSelectedItem(makeTwoFacedFont(myInfo.getFont()));
         fontSizeBox.setSelectedItem(new Integer(myInfo.getLabelSize()));
+        alignBox.setSelectedItem((myInfo.getAlignLabels())
+                                 ? aligns[0]
+                                 : aligns[1]);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -34,6 +34,9 @@ public class ContourInfo {
 
     /** Default contour labeling setting */
     public final static boolean DEFAULT_LABEL = true;
+
+    /** Default contour labeling alignment setting */
+    public final static boolean DEFAULT_LABEL_ALIGNMENT = true;
 
     /** Default contour dashing setting */
     public final static boolean DEFAULT_DASH = false;
@@ -76,6 +79,9 @@ public class ContourInfo {
 
     /** Font - uses Object because font may be a HersheyFont */
     private Object font;
+
+    /** label alignment */
+    private boolean alignLabels = DEFAULT_LABEL_ALIGNMENT;
 
     /** Flag for labeled contours */
     private boolean isLabeled = DEFAULT_LABEL;
@@ -174,7 +180,8 @@ public class ContourInfo {
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle) {
         this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
-             width, DEFAULT_DASHED_STYLE, DEFAULT_LABEL_SIZE, null);
+             width, DEFAULT_DASHED_STYLE, DEFAULT_LABEL_SIZE, null,
+             DEFAULT_LABEL_ALIGNMENT);
     }
 
     /**
@@ -192,11 +199,12 @@ public class ContourInfo {
      * @param dashedStyle    dashedStyle
      * @param labelSize      the label (font) size
      * @param font           the font - Font or HersheyFont
+     * @param align      the label alignment - true to be along contours
      */
     public ContourInfo(String levelsString, float base, float min, float max,
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle,
-                       int labelSize, Object font) {
+                       int labelSize, Object font, boolean align) {
 
         if (isIrregularInterval(levelsString)) {
             this.levelsString = levelsString;
@@ -214,6 +222,7 @@ public class ContourInfo {
         this.lineWidth     = width;
         this.dashedStyle   = dashedStyle;
         this.font          = font;
+        this.alignLabels   = align;
     }
 
 
@@ -376,6 +385,8 @@ public class ContourInfo {
                     labelSize = new Integer(value).intValue();
                 } else if (name.equals("font")) {
                     //TODO: what should go here?
+                } else if (name.equals("align")) {
+                    alignLabels = new Boolean(value).booleanValue();
                 } else {
                     throw new IllegalArgumentException(
                         "Unknown ContourInfo parameter:" + name);
@@ -584,6 +595,7 @@ public class ContourInfo {
         this.dashedStyle   = that.dashedStyle;
         this.labelSize     = that.labelSize;
         this.font          = that.font;
+        this.alignLabels   = that.alignLabels;
     }
 
 
@@ -617,6 +629,7 @@ public class ContourInfo {
         this.dashedStyle = that.dashedStyle;
         this.labelSize   = that.labelSize;
         this.font        = that.font;
+        this.alignLabels = that.alignLabels;
     }
 
     /**
@@ -785,7 +798,7 @@ public class ContourInfo {
 
     /**
      * Get the label (font) size.
-     *    
+     *
      * @return the label (font) size
      */
     public int getLabelSize() {
@@ -801,11 +814,9 @@ public class ContourInfo {
         this.labelSize = size;
     }
 
-
-
     /**
      *     Get the font.
-     *    
+     *
      *     @return the font - null, Font, or HersheyFont
      */
     public Object getFont() {
@@ -819,6 +830,27 @@ public class ContourInfo {
      */
     public void setFont(Object font) {
         this.font = font;
+    }
+
+
+    /**
+     * Get the label alignment
+     *
+     * @return  true for along contours
+     */
+    public boolean getAlignLabels() {
+        return alignLabels;
+    }
+
+    /**
+     * Set the label alignment.
+     *
+     * @param along  - true for along contours
+     *
+     * @param align _more_
+     */
+    public void setAlignLabels(boolean align) {
+        this.alignLabels = align;
     }
 
     /**
