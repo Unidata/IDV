@@ -64,6 +64,9 @@ public class GridMath {
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_MIN = "min";
 
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_RNG = "range";
+
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
 
@@ -314,6 +317,19 @@ public class GridMath {
         return applyFunctionOverMembers(grid, FUNC_MAX);
     }
 
+    /**
+     * ensemble grid range values
+     *
+     * @param grid   ensemble grid
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleRangeValues(FieldImpl grid)
+            throws VisADException {
+        return applyFunctionOverMembers(grid, FUNC_RNG);
+    }
     /**
      * ensemble grid min values
      *
@@ -755,6 +771,7 @@ public class GridMath {
             }
             final boolean doMax        = function.equals(FUNC_MAX);
             final boolean doMin        = function.equals(FUNC_MIN);
+            final boolean doRange        = function.equals(FUNC_RNG);
 
             final Set     timeDomain   = Util.getDomainSet(grid);
             int           numMembers = 0;
@@ -770,6 +787,8 @@ public class GridMath {
                 GriddedSet newDomain  = null;
                 float[][]     values       = null;
                 float[][]     stdevs       = null;
+                float[][]     rangev       = null;
+
                 for (int k = 0; k < numMembers; k++) {
                     FlatField innerField = (FlatField) sample.getSample(k, false);
                     if (innerField == null) {
@@ -785,6 +804,7 @@ public class GridMath {
                     float[][] ensStepValues = innerField.getFloats(false);
                     if (values == null) {
                         values  = Misc.cloneArray(ensStepValues);
+                        rangev  = Misc.cloneArray(ensStepValues);
                         continue;
                     }
                     for (int i = 0; i < ensStepValues.length; i++) {
@@ -793,10 +813,13 @@ public class GridMath {
                             if (value != value) {
                                 continue;
                             }
-                            if (doMax) {
+                            if (doMax ) {
                                 values[i][j] = Math.max(values[i][j], value);
                             } else if (doMin) {
                                 values[i][j] = Math.min(values[i][j], value);
+                            } else if (doRange) {
+                                values[i][j] = Math.max(values[i][j], value);
+                                rangev[i][j] = Math.min(rangev[i][j], value);
                             } else {
                                 values[i][j] += value;
                             }
@@ -809,6 +832,14 @@ public class GridMath {
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
                             values[i][j] = values[i][j] / numMembers;
+                        }
+                    }
+                }
+
+                if (function.equals(FUNC_RNG) && (numMembers > 1)) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            values[i][j] = values[i][j] - rangev[i][j];
                         }
                     }
                 }
