@@ -1,7 +1,6 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -2097,6 +2096,35 @@ public class HtmlUtil {
             this.margin   = margin;
             this.isHeader = isHeader;
         }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getId() {
+            return id;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getIcon() {
+            return icon;
+        }
+
     }
 
     /**
@@ -2134,7 +2162,7 @@ public class HtmlUtil {
                 if (selector.icon != null) {
                     extraAttr = style(
                         "margin:3px;margin-left:" + selector.margin
-                        + "px;padding-left:20px;background-repeat:no-repeat; background-image: url("
+                        + "px;padding-left:20px;padding-bottom:0px;padding-top:2px;background-repeat:no-repeat; background-image: url("
                         + selector.icon + ");");
                 } else if (selector.isHeader) {
                     extraAttr = style("font-weight:bold");
@@ -2606,10 +2634,17 @@ public class HtmlUtil {
     }
 
 
-    public static String attrs(String[]pairs) {
+    /**
+     * _more_
+     *
+     * @param pairs _more_
+     *
+     * @return _more_
+     */
+    public static String attrs(String[] pairs) {
         StringBuffer sb = new StringBuffer();
-        for(int i=0;i<pairs.length;i+=2) {
-            sb.append(attrs(pairs[i],pairs[i+1]));
+        for (int i = 0; i < pairs.length; i += 2) {
+            sb.append(attrs(pairs[i], pairs[i + 1]));
         }
         return sb.toString();
     }
@@ -3136,7 +3171,6 @@ public class HtmlUtil {
                 + "')"), img /* + label*/,
                          HtmlUtil.cssClass("toggleblocklabellink"));
 
-
         link = link + " " + label;
 
 
@@ -3155,6 +3189,56 @@ public class HtmlUtil {
         sb.append(close(TAG_DIV));
         sb.append(close(TAG_DIV));
         return sb.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static String[] getToggle(String label, boolean visible) {
+        return getToggle(label, visible, blockHideImageUrl,
+                         blockShowImageUrl);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param visible _more_
+     * @param hideImg _more_
+     * @param showImg _more_
+     *
+     * @return _more_
+     */
+    public static String[] getToggle(String label, boolean visible,
+                                     String hideImg, String showImg) {
+        String id  = "block_" + (blockCnt++);
+        String img = HtmlUtil.img(visible
+                                  ? hideImg
+                                  : showImg, "", HtmlUtil.id(id + "img"));
+        String link =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
+                + id + "','" + id + "img','" + hideImg + "','" + showImg
+                + "')"), img /* + label*/,
+                         HtmlUtil.cssClass("toggleblocklabellink"));
+
+        if (label.length() > 0) {
+            link = link + " " + label;
+        }
+
+        String initJS = "";
+        if ( !visible) {
+            initJS = HtmlUtil.call("hide", HtmlUtil.squote(id));
+        }
+
+        return new String[] { id, link, initJS };
     }
 
 

@@ -40,9 +40,7 @@ import java.util.regex.*;
 
 /**
  *
- *
- * @author IDV Development Team
- * @version $Revision: 1.3 $
+ * @deprecated Any active development of this class should be in the ramadda version from SourceFroge
  */
 public class WikiUtil {
 
