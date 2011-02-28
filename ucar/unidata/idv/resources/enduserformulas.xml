@@ -177,6 +177,19 @@
     <operands/>
   </derived>
   <derived
+       description="Ensemble grid mode values"
+       formula="ens_mode(fieldimpl)"
+       id="ENS_MODE Grid"
+       isdefault="false"
+       isenduser="true">
+      <categories>
+        <category
+           display="true"
+           value="Grids-Ensemble"/>
+      </categories>
+      <operands/>
+  </derived>
+  <derived
      description="Ensemble grid percentile values"
      formula="ens_prcntl(fieldimpl, user_Percent[default=50])"
      id="ENS_PRCNTL Grid"
