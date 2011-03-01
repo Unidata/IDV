@@ -305,7 +305,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return Was this successful
      */
-    protected boolean doApply() {
+    public boolean doApply() {
         try {
             String intoStr = intervalFld.getText();
             float  into    = Float.NaN;

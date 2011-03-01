@@ -214,7 +214,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Preference for  showing the wireframe box */
     public static final String PREF_WIREFRAME = "View.Wireframe";
 
-
     /** Preference for showing the time string in the display */
     public static final String PREF_ANIREADOUT = "View.AniReadout";
 
@@ -224,6 +223,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** For the visibility of the please wait message */
     public static final String PREF_WAITMSG = "View.WaitVisible";
+
+    /** for the contour label size */
+    public static final String PREF_CONTOUR_LABELSIZE = "idv.viewmanager.contour.labelsize";
+
+    /** for the contour label Font */
+    public static final String PREF_CONTOUR_LABELFONT = "idv.viewmanager.contour.labelfont";
+
+    /** for the contour label Font */
+    public static final String PREF_CONTOUR_LABELALIGN = "idv.viewmanager.contour.alignlabel";
 
 
     /** border width */

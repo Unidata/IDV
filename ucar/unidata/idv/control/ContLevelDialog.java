@@ -90,7 +90,7 @@ public class ContLevelDialog extends ContourInfoDialog implements ActionListener
      *
      * @return Was this successful
      */
-    protected boolean doApply() {
+    public boolean doApply() {
         if ( !super.doApply()) {
             return false;
         }

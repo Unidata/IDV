@@ -47,6 +47,7 @@ import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.XmlUi;
 
 import ucar.unidata.util.BooleanProperty;
+import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -242,6 +243,8 @@ public class MapViewManager extends NavigatedViewManager {
     /** rotate button */
     JToggleButton rotateBtn;
 
+    /** contour info dialog for preferences */
+    ContourInfoDialog cid;
 
     /** background color for filled globe */
     private Color globeBackgroundColor = null;
@@ -1253,6 +1256,18 @@ public class MapViewManager extends NavigatedViewManager {
             globeComps[1],
         }, 3, GuiUtils.WT_N, GuiUtils.WT_N));
         colorPanel = GuiUtils.vbox(new JLabel("Color Scheme:"), colorPanel);
+        
+        cid = new ContourInfoDialog("Preferences", false, null, false);
+        ContourInfo ci = new ContourInfo(null,0,0,10,true,false,false,1,0,
+        		getStore().get(PREF_CONTOUR_LABELSIZE, ContourInfo.DEFAULT_LABEL_SIZE), 
+        		(Object) getStore().get(PREF_CONTOUR_LABELFONT), 
+        		getStore().get(PREF_CONTOUR_LABELALIGN, true));
+        cid.setState(ci);
+
+        JPanel contourPanel = GuiUtils.vbox(new JLabel("Contours:"), GuiUtils.inset(cid.getLabelPanel(), new Insets(5,5,5,5)));
+        contourPanel = GuiUtils.topCenter(contourPanel, GuiUtils.filler());
+        colorPanel = GuiUtils.hbox(colorPanel, contourPanel);
+        
         final FontSelector fontSelector =
             new FontSelector(FontSelector.COMBOBOX_UI, false, false);
         Font f = getStore().get(PREF_DISPLAYLISTFONT, getDisplayListFont());
@@ -1297,6 +1312,11 @@ public class MapViewManager extends NavigatedViewManager {
                              dlColorWidget.getSwatchColor());
                 checkToolBarVisibility();
                 ViewManager.setHighlightBorder(border[0].getBackground());
+                cid.doApply();
+                ContourInfo ci = cid.getInfo();
+                theStore.put(PREF_CONTOUR_LABELSIZE, ci.getLabelSize());
+                theStore.put(PREF_CONTOUR_LABELFONT, ci.getFont());
+                theStore.put(PREF_CONTOUR_LABELALIGN, ci.getAlignLabels());
 
             }
         };
