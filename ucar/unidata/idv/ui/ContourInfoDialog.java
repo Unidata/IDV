@@ -231,10 +231,10 @@ public class ContourInfoDialog implements ActionListener {
         labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
                                             GuiUtils.WT_N);
 
-        toggleBtn = new JCheckBox("Labels: ");
+        toggleBtn = new JCheckBox("Labels:", true);
         toggleBtn.setToolTipText("Toggle contour labels");
-        toggleBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        toggleBtn.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
                 GuiUtils.enableTree(labelPanel,
                                     ((JCheckBox) e.getSource()).isSelected());
             }
