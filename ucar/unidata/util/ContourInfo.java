@@ -221,6 +221,7 @@ public class ContourInfo {
         this.isColorFilled = isColorFilled;
         this.lineWidth     = width;
         this.dashedStyle   = dashedStyle;
+        this.labelSize     = labelSize;
         this.font          = font;
         this.alignLabels   = align;
     }

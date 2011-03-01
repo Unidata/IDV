@@ -372,6 +372,18 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                         //                                           + getClass().getName());
                     }
                 }
+                // set the default labelling stuff from preferences
+                if (contourInfo != null) {
+                    contourInfo.setLabelSize(
+                        getStore().get(
+                            ViewManager.PREF_CONTOUR_LABELSIZE,
+                            ContourInfo.DEFAULT_LABEL_SIZE));
+                    contourInfo.setFont(
+                        getStore().get(ViewManager.PREF_CONTOUR_LABELFONT));
+                    contourInfo.setAlignLabels(
+                        getStore().get(
+                            ViewManager.PREF_CONTOUR_LABELALIGN, true));
+                }
                 //              System.err.println (contourInfoParams);
                 if (contourInfoParams != null) {
 

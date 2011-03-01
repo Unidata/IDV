@@ -1264,7 +1264,7 @@ public class MapViewManager extends NavigatedViewManager {
         		getStore().get(PREF_CONTOUR_LABELALIGN, true));
         cid.setState(ci);
 
-        JPanel contourPanel = GuiUtils.vbox(new JLabel("Contours:"), GuiUtils.inset(cid.getLabelPanel(), new Insets(5,5,5,5)));
+        JPanel contourPanel = GuiUtils.vbox(new JLabel("Contours:"), GuiUtils.inset(cid.getLabelPanel(), new Insets(5,20,0,0)));
         contourPanel = GuiUtils.topCenter(contourPanel, GuiUtils.filler());
         colorPanel = GuiUtils.hbox(colorPanel, contourPanel);
         
