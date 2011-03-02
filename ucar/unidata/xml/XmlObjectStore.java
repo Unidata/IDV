@@ -615,7 +615,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public boolean get(String key, boolean dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Boolean(value.toString()).booleanValue();
@@ -629,7 +629,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public char get(String key, char dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return value.toString().charAt(0);
@@ -643,7 +643,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public short get(String key, short dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Short(value.toString()).shortValue();
@@ -657,7 +657,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public int get(String key, int dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Integer(value.toString()).intValue();
@@ -671,7 +671,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public float get(String key, float dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Float(value.toString()).floatValue();
@@ -685,7 +685,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public long get(String key, long dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Long(value.toString()).longValue();
@@ -699,7 +699,7 @@ public class XmlObjectStore implements PersistentStore {
      */
     public double get(String key, double dflt) {
         Object value = get(key);
-        if (value == null) {
+        if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
         return new Double(value.toString()).doubleValue();

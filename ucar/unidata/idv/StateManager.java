@@ -1077,7 +1077,7 @@ public class StateManager extends IdvManager {
      */
     public boolean getPreferenceOrProperty(String pref, boolean dflt) {
         Object o = getPreferenceOrProperty(pref);
-        if (o != null) {
+        if (o != null && !o.toString().isEmpty()) {
             return new Boolean(o.toString()).booleanValue();
         }
         return dflt;

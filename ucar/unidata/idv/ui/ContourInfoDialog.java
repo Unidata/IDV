@@ -25,7 +25,6 @@ import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import visad.Unit;
@@ -38,7 +37,6 @@ import java.awt.event.*;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.*;
 
 
 /**
@@ -229,7 +227,7 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox)
         };
         labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
-                                            GuiUtils.WT_N);
+                                       GuiUtils.WT_N);
 
         toggleBtn = new JCheckBox("Labels:", true);
         toggleBtn.setToolTipText("Toggle contour labels");
@@ -256,7 +254,8 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.rLabel("Line Width:"),
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
-            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn), labelPanel
+            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn),
+            labelPanel
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -441,6 +440,36 @@ public class ContourInfoDialog implements ActionListener {
         }
         return null;
     }
+
+    /**
+     * Get the contour font (Font or HersheyFont or null)
+     *
+     * @param fontSpec  string or Font/HersheyFont
+     *
+     * @return  the font (Font, HersheyFont or null)
+     */
+    public static Object getContourFont(Object fontSpec) {
+        Object font = fontSpec;
+        if ((fontSpec != null)
+                && !((fontSpec instanceof Font)
+                     || (fontSpec instanceof HersheyFont))) {
+            String fontName = fontSpec.toString();
+            try {
+                if (fontName.startsWith("HersheyFont:")) {
+                    font = new HersheyFont(
+                        fontName.substring(fontName.indexOf(" ") + 1));
+                } else {
+                    // Default list has point size of 1
+                    fontName = fontName + "-1";
+                    font     = Font.decode(fontName);
+                }
+            } catch (Exception e) {
+                font = null;
+            }
+        }
+        return font;
+    }
+
 
 
 

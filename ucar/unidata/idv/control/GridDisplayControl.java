@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -374,14 +374,18 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                 }
                 // set the default labelling stuff from preferences
                 if (contourInfo != null) {
-                    contourInfo.setLabelSize(
-                        getStore().get(
-                            ViewManager.PREF_CONTOUR_LABELSIZE,
-                            ContourInfo.DEFAULT_LABEL_SIZE));
-                    contourInfo.setFont(
-                        getStore().get(ViewManager.PREF_CONTOUR_LABELFONT));
+                    contourInfo
+                        .setLabelSize((int) getIdv().getStateManager()
+                            .getPreferenceOrProperty(ViewManager
+                                .PREF_CONTOUR_LABELSIZE, ContourInfo
+                                .DEFAULT_LABEL_SIZE));
+                    contourInfo
+                        .setFont(ContLevelDialog
+                            .getContourFont(getIdv().getStateManager()
+                                .getPreferenceOrProperty(ViewManager
+                                    .PREF_CONTOUR_LABELFONT)));
                     contourInfo.setAlignLabels(
-                        getStore().get(
+                        getIdv().getStateManager().getPreferenceOrProperty(
                             ViewManager.PREF_CONTOUR_LABELALIGN, true));
                 }
                 //              System.err.println (contourInfoParams);

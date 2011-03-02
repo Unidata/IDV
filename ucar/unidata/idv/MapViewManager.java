@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -280,16 +280,16 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_ */
     private Color initMapColor = null;
 
-    /** _more_          */
+    /** _more_ */
     private boolean initLatLonVisible = false;
 
-    /** _more_          */
+    /** _more_ */
     private int initLatLonWidth = 1;
 
-    /** _more_          */
+    /** _more_ */
     private float initLatLonSpacing = 15;
 
-    /** _more_          */
+    /** _more_ */
     private Color initLatLonColor = Color.white;
 
     /** _more_ */
@@ -1271,33 +1271,20 @@ public class MapViewManager extends NavigatedViewManager {
         colorPanel = GuiUtils.vbox(new JLabel("Color Scheme:"), colorPanel);
 
         cid        = new ContourInfoDialog("Preferences", false, null, false);
-        Object defaultFont =
-            getStateManager().getPreferenceOrProperty(PREF_CONTOUR_LABELFONT);
-        if ((defaultFont != null)
-                && !((defaultFont instanceof Font)
-                     || (defaultFont instanceof HersheyFont))) {
-            String fontName = defaultFont.toString();
-            try {
-                if (fontName.startsWith("HersheyFont:")) {
-                    defaultFont = new HersheyFont(
-                        fontName.substring(fontName.indexOf(" ") + 1));
-                } else {
-                    // Default list has point size of 1
-                    fontName    = fontName + "-1";
-                    defaultFont = Font.decode(fontName);
-                }
-            } catch (Exception e) {
-                defaultFont = null;
-            }
-        }
         ContourInfo ci =
             new ContourInfo(
                 null, 0, 0, 10, true, false, false, 1, 0,
-                (int) getStateManager().getPreferenceOrProperty(
-                    PREF_CONTOUR_LABELSIZE,
-                    ContourInfo.DEFAULT_LABEL_SIZE), defaultFont,
-                        getStateManager().getPreferenceOrProperty(
-                            PREF_CONTOUR_LABELALIGN, true));
+                (int) getStateManager()
+                    .getPreferenceOrProperty(
+                        PREF_CONTOUR_LABELSIZE,
+                        ContourInfo.DEFAULT_LABEL_SIZE), ContourInfoDialog
+                            .getContourFont(
+                                getStateManager()
+                                    .getPreferenceOrProperty(
+                                        PREF_CONTOUR_LABELFONT)), getStateManager()
+                                            .getPreferenceOrProperty(
+                                                PREF_CONTOUR_LABELALIGN,
+                                                true));
         cid.setState(ci);
 
         JPanel contourPanel =
