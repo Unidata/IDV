@@ -1059,7 +1059,7 @@ public class StateManager extends IdvManager {
      */
     public double getPreferenceOrProperty(String pref, double dflt) {
         Object o = getPreferenceOrProperty(pref);
-        if (o != null) {
+        if (o != null && !o.toString().isEmpty()) {
             return new Double(o.toString()).doubleValue();
         }
         return dflt;
