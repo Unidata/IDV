@@ -77,6 +77,8 @@ import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
+import visad.util.HersheyFont;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -167,11 +169,11 @@ public class MapViewManager extends NavigatedViewManager {
     /** Preference for  showing the pip */
     public static final String PREF_SHOWPIP = "View.ShowPip";
 
-    /** Preference for showing the globe background  */
+    /** Preference for showing the globe background */
     public static final String PREF_SHOWGLOBEBACKGROUND =
         "View.ShowGlobeBackground";
 
-    /** Preference for the globe background  color*/
+    /** Preference for the globe background  color */
     public static final String PREF_GLOBEBACKGROUND = "View.GlobeBackground";
 
     /** Preference for  showing the earth nav panel */
@@ -278,12 +280,16 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_ */
     private Color initMapColor = null;
 
+    /** _more_          */
     private boolean initLatLonVisible = false;
 
+    /** _more_          */
     private int initLatLonWidth = 1;
 
+    /** _more_          */
     private float initLatLonSpacing = 15;
 
+    /** _more_          */
     private Color initLatLonColor = Color.white;
 
     /** _more_ */
@@ -631,6 +637,11 @@ public class MapViewManager extends NavigatedViewManager {
         notifyDisplayControls(SHARE_PROJECTION);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean shouldAnimateViewChanges() {
         return !getStateManager().getRunningIsl();
     }
@@ -669,13 +680,15 @@ public class MapViewManager extends NavigatedViewManager {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
             if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_N)) {
                 EarthLocation center = getScreenCenter();
-                getMapDisplay().centerAndZoom(center, null, 1.0, shouldAnimateViewChanges(), true);
+                getMapDisplay().centerAndZoom(center, null, 1.0,
+                        shouldAnimateViewChanges(), true);
                 return;
             }
 
             if (GuiUtils.isControlKey(keyEvent, KeyEvent.VK_S)) {
                 EarthLocation center = getScreenCenter();
-                getMapDisplay().centerAndZoom(center, null, 1.0, shouldAnimateViewChanges(), false);
+                getMapDisplay().centerAndZoom(center, null, 1.0,
+                        shouldAnimateViewChanges(), false);
                 return;
             }
 
@@ -949,7 +962,7 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(xrc, false, true);
                 }
 
-                if(initLatLonVisible) {
+                if (initLatLonVisible) {
                     mapInfo.getLatData().setVisible(true);
                     mapInfo.getLatData().setLineWidth(initLatLonWidth);
                     mapInfo.getLatData().setSpacing(initLatLonSpacing);
@@ -1256,18 +1269,44 @@ public class MapViewManager extends NavigatedViewManager {
             globeComps[1],
         }, 3, GuiUtils.WT_N, GuiUtils.WT_N));
         colorPanel = GuiUtils.vbox(new JLabel("Color Scheme:"), colorPanel);
-        
-        cid = new ContourInfoDialog("Preferences", false, null, false);
-        ContourInfo ci = new ContourInfo(null,0,0,10,true,false,false,1,0,
-        		getStore().get(PREF_CONTOUR_LABELSIZE, ContourInfo.DEFAULT_LABEL_SIZE), 
-        		(Object) getStore().get(PREF_CONTOUR_LABELFONT), 
-        		getStore().get(PREF_CONTOUR_LABELALIGN, true));
+
+        cid        = new ContourInfoDialog("Preferences", false, null, false);
+        Object defaultFont =
+            getStateManager().getPreferenceOrProperty(PREF_CONTOUR_LABELFONT);
+        if ((defaultFont != null)
+                && !((defaultFont instanceof Font)
+                     || (defaultFont instanceof HersheyFont))) {
+            String fontName = defaultFont.toString();
+            try {
+                if (fontName.startsWith("HersheyFont:")) {
+                    defaultFont = new HersheyFont(
+                        fontName.substring(fontName.indexOf(" ") + 1));
+                } else {
+                    // Default list has point size of 1
+                    fontName    = fontName + "-1";
+                    defaultFont = Font.decode(fontName);
+                }
+            } catch (Exception e) {
+                defaultFont = null;
+            }
+        }
+        ContourInfo ci =
+            new ContourInfo(
+                null, 0, 0, 10, true, false, false, 1, 0,
+                (int) getStateManager().getPreferenceOrProperty(
+                    PREF_CONTOUR_LABELSIZE,
+                    ContourInfo.DEFAULT_LABEL_SIZE), defaultFont,
+                        getStateManager().getPreferenceOrProperty(
+                            PREF_CONTOUR_LABELALIGN, true));
         cid.setState(ci);
 
-        JPanel contourPanel = GuiUtils.vbox(new JLabel("Contours:"), GuiUtils.inset(cid.getLabelPanel(), new Insets(5,20,0,0)));
+        JPanel contourPanel =
+            GuiUtils.vbox(new JLabel("Contours:"),
+                          GuiUtils.inset(cid.getLabelPanel(),
+                                         new Insets(5, 20, 0, 0)));
         contourPanel = GuiUtils.topCenter(contourPanel, GuiUtils.filler());
-        colorPanel = GuiUtils.hbox(colorPanel, contourPanel);
-        
+        colorPanel   = GuiUtils.hbox(colorPanel, contourPanel);
+
         final FontSelector fontSelector =
             new FontSelector(FontSelector.COMBOBOX_UI, false, false);
         Font f = getStore().get(PREF_DISPLAYLISTFONT, getDisplayListFont());
@@ -1471,7 +1510,8 @@ public class MapViewManager extends NavigatedViewManager {
 
                 setMapProjection(mp, true);
             } else {
-                getMapDisplay().center(GeoUtils.toEarthLocation(llp), shouldAnimateViewChanges() );
+                getMapDisplay().center(GeoUtils.toEarthLocation(llp),
+                                       shouldAnimateViewChanges());
                 //                getMapDisplay().center(GeoUtils.toEarthLocation(llp), false);
             }
         } catch (Exception e) {
@@ -2405,7 +2445,8 @@ public class MapViewManager extends NavigatedViewManager {
                         IdvConstants.PROP_LOADINGXML, false)) {
                 MapProjection mp = display.getDataProjection();
 
-                if (getUseGlobeDisplay() && !getViewpointControl().getAutoRotate()) {
+                if (getUseGlobeDisplay()
+                        && !getViewpointControl().getAutoRotate()) {
                     LatLonPoint center = mp.getCenterLatLon();
                     getNavigatedDisplay().center(
                         new EarthLocationTuple(
@@ -3447,21 +3488,41 @@ public class MapViewManager extends NavigatedViewManager {
         return this.initMapPaths;
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void setInitLatLonVisible(boolean v) {
         initLatLonVisible = v;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void setInitLatLonColor(Color v) {
         initLatLonColor = v;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void setInitLatLonWidth(int v) {
         initLatLonWidth = v;
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void setInitLatLonSpacing(float v) {
         initLatLonSpacing = v;
     }

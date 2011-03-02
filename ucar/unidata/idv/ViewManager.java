@@ -225,13 +225,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public static final String PREF_WAITMSG = "View.WaitVisible";
 
     /** for the contour label size */
-    public static final String PREF_CONTOUR_LABELSIZE = "idv.viewmanager.contour.labelsize";
+    public static final String PREF_CONTOUR_LABELSIZE = "idv.contour.labelsize";
 
     /** for the contour label Font */
-    public static final String PREF_CONTOUR_LABELFONT = "idv.viewmanager.contour.labelfont";
+    public static final String PREF_CONTOUR_LABELFONT = "idv.contour.labelfont";
 
     /** for the contour label Font */
-    public static final String PREF_CONTOUR_LABELALIGN = "idv.viewmanager.contour.alignlabel";
+    public static final String PREF_CONTOUR_LABELALIGN = "idv.contour.alignlabel";
 
 
     /** border width */
