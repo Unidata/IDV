@@ -1184,6 +1184,32 @@ public class HtmlUtil {
 
 
     /**
+     * Make the url argument string from the set of given args.
+     * If the value of a given arg is a list then add multiple key=value pairs
+     *
+     * @param args url arguments
+     *
+     * @return URL argument  string
+     */
+    public static String args(Hashtable args) {
+        List<String> a = new ArrayList<String>();
+        for (java.util.Enumeration keys =
+                args.keys(); keys.hasMoreElements(); ) {
+            Object key   = keys.nextElement();
+            Object value = args.get(key);
+            if (value instanceof List) {
+                for (Object v : (List) value) {
+                    a.add(arg(key.toString(), v.toString()));
+                }
+            } else {
+                a.add(arg(key.toString(), value.toString()));
+            }
+        }
+        return StringUtil.join("&", a);
+    }
+
+
+    /**
      * _more_
      *
      * @param name _more_
