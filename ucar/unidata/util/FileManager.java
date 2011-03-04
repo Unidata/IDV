@@ -925,7 +925,10 @@ public class FileManager {
     /** Suffix for JPEG files */
     public static final String SUFFIX_JPG = ".jpg";
 
-    /** Suffix for JPEG files */
+    /** Suffix for PNG files */
+    public static final String SUFFIX_PNG = ".png";
+
+    /** Suffix for GIF files */
     public static final String SUFFIX_GIF = ".gif";
 
     /** Suffix for Quicktime files */

@@ -1493,19 +1493,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File suffix
      */
     protected String getFileSuffix() {
-        if (justCaptureAnimation) {
-            return "png";
+        if (justCaptureAnimation || movieFileName.toLowerCase()
+                .endsWith(FileManager.SUFFIX_KMZ)) {
+            return FileManager.SUFFIX_PNG;
         }
         if (scriptingNode != null) {
             return imageGenerator.applyMacros(scriptingNode,
-                    ATTR_IMAGESUFFIX, "jpg");
+                    ATTR_IMAGESUFFIX, FileManager.SUFFIX_JPG);
         }
         if ((backgroundTransparentBtn != null)
                 && backgroundTransparentBtn.isSelected()) {
-            return "png";
+            return FileManager.SUFFIX_PNG;
         }
         //        if(true) return "png";
-        return "jpg";
+        return FileManager.SUFFIX_JPG;
     }
 
 
