@@ -1499,22 +1499,23 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File suffix
      */
     protected String getFileSuffix() {
-        if (justCaptureAnimation || movieFileName.toLowerCase()
-                .endsWith(FileManager.SUFFIX_KMZ)) {
-            return FileManager.SUFFIX_PNG;
-        }
-        if (scriptingNode != null) {
-            return imageGenerator.applyMacros(scriptingNode,
-                    ATTR_IMAGESUFFIX, FileManager.SUFFIX_JPG);
-        }
-        if ((backgroundTransparentBtn != null)
-                && backgroundTransparentBtn.isSelected()) {
-            return FileManager.SUFFIX_PNG;
-        }
-        //        if(true) return "png";
-        return FileManager.SUFFIX_JPG;
-    }
-
+		String defSuffix = FileManager.SUFFIX_JPG;
+		
+		if (scriptingNode != null && movieFileName != null) {
+			final String suffix = IOUtil.getFileExtension(movieFileName);
+			if (suffix != null) {
+				if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
+						|| suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
+					defSuffix = FileManager.SUFFIX_PNG;
+				} else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
+					defSuffix = FileManager.SUFFIX_JPG;
+				} // TODO: GIF, AVI?
+			}
+			defSuffix =  imageGenerator.applyMacros(scriptingNode, ATTR_IMAGESUFFIX,
+					defSuffix);
+		}
+		return defSuffix;
+	}
 
 
 
