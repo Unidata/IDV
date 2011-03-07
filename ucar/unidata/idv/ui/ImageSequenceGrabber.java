@@ -22,71 +22,77 @@ package ucar.unidata.idv.ui;
 
 
 
-import ij.*;
+import ij.ImagePlus;
 
-import org.w3c.dom.Element;
-
-import ucar.unidata.data.GeoLocationInfo;
-import ucar.unidata.data.gis.KmlDataSource;
-
-
-
-import ucar.unidata.idv.*;
-import ucar.unidata.idv.flythrough.Flythrough;
-
-import ucar.unidata.ui.AnimatedGifEncoder;
-import ucar.unidata.ui.ImagePanel;
-import ucar.unidata.ui.ImageUtils;
-
-import ucar.unidata.ui.JpegImagesToMovie;
-import ucar.unidata.util.FileManager;
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.xml.XmlUtil;
-
-import ucar.visad.display.Animation;
-import ucar.visad.display.AnimationWidget;
-
-import visad.*;
-
-import visad.georef.EarthLocation;
-
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-
-import java.beans.*;
-
-import java.io.*;
-
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-import javax.media.*;
-import javax.media.control.*;
-import javax.media.datasink.*;
-import javax.media.format.VideoFormat;
-import javax.media.protocol.*;
-import javax.media.protocol.DataSource;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import org.w3c.dom.Element;
+
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.gis.KmlDataSource;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.flythrough.Flythrough;
+import ucar.unidata.ui.AnimatedGifEncoder;
+import ucar.unidata.ui.ImagePanel;
+import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.ui.JpegImagesToMovie;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationWidget;
+import visad.DateTime;
 
 
 
