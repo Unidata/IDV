@@ -2638,9 +2638,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         //int[]   bincount    = new int[numberOfSweeps];
         int[] tiltindices = new int[numberOfSweeps];
         int   bincounter  = 1200;
+        int gateNumber0 = getGateNumber(sweepVar);
 
         if (moment == REFLECTIVITY) {
-            bincounter = 500;
+            if( gateNumber0 > 500)
+                bincounter = gateNumber0;
+            else
+                bincounter = 500;
         }
         Trace.call2("   getRHI.setup");
 
