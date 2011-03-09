@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,6 +24,32 @@ package ucar.unidata.idv.ui;
 
 import ij.ImagePlus;
 
+import org.w3c.dom.Element;
+
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.gis.KmlDataSource;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.flythrough.Flythrough;
+import ucar.unidata.ui.AnimatedGifEncoder;
+import ucar.unidata.ui.ImagePanel;
+import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.ui.JpegImagesToMovie;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+
+import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationWidget;
+
+import visad.DateTime;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -39,11 +65,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.text.DecimalFormat;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -69,30 +98,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.w3c.dom.Element;
-
-import ucar.unidata.data.GeoLocationInfo;
-import ucar.unidata.data.gis.KmlDataSource;
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.flythrough.Flythrough;
-import ucar.unidata.ui.AnimatedGifEncoder;
-import ucar.unidata.ui.ImagePanel;
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.ui.JpegImagesToMovie;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.xml.XmlUtil;
-import ucar.visad.display.Animation;
-import ucar.visad.display.AnimationWidget;
-import visad.DateTime;
 
 
 
@@ -261,7 +266,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private boolean capturingAuto = false;
 
-    /** annoying beep checkbox  */
+    /** annoying beep checkbox */
     private JCheckBox beepCbx = new JCheckBox("Beep", false);
 
     /** The window for the main gui */
@@ -534,9 +539,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                 Element scriptingNode,
                                 List<ImageWrapper> imageFiles,
                                 Dimension size, double displayRate) {
-    	this(filename, idv, imageGenerator, scriptingNode, imageFiles, size, displayRate, -1);
+        this(filename, idv, imageGenerator, scriptingNode, imageFiles, size,
+             displayRate, -1);
     }
-    
+
     /**
      *  This gets called when we automatically create a movie. It will not show the
      *  dialog window and will start up the animation capture
@@ -554,14 +560,16 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                 ImageGenerator imageGenerator,
                                 Element scriptingNode,
                                 List<ImageWrapper> imageFiles,
-                                Dimension size, double displayRate, double endPause) {
+                                Dimension size, double displayRate,
+                                double endPause) {
         this.idv            = idv;
         this.imageGenerator = imageGenerator;
         this.scriptingNode  = scriptingNode;
         this.images         = ImageWrapper.makeImageWrappers(imageFiles);
         this.idv            = idv;
         movieFileName       = filename;
-        createMovie(movieFileName, images, size, displayRate, scriptingNode, endPause);
+        createMovie(movieFileName, images, size, displayRate, scriptingNode,
+                    endPause);
     }
 
 
@@ -1499,23 +1507,33 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File suffix
      */
     protected String getFileSuffix() {
-		String defSuffix = FileManager.SUFFIX_JPG;
-		
-		if (scriptingNode != null && movieFileName != null) {
-			final String suffix = IOUtil.getFileExtension(movieFileName);
-			if (suffix != null) {
-				if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
-						|| suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
-					defSuffix = FileManager.SUFFIX_PNG;
-				} else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
-					defSuffix = FileManager.SUFFIX_JPG;
-				} // TODO: GIF, AVI?
-			}
-			defSuffix =  imageGenerator.applyMacros(scriptingNode, ATTR_IMAGESUFFIX,
-					defSuffix);
-		}
-		return defSuffix;
-	}
+
+        if (justCaptureAnimation) {
+            return FileManager.SUFFIX_PNG;
+        }
+
+        String defSuffix = FileManager.SUFFIX_JPG;
+
+        if ((scriptingNode != null) && (movieFileName != null)) {
+            final String suffix = IOUtil.getFileExtension(movieFileName);
+            if (suffix != null) {
+                if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
+                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
+                    defSuffix = FileManager.SUFFIX_PNG;
+                } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
+                    defSuffix = FileManager.SUFFIX_JPG;
+                }  // TODO: GIF, AVI?
+            }
+            defSuffix = imageGenerator.applyMacros(scriptingNode,
+                    ATTR_IMAGESUFFIX, defSuffix);
+        }
+        if ((backgroundTransparentBtn != null)
+                && backgroundTransparentBtn.isSelected()) {
+            defSuffix = FileManager.SUFFIX_PNG;
+        }
+
+        return defSuffix;
+    }
 
 
 
@@ -1851,10 +1869,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         if (scriptingNode != null) {
             displayRate = imageGenerator.applyMacros(scriptingNode,
                     imageGenerator.ATTR_FRAMERATE, displayRate);
-            endPause = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_ENDFRAMEPAUSE, -1);
+            endPause = imageGenerator.applyMacros(scriptingNode,
+                    imageGenerator.ATTR_ENDFRAMEPAUSE, -1);
         }
 
-        createMovie(movieFile, images, size, displayRate, scriptingNode, endPause);
+        createMovie(movieFile, images, size, displayRate, scriptingNode,
+                    endPause);
     }
 
     /** widget for saving html */
@@ -1925,7 +1945,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void createMovie(String commaSeparatedFiles,
                              List<ImageWrapper> images, Dimension size,
                              double displayRate, Element scriptingNode) {
-    	createMovie(commaSeparatedFiles, images, size, displayRate, scriptingNode, -1);
+        createMovie(commaSeparatedFiles, images, size, displayRate,
+                    scriptingNode, -1);
     }
 
 
@@ -1938,10 +1959,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param size size
      * @param displayRate display rate
      * @param scriptingNode isl node. May be null
+     * @param endPause end pause value
      */
     private void createMovie(String commaSeparatedFiles,
                              List<ImageWrapper> images, Dimension size,
-                             double displayRate, Element scriptingNode, 
+                             double displayRate, Element scriptingNode,
                              double endPause) {
 
 
@@ -1986,7 +2008,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     AnimatedGifEncoder.createGif(movieFile,
                             ImageWrapper.makeFileList(images),
                             AnimatedGifEncoder.REPEAT_FOREVER,
-                            (int) (rate * 1000), (int) ((endPause == -1) ? -1 : endPause*1000));
+                            (int) (rate * 1000), (int) ((endPause == -1)
+                            ? -1
+                            : endPause * 1000));
                 } else if (movieFile.toLowerCase().endsWith(".htm")
                            || movieFile.toLowerCase().endsWith(".html")) {
                     createAnisHtml(movieFile, images, size, displayRate,
