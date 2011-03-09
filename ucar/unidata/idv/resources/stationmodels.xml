@@ -6502,4 +6502,468 @@
             </property>
         </object>
     </method>
+    <method name="add">
+    <object class="ucar.unidata.ui.symbol.StationModel">
+      <property name="Name">
+        <string><![CDATA[Lightning>Plus/Minus]]></string>
+      </property>
+      <property name="List">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.ui.symbol.MappedShapeSymbol">
+              <property name="ShapeMappings">
+                <object class="java.util.ArrayList">
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ShapeMap">
+                      <property name="Shape">
+                        <string><![CDATA[PLUS]]></string>
+                      </property>
+                      <property name="Pattern">
+                        <string><![CDATA[.01,50000]]></string>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ShapeMap">
+                      <property name="Shape">
+                        <string><![CDATA[MINUS]]></string>
+                      </property>
+                      <property name="Pattern">
+                        <string><![CDATA[-50000, -.01]]></string>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ShapeMap">
+                      <property name="Shape">
+                        <string><![CDATA[TRIANGLE]]></string>
+                      </property>
+                      <property name="Pattern">
+                        <string><![CDATA[0]]></string>
+                      </property>
+                    </object>
+                  </method>
+                </object>
+              </property>
+              <property name="Shape">
+                <string><![CDATA[TRIANGLE]]></string>
+              </property>
+              <property name="ShapeType">
+                <string><![CDATA[line]]></string>
+              </property>
+              <property name="ParamIds">
+                <array class="string" length="1">
+                  <string><![CDATA[SGNL]]></string>
+                </array>
+              </property>
+              <property name="ParamDescs">
+                <array class="string" length="1">
+                  <string><![CDATA[Parameter]]></string>
+                </array>
+              </property>
+              <property name="ColorTable">
+                <object class="ucar.unidata.util.ColorTable">
+                  <property name="Name">
+                    <string><![CDATA[Lightning]]></string>
+                  </property>
+                  <property name="Id">
+                    <string><![CDATA[Lightning]]></string>
+                  </property>
+                  <property name="Table">
+                    <array class="[F" length="4">
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA=</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABlP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABlP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA=</parray>
+                    </array>
+                  </property>
+                  <property name="Range">
+                    <object class="ucar.unidata.util.Range">
+                      <property name="Min">
+                        <double>-100.0</double>
+                      </property>
+                      <property name="Max">
+                        <double>100.0</double>
+                      </property>
+                    </object>
+                  </property>
+                  <property name="Breakpoints">
+                    <object class="java.util.ArrayList">
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                          <property name="Value">
+                            <double>0.5</double>
+                          </property>
+                        </object>
+                      </method>
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                          <property name="Value">
+                            <double>1.0</double>
+                          </property>
+                        </object>
+                      </method>
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                      </method>
+                    </object>
+                  </property>
+                  <property name="Category">
+                    <string><![CDATA[Observation]]></string>
+                  </property>
+                  <property name="ScaleFactor">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABlP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA=</parray>
+                  </property>
+                </object>
+              </property>
+              <property name="ColorTableRange">
+                <object class="ucar.unidata.util.Range">
+                  <property name="Min">
+                    <double>-10.0</double>
+                  </property>
+                  <property name="Max">
+                    <double>10.0</double>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateXInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateYInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Type">
+                    <int>1</int>
+                  </property>
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateZInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Type">
+                    <int>2</int>
+                  </property>
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="ColorParam">
+                <string><![CDATA[SGNL]]></string>
+              </property>
+              <property name="ColorMappings">
+                <object class="java.util.ArrayList">
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[0,0]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>0</int>
+                            <int>255</int>
+                            <int>0</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[-50000,0]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>0</int>
+                            <int>0</int>
+                            <int>255</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[0,50000]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>255</int>
+                            <int>0</int>
+                            <int>0</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                </object>
+              </property>
+              <property name="Id">
+                <string><![CDATA[ID-1251150568340-0]]></string>
+              </property>
+              <property name="Foreground">
+                <object class="java.awt.Color">
+                  <constructor>
+                    <int>255</int>
+                    <int>0</int>
+                    <int>255</int>
+                  </constructor>
+                </object>
+              </property>
+              <property name="BeingCreated">
+                <boolean>false</boolean>
+              </property>
+              <property name="Filled">
+                <boolean>true</boolean>
+              </property>
+              <field name="bounds">
+                <object class="java.awt.Rectangle">
+                  <constructor>
+                    <int>-9</int>
+                    <int>-10</int>
+                    <int>20</int>
+                    <int>20</int>
+                  </constructor>
+                </object>
+              </field>
+              <field name="underline">
+                <java.lang.Boolean>false</java.lang.Boolean>
+              </field>
+              <field name="url">
+                <null/>
+              </field>
+              <field name="baseline">
+                <java.lang.Integer>0</java.lang.Integer>
+              </field>
+            </object>
+          </method>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.ui.symbol.StationModel">
+      <property name="Name">
+        <string><![CDATA[Lightning>Bolts]]></string>
+      </property>
+      <property name="List">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.ui.symbol.WeatherSymbol">
+              <property name="Stretchy">
+                <boolean>true</boolean>
+              </property>
+              <property name="SymbolType">
+                <int>8</int>
+              </property>
+              <property name="ParamIds">
+                <array class="string" length="1">
+                  <string><![CDATA[LIGHTNING]]></string>
+                </array>
+              </property>
+              <property name="ParamDescs">
+                <array class="string" length="1">
+                  <string><![CDATA[Parameter]]></string>
+                </array>
+              </property>
+              <property name="ColorTable">
+                <object class="ucar.unidata.util.ColorTable">
+                  <property name="Name">
+                    <string><![CDATA[Lightning]]></string>
+                  </property>
+                  <property name="Id">
+                    <string><![CDATA[Lightning]]></string>
+                  </property>
+                  <property name="Table">
+                    <array class="[F" length="4">
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                      <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    </array>
+                  </property>
+                  <property name="Range">
+                    <object class="ucar.unidata.util.Range">
+                      <property name="Min">
+                        <double>-50.0</double>
+                      </property>
+                      <property name="Max">
+                        <double>50.0</double>
+                      </property>
+                    </object>
+                  </property>
+                  <property name="Breakpoints">
+                    <object class="java.util.ArrayList">
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                          <property name="Value">
+                            <double>0.5</double>
+                          </property>
+                        </object>
+                      </method>
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                          <property name="Value">
+                            <double>1.0</double>
+                          </property>
+                        </object>
+                      </method>
+                      <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                      </method>
+                    </object>
+                  </property>
+                  <property name="Category">
+                    <string><![CDATA[Observation]]></string>
+                  </property>
+                  <property name="ScaleFactor">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                  </property>
+                </object>
+              </property>
+              <property name="ColorTableRange">
+                <object class="ucar.unidata.util.Range">
+                  <property name="Min">
+                    <double>-50.0</double>
+                  </property>
+                  <property name="Max">
+                    <double>50.0</double>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateXInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateYInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Type">
+                    <int>1</int>
+                  </property>
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="RotateZInfo">
+                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                  <property name="Type">
+                    <int>2</int>
+                  </property>
+                  <property name="Param">
+                    <string stringvalue=""/>
+                  </property>
+                </object>
+              </property>
+              <property name="ColorParam">
+                <string><![CDATA[SGNL]]></string>
+              </property>
+              <property name="ColorMappings">
+                <object class="java.util.ArrayList">
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[0,0]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>0</int>
+                            <int>255</int>
+                            <int>0</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[0,50000]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>255</int>
+                            <int>255</int>
+                            <int>0</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                  <method name="add">
+                    <object class="ucar.unidata.ui.symbol.ColorMap">
+                      <property name="Pattern">
+                        <string><![CDATA[-50000,0]]></string>
+                      </property>
+                      <property name="Color">
+                        <object class="java.awt.Color">
+                          <constructor>
+                            <int>255</int>
+                            <int>0</int>
+                            <int>0</int>
+                          </constructor>
+                        </object>
+                      </property>
+                    </object>
+                  </method>
+                </object>
+              </property>
+              <property name="Id">
+                <string><![CDATA[ID-1251126961104-0]]></string>
+              </property>
+              <property name="Foreground">
+                <object class="java.awt.Color">
+                  <constructor>
+                    <int>255</int>
+                    <int>255</int>
+                    <int>51</int>
+                  </constructor>
+                </object>
+              </property>
+              <property name="BeingCreated">
+                <boolean>false</boolean>
+              </property>
+              <property name="Filled">
+                <boolean>true</boolean>
+              </property>
+              <field name="bounds">
+                <object class="java.awt.Rectangle">
+                  <constructor>
+                    <int>-10</int>
+                    <int>-10</int>
+                    <int>20</int>
+                    <int>20</int>
+                  </constructor>
+                </object>
+              </field>
+              <field name="underline">
+                <java.lang.Boolean>false</java.lang.Boolean>
+              </field>
+              <field name="url">
+                <null/>
+              </field>
+              <field name="baseline">
+                <java.lang.Integer>0</java.lang.Integer>
+              </field>
+            </object>
+          </method>
+        </object>
+      </property>
+    </object>
+  </method>
 </object>
