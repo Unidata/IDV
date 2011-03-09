@@ -183,8 +183,14 @@
        value="/auxdata/ui/icons/3D.gif"/>
   </datasource>
 
-
-
+  <datasource
+     id="File.GrADS"
+     factory="ucar.unidata.data.grid.GeoGridDataSource"
+     patterns="\.ctl$"
+     fileselection="true"
+     doesmultiples="false"
+     label="GrADS Binary Grid Files">
+  </datasource>
 
   <datasource
      id="FILE.NETCDF"
