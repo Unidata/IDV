@@ -177,7 +177,7 @@ public class ChartDecorator extends FlythroughDecorator {
                     sb.append(",");
                     sb.append(el.getLongitude());
                     sb.append(",");
-                    sb.append(values.get(i));
+                    sb.append(values.get(j));
                     sb.append("\n");
                 }
             }
