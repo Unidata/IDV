@@ -2608,12 +2608,11 @@ public class HtmlUtil {
      */
     public static String formEntryTop(String left, String right,
                                       String trExtra, boolean dummy) {
+        left = div(left, cssClass(CLASS_FORMLABEL_TOP));
+        String label = tag(TAG_TD,
+                           attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_VALIGN, VALUE_TOP), left);
         return tag(TAG_TR, attrs(ATTR_VALIGN, VALUE_TOP) + " " + trExtra,
-                   tag(TAG_TD,
-                       attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_VALIGN, VALUE_TOP,
-                             ATTR_CLASS,
-                             CLASS_FORMLABEL_TOP), left) + tag(TAG_TD, "",
-                                 right));
+                   label+ tag(TAG_TD, "", right));
     }
 
     /**
