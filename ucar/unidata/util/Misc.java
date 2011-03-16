@@ -2327,6 +2327,39 @@ public class Misc {
 
 
     /**
+     * Convert int array to double array
+     *
+     * @param d input
+     *
+     * @return double array
+     */
+    public static double[][] toDouble(int[][] d) {
+        double[][] f = new double[d.length][];
+        for (int i = 0; i < f.length; i++) {
+            f[i] = toDouble(d[i]);
+        }
+        return f;
+    }
+
+
+    /**
+     * Convert int array to double array
+     *
+     * @param d input
+     *
+     * @return double array
+     */
+    public static double[] toDouble(int[] d) {
+        double[] f = new double[d.length];
+        for (int i = 0; i < d.length; i++) {
+            f[i] = (double) d[i];
+        }
+        return f;
+    }
+
+
+
+    /**
      * convert float array to double array
      *
      * @param d float array
