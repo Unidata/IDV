@@ -74,10 +74,17 @@ public abstract class GridDataSource extends FilesDataSource {
     /** List of 2D categories for time series of grids */
     private List twoDTimeSeriesCategories;
 
+    /** List of 2D ensemble categories for time series of grids */
+    private List twoDEnsTimeSeriesCategories;
+
     /** List of 3D categories for time series of grids */
     private List threeDTimeSeriesCategories;
 
+    /** List of 3D ensemble categories for time series of grids */
+    private List threeDEnsTimeSeriesCategories;
 
+   /** List of ens categories for grids */
+    private DataCategory ensDCategory;
     /**
      * Default constructor; initializes data categories
      */
@@ -130,14 +137,25 @@ public abstract class GridDataSource extends FilesDataSource {
         if(twoDTimeSeriesCategories==null) {
             twoDTimeSeriesCategories =
                 DataCategory.parseCategories("2D grid;GRID-2D-TIME;");
+            twoDEnsTimeSeriesCategories =
+                DataCategory.parseCategories("2D grid;GRID-2D-TIME;GRID-ENSEMBLE;");
             twoDCategories = DataCategory.parseCategories("2D grid;GRID-2D;");
             threeDTimeSeriesCategories =
                 DataCategory.parseCategories("3D grid;GRID-3D-TIME;");
+            threeDEnsTimeSeriesCategories =
+                DataCategory.parseCategories("3D grid;GRID-3D-TIME;GRID-ENSEMBLE;");
             threeDCategories = DataCategory.parseCategories("3D grid;GRID-3D;");
+            ensDCategory = DataCategory.parseCategory("GRID-ENSEMBLE", true);
         }
     }
 
-
+     /**
+     * Get the ensemble data categories
+     * @return   list of categories
+     */
+    public DataCategory getEnsDCategory() {
+        return ensDCategory;
+    }
 
 
     /**
@@ -166,6 +184,13 @@ public abstract class GridDataSource extends FilesDataSource {
     }
 
     /**
+     * Get the list of 2D time series ensemble categories
+     * @return   list of categories
+     */
+    public List getTwoDEnsTimeSeriesCategories() {
+        return twoDEnsTimeSeriesCategories;
+    }
+    /**
      * Get the list of 3D time series categories
      * @return   list of categories
      */
@@ -173,7 +198,13 @@ public abstract class GridDataSource extends FilesDataSource {
         return threeDTimeSeriesCategories;
     }
 
-
+    /**
+     * Get the list of 3D time series ensemble categories
+     * @return   list of categories
+     */
+    public List getThreeDEnsTimeSeriesCategories() {
+        return threeDEnsTimeSeriesCategories;
+    }
 
 }
 
