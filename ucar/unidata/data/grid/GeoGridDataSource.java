@@ -1988,9 +1988,16 @@ public class GeoGridDataSource extends GridDataSource {
 
 
                 }
-                categories = (tAxis == null)
+
+                if((ensDim != null) && (ensDim.getLength() > 1)) {
+                    categories = (tAxis == null)
+                             ? getTwoDCategories()
+                             : getTwoDEnsTimeSeriesCategories();
+                } else {
+                    categories = (tAxis == null)
                              ? getTwoDCategories()
                              : getTwoDTimeSeriesCategories();
+                }
                 /*
                 choice = new DirectDataChoice(this, parmName, pseudoName,
                         description, (taxis == null)
@@ -2046,10 +2053,17 @@ public class GeoGridDataSource extends GridDataSource {
                                      : getThreeDTimeSeriesCategories(), dataSelection,
                                      props);
                 */
-                categories = (tAxis == null)
+
+                if((ensDim != null) && (ensDim.getLength() > 1)) {
+                    categories = (tAxis == null)
+                             ? getThreeDCategories()
+                             : getThreeDEnsTimeSeriesCategories();
+
+                } else {
+                   categories = (tAxis == null)
                              ? getThreeDCategories()
                              : getThreeDTimeSeriesCategories();
-
+                }
             }
             // see if we have any categorization
             Attribute attr = null;
