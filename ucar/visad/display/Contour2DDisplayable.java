@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,8 +23,9 @@ package ucar.visad.display;
 
 import ucar.unidata.data.grid.GridUtil;
 
-import visad.util.DataUtility;
 import visad.*;
+
+import visad.util.DataUtility;
 
 import java.awt.Color;
 
@@ -403,7 +404,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
 
         RealType[] realTypes =
             GridUtil.getParamType(field).getRealComponents();
-        
+
         // uncomment to determine ad-hoc rather than programatically
         //coloredByAnother = coloredByAnother && (rtt.getDimension() == 2);
         // get the RealType of the range data; use both for
@@ -412,10 +413,9 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
         setContourRealType(contourType);  // in IsoSurface
 
         // get the type of the field for rgb color
-    //    RealType rgbType = coloredByAnother
-     //                      ? realTypes[1]
-    //                       : contourType;
-        // get the type of the field for rgb color
+        //    RealType rgbType = coloredByAnother
+        //                      ? realTypes[1]
+        //                       : contourType;
         RealType rgbType = contourType;
         if (coloredByAnother) {
             if (realTypes.length > 1) {
@@ -424,9 +424,9 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
                 rgbType = GridUtil.ENSEMBLE_TYPE;
             }
         }
-        if(GridUtil.hasEnsemble(field)){
-            rgbType = GridUtil.ENSEMBLE_TYPE;
-        }
+        //if(GridUtil.hasEnsemble(field)){
+        //    rgbType = GridUtil.ENSEMBLE_TYPE;
+        //}
 
         setRGBRealType(rgbType);
         super.setData(field);
