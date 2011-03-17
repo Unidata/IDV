@@ -169,6 +169,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     private String OldSmoothingType = LABEL_NONE;
 
     private int OldSmoothingFactor = 0;
+    
     /**
      * Cstr; does nothing. See init() for creation actions.
      */
@@ -593,12 +594,6 @@ public abstract class PlanViewControl extends GridDisplayControl {
         loadedAny = false;
 
         getGridDisplayable().setColoredByAnother(haveMultipleFields());
-       /*
-        List categories = dataChoice.getCategories();
-        if(categories.contains(DataCategory.GRID_ENSEMBLE_CATEGORY)) {
-            getGridDisplayable().setColoredByAnother(true);
-        } */
-
         if (getMultipleIsTopography()) {
             addTopographyMap();
         }

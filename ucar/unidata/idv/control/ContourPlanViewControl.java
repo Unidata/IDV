@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,25 +21,33 @@
 package ucar.unidata.idv.control;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.rmi.RemoteException;
-import java.util.List;
-
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.visad.display.Contour2DDisplayable;
 import ucar.visad.display.DisplayableData;
+
 import visad.FieldImpl;
+import visad.Unit;
 import visad.VisADException;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.rmi.RemoteException;
+
+import java.util.List;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 
 /**
@@ -50,16 +58,6 @@ import visad.VisADException;
 
 public class ContourPlanViewControl extends PlanViewControl {
 
-    /** labels for smoothing functions 
-    public final static String[] smootherLabels = new String[] { LABEL_NONE,
-            "5 point", "9 point", "Gaussian Weighted" };
-     * */
-
-    /** types of smoothing functions 
-    public final static String[] smoothers = new String[] { LABEL_NONE,
-            GridUtil.SMOOTH_5POINT, GridUtil.SMOOTH_9POINT,
-            GridUtil.SMOOTH_GAUSSIAN };
-     * */
 
     /** the displayable for the data depiction */
     private Contour2DDisplayable contourDisplay;
@@ -67,38 +65,21 @@ public class ContourPlanViewControl extends PlanViewControl {
     /** flag for color filling */
     boolean isColorFill = false;
 
-    /** smoothing factor for Gaussian smoother
-    private int smoothingFactor = 6;
-     * */
+    /** flag for color filling */
+    boolean haveEnsemble = false;
 
-
-    /** default type
-    private String smoothingType = LABEL_NONE;
-     * */
+    /** flag for color filling */
+    boolean colorByMember = true;
 
     /**
      * Create a new <code>ContourPlanViewControl</code> setting the
      * attribute flags as appropriate.
      */
     public ContourPlanViewControl() {
-        setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+        setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE | FLAG_DISPLAYUNIT
+                          | FLAG_SMOOTHING);
     }
 
-
-    /**
-     *  Use the value of the skip factor to subset the data.
-    protected void applySmoothing() {
-
-        if ((getGridDisplayable() != null) && (currentSlice != null)) {
-            try {
-                getGridDisplayable().loadData(
-                    getSliceForDisplay(currentSlice));
-            } catch (Exception ve) {
-                logException("applySkipFactor", ve);
-            }
-        }
-    }
-     */
 
     /**
      * Method to create the particular <code>DisplayableData</code> that
@@ -182,7 +163,7 @@ public class ContourPlanViewControl extends PlanViewControl {
      * @param contourInfo The contour info to initialize
      */
     protected void initializeDefaultContourInfo(ContourInfo contourInfo) {
-        if (isColorFill) {
+        if (isColorFill || haveEnsemble) {
             contourInfo.setIsLabeled(false);
         }
     }
@@ -212,18 +193,109 @@ public class ContourPlanViewControl extends PlanViewControl {
      */
     protected boolean setData(DataChoice data)
             throws VisADException, RemoteException {
+        haveEnsemble = DataCategory.applicableTo(
+            data.getCategories(),
+            DataCategory.parseCategories(
+                DataCategory.CATEGORY_GRIDENSEMBLE, false));
         if ( !super.setData(data)) {
             return false;
         }
         List categories = data.getCategories();
-        for(int i = 0; i < categories.size(); i++){
-            DataCategory dc = (DataCategory)categories.get(i);
-            if(DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc))
-               getGridDisplayable().setColoredByAnother(true);
+        for (int i = 0; i < categories.size(); i++) {
+            DataCategory dc = (DataCategory) categories.get(i);
+            if (DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc)) {
+                getGridDisplayable().setColoredByAnother(true);
+            }
         }
 
 
         return true;
     }
 
+    /**
+     * Return whether the Data held by this display control contains multiple
+     * fields (e.g., for the isosurface colored by another parameter
+     * @return  true if there are multiple fields
+     */
+    protected boolean haveMultipleFields() {
+        return super.haveMultipleFields() || (haveEnsemble && colorByMember);
+    }
+
+    /**
+     * Add in any special control widgets to the current list of widgets.
+     * @param controlWidgets  list of control widgets
+     *
+     * @throws VisADException   VisAD error
+     * @throws RemoteException   RMI error
+     */
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
+        super.getControlWidgets(controlWidgets);
+
+        if (haveEnsemble) {
+            JCheckBox toggle = new JCheckBox("Color by Member",
+                                             colorByMember);
+            toggle.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        colorByMember =
+                            ((JCheckBox) e.getSource()).isSelected();
+                        getContourDisplay().setColoredByAnother(
+                            haveMultipleFields());
+                        getContourDisplay().loadData(
+                            getSliceForDisplay(getCurrentSlice()));
+                    } catch (Exception ve) {
+                        logException("colorByMember", ve);
+                    }
+                }
+            });
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Ensembles:"),
+                    GuiUtils.leftCenter(toggle, GuiUtils.filler())));
+        }
+
+    }
+
+    /**
+     * Get the parameter name for color.
+     * @return  color parameter name
+     */
+    protected String getColorParamName() {
+        if (haveEnsemble) {
+            return GridUtil.ENSEMBLE_TYPE.getName();
+        } else if (haveMultipleFields() && (getGridDataInstance() != null)) {
+            return getGridDataInstance().getDataChoice().getIndexedName(
+                getColorRangeIndex());
+        }
+        return paramName;
+    }
+
+    /**
+     * Set the color by ensemble member property
+     *
+     * @param yesorno  true to color by ensemble member
+     */
+    public void setColorByMember(boolean yesorno) {
+        colorByMember = yesorno;
+    }
+
+    /**
+     * Get the color by ensemble member property
+     *
+     * @return the color by ensemble member property
+     */
+    public boolean getColorByMember() {
+        return colorByMember;
+    }
+
+    /**
+     * If ensemble, return null, otherwise return the default
+     * @return   the unit for the color parameter
+     */
+    protected Unit getColorUnit() {
+        if (colorByMember) {
+            return null;
+        }
+        return super.getColorUnit();
+    }
 }
