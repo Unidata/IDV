@@ -402,4 +402,9 @@ specified  -->
      range_min="-5.0" 
      table="VisAD" 
      unit="K/(100km)/(3h)"/>
+  <param 
+     name="ensemble"
+     range_max="20.0" 
+     range_min="0.0" 
+     table="VisAD" />
 </params>
