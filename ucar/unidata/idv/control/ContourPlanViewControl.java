@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
@@ -71,7 +72,7 @@ public class ContourPlanViewControl extends PlanViewControl {
      * */
 
 
-    /** default type 
+    /** default type
     private String smoothingType = LABEL_NONE;
      * */
 
@@ -214,6 +215,14 @@ public class ContourPlanViewControl extends PlanViewControl {
         if ( !super.setData(data)) {
             return false;
         }
+        List categories = data.getCategories();
+        for(int i = 0; i < categories.size(); i++){
+            DataCategory dc = (DataCategory)categories.get(i);
+            if(DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc))
+               getGridDisplayable().setColoredByAnother(true);
+        }
+
+
         return true;
     }
 
