@@ -141,6 +141,9 @@ public class DataCategory {
     /** The grid skew-T category */
     public static final String CATEGORY_GRIDSOUNDING = "GRID_SOUNDING";
 
+    /** The grid ensemble category */
+    public static final String CATEGORY_GRIDENSEMBLE = "GRID-ENSEMBLE";
+
     /** The RAOB skew-T category */
     public static final String CATEGORY_RAOBSOUNDING = "RAOB_SOUNDING";
 
@@ -235,6 +238,9 @@ public class DataCategory {
     public static final DataCategory COSMIC_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_COSMICSKEWT, false);
 
+    /** _more_          */
+    public static final DataCategory GRID_ENSEMBLE_CATEGORY =
+        new DataCategory(CATEGORY_GRIDENSEMBLE, false);
     /**
      * Grid-derived data appropriate for an aerological sounding display
      * ({@link visad.DateTime} -> ({@link visad.georef.EarthLocationTuple}
