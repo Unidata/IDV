@@ -200,13 +200,13 @@ public class ContourPlanViewControl extends PlanViewControl {
         if ( !super.setData(data)) {
             return false;
         }
-        List categories = data.getCategories();
-        for (int i = 0; i < categories.size(); i++) {
-            DataCategory dc = (DataCategory) categories.get(i);
-            if (DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc)) {
-                getGridDisplayable().setColoredByAnother(true);
-            }
-        }
+        //List categories = data.getCategories();
+        //for (int i = 0; i < categories.size(); i++) {
+        //    DataCategory dc = (DataCategory) categories.get(i);
+        //    if (DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc)) {
+        //        getGridDisplayable().setColoredByAnother(true);
+        //    }
+        //}
 
 
         return true;
