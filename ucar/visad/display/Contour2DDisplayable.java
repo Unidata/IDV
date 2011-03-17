@@ -412,9 +412,21 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
         setContourRealType(contourType);  // in IsoSurface
 
         // get the type of the field for rgb color
-        RealType rgbType = coloredByAnother
-                           ? realTypes[1]
-                           : contourType;
+    //    RealType rgbType = coloredByAnother
+     //                      ? realTypes[1]
+    //                       : contourType;
+        // get the type of the field for rgb color
+        RealType rgbType = contourType;
+        if (coloredByAnother) {
+            if (realTypes.length > 1) {
+                rgbType = realTypes[1];
+            } else if (GridUtil.hasEnsemble(field)) {
+                rgbType = GridUtil.ENSEMBLE_TYPE;
+            }
+        }
+        if(GridUtil.hasEnsemble(field)){
+            rgbType = GridUtil.ENSEMBLE_TYPE;
+        }
 
         setRGBRealType(rgbType);
         super.setData(field);
