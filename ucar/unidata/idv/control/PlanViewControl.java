@@ -593,6 +593,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
         loadedAny = false;
 
         getGridDisplayable().setColoredByAnother(haveMultipleFields());
+
+        List categories = dataChoice.getCategories();
+        if(categories.contains(DataCategory.GRID_ENSEMBLE_CATEGORY)) {
+            getGridDisplayable().setColoredByAnother(true);
+        }
+
         if (getMultipleIsTopography()) {
             addTopographyMap();
         }
