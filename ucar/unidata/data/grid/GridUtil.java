@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -202,6 +202,10 @@ public class GridUtil {
 
     /** Barnes  circular smoother identifier */
     public static final String SMOOTH_RECTANGULAR = "RECT";
+
+    /** ensemble RealType */
+    public static final RealType ENSEMBLE_TYPE =
+        RealType.getRealType("Ensemble");
 
 
     /** Default ctor */
@@ -496,6 +500,54 @@ public class GridUtil {
         return (grid != null) && !(grid instanceof FlatField)
                && (Util.getDomainSet(grid).getDimension() == 1);
     }
+
+    /**
+     * Check to see if this is an ensemble grid
+     *
+     * @param grid   grid to check
+     *
+     * @return  true if the domain of the grid is 1 dimensional and
+     *               the type is convertible with ENSEMBLE_TYPE or a sequence
+     *               and the inner type has a domain of ENSEMBLE_TYPE;
+     *
+     * @throws VisADException  problem determining this
+     */
+    public static boolean hasEnsemble(FieldImpl grid) throws VisADException {
+        if (isSequence(grid)) {
+            if (getSequenceType(grid).equals(ENSEMBLE_TYPE)) {
+                return true;
+            }
+            // must be time sequence
+            try {
+                Data inner = grid.getSample(0);
+                return (inner instanceof FieldImpl)
+                       && isSequence((FieldImpl) inner)
+                       && getSequenceType((FieldImpl) inner).equals(
+                           ENSEMBLE_TYPE);
+            } catch (RemoteException re) {}
+        }
+        return false;
+    }
+
+    /**
+     * Get the RealType of the ensemble.
+     *
+     * @param grid   grid to check
+     *
+     * @return  RealType of ensemble paramter
+     *
+     * @see #hasEnsemble(FieldImpl)
+     *
+     * @throws VisADException     unable to get the information
+     */
+    public static RealType getEnsembleType(FieldImpl grid)
+            throws VisADException {
+        if ( !hasEnsemble(grid)) {
+            throw new IllegalArgumentException("grid is not an ensemble");
+        }
+        return ENSEMBLE_TYPE;
+    }
+
 
     /**
      * Check to see if this is a single grid or if it is a time sequence

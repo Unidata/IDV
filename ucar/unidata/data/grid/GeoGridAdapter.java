@@ -1541,12 +1541,10 @@ public class GeoGridAdapter {
         int          numEns = 1;
         if ((memberIndices != null)) {      //&& (memberIndices.length > 1)) {
             numEns = memberIndices.length;  //ensDim.getLength();
-            ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
-                                      numEns);
+            ensSet = new Integer1DSet(GridUtil.ENSEMBLE_TYPE, numEns);
         } else if ((ensDim != null) && (ensDim.getLength() > 1)) {
             numEns = ensDim.getLength();
-            ensSet = new Integer1DSet(RealType.getRealType("Ensemble"),
-                                      numEns);
+            ensSet = new Integer1DSet(GridUtil.ENSEMBLE_TYPE, numEns);
         }
         for (int i = 0; i < numEns; i++) {
             int ii = i;
