@@ -6593,6 +6593,8 @@ public class GridUtil {
                             if (smoothedRangeType == null) {
                                 smoothedRangeType =
                                     GridUtil.getParamType(innerSmoothedField);
+                            }
+                            if (smoothedFF == null) {
                                 FunctionType innerType =
                                     new FunctionType(
                                         DataUtility.getDomainType(ensDomain),
