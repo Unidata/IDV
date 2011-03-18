@@ -70,6 +70,7 @@ import visad.ErrorEstimate;
 import visad.FieldImpl;
 import visad.FlatField;
 import visad.FunctionType;
+import visad.Gridded1DSet;
 import visad.Gridded2DSet;
 import visad.Gridded3DSet;
 import visad.GriddedSet;
@@ -1536,12 +1537,18 @@ public class GeoGridAdapter {
                               boolean lazyEvaluation, int[] memberIndices)
             throws Exception {
         Dimension    ensDim = geoGrid.getEnsembleDimension();
-        Integer1DSet ensSet = null;
+        Gridded1DSet ensSet = null;
         FieldImpl    sample = null;
         int          numEns = 1;
         if ((memberIndices != null)) {      //&& (memberIndices.length > 1)) {
             numEns = memberIndices.length;  //ensDim.getLength();
-            ensSet = new Integer1DSet(GridUtil.ENSEMBLE_TYPE, numEns);
+            //ensSet = new Integer1DSet(GridUtil.ENSEMBLE_TYPE, numEns);
+            float[][] setVals = new float[1][numEns];
+            for (int i = 0; i < numEns; i++) {
+                setVals[0][i] = memberIndices[i];
+            }
+            ensSet = new Gridded1DSet(GridUtil.ENSEMBLE_TYPE, setVals,
+                                      numEns);
         } else if ((ensDim != null) && (ensDim.getLength() > 1)) {
             numEns = ensDim.getLength();
             ensSet = new Integer1DSet(GridUtil.ENSEMBLE_TYPE, numEns);
