@@ -1208,16 +1208,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected void applySmoothing() throws VisADException, RemoteException {
         if (checkFlag(FLAG_SMOOTHING)) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
-
-                if ( !getSmoothingType().equals(OldSmoothingType)
+               if(!getSmoothingType().equalsIgnoreCase("None") || !OldSmoothingType.equalsIgnoreCase("None"))  {
+                    if(!getSmoothingType().equals(OldSmoothingType)
                         || (getSmoothingFactor() != OldSmoothingFactor)) {
-                    OldSmoothingType   = getSmoothingType();
-                    OldSmoothingFactor = getSmoothingFactor();
-                    try {
-                        getGridDisplayable().loadData(
-                            getSliceForDisplay(currentSlice));
-                    } catch (Exception ve) {
-                        logException("applySmoothing", ve);
+                        OldSmoothingType = getSmoothingType();
+                        OldSmoothingFactor = getSmoothingFactor();
+                        try {
+                            getGridDisplayable().loadData(
+                                getSliceForDisplay(currentSlice));
+                        } catch (Exception ve) {
+                            logException("applySmoothing", ve);
+                        }
                     }
                 }
             }
