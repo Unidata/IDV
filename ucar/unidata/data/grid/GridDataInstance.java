@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -27,15 +27,12 @@ import ucar.unidata.data.DataSelection;
 
 import ucar.unidata.util.LogUtil;
 
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
-
-import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -87,6 +84,11 @@ public class GridDataInstance extends DataInstance {
     /** flag for 3D data */
     private boolean is3D = false;
 
+    /** flag for ensemble data */
+    private boolean isEnsemble = false;
+
+    /** ensemble dimension */
+    private Gridded1DSet ensSet = null;
 
     // grid meta-data for a 3D geogrid (not defined for 2d data)
 
@@ -255,12 +257,17 @@ public class GridDataInstance extends DataInstance {
             // see if this sample is either a displayable FlatField, or
             // is another FieldImpl sequence of FlatFields
             if (data instanceof FlatField) {
-                field = (FlatField) data;
+                isEnsemble = GridUtil.hasEnsemble(gridData);
+                field      = (FlatField) data;
             } else if (data instanceof FieldImpl) {
-                field = (FlatField) ((FieldImpl) data).getSample(0);
+                isEnsemble = GridUtil.hasEnsemble((FieldImpl) data);
+                field      = (FlatField) ((FieldImpl) data).getSample(0);
             }
         } else {
             field = (FlatField) gridData;
+        }
+        if (isEnsemble) {
+            ensSet = GridUtil.getEnsembleSet(gridData);
         }
 
         is3D       = (Util.getDomainSet(field).getManifoldDimension() == 3);
@@ -865,11 +872,29 @@ public class GridDataInstance extends DataInstance {
      */
     private RealType getRealType(String name, Unit u)
             throws VisADException, RemoteException {
-        RealType rt = rt = RealType.getRealType(Util.cleanName(name), u);
+        RealType rt = RealType.getRealType(Util.cleanName(name), u);
         if (rt == null) {
             rt = Util.makeRealType(name, u);
         }
         return rt;
     }
 
+    /**
+     * Is the grid an ensemble?
+     *
+     * @return true if an ensemble
+     */
+    public boolean isEnsemble() {
+        checkInit();
+        return isEnsemble;
+    }
+
+    /**
+     * Get the ensemble set
+     * @return the set or null if not an ensemble
+     */
+    public Gridded1DSet getEnsembleSet() {
+        checkInit();
+        return ensSet;
+    }
 }

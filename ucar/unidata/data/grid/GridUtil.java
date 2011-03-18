@@ -548,6 +548,36 @@ public class GridUtil {
         return ENSEMBLE_TYPE;
     }
 
+    /**
+     * Return the ensemble set for the field
+     *
+     * @param ensGrid  the ensemble grid
+     *
+     * @return the set or null if not an ensemble
+     *
+     * @throws VisADException  problems reading data
+     */
+    public static Gridded1DSet getEnsembleSet(FieldImpl ensGrid)
+            throws VisADException {
+        if (hasEnsemble(ensGrid)) {
+            try {
+                if (isTimeSequence(ensGrid)) {
+                    // (Time -> (Ensemble -> (grid)))
+                    FieldImpl innerGrid = (FieldImpl) ensGrid.getSample(0);
+                    if (hasEnsemble(innerGrid)) {
+                        return (Gridded1DSet) innerGrid.getDomainSet();
+                    }
+                } else {
+                    // (Ensemble -> (grid))
+                    return (Gridded1DSet) ensGrid.getDomainSet();
+                }  // TODO:  (index -> (Ensemble -> (grid)))
+            } catch (RemoteException re) {
+                return null;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Check to see if this is a single grid or if it is a time sequence
