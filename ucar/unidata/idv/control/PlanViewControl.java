@@ -166,10 +166,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** polygon mode */
     int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
-    /** _more_          */
+    /** old smoothing type */
     private String OldSmoothingType = LABEL_NONE;
 
-    /** _more_          */
+    /** old smoothing factor */
     private int OldSmoothingFactor = 0;
 
     /** flag for ensembles */
@@ -1208,10 +1208,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected void applySmoothing() throws VisADException, RemoteException {
         if (checkFlag(FLAG_SMOOTHING)) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
-               if(!getSmoothingType().equalsIgnoreCase("None") || !OldSmoothingType.equalsIgnoreCase("None"))  {
-                    if(!getSmoothingType().equals(OldSmoothingType)
-                        || (getSmoothingFactor() != OldSmoothingFactor)) {
-                        OldSmoothingType = getSmoothingType();
+                if ( !getSmoothingType().equalsIgnoreCase(LABEL_NONE)
+                        || !OldSmoothingType.equalsIgnoreCase(LABEL_NONE)) {
+                    if ( !getSmoothingType().equals(OldSmoothingType)
+                            || (getSmoothingFactor() != OldSmoothingFactor)) {
+                        OldSmoothingType   = getSmoothingType();
                         OldSmoothingFactor = getSmoothingFactor();
                         try {
                             getGridDisplayable().loadData(
@@ -1549,12 +1550,14 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected void applySkipFactor() {
 
-        if ((getGridDisplayable() != null) && (currentSlice != null)) {
-            try {
-                getGridDisplayable().loadData(
-                    getSliceForDisplay(currentSlice));
-            } catch (Exception ve) {
-                logException("applySkipFactor", ve);
+        if (checkFlag(FLAG_SKIPFACTOR)) {
+            if ((getGridDisplayable() != null) && (currentSlice != null)) {
+                try {
+                    getGridDisplayable().loadData(
+                        getSliceForDisplay(currentSlice));
+                } catch (Exception ve) {
+                    logException("applySkipFactor", ve);
+                }
             }
         }
     }
