@@ -90,6 +90,9 @@ public class GridDataInstance extends DataInstance {
     /** ensemble dimension */
     private Gridded1DSet ensSet = null;
 
+    /** number of ensemble members */
+    private int numEns = 0;
+
     // grid meta-data for a 3D geogrid (not defined for 2d data)
 
     /** array of levels */
@@ -268,6 +271,9 @@ public class GridDataInstance extends DataInstance {
         }
         if (isEnsemble) {
             ensSet = GridUtil.getEnsembleSet(gridData);
+            numEns = (ensSet == null)
+                     ? 0
+                     : ensSet.getLength();
         }
 
         is3D       = (Util.getDomainSet(field).getManifoldDimension() == 3);
@@ -896,5 +902,13 @@ public class GridDataInstance extends DataInstance {
     public Gridded1DSet getEnsembleSet() {
         checkInit();
         return ensSet;
+    }
+
+    /**
+     * Get number of ensembles
+     * @return number of ensemble members (or 0)
+     */
+    public int getNumEnsembles() {
+        return numEns;
     }
 }
