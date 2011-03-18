@@ -1,30 +1,28 @@
 /*
- * $Id: DataCategory.java,v 1.74 2007/06/15 13:03:16 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
 import org.w3c.dom.Element;
+
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlResourceCollection;
@@ -142,7 +140,7 @@ public class DataCategory {
     public static final String CATEGORY_GRIDSOUNDING = "GRID_SOUNDING";
 
     /** The grid ensemble category */
-    public static final String CATEGORY_GRIDENSEMBLE = "GRID-ENSEMBLE";
+    public static final String CATEGORY_ENSEMBLE = "ENSEMBLE";
 
     /** The RAOB skew-T category */
     public static final String CATEGORY_RAOBSOUNDING = "RAOB_SOUNDING";
@@ -234,13 +232,14 @@ public class DataCategory {
     public static final DataCategory TRACK_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_TRACKSKEWT, false);
 
-    /** _more_          */
+    /** _more_ */
     public static final DataCategory COSMIC_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_COSMICSKEWT, false);
 
-    /** _more_          */
-    public static final DataCategory GRID_ENSEMBLE_CATEGORY =
-        new DataCategory(CATEGORY_GRIDENSEMBLE, false);
+    /** grid ensemble categories */
+    public static final DataCategory ENSEMBLE_CATEGORY =
+        new DataCategory(CATEGORY_ENSEMBLE, false);
+
     /**
      * Grid-derived data appropriate for an aerological sounding display
      * ({@link visad.DateTime} -> ({@link visad.georef.EarthLocationTuple}
@@ -261,7 +260,7 @@ public class DataCategory {
     public static final DataCategory TRACK_SOUNDING_CATEGORY =
         new DataCategory(CATEGORY_TRACKSOUNDING, false);
 
-    /** Category for the trajectory feature type data files  */
+    /** Category for the trajectory feature type data files */
     public static final DataCategory TRAJECTORY_SOUNDING_CATEGORY =
         new DataCategory(CATEGORY_TRAJECTORYSOUNDING, false);
 
@@ -1009,21 +1008,21 @@ public class DataCategory {
     }
 
     /**
-       Set the Replace property.
-
-       @param value The new value for Replace
-    **/
-    public void setReplace (String value) {
-	this.replace = value;
+     *  Set the Replace property.
+     *
+     *  @param value The new value for Replace
+     */
+    public void setReplace(String value) {
+        this.replace = value;
     }
 
     /**
-       Get the Replace property.
-
-       @return The Replace
-    **/
-    public String getReplace () {
-	return this.replace;
+     *  Get the Replace property.
+     *
+     *  @return The Replace
+     */
+    public String getReplace() {
+        return this.replace;
     }
 
 
@@ -1043,4 +1042,3 @@ public class DataCategory {
         return parseCategory(newName, getForDisplay());
     }
 }
-
