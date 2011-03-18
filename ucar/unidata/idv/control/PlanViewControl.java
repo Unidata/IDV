@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -166,10 +166,15 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** polygon mode */
     int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
+    /** _more_          */
     private String OldSmoothingType = LABEL_NONE;
 
+    /** _more_          */
     private int OldSmoothingFactor = 0;
-    
+
+    /** flag for ensembles */
+    protected boolean haveEnsemble = false;
+
     /**
      * Cstr; does nothing. See init() for creation actions.
      */
@@ -592,6 +597,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return false;
         }
         loadedAny = false;
+
+        // TODO:  We might want to move haveEnsembles up to GridDisplayControl in the future
+        if (getGridDataInstance() != null) {
+            haveEnsemble = getGridDataInstance().getNumEnsembles() > 1;
+        }
 
         getGridDisplayable().setColoredByAnother(haveMultipleFields());
         if (getMultipleIsTopography()) {
@@ -1196,12 +1206,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
-        if (checkFlag(FLAG_SMOOTHING) ) {
+        if (checkFlag(FLAG_SMOOTHING)) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
 
-                if(!getSmoothingType().equals(OldSmoothingType)
-                    || (getSmoothingFactor() != OldSmoothingFactor)) {
-                    OldSmoothingType = getSmoothingType();
+                if ( !getSmoothingType().equals(OldSmoothingType)
+                        || (getSmoothingFactor() != OldSmoothingFactor)) {
+                    OldSmoothingType   = getSmoothingType();
                     OldSmoothingFactor = getSmoothingFactor();
                     try {
                         getGridDisplayable().loadData(
@@ -1226,6 +1236,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
         return super.checkFlag(f);
     }
+
     /**
      * Add any macro name/label pairs
      *

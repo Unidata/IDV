@@ -42,6 +42,7 @@ import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.JCheckBox;
@@ -63,13 +64,10 @@ public class ContourPlanViewControl extends PlanViewControl {
     private Contour2DDisplayable contourDisplay;
 
     /** flag for color filling */
-    boolean isColorFill = false;
+    private boolean isColorFill = false;
 
-    /** flag for color filling */
-    boolean haveEnsemble = false;
-
-    /** flag for color filling */
-    boolean colorByMember = true;
+    /** flag for coloring by ensembles */
+    private boolean colorByMember = true;
 
     /**
      * Create a new <code>ContourPlanViewControl</code> setting the
@@ -159,7 +157,6 @@ public class ContourPlanViewControl extends PlanViewControl {
      * A hook for derived classes to set any state. ex: color filled contours turn off
      * labels
      *
-     *
      * @param contourInfo The contour info to initialize
      */
     protected void initializeDefaultContourInfo(ContourInfo contourInfo) {
@@ -194,7 +191,6 @@ public class ContourPlanViewControl extends PlanViewControl {
     protected boolean setData(DataChoice data)
             throws VisADException, RemoteException {
     	
-        haveEnsemble = DataCategory.ENSEMBLE_CATEGORY.applicableTo(data.getCategories());
         if ( !super.setData(data)) {
             return false;
         }
