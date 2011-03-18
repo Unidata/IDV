@@ -193,22 +193,11 @@ public class ContourPlanViewControl extends PlanViewControl {
      */
     protected boolean setData(DataChoice data)
             throws VisADException, RemoteException {
-        haveEnsemble = DataCategory.applicableTo(
-            data.getCategories(),
-            DataCategory.parseCategories(
-                DataCategory.CATEGORY_GRIDENSEMBLE, false));
+    	
+        haveEnsemble = DataCategory.ENSEMBLE_CATEGORY.applicableTo(data.getCategories());
         if ( !super.setData(data)) {
             return false;
         }
-        //List categories = data.getCategories();
-        //for (int i = 0; i < categories.size(); i++) {
-        //    DataCategory dc = (DataCategory) categories.get(i);
-        //    if (DataCategory.GRID_ENSEMBLE_CATEGORY.applicableTo(dc)) {
-        //        getGridDisplayable().setColoredByAnother(true);
-        //    }
-        //}
-
-
         return true;
     }
 
