@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2496,9 +2496,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
     /**
-     * _more_
+     * Decode the jnlp file
      *
-     * @param filename _more_
+     * @param filename  the name of the file
      */
     public void decodeJnlpFile(String filename) {
         String xml = extractBundleFromJnlp(filename);
@@ -2514,7 +2514,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @param filename The name of the jnlp file.
      *
-     * @return _more_
+     * @return the bundle
      */
     public String extractBundleFromJnlp(String filename) {
         try {
@@ -3505,7 +3505,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 if ((overrideEnsMembers != null)
                         && (dataSource instanceof GridDataSource)) {
                     ((GridDataSource) dataSource).setEnsembleSelection(
-                        overrideTimes);
+                        overrideEnsMembers);
                 }
                 if ( !loadDialog.okToRun()) {
                     return;

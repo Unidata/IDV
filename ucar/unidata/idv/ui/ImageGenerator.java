@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -32,6 +32,7 @@ import org.w3c.dom.*;
 
 import ucar.unidata.collab.*;
 import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridDataSource;
 
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.gis.maps.*;
@@ -361,10 +362,10 @@ public class ImageGenerator extends IdvManager {
     /** x aspect attribute */
     public static final String ATTR_ASPECTX = "aspectx";
 
-    /** y aspect attribute_more_ */
+    /** y aspect attribute */
     public static final String ATTR_ASPECTY = "aspecty";
 
-    /** z aspect attribute_more_ */
+    /** z aspect attribute */
     public static final String ATTR_ASPECTZ = "aspectz";
 
 
@@ -403,16 +404,16 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_TOP = "top";
 
 
-    /** _more_ */
+    /** left space attribute */
     public static final String ATTR_SPACE_LEFT = "space_left";
 
-    /** _more_ */
+    /** right space attribute */
     public static final String ATTR_SPACE_RIGHT = "space_right";
 
-    /** _more_ */
+    /** top space attribute */
     public static final String ATTR_SPACE_TOP = "space_top";
 
-    /** _more_ */
+    /** bottom space attribute */
     public static final String ATTR_SPACE_BOTTOM = "space_bottom";
 
 
@@ -473,7 +474,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_COPY = "copy";
 
-    /** _more_ */
+    /** the count tag */
     public static final String ATTR_COUNT = "count";
 
     /** isl tag */
@@ -531,36 +532,31 @@ public class ImageGenerator extends IdvManager {
     /** isl attr */
     public static final String ATTR_FORMAT = "format";
 
-
-    /** _more_ */
-
-    /** _more_ */
+    /** that latlonlabels tag */
     public static final String TAG_LATLONLABELS = "latlonlabels";
 
-    /** _more_ */
+    /** that latvalues tag */
     public static final String ATTR_LAT_VALUES = "latvalues";
 
-    /** _more_ */
+    /** that latlabels tag */
     public static final String ATTR_LAT_LABELS = "latlabels";
 
-    /** _more_ */
+    /** that lonvalues tag */
     public static final String ATTR_LON_VALUES = "lonvalues";
 
-    /** _more_ */
+    /** that lonlabels tag */
     public static final String ATTR_LON_LABELS = "lonlabels";
 
-
-
-    /** _more_ */
+    /** the draw lon lines tag */
     public static final String ATTR_DRAWLONLINES = "drawlonlines";
 
-    /** _more_ */
+    /**  the draw lat lines tag */
     public static final String ATTR_DRAWLATLINES = "drawlatlines";
 
-    /** _more_ */
+    /** dashes tag */
     public static final String ATTR_DASHES = "dashes";
 
-    /** _more_ */
+    /** linewidth tag */
     public static final String ATTR_LINEWIDTH = "linewidth";
 
     /** _more_ */
@@ -590,10 +586,6 @@ public class ImageGenerator extends IdvManager {
     /** _more_ */
     public static final String ATTR_SHOWRIGHT = "showright";
 
-
-
-
-
     /** isl tag */
     public static final String ATTR_FONTSIZE = "fontsize";
 
@@ -620,7 +612,7 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String ATTR_TIMES = "times";
-    
+
     /** isl tag */
     public static final String ATTR_ENSEMBLES = "ensembles";
 
@@ -685,7 +677,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_BOTTOM = "bottom";
 
-    /** _more_ */
+    /** the valign attribute */
     public static final String ATTR_VALIGN = "valign";
 
     /** isl tag */
@@ -719,7 +711,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_VIEW = "view";
 
-    /** _more_ */
+    /** the view dir attribute */
     public static final String ATTR_VIEWDIR = "viewdir";
 
     /** isl tag */
@@ -810,7 +802,7 @@ public class ImageGenerator extends IdvManager {
     /** Keep around the last image captured */
     private Image lastImage;
 
-    /** _more_ */
+    /** an object map */
     private Hashtable objectMap;
 
 
@@ -1841,8 +1833,8 @@ public class ImageGenerator extends IdvManager {
             List ensList =
                 StringUtil.parseIntegerListString(applyMacros(node,
                     ATTR_ENSEMBLES, (String) null));
-            if (dataSource instanceof ucar.unidata.data.grid.GridDataSource) {
-                dataSource.setDateTimeSelection(ensList);
+            if (dataSource instanceof GridDataSource) {
+                ((GridDataSource) dataSource).setEnsembleSelection(ensList);
             }
         }
 
@@ -1920,13 +1912,13 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Process the view tag
      *
-     * @param node _more_
+     * @param node the element
      *
-     * @return _more_
+     * @return  true if it was processed
      *
-     * @throws Throwable _more_
+     * @throws Throwable  problems
      */
     protected boolean processTagView(Element node) throws Throwable {
         List   vms    = getViewManagers(node);
@@ -1968,13 +1960,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * handle the animation tag. The index attribute can either be a number or be "end"
+     * Handle the animation tag. The index attribute can either be a number or be "end"
      *
-     * @param node _more_
+     * @param node  the node
      *
-     * @return _more_
+     * @return  true if successful
      *
-     * @throws Throwable _more_
+     * @throws Throwable  problems
      */
     protected boolean processTagAnimation(Element node) throws Throwable {
         String  indexString = applyMacros(node, ATTR_INDEX, "0");
@@ -2004,13 +1996,13 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Process the viewpoint tag
      *
-     * @param node _more_
+     * @param node  the node
      *
-     * @return _more_
+     * @return  true if successful
      *
-     * @throws Throwable _more_
+     * @throws Throwable  problems
      */
     protected boolean processTagViewpoint(Element node) throws Throwable {
 
@@ -2263,12 +2255,12 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Find the display control
      *
-     * @param id _more_
-     * @param controls _more_
+     * @param id  the control id
+     * @param controls  the list of controls
      *
-     * @return _more_
+     * @return  the control or null
      */
     public DisplayControlImpl findDisplayControl(String id,
             List<DisplayControlImpl> controls) {
@@ -2303,10 +2295,16 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagBundle(Element node) throws Throwable {
 
         List timesList = null;
+        List ensList   = null;
         if (XmlUtil.hasAttribute(node, ATTR_TIMES)) {
             timesList = StringUtil.parseIntegerListString(applyMacros(node,
                     ATTR_TIMES, (String) null));
         }
+        if (XmlUtil.hasAttribute(node, ATTR_ENSEMBLES)) {
+            ensList = StringUtil.parseIntegerListString(applyMacros(node,
+                    ATTR_ENSEMBLES, (String) null));
+        }
+
 
         List nodes    = XmlUtil.findChildren(node, TAG_SETFILES);
         List ids      = new ArrayList();
@@ -2366,6 +2364,9 @@ public class ImageGenerator extends IdvManager {
         if (timesList != null) {
             bundleProperties.put(IdvPersistenceManager.PROP_TIMESLIST,
                                  timesList);
+        }
+        if (ensList != null) {
+            bundleProperties.put(IdvPersistenceManager.PROP_ENSLIST, ensList);
         }
 
 
@@ -2937,11 +2938,11 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Process tag display properties
      *
-     * @param node _more_
+     * @param node  the node
      *
-     * @return _more_
+     * @return true if successful
      */
     protected boolean processTagDisplayproperties(Element node) {
         DisplayControlImpl display = findDisplayControl(node);
@@ -3575,13 +3576,13 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Do the macro substitution
      *
-     * @param s _more_
-     * @param props _more_
-     * @param doTime _more_
+     * @param s The string
+     * @param props Properties
+     * @param doTime  process time macros
      *
-     * @return _more_
+     * @return The expanded string
      */
     private String applyMacros(String s, Hashtable props, boolean doTime) {
         if (s == null) {
@@ -3699,11 +3700,11 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Put the index
      *
-     * @param props _more_
-     * @param name _more_
-     * @param v _more_
+     * @param props  the properties
+     * @param name the name
+     * @param v  the index
      */
     public void putIndex(Hashtable props, String name, int v) {
         props.put(name, new Integer(v));
@@ -3829,7 +3830,7 @@ public class ImageGenerator extends IdvManager {
      * @param width The width of the display area to use
      * @param height The height of the display are to use
      *
-     * @throws Throwable _more_
+     * @throws Throwable  an exception
      */
     public void loadBundle(String bundleFile, List setFiles, int width,
                            int height)
@@ -3848,7 +3849,7 @@ public class ImageGenerator extends IdvManager {
      * @param times A string of times to use from the bundle file
      * @param clear If false then do not clear out the data sources and displays (which is otherwise the default)
      *
-     * @throws Throwable _more_
+     * @throws Throwable  an exception
      */
     public void loadBundle(String bundleFile, List setFiles, int width,
                            int height, String times, boolean clear)
@@ -3878,13 +3879,13 @@ public class ImageGenerator extends IdvManager {
             attrs.append(ATTR_HEIGHT + "=" + quote("" + height));
             attrs.append(" ");
         }
-        if (times != null && !times.isEmpty()) {
+        if ((times != null) && !times.isEmpty()) {
             attrs.append(" ");
             attrs.append(ATTR_TIMES + "=" + quote("" + times));
         }
-        if (!clear) {
+        if ( !clear) {
             attrs.append(" ");
-            attrs.append(ATTR_CLEAR + "=" + quote("false") );
+            attrs.append(ATTR_CLEAR + "=" + quote("false"));
         }
 
         String xml = "<bundle " + attrs + ">" + extra + "</bundle>";
@@ -3971,11 +3972,11 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Quote a string
      *
-     * @param s _more_
+     * @param s  the string
      *
-     * @return _more_
+     * @return  the quotated string
      */
     private static String quote(String s) {
         return "\"" + s + "\"";
@@ -4226,7 +4227,7 @@ public class ImageGenerator extends IdvManager {
      * @param node Node to process
      * @param props Extra properties
      * @param viewManager The viewmanager this image came from
-     * @param imageProps _more_
+     * @param imageProps  the image properties
      *
      *
      * @return The processed image
@@ -5002,12 +5003,12 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
-     * _more_
+     * Get the insets
      *
-     * @param child _more_
-     * @param dflt _more_
+     * @param child  the element
+     * @param dflt   the default value
      *
-     * @return _more_
+     * @return the Insets
      */
     public Insets getInsets(Element child, int dflt) {
         int space  = applyMacros(child, ATTR_SPACE, dflt);
