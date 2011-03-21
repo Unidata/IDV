@@ -232,14 +232,19 @@ public abstract class GridDataSource extends FilesDataSource {
      *
      *  @param ensMembers  the ensemble memeber selection for this datasource
      */
-    public void setEnsembleSelection(List ensMembers) {}
+    public void setEnsembleSelection(List<Integer> ensMembers) {
+        if (ensMembers != null) {
+            getProperties().put(PROP_ENSEMBLEMEMBERS, ensMembers);
+        }
+    }
 
     /**
      *  Get the ensemble selection
      *
      * @return the ensemble selection for this datasource or null
      */
-    public List getEnsembleSelection() {
-        return null;
+    public List<Integer> getEnsembleSelection() {
+        return (List<Integer>) getProperties().get(PROP_ENSEMBLEMEMBERS);
     }
+
 }

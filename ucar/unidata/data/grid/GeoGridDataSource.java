@@ -2506,26 +2506,4 @@ public class GeoGridDataSource extends GridDataSource {
         return reverseTimes;
     }
 
-
-    /**
-     *  Set the ensemble selection
-     *
-     *  @param ensMembers  the ensemble memeber selection for this datasource
-     */
-    public void setEnsembleSelection(List ensMembers) {
-        if (ensMembers != null) {
-            getProperties().put(PROP_ENSEMBLEMEMBERS, ensMembers);
-        }
-    }
-
-    /**
-     *  Get the ensemble selection
-     *
-     * @return the ensemble selection for this datasource or null
-     */
-    public List getEnsembleSelection() {
-        return (List) getProperties().get(PROP_ENSEMBLEMEMBERS);
-    }
-
-
 }
