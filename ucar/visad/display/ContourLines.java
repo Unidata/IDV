@@ -596,6 +596,7 @@ public abstract class ContourLines extends LineDrawing {
         applyDisplayUnit(contourMap, contourRealType);
 
         replaceScalarMap(oldContourMap, contourMap);  // in Displayable.java
+        fireScalarMapSetChange();
 
     }
 }
