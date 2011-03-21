@@ -53,25 +53,25 @@ import java.util.List;
  */
 public abstract class GridDataSource extends FilesDataSource {
 
-    /** _more_          */
+    /** North attribute */
     public static final String ATTR_NORTH = "north";
 
-    /** _more_          */
+    /** south attribute */
     public static final String ATTR_SOUTH = "south";
 
-    /** _more_          */
+    /** east attribute */
     public static final String ATTR_EAST = "east";
 
-    /** _more_          */
+    /** west attribute */
     public static final String ATTR_WEST = "west";
 
-    /** _more_          */
+    /** x attribute */
     public static final String ATTR_X = "x";
 
-    /** _more_          */
+    /** y attribute */
     public static final String ATTR_Y = "y";
 
-    /** _more_          */
+    /** z attribute */
     public static final String ATTR_Z = "z";
 
 
@@ -96,6 +96,9 @@ public abstract class GridDataSource extends FilesDataSource {
     /** List of ens categories for grids */
     private DataCategory ensDCategory;
 
+    /** grid ensemble members */
+    public static final String PROP_ENSEMBLEMEMBERS = "prop.gridmembers";
+
     /**
      * Default constructor; initializes data categories
      */
@@ -106,9 +109,9 @@ public abstract class GridDataSource extends FilesDataSource {
 
 
     /**
-     * _more_
+     * Create a GridDataSource from the descriptor
      *
-     * @param descriptor _more_
+     * @param descriptor  the descriptor
      */
     public GridDataSource(DataSourceDescriptor descriptor) {
         super(descriptor);
@@ -224,4 +227,19 @@ public abstract class GridDataSource extends FilesDataSource {
         return threeDEnsTimeSeriesCategories;
     }
 
+    /**
+     *  Set the ensemble selection
+     *
+     *  @param ensMembers  the ensemble memeber selection for this datasource
+     */
+    public void setEnsembleSelection(List ensMembers) {}
+
+    /**
+     *  Get the ensemble selection
+     *
+     * @return the ensemble selection for this datasource or null
+     */
+    public List getEnsembleSelection() {
+        return null;
+    }
 }

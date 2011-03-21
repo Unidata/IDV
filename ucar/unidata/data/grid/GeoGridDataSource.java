@@ -128,9 +128,6 @@ public class GeoGridDataSource extends GridDataSource {
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
 
-    /** grid ensemble members */
-    public static final String PROP_GRIDMEMBERS = "prop.gridmembers";
-
     /** property timesize */
     public static final String PROP_TIMESIZE = "prop.timesize";
 
@@ -1745,7 +1742,7 @@ public class GeoGridDataSource extends GridDataSource {
         List times = getTimesFromDataSelection(givenDataSelection,
                          dataChoice);
         List members =
-            (List) givenDataSelection.getProperty(PROP_GRIDMEMBERS);
+            (List) givenDataSelection.getProperty(PROP_ENSEMBLEMEMBERS);
         int[] membersIndices = null;
         if (members != null) {
             int msize = members.size();
@@ -1984,19 +1981,19 @@ public class GeoGridDataSource extends GridDataSource {
 
                     }
                     List ensSet = TwoFacedObject.createList(ids, enames);
-                    props.put(PROP_GRIDMEMBERS, ensSet);
+                    props.put(PROP_ENSEMBLEMEMBERS, ensSet);
 
 
                 }
 
-                if((ensDim != null) && (ensDim.getLength() > 1)) {
+                if ((ensDim != null) && (ensDim.getLength() > 1)) {
                     categories = (tAxis == null)
-                             ? getTwoDCategories()
-                             : getTwoDEnsTimeSeriesCategories();
+                                 ? getTwoDCategories()
+                                 : getTwoDEnsTimeSeriesCategories();
                 } else {
                     categories = (tAxis == null)
-                             ? getTwoDCategories()
-                             : getTwoDTimeSeriesCategories();
+                                 ? getTwoDCategories()
+                                 : getTwoDTimeSeriesCategories();
                 }
                 /*
                 choice = new DirectDataChoice(this, parmName, pseudoName,
@@ -2042,7 +2039,7 @@ public class GeoGridDataSource extends GridDataSource {
                         enames[i] = na.toString();
                     }
                     List ensSet = TwoFacedObject.createList(ids, enames);
-                    props.put(PROP_GRIDMEMBERS, ensSet);
+                    props.put(PROP_ENSEMBLEMEMBERS, ensSet);
 
 
                 }
@@ -2054,15 +2051,15 @@ public class GeoGridDataSource extends GridDataSource {
                                      props);
                 */
 
-                if((ensDim != null) && (ensDim.getLength() > 1)) {
+                if ((ensDim != null) && (ensDim.getLength() > 1)) {
                     categories = (tAxis == null)
-                             ? getThreeDCategories()
-                             : getThreeDEnsTimeSeriesCategories();
+                                 ? getThreeDCategories()
+                                 : getThreeDEnsTimeSeriesCategories();
 
                 } else {
-                   categories = (tAxis == null)
-                             ? getThreeDCategories()
-                             : getThreeDTimeSeriesCategories();
+                    categories = (tAxis == null)
+                                 ? getThreeDCategories()
+                                 : getThreeDTimeSeriesCategories();
                 }
             }
             // see if we have any categorization
@@ -2119,9 +2116,9 @@ public class GeoGridDataSource extends GridDataSource {
     /**
      * check if a input is only numeric number
      *
-     * @param str _more_
+     * @param str  is this numeric
      *
-     * @return _more_
+     * @return true if numeric
      */
     public static boolean isNumeric(String str) {
         try {
@@ -2505,9 +2502,23 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
+    /**
+     *  Set the ensemble selection
+     *
+     *  @param ensMembers  the ensemble memeber selection for this datasource
+     */
+    public void setEnsembleSelection(List ensMembers) {
+        getProperties().put(PROP_ENSEMBLEMEMBERS, ensMembers);
+    }
 
-
-
+    /**
+     *  Get the ensemble selection
+     *
+     * @return the ensemble selection for this datasource or null
+     */
+    public List getEnsembleSelection() {
+        return (List) getProperties().get(PROP_ENSEMBLEMEMBERS);
+    }
 
 
 }
