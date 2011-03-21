@@ -1741,8 +1741,13 @@ public class GeoGridDataSource extends GridDataSource {
         Trace.call1("GeoGridDataSource.make times");
         List times = getTimesFromDataSelection(givenDataSelection,
                          dataChoice);
-        List members =
-            (List) givenDataSelection.getProperty(PROP_ENSEMBLEMEMBERS);
+
+        // Datasource overrides data selection
+        List members = getEnsembleSelection();
+        if (members == null) {
+            members =
+                (List) givenDataSelection.getProperty(PROP_ENSEMBLEMEMBERS);
+        }
         int[] membersIndices = null;
         if (members != null) {
             int msize = members.size();
