@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2508,7 +2508,9 @@ public class GeoGridDataSource extends GridDataSource {
      *  @param ensMembers  the ensemble memeber selection for this datasource
      */
     public void setEnsembleSelection(List ensMembers) {
-        getProperties().put(PROP_ENSEMBLEMEMBERS, ensMembers);
+        if (ensMembers != null) {
+            getProperties().put(PROP_ENSEMBLEMEMBERS, ensMembers);
+        }
     }
 
     /**
