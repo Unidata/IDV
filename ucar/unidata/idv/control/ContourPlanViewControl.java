@@ -190,7 +190,7 @@ public class ContourPlanViewControl extends PlanViewControl {
      */
     protected boolean setData(DataChoice data)
             throws VisADException, RemoteException {
-    	
+
         if ( !super.setData(data)) {
             return false;
         }
@@ -240,6 +240,22 @@ public class ContourPlanViewControl extends PlanViewControl {
         }
 
     }
+
+    /**
+     *  Use the value of the smoothing type and weight to subset the data.
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
+     */
+    protected void applySmoothing() throws VisADException, RemoteException {
+        // NB: For some reason, when the smoothing changes and the original state was color
+        // by param in a bundle, the displayUnit was not being set when smoothing changed.
+        if (checkFlag(FLAG_SMOOTHING)) {
+            super.applySmoothing();
+            applyDisplayUnit();
+        }
+    }
+
 
     /**
      * Get the parameter name for color.
