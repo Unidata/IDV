@@ -620,6 +620,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String ATTR_TIMES = "times";
+    
+    /** isl tag */
+    public static final String ATTR_ENSEMBLES = "ensembles";
 
     /** isl tag */
     public static final String ATTR_DIR = "dir";
@@ -1832,6 +1835,15 @@ public class ImageGenerator extends IdvManager {
                 StringUtil.parseIntegerListString(applyMacros(node,
                     ATTR_TIMES, (String) null));
             dataSource.setDateTimeSelection(timesList);
+        }
+
+        if (XmlUtil.hasAttribute(node, ATTR_ENSEMBLES)) {
+            List ensList =
+                StringUtil.parseIntegerListString(applyMacros(node,
+                    ATTR_ENSEMBLES, (String) null));
+            if (dataSource instanceof ucar.unidata.data.grid.GridDataSource) {
+                dataSource.setDateTimeSelection(ensList);
+            }
         }
 
 
