@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -321,9 +321,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
     }
 
     /**
-     * _more_
+     * Is the layer fixed?
      *
-     * @return _more_
+     * @return true if fixed
      */
     private boolean isLayerFixed() {
         if (wmsInfo != null) {
@@ -342,9 +342,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
     }
 
     /**
-     * _more_
+     * Get initial fast rendering option
      *
-     * @return _more_
+     * @return false
      */
     protected boolean getInitialFastRendering() {
         return false;
@@ -1670,5 +1670,19 @@ public class WMSControl extends ImageControl implements ImageObserver {
     public double getScale() {
         return scale;
     }
+
+    /**
+     * Get default z position to use
+     *
+     * @return Default z position
+     */
+    protected double getInitialZPosition() {
+        if (inGlobeDisplay()) {
+            return super.getInitialZPosition() - ZFUDGE;
+        }
+        return super.getInitialZPosition();
+    }
+
+
 
 }
