@@ -34,6 +34,8 @@ import ucar.unidata.collab.*;
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataSource;
 
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.gis.maps.*;
 import ucar.unidata.idv.*;
@@ -347,6 +349,9 @@ public class ImageGenerator extends IdvManager {
     /** z stride attribute */
     public static final String ATTR_STRIDEZ = "stridez";
 
+    /** bounding box attribute */
+    public static final String ATTR_BBOX = "bbox";
+
     /** from level attribute */
     public static final String ATTR_LEVEL_FROM = "levelfrom";
 
@@ -550,7 +555,7 @@ public class ImageGenerator extends IdvManager {
     /** the draw lon lines tag */
     public static final String ATTR_DRAWLONLINES = "drawlonlines";
 
-    /**  the draw lat lines tag */
+    /** the draw lat lines tag */
     public static final String ATTR_DRAWLATLINES = "drawlatlines";
 
     /** dashes tag */
@@ -1838,6 +1843,8 @@ public class ImageGenerator extends IdvManager {
             }
         }
 
+        processGeoSelectionTags(node, dataSource.getDataSelection());
+
 
         Hashtable properties = getProperties(node);
         dataSource.setObjectProperties(properties);
@@ -3029,41 +3036,7 @@ public class ImageGenerator extends IdvManager {
                         (String) null));
 
 
-            String strideString = applyMacros(node, ATTR_STRIDE,
-                                      (String) null);
-            if (strideString != null) {
-                dataSelection.getGeoSelection(true).setXStride(
-                    applyMacros(node, ATTR_STRIDE, 1));
-                dataSelection.getGeoSelection(true).setYStride(
-                    applyMacros(node, ATTR_STRIDE, 1));
-
-            }
-
-
-            String strideXString = applyMacros(node, ATTR_STRIDEX,
-                                       (String) null);
-            if (strideXString != null) {
-                dataSelection.getGeoSelection().setXStride(applyMacros(node,
-                        ATTR_STRIDEX, 1));
-
-            }
-
-            String strideYString = applyMacros(node, ATTR_STRIDEY,
-                                       (String) null);
-            if (strideYString != null) {
-                dataSelection.getGeoSelection().setYStride(applyMacros(node,
-                        ATTR_STRIDEY, 1));
-
-            }
-            String strideZString = applyMacros(node, ATTR_STRIDEZ,
-                                       (String) null);
-            if (strideZString != null) {
-                dataSelection.getGeoSelection().setZStride(applyMacros(node,
-                        ATTR_STRIDEX, 1));
-
-            }
-
-
+            processGeoSelectionTags(node, dataSelection);
 
             String timeString = applyMacros(node, ATTR_TIMES, (String) null);
             if (timeString != null) {
@@ -3123,6 +3096,65 @@ public class ImageGenerator extends IdvManager {
         }
         return true;
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param dataSelection _more_
+     *
+     * @return _more_
+     */
+    private boolean processGeoSelectionTags(Element node,
+                                            DataSelection dataSelection) {
+        String strideString = applyMacros(node, ATTR_STRIDE, (String) null);
+        if (strideString != null) {
+            dataSelection.getGeoSelection(true).setXStride(applyMacros(node,
+                    ATTR_STRIDE, 1));
+            dataSelection.getGeoSelection(true).setYStride(applyMacros(node,
+                    ATTR_STRIDE, 1));
+
+        }
+
+
+        String strideXString = applyMacros(node, ATTR_STRIDEX, (String) null);
+        if (strideXString != null) {
+            dataSelection.getGeoSelection(true).setXStride(applyMacros(node,
+                    ATTR_STRIDEX, 1));
+
+        }
+
+        String strideYString = applyMacros(node, ATTR_STRIDEY, (String) null);
+        if (strideYString != null) {
+            dataSelection.getGeoSelection(true).setYStride(applyMacros(node,
+                    ATTR_STRIDEY, 1));
+
+        }
+        String strideZString = applyMacros(node, ATTR_STRIDEZ, (String) null);
+        if (strideZString != null) {
+            dataSelection.getGeoSelection(true).setZStride(applyMacros(node,
+                    ATTR_STRIDEX, 1));
+
+        }
+
+        String bboxString = applyMacros(node, ATTR_BBOX, (String) null);
+        if (bboxString != null) {
+            List toks = StringUtil.split(bboxString, ",", true, true);
+            if (toks.size() != 4) {
+                return error("Bad idv.data.geosubset property:" + bboxString);
+            } else {
+                GeoLocationInfo boundingBox =
+                    new GeoLocationInfo(
+                        Misc.decodeLatLon((String) toks.get(0)),
+                        Misc.decodeLatLon((String) toks.get(1)),
+                        Misc.decodeLatLon((String) toks.get(2)),
+                        Misc.decodeLatLon((String) toks.get(3)));
+                dataSelection.getGeoSelection(true).setBoundingBox(
+                    boundingBox);
+            }
+        }
+        return true;
     }
 
 
