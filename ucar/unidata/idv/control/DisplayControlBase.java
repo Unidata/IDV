@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -987,16 +987,23 @@ public abstract class DisplayControlBase extends SharableImpl {
         } else if (level instanceof Real) {
             return (Real) level;
         } else if (level instanceof String) {
-            String tmp = (String) level;
-            tmp = tmp.trim();
-            if (tmp.startsWith("#")) {
-                tmp = tmp.substring(1);
-            }
+            /*
+        String tmp = (String) level;
+        tmp = tmp.trim();
+        if (tmp.startsWith("#")) {
+            tmp = tmp.substring(1);
+        }
+        try {
+            double value = Misc.parseValue(tmp);
+            return new Real(value);
+        } catch (Exception e) {
+            System.err.println("error parsing level: " + tmp + " " + e);
+        }
+        */
             try {
-                double value = Misc.parseValue(tmp);
-                return new Real(value);
+                return Util.toReal(level.toString());
             } catch (Exception e) {
-                System.err.println("error parsing level: " + tmp + " " + e);
+                System.err.println("error parsing level: " + level + " " + e);
             }
         }
         userMessage("Unable to handle a level of type "
