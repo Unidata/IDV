@@ -124,6 +124,29 @@ The [isl::attr times] and [isl::attr ensembles] attributes work the same as in t
 
 [isl::importxml datasource.isl]
 
+One or more spatial subset attributes can be specified for data sources that 
+support them:<p>
+<pre>
+
+    stridex = the X skip factor (stride)
+    stridey = the Y skip factor
+    stridez = the Z skip factor
+    bbox    = the geographic bounding box (N,W,S,E)
+
+</pre>
+For example:
+
+[isl::xml {
+  <isl>
+  <datasource 
+       url="dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc" stridex="1" stridey="2" stridez="1" bbox="40,-113,20,-98"/>
+  </isl>
+}]
+
+would select every other X gridpoint, every 3rd Y gridpoint, 
+every other level and data between 40N and 20N and 113W and 98W.
+
+
 
 [isl::tagdef display {Create a display} -attrs {type+ {display type} param {parameter name}}]
 The [isl::tag display] tag lets you create a display and can exist on its own:
@@ -146,6 +169,8 @@ on the display.
 <p>
 The property tags define various properties to apply to the display. See <a href="DisplayProperties.html">here</a>
 for a listing.
+<p>
+The spatial subset attributes described in the [isl::tagref datasource] tag above can be used with each display to override the default.
 
 
 [isl::tagdef removedisplays {Remove all displays} -attrs {display  {display id to remove}}]
