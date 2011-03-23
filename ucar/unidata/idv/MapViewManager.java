@@ -253,7 +253,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /** z level (really radius) for where to put the globe fill layer */
-    private double globeBackgroundLevel = -0.001;
+    private double globeBackgroundLevel = -0.01;
 
     /** globe fill background stuff */
     private LineDrawing globeBackgroundDisplayable;
