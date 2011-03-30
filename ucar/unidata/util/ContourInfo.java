@@ -370,6 +370,9 @@ public class ContourInfo {
                 String value = subToks.get(1).toString().trim();
                 if (name.equals("interval")) {
                     interval = new Float(value).floatValue();
+                } else if(name.equals("levels")) {
+                    value = value.replaceAll(",",";");
+                    setLevelsString(value);
                 } else if (name.equals("min")) {
                     min = new Float(value).floatValue();
                 } else if (name.equals("max")) {
