@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -268,40 +268,40 @@ public class MapViewManager extends NavigatedViewManager {
     /** The flythrough */
     private Flythrough flythrough;
 
-    /** _more_ */
+    /** show maps flag */
     private boolean showMaps = true;
 
-    /** _more_ */
+    /** init maps flag */
     private String initMapPaths;
 
-    /** _more_ */
+    /** initial map width */
     private float initMapWidth = -1;
 
-    /** _more_ */
+    /** initial map color */
     private Color initMapColor = null;
 
-    /** _more_ */
+    /** initial lat/lon visibility */
     private boolean initLatLonVisible = false;
 
-    /** _more_ */
+    /** initial lat/lon width */
     private int initLatLonWidth = 1;
 
-    /** _more_ */
+    /** initial lat/lon spacing */
     private float initLatLonSpacing = 15;
 
-    /** _more_ */
+    /** initial lat/lon color */
     private Color initLatLonColor = Color.white;
 
-    /** _more_ */
+    /** initial lat/lon bounds */
     private Rectangle2D.Float initLatLonBounds;
 
-    /** _more_ */
+    /** use default globe background flag */
     private boolean defaultGlobeBackground = false;
 
-    /** _more_ */
+    /** initial display projection zoom */
     private double displayProjectionZoom = 0;
 
-    /** _more_ */
+    /** do not set projection flag */
     private boolean doNotSetProjection = false;
 
     /**
@@ -594,7 +594,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Initialize the UI
      */
     protected void initUI() {
         super.initUI();
@@ -609,7 +609,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Fill the legends
      */
     protected void fillLegends() {
         super.fillLegends();
@@ -638,9 +638,9 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
     /**
-     * _more_
+     * Should we animate view changes
      *
-     * @return _more_
+     * @return true if not running ISL
      */
     public boolean shouldAnimateViewChanges() {
         return !getStateManager().getRunningIsl();
@@ -735,13 +735,13 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Handle the mouse flicked
      *
-     * @param startPoint _more_
-     * @param endPoint _more_
-     * @param startMatrix _more_
-     * @param endMatrix _more_
-     * @param speed _more_
+     * @param startPoint  start point of flick
+     * @param endPoint  end point of flick
+     * @param startMatrix the start matrix
+     * @param endMatrix the end matrix
+     * @param speed  the speed of flicking
      */
     protected void mouseFlicked(Point startPoint, Point endPoint,
                                 double[] startMatrix, double[] endMatrix,
@@ -1036,11 +1036,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Initialize with another view
      *
-     * @param viewState _more_
+     * @param viewState  the view state
      *
-     * @throws Exception _more_
+     * @throws Exception  problems
      */
     public void initWith(ViewState viewState) throws Exception {
 
@@ -1058,7 +1058,7 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
     /**
-     * _more_
+     * Handle the animation time changed
      */
     protected void animationTimeChanged() {
         super.animationTimeChanged();
@@ -1188,9 +1188,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Initialize the ViewState
      *
-     * @param viewState _more_
+     * @param viewState the ViewState
      */
     public void initViewState(ViewState viewState) {
         super.initViewState(viewState);
@@ -1237,11 +1237,6 @@ public class MapViewManager extends NavigatedViewManager {
 
         super.initPreferences(preferenceManager);
 
-
-
-
-
-
         final JComponent[] bgComps =
             GuiUtils.makeColorSwatchWidget(getStore().get(PREF_BGCOLOR,
                 getBackground()), "Set Background Color");
@@ -1259,6 +1254,7 @@ public class MapViewManager extends NavigatedViewManager {
         final JComponent[] globeComps =
             GuiUtils.makeColorSwatchWidget(getGlobeBackgroundColorToUse(),
                                            "Globe Background Color");
+        StateManager stateManager = getStateManager();
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel colorPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
@@ -1274,14 +1270,14 @@ public class MapViewManager extends NavigatedViewManager {
         ContourInfo ci =
             new ContourInfo(
                 null, 0, 0, 10, true, false, false, 1, 0,
-                (int) getStateManager()
+                (int) stateManager
                     .getPreferenceOrProperty(
                         PREF_CONTOUR_LABELSIZE,
                         ContourInfo.DEFAULT_LABEL_SIZE), ContourInfoDialog
                             .getContourFont(
-                                getStateManager()
+                                stateManager
                                     .getPreferenceOrProperty(
-                                        PREF_CONTOUR_LABELFONT)), getStateManager()
+                                        PREF_CONTOUR_LABELFONT)), stateManager
                                             .getPreferenceOrProperty(
                                                 PREF_CONTOUR_LABELALIGN,
                                                 true));
@@ -1301,13 +1297,13 @@ public class MapViewManager extends NavigatedViewManager {
         final GuiUtils.ColorSwatch dlColorWidget =
             new GuiUtils.ColorSwatch(getStore().get(PREF_DISPLAYLISTCOLOR,
                 getDisplayListColor()), "Set Display List Color");
-        GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+        //GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel fontPanel =
             GuiUtils.vbox(GuiUtils.lLabel("Display List Properties:"),
                           GuiUtils.doLayout(new Component[] {
-                              GuiUtils.rLabel("   Font:"),
+                              GuiUtils.rLabel("Font:"),
                               GuiUtils.left(fontSelector.getComponent()),
-                              GuiUtils.rLabel("  Color:"),
+                              GuiUtils.rLabel("Color:"),
                               GuiUtils.left(GuiUtils.hbox(dlColorWidget,
                                   dlColorWidget.getSetButton(),
                                   dlColorWidget.getClearButton(), 5)) }, 2,
@@ -1321,6 +1317,65 @@ public class MapViewManager extends NavigatedViewManager {
         if (defaultProj != null) {
             projBox.setSelectedItem(defaultProj);
         }
+
+        final JCheckBox logoVizBox = new JCheckBox("Show Logo in View", stateManager.getPreferenceOrProperty(PREF_LOGO_VISIBILITY, false));
+        final JTextField logoField =
+            new JTextField(stateManager.getPreferenceOrProperty(PREF_LOGO,
+                ""));
+        logoField.setToolTipText("Enter a file or URL");
+        // top panel
+        JButton browseButton = new JButton("Browse..");
+        browseButton.setToolTipText("Choose a logo from disk");
+        browseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                String filename =
+                    FileManager.getReadFile(FileManager.FILTER_IMAGE);
+                if (filename == null) {
+                    return;
+                }
+                logoField.setText(filename);
+            }
+        });
+
+        String[] logos = parseLogoPosition(
+                             stateManager.getPreferenceOrProperty(
+                                 PREF_LOGO_POSITION_OFFSET, ""));
+        final JComboBox logoPosBox = new JComboBox(logoPoses);
+        logoPosBox.setToolTipText("Set the logo position on the screen");
+        logoPosBox.setSelectedItem(findLoc(logos[0]));
+
+        final JTextField logoOffsetField = new JTextField(logos[1]);
+        logoOffsetField.setToolTipText(
+            "Set an offset from the position (x,y)");
+
+        float logoScaleFactor = (float) stateManager.getPreferenceOrProperty(PREF_LOGO_SCALE, 1.0);
+        final JLabel logoSizeLab =
+            new JLabel(""+logoScaleFactor);
+        JComponent[] sliderComps = GuiUtils.makeSliderPopup(0, 20,
+                                       (int) (logoScaleFactor * 10), null);
+        final JSlider  logoScaleSlider = (JSlider) sliderComps[1];
+        ChangeListener listener        = new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                logoSizeLab.setText("" + logoScaleSlider.getValue() / 10.f);
+            }
+        };
+        logoScaleSlider.addChangeListener(listener);
+        sliderComps[0].setToolTipText("Change Logo Scale Value");
+
+        JPanel logoPanel = GuiUtils.vbox(
+        GuiUtils.left(logoVizBox),
+        GuiUtils.centerRight(logoField, browseButton), GuiUtils.hbox(
+            GuiUtils.leftCenter(
+                GuiUtils.rLabel("Screen Position: "),
+                logoPosBox), GuiUtils.leftCenter(
+                    GuiUtils.rLabel("Offset: "),
+                    logoOffsetField), GuiUtils.leftCenter(
+                        GuiUtils.rLabel("Scale: "),
+                        GuiUtils.leftRight(logoSizeLab, sliderComps[0]))));
+        logoPanel = 
+            GuiUtils.vbox(GuiUtils.lLabel("Logo: "),
+                          GuiUtils.left(GuiUtils.inset(logoPanel,
+                              new Insets(5, 5, 0, 0))));
 
 
         PreferenceManager miscManager = new PreferenceManager() {
@@ -1343,6 +1398,16 @@ public class MapViewManager extends NavigatedViewManager {
                 theStore.put(PREF_CONTOUR_LABELSIZE, ci.getLabelSize());
                 theStore.put(PREF_CONTOUR_LABELFONT, ci.getFont());
                 theStore.put(PREF_CONTOUR_LABELALIGN, ci.getAlignLabels());
+                theStore.put(PREF_LOGO, logoField.getText());
+                String lpos =
+                    ((TwoFacedObject) logoPosBox.getSelectedItem()).getId()
+                        .toString();
+                String loff = logoOffsetField.getText().trim();
+                theStore.put(PREF_LOGO_POSITION_OFFSET,
+                             makeLogoPosition(lpos, loff));
+                theStore.put(PREF_LOGO_VISIBILITY, logoVizBox.isSelected());
+                theStore.put(PREF_LOGO_SCALE,
+                             logoScaleSlider.getValue() / 10f);
 
             }
         };
@@ -1370,7 +1435,10 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show \"Please Wait\" Message", PREF_WAITMSG,
               new Boolean(getWaitMessageVisible()) },
             { "Reset Projection With New Data", PREF_PROJ_USEFROMDATA },
-            { "Use 3D View", PREF_DIMENSION }
+            { "Use 3D View", PREF_DIMENSION },
+            { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
+              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND,
+                                         defaultGlobeBackground)) }
         };
 
 
@@ -1387,10 +1455,7 @@ public class MapViewManager extends NavigatedViewManager {
                   getStateManager().getPreferenceOrProperty(
                       IdvConstants.PROP_SHOWCLOCK, "true")) },
             { "Show Overview Map", PREF_SHOWPIP,
-              new Boolean(getStore().get(PREF_SHOWPIP, false)) },
-            { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
-              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND,
-                                         defaultGlobeBackground)) }
+              new Boolean(getStore().get(PREF_SHOWPIP, false)) }
         };
 
         Object[][] toolbarObjects = {
@@ -1416,19 +1481,24 @@ public class MapViewManager extends NavigatedViewManager {
                               new Insets(5, 20, 0, 0))));
 
         JPanel colorFontPanel = GuiUtils.vbox(GuiUtils.top(colorPanel),
-                                    GuiUtils.top(fontPanel),
-                                    GuiUtils.top(projPanel));
+                                    GuiUtils.top(fontPanel) //,
+                                     //GuiUtils.top(projPanel)
+                                    );
 
 
 
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        JPanel miscContents =
-            GuiUtils.doLayout(Misc.newList(GuiUtils.top(legendPanel),
-                                           GuiUtils.top(toolbarPanel),
-                                           GuiUtils.top(miscPanel),
-                                           GuiUtils.top(colorFontPanel)), 2,
-                                               GuiUtils.WT_N, GuiUtils.WT_N);
+        JPanel miscContents = GuiUtils.doLayout(
+                                  Misc.newList( new Component[] {
+                                      GuiUtils.top(legendPanel),
+                                      GuiUtils.top(toolbarPanel),
+                                      GuiUtils.top(miscPanel), 
+                                      GuiUtils.top(colorFontPanel),
+                                      GuiUtils.top(projPanel), 
+                                      GuiUtils.top(logoPanel)}), 2,
+                                                      GuiUtils.WT_N,
+                                                      GuiUtils.WT_N);
 
 
         miscContents = GuiUtils.inset(GuiUtils.left(miscContents), 5);
@@ -1609,9 +1679,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Set the viewpoint info
      *
-     * @param viewpointInfo _more_
+     * @param viewpointInfo the viewpoint info
      */
     public void setViewpointInfo(ViewpointInfo viewpointInfo) {
         getViewpointControl().setViewpointInfo(viewpointInfo);
@@ -1692,6 +1762,7 @@ public class MapViewManager extends NavigatedViewManager {
         createCBMI(showMenu, PREF_ANIREADOUT);
         createCBMI(showMenu, PREF_SHOWPIP);
         createCBMI(showMenu, PREF_SHOWEARTHNAVPANEL);
+        createCBMI(showMenu, PREF_LOGO_VISIBILITY);
         return showMenu;
     }
 
@@ -1700,10 +1771,10 @@ public class MapViewManager extends NavigatedViewManager {
     /**
      * Center the display (animated) to the center of the given mapprojection
      *
-     * @param mp _more_
+     * @param mp  map projection
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public void center(MapProjection mp)
             throws RemoteException, VisADException {
@@ -1850,11 +1921,11 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         /**
-         * _more_
+         * Encode the map projection
          *
-         * @param projection _more_
+         * @param projection the map projection
          *
-         * @return _more_
+         * @return the encoded XML
          */
         private String encode(MapProjection projection) {
             try {
@@ -1865,11 +1936,11 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         /**
-         * _more_
+         * Decode a MapProjection XML spec
          *
-         * @param xml _more_
+         * @param xml a MapProjection XML spec
          *
-         * @return _more_
+         * @return  the decoded MapProjection
          */
         private MapProjection decode(String xml) {
             try {
@@ -2009,7 +2080,7 @@ public class MapViewManager extends NavigatedViewManager {
      *                    menu item)
      * @param name        name to put in the history list (may be null)
      *
-     * @return _more_
+     * @return  true if successful
      */
     public boolean setMapProjection(MapProjection projection,
                                     boolean fromWidget, String name) {
@@ -2026,7 +2097,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @param checkDefault  if true, check to see if we
      *                    should call getUseProjectionFromData()
      *
-     * @return _more_
+     * @return  true if successful
      */
     public boolean setMapProjection(MapProjection projection,
                                     boolean fromWidget, String name,
@@ -2048,7 +2119,7 @@ public class MapViewManager extends NavigatedViewManager {
      *                    should call getUseProjectionFromData()
      * @param addToCommandHistory Add this projection to the command history
      *
-     * @return _more_
+     * @return  true if successful
      */
     public boolean setMapProjection(MapProjection projection,
                                     boolean fromWidget, String name,
@@ -2071,7 +2142,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @param addToCommandHistory Add this projection to the command history
      * @param maintainViewpoint  maintain the viewpoint
      *
-     * @return _more_
+     * @return  true if successful
      */
     public boolean setMapProjection(MapProjection projection,
                                     boolean fromWidget, String name,
@@ -2243,15 +2314,10 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
-
-
-
-
-
     /**
-     * _more_
+     * Apply the properties
      *
-     * @return _more_
+     * @return true if successful
      */
     public boolean applyProperties() {
         if ( !super.applyProperties()) {
@@ -2268,9 +2334,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Add the properties components for this ViewManager
      *
-     * @param tabbedPane _more_
+     * @param tabbedPane  the tabbed pane to add to
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
@@ -2300,9 +2366,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Set the globe background
      *
-     * @param globe _more_
+     * @param globe  the globe display
      */
     private void setGlobeBackground(GlobeDisplay globe) {
         try {
@@ -2344,7 +2410,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Destroy this ViewManager
      */
     public void destroy() {
         if (flythrough != null) {
@@ -2359,7 +2425,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Show the fly through
      */
     public void showFlythrough() {
         if (flythrough == null) {
@@ -2370,9 +2436,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Do a flythrough
      *
-     * @param pts _more_
+     * @param pts  the flythrough points
      */
     public void flythrough(final float[][] pts) {
         if (flythrough == null) {
@@ -2383,9 +2449,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Flythrough the points
      *
-     * @param pts _more_
+     * @param pts  the List of points
      */
     public void flythrough(List<FlythroughPoint> pts) {
         if (flythrough == null) {
@@ -2395,12 +2461,12 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
     /**
-     * _more_
+     * Initialize after unpersistence
      *
-     * @param idv _more_
+     * @param idv  the IDV
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  VisAD problem
      */
     public final void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
@@ -2409,9 +2475,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Handle a change to the data in a DisplayControl
      *
-     * @param display _more_
+     * @param display  the DisplayControl
      */
     public void displayDataChanged(DisplayControl display) {
         displayDataChanged(display, false);
@@ -2419,10 +2485,10 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Handle a change to the data in a DisplayControl
      *
-     * @param display _more_
-     * @param fromInitialLoad _more_
+     * @param display  the DisplayControl
+     * @param fromInitialLoad  if this is from the initial load
      */
     public void displayDataChanged(DisplayControl display,
                                    boolean fromInitialLoad) {
@@ -2927,11 +2993,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Is this a compatible ViewManager
      *
-     * @param vm _more_
+     * @param vm  the other
      *
-     * @return _more_
+     * @return  true if compatible
      */
     public boolean isCompatibleWith(ViewManager vm) {
         if ( !super.isCompatibleWith(vm)) {
@@ -2943,11 +3009,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Is this compatible with the ViewState
      *
-     * @param viewState _more_
+     * @param viewState  the view state
      *
-     * @return _more_
+     * @return  true if compatible
      */
     public boolean isCompatibleWith(ViewState viewState) {
         if ( !super.isCompatibleWith(viewState)) {
@@ -3252,7 +3318,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Hide the pip panel
      */
     public void hidePip() {
         setShowPip(false);
@@ -3476,9 +3542,9 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
     /**
-     * _more_
+     * Set the intial lat/lon visible
      *
-     * @param v _more_
+     * @param v  true or false
      */
     public void setInitLatLonVisible(boolean v) {
         initLatLonVisible = v;
@@ -3487,9 +3553,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Set the intial lat/lon color
      *
-     * @param v _more_
+     * @param v  the color
      */
     public void setInitLatLonColor(Color v) {
         initLatLonColor = v;
@@ -3497,18 +3563,18 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * Set the initial lat/lon line width
      *
-     * @param v _more_
+     * @param v  the width
      */
     public void setInitLatLonWidth(int v) {
         initLatLonWidth = v;
     }
 
     /**
-     * _more_
+     * Set the initial lat/lon spacing
      *
-     * @param v _more_
+     * @param v  the spacing
      */
     public void setInitLatLonSpacing(float v) {
         initLatLonSpacing = v;

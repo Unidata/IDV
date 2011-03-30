@@ -481,6 +481,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void perspectiveViewChanged(boolean v) {
         updateDisplayList();
+        updateAnnotations();
     }
 
     /**
