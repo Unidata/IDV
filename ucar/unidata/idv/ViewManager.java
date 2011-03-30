@@ -1938,7 +1938,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     return;
                 }
 
-                Image logo = ImageUtils.readImage(logoFile, true);
+                Image logo = ImageUtils.readImage(logoFile, true, true);
                 if (logo == null) {
                     //throw new VisADException("Logo file: " + logoFile + " does not exist.");
                     System.err.println("Logo file: " + logoFile + " does not exist.");
