@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<aliases>
+<!--
+A list of aliases. Each alias tag holds a name (which is the canonical name)
+and a comma separated list of aliases of the canonical name.
+The label is used  (if defined) for  the AliasEditor gui.
+ -->
+  <alias
+     name="TEMP"
+     label="Temperature"
+     aliases="tasmin,tasmax,tas"/>
+</aliases>
