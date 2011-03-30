@@ -306,6 +306,9 @@ public class ImageXmlDataSource extends FilesDataSource {
             shapeCategories = DataCategory.parseCategories("GIS-SHAPEFILE",
                     false);
             Element root = XmlUtil.getRoot(xmlFile, getClass());
+            if(root == null) {
+                throw new IllegalArgumentException("Could not find image xml file:" + xmlFile);
+            }
             String dataSourceName = XmlUtil.getAttribute(root, ATTR_NAME,
                                         (String) null);
             if (dataSourceName != null) {
