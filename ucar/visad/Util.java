@@ -122,6 +122,9 @@ public final class Util {
     /** type counter */
     private static int typeCnt = 0;
 
+    /** RGBA names */
+    private static String[] rgbaNames = {"Red", "Green", "Blue", "Alpha"};
+
     /**
      * Default Constructor
      */
@@ -2946,6 +2949,25 @@ public final class Util {
     public static FlatField makeField(Image image, float alphaThreshold,
                                       boolean makeAlpha)
             throws IOException, VisADException {
+        return makeField(image, alphaThreshold, false, false);
+    }
+
+    /**
+     * Create a VisAD Data object from the given Image
+     * @param  image   image to use
+     * @param  alphaThreshold If there is an alpha channel in the image then set the field value to nan
+     * for any alhpa greater than the given threshold. Do nothing if threshold<0
+     *   value and we turn the other values into nan-s
+     * @param makeAlpha  if true, make an alpha channel as well
+     * @return a FlatField representation of the image
+     *
+     * @throws IOException  problem reading the image
+     * @throws VisADException problem creating the FlatField
+     */
+
+    public static FlatField makeField(Image image, float alphaThreshold,
+                                      boolean makeAlpha, boolean incNames)
+            throws IOException, VisADException {
 
         if (image == null) {
             throw new VisADException("image cannot be null");
@@ -3032,14 +3054,24 @@ public final class Util {
         //        System.err.println(alphaThreshold +" hasAlpha:" + hasAlpha +" make alpha:" + makeAlpha +" cnt:" + alphaCnt);
 
         //System.out.println("opaque = " + opaque);
+        String [] rtNames;
+        if (incNames) {
+        	rtNames = new String[rgbaNames.length];
+        	int cnt = typeCnt++;
+        	for (int i = 0; i < rtNames.length; i++) {
+        		rtNames[i] = rgbaNames[i]+"_"+cnt;
+        	}
+        } else {
+        	rtNames = rgbaNames;
+        }
 
         // build FlatField
         RealType   line    = RealType.getRealType("ImageLine");
         RealType   element = RealType.getRealType("ImageElement");
-        RealType   c_red   = RealType.getRealType("Red");
-        RealType   c_green = RealType.getRealType("Green");
-        RealType   c_blue  = RealType.getRealType("Blue");
-        RealType   c_alpha = RealType.getRealType("Alpha");
+        RealType   c_red   = RealType.getRealType(rtNames[0]);
+        RealType   c_green = RealType.getRealType(rtNames[1]);
+        RealType   c_blue  = RealType.getRealType(rtNames[2]);
+        RealType   c_alpha = RealType.getRealType(rtNames[3]);
 
         RealType[] c_all   = (makeAlpha
                               ? new RealType[] { c_red, c_green, c_blue,

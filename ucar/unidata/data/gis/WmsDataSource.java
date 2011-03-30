@@ -288,7 +288,7 @@ public class WmsDataSource extends DataSourceImpl {
                 //                javax.swing.JLabel l = new javax.swing.JLabel(new javax.swing.ImageIcon(image));
                 //                l.setBackground(Color.red);
                 //                ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, l,null);
-                xyData = ucar.visad.Util.makeField(image, true);
+                xyData = ucar.visad.Util.makeField(image, 0, false, true);
             } catch (Exception iexc) {
                 logException("There was an error accessing the image:\n"
                              + wmsInfo.getImageFile(), iexc);
