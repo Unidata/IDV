@@ -154,7 +154,6 @@ public class ImageUtils {
         return readImage(imagePath, true);
     }
 
-
     /**
      * Read and image
      *
@@ -165,8 +164,21 @@ public class ImageUtils {
      */
 
     public static Image readImage(String imagePath, boolean cache) {
+    	return readImage(imagePath, cache, false);
+    }
+
+    /**
+     * Read and image
+     *
+     * @param imagePath  the path to the image
+     * @param cache Cache the image
+     * @param returnNullIfNotFound  if true, return null if the image does not exist
+     *
+     * @return  the Image
+     */
+    public static Image readImage(String imagePath, boolean cache, boolean returnNullIfNotFound) {
         //System.err.println ("getImage");
-        Image image = GuiUtils.getImage(imagePath, ImageUtils.class, cache);
+        Image image = GuiUtils.getImage(imagePath, ImageUtils.class, cache, returnNullIfNotFound);
         //System.err.println ("waiting");
         image = waitOnImage(image);
         //System.err.println ("done waiting");
