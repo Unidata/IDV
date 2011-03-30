@@ -43,6 +43,11 @@
 -->
       <property name="contourInfoParams" value="interval=10;base=40;min=-30;max=100;dashed=true;labels=false"/>
 
+<!--
+you can also specify irregular levels with levels=, e.g.:
+      <property name="contourInfoParams" value="levels=10,20,30;dashed=true;labels=false"/>
+-->
+
       <property
          name="legendLabelTemplate"
          value="%datasourcename% - %shortname%"/>
