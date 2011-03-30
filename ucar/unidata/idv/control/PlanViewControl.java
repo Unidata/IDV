@@ -936,16 +936,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @param level The level
      */
     public void setDataSelectionLevel(Object level) {
-
         if (level instanceof String) {
-             try {
-                 Real level1 = Util.toReal(level.toString());
-                 getDataSelection().setLevel(level1);
-             } catch (Exception e) {
-                 System.err.println("error parsing level: " + level + " " + e);
-             }
-        } else
+            try {
+                Real level1 = Util.toReal(level.toString());
+                getDataSelection().setLevel(level1);
+            } catch (Exception e) {
+                System.err.println("error parsing level: " + level + " " + e);
+                getDataSelection().setLevel(level);
+            }
+        } else {
             getDataSelection().setLevel(level);
+        }
     }
 
 
