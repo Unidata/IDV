@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1941,30 +1941,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 Image logo = ImageUtils.readImage(logoFile, true);
                 if (logo == null) {
                     //throw new VisADException("Logo file: " + logoFile + " does not exist.");
-                    //System.err.println("Logo file: " + logoFile + " does not exist.");
+                    System.err.println("Logo file: " + logoFile + " does not exist.");
                     return;
                 }
-                int imageWidth = Math.round((float) logo.getWidth(null)
-                                            * getLogoScale());
-                int imageHeight = Math.round((float) logo.getHeight(null)
-                                             * getLogoScale());
-                Rectangle imageRect = new Rectangle(0, 0, imageWidth,
-                                          imageHeight);
 
-                //Point pp = ImageUtils.parsePoint(getLogoAnchor(), imageRect);
-                //System.out.println("image point = " + pp);
                 Point ap = ImageUtils.parsePoint(getLogoPosition(), bounds);
                 //System.out.println("screen point = " + ap);
 
                 int   baseX = ap.x;
                 int   baseY = ap.y;
-                int   zval  = getPerspectiveView()
+                float zval  = getPerspectiveView()
                               ? 1
-                              : 2;
+                              : display.getDisplayRenderer().getMode2D()
+                                ? 1.5f
+                                : 2;
 
                 ImageJ3D logoJ3D = new ImageJ3D(logo,
-                                       getImageAnchor(getLogoPosition()), baseX,
-                                       baseY, zval, getLogoScale());
+                                       getImageAnchor(getLogoPosition()),
+                                       baseX, baseY, zval, getLogoScale());
                 annotator.add(logoJ3D);
                 annotator.draw();
             }
