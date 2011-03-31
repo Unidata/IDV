@@ -135,7 +135,8 @@ public class StateManager extends IdvManager {
     /** The default view size to be used for view managers */
     private Dimension viewSize;
 
-
+    /** disable mixing **/
+    public static final String PREF_SunAwtDisableMixing = "SunAwtDisableMixing";
     /**
      * Create this manager
      *
@@ -420,6 +421,10 @@ public class StateManager extends IdvManager {
         getResourceManager().init(propertyRbiFiles);
         //Trace.msg("initState-4");
 
+        String ut = (String) getProperty(PREF_SunAwtDisableMixing);
+        if(ut != null && ut.equalsIgnoreCase("no")) {
+             System.setProperty("sun.awt.disableMixing", "false");
+        }
         getStore().append(
             getResourceManager().getXmlResources(
                 IdvResourceManager.RSC_PREFERENCES), true);

@@ -480,6 +480,9 @@ public class IdvUIManager extends IdvManager {
     /** default screen */
     private GraphicsDevice defaultScreen;
 
+    /** light weight popup **/
+    public static final String PREF_LightWeightPopupEnabled = "LightWeightPopupEnabled";
+
     /**
      * Create me with the IDV
      *
@@ -931,9 +934,13 @@ public class IdvUIManager extends IdvManager {
         }
         haveInitialized = true;
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+        // ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
-
+        String ut = (String)getIdv().getStateManager().getPreferenceOrProperty(PREF_LightWeightPopupEnabled);
+        if(ut != null && ut.equalsIgnoreCase("yes")){
+            ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
+        } else
+            ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
         if (getIdv().getStateManager().getShowDashboardOnStart()) {
             //            showBasicWindow(true);
