@@ -310,7 +310,7 @@ public class WmsUtil {
             //TODO: use the exceptions
             String style = XmlUtil.getChildText(styleNameNode);
             String layer = XmlUtil.getChildText(nameNode);
-
+            String opaque =  XmlUtil.getAttribute(layerNode, "opaque");
             List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
                                 WmsUtil.TAG_SRS);
             for (int srsIdx = 0;
@@ -391,9 +391,15 @@ public class WmsUtil {
             }
 
             if (wmsSelection == null) {
-                wmsSelection = new WmsSelection(url, layer, title, srsString,
+                if(opaque != null) {
+                    wmsSelection = new WmsSelection(url, layer, title, srsString,
+                        format, version,
+                        new GeoLocationInfo(miny, maxx, maxy, minx), opaque);
+                } else {
+                    wmsSelection = new WmsSelection(url, layer, title, srsString,
                         format, version,
                         new GeoLocationInfo(miny, maxx, maxy, minx));
+                }
 
                 Element abstractNode = XmlUtil.getElement(layerNode,
                                            WmsUtil.TAG_ABSTRACT);
