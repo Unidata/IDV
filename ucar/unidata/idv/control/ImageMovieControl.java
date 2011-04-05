@@ -741,6 +741,7 @@ public class ImageMovieControl extends DisplayControlImpl {
             lastDataImage = image;
             imageDisplay.setVisible(getDisplayVisibility());
             image = ImageUtils.resize(image, 150, -1);
+            // TODO:  should we make a unique realtype?  What's the overhead for each timestep?
             FlatField imageData = Util.makeField(image, true);
             //FlatField   imageData   = DataUtility.makeField(image, true);
             Linear2DSet imageDomain = (Linear2DSet) imageData.getDomainSet();
