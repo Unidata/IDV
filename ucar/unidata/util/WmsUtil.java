@@ -92,6 +92,9 @@ public class WmsUtil {
     public static final String ATTR_FIXEDWIDTH = "fixedWidth";
 
     /** xml attribute name */
+    public static final String ATTR_OPAQUE = "opaque";
+
+    /** xml attribute name */
     public static final String ATTR_VERSION = "version";
 
     /** xml attribute name */
@@ -238,6 +241,7 @@ public class WmsUtil {
                            maxx         = 180,
                            miny         = -90,
                            maxy         = 90;
+        int                opaque   = 0;
         int                fixedWidth   = -1;
         int                fixedHeight  = -1;
         boolean            allowSubsets = true;
@@ -310,7 +314,7 @@ public class WmsUtil {
             //TODO: use the exceptions
             String style = XmlUtil.getChildText(styleNameNode);
             String layer = XmlUtil.getChildText(nameNode);
-            String opaque =  XmlUtil.getAttribute(layerNode, "opaque");
+
             List srsNodes = XmlUtil.findChildrenRecurseUp(layerNode,
                                 WmsUtil.TAG_SRS);
             for (int srsIdx = 0;
@@ -377,6 +381,8 @@ public class WmsUtil {
             miny = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MINY, miny);
             maxy = XmlUtil.getAttribute(bboxNode, WmsUtil.ATTR_MAXY, maxy);
 
+            opaque = XmlUtil.getAttribute(layerNode,
+                    WmsUtil.ATTR_OPAQUE, 0);
             fixedWidth = XmlUtil.getAttribute(layerNode,
                     WmsUtil.ATTR_FIXEDWIDTH, -1);
             fixedHeight = XmlUtil.getAttribute(layerNode,
@@ -391,15 +397,9 @@ public class WmsUtil {
             }
 
             if (wmsSelection == null) {
-                if(opaque != null) {
-                    wmsSelection = new WmsSelection(url, layer, title, srsString,
-                        format, version,
-                        new GeoLocationInfo(miny, maxx, maxy, minx), opaque);
-                } else {
-                    wmsSelection = new WmsSelection(url, layer, title, srsString,
+                wmsSelection = new WmsSelection(url, layer, title, srsString,
                         format, version,
                         new GeoLocationInfo(miny, maxx, maxy, minx));
-                }
 
                 Element abstractNode = XmlUtil.getElement(layerNode,
                                            WmsUtil.TAG_ABSTRACT);
@@ -413,6 +413,7 @@ public class WmsUtil {
                 wmsSelection.setAllowSubsets(allowSubsets);
                 wmsSelection.setFixedWidth(fixedWidth);
                 wmsSelection.setFixedHeight(fixedHeight);
+                wmsSelection.setOpaque(opaque);
                 infos.add(wmsSelection);
             } else {
                 wmsSelection.appendLayer(layer,

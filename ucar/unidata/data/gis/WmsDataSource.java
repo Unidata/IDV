@@ -288,7 +288,7 @@ public class WmsDataSource extends DataSourceImpl {
                 //                javax.swing.JLabel l = new javax.swing.JLabel(new javax.swing.ImageIcon(image));
                 //                l.setBackground(Color.red);
                 //                ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, l,null);
-                xyData = ucar.visad.Util.makeField(image, 0, true, true);
+                xyData = ucar.visad.Util.makeField(image, 0, false, true);
             } catch (Exception iexc) {
                 logException("There was an error accessing the image:\n"
                              + wmsInfo.getImageFile(), iexc);
@@ -435,7 +435,7 @@ public class WmsDataSource extends DataSourceImpl {
                 }
                 long tt1 = System.currentTimeMillis();
 
-                xyData = ucar.visad.Util.makeField(image, 0, true, true);
+                xyData = ucar.visad.Util.makeField(image, 0, false, true);
                 long tt2 = System.currentTimeMillis();
                 //      System.err.println("time to make field:" + (tt2-tt1));
             } catch (Exception iexc) {

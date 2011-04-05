@@ -103,6 +103,8 @@ public class WmsSelection {
     /** Fixed width of image */
     private int fixedWidth = -1;
 
+    /** opaque attribute*/
+    private int opaque = 0;
 
     /** The description */
     private String description;
@@ -132,7 +134,6 @@ public class WmsSelection {
     /** _more_ */
     private String imageFile;
 
-    private String opaque = null;
     /**
      * Default constructor.
      */
@@ -178,29 +179,7 @@ public class WmsSelection {
         this.version = version;
     }
 
-     /**
-     * Constructor.
-     *
-     * @param server  The server
-     * @param layer  The layer
-     * @param title  The title
-     * @param srs  The srs
-     * @param format  The format
-     * @param version  The version
-     * @param bounds  The bounds
-     */
-    public WmsSelection(String server, String layer, String title,
-                        String srs, String format, String version,
-                        GeoLocationInfo bounds, String opaque) {
-        this.server  = server;
-        this.layer   = layer;
-        this.title   = title;
-        this.srs     = srs;
-        this.bounds  = bounds;
-        this.format  = format;
-        this.version = version;
-        this.opaque = opaque;
-    }
+
     /**
      * Append the given layer to our layer name. Union the  bounds
      *
@@ -243,20 +222,17 @@ public class WmsSelection {
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();
-        if(opaque != null && opaque.equalsIgnoreCase("1"))
-            url = url + "version=" + version + "&request=GetMap" +
+        url = url + "version=" + version + "&request=GetMap" +
             //          "&Exceptions=se_xml" +
             "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
                        + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
                        + bbox + "&width=" + imageWidth + "&height=" + imageHeight
-                       + "&reaspect=false" + "&transparent=FALSE";
-        else
-            url = url + "version=" + version + "&request=GetMap" +
-            //          "&Exceptions=se_xml" +
-            "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
-                       + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
-                       + bbox + "&width=" + imageWidth + "&height=" + imageHeight
-                       + "&reaspect=false" + "&transparent=TRUE";
+                       + "&reaspect=false";
+        if (opaque == 0) {
+        	url += "&transparent=TRUE";
+        } else {
+        	url += "&transparent=FALSE";
+        }
         return url;
     }
 
@@ -391,25 +367,6 @@ public class WmsSelection {
     }
 
     /**
-     * Set the Version property.
-     *
-     * @param value The new value for Version
-     */
-    public void setOpaque(String value) {
-        opaque = value;
-    }
-
-    /**
-     * Get the Version property.
-     *
-     * @return The Version
-     */
-    public String getOpaque() {
-        return opaque;
-    }
-
-
-    /**
      * to string
      *
      * @return the title
@@ -496,6 +453,24 @@ public class WmsSelection {
      */
     public int getFixedWidth() {
         return fixedWidth;
+    }
+
+    /**
+     * Set the Opaque property.
+     *
+     * @param value The new value for FixedWidth
+     */
+    public void setOpaque(int value) {
+        opaque = value;
+    }
+
+    /**
+     * Get the Opaque property.
+     *
+     * @return The Opaque
+     */
+    public int getOpaque() {
+        return opaque;
     }
 
     /**
