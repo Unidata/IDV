@@ -1284,7 +1284,7 @@ public class MapViewManager extends NavigatedViewManager {
         cid.setState(ci);
 
         JPanel contourPanel =
-            GuiUtils.vbox(new JLabel("Contours:"),
+            GuiUtils.vbox(new JLabel("Contour Labels:"),
                           GuiUtils.inset(cid.getLabelPanel(),
                                          new Insets(5, 20, 0, 0)));
         contourPanel = GuiUtils.topCenter(contourPanel, GuiUtils.filler());
@@ -1299,7 +1299,7 @@ public class MapViewManager extends NavigatedViewManager {
                 getDisplayListColor()), "Set Display List Color");
         //GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel fontPanel =
-            GuiUtils.vbox(GuiUtils.lLabel("Display List Properties:"),
+            GuiUtils.vbox(GuiUtils.lLabel("Display List:"),
                           GuiUtils.doLayout(new Component[] {
                               GuiUtils.rLabel("Font:"),
                               GuiUtils.left(fontSelector.getComponent()),

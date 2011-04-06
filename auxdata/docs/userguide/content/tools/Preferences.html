@@ -303,19 +303,23 @@ data. This can be undesirable if you are overlaying several kinds of
 some of which have differing projections.
 
 
-
 [ug::preference {Use 3D View}]
 Allows you to override the default 3D behavior of the IDV and use
 a 2D View for Map Views.
 
+[ug::preference {Show Globe Background}]
+In a globe display, show a solid background if this is selected.  The 
+default color of the background can be set in the Color Scheme section.
 
-</div>
+
+[ug::prefSubGroup {Default Projection}]
+You can specify the default map projection used in a new map view window.
 
 
 [ug::prefSubGroup Toolbars]
+
 [ug::preference {Show Earth Navigation Panel}]
 Show a graphical navigation panel. 
-
 
 [ug::preference {Show Viewpoint Toolbar}] 
 Enable the <a href="../ui/Navigation.html#viewpoint">Viewpoint toolbar</a>.
@@ -323,16 +327,34 @@ Enable the <a href="../ui/Navigation.html#viewpoint">Viewpoint toolbar</a>.
 [ug::preference {Show Zoom/Pan Toolbar}] 
 Enable the <a href="../ui/Navigation.html#navigation">Zoom/Pan toolbar</a>.
 
+[ug::preference {Show Undo/Redo Toolbar}] 
+Enable the <a href="../ui/Navigation.html#undoredo">Undo/Redo toolbar</a>.
+
 
 [ug::prefSubGroup {Color Scheme}]
 You can specify the 
-default foreground/background colors. The foreground  color is applied to
+default foreground/background colors, the selected panel highlight and
+the globe background color. The foreground  color is applied to
 the bounding box lines and the time readout. The color of the  maps
 is controlled by the individual 
 <a href="../controls/MapDisplayControl.html">map control</a>.
 
+[ug::prefSubGroup {Contour Labels}]
+You can specify the default font, font size and alignment of the
+countour labels.  These can be overridden in each individual contour
+display control through the 
+<a href="ContourDialog.html">Contour Properties Editor</a>.
 
+[ug::prefSubGroup {Display List Properties}]
+The default font, font type and font size as well as the color of the display
+list labels in the view window can be set here.  These preferences can be 
+overridden in each View's Properties dialog.
 
+[ug::prefSubGroup {Logo}]
+Each View can have a logo image displayed in it.  These preferences 
+control the logo used, whether it is shown and the positioning and 
+sizing of the logo.  These preferences can be overridden for each 
+individual View throught its Properties dialog.
 
 [ug::prefGroup Navigation]
 
