@@ -580,7 +580,9 @@ public interface IdvConstants {
 
     /** Keep around the last archive dir */
     public static final String PREF_ARCHIVEDIR = "test.archivedir";
-
+    
+    /** IDV memory usage */
+    public static final String PREF_MEMORY = "idv.memory";
 
     /** Preference to store what choosers to show */
     public static final String PROP_CHOOSERS = "idv.choosers";
