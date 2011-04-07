@@ -1929,7 +1929,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     annotator = new ScreenAnnotatorJ3D(display);
                 }
                 annotator.clear();
-                Rectangle bounds = display.getComponent().getBounds();
+                Component comp = display.getComponent();
+                if (comp == null) {
+                    return;
+                }
+                Rectangle bounds = comp.getBounds();
                 //System.out.println("window bounds: " + bounds);
                 if ((bounds.width == 0) || (bounds.height == 0)
                         || (logoFile == null) || logoFile.isEmpty()
@@ -1941,7 +1945,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 Image logo = ImageUtils.readImage(logoFile, true, true);
                 if (logo == null) {
                     //throw new VisADException("Logo file: " + logoFile + " does not exist.");
-                    System.err.println("Logo file: " + logoFile + " does not exist.");
+                    System.err.println("Logo file: " + logoFile
+                                       + " does not exist.");
                     return;
                 }
 
