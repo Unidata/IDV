@@ -3,7 +3,6 @@ package ucar.unidata.idv;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
