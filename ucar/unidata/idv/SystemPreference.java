@@ -192,10 +192,18 @@ public class SystemPreference {
                 final String t = ((JTextField) e.getSource()).getText();
 
                 if ((t != null) && (t.length() > 0)) {
-                    memory.getAndSet(Integer.valueOf(t));
+                	final int i = Integer.valueOf(t);
+                	if (withinSliderBounds(i) ) {
+                        memory.getAndSet(i);
+                	} else if (i < MIN_SLIDER_VALUE) {
+                        memory.getAndSet(convertToNumber(MIN_SLIDER_VALUE));                		
+                	} else if (i > MAX_SLIDER_VALUE) {
+                        memory.getAndSet(convertToNumber(MAX_SLIDER_VALUE));                		
+                	}
                 }
             }
-            @Override
+            
+			@Override
             public void keyPressed(KeyEvent e) {}
         });
         text.addActionListener(new ActionListener() {
@@ -243,6 +251,17 @@ public class SystemPreference {
             }
         };
     }
+
+	/**
+	 * Check if number is within slider bounds.
+	 *
+	 * @param number
+	 *            the number
+	 * @return is the number within slider bounds.
+	 */
+    private boolean withinSliderBounds(final int i) {
+    	return (!displaySlider) ? true :  (i >= MIN_SLIDER_VALUE) && (i <= MAX_SLIDER_VALUE);
+	}
 
 	/**
 	 * Convert memory to percent.
