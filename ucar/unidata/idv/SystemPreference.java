@@ -193,7 +193,7 @@ public class SystemPreference {
 
                 if ((t != null) && (t.length() > 0)) {
                 	final int i = Integer.valueOf(t);
-                	if (withinSliderBounds(i) ) {
+                	if (withinSliderBounds(convertToPercent(i))) {
                         memory.getAndSet(i);
                 	} else if (i < MIN_SLIDER_VALUE) {
                         memory.getAndSet(convertToNumber(MIN_SLIDER_VALUE));                		
