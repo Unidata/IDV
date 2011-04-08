@@ -22,7 +22,4 @@ fi
 heap="$(${java} -cp idv.jar ucar.unidata.idv.UserMemory  2>&1 )"
 
 dirname=`dirname $0`
-command="${java} -Xmx${heap}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*"
-
-${command}
-
+${java} -Xmx${heap}m -Didv.enableStereo=false -jar ${dirname}/idv.jar
