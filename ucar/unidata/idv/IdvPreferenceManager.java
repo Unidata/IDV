@@ -1243,10 +1243,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         this.add("General", "General Preferences", basicManager,
                  GuiUtils.topCenter(miscContents, new JPanel()), widgets);
 
-//        AtomicLong memVal = new AtomicLong(getStore().get(IdvConstants.PREF_MEMORY, UserMemory.DEFAULT_MEMORY));
-//        SystemPreference systemPref = new SystemPreference(memVal);
-//        this.add("System", "System Preferences", systemPref.getSystemManager(),
-//        		GuiUtils.topCenter(GuiUtils.top(systemPref.getJComponent()), new JPanel()),memVal);
+        AtomicLong memVal = new AtomicLong(getStore().get(IdvConstants.PREF_MEMORY, UserMemory.DEFAULT_MEMORY));
+        SystemPreference systemPref = new SystemPreference(memVal);
+        this.add("System", "System Preferences", systemPref.getSystemManager(),
+        		GuiUtils.topCenter(GuiUtils.top(systemPref.getJComponent()), new JPanel()),memVal);
 
         this.add("Formats & Data", "", navManager,
                  GuiUtils.topCenter(GuiUtils.top(formatPrefs), new JPanel()),

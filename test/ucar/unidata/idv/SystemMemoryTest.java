@@ -1,19 +1,27 @@
 package ucar.unidata.idv;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import org.junit.Test;
 
-
+/**
+ * The SystemMemoryTest. Does not do much at this point.
+ */
 public class SystemMemoryTest {
 	
-    @Test
-    public void testGetMemory() {
-    	System.out.println(SystemMemory.getMemory());
-    }
-    
-    @Test
-    public void testIsMemoryAvailable() {
-    	System.out.println(SystemMemory.isMemoryAvailable());
-    }
-    
-    
+	/**
+	 * Test get memory.
+	 */
+	@Test
+	public void testGetMemory() {
+		SystemMemory.getMemory();
+	}
+
+	/**
+	 * Test is memory available.
+	 */
+	@Test
+	public void testIsMemoryAvailable() {
+		SystemMemory.isMemoryAvailable();
+	}
 }

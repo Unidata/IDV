@@ -56,7 +56,6 @@ public final class SystemMemory {
         try {
             final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
             final Method                m      = osBean.getClass().getMethod("getTotalPhysicalMemorySize");
-
             m.setAccessible(true);
             mem = (Long) m.invoke(osBean);
         } catch (Exception ignore) {}
