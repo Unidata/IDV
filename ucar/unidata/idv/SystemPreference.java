@@ -37,7 +37,7 @@ public class SystemPreference {
     private static final int MAX_SLIDER_VALUE = 80 + 1;
 
     /** Min value for the slider. */
-    private static final int MIN_SLIDER_VALUE = 5;
+    private static final int MIN_SLIDER_VALUE = 1;
 
     /** Total system memory. */
     private static final long TOTAL_SYSTEM_MEMORY_MB = SystemMemory.getMemory() / (1024 * 1024);
@@ -133,7 +133,7 @@ public class SystemPreference {
     private void createSlider() {
         sliderLabel = new JLabel("Use " + convertToPercent(memory.get()) + "% ");
 
-        final JLabel         postLabel       = new JLabel(" of available memory (" + TOTAL_SYSTEM_MEMORY_MB + "mb"
+        final JLabel         postLabel       = new JLabel(" of available memory (" + TOTAL_SYSTEM_MEMORY_MB + " megabytes"
                                                    + ")");
         final ChangeListener percentListener = new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {
@@ -193,11 +193,12 @@ public class SystemPreference {
 
                 if ((t != null) && (t.length() > 0)) {
                 	final int i = Integer.valueOf(t);
-                	if (withinSliderBounds(convertToPercent(i))) {
+                	final int p = convertToPercent(i);
+                	if (withinSliderBounds(p)) {
                         memory.getAndSet(i);
-                	} else if (i < MIN_SLIDER_VALUE) {
+                	} else if (p < MIN_SLIDER_VALUE) {
                         memory.getAndSet(convertToNumber(MIN_SLIDER_VALUE));                		
-                	} else if (i > MAX_SLIDER_VALUE) {
+                	} else if (p > MAX_SLIDER_VALUE) {
                         memory.getAndSet(convertToNumber(MAX_SLIDER_VALUE));                		
                 	}
                 }
