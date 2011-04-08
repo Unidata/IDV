@@ -2,18 +2,11 @@ package ucar.unidata.idv;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlObjectStore;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +20,10 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.xml.PreferenceManager;
+import ucar.unidata.xml.XmlObjectStore;
 
 /**
  * Preferences for the "System" tab. Thanks to McV team for providing hints
@@ -88,6 +85,9 @@ public class SystemPreference {
      *            the memory
      */
     SystemPreference(final AtomicLong memory) {
+    	if (!withinSliderBounds(convertToPercent(memory.get()))) {
+    		memory.set(UserMemory.DEFAULT_MEMORY);
+    	}
         this.memory = memory;
 
         if (displaySlider) {
