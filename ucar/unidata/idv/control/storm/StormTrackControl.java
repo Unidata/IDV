@@ -740,11 +740,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
             //Set the dflt so we can use its unit later
             if (rangeType == null) {
-                String key = track.getWay() + "_" + param;
+                String key = track.getWay() + "_" + track.getId() + "_" + param;
                 rangeType = (RealType) rangeTypes.get(key);
                 if (rangeType == null) {
                     cnt++;
-                    rangeType = Util.makeRealType("trackrange_"
+                    rangeType = Util.makeRealType("trackrange_" + track.getId() + "_"
                             + track.getWay() + "_" + cnt, unit);
                     rangeTypes.put(key, rangeType);
                 }
