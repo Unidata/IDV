@@ -3,6 +3,8 @@
 ##Error message, if needed.
 error_msg="IDV failed to start. Please contact support-idv@unidata.ucar.edu"
 
+dirname=`dirname $0`
+
 java="java"
 if test -f jre/bin/java; then
 ##We are in the installer directory
@@ -22,7 +24,7 @@ else
     fi
 fi
 
-prefs="$(${java} -client -cp idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1 )"
+prefs="$(${java} -client -cp ${dirname}/idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1 )"
 
 if [ $? -eq 1 ]; then
     echo "${error_msg}"
@@ -37,5 +39,4 @@ if test -z ${idv_memory}; then
     exit 1
 fi
 
-dirname=`dirname $0`
 ${java} -Xmx${idv_memory}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
