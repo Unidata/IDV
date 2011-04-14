@@ -25,7 +25,7 @@ fi
 prefs="$(${java} -client -cp idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1 )"
 
 if [ $? -eq 1 ]; then
-    echo "IDV failed to start. Please contact support-idv@unidata.ucar.edu"
+    echo "${error_msg}"
     exit 1
 fi    
 
@@ -33,7 +33,7 @@ eval "${prefs}"
 
 ##Sanity check. If memory variable does not exist, we have problems
 if test -z ${idv_memory}; then
-    echo "IDV failed to start. Please contact support-idv@unidata.ucar.edu"
+    echo "${error_msg}"
     exit 1
 fi
 
