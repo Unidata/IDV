@@ -2,16 +2,19 @@ package ucar.unidata.idv;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class helps supply command line arguments to the IDV via bash.
@@ -21,11 +24,13 @@ import ucar.unidata.xml.XmlUtil;
  */
 public class IdvCommandLinePrefs {
 
-    /** Where the default user path is located are located. */
-    private static final String USER_PATH_DEFUALT = IOUtil.joinDir(System.getProperty("user.home"), ".unidata");
-
-    /** Where the user prefs are located relative to the user path. */
-    private static final String USER_PREFS = IOUtil.joinDirs("idv", "DefaultIdv", "main.xml");
+    /** Default user pref path. */
+    private static final String DEFAULT_USER_PREF_PATH = IOUtil.joinDirs(System.getProperty("user.home"), ".unidata",
+                                                         "idv", "DefaultIdv");
+    
+    /** Default user pref file. */
+    private static final String DEFAULT_USER_PREF_FILE = "main.xml";
+    
 
     /** The Constant defaultsMap. */
     private static final Map<Object, Object> defaultsMap = new HashMap<Object, Object>();
@@ -110,8 +115,8 @@ public class IdvCommandLinePrefs {
             }
         }
 
-        return ((userPath == null)
-                ? IOUtil.joinDir(USER_PATH_DEFUALT, USER_PREFS)
-                : IOUtil.joinDir(userPath, USER_PREFS));
+        return (userPath == null)
+               ? IOUtil.joinDir(DEFAULT_USER_PREF_PATH,DEFAULT_USER_PREF_FILE)
+               : IOUtil.joinDir(userPath,DEFAULT_USER_PREF_FILE);
     }
 }
