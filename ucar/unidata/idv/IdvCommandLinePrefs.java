@@ -1,20 +1,17 @@
-
 package ucar.unidata.idv;
 
 //~--- non-JDK imports --------------------------------------------------------
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.xml.XmlEncoder;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.File;
-import java.io.IOException;
-
-import java.util.HashMap;
-import java.util.Map;
+import ucar.unidata.xml.XmlUtil;
 
 /**
  * This class helps supply command line arguments to the IDV via bash.
@@ -78,13 +75,13 @@ public class IdvCommandLinePrefs {
      *             the exception
      */
     @SuppressWarnings("unchecked")
-	private static Map<Object, Object> getPrefMap(String... args) throws IOException, Exception {
+    private static Map<Object, Object> getPrefMap(String... args) throws IOException, Exception {
         final Map<Object, Object> userPrefMap = new HashMap<Object, Object>();
         final File                f           = new File(getPreferences(args));
 
         if (f.exists()) {
-            final String xmlPrefs = FileUtils.readFileToString(f);
-            userPrefMap.putAll((Map<Object, Object>) (new XmlEncoder().toObject(xmlPrefs)));
+            userPrefMap.putAll(
+                (Map<Object, Object>) (new XmlEncoder().createObject(XmlUtil.getRoot(FileUtils.readFileToString(f)))));
         }
 
         // Now adding defaults, if needed.
