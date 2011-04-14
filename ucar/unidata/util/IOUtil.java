@@ -1854,7 +1854,7 @@ public class IOUtil {
      * @return  concatenated String with the appropriate file separator
      */
     public static String joinDir(String f1, String f2) {
-        return f1 + File.separator + f2;
+        return joinDirs(f1 , f2);
     }
 
 
@@ -1867,7 +1867,21 @@ public class IOUtil {
      * @return  concatenated String with the appropriate file separator
      */
     public static String joinDir(File f1, String filename) {
-        return (f1.getPath() + File.separator + filename);
+        return joinDirs(f1.getPath() , filename);
+    }
+
+    /**
+     * Return the String representation of the given path separated by args.
+     *
+     * @param f          directory path vararg
+     * @return  concatenated String with the appropriate file separator
+     */
+    public static String joinDirs(String...f) {
+    	final StringBuilder sb = new StringBuilder();
+    	for (int i = 0; i < f.length; i++) {
+    		sb.append(i == 0 ? "" : File.separator).append(f[i]); 
+		}
+    	return sb.toString();
     }
 
 
