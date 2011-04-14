@@ -593,7 +593,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                  "What displays should be available in the user interface?",
                  controlsManager, controlsPanel, cbxToCdMap);
         
-        AtomicLong memVal = new AtomicLong(getStore().get(IdvConstants.PREF_MEMORY, UserMemory.DEFAULT_MEMORY));
+        AtomicLong memVal = new AtomicLong(getStore().get(IdvConstants.PREF_MEMORY, SystemPreference.DEFAULT_MEMORY));
         SystemPreference systemPref = new SystemPreference(memVal);
         this.add("System", "System Preferences", systemPref.getSystemManager(),
         		GuiUtils.topCenter(GuiUtils.top(systemPref.getJComponent()), new JPanel()),memVal);

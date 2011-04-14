@@ -11,6 +11,9 @@ import java.lang.reflect.Method;
  * for hints on how to do this.
  */
 public final class SystemMemory {
+	
+	/** A sensible default for the IDV, in case all else fails. */
+	public final static int DEFAULT_MEMORY = 512;
 
     /** The INSTANCE. */
     private static final SystemMemory INSTANCE = new SystemMemory();
@@ -43,6 +46,22 @@ public final class SystemMemory {
      */
     public static boolean isMemoryAvailable() {
         return INSTANCE.memory > 0;
+    }
+
+    /**
+     * Same as {@link #getMemory()}, but in megabytes for convenience.
+     *
+     * @return the memory in megabytes
+     */
+    public static long getMemoryInMegabytes() {
+    	return isMemoryAvailable() ? INSTANCE.memory/1024/1024 : INSTANCE.memory;
+    }
+    
+    /**
+     * Another convenience method, returns 80% of {@link #getMemoryInMegabytes()}.
+     */
+    public static long getMaxMemoryInMegabytes() {
+    	return isMemoryAvailable() ? Math.round(getMemoryInMegabytes() * (80/100f)) : INSTANCE.memory;
     }
 
     /**

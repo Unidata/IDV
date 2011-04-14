@@ -2,11 +2,18 @@ package ucar.unidata.idv;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.xml.PreferenceManager;
+import ucar.unidata.xml.XmlObjectStore;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,26 +28,24 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlObjectStore;
-
 /**
  * Preferences for the "System" tab. Thanks to McV team for providing hints
- * here. Note the slider is not always displayed because system memory is not 
+ * here. Note the slider is not always displayed because system memory is not
  * always available.
  *
  */
 public class SystemPreference {
+
+    /** Default memory. */
+    static final long DEFAULT_MEMORY = SystemMemory.isMemoryAvailable()
+                                      ? SystemMemory.getMaxMemoryInMegabytes()
+                                      : SystemMemory.DEFAULT_MEMORY;
 
     /** Max value for the slider. */
     private static final int MAX_SLIDER_VALUE = 80 + 1;
 
     /** Min value for the slider. */
     private static final int MIN_SLIDER_VALUE = 1;
-
-    /** Total system memory. */
-    private static final long TOTAL_SYSTEM_MEMORY_MB = SystemMemory.getMemory() / (1024 * 1024);
 
     /** If system memory is available display slider. */
     private final boolean displaySlider = SystemMemory.isMemoryAvailable();
@@ -85,9 +90,10 @@ public class SystemPreference {
      *            the memory
      */
     SystemPreference(final AtomicLong memory) {
-    	if (!withinSliderBounds(convertToPercent(memory.get()))) {
-    		memory.set(UserMemory.DEFAULT_MEMORY);
-    	}
+        if (!withinSliderBounds(convertToPercent(memory.get()))) {
+            memory.set(DEFAULT_MEMORY);
+        }
+
         this.memory = memory;
 
         if (displaySlider) {
@@ -120,6 +126,7 @@ public class SystemPreference {
         } else {
             for (java.awt.Component c : container.getComponents()) {
                 c.setEnabled(enable);
+
                 if (c instanceof Container) {
                     containerXable((Container) c, enable);
                 }
@@ -133,8 +140,8 @@ public class SystemPreference {
     private void createSlider() {
         sliderLabel = new JLabel("Use " + convertToPercent(memory.get()) + "% ");
 
-        final JLabel         postLabel       = new JLabel(" of available memory (" + TOTAL_SYSTEM_MEMORY_MB + " megabytes"
-                                                   + ")");
+        final JLabel         postLabel       = new JLabel(" of available memory (" + SystemMemory.getMemoryInMegabytes()
+                                                   + " megabytes" + ")");
         final ChangeListener percentListener = new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {
                 if ((sliderComp == null) ||!sliderComp.isEnabled()) {
@@ -192,19 +199,19 @@ public class SystemPreference {
                 final String t = ((JTextField) e.getSource()).getText();
 
                 if ((t != null) && (t.length() > 0)) {
-                	final int i = Integer.valueOf(t);
-                	final int p = convertToPercent(i);
-                	if (withinSliderBounds(p)) {
+                    final int i = Integer.valueOf(t);
+                    final int p = convertToPercent(i);
+
+                    if (withinSliderBounds(p)) {
                         memory.getAndSet(i);
-                	} else if (p < MIN_SLIDER_VALUE) {
-                        memory.getAndSet(convertToNumber(MIN_SLIDER_VALUE));                		
-                	} else if (p > MAX_SLIDER_VALUE) {
-                        memory.getAndSet(convertToNumber(MAX_SLIDER_VALUE));                		
-                	}
+                    } else if (p < MIN_SLIDER_VALUE) {
+                        memory.getAndSet(convertToNumber(MIN_SLIDER_VALUE));
+                    } else if (p > MAX_SLIDER_VALUE) {
+                        memory.getAndSet(convertToNumber(MAX_SLIDER_VALUE));
+                    }
                 }
             }
-            
-			@Override
+            @Override
             public void keyPressed(KeyEvent e) {}
         });
         text.addActionListener(new ActionListener() {
@@ -234,8 +241,10 @@ public class SystemPreference {
      */
     JComponent getJComponent() {
         final List<JComponent> formatComps = new ArrayList<JComponent>();
+
         formatComps.add(GuiUtils.topBottom(GuiUtils.rLabel("Memory:   "), new JPanel()));
         formatComps.add(GuiUtils.left(GuiUtils.topBottom(sliderComp, textComp)));
+
         return GuiUtils.inset(GuiUtils.topLeft(GuiUtils.doLayout(formatComps, 2, GuiUtils.WT_N, GuiUtils.WT_N)), 5);
     }
 
@@ -253,36 +262,38 @@ public class SystemPreference {
         };
     }
 
-	/**
-	 * Check if number is within slider bounds.
-	 *
-	 * @param number
-	 *            the number
-	 * @return is the number within slider bounds.
-	 */
+    /**
+     * Check if number is within slider bounds.
+     *
+     * @param number
+     *            the number
+     * @return is the number within slider bounds.
+     */
     private boolean withinSliderBounds(final int i) {
-    	return (!displaySlider) ? true :  (i >= MIN_SLIDER_VALUE) && (i <= MAX_SLIDER_VALUE);
-	}
+        return (!displaySlider)
+               ? true
+               : (i >= MIN_SLIDER_VALUE) && (i <= MAX_SLIDER_VALUE);
+    }
 
-	/**
-	 * Convert memory to percent.
-	 *
-	 * @param number
-	 *            the number
-	 * @return the int
-	 */
-	private static int convertToPercent(final long number) {
-	    return Math.round(((float) number / TOTAL_SYSTEM_MEMORY_MB) * 100);
-	}
+    /**
+     * Convert memory to percent.
+     *
+     * @param number
+     *            the number
+     * @return the int
+     */
+    private static int convertToPercent(final long number) {
+        return Math.round(((float) number / SystemMemory.getMemoryInMegabytes()) * 100);
+    }
 
-	/**
-	 * Convert memory to number.
-	 *
-	 * @param percent
-	 *            the percent
-	 * @return the long
-	 */
-	private static long convertToNumber(final int percent) {
-	    return (long) ((percent / 100.0) * TOTAL_SYSTEM_MEMORY_MB);
-	}
+    /**
+     * Convert memory to number.
+     *
+     * @param percent
+     *            the percent
+     * @return the long
+     */
+    private static long convertToNumber(final int percent) {
+        return (long) ((percent / 100.0) * SystemMemory.getMemoryInMegabytes());
+    }
 }

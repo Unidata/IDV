@@ -1,5 +1,8 @@
 #!/bin/sh
 
+##Error message, if needed.
+error_msg="IDV failed to start. Please contact support-idv@unidata.ucar.edu"
+
 java="java"
 if test -f jre/bin/java; then
 ##We are in the installer directory
@@ -19,7 +22,20 @@ else
     fi
 fi
 
-heap="$(${java} -cp idv.jar ucar.unidata.idv.UserMemory  2>&1 )"
+prefs="$(${java} -client -cp idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1 )"
+
+if [ $? -eq 1 ]; then
+    echo "IDV failed to start. Please contact support-idv@unidata.ucar.edu"
+    exit 1
+fi    
+
+eval "${prefs}"
+
+##Sanity check. If memory variable does not exist, we have problems
+if test -z ${idv_memory}; then
+    echo "IDV failed to start. Please contact support-idv@unidata.ucar.edu"
+    exit 1
+fi
 
 dirname=`dirname $0`
-${java} -Xmx${heap}m -Didv.enableStereo=false -jar ${dirname}/idv.jar
+${java} -Xmx${idv_memory}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
