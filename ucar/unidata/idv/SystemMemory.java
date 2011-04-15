@@ -28,7 +28,30 @@ public final class SystemMemory {
      * Private constructor.
      */
     private SystemMemory() {
-        memory = getMemoryInternal();
+        long mem = -1;
+
+        try {
+            final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+            final Method                m      = osBean.getClass().getMethod("getTotalPhysicalMemorySize");
+
+            m.setAccessible(true);
+            mem = (Long) m.invoke(osBean);
+        } catch (Exception ignore) {}
+
+        // Are we running on a 64 bit OS?
+        final boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
+
+        // Is this a windows machine?
+        final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+
+        // Is this a 32 bit windows machine?
+        final boolean isWindows32 = !is64 && isWindows;
+
+        if (isWindows32 && (mem > WINDOWS_32_MAX)) {
+            mem = WINDOWS_32_MAX;
+        }
+
+        this.memory = mem;
     }
 
     /**
@@ -69,37 +92,5 @@ public final class SystemMemory {
         return isMemoryAvailable()
                ? Math.round(getMemoryInMegabytes() * (80 / 100f))
                : INSTANCE.memory;
-    }
-
-    /**
-     * Actually determining memory.
-     *
-     * @return the total available system memory
-     */
-    private long getMemoryInternal() {
-        long mem = -1;
-
-        /** Are we running on a 64 bit OS? */
-        final boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
-
-        /** Is this a windows machine? */
-        final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-
-        /** Is this a 32 bit windows machine? */
-        final boolean isWindows32 = !is64 && isWindows;
-
-        try {
-            final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-            final Method                m      = osBean.getClass().getMethod("getTotalPhysicalMemorySize");
-
-            m.setAccessible(true);
-            mem = (Long) m.invoke(osBean);
-        } catch (Exception ignore) {}
-
-        if (isWindows32 && (mem > WINDOWS_32_MAX)) {
-            mem = WINDOWS_32_MAX;
-        }
-
-        return mem;
     }
 }
