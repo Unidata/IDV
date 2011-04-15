@@ -1,5 +1,22 @@
 #!/bin/sh
 
+###############################################################################
+# Script:  runIDV
+#
+# Purpose: script to launch the IDV
+#
+# Syntax:  runIDV <idv options>
+#
+# Notes:   In past versions of the IDV, users had to change this script to
+# manipulate memory settings. The IDV now configures the  appropriate memory. 
+# Users can also change the memory via the Preferences  menu. In exceptional 
+# situations where the IDV may not start due to memory issues, it may be 
+# necessary to bootstrap the memory size. In this case, please uncomment the 
+# idv_memory section below and subsequently choose memory via the Preferences
+# menu.  Be sure to comment it out that after setting the memory via the 
+# Preferences if you want the preference to take effect. 
+###############################################################################
+
 ##Error message, if needed.
 error_msg="IDV failed to start. Please contact support-idv@unidata.ucar.edu"
 
@@ -38,5 +55,9 @@ if test -z ${idv_memory}; then
     echo "${error_msg}"
     exit 1
 fi
+
+## See important note about this above. To bootstrap the IDV memory, uncomment 
+## this line and set to a value  in megabytes. 
+## idv_memory=512
 
 ${java} -Xmx${idv_memory}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
