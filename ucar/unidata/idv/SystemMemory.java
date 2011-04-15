@@ -11,34 +11,24 @@ import java.lang.reflect.Method;
  * for hints on how to do this.
  */
 public final class SystemMemory {
-	
-	/** A sensible default for the IDV, in case all else fails. */
-	public final static int DEFAULT_MEMORY = 512;
+
+    /** A sensible default for the IDV, in case all else fails. */
+    public final static int DEFAULT_MEMORY = 512;
 
     /** The INSTANCE. */
     private static final SystemMemory INSTANCE = new SystemMemory();
 
-	/** Max heap for a 32 bit windows machine */
-	private static final int WINDOWS_32_MAX = 1536;
-	
+    /** Max heap for a 32 bit windows machine */
+    private static final int WINDOWS_32_MAX = 1536;
+
     /** The total available system memory in bytes. */
     private final long memory;
-    
-    /** Are we running on a 64 bit OS? */
-	private boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
-
-    /** Is this a windows machine? */
-	private boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf( "win" ) >= 0;
-	
-    /** Is this a 32 bit windows machine? */
-	private boolean isWindows32 = !is64 && isWindows;
-
 
     /**
      * Private constructor.
      */
     private SystemMemory() {
-        memory            = getMemoryInternal();
+        memory = getMemoryInternal();
     }
 
     /**
@@ -67,14 +57,18 @@ public final class SystemMemory {
      * @return the memory in megabytes
      */
     public static long getMemoryInMegabytes() {
-    	return isMemoryAvailable() ? INSTANCE.memory/1024/1024 : INSTANCE.memory;
+        return isMemoryAvailable()
+               ? INSTANCE.memory / 1024 / 1024
+               : INSTANCE.memory;
     }
-    
+
     /**
      * Another convenience method, returns 80% of {@link #getMemoryInMegabytes()}.
      */
     public static long getMaxMemoryInMegabytes() {
-    	return isMemoryAvailable() ? Math.round(getMemoryInMegabytes() * (80/100f)) : INSTANCE.memory;
+        return isMemoryAvailable()
+               ? Math.round(getMemoryInMegabytes() * (80 / 100f))
+               : INSTANCE.memory;
     }
 
     /**
@@ -85,16 +79,26 @@ public final class SystemMemory {
     private long getMemoryInternal() {
         long mem = -1;
 
+        /** Are we running on a 64 bit OS? */
+        final boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
+
+        /** Is this a windows machine? */
+        final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+
+        /** Is this a 32 bit windows machine? */
+        final boolean isWindows32 = !is64 && isWindows;
+
         try {
             final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
             final Method                m      = osBean.getClass().getMethod("getTotalPhysicalMemorySize");
+
             m.setAccessible(true);
             mem = (Long) m.invoke(osBean);
         } catch (Exception ignore) {}
-        
-		if (isWindows32 && mem > WINDOWS_32_MAX) {
-			mem = WINDOWS_32_MAX;
-		}
+
+        if (isWindows32 && (mem > WINDOWS_32_MAX)) {
+            mem = WINDOWS_32_MAX;
+        }
 
         return mem;
     }
