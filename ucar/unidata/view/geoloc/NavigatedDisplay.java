@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -649,14 +649,26 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public abstract void setView(int view);
 
+    /**
+     * Set the view from the name of a view
+     *
+     * @param view  the view name
+     */
     public void setView(String view) {
         view = view.toLowerCase();
-        if(view.equals("bottom")) setView(BOTTOM_VIEW);
-        else if(view.equals("north")) setView(NORTH_VIEW);
-        else if(view.equals("east")) setView(EAST_VIEW);
-        else if(view.equals("top")) setView(TOP_VIEW);
-        else if(view.equals("south")) setView(SOUTH_VIEW);
-        else if(view.equals("west")) setView(WEST_VIEW);
+        if (view.equals("bottom")) {
+            setView(BOTTOM_VIEW);
+        } else if (view.equals("north")) {
+            setView(NORTH_VIEW);
+        } else if (view.equals("east")) {
+            setView(EAST_VIEW);
+        } else if (view.equals("top")) {
+            setView(TOP_VIEW);
+        } else if (view.equals("south")) {
+            setView(SOUTH_VIEW);
+        } else if (view.equals("west")) {
+            setView(WEST_VIEW);
+        }
     }
 
 
@@ -966,7 +978,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @param el   earth location to translate
      * @param xyz  buffer to put value in
-     * @param altitude _more_
+     * @param altitude the altitude
      *
      * @return  xyz
      *
@@ -1084,9 +1096,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Animate the matrix
      *
-     * @param to _more_
+     * @param to  matrix to animate to
      */
     public void animateMatrix(double[] to) {
         animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null);
@@ -1094,10 +1106,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Animate matrix
      *
-     * @param to _more_
-     * @param sleepTime _more_
+     * @param to  where to go
+     * @param sleepTime  sleep time
      */
     public void animateMatrix(double[] to, long sleepTime) {
         animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null,
@@ -1123,9 +1135,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Apply the rotation
      *
-     * @param p _more_
+     * @param p  the point to rotate to
      */
     public void applyRotation(Point3d p) {
         double[]      trans         = { 0.0, 0.0, 0.0 };
@@ -1143,13 +1155,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * _more_
+     * Animate the matrix
      *
-     * @param myTimeStamp _more_
-     * @param from _more_
-     * @param to _more_
-     * @param finalLocation _more_
-     * @param sleepTime _more_
+     * @param myTimeStamp  my time
+     * @param from  where we came from
+     * @param to  where we are going to
+     * @param finalLocation  the final location
+     * @param sleepTime  sleepy time
      */
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation, long sleepTime) {
@@ -1314,13 +1326,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Interpolate to a percentage between two values
      *
-     * @param d1 _more_
-     * @param d2 _more_
-     * @param percent _more_
+     * @param d1  first
+     * @param d2  second
+     * @param percent  the percentage between the two
      *
-     * @return _more_
+     * @return  the value
      */
     private double interp(double d1, double d2, double percent) {
         return d1 + percent * (d2 - d1);
@@ -1330,14 +1342,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Interpolate between two vectors
      *
-     * @param a1 _more_
-     * @param a2 _more_
-     * @param index _more_
-     * @param percent _more_
+     * @param a1  vector 1
+     * @param a2  vector 2
+     * @param index  the index in the vector
+     * @param percent  the percentage between
      *
-     * @return _more_
+     * @return the value
      */
     private double interp(Vector3d a1, Vector3d a2, int index,
                           double percent) {
@@ -1473,15 +1485,15 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Get the latlon box of the displayed area
      *
-     * @param padSamples _more_
-     * @param normalizeLon _more_
+     * @param padSamples  should we pad some
+     * @param normalizeLon  true to normalize longitudes to -180 to 180
      *
-     * @return _more_
+     * @return lat lon box  or null if it can't be determined
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public Rectangle2D.Double getLatLonBox(boolean padSamples,
                                            boolean normalizeLon)
@@ -1503,8 +1515,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
         ys = new double[] {
-            0 - b.height * pad, 0, b.height * 0.25, b.height * 0.5,
-            b.height * 1, b.height + b.height * pad
+            0 - b.height * pad, 0, b.height * 0.2, b.height * 0.4,
+            b.height * 0.6, b.height * 0.8, b.height * 1,
+            b.height + b.height * pad
         };
 
         double[] rangeX = { Double.NaN, Double.NaN };
@@ -1581,7 +1594,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param y y position
      * @param rangeX X range
      * @param rangeY Y range
-     * @param normalizeLon _more_
+     * @param normalizeLon  normalize longitudes to -180 to 180
      *
      * @throws VisADException problem accessing screen
      */
@@ -1929,10 +1942,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * Move the center to the given earth location and zoom in
      *
      * @param el el to center on
-     * @param altitude _more_
+     * @param altitude  the altitude of the point
      * @param animated animate the move
      * @param zoomFactor   factor to zoom
-     * @param northUp _more_
+     * @param northUp  put north up
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -2114,7 +2127,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Clean up
      */
     public void destroy() {
         if (navToolBar != null) {
@@ -2287,7 +2300,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * _more_
+     * Rotate faster
      */
     public void rotateFaster() {
         setRotateDelay(rotateDelay / 2);
