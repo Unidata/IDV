@@ -19,7 +19,7 @@ public final class SystemMemory {
     private static final SystemMemory INSTANCE = new SystemMemory();
 
     /** Max heap for a 32 bit windows machine */
-    private static final int WINDOWS_32_MAX = 1536;
+    private static final long WINDOWS_32_MAX = 1536 * 1024 * 1024;
 
     /** The total available system memory in bytes. */
     private final long memory;
