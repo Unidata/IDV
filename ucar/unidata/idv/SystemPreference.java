@@ -215,7 +215,7 @@ public class SystemPreference {
 
                 if ((t != null) && (t.length() > 0)) {
                     final int i = Integer.valueOf(t);
-                    final int p = convertToPercent(i);
+                    final float p = ((float)i / SystemMemory.getMemoryInMegabytes()) * 100;
 
                     if (withinSliderBounds(p)) {
                         memory.getAndSet(i);
@@ -284,7 +284,7 @@ public class SystemPreference {
      *            the number
      * @return is the number within slider bounds.
      */
-    private boolean withinSliderBounds(final int i) {
+    private boolean withinSliderBounds(final float i) {
         return (!displaySlider)
                ? true
                : (i >= MIN_SLIDER_VALUE) && (i <= MAX_SLIDER_VALUE);
@@ -309,10 +309,6 @@ public class SystemPreference {
      * @return the long
      */
     private static long convertToNumber(final int percent) {
-        return (long) ((percent / 100.0) * SystemMemory.getMemoryInMegabytes());
-    }
-
-    private static boolean withinTolerance(final int num1, final int num2, final int tolerance) {
-        return Math.abs(num1 - num2) < tolerance;
+        return  Math.round((percent / 100f) * SystemMemory.getMemoryInMegabytes());
     }
 }
