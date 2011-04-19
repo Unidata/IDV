@@ -14,6 +14,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import java.text.MessageFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,8 +40,8 @@ public class SystemPreference {
 
     /** Default memory. */
     static final long DEFAULT_MEMORY = SystemMemory.isMemoryAvailable()
-                                      ? SystemMemory.getMaxMemoryInMegabytes()
-                                      : SystemMemory.DEFAULT_MEMORY;
+                                       ? SystemMemory.getMaxMemoryInMegabytes()
+                                       : SystemMemory.DEFAULT_MEMORY;
 
     /** Max value for the slider. */
     private static final int MAX_SLIDER_VALUE = 81;
@@ -138,10 +140,13 @@ public class SystemPreference {
      * Creates the memory slider UI.
      */
     private void createSlider() {
-        sliderLabel = new JLabel("Use " + convertToPercent(memory.get()) + "% ");
+        final String sliderLabelText = "Use {0,number,#}% ";
+        final String postLabelText   = " of available memory ( %d/" + SystemMemory.getMemoryInMegabytes()
+                                       + " megabytes" + ")";
 
-        final JLabel         postLabel       = new JLabel(" of available memory (" + SystemMemory.getMemoryInMegabytes()
-                                                   + " megabytes" + ")");
+        sliderLabel = new JLabel(MessageFormat.format(sliderLabelText, convertToPercent(memory.get())));
+
+        final JLabel         postLabel       = new JLabel(String.format(postLabelText, memory.get()));
         final ChangeListener percentListener = new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {
                 if ((sliderComp == null) ||!sliderComp.isEnabled()) {
@@ -150,8 +155,9 @@ public class SystemPreference {
 
                 final int sliderValue = ((JSlider) evt.getSource()).getValue();
 
-                sliderLabel.setText("Use " + sliderValue + "% ");
+                sliderLabel.setText(MessageFormat.format(sliderLabelText, sliderValue));
                 memory.getAndSet(convertToNumber(sliderValue));
+                postLabel.setText(String.format(postLabelText, memory.get()));
             }
         };
         final JComponent[] sliderComps = GuiUtils.makeSliderPopup(MIN_SLIDER_VALUE, MAX_SLIDER_VALUE,
