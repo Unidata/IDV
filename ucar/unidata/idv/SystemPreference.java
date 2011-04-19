@@ -141,7 +141,7 @@ public class SystemPreference {
      */
     private void createSlider() {
         final String sliderLabelText = "Use {0,number,#}% ";
-        final String postLabelText   = " of available memory ( %d/" + SystemMemory.getMemoryInMegabytes()
+        final String postLabelText   = " of available memory (%d/" + SystemMemory.getMemoryInMegabytes()
                                        + " megabytes" + ")";
 
         sliderLabel = new JLabel(MessageFormat.format(sliderLabelText, convertToPercent(memory.get())));
@@ -164,9 +164,7 @@ public class SystemPreference {
                                              convertToPercent(memory.get()), percentListener);
 
         slider = (JSlider) sliderComps[1];
-        slider.setMinorTickSpacing(1);
         slider.setMajorTickSpacing(10);
-        slider.setSnapToTicks(true);
         slider.setExtent(1);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
