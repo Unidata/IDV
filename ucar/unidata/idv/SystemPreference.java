@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import java.math.BigInteger;
 import java.text.MessageFormat;
 
 import java.util.ArrayList;
@@ -214,7 +215,7 @@ public class SystemPreference {
                 final String t = ((JTextField) e.getSource()).getText();
 
                 if ((t != null) && (t.length() > 0)) {
-                    final int i = Integer.valueOf(t);
+                    final long i = new BigInteger(t).longValue();
                     final float p = ((float)i / SystemMemory.getMemoryInMegabytes()) * 100;
 
                     if (withinSliderBounds(p)) {
