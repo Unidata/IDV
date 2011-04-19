@@ -36,7 +36,7 @@ public class IdvCommandLinePrefs {
     private static final Map<Object, Object> defaultsMap = new HashMap<Object, Object>();
 
     static {
-        defaultsMap.put("idv_memory", SystemMemory.isMemoryAvailable()
+        defaultsMap.put("idv.memory", SystemMemory.isMemoryAvailable()
                                       ? SystemMemory.getMaxMemoryInMegabytes()
                                       : SystemMemory.DEFAULT_MEMORY);
 
