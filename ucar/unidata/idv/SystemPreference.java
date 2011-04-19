@@ -45,10 +45,10 @@ public class SystemPreference {
                                        : SystemMemory.DEFAULT_MEMORY;
 
     /** Max value for the slider. */
-    private static final int MAX_SLIDER_VALUE = 81;
+    private static final int MAX_SLIDER_VALUE = 100;
 
     /** Min value for the slider. */
-    private static final int MIN_SLIDER_VALUE = 5;
+    private static final int MIN_SLIDER_VALUE = 0;
     
     /**The tolerance for the slider. */    
     private final long       TOLERANCE        = DEFAULT_MEMORY / 100;
@@ -157,7 +157,8 @@ public class SystemPreference {
                     return;
                 }
 
-                final int  sliderValue = ((JSlider) evt.getSource()).getValue();
+                int sliderValue = massageSliderVal(((JSlider)evt.getSource()).getValue());
+
                 final long n           = convertToNumber(sliderValue);
 
                 // Preventing superfluous changes that will confuse the user.
@@ -171,12 +172,13 @@ public class SystemPreference {
                 sliderLabel.setText(MessageFormat.format(sliderLabelText, sliderValue));
                 postLabel.setText(String.format(postLabelText, memory.get()));
             }
+
         };
         final JComponent[] sliderComps = GuiUtils.makeSliderPopup(MIN_SLIDER_VALUE, MAX_SLIDER_VALUE,
                                              convertToPercent(memory.get()), percentListener);
 
         slider = (JSlider) sliderComps[1];
-        slider.setMajorTickSpacing(10);
+        slider.setMajorTickSpacing(20);
         slider.setExtent(1);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
@@ -194,6 +196,25 @@ public class SystemPreference {
         sliderSubComp = GuiUtils.center(GuiUtils.hbox(sliderLabel, sliderComps[0], postLabel));
         sliderComp    = GuiUtils.hbox(sliderButton, sliderSubComp);
     }
+    
+	/**
+	 * If the user chooses slider end points, fix
+	 *
+	 * @param i the i
+	 * 
+	 * @return the fixed value
+	 */
+	private static int massageSliderVal(final int i) {
+		int  sliderValue = i;
+        if (sliderValue == MIN_SLIDER_VALUE) {
+        	sliderValue = 1; 
+        }
+        if (sliderValue == MAX_SLIDER_VALUE) {
+        	sliderValue = 1; 
+        }
+		return sliderValue;
+	}
+
 
     /**
      * Creates the memory text UI.
