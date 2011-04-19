@@ -86,7 +86,7 @@ public class IdvCommandLinePrefs {
 
         if (f.exists()) {
             userPrefMap.putAll(
-                (Map<Object, Object>) (new XmlEncoder().createObject(XmlUtil.getRoot(FileUtils.readFileToString(f)))));
+                (Map<Object, Object>) (new XmlEncoder().createObject(XmlUtil.getRoot(f.getPath(), XmlUtil.class))));
         }
 
         // Now adding defaults, if needed.
