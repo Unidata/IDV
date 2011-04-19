@@ -48,6 +48,9 @@ public class SystemPreference {
 
     /** Min value for the slider. */
     private static final int MIN_SLIDER_VALUE = 5;
+    
+    /**The tolerance for the slider. */    
+    private final long       TOLERANCE        = DEFAULT_MEMORY / 100;
 
     /** If system memory is available display slider. */
     private final boolean displaySlider = SystemMemory.isMemoryAvailable();
@@ -141,8 +144,8 @@ public class SystemPreference {
      */
     private void createSlider() {
         final String sliderLabelText = "Use {0,number,#}% ";
-        final String postLabelText   = " of available memory (%d/" + SystemMemory.getMemoryInMegabytes()
-                                       + " megabytes" + ")";
+        final String postLabelText   = " of available memory (%d/" + SystemMemory.getMemoryInMegabytes() + " megabytes"
+                                       + ")";
 
         sliderLabel = new JLabel(MessageFormat.format(sliderLabelText, convertToPercent(memory.get())));
 
@@ -153,10 +156,18 @@ public class SystemPreference {
                     return;
                 }
 
-                final int sliderValue = ((JSlider) evt.getSource()).getValue();
+                final int  sliderValue = ((JSlider) evt.getSource()).getValue();
+                final long n           = convertToNumber(sliderValue);
+
+                // Preventing superfluous changes that will confuse the user.
+                // This typically happens when the user types the memory in the text field,
+                // then switches over to the slider. In this situation, the memory will drift
+                // slightly because of the low precision of a percent.
+                if (Math.abs(n - memory.get()) > TOLERANCE) {
+                    memory.getAndSet(n);
+                }
 
                 sliderLabel.setText(MessageFormat.format(sliderLabelText, sliderValue));
-                memory.getAndSet(convertToNumber(sliderValue));
                 postLabel.setText(String.format(postLabelText, memory.get()));
             }
         };
@@ -299,5 +310,9 @@ public class SystemPreference {
      */
     private static long convertToNumber(final int percent) {
         return (long) ((percent / 100.0) * SystemMemory.getMemoryInMegabytes());
+    }
+
+    private static boolean withinTolerance(final int num1, final int num2, final int tolerance) {
+        return Math.abs(num1 - num2) < tolerance;
     }
 }
