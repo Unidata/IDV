@@ -42,10 +42,10 @@ public class SystemPreference {
                                       : SystemMemory.DEFAULT_MEMORY;
 
     /** Max value for the slider. */
-    private static final int MAX_SLIDER_VALUE = 80 + 1;
+    private static final int MAX_SLIDER_VALUE = 81;
 
     /** Min value for the slider. */
-    private static final int MIN_SLIDER_VALUE = 1;
+    private static final int MIN_SLIDER_VALUE = 5;
 
     /** If system memory is available display slider. */
     private final boolean displaySlider = SystemMemory.isMemoryAvailable();
@@ -158,7 +158,7 @@ public class SystemPreference {
                                              convertToPercent(memory.get()), percentListener);
 
         slider = (JSlider) sliderComps[1];
-        slider.setMinorTickSpacing(5);
+        slider.setMinorTickSpacing(1);
         slider.setMajorTickSpacing(10);
         slider.setSnapToTicks(true);
         slider.setExtent(1);
