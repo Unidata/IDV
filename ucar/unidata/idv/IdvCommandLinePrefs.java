@@ -2,8 +2,6 @@ package ucar.unidata.idv;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.apache.commons.io.FileUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
@@ -24,13 +22,12 @@ import java.util.Map;
  */
 public class IdvCommandLinePrefs {
 
-    /** Default user pref path. */
-    private static final String DEFAULT_USER_PREF_PATH = IOUtil.joinDirs(System.getProperty("user.home"), ".unidata",
-                                                         "idv", "DefaultIdv");
-    
     /** Default user pref file. */
     private static final String DEFAULT_USER_PREF_FILE = "main.xml";
-    
+
+    /** Default user pref path. */
+    private static final String DEFAULT_USER_PREF_PATH = IOUtil.joinDirs(System.getProperty("user.home"), ".unidata",
+                                                             "idv", "DefaultIdv");
 
     /** The Constant defaultsMap. */
     private static final Map<Object, Object> defaultsMap = new HashMap<Object, Object>();
@@ -85,8 +82,9 @@ public class IdvCommandLinePrefs {
         final File                f           = new File(getPreferences(args));
 
         if (f.exists()) {
-            userPrefMap.putAll(
-                (Map<Object, Object>) (new XmlEncoder().createObject(XmlUtil.getRoot(f.getPath(), XmlUtil.class))));
+            userPrefMap.putAll((Map<Object,
+                                    Object>) (new XmlEncoder().createObject(XmlUtil.getRoot(f.getPath(),
+                                        XmlUtil.class))));
         }
 
         // Now adding defaults, if needed.
@@ -116,7 +114,7 @@ public class IdvCommandLinePrefs {
         }
 
         return (userPath == null)
-               ? IOUtil.joinDir(DEFAULT_USER_PREF_PATH,DEFAULT_USER_PREF_FILE)
-               : IOUtil.joinDir(userPath,DEFAULT_USER_PREF_FILE);
+               ? IOUtil.joinDir(DEFAULT_USER_PREF_PATH, DEFAULT_USER_PREF_FILE)
+               : IOUtil.joinDir(userPath, DEFAULT_USER_PREF_FILE);
     }
 }

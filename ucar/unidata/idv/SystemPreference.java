@@ -32,7 +32,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 /**
  * Preferences for the "System" tab. Thanks to McV team for providing hints
  * here. Note the slider is not always displayed because system memory is not
@@ -99,43 +98,16 @@ public class SystemPreference {
      */
     SystemPreference(final AtomicLong memory) {
         this.memory = new MyMemory(memory);
-
-        if (DISPLAY_SLIDER) {
-            createSlider();
-        }
-
         createText();
 
         if (DISPLAY_SLIDER) {
+            createSlider();
             containerXable(textSubComp, false);
             containerXable(sliderSubComp, true);
             sliderButton.setSelected(true);
         }
 
         jtbBg = GuiUtils.buttonGroup(sliderButton, textButton);
-    }
-
-    /**
-     * Recursively enable or disable the container, and whatever is in the
-     * container.
-     *
-     * @param container
-     *            the container
-     * @param enable
-     *            the enable
-     */
-    private void containerXable(final Container container, final boolean enable) {
-        if (container == null) {
-            return;
-        } else {
-            for (java.awt.Component c : container.getComponents()) {
-                c.setEnabled(enable);
-
-                if (c instanceof Container) {
-                    containerXable((Container) c, enable);
-                }
-            }
-        }
     }
 
     /**
@@ -187,6 +159,7 @@ public class SystemPreference {
                 containerXable(sliderSubComp, true);
                 slider.setValue(Math.round(convertToPercent(memory.get())));
                 textButton.setSelected(false);
+                postLabel.setText(String.format(postLabelText, memory.get()));
             }
         });
         sliderSubComp = GuiUtils.center(GuiUtils.hbox(sliderLabel, sliderComps[0], postLabel));
@@ -203,11 +176,11 @@ public class SystemPreference {
         int sliderValue = p;
 
         if (sliderValue == MIN_SLIDER_VALUE) {
-            sliderValue = 1;
+            sliderValue = MIN_SLIDER_VALUE + 1;
         }
 
         if (sliderValue == MAX_SLIDER_VALUE) {
-            sliderValue = 1;
+            sliderValue = MAX_SLIDER_VALUE - 1;
         }
 
         if (convertToNumber(p) < SystemMemory.DEFAULT_MEMORY) {
@@ -261,6 +234,29 @@ public class SystemPreference {
         textComp    = DISPLAY_SLIDER
                       ? GuiUtils.hbox(textButton, textSubComp)
                       : textSubComp;
+    }
+
+    /**
+     *     Recursively enable or disable the container, and whatever is in the
+     *     container.
+     *    
+     *     @param container
+     *                the container
+     *     @param enable
+     *                the enable
+     */
+    private static void containerXable(final Container container, final boolean enable) {
+        if (container == null) {
+            return;
+        } else {
+            for (java.awt.Component c : container.getComponents()) {
+                c.setEnabled(enable);
+
+                if (c instanceof Container) {
+                    containerXable((Container) c, enable);
+                }
+            }
+        }
     }
 
     /**
@@ -323,17 +319,17 @@ public class SystemPreference {
 
         /**
          *     Instantiates a new my memory.
-         *    
+         *
          *     @param memory the memory
          */
         private MyMemory(final AtomicLong memory) {
             this.memory = memory;
-            memory.getAndSet(massage(memory.get()));
+            set(memory.get());
         }
 
         /**
          *     Sets the memory. It massages, if necessary.
-         *    
+         *
          *     @param i the i
          */
         private void set(final long i) {
@@ -342,7 +338,7 @@ public class SystemPreference {
 
         /**
          *     Gets the the memory.
-         *    
+         *
          *     @return the long
          */
         private long get() {
@@ -350,39 +346,27 @@ public class SystemPreference {
         }
 
         /**
-         * Check if number is within slider bounds.
-         *
-         * @param i the i
-         * @return is the number within slider bounds.
-         */
-        private static boolean withinSliderBounds(final float i) {
-            return (!DISPLAY_SLIDER)
-                   ? true
-                   : (i >= MIN_SLIDER_VALUE) && (i <= MAX_SLIDER_VALUE);
-        }
-
-        /**
          *     Massage.
-         *    
+         *
          *     @param i the i
          *     @return the long
          */
         private static long massage(final long i) {
             long        val;
-            final float p   = convertToPercent(i);
+            final float p = convertToPercent(i);
 
-            //First check
-            if (withinSliderBounds(i)) {
-            	val = i;
+            // First check
+            if (!DISPLAY_SLIDER) {
+                val = i;
             } else if (p < MIN_SLIDER_VALUE) {
                 val = convertToNumber(MIN_SLIDER_VALUE);
             } else if (p > MAX_SLIDER_VALUE) {
                 val = convertToNumber(MAX_SLIDER_VALUE);
             } else {
-            	val = i;
+                val = i;
             }
 
-            //Second check
+            // Second check
             if (val < SystemMemory.DEFAULT_MEMORY) {
                 val = SystemMemory.DEFAULT_MEMORY;
             }
