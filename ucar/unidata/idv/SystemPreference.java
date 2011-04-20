@@ -186,6 +186,10 @@ public class SystemPreference {
         if (convertToNumber(p) < SystemMemory.DEFAULT_MEMORY) {
             sliderValue = Math.round(convertToPercent(SystemMemory.DEFAULT_MEMORY));
         }
+        
+        if (convertToNumber(p) > SystemMemory.getMaxMemoryInMegabytes()) {
+            sliderValue = Math.round(convertToPercent(SystemMemory.getMaxMemoryInMegabytes()));
+        }
 
         return sliderValue;
     }
@@ -369,6 +373,11 @@ public class SystemPreference {
             // Second check
             if (val < SystemMemory.DEFAULT_MEMORY) {
                 val = SystemMemory.DEFAULT_MEMORY;
+            }
+            
+            //Third check
+            if (SystemMemory.isMemoryAvailable() && val > SystemMemory.getMaxMemoryInMegabytes()) {
+                val = SystemMemory.getMaxMemoryInMegabytes();
             }
 
             return val;

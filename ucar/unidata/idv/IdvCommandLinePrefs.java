@@ -22,7 +22,10 @@ import java.util.Map;
  */
 public class IdvCommandLinePrefs {
 
-    /** Default user pref file. */
+	/** The IDV preference. */
+    private static final String IDV_MEMORY = "idv.memory";
+
+	/** Default user pref file. */
     private static final String DEFAULT_USER_PREF_FILE = "main.xml";
 
     /** Default user pref path. */
@@ -33,7 +36,7 @@ public class IdvCommandLinePrefs {
     private static final Map<Object, Object> defaultsMap = new HashMap<Object, Object>();
 
     static {
-        defaultsMap.put("idv.memory", SystemMemory.isMemoryAvailable()
+        defaultsMap.put(IDV_MEMORY, SystemMemory.isMemoryAvailable()
                                       ? SystemMemory.getMaxMemoryInMegabytes()
                                       : SystemMemory.DEFAULT_MEMORY);
 
@@ -93,11 +96,40 @@ public class IdvCommandLinePrefs {
                 userPrefMap.put(e.getKey(), e.getValue());
             }
         }
+        
+        vetSettings(userPrefMap);
 
         return userPrefMap;
     }
 
+    
     /**
+     * Herein lies code to check if any settings will make the IDV blow up.
+     * Will fix parameters if necessary
+     *
+     * @param userPrefMap the user pref map
+     */
+    private static void vetSettings(final Map<Object, Object> userPrefMap) {
+    	checkMemory(userPrefMap);
+    	//Eventually check more stuff
+	}
+
+    /**
+     * Herein lies code to check if the memory setting will make the IDV blow up.
+     * Will fix memory if necessary
+     *
+     * @param userPrefMap the user pref map
+     */
+	private static void checkMemory(final Map<Object, Object> userPrefMap) {
+		final long i = (Long) userPrefMap.get(IDV_MEMORY);
+		if (i < SystemMemory.DEFAULT_MEMORY || i > SystemMemory.getMaxMemoryInMegabytes()) {
+			userPrefMap.put(IDV_MEMORY, SystemMemory.isMemoryAvailable()
+                    ? SystemMemory.getMaxMemoryInMegabytes()
+                    : SystemMemory.DEFAULT_MEMORY);
+		}
+	}
+
+	/**
      * Gets the preferences.
      *
      * @param args
