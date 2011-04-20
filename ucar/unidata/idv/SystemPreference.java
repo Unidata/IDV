@@ -303,7 +303,7 @@ public class SystemPreference {
     }
 
     /**
-     * Convert memory to number.
+     * Convert memory to number. Be careful. Only valid if SystemMemory.isMemoryAvailable
      *
      * @param percent
      *            the percent
