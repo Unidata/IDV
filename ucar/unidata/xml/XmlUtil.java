@@ -867,7 +867,7 @@ public abstract class XmlUtil {
         boolean   doAll    = ((tag == null) || tag.equals("*"));
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (doAll || getNodeName(child).equals(tag)) {
+            if (doAll || getNodeName(child).equals(tag) || child.getNodeName().equals(tag)) {
                 found.add(child);
             }
         }
