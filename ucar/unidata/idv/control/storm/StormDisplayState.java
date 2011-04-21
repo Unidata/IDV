@@ -1065,7 +1065,19 @@ public class StormDisplayState {
         }
         return attrNames;
     }
+    //RealType fixedtype;
+    StormParam getFixedParam(){
+        RealType rtype = RealType.getRealType("Fixed");
+        if(rtype == null) {
+            try{
+                rtype = new RealType("Fixed");
+            } catch (VisADException e) {
 
+            }
+            //fixedtype=rtype;
+        }
+        return new StormParam(rtype, false, false);
+    }
 
     /**
      * _more_
@@ -1161,8 +1173,8 @@ public class StormDisplayState {
 
         List obsColorParams      = new ArrayList(obsParams);
         List forecastColorParams = new ArrayList(forecastParams);
-        obsColorParams.add(0, "Fixed");
-        forecastColorParams.add(0, "Fixed");
+        obsColorParams.add(0, getFixedParam());
+        forecastColorParams.add(0, getFixedParam());
 
 
         JComponent obsLayoutComp = new LayoutModelWidget(stormTrackControl,
@@ -1770,15 +1782,22 @@ public class StormDisplayState {
                                         ? ColorTableCanvas.getIcon(ct)
                                         : null));
 
+            obsColorTableLabel.setToolTipText(getColorTableToolTip(true));
+
+        }
+
+        if (forecastColorTableLabel != null) {
+            ColorTable ct = null;
+
             ct = getColorTable(getColorParam(false));
             forecastColorTableLabel.setIcon(((ct != null)
                                              ? ColorTableCanvas.getIcon(ct)
                                              : null));
 
-            obsColorTableLabel.setToolTipText(getColorTableToolTip(true));
             forecastColorTableLabel.setToolTipText(
                 getColorTableToolTip(false));
         }
+
     }
 
 
@@ -1820,7 +1839,7 @@ public class StormDisplayState {
      * @return _more_
      */
     protected ColorTable getColorTable(StormParam param) {
-        if (param == null) {
+        if (param == null || param.getName().equalsIgnoreCase("Fixed")) {
             return null;
         }
         ColorTable ct =
