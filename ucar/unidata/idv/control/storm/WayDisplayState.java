@@ -967,7 +967,11 @@ public class WayDisplayState {
      */
     private void setTrackColor() throws Exception {
         if (trackDisplay != null) {
-            trackDisplay.setColorPalette(getColorPalette());
+            if(colorParam == null || colorParam.getName().equalsIgnoreCase("Fixed") ) {
+                trackDisplay.setColor(getColor());
+            }
+            else
+                trackDisplay.setColorPalette(getColorPalette());
         }
 
     }
