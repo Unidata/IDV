@@ -512,6 +512,13 @@
          value="System"/>
     </resource>
     <resource
+       label="Climatology Diagnostics"
+       location="%IDVPATH%/python/climate.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="ISL"
        location="%IDVPATH%/isl.py">
       <property
