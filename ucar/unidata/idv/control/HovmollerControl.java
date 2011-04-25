@@ -1,0 +1,707 @@
+/*
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ * 
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+package ucar.unidata.idv.control;
+
+
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.grid.GridMath;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.idv.HovmollerViewManager;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.util.GuiUtils;
+
+import ucar.visad.display.ColorScale;
+import ucar.visad.display.Contour2DDisplayable;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.Grid2DDisplayable;
+import ucar.visad.display.GridDisplayable;
+import ucar.visad.display.XYDisplay;
+
+import visad.AxisScale;
+import visad.CoordinateSystem;
+import visad.DateTime;
+import visad.ErrorEstimate;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded2DDoubleSet;
+import visad.GriddedSet;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SampledSet;
+import visad.Set;
+import visad.SetType;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
+
+import visad.util.DataUtility;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.JCheckBox;
+import javax.swing.JMenu;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
+
+/**
+ * Class description
+ *
+ *
+ * @version        Enter version here..., Mon, Apr 25, '11
+ * @author         Enter your name here...
+ */
+public class HovmollerControl extends GridDisplayControl {
+
+    /** the longitude dimenstion id */
+    public static final int LON_DIM = 0;
+
+    /** the latitude dimension id */
+    public static final int LAT_DIM = 1;
+
+    /** the default averaging dimension */
+    private int averageDim = LAT_DIM;
+
+    /** XY display for displaying time/height diagram */
+    private XYDisplay hovmollerDisplay;
+
+    /** the data */
+    private FieldImpl fieldImpl;
+
+    /** Displayable for color shaded display */
+    private DisplayableData dataDisplay;
+
+    /** Displayable for contours */
+    private Contour2DDisplayable contourDisplay;
+
+    /** flag for type of color display */
+    private boolean showAsContours = true;
+
+    /** foreground color */
+    private Color foreground;
+
+    /** background color */
+    private Color background;
+
+    /** default time format */
+    private static final String defaultTimeFormat = "MMM dd HH'Z'";
+
+    /** time format */
+    private String timeFormat = defaultTimeFormat;
+
+    /** Hovmoller ViewManager */
+    private HovmollerViewManager hovmollerView;
+
+    /** flag for reversing time */
+    private boolean reverseTime = true;
+
+    /**
+     *  Default Contructor; sets flags. See init() for creation actions.
+     */
+    public HovmollerControl() {
+        setAttributeFlags(FLAG_DATACONTROL | FLAG_COLOR);
+    }
+
+    /**
+     * Construct the display, frame, and controls
+     *
+     * @param dataChoice the data to use
+     *
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public boolean init(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+
+        hovmollerView = new HovmollerViewManager(getViewContext(),
+                new ViewDescriptor("hovmoller_of_" + paramName),
+                "showControlLegend=false;wireframe=true;") {}
+        ;
+        hovmollerDisplay = hovmollerView.getHovmollerDisplay();
+        hovmollerDisplay.setAspect(.8, 1.0);
+        hovmollerDisplay.setYAxisType(RealType.Time);
+        hovmollerDisplay.setXAxisType((getAverageDimension() == LAT_DIM)
+                                      ? RealType.Longitude
+                                      : RealType.Latitude);
+
+        //If foreground is not null  then this implies we have been unpersisted
+        if (foreground != null) {
+            hovmollerView.setColors(foreground, background);
+        }
+
+        addViewManager(hovmollerView);
+
+        if (showAsContours) {
+            dataDisplay = new Contour2DDisplayable("ts_color_" + paramName,
+                    true, true);
+            dataDisplay.setVisible(true);
+            contourDisplay = new Contour2DDisplayable("ts_contour_"
+                    + paramName);
+            contourDisplay.setVisible(true);
+            addDisplayable(dataDisplay, hovmollerView,
+                           FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT);
+            addDisplayable(contourDisplay, hovmollerView,
+                           FLAG_COLOR | FLAG_CONTOUR | FLAG_DISPLAYUNIT);
+
+        } else {
+            dataDisplay = createDataDisplay();
+            addDisplayable(dataDisplay, hovmollerView, getDataDisplayFlags());
+        }
+
+        if ( !setData(dataChoice)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the attribute flags for the data display
+     * @return the flags
+     */
+    protected int getDataDisplayFlags() {
+        return FLAG_COLORTABLE | FLAG_DISPLAYUNIT;
+    }
+
+    /**
+     * Create the default data display if not showAsContours
+     *
+     * @return the default display
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected DisplayableData createDataDisplay()
+            throws VisADException, RemoteException {
+        DisplayableData dataDisplay = new Grid2DDisplayable("ts_color_"
+                                          + paramName, true);
+        ((Grid2DDisplayable) dataDisplay).setTextureEnable(true);
+        dataDisplay.setVisible(true);
+        return dataDisplay;
+    }
+
+    /**
+     * Return the <code>Displayable</code> created by createDataDisplay.
+     *
+     * @return <code>DisplayableData</code>
+     */
+    public DisplayableData getDataDisplay() {
+        return dataDisplay;
+    }
+
+    /**
+     * User has asked to see a different new parameter in this existing display.
+     * Do everything needed to load display with new kind of parameter.
+     *
+     * @param dataChoice    choice for data
+     * @return  true if successfule
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected boolean setData(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+        if ( !super.setData(dataChoice)) {
+            return false;
+        }
+
+        fieldImpl = getGridDataInstance().getGrid();
+
+        boolean isSequence = GridUtil.isTimeSequence(fieldImpl);
+
+        // Check to see if this is a time sequence or not.  No sense
+        // creating a timeHeight CrossSection with no times or one time.
+        if ( !isSequence || (fieldImpl.getDomainSet().getLength() <= 1)) {
+            throw new VisADException(
+                "Need more than one time to create a Time-Space Diagram");
+        }
+        loadData();
+        setTimeAxisLabels((SampledSet) fieldImpl.getDomainSet());
+
+        return true;
+    }
+
+    /**
+     * Load the data into the display
+     *
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void loadData() throws VisADException, RemoteException {
+
+        if ( !getHaveInitialized()) {
+            return;
+        }
+        if (fieldImpl == null) {
+            return;
+        }
+
+        displayTSForCoord(fieldImpl, getAverageDimension());
+    }
+
+    /**
+     * Called after init().  Load profile into display.
+     */
+    public void initDone() {
+        super.initDone();
+        try {
+            loadData();
+            hovmollerDisplay.draw();
+        } catch (Exception exc) {
+            logException("initDone", exc);
+        }
+    }
+
+    /**
+     * Make a 2D display of the range values against domain coordinate # NN.
+     *
+     * @param fi a VisAD FlatField or seqence of FlatFields with 3 or more
+     *           domain coordinates, manifold dimension 1.
+     * @param NN an integer, the index number of the coordinate to use
+     *               as profile or y axis of plot (0,1,2,...)
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected void displayTSForCoord(FieldImpl fi, int NN)
+            throws VisADException, RemoteException {
+
+        //Have to assume that we have (time -> ((x,y,z)->(param)) because
+        // if we don't have a sequence, how can we do a TimeHeight XS?
+        if (GridUtil.isVolume(fi)) {
+            throw new VisADException("Need to select a level");
+        }
+        int           averageIndex  = NN;
+        int           spatialIndex  = 1 - NN;
+
+        Set           timeSet       = fi.getDomainSet();
+        double[][]    timeVals      = timeSet.getDoubles();
+        GriddedSet spatialDomain = (GriddedSet) GridUtil.getSpatialDomain(fi);
+        int[]         sizes         = spatialDomain.getLengths();
+
+        TupleType     parmType      = GridUtil.getParamType(fi);
+        int           numParms      = parmType.getNumberOfRealComponents();
+        RealType      parm = (RealType) parmType.getRealComponents()[0];
+        RealType      other         = (spatialIndex == LON_DIM)
+                                      ? RealType.Longitude
+                                      : RealType.Latitude;
+
+        RealTupleType newDomainType = new RealTupleType(other, RealType.Time);
+        FieldImpl data = GridMath.applyFunctionToAxis(fi,
+                             GridMath.FUNC_AVERAGE, ((averageIndex == LAT_DIM)
+                ? GridMath.AXIS_Y
+                : GridMath.AXIS_X));
+
+        FunctionType     newFieldType = new FunctionType(newDomainType, parm);
+
+        float[][]        latlonalt    = spatialDomain.getSamples();
+        Unit             spaceUnit =
+            spatialDomain.getSetUnits()[spatialIndex];
+        CoordinateSystem cs           = spatialDomain.getCoordinateSystem();
+        if (cs != null) {
+            spatialIndex = cs.getReference().getIndex(other);
+            latlonalt = cs.toReference(latlonalt,
+                                       spatialDomain.getSetUnits());
+            spaceUnit = cs.getReferenceUnits()[spatialIndex];
+        }
+
+        int        numTimes      = timeVals[0].length;
+        int        numSpace      = sizes[spatialIndex];
+
+        double[][] newDomainVals = new double[2][numTimes * numSpace];
+        int        l             = 0;
+        for (int j = 0; j < numTimes; j++) {
+            for (int i = 0; i < numSpace; i++) {
+                newDomainVals[0][l] = latlonalt[spatialIndex][i];
+                newDomainVals[1][l] = timeVals[0][j];
+                l++;
+            }
+        }
+        Gridded2DDoubleSet newDomain = new Gridded2DDoubleSet(newDomainType,
+                                           newDomainVals, numSpace, numTimes,
+                                           (CoordinateSystem) null,
+                                           new Unit[] { spaceUnit,
+                timeSet.getSetUnits()[0] }, (ErrorEstimate[]) null, false);
+
+        float[][] newRangeVals = new float[numParms][numTimes * numSpace];
+        int       index        = 0;
+        for (int i = 0; i < numTimes; i++) {
+            FlatField ff   = (FlatField) data.getSample(i);
+            float[][] vals = ff.getFloats(false);
+            for (int j = 0; j < numParms; j++) {
+                System.arraycopy(vals[j], 0, newRangeVals[j], index,
+                                 numSpace);
+            }
+            index += numSpace;
+        }
+
+        FlatField hovData = new FlatField(newFieldType, newDomain);
+
+        hovData.setSamples(newRangeVals, false);
+        ((GridDisplayable) dataDisplay).loadData(hovData);
+
+        if (showAsContours) {  // add in the color filled type
+            RealType[] origTypes = parmType.getRealComponents();
+            RealType[] parmTypes = new RealType[numParms];
+            for (int i = 0; i < numParms; i++) {
+                RealType param = (RealType) origTypes[i];
+                parmTypes[i] = RealType.getRealType(param.getName()
+                        + "_color", param.getDefaultUnit());
+            }
+            RealTupleType colorType = new RealTupleType(parmTypes);
+
+            FieldImpl hovDataOther = GridUtil.setParamType(hovData,
+                                         colorType, false);
+
+            contourDisplay.loadData(hovDataOther);
+        }
+    }  // end method displayTHForCoord
+
+
+
+    /**
+     * Make the UI contents for this control window.
+     *
+     * @return  UI container
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
+
+        // TODO:  This is what should be done - however legends don't show up.
+        return GuiUtils.centerBottom(hovmollerView.getContents(),
+                                     doMakeWidgetComponent());
+        //return GuiUtils.centerBottom(profileDisplay.getComponent(),
+        //                             doMakeWidgetComponent());
+    }
+
+    /**
+     * Set x (time) axis values depending on data loaded in displayable.
+     * Set the order of the axes based on whether latest is on left.
+     *
+     * @throws VisADException   VisAD error
+     */
+    private void setTimeAxisValues() throws VisADException {
+        if (getGridDataInstance() == null) {
+            return;
+        }
+        SampledSet timeSet =
+            (SampledSet) getGridDataInstance().getGrid().getDomainSet();
+        setTimeAxisLabels(timeSet);
+    }
+
+    /**
+     * Set x (time) axis values from the time set supplied.
+     *
+     * @param timeSet   time set to use
+     *
+     * @throws VisADException   VisAD error
+     */
+    private void setTimeAxisLabels(SampledSet timeSet) throws VisADException {
+        try {
+            if (timeSet == null) {
+                return;
+            }
+            Real startTime = (Real) DataUtility.getSample(timeSet,
+                                 0).getComponent(0);
+            double start    = startTime.getValue();
+            int    numSteps = timeSet.getLength();
+            Real endTime = (Real) DataUtility.getSample(timeSet,
+                               numSteps - 1).getComponent(0);
+            double end = endTime.getValue();
+            Hashtable<Double, String> timeLabels = new Hashtable<Double,
+                                                       String>();
+
+            int step = (numSteps < 5)
+                       ? 1
+                       : timeSet.getLength() / 5;  //no more than 5 labels;
+            double majorTickSpacing = endTime.getValue()
+                                      - startTime.getValue();
+            /*
+            String format = (majorTickSpacing >= 24 * 60 * 60)
+                            ? "dd'/'HH"
+                            : "HH:mm";
+            */
+            String format = getTimeFormat();
+
+            int    k;
+            for (k = 0; k < numSteps; k += step) {
+                Real r = (Real) DataUtility.getSample(timeSet,
+                             k).getComponent(0);
+                double time = r.getValue();
+                if (k == step) {
+                    majorTickSpacing = (time - start);
+                }
+                DateTime dt = new DateTime(r);
+                timeLabels.put(new Double(time),
+                               dt.formattedString(format,
+                                   DateTime.getFormatTimeZone()));
+            }
+            // do this so we get the last one
+            if (k < numSteps - step / 2) {
+                DateTime dt = new DateTime(endTime);
+                timeLabels.put(new Double(end),
+                               dt.formattedString(format,
+                                   DateTime.getFormatTimeZone()));
+            }
+
+            if (getReverseTime()) {
+                hovmollerDisplay.setYRange(end, start);
+            } else {
+                hovmollerDisplay.setYRange(start, end);
+            }
+            AxisScale timeScale = hovmollerDisplay.getYAxisScale();
+            timeScale.setSnapToBox(true);
+            timeScale.setTickBase(start);
+            //double averageTickSpacing = (end-start)/(double)(numSteps);
+            double averageTickSpacing = (end - start);
+            timeScale.setMajorTickSpacing(averageTickSpacing * step);
+            timeScale.setMinorTickSpacing(averageTickSpacing);
+            timeScale.setLabelTable(timeLabels);
+            timeScale.setTitle("Time");
+
+            AxisScale spaceScale = hovmollerDisplay.getXAxisScale();
+            spaceScale.setSnapToBox(true);
+
+        } catch (RemoteException re) {}  // can't happen
+    }
+
+    /**
+     * make widgets for check box for latest data time on left of x axis.
+     *
+     * @param controlWidgets to fill
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
+        super.getControlWidgets(controlWidgets);
+
+        // make check box for latest data time on left of x axis
+        JCheckBox toggle = new JCheckBox("Latest Time at Bottom",
+                                         reverseTime);
+        toggle.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reverseTime = ((JCheckBox) e.getSource()).isSelected();
+                try {
+                    setTimeAxisValues();
+                } catch (VisADException ve) {
+                    userMessage("couldn't set order");
+                }
+            }
+        });
+        final JTextField formatField = new JTextField(getTimeFormat());
+        formatField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setTimeFormat(formatField.getText());
+            }
+        });
+
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Time: "),
+                GuiUtils.centerRight(
+                    GuiUtils.leftCenter(
+                        GuiUtils.rLabel("Label Format: "),
+                        formatField), toggle)));
+
+    }
+
+    /**
+     * Add items to the command menu.
+     *
+     * @param items  menu to add to.
+     * @param forMenuBar  whether for menu bar (true) or popup (false)
+     */
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        super.getViewMenuItems(items, forMenuBar);
+
+        items.add(GuiUtils.MENU_SEPARATOR);
+        if (forMenuBar) {
+            JMenu hovMenu = hovmollerView.makeViewMenu();
+            hovMenu.setText("Hovmoller View");
+            items.add(hovMenu);
+        }
+    }
+
+    /**
+     * Actually create the color scales.  Override to only show in
+     * control window
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    protected void doMakeColorScales()
+            throws VisADException, RemoteException {
+        colorScales = new ArrayList();
+        if (colorScaleInfo == null) {
+            colorScaleInfo = getDefaultColorScaleInfo();
+        }
+        ColorScale colorScale = new ColorScale(getColorScaleInfo());
+        addDisplayable(colorScale, hovmollerView, FLAG_COLORTABLE);
+        colorScales.add(colorScale);
+
+    }
+
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    public void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+
+        if (hovmollerView != null) {
+            jtp.add("Hovmoller View", hovmollerView.getPropertiesComponent());
+        }
+    }
+
+    /**
+     * Apply the properties
+     *
+     * @return true if successful
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        if (hovmollerView != null) {
+            return hovmollerView.applyProperties();
+        }
+        return true;
+    }
+
+    /**
+     * Apply the preferences.  Used to pick up the date format changes.
+     */
+    public void applyPreferences() {
+        super.applyPreferences();
+        try {
+            setTimeAxisValues();
+        } catch (Exception exc) {
+            logException("applyPreferences", exc);
+        }
+    }
+
+    /**
+     * Get whether the display is shown as contours.
+     *
+     * @param yesorno  <code>true</code> if want contours instead of an image.
+     */
+    public void setShowAsContours(boolean yesorno) {
+        showAsContours = yesorno;
+    }
+
+    /**
+     * Get whether the display is an image or contours.
+     *
+     * @return  <code>true</code> if contours display, false if image
+     */
+    public boolean getShowAsContours() {
+        return showAsContours;
+    }
+
+    /**
+     * Set the averaging dimension
+     *
+     * @param dim  the dimension (LAT_DIM, LON_DIM)
+     */
+    public void setAverageDimension(int dim) {
+        averageDim = dim;
+    }
+
+    /**
+     * Get the averaging dimension
+     *
+     * @return  the averaging dimension
+     */
+    public int getAverageDimension() {
+        return averageDim;
+    }
+
+    /**
+     * Set the time format
+     *
+     * @param format  time format
+     */
+    public void setTimeFormat(String format) {
+        timeFormat = format;
+        if (getHaveInitialized()) {
+            try {
+                setTimeAxisValues();
+            } catch (VisADException ve) {
+                logException("Unable to set time format", ve);
+            }
+        }
+    }
+
+    /**
+     * Get the time format
+     *
+     * @return  the time format
+     */
+    public String getTimeFormat() {
+        return timeFormat;
+    }
+
+    /**
+     * Set reverse times
+     *
+     * @param yesorno  true to go oldest to youngest
+     */
+    public void setReverseTime(boolean yesorno) {
+        reverseTime = yesorno;
+        if (getHaveInitialized()) {
+            try {
+                setTimeAxisValues();
+            } catch (VisADException ve) {
+                logException("Unable to set time format", ve);
+            }
+        }
+    }
+
+    /**
+     * Get reverse times property
+     *
+     * @return the reverse times property
+     */
+    public boolean getReverseTime() {
+        return reverseTime;
+    }
+
+
+}

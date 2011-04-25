@@ -677,6 +677,42 @@ Since this is confusing and needs more work lets remove this for now
      properties="windowVisible=true;showAsContours=false;"/>
 
   <control
+     id="timelonshade"
+     categories="GRID-3D-TIME-*;GRID-2D-TIME"
+     class="ucar.unidata.idv.control.HovmollerControl"
+     doeslevels="true"
+     label="Time-Longitude (Color Shaded)"
+     displaycategory="Hovmoller"
+     properties="windowVisible=true;showAsContours=false;averageDimension=1;"/>
+
+  <control
+     id="timeloncontour"
+     categories="GRID-3D-TIME-*;GRID-2D-TIME"
+     class="ucar.unidata.idv.control.HovmollerControl"
+     doeslevels="true"
+     label="Time-Longitude (Contours)"
+     displaycategory="Hovmoller"
+     properties="windowVisible=true;showAsContours=true;averageDimension=1;"/>
+
+  <control
+     id="timelatshade"
+     categories="GRID-3D-TIME-*;GRID-2D-TIME"
+     class="ucar.unidata.idv.control.HovmollerControl"
+     doeslevels="true"
+     label="Time-Latitude (Color Shaded)"
+     displaycategory="Hovmoller"
+     properties="windowVisible=true;showAsContours=false;averageDimension=0;"/>
+
+  <control
+     id="timelatcontour"
+     categories="GRID-3D-TIME-*;GRID-2D-TIME"
+     class="ucar.unidata.idv.control.HovmollerControl"
+     doeslevels="true"
+     label="Time-Latitude (Contours)"
+     displaycategory="Hovmoller"
+     properties="windowVisible=true;showAsContours=true;averageDimension=0;"/>
+
+  <control
      id="timeheightflow"
      categories="*-flowvector-*" 
      class="ucar.unidata.idv.control.FlowTimeHeightControl"
