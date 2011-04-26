@@ -349,7 +349,7 @@ public class DisplayConventions extends IdvManager {
      * @return The formatted lat or lon
      */
     public String formatLatLonCardinal(Real latorlon, int type) {
-        return formatLatLonCardinal(latorlon.getValue(), dim);
+        return formatLatLonCardinal(latorlon.getValue(), type);
     }
 
 
