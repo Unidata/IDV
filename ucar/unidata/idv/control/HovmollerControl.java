@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -645,7 +645,8 @@ public class HovmollerControl extends GridDisplayControl {
         AxisScale xScale = hovmollerDisplay.getXAxisScale();
         xScale.setSnapToBox(true);
         xScale.setTickBase(botval);
-        double averageTickSpacing = (topval - botval) / (double) (numSteps);
+        double averageTickSpacing = (topval - botval)
+                                    / (double) (numSteps - 1);
         xScale.setMajorTickSpacing(averageTickSpacing);
         xScale.setMinorTickSpacing(averageTickSpacing);
         xScale.setLabelTable(xLabels);
