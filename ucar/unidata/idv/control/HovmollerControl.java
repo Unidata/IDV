@@ -471,7 +471,7 @@ public class HovmollerControl extends GridDisplayControl {
                                    DateTime.getFormatTimeZone()));
             }
             // do this so we get the last one
-            if (k < numSteps - step / 2) {
+            if (k - step < numSteps - step / 2) {
                 DateTime dt = new DateTime(endTime);
                 timeLabels.put(new Double(end),
                                dt.formattedString(format,
