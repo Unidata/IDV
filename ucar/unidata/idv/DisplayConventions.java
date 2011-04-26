@@ -104,6 +104,11 @@ public class DisplayConventions extends IdvManager {
     /** Provides for synchronization when dealing with the unit list */
     private Object UNIT_MUTEX = new Object();
 
+    /** Latitude id */
+    private static final int LATITUDE = 1;
+
+    /** Longitude id */
+    private static final int LONGITUDE = 0;
 
 
     /**
@@ -299,6 +304,52 @@ public class DisplayConventions extends IdvManager {
      */
     public String formatLatLon(Real latorlon) {
         return formatLatLon(latorlon.getValue());
+    }
+
+    /**
+     * Format the lat/lon labels with cardinal points (N,S,E,W)
+     *
+     * @param value
+     * @param type (LATITUDE or LONGITUDE)
+     *
+     * @return  the formatted string
+     */
+    public String formatLatLonCardinal(double value, int type) {
+        String retString;
+        if (type == LATITUDE) {
+            retString = Misc.format(Math.abs(value));
+            if (value < 0) {
+                retString += "S";
+            } else if (value == 0.f) {
+                retString = "EQ";
+            } else {
+                retString += "N";
+            }
+        } else {  // LONGITUDE
+            if (value > 180) {
+                value -= 360;
+            }
+            retString = Misc.format(Math.abs(value));
+            if (value < 0) {
+                retString += "W";
+            } else if (value == 0.f) {
+                retString = "0";
+            } else {
+                retString += "E";
+            }
+        }
+        return retString;
+    }
+
+    /**
+     * Format an lat or lon with cardinal id (N,S,E,W)
+     *
+     * @param latorlon The lat or lon
+     * @param type (LATITUDE or LONGITUDE)
+     * @return The formatted lat or lon
+     */
+    public String formatLatLonCardinal(Real latorlon, int type) {
+        return formatLatLonCardinal(latorlon.getValue(), dim);
     }
 
 

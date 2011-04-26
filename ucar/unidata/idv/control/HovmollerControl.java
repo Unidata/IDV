@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,9 +24,11 @@ package ucar.unidata.idv.control;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridMath;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.HovmollerViewManager;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 
 import ucar.visad.display.ColorScale;
 import ucar.visad.display.Contour2DDisplayable;
@@ -386,9 +388,92 @@ public class HovmollerControl extends GridDisplayControl {
 
             contourDisplay.loadData(hovDataOther);
         }
+        setXAxisLabels(spatialDomain);
     }  // end method displayTHForCoord
 
+    /**
+     * Add DisplaySettings appropriate for this display
+     *
+     * @param dsd  the dialog to add to
+     */
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        dsd.addPropertyValue(getTimeFormat(), "timeFormat",
+                             "Time Label Format", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getReverseTime()), "reverseTime",
+                             "Latest Time at Bottom", SETTINGS_GROUP_DISPLAY);
+    }
 
+    /**
+     * Return the label that is to be used for the color widget
+     * This allows derived classes to override this and provide their
+     * own name,
+     *
+     * @return Label used for the color widget
+     */
+    public String getColorWidgetLabel() {
+        return "Contour Line Color";
+    }
+
+    /**
+     * Get the default display list template for this control.  Subclasses can override
+     * @return the default template
+     */
+    protected String getDefaultDisplayListTemplate() {
+        if (getGridDataInstance() == null) {
+            return MACRO_SHORTNAME;
+        }
+        try {
+            GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(
+                                       getGridDataInstance().getGrid());
+            float[][]        ranges   = getLatLonRanges(domainSet);
+            CoordinateSystem cs       = domainSet.getCoordinateSystem();
+            int              dimIndex = averageDim;
+            if (cs != null) {
+                dimIndex = cs.getReference().getIndex((averageDim == LAT_DIM)
+                        ? RealType.Latitude
+                        : RealType.Longitude);
+            }
+            float high = ranges[dimIndex][1];
+            float low  = ranges[dimIndex][0];
+            if (averageDim == LON_DIM) {  // switch to be left to right
+                float temp = high;
+                high = low;
+                low  = temp;
+            }
+            DisplayConventions dc = getDisplayConventions();
+            return MACRO_SHORTNAME + " - "
+                   + dc.formatLatLonCardinal(high, averageDim) + "-"
+                   + dc.formatLatLonCardinal(low, averageDim);
+        } catch (VisADException ve) {
+            return MACRO_SHORTNAME;
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param domainSet _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    private float[][] getLatLonRanges(GriddedSet domainSet)
+            throws VisADException {
+        CoordinateSystem cs       = domainSet.getCoordinateSystem();
+        float[]          his      = domainSet.getHi();
+        float[]          los      = domainSet.getLow();
+        int              dimIndex = averageDim;
+        float[][]        ranges   = null;
+        if (cs != null) {
+            float[][] latlons = cs.toReference(domainSet.getSamples());
+            ranges = Misc.getRanges(latlons);
+        } else {
+            ranges = Misc.getRanges(domainSet.getSamples(false));
+        }
+        return ranges;
+    }
 
     /**
      * Make the UI contents for this control window.
@@ -486,8 +571,8 @@ public class HovmollerControl extends GridDisplayControl {
             AxisScale timeScale = hovmollerDisplay.getYAxisScale();
             timeScale.setSnapToBox(true);
             timeScale.setTickBase(start);
-            //double averageTickSpacing = (end-start)/(double)(numSteps);
-            double averageTickSpacing = (end - start);
+            double averageTickSpacing = (end - start) / (double) (numSteps);
+            //double averageTickSpacing = (end - start);
             timeScale.setMajorTickSpacing(averageTickSpacing * step);
             timeScale.setMinorTickSpacing(averageTickSpacing);
             timeScale.setLabelTable(timeLabels);
@@ -497,6 +582,74 @@ public class HovmollerControl extends GridDisplayControl {
             spaceScale.setSnapToBox(true);
 
         } catch (RemoteException re) {}  // can't happen
+    }
+
+    /**
+     * Set x (lat/lon) axis values from spatial domain
+     *
+     * @param spatialSet   the spatial domain set to use
+     *
+     * @throws VisADException   VisAD error
+     */
+    private void setXAxisLabels(GriddedSet spatialSet) throws VisADException {
+        if (spatialSet == null) {
+            return;
+        }
+        float[][]        ranges   = getLatLonRanges(spatialSet);
+        CoordinateSystem cs       = spatialSet.getCoordinateSystem();
+        int              dimIndex = 1 - averageDim;
+        if (cs != null) {
+            dimIndex = cs.getReference().getIndex((averageDim == LAT_DIM)
+                    ? RealType.Longitude
+                    : RealType.Latitude);
+        }
+        double                    min     = ranges[dimIndex][0];
+        double                    max     = ranges[dimIndex][1];
+        double                    range   = Math.abs(max - min);
+        Hashtable<Double, String> xLabels = new Hashtable<Double, String>();
+
+        double                    tens    = 1.0;
+        if (range < tens) {
+            tens /= 10.0;
+            while (range < tens) {
+                tens /= 10.0;
+            }
+        } else {
+            while (10.0 * tens <= range) {
+                tens *= 10.0;
+            }
+        }
+        // now tens <= range < 10.0 * tens;
+        double ratio = range / tens;
+        if (ratio < 2.0) {
+            tens = tens / 5.0;
+        } else if (ratio < 4.0) {
+            tens = tens / 2.0;
+        }
+        double majorTickSpacing = tens;
+        // now tens = interval between major tick marks (majorTickSpacing)
+
+        double[] hilo = Misc.computeTicks(max, min, 0, majorTickSpacing);
+        // firstValue is the first Tick mark value
+        double             firstValue = hilo[0];
+        double             botval     = hilo[0];
+        double             topval     = hilo[hilo.length - 1];
+        int                numSteps   = hilo.length;
+        DisplayConventions dc         = getDisplayConventions();
+
+        for (int k = 0; k < hilo.length; k++) {
+            double val = hilo[k];
+            xLabels.put(new Double(val),
+                        dc.formatLatLonCardinal(val, 1 - averageDim));
+        }
+        AxisScale xScale = hovmollerDisplay.getXAxisScale();
+        xScale.setSnapToBox(true);
+        xScale.setTickBase(botval);
+        double averageTickSpacing = (topval - botval) / (double) (numSteps);
+        xScale.setMajorTickSpacing(averageTickSpacing);
+        xScale.setMinorTickSpacing(averageTickSpacing);
+        xScale.setLabelTable(xLabels);
+
     }
 
     /**

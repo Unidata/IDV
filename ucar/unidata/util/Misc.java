@@ -4121,11 +4121,11 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Get the range of all values
      *
-     * @param a _more_
+     * @param a  arrays of values
      *
-     * @return _more_
+     * @return the range (min,max)
      */
     public static float[] getRange(float[][] a) {
         float[] range = { Float.MAX_VALUE, Float.MIN_VALUE };
@@ -4138,6 +4138,22 @@ public class Misc {
             }
         }
         return range;
+    }
+
+
+    /**
+     * Get the ranges for each column
+     *
+     * @param a arrays of values
+     *
+     * @return  the range (min,max) of each column
+     */
+    public static float[][] getRanges(float[][] a) {
+        float[][] ranges = new float[a.length][];
+        for (int i = 0; i < a.length; i++) {
+              ranges[i] = getRange(new float[][] {a[i]});
+        }
+        return ranges;
     }
 
 
