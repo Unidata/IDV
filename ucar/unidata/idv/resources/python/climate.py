@@ -46,4 +46,28 @@ def calcMonAnom(monthly, ltm, normalize=0):
            diff = GridUtil.setParamType(diff, GridUtil.getParamType(monAnom))
        monAnom[index] = diff
   return monAnom
+  
+def stdMon(grid):
+  """ Create monthly standard deviations from a grid of monthly data over a period
+      of years. The number of timesteps must be a multiple of 12.
+  """
+  from visad import VisADException
+  from visad import Gridded1DDoubleSet
+  from visad import FunctionType
+  from visad import FieldImpl
+  from visad import RealType
+  timeSet = GridUtil.getTimeSet(grid)
+  numT = timeSet.getLength()
+  if (numT%12 > 0):
+    raise VisADException("Number of times must be a multiple of 12")
+  numYears = numT/12
+  months = [[0,1,2,3,4,5,6,7,8,9,10,11]]
+  units = [Util.parseUnit("months since 0001-01-01 00:00")]
+  newTimes = Gridded1DDoubleSet(RealType.Time, months, 12, None, units, None)
+  stdev = FieldImpl(FunctionType(RealType.Time, grid.getSample(0).getType()), newTimes) 
+  for month in range (12):
+     a = GridMath.applyFunctionOverTime(grid, GridMath.FUNC_STDEV, month, 12, 0)
+     stdev.setSample(month, a, 0)
+  return stdev
+
 
