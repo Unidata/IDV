@@ -26,6 +26,8 @@ public final class SystemMemory {
 
     /**
      * Private constructor.
+     * See this discussion: http://stackoverflow.com/questions/1190837/java-xmx-max-memory-on-system
+     * Post condition: memory will either be -1, OS_32_MAX, or the result of getTotalPhysicalMemorySize
      */
     private SystemMemory() {
         long mem = -1;
