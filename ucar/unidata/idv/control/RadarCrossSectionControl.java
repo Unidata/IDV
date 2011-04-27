@@ -490,4 +490,51 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
 
 
 
+    /**
+     * Set the position of the selector
+     *
+     * @param startLoc    Start location
+     * @param endLoc      End location
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void setPosition(EarthLocation startLoc, EarthLocation endLoc)
+            throws VisADException, RemoteException {
+
+        double x1 = 0;
+        double y1 = 0;
+        double[] box1 = earthToBox(startLoc);
+                if (box1 != null) {
+                    x1 = box1[0];
+                    y1 = box1[1];
+                }
+
+         RealTuple start =
+                new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+                              new double[] { x1,
+                                             y1 });
+
+
+        double x2 = 0;
+        double y2 = 0;
+        double[] box2 = earthToBox(startLoc);
+                if (box2 != null) {
+                    x2 = box2[0];
+                    y2 = box2[1];
+                }
+         RealTuple end =
+                new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+                              new double[] { x2,
+                                             y2 });
+        csSelector.setPosition(start, end);
+
+        startLocation = startLoc;
+        endLocation = endLoc;
+        csSelector.setZValue(0.99);
+        setCSLineLength(defaultLen);
+        setRequestProperties();
+    }
+
+
+
 }
