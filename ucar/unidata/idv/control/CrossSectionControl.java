@@ -1344,7 +1344,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    private void setPosition(EarthLocation startLoc, EarthLocation endLoc)
+    protected void setPosition(EarthLocation startLoc, EarthLocation endLoc)
             throws VisADException, RemoteException {
         RealTuple start =
             new RealTuple(RealTupleType.SpatialEarth3DTuple,
