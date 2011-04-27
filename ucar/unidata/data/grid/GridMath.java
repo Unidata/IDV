@@ -250,7 +250,7 @@ public class GridMath {
     }
 
     /**
-     * Average the grid over time
+     * Average the grid at each point over time
      *
      * @param grid   grid to average
      * @param makeTimes If true then make a time field with the range being the same computed value
@@ -262,6 +262,21 @@ public class GridMath {
     public static FieldImpl averageOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
         return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
+    }
+    
+    /**
+     * Compute the standard deviation of the grid at each point over time
+     *
+     * @param grid   grid to compute std
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl standardDeviationOverTime(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverTime(grid, FUNC_STDEV, makeTimes);
     }
 
     /**
@@ -610,7 +625,10 @@ public class GridMath {
             }
             final boolean doMax        = function.equals(FUNC_MAX);
             final boolean doMin        = function.equals(FUNC_MIN);
+            final boolean doStd        = function.equals(FUNC_STDEV);
             float[][]     values       = null;
+            float[][]     values2      = null;
+            int[][]       nums         = null;
             final Set     timeDomain   = Util.getDomainSet(grid);
             int           numTimeSteps = timeDomain.getLength() / idxStride;
             for (int timeStepIdx = startIdx;
@@ -618,8 +636,24 @@ public class GridMath {
                     timeStepIdx += idxStride) {
                 FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
                 float[][] timeStepValues = sample.getFloats(false);
-                if (values == null) {
+                if (values == null) {  // first pass through
                     values  = Misc.cloneArray(timeStepValues);
+                    nums   = new int[values.length][values[0].length];
+                    if (doStd) {
+                    	values2 = new float[values.length][values[0].length];
+                    }
+                    for (int i = 0; i < timeStepValues.length; i++) {
+                        for (int j = 0; j < timeStepValues[i].length; j++) {
+                            float value = timeStepValues[i][j];
+                            if (value != value) {
+                                continue;
+                            }
+                            nums[i][j] = 1;
+                            if (doStd) {
+                            	values2[i][j] = value*value;
+                            }
+                        }
+                    }
                     newGrid = (FlatField) sample.clone();
                     continue;
                 }
@@ -633,16 +667,39 @@ public class GridMath {
                             values[i][j] = Math.max(values[i][j], value);
                         } else if (doMin) {
                             values[i][j] = Math.min(values[i][j], value);
+                        } else if (doStd) {
+                            values[i][j] += value;
+                            values2[i][j] += value*value;
                         } else {
                             values[i][j] += value;
                         }
+                        nums[i][j]++;
                     }
                 }
             }
-            if (function.equals(FUNC_AVERAGE) && (numTimeSteps > 0)) {
+            if (function.equals(FUNC_AVERAGE)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                        values[i][j] = values[i][j] / numTimeSteps;
+                    	int num = nums[i][j];
+                    	if (num > 0) {
+                             values[i][j] = values[i][j] / num;
+                    	} else {
+                    		values[i][j] = Float.NaN;
+                    	}
+                    }
+                }
+            }
+            if (function.equals(FUNC_STDEV)) {
+                for (int i = 0; i < values.length; i++) {
+                    for (int j = 0; j < values[i].length; j++) {
+                    	int num = nums[i][j];
+                    	if (num > 0) {
+                    	    float mean = values[i][j] / num;
+                    	    float var = values2[i][j] / num - mean*mean;
+                    	    values[i][j] = (float) Math.sqrt(var);
+                    	} else {
+                    		values[i][j] = Float.NaN;
+                    	}
                     }
                 }
             }
