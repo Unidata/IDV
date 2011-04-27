@@ -325,14 +325,16 @@ public class HovmollerControl extends GridDisplayControl {
                 ? GridMath.AXIS_Y
                 : GridMath.AXIS_X));
 
-        FunctionType     newFieldType = new FunctionType(newDomainType, parm);
-        int        numTimes      = timeVals[0].length;
-        int        numSpace      = sizes[spatialIndex];
+        FunctionType     newFieldType  = new FunctionType(newDomainType,
+                                             parm);
+        int              numTimes      = timeVals[0].length;
+        int              numSpace      = sizes[spatialIndex];
+        int              numOtherSpace = sizes[averageIndex];
 
-        float[][]        latlonalt    = spatialDomain.getSamples();
+        float[][]        latlonalt     = spatialDomain.getSamples();
         Unit             spaceUnit =
             spatialDomain.getSetUnits()[spatialIndex];
-        CoordinateSystem cs           = spatialDomain.getCoordinateSystem();
+        CoordinateSystem cs            = spatialDomain.getCoordinateSystem();
         if (cs != null) {
             spatialIndex = cs.getReference().getIndex(other);
             latlonalt = cs.toReference(latlonalt,
@@ -344,17 +346,19 @@ public class HovmollerControl extends GridDisplayControl {
         int        l             = 0;
         for (int j = 0; j < numTimes; j++) {
             for (int i = 0; i < numSpace; i++) {
-                newDomainVals[0][l] = latlonalt[spatialIndex][i];
+                int index = (averageIndex == LAT_DIM)
+                            ? i
+                            : i * numOtherSpace;
+                newDomainVals[0][l] = latlonalt[spatialIndex][index];
                 newDomainVals[1][l] = timeVals[0][j];
                 l++;
             }
         }
-        // NB: check equals false because for non lat/lon grids, there is curvature
         Gridded2DDoubleSet newDomain = new Gridded2DDoubleSet(newDomainType,
                                            newDomainVals, numSpace, numTimes,
                                            (CoordinateSystem) null,
                                            new Unit[] { spaceUnit,
-                timeSet.getSetUnits()[0] }, (ErrorEstimate[]) null, false, false );
+                timeSet.getSetUnits()[0] }, (ErrorEstimate[]) null, false);
 
         float[][] newRangeVals = new float[numParms][numTimes * numSpace];
         int       index        = 0;
@@ -362,8 +366,17 @@ public class HovmollerControl extends GridDisplayControl {
             FlatField ff   = (FlatField) data.getSample(i);
             float[][] vals = ff.getFloats(false);
             for (int j = 0; j < numParms; j++) {
-                System.arraycopy(vals[j], 0, newRangeVals[j], index,
-                                 numSpace);
+                // for lat (y) averaging, just take the first row
+                if (averageIndex == LAT_DIM) {
+                    System.arraycopy(vals[j], 0, newRangeVals[j], index,
+                                     numSpace);
+                } else {
+                    // for lon (x) averaging, get the first value in each row
+                    for (int k = 0; k < numSpace; k++) {
+                        newRangeVals[j][index + k] =
+                            vals[j][k * numOtherSpace];
+                    }
+                }
             }
             index += numSpace;
         }
@@ -451,13 +464,13 @@ public class HovmollerControl extends GridDisplayControl {
     }
 
     /**
-     * _more_
+     * Get the lat/lon ranges of the domainSet
      *
-     * @param domainSet _more_
+     * @param domainSet  the spatial domain
      *
-     * @return _more_
+     * @return  the ranges
      *
-     * @throws VisADException _more_
+     * @throws VisADException problem getting at values
      */
     private float[][] getLatLonRanges(GriddedSet domainSet)
             throws VisADException {
@@ -571,10 +584,8 @@ public class HovmollerControl extends GridDisplayControl {
             AxisScale timeScale = hovmollerDisplay.getYAxisScale();
             timeScale.setSnapToBox(true);
             timeScale.setTickBase(start);
-            double averageTickSpacing = (end - start) / (double) (numSteps);
-            //double averageTickSpacing = (end - start);
-            timeScale.setMajorTickSpacing(averageTickSpacing * step);
-            timeScale.setMinorTickSpacing(averageTickSpacing);
+            timeScale.setMajorTickSpacing(majorTickSpacing);
+            //timeScale.setMinorTickSpacing(averageTickSpacing*step);
             timeScale.setLabelTable(timeLabels);
             timeScale.setTitle("Time");
 
@@ -642,7 +653,6 @@ public class HovmollerControl extends GridDisplayControl {
             xLabels.put(new Double(val),
                         dc.formatLatLonCardinal(val, 1 - averageDim));
         }
-        //hovmollerDisplay.setXRange(botval, topval);
         AxisScale xScale = hovmollerDisplay.getXAxisScale();
         xScale.setSnapToBox(true);
         xScale.setTickBase(botval);
