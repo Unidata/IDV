@@ -1717,8 +1717,8 @@ public abstract class DrawingGlyph {
         float[][] pts    = getLatLons(((actualPoints != null)
                                        ? actualPoints
                                        : points));
-        double    minLat = Double.MAX_VALUE;
-        double    minLon = Double.MIN_VALUE;
+        double    minLat = Double.POSITIVE_INFINITY;
+        double    minLon = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < pts[0].length; i++) {
             if (i == 0) {
                 minLat = pts[IDX_LAT][i];
