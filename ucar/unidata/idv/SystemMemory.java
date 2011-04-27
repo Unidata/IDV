@@ -41,11 +41,9 @@ public final class SystemMemory {
         // Are we running on a 64 bit OS?
         final boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
 
-        if (!is64 && mem > OS_32_MAX) {
-            mem = OS_32_MAX;
-        }
-
-        this.memory = mem;
+        this.memory = (!is64 && (mem > OS_32_MAX))
+                      ? OS_32_MAX
+                      : mem;
     }
 
     /**
