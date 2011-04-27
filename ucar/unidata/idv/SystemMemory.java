@@ -18,8 +18,8 @@ public final class SystemMemory {
     /** The INSTANCE. */
     private static final SystemMemory INSTANCE = new SystemMemory();
 
-    /** Max heap for a 32 bit windows machine */
-    private static final long WINDOWS_32_MAX = 1536 * 1024 * 1024;
+    /** Max heap for a 32 bit OS */
+    private static final long OS_32_MAX = 1536 * 1024 * 1024;
 
     /** The total available system memory in bytes. */
     private final long memory;
@@ -41,14 +41,8 @@ public final class SystemMemory {
         // Are we running on a 64 bit OS?
         final boolean is64 = System.getProperty("os.arch").indexOf("64") >= 0;
 
-        // Is this a windows machine?
-        final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-
-        // Is this a 32 bit windows machine?
-        final boolean isWindows32 = !is64 && isWindows;
-
-        if (isWindows32 && (mem > WINDOWS_32_MAX)) {
-            mem = WINDOWS_32_MAX;
+        if (!is64 && mem > OS_32_MAX) {
+            mem = OS_32_MAX;
         }
 
         this.memory = mem;
