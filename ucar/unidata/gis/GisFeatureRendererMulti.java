@@ -651,8 +651,8 @@ public abstract class GisFeatureRendererMulti extends GisFeatureRenderer {
         int                 total_feats = 0;
         int                 cross_pts   = 0;
         double              avgD        = 0;
-        double              minD        = Double.MAX_VALUE;
-        double              maxD        = Double.MIN_VALUE;
+        double              minD        = Double.POSITIVE_INFINITY;
+        double              maxD        = Double.NEGATIVE_INFINITY;
 
         ProjectionImpl      dataProject = getDataProjection();
         ProjectionPointImpl thisW       = new ProjectionPointImpl();
