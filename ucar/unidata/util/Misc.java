@@ -4128,12 +4128,13 @@ public class Misc {
      * @return the range (min,max)
      */
     public static float[] getRange(float[][] a) {
-        float[] range = { Float.MAX_VALUE, Float.MIN_VALUE };
+        float[] range = { Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY };
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a[i].length; j++) {
-                if (a[i][j] == a[i][j]) {
-                    range[0] = (float) Math.min(range[0], a[i][j]);
-                    range[1] = (float) Math.max(range[1], a[i][j]);
+            	float val = a[i][j];
+                if (val == val) {
+                    range[0] = (float) Math.min(range[0], val);
+                    range[1] = (float) Math.max(range[1], val);
                 }
             }
         }
