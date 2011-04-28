@@ -1,3 +1,5 @@
+@echo off
+
 REM ##############################################################################
 REM  Script:  runIDV
 REM 
@@ -30,9 +32,11 @@ set idv_memory=%idv_memory:"=%
 REM See important note about this above. To bootstrap the IDV memory, uncomment 
 REM the line below and set to a value  in megabytes. 
 REM idv_memory=512
-	    
+	
+@echo on    
 jre\bin\java -Xmx%idv_memory%m -Didv.enableStereo=false -jar idv.jar %*
-	    
+@echo off
+
 REM Use the line below instead if you want to use the D3D version of Java 3D
 REM jre\bin\java -Xmx%idv_memory%m -Dj3d.rend=d3d -jar idv.jar %*
 	    
