@@ -105,23 +105,10 @@ public class IdvCommandLinePrefs {
      *            the user pref map
      */
     private static void checkMemory(final Map<Object, Object> userPrefMap) {
-        boolean fix = false;
-
-        if (!userPrefMap.containsKey(IDV_MEMORY)) {
-            fix = true;
+        if (userPrefMap.containsKey(IDV_MEMORY)) {
+            userPrefMap.put(IDV_MEMORY, SystemMemoryManager.checkAndRepair((Long) userPrefMap.get(IDV_MEMORY)));
         } else {
-            final long i = (Long) userPrefMap.get(IDV_MEMORY);
-
-            if ((i < SystemMemory.DEFAULT_MEMORY)
-                    || (SystemMemory.isMemoryAvailable() && (i > SystemMemory.getMaxMemoryInMegabytes()))) {
-                fix = true;
-            }
-        }
-
-        if (fix) {
-            userPrefMap.put(IDV_MEMORY, SystemMemory.isMemoryAvailable()
-                                        ? SystemMemory.getMaxMemoryInMegabytes()
-                                        : SystemMemory.DEFAULT_MEMORY);
+            userPrefMap.put(IDV_MEMORY, SystemMemoryManager.getDefaultMemory());
         }
     }
 

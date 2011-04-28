@@ -40,22 +40,17 @@ import javax.swing.event.ChangeListener;
  */
 public class SystemPreference {
 
-    /** Default memory. */
-    static final long DEFAULT_MEMORY = SystemMemory.isMemoryAvailable()
-                                       ? SystemMemory.getMaxMemoryInMegabytes()
-                                       : SystemMemory.DEFAULT_MEMORY;
-
     /** Max value for the slider. */
-    private static final int MAX_SLIDER_VALUE = 100;
+    private static final int MAX_SLIDER_VALUE = 101;
 
     /** Min value for the slider. */
     private static final int MIN_SLIDER_VALUE = 0;
 
     /** The tolerance for the slider. */
-    private static final long TOLERANCE = DEFAULT_MEMORY / 100;
+    private static final long TOLERANCE = Math.round(SystemMemoryManager.getTotalMemory() / 100d);
 
     /** If system memory is available display slider. */
-    private static final boolean DISPLAY_SLIDER = SystemMemory.isMemoryAvailable();
+    private static final boolean DISPLAY_SLIDER = SystemMemoryManager.isMemoryAvailable();
 
     /** The jtb bg. */
     private ButtonGroup jtbBg;
@@ -115,10 +110,10 @@ public class SystemPreference {
      */
     private void createSlider() {
         final String sliderLabelText = "Use {0,number,#}% ";
-        final String postLabelText   = " of available memory (%d/" + SystemMemory.getMemoryInMegabytes() + " megabytes"
+        final String postLabelText   = " of available memory (%d/" + SystemMemoryManager.getTotalMemory()+ " megabytes"
                                        + ")";
 
-        sliderLabel = new JLabel(MessageFormat.format(sliderLabelText, Math.round(convertToPercent(memory.get()))));
+        sliderLabel = new JLabel(MessageFormat.format(sliderLabelText, Math.round(SystemMemoryManager.convertToPercent(memory.get()))));
 
         final JLabel         postLabel       = new JLabel(String.format(postLabelText, memory.get()));
         final ChangeListener percentListener = new ChangeListener() {
@@ -127,8 +122,8 @@ public class SystemPreference {
                     return;
                 }
 
-                int        sliderValue = massageSliderVal(((JSlider) evt.getSource()).getValue());
-                final long n           = convertToNumber(sliderValue);
+                int        sliderValue = ((JSlider) evt.getSource()).getValue();
+                final long n           = SystemMemoryManager.convertToNumber(sliderValue);
 
                 // Preventing superfluous changes that will confuse the user.
                 // This typically happens when the user types the memory in the text field,
@@ -143,7 +138,7 @@ public class SystemPreference {
             }
         };
         final JComponent[] sliderComps = GuiUtils.makeSliderPopup(MIN_SLIDER_VALUE, MAX_SLIDER_VALUE,
-                                             Math.round(convertToPercent(memory.get())), percentListener);
+                                             Math.round(SystemMemoryManager.convertToPercent(memory.get())), percentListener);
 
         slider = (JSlider) sliderComps[1];
         slider.setMajorTickSpacing(20);
@@ -157,7 +152,7 @@ public class SystemPreference {
             public void actionPerformed(ActionEvent e) {
                 containerXable(textSubComp, false);
                 containerXable(sliderSubComp, true);
-                slider.setValue(Math.round(convertToPercent(memory.get())));
+                slider.setValue(Math.round(SystemMemoryManager.convertToPercent(memory.get())));
                 textButton.setSelected(false);
                 postLabel.setText(String.format(postLabelText, memory.get()));
             }
@@ -166,33 +161,6 @@ public class SystemPreference {
         sliderComp    = GuiUtils.hbox(sliderButton, sliderSubComp);
     }
 
-    /**
-     * If the user chooses slider end points, fix.
-     *
-     * @param p the p
-     * @return the fixed value
-     */
-    private static int massageSliderVal(final int p) {
-        int sliderValue = p;
-
-        if (sliderValue == MIN_SLIDER_VALUE) {
-            sliderValue = MIN_SLIDER_VALUE + 1;
-        }
-
-        if (sliderValue == MAX_SLIDER_VALUE) {
-            sliderValue = MAX_SLIDER_VALUE - 1;
-        }
-
-        if (convertToNumber(p) < SystemMemory.DEFAULT_MEMORY) {
-            sliderValue = Math.round(convertToPercent(SystemMemory.DEFAULT_MEMORY));
-        }
-        
-        if (convertToNumber(p) > SystemMemory.getMaxMemoryInMegabytes()) {
-            sliderValue = Math.round(convertToPercent(SystemMemory.getMaxMemoryInMegabytes()));
-        }
-
-        return sliderValue;
-    }
 
     /**
      * Creates the memory text UI.
@@ -292,28 +260,6 @@ public class SystemPreference {
     }
 
     /**
-     * Convert memory to percent.
-     *
-     * @param number
-     *            the number
-     * @return the float
-     */
-    private static float convertToPercent(final long number) {
-        return ((float) number / SystemMemory.getMemoryInMegabytes()) * 100;
-    }
-
-    /**
-     * Convert memory to number. Be careful. Only valid if SystemMemory.isMemoryAvailable
-     *
-     * @param percent
-     *            the percent
-     * @return the long
-     */
-    private static long convertToNumber(final int percent) {
-        return Math.round((percent / 100f) * SystemMemory.getMemoryInMegabytes());
-    }
-
-    /**
      * A wrapper class to make sure memory value stays within range, hopefully.
      */
     private static class MyMemory {
@@ -337,7 +283,7 @@ public class SystemPreference {
          *     @param i the i
          */
         private void set(final long i) {
-            memory.getAndSet(massage(i));
+            memory.getAndSet(SystemMemoryManager.checkAndRepair(i));
         }
 
         /**
@@ -349,38 +295,5 @@ public class SystemPreference {
             return memory.get();
         }
 
-        /**
-         *     Massage.
-         *
-         *     @param i the i
-         *     @return the long
-         */
-        private static long massage(final long i) {
-            long        val;
-            final float p = convertToPercent(i);
-
-            // First check
-            if (!DISPLAY_SLIDER) {
-                val = i;
-            } else if (p < MIN_SLIDER_VALUE) {
-                val = convertToNumber(MIN_SLIDER_VALUE);
-            } else if (p > MAX_SLIDER_VALUE) {
-                val = convertToNumber(MAX_SLIDER_VALUE);
-            } else {
-                val = i;
-            }
-
-            // Second check
-            if (val < SystemMemory.DEFAULT_MEMORY) {
-                val = SystemMemory.DEFAULT_MEMORY;
-            }
-            
-            //Third check
-            if (SystemMemory.isMemoryAvailable() && val > SystemMemory.getMaxMemoryInMegabytes()) {
-                val = SystemMemory.getMaxMemoryInMegabytes();
-            }
-
-            return val;
-        }
     }
 }
