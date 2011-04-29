@@ -1,7 +1,6 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -16,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package ucar.unidata.xml;
@@ -40,11 +40,11 @@ import java.awt.Color;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.security.SignatureException;
@@ -76,6 +76,11 @@ public abstract class XmlUtil {
     public static final String XML_HEADER =
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 
+
+    /**
+     *  used for matching any tag
+     */
+    public static final String TAG_WILDCARD = "*";
 
     /**
      *  Dummy ctor for doclint.
@@ -141,21 +146,21 @@ public abstract class XmlUtil {
     public static void attr(Appendable buff, String name, String value,
                             String tab) {
         try {
-        buff.append(" ");
-        buff.append(name);
-        buff.append("=\"");
-        //TODO
-        value = value.trim();
-        for (int i = 0; i < 5; i++) {
-            value = StringUtil.replace(value, "  ", " ");
-        }
+            buff.append(" ");
+            buff.append(name);
+            buff.append("=\"");
+            //TODO
+            value = value.trim();
+            for (int i = 0; i < 5; i++) {
+                value = StringUtil.replace(value, "  ", " ");
+            }
 
-        buff.append(encodeString(value));
-        //        buff.append("\" ");
+            buff.append(encodeString(value));
+            //        buff.append("\" ");
 
-        //TODO
-        buff.append("\"");
-        } catch(IOException ioe) {
+            //TODO
+            buff.append("\"");
+        } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
     }
@@ -172,10 +177,17 @@ public abstract class XmlUtil {
         return " " + name + "=" + quote(encodeString(value)) + " ";
     }
 
-    public static String attrs(String []attrs) {
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     *
+     * @return _more_
+     */
+    public static String attrs(String[] attrs) {
         StringBuffer a = new StringBuffer();
         for (int i = 0; i < attrs.length; i += 2) {
-            a.append(attr(attrs[i],attrs[i+1]));
+            a.append(attr(attrs[i], attrs[i + 1]));
         }
         return a.toString();
     }
@@ -864,10 +876,11 @@ public abstract class XmlUtil {
     public static List findChildren(Node parent, String tag) {
         ArrayList found    = new ArrayList();
         NodeList  children = parent.getChildNodes();
-        boolean   doAll    = ((tag == null) || tag.equals("*"));
+        boolean   doAll    = ((tag == null) || tag.equals(TAG_WILDCARD));
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (doAll || getNodeName(child).equals(tag) || child.getNodeName().equals(tag)) {
+            //if (doAll || getNodeName(child).equals(tag) || child.getNodeName().equals(tag)) {
+            if (doAll || isTag(child, tag)) {
                 found.add(child);
             }
         }
@@ -984,7 +997,7 @@ public abstract class XmlUtil {
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             //            System.err.println (tab+">child:" + getLocalName(child));
-            if (tag.equals("*") || isTag(child, tag)) {
+            if (tag.equals(TAG_WILDCARD) || isTag(child, tag)) {
                 if (lastTag) {
                     results.add(child);
                 } else {
@@ -1353,16 +1366,34 @@ public abstract class XmlUtil {
 
 
     /**
-     * Is the non-qualified tagname of the given element equals to the given name
+     * Checks if the tag name of the given  node matches the given name.
+     * If the given name is fully qualified (e.g., namespace:tagname) then
+     * check if it matches the full name of the node.
+     * If the node name is fully qualified and the name isn't then strip off
+     * the namespace of the node and compare
+     * else just compare the 2
      *
-     * @param element element
+     *
+     * @param node the xml node
      * @param name name
      *
      * @return is non qualified tag name the same
      */
-    public static boolean isTag(Element element, String name) {
-        return Misc.equals(getLocalName(element), name);
+    public static boolean isTag(Node node, String name) {
+        if ((name == null) || name.equals(TAG_WILDCARD)) {
+            return true;
+        }
+        String nodeName = node.getNodeName();
+        if (isFullyQualified(name)) {
+            return nodeName.equals(name);
+        }
+        if (isFullyQualified(nodeName)) {
+            return Misc.equals(getLocalName(node), name);
+        }
+        return Misc.equals(nodeName, name);
     }
+
+
 
 
     /**
@@ -1372,12 +1403,12 @@ public abstract class XmlUtil {
      *
      * @return tag name
      */
-    public static String getLocalName(Element element) {
+    public static String getLocalName(Node element) {
         String localName = element.getLocalName();
         if (localName != null) {
             return localName;
         }
-        String name = element.getTagName();
+        String name = element.getNodeName();
         int    idx  = name.indexOf(":");
         if (idx >= 0) {
             name = name.substring(idx + 1);
@@ -1385,6 +1416,17 @@ public abstract class XmlUtil {
         return name;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param tagName _more_
+     *
+     * @return _more_
+     */
+    public static boolean isFullyQualified(String tagName) {
+        return tagName.indexOf(":") >= 0;
+    }
 
     /**
      * Get the non qualified tag name
@@ -1405,6 +1447,9 @@ public abstract class XmlUtil {
         }
         return name;
     }
+
+
+
 
 
     /**
@@ -1979,6 +2024,12 @@ public abstract class XmlUtil {
         return toStringWithHeader(node, tabSpacing, newLine, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param appendable _more_
+     */
     public static void toString(Node node, Appendable appendable) {
         toString(appendable, node, "", "", "", false, true);
     }
@@ -2022,108 +2073,109 @@ public abstract class XmlUtil {
                                  boolean recurse) {
 
         try {
-        int type = node.getNodeType();
+            int type = node.getNodeType();
 
-        switch (type) {
+            switch (type) {
 
-          case Node.DOCUMENT_NODE : {
-              xml.append(getHeader());
-              break;
-          }
-
-          case Node.ELEMENT_NODE : {
-              xml.append(currentTab);
-              xml.append('<');
-              xml.append(node.getNodeName());
-              NamedNodeMap nnm     = node.getAttributes();
-              String       nextTab = currentTab + tabSpacing;
-              String       attrTab = nextTab;
-              if (nnm != null) {
-                  for (int i = 0; i < nnm.getLength(); i++) {
-                      Attr attr = (Attr) nnm.item(i);
-                      if (prettifyAttrs && (nnm.getLength() > 2)) {
-                          xml.append("\n");
-                          xml.append(attrTab);
-                      }
-                      attr(xml, attr.getNodeName(), attr.getNodeValue(),
-                           attrTab);
-                  }
-              }
-              boolean  wasText     = false;
-              int      cnt         = 0;
-              NodeList children    = node.getChildNodes();
-              int      numChildren = children.getLength();
-              if (recurse) {
-                  for (int i = 0; i < children.getLength(); i++) {
-                      Node child = children.item(i);
-                      wasText = ((child.getNodeType() == Node.TEXT_NODE)
-                                 || (child.getNodeType()
-                                     == Node.CDATA_SECTION_NODE));
-                      if (cnt == 0) {
-                          xml.append(">");
-                          if ( !wasText || (numChildren > 1)) {
-                              xml.append(newLine);
-                          }
-                      }
-                      toString(xml, child, nextTab, tabSpacing, newLine,
-                               prettifyAttrs, true);
-                      cnt++;
-                  }
-              }
-              if (cnt == 0) {
-                  xml.append("/>");
-                  xml.append(newLine);
-              } else {
-                  if ( !wasText || (cnt > 1)) {
-                      xml.append(currentTab);
-                  }
-                  xml.append("</");
-                  xml.append(node.getNodeName());
-                  xml.append(">");
-                  xml.append(newLine);
-              }
-
-              break;
-          }
-
-          case Node.ENTITY_REFERENCE_NODE : {
-              xml.append('&' + node.getNodeName() + ';');
-              break;
-          }
-
-          case Node.CDATA_SECTION_NODE : {
-              String value = node.getNodeValue();
-              if(value!=null) {
-                  if (value.startsWith("XmlUtil.COMMENT:")) {
-                      xml.append("\n<!--" + value.substring(16) + " -->\n");
-                  } else {
-                      xml.append("<![CDATA[" + value + "]]>");
-                  }
-              }
-              break;
-          }
-
-          case Node.TEXT_NODE : {
-              //Trim whitespace
-              String v = node.getNodeValue();
-              if (v == null) {
+              case Node.DOCUMENT_NODE : {
+                  xml.append(getHeader());
                   break;
               }
-              xml.append(encodeString(v));
-              break;
-          }
 
-          case Node.PROCESSING_INSTRUCTION_NODE : {
-              xml.append("<?" + node.getNodeName());
-              String data = node.getNodeValue();
-              if ((data != null) && (data.length() > 0)) {
-                  xml.append(" " + data);
+              case Node.ELEMENT_NODE : {
+                  xml.append(currentTab);
+                  xml.append('<');
+                  xml.append(node.getNodeName());
+                  NamedNodeMap nnm     = node.getAttributes();
+                  String       nextTab = currentTab + tabSpacing;
+                  String       attrTab = nextTab;
+                  if (nnm != null) {
+                      for (int i = 0; i < nnm.getLength(); i++) {
+                          Attr attr = (Attr) nnm.item(i);
+                          if (prettifyAttrs && (nnm.getLength() > 2)) {
+                              xml.append("\n");
+                              xml.append(attrTab);
+                          }
+                          attr(xml, attr.getNodeName(), attr.getNodeValue(),
+                               attrTab);
+                      }
+                  }
+                  boolean  wasText     = false;
+                  int      cnt         = 0;
+                  NodeList children    = node.getChildNodes();
+                  int      numChildren = children.getLength();
+                  if (recurse) {
+                      for (int i = 0; i < children.getLength(); i++) {
+                          Node child = children.item(i);
+                          wasText = ((child.getNodeType() == Node.TEXT_NODE)
+                                     || (child.getNodeType()
+                                         == Node.CDATA_SECTION_NODE));
+                          if (cnt == 0) {
+                              xml.append(">");
+                              if ( !wasText || (numChildren > 1)) {
+                                  xml.append(newLine);
+                              }
+                          }
+                          toString(xml, child, nextTab, tabSpacing, newLine,
+                                   prettifyAttrs, true);
+                          cnt++;
+                      }
+                  }
+                  if (cnt == 0) {
+                      xml.append("/>");
+                      xml.append(newLine);
+                  } else {
+                      if ( !wasText || (cnt > 1)) {
+                          xml.append(currentTab);
+                      }
+                      xml.append("</");
+                      xml.append(node.getNodeName());
+                      xml.append(">");
+                      xml.append(newLine);
+                  }
+
+                  break;
               }
-              xml.append("?>");
-              break;
-          }
-        }
-        } catch(IOException ioe) {
+
+              case Node.ENTITY_REFERENCE_NODE : {
+                  xml.append('&' + node.getNodeName() + ';');
+                  break;
+              }
+
+              case Node.CDATA_SECTION_NODE : {
+                  String value = node.getNodeValue();
+                  if (value != null) {
+                      if (value.startsWith("XmlUtil.COMMENT:")) {
+                          xml.append("\n<!--" + value.substring(16)
+                                     + " -->\n");
+                      } else {
+                          xml.append("<![CDATA[" + value + "]]>");
+                      }
+                  }
+                  break;
+              }
+
+              case Node.TEXT_NODE : {
+                  //Trim whitespace
+                  String v = node.getNodeValue();
+                  if (v == null) {
+                      break;
+                  }
+                  xml.append(encodeString(v));
+                  break;
+              }
+
+              case Node.PROCESSING_INSTRUCTION_NODE : {
+                  xml.append("<?" + node.getNodeName());
+                  String data = node.getNodeValue();
+                  if ((data != null) && (data.length() > 0)) {
+                      xml.append(" " + data);
+                  }
+                  xml.append("?>");
+                  break;
+              }
+            }
+        } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
 
@@ -2381,12 +2433,12 @@ public abstract class XmlUtil {
         Trace.stopTrace();
         if(true) return;
         */
-        HashSet<String> seen  = new HashSet<String>();
+        HashSet<String> seen         = new HashSet<String>();
 
-        boolean doFormat = true;
-        boolean printTags = false;;
-        boolean generateCode = false;
-        String packageName = null;
+        boolean         doFormat     = true;
+        boolean         printTags    = false;;
+        boolean         generateCode = false;
+        String          packageName  = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-format")) {
                 doFormat = true;
@@ -2407,10 +2459,10 @@ public abstract class XmlUtil {
                 continue;
             }
 
-            if(generateCode) {
+            if (generateCode) {
                 generateCode(args[i], packageName);
             } else if (printTags) {
-                printTags(args[i],seen);
+                printTags(args[i], seen);
             } else {
                 format(args[i]);
             }
@@ -2424,6 +2476,7 @@ public abstract class XmlUtil {
      * @param seen _more_
      * @param tagBuff _more_
      * @param attrBuff _more_
+     * @param topBuff _more_
      */
     private static void printTags(Element node, HashSet<String> seen,
                                   StringBuffer tagBuff,
@@ -2444,11 +2497,11 @@ public abstract class XmlUtil {
                 if (attrName.startsWith("xmlns")) {
                     seen.add("attr:" + attrName);
                     String value = attr.getNodeValue();
-                    attrName = attrName.replace(":","_");
+                    attrName = attrName.replace(":", "_");
                     topBuff.append("public static final String XMLNS_"
-                                    + attrName.toUpperCase() + " = \""
-                                    + value+ "\";\n");
-                    
+                                   + attrName.toUpperCase() + " = \"" + value
+                                   + "\";\n");
+
                     continue;
                 }
 
@@ -2465,7 +2518,7 @@ public abstract class XmlUtil {
         NodeList elements = getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            printTags(child, seen, tagBuff, attrBuff,topBuff);
+            printTags(child, seen, tagBuff, attrBuff, topBuff);
         }
     }
 
@@ -2474,6 +2527,7 @@ public abstract class XmlUtil {
      * _more_
      *
      * @param f _more_
+     * @param seen _more_
      */
     private static void printTags(String f, HashSet<String> seen) {
         try {
@@ -2481,7 +2535,7 @@ public abstract class XmlUtil {
             Element      root     = getRoot(xml);
             StringBuffer tagBuff  = new StringBuffer();
             StringBuffer attrBuff = new StringBuffer();
-            StringBuffer topBuff = new StringBuffer();
+            StringBuffer topBuff  = new StringBuffer();
             printTags(root, seen, tagBuff, attrBuff, topBuff);
             System.out.println(topBuff);
             System.out.println(tagBuff);
@@ -2492,19 +2546,37 @@ public abstract class XmlUtil {
         }
     }
 
-    private static void generateCode(String f, String packageName) throws Exception  {
+    /**
+     * _more_
+     *
+     * @param f _more_
+     * @param packageName _more_
+     *
+     * @throws Exception _more_
+     */
+    private static void generateCode(String f, String packageName)
+            throws Exception {
         HashSet<String> seen = new HashSet<String>();
-        String       xml      = IOUtil.readContents(f, XmlUtil.class);
-        Element      root     = getRoot(xml);
+        String          xml  = IOUtil.readContents(f, XmlUtil.class);
+        Element         root = getRoot(xml);
         generateCode(root, seen, packageName);
     }
 
 
-    private static void generateCode(Element element, HashSet<String> seen, String packageName) throws Exception  {
-        String className =  element.getTagName();
-        if(!seen.contains(className)) {
-            
-        }
+    /**
+     * _more_
+     *
+     * @param element _more_
+     * @param seen _more_
+     * @param packageName _more_
+     *
+     * @throws Exception _more_
+     */
+    private static void generateCode(Element element, HashSet<String> seen,
+                                     String packageName)
+            throws Exception {
+        String className = element.getTagName();
+        if ( !seen.contains(className)) {}
     }
 
 
