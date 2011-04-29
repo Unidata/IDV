@@ -595,7 +595,7 @@ public class GridMath {
     public static FieldImpl applyFunctionOverTime(FieldImpl grid,
             String function, boolean makeTimes)
             throws VisADException {
-        return applyFunctionOverTime(grid, FUNC_MAX, 0, 1, makeTimes);
+        return applyFunctionOverTime(grid, function, 0, 1, makeTimes);
     }
 
     /**
