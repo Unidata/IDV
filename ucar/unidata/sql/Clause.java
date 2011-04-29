@@ -1,7 +1,6 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -50,89 +49,100 @@ import java.util.regex.*;
 
 
 /**
+ * The Clause class provides a tree data structure for creating sql query clauses.
+ * A leaf node clause has an operator and a set of operands - column names, values, etc.
+ * A parent clause has one or more children clauses and an operator (e.g., EXPR_OR, EXPR_AND, etc).
  *
- *
- * @author IDV Development Team
+ * To use this do, e.g.:
+ * <pre>
+ * Clause andClause = Clause.and(Clause.eq("some db col", "some value"),
+ *                              Clause.eq("some other db col", "some other value"));
+ * StringBuffer sql = new StringBuffer("select * from table where ");
+ * andClause.addClause(sql); //This creates the SQL expression for a PreparedStatement
+ * PreparedStatement statement = ....
+ * clause.setValue(statement, 1); //Set the values in the prepared statement. the "1" is the column count
+ * </pre>
+ * @author IDV & RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
 public class Clause {
 
-    /** _more_ */
+    /** calendar */
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_EQUALS = "=";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_GE = ">=";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_LE = "<=";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_LT = "<";
 
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_GT = ">";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_NOTEQUALS = "<>";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_LIKE = "LIKE";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_NOTLIKE = "NOTLIKE";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_ISNULL = "is null";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_ISNOTNULL = "is not null";
 
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_IN = "IN";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_OR = "OR";
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_AND = "AND";
 
 
-    /** _more_ */
+    /** expression */
     public static final String EXPR_JOIN = "join";
 
-    /** _more_ */
+    /** the expression */
     private String expr = null;
 
-    /** _more_ */
+    /** database column name we are a clause for */
     private String column;
 
-    /** _more_ */
+    /** the operand value */
     private Object value;
 
-    /** _more_ */
-    private String extra;
+    /** Holds the extra select for the IN operand */
+    private String extraSelectForInClause;
 
-    /** _more_ */
+    /** for tree nodes */
     private Clause[] subClauses;
 
 
     /**
-     * _more_
+     * ctor
      */
     public Clause() {}
 
     /**
-     * _more_
+     * ctor for tree nodes
      *
-     * @param expr _more_
-     * @param subClauses _more_
+     * @param expr the exprssion (e.g., EXPR_AND, EXPR_OR, ...)
+     * @param subClauses children clauses
      */
     public Clause(String expr, Clause[] subClauses) {
         this.expr       = expr;
@@ -141,11 +151,11 @@ public class Clause {
 
 
     /**
-     * _more_
+     * ctor for regular column clause
      *
-     * @param column _more_
-     * @param expr _more_
-     * @param value _more_
+     * @param column the column name
+     * @param expr the expression  (e.g., EXPR_GT, EXPR_EQ)
+     * @param value the value for the expression
      */
     public Clause(String column, String expr, Object value) {
         this.column = column;
@@ -154,12 +164,12 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * utility to make a 2 element OR clause
      *
-     * @param clause1 _more_
-     * @param clause2 _more_
+     * @param clause1 child clause
+     * @param clause2 child clause
      *
-     * @return _more_
+     * @return a new OR clause
      */
     public static Clause or(Clause clause1, Clause clause2) {
         return new Clause(EXPR_OR, new Clause[] { clause1, clause2 });
@@ -168,23 +178,23 @@ public class Clause {
 
 
     /**
-     * _more_
+     * utility to make an AND clause
      *
-     * @param clause1 _more_
-     * @param clause2 _more_
+     * @param clause1 child clause
+     * @param clause2 child clause
      *
-     * @return _more_
+     * @return new AND clause
      */
     public static Clause and(Clause clause1, Clause clause2) {
         return new Clause(EXPR_AND, new Clause[] { clause1, clause2 });
     }
 
     /**
-     * _more_
+     * utility to make an N element OR clause
      *
-     * @param clauses _more_
+     * @param clauses children clauses
      *
-     * @return _more_
+     * @return new OR clause
      */
     public static Clause or(Clause[] clauses) {
         if ((clauses == null) || (clauses.length == 0)) {
@@ -194,11 +204,11 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * utility to make an N element AND clause
      *
-     * @param clauses _more_
+     * @param clauses children clauses
      *
-     * @return _more_
+     * @return new AND clause
      */
     public static Clause and(Clause[] clauses) {
         if ((clauses == null) || (clauses.length == 0)) {
@@ -208,11 +218,11 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * utility to make an N element AND clause
      *
-     * @param clauses _more_
+     * @param clauses children clauses
      *
-     * @return _more_
+     * @return new AND clause
      */
     public static Clause and(List<Clause> clauses) {
         return new Clause(EXPR_AND, toArray(clauses));
@@ -220,11 +230,11 @@ public class Clause {
 
 
     /**
-     * _more_
+     * utility to make an N element OR clause
      *
-     * @param clauses _more_
+     * @param clauses children clauses
      *
-     * @return _more_
+     * @return new OR clause
      */
     public static Clause or(List<Clause> clauses) {
         return new Clause(EXPR_OR, toArray(clauses));
@@ -232,12 +242,12 @@ public class Clause {
 
 
     /**
-     * _more_
+     * This makes a number of  EQUALS clauses first converting the given String values  into ints
      *
-     * @param colName _more_
-     * @param values _more_
+     * @param colName column
+     * @param values values to convert to int
      *
-     * @return _more_
+     * @return List of EQUALS clauses
      */
     public static List<Clause> makeIntClauses(String colName,
             List<String> values) {
@@ -253,12 +263,12 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * This makes a number of EQUALS clauses with the given String values
      *
-     * @param colName _more_
-     * @param values _more_
+     * @param colName The column
+     * @param values values
      *
-     * @return _more_
+     * @return List of EQUALS clauses
      */
     public static List<Clause> makeStringClauses(String colName,
             List<String> values) {
@@ -275,13 +285,13 @@ public class Clause {
 
 
     /**
-     * _more_
+     * make an EQUALS or a NOT EQUALS clause with the given column and value
      *
-     * @param column _more_
-     * @param value _more_
-     * @param not _more_
+     * @param column Column name
+     * @param value value
+     * @param not If true  then make a NOT EQUALS clause
      *
-     * @return _more_
+     * @return Clause
      */
     public static Clause eq(String column, Object value, boolean not) {
         if (not) {
@@ -292,140 +302,24 @@ public class Clause {
 
 
     /**
-     * _more_
+     * Make an EQUALS clause
      *
-     * @param column _more_
-     * @param value _more_
+     * @param column Column name
+     * @param value value
      *
-     * @return _more_
+     * @return Clause
      */
     public static Clause eq(String column, Object value) {
         return new Clause(column, EXPR_EQUALS, value);
     }
 
     /**
-     * _more_
+     * Make an NOT EQUALS clause
      *
-     * @param column _more_
-     * @param value _more_
+     * @param column Column name
+     * @param value value
      *
-     * @return _more_
-     */
-    public static Clause ge(String column, Object value) {
-        return new Clause(column, EXPR_GE, value);
-    }
-
-    public static Clause gt(String column, Object value) {
-        return new Clause(column, EXPR_GT, value);
-    }
-
-    public static Clause lt(String column, Object value) {
-        return new Clause(column, EXPR_LT, value);
-    }
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static Clause le(String column, Object value) {
-        return new Clause(column, EXPR_LE, value);
-    }
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param inner _more_
-     *
-     * @return _more_
-     */
-    public static Clause in(String column, String inner) {
-        return new Clause(column, EXPR_IN, inner);
-    }
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param what _more_
-     * @param from _more_
-     * @param inner _more_
-     *
-     * @return _more_
-     */
-    public static Clause in(String column, String what, String from,
-                            Clause inner) {
-        Clause clause = new Clause(EXPR_IN, new Clause[] { inner });
-        clause.column = column;
-        clause.extra  = " select " + what + " from " + from + " ";
-        return clause;
-    }
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static Clause le(String column, double value) {
-        return le(column, new Double(value));
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static Clause ge(String column, double value) {
-        return ge(column, new Double(value));
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     *
-     * @return _more_
-     */
-    public static Clause isNull(String column) {
-        return new Clause(column, EXPR_ISNULL, null);
-    }
-
-    public static Clause isNotNull(String column) {
-        return new Clause(column, EXPR_ISNOTNULL, null);
-    }
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param column2 _more_
-     *
-     * @return _more_
-     */
-    public static Clause join(String column, String column2) {
-        return new Clause(column, EXPR_JOIN, column2);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param value _more_
-     *
-     * @return _more_
+     * @return Clause
      */
     public static Clause neq(String column, Object value) {
         return new Clause(column, EXPR_NOTEQUALS, value);
@@ -433,13 +327,112 @@ public class Clause {
 
 
     /**
-     * _more_
+     * makes a new GE clause
      *
-     * @param column _more_
-     * @param value _more_
-     * @param not _more_
+     * @param column Column name
+     * @param value The value
      *
-     * @return _more_
+     * @return The new Clause
+     */
+    public static Clause ge(String column, Object value) {
+        return new Clause(column, EXPR_GE, value);
+    }
+
+    /**
+     * makes a new GT clause
+     *
+     * @param column The column
+     * @param value The value
+     *
+     * @return the new clause
+     */
+    public static Clause gt(String column, Object value) {
+        return new Clause(column, EXPR_GT, value);
+    }
+
+    /**
+     * makes a new LT clause
+     *
+     * @param column The column
+     * @param value The value
+     *
+     * @return the new clause
+     */
+    public static Clause lt(String column, Object value) {
+        return new Clause(column, EXPR_LT, value);
+    }
+
+    /**
+     * makes a new LE clause
+     *
+     * @param column Column name
+     * @param value The value
+     *
+     * @return The new Clause
+     */
+    public static Clause le(String column, Object value) {
+        return new Clause(column, EXPR_LE, value);
+    }
+
+    /**
+     * makes a new LE clause
+     *
+     * @param column Column name
+     * @param value The value
+     *
+     * @return The new Clause
+     */
+    public static Clause le(String column, double value) {
+        return le(column, new Double(value));
+    }
+
+
+    /**
+     * makes a new GE clause
+     *
+     * @param column Column name
+     * @param value The value
+     *
+     * @return The new Clause
+     */
+    public static Clause ge(String column, double value) {
+        return ge(column, new Double(value));
+    }
+
+
+    /**
+     * makes a IS NULL clause
+     *
+     * @param column Column name
+     *
+     * @return The new Clause
+     */
+    public static Clause isNull(String column) {
+        return new Clause(column, EXPR_ISNULL, null);
+    }
+
+    /**
+     * makes a IS NOT NULL clause
+     *
+     * @param column The column
+     *
+     * @return the new clause
+     */
+    public static Clause isNotNull(String column) {
+        return new Clause(column, EXPR_ISNOTNULL, null);
+    }
+
+
+
+
+    /**
+     * Makes a COLUMN LIKE 'value' or a NOT LIKE
+     *
+     * @param column Column name
+     * @param value The value
+     * @param not NOT or not
+     *
+     * @return The new Clause
      */
     public static Clause like(String column, Object value, boolean not) {
         if (not) {
@@ -451,35 +444,84 @@ public class Clause {
 
 
     /**
-     * _more_
+     * Make a LIKE clause
      *
-     * @param column _more_
-     * @param value _more_
+     * @param column Column name
+     * @param value The value
      *
-     * @return _more_
+     * @return The new Clause
      */
     public static Clause like(String column, Object value) {
         return new Clause(column, EXPR_LIKE, value);
     }
 
     /**
-     * _more_
+     * Make a NOT LIKE clause
      *
-     * @param column _more_
-     * @param value _more_
+     * @param column Column name
+     * @param value The value
      *
-     * @return _more_
+     * @return The new Clause
      */
     public static Clause notLike(String column, Object value) {
         return new Clause(column, EXPR_NOTLIKE, value);
     }
 
+
+
+
     /**
-     * _more_
+     * Makes a simple COLUMN IN (a,b,c,...) clause
      *
-     * @param clauses _more_
+     * @param column Column name
+     * @param inner The inner set
      *
-     * @return _more_
+     * @return The new Clause
+     */
+    public static Clause in(String column, String inner) {
+        return new Clause(column, EXPR_IN, inner);
+    }
+
+    /**
+     * Makes a COLUMN IN (SELECT what FROM from where <inner clause>) caluse
+     *
+     * @param column Column name
+     * @param what What to select in the inner select
+     * @param from from where
+     * @param inner with clause
+     *
+     * @return The new Clause
+     */
+    public static Clause in(String column, String what, String from,
+                            Clause inner) {
+        Clause clause = new Clause(EXPR_IN, new Clause[] { inner });
+        clause.column = column;
+        clause.extraSelectForInClause = " select " + what + " from " + from
+                                        + " ";
+        return clause;
+    }
+
+
+    /**
+     * makes a join clause
+     *
+     * @param column Column name
+     * @param column2 Other column
+     *
+     * @return The new Clause
+     */
+    public static Clause join(String column, String column2) {
+        return new Clause(column, EXPR_JOIN, column2);
+    }
+
+
+
+    /**
+     * Converts list to array
+     *
+     * @param clauses array
+     *
+     * @return list
      */
     public static Clause[] toArray(List<Clause> clauses) {
         Clause[] array = new Clause[clauses.size()];
@@ -489,93 +531,16 @@ public class Clause {
         return array;
     }
 
-    /**
-     * _more_
-     *
-     * @param table _more_
-     *
-     * @return _more_
-     */
-    public boolean isColumnFromTable(String table) {
-        if (column == null) {
-            if (subClauses != null) {
-                for (int i = 0; i < subClauses.length; i++) {
-                    if ((subClauses[i] != null)
-                            && subClauses[i].isColumnFromTable(table)) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-        return column.startsWith(table + ".");
-    }
-
-    public List<String> getTableNames() {
-	return getTableNames(new ArrayList<String>());
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List<String> getTableNames(List<String> names) {
-        doGetTableNames(names);
-        return names;
-    }
-
-    /**
-     * _more_
-     *
-     * @param names _more_
-     */
-    private void doGetTableNames(List<String> names) {
-	if(expr.equals(EXPR_IN)) {
-            return;
-        }
-        if (subClauses != null) {
-
-
-            for (Clause clause : subClauses) {
-		if(clause ==null) continue;
-                clause.doGetTableNames(names);
-            }
-            return;
-        }
-
-	if(expr.equals(EXPR_JOIN)) {
-            int idx = value.toString().indexOf(".");
-            if (idx >= 0) {
-                String name = value.toString().substring(0, idx);
-                if ( !names.contains(name)) {
-                    names.add(name);
-                }
-            }
-	}
-
-        if (column != null) {
-            int idx = column.indexOf(".");
-            if (idx >= 0) {
-                String name = column.substring(0, idx);
-                if ( !names.contains(name)) {
-                    names.add(name);
-                }
-            }
-        }
-    }
-
 
 
 
     /**
-     * _more_
+     * Utility to check if any of the clauses come from the given DB table
      *
-     * @param clauses _more_
-     * @param table _more_
+     * @param clauses clauses to check
+     * @param table DB table name
      *
-     * @return _more_
+     * @return any clauses on given table
      */
     public static boolean isColumnFromTable(List<Clause> clauses,
                                             String table) {
@@ -588,12 +553,20 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * This tokenizes the given values by splitting the string on ","
+     * If a value has a wildcard "%" in it then this creates a LIKE clause
+     * If a value begins with "!" then this creates a NEQ clause
+     * Else it creates an EQUALS clause
      *
-     * @param column _more_
-     * @param values _more_
+     * If its just regular clauses we get an OR of the clauses.
+     * If its just the NOT clauses we AND them
+     * Else if its a mix this  does:
+     * (OR of the EQUALS clauses) AND (AND of the NOT EQUALS clauses)
      *
-     * @return _more_
+     * @param column Column name
+     * @param values the values
+     *
+     * @return new Clause
      */
     public static Clause makeOrSplit(String column, String values) {
         List toks    = StringUtil.split(values, ",", true, true);
@@ -648,11 +621,104 @@ public class Clause {
 
 
     /**
-     * _more_
+     * Is this Clauses (or its children) column from the DB table. Typically the column name
+     * is the fully qualified table_name.column_name
      *
-     * @param col _more_
+     * @param table
      *
-     * @return _more_
+     * @return is from table
+     */
+    public boolean isColumnFromTable(String table) {
+        if (column == null) {
+            if (subClauses != null) {
+                for (int i = 0; i < subClauses.length; i++) {
+                    if ((subClauses[i] != null)
+                            && subClauses[i].isColumnFromTable(table)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        return column.startsWith(table + ".");
+    }
+
+
+    /**
+     * Get the table names used in the Clause tree
+     *
+     * @return List of unique table names
+     */
+    public List<String> getTableNames() {
+        return getTableNames(new ArrayList<String>());
+    }
+
+
+    /**
+     * Get the table names used in the Clause tree
+     *
+     * @param names list to add to
+     *
+     * @return List of unique table names
+     */
+    public List<String> getTableNames(List<String> names) {
+        doGetTableNames(names);
+        return names;
+    }
+
+    /**
+     * Get the table names used in the Clause tree
+     *
+     * @param names list to add to
+     */
+    private void doGetTableNames(List<String> names) {
+        if (expr.equals(EXPR_IN)) {
+            return;
+        }
+        if (subClauses != null) {
+
+
+            for (Clause clause : subClauses) {
+                if (clause == null) {
+                    continue;
+                }
+                clause.doGetTableNames(names);
+            }
+            return;
+        }
+
+        if (expr.equals(EXPR_JOIN)) {
+            int idx = value.toString().indexOf(".");
+            if (idx >= 0) {
+                String name = value.toString().substring(0, idx);
+                if ( !names.contains(name)) {
+                    names.add(name);
+                }
+            }
+        }
+
+        if (column != null) {
+            int idx = column.indexOf(".");
+            if (idx >= 0) {
+                String name = column.substring(0, idx);
+                if ( !names.contains(name)) {
+                    names.add(name);
+                }
+            }
+        }
+    }
+
+
+
+
+
+    /**
+     * If this Clause has a column is it the given one
+     *
+     * @param col column name to check
+     *
+     * @return my column
      */
     public boolean isColumn(String col) {
         if (column == null) {
@@ -662,12 +728,12 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * Any of the clauses applied to the given DB column
      *
-     * @param clauses _more_
-     * @param col _more_
+     * @param clauses clauses to check
+     * @param col column name to check
      *
-     * @return _more_
+     * @return my column
      */
     public static boolean isColumn(List<Clause> clauses, String col) {
         for (Clause clause : clauses) {
@@ -681,11 +747,11 @@ public class Clause {
 
 
     /**
-     * _more_
+     * This makes the prepared statement SQL string. All of the values will have "?" in them.
      *
-     * @param sb _more_
+     * @param sb Buffer to append to
      *
-     * @return _more_
+     * @return the given sb buffer
      */
     public StringBuffer addClause(StringBuffer sb) {
         if (expr == null) {
@@ -703,10 +769,11 @@ public class Clause {
 
             if (expr.equals(EXPR_IN)) {
                 if (toks.size() == 0) {
-                    sb.append(SqlUtil.group(column + "  IN ( " + extra
-                                            + ")"));
+                    sb.append(SqlUtil.group(column + "  IN ( "
+                                            + extraSelectForInClause + ")"));
                 } else {
-                    sb.append(SqlUtil.group(column + "  IN ( " + extra
+                    sb.append(SqlUtil.group(column + "  IN ( "
+                                            + extraSelectForInClause
                                             + " WHERE " + toks.get(0) + ")"));
                 }
             } else {
@@ -735,7 +802,7 @@ public class Clause {
             sb.append(SqlUtil.group("NOT " + column + "  like ?"));
         } else {
             if (SqlUtil.debug) {
-		//                System.err.println(toString());
+                //                System.err.println(toString());
             }
             String theExpr = column + " " + expr + " ?";
             sb.append(SqlUtil.group(theExpr));
@@ -746,14 +813,14 @@ public class Clause {
 
 
     /**
-     * _more_
+     * This sets the values in the prepared statement
      *
-     * @param stmt _more_
-     * @param col _more_
+     * @param stmt statement
+     * @param col Which value index in the SQL (e.g., which "?") are we  at
      *
-     * @return _more_
+     * @return Next value index
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public int setValue(PreparedStatement stmt, int col) throws Exception {
         if (expr == null) {
@@ -768,7 +835,8 @@ public class Clause {
             return col;
         }
 
-        if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_ISNOTNULL) || expr.equals(EXPR_JOIN)) {
+        if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_ISNOTNULL)
+                || expr.equals(EXPR_JOIN)) {
             return col;
         }
         if (SqlUtil.debug) {
@@ -835,30 +903,34 @@ public class Clause {
     }
 
     /**
-     * _more_
+     * Convert this to a string representation of the expression
      *
-     * @return _more_
+     * @return to string
      */
     public String toString() {
         if (column != null) {
-            if(expr.equals(EXPR_IN)) {
-                if(subClauses!=null && subClauses.length>0) {
-                    return  column + " " + expr + " (" + extra+" WHERE " + subClauses[0] +")";
+            if (expr.equals(EXPR_IN)) {
+                if ((subClauses != null) && (subClauses.length > 0)) {
+                    return column + " " + expr + " ("
+                           + extraSelectForInClause + " WHERE "
+                           + subClauses[0] + ")";
                 } else {
-                    return  column + " " + expr + " (" + extra+")";
+                    return column + " " + expr + " ("
+                           + extraSelectForInClause + ")";
                 }
-            } 
-	    String svalue;
-	    if(value instanceof String)
-		svalue = "'" + value +"'";
-	    else
-		svalue  =""+value;
-            return  column + " " + expr + " " + svalue;
+            }
+            String svalue;
+            if (value instanceof String) {
+                svalue = "'" + value + "'";
+            } else {
+                svalue = "" + value;
+            }
+            return column + " " + expr + " " + svalue;
         } else if (subClauses != null) {
-            if(subClauses.length==1) {
+            if (subClauses.length == 1) {
                 return subClauses[0].toString();
             }
-            return  "("+Misc.join(" " + expr+" ",subClauses)+")";
+            return "(" + Misc.join(" " + expr + " ", subClauses) + ")";
         }
         return "clause:null";
     }

@@ -1,7 +1,6 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
