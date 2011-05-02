@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -27,6 +27,7 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.HovmollerViewManager;
 import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
@@ -60,6 +61,7 @@ import visad.util.DataUtility;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -130,7 +132,7 @@ public class HovmollerControl extends GridDisplayControl {
      *  Default Contructor; sets flags. See init() for creation actions.
      */
     public HovmollerControl() {
-        setAttributeFlags(FLAG_DATACONTROL | FLAG_COLOR);
+        setAttributeFlags(FLAG_DATACONTROL);
     }
 
     /**
@@ -165,6 +167,7 @@ public class HovmollerControl extends GridDisplayControl {
         addViewManager(hovmollerView);
 
         if (showAsContours) {
+            setAttributeFlags(FLAG_COLOR);
             dataDisplay = new Contour2DDisplayable("ts_color_" + paramName,
                     true, true);
             dataDisplay.setVisible(true);
@@ -522,6 +525,44 @@ public class HovmollerControl extends GridDisplayControl {
     }
 
     /**
+     * Set the X axis values
+     *
+     * @throws VisADException  problem getting the data for the labels
+     */
+    private void setXAxisValues() throws VisADException {
+        if (getGridDataInstance() == null) {
+            return;
+        }
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(
+                                   getGridDataInstance().getGrid());
+        setXAxisLabels(domainSet);
+    }
+
+    /**
+     * Set the axis labels
+     *
+     * @throws VisADException  problem retrieving data for labels
+     */
+    private void setAxisLabels() throws VisADException {
+        setXAxisValues();
+        setTimeAxisValues();
+    }
+
+    /**
+     * Method called when the view changes.
+     *
+     * @param property The property that changed
+     */
+    public void viewManagerChanged(String property) {
+        try {
+            setAxisLabels();
+        } catch (Exception e) {
+            logException("Problem setting labels", e);
+        }
+        super.viewManagerChanged(property);
+    }
+
+    /**
      * Set x (time) axis values from the time set supplied.
      *
      * @param timeSet   time set to use
@@ -581,7 +622,17 @@ public class HovmollerControl extends GridDisplayControl {
             } else {
                 hovmollerDisplay.setYRange(start, end);
             }
+            Font f    = hovmollerView.getDisplayListFont();
+            int  size = (f == null)
+                        ? 12
+                        : f.getSize();
+            if ((f != null)
+                    && f.getName().equals(FontSelector.DEFAULT_NAME)) {
+                f = null;
+            }
             AxisScale timeScale = hovmollerDisplay.getYAxisScale();
+            timeScale.setFont(f);
+            timeScale.setLabelSize(size);
             timeScale.setSnapToBox(true);
             timeScale.setTickBase(start);
             timeScale.setMajorTickSpacing(majorTickSpacing);
@@ -653,7 +704,16 @@ public class HovmollerControl extends GridDisplayControl {
             xLabels.put(new Double(val),
                         dc.formatLatLonCardinal(val, 1 - averageDim));
         }
+        Font f    = hovmollerView.getDisplayListFont();
+        int  size = (f == null)
+                    ? 12
+                    : f.getSize();
+        if ((f != null) && f.getName().equals(FontSelector.DEFAULT_NAME)) {
+            f = null;
+        }
         AxisScale xScale = hovmollerDisplay.getXAxisScale();
+        xScale.setFont(f);
+        xScale.setLabelSize(size);
         xScale.setSnapToBox(true);
         xScale.setTickBase(botval);
         double averageTickSpacing = (topval - botval)
@@ -665,7 +725,7 @@ public class HovmollerControl extends GridDisplayControl {
     }
 
     /**
-     * make widgets for check box for latest data time on left of x axis.
+     * make widgets for time format and latest data time on bottom of y axis.
      *
      * @param controlWidgets to fill
      *
@@ -676,7 +736,7 @@ public class HovmollerControl extends GridDisplayControl {
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
 
-        // make check box for latest data time on left of x axis
+        // make check box for latest data time on bottom of y axis
         JCheckBox toggle = new JCheckBox("Latest Time at Bottom",
                                          reverseTime);
         toggle.addActionListener(new ActionListener() {
@@ -685,7 +745,7 @@ public class HovmollerControl extends GridDisplayControl {
                 try {
                     setTimeAxisValues();
                 } catch (VisADException ve) {
-                    userMessage("couldn't set order");
+                    userMessage("couldn't set time order");
                 }
             }
         });
@@ -704,6 +764,19 @@ public class HovmollerControl extends GridDisplayControl {
                         GuiUtils.rLabel("Label Format: "),
                         formatField), toggle)));
 
+    }
+
+    /**
+     * If the color  is non-null then apply it to the
+     * {@link ucar.visad.display.Displayable}s in the displayables
+     * list that are flagged with the FLAG_COLOR
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    protected void applyColor() throws VisADException, RemoteException {
+        displayListUsesColor = false;
+        super.applyColor();
     }
 
     /**

@@ -544,7 +544,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * A boolean to see if the display list got it's color from the display.
      */
-    private boolean displayListUsesColor = false;
+    protected boolean displayListUsesColor = false;
 
     /**
      * The color widget
