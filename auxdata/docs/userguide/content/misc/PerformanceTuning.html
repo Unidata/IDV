@@ -34,31 +34,23 @@ section of the IDV User's Guide.
 <subhead id="heap" xintoc="false" desc="Change the amount of
 memory allocated to the IDV">Memory allocation</subhead>
 
-By default, the IDV startup script (runIDV) allocates 512 megabytes of
-maximum memory for Java. This is usually the optimum amount for a Windows
-system with 1 gigabyte of physical memory (RAM).  Windows takes up half of
-that anyway and once Windows has to start swapping, performance severely
-degrades. On a Linux system, you can probably get away with 700m for
-1 Gb of memory as it does a much better job of swapping. All this also
-depends on what else you are running on the machine and how much memory
-those applications use. <p>
+By default, the IDV start script tunes the amount of memory allocated 
+to the IDV according to system parameters. On 64 bit computers, the memory 
+allocation amount is 80% of the available RAM. On 32 bit computers, the 
+amount is the minimum of 1.5GB and the available RAM minus 512MB. <p> 
 
-If your system has more than 1 Gb of memory, increasing the amount
-available to the IDV can improve performance for displaying large
-datasets. You can change the runIDV script to increase the amount
-of memory. In that script, change the -Xmx512m to some higher number
-(e.g. -Xmx1024m). The number is the number of bytes, the trailing m is
-a multiplier (m=mega). Do not use the maximum amount of memory on your
-machine as some is needed for the operating system itself. If the system
-has to use swap memory, performance will degrade as well.  For a system
-with 2 Gb of physical memory, you can probably allocate 1.5 Gb to the IDV.
-If you have less than 1 Gb of RAM, you should start the IDV with about
-1/2 of the total memory (e.g., if your system has only 512 megabytes of
-RAM, you should use -Xmx256m).<p>
+In addition, users can change the memory settings in  the [ht::menu Edit Preferences],
+System tab. In order for these changes to take effect, the user will have to
+restart the IDV. <p>
 
-On Mac OS-X, the procedure is a little different if you are not using the 
-runIDV script.  See the <a href="../FAQ.html#memory">FAQ item</a> on 
-changing the amount of memory on Macs.
+In rare circumstances, the IDV start script cannot determine the optimal amount 
+of memory for the IDV. In this unusual case, the IDV start script allocates 512MB. 
+The user can still go to the [ht::menu Edit Preferences], System tab and adjust memory 
+settings. Again, the user must restart the IDV in order for this to take effect. <p>
+
+In other exceptional situations, the user may still wish to override the automatic
+tuning mechanism. In the body of the runIDV script, there are instructions on how
+to achieve this change, although this should rarely be necessary. <p>
 
 <subhead id="cache" xintoc="false" desc="Data caching uses more
 memory">Data Caching</subhead>
