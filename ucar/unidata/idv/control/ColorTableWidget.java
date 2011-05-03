@@ -812,7 +812,16 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         }
         popupBtn.setText(colorTable.getName());
     }
+    /**
+     * Get the color table.
+     *
+     * @param
+     * @return  the color table
+     */
 
+    public ColorTable getColorTable(){
+        return  this.colorTable;
+    }
     /**
      * Fill the list of components and set them in a certain number of
      * columns.
