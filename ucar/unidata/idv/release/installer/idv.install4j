@@ -578,7 +578,7 @@
                 </serializedBean>
                 <condition>context.getBooleanVariable("installJOGLAction") &amp;&amp; (((Integer) context.getVariable("glForUser")).intValue() == 1)</condition>
               </action>
-              <action name="" id="586" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Configure run_script with Install Directory" id="586" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
