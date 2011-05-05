@@ -255,33 +255,26 @@ See <a href="Bundles.html">Saving State with Bundles</a>.
 </faqitem>
 
 <faqitem q="How can I change the amount of memory available to the IDV?" id="memory">
-By default, the IDV startup script (<b>runIDV</b> (Unix) or             
-<b>runIDV.bat</b> (Windows)) allocates 512 megabytes of maximum memory  
-for Java. If your system has more than 1 gigabyte of memory, increasing 
-the amount of memory available to the IDV can improve performance for   
-displaying large datasets. You can change the runIDV script to increase 
-the amount of memory. In that script, change the <b>-Xmx512m</b> to     
-some higher number (e.g. <b>-Xmx1024m</b>). The number is the number    
-of bytes, the trailing <b>m</b> is a multiplier (m=mega). Do not use    
-the maximum amount of memory on your machine as some is needed for      
-the operating system itself. If the system has to use swap memory,      
-performance will degrade as well.                                       
-<p>
 
-On a Mac, the procedure is a little more complicated because the
-launcher does not use the runIDV script. In order to increase the
-memory to say 1024 mb, you need to edit the Info.plist file in the IDV
-application contents. To do this first go into the IDV folder in the
-Applications folder and holding the Control button on the keyboard and
-click on "IDV". For a 3-button mouse just right click. This will give
-the Contents of the file in a new window. Then click on Contents folder.
-You can edit the Info.plist file by dragging it into a text editor or
-into a terminal window (type vi first). After the line VMOptions is the
-memory setting "-Xmx512m". Change this to -Xmx1024m and save the file.
-You can now launch the IDV by double clicking on the IDV application.
-You should see 1024 MB as the allocated memory at the bottom of the IDV
-window.
-<p>
+By default, the IDV startup script (<b>runIDV</b> (Unix) or             
+<b>runIDV.bat</b> (Windows)) tunes the amount of memory allocated 
+to the IDV according to system parameters. On 64 bit computers, the memory 
+allocation amount is 80% of the available RAM. On 32 bit computers, the 
+amount is the minimum of 1.5GB and the available RAM minus 512MB. <p> 
+
+In addition, users can change the memory settings in  the [ht::menu Edit Preferences],
+System tab. In order for these changes to take effect, the user will have to
+restart the IDV. <p>
+
+In rare circumstances, the IDV start script cannot determine the optimal amount 
+of memory for the IDV. In this unusual case, the IDV start script allocates 512MB. 
+The user can still go to the [ht::menu Edit Preferences], System tab and adjust memory 
+settings. Again, the user must restart the IDV in order for this to take effect. <p>
+
+In other exceptional situations, the user may still wish to override the automatic
+tuning mechanism. In the body of the runIDV script, there are instructions on how
+to achieve this change, although this should rarely be necessary. <p>
+
 
 </faqitem>
 
