@@ -635,87 +635,8 @@
             <validation />
             <preActivation />
             <postActivation />
-            <actions>
-              <group name="" id="439" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
-                      <void property="conditionExpression">
-                        <object class="com.install4j.api.beans.ScriptProperty">
-                          <void property="value">
-                            <string>Util.isWindows()</string>
-                          </void>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <beans>
-                  <action name="" id="440" beanClass="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to launch the IDV">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction">
-                          <void property="launcherId">
-                            <string>7</string>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition>context.getBooleanVariable("executeLauncherAction") &amp;&amp; (!context.isUnattended())</condition>
-                  </action>
-                </beans>
-              </group>
-              <group name="" id="442" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
-                      <void property="conditionExpression">
-                        <object class="com.install4j.api.beans.ScriptProperty">
-                          <void property="value">
-                            <string>Util.isUnixInstaller()</string>
-                          </void>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <beans>
-                  <action name="" id="443" beanClass="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction">
-                          <void property="launcherId">
-                            <string>2</string>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition>context.getBooleanVariable("executeLauncherAction") &amp;&amp; (!context.isUnattended())</condition>
-                  </action>
-                </beans>
-              </group>
-            </actions>
-            <formComponents>
-              <formComponent name="Execute launcher" id="441" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
-                      <void property="checkboxText">
-                        <string>${i18n:RunEntryExec("${compiler:sys.fullName}")}</string>
-                      </void>
-                      <void property="initiallySelected">
-                        <boolean>true</boolean>
-                      </void>
-                      <void property="variableName">
-                        <string>executeLauncherAction</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibiltyScript />
-              </formComponent>
-            </formComponents>
+            <actions />
+            <formComponents />
           </screen>
         </screens>
       </application>
