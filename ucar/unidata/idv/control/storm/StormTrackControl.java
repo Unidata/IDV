@@ -43,15 +43,7 @@ import ucar.unidata.ui.TwoListPanel;
 
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.MenuUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlUtil;
 
@@ -320,7 +312,7 @@ public class StormTrackControl extends DisplayControlImpl {
             return false;
         }
 
-        getColorTableWidget(getRangeForColorTable());
+        getColorTableWidget( new Range(1.0,1.0));
         stormDataSource = (StormDataSource) dataSources.get(0);
 
         if (okWays == null) {
@@ -2596,7 +2588,12 @@ public class StormTrackControl extends DisplayControlImpl {
         return editMode;
     }
 
-
+    protected void applyRange() throws VisADException, RemoteException {
+        for (StormDisplayState sds : getActiveStorms()) {
+            sds.colorRangeChanged();
+        }
+     
+    }
 
 }
 

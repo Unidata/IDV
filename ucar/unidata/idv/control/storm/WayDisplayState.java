@@ -315,7 +315,7 @@ public class WayDisplayState {
             boolean    hadTrack     = hasTrackDisplay();
             boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
             boolean    modeChanged  = !(modeParam == forecastAnimationMode);
-            if (force || !hadTrack || paramChanged || modeChanged) {
+            if (force || !hadTrack || paramChanged || modeChanged || stormDisplayState.isColorRangeChanged()) {
                 //                System.err.println("makeing field");
                 colorParam = tmpParam;
                 // modeParam = forecastAnimationMode;
@@ -330,6 +330,10 @@ public class WayDisplayState {
                             stormDisplayState.getStormTrackControl().getIdv()
                                 .getParamDefaultsEditor()
                                 .getParamRange(paramName);
+                        if(stormDisplayState.isColorRangeChanged()){
+                            range =  stormDisplayState.getStormTrackControl().getRangeForColorTable();
+                            stormDisplayState.getStormTrackControl().getColorTableWidget(range);
+                        }
 
                         Unit displayUnit =
                             stormDisplayState.getStormTrackControl().getIdv()
@@ -337,6 +341,11 @@ public class WayDisplayState {
                                 .getParamDisplayUnit(paramName);
                         if (displayUnit != null) {
                             getTrackDisplay().setDisplayUnit(displayUnit);
+                        } else {
+                            Unit[] u =GridUtil.getParamUnits(trackField);
+                            if(u[0] != null){
+                                 getTrackDisplay().setDisplayUnit(u[0]);
+                            }
                         }
                     }
                     if (range == null) {
@@ -787,7 +796,7 @@ public class WayDisplayState {
      * @throws Exception _more_
      */
     public TrackDisplayable getTrackDisplay() throws Exception {
-        if (trackDisplay == null) {
+       // if (trackDisplay == null) {
             trackDisplay = new TrackDisplayable("track_"
                     + stormDisplayState.getStormInfo().getStormId());
             if (way.isObservation()) {
@@ -798,7 +807,7 @@ public class WayDisplayState {
             }
             setTrackColor();
             addDisplayable(trackDisplay);
-        }
+      //  }
         return trackDisplay;
     }
 

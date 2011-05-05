@@ -47,6 +47,8 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.idv.control.LayoutModelWidget;
+import ucar.unidata.idv.control.ColorTableWidget;
+import ucar.unidata.idv.control.FlaggedDisplayable;
 import ucar.unidata.idv.control.chart.*;
 
 
@@ -173,6 +175,9 @@ public class StormDisplayState {
 
     /** _more_ */
     private boolean hasBeenEdited = false;
+
+    /** _more_ */
+    private boolean colorRangeChanged = false;
 
     /** _more_ */
     private static int[] nextColor = { 0 };
@@ -880,6 +885,7 @@ public class StormDisplayState {
             }
             trackCollection = null;
             active          = false;
+            colorRangeChanged  = false;
             stormTrackControl.removeDisplayable(holder);
             holder = null;
             if (mainContents != null) {
@@ -1028,6 +1034,7 @@ public class StormDisplayState {
                     params.put(id, selected);
                 }
                 try {
+                    colorRangeChanged = false;
                     updateDisplays();
                 } catch (Exception exc) {
                     stormTrackControl.logException("setting cones", exc);
@@ -1666,7 +1673,9 @@ public class StormDisplayState {
      */
     protected StormParam getColorParam(boolean forObs) {
         if (forObs) {
-            return (StormParam) params.get(ID_OBS_COLOR);
+            StormParam sp = (StormParam) params.get(ID_OBS_COLOR);
+            if(sp == null) sp= getFixedParam();
+            return  sp;
         }
         return (StormParam) params.get(ID_FORECAST_COLOR);
     }
@@ -1839,15 +1848,41 @@ public class StormDisplayState {
      * @return _more_
      */
     protected ColorTable getColorTable(StormParam param) {
-        if (param == null || param.getName().equalsIgnoreCase("Fixed")) {
+        if (param == null) {
+
+            return null;
+        }  else if(param.getName().equalsIgnoreCase("Fixed")){
+            try{
+                getStormTrackControl().getColorTableWidget(new Range(1.0, 1.0));
+            } catch (VisADException r ) {}
+              catch (RemoteException s) {}
             return null;
         }
-        ColorTable ct =
+
+        Range range =
             getStormTrackControl().getIdv().getParamDefaultsEditor()
-                .getParamColorTable(param.getName(), false);
+                .getParamRange(param.getName());
+        if (range == null) {
+            range = new Range(1.0, 100.0);
+        }
+
+        ColorTableWidget ctw = null;
+        try{
+            if(colorRangeChanged){
+               range = getStormTrackControl().getRangeForColorTable();
+            }
+            ctw = getStormTrackControl().getColorTableWidget(range);
+        } catch (VisADException r ) {}
+          catch (RemoteException s) {}
+        ColorTable ct = ctw.getColorTable();
+        //    getStormTrackControl().getIdv().getParamDefaultsEditor()
+        //        .getParamColorTable(param.getName(), false);
         if (ct == null) {
             ct = getStormTrackControl().getColorTable();
         }
+        ct.setRange(range);
+
+
         return ct;
     }
 
@@ -2638,7 +2673,24 @@ public class StormDisplayState {
         hasBeenEdited = true;
     }
 
+    public void colorRangeChanged() {
+        DisplayMaster displayMaster = stormTrackControl.getDisplayMaster();
+        colorRangeChanged = true;
+        boolean       wasActive     = displayMaster.ensureInactive();
+        try {
+            stormTrackControl.stormChanged(StormDisplayState.this);
+            updateDisplays();
+        } catch (Exception exc) {
+            stormTrackControl.logException("Changing color table", exc);
+        }
 
+    }
 
+    /**
+     * _more_
+     */
+    public boolean isColorRangeChanged(){
+         return  colorRangeChanged;
+    }
 }
 
