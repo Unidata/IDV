@@ -599,6 +599,23 @@
                 </serializedBean>
                 <condition />
               </action>
+              <action name="Chmod run_script" id="626" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>IDV.app/Contents/MacOS/run_script</string>
+                        </object>
+                      </void>
+                      <void property="mode">
+                        <string>777</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
             </actions>
             <formComponents />
           </screen>
