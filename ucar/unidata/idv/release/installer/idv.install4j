@@ -758,6 +758,7 @@
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
+        <launcher id="49" />
       </excludedLaunchers>
       <excludedComponents>
         <component id="295" />
@@ -778,6 +779,7 @@
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
+        <launcher id="49" />
       </excludedLaunchers>
       <excludedComponents>
         <component id="230" />
@@ -851,6 +853,7 @@
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
+        <launcher id="49" />
       </excludedLaunchers>
       <excludedComponents>
         <component id="230" />
@@ -872,6 +875,7 @@
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
+        <launcher id="49" />
       </excludedLaunchers>
       <excludedComponents>
         <component id="230" />
