@@ -316,6 +316,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         getIdv().getIdvUIManager().addToolbarPreferences(this);
         addChooserPreferences();
         addDisplayPreferences();
+        addSystemPreferences();
     }
 
     /**
@@ -571,6 +572,12 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         this.add("Available Displays", "What displays should be available in the user interface?", controlsManager,
                  controlsPanel, cbxToCdMap);
+    }
+    
+    /**
+     * Add in the user preference tab for the controls to show
+     */
+    protected void addSystemPreferences() {
 
         AtomicLong memVal = new AtomicLong(getStore().get(IdvConstants.PREF_MEMORY,
                                 SystemMemoryManager.getDefaultMemory()));
