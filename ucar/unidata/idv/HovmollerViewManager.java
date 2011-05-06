@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,16 +21,19 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.HovmollerDisplay;
 
+import visad.AxisScale;
 import visad.VisADException;
 
 
 import java.awt.Container;
+import java.awt.Font;
 
 import java.rmi.RemoteException;
 
@@ -163,6 +166,40 @@ public class HovmollerViewManager extends ViewManager {
         }
     }
 
+    /**
+     * Apply properties
+     *
+     * @return true if successful
+     */
+    public boolean applyProperties() {
+        boolean val = super.applyProperties();
+        if (val) {
+            notifyDisplayControls(PREF_DISPLAYLISTFONT);
+        }
+        return val;
+    }
+
+    /**
+     * Some user preferences have changed.
+     */
+    public void applyPreferences() {
+        super.applyPreferences();
+        /*
+        HovmollerDisplay hov = getHovmollerDisplay();
+        Font f    = getDisplayListFont();
+        int  size = (f == null) ? 12 : f.getSize();
+        if ((f != null)
+                && f.getName().equals(FontSelector.DEFAULT_NAME)) {
+            f = null;
+        }
+        AxisScale timeScale = hov.getYAxisScale();
+        timeScale.setFont(f);
+        timeScale.setLabelSize(size);
+        AxisScale xScale = hov.getXAxisScale();
+        xScale.setFont(f);
+        xScale.setLabelSize(size);
+        */
+    }
 
     /**
      * Create and return the show menu.

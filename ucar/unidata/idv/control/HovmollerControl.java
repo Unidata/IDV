@@ -148,12 +148,18 @@ public class HovmollerControl extends GridDisplayControl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
 
-        hovmollerView = new HovmollerViewManager(getViewContext(),
-                new ViewDescriptor("hovmoller_of_" + paramName),
-                "showControlLegend=false;wireframe=true;") {}
-        ;
-        hovmollerDisplay = hovmollerView.getHovmollerDisplay();
-        hovmollerDisplay.setAspect(.8, 1.0);
+        if (hovmollerView != null) {
+            //If the ViewManager is non-null it means we have been unpersisted.
+            //If so, we initialie the VM with the IDV
+            hovmollerView.initAfterUnPersistence(getIdv());
+            hovmollerDisplay = hovmollerView.getHovmollerDisplay();
+        } else {
+            hovmollerView = new HovmollerViewManager(getViewContext(),
+                    new ViewDescriptor("hovmoller_of_" + paramName),
+                    "showControlLegend=false;wireframe=true;");
+            hovmollerDisplay = hovmollerView.getHovmollerDisplay();
+            hovmollerDisplay.setAspect(.8, 1.0);
+        }
         hovmollerDisplay.setYAxisType(RealType.Time);
         hovmollerDisplay.setXAxisType((getAverageDimension() == LAT_DIM)
                                       ? RealType.Longitude
@@ -167,7 +173,7 @@ public class HovmollerControl extends GridDisplayControl {
         addViewManager(hovmollerView);
 
         if (showAsContours) {
-            setAttributeFlags(FLAG_COLOR);
+            addAttributeFlags(FLAG_COLOR);
             dataDisplay = new Contour2DDisplayable("ts_color_" + paramName,
                     true, true);
             dataDisplay.setVisible(true);
@@ -940,6 +946,25 @@ public class HovmollerControl extends GridDisplayControl {
     public boolean getReverseTime() {
         return reverseTime;
     }
+
+    /**
+     *  Set the HovmollerView property.
+     *
+     *  @param value The new value for HovmollerView
+     */
+    public void setHovmollerView(HovmollerViewManager value) {
+        hovmollerView = value;
+    }
+
+    /**
+     *  Get the HovmollerView property.
+     *
+     *  @return The HovmollerView
+     */
+    public HovmollerViewManager getHovmollerView() {
+        return hovmollerView;
+    }
+
 
 
 }
