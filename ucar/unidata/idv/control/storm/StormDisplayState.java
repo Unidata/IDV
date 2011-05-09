@@ -1880,7 +1880,7 @@ public class StormDisplayState {
         if (ct == null) {
             ct = getStormTrackControl().getColorTable();
         }
-        ct.setRange(range);
+        //ct.setRange(range);
 
 
         return ct;

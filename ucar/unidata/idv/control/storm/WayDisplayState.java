@@ -321,6 +321,10 @@ public class WayDisplayState {
                 // modeParam = forecastAnimationMode;
                 FieldImpl trackField = makeTrackField(forecastAnimationMode);
                 if (trackField != null) {
+                    if(paramChanged){
+                        trackDisplay    = null;
+                        initTrackDisplay();
+                    }
                     getTrackDisplay().setUseTimesInAnimation(false);
                     getTrackDisplay().setTrack(trackField);
                     Range range = null;
@@ -795,22 +799,46 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public TrackDisplayable getTrackDisplay() throws Exception {
-       // if (trackDisplay == null) {
-            trackDisplay = new TrackDisplayable("track_"
-                    + stormDisplayState.getStormInfo().getStormId());
-            if (way.isObservation()) {
-                trackDisplay.setLineWidth(3);
-            } else {
-                trackDisplay.setLineWidth(2);
-                trackDisplay.setUseTimesInAnimation(false);
+     public void initTrackDisplay() throws Exception {
+
+        trackDisplay = new TrackDisplayable("track_"
+                + stormDisplayState.getStormInfo().getStormId() ); // + stormDisplayState.getColorParam(this));
+        if (way.isObservation()) {
+            trackDisplay.setLineWidth(3);
+        } else {
+            trackDisplay.setLineWidth(2);
+            trackDisplay.setUseTimesInAnimation(false);
+        }
+        //setTrackColor();
+       int cnt = holder.displayableCount();
+
+        for(int i = 0; i<cnt; i++ ){
+            Displayable dp = holder.getDisplayable(i);
+            if(dp.getClass().isInstance(trackDisplay)) {
+                TrackDisplayable dd = (TrackDisplayable)dp;
+                if(dd.toString().equalsIgnoreCase(trackDisplay.toString())){
+                    holder.removeDisplayable(dp);
+                    cnt = cnt -1;
+                }
             }
-            setTrackColor();
-            addDisplayable(trackDisplay);
-      //  }
+        }
+
+        addDisplayable(trackDisplay);
+
+    }
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TrackDisplayable getTrackDisplay() throws Exception {
+        if (trackDisplay == null) {
+           initTrackDisplay();
+        }
         return trackDisplay;
     }
-
 
     /**
      * _more_
@@ -1095,7 +1123,10 @@ public class WayDisplayState {
             if (field == null) {
                 continue;
             }
-            datas[i++] = field;
+            if(i == 0)
+                datas[i++] = field;
+            else
+                datas[i++] = field.changeMathType(datas[0].getType());
             fields.add(field);
             times.add(track.getStartTime());
             //  if(!way.isObservation() && mode == 0)
