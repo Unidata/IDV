@@ -117,6 +117,10 @@ public class DerivedGridFactory {
     /** Default ctor; does nothing */
     public DerivedGridFactory() {}
 
+    public static FieldImpl ensembleAverage(FieldImpl grid)
+            throws VisADException, RemoteException {
+        return GridMath.applyFunctionOverMembers(grid, GridMath.FUNC_AVERAGE);       
+    }
     /**
      * Create a 1000-500 mb thickness grid
      *
@@ -1418,7 +1422,7 @@ public class DerivedGridFactory {
     private static FlatField makeHorizontalDivergence(FlatField uFF,
             FlatField vFF)
             throws VisADException, RemoteException {
-        return (FlatField) ddx(uFF).add(ddy(vFF));
+        return (FlatField) GridMath.add(GridMath.ddx(uFF), GridMath.ddy(vFF));
     }
 
     /**
@@ -1528,8 +1532,10 @@ public class DerivedGridFactory {
     private static FlatField makeHorizontalAdvection(FlatField aFF,
             FlatField uFF, FlatField vFF)
             throws VisADException, RemoteException {
-        FlatField advgrid =
-            (FlatField) (ddx(aFF).multiply(uFF)).add(ddy(aFF).multiply(vFF));
+
+            FlatField udtdx = (FlatField) GridMath.multiply(GridMath.ddx(aFF),uFF);
+            FlatField vdtdy = (FlatField) GridMath.multiply(GridMath.ddy(aFF),vFF);
+            FlatField advgrid = (FlatField) GridMath.add(udtdx,vdtdy);
 
         return (FlatField) advgrid.negate();
     }
