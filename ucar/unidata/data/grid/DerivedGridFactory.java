@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -117,10 +117,21 @@ public class DerivedGridFactory {
     /** Default ctor; does nothing */
     public DerivedGridFactory() {}
 
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static FieldImpl ensembleAverage(FieldImpl grid)
             throws VisADException, RemoteException {
-        return GridMath.applyFunctionOverMembers(grid, GridMath.FUNC_AVERAGE);       
+        return GridMath.applyFunctionOverMembers(grid, GridMath.FUNC_AVERAGE);
     }
+
     /**
      * Create a 1000-500 mb thickness grid
      *
@@ -1422,6 +1433,7 @@ public class DerivedGridFactory {
     private static FlatField makeHorizontalDivergence(FlatField uFF,
             FlatField vFF)
             throws VisADException, RemoteException {
+        //return (FlatField) ddx(uFF).add(ddy(vFF));
         return (FlatField) GridMath.add(GridMath.ddx(uFF), GridMath.ddy(vFF));
     }
 
@@ -1444,9 +1456,16 @@ public class DerivedGridFactory {
     public static FieldImpl createHorizontalFluxDivergence(
             FieldImpl paramGrid, FieldImpl uGrid, FieldImpl vGrid)
             throws VisADException, RemoteException {
+        /*
         return (FieldImpl) ((paramGrid.multiply(
             createHorizontalDivergence(uGrid, vGrid))).subtract(
                 createHorizontalAdvection(paramGrid, uGrid, vGrid)));
+       */
+        FieldImpl div  = createHorizontalDivergence(uGrid, vGrid);
+        FieldImpl adv  = createHorizontalAdvection(paramGrid, uGrid, vGrid);
+        FieldImpl pdiv = GridMath.multiply(paramGrid, div);
+        return GridMath.subtract(pdiv, adv);
+
     }
 
     /**
@@ -1532,10 +1551,11 @@ public class DerivedGridFactory {
     private static FlatField makeHorizontalAdvection(FlatField aFF,
             FlatField uFF, FlatField vFF)
             throws VisADException, RemoteException {
-
-            FlatField udtdx = (FlatField) GridMath.multiply(GridMath.ddx(aFF),uFF);
-            FlatField vdtdy = (FlatField) GridMath.multiply(GridMath.ddy(aFF),vFF);
-            FlatField advgrid = (FlatField) GridMath.add(udtdx,vdtdy);
+        FlatField udadx = (FlatField) GridMath.multiply(GridMath.ddx(aFF),
+                              uFF);
+        FlatField vdady = (FlatField) GridMath.multiply(GridMath.ddy(aFF),
+                              vFF);
+        FlatField advgrid = (FlatField) GridMath.add(udadx, vdady);
 
         return (FlatField) advgrid.negate();
     }
@@ -2605,7 +2625,7 @@ public class DerivedGridFactory {
         return latField;
     }
 
-        /**
+    /**
      * Every geo-located data grid can be used
      * to make a grid with longitude with the grid values as well
      *
@@ -2682,6 +2702,7 @@ public class DerivedGridFactory {
 
         return lonField;
     }
+
     /**
      * Every geo-located data grid can be used
      * to make a grid with latitude with the grid values as well
@@ -2758,6 +2779,7 @@ public class DerivedGridFactory {
 
         return latff;
     }
+
     /**
      * Every geo-located data grid can be used
      * to make a grid with longitude with the grid values as well
@@ -2811,10 +2833,13 @@ public class DerivedGridFactory {
             lons = flatlon[lonI];
         }
 
-        lonff.setSamples(new float[][] {lons}, false);
+        lonff.setSamples(new float[][] {
+            lons
+        }, false);
 
         return lonff;
     }
+
     /**
      * Take the partial derivative with respect to X of the given field.
      * @param grid   grid to parialize
