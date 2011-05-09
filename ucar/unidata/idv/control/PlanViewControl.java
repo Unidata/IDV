@@ -1560,7 +1560,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected void applySkipFactor() {
 
-        if (checkFlag(FLAG_SKIPFACTOR)) {
+       // if (checkFlag(FLAG_SKIPFACTOR)) {
             if ((getGridDisplayable() != null) && (currentSlice != null)) {
                 try {
                     getGridDisplayable().loadData(
@@ -1569,7 +1569,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     logException("applySkipFactor", ve);
                 }
             }
-        }
+       // }
     }
 
 
