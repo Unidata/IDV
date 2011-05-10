@@ -1497,7 +1497,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  true if they are equal
      */
     public boolean equals(Object o) {
-        if ( !(getClass().equals(o.getClass()))) {
+        if ( o==null || !(getClass().equals(o.getClass()))) {
             return false;
         }
         DataSourceImpl that = (DataSourceImpl) o;
