@@ -22,7 +22,7 @@ def extractPressureFromNWPGrid(fieldimpl):
      return a grid of the pressure at all points.  Input
      grid must have pressure or height (which is converted
      to pressure in the standard atmosphere).
-     User must be sure input is a suitable FlatField. 
+     User must be sure input is a suitable FlatField.
   """
   ff = fieldimpl.getSample(0)
   return DerivedGridFactory.createPressureGridFromDomain(ff)
@@ -45,8 +45,8 @@ def extractLongitudeFromNWPGrid(fieldimpl):
 
 def getNthTimeGrid(fieldimpl, Nth):
   """Get the Nth grid in time series of grids;
-     User must be sure input is a suitable data field. 
-     returns a single time. 
+     User must be sure input is a suitable data field.
+     returns a single time.
      Nth is an integer, >=0, <= max index of grid time series. """
   #trap bad values of N
   N = int(Nth)
@@ -117,14 +117,14 @@ def windShear(u, v, z, top, bottom):
 
 
 def windShearVector(u, v, top, bottom):
-   """ calculate the u and v layer difference and return as vector 
+   """ calculate the u and v layer difference and return as vector
    """
    udiff = layerDiff(u, top, bottom)
    vdiff = layerDiff(v, top, bottom)
    return makeVector(udiff, vdiff)
 
 def resampleGrid(oldGrid, gridwithNewDomain):
-   """ display gridded data on a new domain 
+   """ display gridded data on a new domain
    """
    newLocs = GridUtil.getSpatialDomain(gridwithNewDomain)
    return GridUtil.resampleGrid(oldGrid, newLocs)
@@ -238,7 +238,7 @@ def oldaverageOverTime(field,makeTimes = 0):
     for t in range(domainSet.getLength()):
         cnt=cnt+1
         rangeValue = field.getSample(t)
-        if(current == None):
+        if(current is None):
             current = rangeValue.clone();
         else:
             current = current+rangeValue;
@@ -349,15 +349,15 @@ def substitute(data, low, high, newValue):
             values = rangeObject.getFloats(0);
             for i in range(len(values)):
                for j in range(len(values[0])):
-		           if values[i][j]>=low:       
+		           if values[i][j]>=low:
 		             if values[i][j]<=high:  values[i][j] = newValue;
             rangeObject.setSamples(values,1);
     else:
         rangeObject = newData;
         values = rangeObject.getFloats(0);
         for i in range(len(values)):
-          for j in range(len(values[0])):                                                                   
-             if values[i][j]>=low:                                                                            
+          for j in range(len(values[0])):
+             if values[i][j]>=low:
                 if values[i][j]<=high: values[0][i] = newValue;
         rangeObject.setSamples(values,1);
     return newData;
@@ -370,3 +370,9 @@ def GP2Z(gp):
     """Convert Geopotential (GP) to Height (Z)"""
     return gp/DerivedGridFactory.GRAVITY
 
+
+def uvFromWindDir(dir):
+    """creating the vector field using the wind direction"""
+    u = newName(sin(dir),"U")
+    v = newName(cos(dir),"V")
+    return makeVector(u,v)
