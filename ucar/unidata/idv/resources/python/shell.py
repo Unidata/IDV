@@ -9,7 +9,7 @@ shell=None
 def selectData(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
     """Select up to 5 data fields. This returns a List of the actual Data objects """
     result = selectDataChoice(name1,name2,name3,name4,name5);
-    if(result == None): 
+    if(result is None):
         return None;
     if(isinstance(result, DataChoice)==1):
         return result.getData(None);
@@ -37,7 +37,7 @@ def selectDataChoice(name1='Select Field',name2=None,name3=None,name4=None,name5
     result = idv.selectDataChoices(list);
     if (shell != None):
        shell.toFront();
-    if(result == None): 
+    if(result is None):
         return None;
     if(result.size()==1):
         return result.get(0);
@@ -115,7 +115,7 @@ def getDataChoice(dataSourceName=None,dataChoiceName=None):
     If no data source or data choice is found then return null"""
 
     dataSource=idv.getDataManager().findDataSource(dataSourceName);
-    if(dataSource == None):
+    if(dataSource is None):
         return None;
     return  dataSource.findDataChoice(dataChoiceName);
 
@@ -127,7 +127,7 @@ def getData(dataSourceName=None,dataChoiceName=None):
     Return the data for the data choice.
     If no data source or data choice is found then return null"""
     dataChoice = getDataChoice(dataSourceName, dataChoiceName);
-    if(dataChoice==None):
+    if(dataChoice is None):
         return None;
     return dataChoice.getData(None);
 
@@ -148,13 +148,13 @@ def setDataChoices(dataSource=None):
     """The given dataSource can be an actual data source or the name of a data source.
     This procedure will define a set of jython variables that correspond to the data choices
     held by the given data source. """
-    if(dataSource==None):
+    if(dataSource is None):
         dataSource = findDataSource();
-    if(dataSource == None):
+    if(dataSource is None):
         return;
     if(isinstance(dataSource,java.lang.String)==1):
         dataSource = findDataSource(dataSource);
-    if(dataSource == None):
+    if(dataSource is None):
         return;
     choices  = dataSource.getDataChoices();
     for i in range(choices.size()):
