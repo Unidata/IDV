@@ -25,10 +25,10 @@ def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
-            rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, mapSets, fillValue, inverse); 
+            rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, mapSets, fillValue, inverse);
             newData.setSample(timeStep,rangeObject)
         return newData
-    return subsetRangeFromMap(field, 0, mapSets, fillValue, inverse);    
+    return subsetRangeFromMap(field, 0, mapSets, fillValue, inverse);
 
 
 def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
@@ -71,7 +71,7 @@ def  mapsApplyToField(function, field, mapSets,inside):
             rangeObject = mapsApplyToRange(function, field.getSample(timeStep), timeStep, mapSets,inside);
             newData.setSample(timeStep,rangeObject)
         return newData
-    else:   
+    else:
 	return mapsApplyToRange(function, field, 0, mapSets);
 
 
@@ -91,7 +91,7 @@ def  applyFunctionToValuesInField(function, field, min,max,inside):
             rangeObject = applyFunctionToValuesInRange(function, field.getSample(timeStep), timeStep, min, max,inside);
             newData.setSample(timeStep,rangeObject)
         return newData
-    else:   
+    else:
 	return applyFunctionToValuesInRange(function, field, 0, mapSets);
 
 
@@ -166,7 +166,7 @@ def averageFromMap(field,mapSets):
 
 def averageFromMapAndClip(field,mapSets):
 	return subsetFromMap(mapsApplyToField('mapsAverage', field, mapSets,1), mapSets);
-    
+
 
 def  mapsAverage(originalValues, newValues, indexArray):
     DataUtil.average(originalValues, newValues, indexArray);
@@ -182,7 +182,7 @@ def mapsMin(originalValues, newValues, indexArray, value):
 
 def mapsSetValue(originalValues, newValues, indexArray, value):
  	DataUtil.setValue(originalValues, newValues, indexArray,value);
-	
+
 
 
 def getMapProperty(polygon, propName):
@@ -207,25 +207,25 @@ def filterMaps(mapSets, propName,operator,value):
 	sets = mapSets.getSets();
         for mapIdx in xrange(len(sets)):
 		mapValue =  getMapProperty(sets[mapIdx],propName);
-		if(mapValue == None): 
+		if(mapValue is None):
 			continue;
 		if(operator== '==' and mapValue == value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '!=' and mapValue != value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '<' and mapValue < value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '<=' and mapValue <= value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '>' and mapValue > value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '>=' and mapValue >= value):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== 'match' and StringUtil.stringMatch(str(mapValue), value)):
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 		elif(operator== '!match' and not StringUtil.stringMatch(str(mapValue), value)):
 			print "not match: " + mapValue;
-			goodOnes.add(sets[mapIdx]);		
+			goodOnes.add(sets[mapIdx]);
 
 	return ShapefileAdapter.makeSet(goodOnes);
 
@@ -268,7 +268,7 @@ def  subsetRangeWithProperty(range, mapSets):
         print value
         indexArray = indices[mapIdx]
         for j in xrange(len(indexArray)):
-            if(value==None):
+           if(value is None):
                  newValues[0][indexArray[j]] = originalValues[0][indexArray[j]];
             else:
                 newValues[0][indexArray[j]] = float(value);
