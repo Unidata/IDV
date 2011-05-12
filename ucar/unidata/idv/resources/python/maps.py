@@ -270,7 +270,7 @@ def  subsetRangeWithProperty(range, mapSets):
         for j in xrange(len(indexArray)):
            if(value is None):
                  newValues[0][indexArray[j]] = originalValues[0][indexArray[j]];
-            else:
-                newValues[0][indexArray[j]] = float(value);
+           else:
+                 newValues[0][indexArray[j]] = float(value);
     rangeObject.setSamples(newValues)
     return rangeObject;
