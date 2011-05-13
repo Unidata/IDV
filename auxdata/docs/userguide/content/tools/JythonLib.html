@@ -1,11 +1,13 @@
 [ug::head {Jython Library}]
 
-
 <a name="grid">
 <h2> Module: grid</h2>
  This is the doc for the grid module 
 <hr>
 
+<meta name="jhid" value="GP2Z">
+<p><a name="GP2Z"></a><code class="command">GP2Z(gp):</code><p style="padding:0;margin-left:20;margin-top:0">
+Convert Geopotential (GP) to Height (Z)</p>
 <meta name="jhid" value="applyToRange">
 <p><a name="applyToRange"></a><code class="command">applyToRange(function, data):</code><p style="padding:0;margin-left:20;margin-top:0">
 Apply the function name to each timestep of the data</p>
@@ -31,6 +33,10 @@ Write out the grid data to CF compliant netCDF file</p>
 <p><a name="extractLatitudeFromNWPGrid"></a><code class="command">extractLatitudeFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
 Get the latitude coordinate from a grid.  Return a grid
 of the latitudes at each point.</p>
+<meta name="jhid" value="extractLongitudeFromNWPGrid">
+<p><a name="extractLongitudeFromNWPGrid"></a><code class="command">extractLongitudeFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
+Get the longitude coordinate from a grid.  Return a grid
+of the longitudes at each point.</p>
 <meta name="jhid" value="extractPressureFromNWPGrid">
 <p><a name="extractPressureFromNWPGrid"></a><code class="command">extractPressureFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
 Get the pressure coordinate from a time series grid and
@@ -83,6 +89,9 @@ makeVector(a,b,c) = \[a,b,c\]
 <meta name="jhid" value="makeTimeSequence">
 <p><a name="makeTimeSequence"></a><code class="command">makeTimeSequence(g):</code><p style="padding:0;margin-left:20;margin-top:0">
 Merge a set of single time grids/images into a time sequence</p>
+<meta name="jhid" value="makeTopographyFromField">
+<p><a name="makeTopographyFromField"></a><code class="command">makeTopographyFromField(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+make a topography out of a grid</p>
 <meta name="jhid" value="makeTrueVector">
 <p><a name="makeTrueVector"></a><code class="command">makeTrueVector(u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
 true wind vectors</p>
@@ -92,11 +101,18 @@ Make a vector from 2 components
 <div class=jython>
 makeVector(a,b) = \[a,b\]
 </div></p>
+<meta name="jhid" value="maskGrid">
+<p><a name="maskGrid"></a><code class="command">maskGrid(grid, mask, value):</code><p style="padding:0;margin-left:20;margin-top:0">
+mask one grid by the values in the other.  value is the masking value</p>
 <meta name="jhid" value="maxOverTime">
 <p><a name="maxOverTime"></a><code class="command">maxOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
 Take the max of the values in each time step
 If makeTimes is true (1) then we return a field mapping all of the times
 to the average. Else we just return the max</p>
+<meta name="jhid" value="mergeTimeSequences">
+<p><a name="mergeTimeSequences"></a><code class="command">mergeTimeSequences(g):</code><p style="padding:0;margin-left:20;margin-top:0">
+Merge a set of time sequences of grids/images into a single time sequence.
+All grids/images must have the same parameter name</p>
 <meta name="jhid" value="minOverTime">
 <p><a name="minOverTime"></a><code class="command">minOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
 Take the min of the values in each time step
@@ -108,6 +124,9 @@ create a new field with a new parameter name</p>
 <meta name="jhid" value="newUnit">
 <p><a name="newUnit"></a><code class="command">newUnit(field, varname, unitname):</code><p style="padding:0;margin-left:20;margin-top:0">
 set the name and unit on a grid</p>
+<meta name="jhid" value="noUnit">
+<p><a name="noUnit"></a><code class="command">noUnit(field):</code><p style="padding:0;margin-left:20;margin-top:0">
+remove the units from a grid</p>
 <meta name="jhid" value="oldaverageOverTime">
 <p><a name="oldaverageOverTime"></a><code class="command">oldaverageOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
 @deprecated Average the values in each time step
@@ -116,6 +135,9 @@ to the average. Else we just return the average</p>
 <meta name="jhid" value="resampleGrid">
 <p><a name="resampleGrid"></a><code class="command">resampleGrid(oldGrid, gridwithNewDomain):</code><p style="padding:0;margin-left:20;margin-top:0">
 display gridded data on a new domain</p>
+<meta name="jhid" value="substitute">
+<p><a name="substitute"></a><code class="command">substitute(data, low, high, newValue):</code><p style="padding:0;margin-left:20;margin-top:0">
+change values in data  between low/high to newvalue</p>
 <meta name="jhid" value="sumFromBaseTime">
 <p><a name="sumFromBaseTime"></a><code class="command">sumFromBaseTime(field):</code><p style="padding:0;margin-left:20;margin-top:0">
 set the value of each time step N:
@@ -135,6 +157,9 @@ where offset should be negative</p>
 set the value of each time step N:
 D(N)= D(N) + D(N+offset)
 where offset should be negative</p>
+<meta name="jhid" value="uvFromWindDir">
+<p><a name="uvFromWindDir"></a><code class="command">uvFromWindDir(dir):</code><p style="padding:0;margin-left:20;margin-top:0">
+creating the vector field using the wind direction</p>
 <meta name="jhid" value="windShear">
 <p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the wind shear between discrete layers
@@ -201,11 +226,43 @@ Absolute Vorticity
 <div class=jython>
 AVOR ( V ) = VOR ( V ) + CORL(V)
 </div></p>
+<meta name="jhid" value="circs">
+<p><a name="circs"></a><code class="command">circs(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a circular aperature smoothing to the grid points.  The weighting
+function is the circular aperature diffraction function.  D is
+the radius of influence in grid increments, increasing D increases
+the smoothing. (default D=2)
+</div></p>
+<meta name="jhid" value="circv">
+<p><a name="circv"></a><code class="command">circv(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a circular aperature smoothing to the grid points.  The weighting
+function is the circular aperature diffraction function.  D is
+the radius of influence in grid increments, increasing D increases
+the smoothing. (default D=2)
+</div></p>
 <meta name="jhid" value="corl">
 <p><a name="corl"></a><code class="command">corl(S):</code><p style="padding:0;margin-left:20;margin-top:0">
 Coriolis Parameter for all points in a grid
 <div class=jython>
 CORL = TWO_OMEGA*sin(latr)
+</div></p>
+<meta name="jhid" value="cress">
+<p><a name="cress"></a><code class="command">cress(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a Cressman smoothing to the grid points.  The smoothed value
+is given by a weighted average of surrounding grid points.  D is
+the radius of influence in grid increments,
+increasing D increases the smoothing. (default D=2)
+</div></p>
+<meta name="jhid" value="cresv">
+<p><a name="cresv"></a><code class="command">cresv(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a Cressman smoothing to the grid points.  The smoothed value
+is given by a weighted average of surrounding grid points.  D is
+the radius of influence in grid increments,
+increasing D increases the smoothing. (default D=2)
 </div></p>
 <meta name="jhid" value="cros">
 <p><a name="cros"></a><code class="command">cros(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -319,7 +376,7 @@ LAP ( S ) = DIV ( GRAD (S) )
 Latitudue all points in a grid</p>
 <meta name="jhid" value="lav">
 <p><a name="lav"></a><code class="command">lav(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
-Layer Average
+Layer Average of a multi layer grid
 <div class=jython>
 LAV ( S ) = ( S (level1) + S (level2) ) / 2.
 </div></p>
@@ -350,6 +407,14 @@ Divide
 <div class=jython>
 QUO  (S1, S2) = S1 / S2
 </div></p>
+<meta name="jhid" value="qvcl">
+<p><a name="qvcl"></a><code class="command">qvcl(THTA, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Q-vector ( K / m / s )
+<div class=jython>
+QVCL ( THTA, V ) = ( 1/( D (THTA) / DP ) ) *
+\[ ( DOT ( DVDX (V), GRAD (THTA) ) ),
+( DOT ( DVDY (V), GRAD (THTA) ) ) \]
+</div></p>
 <meta name="jhid" value="qvec">
 <p><a name="qvec"></a><code class="command">qvec(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Q-vector at a level ( K / m / s )
@@ -357,6 +422,22 @@ Q-vector at a level ( K / m / s )
 QVEC ( S, V ) = \[ - ( DOT ( DVDX (V), GRAD (S) ) ),
 - ( DOT ( DVDY (V), GRAD (S) ) ) \]
 where S can be any thermal paramenter, usually THTA.
+</div></p>
+<meta name="jhid" value="rects">
+<p><a name="rects"></a><code class="command">rects(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a rectangular aperature smoothing to the grid points.  The weighting
+function is the product of the rectangular aperature diffraction function
+in the x and y directions.  D is the radius of influence in grid
+increments, increasing D increases the smoothing. (default D=2)
+</div></p>
+<meta name="jhid" value="rectv">
+<p><a name="rectv"></a><code class="command">rectv(S, D):</code><p style="padding:0;margin-left:20;margin-top:0">
+<div class=jython>
+Apply a rectangular aperature smoothing to the grid points.  The weighting
+function is the product of the rectangular aperature diffraction function
+in the x and y directions.  D is the radius of influence in grid
+increments, increasing D increases the smoothing. (default D=2)
 </div></p>
 <meta name="jhid" value="relh">
 <p><a name="relh"></a><code class="command">relh(temp, mixr):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -510,6 +591,81 @@ Magnitude of the vertical wind shear in a layer
 <div class=jython>
 WSHR ( V ) = MAG \[ VLDF (V) \] / LDF (Z)
 </div></p>
+<meta name="jhid" value="xav">
+<p><a name="xav"></a><code class="command">xav(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average along a grid row
+<div class=jython>
+XAV (S) = ( S (X1) + S (X2) + ... + S (KXD) ) / KNT
+KXD = number of points in row
+KNT = number of non-missing points in row
+XAV for a row is stored at every point in that row.
+</div></p>
+<meta name="jhid" value="xsum">
+<p><a name="xsum"></a><code class="command">xsum(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Sum along a grid row
+<div class=jython>
+XSUM (S) = ( S (X1) + S (X2) + ... + S (KXD) )
+KXD = number of points in row
+XSUM for a row is stored at every point in that row.
+</div></p>
+<meta name="jhid" value="yav">
+<p><a name="yav"></a><code class="command">yav(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average along a grid column
+<div class=jython>
+YAV (S) = ( S (Y1) + S (Y2) + ... + S (KYD) ) / KNT
+KYD = number of points in column
+KNT = number of non-missing points in column
+</div></p>
+<meta name="jhid" value="ysum">
+<p><a name="ysum"></a><code class="command">ysum(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Sum along a grid column
+<div class=jython>
+YSUM (S) = ( S (Y1) + S (Y2) + ... + S (KYD) )
+KYD = number of points in row
+YSUM for a column is stored at every point in that column.
+</div></p>
+<meta name="jhid" value="zav">
+<p><a name="zav"></a><code class="command">zav(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average across the levels of a grid at all points
+<div class=jython>
+ZAV (S) = ( S (Z1) + S (Z2) + ... + S (KZD) ) / KNT
+KZD = number of levels
+KNT = number of non-missing points in column
+</div></p>
+<meta name="jhid" value="zsum">
+<p><a name="zsum"></a><code class="command">zsum(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Sum across the levels of a grid at all points
+<div class=jython>
+ZSUM (S) = ( S (Z1) + S (Z2) + ... + S (KZD) )
+KYD = number of levels
+ZSUM for a vertical column is stored at every point
+</div></p>
+<a name="ensemble">
+<h2> Module: ensemble</h2>
+ This is the doc for the ensemble grid module 
+<hr>
+
+<meta name="jhid" value="ens_mode">
+<p><a name="ens_mode"></a><code class="command">ens_mode(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+mode value</p>
+<meta name="jhid" value="ens_prcntl">
+<p><a name="ens_prcntl"></a><code class="command">ens_prcntl(grid, percent):</code><p style="padding:0;margin-left:20;margin-top:0">
+percentile value</p>
+<meta name="jhid" value="ens_savg">
+<p><a name="ens_savg"></a><code class="command">ens_savg(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+basic ensemble average</p>
+<meta name="jhid" value="ens_smax">
+<p><a name="ens_smax"></a><code class="command">ens_smax(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+max value of all member</p>
+<meta name="jhid" value="ens_smin">
+<p><a name="ens_smin"></a><code class="command">ens_smin(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+min value of all member</p>
+<meta name="jhid" value="ens_srng">
+<p><a name="ens_srng"></a><code class="command">ens_srng(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+max - min grid value</p>
+<meta name="jhid" value="ens_ssprd">
+<p><a name="ens_ssprd"></a><code class="command">ens_ssprd(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+basic ensemble average</p>
 <a name="image">
 <h2> Module: image</h2>
 <hr>
@@ -521,6 +677,28 @@ combine 3 images as an RGB image</p>
 <p><a name="makeNavigatedImage"></a><code class="command">makeNavigatedImage(d, ulLat, ulLon, lrLat, lrLon):</code><p style="padding:0;margin-left:20;margin-top:0">
 This takes a image data object and a lat/lon bounding box
 and adds a lat/lon domain to the data. Use it in conjunction with a formula:</p>
+<a name="climate">
+<h2> Module: climate</h2>
+ 
+   This is the doc for the climate module.  These functions are useful
+   for creating climate features from grids (means, anomalies, standard
+   deviations).  Function names are based on NCL function names.
+
+<hr>
+
+<meta name="jhid" value="calcMonAnom">
+<p><a name="calcMonAnom"></a><code class="command">calcMonAnom(monthly, ltm, normalize):</code><p style="padding:0;margin-left:20;margin-top:0">
+Calculate the monthly anomaly from a long term mean.
+The number of timesteps in ltm must be 12 and the monthly
+data must start in January.</p>
+<meta name="jhid" value="clmMon">
+<p><a name="clmMon"></a><code class="command">clmMon(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+Create a monthly climatology from a grid of monthly data over a period
+of years. The number of timesteps must be a multiple of 12.</p>
+<meta name="jhid" value="stdMon">
+<p><a name="stdMon"></a><code class="command">stdMon(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+Create monthly standard deviations from a grid of monthly data over a period
+of years. The number of timesteps must be a multiple of 12.</p>
 <a name="maps">
 <h2> Module: maps</h2>
 <hr>
@@ -672,7 +850,7 @@ A set of miscellaneous utilities.
 A utility to make a 2 dimensional float array filled
 with the given value</p>
 <meta name="jhid" value="idveval">
-<p><a name="idveval"></a><code class="command">idveval(formula):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="idveval"></a><code class="command">idveval(formula, name):</code><p style="padding:0;margin-left:20;margin-top:0">
 evaluate a formula  and return a DerivedDataChoice</p>
 <meta name="jhid" value="makeFloatArray">
 <p><a name="makeFloatArray"></a><code class="command">makeFloatArray(rows, cols, value):</code><p style="padding:0;margin-left:20;margin-top:0">
