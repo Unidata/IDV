@@ -2448,36 +2448,49 @@ public class GridUtil {
                 && (domainSet.getManifoldDimension() != 2)) {
             throw new VisADException("slice is not 3D with 2D manifold");
         }
-        Gridded2DSet newDomainSet = makeDomain2D(domainSet);
-        /*
-        float[][]     samples    = domainSet.getSamples(false);
-        int[]         lengths    = domainSet.getLengths();
-        Unit[]        setUnits   = domainSet.getSetUnits();
-        float[][]     newSamples = new float[][] {
-            samples[0], samples[1]
-        };
-        RealTupleType domainType =
-            ((SetType) domainSet.getType()).getDomain();
-        RealTupleType newType = null;
-        if (domainSet.getCoordinateSystem() != null) {
-            MapProjection mp = getNavigation(domainSet);
-            newType =
-                new RealTupleType((RealType) domainType.getComponent(0),
-                                  (RealType) domainType.getComponent(1), mp,
-                                  null);
+        Gridded2DSet new2DDomainSet = makeDomain2D(domainSet);
+        if (isConstantSpatialDomain(slice)) {
+            return setSpatialDomain(slice, new2DDomainSet, copy);
         } else {
-            newType =
-                new RealTupleType((RealType) domainType.getComponent(0),
-                                  (RealType) domainType.getComponent(1));
-        }
+            if (isTimeSequence(slice)) {
+                Set          timeSet         = getTimeSet(slice);
+                GriddedSet   lastDomainSet   = domainSet;
+                Gridded2DSet last2DDomainSet = new2DDomainSet;
+                try {
+                    FieldImpl newSlice =
+                        setSpatialDomain((FieldImpl) slice.getSample(0),
+                                         last2DDomainSet, copy);
+                    FieldImpl retField =
+                        new FieldImpl(
+                            new FunctionType(
+                                ((SetType) timeSet.getType()).getDomain(),
+                                newSlice.getType()), timeSet);
+                    retField.setSample(0, newSlice, copy);
+                    for (int t = 1; t < timeSet.getLength(); t++) {
+                        FieldImpl timeStep = (FieldImpl) slice.getSample(t,
+                                                 false);
+                        GriddedSet domain =
+                            (GriddedSet) getSpatialDomain(timeStep);
+                        if ( !domain.equals(lastDomainSet)) {
+                            lastDomainSet   = domain;
+                            last2DDomainSet = makeDomain2D(domain);
+                        }
+                        newSlice =
+                            setSpatialDomain((FieldImpl) slice.getSample(t),
+                                             last2DDomainSet, copy);
+                        retField.setSample(t, newSlice, copy);
+                    }
+                    return retField;
 
-        Gridded2DSet newDomainSet = new Gridded2DSet(newType, newSamples,
-                                        lengths[0], lengths[1],
-                                        (CoordinateSystem) null,
-                                        new Unit[] { setUnits[0],
-                setUnits[1] }, (ErrorEstimate[]) null, true);  // copy samples
-        */
-        return setSpatialDomain(slice, newDomainSet, copy);
+                } catch (RemoteException re) {
+                    throw new VisADException(
+                        "Got unexpected RemoteException: " + re.getMessage());
+                }
+            } else {
+                throw new VisADException(
+                    "Unable to handle time series with different spatial domains");
+            }
+        }
     }
 
     /**
