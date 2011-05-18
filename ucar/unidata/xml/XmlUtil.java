@@ -26,8 +26,6 @@ import org.w3c.dom.*;
 import org.xml.sax.*;
 
 
-
-
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.IOUtil;
@@ -308,7 +306,7 @@ public abstract class XmlUtil {
      * @return the open tag
      */
     public static String openTag(String name) {
-        return "<" + name + ">\n";
+        return "<" + name + ">";
     }
 
     /**
