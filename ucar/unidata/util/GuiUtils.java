@@ -264,6 +264,9 @@ public class GuiUtils extends LayoutUtil {
         defaultTimeZone = tz;
     }
 
+    public static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+
+
     /**
      * Get the default timezone used for formatting
      *
@@ -271,7 +274,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static TimeZone getTimeZone() {
         if (defaultTimeZone == null) {
-            return DateUtil.TIMEZONE_GMT;
+            return TIMEZONE_UTC;
         }
         return defaultTimeZone;
     }

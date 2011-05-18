@@ -426,6 +426,10 @@ public class IOUtil {
 
 
 
+    public static double millisToMinutes(double millis) {
+        return millis / 1000 / 60;
+    }
+
     /**
      * _more_
      *
