@@ -80,10 +80,12 @@ import visad.Real;
 import visad.RealTuple;
 import visad.RealTupleType;
 import visad.RealType;
+import visad.SampledSet;
 import visad.Scalar;
 import visad.ScalarType;
 import visad.Set;
 import visad.SetType;
+import visad.SingletonSet;
 import visad.Text;
 import visad.TextType;
 import visad.Tuple;
@@ -384,10 +386,15 @@ public class PointObFactory {
                                             ((componentIndex < 0)
                                              ? (MathType) sampleType
                                              : obType));
-        FieldImpl timeSequence = new FieldImpl(timeSequenceType,
-                                     DateTime.makeTimeSet(times));
+        SampledSet timeSet = (times.length > 1)
+                             ? DateTime.makeTimeSet(times)
+                             : (SampledSet) new SingletonSet(
+                                 new RealTuple(new Real[] { times[0] }));
 
-        List samples = new ArrayList();
+
+        FieldImpl timeSequence = new FieldImpl(timeSequenceType, timeSet);
+
+        List      samples      = new ArrayList();
         Trace.call1("makeTimeSequence-loop2");
         Data[] timeSamples = new Data[times.length];
         for (int i = 0; i < times.length; i++) {
