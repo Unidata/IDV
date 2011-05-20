@@ -284,7 +284,46 @@ public class GridUtil {
         return getSpatialDomain(grid, 0);
     }
 
+    /**
+     * Get the spatial domain for this grid. If the grid is time sequence, this will
+     * check the domain in the sequence and find the largest domain , this is very
+     * useful in point data observation when returning the first time step
+     * spatial domain is not big enough to cover the later time step.
+     *
+     * @param grid   grid to check
+     *
+     * @return  the spatial domain of the grid.  If this is a time series
+     *          it is the spatial domain of the first grid in the series
+     *
+     * @throws VisADException  problem getting domain set
+     */
+    public static SampledSet getWholeSpatialDomain(FieldImpl grid)
+            throws VisADException {
+        // find first non-missing grid
+        if (isTimeSequence(grid)) {
+            try {
+                Set timeDomain = Util.getDomainSet(grid);
+                SampledSet ss0 = null;
+                int slength = 0;
+                for (int i = 0; i < timeDomain.getLength(); i++) {
+                    FieldImpl sample = (FieldImpl) grid.getSample(i);
+                    if ( !sample.isMissing()) {
+                        SampledSet ss = getSpatialDomain(grid, i);
+                        int ll = ss.getLength();
+                        if(ll > slength) {
+                            slength = ll;
+                            ss0 = (SampledSet)ss.clone();
+                        }
 
+                    }
+                }
+                return ss0;
+            } catch (RemoteException excp) {
+                throw new VisADException("RemoteException");
+            }
+        }
+        return getSpatialDomain(grid, 0);
+    }
 
     /**
      * Get the spatial domain for this grid at the specified time step.
