@@ -630,8 +630,12 @@ public class TextPointDataSource extends PointDataSource {
                     setInError(true, false, "");
                     return null;
                 }
-                ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, dataProperties, sampleIt,
+                // if delimiter was set by the gui, use that
+                String delim = (this.delimiter != null)
+                               ? this.delimiter
+                               : delimiter;
+                ta = new TextAdapter(getInputStream(contents), delim, map,
+                                     params, dataProperties, sampleIt,
                                      skipPattern, streamProcessorToUse);
             }
             try {
