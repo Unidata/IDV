@@ -32,6 +32,7 @@ import ucar.unidata.idv.ControlContext;
 
 
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
@@ -100,7 +101,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
     private boolean isPlanView = true;
 
     /** vertical interval */
-    private Real currentVerticalInt;
+    private Real currentVerticalInt = new Real(125.0);
 
     /** raw data and working data */
     private FieldImpl fieldImpl, workingFI;
@@ -112,7 +113,10 @@ public class ProfilerMultiStationControl extends ProfilerControl {
     private float currentLevel;
 
     /** level */
-    private float levelValue = 3000.0f;
+    private float levelValue = 17000.0f;
+
+    /** level */
+    private float initLevelValue = 3000.0f;
 
     /** displayable for the data depiction */
     private FlowDisplayable mappedDisplayable;
@@ -167,6 +171,21 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         addDisplayable(mappedDisplayable);
 
         displayIs3D = isDisplay3D();
+        int[] percent = {
+            90, 80, 70, 60, 50, 40, 30, 20, 10
+        };
+        int   ii      = 0;
+        // check and set data level
+        while ( !checkDataLevelValue(levelValue) && (ii < 9)) {
+            levelValue         = levelValue * percent[ii] / 100;
+            currentVerticalInt = new Real(levelValue / 25.0);
+            ii++;
+        }
+
+        if (levelValue < 5000) {
+            initLevelValue = 1000;
+        }
+
         loadData();
 
         /*
@@ -186,6 +205,52 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         return true;
     }
 
+    /**
+     * check the input zlevel is not too high for the obs data point
+     *
+     * @param zlevel _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public boolean checkDataLevelValue(float zlevel)
+            throws VisADException, RemoteException {
+
+        // internal working "grids"
+        FlatField oneTimeFF;
+
+        float     interval = (float) currentVerticalInt.getValue();
+
+        // or will use desired level limits for plan view
+        float zmin    = zlevel - interval,
+              zmax    = zlevel + interval;
+
+        Set   timeSet = fieldImpl.getDomainSet();
+
+        // extract the multi-position FlatField of obs for each time step
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            // get Profiler winds  for this one time step
+            oneTimeFF = (FlatField) fieldImpl.getSample(i);
+
+            // for each ob in this time's collection
+            for (int j = 0; j < oneTimeFF.getLength(); j++) {
+
+                Gridded3DSet tds     =
+                    (Gridded3DSet) oneTimeFF.getDomainSet();
+                float[][]    latlonz = tds.getSamples(false);
+                // test if this z altitude value matches either spacings
+                // for 3D plot; or single level value for Plan View.
+                if ((latlonz[2][j] >= zmin) && (latlonz[2][j] <= zmax)) {
+                    return true;
+
+                }  // if this ob's altitude is ok, save it
+            }      // end checking each ob in this oneTimeFF
+            return false;
+        }
+        return false;
+    }
 
     /**
      * Load the data
@@ -199,7 +264,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         // if plan view, set initial level at 3000 m above MSL
         if (getIsPlanView()) {
             //System.out.println (" resetDataVerticalLocation to level 3000");
-            resetDataVerticalLocation(new Real(0), getLevel(), false);
+            resetDataVerticalLocation(new Real(0), initLevelValue, false);
             mappedDisplayable.loadData(workingFI);
         } else {
             //System.out.println (" make full 3d view");
@@ -271,9 +336,9 @@ public class ProfilerMultiStationControl extends ProfilerControl {
     protected JComponent doMakeExtraComponent() {
         if (getIsPlanView()) {
             JComboBox box = GuiUtils.createValueBox(this, CMD_LEVEL,
-                                (int) levelValue,
-                                Misc.createIntervalList(500, 17000, 500),
-                                true);
+                                (int) initLevelValue,
+                                Misc.createIntervalList(500,
+                                    (int) levelValue, 500), true);
             return GuiUtils.label("Plan level (m MSL): ", GuiUtils.wrap(box));
         } else {
             return doMakeVerticalIntervalComponent();
@@ -412,9 +477,11 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         // lists of locations and dir-spd wind obs at the locations
         ArrayList locList = new ArrayList();
         ArrayList dsList  = new ArrayList();
-
-        currentVerticalInt = verticalInt;
-        currentLevel       = zlevel;
+        if (verticalInt.getValue() != 0.0) {
+            currentVerticalInt = verticalInt;
+        }
+        currentLevel = zlevel;
+        float interval = (float) currentVerticalInt.getValue();
 
         // complete data's fieldImpl is of function type 
         // (DateTime -> ((lat,lon,z)->(dir,spd)) )
@@ -423,8 +490,8 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         float spacing = (float) verticalInt.getValue();
 
         // or will use desired level limits for plan view
-        float zmin    = zlevel - 125.0f,
-              zmax    = zlevel + 125.0f;
+        float zmin    = zlevel - interval,
+              zmax    = zlevel + interval;
 
         Set   timeSet = fieldImpl.getDomainSet();
 
@@ -447,11 +514,9 @@ public class ProfilerMultiStationControl extends ProfilerControl {
 
                 // test if this z altitude value matches either spacings
                 // for 3D plot; or single level value for Plan View.
-                if ((use3D && ((latlonz[2][j] + 125) % spacing <= 125.0
-                               || (latlonz[2][j] % spacing)
-                                  <= 125.0)) || ( !use3D
-                                      && (latlonz[2][j] >= zmin)
-                                      && (latlonz[2][j] <= zmax))) {
+                if ((use3D && ((latlonz[2][j] + interval)
+                        % spacing <= interval || (latlonz[2][j]
+                            % spacing) <= interval)) || ( !use3D && (latlonz[2][j] >= zmin) && (latlonz[2][j] <= zmax))) {
                     // have an ob within 124 meters of the desired level
                     // or spacing altitude; retain and display this observation
 
@@ -516,7 +581,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             //                 " has "+newonetimeFF.getLength()+
             //                 " observed wind values in this plot");
 
-            if (i == 0) {
+            if ((i == 0) || (workingFI == null)) {
                 // define working grid, as yet empty of data)
                 workingFI = new FieldImpl(
                     new FunctionType(
@@ -573,7 +638,23 @@ public class ProfilerMultiStationControl extends ProfilerControl {
      * @return MapProjection  for the data
      */
     public MapProjection getDataProjection() {
-        MapProjection mp = super.getDataProjection();
+        MapProjection mp = null;
+
+        try {
+            Data data = fieldImpl;  //info.getDisplayable().getData();
+            if ((data != null) && (data instanceof FieldImpl)) {
+                try {
+                    mp = GridUtil.getNavigation(
+                        GridUtil.getWholeSpatialDomain((FieldImpl) data));
+                } catch (Exception e) {
+                    mp = null;
+                }
+
+            }
+        } catch (Exception e) {
+            logException("Getting projection from data", e);
+        }
+
         if (mp == null) {
             return null;
         }
