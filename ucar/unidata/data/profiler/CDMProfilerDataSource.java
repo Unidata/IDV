@@ -779,7 +779,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
         if (size < 3) {
             name = name + StringUtil.join(", ", selectedStations);
         } else {
-            name = name + size + " stations";
+            name = name + " " + size + " stations";
         }
 
         setName(name);
@@ -1144,7 +1144,8 @@ public class CDMProfilerDataSource extends FilesDataSource {
         List singleDC = DataCategory.parseCategories(
                             DataCategory.CATEGORY_PROFILER_ONESTA, false);
         List compositeDC =
-            DataCategory.parseCategories(DataCategory.CATEGORY_PROFILER_3D,
+            DataCategory.parseCategories(DataCategory.CATEGORY_PROFILER_PLAN + ";"
+                                   + DataCategory.CATEGORY_PROFILER_3D,
                                          false);
         compositeDC.addAll(singleDC);
 
