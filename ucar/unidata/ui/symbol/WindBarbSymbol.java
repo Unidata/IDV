@@ -324,15 +324,15 @@ public class WindBarbSymbol extends MetSymbol {
 
             // calc how long the windBarb should be
             int len = 0;
-            while (speed >= 48.0) {
+            while (speed >= 47.5) {
                 len   += 6;
                 speed -= 50;
             }
-            while (speed >= 8.0) {
+            while (speed >= 7.5) {
                 len   += 3;
                 speed -= 10;
             }
-            if (speed >= 3.0) {
+            if (speed >= 2.5) {
                 len += 3;
             }
             lenBarb = Math.max(len, width);
@@ -352,16 +352,16 @@ public class WindBarbSymbol extends MetSymbol {
             // draw the flags and lines
             int start = 0;
             speed = windSpeed;
-            while (speed >= 48.0) {
+            while (speed >= 47.5) {
                 start = draw50knotFlag(g, start);
                 speed -= 50;
             }
-            while (speed >= 8.0) {
+            while (speed >= 7.5) {
                 start = draw10knotLine(g, start);
                 speed -= 10;
             }
-            if (speed >= 3.0) {
-                if ((windSpeed >= 3.0) && (windSpeed < 8.0)) {  // special case
+            if (speed >= 2.5) {
+                if ((windSpeed >= 2.5) && (windSpeed < 7.5)) {  // special case
                     start = 3;
                 }
                 drawRotatedLine(g, 0, -lenBarb + start, .2 * lenBarb,
