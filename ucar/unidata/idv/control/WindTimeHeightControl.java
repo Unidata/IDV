@@ -120,6 +120,8 @@ public class WindTimeHeightControl extends ProfilerControl {
     /** selected data choice */
     protected DataChoice currentDataChoice = null;
 
+    /** from data choice */
+    private float currentLevel;
     /**
      *  Cstr; does nothing. See init() for creation actions.
      */
@@ -293,9 +295,9 @@ public class WindTimeHeightControl extends ProfilerControl {
             return;
         }
         currentVerticalInt = verticalInt;
-        int numbZs = 1 + (int) (16000.0 / verticalInt.getValue());
+        int numbZs = 1 + (int) (currentLevel / verticalInt.getValue());
         Linear1DSet newZset = new Linear1DSet(RealType.Altitude, 0.0,
-                                  16000.0, numbZs);
+                                  currentLevel, numbZs);
         Set       timeSet = fieldImpl.getDomainSet();
         FieldImpl rvFI    = null;
         FlatField oneTimeFF, newFF;
@@ -438,20 +440,18 @@ public class WindTimeHeightControl extends ProfilerControl {
 
             if (hii < 5000) {
                 double averageSpacing = (hii - loo) / (double) (step);
-                yScale.setTickBase(loo);
-                yScale.setMajorTickSpacing(averageSpacing * step);
-                yScale.setMinorTickSpacing(averageSpacing);
-                yScale.setMajorTickSpacing(500);
-                yScale.setMinorTickSpacing(100);
-                yScale.createStandardLabels(4000, 0, 0, 500);
-                profileDisplay.setYRange(loo, hii);
-            } else {
+                averageSpacing = (int)(averageSpacing/100)* 100.0;
+                yScale.setMajorTickSpacing(averageSpacing);
+                yScale.setMinorTickSpacing(averageSpacing/step);
+                yScale.createStandardLabels(hii, 0, 0, averageSpacing);
+                profileDisplay.setYRange(0, hii);
+            } else {  // for anything above 5000
                 yScale.setMajorTickSpacing(2000);
                 yScale.setMinorTickSpacing(500);
                 yScale.createStandardLabels(16000, 0, 0, 2000);
-                profileDisplay.setYRange(loo, hii);
+                profileDisplay.setYRange(0, hii);
             }
-
+            currentLevel = hii;
         } catch (RemoteException re) {}
     }
 
