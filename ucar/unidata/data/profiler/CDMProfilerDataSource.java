@@ -536,17 +536,15 @@ public class CDMProfilerDataSource extends FilesDataSource {
                     data[i][1] = (Double) lonList.get(i);
                     data[i][2] = (Double) altList.get(i);
                     data[i][3] = (Double) timeList.get(i);
-                    double spd = getWindSpd((Double) uSpdList.get(i),
+                    data[i][4] = getWindSpd((Double) uSpdList.get(i),
                                             (Double) vSpdList.get(i));
-                    double speed = CommonUnits.METERS_PER_SECOND.toThis(spd, CommonUnits.KNOT);
-                    data[i][4] = speed;
                     data[i][5] = getWindDir((Double) uSpdList.get(i),
                                             (Double) vSpdList.get(i));
                     latVector.add(latList.get(i));
                     lonVector.add(lonList.get(i));
                     altVector.add(altList.get(i));
                     timeVector.add(timeList.get(i));
-                    windSpdVector.add(speed);
+                    windSpdVector.add(data[i][4]);
                     windDirVector.add(data[i][5]);
                 }
 
