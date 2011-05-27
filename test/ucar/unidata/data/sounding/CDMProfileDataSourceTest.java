@@ -1,4 +1,4 @@
-package ucar.unidata.data.point;
+package ucar.unidata.data.sounding;
 
 //~--- non-JDK imports --------------------------------------------------------
 

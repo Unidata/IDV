@@ -1,4 +1,4 @@
-package ucar.unidata.data.point;
+package ucar.unidata.data.sounding;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -11,6 +11,7 @@ import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.point.PointDataSource;
 import ucar.unidata.geoloc.LatLonRect;
 import visad.FieldImpl;
 import visad.VisADException;
