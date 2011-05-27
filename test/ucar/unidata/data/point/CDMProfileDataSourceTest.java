@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 /**
  * The Class CDMPointDataSourceTest.
  */
-public class CDMPointDataSourceTest {
+public class CDMProfileDataSourceTest {
     
     /**
      * Test make obs.

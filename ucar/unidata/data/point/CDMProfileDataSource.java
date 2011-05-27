@@ -18,14 +18,14 @@ import visad.VisADException;
 /**
  * The Class CDMPointDataSource.
  */
-public class CDMPointDataSource extends PointDataSource {
+public class CDMProfileDataSource extends PointDataSource {
     
     /**
      * Instantiates a new cDM point data source.
      *
      * @throws VisADException the vis ad exception
      */
-    public CDMPointDataSource() throws VisADException {
+    public CDMProfileDataSource() throws VisADException {
         super();
     }
 
