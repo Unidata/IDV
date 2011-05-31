@@ -39,7 +39,6 @@ import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.*;
 
 import ucar.visad.Util;
-import ucar.visad.quantities.CommonUnits;
 
 
 import visad.*;
@@ -123,8 +122,8 @@ public class CDMProfilerDataSource extends FilesDataSource {
     RealType[] rTypes = {
         RealType.Latitude, RealType.Longitude, RealType.Altitude,
         RealType.Time,
-        DataUtil.makeRealType("SPD", DataUtil.parseUnit("m/s")),
-        DataUtil.makeRealType("DIR", DataUtil.parseUnit("degree_N"))
+        DataUtil.makeRealType("SPD", CommonUnit.meterPerSecond),
+        DataUtil.makeRealType("DIR", CommonUnit.degree)
     };
 
     /** _more_ */
@@ -519,9 +518,10 @@ public class CDMProfilerDataSource extends FilesDataSource {
                         units[1] = sd.findMember("staLon").getUnitsString();
                         units[2] = "meter";  //sd.findMember("levels").getUnitsString();
                         units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
-                        units[4] = "m/s";
-                        units[5] = "degree_N";
-
+                        //units[4] = "knots";
+                        //units[5] = "degree_N";
+                        units[4] = sd.findMember("windSpeed").getUnitsString();
+                        units[5] = "degree";
                     }
 
                 }
@@ -835,10 +835,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
                         altList.add(sd.convertScalarDouble("levels")
                                     + st.getAltitude());
                         timeList.add((double) dateTime.getValue());  //sd.convertScalarFloat("observationTime"));
-                        String unitStr = sd.findMember("windSpeed").getUnitsString();
-                        double spdValue = (double)sd.convertScalarDouble("windSpeed");
-                        double speed = CommonUnits.METERS_PER_SECOND.toThis(spdValue, Util.parseUnit(unitStr));
-                        windSpdList.add(speed);
+                        windSpdList.add(sd.convertScalarDouble("windSpeed"));
                         windDirList.add(sd.convertScalarDouble("windDir"));
                     }
                     if (ii == 0) {
@@ -847,9 +844,8 @@ public class CDMProfilerDataSource extends FilesDataSource {
                             sd.findMember("longitude").getUnitsString();
                         units[2] = sd.findMember("levels").getUnitsString();
                         units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
-                        String unitStr = sd.findMember("windSpeed").getUnitsString();
-                        units[4] = CommonUnits.METERS_PER_SECOND.toString();
-                          //  sd.findMember("windSpeed").getUnitsString();
+                        units[4] =
+                            sd.findMember("windSpeed").getUnitsString();
                         units[5] = sd.findMember("windDir").getUnitsString();
 
                     }
