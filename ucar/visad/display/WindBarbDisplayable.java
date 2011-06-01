@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -22,21 +22,22 @@ package ucar.visad.display;
 
 
 import ucar.visad.WindBarb;
-
-
 import ucar.visad.quantities.CommonUnits;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.DataRenderer;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Unit;
+import visad.UnitException;
+import visad.VisADException;
 
-import visad.java2d.*;
+import visad.bom.BarbRenderer;
 
-import visad.util.DataUtility;
-
+import visad.java2d.DisplayRendererJ2D;
 
 
 import java.rmi.RemoteException;
-
-import java.util.Iterator;
 
 
 /**
@@ -60,7 +61,7 @@ public class WindBarbDisplayable extends FlowDisplayable {
      */
     public WindBarbDisplayable(String name, RealTupleType rTT)
             throws VisADException, RemoteException {
-    	this(name,rTT,false);
+        this(name, rTT, false);
     }
 
     /**
@@ -70,13 +71,15 @@ public class WindBarbDisplayable extends FlowDisplayable {
      * @param name           The name for the displayable.
      * @param rTT        The VisAD RealTupleType of the parameter.  May be
      *                          <code>null</code>.
+     * @param useSpeedForColor _more_
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public WindBarbDisplayable(String name, RealTupleType rTT, boolean useSpeedForColor)
+    public WindBarbDisplayable(String name, RealTupleType rTT,
+                               boolean useSpeedForColor)
             throws VisADException, RemoteException {
         super(name, rTT, 0.1f, useSpeedForColor);
-        
+
     }
 
     /**
@@ -86,11 +89,11 @@ public class WindBarbDisplayable extends FlowDisplayable {
      *                     instance.
      */
     protected DataRenderer getDataRenderer() {
-        return (getDisplay().getDisplayRenderer()
-                instanceof DisplayRendererJ2D)
-               ? (DataRenderer) new visad.bom.BarbRendererJ2D()
-               : (DataRenderer) new MyBarbRenderer();
-        //: (DataRenderer) new visad.bom.BarbRendererJ3D();
+        BarbRenderer br = (getDisplay().getDisplayRenderer()
+                           instanceof DisplayRendererJ2D)
+                          ? new visad.bom.BarbRendererJ2D()
+                          : new MyBarbRenderer();
+        return (DataRenderer) br;
     }
 
     /**
@@ -144,7 +147,7 @@ public class WindBarbDisplayable extends FlowDisplayable {
      *
      * @author IDV Development Team
      */
-    protected static class MyBarbRenderer extends visad.bom.BarbRendererJ3D {
+    protected class MyBarbRenderer extends visad.bom.BarbRendererJ3D {
 
         /**
          * Ctor
@@ -180,6 +183,16 @@ public class WindBarbDisplayable extends FlowDisplayable {
                                   float f1, float[] vx, float[] vy,
                                   float[] vz, int[] numv, float[] tx,
                                   float[] ty, float[] tz, int[] numt) {
+            // WindBarb.makeBarb(New) always expects f0 and f1 to be in m/s
+            Unit u = speedUnit;
+            if ((u != null) && Unit.canConvert(u, CommonUnit.meterPerSecond)
+                    && !u.equals(CommonUnit.meterPerSecond)) {
+                try {
+                    // convert meters per second to knots
+                    f0 = (float) CommonUnit.meterPerSecond.toThis(f0, u);
+                    f1 = (float) CommonUnit.meterPerSecond.toThis(f1, u);
+                } catch (UnitException ue) {}
+            }
             return WindBarb.makeBarbNew(south, x, y, z, scale, pt_size, f0,
                                         f1, vx, vy, vz, numv, tx, ty, tz,
                                         numt);

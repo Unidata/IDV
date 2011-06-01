@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,18 +24,30 @@ package ucar.visad.display;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
-import visad.*;
+import visad.BadMappingException;
+import visad.CommonUnit;
+import visad.ConstantMap;
+import visad.Display;
+import visad.EarthVectorType;
+import visad.FieldImpl;
+import visad.FlatField;
 import visad.FlowControl;
+import visad.MathType;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.RealVectorType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
-import visad.util.DataUtility;
 
 import java.awt.Color;
 
-
-
 import java.rmi.RemoteException;
-
-import java.util.Iterator;
 
 
 /**
@@ -123,6 +135,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** max flow range */
     private double flowMaxValue = Double.POSITIVE_INFINITY;
 
+    /** max flow range */
+    protected Unit speedUnit = null;
+
     /**
      * Constructs from a name for the Displayable and the type of the
      * parameter, and the desired size of "scale"
@@ -135,7 +150,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public FlowDisplayable(String name, RealTupleType rTT, float flowscale, boolean useSpeedForColor)
+    public FlowDisplayable(String name, RealTupleType rTT, float flowscale,
+                           boolean useSpeedForColor)
             throws VisADException, RemoteException {
 
         super(name, null, null, true);
@@ -148,7 +164,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             setFlowMaps();
         }
     }
-    
+
     /**
      * Constructs from a name for the Displayable and the type of the
      * parameter, and the desired size of "scale"
@@ -497,6 +513,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     : Display.Flow2Y));
             spdIndex = 0;  // color speed by u component
         }
+        speedUnit = units[spdIndex];
 
         if (get3DFlow()) {
             if (Unit.canConvert(units[2], CommonUnit.meterPerSecond)) {
@@ -513,7 +530,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
 
         // set RealType to color by speed
-        if ( useSpeedForColor && !isCartesian) {
+        if (useSpeedForColor && !isCartesian) {
             //if ( !coloredByAnother) {
             setRGBRealType(
                 (RealType) flowRealTupleType.getComponent(spdIndex));
