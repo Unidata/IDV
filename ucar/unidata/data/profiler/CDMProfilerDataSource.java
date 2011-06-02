@@ -520,8 +520,9 @@ public class CDMProfilerDataSource extends FilesDataSource {
                         units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
                         //units[4] = "knots";
                         //units[5] = "degree_N";
-                        units[4] = sd.findMember("windSpeed").getUnitsString();
+                        units[4] = sd.findMember("uComponent").getUnitsString();
                         units[5] = "degree";
+
                     }
 
                 }
