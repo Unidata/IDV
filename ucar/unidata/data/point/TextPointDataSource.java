@@ -1428,19 +1428,20 @@ public class TextPointDataSource extends PointDataSource {
             String attrs = "";
             if (name.equals("Time")) {
                 if (unit.trim().length() > 0) {
-                    attrs = attrs + " fmt=\"" + unit + "\" ";
+                    attrs = attrs + "fmt=\"" + unit + "\" ";
                 }
 
             } else {
                 if (unit.trim().length() > 0) {
-                    attrs = attrs + " unit=\"" + unit + "\" ";
+                    attrs = attrs + "unit=\"" + unit + "\" ";
                 }
             }
             if (missing.length() > 0) {
-                attrs = attrs + " missing=\"" + missing + "\" ";
+                attrs = attrs + "missing=\"" + missing + "\" ";
             }
             if (extra.length() > 0) {
-                attrs = attrs + " " + extra;
+                //attrs = attrs + " " + extra;
+                attrs = attrs + extra;
                 String colspan = StringUtil.findPattern(extra,
                                      "colspan *= *\"([^\"]+)\"");
                 if (colspan != null) {

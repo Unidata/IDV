@@ -630,7 +630,6 @@ public class GridMath {
             float[][]     values2      = null;
             int[][]       nums         = null;
             final Set     timeDomain   = Util.getDomainSet(grid);
-            int           numTimeSteps = timeDomain.getLength() / idxStride;
             for (int timeStepIdx = startIdx;
                     timeStepIdx < timeDomain.getLength();
                     timeStepIdx += idxStride) {
