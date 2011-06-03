@@ -20,14 +20,10 @@
 
 package ucar.visad;
 
-
-import visad.*;
-
-import visad.java3d.*;
-
-import java.rmi.*;
-
-import java.util.*;
+import visad.VisADException;
+import visad.VisADGeometryArray;
+import visad.VisADLineArray;
+import visad.VisADTriangleArray;
 
 
 /**
