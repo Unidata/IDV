@@ -194,52 +194,12 @@ You can specify  the type of algorithm you want to use for converting from press
 
 
 
-[ug::preference  {Cache Data in Memory}]
-The IDV normally tries to cache data that it loads in memory. You can turn this behavior off with a preference.
-
-[ug::preference  {Disk Cache Size}]
-The IDV will cache some data sets to disk to eliminate network latency.  Specify the maximum amount of disk size with this preference.
-
-[ug::preference  {Write Grib Index in Disk Cache}]
-The IDV will normally cache grib data index sets to disk in the default directory: .unidata/idv/DefaultIdv/tmp/nj22.  If you uncheck this box,
-the IDV will save those index sets to the same directory as the grib datasets. When you make the change, you need to restart the IDV for this
-change to take effect, and you need to make sure the write permission on this data directory.
-
-[ug::preference  {Thread Count}]
-The IDV can do processing in multiple threads. This allows one to take advantage of mulitple core chip architectures.
-One can set both the thread count for rendering and for data reading. 
-For rendering, each time step for each display is rendered separately.
-We suggest that for rendering running with 2 threads is optimal. We have not seen large improvements
-with a higher number of threads (due to memory issues). Also, it is easy to exceed the maximum memory
-amount if one is rendering in a large number of threads.
-<p>
-The data reading thread count is how many parallel reads (e.g., per time step) there are when accessing data
-on remote servers (e.g., THREDDS/OpenDAP, ADDE).
-There is no optimal thread count for data reading because it depends on the configuration of the server machine.
-We have found that 4 works well.
-
-
-[ug::preference {Max Image Size}]
-This field allows you to set a maximum image size (in pixels) that is to be displayed.
-When this preference is set the image display will adjust the Pixel Sampling to
-reduce the image to less than the preferred value. This allows for the initial
-display of large images without causing  memory issues.
-
-
-[ug::preference {Grid Threshold}]
-This field allows you to set a size limit for holding grids in memory.
-Grids larger than this size will be cached to disk instead of held
-in memory during the IDV session.  This allows loading large grids and
-long loops of grids without a major performance hit.
-
-
 [ug::prefGroup View]
-
-[ht::cimg images/preferences/MainDisplay.gif {View Preferences}]
-
 
 The <b>View</b> tab allows you to set preferences related to the
 main 3D map view window.
+
+[ht::cimg images/preferences/MainDisplay.gif {View Preferences}]
 
 
 [ug::prefSubGroup Legends]
@@ -377,7 +337,6 @@ any modifier (i.e., control, shift):
 
 [ug::prefGroup {Toolbar}]
 
-[ht::cimg images/preferences/Toolbar.gif {Toolbar Preferences}]
 Allows you to define what action/icons are displayed in the toolbar. The list on the
 left shows all of the available actions. The list on the right
 shows the actions which make up the toolbar. You can add/remove actions
@@ -387,12 +346,9 @@ list to the one before any changes have been made.
 The [ug::button Reload System] button resets  the toolbar list to
 the original one defined in the system.
 
-
+[ht::cimg images/preferences/Toolbar.gif {Toolbar Preferences}]
 
 [ug::prefGroup Available Choosers]
-
-[ht::cimg images/preferences/Choosers.gif {Chooser Preferences}]
-
 
 The <b>Available Choosers</b> tab  allows you to define what types of data 
 choosers to use. This is a way to simplify the data chooser window,
@@ -402,9 +358,9 @@ to  &quot;Use all choosers&quot; or
 &quot;Use selected choosers&quot;
 and select individual choosers to use.
 
-[ug::prefGroup Available Displays]
+[ht::cimg images/preferences/Choosers.gif {Chooser Preferences}]
 
-[ht::cimg images/preferences/Displays.gif {Display Preferences}]
+[ug::prefGroup Available Displays]
 
 
 The <b>Available Displays</b> tab allows you to specify  what types of displays to 
@@ -416,12 +372,67 @@ The list of displays is hierarchical. You can turn on or off
 the user of all displays, specific groupings or individual
 displays. 
 
+[ht::cimg images/preferences/Displays.gif {Display Preferences}]
+
 [ug::prefGroup System]
+
+The <b>System</b> tab allows you to change the system settings such 
+as the amount of memory allocated to the IDV, data caching, threading and
+some Java 3D settings.  In order for these changes to take effect, 
+the user will have to restart the IDV. 
 
 [ht::cimg images/preferences/System.gif {System Preferences}]
 
-The <b>System</b> tab allows you to change the IDV memory consumption settings. 
-In order for these changes to take effect, the user will have to restart the IDV. 
+[ug::preference  {Memory}]
+You can set the amount of memory allocated to the IDV as a percentage of
+the total system memory or a specific amount (in megabytes).  On 32-bit
+systems, the maximum is 1.5 gigabytes (1500 MB).
+
+[ug::preference  {Cache Data in Memory}]
+The IDV normally tries to cache data that it loads in memory. You can turn this behavior off with a preference.
+
+[ug::preference  {Disk Cache Size}]
+The IDV will cache some data sets to disk to eliminate network latency.  Specify the maximum amount of disk size with this preference.
+
+[ug::preference  {Write Grib Index in Disk Cache}]
+The IDV will normally cache grib data index sets to disk in the default directory: .unidata/idv/DefaultIdv/tmp/nj22.  If you uncheck this box,
+the IDV will save those index sets to the same directory as the grib datasets. When you make the change, you need to restart the IDV for this
+change to take effect, and you need to make sure the write permission on this data directory.
+
+[ug::preference  {Thread Count}]
+The IDV can do processing in multiple threads. This allows one to take advantage of mulitple core chip architectures.
+One can set both the thread count for rendering and for data reading. 
+For rendering, each time step for each display is rendered separately.
+We suggest that for rendering running with 2 threads is optimal. We have not seen large improvements
+with a higher number of threads (due to memory issues). Also, it is easy to exceed the maximum memory
+amount if one is rendering in a large number of threads.
+<p>
+The data reading thread count is how many parallel reads (e.g., per time step) there are when accessing data
+on remote servers (e.g., THREDDS/OpenDAP, ADDE).
+There is no optimal thread count for data reading because it depends on the configuration of the server machine.
+We have found that 4 works well.
+
+
+[ug::preference {Max Image Size}]
+This field allows you to set a maximum image size (in pixels) that is to be displayed.
+When this preference is set the image display will adjust the Pixel Sampling to
+reduce the image to less than the preferred value. This allows for the initial
+display of large images without causing  memory issues.
+
+[ug::preference {Java 3D}]
+These preferences control some Java 3D settings that reduce memory usage when
+checked.
+<ul>
+<li><b>Enable geometry by reference</b> - does not copy geometries (lines,
+triangles, etc).  If you have problems with spurious map lines, turn this
+off.</li>
+<li><b>Enable access to image data by reference</b> - does not copy image textures</li>
+<li><b>Enable Non-Power of Two (NPOT) textures - USE WITH CAUTION</b> - 
+by default, all textures (images, color shaded displays) are expanded to 
+fill a power of two (e.g. 512, 1024, etc) size.  By checking this, the 
+renderer will not expand the size to a power of 2.  This is not well tested 
+and does not work on all systems. </li>
+</ul>
 
 </body>
 

@@ -41,12 +41,12 @@ allocation amount is 80% of the available RAM. On 32 bit computers, the
 amount is the minimum of 1.5GB and the available RAM minus 512MB. <p> 
 
 In addition, users can change the memory settings in  the [ht::menu Edit Preferences],
-System tab. In order for these changes to take effect, the user will have to
+<b>System</b> tab. In order for these changes to take effect, the user will have to
 restart the IDV. <p>
 
 In rare circumstances, the IDV start script cannot determine the optimal amount 
 of memory for the IDV. In this unusual case, the IDV start script allocates 512MB. 
-The user can still go to the [ht::menu Edit Preferences], System tab and adjust memory 
+The user can still go to the [ht::menu Edit Preferences], <b>System</b> tab and adjust memory 
 settings. Again, the user must restart the IDV in order for this to take effect. <p>
 
 In other exceptional situations, the user may still wish to override the automatic
@@ -63,7 +63,7 @@ disk or a remote server.  If you are only displaying/using a
 field (i.e. not using it for multiple displays or calculations), 
 you can keep the IDV from caching it in memory.   You can
 turn off data caching by unchecking the [ht::command {Cache data in memory}]
-checkbox on the [ht::command {Data &amp; Formats}] tab of
+checkbox on the [ht::command {System}] tab of
 the user preferences (accessible from the [ht::menu Edit Preferences] menu).
 
 
@@ -72,7 +72,7 @@ the user preferences (accessible from the [ht::menu Edit Preferences] menu).
 
 The IDV has a caching facility where actively used data (e.g., gridded fields, satellite image, radar) is held in a memory cache. As the amount of data increases the IDV will write the data out to a temporary space on your local disk. If that data is needed again (e.g., rerendering the display) then the IDV will need to go to disk and re-read the data. This may cause some delays. 
 <p>
-The memory cache size is intially set at 30% of your maximum memory. This can be changed in the User Preferences under the &quot;Formats and Data&quot; tab.
+The memory cache size is intially set at 30% of your maximum memory. This can be changed in the [ht::menu Edit Preferences], <b>System</b> tab.
 <p>
 In a worst case scenario you could have a very long animation loop of imagery. In this case every time one of the images is displayed while animating its data needs to be accessed. If you have very large images or a very long loop then the images needed to display will be on disk and the time it takes to read them from disk for display will be quite noticable. In this case you can reduce the resolution of the images, reduce the number of times being displayed or increase the cache and/or overall memory size.
 
@@ -85,7 +85,7 @@ You can also set the maximum size of a grid or image that will be displayed.
 This will allow you to download a large image or grid, but it will be 
 re-sampled before displaying if it is larger than the maximum size you 
 have asked for. You can set the maximum image/grid size under
-the [ht::command {Data &amp; Formats}] tab of
+the [ht::command {System}] tab of
 the user preferences (accessible from the [ht::menu Edit Preferences] menu).
 
 <subhead id="fastrender" xintoc="false" desc="Fast rendering reduces memory
@@ -113,7 +113,7 @@ to render individual time steps in parallel. You can also do remote data reads
 in parallel. This typically results in a 50% reduction in overall data 
 reading and rendering time.
 <p>
-There are 2  preferences in the Preferences-&gt;Data &amp; Format tab.
+There are 2  preferences in the [ht::menu Edit Preferences], <b>System</b> tab.
 One is the number of threads used for rendering. This defaults to the number
 of processors on your machine. The second is the number of threads used for
 data reading. This defaults to 4.  
