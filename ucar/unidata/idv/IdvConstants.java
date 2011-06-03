@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -131,7 +131,7 @@ public interface IdvConstants {
     /** is isl scripting interactive or batch */
     public static final String ARG_ISLINTERACTIVE = "-islinteractive";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_B64ISL = "-b64isl";
 
     /** an isl file */
@@ -312,23 +312,23 @@ public interface IdvConstants {
     public static final String ID_COMMANDSTORUN = "commandstorun";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_LEGEND_SHOWICONS = "idv.legend.showicons";
 
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_MINIMUMFRAMECYCLETIME =
         "idv.minimumframecycletime";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FIXFILELOCKUP = "idv.fixfilelockup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DISPLAYLIST_GROUP =
         "idv.displaylist.group";
 
@@ -339,26 +339,26 @@ public interface IdvConstants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_MAP_GLOBE_LEVEL = "idv.map.globe.level";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_MAP_MAP_LEVEL = "idv.map.map.level";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_MONITORPORT = "idv.monitorport";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_THREADS_RENDER = "idv.threads.render.max";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_THREADS_DATA = "idv.threads.render.data";
 
 
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_SHOWHIDDENFILES = "idv.showhiddenfiles";
 
     /** preference for scroll wheel */
@@ -551,6 +551,15 @@ public interface IdvConstants {
     /** Where to save zip data files */
     public static final String PREF_ZIDV_DIRECTORY = "idv.zidv.directory";
 
+    /** geometry by reference */
+    public static final String PREF_GEOMETRY_BY_REF =
+        "visad.java3d.geometryByRef";
+
+    /** image by reference */
+    public static final String PREF_IMAGE_BY_REF = "visad.java3d.imageByRef";
+
+    /** non-power of two textures */
+    public static final String PREF_NPOT_IMAGE = "visad.java3d.textureNpot";
 
     /** Some preference */
     public static final String PREF_OPEN_MERGE = "idv.open.merge";
@@ -580,7 +589,7 @@ public interface IdvConstants {
 
     /** Keep around the last archive dir */
     public static final String PREF_ARCHIVEDIR = "test.archivedir";
-    
+
     /** IDV memory usage */
     public static final String PREF_MEMORY = "idv.memory";
 

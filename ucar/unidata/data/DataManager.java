@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -319,8 +319,9 @@ public class DataManager {
 
         for (String visadProp : visadProperties) {
             System.setProperty(visadProp,
-                               dataContext.getIdv().getProperty(visadProp,
-                                   "false"));
+                               dataContext.getIdv().getStateManager()
+                                   .getPreferenceOrProperty(visadProp,
+                                       "false"));
         }
 
         SampledSet.setCacheSizeThreshold(
