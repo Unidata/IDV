@@ -171,15 +171,11 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         addDisplayable(mappedDisplayable);
 
         displayIs3D = isDisplay3D();
-        int[] percent = {
-            90, 80, 70, 60, 50, 40, 30, 20, 10
-        };
-        int   ii      = 0;
+
         // check and set data level
-        while ( !checkDataLevelValue(levelValue) && (ii < 9)) {
-            levelValue         = levelValue * percent[ii] / 100;
+        while ( !checkDataLevelValue(levelValue) ) {
+            levelValue         = levelValue *0.9f;
             currentVerticalInt = new Real(levelValue / 25.0);
-            ii++;
         }
 
         if (levelValue < 5000) {
