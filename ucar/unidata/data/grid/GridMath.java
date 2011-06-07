@@ -73,6 +73,15 @@ public class GridMath {
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
 
+    /** cyclic option */
+    public static final String OPT_CYCLIC = "cyclic";
+
+    /** missing option */
+    public static final String OPT_MISSING = "missing";
+
+    /** symmetric option */
+    public static final String OPT_SYMMETRIC = "symmetric";
+
     /** axis identifier - X */
     public static final String AXIS_X = "X";
 
@@ -263,7 +272,7 @@ public class GridMath {
             throws VisADException {
         return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
     }
-    
+
     /**
      * Compute the standard deviation of the grid at each point over time
      *
@@ -274,7 +283,8 @@ public class GridMath {
      *
      * @throws VisADException  On badness
      */
-    public static FieldImpl standardDeviationOverTime(FieldImpl grid, boolean makeTimes)
+    public static FieldImpl standardDeviationOverTime(FieldImpl grid,
+            boolean makeTimes)
             throws VisADException {
         return applyFunctionOverTime(grid, FUNC_STDEV, makeTimes);
     }
@@ -367,12 +377,12 @@ public class GridMath {
 
     /**
      *  ensemble grid min values
-     * 
+     *
      *  @param grid   ensemble grid
      * @param percent _more_
-     * 
+     *
      *  @return the new field
-     * 
+     *
      *  @throws VisADException  On badness
      */
     public static FieldImpl ensemblePercentileValues(FieldImpl grid,
@@ -383,11 +393,11 @@ public class GridMath {
 
     /**
      *  ensemble grid min values
-     * 
+     *
      *  @param grid   ensemble grid
-     * 
+     *
      *  @return the new field
-     * 
+     *
      *  @throws VisADException  On badness
      */
     public static FieldImpl ensembleModeValues(FieldImpl grid)
@@ -530,6 +540,170 @@ public class GridMath {
         }
     }
 
+    /**
+     * Create a running average across the time dimension.
+     *
+     * @param grid    grid to average
+     * @param wgts    number of steps to average
+     * @param opt  options for endpoints
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeWeightedRunningAverage(FieldImpl grid,
+            float[] wgts, String opt)
+            throws VisADException {
+        return runave(grid, wgts, -1, opt);
+    }
+
+    /**
+     * Create a running average across the time dimension.
+     *
+     * @param grid    grid to average
+     * @param nave    number of steps to average
+     * @param opt  options for endpoints
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeRunningAverage(FieldImpl grid, int nave,
+            String opt)
+            throws VisADException {
+        return runave(grid, null, nave, opt);
+    }
+
+    /**
+     * Create a running average across the time dimension.
+     *
+     * @param grid    grid to average
+     * @param wgts    number of steps to average
+     * @param nave    number of steps to average
+     * @param opt  options for endpoints
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static FieldImpl runave(FieldImpl grid, float[] wgts, int nave,
+                                    String opt)
+            throws VisADException {
+
+        float wsum = 0;
+        if (wgts != null) {
+            nave = wgts.length;
+            for (int i = 0; i < nave; i++) {
+                wsum += wgts[i];
+            }
+        } else {
+            wgts = new float[nave];
+            for (int i = 0; i < nave; i++) {
+                wgts[i] = 1.0f;
+                wsum    += 1f;
+            }
+        }
+        if (wsum > 1.0) {
+            wsum = 1f / wsum;
+        }
+        try {
+            if ( !GridUtil.isTimeSequence(grid) || (nave == 1)) {
+                return grid;
+            }
+            Set timeDomain   = Util.getDomainSet(grid);
+            int numTimeSteps = timeDomain.getLength();
+            int npts         = numTimeSteps;
+            if (nave > numTimeSteps) {
+                throw new VisADException(
+                    "Number of average steps is greater than number of times");
+            }
+            FieldImpl newGrid = (FieldImpl) grid.clone();
+            int       nav2    = nave / 2;
+            int       noe     = (nave % 2 == 0)
+                                ? 1
+                                : 0;
+            //System.out.println("nave = "+nave+", nav2 = "+nav2+", noe= "+noe);
+            FlatField sample      = (FlatField) newGrid.getSample(0);
+            float[][] missingData = Misc.cloneArray(sample.getFloats(false));
+            Misc.fillArray(missingData, Float.NaN);
+            int         lwork       = numTimeSteps + 2 * nav2;
+            float[][]   values      = null;
+            float[][][] work        = new float[lwork][][];
+            float[][][] x           = new float[npts][][];
+            int[]       timeIndices = new int[lwork];
+            // Prefill with missing values (OPT_MISSING)
+            //System.out.println("new array has " + lwork + " elements");
+            for (int n = 0; n < lwork; n++) {
+                work[n]        = missingData;
+                timeIndices[n] = -1;
+            }
+            for (int n = 0; n < npts; n++) {
+                sample = (FlatField) newGrid.getSample(n);
+                float[][] timeStepValues =
+                    Misc.cloneArray(sample.getFloats(false));
+                //System.out.println("setting timestep " + n + " at position " + (nav2+n));
+                x[n]                  = timeStepValues;
+                work[nav2 + n]        = x[n];
+                timeIndices[nav2 + n] = n;
+            }
+            int lpts = npts - 1;
+            if (opt.equals(OPT_SYMMETRIC)) {
+                for (int n = 0; n < nav2; n++) {
+                    //System.out.println("setting work array " + (nav2-(n+1)) + " with time " + (n+1));
+                    work[nav2 - (n + 1)]        = x[n + 1];
+                    timeIndices[nav2 - (n + 1)] = n + 1;
+                    //System.out.println("setting work array " + (lpts+nav2+(n+1)) + " with time " + (lpts-(n+1)));
+                    work[lpts + nav2 + (n + 1)]        = x[lpts - (n + 1)];
+                    timeIndices[lpts + nav2 + (n + 1)] = lpts - (n + 1);
+                }
+            } else if (opt.equals(OPT_CYCLIC)) {
+                for (int n = 0; n < nav2; n++) {
+                    //System.out.println("setting work array " + (nav2-(n+1)) + " with time " + (lpts-n));
+                    work[nav2 - (n + 1)]        = x[lpts - n];
+                    timeIndices[nav2 - (n + 1)] = lpts - n;
+                    //System.out.println("setting work array " + (lpts+nav2+n+1) + " with time " + (n));
+                    work[lpts + nav2 + n + 1]        = x[n];
+                    timeIndices[lpts + nav2 + n + 1] = n;
+                }
+            }
+            //Misc.printArray("times", timeIndices);
+            for (int n = 0; n < npts; n++) {
+                int       nmid   = n + nav2 + noe;
+                int       mstart = nmid - nav2;
+                int       mlast  = mstart + nave;
+                float[][] sum    = Misc.cloneArray(missingData);
+                Misc.fillArray(sum, 0);
+                boolean haveMissing = false;
+                for (int m = mstart; m < mlast; m++) {
+                    //System.out.println("for time " + n + ", adding time " + timeIndices[m]);
+                    values = work[m];
+                    if ( !Misc.equals(values, missingData)) {
+                        for (int i = 0; i < values.length; i++) {
+                            for (int j = 0; j < values[i].length; j++) {
+                                sum[i][j] += values[i][j] * wgts[m - mstart];
+                            }
+                        }
+                    } else {
+                        haveMissing = true;
+                    }
+                }
+                if ( !haveMissing) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            sum[i][j] *= wsum;
+                        }
+                    }
+                } else {
+                    sum = missingData;
+                }
+                sample = (FlatField) newGrid.getSample(n);
+                sample.setSamples(sum, false);
+            }
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException in timeStepFunc");
+        }
+    }
+
 
     /**
      * Sum each grid point
@@ -623,23 +797,23 @@ public class GridMath {
                 newGrid.setSamples(grid.getFloats(false), true);
                 return newGrid;
             }
-            final boolean doMax        = function.equals(FUNC_MAX);
-            final boolean doMin        = function.equals(FUNC_MIN);
-            final boolean doStd        = function.equals(FUNC_STDEV);
-            float[][]     values       = null;
-            float[][]     values2      = null;
-            int[][]       nums         = null;
-            final Set     timeDomain   = Util.getDomainSet(grid);
+            final boolean doMax      = function.equals(FUNC_MAX);
+            final boolean doMin      = function.equals(FUNC_MIN);
+            final boolean doStd      = function.equals(FUNC_STDEV);
+            float[][]     values     = null;
+            float[][]     values2    = null;
+            int[][]       nums       = null;
+            final Set     timeDomain = Util.getDomainSet(grid);
             for (int timeStepIdx = startIdx;
                     timeStepIdx < timeDomain.getLength();
                     timeStepIdx += idxStride) {
                 FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
                 float[][] timeStepValues = sample.getFloats(false);
                 if (values == null) {  // first pass through
-                    values  = Misc.cloneArray(timeStepValues);
+                    values = Misc.cloneArray(timeStepValues);
                     nums   = new int[values.length][values[0].length];
                     if (doStd) {
-                    	values2 = new float[values.length][values[0].length];
+                        values2 = new float[values.length][values[0].length];
                     }
                     for (int i = 0; i < timeStepValues.length; i++) {
                         for (int j = 0; j < timeStepValues[i].length; j++) {
@@ -649,7 +823,7 @@ public class GridMath {
                             }
                             nums[i][j] = 1;
                             if (doStd) {
-                            	values2[i][j] = value*value;
+                                values2[i][j] = value * value;
                             }
                         }
                     }
@@ -667,8 +841,8 @@ public class GridMath {
                         } else if (doMin) {
                             values[i][j] = Math.min(values[i][j], value);
                         } else if (doStd) {
-                            values[i][j] += value;
-                            values2[i][j] += value*value;
+                            values[i][j]  += value;
+                            values2[i][j] += value * value;
                         } else {
                             values[i][j] += value;
                         }
@@ -679,26 +853,26 @@ public class GridMath {
             if (function.equals(FUNC_AVERAGE)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                    	int num = nums[i][j];
-                    	if (num > 0) {
-                             values[i][j] = values[i][j] / num;
-                    	} else {
-                    		values[i][j] = Float.NaN;
-                    	}
+                        int num = nums[i][j];
+                        if (num > 0) {
+                            values[i][j] = values[i][j] / num;
+                        } else {
+                            values[i][j] = Float.NaN;
+                        }
                     }
                 }
             }
             if (function.equals(FUNC_STDEV)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                    	int num = nums[i][j];
-                    	if (num > 0) {
-                    	    float mean = values[i][j] / num;
-                    	    float var = values2[i][j] / num - mean*mean;
-                    	    values[i][j] = (float) Math.sqrt(var);
-                    	} else {
-                    		values[i][j] = Float.NaN;
-                    	}
+                        int num = nums[i][j];
+                        if (num > 0) {
+                            float mean = values[i][j] / num;
+                            float var  = values2[i][j] / num - mean * mean;
+                            values[i][j] = (float) Math.sqrt(var);
+                        } else {
+                            values[i][j] = Float.NaN;
+                        }
                     }
                 }
             }
