@@ -150,10 +150,10 @@
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.InstallerApplication">
               <void property="allowConsole">
-                <boolean>false</boolean>
+                <boolean>true</boolean>
               </void>
               <void property="allowUnattended">
-                <boolean>false</boolean>
+                <boolean>true</boolean>
               </void>
               <void property="customPngIcon16File">
                 <object class="com.install4j.api.beans.ExternalFile">
