@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -452,16 +452,39 @@ public class GridMath {
 
 
     /**
-     * This creates a field where D(T) = D(T)+D(0)
-     * Any time steps up to the offset time are set to missing
-     * @param grid   grid to average
+     * This creates a field where D(T) = D(0)+D(1)+...+D(T-1)+D(T)
+     * @param grid   grid to sum
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     public static FieldImpl sumFromBaseTime(FieldImpl grid)
             throws VisADException {
-        return timeStepFunc(grid, 0, FUNC_SUM);
+        try {
+            if ( !GridUtil.isTimeSequence(grid)) {
+                return grid;
+            }
+            FieldImpl newGrid      = (FieldImpl) grid.clone();
+            Set       timeDomain   = Util.getDomainSet(newGrid);
+            int       numTimeSteps = timeDomain.getLength();
+            FlatField sample       = (FlatField) newGrid.getSample(0);
+            float[][] baseValue    = Misc.cloneArray(sample.getFloats(false));
+            for (int timeStepIdx = 1; timeStepIdx < numTimeSteps;
+                    timeStepIdx++) {
+                sample = (FlatField) newGrid.getSample(timeStepIdx);
+                float[][] timeStepValues = sample.getFloats(false);
+                // this creates a new array
+                float[][] value = Misc.addArray(baseValue, timeStepValues,
+                                      null);
+                baseValue = value;
+                sample.setSamples(value, false);
+            }
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException in timeStepFunc");
+        }
     }
 
 

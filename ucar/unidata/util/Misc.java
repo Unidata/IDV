@@ -4072,13 +4072,13 @@ public class Misc {
 
 
     /**
-     * set c=a-b and return c. If c is null then create a new array
+     * Set c=a-b and return c. If c is null then create a new array
      *
-     * @param a a
-     * @param b b
-     * @param c c
+     * @param a  the array
+     * @param b  the the other array
+     * @param c  the return array
      *
-     * @return diff
+     * @return  the new array
      */
     public static float[][] subtractArray(float[][] a, float[][] b,
                                           float[][] c) {
@@ -4093,15 +4093,14 @@ public class Misc {
         return c;
     }
 
-
     /**
-     * _more_
+     * Add two arrays together
      *
-     * @param a _more_
-     * @param b _more_
-     * @param c _more_
+     * @param a  the array
+     * @param b  the the other array
+     * @param c  the return array
      *
-     * @return _more_
+     * @return  the new array
      */
     public static float[][] addArray(float[][] a, float[][] b, float[][] c) {
         if (c == null) {
@@ -4114,8 +4113,6 @@ public class Misc {
         }
         return c;
     }
-
-
 
     /**
      * Get the range of all values

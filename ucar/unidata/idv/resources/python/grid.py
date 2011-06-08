@@ -379,24 +379,32 @@ def uvFromWindDir(dir):
 
 def runave(grid, nave=3, option=0):
     """generate a running average:
-          grid = grid to average
-          nave - number of steps to average over
-          option - option for unsmoothed end points
-                   0 - set to missing
-                   1 - use symmetry
-                  -1 - assume cyclic """
+    <div class=jython>
+    Where:<br>
+          grid = grid to average<br>
+          nave - number of steps to average over<br>
+          option - option for unsmoothed end points<br>
+                   0 - set to missing<br>
+                   1 - use symmetry<br>
+                  -1 - assume cyclic <br>
+    </div>
+    """
     steps = int(nave)
     opt = int(option)
     return GridMath.timeRunningAverage(grid,steps,opt)
 
 def wgt_runave(grid, wgts, option=0):
     """generate a weighted running average:
-          grid = grid to average
-          wgts - comma separated list of weights
-          option - option for unsmoothed end points
-                   0 - set to missing
-                   1 - use symmetry
-                  -1 - assume cyclic """
+    <div class=jython>
+    Where:<br>
+          grid = grid to average<br>
+          wgts - comma separated list of weights<br>
+          option - option for unsmoothed end points<br>
+                   0 - set to missing<br>
+                   1 - use symmetry<br>
+                  -1 - assume cyclic <br>
+    </div>
+    """
     from ucar.unidata.util import Misc
     weights = Misc.parseFloats(wgts)
     opt = int(option)

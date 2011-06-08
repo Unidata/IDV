@@ -713,14 +713,14 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-  <derived description="Sum over time steps" formula="sumOverTime(field)" id="Sum over time steps" isdefault="false" isenduser="true">
+  <derived description="Total sum over time steps" formula="sumOverTime(field)" id="Total sum over time steps" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
     </categories>
     <operands categories=""/>
   </derived>
 
-  <derived description="Merge Time Sequences" formula="mergeTimeSequences(field[multiple=true])" id="Merge Time Sequences" isdefault="false" isenduser="true">
+  <derived description="Merge time sequences" formula="mergeTimeSequences(field[multiple=true])" id="Merge Time Sequences" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
     </categories>
@@ -734,17 +734,26 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
 
-
-<!--
-  <derived description="Sum from initial timestep (D(T)=D(T)+D(0))" formula="sumFromBaseTime(field)" id="Base time sum" isdefault="false" isenduser="true">
+  <derived description="Running average" formula="runave(grid, steps[isuser=true,default=3,label=No. of Steps],opt[isuser=true, default=0, label=End Point Option])" id="Running average" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
     </categories>
     <operands categories=""/>
   </derived>
--->
+  <derived description="Weighted running average" formula="wgt_runave(grid, wgts[isuser=true,default=3,label=Weights - comma separated list],opt[isuser=true, default=0, label=End Point Option])" id="Weighted running average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
 
+  <derived description="Accumulate from initial timestep (D(T)=D(0)+D(1)+..+D(T))" formula="sumFromBaseTime(field)" id="Base time accum" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
   <derived description="Time step difference (D(T)=D(T)-D(T-1))" formula="timeStepDifference(field,-1)" id="Time step difference" isdefault="false" isenduser="true">
     <categories>

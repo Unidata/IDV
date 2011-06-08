@@ -135,6 +135,18 @@ to the average. Else we just return the average</p>
 <meta name="jhid" value="resampleGrid">
 <p><a name="resampleGrid"></a><code class="command">resampleGrid(oldGrid, gridwithNewDomain):</code><p style="padding:0;margin-left:20;margin-top:0">
 display gridded data on a new domain</p>
+<meta name="jhid" value="runave">
+<p><a name="runave"></a><code class="command">runave(grid, nave, option):</code><p style="padding:0;margin-left:20;margin-top:0">
+generate a running average:
+<div class=jython>
+Where:<br>
+grid = grid to average<br>
+nave - number of steps to average over<br>
+option - option for unsmoothed end points<br>
+0 - set to missing<br>
+1 - use symmetry<br>
+-1 - assume cyclic <br>
+</div></p>
 <meta name="jhid" value="substitute">
 <p><a name="substitute"></a><code class="command">substitute(data, low, high, newValue):</code><p style="padding:0;margin-left:20;margin-top:0">
 change values in data  between low/high to newvalue</p>
@@ -160,6 +172,18 @@ where offset should be negative</p>
 <meta name="jhid" value="uvFromWindDir">
 <p><a name="uvFromWindDir"></a><code class="command">uvFromWindDir(dir):</code><p style="padding:0;margin-left:20;margin-top:0">
 creating the vector field using the wind direction</p>
+<meta name="jhid" value="wgt_runave">
+<p><a name="wgt_runave"></a><code class="command">wgt_runave(grid, wgts, option):</code><p style="padding:0;margin-left:20;margin-top:0">
+generate a weighted running average:
+<div class=jython>
+Where:<br>
+grid = grid to average<br>
+wgts - comma separated list of weights<br>
+option - option for unsmoothed end points<br>
+0 - set to missing<br>
+1 - use symmetry<br>
+-1 - assume cyclic <br>
+</div></p>
 <meta name="jhid" value="windShear">
 <p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the wind shear between discrete layers
