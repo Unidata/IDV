@@ -41,6 +41,11 @@
             icon="/ucar/unidata/ui/symbol/images/windbarb.gif"
             attrs=""
     /> 
+    <symbol class="ucar.unidata.ui.symbol.WindVectorSymbol"
+            name="Vector"
+            icon="/ucar/unidata/ui/symbol/images/windvector.gif"
+            attrs=""
+    /> 
     <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
             name="Cloud coverage"
             icon="/ucar/unidata/ui/symbol/images/cloudcoverage.gif"

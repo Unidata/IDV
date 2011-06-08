@@ -700,7 +700,7 @@ public abstract class XYChartManager extends ChartManager {
     protected static class WindbarbRenderer extends AbstractXYItemRenderer {
 
         /** drawer */
-        WindBarbSymbol.Drawer drawer;
+        WindBarbSymbol.WindDrawer drawer;
 
         /** speed data */
         Series speedSeries;
@@ -907,7 +907,7 @@ public abstract class XYChartManager extends ChartManager {
 
 
             if (drawer == null) {
-                drawer = new WindBarbSymbol.Drawer();
+                drawer = new WindBarbSymbol.WindDrawer();
             }
             // System.err.println ("speed: " + speed +", dir: " + dir + ", X: " + xPos + ", Y: " + yPos);
             try {

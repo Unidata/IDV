@@ -22,62 +22,46 @@ package ucar.unidata.ui.symbol;
 
 import ucar.unidata.ui.drawing.DisplayCanvas;
 
-import java.awt.*;
+import visad.VisADException;
+import visad.VisADGeometryArray;
+import visad.VisADLineArray;
+
+import java.awt.Graphics2D;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: yuanho
- * Date: Jun 6, 2011
- * Time: 12:05:16 PM
- * To change this template use File | Settings | File Templates.
+ * Class description
+ *
+ *
+ * @version        Enter version here..., Wed, Jun 8, '11
+ * @author         Enter your name here...    
  */
-public class WindVectorSymbol extends MetSymbol {
-
-    /** Fix conversion value */
-    private static final double DEG_TO_RAD = (Math.PI / 180.0);
-
-    /** The example windspeed */
-    private double windSpeed;  // knots
-
-    /** The example wind dir */
-    private double windDirection;  // degrees; clockwise 0 = North
-
-    /** for drawing */
-    private int lenBarb;  // length of the Barb
-
-    /** for drawing */
-    private double sint, cost;
-
-
-    /** my drawer */
-    private Drawer drawer;
-
+public class WindVectorSymbol extends WindBarbSymbol {
 
     /**
-     * Default constructor.
+     * Create a WindVectorSymbol
      */
     public WindVectorSymbol() {
-        //setRectPoint(PT_MM);
+        // TODO Auto-generated constructor stub
     }
 
     /**
-     * Construct a WindBarbSymbol to use on the canvas specified at the
-     * position specified.  Use the default names and long names.
-     * @param canvas  canvas to draw on.
-     * @param x  x position on the canvas
-     * @param y  y position on the canvas
+     * Create a wind vector symbol
+     *
+     * @param canvas  the canvas
+     * @param x  the x position
+     * @param y  the y position
      */
     public WindVectorSymbol(DisplayCanvas canvas, int x, int y) {
-        this(canvas, x, y, "U", "U or windspeed parameter", "V",
+        this(canvas, x, y, "U", "U or speed parameter", "V",
              "V or direction parameter");
     }
 
     /**
-     * Construct a WindBarbSymbol without a canvas at the
+     * Construct a WindVectorSymbol to use on the canvas specified at the
      * position specified.  Use the parameter names and long names specified.
-     * @param x              x position
-     * @param y              y position
+     * @param x  x position on the canvas
+     * @param y  y position on the canvas
      * @param uOrSpeedParam  u or speed component of wind parameter name
      * @param uOrSpeedDescr  u or speed component of wind parameter description
      * @param vOrDirParam    v or direction component of wind parameter name
@@ -90,9 +74,8 @@ public class WindVectorSymbol extends MetSymbol {
              vOrDirDescr);
     }
 
-
     /**
-     * Construct a WindBarbSymbol to use on the canvas specified at the
+     * Construct a WindVectorSymbol to use on the canvas specified at the
      * position specified.  Use the parameter names and long names specified.
      * @param canvas  canvas to draw on.
      * @param x  x position on the canvas
@@ -105,173 +88,173 @@ public class WindVectorSymbol extends MetSymbol {
     public WindVectorSymbol(DisplayCanvas canvas, int x, int y,
                             String uOrSpeedParam, String uOrSpeedDescr,
                             String vOrDirParam, String vOrDirDescr) {
-        super(canvas, x, y, new String[] { uOrSpeedParam, vOrDirParam },
-              new String[] { uOrSpeedDescr,
-                             vOrDirDescr });
-        //rectPoint = PT_MM;
-        setSize(20, 20);
-        setWindDirection(300.0);
-        setWindSpeed(65.0);
+        super(canvas, x, y, uOrSpeedParam, uOrSpeedDescr, vOrDirParam,
+              vOrDirDescr);
     }
 
+    /**
+     * Make the drawer for this symbol
+     * @return the drawer
+     */
+    protected WindDrawer makeDrawer() {
+        return new VectorDrawer();
+    }
 
+    /** back scaling */
+    private static final float BACK_SCALE = -0.15f;
+
+    /** forward scaling */
+    private static final float PERP_SCALE = 0.15f;
 
     /**
-     * Should this shape be scaled. See MetSymbol.
+     * make the vector.  Adapted from visad.ShadowType.makeFlow.
      *
-     * @return Should this shape be scaled
-     */
-    public boolean shouldScaleShape() {
-        return false;
-    }
-
-    /**
-     * Should this shape be offset. See MetSymbol.
+     * @param flow_values  the flow values (u,v)
+     * @param flowScale  the scale
+     * @param spatial_values  the spatial locations (x,y)
+     * @param color_values  color (not handled here)
+     * @param range_select  missing flags
      *
-     * @return Should this shape be offset
+     * @return the drawn vector
+     *
+     * @throws VisADException  problem drawing the vector
      */
-    public boolean shouldOffsetShape() {
-        return false;
-    }
+    public VisADGeometryArray[] makeVector(float[][] flow_values,
+                                           float flowScale,
+                                           float[][] spatial_values,
+                                           byte[][] color_values,
+                                           boolean[][] range_select)
+            throws VisADException {
 
-    /**
-     * Determine whether this <code>MetSymbol</code> should show an
-     * alignment menu in an editor.  Subclasses should override if not.
-     * @return false for this
-     */
-    public boolean doAlignmentMenu() {
-        return false;
-    }
+        if (flow_values[0] == null) {
+            return null;
+        }
+        if (spatial_values[0] == null) {
+            return null;
+        }
 
-    /**
-     * Get the parameter value at the index specified.
-     * @param  index  index into param array
-     * @return value of uOrSpeedParam if index = 0, otherwise vOrDirParam value
-     */
-    public Object getParamValue(int index) {
-        return ((index == 0)
-                ? new Double(windSpeed)
-                : new Double(windDirection));
-    }
+        VisADLineArray array = new VisADLineArray();
 
-    /**
-     * Set the parameter value at the index specified.
-     * @param  index  index into param array
-     * @param  v      value (<code>String</code>) of double parameter value
-     */
-    public void setParamValue(int index, Object v) {
-        if (index == 0) {
-            setWindSpeed(new Double(v.toString()).doubleValue());
+        int            len   = spatial_values[0].length;
+        int            flen  = flow_values[0].length;
+        int            rlen  = 0;  // number of non-missing values
+        if (range_select[0] == null) {
+            rlen = len;
         } else {
-            setWindDirection(new Double(v.toString()).doubleValue());
+            for (int j = 0; j < range_select[0].length; j++) {
+                if (range_select[0][j]) {
+                    rlen++;
+                }
+            }
         }
-    }
-
-    /**
-     * Get the name of the Speed or U component.
-     * @return name of this component.
-     */
-    public String getSpeedName() {
-        return getParam(0);
-    }
-
-    /**
-     * Get the name of the Direction or V component.
-     * @return name of this component.
-     */
-    public String getDirectionName() {
-        return getParam(1);
-    }
-
-    /**
-     * Get whether this <code>MetSymbol</code> can be stretched or not.
-     * @return true if can be stretched.
-     */
-    public boolean getStretchy() {
-        return !getBeingCreated();
-    }
-
-    /**
-     * Get whether this <code>MetSymbol</code> has equals sides
-     * (width and height).
-     * @return  true
-     */
-    public boolean getEqualSides() {
-        return true;
-    }
-
-    /**
-     * Get whether this <code>MetSymbol</code> should be stretched
-     * symetrically or not.
-     * @return true
-     */
-    public boolean getSymetricReshape() {
-        return true;
-    }
-
-    /**
-     * get the Wind Speed, in knots
-     * @return windSpeed
-     */
-    public double getWindSpeed() {
-        return windSpeed;
-    }
-
-    /**
-     * set the Wind Speed, in knots
-     * @param  windSpeed speed in knots
-     */
-    public void setWindSpeed(double windSpeed) {
-        this.windSpeed = windSpeed;
-    }
-
-    /**
-     * get the Wind Direction, in degrees (0 = north) from [0, 360)
-     * @return The direction
-     */
-    public double getWindDirection() {
-        return windDirection;
-    }
-
-    /**
-     * set the Wind Direction, in degrees (0 = north) from [0, 360)
-     *
-     * @param windDirection
-     */
-    public void setWindDirection(double windDirection) {
-        this.windDirection =
-            ucar.unidata.geoloc.LatLonPointImpl.lonNormal360(windDirection);
-    }
-
-
-
-
-    /**
-     *     draw the symbol at the specified location
-     *     @param  g        Graphics to draw to
-     *     @param  x        x location
-     *     @param  y        y location
-     *     @param  width    width to draw
-     *     @param  height   height to draw
-     */
-    public void draw(Graphics2D g, int x, int y, int width, int height) {
-        g.setColor(getForeground());
-        if (drawer == null) {
-            drawer = new Drawer();
+        if (rlen == 0) {
+            return null;
         }
-        drawer.draw(g, x, y, width, height, windSpeed, windDirection);
+
+        array.vertexCount = 6 * rlen;
+
+        float[] coordinates = new float[18 * rlen];
+        int     m           = 0;
+        // flow vector
+        float f0 = 0.0f,
+              f1 = 0.0f,
+              f2 = 0.0f;
+        // arrow head vector
+        float a0 = 0.0f,
+              a1 = 0.0f,
+              a2 = 0.0f;
+        float b0 = 0.0f,
+              b1 = 0.0f,
+              b2 = 0.0f;
+        for (int j = 0; j < len; j++) {
+            if ((range_select[0] == null) || range_select[0][j]) {
+                if (flen == 1) {
+                    f0 = flowScale * flow_values[0][0];
+                    f1 = flowScale * flow_values[1][0];
+                    f2 = flowScale * flow_values[2][0];
+                } else {
+                    f0 = flowScale * flow_values[0][j];
+                    f1 = flowScale * flow_values[1][j];
+                    f2 = flowScale * flow_values[2][j];
+                }
+                int k = m;
+                // base point of flow vector
+                coordinates[m++] = spatial_values[0][j];
+                coordinates[m++] = spatial_values[1][j];
+                coordinates[m++] = spatial_values[2][j];
+                int n = m;
+                // k = orig m
+                // m = orig m + 3
+                // end point of flow vector
+                coordinates[m++] = coordinates[k++] + f0;
+                coordinates[m++] = coordinates[k++] + f1;
+                coordinates[m++] = coordinates[k++] + f2;
+                k                = n;
+                // n = orig m + 3
+                // m = orig m + 6
+                // repeat end point of flow vector as
+                // first point of first arrow head
+                coordinates[m++] = coordinates[n++];
+                coordinates[m++] = coordinates[n++];
+                coordinates[m++] = coordinates[n++];
+                b0               = a0 = BACK_SCALE * f0;
+                b1               = a1 = BACK_SCALE * f1;
+                b2               = a2 = BACK_SCALE * f2;
+
+                if (  /*mode2d
+                      || */
+                ((Math.abs(f2) <= Math.abs(f0))
+                        && (Math.abs(f2) <= Math.abs(f1)))) {
+                    a0 += PERP_SCALE * f1;
+                    a1 -= PERP_SCALE * f0;
+                    b0 -= PERP_SCALE * f1;
+                    b1 += PERP_SCALE * f0;
+                }  /*else if (Math.abs(f1) <= Math.abs(f0)) {
+                   a0 += PERP_SCALE * f2;
+                   a2 -= PERP_SCALE * f0;
+                   b0 -= PERP_SCALE * f2;
+                   b2 += PERP_SCALE * f0;
+                 } else { // f0 is least
+                   a1 += PERP_SCALE * f2;
+                   a2 -= PERP_SCALE * f1;
+                   b1 -= PERP_SCALE * f2;
+                   b2 += PERP_SCALE * f1;
+                 }
+                 */
+
+                k = n;
+                // n = orig m + 6
+                // m = orig m + 9
+                // second point of first arrow head
+                coordinates[m++] = coordinates[n++] + a0;
+                coordinates[m++] = coordinates[n++] + a1;
+                coordinates[m++] = coordinates[n++] + a2;
+
+                n                = k;
+                // k = orig m + 6
+                // first point of second arrow head
+                coordinates[m++] = coordinates[k++];
+                coordinates[m++] = coordinates[k++];
+                coordinates[m++] = coordinates[k++];
+
+                // n = orig m + 6
+                // second point of second arrow head
+                coordinates[m++] = coordinates[n++] + b0;
+                coordinates[m++] = coordinates[n++] + b1;
+                coordinates[m++] = coordinates[n++] + b2;
+            }
+        }
+        array.coordinates = coordinates;
+        return new VisADGeometryArray[] { array };
+
     }
 
-
-
     /**
-     * Class Drawer knows how to draw windbarbs
-     *
+     * Class VectorDrawer knows how to draw windbarbs
      *
      * @author IDV Development Team
-     * @version $Revision: 1.23 $
      */
-    public static class Drawer {
+    public static class VectorDrawer extends WindDrawer {
 
         /** attrs */
         int x0, y0;
@@ -291,7 +274,7 @@ public class WindVectorSymbol extends MetSymbol {
         /**
          * ctor
          */
-        public Drawer() {}
+        public VectorDrawer() {}
 
         /**
          * draw
@@ -304,7 +287,6 @@ public class WindVectorSymbol extends MetSymbol {
          * @param speed wind speed
          * @param dirDegrees wind dir
          */
-
         public void draw(Graphics2D g, int x, int y, int width, int height,
                          double speed, double dirDegrees) {
 
@@ -318,39 +300,51 @@ public class WindVectorSymbol extends MetSymbol {
             x0   = x + width / 2;
             y0   = y + height / 2;
 
-            // calc how long the windBarb should be
-            int len = 0;
-            while (speed >= 47.5) {
-                len   += 6;
-                speed -= 50;
-            }
-            while (speed >= 7.5) {
-                len   += 3;
-                speed -= 10;
-            }
-            if (speed >= 2.5) {
-                len += 3;
-            }
-            lenBarb = Math.max(len, width);
+            // calc how long the wind vector should be
+            lenBarb = width;
 
-            drawRotatedLine(g, 0, 0, 0, -lenBarb);
-            sint = Math.sin(theta + 15.0 * DEG_TO_RAD);
-            cost = Math.cos(theta + 15.0 * DEG_TO_RAD);
-            drawRotatedLine(g, 0, 0, 0, -lenBarb / 2);
-            sint = Math.sin(theta - 15.0 * DEG_TO_RAD);
-            cost = Math.cos(theta - 15.0 * DEG_TO_RAD);
-            drawRotatedLine(g, 0, 0, 0, -lenBarb / 2);
+            drawRotatedLine(g, 0, 0, 0, lenBarb);
+            drawRotatedLine(g, 0, lenBarb, lenBarb / 4, 3 * lenBarb / 4);
+            drawRotatedLine(g, 0, lenBarb, -lenBarb / 4, 3 * lenBarb / 4);
+
+        }
+
+
+        /**
+         * Draw a line
+         *
+         * @param g graphics
+         * @param start start degrees
+         * @return next degrees
+         */
+        private int draw10knotLine(Graphics2D g, int start) {
+            drawRotatedLine(g, 0, -lenBarb + start, .4 * lenBarb,
+                            -lenBarb + start - 3);
+            return start + 3;
+        }
+
+        /**
+         * Draw the flag
+         *
+         * @param g graphics
+         * @param start degrees
+         * @return next degrees
+         */
+        private int draw50knotFlag(Graphics2D g, int start) {
+            drawRotatedTriangle(g, 0, -lenBarb + start + 4, .4 * lenBarb + 2,
+                                -lenBarb + start - 1, 0,
+                                -lenBarb + start - 1);
+            return start + 6;
         }
 
         /**
          * draw line
          *
          * @param g graphics
-         * @param x1 _more_
-         * @param y1 _more_
-         * @param x2 _more_
-         * @param y2 _more_
-         *
+         * @param x1 x1
+         * @param y1 y1
+         * @param x2 x2
+         * @param y2 y2
          */
         private void drawRotatedLine(Graphics2D g, double x1, double y1,
                                      double x2, double y2) {
@@ -363,17 +357,38 @@ public class WindVectorSymbol extends MetSymbol {
             g.drawLine(x0 + begx, y0 + begy, x0 + endx, y0 + endy);
         }
 
+        /**
+         * draw triangle
+         *
+         * @param g graphics
+         * @param x1 x1
+         * @param y1 y1
+         * @param x2 x2
+         * @param y2 y2
+         * @param x3 x3
+         * @param y3 y3
+         */
+        private void drawRotatedTriangle(Graphics2D g, double x1, double y1,
+                                         double x2, double y2, double x3,
+                                         double y3) {
+
+            /** for drawing */
+            int[] xPoint = new int[3];
+
+            /** for drawing */
+            int[] yPoint = new int[3];
+
+            xPoint[0] = x0 + (int) (x1 * cost - y1 * sint);
+            yPoint[0] = y0 + (int) (x1 * sint + y1 * cost);
+
+            xPoint[1] = x0 + (int) (x2 * cost - y2 * sint);
+            yPoint[1] = y0 + (int) (x2 * sint + y2 * cost);
+
+            xPoint[2] = x0 + (int) (x3 * cost - y3 * sint);
+            yPoint[2] = y0 + (int) (x3 * sint + y3 * cost);
+
+            g.fillPolygon(xPoint, yPoint, 3);
+        }
+
     }
-
-    /**
-     * Can we rotate this symbol when the display rotates
-     *
-     * @return _more_
-     */
-    public boolean rotateOnEarth() {
-        return false;
-    }
-
-
-
 }

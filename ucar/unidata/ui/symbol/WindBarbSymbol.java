@@ -1,20 +1,18 @@
 /*
- * $Id: WindBarbSymbol.java,v 1.23 2007/05/22 20:00:23 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -41,7 +39,7 @@ import java.awt.geom.*;
 public class WindBarbSymbol extends MetSymbol {
 
     /** Fix conversion value */
-    private static final double DEG_TO_RAD = (Math.PI / 180.0);
+    public static final double DEG_TO_RAD = (Math.PI / 180.0);
 
     /** The example windspeed */
     private double windSpeed;  // knots
@@ -57,7 +55,7 @@ public class WindBarbSymbol extends MetSymbol {
 
 
     /** my drawer */
-    private Drawer drawer;
+    private WindDrawer drawer;
 
 
     /**
@@ -263,20 +261,26 @@ public class WindBarbSymbol extends MetSymbol {
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         g.setColor(getForeground());
         if (drawer == null) {
-            drawer = new Drawer();
+            drawer = makeDrawer();
         }
         drawer.draw(g, x, y, width, height, windSpeed, windDirection);
     }
 
+    /**
+     * Make the drawer for this symbol
+     * @return the drawer
+     */
+    protected WindDrawer makeDrawer() {
+        return new WindDrawer();
+    }
+
 
     /**
-     * Class Drawer knows how to draw windbarbs
-     *
+     * Class WindDrawer knows how to draw windbarbs
      *
      * @author IDV Development Team
-     * @version $Revision: 1.23 $
      */
-    public static class Drawer {
+    public static class WindDrawer {
 
         /** attrs */
         int x0, y0;
@@ -296,7 +300,7 @@ public class WindBarbSymbol extends MetSymbol {
         /**
          * ctor
          */
-        public Drawer() {}
+        public WindDrawer() {}
 
         /**
          * draw
@@ -454,6 +458,8 @@ public class WindBarbSymbol extends MetSymbol {
 
     /**
      * Can we rotate this symbol when the display rotates
+     *
+     * @return false
      */
     public boolean rotateOnEarth() {
         return false;
@@ -462,4 +468,3 @@ public class WindBarbSymbol extends MetSymbol {
 
 
 }
-

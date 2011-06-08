@@ -41,6 +41,7 @@ import ucar.unidata.ui.symbol.TextSymbol;
 import ucar.unidata.ui.symbol.ValueSymbol;
 import ucar.unidata.ui.symbol.WeatherSymbol;
 import ucar.unidata.ui.symbol.WindBarbSymbol;
+import ucar.unidata.ui.symbol.WindVectorSymbol;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -1224,9 +1225,10 @@ public class StationModelDisplayable extends DisplayableData {
                     boolean isNorth =
                         (ob.getEarthLocation().getLatitude().getValue(
                             CommonUnit.degree) < 0.0);
+                    String name = metSymbol.getClass().getName();
                     Object key = "wind_" + pointOnSymbol + "_" + isNorth
                                  + "_" + workDataArray[0] + "_"
-                                 + workDataArray[1];
+                                 + workDataArray[1]+"_"+name;
                     //shapes = (VisADGeometryArray[]) shapeCache.get(key);
                     if (shapes != null) {
                         shapes = ShapeUtility.clone(shapes);
@@ -1294,9 +1296,15 @@ public class StationModelDisplayable extends DisplayableData {
                             (float) (-pointOnSymbol.getY());
                         float scale = 2.5f * (float) metSymbol.getScale();
                         try {
-                            shapes = WindBarb.staticMakeFlow(workFlowValues,
-                                    2.5f, workSpatialValues, (byte[][]) null,  //color_values, 
-                                    workRangeSelect, isNorth);
+                        	if (metSymbol instanceof WindVectorSymbol) {
+                               shapes = ((WindVectorSymbol) metSymbol).makeVector(workFlowValues,
+                                    1f, workSpatialValues, (byte[][]) null,  //color_values, 
+                                    workRangeSelect);
+                        	} else {
+                               shapes = WindBarb.staticMakeFlow(workFlowValues,
+                                       2.5f, workSpatialValues, (byte[][]) null,  //color_values, 
+                                       workRangeSelect, isNorth);
+                        	}
                             shapeCache.put(key, ShapeUtility.clone(shapes));
 
                         } catch (Exception excp) {
