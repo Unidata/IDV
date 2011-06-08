@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -74,13 +74,13 @@ public class GridMath {
     public static final String FUNC_DIFFERENCE = "difference";
 
     /** cyclic option */
-    public static final String OPT_CYCLIC = "cyclic";
+    public static final int OPT_CYCLIC = -1;
 
     /** missing option */
-    public static final String OPT_MISSING = "missing";
+    public static final int OPT_MISSING = 0;
 
     /** symmetric option */
-    public static final String OPT_SYMMETRIC = "symmetric";
+    public static final int OPT_SYMMETRIC = 1;
 
     /** axis identifier - X */
     public static final String AXIS_X = "X";
@@ -544,14 +544,58 @@ public class GridMath {
      * Create a running average across the time dimension.
      *
      * @param grid    grid to average
-     * @param wgts    number of steps to average
-     * @param opt  options for endpoints
+     * @param wgts    weights per step (usually odd and add to 1)
+     * @param opt     options for end points
+     * <pre>
+     *     N = {last point in the series}
+     *    xi = {input series}
+     *    xo = {output series}
+     *    nwgt = {number of wgts}
+     *
+     *    opt < 0 : utilize cyclic conditions
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = w(0) * xi(N) + w(1) * xi(0)
+     *          e.g., nwgt = 3
+     *                 xo(0) = w(0) * xi(N) + w(1) * xi(0) + w(2) * xi(1)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(0)
+     *          e.g., nwgt = 4
+     *                 xo(0) = w(0) * xi(N) + w(1) * xi(0) + w(2) * xi(1) + w(3) * xi(2)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(1) + w(3) * xi(2)
+     *
+     *    opt = 0 : set unsmoothed beginning and end pts to x@_FillValue (most common)
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = xi@_FillValue
+     *          e.g., nwgt = 3
+     *                 xo(0) = xi@_FillValue
+     *                 xo(1) = w(0) * xi(0) + w(1) * xi(1) + w(2) * xi(2)
+     *                 xi(N) = xi@_FillValue
+     *          e.g., nwgt = 4
+     *                 xo(0)     = xi@_FillValue
+     *                 xo(1)     = w(0) * xi(0) + w(1) * xi(1) + w(2) * xi(2) + w(3) * xi(3)
+     *                 xo(N - 2) = w(0) * xi(N - 3) + w(1) * xi(N - 2) + w(2) * xi(N - 1) + w(3) * xi(N)
+     *                 xo(N - 1) = xi@_FillValue
+     *                 xo(N)     = xi@_FillValue
+     *
+     *    opt > 0 : utilize reflective (symmetric) conditions
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = w(0) * xi(N) + w(0) * xi(0)
+     *          e.g., nwgt = 3
+     *                 xo(0) = w(0) * xi(1) + w(1) * xi(0) + w(2) * xi(1)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(N - 1)
+     *          e.g., nwgt = 4
+     *                 xo(0) = w(0) * xi(1) + w(1) * xi(0) + w(2) * xi(1) + w(3) * xi(2)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(0) + w(3) * xi(2)
+     * </pre>
+     *
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     public static FieldImpl timeWeightedRunningAverage(FieldImpl grid,
-            float[] wgts, String opt)
+            float[] wgts, int opt)
             throws VisADException {
         return runave(grid, wgts, -1, opt);
     }
@@ -561,30 +605,75 @@ public class GridMath {
      *
      * @param grid    grid to average
      * @param nave    number of steps to average
-     * @param opt  options for endpoints
+     * @param opt     options for end points
+     * <pre>
+     *     In the following:
+     *
+     *         N = {last point in the series, i.e. N = npts - 1}
+     *         xi = {input series}
+     *         xo = {output series}
+     *
+     *     opt < 0 : utilize cyclic conditions
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1))/nave
+     *                      xo(N) = (xi(N) + xi(0))/nave
+     *                e.g., nave = 3
+     *                      xo(0) = (xi(N) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(0)) / nave
+     *                e.g., nave = 4
+     *                      xo(0) = (xi(N) + xi(0) + xi(1) + xi(2)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(0) + xi(1)) / nave
+     *
+     *     opt = 0 : set unsmoothed beginning and end pts to x@_FillValue [most common]
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1)) / nave
+     *                      xo(N) = xi@_FillValue
+     *                e.g., nave = 3
+     *                      xo(0) = xi@_FillValue
+     *                      xo(1) = (xi(0) + xi(1) + xi(2)) / nave
+     *                      xi(N) = xi@_FillValue
+     *                e.g., nave = 4
+     *                      xo(0) = xi@_FillValue
+     *                      xo(1) = (xi(0) + xi(1) + xi(2) + xi(3)) / nave
+     *                      xo(N - 2) = (xi(N - 3) + xi(N - 2) + xi(N - 1) + xi(N)) / nave
+     *                      xo(N - 1)= xi@_FillValue
+     *                      xo(N)= xi@_FillValue
+     *
+     *     opt > 0 : utilize reflective (symmetric) conditions
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N) + xi(N-1)) / nave
+     *                e.g., nave = 3
+     *                      xo(0) = (xi(1) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(N-1)) / nave
+     *                e.g., nave = 4
+     *                      xo(0) = (xi(2) + xi(1) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(N - 1) + xi(N - 2)) / nave
+     * </pre>
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     public static FieldImpl timeRunningAverage(FieldImpl grid, int nave,
-            String opt)
+            int opt)
             throws VisADException {
         return runave(grid, null, nave, opt);
     }
 
     /**
-     * Create a running average across the time dimension.
+     * Create a running average across the time dimension.  If wgts is null,
+     * use nave.  If wgts not null, nave is the number of weights
      *
      * @param grid    grid to average
-     * @param wgts    number of steps to average
+     * @param wgts    weights per step (usually odd and add to 1)
      * @param nave    number of steps to average
-     * @param opt  options for endpoints
+     * @param opt     options for end points (OPT_MISSING, OPT_CYCLIC, OPT_SYMMETRIC)
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     private static FieldImpl runave(FieldImpl grid, float[] wgts, int nave,
-                                    String opt)
+                                    int opt)
             throws VisADException {
 
         float wsum = 0;
@@ -644,7 +733,7 @@ public class GridMath {
                 timeIndices[nav2 + n] = n;
             }
             int lpts = npts - 1;
-            if (opt.equals(OPT_SYMMETRIC)) {
+            if (opt == OPT_SYMMETRIC) {
                 for (int n = 0; n < nav2; n++) {
                     //System.out.println("setting work array " + (nav2-(n+1)) + " with time " + (n+1));
                     work[nav2 - (n + 1)]        = x[n + 1];
@@ -653,7 +742,7 @@ public class GridMath {
                     work[lpts + nav2 + (n + 1)]        = x[lpts - (n + 1)];
                     timeIndices[lpts + nav2 + (n + 1)] = lpts - (n + 1);
                 }
-            } else if (opt.equals(OPT_CYCLIC)) {
+            } else if (opt == OPT_CYCLIC) {
                 for (int n = 0; n < nav2; n++) {
                     //System.out.println("setting work array " + (nav2-(n+1)) + " with time " + (lpts-n));
                     work[nav2 - (n + 1)]        = x[lpts - n];
