@@ -799,8 +799,6 @@ public class DerivedGridFactory {
             // System.err.println("paramRef = " + paramRef);
             // System.err.println("topoRef = " + topoRef);
             // lat/lon over lon/lat (or vice versa)
-            // TODO:  handle a time sequence topography or topo with CS
-            // if ( !GridUtil.isTimeSequence(topoGrid)) {
             if ( !paramRef.equals(topoRef)) {
 
                 // System.out.println("refs aren't equal");
