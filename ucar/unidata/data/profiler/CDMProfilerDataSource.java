@@ -2160,6 +2160,25 @@ public class CDMProfilerDataSource extends FilesDataSource {
     }
 
     /**
+     * Set the selectedStations property.
+     *
+     * @param value The new value for selectedStations
+     */
+    public void setselectedStations(List<NamedStation> value) {
+        selectedStations = value;
+    }
+
+
+    /**
+     * Get the selectedStations property.
+     *
+     * @return The selectedStations
+     */
+    public List<NamedStation> getSelectedStations() {
+        return selectedStations;
+    }
+
+    /**
      * Add the gui components into the list for the properties dialog
      *
      * @param comps List of components
