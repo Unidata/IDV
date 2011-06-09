@@ -48,7 +48,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="GUST"
      label="Wind Gust"
-     aliases="GUST, windGust,wind_gust,GUMS"/>
+     aliases="GUS,GUST, windGust,wind_gust,GUMS"/>
   <alias
      name="VIS"
      label="Visibility"
