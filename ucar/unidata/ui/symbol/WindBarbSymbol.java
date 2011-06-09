@@ -410,7 +410,7 @@ public class WindBarbSymbol extends MetSymbol {
          * @param x2 x2
          * @param y2 y2
          */
-        private void drawRotatedLine(Graphics2D g, double x1, double y1,
+        void drawRotatedLine(Graphics2D g, double x1, double y1,
                                      double x2, double y2) {
             int begx = (int) (x1 * cost - y1 * sint);
             int begy = (int) (x1 * sint + y1 * cost);

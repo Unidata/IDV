@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -17,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.ui.symbol;
 
 
@@ -34,9 +35,15 @@ import java.awt.Graphics2D;
  *
  *
  * @version        Enter version here..., Wed, Jun 8, '11
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class WindVectorSymbol extends WindBarbSymbol {
+
+    /** back scaling */
+    private static final float BACK_SCALE = -0.15f;
+
+    /** forward scaling */
+    private static final float PERP_SCALE = 0.15f;
 
     /**
      * Create a WindVectorSymbol
@@ -99,12 +106,6 @@ public class WindVectorSymbol extends WindBarbSymbol {
     protected WindDrawer makeDrawer() {
         return new VectorDrawer();
     }
-
-    /** back scaling */
-    private static final float BACK_SCALE = -0.15f;
-
-    /** forward scaling */
-    private static final float PERP_SCALE = 0.15f;
 
     /**
      * make the vector.  Adapted from visad.ShadowType.makeFlow.
@@ -201,10 +202,9 @@ public class WindVectorSymbol extends WindBarbSymbol {
                 b1               = a1 = BACK_SCALE * f1;
                 b2               = a2 = BACK_SCALE * f2;
 
-                if (  /*mode2d
-                      || */
-                ((Math.abs(f2) <= Math.abs(f0))
-                        && (Math.abs(f2) <= Math.abs(f1)))) {
+                if ( /*mode2d */true ||  // we're always in 2D for the symbols
+                        ((Math.abs(f2) <= Math.abs(f0))
+                         && (Math.abs(f2) <= Math.abs(f1)))) {
                     a0 += PERP_SCALE * f1;
                     a1 -= PERP_SCALE * f0;
                     b0 -= PERP_SCALE * f1;
@@ -250,29 +250,14 @@ public class WindVectorSymbol extends WindBarbSymbol {
     }
 
     /**
-     * Class VectorDrawer knows how to draw windbarbs
+     * Class VectorDrawer knows how to draw wind vectors
      *
      * @author IDV Development Team
      */
     public static class VectorDrawer extends WindDrawer {
 
-        /** attrs */
-        int x0, y0;
-
-        /** attrs */
-        double lenBarb;
-
-        /** attrs */
-        double sint;
-
-        /** attrs */
-        double cost;
-
-        /** attrs */
-        double windSpeed;
-
         /**
-         * ctor
+         * Default ctor
          */
         public VectorDrawer() {}
 
@@ -297,98 +282,13 @@ public class WindVectorSymbol extends WindBarbSymbol {
             sint = Math.sin(theta);
             cost = Math.cos(theta);
 
-            x0   = x + width / 2;
-            y0   = y + height / 2;
-
             // calc how long the wind vector should be
-            lenBarb = width;
+            double lenVect = width;
 
-            drawRotatedLine(g, 0, 0, 0, lenBarb);
-            drawRotatedLine(g, 0, lenBarb, lenBarb / 4, 3 * lenBarb / 4);
-            drawRotatedLine(g, 0, lenBarb, -lenBarb / 4, 3 * lenBarb / 4);
+            drawRotatedLine(g, 0, 0, 0, lenVect);
+            drawRotatedLine(g, 0, lenVect, lenVect / 4, 3 * lenVect / 4);
+            drawRotatedLine(g, 0, lenVect, -lenVect / 4, 3 * lenVect / 4);
 
         }
-
-
-        /**
-         * Draw a line
-         *
-         * @param g graphics
-         * @param start start degrees
-         * @return next degrees
-         */
-        private int draw10knotLine(Graphics2D g, int start) {
-            drawRotatedLine(g, 0, -lenBarb + start, .4 * lenBarb,
-                            -lenBarb + start - 3);
-            return start + 3;
-        }
-
-        /**
-         * Draw the flag
-         *
-         * @param g graphics
-         * @param start degrees
-         * @return next degrees
-         */
-        private int draw50knotFlag(Graphics2D g, int start) {
-            drawRotatedTriangle(g, 0, -lenBarb + start + 4, .4 * lenBarb + 2,
-                                -lenBarb + start - 1, 0,
-                                -lenBarb + start - 1);
-            return start + 6;
-        }
-
-        /**
-         * draw line
-         *
-         * @param g graphics
-         * @param x1 x1
-         * @param y1 y1
-         * @param x2 x2
-         * @param y2 y2
-         */
-        private void drawRotatedLine(Graphics2D g, double x1, double y1,
-                                     double x2, double y2) {
-            int begx = (int) (x1 * cost - y1 * sint);
-            int begy = (int) (x1 * sint + y1 * cost);
-
-            int endx = (int) (x2 * cost - y2 * sint);
-            int endy = (int) (x2 * sint + y2 * cost);
-
-            g.drawLine(x0 + begx, y0 + begy, x0 + endx, y0 + endy);
-        }
-
-        /**
-         * draw triangle
-         *
-         * @param g graphics
-         * @param x1 x1
-         * @param y1 y1
-         * @param x2 x2
-         * @param y2 y2
-         * @param x3 x3
-         * @param y3 y3
-         */
-        private void drawRotatedTriangle(Graphics2D g, double x1, double y1,
-                                         double x2, double y2, double x3,
-                                         double y3) {
-
-            /** for drawing */
-            int[] xPoint = new int[3];
-
-            /** for drawing */
-            int[] yPoint = new int[3];
-
-            xPoint[0] = x0 + (int) (x1 * cost - y1 * sint);
-            yPoint[0] = y0 + (int) (x1 * sint + y1 * cost);
-
-            xPoint[1] = x0 + (int) (x2 * cost - y2 * sint);
-            yPoint[1] = y0 + (int) (x2 * sint + y2 * cost);
-
-            xPoint[2] = x0 + (int) (x3 * cost - y3 * sint);
-            yPoint[2] = y0 + (int) (x3 * sint + y3 * cost);
-
-            g.fillPolygon(xPoint, yPoint, 3);
-        }
-
     }
 }

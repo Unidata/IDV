@@ -1294,11 +1294,11 @@ public class StationModelDisplayable extends DisplayableData {
                             (float) (pointOnSymbol.getX());
                         workSpatialValues[1][0] =
                             (float) (-pointOnSymbol.getY());
-                        float scale = 2.5f * (float) metSymbol.getScale();
+                        //float scale = 2.5f * (float) metSymbol.getScale();
                         try {
                         	if (metSymbol instanceof WindVectorSymbol) {
                                shapes = ((WindVectorSymbol) metSymbol).makeVector(workFlowValues,
-                                    1f, workSpatialValues, (byte[][]) null,  //color_values, 
+                                    .5f, workSpatialValues, (byte[][]) null,  //color_values, 
                                     workRangeSelect);
                         	} else {
                                shapes = WindBarb.staticMakeFlow(workFlowValues,
