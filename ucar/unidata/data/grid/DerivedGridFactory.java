@@ -808,7 +808,7 @@ public class DerivedGridFactory {
                     if ((topoRef.equals(RealTupleType.SpatialEarth2DTuple)
                             || topoRef.equals(
                                 RealTupleType.LatitudeLongitudeTuple))) {
-                        topoGrid = GridUtil.swapLatLon((FlatField) topoGrid);
+                        topoGrid = GridUtil.swapLatLon(topoGrid);
                     }
                 }
             }
