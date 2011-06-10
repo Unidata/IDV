@@ -186,8 +186,14 @@ public class CDMProfilerDataSource extends FilesDataSource {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
-        List files = getFileNameOrUrls();
+        List files = new ArrayList();
         String nam = "CDM Profiler Data Source";
+        Iterator itr = this.sources.iterator();
+        while(itr.hasNext()){
+            String fn = (String)itr.next();
+            files.add(fn);
+        }
+
         try{
             initProfilerAll(files, nam);
         } catch (VisADException e){
@@ -2159,24 +2165,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
         return fileNameOrUrls;
     }
 
-    /**
-     * Set the selectedStations property.
-     *
-     * @param value The new value for selectedStations
-     */
-    public void setselectedStations(List<NamedStation> value) {
-        selectedStations = value;
-    }
 
-
-    /**
-     * Get the selectedStations property.
-     *
-     * @return The selectedStations
-     */
-    public List<NamedStation> getSelectedStations() {
-        return selectedStations;
-    }
 
     /**
      * Add the gui components into the list for the properties dialog
