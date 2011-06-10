@@ -118,7 +118,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws VisADException   VisAD error
      */
     protected boolean setData(DataChoice choice)
-            throws VisADException, RemoteException {
+            throws VisADException, RemoteException {        
         if ( !super.setData(choice)) {
             System.out.println("set data is false");
             return false;
@@ -354,6 +354,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         ginst.reInitialize();
 
         FieldImpl grid = ginst.getGrid();
+        dataIs3D = true;
         loadData(grid);
 
 
