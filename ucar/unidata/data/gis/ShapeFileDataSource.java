@@ -358,7 +358,7 @@ public class ShapeFileDataSource extends FilesDataSource {
             if (shapefileData == null) {
                 //If its not a shp or zip file then try it with the mapFamily
                 if ( !IOUtil.hasSuffix(filename, ".shp")
-                        && !IOUtil.hasSuffix(filename, ".zip")) {
+                        && !IOUtil.hasSuffix(filename, ".zip") && !IOUtil.hasSuffix(filename, ".tcl")) {
                     try {
                         URL url = IOUtil.getURL(filename, getClass());
                         shapefileData = (url == null)
