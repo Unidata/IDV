@@ -302,17 +302,17 @@ public class GridUtil {
         // find first non-missing grid
         if (isTimeSequence(grid)) {
             try {
-                Set timeDomain = Util.getDomainSet(grid);
-                SampledSet ss0 = null;
-                int slength = 0;
+                Set        timeDomain = Util.getDomainSet(grid);
+                SampledSet ss0        = null;
+                int        slength    = 0;
                 for (int i = 0; i < timeDomain.getLength(); i++) {
                     FieldImpl sample = (FieldImpl) grid.getSample(i);
                     if ( !sample.isMissing()) {
                         SampledSet ss = getSpatialDomain(grid, i);
-                        int ll = ss.getLength();
-                        if(ll > slength) {
+                        int        ll = ss.getLength();
+                        if (ll > slength) {
                             slength = ll;
-                            ss0 = (SampledSet)ss.clone();
+                            ss0     = (SampledSet) ss.clone();
                         }
 
                     }
@@ -1759,13 +1759,24 @@ public class GridUtil {
         Gridded2DSet  newDomainSet = null;
         RealTupleType domainType =
             ((SetType) domainSet.getType()).getDomain();
-        RealTupleType newType = null;
-        if (domainSet.getCoordinateSystem() != null) {
-            MapProjection mp = getNavigation(domainSet);
-            newType =
-                new RealTupleType((RealType) domainType.getComponent(0),
-                                  (RealType) domainType.getComponent(1), mp,
-                                  null);
+        RealTupleType    newType = null;
+        CoordinateSystem cs      = domainSet.getCoordinateSystem();
+        if (cs != null) {
+            // hack for WRF empirical cs - getNavigation returns the lat/lon set
+            if (cs instanceof EmpiricalCoordinateSystem) {
+                domainSet =
+                    ((EmpiricalCoordinateSystem) cs).getReferenceSet();
+                domainType = ((SetType) domainSet.getType()).getDomain();
+                newType =
+                    new RealTupleType((RealType) domainType.getComponent(0),
+                                      (RealType) domainType.getComponent(1));
+            } else {
+                MapProjection mp = getNavigation(domainSet);
+                newType =
+                    new RealTupleType((RealType) domainType.getComponent(0),
+                                      (RealType) domainType.getComponent(1),
+                                      mp, null);
+            }
         } else {
             newType =
                 new RealTupleType((RealType) domainType.getComponent(0),

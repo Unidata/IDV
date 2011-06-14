@@ -417,7 +417,7 @@ def zsum(S):
                  ZSUM for a vertical column is stored at every point
   </div>
   """
-  return GridMath.applyFunctionToLevels(S, GridMath.FUNC_SUM)
+  return GridMath.applyFunctionOverLevels(S, GridMath.FUNC_SUM)
 
 def wshr(V, Z, top, bottom):
   """  Magnitude of the vertical wind shear in a layer
