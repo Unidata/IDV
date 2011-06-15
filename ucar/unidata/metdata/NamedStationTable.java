@@ -1,25 +1,22 @@
 /*
- * $Id: NamedStationTable.java,v 1.46 2007/06/08 21:10:35 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.metdata;
 
@@ -31,43 +28,43 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.data.DataUtil;
-
-import ucar.unidata.gis.WorldWindReader;
-
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
-
-import ucar.unidata.xml.*;
+import ucar.unidata.xml.XmlNodeList;
+import ucar.unidata.xml.XmlResourceCollection;
+import ucar.unidata.xml.XmlUtil;
 
 import visad.CommonUnit;
 import visad.Real;
 import visad.RealType;
 import visad.Unit;
-import visad.VisADException;
 
-import java.awt.event.*;
-import java.awt.*;
 
-import java.io.*;
+import java.awt.Component;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.lang.Double;
-
-import java.rmi.RemoteException;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 
 /**
@@ -362,10 +359,10 @@ public class NamedStationTable extends StationTableImpl {
      */
     public static String getStationXml(String name, String category,
                                        List stations) {
-        StringBuffer sb    = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER);
         sb.append("\n");
-        String       attrs = XmlUtil.attr(ATTR_NAME, name);
+        String attrs = XmlUtil.attr(ATTR_NAME, name);
         if (category != null) {
             attrs = attrs + XmlUtil.attr(ATTR_CATEGORY, category);
         }
@@ -398,8 +395,10 @@ public class NamedStationTable extends StationTableImpl {
      * @return  true if identified as KML
      */
     private static boolean isKml(String filename) {
-        return (filename.toLowerCase().endsWith(".kml")
-                || filename.toLowerCase().endsWith(".kmz"));
+        //return (filename.toLowerCase().endsWith(".kml")
+        //        || filename.toLowerCase().endsWith(".kmz"));
+        return (IOUtil.hasSuffix(filename, ".kml")
+                || IOUtil.hasSuffix(filename, ".kmz"));
     }
 
     /**
@@ -410,7 +409,7 @@ public class NamedStationTable extends StationTableImpl {
      * @return  true if identified as GEMPAK station file
      */
     private static boolean isGempak(String filename) {
-        return filename.toLowerCase().endsWith(".tbl");
+        return IOUtil.hasSuffix(filename, ".tbl");
     }
 
 
@@ -868,7 +867,8 @@ public class NamedStationTable extends StationTableImpl {
     public void createStationTableFromKmlFile(String filename)
             throws Exception {
         String kml = null;
-        if (filename.toLowerCase().endsWith(".kmz")) {
+        //if (filename.toLowerCase().endsWith(".kmz")) {
+        if (IOUtil.hasSuffix(filename, ".kmz")) {
             InputStream is = IOUtil.getInputStream(filename);
             if (is == null) {
                 valid = false;
@@ -941,6 +941,7 @@ public class NamedStationTable extends StationTableImpl {
      * @throws Exception problem creating table from file
      */
     public void createStationTableFromCsv(String csv) throws Exception {
+
         List lines = StringUtil.split(csv, "\n");
         if (lines.size() == 0) {
             return;
@@ -972,12 +973,12 @@ public class NamedStationTable extends StationTableImpl {
                     && (altIndex == -1)) {
                 altIndex = i;
                 //              int bracketIdx = name.indexOf("[");
-            } else  if (name.startsWith("elev")
-                        && (altIndex == -1)) {
+            } else if (name.startsWith("elev") && (altIndex == -1)) {
                 altIndex = i;
                 //              int bracketIdx = name.indexOf("[");
             }
-            if(name.equals("id") || name.startsWith("station") || name.startsWith("site")) {
+            if (name.equals("id") || name.startsWith("station")
+                    || name.startsWith("site")) {
                 titleIndex = i;
 
             }
@@ -1041,6 +1042,7 @@ public class NamedStationTable extends StationTableImpl {
 
             this.add(station, true);
         }
+
     }
 
 
@@ -1269,7 +1271,8 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             return createStationTable(filename);
         }
 
-        if (filename.toLowerCase().endsWith(".csv")) {
+        //if (filename.toLowerCase().endsWith(".csv")) {
+        if (IOUtil.hasSuffix(filename, ".csv")) {
             NamedStationTable table = new NamedStationTable(
                                           IOUtil.stripExtension(
                                               IOUtil.getFileTail(filename)));
@@ -1279,7 +1282,8 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             return table;
         }
 
-        if (filename.toLowerCase().endsWith(".xls")) {
+        //if (filename.toLowerCase().endsWith(".xls")) {
+        if (IOUtil.hasSuffix(filename, ".xls")) {
             NamedStationTable table = new NamedStationTable(
                                           IOUtil.stripExtension(
                                               IOUtil.getFileTail(filename)));
@@ -1559,40 +1563,51 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
      * @return a List of menu items
      */
     public static List<JMenuItem> makeMenuItems(final List locations,
-						final ObjectListener listener) {
-	//Don't do this for now since we don't use the mac menubar
-	if(false && GuiUtils.isMac()) {
-	    JMenuItem menuItem = new JMenuItem("Add Location...");
-	    menuItem.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent ae) {
-			JMenuBar menuBar = new JMenuBar();
-			List<JMenuItem> items         = makeMenuItemsInner(locations, listener);
-			for(JMenuItem mi: items) {
-			    menuBar.add(mi);
-			}
-			GuiUtils.showOkDialog((Window)null,"Locations",(Component)menuBar,(Component)null);
-		    }
-		});
-	    List<JMenuItem>            items         = new ArrayList<JMenuItem>();
-	    items.add(menuItem);
-	    return items;
-	} else {
-	    return makeMenuItemsInner(locations, listener);
-	}
+            final ObjectListener listener) {
+        //Don't do this for now since we don't use the mac menubar
+        if (false && GuiUtils.isMac()) {
+            JMenuItem menuItem = new JMenuItem("Add Location...");
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    JMenuBar menuBar = new JMenuBar();
+                    List<JMenuItem> items = makeMenuItemsInner(locations,
+                                                listener);
+                    for (JMenuItem mi : items) {
+                        menuBar.add(mi);
+                    }
+                    GuiUtils.showOkDialog((Window) null, "Locations",
+                                          (Component) menuBar,
+                                          (Component) null);
+                }
+            });
+            List<JMenuItem> items = new ArrayList<JMenuItem>();
+            items.add(menuItem);
+            return items;
+        } else {
+            return makeMenuItemsInner(locations, listener);
+        }
     }
-	
 
 
 
-    private  static List<JMenuItem> makeMenuItemsInner(final List locations,
-							   final ObjectListener listener) {
-        List<JMenuItem>            items         = new ArrayList<JMenuItem>();
 
-        JMenu           locationsMenu = null;
-        Hashtable       menus         = new Hashtable();
-        final Hashtable categoryMap   = new Hashtable();
+    /**
+     * Make the menu items
+     *
+     * @param locations  the locations
+     * @param listener   the listener for each
+     *
+     * @return  the menus
+     */
+    private static List<JMenuItem> makeMenuItemsInner(final List locations,
+            final ObjectListener listener) {
+        List<JMenuItem>      items         = new ArrayList<JMenuItem>();
 
-	final List<Object[]> macItems = new ArrayList<Object[]>();
+        JMenu                locationsMenu = null;
+        Hashtable            menus         = new Hashtable();
+        final Hashtable      categoryMap   = new Hashtable();
+
+        final List<Object[]> macItems      = new ArrayList<Object[]>();
 
         for (int i = 0; i < locations.size(); i++) {
             NamedStationTable stationTable =
@@ -1637,26 +1652,26 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
                 lastMenu = catMenu;
             }
             if (catMenu != null) {
-		boolean newOne = catMenu.getMenuListeners().length==0;
+                boolean newOne = catMenu.getMenuListeners().length == 0;
                 if (newOne) {
                     final JMenu  theMenu     = catMenu;
                     final String theCategory = catSoFar;
-		    //Don't do this for now
-		    if(false && GuiUtils.isMac()) {
-			macItems.add(new Object[]{
-				categoryMap, theMenu, theCategory});
-		    } else {
-			catMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {}
+                    //Don't do this for now
+                    if (false && GuiUtils.isMac()) {
+                        macItems.add(new Object[] { categoryMap, theMenu,
+                                theCategory });
+                    } else {
+                        catMenu.addMenuListener(new MenuListener() {
+                            public void menuCanceled(MenuEvent e) {}
 
-				public void menuDeselected(MenuEvent e) {}
+                            public void menuDeselected(MenuEvent e) {}
 
-				public void menuSelected(MenuEvent e) {
-				    addMenuItems(categoryMap, theMenu, theCategory,
-						 listener);
-				}
-			    });
-		    }
+                            public void menuSelected(MenuEvent e) {
+                                addMenuItems(categoryMap, theMenu,
+                                             theCategory, listener);
+                            }
+                        });
+                    }
                 }
             } else {
                 JMenuItem mi = new JMenuItem(stationTable.getName());
@@ -1669,19 +1684,19 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             }
         }
 
-	if(macItems.size()>0) {
-	    Misc.run(new Runnable() {
-		    public void run() {
-			for(Object[]tuple: macItems) {
-			    Hashtable categoryMap = (Hashtable) tuple[0];
-			    JMenu theMenu = (JMenu) tuple[1];
-			    String theCategory = (String) tuple[2];
-			    addMenuItems(categoryMap, theMenu, theCategory,
-					 listener);
-			}
-		    }
-		});
-	}
+        if (macItems.size() > 0) {
+            Misc.run(new Runnable() {
+                public void run() {
+                    for (Object[] tuple : macItems) {
+                        Hashtable categoryMap = (Hashtable) tuple[0];
+                        JMenu     theMenu     = (JMenu) tuple[1];
+                        String    theCategory = (String) tuple[2];
+                        addMenuItems(categoryMap, theMenu, theCategory,
+                                     listener);
+                    }
+                }
+            });
+        }
         return items;
     }
 
@@ -1788,4 +1803,3 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             NamedStationTable.createStationTableFromFile(args[0]);
     }
 }
-
