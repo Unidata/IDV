@@ -23,43 +23,29 @@
 package ucar.unidata.util;
 
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScheme;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
-import org.apache.commons.httpclient.auth.RFC2617Scheme;
 
-/*
-import org.apache.http.auth.AuthScheme;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.InvalidCredentialsException;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.auth.RFC2617Scheme;
-*/
-
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
-
-import java.awt.*;
-
-import java.awt.event.*;
-
-import java.io.File;
-
-import java.net.*;
-
-import java.util.Enumeration;
-
-import java.util.Hashtable;
-
-import javax.swing.*;
 
 
 /**
@@ -156,35 +142,34 @@ public class AccountManager implements CredentialsProvider,
      * _more_
      *
      * @param scope _more_
-     * @param credentials _more_
+     * @param host
+     * @param port
+     * @param isproxy
+     *
      */
-    public void setCredentials(AuthScope scope, Credentials credentials) {
+    public void setCredentials(AuthScheme scope, String host,int port, boolean isproxy)
+    {
         //TODO: What should this do?
         if (scope == null) {
             throw new IllegalArgumentException(
                 "Authentication scope may not be null");
         }
 
-
-        String key = scope.getHost() + ":" + scope.getPort() + ":"
+        String key = host + ":" + port + ":"
                      + scope.getRealm();
         //        System.err.println ("got auth call " + key);
 
         UserInfo userInfo = getUserNamePassword(key,
-                                "The server " + scope.getHost() + ":"
-                                + scope.getPort()
+                                "The server " + host + ":"
+                                + port
                                 + " requires a username/password");
         if (userInfo == null) {
             return;
         }
 
-        if (credentials == null) {
-            currentCredentials =
+        currentCredentials =
                 new UsernamePasswordCredentials(userInfo.getUserId(),
                     userInfo.getPassword());
-        } else {
-            currentCredentials = credentials;
-        }
     }
 
     /**
@@ -194,15 +179,15 @@ public class AccountManager implements CredentialsProvider,
      * @return Null if the user presses cancel. Else return the credentials
      *
      */
-    //jeffmc:    public Credentials getCredentials(AuthScope authscope, String s,int x, boolean y) {
-    public Credentials getCredentials(AuthScheme authscope, String s,int x, boolean y) {
+    public Credentials getCredentials(AuthScheme authscope, String host,int port, boolean isproxy)
+    {
         if (authscope == null) {
             throw new IllegalArgumentException(
                 "Authentication scope may not be null");
         }
 
         if (currentCredentials == null) {
-            //jeffmc: skip for now            setCredentials(authscope, null);
+            setCredentials(authscope, host, port, isproxy);
         }
 
         return currentCredentials;
