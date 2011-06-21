@@ -25,26 +25,40 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
-
-import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.ProjectionCoordinateSystem;
-import ucar.visad.display.*;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.RubberBandBox;
+import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.GeopotentialAltitude;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.DisplayEvent;
+import visad.DisplayImpl;
+import visad.DisplayListener;
+import visad.DisplayRealType;
+import visad.DisplayRenderer;
+import visad.MouseBehavior;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADRay;
 
-import visad.georef.*;
+import visad.georef.EarthLocation;
+import visad.georef.MapProjection;
 
-import visad.java3d.*;
+import visad.java3d.DisplayRendererJ3D;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.Color;
+import java.awt.event.InputEvent;
 import java.awt.geom.Rectangle2D;
-
 
 import java.rmi.RemoteException;
 
@@ -52,11 +66,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.media.j3d.*;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.View;
 
-import javax.swing.*;
+import javax.swing.JToolBar;
 
-import javax.vecmath.*;
+import javax.vecmath.Point3d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 
 
 /**
@@ -70,23 +87,23 @@ import javax.vecmath.*;
  */
 public abstract class NavigatedDisplay extends DisplayMaster {
 
-    /** _more_ */
+    /** default front clip value */
     public static double CLIP_FRONT_DEFAULT = -1000.0;
 
-    /** _more_ */
+    /** default front clip perspective */
     public static double CLIP_FRONT_PERSPECTIVE = 0.1;
 
-    /** _more_ */
+    /** default back clip value */
     public static double CLIP_BACK_DEFAULT = 1000.0;
 
-    /** _more_ */
+    /** default back clip perspective */
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
 
 
-    /** _more_ */
+    /** the back clip distance */
     private double clipDistanceBack = CLIP_BACK_DEFAULT;
 
-    /** _more_ */
+    /** the front clip distance */
     private double clipDistanceFront = CLIP_FRONT_DEFAULT;
 
 
@@ -141,13 +158,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private boolean autoRotate = false;
 
 
-    /** _more_ */
+    /** rotate x flag */
     private double rotateX = 0;
 
-    /** _more_ */
+    /** rotate y flag */
     private double rotateY = -1;
 
-    /** _more_ */
+    /** rotate z flag */
     private double rotateZ = 0;
 
 
@@ -349,11 +366,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Set the rotation multiplier matrix
      *
-     * @param rotx _more_
-     * @param roty _more_
-     * @param rotz _more_
+     * @param rotx  x rotation
+     * @param roty  y rotation
+     * @param rotz  z rotation
      */
     public void setRotationMultiplierMatrix(double rotx, double roty,
                                             double rotz) {
@@ -640,6 +657,24 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void removeVerticalMap(RealType verticalType)
             throws VisADException, RemoteException {}
+
+    /**
+     * Method to get a ScalarMap to the vertical coordinate (i.e.,
+     * getDisplayAltitudeType is mapped to)..
+     * Subclasses should override if they want to implement this.  This
+     * implementation does nothing.
+     *
+     * @param verticalType RealType of the vertical map
+     *
+     * @return the ScalarMap or null
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+    public ScalarMap getVerticalMap(RealType verticalType)
+            throws VisADException, RemoteException {
+        return null;
+    }
 
     /**
      * Set the view for 3D.  The views are subject to each subclass-s
@@ -1364,14 +1399,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Interpolate between one vector two points
      *
-     * @param a1 _more_
-     * @param a2 _more_
-     * @param index _more_
-     * @param percent _more_
+     * @param a1  point 1
+     * @param a2  point 2
+     * @param index  the index in the points
+     * @param percent  the percent to interpolate
      *
-     * @return _more_
+     * @return the interpolated value
      */
     private double interp(double[] a1, double[] a2, int index,
                           double percent) {
@@ -1393,12 +1428,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Get the screen coordinates
      *
-     * @return _more_
+     * @return  screen coords
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI issue
+     * @throws VisADException  VisAD issue
      */
     public List<TwoFacedObject> getScreenCoordinates()
             throws VisADException, RemoteException {
@@ -1570,14 +1605,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Translate from screen to earth coordinates
      *
-     * @param x _more_
-     * @param y _more_
+     * @param x  screen x
+     * @param y  screen y
      *
-     * @return _more_
+     * @return  the corresponding earth location
      *
-     * @throws VisADException _more_
+     * @throws VisADException problem accessing data
      */
     public EarthLocation screenToEarthLocation(int x, int y)
             throws VisADException {
@@ -2106,12 +2141,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
-     * _more_
+     * Get the navigation toolbar for this NavigatedDisplay
      *
-     * @param orientation _more_
-     * @param floatable _more_
+     * @param orientation  the orientation
+     * @param floatable    true to allow floatation
      *
-     * @return _more_
+     * @return  the toolbar
      */
     public NavigatedDisplayToolBar getNavigationToolBar(int orientation,
             boolean floatable) {
@@ -2307,7 +2342,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * _more_
+     * rotate slower
      */
     public void rotateSlower() {
         setRotateDelay(rotateDelay * 2);
@@ -2335,10 +2370,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * _more_
+     * Reset the scale and translation
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD problem
      */
     public void resetScaleTranslate() throws VisADException, RemoteException {
         getDisplay().getProjectionControl().resetProjection();

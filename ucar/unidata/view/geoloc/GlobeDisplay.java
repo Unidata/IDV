@@ -1,57 +1,90 @@
 /*
- * $Id: GlobeDisplay.java,v 1.49 2007/07/31 15:11:25 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
 
-import ucar.unidata.geoloc.Projection;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.geoloc.projection.*;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.visad.Util;
-import ucar.visad.display.*;
+import ucar.visad.display.Grid2DDisplayable;
+import ucar.visad.display.MapLines;
+import ucar.visad.display.RubberBandBox;
+import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.GeopotentialAltitude;
 
-import visad.*;
+import visad.ActionImpl;
+import visad.CommonUnit;
+import visad.ConstantMap;
+import visad.CoordinateSystem;
+import visad.DataRenderer;
+import visad.Display;
+import visad.DisplayImpl;
+import visad.DisplayRealType;
+import visad.DisplayTupleType;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.KeyboardBehavior;
+import visad.MouseBehavior;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.Unit;
+import visad.UnitException;
+import visad.VisADException;
+import visad.VisADRay;
 
 import visad.data.mcidas.BaseMapAdapter;
 
-import visad.georef.*;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
+import visad.georef.MapProjection;
 
-import visad.java3d.*;
+import visad.java3d.DefaultDisplayRendererJ3D;
+import visad.java3d.DisplayImplJ3D;
+import visad.java3d.DisplayRendererJ3D;
+import visad.java3d.KeyboardBehaviorJ3D;
+import visad.java3d.ProjectionControlJ3D;
 
-import java.awt.*;
-import java.awt.event.*;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import java.net.URL;
 
@@ -59,18 +92,25 @@ import java.rmi.RemoteException;
 
 import java.util.Iterator;
 
-import javax.media.j3d.*;
+import javax.media.j3d.GraphicsConfigTemplate3D;
+import javax.media.j3d.PhysicalBody;
 import javax.media.j3d.Transform3D;
+import javax.media.j3d.TransformGroup;
+import javax.media.j3d.View;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-import javax.vecmath.*;
-
-import javax.vecmath.*;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 
 /**
- * Provides a navigated globe for displaying meteorological data.
+ * Provides a navigated globe for displaying geolocated data.
  * Any displayable data must be able to map to RealType.Latitude,
  * RealType.Longitude and/or RealType.Altitude.
  *
@@ -1064,6 +1104,29 @@ public class GlobeDisplay extends NavigatedDisplay {
     }
 
     /**
+     * Get a new mapping of this type to the vertical coordinate
+     *
+     * @param vertType  RealType of map
+     * @return the ScalarMap or null
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public ScalarMap getVerticalMap(RealType vertType)
+            throws VisADException, RemoteException {
+        if (getDisplayMode() == MODE_3D) {
+            for (Iterator iter =
+                    verticalMapSet.iterator(); iter.hasNext(); ) {
+                ScalarMap s = (ScalarMap) iter.next();
+                if (((RealType) s.getScalar()).equals(vertType)) {
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Set the Unit of the vertical range
      *
      * @param  newUnit  unit of range
@@ -1409,4 +1472,3 @@ public class GlobeDisplay extends NavigatedDisplay {
     }
 
 }
-

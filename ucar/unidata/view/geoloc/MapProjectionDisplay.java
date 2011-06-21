@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,25 +21,49 @@
 package ucar.unidata.view.geoloc;
 
 
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.ProjectionPoint;
+import ucar.unidata.geoloc.ProjectionRect;
+import ucar.unidata.geoloc.projection.LatLonProjection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.GeoUtils;
-
 import ucar.visad.ProjectionCoordinateSystem;
-import ucar.visad.display.*;
+import ucar.visad.display.MapLines;
+import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 
-import visad.*;
+import visad.AxisScale;
+import visad.CachingCoordinateSystem;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Display;
+import visad.DisplayImpl;
+import visad.DisplayRealType;
+import visad.DisplayTupleType;
+import visad.Gridded2DSet;
+import visad.InverseLinearScaledCS;
+import visad.KeyboardBehavior;
+import visad.MouseBehavior;
+import visad.ProjectionControl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarType;
+import visad.SetType;
+import visad.Unit;
+import visad.UnitException;
+import visad.VisADException;
+import visad.VisADRay;
 
 import visad.data.mcidas.AREACoordinateSystem;
-import visad.data.mcidas.AreaAdapter;
 import visad.data.mcidas.BaseMapAdapter;
 
 import visad.georef.EarthLocation;
@@ -48,9 +72,16 @@ import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
 
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 
 import java.beans.PropertyChangeEvent;
@@ -66,7 +97,11 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 
 /**
@@ -622,6 +657,29 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 removeScalarMaps(sms);
             }
         }
+    }
+
+    /**
+     * Get a new mapping of this type to the vertical coordinate
+     *
+     * @param vertType  RealType of map
+     * @return the ScalarMap or null
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public ScalarMap getVerticalMap(RealType vertType)
+            throws VisADException, RemoteException {
+        if (getDisplayMode() == MODE_3D) {
+            for (Iterator iter =
+                    verticalMapSet.iterator(); iter.hasNext(); ) {
+                ScalarMap s = (ScalarMap) iter.next();
+                if (((RealType) s.getScalar()).equals(vertType)) {
+                    return s;
+                }
+            }
+        }
+        return null;
     }
 
     /**
