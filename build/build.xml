@@ -434,14 +434,6 @@ line using: and -Dbasedir=/some/other/dir
           <param  name="codebase_path" value="${snapshot_webstart_path}/webstart"/>
        </antcall>
 
-        <scp
-            todir="${user.name}@conan:/content${snapshot_path}/docs"
-            keyfile="${user.home}/.ssh/id_dsa"
-            passphrase=""
-            file="auxdata/docs/.htaccess"/>
-
-
-
         <echo message="Making docs, jars zip, etc."/>
         <antcall target="ftpdir"/>
         <scp
