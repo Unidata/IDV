@@ -1432,6 +1432,22 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     GuiUtils.left(levelSelector),
                     GuiUtils.centerRight(levelReadout, cycleLevelsCbx)));
         }
+        /*
+        if (getMultipleIsTopography()) {
+            JButton setRangeBtn = new JButton("Push Me");
+            setRangeBtn.addActionListener(new ActionListener() {
+            	public void actionPerformed(ActionEvent e) {
+            		try {
+            			setTopoRange();
+            		} catch (Exception excp) {
+            			logException("Setting topography range", excp);
+            		}
+            	}
+            });
+            controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel("Topography Range"),
+            		  GuiUtils.left((setRangeBtn))));
+        }
+        */
     }
 
 

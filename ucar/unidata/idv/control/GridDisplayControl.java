@@ -25,16 +25,8 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.idv.ControlContext;
-
-
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.ColorTable;
-
-//begin control imports
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -42,37 +34,30 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
+import visad.Data;
+import visad.DisplayRealType;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.Unit;
+import visad.VisADException;
+
+import visad.georef.EarthLocation;
+import visad.georef.MapProjection;
 
 
-import ucar.unidata.view.geoloc.*;
-
-import ucar.visad.Util;
-
-import ucar.visad.display.*;
-
-import ucar.visad.display.DisplayMaster;
-
-
-
-import visad.*;
-
-import visad.georef.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.io.*;
+import java.awt.event.ActionEvent;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-
-import javax.swing.event.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 
 
 
@@ -104,6 +89,9 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
 
     /** RealType for vertical mapping */
     private RealType topoType;
+
+    /** RealType for vertical mapping */
+    private Range topoRange;
 
     /**
      * For legacy code.
@@ -148,7 +136,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      * @param el  earth location
      * @param animationValue animation value
      * @param animationStep animation step
-     * @param samples _more_
+     * @param samples the list of samples
      *
      * @return list of values
      *
@@ -578,6 +566,24 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         }
         topoType = getGridDataInstance().getRealType(typeIndex);
         nd.addVerticalMap(topoType);
+        setTopoRange();
+    }
+
+    /**
+     * Set the range on the topography ScalarMap
+     *
+     * @throws VisADException  data problem
+     * @throws RemoteException  remote problem
+     */
+    protected void setTopoRange() throws VisADException, RemoteException {
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd == null) {
+            return;
+        }
+        if ((topoRange != null) && (topoType != null)) {
+            ScalarMap topoMap = nd.getVerticalMap(topoType);
+            topoMap.setRange(topoRange.getMin(), topoRange.getMax());
+        }
     }
 
     /**
