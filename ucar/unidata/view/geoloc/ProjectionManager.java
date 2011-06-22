@@ -419,7 +419,6 @@ public class ProjectionManager implements ActionListener {
         }
 
         JList jlist = new JList(v);
-        jlist.setPreferredSize(new Dimension(200, 400));
         JPanel contents =
             GuiUtils
                 .topCenter(GuiUtils
