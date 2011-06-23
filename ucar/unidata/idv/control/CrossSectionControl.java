@@ -591,6 +591,28 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                         { rect.getCenterY() }
                     });
 
+                    if (startLLP.getLatitude().isMissing()
+                            || startLLP.getLongitude().isMissing()
+                            || endLLP.getLatitude().isMissing()
+                            || endLLP.getLongitude().isMissing()) {
+                        //Tried to check here whether end   points of Transect are missing or not
+
+
+                        //It is assumed that at least 10% of the projected area is not missing.
+                        startLLP = mp.getLatLon(new double[][] {
+                            //And reset the end points of the Data Transect.
+                            { rect.getCenterX() - rect.getWidth() / 10 },
+                            { rect.getCenterY() - rect.getHeight() / 10 }
+                        });
+                        endLLP = mp.getLatLon(new double[][] {
+                            { rect.getCenterX() + rect.getWidth() / 10 },
+                            { rect.getCenterY() + rect.getHeight() / 10 }
+                        });
+                    }
+
+
+
+
                     EarthLocation startLoc =
                         new EarthLocationTuple(
                             startLLP.getLatitude().getValue(),
@@ -2300,66 +2322,71 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
     /**
-       Set the LineVisible property.
-
-       @param value The new value for LineVisible
-    **/
-    public void setLineVisible (boolean value) {
-	lineVisible = value;
+     *  Set the LineVisible property.
+     *
+     *  @param value The new value for LineVisible
+     */
+    public void setLineVisible(boolean value) {
+        lineVisible = value;
     }
 
     /**
-       Get the LineVisible property.
-
-       @return The LineVisible
-    **/
-    public boolean getLineVisible () {
-	return lineVisible;
-    }
-
-
-    public void setInitAlt (double value) {
-	initAlt = value;
+     *  Get the LineVisible property.
+     *
+     *  @return The LineVisible
+     */
+    public boolean getLineVisible() {
+        return lineVisible;
     }
 
 
     /**
-       Set the Lat2 property.
-
-       @param value The new value for Lat2
-    **/
-    public void setInitLat2 (double value) {
-	initLat2 = value;
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setInitAlt(double value) {
+        initAlt = value;
     }
 
 
     /**
-       Set the Lon2 property.
-
-       @param value The new value for Lon2
-    **/
-    public void setInitLon2 (double value) {
-	initLon2 = value;
+     *  Set the Lat2 property.
+     *
+     *  @param value The new value for Lat2
+     */
+    public void setInitLat2(double value) {
+        initLat2 = value;
     }
 
 
     /**
-       Set the InitLat1 property.
-
-       @param value The new value for InitLat1
-    **/
-    public void setInitLat1 (double value) {
-	initLat1 = value;
+     *  Set the Lon2 property.
+     *
+     *  @param value The new value for Lon2
+     */
+    public void setInitLon2(double value) {
+        initLon2 = value;
     }
 
 
     /**
-       Set the Lon1 property.
+     *  Set the InitLat1 property.
+     *
+     *  @param value The new value for InitLat1
+     */
+    public void setInitLat1(double value) {
+        initLat1 = value;
+    }
 
-       @param value The new value for Lon1
-    **/
-    public void setInitLon1 (double value) {
-	initLon1 = value;
+
+    /**
+     *  Set the Lon1 property.
+     *
+     *  @param value The new value for Lon1
+     */
+    public void setInitLon1(double value) {
+        initLon1 = value;
     }
 
 
