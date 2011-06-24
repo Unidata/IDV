@@ -90,9 +90,6 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
     /** RealType for vertical mapping */
     private RealType topoType;
 
-    /** RealType for vertical mapping */
-    private Range topoRange;
-
     /**
      * For legacy code.
      * @deprecated Should use getGridDataInstance
@@ -560,30 +557,11 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         if (nd == null) {
             return;
         }
-        DisplayRealType vertType = getDisplayAltitudeType();
         if (topoType != null) {
             nd.removeVerticalMap(topoType);
         }
         topoType = getGridDataInstance().getRealType(typeIndex);
         nd.addVerticalMap(topoType);
-        setTopoRange();
-    }
-
-    /**
-     * Set the range on the topography ScalarMap
-     *
-     * @throws VisADException  data problem
-     * @throws RemoteException  remote problem
-     */
-    protected void setTopoRange() throws VisADException, RemoteException {
-        NavigatedDisplay nd = getNavigatedDisplay();
-        if (nd == null) {
-            return;
-        }
-        if ((topoRange != null) && (topoType != null)) {
-            ScalarMap topoMap = nd.getVerticalMap(topoType);
-            topoMap.setRange(topoRange.getMin(), topoRange.getMax());
-        }
     }
 
     /**

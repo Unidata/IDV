@@ -36,6 +36,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Util;
 import ucar.visad.display.Displayable;
@@ -43,6 +44,7 @@ import ucar.visad.display.DisplayableData;
 
 import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.GridDisplayable;
+import ucar.visad.display.ScalarMapSet;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.ZSelector;
 
@@ -152,8 +154,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** data choice for the data */
     protected DataChoice datachoice;
 
-    /** data choice for the data */
+    /** multiple is topography flag */
     private boolean multipleIsTopography = false;
+
+    /** parameter is topography flag */
+    private boolean parameterIsTopography = false;
+
+    /** ScalarMap for parameter topography */
+    ScalarMap parameterZMap = null;
+    
+    /** RealType for vertical mapping */
+    private Range topoRange;
 
     /** vertical scalar map */
     private RealType topoType = null;
@@ -464,8 +475,20 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 addDisplayable(planDisplay);
             }
         }
+        if (getParameterIsTopography()) {
+        	addParameterTopographyMap();
+        }
+
         Trace.call2("PlanView.init");
         return result;
+    }
+    
+    public void initDone() {
+        if (getParameterIsTopography()) {
+        	try {
+        	addParameterTopographyMap();
+        	} catch (Exception e) {}
+        }
     }
 
     /**
@@ -607,7 +630,6 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (getMultipleIsTopography()) {
             addTopographyMap();
         }
-
         Trace.call1("PlanView.getLevels");
         //Now get the list of levels. We don't want to pass in the level range here since then we won't see
         //any other levels
@@ -673,6 +695,47 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected void addTopographyMap() throws VisADException, RemoteException {
         addTopographyMap(1);
     }
+
+    /**
+     * Add a topography map for the parameter
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException Unable to set the ScalarMap
+     */
+    protected void addParameterTopographyMap()
+            throws VisADException, RemoteException {
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd == null) {
+            return;
+        }
+        DisplayRealType vertType = getDisplayAltitudeType();
+        ScalarMapSet mapSet = getPlanDisplay().getScalarMapSet();
+        if (parameterZMap != null) {
+            mapSet.remove(parameterZMap);
+        }
+        RealType paramTopoType = getGridDataInstance().getRealType(0);
+        parameterZMap = new ScalarMap(paramTopoType, vertType);
+        parameterZMap.setOverrideUnit(getDisplayUnit());
+        mapSet.add(parameterZMap);
+        getPlanDisplay().setScalarMapSet(mapSet);
+    }
+
+    /**
+     * Set the range on the topography ScalarMap
+     *
+     * @throws VisADException  data problem
+     * @throws RemoteException  remote problem
+    protected void setTopoRange() throws VisADException, RemoteException {
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd == null) {
+            return;
+        }
+        if ((topoRange != null) && (topoType != null)) {
+            ScalarMap topoMap = nd.getVerticalMap(topoType);
+            topoMap.setRange(topoRange.getMin(), topoRange.getMax());
+        }
+    }
+     */
 
     /**
      * Turn on or off animation by level according to input arg. true = on.
@@ -895,6 +958,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
             if (getMultipleIsTopography()) {
                 addTopographyMap();
             }
+            if (getParameterIsTopography()) {
+                addParameterTopographyMap();
+            }
         } catch (Exception e) {}
     }
 
@@ -1114,7 +1180,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         } else {  // 2D grid or requested slice
             currentSlice = workingGrid;
             if (GridUtil.is3D(currentSlice)
-                    && ( !displayIs3D || getMultipleIsTopography())) {
+                    && ( !displayIs3D || getMultipleIsTopography() || getParameterIsTopography())) {
                 currentSlice = GridUtil.make2DGridFromSlice(currentSlice);
             }
         }
@@ -1433,7 +1499,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     GuiUtils.centerRight(levelReadout, cycleLevelsCbx)));
         }
         /*
-        if (getMultipleIsTopography()) {
+        if (getParameterIsTopography()) {
             JButton setRangeBtn = new JButton("Push Me");
             setRangeBtn.addActionListener(new ActionListener() {
             	public void actionPerformed(ActionEvent e) {
@@ -1521,6 +1587,24 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public boolean getMultipleIsTopography() {
         return multipleIsTopography;
+    }
+
+    /**
+     * Set the parameter is topography property.
+     *
+     * @param v true if second parameter is topography
+     */
+    public void setParameterIsTopography(boolean v) {
+        parameterIsTopography = v;
+    }
+
+    /**
+     * Get the parameter is topography property.
+     *
+     * @return true if multiple grid is topography
+     */
+    public boolean getParameterIsTopography() {
+        return parameterIsTopography;
     }
 
     /**
