@@ -659,24 +659,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             throws VisADException, RemoteException {}
 
     /**
-     * Method to get a ScalarMap to the vertical coordinate (i.e.,
-     * getDisplayAltitudeType is mapped to)..
-     * Subclasses should override if they want to implement this.  This
-     * implementation does nothing.
-     *
-     * @param verticalType RealType of the vertical map
-     *
-     * @return the ScalarMap or null
-     *
-     * @throws RemoteException  Java RMI problem
-     * @throws VisADException   VisAD problem
-     */
-    public ScalarMap getVerticalMap(RealType verticalType)
-            throws VisADException, RemoteException {
-        return null;
-    }
-
-    /**
      * Set the view for 3D.  The views are subject to each subclass-s
      * implementation.
      * @param  view  one of the static view fields (NORTH_VIEW, SOUTH_VIEW, ..

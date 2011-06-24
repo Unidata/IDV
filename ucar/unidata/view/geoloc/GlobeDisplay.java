@@ -1104,29 +1104,6 @@ public class GlobeDisplay extends NavigatedDisplay {
     }
 
     /**
-     * Get a new mapping of this type to the vertical coordinate
-     *
-     * @param vertType  RealType of map
-     * @return the ScalarMap or null
-     *
-     * @throws RemoteException    Java RMI problem
-     * @throws VisADException     VisAD problem
-     */
-    public ScalarMap getVerticalMap(RealType vertType)
-            throws VisADException, RemoteException {
-        if (getDisplayMode() == MODE_3D) {
-            for (Iterator iter =
-                    verticalMapSet.iterator(); iter.hasNext(); ) {
-                ScalarMap s = (ScalarMap) iter.next();
-                if (((RealType) s.getScalar()).equals(vertType)) {
-                    return s;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Set the Unit of the vertical range
      *
      * @param  newUnit  unit of range
