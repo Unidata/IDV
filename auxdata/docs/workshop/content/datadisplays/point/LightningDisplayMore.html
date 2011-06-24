@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>Overlaying Lightning Data on Radar Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+Overlaying lightning data on radar data.
+</div>
+
+<ol class="step">
+    <li>Load some radar data</li>
+    <ul>
+      <li>[ht::openDataSourceChooser]</li>
+	  <li>In the [ht::dialog Data Source Chooser] click on the [ht::command Files] tab.</li>
+      <li>Go to the radar data directory: [ht::filename <%workshop.datadir%>/lightning/radar/].</li>
+	  <li>Select all the [ht::filename *.ar2v] files</li>
+	  <li>Under the [ht::command Data Source Type] pulldown menu, select &quot;Radar files (NEXRAD/DORADE/UF)&quot;</li>
+      <li>Press [ht::button Add Source]</li>
+    </ul>
+    <li>Create the display</li>
+    <ul>
+      <li>In the [ht::command Fields] panel select [ht::param Reflectivity].</li>
+      <li>In the [ht::command Displays]  select [ht::display Radar Sweep View in 2D] and press [ht::button Create Display]</li>
+      <li>Press [ht::button Create Display]</li>
+    </ul>
+    <li>As an exercise for the reader, turn on various geographic data sets such as US State lines.</li>
+    <li>Turn on animation</li>
+    <li>Where are strikes occurring relative to areas of high reflectivity?</li>
+</ol>
+</body>
+</html>
+
