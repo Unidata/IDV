@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Lightning  Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+The IDV has lightning data display capability.
+</div>
+
+<ol class="step">
+    <li>[ht::clearDisplaysAndData]</li>
+    <li>Load some lighting data</li>
+    <ul>
+          <li>[ht::openDataSourceChooser]</li>
+	  <li>In the [ht::dialog Data Source Chooser] click on the [ht::command Files] tab.</li>
+          <li> Go to the point data directory: [ht::filename <%workshop.datadir%>/lightning/].</li>
+	  <li> Select [ht::filename 201117415.ingest]</li>
+	  <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;Netcdf Point Data files&quot;</li>
+          <li> Press [ht::button Add Source]</li>
+    </ul>
+    <li>Create the display</li>
+    <ul>
+      <li>In the [ht::command Data Sources] panel right click the lightning data source.</li>      
+      <li>Under [ht::command Properties] tab in the Time Binning section, change Bin Size to 5 minutes</li>
+      <li>Click on the [ht::tab Spatial Subset] tab. Select a region encompassing New York state and press [ht::button OK].</li>
+      <li>In the [ht::command Fields] panel select [ht::param Point Data].</li>
+      <li>In the [ht::command Displays]  select [ht::display Point Data Plot] and press [ht::button Create Display]</li>
+      <li>Select [ht::command Layout Model] tab</li>
+      <li>Click on the menu and and select Lightning > Bolts</li>
+      <li>In the same menu click Edit</li>
+      <li>Double click on the lightning layout model</li>
+      <li>Ensure that the parameter being displayed is "sgnl", and Press [ht::button OK].</li>
+      <li>Press [ht::button Create Display]</li>
+    </ul>
+    <li>Improving the lightning display in the [ht::command Displays] panel</li>
+    <ul>
+      <li>Disable [ht::command Declutter].</li>
+      <li>In the [ht::command Times] panel, select [ht::command {Show Multiple}]</li>
+      <li>Click on the calendar which will bring up a [ht::command Time Settings] panel</li>
+      <li>For Start Time, select "Relative to End Time", and click on Calendar Icon to the right of that menu</li>
+      <li>In the Set Start Offset Dialog select minus (-) 5 minutes.</li>
+      <li>For End Time, Select "From Animation Time", and press OK</li>
+    </ul>
+    <li>Turn on animation</li>
+</ol>
+
+</body>
+</html>
+
