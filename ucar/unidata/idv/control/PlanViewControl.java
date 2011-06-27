@@ -22,16 +22,13 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-
-import ucar.unidata.data.*;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.idv.ControlContext;
-
-import ucar.unidata.idv.DisplayConventions;
-
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
@@ -39,27 +36,36 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Util;
-import ucar.visad.display.Displayable;
 import ucar.visad.display.DisplayableData;
-
 import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.GridDisplayable;
 import ucar.visad.display.ScalarMapSet;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.ZSelector;
 
-import visad.*;
+import visad.Data;
+import visad.DisplayRealType;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
+
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.*;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
@@ -67,8 +73,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 
 /**
@@ -161,13 +177,13 @@ public abstract class PlanViewControl extends GridDisplayControl {
     private boolean parameterIsTopography = false;
 
     /** ScalarMap for parameter topography */
-    ScalarMap parameterZMap = null;
-    
-    /** RealType for vertical mapping */
-    private Range topoRange;
+    ScalarMap parameterTopoMap = null;
 
     /** vertical scalar map */
-    private RealType topoType = null;
+    private VerticalRangeWidget verticalRangeWidget = null;
+
+    /** vertical scalar map */
+    private Range verticalRange;
 
     /** Keep around the  range of the last level */
     private Range levelColorRange;
@@ -382,6 +398,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
+
         datachoice = dataChoice;
 
         //        debug("PV-1");
@@ -475,19 +492,25 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 addDisplayable(planDisplay);
             }
         }
+        /*
         if (getParameterIsTopography()) {
-        	addParameterTopographyMap();
+                addParameterTopographyMap();
         }
+        */
 
         Trace.call2("PlanView.init");
         return result;
+
     }
-    
+
+    /**
+     * _more_
+     */
     public void initDone() {
         if (getParameterIsTopography()) {
-        	try {
-        	addParameterTopographyMap();
-        	} catch (Exception e) {}
+            try {
+                addParameterTopographyMap();
+            } catch (Exception e) {}
         }
     }
 
@@ -709,33 +732,52 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return;
         }
         DisplayRealType vertType = getDisplayAltitudeType();
-        ScalarMapSet mapSet = getPlanDisplay().getScalarMapSet();
-        if (parameterZMap != null) {
-            mapSet.remove(parameterZMap);
+        ScalarMapSet    mapSet   = getPlanDisplay().getScalarMapSet();
+        if (parameterTopoMap != null) {
+            mapSet.remove(parameterTopoMap);
         }
         RealType paramTopoType = getGridDataInstance().getRealType(0);
-        parameterZMap = new ScalarMap(paramTopoType, vertType);
-        parameterZMap.setOverrideUnit(getDisplayUnit());
-        mapSet.add(parameterZMap);
+        parameterTopoMap = new ScalarMap(paramTopoType, vertType);
+        parameterTopoMap.setOverrideUnit(getDisplayUnit());
+        if (verticalRange != null) {
+            setVerticalRange(verticalRange);
+        }
+        mapSet.add(parameterTopoMap);
         getPlanDisplay().setScalarMapSet(mapSet);
     }
 
     /**
-     * Set the range on the topography ScalarMap
+     * Set the range on the parameter topography ScalarMap
      *
+     *
+     * @param vertRange _more_
      * @throws VisADException  data problem
      * @throws RemoteException  remote problem
-    protected void setTopoRange() throws VisADException, RemoteException {
-        NavigatedDisplay nd = getNavigatedDisplay();
-        if (nd == null) {
-            return;
-        }
-        if ((topoRange != null) && (topoType != null)) {
-            ScalarMap topoMap = nd.getVerticalMap(topoType);
-            topoMap.setRange(topoRange.getMin(), topoRange.getMax());
+     */
+    public void setVerticalRange(Range vertRange) {
+        verticalRange = vertRange;
+        if (vertRange != null) {
+            try {
+                if (parameterTopoMap != null) {
+                    parameterTopoMap.setRange(vertRange.getMin(),
+                            vertRange.getMax());
+                }
+            } catch (Exception exc) {
+                logException("Unable to set the vertical range ", exc);
+            }
+            if (verticalRangeWidget != null) {
+                verticalRangeWidget.setRange(vertRange);
+            }
         }
     }
+
+    /**
+     * Get the vertical range
+     * @return the vertical range
      */
+    public Range getVerticalRange() {
+        return verticalRange;
+    }
 
     /**
      * Turn on or off animation by level according to input arg. true = on.
@@ -1180,7 +1222,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
         } else {  // 2D grid or requested slice
             currentSlice = workingGrid;
             if (GridUtil.is3D(currentSlice)
-                    && ( !displayIs3D || getMultipleIsTopography() || getParameterIsTopography())) {
+                    && ( !displayIs3D || getMultipleIsTopography()
+                         || getParameterIsTopography())) {
                 currentSlice = GridUtil.make2DGridFromSlice(currentSlice);
             }
         }
@@ -1498,25 +1541,39 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     GuiUtils.left(levelSelector),
                     GuiUtils.centerRight(levelReadout, cycleLevelsCbx)));
         }
-        /*
         if (getParameterIsTopography()) {
-            JButton setRangeBtn = new JButton("Push Me");
-            setRangeBtn.addActionListener(new ActionListener() {
-            	public void actionPerformed(ActionEvent e) {
-            		try {
-            			setTopoRange();
-            		} catch (Exception excp) {
-            			logException("Setting topography range", excp);
-            		}
-            	}
-            });
-            controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel("Topography Range"),
-            		  GuiUtils.left((setRangeBtn))));
+            if (verticalRange == null) {
+                verticalRange = getColorRangeFromData();
+            }
+            verticalRangeWidget = new VerticalRangeWidget(this,
+                    verticalRange);
+            addRemovable(verticalRangeWidget);
+            controlWidgets.add(verticalRangeWidget);
         }
-        */
     }
 
-
+    /**
+     * A hook that is called when the display unit is changed. Allows
+     * derived classes to act accordingly.
+     *
+     * @param oldUnit The old color unit
+     * @param newUnit The new color unit
+     */
+    protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
+        if (parameterTopoMap != null) {
+            try {
+                parameterTopoMap.setOverrideUnit(newUnit);
+                if (verticalRangeWidget != null) {
+                    Range newRange =
+                        Util.convertRange(verticalRangeWidget.getRange(),
+                                          oldUnit, newUnit);
+                    setVerticalRange(newRange);
+                }
+            } catch (Exception excp) {
+                logException("Unable to set the topo override unit", excp);
+            }
+        }
+    }
 
 
     /**
@@ -1660,16 +1717,16 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected void applySkipFactor() {
 
-       // if (checkFlag(FLAG_SKIPFACTOR)) {
-            if ((getGridDisplayable() != null) && (currentSlice != null)) {
-                try {
-                    getGridDisplayable().loadData(
-                        getSliceForDisplay(currentSlice));
-                } catch (Exception ve) {
-                    logException("applySkipFactor", ve);
-                }
+        // if (checkFlag(FLAG_SKIPFACTOR)) {
+        if ((getGridDisplayable() != null) && (currentSlice != null)) {
+            try {
+                getGridDisplayable().loadData(
+                    getSliceForDisplay(currentSlice));
+            } catch (Exception ve) {
+                logException("applySkipFactor", ve);
             }
-       // }
+        }
+        // }
     }
 
 
@@ -1690,6 +1747,174 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public int getPolygonMode() {
         return polygonMode;
+    }
+
+    /**
+     * A widget for the control window for setting the vertical range properties
+     *
+     * @author  Unidata Development Team
+     */
+    public class VerticalRangeWidget extends ControlWidget {
+
+        /** range */
+        private Range range;
+
+        /** The label for widget */
+        private JLabel label;
+
+        /** A button for brining up the editor */
+        private JButton button;
+
+        /** The right hand label that shows some of the contour information */
+        private JLabel rhLabel;
+
+        /** Change range dialog */
+        private RangeDialog rangeDialog;
+
+        /**
+         * Construct a VerticalRangeWidget
+         *
+         * @param control      the associate control
+         * @param range The initial range
+         */
+        public VerticalRangeWidget(PlanViewControl control, Range range) {
+            this(control, range, "Change Vertical Range");
+        }
+
+        /**
+         * Construct a VerticalRangeWidget
+         *
+         * @param control      the associate control
+         * @param range The initial range
+         * @param dialogTitle Dialog title
+         */
+        public VerticalRangeWidget(PlanViewControl control, Range range,
+                                   String dialogTitle) {
+            super(control);
+            label   = new JLabel("Vertical Range:", SwingConstants.RIGHT);
+            rhLabel = new JLabel(" ");
+            setRange(range);
+            button = new JButton("Change");
+            button.addActionListener(this);
+        }
+
+        /**
+         * Method public due to ActionListener implementation
+         *
+         * @param ae    action event
+         */
+        public void actionPerformed(ActionEvent ae) {
+            showChangeRangeDialog();
+        }
+
+
+        /**
+         * Show the dialog
+         */
+        public void showChangeRangeDialog() {
+            if (rangeDialog == null) {
+                rangeDialog = new RangeDialog(getDisplayControl(), range,
+                        "Change Vertical Range", "setVerticalRange", button);
+            }
+            rangeDialog.showDialog();
+        }
+
+        /**
+         * Get the range information for this widget.
+         *
+         * @return the Range
+         */
+        public Range getRange() {
+            return range;
+        }
+
+        /**
+         * Set the range information for this widget.
+         *
+         * @param r  new Range
+         */
+        public void setRange(Range r) {
+            this.range = r;
+            if (r != null) {
+                updateLabel();
+                if (rangeDialog != null) {
+                    rangeDialog.setRangeDialog(r);
+                }
+            }
+        }
+
+        /**
+         * Update the label
+         */
+        private void updateLabel() {
+            if (rhLabel == null) {
+                return;
+            }
+            StringBuilder buf = new StringBuilder();
+            buf.append("From: ");
+            buf.append(getDisplayConventions().format(range.getMin()));
+            buf.append(" To: ");
+            buf.append(getDisplayConventions().format(range.getMax()));
+            if (displayControl.getDisplayUnit() != null) {
+                ;
+            }
+            {
+                buf.append(" ");
+                buf.append(displayControl.getDisplayUnit());
+            }
+            rhLabel.setText(buf.toString());
+        }
+
+        /**
+         * Get the label for this widget.
+         *
+         * @return   the label.
+         */
+        public JLabel getLabel() {
+            return label;
+        }
+
+        /**
+         * Fill a list of components
+         *
+         * @param l    list of widgets
+         * @param columns  number of columns for layout
+         */
+        public void fillList(List l, int columns) {
+            l.add(label);
+            l.add(GuiUtils.doLayout(new Component[] {
+                GuiUtils.inset(button, new Insets(0, 8, 0, 0)),
+                new Label(" "), rhLabel, GuiUtils.filler() }, 4,
+                    GuiUtils.WT_NNNY, GuiUtils.WT_N));
+        }
+
+        /**
+         * Get the range from the color table
+         *
+         * @return range from the color table
+         */
+        public Range getRangeFromColorTable() {
+
+            Range ctRange = null;
+            ColorTable originalCT =
+                getDisplayControl().getOldColorTableOrInitialColorTable();
+            if (originalCT != null) {
+                ctRange = originalCT.getRange();
+            }
+            return ctRange;
+        }
+
+        /**
+         * Called to remove this from the display.
+         */
+        public void doRemove() {
+            super.doRemove();
+            if (rangeDialog != null) {
+                rangeDialog.doRemove();
+                rangeDialog = null;
+            }
+        }
+
     }
 
 
