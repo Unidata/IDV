@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -897,7 +897,7 @@ public abstract class Displayable {
      * @param maps              The set of ScalarMap-s to be added.
      * @see #fireScalarMapSetChange()
      */
-    protected void setScalarMapSet(ScalarMapSet maps) {
+    public void setScalarMapSet(ScalarMapSet maps) {
         scalarMapSet = maps;
         fireScalarMapSetChange();
     }
