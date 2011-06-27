@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,44 +21,42 @@
 package ucar.unidata.data;
 
 
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import ucar.ma2.Array;
-import ucar.ma2.Index;
 
 import ucar.unidata.util.IOUtil;
-
 import ucar.unidata.util.LogUtil;
-
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Util;
-import ucar.visad.quantities.AirPressure;
+
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.Real;
+import visad.RealType;
+import visad.TextType;
+import visad.Tuple;
+import visad.Unit;
+import visad.VisADException;
 
 
-import visad.*;
-
-import visad.data.vis5d.Vis5DVerticalSystem;
-
-import visad.georef.*;
-
-import java.io.*;
-
-import java.lang.reflect.*;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import java.rmi.RemoteException;
 
 import java.text.SimpleDateFormat;
 
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
 
 /**
@@ -84,30 +82,43 @@ public class DataUtil {
      * @return  float representation
      */
     public static float[] toFloatArray(Array arr) {
-        Object dst       = arr.get1DJavaArray(float.class);
-        Class  fromClass = dst.getClass().getComponentType();
+        Class fromClass = arr.getElementType();
         if (fromClass.equals(float.class)) {
-            //It should always be a float
-            return (float[]) dst;
+            // It should always be a float
+            return (float[]) arr.get1DJavaArray(float.class);
         } else {
-            float[] values = new float[(int) arr.getSize()];
+            float[] values     = new float[(int) arr.getSize()];
+            boolean isUnsigned = arr.isUnsigned();
             if (fromClass.equals(byte.class)) {
-                byte[] fromArray = (byte[]) dst;
+                byte[] fromArray = (byte[]) arr.get1DJavaArray(byte.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (int) fromArray[i] & 0xFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(short.class)) {
-                short[] fromArray = (short[]) dst;
+                short[] fromArray = (short[]) arr.get1DJavaArray(short.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (int) fromArray[i] & 0xFFFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(int.class)) {
-                int[] fromArray = (int[]) dst;
+                int[] fromArray = (int[]) arr.get1DJavaArray(int.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (long) fromArray[i] & 0xFFFFFFFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(double.class)) {
-                double[] fromArray = (double[]) dst;
+                double[] fromArray =
+                    (double[]) arr.get1DJavaArray(double.class);
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = (float) fromArray[i];
                 }
@@ -120,8 +131,6 @@ public class DataUtil {
 
     }
 
-
-
     /**
      * Get the 1D values for an array as doubles.
      *
@@ -129,41 +138,50 @@ public class DataUtil {
      * @return  double representation
      */
     public static double[] toDoubleArray(Array arr) {
-        Object dst = arr.get1DJavaArray(double.class);
-        //        Object dst = arr.copyTo1DJavaArray();
-        Class fromClass = dst.getClass().getComponentType();
-
+        Class fromClass = arr.getElementType();
         if (fromClass.equals(double.class)) {
-            //It should always be a double
-            return (double[]) dst;
+            // It should always be a double
+            return (double[]) arr.get1DJavaArray(double.class);
         } else {
-            double[] values = new double[(int) arr.getSize()];
+            double[] values     = new double[(int) arr.getSize()];
+            boolean  isUnsigned = arr.isUnsigned();
             if (fromClass.equals(byte.class)) {
-                byte[] fromArray = (byte[]) dst;
+                byte[] fromArray = (byte[]) arr.get1DJavaArray(byte.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (int) fromArray[i] & 0xFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(short.class)) {
-                short[] fromArray = (short[]) dst;
+                short[] fromArray = (short[]) arr.get1DJavaArray(short.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (int) fromArray[i] & 0xFFFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(int.class)) {
-                int[] fromArray = (int[]) dst;
+                int[] fromArray = (int[]) arr.get1DJavaArray(int.class);
+                for (int i = 0; i < fromArray.length; ++i) {
+                    if (isUnsigned) {
+                        values[i] = (long) fromArray[i] & 0xFFFFFFFF;
+                    } else {
+                        values[i] = fromArray[i];
+                    }
+                }
+            } else if (fromClass.equals(float.class)) {
+                float[] fromArray = (float[]) arr.get1DJavaArray(float.class);
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = fromArray[i];
-                }
-            } else if (fromClass.equals(double.class)) {
-                double[] fromArray = (double[]) dst;
-                for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = (double) fromArray[i];
                 }
             }
             return values;
         }
 
     }
-
 
     /**
      * Get the 1D values for an array as Strings.
@@ -182,32 +200,41 @@ public class DataUtil {
      * @return  chars representation
      */
     public static char[] toCharArray(Array arr) {
-        Object dst = arr.get1DJavaArray(char.class);
-        //        Object dst = arr.copyTo1DJavaArray();
-        Class fromClass = dst.getClass().getComponentType();
+        Class fromClass = arr.getElementType();
 
         if (fromClass.equals(char.class)) {
-            //It should always be a char
-            return (char[]) dst;
+            // It should always be a char
+            return (char[]) arr.get1DJavaArray(char.class);
         } else {
-            char[] values = new char[(int) arr.getSize()];
+            char[]  values     = new char[(int) arr.getSize()];
+            boolean isUnsigned = arr.isUnsigned();
             if (fromClass.equals(byte.class)) {
-                byte[] fromArray = (byte[]) dst;
+                byte[] fromArray = (byte[]) arr.get1DJavaArray(byte.class);
                 for (int i = 0; i < fromArray.length; ++i) {
-                    values[i] = (char) fromArray[i];
+                    if (isUnsigned) {
+                        values[i] = (char) ((int) fromArray[i] & 0xFF);
+                    } else {
+                        values[i] = (char) fromArray[i];
+                    }
                 }
             } else if (fromClass.equals(short.class)) {
-                short[] fromArray = (short[]) dst;
+                short[] fromArray = (short[]) arr.get1DJavaArray(short.class);
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = (char) fromArray[i];
                 }
             } else if (fromClass.equals(int.class)) {
-                int[] fromArray = (int[]) dst;
+                int[] fromArray = (int[]) arr.get1DJavaArray(int.class);
+                for (int i = 0; i < fromArray.length; ++i) {
+                    values[i] = (char) fromArray[i];
+                }
+            } else if (fromClass.equals(float.class)) {
+                float[] fromArray = (float[]) arr.get1DJavaArray(float.class);
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = (char) fromArray[i];
                 }
             } else if (fromClass.equals(double.class)) {
-                double[] fromArray = (double[]) dst;
+                double[] fromArray =
+                    (double[]) arr.get1DJavaArray(double.class);
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = (char) fromArray[i];
                 }
@@ -240,7 +267,6 @@ public class DataUtil {
     public static TextType makeTextType(String name) {
         return TextType.getTextType(Util.cleanName(name));
     }
-
 
     /**
      * Try to create a RealType from the name and unit.
@@ -310,9 +336,7 @@ public class DataUtil {
     public static float[][] makeFloatArray(int rows, int cols, float value) {
         float[][] values = new float[rows][cols];
         for (int i = 0; i < values.length; i++) {
-            for (int j = 0; j < values[0].length; j++) {
-                values[i][j] = value;
-            }
+            java.util.Arrays.fill(values[i], value);
         }
         return values;
     }
@@ -327,9 +351,7 @@ public class DataUtil {
     public static float[][] cloneArray(float[][] a) {
         float[][] values = new float[a.length][a[0].length];
         for (int i = 0; i < a.length; i++) {
-            for (int j = 0; j < a[0].length; j++) {
-                values[i][j] = a[i][j];
-            }
+            System.arraycopy(a[i], 0, values[i], 0, a[0].length);
         }
         return values;
     }
@@ -570,7 +592,6 @@ public class DataUtil {
      *
      * @throws Exception On badness
      */
-
     public static String xlsToCsv(String filename,
                                   boolean skipToFirstNumeric,
                                   SimpleDateFormat sdf)
