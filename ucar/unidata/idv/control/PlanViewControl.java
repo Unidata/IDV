@@ -504,9 +504,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
     /**
-     * _more_
+     * What to do when you are done.
      */
     public void initDone() {
+        // N.B.  This is done here instead of in init because the projection changed 
+        // event wasn't getting passed through and the wrong ScalarMap was being used.
         if (getParameterIsTopography()) {
             try {
                 addParameterTopographyMap();
@@ -749,10 +751,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /**
      * Set the range on the parameter topography ScalarMap
      *
-     *
-     * @param vertRange _more_
-     * @throws VisADException  data problem
-     * @throws RemoteException  remote problem
+     * @param vertRange the vertical range
      */
     public void setVerticalRange(Range vertRange) {
         verticalRange = vertRange;
@@ -1594,7 +1593,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected boolean shouldShowZSelector() {
         boolean b = !getMultipleIsTopography() && haveLevels()
-                    && useZPosition();
+                    && useZPosition() && !getParameterIsTopography();
         try {
             b = b && ((workingGrid != null)
                       && GridUtil.isVolume(workingGrid));
@@ -1613,7 +1612,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @return Should use z position
      */
     protected boolean shouldUseZPosition() {
-        return !haveLevels() && !getMultipleIsTopography();
+        return !haveLevels() && !getMultipleIsTopography()
+               && !getParameterIsTopography();
     }
 
 
