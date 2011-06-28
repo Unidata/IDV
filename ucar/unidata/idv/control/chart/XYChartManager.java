@@ -717,6 +717,9 @@ public abstract class XYChartManager extends ChartManager {
         /** Speed,Dir or U,V */
         boolean polarWind = true;
 
+        /** Is in Southern hemisphere? */
+        boolean isSouth = false;
+
         /**
          * ctor
          *
@@ -907,7 +910,7 @@ public abstract class XYChartManager extends ChartManager {
 
 
             if (drawer == null) {
-                drawer = new WindBarbSymbol.WindDrawer();
+                drawer = new WindBarbSymbol.WindDrawer(isSouth);
             }
             // System.err.println ("speed: " + speed +", dir: " + dir + ", X: " + xPos + ", Y: " + yPos);
             try {

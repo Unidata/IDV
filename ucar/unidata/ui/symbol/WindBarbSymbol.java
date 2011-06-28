@@ -297,10 +297,20 @@ public class WindBarbSymbol extends MetSymbol {
         /** attrs */
         double windSpeed;
 
+        /** attrs */
+        boolean isSouth = false;
+
         /**
          * ctor
          */
         public WindDrawer() {}
+
+        /**
+         * ctor
+         */
+        public WindDrawer(boolean isSouth) {
+        	this.isSouth = isSouth;
+        }
 
         /**
          * draw
@@ -368,7 +378,7 @@ public class WindBarbSymbol extends MetSymbol {
                 if ((windSpeed >= 2.5) && (windSpeed < 7.5)) {  // special case
                     start = 3;
                 }
-                drawRotatedLine(g, 0, -lenBarb + start, .2 * lenBarb,
+                drawRotatedBarbLine(g, 0, -lenBarb + start, .2 * lenBarb,
                                 -lenBarb + start - 1.5);
             }
         }
@@ -382,7 +392,7 @@ public class WindBarbSymbol extends MetSymbol {
          * @return next degrees
          */
         private int draw10knotLine(Graphics2D g, int start) {
-            drawRotatedLine(g, 0, -lenBarb + start, .4 * lenBarb,
+            drawRotatedBarbLine(g, 0, -lenBarb + start, .4 * lenBarb,
                             -lenBarb + start - 3);
             return start + 3;
         }
@@ -420,6 +430,28 @@ public class WindBarbSymbol extends MetSymbol {
 
             g.drawLine(x0 + begx, y0 + begy, x0 + endx, y0 + endy);
         }
+        
+        /**
+         * draw barb line
+         *
+         * @param g graphics
+         * @param x1 x1
+         * @param y1 y1
+         * @param x2 x2
+         * @param y2 y2
+         */
+		void drawRotatedBarbLine(Graphics2D g, double x1, double y1, double x2,
+				double y2) {
+			int begx = (int) (x1 * cost - y1 * sint);
+			int begy = (int) (x1 * sint + y1 * cost);
+
+			int endx = (int) (x2 * ((isSouth ? -1 : 1) * cost) - y2 * sint);
+			int endy = (int) (x2 * ((isSouth ? -1 : 1) * sint) + y2 * cost);
+
+			g.drawLine(x0 + begx, y0 + begy, x0 + endx, y0 + endy);
+		}
+        
+
 
         /**
          * draw triangle
@@ -445,8 +477,8 @@ public class WindBarbSymbol extends MetSymbol {
             xPoint[0] = x0 + (int) (x1 * cost - y1 * sint);
             yPoint[0] = y0 + (int) (x1 * sint + y1 * cost);
 
-            xPoint[1] = x0 + (int) (x2 * cost - y2 * sint);
-            yPoint[1] = y0 + (int) (x2 * sint + y2 * cost);
+            xPoint[1] = x0 + (int) (x2 * ((isSouth ? -1 : 1) * cost) - y2 * sint);
+            yPoint[1] = y0 + (int) (x2 * ((isSouth ? -1 : 1) * sint) + y2 * cost);
 
             xPoint[2] = x0 + (int) (x3 * cost - y3 * sint);
             yPoint[2] = y0 + (int) (x3 * sint + y3 * cost);

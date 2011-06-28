@@ -1048,9 +1048,10 @@ public class TimeSeriesChart extends XYChartManager {
                         }
                     }
                     if ((speedSeries != null) && (dirSeries != null)) {
-                        XYItemRenderer renderer =
+                    	WindbarbRenderer renderer =
                             new WindbarbRenderer(speedLineState, speedSeries,
                                 dirSeries, speedUnit, polarWind);
+                    	renderer.isSouth = (obs != null && obs.size() > 0) ? obs.get(0).getEarthLocation().getLatitude().getValue() < 0 : false;
                         Axis axis = addSeries(speedSeries, speedLineState,
                                         paramIdx++, renderer, true);
                         if (speedLineState.getVerticalPosition()
