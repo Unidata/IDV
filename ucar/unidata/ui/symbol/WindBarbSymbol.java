@@ -445,8 +445,9 @@ public class WindBarbSymbol extends MetSymbol {
 			int begx = (int) (x1 * cost - y1 * sint);
 			int begy = (int) (x1 * sint + y1 * cost);
 
-			int endx = (int) (x2 * ((isSouth ? -1 : 1) * cost) - y2 * sint);
-			int endy = (int) (x2 * ((isSouth ? -1 : 1) * sint) + y2 * cost);
+			double s = isSouth ? -1 : 1;
+			int endx = (int) (x2 * s * cost - y2 * sint);
+			int endy = (int) (x2 * s * sint + y2 * cost);
 
 			g.drawLine(x0 + begx, y0 + begy, x0 + endx, y0 + endy);
 		}
@@ -477,8 +478,9 @@ public class WindBarbSymbol extends MetSymbol {
             xPoint[0] = x0 + (int) (x1 * cost - y1 * sint);
             yPoint[0] = y0 + (int) (x1 * sint + y1 * cost);
 
-            xPoint[1] = x0 + (int) (x2 * ((isSouth ? -1 : 1) * cost) - y2 * sint);
-            yPoint[1] = y0 + (int) (x2 * ((isSouth ? -1 : 1) * sint) + y2 * cost);
+			double s = isSouth ? -1 : 1;
+            xPoint[1] = x0 + (int) (x2 * s * cost - y2 * sint);
+            yPoint[1] = y0 + (int) (x2 * s * sint + y2 * cost);
 
             xPoint[2] = x0 + (int) (x3 * cost - y3 * sint);
             yPoint[2] = y0 + (int) (x3 * sint + y3 * cost);
