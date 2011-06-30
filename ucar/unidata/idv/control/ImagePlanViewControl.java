@@ -56,7 +56,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         //setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_ZPOSITION
         //                  | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                          | FLAG_SKIPFACTOR);
+                          | FLAG_TEXTUREQUALITY | FLAG_SKIPFACTOR);
     }
 
     /**
@@ -80,13 +80,11 @@ public class ImagePlanViewControl extends PlanViewControl {
         }
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
+        gridDisplay.setTextureEnable( !getParameterIsTopography());
+        gridDisplay.setCurvedSize(getTextureQuality());
         if ( !getParameterIsTopography()) {
-            gridDisplay.setTextureEnable(true);
-            gridDisplay.setCurvedSize(getTextureQuality());
             //addAttributedDisplayable(gridDisplay);
-            addDisplayable(gridDisplay,
-                           getAttributeFlags() | FLAG_ZPOSITION
-                           | FLAG_TEXTUREQUALITY);
+            addDisplayable(gridDisplay, getAttributeFlags() | FLAG_ZPOSITION);
         } else {
             addAttributedDisplayable(gridDisplay);
         }
