@@ -50,6 +50,20 @@ example:
      properties="windowVisible=true;multipleIsTopography=true">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+
+
+<!--  THIS DOESN'T WORK, but could be cool if it was made to
+  <control
+     id="imagedisplayastopo"
+     categories="IMAGE-*-*"
+     class="ucar.unidata.idv.control.ImagePlanViewControl"
+     label="Image As Topography"
+     displaycategory="Imagery"
+     properties="windowVisible=true;parameterIsTopography=true">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+-->
+
   <control
      id="imagesequence"
      categories="IMAGE-2D-*"
@@ -552,6 +566,7 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+<!--
   <control
      id="planviewcolorasz"
      categories="GRID-2D-*;GRID-3D-*"
@@ -597,6 +612,49 @@ Since this is confusing and needs more work lets remove this for now
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
      properties="smoothed=false;use3D=false;allowSmoothing=false;multipleIsTopography=true"/>
+-->
+
+  <control
+     id="planviewcolorastopo"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ColorPlanViewControl"
+     doeslevels="true"
+     label="Color-Shaded Parameter As Topography"
+     displaycategory="3D Surface"
+     properties="smoothed=false;parameterIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+  <control
+     id="planviewcontourastopo"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ContourPlanViewControl"
+     doeslevels="true"
+     label="Contoured Parameter As Topography"
+     displaycategory="3D Surface"
+     properties="parameterIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    
+  <control
+     id="planviewcontourfilledastopo"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.idv.control.ContourPlanViewControl"
+     label="Color-Filled Contoured Parameter As Topography"
+     doeslevels="true"
+     displaycategory="3D Surface"
+     properties="colorFill=true;parameterIsTopography=true">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+  <control
+     id="radarsweepastopo"
+     categories="SWEEP-2D-*"
+     doeslevels="true"
+     class="ucar.unidata.idv.control.RadarSweepControl"
+     label="Radar Sweep as Topography"
+     displaycategory="3D Surface"
+     properties="smoothed=false;use3D=false;allowSmoothing=false;parameterIsTopography=true"/>
 
   <control
      id="imagecontroloverz"
