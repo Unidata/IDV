@@ -11,49 +11,63 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.9u2 release.
+The items below reflect changes since the 2.9u3 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="IDV Web Start Updated DigiCert Certificates" id="jdk6_20">
-The Java Web Start version of the IDV has updated DigiCert certificates lasting for one year. 
+<faqitem q="IDV memory allocation" id="idvmemory">
+Upon IDV start up, memory allocation is done automatically according to the user's machine specifications,
+also IDV memory allocation can be changed via Edit --> Preferences, System tab.
+</faqitem>
+
+<faqitem q="Mac OS X bundle" id="macOS">
+The IDV can now be installed as a Mac OS X bundle.
+</faqitem>
+
+<faqitem q="IDV logo" id="idvLOGO">
+The IDV add new user interface to add logo easily via Edit --> Preferences, View tab .
 </faqitem>
 
 <faqitem q="New netCDF-Java Version" id="nj42">
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">netCDF-Java change log</a> 
 </faqitem>
 
-<faqitem q="Additional Jython function" id="jython">
-Added a function to extract longitudes out of a NWP Grid.
+<faqitem q="New Jython library" id="jython">
+Jython library 1.5.2 is in the IDV library.
 </faqitem>
 
-<faqitem q="Improved Workshop Material" id="workshop">
-Improved and cleaned up workshop documentation.
+<faqitem q="New ViSAD library" id="visad">
+New version of ViSAD library is installed.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Webcams" id="webcams">
-<a href="http://www.unidata.ucar.edu/georesources/webcams/images/latest.html">Webcam</a> links have been cleaned up.
+<faqitem q="Contour labeling" id="contourlabel">
+Added user interface  to resize the contour labels (with the consideration of the aspect ratio in the IDV),
+    changing font, show and hide, and align (in globe view too).
 </faqitem>
 
-<faqitem q="New VisAD Version" id="visad">
-The new VisAD version includes wind barb improvements.
+<faqitem q="Ensemble grid capability" id="ensemble">         
+Added Ensemble grids UIs to support selecting all or partial members.
 </faqitem>
 
-<faqitem q="Blue Marble Display" id="bluemarble">
-
-According to <a href="http://onearth.jpl.nasa.gov/">NASA</a>: 
-The JPL One Earth "server no longer provides full WMS services for any of the datasets." 
-We have updated the IDV to point to the <a href="http://neowms.sci.gsfc.nasa.gov/wms/wms">NASA Earth Observations (NEO) WMS</a> This isn't an exact replacement, but it will do. 
+<faqitem q="Ensemble grid Diagnostic functions" id="ensFunctions">
+Added Ensemble grids diagnostic functions, including Average, Highest, Lowest, Mode, Percentile, Range, and Standard Deviation.
 </faqitem>
 
-<faqitem q="Smoothing of grids" id="gridsmooth">
-In situations where users have smoothed a grid, they can now revert back to an unsmoothed grid without having
- to reload the data. In addition, users can no longer smooth grids over topography fields. In this specific situation
- the user must smooth the grid via the IDV Jython formulas.
+<faqitem q="Hovmoller display" id="hovmoller">
+Added a new display type to do the Hovmoller display.
+</faqitem>
+
+<faqitem q="As topography displays" id="asTopo">
+ Added 2D parameter as topography displays, including Color-Shaded Parameter As Topography, Contoured Parameter As Topography,
+    Color-Filled Contoured Parameter As Topography, and Radar Sweep As Topography.
+</faqitem>
+
+<faqitem q="New support of GrADS" id="grads">
+ Added support for GrADS dataset.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
@@ -61,8 +75,9 @@ In situations where users have smoothed a grid, they can now revert back to an u
 <faqitem q="Bug Fixes" id="bugfix">
 Several bug fixes were made in this release, including:
 <ul>
-<li>Probe control fixes for the fly-through. 
 <li>Fixed wind barb issue.
+<li>Fixed hurricane track color control issue.
+<li>Fixed CAP profile display bug.
 </ul>
 </faqitem>
 
