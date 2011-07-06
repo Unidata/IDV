@@ -979,7 +979,10 @@ public class TimeSeriesChart extends XYChartManager {
                             double value = ((lineState.unit != null)
                                             ? obsReal.getValue(lineState.unit)
                                             : obsReal.getValue());
-                            if (value == value) {
+                            //NaN wind directions must be special cased b/c they cannot
+                            //be thrown away lest they get out of sync with speed causing
+                            //rendering problems for wind barbs.
+                            if ((value == value) || Misc.equals(canonical, "DIR")) {
                                 if ((obIdx == 0) || (value > max)) {
                                     max = value;
                                 }
