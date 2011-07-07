@@ -443,8 +443,9 @@ public class RadarGrid extends CompositeDisplayable {
      */
     public void setLabelSize(float size) {
         try {
-            labels.setTextSize(labelSize);
             labelSize = size;
+            labels.setTextSize(labelSize);
+
         } catch (Exception ve) {}
     }
 
