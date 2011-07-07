@@ -912,6 +912,15 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
 
     }
 
+    /**
+     * A hook to allow derived classes to tell us to add this
+     * as a control listener
+     *
+     * @return Add as control listener
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
 
     /**
      * Listen for DisplayEvents
