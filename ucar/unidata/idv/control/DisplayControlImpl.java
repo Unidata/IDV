@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -3700,7 +3700,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 for (int i = 0; i < s.getLength(); i++) {
                     DateTime dt = new DateTime(samples[0][i],
                                       s.getSetUnits()[0]);
-                    String label = UtcDate.applyTimeMacro(template, dt);
+                    String label =
+                        UtcDate.applyTimeMacro(template, dt,
+                            getIdv().getPreferenceManager()
+                                .getDefaultTimeZone());
                     label = applyForecastHourMacro(label, dt);
                     Text t = new Text(tt, label);
                     fi.setSample(i, t, false);
@@ -3936,7 +3939,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 checkTimestampLabel(null);
             }
             if (UtcDate.containsTimeMacro(template)) {
-                template = UtcDate.applyTimeMacro(template, currentTime);
+                template = UtcDate.applyTimeMacro(template, currentTime,
+                        getIdv().getPreferenceManager().getDefaultTimeZone());
             }
             template = applyForecastHourMacro(template, currentTime);
         }
@@ -9997,9 +10001,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void setColorTableName(String n) {
         colorTableName = n;
         if (haveInitialized) {
-            ColorTable ct = 
+            ColorTable ct =
                 controlContext.getColorTableManager().getColorTable(
-                                                                    colorTableName);
+                    colorTableName);
             try {
                 setColorTable(ct);
             } catch (Exception exc) {

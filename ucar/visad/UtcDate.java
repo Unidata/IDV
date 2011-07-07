@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -39,6 +39,9 @@ public final class UtcDate {
     /** timestamp macro identifier */
     public static final String MACRO_TIMESTAMP = "%timestamp%";
 
+    /** timestamp macro identifier */
+    public static final String TEMPLATE_TIMEFORMAT = "time:";
+
     /** default constructor */
     public UtcDate() {}
 
@@ -69,7 +72,17 @@ public final class UtcDate {
      * @return hour as a String (HH)
      */
     public static String getHH(DateTime dt) {
-        return formatUtcDate(dt, HH_FORMAT);
+        return getHH(dt, GMT);
+    }
+
+    /**
+     * Get the hour as a String.
+     * @param dt  DateTime to use
+     * @param tz  the TimeZone to use
+     * @return hour as a String (HH)
+     */
+    public static String getHH(DateTime dt, TimeZone tz) {
+        return formatUtcDate(dt, HH_FORMAT, tz);
     }
 
     /**
@@ -84,16 +97,16 @@ public final class UtcDate {
     }
 
     /**
-     * _more_
+     * Does this string contain a time macro
      *
-     * @param s _more_
-     * @param prefix _more_
+     * @param s   the string
+     * @param prefix  the prefix
      *
-     * @return _more_
+     * @return  true if it contains a time macro
      */
     public static boolean containsTimeMacro(String s, String prefix) {
         return (s.indexOf(MACRO_TIMESTAMP) >= 0)
-               || (s.indexOf(prefix + "time:") >= 0);
+               || (s.indexOf(prefix + TEMPLATE_TIMEFORMAT) >= 0);
     }
 
     /**
@@ -105,7 +118,21 @@ public final class UtcDate {
      * @return a formatted string of form template
      */
     public static String applyTimeMacro(String template, DateTime dttm) {
-        return applyTimeMacro(template, dttm, "");
+        return applyTimeMacro(template, dttm, GMT);
+    }
+
+    /**
+     * Apply the timestamp macro to the string
+     *
+     * @param template the timestamp template
+     * @param dttm     the DateTime
+     * @param tz the TimeZone to use
+     *
+     * @return a formatted string of form template
+     */
+    public static String applyTimeMacro(String template, DateTime dttm,
+                                        TimeZone tz) {
+        return applyTimeMacro(template, dttm, "", "%", "%", tz);
     }
 
     /**
@@ -124,19 +151,38 @@ public final class UtcDate {
     }
 
     /**
-     * _more_
+     * Apply the timestamp macro to the string
      *
-     * @param template _more_
-     * @param dttm _more_
-     * @param noTimeLabel _more_
-     * @param prefix _more_
-     * @param suffix _more_
+     * @param template the timestamp template
+     * @param dttm     the DateTime
+     * @param noTimeLabel   the label if dttm is null;
+     * @param prefix  macro prefix
+     * @param suffix  macro suffix
      *
-     * @return _more_
+     * @return  the String with the macro applied
      */
     public static String applyTimeMacro(String template, DateTime dttm,
                                         String noTimeLabel, String prefix,
                                         String suffix) {
+        return applyTimeMacro(template, dttm, noTimeLabel, prefix, suffix,
+                              GMT);
+    }
+
+    /**
+     * Apply the timestamp macro to the string
+     *
+     * @param template the timestamp template
+     * @param dttm     the DateTime
+     * @param noTimeLabel   the label if dttm is null;
+     * @param prefix  macro prefix
+     * @param suffix  macro suffix
+     * @param tz      TimeZone
+     *
+     * @return  the String with the macro applied
+     */
+    public static String applyTimeMacro(String template, DateTime dttm,
+                                        String noTimeLabel, String prefix,
+                                        String suffix, TimeZone tz) {
         if (dttm != null) {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           dttm.toString());
@@ -144,7 +190,7 @@ public final class UtcDate {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           noTimeLabel);
         }
-        prefix = prefix + "time:";
+        prefix = prefix + TEMPLATE_TIMEFORMAT;
         int prefixLength = prefix.length();
         int suffixLength = suffix.length();
         int idx1         = template.indexOf(prefix);
@@ -155,7 +201,7 @@ public final class UtcDate {
                                           idx2);
                 String tmp = ((dttm == null)
                               ? noTimeLabel
-                              : formatUtcDate(dttm, formatString));
+                              : formatUtcDate(dttm, formatString, tz));
                 template = StringUtil.replace(template,
                         prefix + formatString + suffix, tmp);
             }
@@ -164,14 +210,24 @@ public final class UtcDate {
         return template;
     }
 
-
     /**
      * Get the hour:minute as a String.
      * @param dt  DateTime to use
      * @return hour:minute as a String (HH:mm);
      */
     public static String getHHMM(DateTime dt) {
-        return formatUtcDate(dt, HH_MM_FORMAT);
+        return getHHMM(dt, GMT);
+    }
+
+
+    /**
+     * Get the hour:minute as a String.
+     * @param dt  DateTime to use
+     * @param tz  the TimeZone to use
+     * @return hour:minute as a String (HH:mm);
+     */
+    public static String getHHMM(DateTime dt, TimeZone tz) {
+        return formatUtcDate(dt, HH_MM_FORMAT, tz);
     }
 
     /**
@@ -180,7 +236,17 @@ public final class UtcDate {
      * @return year-month-day as a String (yyyy-MM-dd);
      */
     public static String getYMD(DateTime dt) {
-        return formatUtcDate(dt, YMD_FORMAT);
+        return getYMD(dt, GMT);
+    }
+
+    /**
+     * Get the year-month-day as a String
+     * @param dt  DateTime to use
+     * @param tz  the TimeZone to use
+     * @return year-month-day as a String (yyyy-MM-dd);
+     */
+    public static String getYMD(DateTime dt, TimeZone tz) {
+        return formatUtcDate(dt, YMD_FORMAT, tz);
     }
 
     /**
@@ -189,16 +255,26 @@ public final class UtcDate {
      * @return the hour/minute/second as a String (HH:mm:ss)
      */
     public static String getHMS(DateTime dt) {
+        return getHMS(dt, GMT);
+    }
+
+    /**
+     * Get the hour/minute/second as a String
+     * @param dt  DateTime to use
+     * @param tz  the TimeZone to use
+     * @return the hour/minute/second as a String (HH:mm:ss)
+     */
+    public static String getHMS(DateTime dt, TimeZone tz) {
         return formatUtcDate(dt, HMS_FORMAT);
     }
 
     /**
-     * Get the full datetime using the DEFAULT_FORMAT
+     * Get the full datetime using the DEFAULT_PATTERN
      * @param dt  DateTime to use
      * @return the formatted UTC date
      */
     public static String getUtcDate(DateTime dt) {
-        return formatUtcDate(dt, HMS_FORMAT);
+        return formatUtcDate(dt, DEFAULT_PATTERN, GMT);
     }
 
     /**
@@ -207,7 +283,17 @@ public final class UtcDate {
      * @return year.jday as a String (yyyyDDD);
      */
     public static String getIYD(DateTime dt) {
-        return formatUtcDate(dt, IYD_FORMAT);
+        return getIYD(dt, GMT);
+    }
+
+    /**
+     * Get the year.jday (IYD_FORMAT) as a String
+     * @param dt DateTime to use
+     * @param tz  the TimeZone to use
+     * @return year.jday as a String (yyyyDDD);
+     */
+    public static String getIYD(DateTime dt, TimeZone tz) {
+        return formatUtcDate(dt, IYD_FORMAT, tz);
     }
 
     /**
@@ -218,6 +304,19 @@ public final class UtcDate {
      * @return formatted date.
      */
     public static String formatUtcDate(DateTime dt, String pattern) {
+        return formatUtcDate(dt, pattern, GMT);
+    }
+
+    /**
+     * Return a formated date in UTC time. Uses DateTime.formatString()
+     * with the UTC (GMT) time zone.
+     * @param dt DateTime object
+     * @param pattern format pattern
+     * @param tz  the TimeZone to use
+     * @return formatted date.
+     */
+    public static String formatUtcDate(DateTime dt, String pattern,
+                                       TimeZone tz) {
         if (dt == null) {
             return "null";
         }
@@ -225,7 +324,7 @@ public final class UtcDate {
             return dt.toString();
         }
         try {
-            return dt.formattedString(pattern, GMT);
+            return dt.formattedString(pattern, tz);
         } catch (Exception e) {
             return "";
         }
