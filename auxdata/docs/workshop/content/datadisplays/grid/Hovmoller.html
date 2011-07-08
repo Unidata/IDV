@@ -11,21 +11,29 @@
 <p>The Hovm&ouml;ller diagram was invented by Danish meteorologist Ernest Aabo Hovm&ouml;ller (1912-2008). Typically, time is displayed on the ordinate (y-axis) and geolocation on the abscissa (x-axis). They are commonly used in meteorology and oceanography.</p>
 
 
-<p>Let's create a  Hovm&ouml;ller of temperature </p>
+<p>Let's create a Hovm&ouml;ller of sea surface temperature (SST) from the Pacific Ocean to observe El Ni&ntilde;o/La Ni&ntilde;a-Southern Oscillation.</p>
 
   <ul class="substep">
-    <li>In the [ht::dialog Field Selector]'s  [ht::command Data Sources] panel, select
-        the [ht::dataset NCEP Model Data ETA data source]  that you loaded in during 
-        the previous exercise.</li>
-    <li>In the [ht::command Fields] panel, expand the [ht::param 3D grid] tab. Select the
-        [ht::param temperature] field.</li>
+    <li>In the [ht::dialog Data Choosers]'s  [ht::param URLs] tab, enter
+        the [ht::dataset dods://www.esrl.noaa.gov/psd/thredds/dodsC/Datasets/noaa.ersst/sst.mnmean.nc] URL and click
+        the [ht::command Add Source] button.</li>
+    <li>In the [ht::dialog Field Selector]'s  [ht::command Data Sources] panel, right-click
+             the SST datasource and select [ht::command Properties] dialog.</li>
+    <li>Click on the [ht::tab Times] tab and select a time range from January 1997 to December 1998 and click the [ht::command Apply] button. </li>
+    <li>Click on the [ht::tab Spatial Subset] tab and select a region in the equatorial Pacific Ocean from Mexico to Hawaii and click the [ht::command OK] button.</li>
+    <li>In the [ht::command Fields] panel, select the [ht::param Monthly Means of Sea Surface Temperature] field.</li>
     <li>In the [ht::command Displays] panel, expand the [ht::param Hovmoller] tab 
-        and select [ht::display Time-Latitude (Color Shaded)] then click
+        and select [ht::display Time-Longitude (Contours)] then click
         the [ht::command Create Display] button.</li>
-    <li> Modify the color table by clicking the Temperature button. Change the range from -30 to 30.</li>
-    <li> Can you distinguish a pattern in the data?</li>
+    <li>Modify the contour labeling by clicking in the Contour [ht::command Change] button. Choose a contour interval of 1 degree Celsius.</li>
+    <li>Modify the color table by clicking the Color table  [ht::command default] button. Change the range from 15 to 32.</li>
+    <li>Can you see the El Ni&ntilde;o/La Ni&ntilde;a-Southern Oscillation?</li>
   </ul>
 [ht::cimg images/Hovmoller.gif]
 </body>
 </html>
+
+
+
+
 
