@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>Working with NcML</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+<p> NcML is an XML representation of netCDF metadata, NcML is similar to the
+netCDF CDL (network Common data form Description Language), except, of course, it uses XML syntax..
+</p>
+</div>
+
+<ol class="step">
+<li>A more advanced use of NcML is to modify existing NetCDF files. Displaying a bad netCDF grid
+    dataset in the IDV can be frustrated.  I am giving a example here that shows how to fix
+    a bad nc file before loading it to the IDV.
+    <pre>
+        netcdf X:/example/ecmf_2011032700_rh.nc {
+         dimensions:
+           x = 141;
+           y = 61;
+           z = UNLIMITED;   // (29 currently)
+         variables:
+           short ForecastHour(z=29);
+             :units = "Degrees";
+           float Longitude(x=141);
+             :units = "Degrees";
+           float Latitude(y=61);
+             :units = "Hours";
+           float RelativeHumidity_q25(z=29, y=61, x=141);
+             :units = "Percent";
+           float RelativeHumidity_q50(z=29, y=61, x=141);
+             :units = "Percent";
+           float RelativeHumidity_q75(z=29, y=61, x=141);
+             :units = "Percent";
+
+         :Title = "Relative Humidity Forecasts";
+        }
+    </pre>
+    <p>
+    There are several issues in the above netCDF file, the unit of the variable Latitude and the
+    the variable ForecastHour are switched, and dimension Z should be time dimension. The following
+    NcML file will do correction of naming and unit.
+    </p>
+    <pre>
+     [gen::isl NcMLExample.ncml]   
+    </pre>
+    <p>
+    What has been modified here is the name of dimension z and variable ForecastHour. The unit of Latitude
+    is also corrected, and the unit of new variable Time is [ht::param hours since 2011-3-27 00:00:00 UTC] which includes
+    the information from the original file name. The above xml syntax is save in a file with an ncml file extension
+    [ht::param ecmf_2011032700_rh.ncml], and we can load this ncml file into the IDV for display. This is a very simple
+    example, please visit [ht::popup "http://www.unidata.ucar.edu/software/netcdf/ncml/" NcML] for complete information.
+    </p>
+</li>
+
+<li>Another advanced use of NcML is to create virtual NetCDF datasets through aggregation. There
+are two [ht::command Data Source Type] in the IDV,  [ht::param Aggregate Grids by Time] and
+[ht::param Aggregate WRF netCDF Grids by Time], both using the built-in ncml to do the aggregation on the fly.
+</li>
+
+</ol>
+
+</body>
+</html>

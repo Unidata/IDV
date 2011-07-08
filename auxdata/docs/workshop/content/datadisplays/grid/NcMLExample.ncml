@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" location="./ecmf_2011032700_rh.nc">
+  <dimension name="time" orgName="z" length="29" isUnlimited="true" />
+
+  <variable name="Time" orgName="ForecastHour" shape="time" type="short">
+    <attribute name="units" value="hours since 2011-3-27 00:00:00 UTC" />
+  </variable>
+  <variable name="Latitude" shape="y" type="float">
+    <attribute name="units" value="Degrees" />
+  </variable>
+</netcdf>
