@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>Japan EarthQuakes Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+We are going to look at another earthquake display combining Japan historical earthquakes and 2011 earthquakes
+ point data in this section.
+</div>
+
+<p>
+
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+    <li> First create two layout models for this exercise.
+       <ul>
+           <li> Open up the [ht::dialog Layout Model Editor] from the [ht::menu Tools {Layout Models}]  menu.</li>
+           <li> Create a [ht::command Shape Symbol] with the shape as [ht::command Sphere],
+               double click the symbol to bring up the [ht::dialog Properties Dialog] and set the Foreground Color as
+               blue and Scale Size 0.2, and save as [ht::command EarthQuake1]. </li>
+           <li> Create another [ht::command Sphere] shape, with [ht::command Foreground Color] set as Clear,
+               [ht::command Scale Size By] 0.2, in the [ht::dialog Color By] tab, set [ht::command Map Value of] as
+               [ht::param magnitude], and set [ht::command Data Range] 0 and 9, in the [ht::dialog Scale Size]
+               tab, set [ht::command Scale By Parameter] as [ht::param magnitude], set [ht::command Data Range]
+               0 and 9, and set [ht::command Scale By Factor] 0.3 and 3. Now save this model as
+               [ht::command EarthQuake2].</li>
+       </ul>
+    <li> Load Japan historical earthquake point data.
+    <ul>
+    <li> [ht::openDataSourceChooser]
+    <li>In the [ht::dialog Data Source Chooser] click on the
+    [ht::command Files] tab.
+    <li> Go to the point data directory:  [ht::filename <%workshop.datadir%>/point/].
+    <li> Select [ht::filename IEB-Sendai-region-3000quakes-before-1Mar2011-mags-ge-5.nc]
+    <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;Netcdf Point Data files&quot;
+    <li> Press [ht::button Add Source]
+    <li> Bring up the [ht::dialog Properties] window, and set the [ht::command Bin Size] to 5 years.
+    <li> In the [ht::command Fields] panel select [ht::param Point Data].
+    <li> Select the [ht::command Layout Model] [ht::param EarthQuake1].
+    <li> In the [ht::command Displays] select [ht::display Point Data List] and press
+          [ht::button Create Display]
+    </ul>
+
+    <li> Modify the displayed setting.
+    <ul>
+     <li> In the [ht::dialog Displays] control window, under the Layout tab, uncheck the [ht::button Declutter].
+     <li> Select the [ht::dialog Times] tab, click the [ht::button Multiple], and change the
+          [ht::command Range] to be [ht::param Start from data] and [ht::param End from animation].
+    </ul>
+
+    <li> Load 2011 Japan earthquake point data .
+    <ul>
+      <li> Load another dataset in the directory [ht::filename IRIS-EB-quakes-Japan-01Mar2011-1201-16Mar2011-530quakes.nc].
+      <li> Set the [ht::command Bin Size] to be 5 hours.
+      <li> Select the [ht::command Layout Model]  [ht::param EarthQuake2].
+      <li> Create Display and repeat the display setting in the previous step.
+    </ul>
+
+    <li> Start the Animation.</li>
+
+
+</ol>
+
+</body>
+</html>
