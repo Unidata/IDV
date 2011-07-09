@@ -95,6 +95,7 @@ index.html
 >>>datadisplays/point/SubsettingPointData.html
 >>>datadisplays/point/ObsListDisplay.html
 >>>datadisplays/point/OtherPointDisplay.html
+>>>datadisplays/point/JapanEarthQuakeDisplay.html
 >>>datadisplays/point/TextPointData.html
 >>>datadisplays/point/ObjectiveAnalysis.html
 -datadisplays/point/metar.csv.txt
