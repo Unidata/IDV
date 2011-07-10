@@ -93,6 +93,8 @@ index.html
 >>>datadisplays/point/SurfaceDataLoading.html
 >>>datadisplays/point/MetarSynopDisplays.html
 >>>datadisplays/point/SubsettingPointData.html
+>>>resources/stationmodel/StationModelEditor.html
+>>>resources/stationmodel/StationModelEditor2.html
 >>>datadisplays/point/ObsListDisplay.html
 >>>datadisplays/point/OtherPointDisplay.html
 >>>datadisplays/point/JapanEarthQuakeDisplay.html
@@ -101,8 +103,6 @@ index.html
 -datadisplays/point/metar.csv.txt
 
 #>>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
->>>resources/stationmodel/StationModelEditor.html
->>>resources/stationmodel/StationModelEditor2.html
 |>>>resources/stationmodel/JythonInStationModels.html
 >>>datadisplays/point/DoingMorePointObs.html
 >>>datadisplays/point/LightningDisplay.html
