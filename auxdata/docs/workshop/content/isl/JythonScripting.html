@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>Scripting the IDV with Jython and VisAD</title>
+</head>
+<body>
+[ht::ug::top /isl/index.html]
+
+<div class="overview">
+IDV Jython scripting environment to visualize data interactively. 
+</div>
+
+<p>
+Leveraging the IDV Jython command shell with VisAD  creates a powerful combination for scripting IDV workflows as well as "experimental exploration" of data and the IDV and VisAD APIs. In this section, we will examine to how make use of the IDV Jython scripting environment to visualize data interactively. 
+</p>
+<p>
+To achieve this objective, we will leverage the VisAD Jython APIs. Complete documentation for these APIs can be found here: 
+</p>
+<ul>
+<li>http://www.ssec.wisc.edu/visad-docs/javadoc/visad/python/JPythonMethods.html</li>
+<li>http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/JythonLib.html</li>
+</ul>
+<p>
+The JPython (the old name for Jython) VisAD API is a low-level API for interacting with VisAD objects from the Jython environment. The IDV JythonLib is a higher-level API built on top on the VisAD JPython API. In the following exercises we will be using both these APIs. 
+</p>
+
+<p>
+These exercises are meant to be done in sequence.
+</p>
+<ol class="step">
+
+  <li>[ht::clearDisplaysAndData]</li>
+
+<li>Select the [ht::menu Edit Formulas {Jython Shell}] menu item.</li>
+
+<li>Write a script to load some RUC data and display it in the planview. Copy this text into the Jython Shell to the right of the evaluate button and click on the [ht::button Evaluate] button.
+<pre>
+ds = makeDataSource("dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc","netcdf.grid")
+temp = getData(ds.getName(),"T")
+dc = createDisplay('planviewcolor',temp)
+</pre>
+<p>This script should result in a color shaded plan view of temperature data.</p>
+</li>
+
+<li>
+  Have the IDV prompt the user for the data interactively. 
+<pre>
+rh = selectData()
+</pre>
+<p>You will be prompted for data. Select relative humidity.</p>
+<pre>
+dc = createDisplay('planviewcolor',rh)
+</pre>
+</li>
+
+<li>We will now write a couple of convenience methods
+<pre>
+def retrieveData(dset, field) :
+  return getData(dset.getName(),field)
+
+def createColorShadedPlanView(field) :
+  return createDisplay('planviewcolor',field)
+</pre>
+</li>
+
+<li> Obtain the U and V wind fields and display wind speed in plan view
+
+<pre>
+u = retrieveData(ds,"u")
+v = retrieveData(ds,"v")
+</pre>
+
+
+<p>Now invoke the windpeed formula you wrote in an earlier</p>
+
+<pre>
+showLib()
+ws = windSpeed(u,v)
+dc = createColorShadedPlanView(ws)
+</pre>
+
+If you did not complete that exercises, here is the wind speed formula.
+<pre>
+def  windSpeed(u,v):
+  usqd= u*u
+  vsqd= v*v
+  ws = sqrt(usqd + vsqd)
+  return ws
+</pre>
+</li>
+</ol>
+
+<p>
+The VisAD Jython shell is a full programatic environment. We have only scratched the surface of what can be achieved. We encourage users to interactively experiment with the IDV in this manner.
+</p>
+
+</body>
+</html>
