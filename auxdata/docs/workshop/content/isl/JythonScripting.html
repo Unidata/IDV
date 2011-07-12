@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Scripting the IDV with Jython and VisAD</title>
+<title>Interactive Scripting the IDV with Jython Shell</title>
 </head>
 <body>
 [ht::ug::top /isl/index.html]
@@ -16,19 +16,23 @@ Leveraging the IDV Jython command shell with VisAD  creates a powerful combinati
 To achieve this objective, we will leverage the VisAD Jython APIs. Complete documentation for these APIs can be found here: 
 </p>
 <ul>
-<li>http://www.ssec.wisc.edu/visad-docs/javadoc/visad/python/JPythonMethods.html</li>
-<li>http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/JythonLib.html</li>
+<li><a href="http://www.ssec.wisc.edu/visad-docs/javadoc/visad/python/JPythonMethods.html">JPythonMethods</a></li>
+<li><a href="http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/JythonLib.html">JythonLib</a></li>
 </ul>
+
 <p>
 The JPython (the old name for Jython) VisAD API is a low-level API for interacting with VisAD objects from the Jython environment. The IDV JythonLib is a higher-level API built on top on the VisAD JPython API. In the following exercises we will be using both these APIs. 
 </p>
 
 <p>
-These exercises are meant to be done in sequence.
+These exercises are meant to be done in sequence. We will be using the Jython interactive shell. Please enter the commands described below in the evaluation area as shown in the figure.
 </p>
+<br />
+[ht::img images/shell.gif]
+
 <ol class="step">
 
-  <li>[ht::clearDisplaysAndData]</li>
+<li>[ht::clearDisplaysAndData]</li>
 
 <li>Select the [ht::menu Edit Formulas {Jython Shell}] menu item.</li>
 
@@ -87,6 +91,22 @@ def  windSpeed(u,v):
   return ws
 </pre>
 </li>
+
+<li>This is a slightly more complicated example involving the comparison and difference observational satellite temperature data with NAM model temperature data
+<p>[ht::clearDisplaysAndData]</p>
+<pre>
+sds = makeDataSource("/Users/chastang/tmp/sat/GOES-East100.area")
+img = selectData()
+gds = makeDataSource("http://motherlode.ucar.edu/thredds/dodsC/model/NCEP/NAM/CONUS_40km/conduit/NAM_CONUS_40km_conduit_20110712_1200.grib2")
+grid = selectData()
+</pre>
+Here you will be prompted for the field.  Select Formulas -> Grid -> Make 2D slice, then pick the 300hPa temperature -- one time only!
+<pre>
+diff = img - grid
+createDisplay('planviewcolor',diff)
+</pre>
+</li>
+
 </ol>
 
 <p>
