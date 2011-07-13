@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>Batch Scripting with the IDV Jython API</title>
+</head>
+<body>
+[ht::ug::top /isl/index.html]
+
+<div class="overview">
+IDV Jython scripting to visualize data in batch mode
+</div>
+
+<p>
+In addition to interactive scripting, Jython scripts can run in batch mode for automatic generation of images without necessarily having to "manually" invoke an IDV client GUI. These scripts can be useful for generating images via a crontab, for example. Note that when developing your Jython IDV batch script, it is useful to first experiment with them in interactive mode. See the previous section about the Jython interactive shell.
+</p>
+
+<ol class="step">
+
+<li>
+In your favorite editor, create a file call script.py and add the following code  
+
+<pre>
+setOffScreen(1)
+idv.getStateManager().setViewSize(java.awt.Dimension(800,600))
+ds = makeDataSource("dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc","netcdf.grid")
+temp = getData(ds.getName(),"T")
+dc = createDisplay('planviewcolor',temp)
+pause()
+image = getImage()
+writeImage('/tmp/image.png')
+</pre>
+</li>
+<li>
+Now run that script with the following command 
+
+<pre>
+runIDV -islfile script.py
+</pre>
+</li>
+
+
+</ol>
+
+</body>
+</html>
