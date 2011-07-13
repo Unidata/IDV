@@ -92,15 +92,6 @@ public class SystemMemoryManager {
         return returnVal;
     }
 
-    /**
-     * Gets the minimum memory.
-     *
-     * @return the minimum memory
-     */
-    public static long getMinimumMemory() {
-        return MINIMUM_MEMORY;
-    }
-
 	/**
 	 * The default when the user first starts up should be to use 80% of the
 	 * total, but they should be allowed to increase that to 100% of the total
@@ -121,7 +112,7 @@ public class SystemMemoryManager {
      */
     public static float convertToPercent(final long number) {
         return isMemoryAvailable()
-               ? (number - getMinimumMemory()) * 100f / (getTotalMemory() - getMinimumMemory())
+               ? (number - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY)
                : -1;
     }
 
@@ -134,7 +125,7 @@ public class SystemMemoryManager {
      */
     public static long convertToNumber(final int percent) {
         return isMemoryAvailable()
-               ? getMinimumMemory() + Math.round((percent / 100f) * (getTotalMemory() - getMinimumMemory()))
+               ? MINIMUM_MEMORY + Math.round((percent / 100f) * (getTotalMemory() - MINIMUM_MEMORY))
                : -1;
     }
 
@@ -148,8 +139,8 @@ public class SystemMemoryManager {
     public static long checkAndRepair(final long memory) {
         long val = memory;
 
-        if (memory < getMinimumMemory()) {
-            val = getMinimumMemory();
+        if (memory < MINIMUM_MEMORY) {
+            val = MINIMUM_MEMORY;
         }
 
         if (isMemoryAvailable() && (memory > getTotalMemory())) {
