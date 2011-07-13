@@ -38,6 +38,18 @@
                             <method name="add">
                                 <java.lang.Integer>1</java.lang.Integer>
                             </method>
+                            <method name="add">
+                                <java.lang.Integer>2</java.lang.Integer>
+                            </method>
+                            <method name="add">
+                                <java.lang.Integer>3</java.lang.Integer>
+                            </method>
+                            <method name="add">
+                                <java.lang.Integer>4</java.lang.Integer>
+                            </method>
+                            <method name="add">
+                                <java.lang.Integer>5</java.lang.Integer>
+                            </method>
                         </object>
                     </property>
                     <property name="DataSelection">
@@ -1006,6 +1018,18 @@
                                     <method name="add">
                                         <java.lang.Integer>1</java.lang.Integer>
                                     </method>
+                                    <method name="add">
+                                        <java.lang.Integer>2</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>3</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>4</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>5</java.lang.Integer>
+                                    </method>
                                 </object>
                             </property>
                             <property name="TimesMode">
@@ -1549,6 +1573,18 @@
                                     </method>
                                     <method name="add">
                                         <java.lang.Integer>1</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>2</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>3</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>4</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>5</java.lang.Integer>
                                     </method>
                                 </object>
                             </property>
@@ -2374,6 +2410,18 @@
                                     <method name="add">
                                         <java.lang.Integer>1</java.lang.Integer>
                                     </method>
+                                    <method name="add">
+                                        <java.lang.Integer>2</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>3</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>4</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>5</java.lang.Integer>
+                                    </method>
                                 </object>
                             </property>
                             <property name="TimesMode">
@@ -2823,6 +2871,18 @@
                                     </method>
                                     <method name="add">
                                         <java.lang.Integer>1</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>2</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>3</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>4</java.lang.Integer>
+                                    </method>
+                                    <method name="add">
+                                        <java.lang.Integer>5</java.lang.Integer>
                                     </method>
                                 </object>
                             </property>
