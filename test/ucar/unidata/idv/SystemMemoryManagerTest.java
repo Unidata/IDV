@@ -31,10 +31,19 @@ public class SystemMemoryManagerTest {
 
     @Test
     public void testConvertToPercent() {
+    	
         if (SystemMemoryManager.isMemoryAvailable()) {
-            assertEquals("512 should always be 0%", 0, SystemMemoryManager.convertToPercent(512), 0.001);
-            assertEquals("total memory should always be 100%",
-                         SystemMemoryManager.convertToPercent(SystemMemoryManager.getTotalMemory()), 100, 0.001);
+        	//Deal with special case
+        	if (SystemMemoryManager.getTotalMemory() == SystemMemoryManager.MINIMUM_MEMORY) {
+                assertEquals("512 should always be 100%", 100, SystemMemoryManager.convertToPercent(512), 0.001);
+                assertEquals("total memory should always be 100%",
+                             SystemMemoryManager.convertToPercent(SystemMemoryManager.getTotalMemory()), 100, 0.001);
+        		
+        	} else {
+                assertEquals("512 should always be 0%", 0, SystemMemoryManager.convertToPercent(512), 0.001);
+                assertEquals("total memory should always be 100%",
+                             SystemMemoryManager.convertToPercent(SystemMemoryManager.getTotalMemory()), 100, 0.001);
+        	}
         } else {
             assertEquals("Should always be -1", -1, SystemMemoryManager.convertToPercent(0), 0.001);
             assertEquals("Should always be -1", -1, SystemMemoryManager.convertToPercent(100), 0.001);

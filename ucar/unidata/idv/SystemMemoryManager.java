@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 public class SystemMemoryManager {
 
     /** Minimum memory for the IDV. */
-    private static final long MINIMUM_MEMORY = 512;
+    public static final long MINIMUM_MEMORY = 512;
 
     /** Max heap for a 32 bit OS. */
     private static final long OS_32_MAX = 1536;
@@ -71,7 +71,8 @@ public class SystemMemoryManager {
      * For 32 bit OS, the total should be the minimum of the (total system
      * memory - 512Mb) and 1536MB. On 64-bit systems, it should be the total
      * system memory-512Mb. If the total system memory is not available -1.
-     * Probably should call {@link #isMemoryAvailable} first.
+     * Probably should call {@link #isMemoryAvailable} first. Must return at
+     * least 512.
      *
      * @return Return the total memory in megabytes, if available.
      *
@@ -89,7 +90,8 @@ public class SystemMemoryManager {
                         : getMemory() - MINIMUM_MEMORY;
         }
 
-        return returnVal;
+        //Must return at least 512.
+        return Math.max(returnVal,512);
     }
 
 	/**
@@ -110,11 +112,21 @@ public class SystemMemoryManager {
      *            the number
      * @return the percent or -1 
      */
-    public static float convertToPercent(final long number) {
-        return isMemoryAvailable()
-               ? (number - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY)
-               : -1;
-    }
+	public static float convertToPercent(final long number) {
+		float val;
+
+		if (isMemoryAvailable()) {
+			if (getTotalMemory() == MINIMUM_MEMORY) {
+				val = number * 100f / MINIMUM_MEMORY;
+			} else {
+				val = (number - MINIMUM_MEMORY) * 100f
+						/ (getTotalMemory() - MINIMUM_MEMORY);
+			}
+		} else {
+			val = -1;
+		}
+		return val;
+	}
 
     /**
      * Convenience method. Convert memory percent to number. 
