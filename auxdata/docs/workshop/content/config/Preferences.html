@@ -70,14 +70,32 @@ In this section we will briefly cover how to change user preferences.
            URW Gothic, 14 point.  
       <li>Change the [ht::command Display List] color to white.
       <li>Change the [ht::command Default Projection] to <b>US>CONUS</b>.
-      <li>Press [ht::button Apply].  
+      <li>Check the [ht::command Show Logo in View] option
+      <li>Press [ht::button Apply].
     </ul>
     
     <li>Select the [ht::command Navigation] tab. This allows 
         you to define different mouse and key bindings. 
 
     <li>Select the [ht::command Toolbar] tab. This allows you top 
-        define what toolbar icons are shown on the toolbar. 
+        define what toolbar icons are shown on the toolbar.
+    
+<li>Select the [ht::command System] tab. These are preferences used
+    to change the system settings such as the amount of memory
+    allocated to the IDV, data caching, threading and some Java 3D settings.
+    In order for these changes to take effect, the user will have to restart the IDV.</li>
+
+    <ul class="substep">
+      <li> [ht::command Memory] You can set the amount of memory allocated to the IDV as a
+          percentage of the total system memory or a specific amount (in megabytes). 
+          On 32-bit systems, the maximum is 1.5 gigabytes (1500 MB).
+      <li> [ht::command Thread Count] Taking advantage of mulitple core chip architectures, the user can
+        set both the thread count for rendering and for data reading. For rendering, each time step for
+        each display is rendered separately, and 2 threads is optimal due to memory issues.
+      <li> Set the [ht::command Java 3D/Enable geometry by reference] If you have problems with
+        spurious map lines, turn this off.
+        
+    </ul>
 </ol>
 
 
