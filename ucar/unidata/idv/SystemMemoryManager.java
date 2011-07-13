@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 public class SystemMemoryManager {
 
     /** Minimum memory for the IDV. */
-    private static final long MINUMUM_MEMORY = 512;
+    private static final long MINIMUM_MEMORY = 512;
 
     /** Max heap for a 32 bit OS. */
     private static final long OS_32_MAX = 1536;
@@ -85,8 +85,8 @@ public class SystemMemoryManager {
             final boolean is32 = System.getProperty("os.arch").indexOf("64") < 0;
 
             returnVal = is32
-                        ? Math.min(getMemory() - MINUMUM_MEMORY, OS_32_MAX)
-                        : getMemory() - MINUMUM_MEMORY;
+                        ? Math.min(getMemory() - MINIMUM_MEMORY, OS_32_MAX)
+                        : getMemory() - MINIMUM_MEMORY;
         }
 
         return returnVal;
@@ -98,7 +98,7 @@ public class SystemMemoryManager {
      * @return the minimum memory
      */
     public static long getMinimumMemory() {
-        return MINUMUM_MEMORY;
+        return MINIMUM_MEMORY;
     }
 
 	/**
@@ -109,7 +109,7 @@ public class SystemMemoryManager {
 	 */
 	public static long getDefaultMemory() {
 		return Math.round((isMemoryAvailable() ? getTotalMemory() * 0.8
-				: MINUMUM_MEMORY));
+				: MINIMUM_MEMORY));
 	}
 
     /**
