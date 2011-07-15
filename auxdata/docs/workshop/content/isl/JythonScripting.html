@@ -106,8 +106,35 @@ diff = img - grid
 createDisplay('planviewcolor',diff)
 </pre>
 </li>
-
 </ol>
+
+<hr />
+
+<h3>Exporting to Jython Library</h3>
+
+As you gain familiarity with the IDV Jython Scripting environment, you will eventually wish to save and export your methods to the Jython library. For the purposes of illustrating this functionality, in this exercise, we will write a simple method and export it to the library.
+
+<ol class="step">
+  <li>Select the [ht::menu Edit Formulas {Jython Shell}] menu item.
+  <p>Note that it is possible to have several shell windows open at once. This is a nice feature as you develop your Jython methods in one shell, then copy / paste the completed method to the fresh shell for export.</p>
+  </li>
+  <li> Let's write a formulate to calculate the dew point from the temperature, and relative humidity.
+  </li>
+  
+  <pre>
+    def dew_c(rh, temp_c):
+      from java.lang import Math
+      l = Math.log(rh / 100.0)
+      m = 17.27 * temp_c
+      n = temp_c + 237.3
+      b = (l + (m / n)) / 17.27
+      dew_c = (237.3 * b) / (1 - b)
+      return dew_c
+  </pre>
+  <li>Select the [ht::menu File "Export Commands"] menu item. This action will prompt you for a procedure name, but leave this field blank and click the [ht::command OK] button.</li>
+  <li>You are now in your Jython User library where you should see your method. Click the [ht::command Save] button. You now have your Jython method available for later use.</li>
+</ol>
+<hr />
 
 <p>
 The VisAD Jython shell is a full programmatic environment. We have only scratched the surface of what can be achieved. We encourage users to interactively experiment with the IDV in this manner.
