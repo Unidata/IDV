@@ -124,7 +124,7 @@ index.html
 >>title:Trajectory Data:The IDV supports a variety of aircraft track data and displays.
 >>>datadisplays/trajectory/Tracks.html
 >>>datadisplays/trajectory/PointDisplay.html
-+>>>datadisplays/trajectory/StormTracks.html
+>>>datadisplays/trajectory/StormTracks.html
 #>>>datadisplays/trajectory/TracksInTransect.html
 
 
