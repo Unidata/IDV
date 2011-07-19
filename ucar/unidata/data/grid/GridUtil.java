@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -6724,6 +6724,7 @@ public class GridUtil {
     private static FlatField smooth5Point(FlatField slice,
                                           TupleType rangeType)
             throws VisADException, RemoteException {
+
         int   jgymin, jgymax, jgxmin, jgxmax, kxd;
         int   ii, ip1, im1, jp1, jm1, ier, zero;
         float wt, wt4, dip1, dim1, djp1, djm1, dsum, wsum;
@@ -6749,12 +6750,31 @@ public class GridUtil {
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
+        int       kyd       = jgymax;
         int       numParams = samples.length;
+        float[]   highs     = domain.getHi();
+        float[]   lows      = domain.getLow();
+        boolean   isCyclic  = lows[0] == highs[0] % 360.f;
         float[][] newVals   = newField.getFloats(false);
+        int       nr        = 5;
 
         for (int np = 0; np < numParams; np++) {
-            float[] gni = samples[np];
-            float[] gno = newVals[np];
+            //float[] gni = samples[np];
+            //float[] gno = newVals[np];
+            float[] gni;
+            float[] gno;
+            float[] gnii = samples[np];
+            float[] gnoi = newVals[np];
+            if (isCyclic) {
+                gni    = extendGrid(gnii, nr, jgxmax, jgymax);
+                gno    = new float[gni.length];
+                jgxmax += 2 * nr;
+                kxd    = jgxmax;
+            } else {
+                gni = gnii;
+                gno = gnoi;
+            }
+
 
             /*
              * Apply five-point binomial smoother over subset grid.
@@ -6814,10 +6834,21 @@ public class GridUtil {
                     }
                 }
             }
+            if (isCyclic) {
+                int kxdi = kxd - 2 * nr;
+                int m    = 0;
+                for (int i = 0; i < kyd; i++) {
+                    for (int j = 0; j < kxdi; j++) {
+                        int index = nr + j + i * kxd;
+                        gnoi[m++] = gno[index];
+                    }
+                }
+            }
         }
         newField.setSamples(newVals, false);
 
         return newField;
+
     }
 
     /**
@@ -6871,12 +6902,28 @@ public class GridUtil {
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
+        kyd    = jgymax;
         int       numParams = samples.length;
+        float[]   highs     = domain.getHi();
+        float[]   lows      = domain.getLow();
+        boolean   isCyclic  = lows[0] == highs[0] % 360.f;
         float[][] newVals   = newField.getFloats(false);
+        int       nr        = 9;
 
         for (int np = 0; np < numParams; np++) {
-            float[] gni = samples[np];
-            float[] gno = newVals[np];
+            float[] gni;
+            float[] gno;
+            float[] gnii = samples[np];
+            float[] gnoi = newVals[np];
+            if (isCyclic) {
+                gni    = extendGrid(gnii, nr, jgxmax, jgymax);
+                gno    = new float[gni.length];
+                jgxmax += 2 * nr;
+                kxd    = jgxmax;
+            } else {
+                gni = gnii;
+                gno = gnoi;
+            }
 
             for (j = jgymin; j <= jgymax; j++) {
                 for (i = jgxmin; i <= jgxmax; i++) {
@@ -7013,6 +7060,16 @@ public class GridUtil {
                     }
                 }
             }
+            if (isCyclic) {
+                int kxdi = kxd - 2 * nr;
+                int m    = 0;
+                for (i = 0; i < kyd; i++) {
+                    for (j = 0; j < kxdi; j++) {
+                        int index = nr + j + i * kxd;
+                        gnoi[m++] = gno[index];
+                    }
+                }
+            }
         }
         newField.setSamples(newVals, false);
 
@@ -7079,12 +7136,23 @@ public class GridUtil {
         int[]      lengths = domain.getLengths();
         kxd = lengths[0];
         kyd = lengths[1];
+        float[]   highs     = domain.getHi();
+        float[]   lows      = domain.getLow();
+        boolean   isCyclic  = lows[0] == highs[0] % 360.f;
         int       numParams = samples.length;
         float[][] newVals   = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
-            gnist = samples[np];
-            gnost = newVals[np];
+            float[] gnisti = samples[np];
+            float[] gnosti = newVals[np];
+            if (isCyclic) {
+                gnist = extendGrid(gnisti, nr, kxd, kyd);
+                gnost = new float[gnist.length];
+                kxd   += 2 * nr;
+            } else {
+                gnist = gnisti;
+                gnost = gnosti;
+            }
 
 
             /*
@@ -7149,6 +7217,16 @@ public class GridUtil {
                     }
                 }
             }
+            if (isCyclic) {
+                int kxdi = kxd - 2 * nr;
+                int m    = 0;
+                for (i = 0; i < kyd; i++) {
+                    for (j = 0; j < kxdi; j++) {
+                        int index = nr + j + i * kxd;
+                        gnosti[m++] = gnost[index];
+                    }
+                }
+            }
         }
         newField.setSamples(newVals, false);
 
@@ -7195,20 +7273,21 @@ public class GridUtil {
                                             String type, TupleType rangeType)
             throws VisADException, RemoteException {
 
-        float     beszero = 3.8317f;
+        float beszero = 3.8317f;
 
-        int       idist, nfp, npsq, njx, niy;
-        int       is, ie, js, je, ifp, jfp;
-        float     dist, distsq, xfac, yfac, tot, totwt, xdist, ydist;
-        float[][] fprint = new float[MAXWTS][MAXWTS];
-        float[]   pslab, work;
-        int       index, psindex;
+        int   idist, nfp, npsq, njx, niy;
+        int   is, ie, js, je, ifp, jfp;
+        float dist, distsq, xfac, yfac, tot, totwt, xdist, ydist;
+        //float[][] fprint = new float[MAXWTS][MAXWTS];
+        float[] pslab, work;
+        int     index, psindex;
 
         idist = radius;
         if (idist == 0) {
             return slice;
         }
-        nfp  = Math.min(MAXWTS, 2 * idist);
+        nfp = Math.min(MAXWTS, 2 * idist);
+        float[][] fprint = new float[nfp][nfp];
         npsq = idist * idist;
         if (rangeType == null) {
             rangeType =
@@ -7222,12 +7301,15 @@ public class GridUtil {
         int[]      lengths = domain.getLengths();
         njx = lengths[0];
         niy = lengths[1];
+        float[]   highs     = domain.getHi();
+        float[]   lows      = domain.getLow();
+        boolean   isCyclic  = lows[0] == highs[0] % 360.f;
         int       numParams = samples.length;
         float[][] newValues = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
-            pslab = samples[np];
-            work  = newValues[np];
+            float[] pslabi = samples[np];
+            float[] worki  = newValues[np];
 
             if (type.equals(SMOOTH_CRESSMAN)) {  // Cressman function
                 for (int i = 0; i < nfp; i++) {
@@ -7271,6 +7353,14 @@ public class GridUtil {
                     }
                 }
             }
+            if (isCyclic) {  // pad each side with idist the values
+                pslab = extendGrid(pslabi, idist, njx, niy);
+                work  = new float[pslab.length];
+                njx   += 2 * idist;
+            } else {
+                pslab = pslabi;
+                work  = worki;
+            }
             // now do the work of smoothing
             for (int i = 0; i < niy; i++) {
                 for (int j = 0; j < njx; j++) {
@@ -7300,17 +7390,50 @@ public class GridUtil {
                     }
                 }
             }
+            if (isCyclic) {
+                int njxi = njx - 2 * idist;
+                int m    = 0;
+                for (int i = 0; i < niy; i++) {
+                    for (int j = 0; j < njxi; j++) {
+                        index      = idist + j + i * njx;
+                        worki[m++] = work[index];
+                    }
+                }
+            }
         }
-        /*
-              do i=1,niy
-              do j=1,njx
-                 pslab(j,i)=work(j,i)
-              enddo
-              enddo
-        */
         newField.setSamples(newValues, false);
 
         return newField;
+    }
+
+    /**
+     * Pad the cyclical grid on each edge by ncols
+     * @param data  the data to pad
+     * @param ncols  the number of columns
+     * @param nx  number of x points
+     * @param ny  number of y points
+     * @return  extended grid
+     */
+    private static float[] extendGrid(float[] data, int ncols, int nx,
+                                      int ny) {
+        float[] newData = new float[data.length + ny * ncols * 2];
+        int     index   = 0;
+        int     l       = 0;
+        for (int i = 0; i < ny; i++) {
+            for (int j = ncols; j > 0; j--) {
+                index        = nx - j - 1 + i * nx;
+                newData[l++] = data[index];
+            }
+            for (int j = 0; j < nx; j++) {
+                index        = j + i * nx;
+                newData[l++] = data[index];
+            }
+            for (int j = 0; j < ncols; j++) {
+                index        = j + 1 + i * nx;
+                newData[l++] = data[index];
+            }
+        }
+        return newData;
     }
 
     /**
@@ -7381,14 +7504,14 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make a grid structure
      *
-     * @param grid2D _more_
-     * @param numCols _more_
-     * @param numRows _more_
-     * @param missingValue _more_
+     * @param grid2D  the values
+     * @param numCols number of columns
+     * @param numRows number of rows
+     * @param missingValue  the missing value
      *
-     * @return _more_
+     * @return the grid structure
      */
     public static float[][] makeGrid(float[][] grid2D, int numCols,
                                      int numRows, float missingValue) {
@@ -7399,14 +7522,14 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Make a grid structure
      *
-     * @param grid2D _more_
-     * @param numCols _more_
-     * @param numRows _more_
-     * @param missingValue _more_
+     * @param grid2D  the values
+     * @param numCols number of columns
+     * @param numRows number of rows
+     * @param missingValue  the missing value
      *
-     * @return _more_
+     * @return the grid structure
      */
     public static float[][] makeGrid(float[][][] grid2D, int numCols,
                                      int numRows, float missingValue) {
@@ -7429,10 +7552,10 @@ public class GridUtil {
     }
 
     /**
-     * _more_
+     * Fill a structure with missing values with nearby grid values
      *
-     * @param grid2D _more_
-     * @param missingValue _more_
+     * @param grid2D  grid structure
+     * @param missingValue  missing value
      */
     public static void fillMissing(float[][] grid2D, float missingValue) {
         int numCols = grid2D[0].length;
@@ -7511,14 +7634,14 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Fill in missing values with neighbor values
      *
-     * @param grid _more_
-     * @param x _more_
-     * @param y _more_
-     * @param missingValue _more_
+     * @param grid the grid
+     * @param x  x point
+     * @param y  y point
+     * @param missingValue missing value
      *
-     * @return _more_
+     * @return true grid was filled
      */
     private static boolean fillMissingFromNeighbors(float[][] grid, int x,
             int y, float missingValue) {
