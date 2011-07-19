@@ -25,5 +25,8 @@
    <bundle  category="Toolbar&gt;Workshop"   name="Sample Global Displays"
             url="/ucar/unidata/apps/workshop/bundles/SampleGlobalDisplay.xidv"/>
 
+   <bundle  category="Toolbar&gt;Workshop"   name="Globe View"
+            url="/ucar/unidata/apps/workshop/bundles/GlobeDisplay.xidv"/>
+
 
 </bundles>
