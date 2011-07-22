@@ -24,7 +24,7 @@ set ::idvInstall /home/idv/
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
 
 ##We use this for referencing download file names
-gen::defineMacro {<%idv.version%>} {2.7u1}
+gen::defineMacro {<%idv.version%>} {3.0b1}
 
 ##The installed directory of the source
 gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
@@ -77,6 +77,8 @@ gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.versio
 ##We use this for referencing download file names
 gen::defineMacro {<%dev.version%>} {<%idv.version%>}
 
+gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}plugins/workshop.jar
+gen::defineMacro {<%starting.bundle%>} "Sample Data Displays"
 
 set ::forDevWorkshop 0
 set ::forRegionalWorkshop 0
@@ -92,17 +94,19 @@ proc gen::hook::parseArgs {argv arg i} {
     }  
     if {$arg == "-forreg"} {
         set ::forRegionalWorkshop 1
-        gen::setIndexFile   regional.index
-        set ::workshopTitle {Regional Unidata IDV Workshop}
+        gen::setIndexFile   ictp.index
+        set ::workshopTitle {Joint AAP/ICTP IDV Workshop}
         gen::define flag_regionalworkshop 
-        gen::defineMacro {<%idv.version%>} {2.6}
+        gen::defineMacro {<%idv.version%>} {3.0b1}
         set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
-        set ::workshopHome {c:\\\\data\\\\idv}
+        set ::workshopHome {~}
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
         gen::defineMacro {<%workshop.homedir%>} $::workshopHome
-        gen::defineMacro {<%workshop.idvinstall%>} {c:\\\\Program Files\\\\}
-        gen::defineMacro {<%workshop.datadir%>} {c:\\\\workshopdata}
+        gen::defineMacro {<%workshop.idvinstall%>} {~/}
+        gen::defineMacro {<%workshop.datadir%>} {/scratch/workshopdata}
         gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
+        gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}plugins/regional.workshop.jar
+        gen::defineMacro {<%starting.bundle%>} "Sample Global Displays"
         gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
 
