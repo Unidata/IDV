@@ -1,0 +1,49 @@
+
+<html>
+<head>
+<title>Doing More with Image Displays</title>
+<meta name="description" content="Additional exercises you can do with image data."/>
+</head>
+
+<body>
+
+Try these exercises on your own.
+
+<ol class="step">
+
+  <li>Load in images over Africa from <i>adde.ucar.edu</i> using the
+      <b>GLOBAL</b> dataset.
+
+  <li>If you have access to multi-banded imagery, you can create a
+      true color image from 3 channels that would represent the
+      Red, Green and Blue bands of the imagery.
+      <ul>
+        <li>Use the satellite chooser to load in the data.
+          <ol>
+          <li>Choose <i>adde.eumetsat.int</i> as the server and <b>EUM_AD</b> as the dataset.</li>
+          <li>When prompted, enter in the user and project information given
+              by the intructor.
+          <li>Select the [ht::command M9] dataset.
+          <li>Uncheck the [ht::command Create display] checkbox.</li>
+          <li>Set the [ht::command Data Type] to [ht::param Brightness] and the [ht::command Channel] to [ht::param All Bands].</li>
+          <li>Use the first [ht::command Magnification] slider to set the
+              magnification to -4</li>
+          <li>Click the [ht::button Add Source] button.</li>
+          </ol>
+        </li>
+        <li>In the [ht::dialog Field Selector], select the 
+            [ht::dataset Formulas] data source and use the 
+            [ht::param {Imagery-&gt;Three Color (RGB) Image}] formula.
+            Select the [ht::display {3 Color (RGB) Image}] display,
+            then click the [ht::button Create Display] button.</li>
+        <li>When prompted for the bands, pick the approapriate field for
+            the red, green and blue parameters (1.6, 0.8, 0.6 microns) and
+            click [ht::command OK].</li>
+      </ul>
+
+</ol>
+
+<p>
+
+</body>
+</html>
