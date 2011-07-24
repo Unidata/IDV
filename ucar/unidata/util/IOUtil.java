@@ -191,6 +191,15 @@ public class IOUtil {
         }
 
         /**
+         * Return the file
+         *
+         * @return the file
+         */
+        public File getFile() {
+            return file;
+        }
+
+        /**
          * _more_
          *
          * @return _more_
