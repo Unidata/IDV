@@ -2167,9 +2167,14 @@ public class HtmlUtil {
     public static String select(String name, List values, List selected,
                                 String extra, int maxLength) {
         StringBuffer sb = new StringBuffer();
+        String attrs;
+        if(extra !=null && extra.indexOf(ATTR_CLASS)<0) {
+            attrs = attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT);
+        } else {
+            attrs = attrs(ATTR_NAME, name);
+        }
         sb.append(open(TAG_SELECT,
-                       attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)
-                       + extra));
+                       attrs + extra));
 
         HashSet seenSelected = new HashSet();
         for (int i = 0; i < values.size(); i++) {
