@@ -1,35 +1,33 @@
 /*
- * $Id: IOUtil.java,v 1.52 2007/08/14 16:06:15 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
- *
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
-
-
-
-
 
 package ucar.unidata.util;
 
 
 import java.io.*;
 
+import java.math.*;
+
 import java.net.*;
+
+import java.security.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,9 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.zip.*;
-
-import java.security.*;
-import java.math.*;
 
 
 /**
@@ -191,6 +186,15 @@ public class IOUtil {
         }
 
         /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String toString() {
+            return "" + file;
+        }
+
+        /**
          * Return the file
          *
          * @return the file
@@ -207,6 +211,7 @@ public class IOUtil {
         public long lastModified() {
             return modified;
         }
+
 
         /**
          * _more_
@@ -435,6 +440,13 @@ public class IOUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param millis _more_
+     *
+     * @return _more_
+     */
     public static double millisToMinutes(double millis) {
         return millis / 1000 / 60;
     }
@@ -597,8 +609,8 @@ public class IOUtil {
             int result = writeTo(is, fos, loadId, length);
             numBytes = result;
         } finally {
-	    close(fos);
-	    close(is);
+            close(fos);
+            close(is);
             if (numBytes <= 0) {
                 try {
                     file.delete();
@@ -1048,16 +1060,16 @@ public class IOUtil {
     public static void copyFile(InputStream fis, File to)
             throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream(to);
-	try {
-	    writeTo(fis, fos);
-	} finally {
-	    try {
-		fos.close();
-	    } catch (Exception exc) {}
-	    try {
-		fis.close();
-	    } catch (Exception exc) {}
-	}
+        try {
+            writeTo(fis, fos);
+        } finally {
+            try {
+                fos.close();
+            } catch (Exception exc) {}
+            try {
+                fis.close();
+            } catch (Exception exc) {}
+        }
     }
 
 
@@ -1287,7 +1299,7 @@ public class IOUtil {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static UserAccountManager userAccountManager;
 
     /**
@@ -1748,20 +1760,34 @@ public class IOUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param inputStream _more_
+     */
     public static void close(InputStream inputStream) {
-	if(inputStream==null) return;
-	try {
-	    inputStream.close();
-	} catch(Exception ignore) {}
+        if (inputStream == null) {
+            return;
+        }
+        try {
+            inputStream.close();
+        } catch (Exception ignore) {}
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param outputStream _more_
+     */
     public static void close(OutputStream outputStream) {
-	if(outputStream==null) return;
-	try {
-	    outputStream.close();
-	} catch(Exception ignore) {}
+        if (outputStream == null) {
+            return;
+        }
+        try {
+            outputStream.close();
+        } catch (Exception ignore) {}
     }
 
     /**
@@ -1777,42 +1803,42 @@ public class IOUtil {
      */
     public static byte[] readBytes(InputStream is, Object loadId,
                                    boolean closeIt)
-	throws IOException {
+            throws IOException {
         int    totalRead = 0;
         byte[] content   = getByteBuffer();
-	try {
-	    while (true) {
-		int howMany = is.read(content, totalRead,
-				      content.length - totalRead);
-		//      Trace.msg("IOUtil.readBytes:" + howMany + " buff.length=" + content.length);
-		if ((loadId != null)
-                    && !JobManager.getManager().canContinue(loadId)) {
-		    //                System.err.println ("Ditching");                
-		    return null;
-		}
-		if (howMany < 0) {
-		    break;
-		}
-		if (howMany == 0) {
-		    continue;
-		}
-		totalRead += howMany;
-		if (totalRead >= content.length) {
-		    byte[] tmp       = content;
-		    int    newLength = ((content.length < 25000000)
-					? content.length * 2
-					: content.length + 5000000);
-		    content = new byte[newLength];
-		    System.arraycopy(tmp, 0, content, 0, totalRead);
-		}
-	    }
-	} finally {
-	    try {
-		if (closeIt) {
-		    is.close();
-		}
-	    } catch (Exception exc) {}
-	}
+        try {
+            while (true) {
+                int howMany = is.read(content, totalRead,
+                                      content.length - totalRead);
+                //      Trace.msg("IOUtil.readBytes:" + howMany + " buff.length=" + content.length);
+                if ((loadId != null)
+                        && !JobManager.getManager().canContinue(loadId)) {
+                    //                System.err.println ("Ditching");                
+                    return null;
+                }
+                if (howMany < 0) {
+                    break;
+                }
+                if (howMany == 0) {
+                    continue;
+                }
+                totalRead += howMany;
+                if (totalRead >= content.length) {
+                    byte[] tmp       = content;
+                    int    newLength = ((content.length < 25000000)
+                                        ? content.length * 2
+                                        : content.length + 5000000);
+                    content = new byte[newLength];
+                    System.arraycopy(tmp, 0, content, 0, totalRead);
+                }
+            }
+        } finally {
+            try {
+                if (closeIt) {
+                    is.close();
+                }
+            } catch (Exception exc) {}
+        }
         byte[] results = new byte[totalRead];
         System.arraycopy(content, 0, results, 0, totalRead);
         putByteBuffer(content);
@@ -1867,7 +1893,7 @@ public class IOUtil {
      * @return  concatenated String with the appropriate file separator
      */
     public static String joinDir(String f1, String f2) {
-        return joinDirs(f1 , f2);
+        return joinDirs(f1, f2);
     }
 
 
@@ -1880,7 +1906,7 @@ public class IOUtil {
      * @return  concatenated String with the appropriate file separator
      */
     public static String joinDir(File f1, String filename) {
-        return joinDirs(f1.getPath() , filename);
+        return joinDirs(f1.getPath(), filename);
     }
 
     /**
@@ -1889,12 +1915,14 @@ public class IOUtil {
      * @param f          directory path vararg
      * @return  concatenated String with the appropriate file separator
      */
-    public static String joinDirs(String...f) {
-    	final StringBuilder sb = new StringBuilder();
-    	for (int i = 0; i < f.length; i++) {
-    		sb.append(i == 0 ? "" : File.separator).append(f[i]); 
-		}
-    	return sb.toString();
+    public static String joinDirs(String... f) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < f.length; i++) {
+            sb.append((i == 0)
+                      ? ""
+                      : File.separator).append(f[i]);
+        }
+        return sb.toString();
     }
 
 
@@ -2315,19 +2343,37 @@ public class IOUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static Object readSerializedObject(String file) throws Exception {
-        FileInputStream fis = new FileInputStream(file);
+        FileInputStream     fis = new FileInputStream(file);
         BufferedInputStream bis = new BufferedInputStream(fis, 100000);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        Object  o = ois.readObject();
+        ObjectInputStream   ois = new ObjectInputStream(bis);
+        Object              o   = ois.readObject();
         ois.close();
         bis.close();
         fis.close();
         return o;
     }
 
-    public static void writeSerializedObject(String file, Object o) throws Exception {
-        FileOutputStream fos = new FileOutputStream(file);
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param o _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void writeSerializedObject(String file, Object o)
+            throws Exception {
+        FileOutputStream   fos = new FileOutputStream(file);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(o);
         oos.close();
@@ -2336,15 +2382,20 @@ public class IOUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public static void testio() throws Exception {
-        byte[]d = new byte[4*1000000];
+        byte[] d = new byte[4 * 1000000];
         writeSerializedObject("test.dat", d);
-        long t1  = System.currentTimeMillis();
-        for(int i=0;i<100;i++) {
-            d = (byte[])readSerializedObject("test.dat");
+        long t1 = System.currentTimeMillis();
+        for (int i = 0; i < 100; i++) {
+            d = (byte[]) readSerializedObject("test.dat");
         }
-        long t2  = System.currentTimeMillis();
-        System.err.println ("Time:" + (t2-t1));
+        long t2 = System.currentTimeMillis();
+        System.err.println("Time:" + (t2 - t1));
     }
 
 
@@ -2356,17 +2407,17 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
-        if(true) {
-            for(String arg: args)  {
-                long t1 = System.currentTimeMillis();
-                String md5  =getMd5(arg);
-                long t2 = System.currentTimeMillis();
-                System.err.println(arg +" " + md5 + " time:" + (t2-t1));
+        if (true) {
+            for (String arg : args) {
+                long   t1  = System.currentTimeMillis();
+                String md5 = getMd5(arg);
+                long   t2  = System.currentTimeMillis();
+                System.err.println(arg + " " + md5 + " time:" + (t2 - t1));
             }
             return;
         }
 
-        if(true) {
+        if (true) {
             testio();
             return;
         }
@@ -2534,12 +2585,22 @@ public class IOUtil {
     }
 
 
-    public static byte[] createChecksum(String filename) throws  Exception {
-        InputStream fis =  new BufferedInputStream(new FileInputStream(filename),10000);
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static byte[] createChecksum(String filename) throws Exception {
+        InputStream fis =
+            new BufferedInputStream(new FileInputStream(filename), 10000);
 
-        byte[] buffer = new byte[1024];
+        byte[]        buffer   = new byte[1024];
         MessageDigest complete = MessageDigest.getInstance("MD5");
-        int numRead;
+        int           numRead;
         do {
             numRead = fis.read(buffer);
             if (numRead > 0) {
@@ -2552,20 +2613,38 @@ public class IOUtil {
 
     // see this How-to for a faster way to convert 
     // a byte array to a HEX string 
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String getMD5Checksum(String filename) throws Exception {
-        byte[] b = createChecksum(filename);
+        byte[] b      = createChecksum(filename);
         String result = "";
-        for (int i=0; i < b.length; i++) {
-            result +=
-                Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        for (int i = 0; i < b.length; i++) {
+            result += Integer.toString((b[i] & 0xff) + 0x100,
+                                       16).substring(1);
         }
         return result;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param path _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String getMd5(String path) throws Exception {
         return getMD5Checksum(path);
     }
 
 }
-
