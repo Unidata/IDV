@@ -76,6 +76,7 @@ defineImage {http://hvo.wr.usgs.gov/cams/KIcam/images/M.jpg} {Hawaii Volcanoes N
 
 
 defineGroup {West Coast}
+defineImage http://castrocam.net/castrocam.jpg {San Francisco,CA} -ll {37.76298,-122.440395} -dz -8
 defineImage http://sv.berkeley.edu/view/images/current_view.jpg {Berkeley,CA} -ll {37.86972,-122.25778} -dz -8
 defineImage http://www.met.sjsu.edu/cam_directory/latest.jpg {San Jose State} -ll {37.3044,-121.85} -dz -8
 defineImage http://obs.astro.ucla.edu/images/towercam.jpg {Mt. Wilson, CA} -ll {34.22583,-118.05639} -dz -8
