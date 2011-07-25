@@ -128,6 +128,8 @@ defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque,NM}  -ll {35.1029697, -106.6703963}
 
 defineImage http://belo.bimedia.net/WFAA/weather/stills/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
+defineImage http://www.atmo.ttu.edu/includes/Photo_S.jpg {Lubbock,TX} -ll {33.5777778, -101.8547222} -dz -6
+defineImage http://www.atmo.ttu.edu/includes/Photo_N.jpg {Lubbock,TX} -ll {33.5777778, -101.8547222} -dz -6
 
 defineImage http://www.nps.gov/webcams-glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
 defineImage http://www.nps.gov/webcams-glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
