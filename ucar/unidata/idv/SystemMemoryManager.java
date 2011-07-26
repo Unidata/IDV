@@ -42,9 +42,9 @@ public class SystemMemoryManager {
             mem = (Long) m.invoke(osBean);
         } catch (Exception ignore) {}
 
-        this.memory = Math.round((mem > -1)
-                                 ? mem / 1024d / 1024d
-                                 : mem);
+        this.memory = (mem > -1)
+                      ? Math.round(mem / 1024d / 1024d)
+                      : mem;
     }
 
     /**
@@ -90,46 +90,49 @@ public class SystemMemoryManager {
                         : getMemory() - MINIMUM_MEMORY;
         }
 
-        //Must return at least 512.
-        return Math.max(returnVal,512);
+        // If memory is available, must return at least 512.
+        return isMemoryAvailable()
+               ? Math.max(returnVal, 512)
+               : INSTANCE.memory;
     }
 
-	/**
-	 * The default when the user first starts up should be to use 80% of the
-	 * total, but they should be allowed to increase that to 100% of the total
-	 * 
-	 * @return the default memory
-	 */
-	public static long getDefaultMemory() {
-		return Math.round((isMemoryAvailable() ? getTotalMemory() * 0.8
-				: MINIMUM_MEMORY));
-	}
+    /**
+     * The default when the user first starts up should be to use 80% of the
+     * total, but they should be allowed to increase that to 100% of the total
+     *
+     * @return the default memory
+     */
+    public static long getDefaultMemory() {
+        return Math.round((isMemoryAvailable()
+                           ? getTotalMemory() * 0.8
+                           : MINIMUM_MEMORY));
+    }
 
     /**
      * Convenience method. Convert memory to percent.
      *
      * @param number
      *            the number
-     * @return the percent or -1 
+     * @return the percent or -1
      */
-	public static float convertToPercent(final long number) {
-		float val;
+    public static float convertToPercent(final long number) {
+        float val;
 
-		if (isMemoryAvailable()) {
-			if (getTotalMemory() == MINIMUM_MEMORY) {
-				val = number * 100f / MINIMUM_MEMORY;
-			} else {
-				val = (number - MINIMUM_MEMORY) * 100f
-						/ (getTotalMemory() - MINIMUM_MEMORY);
-			}
-		} else {
-			val = -1;
-		}
-		return val;
-	}
+        if (isMemoryAvailable()) {
+            if (getTotalMemory() == MINIMUM_MEMORY) {
+                val = number * 100f / MINIMUM_MEMORY;
+            } else {
+                val = (number - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY);
+            }
+        } else {
+            val = -1;
+        }
+
+        return val;
+    }
 
     /**
-     * Convenience method. Convert memory percent to number. 
+     * Convenience method. Convert memory percent to number.
      *
      * @param percent
      *            the percent

@@ -5,6 +5,7 @@ package ucar.unidata.idv;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -13,6 +14,12 @@ import java.util.logging.Logger;
 public class SystemMemoryManagerTest {
     @Test
     public void testGetTotalMemory() {
+        if (SystemMemoryManager.isMemoryAvailable()) {
+            assertTrue("should always be > 0 when memory is available", SystemMemoryManager.getTotalMemory() > 0);
+        } else {
+            assertEquals("should always be -1 when memory is not available", -1, SystemMemoryManager.getTotalMemory());
+        }
+
         log(SystemMemoryManager.getTotalMemory());
         log(SystemMemoryManager.isMemoryAvailable());
     }
@@ -31,19 +38,18 @@ public class SystemMemoryManagerTest {
 
     @Test
     public void testConvertToPercent() {
-    	
         if (SystemMemoryManager.isMemoryAvailable()) {
-        	//Deal with special case
-        	if (SystemMemoryManager.getTotalMemory() == SystemMemoryManager.MINIMUM_MEMORY) {
+
+            // Deal with special case
+            if (SystemMemoryManager.getTotalMemory() == SystemMemoryManager.MINIMUM_MEMORY) {
                 assertEquals("512 should always be 100%", 100, SystemMemoryManager.convertToPercent(512), 0.001);
                 assertEquals("total memory should always be 100%",
                              SystemMemoryManager.convertToPercent(SystemMemoryManager.getTotalMemory()), 100, 0.001);
-        		
-        	} else {
+            } else {
                 assertEquals("512 should always be 0%", 0, SystemMemoryManager.convertToPercent(512), 0.001);
                 assertEquals("total memory should always be 100%",
                              SystemMemoryManager.convertToPercent(SystemMemoryManager.getTotalMemory()), 100, 0.001);
-        	}
+            }
         } else {
             assertEquals("Should always be -1", -1, SystemMemoryManager.convertToPercent(0), 0.001);
             assertEquals("Should always be -1", -1, SystemMemoryManager.convertToPercent(100), 0.001);
