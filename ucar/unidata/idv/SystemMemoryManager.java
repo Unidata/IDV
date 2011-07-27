@@ -51,16 +51,6 @@ public class SystemMemoryManager {
         this.is32   = System.getProperty("os.arch").indexOf("64") < 0;
     }
 
-    /**
-     * Gets total available system memory in bytes. If none could be found
-     * because the JVM does not implement this functionality, this method will
-     * return -1. Probably should call {@link #isMemoryAvailable} first.
-     *
-     * @return the memory in bytes
-     */
-    private static long getMemory() {
-        return INSTANCE.memory;
-    }
 
     /**
      * Checks if is memory is available for this JVM.
@@ -88,8 +78,8 @@ public class SystemMemoryManager {
             returnVal = INSTANCE.memory;
         } else {
             returnVal = INSTANCE.is32
-                        ? Math.min(getMemory() - MINIMUM_MEMORY, OS_32_MAX)
-                        : getMemory() - MINIMUM_MEMORY;
+                        ? Math.min(INSTANCE.memory - MINIMUM_MEMORY, OS_32_MAX)
+                        : INSTANCE.memory - MINIMUM_MEMORY;
         }
 
         // If memory is available, must return at least 512.
@@ -112,7 +102,7 @@ public class SystemMemoryManager {
         double percent = 0.8;
 
         if (INSTANCE.is32 && (getTotalMemory() > OS_32_MAX)) {
-            percent = Math.min(1, percent * getMemory() / OS_32_MAX);
+            percent = Math.min(1, percent * INSTANCE.memory / OS_32_MAX);
         }
 
         return isMemoryAvailable()
