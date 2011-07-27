@@ -21,6 +21,9 @@ public class SystemMemoryManager {
     /** The INSTANCE. */
     private static final SystemMemoryManager INSTANCE = new SystemMemoryManager();
 
+    /** Is the OS 32 bit. */
+    private final boolean is32;
+
     /** The total available system memory in bytes. */
     private final long memory;
 
@@ -45,6 +48,7 @@ public class SystemMemoryManager {
         this.memory = (mem > -1)
                       ? Math.round(mem / 1024d / 1024d)
                       : mem;
+        this.is32   = System.getProperty("os.arch").indexOf("64") < 0;
     }
 
     /**
@@ -83,9 +87,7 @@ public class SystemMemoryManager {
         if (!isMemoryAvailable()) {
             returnVal = INSTANCE.memory;
         } else {
-            final boolean is32 = System.getProperty("os.arch").indexOf("64") < 0;
-
-            returnVal = is32
+            returnVal = INSTANCE.is32
                         ? Math.min(getMemory() - MINIMUM_MEMORY, OS_32_MAX)
                         : getMemory() - MINIMUM_MEMORY;
         }
@@ -98,14 +100,24 @@ public class SystemMemoryManager {
 
     /**
      * The default when the user first starts up should be to use 80% of the
-     * total, but they should be allowed to increase that to 100% of the total
+     * total, but they should be allowed to increase that to 100% of the total.
+     * There are a couple of exceptions to the 80% heuristic. The amount of
+     * memory returned will never be less than 512GB. Also, if on 32 bit OS and
+     * the total available memory is greater than 1536, return an amount that
+     * better uses the capacity of the machine i.e. between 80 and 100 percent.
      *
      * @return the default memory
      */
     public static long getDefaultMemory() {
-        return Math.round((isMemoryAvailable()
-                           ? getTotalMemory() * 0.8
-                           : MINIMUM_MEMORY));
+        double percent = 0.8;
+
+        if (INSTANCE.is32 && (getTotalMemory() > OS_32_MAX)) {
+            percent = Math.min(1, percent * getMemory() / OS_32_MAX);
+        }
+
+        return isMemoryAvailable()
+               ? Math.max(Math.round(getTotalMemory() * percent), MINIMUM_MEMORY)
+               : MINIMUM_MEMORY;
     }
 
     /**
