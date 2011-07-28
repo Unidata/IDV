@@ -15,13 +15,20 @@ public class SystemMemoryManagerTest {
     @Test
     public void testGetTotalMemory() {
         if (SystemMemoryManager.isMemoryAvailable()) {
-            assertTrue("should always be > 0 when memory is available", SystemMemoryManager.getTotalMemory() > 0);
+            assertTrue("should always be > than low water mark when memory is available",
+                       SystemMemoryManager.getTotalMemory() >= SystemMemoryManager.MINIMUM_MEMORY);
         } else {
             assertEquals("should always be -1 when memory is not available", -1, SystemMemoryManager.getTotalMemory());
         }
 
         log(SystemMemoryManager.getTotalMemory());
         log(SystemMemoryManager.isMemoryAvailable());
+    }
+
+    @Test
+    public void testGetDefaultMemory() {
+        assertTrue("should always be > than low water mark",
+                   SystemMemoryManager.getDefaultMemory() >= SystemMemoryManager.MINIMUM_MEMORY);
     }
 
     @Test
