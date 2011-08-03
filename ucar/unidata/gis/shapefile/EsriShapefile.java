@@ -1,26 +1,22 @@
 /*
- * $Id: EsriShapefile.java,v 1.27 2005/05/13 18:29:48 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
- *
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 2010- Jeff McWhirter
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
-
-
 
 package ucar.unidata.gis.shapefile;
 
@@ -62,6 +58,12 @@ import java.util.zip.ZipInputStream;
  * @version $Revision: 1.27 $  $Date: 2005/05/13 18:29:48 $
  */
 public class EsriShapefile {
+
+    /** _more_          */
+    private boolean debug = false;
+
+    /** count total number of points    */
+    private int NUMPOINTS = 0;
 
     /** shapefile magic number */
     public final static int SHAPEFILE_CODE = 9994;  // shapefile magic number
@@ -156,7 +158,7 @@ public class EsriShapefile {
      * zooming.  Anything over about 2.0 is ugly.  1.50 makes things
      * faster than 1.0 at the cost of barely discernible ugliness, but
      * for best quality (without zooms), set to 1.0.  If you still
-     * want quality at 10:1 zooms, set to 1/10, etc.  
+     * want quality at 10:1 zooms, set to 1/10, etc.
      */
     private double coarseness = defaultCoarseness;
 
@@ -178,7 +180,7 @@ public class EsriShapefile {
 
     /**
      *
-        * Read an ESRI shapefile from a URL and extract all features into
+     *    Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure.
      *
      * @param url URL of ESRI shapefile
@@ -345,6 +347,9 @@ public class EsriShapefile {
                 } else if (name.endsWith(".prj")) {
                     try {
                         prjFile = new ProjFile(zin);
+                        if (debug) {
+                            System.err.println("Make prj file: " + prjFile);
+                        }
                     } catch (Exception e) {
                         prjFile = null;
                         break;
@@ -426,7 +431,7 @@ public class EsriShapefile {
         version       = readLEInt();
         fileShapeType = readLEInt();
         listBounds    = readBoundingBox();
-	//	bBox = null;
+        //      bBox = null;
         // if no bounds specified, use shapefile bounds
         if (bBox == null) {
             bBox = listBounds;
@@ -443,7 +448,7 @@ public class EsriShapefile {
                         * Math.min(Math.abs(xu - xl) / w,
                                    Math.abs(yu - yl) / h));
 
-	//	System.err.println("coarseness:" + coarseness +" resolution:" + resolution);
+        //      System.err.println("coarseness:" + coarseness +" resolution:" + resolution);
 
         skipBytes(32);  // skip to start of first record header
 
@@ -459,13 +464,14 @@ public class EsriShapefile {
                     || (gfBounds.getHeight() == 0)
                     || gfBounds.intersects(bBox)) {
                 features.add(gf);
-		//		if(features.size()>10) break;
+                //              if(features.size()>10) break;
             }
         }
-        //        System.err.println ("features:" + features.size() + " num points:" + NUMPOINTS);
+        System.err.println("features:" + features.size() + " num points:"
+                           + NUMPOINTS);
     }
 
-    private  int NUMPOINTS = 0;
+
 
     /**
      * Return percent of file read, so far.
@@ -523,6 +529,8 @@ public class EsriShapefile {
         int contentLength = readInt();  // in 16-bit words
         featureType = readLEInt();
 
+        //        System.err.println("type:" + featureType);
+
         switch (featureType) {
 
           case EsriShapefile.NULL :   // placeholder
@@ -532,6 +540,10 @@ public class EsriShapefile {
               // System.err.println ("point");
               return new EsriPoint();
 
+          case EsriShapefile.POINTZ :  // point data
+              // System.err.println ("point");
+              return new EsriPointZ();
+
           case EsriShapefile.MULTIPOINT :  // multipoint, only 1 part
               // System.err.println ("multi point");
               return new EsriMultipoint();
@@ -539,6 +551,10 @@ public class EsriShapefile {
           case EsriShapefile.POLYLINE :  // arcs
               // System.err.println ("polyline");
               return new EsriPolyline();
+
+          case EsriShapefile.POLYLINEZ :  // arcs
+              // System.err.println ("polyline");
+              return new EsriPolylineZ();
 
           case EsriShapefile.POLYGON :  // polygon
               // System.err.println ("polygon");
@@ -698,6 +714,17 @@ public class EsriShapefile {
         // TODO: extend interface to permit access to this info
 
         /**
+         * read the points
+         *
+         * @throws IOException on badness
+         */
+        protected void readNumPoints() throws IOException {
+            numPoints = readLEInt();
+            NUMPOINTS += numPoints;
+        }
+
+
+        /**
          * Get bounding rectangle for this feature.
          *
          * @return bounding rectangle for this feature.
@@ -777,9 +804,9 @@ public class EsriShapefile {
          *
          */
         public EsriPolygon() throws java.io.IOException {
-            bounds    = readBoundingBox();
-            numParts  = readLEInt();
-            numPoints = readLEInt();
+            bounds   = readBoundingBox();
+            numParts = readLEInt();
+            readNumPoints();
             int[] parts = new int[numParts + 1];
             for (int j = 0; j < numParts; j++) {
                 parts[j] = readLEInt();
@@ -820,7 +847,7 @@ public class EsriShapefile {
      * Represents a PolygonZ in an ESRI shapefile as a List of
      * GisParts.  A PolygonZ is just an ordered set of vertices of 1 or
      * more parts, where a part is a closed connected sequence of
-     * points. 
+     * points.
      *
      * Note: This reads the MRANGE and MPOINTS every time though, according to:
      * http://en.wikipedia.org/wiki/Shapefile
@@ -837,9 +864,9 @@ public class EsriShapefile {
          *
          */
         public EsriPolygonZ() throws java.io.IOException {
-            bounds    = readBoundingBox();
-            numParts  = readLEInt();
-            numPoints = readLEInt();
+            bounds   = readBoundingBox();
+            numParts = readLEInt();
+            readNumPoints();
             int[] parts = new int[numParts + 1];
             for (int j = 0; j < numParts; j++) {
                 parts[j] = readLEInt();
@@ -847,22 +874,23 @@ public class EsriShapefile {
             parts[numParts] = numPoints;
 
             //Mandatory: MBR, Number of parts, Number of points, Parts, Points, Z range, Z array
-            if (xyPoints.length <  2* numPoints) {
+            if (xyPoints.length < 2 * numPoints) {
                 xyPoints = new double[2 * numPoints];
             }
-            NUMPOINTS+=numPoints;
+
 
             readLEDoubles(xyPoints, 2 * numPoints);
-            double[] zRange = {0,0};
-            double[] zPoints = new  double[numPoints];
+
+            double[] zRange  = { 0, 0 };
+            double[] zPoints = new double[numPoints];
 
             readLEDoubles(zRange, 2);
             readLEDoubles(zPoints, numPoints);
 
             //Try reading this again to pick up the mrange and mpoints
             //NOTE: the mrange/mpoints are optional but I don't know how to determine that
-            readLEDoubles(zRange, 2);
-            readLEDoubles(zPoints, numPoints);
+            //            readLEDoubles(zRange, 2);
+            //            readLEDoubles(zPoints, numPoints);
 
             discretize(xyPoints, 2 * numPoints);  // overwrites xyPoints
 
@@ -909,9 +937,9 @@ public class EsriShapefile {
          *
          */
         public EsriPolyline() throws java.io.IOException {
-            bounds    = readBoundingBox();
-            numParts  = readLEInt();
-            numPoints = readLEInt();
+            bounds   = readBoundingBox();
+            numParts = readLEInt();
+            readNumPoints();
             int[] parts = new int[numParts + 1];
             for (int j = 0; j < numParts; j++) {
                 parts[j] = readLEInt();
@@ -922,6 +950,73 @@ public class EsriShapefile {
                 xyPoints = new double[2 * numPoints];
             }
             readLEDoubles(xyPoints, 2 * numPoints);
+            discretize(xyPoints, 2 * numPoints);  // overwrites xyPoints
+
+            /* numPoints is reduced by removing dupl. discretized points */
+            numPoints = 0;
+            int ixy = 0;
+            int numPartsLeft = 0;  // may be < numParts after eliminating 1-point parts
+            for (int part = 0; part < numParts; part++) {
+                int pointsInPart = parts[part + 1] - parts[part];
+                /* remove duplicate discretized points in part constructor */
+                GisPart gp = new EsriPart(pointsInPart, xyPoints, ixy);
+                /* Only add a part if it has 2 or more points, after duplicate
+                   point removal */
+                if (gp.getNumPoints() > 1) {
+                    partsList.add(gp);
+                    numPoints += gp.getNumPoints();
+                    numPartsLeft++;
+                }
+                ixy += 2 * pointsInPart;
+            }
+            numParts = numPartsLeft;
+        }
+    }  // EsriPolyline
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Wed, Aug 3, '11
+     * @author         Enter your name here...    
+     */
+    public class EsriPolylineZ extends EsriFeature {
+
+        /**
+         * Create a new EsriPolyline
+         *
+         * @throws java.io.IOException
+         *
+         */
+        public EsriPolylineZ() throws java.io.IOException {
+            bounds   = readBoundingBox();
+            numParts = readLEInt();
+            readNumPoints();
+            int[] parts = new int[numParts + 1];
+            for (int j = 0; j < numParts; j++) {
+                parts[j] = readLEInt();
+            }
+            parts[numParts] = numPoints;
+
+            if (xyPoints.length < 2 * numPoints) {
+                xyPoints = new double[2 * numPoints];
+            }
+            readLEDoubles(xyPoints, 2 * numPoints);
+
+            double[] zRange  = { 0, 0 };
+            double[] zPoints = new double[numPoints];
+
+            readLEDoubles(zRange, 2);
+            readLEDoubles(zPoints, numPoints);
+
+            //Try reading this again to pick up the mrange and mpoints
+            //NOTE: the mrange/mpoints are optional but I don't know how to determine that
+            //            readLEDoubles(zRange, 2);
+            //            readLEDoubles(zPoints, numPoints);
+
+
             discretize(xyPoints, 2 * numPoints);  // overwrites xyPoints
 
             /* numPoints is reduced by removing dupl. discretized points */
@@ -963,9 +1058,8 @@ public class EsriShapefile {
          *
          */
         public EsriMultipoint() throws java.io.IOException {
-
             bounds = readBoundingBox();
-            int numPoints = readLEInt();
+            readNumPoints();
             if (xyPoints.length < 2 * numPoints) {
                 xyPoints = new double[2 * numPoints];
             }
@@ -994,8 +1088,39 @@ public class EsriShapefile {
          */
         public EsriPoint() throws java.io.IOException {
             numPoints = 1;
+            NUMPOINTS++;
             readLEDoubles(xyPoints, 2 * numPoints);
             discretize(xyPoints, 2 * numPoints);
+            GisPart gp = new EsriPart(numPoints, xyPoints, 0);
+            partsList.add(gp);
+            numParts = 1;
+            bounds = new Rectangle2D.Double(xyPoints[0], xyPoints[1], 0., 0.);
+        }
+    }  // EsriPoint
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Wed, Aug 3, '11
+     * @author         Enter your name here...    
+     */
+    public class EsriPointZ extends EsriFeature {
+
+        /**
+         * Create a new EsriPoint
+         *
+         * @throws java.io.IOException
+         *
+         */
+        public EsriPointZ() throws java.io.IOException {
+            numPoints = 1;
+            NUMPOINTS++;
+            readLEDoubles(xyPoints, 2 * numPoints);
+            discretize(xyPoints, 2 * numPoints);
+            //Read the extra M
+            double  M  = readLEDouble();
             GisPart gp = new EsriPart(numPoints, xyPoints, 0);
             partsList.add(gp);
             numParts = 1;
@@ -1018,7 +1143,7 @@ public class EsriShapefile {
          *
          */
         public EsriNull() {
-            int numPoints = 0;
+            numPoints = 0;
         }
     }  // EsriNull
 
@@ -1140,12 +1265,19 @@ public class EsriShapefile {
         return featureType;
     }
 
-    public static void main(String[]args) throws IOException {
-        for(String arg: args) {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws IOException _more_
+     */
+    public static void main(String[] args) throws IOException {
+        for (String arg : args) {
+            System.err.println(arg);
             EsriShapefile shapefile = new EsriShapefile(arg);
         }
     }
 
 
 }
-

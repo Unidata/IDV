@@ -166,7 +166,7 @@ public class DbaseData {
           case 'N' :
               String sv = new String(field);
               numeric[n] = 0.0;
-              if (sv.trim().length() != 0) {
+              if (sv.trim().length() != 0 && !sv.startsWith("*")) {
                   try {
                       numeric[n] = Double.valueOf(sv).doubleValue();
                   } catch (NumberFormatException nfe) {
