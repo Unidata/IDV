@@ -279,7 +279,7 @@
      patterns="\.shp$,\.zip$"
      fileselection="true"
      factory="ucar.unidata.data.gis.ShapeFileDataSource"
-     label="Map files">
+     label="Shapefile">
 <!--
     <property
        name="default_display"
