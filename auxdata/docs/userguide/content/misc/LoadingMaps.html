@@ -1,0 +1,64 @@
+
+[ug::head {Creating Map Plugin}]
+
+<%nochildlist%>
+
+You can load maps (shapefiles) into the Map Display of the IDV and then write out
+a plugin that contains the maps so other can easily use your maps.
+<p>
+
+<div class="pagesubtitle">Prepare your map files</div>
+<ol>
+<li>
+You first need to prepare your map files.
+ESRI Shapefiles often have 3 or 4 separate files, e.g.:<pre>
+map1.shp
+map1.dbf
+map1.prj
+...
+map2.shp
+map2.dbf
+map2.prj
+</pre>
+
+
+You will need to zip up each set:<pre>
+zip map1.zip map1.shp map1.dbf map1.prj
+zip map2.zip map2.shp map2.dbf map2.prj
+</pre>
+
+<li>
+Now, in the <a href="controls/MapDisplayControl.html">Map Display</a>
+go to the Edit menu and select [ht::menu {Add your own maps}].
+In the dialog select your map file from disk, give it a name, category and
+initial properties and load it in. Repeat these steps for your other map files.
+
+
+<li> Note: Some maps just have points. Currently when displaying such maps
+nothing is shown. 
+
+</ol>
+
+<div class="pagesubtitle">Save maps as a plugin</div>
+
+The Map Display control can add these maps to the <a href="PluginCreator.html">Plugin Creator</a>.
+<ol>
+<li> Turn on the visbility of the maps you would like to save.
+<li> Turn off the visibility of the maps you do not want to include.
+<li> From the File menu in the Map Display Control window select
+[ht::menu Save {Export to Plugin}]
+<li> In the Dialog box just press OK
+<li>  This adds your selection and the map description file to
+the Plugin Creator.
+Consult the <a href="PluginCreator.html">Plugin Creator</a> documentation for writing out
+the file.
+</ol>
+
+
+Now, you can add the new map plugin through the
+<a href="Plugins.html">Plugin Manager</a> and/or give this plugin to your colleagues
+for their use.  
+
+[ug::foot]
+
+
