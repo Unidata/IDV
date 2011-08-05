@@ -467,7 +467,7 @@ public class EsriShapefile {
                 //              if(features.size()>10) break;
             }
         }
-        System.err.println("features:" + features.size() + " num points:"
+        //System.err.println("features:" + features.size() + " num points:"
                            + NUMPOINTS);
     }
 
