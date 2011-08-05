@@ -468,7 +468,7 @@ public class EsriShapefile {
             }
         }
         //System.err.println("features:" + features.size() + " num points:"
-                           + NUMPOINTS);
+        //                   + NUMPOINTS);
     }
 
 
