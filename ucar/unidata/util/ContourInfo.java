@@ -849,9 +849,8 @@ public class ContourInfo {
     /**
      * Set the label alignment.
      *
-     * @param along  - true for along contours
+     * @param align  - true for along contours
      *
-     * @param align _more_
      */
     public void setAlignLabels(boolean align) {
         this.alignLabels = align;
