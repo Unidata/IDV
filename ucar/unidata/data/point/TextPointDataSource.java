@@ -2214,8 +2214,8 @@ public class TextPointDataSource extends PointDataSource {
                                 numReals++;
                                 isVarNumeric[varIdx] = true;
                                 numericTypes.add(d.getType());
-                                varUnits[varIdx] =
-                                    ((RealType) d.getType()).getDefaultUnit();
+                                varUnits[varIdx] = ((Real) d).getUnit();
+                                  //  ((RealType) d.getType()).getDefaultUnit();
                                 varNames.add(
                                     ((RealType) d.getType()).getName());
                                 numericUnits.add(varUnits[varIdx]);
