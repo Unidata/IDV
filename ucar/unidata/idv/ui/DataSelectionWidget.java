@@ -1112,7 +1112,7 @@ public class DataSelectionWidget {
      /**
      * Get the DefaultMemberToAll property.
      *
-     * @return The DefaultMemberToAll
+     * The DefaultMemberToAll
      */
     public void setDefaultMemberToAll(boolean value) {
         defaultMemberToAll = value;
