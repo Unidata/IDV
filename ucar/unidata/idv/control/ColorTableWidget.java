@@ -236,7 +236,6 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
          * Create a new color table preview
          *
          * @param ctw   color table widget
-         * @param map   color map
          * @param colors _more_
          * @param forMain For main control window or for legend
          * @param legendType Side or bottom legend if for a legend
@@ -815,7 +814,6 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
     /**
      * Get the color table.
      *
-     * @param
      * @return  the color table
      */
 
