@@ -74,7 +74,7 @@ argument -Dfoo=bar) -->
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/ncIdv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
 
 
 
@@ -218,7 +218,7 @@ argument -Dfoo=bar) -->
             executable="/upc/share/jh/javahelp/bin/jhindexer"
             failifexecutionfails="false"
             dir="${srcdir}/auxdata/docs/userguide">
-            <arg line="/opt/jdk/bin/java -logfile jh.out processed"/>
+            <arg line="${JAVA_HOME}/bin/java -logfile jh.out processed"/>
 <!--
             <env key="PATH" value="/bin:/usr/bin"/>
 -->
@@ -708,7 +708,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
@@ -747,7 +747,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
-              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
             </manifest> 
             <include name="ucar/**/README*"/>
         </jar>
