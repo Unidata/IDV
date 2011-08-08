@@ -89,7 +89,7 @@ public class StationModelManager extends ResourceManager {
     /**
      * ctor
      *
-     * @param xmlEncoder The encoder to use
+     * @param encoder The XML encoder to use
      */
     public StationModelManager(XmlEncoder encoder) {
         super(encoder);
