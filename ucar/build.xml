@@ -17,6 +17,7 @@ argument -Dfoo=bar) -->
         <!-- The directory  that contains the source trees (from cvs) -->
         <property name="srcdir" value="${basedir}"/>
 
+       <property environment="env"/>
 
        <!-- Read in the version from the properties file -->
        <property file="${srcdir}/ucar/unidata/idv/resources/version.properties"/>
