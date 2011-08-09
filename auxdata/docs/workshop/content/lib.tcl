@@ -8,7 +8,7 @@ gen::setIndexFile   main.index
 
 ##Where is the userguide located at
 ##TODO: Set this to point to the right place
-set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/
+set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
 set ::userguideRoot $::workshopDocroot/docs/userguide
 
 ##The page title
@@ -77,7 +77,7 @@ gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.versio
 ##We use this for referencing download file names
 gen::defineMacro {<%dev.version%>} {<%idv.version%>}
 
-gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}plugins/workshop.jar
+gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}/plugins/workshop.jar
 gen::defineMacro {<%starting.bundle%>} "Sample Data Displays"
 
 set ::forDevWorkshop 0
@@ -97,7 +97,7 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   ictp.index
         set ::workshopTitle {Joint AAP/ICTP IDV Workshop}
         gen::define flag_regionalworkshop 
-        gen::defineMacro {<%idv.version%>} {3.0b1}
+        gen::defineMacro {<%idv.version%>} {3.0b2}
         set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
         set ::workshopHome {~}
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
@@ -105,8 +105,8 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::defineMacro {<%workshop.idvinstall%>} {~/}
         gen::defineMacro {<%workshop.datadir%>} {/scratch/workshopdata}
         gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
-        gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}plugins/regional.workshop.jar
-        gen::defineMacro {<%starting.bundle%>} "Sample Global Displays"
+#        gen::defineMacro {<%workshop.plugin%>} ${::workshopDocroot}/plugins/regional.workshop.jar
+#        gen::defineMacro {<%starting.bundle%>} "Sample Global Displays"
         gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
 
