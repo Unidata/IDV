@@ -216,10 +216,10 @@ argument -Dfoo=bar) -->
 
     <target name="jhindex" depends="init">
         <exec output="dummyfile"
-            executable="/upc/share/jh/javahelp/bin/jhindexer"
+            executable="/share/jh/javahelp/bin/jhindexer"
             failifexecutionfails="false"
             dir="${srcdir}/auxdata/docs/userguide">
-            <arg line="/home/yuanho/jdk1.6.0_26/bin/java -logfile jh.out processed"/>
+            <arg line="${env.JAVA_HOME}/bin/java -logfile jh.out processed"/>
 <!--
             <env key="PATH" value="/bin:/usr/bin"/>
 -->
