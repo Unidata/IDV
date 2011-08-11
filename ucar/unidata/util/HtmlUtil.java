@@ -1482,7 +1482,7 @@ public class HtmlUtil {
                                        String eastArg, String westArg,
                                        String southValue, String northValue,
                                        String eastValue, String westValue) {
-        return "<table cellspacing=0 cellpaddin=1><tr><td colspan=\"2\" align=\"center\">"
+        return "<table cellspacing=0 cellpadding=1><tr><td colspan=\"2\" align=\"center\">"
                + makeLatLonInput(northArg, northValue, "North")
                + "</td></tr>" + "<tr><td>"
                + makeLatLonInput(westArg, westValue, "West") + "</td><td>"
