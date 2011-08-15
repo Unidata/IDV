@@ -112,18 +112,18 @@ public class SystemMemoryManager {
     /**
      * Convenience method. Convert memory to percent.
      *
-     * @param number
-     *            the number
+     * @param memory
+     *            the memory
      * @return the percent or -1
      */
-    public static float convertToPercent(final long number) {
+    public static float convertToPercent(final long memory) {
         float val;
 
         if (isMemoryAvailable()) {
             if (getTotalMemory() == MINIMUM_MEMORY) {
-                val = number * 100f / MINIMUM_MEMORY;
+                val = memory * 100f / MINIMUM_MEMORY;
             } else {
-                val = (number - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY);
+                val = (memory - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY);
             }
         } else {
             val = -1;
