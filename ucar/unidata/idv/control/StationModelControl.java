@@ -910,7 +910,9 @@ public class StationModelControl extends ObsDisplayControl {
                 if (isIdParam(name)) {
                     idFieldName = StringUtil.replace(name, "(Text)", "");
                     idIndex     = typeIdx;
-                    return tuple.getComponent(typeIdx).toString();
+                    String putativeId = tuple.getComponent(typeIdx).toString().trim();
+                    if (!putativeId.isEmpty())
+                      return tuple.getComponent(typeIdx).toString();
                 }
             }
         }
