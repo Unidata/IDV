@@ -444,7 +444,15 @@ public class ChartHolder {
 
         //        chartPanel = new ChartPanel(chart, false,false,false, true,true) {
         chartPanel = new ChartPanel(chart, true) {
-            public void mouseClicked(MouseEvent event) {
+        	
+            @Override
+			public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    displayPopupMenu(e.getX(), e.getY());
+                }
+			}
+            
+			public void mouseClicked(MouseEvent event) {
                 if (SwingUtilities.isRightMouseButton(event)) {
                     return;
                 }
