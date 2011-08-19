@@ -449,6 +449,9 @@ public class ChartHolder {
 			public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     displayPopupMenu(e.getX(), e.getY());
+                } 
+                else { //Usual Behavior
+                	super.mouseReleased(e);
                 }
 			}
             
