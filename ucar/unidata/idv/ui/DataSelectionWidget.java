@@ -21,14 +21,7 @@
 package ucar.unidata.idv.ui;
 
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSelectionComponent;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DerivedDataChoice;
-import ucar.unidata.data.GeoSelection;
-import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.data.*;
 
 
 import ucar.unidata.idv.*;
@@ -458,7 +451,56 @@ public class DataSelectionWidget {
             selectionTab.add(membersTab, "Ensemble", 0);
         }
 
+        if(dc instanceof DerivedDataChoice) {
+            DerivedDataChoice ddc =  (DerivedDataChoice)dc;
+            List ll = ddc.getChoices();
+            DataChoice cdc = (DataChoice)ll.get(0);
+            members = (List) cdc.getProperty("prop.gridmembers");
+            if(members != null && (members.size() > 1)){
+                if (membersList == null) {
+                    membersList = new JList();
+                    //                lastLevel  = idv.getStore().get("idv.dataselector.level");
+                    membersList.setSelectionMode(
+                        ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                    membersScroller = GuiUtils.makeScrollPane(membersList, 300,
+                            100);
+                    membersTab = membersScroller;
+                }
+                Vector membersForGui = new Vector();
+                if (levelsFromDisplay == null) {
+                    membersForGui.add(new TwoFacedObject("All Members", null));
+                }
+                for (int i = 0; i < members.size(); i++) {
+                    Object o = members.get(i);
+                    membersForGui.add(o);
+                }
 
+                Object[] selectedMembers = membersList.getSelectedValues();
+                if ((selectedMembers == null) || (selectedMembers.length == 0)) {
+                    List dcMembers =
+                        (List) dc.getProperty("prop.gridmembers");
+                    if ((dcMembers != null) && !dcMembers.isEmpty()) {
+                        selectedMembers = dcMembers.toArray();
+                    }
+                }
+
+
+
+                membersList.setListData(membersForGui);
+
+                if (membersForGui.size() > 1) {
+                    if (defaultMemberToAll) {
+                        membersList.setSelectedIndex(0);
+                    } else {
+                        membersList.setSelectedIndex(1);
+                    }
+                } else {
+                    membersList.setSelectedIndex(0);
+                }
+
+                selectionTab.add(membersTab, "Ensemble", 0);
+            }
+        }
         levels = ((levelsFromDisplay != null)
                   ? levelsFromDisplay
                   : dc.getAllLevels(
