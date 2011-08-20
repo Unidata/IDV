@@ -632,7 +632,7 @@ public interface IdvConstants {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
     /** default time zone */
-    public static final String DEFAULT_TIMEZONE = "UTC";
+    public static final String DEFAULT_TIMEZONE = "GMT";
 
     /** Preference for the locale */
     public static final String PREF_LOCALE = PREF_DATAPREFIX + "Locale";
