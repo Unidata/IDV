@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
-import opendap.dap.http.HTTPSession;
+//import opendap.dap.http.HTTPSession;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,6 +57,7 @@ import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
+import ucar.nc2.util.net.HTTPSession;
 import visad.DateTime;
 import visad.Real;
 import visad.RealType;
