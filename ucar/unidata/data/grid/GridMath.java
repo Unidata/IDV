@@ -1376,9 +1376,13 @@ public class GridMath {
                             if (rangeType == null) {
                                 rangeType =
                                     GridUtil.getParamType(innerFuncFF);
+                            }
+                            if(newDomain == null) {
                                 newDomain =
                                     (Gridded2DSet) GridUtil.getSpatialDomain(
                                         innerFuncFF);
+                            }
+                            if(funcFF == null) {
                                 FunctionType innerType =
                                     new FunctionType(
                                         DataUtility.getDomainType(ensDomain),
@@ -1559,6 +1563,8 @@ public class GridMath {
                             if (rangeType == null) {
                                 rangeType =
                                     GridUtil.getParamType(innerFuncFF);
+                            }
+                            if(funcFF == null) {
                                 FunctionType innerType =
                                     new FunctionType(
                                         DataUtility.getDomainType(ensDomain),
@@ -1732,6 +1738,8 @@ public class GridMath {
                             if (rangeType == null) {
                                 rangeType =
                                     GridUtil.getParamType(innerFuncFF);
+                            }
+                            if(funcFF == null) {
                                 FunctionType innerType =
                                     new FunctionType(
                                         DataUtility.getDomainType(ensDomain),
@@ -1928,16 +1936,57 @@ public class GridMath {
         FieldImpl retField   = null;
         if (isSequence) {
             Set s = GridUtil.getTimeSet(grid);
+            Boolean ensble = GridUtil.hasEnsemble(grid);
+
+            TupleType rangeType  = null;
+            FunctionType innerType = null;
             for (int i = 0; i < s.getLength(); i++) {
-                FlatField f = partial(((FlatField) grid.getSample(i)), var);
-                if (i == 0) {
-                    FunctionType ftype =
-                        new FunctionType(((SetType) s.getType()).getDomain(),
-                                         f.getType());
-                    retField = new FieldImpl(ftype, s);
+
+                FieldImpl funcFF = null;
+                if(ensble){
+                    FieldImpl sample = (FieldImpl) grid.getSample(i);
+                    Set ensDomain = sample.getDomainSet();
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField =
+                            (FlatField) sample.getSample(j, false);
+                        if (innerField == null) {
+                            continue;
+                        }
+                        FlatField innerFuncFF = partial(innerField, var);
+                        if (rangeType == null) {
+                                rangeType =
+                                    GridUtil.getParamType(innerFuncFF);
+                                innerType =
+                                    new FunctionType(
+                                        DataUtility.getDomainType(ensDomain),
+                                        innerFuncFF.getType());
+                        }
+                        if(funcFF == null) {
+                                funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+                        funcFF.setSample(j, innerFuncFF, false);
+                    }
+                    if (i == 0) {
+                        FunctionType newFieldType =
+                            new FunctionType(
+                                ((SetType) s.getType()).getDomain(),
+                                funcFF.getType());
+                        retField = new FieldImpl(newFieldType, s);
+                    }
+                    retField.setSample(i, funcFF, false);
+                } else {
+                    FlatField f = partial(((FlatField) grid.getSample(i)), var);
+                    if (i == 0) {
+                        FunctionType ftype =
+                            new FunctionType(((SetType) s.getType()).getDomain(),
+                                             f.getType());
+                        retField = new FieldImpl(ftype, s);
+                    }
+                    retField.setSample(i, f, false);
                 }
-                retField.setSample(i, f, false);
             }
+
         } else {
             retField = partial(((FlatField) grid), var);
         }
