@@ -40,25 +40,7 @@ import ucar.visad.quantities.SaturationMixingRatio;
 import ucar.visad.quantities.SaturationVaporPressure;
 import ucar.visad.quantities.WaterVaporMixingRatio;
 
-import visad.CommonUnit;
-import visad.CoordinateSystem;
-import visad.EarthVectorType;
-import visad.Field;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FunctionType;
-import visad.Gridded3DSet;
-import visad.MathType;
-import visad.Real;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.SI;
-import visad.SampledSet;
-import visad.Set;
-import visad.SetType;
-import visad.TupleType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.util.DataUtility;
 
@@ -676,7 +658,7 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl createTrueFlowVector(FieldImpl uvGrid)
+    public static FieldImpl createTrueFlowVector0(FieldImpl uvGrid)
             throws VisADException, RemoteException {
         if ( !isVector(uvGrid)) {
             throw new VisADException("Not a vector grid "
@@ -689,6 +671,81 @@ public class DerivedGridFactory {
             (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
                 uvGrid);
 
+        ucar.unidata.util.Trace.call2("DGF:createTrueFlowVector");
+
+        return result;
+    }
+
+
+    public static FieldImpl createTrueFlowVector(FieldImpl uvGrid)
+            throws VisADException, RemoteException {
+        if ( !isVector(uvGrid)) {
+            throw new VisADException("Not a vector grid "
+                                     + GridUtil.getParamType(uvGrid));
+        }
+        FieldImpl result = null;
+        ucar.unidata.util.Trace.call1("DGF:createTrueFlowVector");
+        Boolean ensble = GridUtil.hasEnsemble(uvGrid);
+
+        if(ensble) {
+            FunctionType  outerFuncType = (FunctionType) uvGrid.getType();
+            Set timeSet = uvGrid.getDomainSet();
+            TupleType rangeType  = null;
+            FunctionType innerType = null;
+            FunctionType newinnerType = null;
+
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FieldImpl funcFF = null;
+                FieldImpl funcFF0 = null;
+                FieldImpl sample = (FieldImpl) uvGrid.getSample(i);
+                Set ensDomain = sample.getDomainSet();
+
+                for (int j = 0; j < ensDomain.getLength(); j++) {
+                    FieldImpl innerField =
+                        (FieldImpl) sample.getSample(j, false);
+                    if (innerField == null ) {
+                        continue;
+                    }
+                    if(newinnerType == null){
+                        newinnerType = new FunctionType(((SetType) timeSet.getType()).getDomain(), innerField.getType());
+                    }
+                    RealType index = RealType.getRealType("index");
+                    SingletonSet ss = new SingletonSet(new RealTuple(new Real[] {
+                                      new Real(index, 0) }));
+                    funcFF0 = new FieldImpl(newinnerType, ss);
+                    funcFF0.setSample(0, innerField, false);
+                    FieldImpl innerrvFF =  (FieldImpl)GridRelativeHorizontalWind.cartesianHorizontalWind(
+                                                     funcFF0);
+
+                    if (rangeType == null) {
+                        rangeType =
+                            GridUtil.getParamType(innerrvFF);
+                        innerType =
+                            new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerrvFF.getSample(0).getType());
+
+                    }
+                    if(funcFF == null) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                    }
+
+                    funcFF.setSample(j, innerrvFF.getSample(0), false);
+                }
+                if (result == null) {
+                    FunctionType newFieldType =
+                        new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            funcFF.getType());
+                    result = new FieldImpl(newFieldType, timeSet);
+                }
+                result.setSample(i, funcFF, false);
+            }
+
+        } else {
+            result = (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
+                    uvGrid);
+        }
         ucar.unidata.util.Trace.call2("DGF:createTrueFlowVector");
 
         return result;
