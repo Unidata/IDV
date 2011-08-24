@@ -877,8 +877,10 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                 || (Arrays.equals(crefCoords[latI], domainSamples[latI])
                     && Arrays.equals(crefCoords[lonI],
                                      domainSamples[lonI]))) {
-            us = gridWinds[0];
-            vs = gridWinds[1];
+            //us = gridWinds[0];
+            //vs = gridWinds[1];
+            System.arraycopy(gridWinds[0], 0, us, 0, us.length);
+            System.arraycopy(gridWinds[1], 0, vs, 0, vs.length);
         } else {
 
             for (int i = 0; i < neighbors.length; i++) {
