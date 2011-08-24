@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -4291,16 +4291,39 @@ public class GridUtil {
             } else {  // some sort of sequence - resample each
                 Set        sequenceDomain = Util.getDomainSet(grid);
                 SampledSet ss             = getSpatialDomain(grid);
+                FieldImpl  sampledField   = null;
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
-                    FlatField ff = (FlatField) grid.getSample(i);
-                    if (ff == null) {
+                    FieldImpl sample = (FieldImpl) grid.getSample(i);
+                    if (sample == null) {
                         continue;
                     }
-                    FlatField sampledField =
-                        new FlatField((FunctionType) ff.getType(), subDomain);
-                    sampledField.setSamples(getSubValues(ss, ff.getFloats(),
-                            skipx, skipy));
+                    if ( !GridUtil.isSequence(sample)) {
+                        sampledField =
+                            new FlatField((FunctionType) sample.getType(),
+                                          subDomain);
+                        sampledField.setSamples(getSubValues(ss,
+                                sample.getFloats(), skipx, skipy));
 
+                    } else {  // ensembles and such
+                        Set ensDomain = sample.getDomainSet();
+                        sampledField =
+                            new FieldImpl((FunctionType) sample.getType(),
+                                          ensDomain);
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                (FlatField) sample.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField sampledFF =
+                                new FlatField(
+                                    (FunctionType) innerField.getType(),
+                                    subDomain);
+                            sampledFF.setSamples(getSubValues(ss,
+                                    innerField.getFloats(), skipx, skipy));
+                            sampledField.setSample(j, sampledFF);
+                        }
+                    }
                     if (sampledFI == null) {  // set up the functiontype
                         FunctionType sampledType =
                             new FunctionType(((SetType) sequenceDomain
