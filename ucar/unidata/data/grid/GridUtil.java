@@ -4324,7 +4324,7 @@ public class GridUtil {
                             sampledField.setSample(j, sampledFF);
                         }
                     }
-                    if (sampledFI == null) {  // set up the functiontype
+                    if ((sampledField != null) && (sampledFI == null)) {  // set up the functiontype
                         FunctionType sampledType =
                             new FunctionType(((SetType) sequenceDomain
                                 .getType()).getDomain(), sampledField
@@ -4332,7 +4332,9 @@ public class GridUtil {
                         sampledFI = new FieldImpl(sampledType,
                                 sequenceDomain);
                     }
-                    sampledFI.setSample(i, sampledField, false);
+                    if (sampledField != null) {
+                        sampledFI.setSample(i, sampledField, false);
+                    }
                 }
             }
         } catch (RemoteException re) {
