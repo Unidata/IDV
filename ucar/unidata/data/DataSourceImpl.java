@@ -1,9 +1,6 @@
-/**
- * $Id: DataSourceImpl.java,v 1.221 2007/08/08 19:12:22 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
- * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
- * support@unidata.ucar.edu.
+/*
+ * Copyright 2010 UNAVCO, 6350 Nautilus Drive, Boulder, CO 80301
+ * http://www.unavco.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -18,8 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
-
 
 package ucar.unidata.data;
 
@@ -86,7 +83,9 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -372,7 +371,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @throws Exception On badness
      */
     public String convertSourceFile(String source) throws Exception {
-        if (descriptor!=null && descriptor.getNcmlTemplate() != null) {
+        if ((descriptor != null) && (descriptor.getNcmlTemplate() != null)) {
             String ncml = IOUtil.readContents(descriptor.getNcmlTemplate(),
                               getClass());
             String file = getDataContext().getObjectStore().getUniqueTmpFile(
@@ -384,7 +383,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             return file;
         }
         //Convert the -1 port number on urls to blank
-        source = source.replace(":-1/","/");
+        source = source.replace(":-1/", "/");
         return source;
     }
 
@@ -1497,7 +1496,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  true if they are equal
      */
     public boolean equals(Object o) {
-        if ( o==null || !(getClass().equals(o.getClass()))) {
+        if ((o == null) || !(getClass().equals(o.getClass()))) {
             return false;
         }
         DataSourceImpl that = (DataSourceImpl) o;
@@ -2049,6 +2048,62 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
+     * For each time in selectionTimes this method finds the closest time in sourceTimes
+     *
+     *
+     * @param dataSelection The data selection. Not used right now.
+     * @param sourceTimes  Needs to be a list of DateTime or Date objects
+     * @param selectionTimes The selection times
+     *
+     * @return List of times from sourceTimes that correspond to the selectionTimes
+     *
+     * @throws Exception On badness
+     */
+    public List<DateTime> selectTimesFromList(DataSelection dataSelection,
+            List sourceTimes, List<DateTime> selectionTimes)
+            throws Exception {
+        List<DateTime> results     = new ArrayList<DateTime>();
+        //First convert the source times to a list of Date objects
+        List<Date>     sourceDates = new ArrayList<Date>();
+        for (int i = 0; i < sourceTimes.size(); i++) {
+            Object object = sourceTimes.get(i);
+            if (object instanceof DateTime) {
+                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
+            } else if (object instanceof Date) {
+                sourceDates.add((Date) object);
+            } else {
+                System.err.println("Unknown time type: "
+                                   + object.getClass().getName());
+                return null;
+            }
+        }
+        //This keeps track of what times in the source list we have used so far
+        HashSet seenTimes = new HashSet();
+
+        //Now look at each selection time and find the closest source time
+        //We need to have logic for when a selection time is outside the range of the source times
+        for (DateTime dateTime : selectionTimes) {
+            Date dttm = ucar.visad.Util.makeDate(dateTime);
+            long minTimeDiff = -1;
+            Date minDate = null;
+            for (int i = 0; i < sourceDates.size(); i++) {
+                Date sourceDate = sourceDates.get(i);
+                long timeDiff = Math.abs(sourceDate.getTime()-dttm.getTime());
+                if(minTimeDiff<0 || timeDiff<minTimeDiff) {
+                    minTimeDiff = timeDiff;
+                    minDate = sourceDate;
+                }
+            }
+            if(minDate!=null && !seenTimes.contains(minDate)) {
+                results.add(new DateTime(minDate));
+                seenTimes.add(minDate);
+            }
+        }
+        return results;
+    }
+
+
+    /**
      * If givenDataSelection is non-null and has a non-null
      * times list then return that. Else return the times list
      * from the myDataSelection member variable.
@@ -2063,6 +2118,26 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         //DataSelection.merge method in the initial getData call.
         List times                  = null;
         List allTimesFromDataChoice = dataChoice.getAllDateTimes();
+
+
+        if (givenDataSelection != null) {
+            List<DateTime> timeDriverTimes =
+                givenDataSelection.getTimeDriverTimes();
+            if (timeDriverTimes != null) {
+                try {
+                    System.err.println("time driver times:" + timeDriverTimes);
+                    List<DateTime> selectedTimes =
+                        selectTimesFromList(givenDataSelection,
+                                            allTimesFromDataChoice,
+                                            timeDriverTimes);
+                    if (selectedTimes != null) {
+                        return selectedTimes;
+                    }
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            }
+        }
 
         if ((givenDataSelection != null) && givenDataSelection.hasTimes()) {
             times = givenDataSelection.getTimes();
@@ -2186,7 +2261,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             throws VisADException, RemoteException {
 
 
-        if(getInError()) return null;
+        if (getInError()) {
+            return null;
+        }
 
         //start up polling if we have not done so already.
         initPolling();
@@ -3924,4 +4001,3 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 }
-

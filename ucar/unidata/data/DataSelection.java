@@ -139,8 +139,6 @@ public class DataSelection {
         }
     }
 
-
-
     /**
      * Construct a <code>DataSelection</code> with a list of times.
      * Use the default times mode
@@ -294,6 +292,13 @@ public class DataSelection {
             newSelection.fromLevel = lowerPriority.fromLevel;
             newSelection.toLevel   = lowerPriority.toLevel;
         }
+
+        if(higherPriority.timeDriverTimes!=null) {
+            newSelection.setTimeDriverTimes(higherPriority.timeDriverTimes);
+        } else {
+            newSelection.setTimeDriverTimes(lowerPriority.timeDriverTimes);
+        }
+
 
         if (higherPriority.hasTimes()) {
             newSelection.setTimesFromSelection(higherPriority);
