@@ -3434,7 +3434,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !DOTIMEDRIVER) {
             return dataSelection;
         }
-        System.err.println("updateDataSelection:" + this);
         if (isTimeDriver || !usesTimeDriver) {
             return dataSelection;
         }
@@ -3443,7 +3442,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return dataSelection;
         }
         List<DateTime> times = vm.getTimeDriverTimes();
-        System.err.println("\t     driver times to use:" + times);
+        //        System.err.println("\tdriver times to use:" + times);
         dataSelection.setTimeDriverTimes(times);
         return dataSelection;
     }
@@ -5107,8 +5106,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !items.isEmpty()) {
             items.add(GuiUtils.MENU_SEPARATOR);
         }
-
-
 
         if (DOTIMEDRIVER) {
             items.add(

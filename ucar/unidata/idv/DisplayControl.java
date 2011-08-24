@@ -65,9 +65,9 @@ import javax.swing.JLabel;
 public interface DisplayControl extends Sharable {
 
     /** For now this allows us to programmatically turn off the time driver functionality */
-    public static final boolean DOTIMEDRIVER = false;
+    //    public static final boolean DOTIMEDRIVER = false;
 
-    //    public static final boolean DOTIMEDRIVER = true;
+    public static final boolean DOTIMEDRIVER = true;
 
 
     /**
