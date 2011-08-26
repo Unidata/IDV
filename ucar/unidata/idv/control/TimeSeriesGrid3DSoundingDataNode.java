@@ -23,21 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.data.grid.GridUtil;
 
-import visad.Data;
-
-import visad.DateTime;
-
-import visad.Field;
-
-import visad.FieldImpl;
-
-import visad.FlatField;
-
-import visad.SampledSet;
-
-import visad.Unit;
-
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.LatLonPoint;
 
@@ -144,23 +130,53 @@ final class TimeSeriesGrid3DSoundingDataNode extends Grid3DSoundingDataNode {
                 Field timeSer =
                     GridUtil.getProfileAtLatLonPoint((FieldImpl) field,
                         inLoc, Data.NEAREST_NEIGHBOR);
+                Boolean ensble = GridUtil.hasEnsemble((FieldImpl)timeSer);
 
-                tempPros = new FlatField[timeCount];
-                dewPros  = new FlatField[timeCount];
-                windPros = new FlatField[timeCount];
+                if(ensble){
+                    FieldImpl sample =
+                        (FieldImpl) timeSer.getSample(0);
+                    Set ensDomain = sample.getDomainSet();
+                    int len = ensDomain.getLength();
+                    tempPros = new FlatField[timeCount*len];
+                    dewPros  = new FlatField[timeCount*len];
+                    windPros = new FlatField[timeCount*len];
+                } else {
 
-                for (int i = 0; i < tempPros.length; i++) {
-                    float[][] values =
-                        ((Field) timeSer.getSample(i)).getFloats();
-
-                    tempPros[i] = makeTempProfile(values[0]);
-                    dewPros[i]  = makeDewProfile(values[1]);
-                    if (values.length > 2) {
-                        windPros[i] = makeWindProfile(new float[][] {
-                            values[2], values[3]
-                        });
-                    }
+                    tempPros = new FlatField[timeCount];
+                    dewPros  = new FlatField[timeCount];
+                    windPros = new FlatField[timeCount];
                 }
+
+                for (int i = 0; i < timeCount; i++) {
+
+                    if(ensble){
+                        FieldImpl sample = (FieldImpl) timeSer.getSample(i);
+                        Set ensDomain = sample.getDomainSet();
+                        int len = ensDomain.getLength();
+
+                        for (int j = 0; j < len; j++) {
+                            float[][] values = ((Field) sample.getSample(i)).getFloats();
+                            tempPros[i] = makeTempProfile(values[0]);
+                            dewPros[i]  = makeDewProfile(values[1]);
+                            if (values.length > 2) {
+                                windPros[i] = makeWindProfile(new float[][] {
+                                    values[2], values[3]
+                                });
+                            }
+                        }
+                    } else {
+                        float[][] values =
+                            ((Field) timeSer.getSample(i)).getFloats();
+
+                        tempPros[i] = makeTempProfile(values[0]);
+                        dewPros[i]  = makeDewProfile(values[1]);
+                        if (values.length > 2) {
+                            windPros[i] = makeWindProfile(new float[][] {
+                                values[2], values[3]
+                            });
+                        }
+                    }
+               }
             }
         }
 
