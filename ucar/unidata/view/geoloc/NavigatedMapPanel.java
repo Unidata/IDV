@@ -230,7 +230,7 @@ public class NavigatedMapPanel extends JPanel {
                 if (e.isPointSelect()) {
                     doPickPoint(e);
                 } else {
-                    System.err.println("dopickregion");
+                    //System.err.println("dopickregion");
                     doPickRegion(e);
                 }
             }
