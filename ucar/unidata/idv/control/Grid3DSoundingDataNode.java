@@ -25,34 +25,9 @@ import ucar.visad.functiontypes.AirTemperatureProfile;
 import ucar.visad.functiontypes.CartesianHorizontalWindOfPressure;
 import ucar.visad.functiontypes.DewPointProfile;
 import ucar.visad.quantities.AirPressure;
+import ucar.unidata.data.grid.GridUtil;
 
-import visad.CoordinateSystem;
-
-import visad.Data;
-
-import visad.DateTime;
-
-import visad.Field;
-
-import visad.FlatField;
-
-import visad.FunctionType;
-
-import visad.Gridded1DSet;
-
-import visad.Gridded3DSet;
-
-import visad.RealType;
-
-import visad.SampledSet;
-
-import visad.Set;
-
-import visad.SetType;
-
-import visad.Unit;
-
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.LatLonPoint;
 
@@ -109,7 +84,14 @@ abstract class Grid3DSoundingDataNode extends SoundingDataNode {
     public final void setData(Data data)
             throws VisADException, RemoteException {
 
-        Field grid3d = (Field) ((Field) data).getSample(0);
+        Field grid3d = null;
+        Boolean ensble = GridUtil.hasEnsemble((FieldImpl)data);
+        if(ensble) {
+            FieldImpl sample =
+                        (FieldImpl)((FieldImpl) data).getSample(0);
+            grid3d = (Field)sample.getSample(0, false);
+        } else
+            grid3d = (Field) ((Field) data).getSample(0);
 
         synchronized (this) {
             this.field = (Field) data;
