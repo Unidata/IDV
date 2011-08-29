@@ -21,38 +21,24 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.collab.Sharable;
-
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-
-
-import ucar.unidata.idv.control.ReadoutInfo;
-
-import ucar.visad.display.DisplayableData;
-
-import visad.Data;
-import visad.VisADException;
-
-import visad.georef.EarthLocation;
-
-import visad.georef.MapProjection;
-
-import java.awt.Container;
-
-
 import java.rmi.RemoteException;
-
-
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-
 import javax.swing.JLabel;
+
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.idv.control.ReadoutInfo;
+import ucar.visad.display.DisplayableData;
+import visad.Data;
+import visad.VisADException;
+import visad.georef.EarthLocation;
+import visad.georef.MapProjection;
 
 
 
@@ -65,9 +51,8 @@ import javax.swing.JLabel;
 public interface DisplayControl extends Sharable {
 
     /** For now this allows us to programmatically turn off the time driver functionality */
-    //    public static final boolean DOTIMEDRIVER = false;
-
-    public static final boolean DOTIMEDRIVER = true;
+    public static final boolean DOTIMEDRIVER = false;
+    //public static final boolean DOTIMEDRIVER = true;
 
 
     /**
