@@ -455,6 +455,11 @@ public class DataSelectionWidget {
             DerivedDataChoice ddc =  (DerivedDataChoice)dc;
             List ll = ddc.getChoices();
             DataChoice cdc = (DataChoice)ll.get(0);
+            if(cdc instanceof DerivedDataChoice){
+                DerivedDataChoice ddc0 =  (DerivedDataChoice)cdc;
+                List ll0 = ddc0.getChoices();
+                cdc = (DataChoice)ll0.get(0);
+            }
             members = (List) cdc.getProperty("prop.gridmembers");
             if(members != null && (members.size() > 1)){
                 if (membersList == null) {
