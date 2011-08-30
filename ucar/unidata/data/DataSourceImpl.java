@@ -35,6 +35,7 @@ import ucar.unidata.idv.DisplayControl;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.idv.chooser.*;
 
@@ -2123,6 +2124,21 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (givenDataSelection != null) {
             List<DateTime> timeDriverTimes =
                 givenDataSelection.getTimeDriverTimes();
+            if(timeDriverTimes ==null){
+                List vms   = getIdv().getVMManager().getViewManagers();
+                for(int i=0; i< vms.size(); i++){
+                    ViewManager vm = (ViewManager)vms.get(i);
+                    if (vm != null && timeDriverTimes==null) {
+                        try{
+                            timeDriverTimes = vm.getTimeDriverTimes();
+                        } catch (Exception ee){
+
+                        }
+                    }
+                }
+
+                
+            }
             if (timeDriverTimes != null) {
                 try {
                     System.err.println("time driver times:" + timeDriverTimes);
