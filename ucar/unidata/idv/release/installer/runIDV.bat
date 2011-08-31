@@ -31,7 +31,7 @@ set idv_memory=%idv_memory:"=%
 
 REM See important note about this above. To bootstrap the IDV memory, uncomment 
 REM the line below and set to a value  in megabytes. 
-REM idv_memory=512
+REM set idv_memory=512
 	
 @echo on    
 jre\bin\java -Xmx%idv_memory%m -Didv.enableStereo=false -jar idv.jar %*
