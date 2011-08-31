@@ -1,12 +1,11 @@
-package ucar.unidata.data;
+package ucar.unidata.data.imagery;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
 
-import ucar.unidata.data.imagery.AddeImageDataSource;
-import ucar.unidata.data.imagery.AddeImageDescriptor;
-import ucar.unidata.data.imagery.AddeImageInfo;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -38,7 +37,7 @@ import javax.swing.event.ChangeListener;
 /**
  * The Class SatImageSelection.
  */
-public class SatImageSelection extends DataSelectionComponent {
+public class AddeImageSelection extends DataSelectionComponent {
 
     /** This is the list of labels used for the advanced gui. */
     private static final String[] ADVANCED_LABELS = {
@@ -178,7 +177,7 @@ public class SatImageSelection extends DataSelectionComponent {
      *
      * @param addeImageDataSource the adde image data source
      */
-    public SatImageSelection(AddeImageDataSource addeImageDataSource) {
+    public AddeImageSelection(AddeImageDataSource addeImageDataSource) {
         super("Advanced");
         this.addeImageDataSource = addeImageDataSource;
     }
