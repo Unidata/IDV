@@ -2122,19 +2122,21 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
         if (givenDataSelection != null) {
-            List<DateTime> timeDriverTimes =
-                givenDataSelection.getTimeDriverTimes();
-            if(timeDriverTimes ==null){
+            List<DateTime> timeDriverTimes = null;
+        //        givenDataSelection.getTimeDriverTimes();
+            if(DisplayControl.DOTIMEDRIVER){
                 List vms   = getIdv().getVMManager().getViewManagers();
                 for(int i=0; i< vms.size(); i++){
                     ViewManager vm = (ViewManager)vms.get(i);
-                    if (vm != null && timeDriverTimes==null) {
-                        try{
-                            timeDriverTimes = vm.getTimeDriverTimes();
-                        } catch (Exception ee){
+                    try{
+                        List dtimes = vm.getTimeDriverTimes();
+                        if (dtimes != null && timeDriverTimes==null)
+                                timeDriverTimes = dtimes;
 
-                        }
+                    } catch (Exception ee){
+
                     }
+
                 }
 
                 
