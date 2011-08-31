@@ -76,11 +76,11 @@
   </datasource>
 
 
-  <datasource
+  <!--datasource
      id="waterml"
      fileselection="true"
      factory="ucar.unidata.data.point.WaterMLDataSource"
-     label="WaterML Point Data"/>
+     label="WaterML Point Data"/ -->
 
 
 
