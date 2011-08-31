@@ -2072,6 +2072,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
             } else if (object instanceof Date) {
                 sourceDates.add((Date) object);
+            } else if (object instanceof TwoFacedObject) { //relative time
+                return null;
             } else {
                 System.err.println("Unknown time type: "
                                    + object.getClass().getName());
