@@ -20,8 +20,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,6 +45,15 @@ public class AddeImageSelection extends DataSelectionComponent {
     private static final String[] ADVANCED_LABELS = {
         "Data Type:", "Channel:", "Placement:", "Location:", "Image Size:", "Magnification:", "Navigation Type:"
     };
+
+    /** string for ALL */
+    private static final String ALL = "ALL";
+
+    /** object for selecting all bands */
+    private static final TwoFacedObject ALLBANDS = new TwoFacedObject("All Bands", ALL);
+
+    /** object for selecting all calibrations */
+    private static final TwoFacedObject ALLUNITS = new TwoFacedObject("All Types", ALL);
 
     /** flag for center. */
     private static final String PLACE_CENTER = "CENTER";
@@ -105,6 +116,12 @@ public class AddeImageSelection extends DataSelectionComponent {
 
     /** The adde image data source. */
     private AddeImageDataSource addeImageDataSource;
+
+    /** Widget for selecting the band */
+    protected JComboBox bandComboBox;
+
+    /** Mapping of area directory to list of BandInfos */
+    protected Hashtable bandTable;
 
     /** Widget for the element center point in the advanced section. */
     protected JTextField centerElementFld;
@@ -171,6 +188,9 @@ public class AddeImageSelection extends DataSelectionComponent {
 
     /** size label. */
     JLabel sizeLbl;
+
+    /** Widget for selecting image units */
+    protected JComboBox unitComboBox;
 
     /**
      * Instantiates a new sat image selection.
@@ -502,25 +522,149 @@ public class AddeImageSelection extends DataSelectionComponent {
     }
 
     /**
-     * Add the bottom advanced gui panel to the list.
+     * Get the selected band from the advanced chooser
      *
-     * @param bottomComps the bottom components
-     * @return the bottom components
+     * @return selected band number
+     */
+    private int getSelectedBand() {
+        Object bi = (bandComboBox == null)
+                    ? null
+                    : bandComboBox.getSelectedItem();
+
+        if ((bi == null) || bi.equals(ALLBANDS)) {
+            return 0;
+        }
+
+        return ((BandInfo) bi).getBandNumber();
+    }
+
+    /**
+     * Set the available units in the  unit selector
+     *
+     * @param ad   AreaDirectory for the image
+     * @param band band to use for units
+     *
+     * @return List of available units
+     */
+    private List<TwoFacedObject> getAvailableUnits(AreaDirectory ad, int band) {
+
+        // get Vector array of Calibration types.   Layout is
+        // v[i] = band[i] and for each band, it is a vector of
+        // strings of calibration names and descriptions
+        // n = name, n+1 = desc.
+        // for radar, we only have one band
+        if (ad == null) {
+            return new ArrayList<TwoFacedObject>();
+        }
+
+        int[] bands = (int[]) bandTable.get(ad);
+        int   index = (bands == null)
+                      ? 0
+                      : Arrays.binarySearch(bands, band);
+
+        if (index < 0) {
+            index = 0;
+        }
+
+        Vector<TwoFacedObject> l                  = new Vector<TwoFacedObject>();
+        Vector                 v                  = ad.getCalInfo()[index];
+        TwoFacedObject         tfo                = null;
+        int                    preferredUnitIndex = 0;
+
+//      String                 preferredUnit = getDefault(PROP_UNIT, "BRIT");
+        String preferredUnit = "BRIT";
+
+        if ((v != null) && (v.size() / 2 > 0)) {
+            for (int i = 0; i < v.size() / 2; i++) {
+                String name = (String) v.get(2 * i);
+                String desc = (String) v.get(2 * i + 1);
+
+                desc = desc.substring(0, 1).toUpperCase() + desc.substring(1).toLowerCase();
+                tfo  = new TwoFacedObject(desc, name);
+                l.add(tfo);
+
+                if (name.equalsIgnoreCase(preferredUnit)) {
+                    preferredUnitIndex = i;
+                }
+            }
+        } else {
+            l.add(new TwoFacedObject("Raw Value", "RAW"));
+        }
+
+        return l;
+    }
+
+    /**
+     * Set the available units in the  unit selector
+     *
+     * @param ad   AreaDirectory for the image
+     * @param band band to use for units
+     */
+    private void setAvailableUnits(AreaDirectory ad, int band) {
+        List l = getAvailableUnits(ad, band);
+
+        l.add(ALLUNITS);
+        GuiUtils.setListData(unitComboBox, l);
+
+        TwoFacedObject tfo = null;
+
+        if ((bandComboBox != null) && (getSelectedBand() == 0)) {
+            tfo = ALLUNITS;
+        } else {
+
+//          String preferredUnit = getDefault(PROP_UNIT, "BRIT");
+            String preferredUnit = "BRIT";
+
+            tfo = TwoFacedObject.findId(preferredUnit, l);
+        }
+
+        if (tfo != null) {
+            unitComboBox.setSelectedItem(tfo);
+        }
+    }
+
+    public JComponent padLabel(String s) {
+        return GuiUtils.inset(new JLabel(s), new Insets(0, 5, 0, 5));
+    }
+
+    /**
+     * Add the bottom advanced gui panel to the list
+     *
+     * @param bottomComps  the bottom components
      */
     protected void getBottomComponents(List bottomComps) {
         String[] propArray  = getAdvancedProps();
         String[] labelArray = getAdvancedLabels();
 
-        // List bottomComps = new ArrayList();
+        // List     bottomComps     = new ArrayList();
         Insets  dfltGridSpacing = new Insets(4, 0, 4, 0);
         String  dfltLblSpacing  = " ";
+        boolean haveBand        = Misc.toList(propArray).contains(PROP_BAND);
         boolean haveNav         = Misc.toList(propArray).contains(PROP_NAV);
 
         for (int propIdx = 0; propIdx < propArray.length; propIdx++) {
             JComponent propComp = null;
             String     prop     = propArray[propIdx];
 
-            if (prop.equals(PROP_PLACE)) {
+            if (prop.equals(PROP_UNIT)) {
+                unitComboBox = new JComboBox();
+                addPropComp(PROP_UNIT, propComp = unitComboBox);
+                GuiUtils.setPreferredWidth(unitComboBox, 100);
+
+                if (haveBand) {
+                    bandComboBox = new JComboBox();
+                    bandComboBox.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            setAvailableUnits(propertiesAD, getSelectedBand());
+                        }
+                    });
+                    addPropComp(PROP_BAND, bandComboBox);
+                    propComp = GuiUtils.hbox(propComp, padLabel("Channel:"), bandComboBox, 5);
+                }
+            } else if (prop.equals(PROP_BAND)) {
+
+                // Moved to PROP_UNIT
+            } else if (prop.equals(PROP_PLACE)) {
 
                 // Moved to PROP_LOC
             } else if (prop.equals(PROP_LOC)) {
@@ -635,9 +779,7 @@ public class AddeImageSelection extends DataSelectionComponent {
 
                     boolean showNav = false;
 
-                    // showNav = getProperty("includeNavComp", false);
-                    showNav = false;
-
+//                  showNav = getProperty("includeNavComp", false);
                     if (showNav) {
                         propComp = GuiUtils.hbox(propComp,
                                                  GuiUtils.inset(new JLabel("Navigation Type:"),
@@ -653,18 +795,15 @@ public class AddeImageSelection extends DataSelectionComponent {
                 sizeLbl            = GuiUtils.lLabel("");
 
                 /*
-                 * JPanel sizePanel = GuiUtils.left(GuiUtils.doLayout(new
-                 * Component[] { GuiUtils.rLabel("Lines:" + dfltLblSpacing),
-                 * numLinesFld, GuiUtils.rLabel(" Elements:" + dfltLblSpacing),
-                 * numElementsFld, new JLabel(" "), sizeLbl }, 6, GuiUtils.WT_N,
-                 * GuiUtils.WT_N));
+                 *                 JPanel sizePanel =
+                 *   GuiUtils.left(GuiUtils.doLayout(new Component[] {
+                 *   GuiUtils.rLabel("Lines:" + dfltLblSpacing), numLinesFld,
+                 *   GuiUtils.rLabel(" Elements:" + dfltLblSpacing),
+                 *   numElementsFld, new JLabel(" "), sizeLbl
+                 *   }, 6, GuiUtils.WT_N, GuiUtils.WT_N));
                  */
                 JPanel sizePanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
-                    numLinesFld, new JLabel(" X "), numElementsFld /* , lockBtn */, GuiUtils.filler(10, 1), fullResBtn,    /*
-                                                                                                                            *                                     new
-                                                                                                                            *                                     JLabel
-                                                                                                                            *                                     (" "),
-                                                                                                                            */
+                    numLinesFld, new JLabel(" X "), numElementsFld /* , lockBtn */, GuiUtils.filler(10, 1), fullResBtn,    /* new JLabel(" "), */
                     sizeLbl
                 }, 7, GuiUtils.WT_N, GuiUtils.WT_N));
 
