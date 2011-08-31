@@ -3,10 +3,12 @@ package ucar.unidata.data.imagery;
 //~--- non-JDK imports --------------------------------------------------------
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.adde.AddeSatBands;
 
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSelectionComponent;
 import ucar.unidata.ui.LatLonWidget;
+import ucar.unidata.util.Format;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -40,11 +43,76 @@ import javax.swing.event.ChangeListener;
  * The Class SatImageSelection.
  */
 public class AddeImageSelection extends DataSelectionComponent {
+	
+    /** maximum size for the widget */
+    private static final int MAX_SIZE = 700;
+
 
     /** This is the list of labels used for the advanced gui. */
     private static final String[] ADVANCED_LABELS = {
         "Data Type:", "Channel:", "Placement:", "Location:", "Image Size:", "Magnification:", "Navigation Type:"
     };
+
+    
+    /** Property for image default value lat/lon */
+    protected static final String PROP_LATLON = "LATLON";
+    
+
+    /** Property for image default value lin/ele */
+    protected static final String PROP_LINELE = "LINELE";
+    
+    /** The previous AreaDirectory used for properties */
+    AreaDirectory prevPropertiesAD;
+
+    
+    /** Property for the user */
+    protected static final String PROP_USER = "user";
+    
+    /** Default value for the user property */
+    protected static final String DEFAULT_USER = "idv";
+    
+    /** Property for the project */
+    protected static final String PROP_PROJ = "proj";
+    
+    /** Default value for the proj property */
+    protected static final String DEFAULT_PROJ = "0";
+    
+    /** Property for image default value descriptor */
+    protected static final String PROP_DESCR = "descr";
+    
+    /** Property for image default value version */
+    protected static final String PROP_VERSION = "version";
+    
+    /** Property for image compress */
+    protected static final String PROP_COMPRESS = "compress";
+    
+    /** Property for the port */
+    protected static final String PROP_PORT = "port";
+    
+    /** Default value for the debug property */
+    protected static final String DEFAULT_DEBUG = "false";
+    
+    /** Property for image default value descriptor */
+    protected static final String PROP_DEBUG = "debug";
+    
+    /** Default value for the version property */
+    protected static final String DEFAULT_VERSION = "1";
+    
+    /** Property for image default value spac */
+    protected static final String PROP_SPAC = "SPAC";
+    
+    /** Selection label text */
+    protected static final String LABEL_SELECT = " -- Select -- ";
+    
+    /** property for the ADDE port */
+    public static final String PROP_ADDEPORT = "adde.port";
+    
+    /** Default value for the port property */
+    protected static final String DEFAULT_PORT = "112";
+
+
+
+
 
     /** string for ALL */
     private static final String ALL = "ALL";
@@ -93,11 +161,19 @@ public class AddeImageSelection extends DataSelectionComponent {
 
     /** limit of slider. */
     private static final int SLIDER_MAX = 29;
+    
+    /** Property for image default value key */
+    protected static final String PROP_KEY = "key";
+
 
     /** This is the list of properties that are used in the advanced gui. */
     private static final String[] ADVANCED_PROPS = {
         PROP_UNIT, PROP_BAND, PROP_PLACE, PROP_LOC, PROP_SIZE, PROP_MAG, PROP_NAV
     };
+    
+    /** default magnification */
+    private static final int DEFAULT_MAG = 0;
+
 
     /** base number of lines. */
     private double baseNumElements = 0.0;
@@ -110,6 +186,10 @@ public class AddeImageSelection extends DataSelectionComponent {
 
     /** Maps the PROP_ property name to the gui component. */
     private Hashtable propToComps = new Hashtable();
+    
+    /** Descriptor/name hashtable */
+    protected Hashtable descriptorTable;
+
 
     /** flag for setting properties. */
     private boolean amSettingProperties = false;
@@ -121,7 +201,7 @@ public class AddeImageSelection extends DataSelectionComponent {
     protected JComboBox bandComboBox;
 
     /** Mapping of area directory to list of BandInfos */
-    protected Hashtable bandTable;
+    protected Hashtable bandTable = new Hashtable();
 
     /** Widget for the element center point in the advanced section. */
     protected JTextField centerElementFld;
@@ -185,12 +265,42 @@ public class AddeImageSelection extends DataSelectionComponent {
 
     /** The current AreaDirectory used for properties. */
     AreaDirectory propertiesAD;
+    
+    /** Label for the properties */
+    JLabel propertiesLabel;
+
 
     /** size label. */
     JLabel sizeLbl;
+    
+    /** A widget for the list of dataset descriptors */
+    protected JComboBox descriptorComboBox;
+
+    
+    
+
+    /**
+     * the  list of band infos
+     */
+    private List<BandInfo> bandInfos;
+
 
     /** Widget for selecting image units */
     protected JComboBox unitComboBox;
+    
+    
+    /** A flag so we can debug the new way of processing sat band file */
+    private boolean useSatBandInfo = true;
+
+    /** Used to parse the sat band file */
+    private AddeSatBands satBandInfo;
+    
+    /**
+     * Mapping of sensor id (String) to hashtable that maps
+     * Integer band number to name
+     */
+    private Hashtable sensorToBandToName;
+
 
     /**
      * Instantiates a new sat image selection.
@@ -200,6 +310,7 @@ public class AddeImageSelection extends DataSelectionComponent {
     public AddeImageSelection(AddeImageDataSource addeImageDataSource) {
         super("Advanced");
         this.addeImageDataSource = addeImageDataSource;
+        
     }
 
     /*
@@ -211,6 +322,15 @@ public class AddeImageSelection extends DataSelectionComponent {
         List bottomComps = new ArrayList();
 
         getBottomComponents(bottomComps);
+        
+        for (Object o : addeImageDataSource.getImageList()) {
+            AddeImageDescriptor d         = (AddeImageDescriptor) o;
+            System.out.println("---->" + d.getDirectory());
+            this.setPropertiesState( d.getDirectory(), false);
+            AddeImageInfo       imageInfo = d.getImageInfo();
+            break;
+        }
+
 
         return propPanel;
     }
@@ -225,6 +345,7 @@ public class AddeImageSelection extends DataSelectionComponent {
 
         for (Object o : addeImageDataSource.getImageList()) {
             AddeImageDescriptor d         = (AddeImageDescriptor) o;
+            d.getDirectory();
             AddeImageInfo       imageInfo = d.getImageInfo();
         }
     }
@@ -571,8 +692,7 @@ public class AddeImageSelection extends DataSelectionComponent {
         TwoFacedObject         tfo                = null;
         int                    preferredUnitIndex = 0;
 
-//      String                 preferredUnit = getDefault(PROP_UNIT, "BRIT");
-        String preferredUnit = "BRIT";
+       String                 preferredUnit = getDefault(PROP_UNIT, "BRIT");
 
         if ((v != null) && (v.size() / 2 > 0)) {
             for (int i = 0; i < v.size() / 2; i++) {
@@ -626,6 +746,614 @@ public class AddeImageSelection extends DataSelectionComponent {
     public JComponent padLabel(String s) {
         return GuiUtils.inset(new JLabel(s), new Insets(0, 5, 0, 5));
     }
+    
+    /**
+     * Check to see if the two Area directories are equal
+     *
+     * @param ad1  first AD (may be null)
+     * @param ad2  second AD (may be null)
+     *
+     * @return true if they are equal
+     */
+    private boolean checkPropertiesEqual(AreaDirectory ad1,
+                                         AreaDirectory ad2) {
+        if (ad1 == null) {
+            return false;
+        }
+        if (ad2 == null) {
+            return false;
+        }
+        return Misc.equals(ad1, ad2)
+               || ((ad1.getLines() == ad2.getLines())
+                   && (ad1.getElements() == ad2.getElements())
+                   && Arrays.equals(ad1.getBands(), ad2.getBands()));
+    }
+    
+    /**
+     * Clear the properties widgets
+     */
+    private void clearPropertiesWidgets() {
+        if (latLonWidget != null) {
+            latLonWidget.getLatField().setText("");
+            latLonWidget.getLonField().setText("");
+        }
+        if (centerLineFld != null) {
+            centerLineFld.setText("");
+            centerElementFld.setText("");
+        }
+        if (numLinesFld != null) {
+            if (sizeLbl != null) {
+                sizeLbl.setText("");
+            }
+            numLinesFld.setText("");
+            numElementsFld.setText("");
+        }
+        if (unitComboBox != null) {
+            GuiUtils.setListData(unitComboBox, new Vector());
+        }
+        if (bandComboBox != null) {
+            GuiUtils.setListData(bandComboBox, new Vector());
+        }
+
+        setMagSliders(DEFAULT_MAG, DEFAULT_MAG);
+
+
+        if (placeLbl != null) {
+            changePlace(PLACE_CENTER);
+        }
+
+        if (navComboBox != null) {
+            navComboBox.setSelectedIndex(0);
+        }
+        baseNumLines    = 0.0;
+        baseNumElements = 0.0;
+    }
+    
+    /**
+     * Get the size for the area directory
+     *
+     * @param ad  the area directory
+     *
+     * @return  an array of lines,elements
+     */
+    protected int[] getSize(AreaDirectory ad) {
+        baseNumLines    = ad.getLines();
+        baseNumElements = ad.getElements();
+
+        String sizeDefault = getDefault(PROP_SIZE, (String) null);
+        List   toks        = ((sizeDefault != null)
+                              ? StringUtil.split(sizeDefault, " ", true, true)
+                              : null);
+        if ((toks == null) || (toks.size() == 0)) {
+            return new int[] { (int) baseNumLines, (int) baseNumElements };
+        } else {
+            String lines = "" + toks.get(0);
+            if (lines.equalsIgnoreCase(ALL)) {
+                lines = "" + (int) baseNumLines;
+            }
+            int    numLines = new Integer(lines.trim()).intValue();
+
+            String elems    = (toks.size() > 1)
+                              ? "" + toks.get(1)
+                              : "" + (int) baseNumElements;
+            if (elems.equalsIgnoreCase(ALL)) {
+                elems = "" + baseNumElements;
+            }
+            int numElements = new Integer(elems.trim()).intValue();
+            return new int[] { (int) Math.min(numLines, baseNumLines),
+                               (int) Math.min(numElements, baseNumElements) };
+        }
+
+    }
+    
+    private String getDefault(String propSize, String string) { //BOGUS!!!!!!
+    	return string;
+	}
+
+	/**
+     * Get the list of bands for the images
+     *
+     * @param ad   AreaDirectory
+     * @param bands  list of bands
+     * @return list of BandInfos for the selected images
+     */
+    private List<BandInfo> makeBandInfos(AreaDirectory ad, int[] bands) {
+        List<BandInfo> l = new ArrayList<BandInfo>();
+        if (ad != null) {
+            if (bands != null) {
+                for (int i = 0; i < bands.length; i++) {
+                    int      band = bands[i];
+                    BandInfo bi   = new BandInfo(ad.getSensorID(), band);
+                    bi.setBandDescription(getBandName(ad, band));
+                    bi.setCalibrationUnits(getAvailableUnits(ad, band));
+                    bi.setPreferredUnit(getDefault(PROP_UNIT, "BRIT"));
+                    l.add(bi);
+                }
+            }
+        }
+        return l;
+    }
+    
+    /**
+     * Get the selected descriptor.
+     *
+     * @return the selected descriptor
+     */
+    public String getSelectedDescriptor() {
+        String selection = (String) descriptorComboBox.getSelectedItem();
+        if (selection == null) {
+            return null;
+        }
+        if (selection.equals(LABEL_SELECT)) {
+            return null;
+        }
+        return selection;
+    }
+
+    
+    /**
+     * Get the selected descriptor.
+     *
+     * @return  the currently selected descriptor.
+     */
+    protected String getDescriptor() {
+        return getDescriptorFromSelection(getSelectedDescriptor());
+    }
+
+    /**
+     * Get the descriptor relating to the selection.
+     *
+     * @param selection   String name from the widget
+     *
+     * @return  the descriptor
+     */
+    protected String getDescriptorFromSelection(String selection) {
+        if (descriptorTable == null) {
+            return null;
+        }
+        if (selection == null) {
+            return null;
+        }
+        return (String) descriptorTable.get(selection);
+    }
+    
+    /**
+     * Get the selected calibration unit.
+     *
+     * @return  the selected calibration unit
+     */
+	protected String getSelectedUnit() {
+		return unitComboBox == null ? null
+				: (String) ((TwoFacedObject) unitComboBox.getSelectedItem())
+						.getId();
+	}
+	
+    /**
+     * Get the port to use. Check the IDV for an adde.port property.
+     * If not null then use the IDV property. Else use DEFAULT_PORT
+     *
+     * @return the port to use
+     */
+    protected String getPort() {
+        String prop = addeImageDataSource.getIdv().getProperty(PROP_ADDEPORT, (String) null);
+        if (prop != null) {
+            return prop;
+        }
+        return DEFAULT_PORT;
+    }
+
+
+    
+    /**
+     * Get the default property value for the adde request string
+     *
+     * @param prop The property
+     * @param ad The AreaDirectory
+     * @param forDisplay Is this to display to the user in the gui
+     *
+     * @return The default of the property to use in the request string
+     */
+    protected String getDefaultPropValue(String prop, AreaDirectory ad,
+                                         boolean forDisplay) {
+        if (prop.equals(PROP_USER)) {
+            return DEFAULT_USER;
+        }
+        if (prop.equals(PROP_PLACE)) {
+            return PLACE_CENTER;
+        }
+        if (prop.equals(PROP_PROJ)) {
+            return DEFAULT_PROJ;
+        }
+        if (prop.equals(PROP_DESCR)) {
+            return getDescriptor();
+        }
+        if (prop.equals(PROP_VERSION)) {
+            return DEFAULT_VERSION;
+        }
+        if (prop.equals(PROP_COMPRESS)) {
+            return "gzip";
+        }
+        if (prop.equals(PROP_PORT)) {
+            return getPort();
+        }
+        if (prop.equals(PROP_DEBUG)) {
+            return DEFAULT_DEBUG;
+        }
+        if (prop.equals(PROP_SIZE)) {
+            if (ad != null) {
+                return ad.getLines() + " " + ad.getElements();
+            }
+            return MAX_SIZE + " " + MAX_SIZE;
+        }
+        if (prop.equals(PROP_MAG)) {
+            return "1 1";
+        }
+        //if (prop.equals(PROP_LOC) || prop.equals(PROP_LINELE)) {
+        if (prop.equals(PROP_LINELE)) {
+            if (ad == null) {
+                return "0 0";
+            }
+            return (ad.getLines() / 2 - 1) + " " + (ad.getElements() / 2 - 1);
+        }
+        //if (prop.equals(PROP_LATLON)) {
+        if (prop.equals(PROP_LOC) || prop.equals(PROP_LATLON)) {
+            if (ad == null) {
+                return "0 0";
+            }
+            return ad.getCenterLatitude() + " " + ad.getCenterLongitude();
+        }
+        if (prop.equals(PROP_BAND)) {
+            if (forDisplay) {
+                return getBandName(ad, ((int[]) bandTable.get(ad))[0]);
+            }
+            return "" + ( bandTable.get(ad) == null ? "" :  ((int[]) bandTable.get(ad))[0]);
+        }
+        if (prop.equals(PROP_SPAC)) {
+            return getSelectedUnit() != null && getSelectedUnit().equalsIgnoreCase("BRIT")
+                   ? "1"
+                   : "4";
+        }
+        if (prop.equals(PROP_UNIT)) {
+            //return getSelectedUnit();
+            //            return "";
+            return "X";
+        }
+        if (prop.equals(PROP_NAV)) {
+            return "X";
+        }
+        return "";
+    }
+
+
+    
+    /**
+     * Set the widgets with the state from the given AreaDirectory
+     *
+     * @param ad   AreaDirectory for the image
+     * @param force force an update regardless of the previous invocation
+     */
+    private void setPropertiesState(AreaDirectory ad, boolean force) {
+
+        if (amSettingProperties) {
+            return;
+        }
+        prevPropertiesAD = propertiesAD;
+        propertiesAD     = ad;
+        if ( !force && checkPropertiesEqual(prevPropertiesAD, propertiesAD)) {
+            return;
+        }
+
+        amSettingProperties = true;
+
+        if (ad == null) {
+            clearPropertiesWidgets();
+            amSettingProperties = false;
+            return;
+        }
+
+
+        String[] propArray  = getAdvancedProps();
+        String[] labelArray = getAdvancedLabels();
+
+
+        if (numLinesFld != null) {
+            int[] size = getSize(ad);
+            numLinesFld.setText("" + size[0]);
+            numElementsFld.setText("" + size[1]);
+            if (sizeLbl != null) {
+                String label = "  Raw size: " + ad.getLines() + " X "
+                               + ad.getElements();
+                sizeLbl.setText(label);
+            }
+        }
+        if (latLonWidget != null) {
+            latLonWidget.getLatField().setText("" + ad.getCenterLatitude());
+            latLonWidget.getLonField().setText("" + ad.getCenterLongitude());
+        }
+        if (centerLineFld != null) {
+            centerLineFld.setText("" + ad.getLines() / 2);
+            centerElementFld.setText("" + ad.getElements() / 2);
+        }
+
+
+        //Vector bandList = new Vector();
+        List<BandInfo> bandList = null;
+        int[]          bands    = (int[]) bandTable.get(ad);
+        if (bands != null) {
+            bandList = makeBandInfos(ad, bands);
+        }
+        bandInfos = bandList;
+
+
+        if (bandComboBox != null) {
+            List comboList = bandList;
+            if (bandList != null && bandList.size() > 1) {
+                comboList = new ArrayList();
+                comboList.addAll(bandList);
+                comboList.add(ALLBANDS);
+            }
+            GuiUtils.setListData(bandComboBox, comboList);
+        }
+
+        setAvailableUnits(ad, getSelectedBand());
+
+        for (int propIdx = 0; propIdx < propArray.length; propIdx++) {
+            String prop = propArray[propIdx];
+            String value = getDefault(prop,
+                                      getDefaultPropValue(prop, ad, false));
+            if (value == null) {
+                value = "";
+            }
+            value = value.trim();
+            if (prop.equals(PROP_LOC)) {
+                //String key = getDefault(PROP_KEY, PROP_LINELE);
+                String  key              = getDefault(PROP_KEY, PROP_LATLON);
+
+
+
+
+                boolean usingLineElement = key.equals(PROP_LINELE);
+                if (usingLineElement) {
+                    locationPanel.show(1);
+                } else {
+                    locationPanel.show(0);
+                }
+                if (usingLineElement) {
+                    value = getDefault(PROP_LOC,
+                                       getDefaultPropValue(PROP_LINELE, ad,
+                                           false));
+                } else {
+                    value = getDefault(PROP_LOC,
+                                       getDefaultPropValue(PROP_LATLON, ad,
+                                           false));
+                }
+                String[] pair = getPair(value);
+                if (pair != null) {
+                    if (usingLineElement) {
+                        centerLineFld.setText(pair[0]);
+                        centerElementFld.setText(pair[1]);
+                    } else {
+                        latLonWidget.setLat(pair[0]);
+                        latLonWidget.setLon(pair[1]);
+
+                    }
+                }
+            } else if (prop.equals(PROP_BAND)) {
+                if (value.equalsIgnoreCase((String) ALLBANDS.getId())) {
+                    bandComboBox.setSelectedItem(ALLBANDS);
+                } else {
+                    int bandNum = 0;
+                    try {
+                        bandNum = Integer.parseInt(value);
+                    } catch (NumberFormatException nfe) {}
+                    int index = BandInfo.findIndexByNumber(bandNum, bandList);
+                    if (index != -1) {
+                        bandComboBox.setSelectedIndex(index);
+                    }
+                }
+            } else if (prop.equals(PROP_PLACE)) {
+                changePlace(value);
+            } else if (prop.equals(PROP_MAG)) {
+                String[] pair = getPair(value);
+                if (pair != null) {
+                    setMagSliders(new Integer(pair[0]).intValue(),
+                                  new Integer(pair[1]).intValue());
+                } else {
+                    setMagSliders(DEFAULT_MAG, DEFAULT_MAG);
+                }
+            } else if (prop.equals(PROP_NAV)) {
+                if (navComboBox != null) {
+                    navComboBox.setSelectedIndex(
+                        (value.equalsIgnoreCase("LALO")
+                         ? 1
+                         : 0));
+                }
+            }
+        }
+        updatePropertiesLabel();
+        amSettingProperties = false;
+    }
+    
+    /**
+     * Get a pair of properties
+     *
+     * @param v   a space separated string
+     *
+     * @return an array of the two strings
+     */
+    private String[] getPair(String v) {
+        if (v == null) {
+            return null;
+        }
+        v = v.trim();
+        List toks = StringUtil.split(v, " ", true, true);
+        if ((toks == null) || (toks.size() == 0)) {
+            return null;
+        }
+        String tok1 = toks.get(0).toString();
+        return new String[] { tok1, ((toks.size() > 1)
+                                     ? toks.get(1).toString()
+                                     : tok1) };
+
+    }
+    
+    /**
+     * Update the label for the properties
+     */
+    private void updatePropertiesLabel() {
+        if (propertiesLabel != null) {
+            propertiesLabel.setText(getPropertiesDescription());
+        }
+    }
+    
+    /**
+     * Get the name of the selected band
+     *
+     * @return the name of the band
+     */
+    public String getSelectedBandName() {
+        return getBandName(propertiesAD, getSelectedBand());
+    }
+    
+    /**
+     * Get the band name for a particular area
+     *
+     * @param ad AreaDirectory
+     * @param band band number
+     *
+     * @return name of the band
+     */
+    private String getBandName(AreaDirectory ad, int band) {
+        // if (band== 0) return ALLBANDS.toString();
+
+        if (useSatBandInfo) {
+            if (satBandInfo == null) {
+                return "Band: " + band;
+            }
+            String[] descrs = satBandInfo.getBandDescr(ad.getSensorID(),
+                                  ad.getSourceType());
+            if (descrs != null) {
+                if ((band >= 0) && (band < descrs.length)) {
+                    return descrs[band];
+                }
+            }
+            return "Band: " + band;
+        }
+
+
+        if (sensorToBandToName == null) {
+            return "Band: " + band;
+        }
+        Hashtable bandToName =
+            (Hashtable) sensorToBandToName.get(new Integer(ad.getSensorID()));
+        String  name        = null;
+        Integer bandInteger = new Integer(band);
+
+        if (bandToName != null) {
+            name = (String) bandToName.get(bandInteger);
+        }
+        if (name == null) {
+            name = "Band: " + band;
+        }
+        /*
+        else {
+            name = band + " - " + name.trim();
+        }
+        */
+        return name;
+    }
+    
+    
+
+
+    
+    /**
+     * Get a description of the properties
+     *
+     * @return  a description
+     */
+    protected String getPropertiesDescription() {
+        StringBuffer buf       = new StringBuffer();
+        String[]     propArray = getAdvancedProps();
+        List         list      = Misc.toList(propArray);
+        if (list.contains(PROP_BAND)) {
+            buf.append(getSelectedBandName());
+            buf.append(", ");
+        }
+        if (list.contains(PROP_SIZE)) {
+            buf.append("Size: ");
+            String sizeKey      = getUserPropValue(PROP_SIZE, propertiesAD);
+            StringTokenizer tok = new StringTokenizer(sizeKey);
+            if (tok.hasMoreTokens()) {
+                String size = ((String) tok.nextElement()).trim();
+                buf.append(size);
+                buf.append("x");
+                if ( !size.equalsIgnoreCase("all")) {
+                    if (tok.hasMoreTokens()) {
+                        buf.append(((String) tok.nextElement()).trim());
+                    } else {
+                        buf.append(size);
+                    }
+                }
+            }
+        }
+        return buf.toString();
+    }
+    
+    /**
+     * Get the user supplied property value for the adde request string
+     *
+     * @param prop The property
+     * @param ad The AreaDirectory
+     *
+     * @return The value, supplied by the user, of the property to use
+     *         in the request string
+     */
+    protected String getUserPropValue(String prop, AreaDirectory ad) {
+        if (prop.equals(PROP_LATLON) && (latLonWidget != null)) {
+            // apparently the ADDE server can't handle long numbers
+            return Format.dfrac(latLonWidget.getLat(), 5) + " "
+                   + Format.dfrac(latLonWidget.getLon(), 5);
+        }
+        if (prop.equals(PROP_PLACE) && (placeLbl != null)) {
+            return place;
+        }
+
+        if (prop.equals(PROP_LINELE) && (centerLineFld != null)) {
+            return centerLineFld.getText().trim() + " "
+                   + centerElementFld.getText().trim();
+        }
+
+        if (prop.equals(PROP_SIZE) && (numLinesFld != null)) {
+            return numLinesFld.getText().trim() + " "
+                   + numElementsFld.getText().trim();
+        }
+        if (prop.equals(PROP_MAG) && (lineMagSlider != null)) {
+            return getLineMagValue() + " " + getElementMagValue();
+        }
+        if (prop.equals(PROP_BAND) && (bandComboBox != null)) {
+
+            Object selected = bandComboBox.getSelectedItem();
+            if (selected != null) {
+                if (selected.equals(ALLBANDS)) {
+                    return ALLBANDS.toString();
+                } else {
+                    return "" + ((BandInfo) selected).getBandNumber();
+                }
+            }
+        }
+        if (prop.equals(PROP_UNIT)) {
+            return getSelectedUnit();
+        }
+        if (prop.equals(PROP_NAV)) {
+            return TwoFacedObject.getIdString(navComboBox.getSelectedItem());
+        }
+        return null;
+    }
+
+
+
+
 
     /**
      * Add the bottom advanced gui panel to the list
@@ -779,7 +1507,7 @@ public class AddeImageSelection extends DataSelectionComponent {
 
                     boolean showNav = false;
 
-//                  showNav = getProperty("includeNavComp", false);
+//                    showNav = getProperty("includeNavComp", false); //TODO: Fix!!!!
                     if (showNav) {
                         propComp = GuiUtils.hbox(propComp,
                                                  GuiUtils.inset(new JLabel("Navigation Type:"),
