@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -3443,7 +3443,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         List<DateTime> times = vm.getTimeDriverTimes();
         //        System.err.println("\tdriver times to use:" + times);
-        dataSelection.setTimeDriverTimes(times);
+        dataSelection.setTheTimeDriverTimes(times);
         return dataSelection;
     }
 

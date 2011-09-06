@@ -24,10 +24,11 @@ package ucar.unidata.data;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import visad.DateTime;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import visad.DateTime;
 
 
 /**
@@ -63,6 +64,7 @@ public class DataSelection {
     /** list of times */
     private List times;
 
+    /** _more_          */
     private List<DateTime> timeDriverTimes;
 
 
@@ -170,9 +172,10 @@ public class DataSelection {
      */
     public DataSelection(DataSelection that) {
         if (that != null) {
-            this.times     = Misc.cloneList(that.times);
-            if(that.timeDriverTimes!=null) {
-                this.timeDriverTimes = (List<DateTime>)Misc.cloneList(that.timeDriverTimes);
+            this.times = Misc.cloneList(that.times);
+            if (that.timeDriverTimes != null) {
+                this.timeDriverTimes =
+                    (List<DateTime>) Misc.cloneList(that.timeDriverTimes);
             }
             this.timesMode = that.timesMode;
             if (that.geoSelection != null) {
@@ -293,10 +296,11 @@ public class DataSelection {
             newSelection.toLevel   = lowerPriority.toLevel;
         }
 
-        if(higherPriority.timeDriverTimes!=null) {
-            newSelection.setTimeDriverTimes(higherPriority.timeDriverTimes);
+        if (higherPriority.timeDriverTimes != null) {
+            newSelection.setTheTimeDriverTimes(
+                higherPriority.timeDriverTimes);
         } else {
-            newSelection.setTimeDriverTimes(lowerPriority.timeDriverTimes);
+            newSelection.setTheTimeDriverTimes(lowerPriority.timeDriverTimes);
         }
 
 
@@ -568,21 +572,21 @@ public class DataSelection {
     }
 
     /**
-       Set the TimeDriverTimes property.
-
-       @param value The new value for TimeDriverTimes
-    **/
-    public void setTimeDriverTimes (List<DateTime> value) {
-	this.timeDriverTimes = value;
+     *  Set the TimeDriverTimes property.
+     *
+     *  @param value The new value for TimeDriverTimes
+     */
+    public void setTheTimeDriverTimes(List<DateTime> value) {
+        this.timeDriverTimes = value;
     }
 
     /**
-       Get the TimeDriverTimes property.
-
-       @return The TimeDriverTimes
-    **/
-    public List<DateTime> getTimeDriverTimes () {
-	return this.timeDriverTimes;
+     *  Get the TimeDriverTimes property.
+     *
+     *  @return The TimeDriverTimes
+     */
+    public List<DateTime> getTimeDriverTimes() {
+        return this.timeDriverTimes;
     }
 
 
