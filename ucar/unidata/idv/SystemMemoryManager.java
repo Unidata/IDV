@@ -33,9 +33,11 @@ public class SystemMemoryManager {
     /**
      * Private constructor.
      *
-     * See this discussion: http://stackoverflow.com/questions/1190837/java-xmx-max-memory-on-system
+     * See this discussion:
+     * http://stackoverflow.com/questions/1190837/java-xmx-max-memory-on-system
      *
-     * Post condition: memory will either be -1, or the result of getTotalPhysicalMemorySize
+     * Post condition: memory will either be -1, or the result of
+     * getTotalPhysicalMemorySize
      */
     private SystemMemoryManager() {
         long mem = -1;
@@ -105,13 +107,11 @@ public class SystemMemoryManager {
     public static long getDefaultMemory() {
         double percent = 0.8;    // Not final
 
-        if (INSTANCE.is32 && (INSTANCE.memory > OS_32_MAX) && !INSTANCE.windows) {
+        if (INSTANCE.is32 && (INSTANCE.memory > OS_32_MAX) &&!INSTANCE.windows) {
             percent = Math.min(1, percent * INSTANCE.memory / OS_32_MAX);
         }
 
-		final long memory = Math
-				.round(((getTotalMemory() - MINIMUM_MEMORY) * percent)
-						+ MINIMUM_MEMORY);
+        final long memory = Math.round(((getTotalMemory() - MINIMUM_MEMORY) * percent) + MINIMUM_MEMORY);
 
         return isMemoryAvailable()
                ? Math.max(memory, MINIMUM_MEMORY)
@@ -155,11 +155,12 @@ public class SystemMemoryManager {
     }
 
     /**
-     *     Check and repair memory settings
+     * Check and repair memory settings
      *
-     *     @param memory the memory setting
+     * @param memory
+     *            the memory setting
      *
-     *     @return the memory (fixed if necessary).
+     * @return the memory (fixed if necessary).
      */
     public static long checkAndRepair(final long memory) {
         long val = memory;
