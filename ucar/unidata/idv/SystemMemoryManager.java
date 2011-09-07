@@ -27,6 +27,9 @@ public class SystemMemoryManager {
     /** The total available system memory in bytes. */
     private final long memory;
 
+    /** The windows operating system. */
+    private final boolean windows;
+
     /**
      * Private constructor.
      *
@@ -45,10 +48,11 @@ public class SystemMemoryManager {
             mem = (Long) m.invoke(osBean);
         } catch (Exception ignore) {}
 
-        this.memory = (mem > -1)
-                      ? Math.round(mem / 1024d / 1024d)
-                      : mem;
-        this.is32   = System.getProperty("os.arch").indexOf("64") < 0;
+        this.memory  = (mem > -1)
+                       ? Math.round(mem / 1024d / 1024d)
+                       : mem;
+        this.is32    = System.getProperty("os.arch").indexOf("64") < 0;
+        this.windows = System.getProperty("os.name").contains("Windows");
     }
 
     /**
@@ -87,21 +91,21 @@ public class SystemMemoryManager {
                : INSTANCE.memory;
     }
 
-	/**
-	 * The default when the user first starts up should be to use 80% between
-	 * the "low and high-water mark", but they should be allowed to increase
-	 * that to 100% of the high-water mark. There are a couple of exceptions to
-	 * the 80% heuristic. The amount of memory returned will never be less than
-	 * 512GB. Also, if on 32 bit OS and the total available memory is greater
-	 * than 1536, return an amount that better uses the capacity of the machine
-	 * i.e. between 80 and 100 percent.
-	 * 
-	 * @return the default memory
-	 */
+    /**
+     * The default when the user first starts up should be to use 80% between
+     * the "low and high-water mark", but they should be allowed to increase
+     * that to 100% of the high-water mark. There are a couple of exceptions to
+     * the 80% heuristic. The amount of memory returned will never be less than
+     * 512GB. Also, if on 32 bit OS and the total available memory is greater
+     * than 1536 and the OS is not windows, return an amount that better uses
+     * the capacity of the machine i.e. between 80 and 100 percent.
+     *
+     * @return the default memory
+     */
     public static long getDefaultMemory() {
         double percent = 0.8;    // Not final
 
-        if (INSTANCE.is32 && (INSTANCE.memory > OS_32_MAX)) {
+        if (INSTANCE.is32 && (INSTANCE.memory > OS_32_MAX) && !INSTANCE.windows) {
             percent = Math.min(1, percent * INSTANCE.memory / OS_32_MAX);
         }
 
