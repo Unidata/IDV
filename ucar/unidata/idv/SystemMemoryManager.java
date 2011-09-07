@@ -27,7 +27,7 @@ public class SystemMemoryManager {
     /** The total available system memory in bytes. */
     private final long memory;
 
-    /** The windows operating system. */
+    /** Windows operating system? */
     private final boolean windows;
 
     /**
