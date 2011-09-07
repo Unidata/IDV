@@ -21,8 +21,9 @@ public class SystemMemoryManagerTest {
             assertEquals("should always be -1 when memory is not available", -1, SystemMemoryManager.getTotalMemory());
         }
 
-        log(SystemMemoryManager.getTotalMemory());
-        log(SystemMemoryManager.isMemoryAvailable());
+        log("SystemMemoryManager.getTotalMemory() " + SystemMemoryManager.getTotalMemory());
+        log("SystemMemoryManager.getDefaultMemory() " + SystemMemoryManager.getDefaultMemory());
+        log("SystemMemoryManager.isMemoryAvailable() " + SystemMemoryManager.isMemoryAvailable());
     }
 
     @Test
