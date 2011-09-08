@@ -93,23 +93,18 @@ public class SystemMemoryManager {
                : INSTANCE.memory;
     }
 
-    /**
-     * The default when the user first starts up should be to use 80% between
-     * the "low and high-water mark", but they should be allowed to increase
-     * that to 100% of the high-water mark. There are a couple of exceptions to
-     * the 80% heuristic. The amount of memory returned will never be less than
-     * 512GB. Also, if on 32 bit OS and the total available memory is greater
-     * than 1536 and the OS is not windows, return an amount that better uses
-     * the capacity of the machine i.e. between 80 and 100 percent.
-     *
-     * @return the default memory
-     */
+	/**
+	 * The default when the user first starts up should be to use 80% between
+	 * the "low and high-water mark", but they should be allowed to increase
+	 * that to 100% of the high-water mark. There are a couple of exceptions to
+	 * the 80% heuristic. The amount of memory returned will never be < 512GB.
+	 * Also, if on 32 bit OS be conservative and choose 70%. For example, if we
+	 * have 32 bit windows with 1536 of memory, the result will be 1229.
+	 * 
+	 * @return the default memory
+	 */
     public static long getDefaultMemory() {
-        double percent = 0.8;    // Not final
-
-        if (INSTANCE.is32 && (INSTANCE.memory > OS_32_MAX) &&!INSTANCE.windows) {
-            percent = Math.min(1, percent * INSTANCE.memory / OS_32_MAX);
-        }
+        final double percent = INSTANCE.is32 ? 0.7 : 0.8;
 
         final long memory = Math.round(((getTotalMemory() - MINIMUM_MEMORY) * percent) + MINIMUM_MEMORY);
 
