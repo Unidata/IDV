@@ -1669,7 +1669,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 String tmp      = filename.toLowerCase();
                 if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
                         || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
-                    filename = filename + "." + getFileSuffix();
+                    filename = filename + getFileSuffix();
                 }
 
                 String path = IOUtil.joinDir(getFileDirectory(), filename);
