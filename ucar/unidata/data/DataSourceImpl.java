@@ -2168,13 +2168,13 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Get the list of times to compare to the time driver times
      *
-     * @param dataChoice _more_
-     * @param selection _more_
-     * @param timeDriverTimes _more_
+     * @param dataChoice  the data choice
+     * @param selection   the selection (for things like level)
+     * @param timeDriverTimes  the time driver times (use range for server query)
      *
-     * @return _more_
+     * @return  the list of times for comparison
      */
     protected List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
             DataSelection selection, List<DateTime> timeDriverTimes) {
