@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -987,6 +987,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (this.dataSelection == null) {
             this.dataSelection = new DataSelection();
         }
+        updateDataSelection(this.dataSelection);
 
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {

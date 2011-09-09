@@ -1,21 +1,21 @@
 /*
- * Copyright 2010 UNAVCO, 6350 Nautilus Drive, Boulder, CO 80301
- * http://www.unavco.org
- *
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.data;
@@ -2063,16 +2063,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public List<DateTime> selectTimesFromList(DataSelection dataSelection,
             List sourceTimes, List<DateTime> selectionTimes)
             throws Exception {
-        List<DateTime> results     = new ArrayList<DateTime>();
+        List<DateTime> results = new ArrayList<DateTime>();
         //First convert the source times to a list of Date objects
-        List<Date>     sourceDates = new ArrayList<Date>();
+        List<Date> sourceDates = new ArrayList<Date>();
         for (int i = 0; i < sourceTimes.size(); i++) {
             Object object = sourceTimes.get(i);
             if (object instanceof DateTime) {
                 sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
             } else if (object instanceof Date) {
                 sourceDates.add((Date) object);
-            } else if (object instanceof TwoFacedObject) { //relative time
+            } else if (object instanceof TwoFacedObject) {  //relative time
                 return null;
             } else {
                 System.err.println("Unknown time type: "
@@ -2086,18 +2086,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         //Now look at each selection time and find the closest source time
         //We need to have logic for when a selection time is outside the range of the source times
         for (DateTime dateTime : selectionTimes) {
-            Date dttm = ucar.visad.Util.makeDate(dateTime);
+            Date dttm        = ucar.visad.Util.makeDate(dateTime);
             long minTimeDiff = -1;
-            Date minDate = null;
+            Date minDate     = null;
             for (int i = 0; i < sourceDates.size(); i++) {
                 Date sourceDate = sourceDates.get(i);
-                long timeDiff = Math.abs(sourceDate.getTime()-dttm.getTime());
-                if(minTimeDiff<0 || timeDiff<minTimeDiff) {
+                long timeDiff = Math.abs(sourceDate.getTime()
+                                         - dttm.getTime());
+                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
                     minTimeDiff = timeDiff;
-                    minDate = sourceDate;
+                    minDate     = sourceDate;
                 }
             }
-            if(minDate!=null && !seenTimes.contains(minDate)) {
+            if ((minDate != null) && !seenTimes.contains(minDate)) {
                 results.add(new DateTime(minDate));
                 seenTimes.add(minDate);
             }
@@ -2124,32 +2125,18 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
         if (givenDataSelection != null) {
-            List<DateTime> timeDriverTimes = null;
-        //        givenDataSelection.getTimeDriverTimes();
-            if(DisplayControl.DOTIMEDRIVER){
-                List vms   = getIdv().getVMManager().getViewManagers();
-                for(int i=0; i< vms.size(); i++){
-                    ViewManager vm = (ViewManager)vms.get(i);
-                    try{
-                        List dtimes = vm.getTimeDriverTimes();
-                        if (dtimes != null && timeDriverTimes==null)
-                                timeDriverTimes = dtimes;
-
-                    } catch (Exception ee){
-
-                    }
-
-                }
-
-                
-            }
+            List<DateTime> timeDriverTimes =
+                givenDataSelection.getTimeDriverTimes();
             if (timeDriverTimes != null) {
                 try {
-                    System.err.println("time driver times:" + timeDriverTimes);
+                    System.err.println("time driver times:"
+                                       + timeDriverTimes);
+                    List<DateTime> dataSourceTimes =
+                        getAllTimesForTimeDriver(dataChoice,
+                            givenDataSelection, timeDriverTimes);
                     List<DateTime> selectedTimes =
                         selectTimesFromList(givenDataSelection,
-                                            allTimesFromDataChoice,
-                                            timeDriverTimes);
+                                            dataSourceTimes, timeDriverTimes);
                     if (selectedTimes != null) {
                         return selectedTimes;
                     }
@@ -2178,6 +2165,21 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param selection _more_
+     * @param timeDriverTimes _more_
+     *
+     * @return _more_
+     */
+    protected List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
+            DataSelection selection, List<DateTime> timeDriverTimes) {
+        return dataChoice.getAllDateTimes();
+    }
 
 
     /**

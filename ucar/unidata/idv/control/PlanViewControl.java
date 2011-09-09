@@ -595,6 +595,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         super.doRemove();
         datachoice  = null;
         workingGrid = null;
+        parameterTopoMap = null;
     }
 
 
@@ -1491,20 +1492,18 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
-     */
     protected DataInstance doMakeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
 
-        /*
-        if (currentLevel == null) {
-            currentLevel = (Real) getDataSelection().getFromLevel();
-            if (currentLevel == null) {
-                List levelsList = dataChoice.getAllLevels(getDataSelection());
-                if ((levelsList != null) && (levelsList.size() > 0)) {
-                    currentLevel = (Real) levelsList.get(0);
-                }
-            }
-            }*/
+        //if (currentLevel == null) {
+        //    currentLevel = (Real) getDataSelection().getFromLevel();
+        //    if (currentLevel == null) {
+        //        List levelsList = dataChoice.getAllLevels(getDataSelection());
+        //        if ((levelsList != null) && (levelsList.size() > 0)) {
+        //            currentLevel = (Real) levelsList.get(0);
+        //        }
+        //    }
+        //}
 
         //Don't set this now
         //        getDataSelection().setLevel(currentLevel);
@@ -1512,7 +1511,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                                     getRequestProperties());
 
     }
-
+     */
 
 
     /**
