@@ -135,6 +135,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private Hashtable timeMap = new Hashtable();
 
 
+    private boolean usingTimeDriver = false;
 
     /**
      *  The parameterless constructor for unpersisting.
@@ -220,6 +221,22 @@ public abstract class ImageDataSource extends DataSourceImpl {
         reloadData();
     }
 
+
+    /**
+     * Get the list of times to compare to the time driver times/
+     *
+     * @param dataChoice  the data choice
+     * @param selection   the selection (for things like level)//
+     * @param timeDriverTimes  the time driver times (use range for server query)
+     *
+     * @return  the list of times for comparison
+     */
+    protected List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
+            DataSelection selection, List<DateTime> timeDriverTimes) {
+        usingTimeDriver = timeDriverTimes != null;
+        return timeDriverTimes;
+        //return super.getAllTimesForTimeDriver(dataChoice, selection, timeDriverTimes);
+    }
 
 
 
@@ -469,7 +486,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
         return descriptors;
     }
-
 
 
 
@@ -1165,8 +1181,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
     }
 
-
-
     /**
      * Reload the data
      */
@@ -1460,7 +1474,11 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if ((times == null) || times.isEmpty()) {
             times = imageTimes;
         }
+        
         List descriptors = new ArrayList();
+        if (usingTimeDriver && false) {
+            
+        } else {
         for (Iterator iter = times.iterator(); iter.hasNext(); ) {
             Object              time  = iter.next();
             AddeImageDescriptor found = null;
@@ -1522,6 +1540,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     descriptors.add(desc);
                 } catch (CloneNotSupportedException cnse) {}
             }
+        }
         }
         return descriptors;
     }
