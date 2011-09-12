@@ -49,6 +49,7 @@ import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
 
 import visad.DateTime;
+import visad.Real;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -1545,8 +1546,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File prefix
      */
     private String getFilePrefix(int cnt) {
-        String filename = "";
-        String template = "image_%count%_%time%";
+        String  filename     = "";
+        String  template     = "image_%count%_%time%";
+        boolean usingDefault = true;
         if (scriptingNode != null) {
             if ( !XmlUtil.hasAttribute(scriptingNode, ATTR_IMAGEPREFIX)) {
                 template = imageGenerator.applyMacros(scriptingNode,
@@ -1558,7 +1560,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 template = template + "_%count%";
                 if (imageGenerator.applyMacros(scriptingNode,
                         ATTR_APPENDTIME, false)) {
-                    template = template + "_%time%";
+                    template     = template + "_%time%";
+                    usingDefault = false;
                 }
             }
         } else {
@@ -1568,6 +1571,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     dfltTemplate = template;
                     idv.getStore().put(PROP_IMAGETEMPLATE, dfltTemplate);
                     idv.getStore().save();
+                    usingDefault = false;
                 }
             }
         }
@@ -1594,14 +1598,23 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         template = StringUtil.replace(template, "%count%", "" + cnt);
 
         try {
-            DateTime dttm       = new DateTime(getAnimation().getAniValue());
+            Real r = getAnimation().getAniValue();
+            if (r != null) {
+                DateTime dttm       = new DateTime(r);
 
-            String   timeString = "" + dttm;
-            timeString = StringUtil.replace(timeString, ":", "_");
-            timeString = StringUtil.replace(timeString, "-", "_");
-            timeString = StringUtil.replace(timeString, " ", "_");
-            template   = StringUtil.replace(template, "%time%", timeString);
-            template   = ucar.visad.UtcDate.applyTimeMacro(template, dttm);
+                String   timeString = "" + dttm;
+                timeString = StringUtil.replace(timeString, ":", "_");
+                timeString = StringUtil.replace(timeString, "-", "_");
+                timeString = StringUtil.replace(timeString, " ", "_");
+                template = StringUtil.replace(template, "%time%", timeString);
+                template   = ucar.visad.UtcDate.applyTimeMacro(template,
+                        dttm);
+            } else {
+                String stub = usingDefault
+                              ? "_%time%"
+                              : "%time%";
+                template = StringUtil.replace(template, stub, "");
+            }
         } catch (Exception exc) {}
         template = StringUtil.replace(template, "/", "_");
         template = StringUtil.replace(template, "\\", "_");
