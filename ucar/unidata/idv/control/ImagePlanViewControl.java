@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -22,20 +22,16 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.ColorTable;
-
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
-import visad.*;
+import visad.FieldImpl;
 import visad.VisADException;
+
 
 import java.rmi.RemoteException;
 
@@ -57,7 +53,7 @@ public class ImagePlanViewControl extends PlanViewControl {
      * this particular <code>PlanViewControl</code>
      */
     public ImagePlanViewControl() {
-        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_ZPOSITION
+        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
 
