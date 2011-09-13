@@ -21,41 +21,37 @@
 package ucar.unidata.idv.ui;
 
 
-import org.apache.commons.net.ftp.*;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 
-import org.python.core.*;
-import org.python.util.*;
+import org.python.util.PythonInterpreter;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
 
-import org.w3c.dom.*;
-
-
-import ucar.unidata.collab.*;
-import ucar.unidata.data.*;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.grid.GridDataSource;
-
-import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.gis.maps.*;
-import ucar.unidata.idv.*;
-
-import ucar.unidata.idv.chooser.IdvChooserManager;
-import ucar.unidata.idv.collab.CollabManager;
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IdvPersistenceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.VectorGraphicsRenderer;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.idv.control.MapDisplayControl;
-import ucar.unidata.idv.publish.IdvPublisher;
-
-import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.colortable.ColorTableCanvas;
-
-import ucar.unidata.ui.drawing.Glyph;
-
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
-
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -64,59 +60,68 @@ import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-import ucar.unidata.view.geoloc.*;
-
-
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.view.geoloc.ViewpointInfo;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
-import ucar.visad.UtcDate;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
 
-import ucar.visad.display.DisplayMaster;
-
-import visad.*;
+import visad.CommonUnit;
+import visad.MouseBehavior;
+import visad.Real;
+import visad.RealType;
+import visad.Unit;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 
-import visad.python.*;
-
 import visad.util.BaseRGBMap;
-
 import visad.util.ColorPreview;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.text.DecimalFormat;
-
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-
-
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 
 /**
@@ -548,6 +553,7 @@ public class ImageGenerator extends IdvManager {
 
     /** that lonvalues tag */
     public static final String ATTR_LON_VALUES = "lonvalues";
+
 
     /** that lonlabels tag */
     public static final String ATTR_LON_LABELS = "lonlabels";
@@ -4339,6 +4345,13 @@ public class ImageGenerator extends IdvManager {
                 }
             } else if (tagName.equals(TAG_COLORBAR)
                        || tagName.equals(TAG_KML_COLORBAR)) {
+                // only do one colorbar if we are writing to kml
+                Integer index = (Integer) props.get(PROP_IMAGEINDEX);
+                if ((index != null) && (index.intValue() > 0)
+                        && tagName.equals(TAG_KML_COLORBAR)) {
+                    continue;
+                }
+
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
                 List<DisplayControlImpl> controls =
