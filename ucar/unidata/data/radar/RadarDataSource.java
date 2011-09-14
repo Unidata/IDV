@@ -42,7 +42,11 @@ import java.util.*;
  */
 public abstract class RadarDataSource extends FilesDataSource implements RadarConstants {
 
+    /** _more_          */
+    public boolean useDriverTime = false;
 
+    /** _more_          */
+    public Object TimeDriver = null;
 
     /**
      * Radar data appropriate for RHI
@@ -436,8 +440,30 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 realDateTimes = (DateTime[]) Misc.reverseArray(realDateTimes,
                         new DateTime[realDateTimes.length]);
             }
+            // if use time driver
+            if (useDriverTime ) {
+                List tests = resetTimesList(realDateTimes, times);
+                if (times.size() != tests.size()) {
+                    reloadData();
+                    adapters      = getAdapters();
 
-
+                    realDateTimes = new DateTime[adapters.size()];
+                    for (int i = 0; i < adapters.size(); i++) {
+                        realDateTimes[i] =
+                            ((RadarAdapter) adapters.get(i)).getBaseTime();
+                    }
+                    Arrays.sort(realDateTimes);
+                    //Flip it to get youngest date first
+                    isRealTime = isRealTime();
+                    if (isRealTime) {
+                        realDateTimes =
+                            (DateTime[]) Misc.reverseArray(realDateTimes,
+                                new DateTime[realDateTimes.length]);
+                    }
+                    tests = resetTimesList(realDateTimes, times);
+                }
+                times = tests;
+            }
             // if times are null, then that means all times
             DateTime[] dateTimes = null;
 
@@ -530,7 +556,45 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
     }
 
 
+    /**
+     * using the time from the adapter to reset the time list
+     *
+     * @param realDateTimes _more_
+     * @param times _more_
+     *
+     * @return _more_
+     */
+    private List resetTimesList(DateTime[] realDateTimes,
+                                List<DateTime> times) {
+        List    results   = new ArrayList();
+        int     len       = realDateTimes.length;
 
+        HashSet seenTimes = new HashSet();
+
+        try {
+            for (DateTime dateTime : times) {
+                Date dttm        = ucar.visad.Util.makeDate(dateTime);
+                long minTimeDiff = -1;
+                Date minDate     = null;
+                for (int i = 0; i < len; i++) {
+                    Date sourceDate =
+                        ucar.visad.Util.makeDate(realDateTimes[i]);
+                    long timeDiff = Math.abs(sourceDate.getTime()
+                                             - dttm.getTime());
+                    if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
+                        minTimeDiff = timeDiff;
+                        minDate     = sourceDate;
+                    }
+                }
+                if ((minDate != null) && !seenTimes.contains(minDate)) {
+                    results.add(new DateTime(minDate));
+                    seenTimes.add(minDate);
+                }
+            }
+        } catch (Exception e) {}
+
+        return results;
+    }
 
 
     /**

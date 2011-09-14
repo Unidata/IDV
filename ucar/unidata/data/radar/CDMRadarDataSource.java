@@ -24,33 +24,19 @@ package ucar.unidata.data.radar;
 import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
-import ucar.unidata.data.CompositeDataChoice;
-import ucar.unidata.data.DataChoice;
 
-
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
-import ucar.unidata.util.DateSelection;
 
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.DatedObject;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectArray;
+import ucar.unidata.util.*;
 
 import ucar.visad.Util;
 
-import visad.CommonUnit;
-import visad.Data;
-import visad.DateTime;
-import visad.Real;
-import visad.RealType;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 
@@ -96,6 +82,8 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** _more_ */
     private boolean isRHI = false;
 
+    /** _more_          */
+    List<DateTime> initTimes;
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -211,74 +199,130 @@ public class CDMRadarDataSource extends RadarDataSource {
      * If we have a RadarQuery then make the sources from that
      */
     private void makeSources() {
+
         try {
             RadarQuery query = (RadarQuery) getProperty(PROP_RADARQUERY);
             if (query == null) {
                 return;
             }
-            DateSelection dateSelection = query.getDateSelection();
-            List          times         = dateSelection.getTimes();
-            List          urls          = new ArrayList();
-            StringBuffer  errlog        = new StringBuffer();
 
+            if (getProperties() != null) {
+
+                Object t = getProperties().get("UseTimeDriver");
+                if (t instanceof Boolean) {
+                    useDriverTime = ((Boolean) t).booleanValue();
+                }
+                Object d = getProperties().get("TimeDriver");
+                if (d != null) {
+                    TimeDriver = (Object) d;
+                }
+            }
+            DateSelection  dateSelection = query.getDateSelection();
+            List           times         = dateSelection.getTimes();
+            List           urls          = new ArrayList();
+            StringBuffer   errlog        = new StringBuffer();
+            DisplayControl tddc          = null;
 
             TDSRadarDatasetCollection collection =
                 TDSRadarDatasetCollection.factory("test",
                     query.getCollectionUrl(), errlog);
 
             if ((times == null) || (times.size() == 0)) {
-                List allTimes = new ArrayList();
-                List timeSpan = collection.getRadarTimeSpan();
-                Date fromDate =
-                    DateUnit.getStandardOrISO((String) timeSpan.get(0));
-                Date toDate =
-                    DateUnit.getStandardOrISO((String) timeSpan.get(1));
+                List allTimes        = new ArrayList();
+                List collectionTimes = null;
+                if (useDriverTime && (initTimes != null)) {
 
-                //If we are doing relative times then make a smaller range
-                if ((dateSelection.getStartMode() == DateSelection
-                        .TIMEMODE_DATA) && (dateSelection
-                        .getEndMode() == DateSelection
-                        .TIMEMODE_DATA) && !dateSelection.hasInterval()) {
-                    //The maximum time between radar scans
-                    long maxIntervalMinutes = 10;
-                    //Add in a factor of 20 fudge factor
-                    long minutesOffset = dateSelection.getCount()
-                                         * maxIntervalMinutes * 20;
-                    fromDate = new Date(toDate.getTime()
-                                        - 1000 * minutesOffset * 60);
-                }
+                    collectionTimes = initTimes;
 
-                List collectionTimes =
-                    collection.getRadarStationTimes(query.getStation(),
-                        query.getProduct(), fromDate, toDate);
-
-                /*
-                if(collectionTimes.size() == 0)  {
-                    List collectionTimes =
-                        collection.getRadarStationTimes(query.getStation(),
-                            query.getProduct(),
-                            query.getDateSelection().getStartFixedDate(),
-                            query.getDateSelection().getEndFixedDate());
-                }
-                */
-
-                for (int timeIdx = 0; timeIdx < collectionTimes.size();
-                        timeIdx++) {
-                    Object timeObj = collectionTimes.get(timeIdx);
-                    Date   date;
-                    if (timeObj instanceof Date) {
-                        date = (Date) timeObj;
-                    } else {
-                        date = DateUnit.getStandardOrISO(timeObj.toString());
+                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
+                            timeIdx++) {
+                        Object timeObj = collectionTimes.get(timeIdx);
+                        Date   date;
+                        if (timeObj instanceof Date) {
+                            date = (Date) timeObj;
+                        } else {
+                            date = DateUnit.getStandardOrISO(
+                                timeObj.toString());
+                        }
+                        allTimes.add(new DatedObject(date));
                     }
-                    allTimes.add(new DatedObject(date));
-                }
+                    times = DatedObject.unwrap(allTimes);
+                } else if (useDriverTime) {
+                    Date fromDate = dateSelection.getStartFixedDate();
+                    Date toDate   = dateSelection.getEndFixedDate();
+                    collectionTimes =
+                        collection.getRadarStationTimes(query.getStation(),
+                            query.getProduct(), fromDate, toDate);
+                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
+                            timeIdx++) {
+                        Object timeObj = collectionTimes.get(timeIdx);
+                        Date   date;
+                        if (timeObj instanceof Date) {
+                            date = (Date) timeObj;
+                        } else {
+                            date = DateUnit.getStandardOrISO(
+                                timeObj.toString());
+                        }
+                        allTimes.add(new DatedObject(date));
+                    }
 
-                times = DatedObject.unwrap(
-                    query.getDateSelection().apply(allTimes));
-                //  System.err.println("Query date range:" + fromDate + " -- " + toDate);
-                //  System.err.println("Collection times:" + collectionTimes);
-                //  System.err.println("Selected times:" + times);
+                    times = DatedObject.unwrap(
+                        query.getDateSelection().apply(allTimes));
+                    initTimes = times;
+                } else {
+                    List timeSpan = collection.getRadarTimeSpan();
+                    Date fromDate =
+                        DateUnit.getStandardOrISO((String) timeSpan.get(0));
+                    Date toDate =
+                        DateUnit.getStandardOrISO((String) timeSpan.get(1));
+
+                    //If we are doing relative times then make a smaller range
+                    if ((dateSelection.getStartMode() == DateSelection
+                            .TIMEMODE_DATA) && (dateSelection
+                            .getEndMode() == DateSelection
+                            .TIMEMODE_DATA) && !dateSelection.hasInterval()) {
+                        //The maximum time between radar scans
+                        long maxIntervalMinutes = 10;
+                        //Add in a factor of 20 fudge factor
+                        long minutesOffset = dateSelection.getCount()
+                                             * maxIntervalMinutes * 20;
+                        fromDate = new Date(toDate.getTime()
+                                            - 1000 * minutesOffset * 60);
+                    }
+
+                    collectionTimes =
+                        collection.getRadarStationTimes(query.getStation(),
+                            query.getProduct(), fromDate, toDate);
+
+                    /*
+                    if(collectionTimes.size() == 0)  {
+                        List collectionTimes =
+                            collection.getRadarStationTimes(query.getStation(),
+                                query.getProduct(),
+                                query.getDateSelection().getStartFixedDate(),
+                                query.getDateSelection().getEndFixedDate());
+                    }
+                    */
+
+                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
+                            timeIdx++) {
+                        Object timeObj = collectionTimes.get(timeIdx);
+                        Date   date;
+                        if (timeObj instanceof Date) {
+                            date = (Date) timeObj;
+                        } else {
+                            date = DateUnit.getStandardOrISO(
+                                timeObj.toString());
+                        }
+                        allTimes.add(new DatedObject(date));
+                    }
+
+                    times = DatedObject.unwrap(
+                        query.getDateSelection().apply(allTimes));
+                    //  System.err.println("Query date range:" + fromDate + " -- " + toDate);
+                    //  System.err.println("Collection times:" + collectionTimes);
+                    //  System.err.println("Selected times:" + times);
+                }
             }
 
             for (int i = 0; i < times.size(); i++) {
@@ -293,12 +337,55 @@ public class CDMRadarDataSource extends RadarDataSource {
         } catch (Exception excp) {
             logException("Creating urls to radar data", excp);
         }
+
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param selection _more_
+     * @param timeDriverTimes _more_
+     *
+     * @return _more_
+     */
+    public List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
+            DataSelection selection, List<DateTime> timeDriverTimes) {
 
+        int num = timeDriverTimes.size();
+        Collections.sort(timeDriverTimes);
+        TDSRadarDatasetCollection collection;
+        List                      collectionTimes = null;
+
+        RadarQuery query = (RadarQuery) getProperty(PROP_RADARQUERY);
+
+        StringBuffer              errlog          = new StringBuffer();
+        Date fromDate =
+            DateUnit.getStandardOrISO(timeDriverTimes.get(0).dateString()
+                                      + "T"
+                                      + timeDriverTimes.get(0).timeString());
+        Date toDate = DateUnit.getStandardOrISO(timeDriverTimes.get(num
+                          - 1).dateString() + "T"
+                                            + timeDriverTimes.get(num
+                                                - 1).timeString());
+        try {
+            collection = TDSRadarDatasetCollection.factory("test",
+                    query.getCollectionUrl(), errlog);
+            List timeSpan = collection.getRadarTimeSpan();
+
+            collectionTimes =
+                collection.getRadarStationTimes(query.getStation(),
+                    query.getProduct(), fromDate, toDate);
+        } catch (Exception e) {}
+
+        initTimes = collectionTimes;
+
+        return collectionTimes;
+
+    }
 
     /**
      * Make and insert the <code>DataChoice</code>-s for this
@@ -327,6 +414,11 @@ public class CDMRadarDataSource extends RadarDataSource {
             Object o = getProperties().get(STATION_LOCATION);
             if (o instanceof NamedStation) {
                 namedStation = (NamedStation) o;
+            }
+
+            Object t = getProperties().get("TimeDriverEnable");
+            if (t instanceof Boolean) {
+                useDriverTime = ((Boolean) t).booleanValue();
             }
         }
         EarthLocation rdLocation = da.getStationLocation();
@@ -390,10 +482,10 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                     } else if (haveTimes) {
                         categories = Misc.newList(CATEGORY_SWEEP_2D_TIME,
-                                CATEGORY_SWEEP_3D_TIME );
+                                CATEGORY_SWEEP_3D_TIME);
                     } else {
                         categories = Misc.newList(CATEGORY_SWEEP_2D,
-                                CATEGORY_SWEEP_3D );
+                                CATEGORY_SWEEP_3D);
                     }
                     //categories = Misc.newList(CATEGORY_SWEEP_2D,
                     //        CATEGORY_SWEEP_3D);
@@ -442,7 +534,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                 } else {
                     if (haveTimes) {
                         categories2D = Misc.newList(CATEGORY_SWEEP_2D_TIME,
-                                CATEGORY_SWEEP_3D_TIME );
+                                CATEGORY_SWEEP_3D_TIME);
                     } else {
                         categories2D = Misc.newList(CATEGORY_SWEEP_2D,
                                 CATEGORY_SWEEP_3D);
