@@ -12046,6 +12046,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void setIsTimeDriver(boolean value) {
         this.isTimeDriver = value;
+        if (haveInitialized && value) {
+             ViewManager vm = getViewManager();
+             vm.ensureOnlyOneTimeDriver(this);
+        }
     }
 
     /**
