@@ -36,16 +36,25 @@ import thredds.catalog.XMLEntityResolver;
 //import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
+import ucar.unidata.data.DataSource;
+
 import ucar.unidata.data.radar.RadarQuery;
 import ucar.unidata.geoloc.StationImpl;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
 
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.display.Animation;
+
 import visad.CommonUnit;
 import visad.DateTime;
+import visad.Set;
+import visad.VisADException;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -59,18 +68,13 @@ import java.io.IOException;
 
 import java.net.URI;
 
+import java.rmi.RemoteException;
+
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 
 /**
@@ -148,6 +152,30 @@ public class TDSRadarChooser extends TimesChooser {
     /** the select object */
     private static final TwoFacedObject SELECT_OBJECT =
         new TwoFacedObject(LABEL_SELECT, LABEL_SELECT);
+    /** _more_          */
+    private JCheckBox timeDriverCbx;
+
+    /** _more_          */
+    private JComponent[] timeDriverComps;
+
+    /** _more_          */
+    private boolean ignoreTimeDriverEnabled = false;
+
+    /** _more_          */
+    private boolean timeDriverEnabled = false;
+
+    /** _more_          */
+    private Object selectedDriver = null;
+
+    /** _more_          */
+    private JComboBox driverLabelBox;
+
+    /** _more_          */
+    private JComponent timesPanel;
+    // private DateTime[] driv erTimes;
+
+    /** _more_          */
+    private HashMap controlToDriverTimes;  //new HashMap()
 
 
     /**
@@ -303,7 +331,7 @@ public class TDSRadarChooser extends TimesChooser {
 
         JComponent stationMap = getStationMap();
         JComponent buttons    = getDefaultButtons();
-        JComponent timesPanel = makeTimesPanel(true, true);
+        timesPanel = makeTimesPanel(true, true);
 
 
 
@@ -314,13 +342,28 @@ public class TDSRadarChooser extends TimesChooser {
         addServerComp(timesPanel);
 
         GuiUtils.tmpInsets = GRID_INSETS;
-        JComponent contents = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Catalog:"), urlBox,
-            GuiUtils.rLabel("Collections:"),
-            GuiUtils.left(collectionSelector), GuiUtils.right(productLabel),
-            GuiUtils.left(productComboBox), GuiUtils.valignLabel("Stations:"),
-            stationMap, GuiUtils.valignLabel("Times:"), timesPanel
-        }, 2, GuiUtils.WT_NY, new double[] { 0, 0, 0, 1, 0.2 });
+        JComponent contents;
+        if ( DisplayControl.DOTIMEDRIVER) {
+            contents = GuiUtils.doLayout(new Component[] {
+                GuiUtils.rLabel("Catalog:"), urlBox,
+                GuiUtils.rLabel("Collections:"),
+                GuiUtils.left(collectionSelector), GuiUtils.right(productLabel),
+                GuiUtils.left(productComboBox), GuiUtils.valignLabel("Stations:"),
+                stationMap, GuiUtils.rLabel("Use Time Driver:"),
+                GuiUtils.left(doMakeTimeDriverWidget()),
+                GuiUtils.valignLabel("Times:"), timesPanel
+            }, 2, GuiUtils.WT_NY, new double[] { 0, 0, 0, 1, 0.2 });
+        } else {
+           contents = GuiUtils.doLayout(new Component[] {
+                GuiUtils.rLabel("Catalog:"), urlBox,
+                GuiUtils.rLabel("Collections:"),
+                GuiUtils.left(collectionSelector), GuiUtils.right(productLabel),
+                GuiUtils.left(productComboBox), GuiUtils.valignLabel("Stations:"),
+                stationMap,
+                GuiUtils.valignLabel("Times:"), timesPanel
+            }, 2, GuiUtils.WT_NY, new double[] { 0, 0, 0, 1, 0.2 });
+
+        }
 
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
@@ -328,6 +371,171 @@ public class TDSRadarChooser extends TimesChooser {
         outerContents = GuiUtils.center(GuiUtils.centerBottom(contents,
                 buttons));
         return outerContents;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private Component doMakeTimeDriverWidget() {
+        JComponent[] timeDriverComps = getTimeDriverComps();
+        JPanel tDriver =
+            GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
+                timeDriverComps[0],
+                timeDriverComps[1] }), 2, 1));
+
+        return tDriver;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected JComponent[] getTimeDriverComps() {
+        driverLabelBox = new JComboBox();
+        driverLabelBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                TwoFacedObject selected =
+                    (TwoFacedObject) driverLabelBox.getSelectedItem();
+                if ((selected == null) || selected.equals(SELECT_OBJECT)) {
+                    selectedDriver = null;
+                    return;
+                }
+                selectedDriver = selected.getId();
+            }
+
+        });
+        ActionListener timeDriverListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    if (ignoreTimeDriverEnabled) {
+                        return;
+                    }
+
+                    if (timeDriverEnabled != timeDriverCbx.isSelected()) {
+                        timeDriverEnabled = timeDriverCbx.isSelected();
+                        timeDriverChanged();
+                    } else if (timeDriverEnabled) {
+                        timeDriverChanged();
+                    }
+                } catch (NumberFormatException nfe) {}
+            }
+        };
+        //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
+
+        timeDriverCbx = new JCheckBox("", getTimeDriverEnabled());
+        timeDriverCbx.addActionListener(timeDriverListener);
+        return timeDriverComps = new JComponent[] { timeDriverCbx,
+                driverLabelBox };
+    }
+
+
+
+    /**
+     * _more_
+     */
+    protected void timeDriverChanged() {
+        GuiUtils.enableTree(timesPanel, !getTimeDriverEnabled());
+        GuiUtils.enableTree(driverLabelBox, getTimeDriverEnabled());
+
+        List<ViewManager>    vms = getIdv().getVMManager().getViewManagers();
+        List<TwoFacedObject> driverNames = new ArrayList<TwoFacedObject>();
+        driverNames.add(SELECT_OBJECT);
+        String driverName1 = null;
+        controlToDriverTimes = new HashMap();
+        for (ViewManager vm : vms) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) vm.getControls()) {
+                if (control.getIsTimeDriver()) {
+                    try {
+                        Set timeSet = control.getTimeSet();
+                        DateTime[] driverTimes =
+                            Animation.getDateTimeArray(timeSet);
+                        List dslist = new ArrayList();
+                        control.getDataChoice().getDataSources(dslist);
+                        DataSource ds    = (DataSource) dslist.get(0);
+                        String     lable = ds.getName();
+                        TwoFacedObject twoObj =
+                            new TwoFacedObject(lable,
+                                control.getDataChoice().getId());
+                        driverNames.add(twoObj);
+                        controlToDriverTimes.put(
+                            control.getDataChoice().getId(), driverTimes);
+                    } catch (Exception e) {}
+
+                }
+            }
+        }
+        GuiUtils.setListData(driverLabelBox, driverNames);
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getTimeDriverEnabled() {
+        return timeDriverEnabled;
+    }
+
+    /**
+     * _more_
+     *
+     * @param sourceTimes _more_
+     * @param driverTimes _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<DateTime> selectTimesFromList(List sourceTimes,
+            List<DateTime> driverTimes)
+            throws Exception {
+        List<DateTime> results = new ArrayList<DateTime>();
+        //First convert the source times to a list of Date objects
+        List<Date> sourceDates = new ArrayList<Date>();
+        for (int i = 0; i < sourceTimes.size(); i++) {
+            Object object = sourceTimes.get(i);
+            if (object instanceof DateTime) {
+                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
+            } else if (object instanceof Date) {
+                sourceDates.add((Date) object);
+            } else if (object instanceof TwoFacedObject) {  //relative time
+                return null;
+            } else {
+                System.err.println("Unknown time type: "
+                                   + object.getClass().getName());
+                return null;
+            }
+        }
+        //This keeps track of what times in the source list we have used so far
+        HashSet seenTimes = new HashSet();
+
+        //Now look at each selection time and find the closest source time
+        //We need to have logic for when a selection time is outside the range of the source times
+        for (DateTime dateTime : driverTimes) {
+            Date dttm        = ucar.visad.Util.makeDate(dateTime);
+            long minTimeDiff = -1;
+            Date minDate     = null;
+            for (int i = 0; i < sourceDates.size(); i++) {
+                Date sourceDate = sourceDates.get(i);
+                long timeDiff = Math.abs(sourceDate.getTime()
+                                         - dttm.getTime());
+                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
+                    minTimeDiff = timeDiff;
+                    minDate     = sourceDate;
+                }
+            }
+            if ((minDate != null) && !seenTimes.contains(minDate)) {
+                results.add(new DateTime(minDate));
+                seenTimes.add(minDate);
+            }
+        }
+        return results;
     }
 
     /**
@@ -756,6 +964,10 @@ public class TDSRadarChooser extends TimesChooser {
         if (selectedStation != null) {
             ht.put(ucar.unidata.data.radar.RadarDataSource.STATION_LOCATION,
                    selectedStation.getNamedLocation());
+            ht.put("UseTimeDriver", timeDriverEnabled);
+            if (selectedDriver != null) {
+                ht.put("TimeDriver", selectedDriver);
+            }
         } else {
             LogUtil.userMessage("No Station selected");
             return;
@@ -801,6 +1013,19 @@ public class TDSRadarChooser extends TimesChooser {
                 }
                 dateSelection.setTimes(times);
                 Trace.msg("TDSRadarChoocer:getting absolute times.end");
+            } else if (timeDriverEnabled && (controlToDriverTimes != null)) {
+                DateTime[] driverTimes =
+                    (DateTime[]) controlToDriverTimes.get(selectedDriver);
+                int n = driverTimes.length;
+                Date fromDate =
+                    DateUnit.getStandardOrISO(driverTimes[0].dateString()
+                        + "T" + driverTimes[0].timeString());
+                Date toDate =
+                    DateUnit.getStandardOrISO(driverTimes[n - 1].dateString()
+                        + "T" + driverTimes[n - 1].timeString());
+                dateSelection.setStartFixedTime(fromDate);
+                dateSelection.setEndFixedTime(toDate);
+
             } else {
                 int count = getRelativeTimesList().getSelectedIndex() + 1;
                 if (count == 0) {
