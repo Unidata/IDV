@@ -24,6 +24,7 @@ package ucar.unidata.data.imagery;
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaDirectoryList;
 import edu.wisc.ssec.mcidas.AreaFile;
+import edu.wisc.ssec.mcidas.AreaFileException;
 
 import ucar.unidata.data.*;
 import ucar.unidata.util.CacheManager;
@@ -39,6 +40,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.UtcDate;
 import ucar.visad.data.AreaImageFlatField;
 
 
@@ -69,11 +71,12 @@ import java.util.ArrayList;
 import java.util.ArrayList;
 
 import java.util.Arrays;
+
+import java.util.Collections;
 import java.util.Comparator;
 
 import java.util.Date;
 import java.util.Hashtable;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
@@ -135,7 +138,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private Hashtable timeMap = new Hashtable();
 
 
-    private boolean usingTimeDriver = false;
 
     /**
      *  The parameterless constructor for unpersisting.
@@ -223,32 +225,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * Get the list of times to compare to the time driver times/
-     *
-     * @param dataChoice  the data choice
-     * @param selection   the selection (for things like level)//
-     * @param timeDriverTimes  the time driver times (use range for server query)
-     *
-     * @return  the list of times for comparison
-     */
-    protected List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
-            DataSelection selection, List<DateTime> timeDriverTimes) {
-        usingTimeDriver = timeDriverTimes != null;
-        return timeDriverTimes;
-        //return super.getAllTimesForTimeDriver(dataChoice, selection, timeDriverTimes);
-    }
-
-
-
-
-    /**
      * Handle when this data source gets new files to use at runtime (e.g., from isl)
      *
      * @param files List of files
      *
      */
     public void setNewFiles(List files) {
-        setImageList(makeImageDescriptors(Misc.listToStringArray(files)));
+        setImageList(
+            makeImageDescriptors(StringUtil.listToStringArray(files)));
     }
 
 
@@ -1470,15 +1454,91 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @return  list of descriptors matching the selection
      */
     private List getDescriptors(DataChoice dataChoice, DataSelection subset) {
-        List times = getTimesFromDataSelection(subset, dataChoice);
+
+        List    times = getTimesFromDataSelection(subset, dataChoice);
+        boolean usingTimeDriver = subset.getTimeDriverTimes() != null;
+        if (usingTimeDriver) {
+            times = subset.getTimeDriverTimes();
+        }
         if ((times == null) || times.isEmpty()) {
             times = imageTimes;
         }
-        
+
         List descriptors = new ArrayList();
-        if (usingTimeDriver && false) {
-            
-        } else {
+        if (usingTimeDriver) {
+            AddeImageDescriptor aid = getDescriptor(imageList.get(0));
+            if (aid.getImageInfo() != null) {
+                try {
+                    AddeImageInfo aii =
+                        (AddeImageInfo) aid.getImageInfo().clone();
+                    // set the start and end dates
+                    Collections.sort(times);
+                    DateTime start = (DateTime) times.get(0);
+                    DateTime end   = (DateTime) times.get(times.size() - 1);
+                    // In ADDE, you can't specify something like DAY=2011256 2011257 TIME=23:45:00 01:45:00
+                    // and expect that to be 2011256/23:45 to 2011257 01:45.  Time ranges are on a per day
+                    // basis.  So, we see if the starting time is a different day than the ending day and if so,
+                    // we set the start time to be 00Z on the first day an 23:59Z on the end day.
+                    String startDay = UtcDate.getYMD(start);
+                    String endDay   = UtcDate.getYMD(end);
+                    if ( !startDay.equals(endDay)) {
+                        startDay += " 00:00:00";
+                        endDay   += " 23:59:59";
+                        start = DateTime.createDateTime(startDay,
+                                DateTime.DEFAULT_TIME_FORMAT);
+                        end = DateTime.createDateTime(endDay,
+                                DateTime.DEFAULT_TIME_FORMAT);
+                    }
+                    aii.setStartDate(
+                        new Date(
+                            (long) (start.getValue(
+                                CommonUnit.secondsSinceTheEpoch) * 1000)));
+                    aii.setEndDate(
+                        new Date(
+                            (long) (end.getValue(
+                                CommonUnit.secondsSinceTheEpoch) * 1000)));
+                    // make the request for the times (AreaDirectoryList)
+                    aii.setRequestType(aii.REQ_IMAGEDIR);
+                    AreaDirectoryList ad =
+                        new AreaDirectoryList(aii.getURLString());
+                    AreaDirectory[][] dirs     = ad.getSortedDirs();
+                    List<DateTime>    dirTimes = new ArrayList<DateTime>();
+                    for (int d = 0; d < dirs.length; d++) {
+                        dirTimes.add(
+                            new DateTime(dirs[d][0].getNominalTime()));
+                    }
+                    List<DateTime> matchedTimes = selectTimesFromList(subset,
+                                                      dirTimes, times);
+                    for (int i = 0; i < dirs.length; i++) {
+                        DateTime dirTime =
+                            new DateTime(dirs[i][0].getNominalTime());
+                        if (matchedTimes.contains(dirTime)) {
+                            AddeImageInfo newaii =
+                                (AddeImageInfo) aid.getImageInfo().clone();
+                            newaii.setRequestType(aii.REQ_IMAGEDATA);
+                            newaii.setStartDate(dirs[i][0].getNominalTime());
+                            newaii.setEndDate(dirs[i][0].getNominalTime());
+                            setBandInfo(dataChoice, newaii);
+                            AddeImageDescriptor newaid =
+                                new AddeImageDescriptor(dirs[i][0],
+                                    newaii.getURLString(), newaii);
+                            newaid.setIsRelative(false);
+                            descriptors.add(newaid);
+                        }
+                    }
+                } catch (CloneNotSupportedException cnse) {
+                    System.out.println("unable to clone aii");
+                } catch (VisADException vader) {
+                    System.out.println("unable to get date values");
+                } catch (AreaFileException afe) {
+                    System.out.println("unable to make request");
+                } catch (Exception excp) {
+                    System.out.println("Got an exception: "
+                                       + excp.getMessage());
+                }
+                return descriptors;
+            }
+        }
         for (Iterator iter = times.iterator(); iter.hasNext(); ) {
             Object              time  = iter.next();
             AddeImageDescriptor found = null;
@@ -1512,14 +1572,16 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     if (desc.getImageInfo() != null) {
                         AddeImageInfo aii =
                             (AddeImageInfo) desc.getImageInfo().clone();
+                        setBandInfo(dataChoice, aii);
+                        /*
                         BandInfo bi = (BandInfo) dataChoice.getId();
                         List<BandInfo> bandInfos =
                             (List<BandInfo>) getProperty(PROP_BANDINFO,
                                 (Object) null);
                         boolean hasBand = true;
-                        //If this data source has been changed after we have create a display 
+                        //If this data source has been changed after we have create a display
                         //then the possibility exists that the bandinfo contained by the incoming
-                        //data choice might not be valid. If it isn't then default to the first 
+                        //data choice might not be valid. If it isn't then default to the first
                         //one in the list
                         if (bandInfos != null) {
                             hasBand = bandInfos.contains(bi);
@@ -1534,6 +1596,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         }
                         aii.setBand("" + bi.getBandNumber());
                         aii.setUnit(bi.getPreferredUnit());
+                        */
                         desc.setImageInfo(aii);
                         desc.setSource(aii.getURLString());
                     }
@@ -1541,8 +1604,38 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 } catch (CloneNotSupportedException cnse) {}
             }
         }
-        }
         return descriptors;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param aii _more_
+     */
+    private void setBandInfo(DataChoice dataChoice, AddeImageInfo aii) {
+        BandInfo bi = (BandInfo) dataChoice.getId();
+        List<BandInfo> bandInfos =
+            (List<BandInfo>) getProperty(PROP_BANDINFO, (Object) null);
+        boolean hasBand = true;
+        //If this data source has been changed after we have create a display 
+        //then the possibility exists that the bandinfo contained by the incoming
+        //data choice might not be valid. If it isn't then default to the first 
+        //one in the list
+        if (bandInfos != null) {
+            hasBand = bandInfos.contains(bi);
+            if ( !hasBand) {
+                //                                System.err.println("has band = " + bandInfos.contains(bi));
+            }
+            if ( !hasBand && (bandInfos.size() > 0)) {
+                bi = bandInfos.get(0);
+            } else {
+                //Not sure what to do here.
+            }
+        }
+        aii.setBand("" + bi.getBandNumber());
+        aii.setUnit(bi.getPreferredUnit());
     }
 
     /**
