@@ -3061,7 +3061,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws VisADException, RemoteException {
         //A cheat, actually call reInitialize if we have been notified of a dataChange event.
         if (inDataChangeCall && (getDataInstance() != null)) {
-            getDataInstance().reInitialize();
+            updateDataInstance(getDataInstance()).reInitialize();
             return true;
         }
         return initializeDataInstance(dataChoice);
