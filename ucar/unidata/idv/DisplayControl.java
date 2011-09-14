@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,7 +21,22 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.idv.control.ReadoutInfo;
+
+import ucar.visad.display.DisplayableData;
+
+import visad.Data;
+import visad.VisADException;
+
+import visad.georef.EarthLocation;
+import visad.georef.MapProjection;
+
+
 import java.rmi.RemoteException;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -30,23 +45,12 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.idv.control.ReadoutInfo;
-import ucar.visad.display.DisplayableData;
-import visad.Data;
-import visad.VisADException;
-import visad.georef.EarthLocation;
-import visad.georef.MapProjection;
-
 
 
 /**
  * A class to support controling the aspects of a display.
  *
- * @author Jeff McWhirter
- * @version $Revision: 1.98 $
+ * @author IDV Development Team
  */
 public interface DisplayControl extends Sharable {
 
@@ -617,7 +621,7 @@ public interface DisplayControl extends Sharable {
      * @param el  position
      * @param animationValue animation value
      * @param animationStep  animation index
-     * @param samples _more_
+     * @param samples  the list of samples to add to
      *
      * @return List of values
      *
@@ -660,14 +664,15 @@ public interface DisplayControl extends Sharable {
      * How long should this display be shown when in visibility animation mode
      * @return -1 if it is undefined. 0 if this one should not be used. else treat the value as seconds
      */
-    public int getVisbilityAnimationPause ();
+    public int getVisbilityAnimationPause();
 
 
     /**
      * is this display the one that drives time selection for other displays
+     *
+     * @return  true if this is the time driver
      */
-    public boolean getIsTimeDriver ();
+    public boolean getIsTimeDriver();
 
 
 }
-
