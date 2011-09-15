@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,31 +23,36 @@ package ucar.unidata.data.imagery;
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaDirectoryList;
-import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.AreaFileException;
 
-import ucar.unidata.data.*;
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.util.CacheManager;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PollingInfo;
-
-import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.UtcDate;
 import ucar.visad.data.AreaImageFlatField;
 
-
-import visad.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.FunctionType;
+import visad.MathType;
+import visad.RealType;
+import visad.Set;
+import visad.VisADException;
 
 import visad.data.DataRange;
-
 import visad.data.mcidas.AreaAdapter;
 
 import visad.meteorology.ImageSequence;
@@ -57,40 +62,30 @@ import visad.meteorology.SingleBandedImage;
 
 import visad.util.ThreadManager;
 
-import java.awt.*;
-import java.awt.event.*;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.rmi.RemoteException;
 
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.ArrayList;
-
 import java.util.Arrays;
-
 import java.util.Collections;
 import java.util.Comparator;
-
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
 
 /**
  * Abstract DataSource class for images files.
  *
  * @author IDV development team
- * @version $Revision: 1.76 $ $Date: 2007/08/20 22:33:05 $
  */
 public abstract class ImageDataSource extends DataSourceImpl {
 
@@ -1479,52 +1474,64 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     // and expect that to be 2011256/23:45 to 2011257 01:45.  Time ranges are on a per day
                     // basis.  So, we see if the starting time is a different day than the ending day and if so,
                     // we set the start time to be 00Z on the first day an 23:59Z on the end day.
-                    String startDay = UtcDate.getYMD(start);
-                    String endDay   = UtcDate.getYMD(end);
+                    // Even worse is that for archive datasets, you can't span multiple days.  So make separate
+                    // requests for each day.
+                    String       startDay = UtcDate.getYMD(start);
+                    String       endDay   = UtcDate.getYMD(end);
+                    List<String> days     = new ArrayList<String>();
                     if ( !startDay.equals(endDay)) {
-                        startDay += " 00:00:00";
-                        endDay   += " 23:59:59";
+                        days = getUniqueDayStrings(times);
+                    } else {
+                        days.add(startDay);
+                    }
+                    HashMap<DateTime, AreaDirectory> dateDir =
+                        new HashMap<DateTime, AreaDirectory>();
+                    List<DateTime> dirTimes = new ArrayList<DateTime>();
+                    for (String day : days) {
+                        startDay = day + " 00:00:00";
+                        endDay   = day + " 23:59:59";
                         start = DateTime.createDateTime(startDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
                         end = DateTime.createDateTime(endDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
-                    }
-                    aii.setStartDate(
-                        new Date(
-                            (long) (start.getValue(
-                                CommonUnit.secondsSinceTheEpoch) * 1000)));
-                    aii.setEndDate(
-                        new Date(
-                            (long) (end.getValue(
-                                CommonUnit.secondsSinceTheEpoch) * 1000)));
-                    // make the request for the times (AreaDirectoryList)
-                    aii.setRequestType(aii.REQ_IMAGEDIR);
-                    AreaDirectoryList ad =
-                        new AreaDirectoryList(aii.getURLString());
-                    AreaDirectory[][] dirs     = ad.getSortedDirs();
-                    List<DateTime>    dirTimes = new ArrayList<DateTime>();
-                    for (int d = 0; d < dirs.length; d++) {
-                        dirTimes.add(
-                            new DateTime(dirs[d][0].getNominalTime()));
+                        aii.setStartDate(new Date((long) (start
+                            .getValue(CommonUnit
+                                .secondsSinceTheEpoch) * 1000)));
+                        aii.setEndDate(new Date((long) (end
+                            .getValue(CommonUnit
+                                .secondsSinceTheEpoch) * 1000)));
+                        // make the request for the times (AreaDirectoryList)
+                        aii.setRequestType(aii.REQ_IMAGEDIR);
+                        AreaDirectoryList ad =
+                            new AreaDirectoryList(aii.getURLString());
+                        AreaDirectory[][] dirs = ad.getSortedDirs();
+                        for (int d = 0; d < dirs.length; d++) {
+                            AreaDirectory dir = dirs[d][0];
+                            DateTime dirTime =
+                                new DateTime(dir.getNominalTime());
+                            dateDir.put(dirTime, dir);
+                            dirTimes.add(dirTime);
+                        }
                     }
                     List<DateTime> matchedTimes = selectTimesFromList(subset,
                                                       dirTimes, times);
-                    for (int i = 0; i < dirs.length; i++) {
-                        DateTime dirTime =
-                            new DateTime(dirs[i][0].getNominalTime());
-                        if (matchedTimes.contains(dirTime)) {
-                            AddeImageInfo newaii =
-                                (AddeImageInfo) aid.getImageInfo().clone();
-                            newaii.setRequestType(aii.REQ_IMAGEDATA);
-                            newaii.setStartDate(dirs[i][0].getNominalTime());
-                            newaii.setEndDate(dirs[i][0].getNominalTime());
-                            setBandInfo(dataChoice, newaii);
-                            AddeImageDescriptor newaid =
-                                new AddeImageDescriptor(dirs[i][0],
-                                    newaii.getURLString(), newaii);
-                            newaid.setIsRelative(false);
-                            descriptors.add(newaid);
+                    for (DateTime dirTime : matchedTimes) {
+                        AreaDirectory dir = dateDir.get(dirTime);
+                        // shouldn't happen, but what the hey
+                        if (dir == null) {
+                            continue;
                         }
+                        AddeImageInfo newaii =
+                            (AddeImageInfo) aid.getImageInfo().clone();
+                        newaii.setRequestType(aii.REQ_IMAGEDATA);
+                        newaii.setStartDate(dir.getNominalTime());
+                        newaii.setEndDate(dir.getNominalTime());
+                        setBandInfo(dataChoice, newaii);
+                        AddeImageDescriptor newaid =
+                            new AddeImageDescriptor(dir,
+                                newaii.getURLString(), newaii);
+                        newaid.setIsRelative(false);
+                        descriptors.add(newaid);
                     }
                 } catch (CloneNotSupportedException cnse) {
                     System.out.println("unable to clone aii");
@@ -1607,6 +1614,25 @@ public abstract class ImageDataSource extends DataSourceImpl {
         return descriptors;
 
     }
+
+    /**
+     * Get a list of unique YMD day strings in the list of times
+     *
+     * @param times  list of times
+     *
+     * @return  the list of unique strings
+     */
+    private List<String> getUniqueDayStrings(List<DateTime> times) {
+        List<String> days = new ArrayList<String>();
+        for (DateTime time : times) {
+            String dateString = UtcDate.getYMD(time);
+            if ( !days.contains(dateString)) {
+                days.add(dateString);
+            }
+        }
+        return days;
+    }
+
 
     /**
      * _more_
