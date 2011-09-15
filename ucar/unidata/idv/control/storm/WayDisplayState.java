@@ -1334,7 +1334,7 @@ public class WayDisplayState {
                                           - baseDate.getTime()) / 1000.0;
                     double diffHours = diffSeconds / 3600.0;
                     flabel = format.format(diffHours) + "H";
-                    rlabel = "" + dttm.toString();
+                    rlabel = "" + stp.getTime().toString(); //dttm.toString();
                     slabel = "" + getMonDayHour(dttm);
                 }
                 Data[] data = new Data[params.size() + 3];
