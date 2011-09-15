@@ -21,11 +21,8 @@
 package ucar.unidata.idv.control;
 
 
-import org.w3c.dom.Element;
-
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-
 import ucar.unidata.data.DataCancelException;
 import ucar.unidata.data.DataChangeListener;
 import ucar.unidata.data.DataChoice;
@@ -46,7 +43,6 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.IdvPreferenceManager;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.NavigatedViewManager;
@@ -54,24 +50,15 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
-
 import ucar.unidata.idv.ui.DataSelectionWidget;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.idv.ui.IdvComponentHolder;
-import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.idv.ui.IdvWindow;
-
-import ucar.unidata.metdata.NamedStationImpl;
-
 import ucar.unidata.ui.DndImageButton;
-import ucar.unidata.ui.DragPanel;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.ui.colortable.ColorTableManager;
-
-
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
@@ -85,41 +72,81 @@ import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.Prototypable;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Removable;
-import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.geoloc.GlobeDisplay;
-
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
-import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlPersistable;
-import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
-
-import ucar.visad.display.*;
-
+import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.AnimationWidget;
+import ucar.visad.display.ColorScale;
+import ucar.visad.display.ColorScaleInfo;
 import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.TextDisplayable;
 
-
-import visad.*;
+import visad.CommonUnit;
+import visad.ControlEvent;
+import visad.ControlListener;
+import visad.Data;
+import visad.DateTime;
+import visad.DisplayEvent;
+import visad.DisplayListener;
+import visad.DisplayRealType;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.GriddedSet;
+import visad.LocalDisplay;
+import visad.ProjectionControl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.Text;
+import visad.TextType;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 
 import visad.util.DataUtility;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.LineMetrics;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GridBagConstraints;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 
 import java.beans.PropertyChangeEvent;
@@ -127,25 +154,49 @@ import java.beans.PropertyChangeListener;
 
 import java.io.File;
 
-
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
-
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.text.JTextComponent;
 
 
@@ -987,7 +1038,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (this.dataSelection == null) {
             this.dataSelection = new DataSelection();
         }
-        updateDataSelection(this.dataSelection);
 
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {
@@ -1026,6 +1076,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
 
+        // we do this here because time driver properties 
+        // might be changed by the display settings.
+        updateDataSelection(this.dataSelection);
 
 
         //Call the derived class init method.
@@ -3435,7 +3488,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !DOTIMEDRIVER) {
             return dataSelection;
         }
-        if (isTimeDriver || !usesTimeDriver) {
+        if (getIsTimeDriver() || !getUsesTimeDriver()) {
+            if ( !getUsesTimeDriver()) {
+                dataSelection.setTheTimeDriverTimes(null);
+            }
             return dataSelection;
         }
         ViewManager vm = getViewManager();
@@ -5111,9 +5167,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (DOTIMEDRIVER) {
             items.add(
                 GuiUtils.makeCheckboxMenuItem(
-                    "Drive times with this display", this, "isTimeDriver",
+                    "Drive Times with this Display", this, "isTimeDriver",
                     null));
-            items.add(GuiUtils.makeCheckboxMenuItem("Uses time driver times",
+            items.add(GuiUtils.makeCheckboxMenuItem("Uses Time Driver Times",
                     this, "usesTimeDriver", null));
             items.add(GuiUtils.MENU_SEPARATOR);
 
@@ -5659,6 +5715,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param dsd  the display settings dialog
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+
         dsd.addPropertyValue(getDisplayCategory(), "displayCategory",
                              "Display Category", "Labels");
         dsd.addPropertyValue(getLegendLabelTemplate(), "legendLabelTemplate",
@@ -5756,6 +5813,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                              SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getShowNoteText()), "showNoteText",
                              "Show Note Text", SETTINGS_GROUP_FLAGS);
+        if (DOTIMEDRIVER) {
+            dsd.addPropertyValue(new Boolean(getIsTimeDriver()),
+                                 "isTimeDriver",
+                                 "Drive Times with this Display",
+                                 SETTINGS_GROUP_FLAGS);
+            dsd.addPropertyValue(new Boolean(getUsesTimeDriver()),
+                                 "usesTimeDriver", "Use Time Driver Times",
+                                 SETTINGS_GROUP_FLAGS);
+        }
+
 
 
     }
@@ -12047,8 +12114,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void setIsTimeDriver(boolean value) {
         this.isTimeDriver = value;
         if (haveInitialized && value) {
-             ViewManager vm = getViewManager();
-             vm.ensureOnlyOneTimeDriver(this);
+            ViewManager vm = getViewManager();
+            vm.ensureOnlyOneTimeDriver(this);
         }
     }
 
@@ -12078,8 +12145,5 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean getUsesTimeDriver() {
         return this.usesTimeDriver;
     }
-
-
-
 
 }
