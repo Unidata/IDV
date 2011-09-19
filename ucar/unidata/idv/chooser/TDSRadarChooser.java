@@ -482,61 +482,7 @@ public class TDSRadarChooser extends TimesChooser {
         return timeDriverEnabled;
     }
 
-    /**
-     * _more_
-     *
-     * @param sourceTimes _more_
-     * @param driverTimes _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<DateTime> selectTimesFromList(List sourceTimes,
-            List<DateTime> driverTimes)
-            throws Exception {
-        List<DateTime> results = new ArrayList<DateTime>();
-        //First convert the source times to a list of Date objects
-        List<Date> sourceDates = new ArrayList<Date>();
-        for (int i = 0; i < sourceTimes.size(); i++) {
-            Object object = sourceTimes.get(i);
-            if (object instanceof DateTime) {
-                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
-            } else if (object instanceof Date) {
-                sourceDates.add((Date) object);
-            } else if (object instanceof TwoFacedObject) {  //relative time
-                return null;
-            } else {
-                System.err.println("Unknown time type: "
-                                   + object.getClass().getName());
-                return null;
-            }
-        }
-        //This keeps track of what times in the source list we have used so far
-        HashSet seenTimes = new HashSet();
 
-        //Now look at each selection time and find the closest source time
-        //We need to have logic for when a selection time is outside the range of the source times
-        for (DateTime dateTime : driverTimes) {
-            Date dttm        = ucar.visad.Util.makeDate(dateTime);
-            long minTimeDiff = -1;
-            Date minDate     = null;
-            for (int i = 0; i < sourceDates.size(); i++) {
-                Date sourceDate = sourceDates.get(i);
-                long timeDiff = Math.abs(sourceDate.getTime()
-                                         - dttm.getTime());
-                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
-                    minTimeDiff = timeDiff;
-                    minDate     = sourceDate;
-                }
-            }
-            if ((minDate != null) && !seenTimes.contains(minDate)) {
-                results.add(new DateTime(minDate));
-                seenTimes.add(minDate);
-            }
-        }
-        return results;
-    }
 
     /**
      * The product changed
@@ -1016,6 +962,12 @@ public class TDSRadarChooser extends TimesChooser {
             } else if (timeDriverEnabled && (controlToDriverTimes != null)) {
                 DateTime[] driverTimes =
                     (DateTime[]) controlToDriverTimes.get(selectedDriver);
+                List<Date> times = new ArrayList<Date>();
+                for (int i=0; i<driverTimes.length;i++) {
+                    Date dd = DateUnit.getStandardOrISO(driverTimes[i].dateString()
+                        + "T" + driverTimes[i].timeString());
+                    times.add(dd);
+                }
                 int n = driverTimes.length;
                 Date fromDate =
                     DateUnit.getStandardOrISO(driverTimes[0].dateString()
@@ -1025,6 +977,7 @@ public class TDSRadarChooser extends TimesChooser {
                         + "T" + driverTimes[n - 1].timeString());
                 dateSelection.setStartFixedTime(fromDate);
                 dateSelection.setEndFixedTime(toDate);
+                dateSelection.setTimes(times);
 
             } else {
                 int count = getRelativeTimesList().getSelectedIndex() + 1;
