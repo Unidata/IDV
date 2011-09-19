@@ -28,6 +28,7 @@ import ucar.nc2.units.DateUnit;
 import ucar.unidata.data.*;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.chooser.TDSRadarChooser;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
@@ -40,12 +41,7 @@ import visad.*;
 
 import visad.georef.EarthLocation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -209,7 +205,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             if (getProperties() != null) {
 
                 Object t = getProperties().get("UseTimeDriver");
-                if (t instanceof Boolean) {
+                if (t instanceof Boolean && useDriverTime == false) {
                     useDriverTime = ((Boolean) t).booleanValue();
                 }
                 Object d = getProperties().get("TimeDriver");
@@ -227,7 +223,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                 TDSRadarDatasetCollection.factory("test",
                     query.getCollectionUrl(), errlog);
 
-            if ((times == null) || (times.size() == 0)) {
+            if ((times == null) || (times.size() == 0) || useDriverTime) {
                 List allTimes        = new ArrayList();
                 List collectionTimes = null;
                 if (useDriverTime && (initTimes != null)) {
@@ -268,7 +264,13 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                     times = DatedObject.unwrap(
                         query.getDateSelection().apply(allTimes));
+                    Collections.sort(times);
                     initTimes = times;
+                    List selectedIdx = new ArrayList();
+                    Collections.sort(collectionTimes);
+                    List selectedTimes =
+                            selectTimesFromList0(collectionTimes, dateSelection.getTimes(), selectedIdx);
+                 //   setDateTimeSelection(selectedIdx);
                 } else {
                     List timeSpan = collection.getRadarTimeSpan();
                     Date fromDate =
@@ -380,13 +382,71 @@ public class CDMRadarDataSource extends RadarDataSource {
                 collection.getRadarStationTimes(query.getStation(),
                     query.getProduct(), fromDate, toDate);
         } catch (Exception e) {}
-
+        Collections.sort(collectionTimes);
         initTimes = collectionTimes;
 
         return collectionTimes;
 
     }
 
+    /**
+     * _more_
+     *
+     * @param sourceTimes _more_
+     * @param driverTimes _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public  List<Date> selectTimesFromList0(List sourceTimes,
+            List<Date> driverTimes, List selectedIdx)
+            throws Exception {
+        List<Date> results = new ArrayList<Date>();
+        //First convert the source times to a list of Date objects
+        List<Date> sourceDates = new ArrayList<Date>();
+        for (int i = 0; i < sourceTimes.size(); i++) {
+            Object object = sourceTimes.get(i);
+            if (object instanceof DateTime) {
+                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
+            } else if (object instanceof Date) {
+                sourceDates.add((Date) object);
+            } else if (object instanceof TwoFacedObject) {  //relative time
+                return null;
+            } else {
+                System.err.println("Unknown time type: "
+                                   + object.getClass().getName());
+                return null;
+            }
+        }
+        //This keeps track of what times in the source list we have used so far
+        HashSet seenTimes = new HashSet();
+
+        //Now look at each selection time and find the closest source time
+        //We need to have logic for when a selection time is outside the range of the source times
+        for (Date date : driverTimes) {
+           // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
+            long minTimeDiff = -1;
+            Date minDate     = null;
+            int idn = -1;
+            for (int i = 0; i < sourceDates.size(); i++) {
+                Date sourceDate = sourceDates.get(i);
+                long timeDiff = Math.abs(sourceDate.getTime()
+                                         - date.getTime());
+                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
+                    minTimeDiff = timeDiff;
+                    minDate     = sourceDate;
+                    idn = i;
+                }
+            }
+            if ((minDate != null) && !seenTimes.contains(minDate)) {
+                results.add(minDate);
+                selectedIdx.add(idn);
+                seenTimes.add(minDate);
+            }
+        }
+        return results;
+    }
     /**
      * Make and insert the <code>DataChoice</code>-s for this
      * <code>DataSource</code>.

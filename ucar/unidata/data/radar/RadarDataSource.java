@@ -387,7 +387,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 times.add(new TwoFacedObject(name, i));
             }
         }
-        return times;
+        Collections.sort(times);
+
+        return   times;
     }
 
     /**
@@ -424,6 +426,12 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             }
             if (times == null) {
                 times = dataChoice.getSelectedDateTimes();
+            }
+
+            List dtimes = subset.getTimeDriverTimes();
+
+            if(dtimes != null && useDriverTime == false) {
+                useDriverTime = true;
             }
 
             List<RadarAdapter> adapters      = getAdapters();
