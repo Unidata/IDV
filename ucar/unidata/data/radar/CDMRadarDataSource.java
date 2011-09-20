@@ -268,9 +268,11 @@ public class CDMRadarDataSource extends RadarDataSource {
                     initTimes = times;
                     List selectedIdx = new ArrayList();
                     Collections.sort(collectionTimes);
-                    List selectedTimes =
-                            selectTimesFromList0(collectionTimes, dateSelection.getTimes(), selectedIdx);
-                 //   setDateTimeSelection(selectedIdx);
+                    if(dateSelection.getTimes() != null){
+                        List selectedTimes =
+                                selectTimesFromList0(collectionTimes, dateSelection.getTimes(), selectedIdx);
+                        setDateTimeSelection(selectedIdx);
+                    }
                 } else {
                     List timeSpan = collection.getRadarTimeSpan();
                     Date fromDate =
