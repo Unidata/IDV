@@ -296,6 +296,15 @@ The Unidata admin staff has the information on licenses and passwords to get in
 to download new versions.
 
 ***********************************************************************
+Java Web Start Certificate Signing
+
+On a yearly basis IDV Java Web Start certificate must be updated. Instructions
+on updating that certificate can be found here
+ 
+https://www.unidata.ucar.edu/unidata_only/admin/idv_software_license_info.html
+
+
+***********************************************************************
 Java 3D Hosting.
 
 As of September 2011, Oracle no longer hosts properly signed Java 3D jars necessary
