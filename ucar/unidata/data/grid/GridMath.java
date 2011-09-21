@@ -2234,6 +2234,7 @@ public class GridMath {
                     values[jj] = values[jj+1];
                     weights[jj] = weights[jj+1];
                 }
+                kk--;
             }
         }
         /*
@@ -2241,8 +2242,8 @@ public class GridMath {
          */
         if ( mm == 1 ) {
             if ( Math.abs(values[0] - 0.0F) < floatDiffTol ) {
-                values[1] = -0.00001F;
-                values[2] = 0.00001F;
+                values[0] = -0.00001F;
+                values[1] = 0.00001F;
             }
             else {
                 values[1] = values[0] + 0.00001F * Math.abs(values[0]);
