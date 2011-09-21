@@ -2192,12 +2192,12 @@ public class GridMath {
          * emvalue (1) lowest and emvalu (nummbr) highest.
          */
         int iswflg = 1;
-        int istop = length;
+        int istop = length -1;
         float swpbuf;
         float wtbuf;
         while ( iswflg != 0 && istop > 0 ) {
             iswflg = 0;
-            for ( int kk = 1; kk < istop; kk++ ) {
+            for ( int kk = 0; kk < istop; kk++ ) {
                 if ( values[kk] > values[kk+1] ) {
                     iswflg = 1;
                     swpbuf = values[kk];
@@ -2221,16 +2221,16 @@ public class GridMath {
          */
         float [] zfreq = new float[nn];
 
-        for (int kk = 1; kk <= nn; kk++){
+        for (int kk = 0; kk < nn; kk++){
             zfreq[kk] = 1.0F;
         }
-        float tol = 0.001F * (values[mm]-values[1]) / mm;
-        for (int kk = 1; kk < mm; kk++) {
+        float tol = 0.001F * (values[mm - 1]-values[1]) / mm;
+        for (int kk = 0; kk < mm - 1; kk++) {
             if ( Math.abs(values[kk] - values[kk+1]) <= tol ) {
                 weights[kk] += weights[kk+1];
                 zfreq[kk] = zfreq[kk] + 1.0F;
                 mm--;
-                for (int jj = kk+1; jj <= mm; jj++) {
+                for (int jj = kk+1; jj < mm; jj++) {
                     values[jj] = values[jj+1];
                     weights[jj] = weights[jj+1];
                 }
@@ -2240,42 +2240,42 @@ public class GridMath {
          * Fabricate order statistics if it has collapsed to a single value.
          */
         if ( mm == 1 ) {
-            if ( Math.abs(values[1] - 0.0F) < floatDiffTol ) {
+            if ( Math.abs(values[0] - 0.0F) < floatDiffTol ) {
                 values[1] = -0.00001F;
                 values[2] = 0.00001F;
             }
             else {
-                values[2] = values[1] + 0.00001F * Math.abs(values[1]);
-                values[1] -= 0.00001F * Math.abs(values[1]);
+                values[1] = values[0] + 0.00001F * Math.abs(values[0]);
+                values[0] -= 0.00001F * Math.abs(values[0]);
             }
+            weights[0] = 0.5F;
             weights[1] = 0.5F;
-            weights[2] = 0.5F;
-            mm = 2;
+            mm = 1;
+            zfreq[0] = 1.0F;
             zfreq[1] = 1.0F;
-            zfreq[2] = 1.0F;
         }
         /*
          *Compute and sum intrinsic weights.
          */
         float [] zwts = new float[mm];
-        zwts[1] = zfreq[1] / ( values[2] - values[1] );
-        float zsum = zwts[1];
-        for (int kk=2; kk < mm; kk++){
+        zwts[0] = zfreq[0] / ( values[1] - values[0] );
+        float zsum = zwts[0];
+        for (int kk=1; kk < mm - 1; kk++){
             zwts[kk] = ( zfreq[kk] * 2.0F ) / ( values[kk+1] - values[kk-1] );
             zsum = zsum + zwts[kk];
         }
-        zwts[mm] = zfreq[mm] / ( values[mm] - values[mm-1] );
-        zsum = zsum + zwts[mm];
+        zwts[mm - 1] = zfreq[mm - 1] / ( values[mm - 1] - values[mm - 2] );
+        zsum = zsum + zwts[mm - 1];
         /*
          * Scale external weights by normalized intrinsic weights and
          * normalize.
          */
         float psum = 0.0F;
-        for (int kk=1; kk <= mm; kk++ ){
+        for (int kk=0; kk < mm; kk++ ){
             weights[kk] = ( zwts[kk] / zsum ) * weights[kk];
             psum = psum + weights[kk];
         }
-        for (int kk=1; kk <= mm; kk++ ){
+        for (int kk=0; kk < mm; kk++ ){
             weights[kk] = weights[kk] / psum;
         }
         /*
@@ -2283,45 +2283,55 @@ public class GridMath {
          * w(), normalized weight; and qlt, qrt.
          */
         float vn = 0.0F;
-        for ( int kk = 2; kk <= mm; kk++ ) {
+        for ( int kk = 1; kk < mm; kk++ ) {
             vn += 0.5 * (weights[kk] + weights[kk-1]) * (values[kk] - values[kk-1]);
         }
         vn = vn / (1.0F - 2.0F / (nn+1));
-        for ( int kk = 1; kk <= mm; kk++ ) {
+        for ( int kk = 0; kk < mm; kk++ ) {
             weights[kk] = weights[kk] / vn;
         }
-        float qlt = values[1] - 2.0F / (weights[1] * (nn + 1));
-        float qrt = values[mm] + 2.0F / (weights[mm] * (nn + 1));
-        weights[0] = 0.0F;
-        weights[mm+1] = 0.0F;
-        values[0] = qlt;
-        values[mm+1] = qrt;
+        float qlt = values[0] - 2.0F / (weights[0] * (nn + 1));
+        float qrt = values[mm - 1] + 2.0F / (weights[mm - 1] * (nn + 1));
+
+        float [] newWeights = new float[mm + 1];
+        float [] newValues = new float[mm + 1];
+
+        newWeights[0] = 0.0F;
+        newWeights[mm] = 0.0F;
+        newValues[0] = qlt;
+        newValues[mm] = qrt;
+
+        for (int ii=1; ii < mm; ii++) {
+            newWeights[ii] = weights[ii - 1];
+            newValues[ii] = values[ii -1];
+        }
         /*
          * Start computing probability output.
          */
         float prob = -999.0F; // probability of value at grid point < pValue)
+
         if ( pValue < values[0] ) {
             prob = 0.0F;
         }
-        else if ( pValue > values[mm+1] ) {
+        else if ( pValue > newValues[mm] ) {
             prob = 1.0F;
         }
         else{
             psum = 0.0F;
-            for ( int kk = 1; kk <= mm + 1; kk++ ) {
-                if ( Math.abs(pValue - values[kk-1]) < floatDiffTol ) {
+            for ( int kk = 1; kk < mm + 1; kk++ ) {
+                if ( Math.abs(pValue - newValues[kk-1]) < floatDiffTol ) {
                     prob = psum;
                     break;
                 }
-                else if ( pValue >= values[kk] ) {
-                    psum += 0.5F * (weights[kk] + weights[kk-1]) *
-                           (values[kk] - values[kk-1]);
+                else if ( pValue >= newValues[kk] ) {
+                    psum += 0.5F * (newWeights[kk] + newWeights[kk-1]) *
+                           (newValues[kk] - newValues[kk-1]);
                 }
-                else if ( pValue > values[kk-1] ) {
-                    float ww = weights[kk-1] + (weights[kk] - weights[kk-1]) *
-                         (pValue - values[kk-1]) /
-                         (values[kk] - values[kk-1]);
-                    float fta = 0.5F * (ww + weights[kk-1]) * (pValue - values[kk-1]);
+                else if ( pValue > newValues[kk-1] ) {
+                    float ww = newWeights[kk-1] + (newWeights[kk] - newWeights[kk-1]) *
+                         (pValue - newValues[kk-1]) /
+                         (newValues[kk] - newValues[kk-1]);
+                    float fta = 0.5F * (ww + newWeights[kk-1]) * (pValue - newValues[kk-1]);
                     prob = psum + fta;
                     break;
                 }
