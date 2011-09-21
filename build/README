@@ -294,3 +294,26 @@ We also share the JRE bundles with them for platforms that we don't have.
 
 The Unidata admin staff has the information on licenses and passwords to get in
 to download new versions.
+
+***********************************************************************
+Java 3D Hosting.
+
+As of September 2011, Oracle no longer hosts properly signed Java 3D jars necessary
+for webstart.
+
+https://forums.oracle.com/forums/thread.jspa?messageID=9882107 
+
+Unidata now host those jars here signed with our own certificate.
+
+http://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp
+
+Please note that when the certificates expire it will be necessary to resign those
+jars. 
+
+jarsigner -keystore file:///share/idv/.keystore -storepass XXXXX <jar file> idv
+
+For the password, see the IDV ant build.xml. 
+
+Please see here for more information:
+
+https://www.unidata.ucar.edu/unidata_only/admin/idv_software_license_info.html
