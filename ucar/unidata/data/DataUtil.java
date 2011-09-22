@@ -29,23 +29,12 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import ucar.ma2.Array;
 
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.*;
 
 import ucar.visad.Util;
+import ucar.nc2.units.DateUnit;
 
-import visad.CoordinateSystem;
-import visad.Data;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.Real;
-import visad.RealType;
-import visad.TextType;
-import visad.Tuple;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 
 import java.io.FileOutputStream;
@@ -57,6 +46,8 @@ import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 
 /**
@@ -695,5 +686,65 @@ public class DataUtil {
         return isPointInside;
     }
 
+        /**
+     * _more_
+     *
+     * @param sourceTimes _more_
+     * @param driverTimes _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public  static List<Date> selectTimesFromList(List sourceTimes,
+            List<DateTime> driverTimes )
+            throws Exception {
+        List<Date> results = new ArrayList<Date>();
+        List<Date> dtimes = new ArrayList<Date>();
+        //First convert the source times to a list of Date objects
+        List<Date> sourceDates = new ArrayList<Date>();
+        for (int i = 0; i < sourceTimes.size(); i++) {
+            Object object = sourceTimes.get(i);
+            if (object instanceof DateTime) {
+                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
+            } else if (object instanceof Date) {
+                sourceDates.add((Date) object);
+            } else if (object instanceof TwoFacedObject) {  //relative time
+                return null;
+            } else {
+                System.err.println("Unknown time type: "
+                                   + object.getClass().getName());
+                return null;
+            }
+        }
 
+        for(int i = 0; i< driverTimes.size(); i++){
+                    dtimes.add(DateUnit.getStandardOrISO(driverTimes.get(i).dateString()
+                        + "T" + driverTimes.get(i).timeString()));
+        }
+        //This keeps track of what times in the source list we have used so far
+        HashSet seenTimes = new HashSet();
+
+        //Now look at each selection time and find the closest source time
+        //We need to have logic for when a selection time is outside the range of the source times
+        for (Date date : dtimes) {
+           // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
+            long minTimeDiff = -1;
+            Date minDate     = null;
+            for (int i = 0; i < sourceDates.size(); i++) {
+                Date sourceDate = sourceDates.get(i);
+                long timeDiff = Math.abs(sourceDate.getTime()
+                                         - date.getTime());
+                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
+                    minTimeDiff = timeDiff;
+                    minDate     = sourceDate;
+                }
+            }
+            if ((minDate != null) && !seenTimes.contains(minDate)) {
+                results.add(minDate);
+                seenTimes.add(minDate);
+            }
+        }
+        return results;
+    }
 }
