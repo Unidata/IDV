@@ -4118,7 +4118,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @param displayControl  the control
      */
-    public void displayDataChanged(DisplayControl displayControl) {}
+    public void displayDataChanged(DisplayControl displayControl) {
+        if (DisplayControl.DOTIMEDRIVER && displayControl.getIsTimeDriver()) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) getControls()) {
+                if ( !control.equals(displayControl)
+                        && ((DisplayControlImpl) control)
+                            .getUsesTimeDriver()) {
+                    try {
+                        ((DisplayControlImpl) control)
+                            .reloadDataSourceInThread();
+                    } catch (Exception e) {
+                        logException("Error reloading data source for "
+                                     + displayControl.getLabel(), e);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Return the  list of {@link DisplayControl}s displayed in this ViewManager
