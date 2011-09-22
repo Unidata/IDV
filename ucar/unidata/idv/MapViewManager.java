@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,53 +23,55 @@ package ucar.unidata.idv;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.GeoLocationInfo;
-
 import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.gis.maps.MapInfo;
-
 import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.idv.control.ZSlider;
-
-
 import ucar.unidata.idv.flythrough.Flythrough;
 import ucar.unidata.idv.flythrough.FlythroughPoint;
-
-import ucar.unidata.idv.ui.*;
-
+import ucar.unidata.idv.ui.ContourInfoDialog;
+import ucar.unidata.idv.ui.EarthNavPanel;
+import ucar.unidata.idv.ui.IdvUIManager;
+import ucar.unidata.idv.ui.PipPanel;
 import ucar.unidata.ui.Command;
-import ucar.unidata.ui.CommandManager;
 import ucar.unidata.ui.FontSelector;
-import ucar.unidata.ui.XmlUi;
-
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.view.geoloc.*;
-
+import ucar.unidata.view.geoloc.GlobeDisplay;
+import ucar.unidata.view.geoloc.MapProjectionDisplay;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.view.geoloc.ViewpointInfo;
 import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
-import ucar.visad.display.*;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.LineDrawing;
 
-import visad.*;
+import visad.ConstantMap;
+import visad.Data;
+import visad.DisplayEvent;
+import visad.DisplayRealType;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.MouseBehavior;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -77,33 +79,43 @@ import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
-import visad.util.HersheyFont;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.io.File;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.plaf.SplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 
@@ -1298,16 +1310,16 @@ public class MapViewManager extends NavigatedViewManager {
             new GuiUtils.ColorSwatch(getStore().get(PREF_DISPLAYLISTCOLOR,
                 getDisplayListColor()), "Set Display List Color");
         //GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        JPanel fontPanel =
-            GuiUtils.vbox(GuiUtils.lLabel("Display List:"),
-                          GuiUtils.doLayout(new Component[] {
-                              GuiUtils.rLabel("Font:"),
-                              GuiUtils.left(fontSelector.getComponent()),
-                              GuiUtils.rLabel("Color:"),
-                              GuiUtils.left(GuiUtils.hbox(dlColorWidget,
-                                  dlColorWidget.getSetButton(),
-                                  dlColorWidget.getClearButton(), 5)) }, 2,
-                                      GuiUtils.WT_N, GuiUtils.WT_N));
+        JPanel fontPanel = GuiUtils.vbox(GuiUtils.lLabel("Display List:"),
+                                         GuiUtils.doLayout(new Component[] {
+                                             GuiUtils.rLabel("Font:"),
+                                             GuiUtils.left(fontSelector.getComponent()),
+                                             GuiUtils.rLabel("Color:"),
+                                             GuiUtils.left(GuiUtils.hbox(dlColorWidget,
+                                                 dlColorWidget.getSetButton(),
+                                                 dlColorWidget.getClearButton(),
+                                                 5)) }, 2, GuiUtils.WT_N,
+                                                     GuiUtils.WT_N));
 
 
         List            projections = getProjectionList();
@@ -1318,7 +1330,10 @@ public class MapViewManager extends NavigatedViewManager {
             projBox.setSelectedItem(defaultProj);
         }
 
-        final JCheckBox logoVizBox = new JCheckBox("Show Logo in View", stateManager.getPreferenceOrProperty(PREF_LOGO_VISIBILITY, false));
+        final JCheckBox logoVizBox = new JCheckBox(
+                                         "Show Logo in View",
+                                         stateManager.getPreferenceOrProperty(
+                                             PREF_LOGO_VISIBILITY, false));
         final JTextField logoField =
             new JTextField(stateManager.getPreferenceOrProperty(PREF_LOGO,
                 ""));
@@ -1348,9 +1363,10 @@ public class MapViewManager extends NavigatedViewManager {
         logoOffsetField.setToolTipText(
             "Set an offset from the position (x,y)");
 
-        float logoScaleFactor = (float) stateManager.getPreferenceOrProperty(PREF_LOGO_SCALE, 1.0);
-        final JLabel logoSizeLab =
-            new JLabel(""+logoScaleFactor);
+        float logoScaleFactor =
+            (float) stateManager.getPreferenceOrProperty(PREF_LOGO_SCALE,
+                1.0);
+        final JLabel logoSizeLab = new JLabel("" + logoScaleFactor);
         JComponent[] sliderComps = GuiUtils.makeSliderPopup(0, 20,
                                        (int) (logoScaleFactor * 10), null);
         final JSlider  logoScaleSlider = (JSlider) sliderComps[1];
@@ -1362,20 +1378,22 @@ public class MapViewManager extends NavigatedViewManager {
         logoScaleSlider.addChangeListener(listener);
         sliderComps[0].setToolTipText("Change Logo Scale Value");
 
-        JPanel logoPanel = GuiUtils.vbox(
-        GuiUtils.left(logoVizBox),
-        GuiUtils.centerRight(logoField, browseButton), GuiUtils.hbox(
-            GuiUtils.leftCenter(
-                GuiUtils.rLabel("Screen Position: "),
-                logoPosBox), GuiUtils.leftCenter(
-                    GuiUtils.rLabel("Offset: "),
-                    logoOffsetField), GuiUtils.leftCenter(
-                        GuiUtils.rLabel("Scale: "),
-                        GuiUtils.leftRight(logoSizeLab, sliderComps[0]))));
-        logoPanel = 
-            GuiUtils.vbox(GuiUtils.lLabel("Logo: "),
-                          GuiUtils.left(GuiUtils.inset(logoPanel,
-                              new Insets(5, 5, 0, 0))));
+        JPanel logoPanel =
+            GuiUtils.vbox(
+                GuiUtils.left(logoVizBox),
+                GuiUtils.centerRight(logoField, browseButton),
+                GuiUtils.hbox(
+                    GuiUtils.leftCenter(
+                        GuiUtils.rLabel("Screen Position: "),
+                        logoPosBox), GuiUtils.leftCenter(
+                            GuiUtils.rLabel("Offset: "),
+                            logoOffsetField), GuiUtils.leftCenter(
+                                GuiUtils.rLabel("Scale: "),
+                                GuiUtils.leftRight(
+                                    logoSizeLab, sliderComps[0]))));
+        logoPanel = GuiUtils.vbox(GuiUtils.lLabel("Logo: "),
+                                  GuiUtils.left(GuiUtils.inset(logoPanel,
+                                      new Insets(5, 5, 0, 0))));
 
 
         PreferenceManager miscManager = new PreferenceManager() {
@@ -1481,24 +1499,19 @@ public class MapViewManager extends NavigatedViewManager {
                               new Insets(5, 20, 0, 0))));
 
         JPanel colorFontPanel = GuiUtils.vbox(GuiUtils.top(colorPanel),
-                                    GuiUtils.top(fontPanel) //,
-                                     //GuiUtils.top(projPanel)
-                                    );
+                                    GuiUtils.top(fontPanel)  //,
+        //GuiUtils.top(projPanel)
+        );
 
 
 
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        JPanel miscContents = GuiUtils.doLayout(
-                                  Misc.newList( new Component[] {
-                                      GuiUtils.top(legendPanel),
-                                      GuiUtils.top(toolbarPanel),
-                                      GuiUtils.top(miscPanel), 
-                                      GuiUtils.top(colorFontPanel),
-                                      GuiUtils.top(projPanel), 
-                                      GuiUtils.top(logoPanel)}), 2,
-                                                      GuiUtils.WT_N,
-                                                      GuiUtils.WT_N);
+        JPanel miscContents = GuiUtils.doLayout(Misc.newList(new Component[] {
+            GuiUtils.top(legendPanel), GuiUtils.top(toolbarPanel),
+            GuiUtils.top(miscPanel), GuiUtils.top(colorFontPanel),
+            GuiUtils.top(projPanel), GuiUtils.top(logoPanel)
+        }), 2, GuiUtils.WT_N, GuiUtils.WT_N);
 
 
         miscContents = GuiUtils.inset(GuiUtils.left(miscContents), 5);
@@ -2527,6 +2540,7 @@ public class MapViewManager extends NavigatedViewManager {
             // ignore, don't set anything.   Uncomment for debugging
             // LogUtil.logException ( "addDisplayInfo:setMapProjection()", exp);
         }
+        super.displayDataChanged(display);
     }
 
 
