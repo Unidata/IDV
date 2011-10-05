@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -20,10 +20,20 @@
 
 package ucar.visad;
 
+
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.Display;
 import visad.VisADException;
 import visad.VisADGeometryArray;
 import visad.VisADLineArray;
 import visad.VisADTriangleArray;
+
+//- java3d
+import javax.media.j3d.Transform3D;
+
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 
 /**
@@ -214,12 +224,11 @@ public class WindBarb {
                 int oldnt = numt[0];
                 //System.out.println("j = "+ j);
                 synchronized (sync) {
-                    float mbarb[] = makeBarb(south[j],
-                                        spatial_values[0][j],
-                                        spatial_values[1][j],
-                                        spatial_values[2][j], scale, pt_size,
-                                        f0, f1, vx, vy, vz, numv, tx, ty, tz,
-                                        numt);
+                    float mbarb[] = makeBarb(south[j], spatial_values[0][j],
+                                             spatial_values[1][j],
+                                             spatial_values[2][j], scale,
+                                             pt_size, f0, f1, vx, vy, vz,
+                                             numv, tx, ty, tz, numt);
 
                     //        ucar.unidata.util.Misc.printArray("mbarb = ", mbarb);
                 }
@@ -375,11 +384,12 @@ public class WindBarb {
      * @param numt       number of coordinates
      * @return  an array of the start and end points
      */
-    public static float[] makeBarbOld(boolean south, float x, float y, float z,
-                                   float scale, float pt_size, float f0,
-                                   float f1, float[] vx, float[] vy,
-                                   float[] vz, int[] numv, float[] tx,
-                                   float[] ty, float[] tz, int[] numt) {
+    public static float[] makeBarbOld(boolean south, float x, float y,
+                                      float z, float scale, float pt_size,
+                                      float f0, float f1, float[] vx,
+                                      float[] vy, float[] vz, int[] numv,
+                                      float[] tx, float[] ty, float[] tz,
+                                      int[] numt) {
 
         float   wsp25, slant, barb, d, c195, s195;
         float   x0, y0;
@@ -730,12 +740,45 @@ public class WindBarb {
      * @param numt       number of coordinates
      * @return  an array of the start and end points
      */
-    public static float[] makeBarb(boolean south, float x, float y,
-                                      float z, float scale, float pt_size,
-                                      float f0, float f1, float[] vx,
-                                      float[] vy, float[] vz, int[] numv,
-                                      float[] tx, float[] ty, float[] tz,
-                                      int[] numt) {
+    public static float[] makeBarb(boolean south, float x, float y, float z,
+                                   float scale, float pt_size, float f0,
+                                   float f1, float[] vx, float[] vy,
+                                   float[] vz, int[] numv, float[] tx,
+                                   float[] ty, float[] tz, int[] numt) {
+        return makeBarb(south, x, y, z, scale, pt_size, f0, f1, vx, vy, vz,
+                        numv, tx, ty, tz, numt, false);
+
+    }
+
+
+    /**
+     * Adapted from Don Murray's mind
+     *
+     * @param south      north or south orientation flag
+     * @param x          x value location
+     * @param y          y value location
+     * @param z          z value location
+     * @param scale      scale factor
+     * @param pt_size    spacing between barbs
+     * @param f0         u component
+     * @param f1         v component
+     * @param vx         x coordinate of VisADLineArrays
+     * @param vy         y coordinate of VisADLineArrays
+     * @param vz         z coordinate of VisADLineArrays
+     * @param numv       number of coordinates
+     * @param tx         x coordinate of VisADTriangleArrays (wind flags)
+     * @param ty         y coordinate of VisADTriangleArrays (wind flags)
+     * @param tz         z coordinate of VisADTriangleArrays (wind flags)
+     * @param numt       number of coordinates
+     * @param rotateToGlobe  if true, rotate vectors for globe
+     * @return  an array of the start and end points
+     */
+    public static float[] makeBarb(boolean south, float x, float y, float z,
+                                   float scale, float pt_size, float f0,
+                                   float f1, float[] vx, float[] vy,
+                                   float[] vz, int[] numv, float[] tx,
+                                   float[] ty, float[] tz, int[] numt,
+                                   boolean rotateToGlobe) {
 
         float   wsp25, slant, barb, d, c195, s195;
         float   x0, y0;
@@ -753,11 +796,13 @@ public class WindBarb {
 
         float wnd_spd = (float) Math.sqrt(f0 * f0 + f1 * f1);
         //System.out.println("Speed = " + wnd_spd);
-        int lenv   = vx.length;
-        int lent   = tx.length;
-        int nv     = numv[0];
-        int nt     = numt[0];
-        int maxbas = 6;
+        int lenv    = vx.length;
+        int lent    = tx.length;
+        int nv      = numv[0];
+        int nt      = numt[0];
+        int maxbas  = 6;
+        int nvStart = nv;
+        int ntStart = nt;
 
         //determine the initial (minimum) length of the flag pole
         if (wnd_spd >= 2.5) {
@@ -981,10 +1026,96 @@ public class WindBarb {
             mbarb[3] = y;
         }
         //    ucar.unidata.util.Misc.printArray("mbarb end makebarb", mbarb);
+        if (rotateToGlobe && false) {
+            float[] oneBarbVx = new float[nv - nvStart];
+            float[] oneBarbVy = new float[nv - nvStart];
+            float[] oneBarbVz = new float[nv - nvStart];
+            float[] oneBarbTx = new float[nt - ntStart];
+            float[] oneBarbTy = new float[nt - ntStart];
+            float[] oneBarbTz = new float[nt - ntStart];
+
+            System.arraycopy(vx, nvStart, oneBarbVx, 0, oneBarbVx.length);
+            System.arraycopy(vy, nvStart, oneBarbVy, 0, oneBarbVy.length);
+            System.arraycopy(vz, nvStart, oneBarbVz, 0, oneBarbVz.length);
+            System.arraycopy(tx, ntStart, oneBarbTx, 0, oneBarbTx.length);
+            System.arraycopy(ty, ntStart, oneBarbTy, 0, oneBarbTy.length);
+            System.arraycopy(tz, ntStart, oneBarbTz, 0, oneBarbTz.length);
+
+            Transform3D t3d       = new Transform3D();
+            float[][]   latlonrad = null;
+
+            t3d.set(new Vector3f(new float[] { -x, -y, -z }));
+            applyTransform(t3d, oneBarbVx, oneBarbVy, oneBarbVz);
+            applyTransform(t3d, oneBarbTx, oneBarbTy, oneBarbTz);
+
+            try {
+                CoordinateSystem dspCS = Display.DisplaySphericalCoordSys;
+                latlonrad = dspCS.fromReference(new float[][] {
+                    { x }, { y }, { z }
+                });
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            float latLoc = latlonrad[0][0];
+            float lonLoc = latlonrad[1][0];
+            latLoc *= (float) Data.DEGREES_TO_RADIANS;
+            lonLoc *= (float) Data.DEGREES_TO_RADIANS;
+
+            t3d.rotZ(-lonLoc);
+            applyTransform(t3d, oneBarbVx, oneBarbVy, oneBarbVz);
+            applyTransform(t3d, oneBarbTx, oneBarbTy, oneBarbTz);
+
+            if (latLoc >= 0) {
+                t3d.rotY(90 * Data.DEGREES_TO_RADIANS - Math.abs(latLoc));
+            } else {
+                t3d.rotY(-(90 * Data.DEGREES_TO_RADIANS - Math.abs(latLoc)));
+            }
+            applyTransform(t3d, oneBarbVx, oneBarbVy, oneBarbVz);
+            applyTransform(t3d, oneBarbTx, oneBarbTy, oneBarbTz);
+
+            t3d.rotZ(lonLoc);
+            applyTransform(t3d, oneBarbVx, oneBarbVy, oneBarbVz);
+            applyTransform(t3d, oneBarbTx, oneBarbTy, oneBarbTz);
+
+            t3d.set(new Vector3f(new float[] { x, y, z }));
+            applyTransform(t3d, oneBarbVx, oneBarbVy, oneBarbVz);
+            applyTransform(t3d, oneBarbTx, oneBarbTy, oneBarbTz);
+
+            System.arraycopy(oneBarbVx, 0, vx, nvStart, oneBarbVx.length);
+            System.arraycopy(oneBarbVy, 0, vy, nvStart, oneBarbVy.length);
+            System.arraycopy(oneBarbVz, 0, vz, nvStart, oneBarbVz.length);
+
+            System.arraycopy(oneBarbTx, 0, tx, ntStart, oneBarbTx.length);
+            System.arraycopy(oneBarbTy, 0, ty, ntStart, oneBarbTy.length);
+            System.arraycopy(oneBarbTz, 0, tz, ntStart, oneBarbTz.length);
+        }
 
         numv[0] = nv;
         numt[0] = nt;
         return mbarb;
+    }
+
+    /**
+     * Apply the transform to the points
+     *
+     * @param t3d  the transform
+     * @param xPts  xpoints
+     * @param yPts  ypoints
+     * @param zPts  zpoints
+     */
+    private static void applyTransform(Transform3D t3d, float[] xPts,
+                                      float[] yPts, float[] zPts) {
+        Point3f pt3f = new Point3f();
+        float[] tmp  = new float[3];
+        for (int k = 0; k < xPts.length; k++) {
+            pt3f.set(xPts[k], yPts[k], zPts[k]);
+            t3d.transform(pt3f);
+            pt3f.get(tmp);
+            xPts[k] = tmp[0];
+            yPts[k] = tmp[1];
+            zPts[k] = tmp[2];
+        }
     }
 
 }

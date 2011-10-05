@@ -21,6 +21,7 @@ package ucar.visad;
 
 
 import visad.CommonUnit;
+import visad.CoordinateSystem;
 import visad.Unit;
 import visad.UnitException;
 
@@ -93,8 +94,12 @@ public class WindBarbRenderer extends BarbRendererJ3D {
                 f1 = (float) CommonUnit.meterPerSecond.toThis(f1, u);
             } catch (UnitException ue) {}
         }
+        CoordinateSystem dcs = getDisplayCoordinateSystem();
+        boolean rotateToGlobe = 
+            (dcs != null && dcs instanceof visad.SphericalCoordinateSystem);
         return WindBarb.makeBarb(south, x, y, z, scale, pt_size, f0, f1,
-                                    vx, vy, vz, numv, tx, ty, tz, numt);
+                                    vx, vy, vz, numv, tx, ty, tz, numt, 
+                                    rotateToGlobe);
     }
 
     /**

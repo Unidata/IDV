@@ -24,9 +24,11 @@ package ucar.visad.display;
 import ucar.visad.WindBarbRenderer;
 import ucar.visad.quantities.CommonUnits;
 
+import visad.CoordinateSystem;
 import visad.DataRenderer;
 import visad.RealTupleType;
 import visad.RealType;
+import visad.SphericalCoordinateSystem;
 import visad.VisADException;
 
 import visad.bom.BarbRenderer;

@@ -25,6 +25,7 @@ import ucar.visad.WindBarbRenderer;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.LineDrawing;
 
+import visad.CommonUnit;
 import visad.DataRenderer;
 import visad.Field;
 import visad.VisADException;
@@ -181,7 +182,7 @@ public class WindProfileDisplayable extends LineDrawing {
         BarbRenderer br = (getDisplay().getDisplayRenderer()
                            instanceof DisplayRendererJ2D)
                           ? new visad.bom.BarbRendererJ2D()
-                          : new WindBarbRenderer();
+                          : new WindBarbRenderer(CommonUnit.meterPerSecond);
         return (DataRenderer) br;
     }
 
