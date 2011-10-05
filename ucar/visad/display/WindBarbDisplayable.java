@@ -21,16 +21,20 @@
 package ucar.visad.display;
 
 
-import java.rmi.RemoteException;
-
 import ucar.visad.WindBarbRenderer;
 import ucar.visad.quantities.CommonUnits;
+
 import visad.DataRenderer;
 import visad.RealTupleType;
 import visad.RealType;
 import visad.VisADException;
+
 import visad.bom.BarbRenderer;
+
 import visad.java2d.DisplayRendererJ2D;
+
+
+import java.rmi.RemoteException;
 
 
 /**

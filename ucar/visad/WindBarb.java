@@ -214,7 +214,7 @@ public class WindBarb {
                 int oldnt = numt[0];
                 //System.out.println("j = "+ j);
                 synchronized (sync) {
-                    float mbarb[] = makeBarbNew(south[j],
+                    float mbarb[] = makeBarb(south[j],
                                         spatial_values[0][j],
                                         spatial_values[1][j],
                                         spatial_values[2][j], scale, pt_size,
@@ -375,7 +375,7 @@ public class WindBarb {
      * @param numt       number of coordinates
      * @return  an array of the start and end points
      */
-    public static float[] makeBarb(boolean south, float x, float y, float z,
+    public static float[] makeBarbOld(boolean south, float x, float y, float z,
                                    float scale, float pt_size, float f0,
                                    float f1, float[] vx, float[] vy,
                                    float[] vz, int[] numv, float[] tx,
@@ -730,7 +730,7 @@ public class WindBarb {
      * @param numt       number of coordinates
      * @return  an array of the start and end points
      */
-    public static float[] makeBarbNew(boolean south, float x, float y,
+    public static float[] makeBarb(boolean south, float x, float y,
                                       float z, float scale, float pt_size,
                                       float f0, float f1, float[] vx,
                                       float[] vy, float[] vz, int[] numv,
