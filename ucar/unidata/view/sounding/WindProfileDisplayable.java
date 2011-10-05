@@ -26,13 +26,14 @@ package ucar.unidata.view.sounding;
 
 import java.rmi.RemoteException;
 
-import ucar.visad.Util;
-import ucar.visad.display.*;
-import ucar.visad.quantities.*;
-import ucar.visad.functiontypes.*;
-
-import visad.*;
-import visad.bom.*;
+import ucar.visad.WindBarbRenderer;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.LineDrawing;
+import visad.DataRenderer;
+import visad.Field;
+import visad.VisADException;
+import visad.bom.BarbRenderer;
+import visad.java2d.DisplayRendererJ2D;
 
 
 /**
@@ -177,7 +178,6 @@ public class WindProfileDisplayable extends LineDrawing {
      * @return renderer for this displayable.
      *
      * @throws VisADException  problem creating renderer
-     */
     protected DataRenderer getDataRenderer() throws VisADException {
 
         LocalDisplay display = getDisplay();
@@ -186,6 +186,22 @@ public class WindProfileDisplayable extends LineDrawing {
                ? (DataRenderer) new BarbRendererJ2D()
                : (DataRenderer) new BarbRendererJ3D();
     }
+     */
+
+    /**
+     * Returns the {@link visad.DataRenderer} associated with this instance.
+     *
+     * @return             The {@link visad.DataRenderer} associated with this
+     *                     instance.
+     */
+    protected DataRenderer getDataRenderer() {
+        BarbRenderer br = (getDisplay().getDisplayRenderer()
+                           instanceof DisplayRendererJ2D)
+                          ? new visad.bom.BarbRendererJ2D()
+                          : new WindBarbRenderer();
+        return (DataRenderer) br;
+    }
+
 }
 
 
