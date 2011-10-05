@@ -354,7 +354,7 @@ public class WindBarbSymbol extends MetSymbol {
 
 
             // special case : calm
-            if (windSpeed < 2.5) {
+            if (windSpeed < 0.5) {
                 int radius = 10;
                 g.drawArc(x0 - radius / 2, y0 - radius / 2, radius, radius,
                           0, 360);

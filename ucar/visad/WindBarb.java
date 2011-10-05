@@ -805,11 +805,11 @@ public class WindBarb {
         int ntStart = nt;
 
         //determine the initial (minimum) length of the flag pole
-        if (wnd_spd >= 2.5) {
+        if (wnd_spd > 0) {
 
             wsp25 = (float) Math.max(wnd_spd + 2.5, 5.0);
             slant = 0.15f * scale;  // amount of slant
-            barb  = 0.5f * scale;   // length of a barb;
+            barb  = (wnd_spd <= 2.5) ? 0: 0.5f * scale;   // length of a barb;
             // WLH 6 Aug 99 - barbs point the other way (duh)
             x0 = -f0 / wnd_spd;
             y0 = -f1 / wnd_spd;
