@@ -290,6 +290,12 @@ proc ug::tag {tag} {
 
 
 
+proc ug::encodeXml {xml} {
+    regsub -all {\<} $xml {\&lt;} xml
+    regsub -all {\>} $xml {\&gt;} xml
+    return "<pre class=\"xml\">$xml</pre>"
+}
+
 
 proc ug::xml {args} {
   set xml [ht::pre [join $args " "]]

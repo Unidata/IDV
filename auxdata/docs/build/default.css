@@ -1,7 +1,7 @@
 
 body {
       background-color: #FFFFFF;
-      margin: 5;
+      margin: 5px;
       font-size: 12pt;
       font-family: SansSerif, Arial, Helvetica, sans-serif}       
 
@@ -21,8 +21,8 @@ body.popup {
 
 .cimg {
     text-align:center;
-    margin-top: 20;
-    margin-bottom: 40;
+    margin-top: 20px;
+    margin-bottom: 40px;
 }
 
 .caption {
@@ -37,10 +37,12 @@ body.popup {
 
 
 .note {
+    font-weight: bold;
     font-style:italic;
     text-decoration:italic;
-    margin-top: 20;
-    margin-bottom: 20;
+    padding:5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     border:1px solid #333;	
 }
 
@@ -84,25 +86,19 @@ A.faq-question-link:hover {
         margin-left:20px;
 }
 
-
-
-
-
-
-
 li {
-       margin-right: 5;
+       margin-right: 5px;
        border: thin;
        border-color: white;
 }
 
 ol li {    
-        margin-top: 20;
+        margin-top: 20px;
         }
 
 ul li {    
-        margin-left:0;
-        margin-top: 8;
+        margin-left:0px;
+        margin-top: 8px;
         }
 
 
@@ -193,29 +189,29 @@ code.link {
     font-size: 18pt;
     font-weight: bold;
     color: #8080C0;
-    margin-top: 15;
-    margin-bottom: 5;
+    margin-top: 15px;
+    margin-bottom: 5px;
 }
 
 .pagesubtitle {
     font-size: 14pt;
     font-weight: bold;
     color: #8080C0;
-    margin-top: 10;
-    margin-bottom: 5;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 .childlist-level {
     font-weigt:bold;
     font-size: 14pt;
     color: #8080C0;
-    margin-top: 10;
-    margin-bottom: 5;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 .childlist {
-    margin: 10;
-    margin-left: 30;
+    margin: 10px;
+    margin-left: 30px;
 }
 
 
@@ -224,68 +220,68 @@ code.link {
     font-size: 12pt;
     font-weight: bold;
     color: #8080C0;
-    margin-top: 5;
-    margin-bottom: 5;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 
 
 p   {
-     margin-top: 10;
-     margin-bottom: 0;
+     margin-top: 10px;
+     margin-bottom: 0px;
 }
 
 p.code {
         font-family: Monospaced;
-	margin-left: 22;
+	margin-left: 22px;
        }
 
 
-p.indent1  {margin-left: 3}
+p.indent1  {margin-left: 3px}
 
-p.indent2  {margin-left: 12}
+p.indent2  {margin-left: 12px}
 
-p.indent3  {margin-left: 32}
+p.indent3  {margin-left: 32px}
 
-p.note {margin-top: -19;
-	margin-left: 22}
+p.note {margin-top: -19px;
+	margin-left: 22px}
 
 p.table {
-     margin-top:0;
-     margin-bottom: 0}
+     margin-top:0px;
+     margin-bottom: 0px}
 
-blockquote.menu {margin-left: 18;
-		margin-top: 10}
+blockquote.menu {margin-left: 18px;
+		margin-top: 10px}
 
-center {margin-top: 10}
+center {margin-top: 10px}
 
 
 
 table {border: none;
        border-color: white;
-       margin-top: 5;
-       margin-bottom: 5}
+       margin-top: 5px;
+       margin-bottom: 5px}
 
 td {
     font-size: 12pt;
     font-family: SansSerif, Arial, Helvetica, sans-serif;
-    padding-left: 1;
-    padding-right: 1;
-    padding-top: 1;
-    padding-bottom: 1} 
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px} 
 
 
-th {padding-left: 1;
-    padding-right: 1;
-    padding-top: 1;
-    padding-bottom: 1}
+th {padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px}
 
 
 small {font-size: x-small}
 
-dl.see_also {margin-left: 0;
-    margin-top: 10;
-    margin-bottom: 10}
+dl.see_also {margin-left: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px}
 
 .xmlcomment {
      background-color: lightgray;
