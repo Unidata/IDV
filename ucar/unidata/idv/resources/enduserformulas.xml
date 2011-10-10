@@ -204,6 +204,28 @@
     </operands>
   </derived>
   <derived
+     description="Ensemble grid probability"
+     formula="ens_prob(fieldimpl,
+                       logicalOp1[isuser=true,type=choice,choices=lt;gt;,label=P(GridVariable lt|gt a)],
+                       pValue1[isuser=true,label=a],
+                       andOr[isuser=true,type=choice,choices=and;or;,label=P1 (and | or) P2],
+                       logicalOp2[isuser=true,type=choice,choices=NotUsed;lt;gt;,label=P(GridVariable lt|gt b) (optional)],
+                       pValue2[isuser=true,label=b (optional)],
+                       exptdLoBound[isuser=true,label=Expected Lower Bound (optional)],
+                       exptdUpBound[isuser=true,label=Expected Upper Bound (optional)])"
+
+     id="Ensemble grid probability"
+     isdefault="false"
+     isenduser="true">
+     <categories>
+      <category
+         display="true"
+         value="Grids-Ensemble"/>
+     </categories>
+     <operands>
+     </operands>
+  </derived>
+  <derived
      description="Find latitude of grid points"
      formula="extractLatitudeFromNWPGrid(fieldimpl)"
      id="latitudeGrid"

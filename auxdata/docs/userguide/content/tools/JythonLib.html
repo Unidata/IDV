@@ -675,6 +675,17 @@ mode value</p>
 <meta name="jhid" value="ens_prcntl">
 <p><a name="ens_prcntl"></a><code class="command">ens_prcntl(grid, percent):</code><p style="padding:0;margin-left:20;margin-top:0">
 percentile value</p>
+<p><a name="ens_prob"></a><code class="command">ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBound, exptdUpBound):</code><p style="padding:0;margin-left:20;margin-top:0">
+Computes the probability value at each point on the grid such that:<br>
+<br>
+P(X logicalOp1 pValue1),<br>
+<br>
+where logicalOp1 is either lt or gt. Optionally, a second condition on the same field
+can be prescribed and combined with the first condition using and / or.<br>
+<br>
+exptdLoBound and exptdUpBound are optionally used to
+provide the expected numerical bounds for the variable on the grid.
+</p>
 <meta name="jhid" value="ens_savg">
 <p><a name="ens_savg"></a><code class="command">ens_savg(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
 basic ensemble average</p>

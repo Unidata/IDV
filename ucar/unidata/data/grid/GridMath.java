@@ -56,6 +56,9 @@ public class GridMath {
     public static final String FUNC_PRCNTL = "ensemblePercentile";
 
     /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_PROB = "ensembleProbability";
+
+    /** function for the applyFunctionOverTime routine */
     public static final String FUNC_SUM = "sum";
 
     /** function for the applyFunctionOverTime routine */
@@ -372,14 +375,14 @@ public class GridMath {
     public static FieldImpl ensemblePercentileValues(FieldImpl grid,
             String percent)
             throws VisADException {
-        return applyFunctionOverMembers(grid, percent, FUNC_PRCNTL);
+        return applyFunctionOverMembers(grid, percent, "0", "0", FUNC_PRCNTL);
     }
 
     /**
      *  ensemble grid min values
      *
      *  @param grid   ensemble grid
-     * @param percent _more_
+     *  @param percent _more_
      *
      *  @return the new field
      *
@@ -388,7 +391,56 @@ public class GridMath {
     public static FieldImpl ensemblePercentileValues(FieldImpl grid,
             int percent)
             throws VisADException {
-        return applyFunctionOverMembers(grid, percent, FUNC_PRCNTL);
+        return applyFunctionOverMembers(grid, percent, 0, 0, FUNC_PRCNTL);
+    }
+    /**
+     *  ensemble grid probability
+     *
+     *  @param grid   ensemble grid
+     *  @param logicalOp gt or lt for P(X > | < pValue)
+     *  @param pValue probability threshold value P(valueAtGridPoint < pValue)
+     *
+     *  @return the new field
+     *
+     *  @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleProbabilityValues(FieldImpl grid,
+            String logicalOp, float pValue, float exptdLoBound, float exptdUpBound)
+            throws VisADException {
+
+        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_PROB);
+        String probName = String.format("Ensemble Probability P(x %s %f)", logicalOp, pValue);;
+        RealType probType = visad.RealType.getRealType(probName, visad.CommonUnit.promiscuous);
+
+        return GridUtil.setParamType(grid, probType, true);
+
+    }
+    /**
+     *  ensemble grid probability
+     *
+     *  @param grid   ensemble grid
+     *  @param logicalOp gt or lt for P(X > | < pValue)
+     *  @param pValue probability threshold value P(valueAtGridPoint < pValue)
+     *
+     *  @return the new field
+     *
+     *  @throws VisADException  On badness
+     */
+    public static FieldImpl ensembleProbabilityValues(FieldImpl grid,
+            String logicalOp, String pValue, String exptdLoBound, String exptdUpBound)
+            throws VisADException {
+
+        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_PROB);
+        String probName = String.format("Ensemble Probability P(x %s %s)", logicalOp, pValue);
+
+        RealTupleType rtt =
+                new RealTupleType(DataUtil.makeRealType(probName,
+                    CommonUnit.dimensionless));
+
+        grid = GridUtil.setParamType(grid, rtt, false /* don't copy */);
+
+
+        return grid;
     }
 
     /**
@@ -402,7 +454,7 @@ public class GridMath {
      */
     public static FieldImpl ensembleModeValues(FieldImpl grid)
             throws VisADException {
-        return applyFunctionOverMembers(grid, 0, FUNC_MODE);
+        return applyFunctionOverMembers(grid, 0, 0, 0, FUNC_MODE);
     }
 
     /**
@@ -1008,7 +1060,7 @@ public class GridMath {
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
-     * @param percent percent the percentage
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_PROB
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1016,10 +1068,30 @@ public class GridMath {
      * @throws VisADException  On badness
      */
     public static FieldImpl applyFunctionOverMembers(FieldImpl grid,
-            String percent, String function)
+            String statThreshold, String exptdLoBoundIn, String exptdUpBoundIn, String function)
             throws VisADException {
+        float defaultExtreme = 999999;
+        String empty = "";
+        float exptdLoBound;
+        if (exptdLoBoundIn.equals(empty)) {
+            exptdLoBound = -defaultExtreme;
+        }
+        else {
+            exptdLoBound = (float) Misc.parseNumber(exptdLoBoundIn);
+        }
+
+        float exptdUpBound;
+        if (exptdUpBoundIn.equals(empty)) {
+            exptdUpBound = defaultExtreme;
+        }
+        else {
+            exptdUpBound = (float) Misc.parseNumber(exptdUpBoundIn);
+        }
+
         return applyFunctionOverMembers(grid,
-                                        (int) Misc.parseNumber(percent),
+                                        (float) Misc.parseNumber(statThreshold),
+                                        exptdLoBound,
+                                        exptdUpBound,
                                         function);
     }
 
@@ -1028,7 +1100,7 @@ public class GridMath {
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
-     * @param percent the percentage
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_PROB
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1036,7 +1108,7 @@ public class GridMath {
      * @throws VisADException  On badness
      */
     public static FieldImpl applyFunctionOverMembers(FieldImpl grid,
-            int percent, String function)
+            float statThreshold, float exptdLoBound, float exptdUpBound, String function)
             throws VisADException {
 
         try {
@@ -1094,13 +1166,13 @@ public class GridMath {
                                 continue;
                             }
                             valuesAll[i][j][k] = value;
-
                         }
                     }
 
                 }
                 // do the math
                 if (function.equals(FUNC_PRCNTL) && (numMembers > 1)) {
+                    int percent = (int) statThreshold;
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
                             values[i][j] =
@@ -1118,13 +1190,46 @@ public class GridMath {
                     }
                 }
 
+                if (function.equals(FUNC_PROB) && (numMembers > 1)) {
+                    for (int i = 0; i < values.length; i++) {
+                        for (int j = 0; j < values[i].length; j++) {
+                            // check if ens values are within bounds.
+                            int numValidMembers = numMembers;
+
+                            float [] tmpValues = new float[numMembers];
+
+                            for (int k = 0; k < numMembers; k++){
+                                 tmpValues[k] = valuesAll[i][j][k];
+                            }
+
+
+                            for (int k = 0; k < numMembers; k++) {
+                                if ((tmpValues[k] < exptdLoBound) | (tmpValues[k] > exptdUpBound)){
+                                    numValidMembers--;
+                                    for (int mm = k; mm < numValidMembers - 1; mm++){
+                                        tmpValues[mm] = tmpValues[mm+1];
+                                    }
+                                    k--;
+                                }
+                            }
+
+                            float [] newValues = new float[numValidMembers];
+                            for (int k = 0; k < numValidMembers; k++){
+                                newValues[k] = tmpValues[k];
+                            }
+                            values[i][j] =
+                                evaluateProbability(newValues, statThreshold,
+                                    numMembers);
+                        }
+                    }
+                }
+
                 FunctionType newFT =
                     new FunctionType(
                         ((SetType) newDomain.getType()).getDomain(),
                         newRangeType);
                 newField = new FlatField(newFT, newDomain);
                 newField.setSamples(values, false);
-
 
                 if (newGrid == null) {
                     FunctionType newFieldType =
@@ -1137,10 +1242,7 @@ public class GridMath {
                 newGrid.setSample(timeStepIdx, newField, false);
 
             }
-
-
             return newGrid;
-
         } catch (CloneNotSupportedException cnse) {
             throw new VisADException("Cannot clone field");
         } catch (RemoteException re) {
@@ -2123,4 +2225,183 @@ public class GridMath {
         return oldmd;
     }
 
+    /**
+     * evaluate probability of "variable with n ensemble values" < pValue
+     *
+     * @param values the values, within the userspecified range, at a given grid point
+     *        from an ensemble model run
+     * @param pValue the threshold used in the probability calculation - P(value < pValue)
+     * @param length  number of ensemble members (might not be the same as values.length)
+     *
+     * @return prob the probability that the value at the grid point is less than pValue
+     *
+     * @throws VisADException   VisAD Error
+     */
+    public static float evaluateProbability(float[] values,
+                                            final float pValue,
+                                            final int length)
+    throws VisADException {
+        // TODO: allow users the chance to set custom weights
+        // TODO: Figure out how to do prob given to prob fields which have dependent variables :-( I think GEMPAK assumes vars are independent
+        double floatDiffTol =  0.000001D; // tolerance for comparing if two floats are the same (used to replace G_DIFF calls from GEMPAK c code)
+        double[] weights = new double[values.length]; // holder for fake weights until ens. weights are passed into function
+        for (int ii = 0; ii < values.length; ii++){
+            weights[ii] = 1.0d / (double)values.length;
+        }
+        /*
+         * Bubble sorting the grid values in emvalu with
+         * emvalue (1) lowest and emvalu (nummbr) highest.
+         */
+
+        int iswflg = 1;
+        int istop = values.length - 1;
+        float swpbuf;
+        double wtbuf;
+        while ( iswflg != 0 && istop > 0 ) {
+            iswflg = 0;
+            for ( int kk = 0; kk < istop; kk++ ) {
+                if ( values[kk] > values[kk+1] ) {
+                    iswflg = 1;
+                    swpbuf = values[kk];
+                    wtbuf = weights[kk];
+                    values[kk] = values[kk+1];
+                    weights[kk] = weights[kk+1];
+                    values[kk+1] = swpbuf;
+                    weights[kk+1] = wtbuf;
+                }
+            }
+            istop--;
+        }
+
+        /*
+         * Check for identical values and compute intrinsic weight
+         * frequency (zfreq).
+         */
+        int mm = values.length;
+        /*
+         * Initialize intrinsic weight frequency array.
+         */
+        double [] zfreq = new double[values.length];
+
+        for (int kk = 0; kk < mm; kk++){
+            zfreq[kk] = 1.0D;
+        }
+        double tol = 0.001D * (values[mm - 1]-values[0]) / mm;
+        for (int kk = 0; kk < mm - 1; kk++) {
+            if ( Math.abs(values[kk] - values[kk+1]) <= tol ) {
+                weights[kk] += weights[kk+1];
+                zfreq[kk] = zfreq[kk] + 1.0D;
+                mm--;
+                for (int jj = kk; jj < mm - 1; jj++) {
+                    values[jj] = values[jj+1];
+                    weights[jj] = weights[jj+1];
+                }
+                kk--;
+            }
+        }
+        /*
+         * Fabricate order statistics if it has collapsed to a single value.
+         */
+        if ( mm == 1 ) {
+            if ( Math.abs(values[0] - 0.0D) < floatDiffTol ) {
+                values[0] = -0.00001F;
+                values[1] = 0.00001F;
+            }
+            else {
+                float delta = 0.00001F * Math.abs(values[0]);
+                values[1] = values[0] + delta;
+                values[0] -= delta;
+            }
+            weights[0] = 0.5D;
+            weights[1] = 0.5D;
+            mm = 2;
+            zfreq[0] = 1.0D;
+            zfreq[1] = 1.0D;
+        }
+        /*
+         *Compute and sum intrinsic weights.
+         */
+        double [] zwts = new double[mm];
+        zwts[0] = zfreq[0] / ( values[1] - values[0] );
+        double zsum = zwts[0];
+        for (int kk=1; kk < mm - 1; kk++){
+            zwts[kk] = ( zfreq[kk] * 2.0F ) / ( values[kk+1] - values[kk-1] );
+            zsum = zsum + zwts[kk];
+        }
+        zwts[mm - 1] = zfreq[mm - 1] / ( values[mm - 1] - values[mm - 2] );
+        zsum = zsum + zwts[mm - 1];
+        /*
+         * Scale external weights by normalized intrinsic weights and
+         * normalize.
+         */
+        double psum = 0.0D;
+        for (int kk=0; kk < mm; kk++ ){
+            weights[kk] = ( zwts[kk] / zsum ) * weights[kk];
+            psum = psum + weights[kk];
+        }
+        for (int kk=0; kk < mm; kk++ ){
+            weights[kk] = weights[kk] / psum;
+        }
+        /*
+         * Compute Qun, the area; Vn, the normalized value;
+         * w(), normalized weight; and qlt, qrt.
+         */
+        double vn = 0.0D;
+        for ( int kk = 1; kk < mm; kk++ ) {
+            vn += 0.5D * (weights[kk] + weights[kk-1]) * (values[kk] - values[kk-1]);
+        }
+        vn = vn / (1.0D - 2.0D / ((double)length + 1));
+        for ( int kk = 0; kk < mm; kk++ ) {
+            weights[kk] = weights[kk] / vn;
+        }
+        double qlt = values[0] - 2.0D / (weights[0] * ((double)length + 1.0D));
+        double qrt = values[mm - 1] + 2.0D / (weights[mm - 1] * ((double)length + 1.0D));
+
+        double [] newWeights = new double[mm + 2];
+        double [] newValues = new double[mm + 2];
+
+        newWeights[0] = 0.0D;
+        newWeights[mm + 1] = 0.0D;
+        newValues[0] = qlt;
+        newValues[mm + 1] = qrt;
+
+        for (int ii=1; ii < mm + 1; ii++) {
+            newWeights[ii] = weights[ii - 1];
+            newValues[ii] = values[ii -1];
+        }
+        /*
+         * Start computing probability output.
+         */
+        float prob = 0.0F; // probability of value at grid point < pValue)
+
+        if ( pValue < newValues[0] ) {
+            prob = 0.0F;
+        }
+        else if ( pValue > newValues[mm + 1] ) {
+            prob = 1.0F;
+        }
+        else{
+            psum = 0.0D;
+            for ( int kk = 1; kk < mm + 2; kk++ ) {
+                if ( Math.abs(pValue - newValues[kk-1]) < floatDiffTol ) {
+                    prob = (float)psum;
+                    break;
+                }
+                else if ( pValue >= newValues[kk] ) {
+                    psum += 0.5D * (newWeights[kk] + newWeights[kk-1]) *
+                           (newValues[kk] - newValues[kk-1]);
+                }
+                else if ( pValue > newValues[kk-1] ) {
+                    double ww = newWeights[kk-1] + (newWeights[kk] - newWeights[kk-1]) *
+                         (pValue - newValues[kk-1]) /
+                         (newValues[kk] - newValues[kk-1]);
+                    double fta = 0.5D * (ww + newWeights[kk-1]) * (pValue - newValues[kk-1]);
+                    prob = (float)psum + (float)fta;
+                    break;
+                }
+            }
+        }
+        return prob;
+    }
 }
+

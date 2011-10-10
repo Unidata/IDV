@@ -161,4 +161,8 @@ The label is used  (if defined) for  the AliasEditor gui.
      name="WIND"
      label="Wind"
      aliases="flowvectors"/>
+  <alias
+     name="PROB"
+     label="Probability"
+     aliases="Ensemble grid probability"/>
 </aliases>
