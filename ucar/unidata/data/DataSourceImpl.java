@@ -82,12 +82,7 @@ import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -2127,7 +2122,13 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (givenDataSelection != null) {
             List<DateTime> timeDriverTimes =
                 givenDataSelection.getTimeDriverTimes();
-            if (timeDriverTimes != null) {
+            Object ud = givenDataSelection.getProperty("Use Display");
+            boolean useTDT = false;
+            if(ud != null){
+                useTDT = ((Boolean)ud).booleanValue();
+            }
+          //  if (useTDT && (timeDriverTimes != null)) {
+            if (timeDriverTimes != null && useTDT == true) {
                 try {
                     System.err.println("time driver times:"
                                        + timeDriverTimes);
@@ -3076,7 +3077,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            dsw = new DataSelectionWidget(getIdv());
+            if(DisplayControl.DOTIMEDRIVER)
+                dsw = new DataSelectionWidget(getIdv(), true, false);
+            else
+                dsw = new DataSelectionWidget(getIdv()); 
             dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
             dsw.setUseAllTimes(getDateTimeSelection() == null);
             JComponent extraTimesComp = getExtraTimesComponent();
