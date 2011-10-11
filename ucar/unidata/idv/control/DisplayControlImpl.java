@@ -934,7 +934,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** default type */
     private String smoothingType = LABEL_NONE;
 
-    private boolean useDriver = true;
+
 
     /**
      * Default constructor. This is called when the control is
@@ -1050,7 +1050,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         setDataChoices(choices);
         Object ud = this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if(ud != null){
-             useDriver = ((Boolean)ud).booleanValue();
+             this.usesTimeDriver = ((Boolean)ud).booleanValue();
         }
 
         if (properties != null) {
@@ -5176,7 +5176,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     "Drive Times with this Display", this, "isTimeDriver",
                     null));
             items.add(GuiUtils.makeCheckboxMenuItem("Uses Time Driver Times",
-                    this, "usesTimeDriver", useDriver, null)); //dataSelection.getUseTDT(), null));
+                    this, "usesTimeDriver", usesTimeDriver, null)); //dataSelection.getUseTDT(), null));
             items.add(GuiUtils.MENU_SEPARATOR);
 
         }
@@ -12151,21 +12151,5 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean getUsesTimeDriver() {
         return this.usesTimeDriver;
     }
-    /**
-     *  Set the UsesTimeDriver property.
-     *
-     *  @param value The new value for UsesTimeDriver
-     */
-    public void setUseDriver(boolean value) {
-        this.useDriver = value;
-    }
 
-    /**
-     *  Get the UsesTimeDriver property.
-     *
-     *  @return The UsesTimeDriver
-     */
-    public boolean getUseDriver() {
-        return this.useDriver;
-    }
 }
