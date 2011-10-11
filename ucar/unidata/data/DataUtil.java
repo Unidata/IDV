@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -29,10 +29,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import ucar.ma2.Array;
 
+import ucar.nc2.units.DateUnit;
+
 import ucar.unidata.util.*;
 
 import ucar.visad.Util;
-import ucar.nc2.units.DateUnit;
 
 import visad.*;
 
@@ -44,10 +45,11 @@ import java.rmi.RemoteException;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -686,7 +688,7 @@ public class DataUtil {
         return isPointInside;
     }
 
-        /**
+    /**
      * _more_
      *
      * @param sourceTimes _more_
@@ -696,11 +698,11 @@ public class DataUtil {
      *
      * @throws Exception _more_
      */
-    public  static List<Date> selectTimesFromList(List sourceTimes,
-            List<DateTime> driverTimes )
+    public static List<Date> selectDatesFromList(List sourceTimes,
+            List<DateTime> driverTimes)
             throws Exception {
         List<Date> results = new ArrayList<Date>();
-        List<Date> dtimes = new ArrayList<Date>();
+        List<Date> dtimes  = new ArrayList<Date>();
         //First convert the source times to a list of Date objects
         List<Date> sourceDates = new ArrayList<Date>();
         for (int i = 0; i < sourceTimes.size(); i++) {
@@ -718,9 +720,11 @@ public class DataUtil {
             }
         }
 
-        for(int i = 0; i< driverTimes.size(); i++){
-                    dtimes.add(DateUnit.getStandardOrISO(driverTimes.get(i).dateString()
-                        + "T" + driverTimes.get(i).timeString()));
+        for (int i = 0; i < driverTimes.size(); i++) {
+            dtimes.add(
+                DateUnit.getStandardOrISO(
+                    driverTimes.get(i).dateString() + "T"
+                    + driverTimes.get(i).timeString()));
         }
         //This keeps track of what times in the source list we have used so far
         HashSet seenTimes = new HashSet();
@@ -728,7 +732,7 @@ public class DataUtil {
         //Now look at each selection time and find the closest source time
         //We need to have logic for when a selection time is outside the range of the source times
         for (Date date : dtimes) {
-           // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
+            // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
             long minTimeDiff = -1;
             Date minDate     = null;
             for (int i = 0; i < sourceDates.size(); i++) {
@@ -747,4 +751,62 @@ public class DataUtil {
         }
         return results;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param sourceTimes _more_
+     * @param selectionTimes _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<DateTime> selectTimesFromList(List sourceTimes,
+            List<DateTime> selectionTimes)
+            throws Exception {
+        List<DateTime> results = new ArrayList<DateTime>();
+        //First convert the source times to a list of Date objects
+        List<Date> sourceDates = new ArrayList<Date>();
+        for (int i = 0; i < sourceTimes.size(); i++) {
+            Object object = sourceTimes.get(i);
+            if (object instanceof DateTime) {
+                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
+            } else if (object instanceof Date) {
+                sourceDates.add((Date) object);
+            } else if (object instanceof TwoFacedObject) {  //relative time
+                return null;
+            } else {
+                System.err.println("Unknown time type: "
+                                   + object.getClass().getName());
+                return null;
+            }
+        }
+        //This keeps track of what times in the source list we have used so far
+        HashSet seenTimes = new HashSet();
+
+        //Now look at each selection time and find the closest source time
+        //We need to have logic for when a selection time is outside the range of the source times
+        for (DateTime dateTime : selectionTimes) {
+            Date dttm        = ucar.visad.Util.makeDate(dateTime);
+            long minTimeDiff = -1;
+            Date minDate     = null;
+            for (int i = 0; i < sourceDates.size(); i++) {
+                Date sourceDate = sourceDates.get(i);
+                long timeDiff = Math.abs(sourceDate.getTime()
+                                         - dttm.getTime());
+                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
+                    minTimeDiff = timeDiff;
+                    minDate     = sourceDate;
+                }
+            }
+            if ((minDate != null) && !seenTimes.contains(minDate)) {
+                results.add(new DateTime(minDate));
+                seenTimes.add(minDate);
+            }
+        }
+        return results;
+    }
+
 }
