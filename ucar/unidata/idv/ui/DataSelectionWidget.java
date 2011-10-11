@@ -377,7 +377,7 @@ public class DataSelectionWidget {
         }
         lastDataSource = dataSource;
         if(dc != null)
-            lastDataChoice.setProperty("Use Display", false);
+            lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER, false);
         if (selectionTab == null) {
             return newDataSource;
         }
@@ -698,7 +698,7 @@ public class DataSelectionWidget {
             dataSelection = new DataSelection(getSelectedDateTimes());
         }
 
-        dataSelection.putProperty("Use Display", selectIdx==2);
+        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, selectIdx==2);
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
             if (strideCbx.isSelected()) {
@@ -1243,7 +1243,7 @@ public class DataSelectionWidget {
                     selectIdx = 2;
                     timesList.setVisible(false);
                     timesList.setEnabled(false);
-                    lastDataChoice.setProperty("Use Display", true);
+                    lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER, true);
                 }
             }
 
