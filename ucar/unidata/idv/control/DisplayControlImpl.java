@@ -1048,7 +1048,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Set the myDataChoices member and add this object as a DataChangeListener
         setDataChoices(choices);
-        Object ud = this.dataSelection.getProperty("Use Display");
+        Object ud = this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if(ud != null){
              useDriver = ((Boolean)ud).booleanValue();
         }
