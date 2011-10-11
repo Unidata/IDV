@@ -451,7 +451,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             // if use time driver
             if (useDriverTime ) {
                 List tests = resetTimesList(realDateTimes, times);
-                if (times.size() != tests.size()) {
+                if (!compareTimeLists(times, tests)) {
                     reloadData();
                     adapters      = getAdapters();
 
@@ -563,6 +563,24 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
     }
 
+
+    private boolean compareTimeLists(List<DateTime> timesA, List<DateTime> timesB){
+        if(timesA.size() != timesB.size())
+            return false;
+
+        Collections.sort(timesA);
+        Collections.sort(timesB);
+        for(int i = 0; i< timesA.size(); i++){
+            DateTime a = timesA.get(i);
+            DateTime b = timesB.get(i);
+
+            double test = Math.abs(a.getValue() -b.getValue()) ;
+            if(test > 65.0)
+                return false;
+            //System.out.println("TTTTTTT =  " + test );
+        }
+        return true;
+    }
 
     /**
      * using the time from the adapter to reset the time list

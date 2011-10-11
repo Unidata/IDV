@@ -217,7 +217,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             List           times         = dateSelection.getTimes();
             List           urls          = new ArrayList();
             StringBuffer   errlog        = new StringBuffer();
-            DisplayControl tddc          = null;
+
 
             TDSRadarDatasetCollection collection =
                 TDSRadarDatasetCollection.factory("test",
@@ -226,55 +226,25 @@ public class CDMRadarDataSource extends RadarDataSource {
             if ((times == null) || (times.size() == 0) || useDriverTime) {
                 List allTimes        = new ArrayList();
                 List collectionTimes = null;
-                if (useDriverTime && (initTimes != null)) {
+                if (useDriverTime) {                                
+                    if((initTimes != null))  {
+                        collectionTimes = initTimes;
 
-                    collectionTimes = initTimes;
-
-                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
-                            timeIdx++) {
-                        Object timeObj = collectionTimes.get(timeIdx);
-                        Date   date;
-                        if (timeObj instanceof Date) {
-                            date = (Date) timeObj;
-                        } else {
-                            date = DateUnit.getStandardOrISO(
-                                timeObj.toString());
+                        for (int timeIdx = 0; timeIdx < collectionTimes.size();
+                                timeIdx++) {
+                            Object timeObj = collectionTimes.get(timeIdx);
+                            Date   date;
+                            if (timeObj instanceof Date) {
+                                date = (Date) timeObj;
+                            } else {
+                                date = DateUnit.getStandardOrISO(
+                                    timeObj.toString());
+                            }
+                            allTimes.add(new DatedObject(date));
                         }
-                        allTimes.add(new DatedObject(date));
+                        times = DatedObject.unwrap(allTimes);
                     }
-                    times = DatedObject.unwrap(allTimes);
-                } else if (useDriverTime) {
-                    Date fromDate = dateSelection.getStartFixedDate();
-                    Date toDate   = dateSelection.getEndFixedDate();
-                    collectionTimes =
-                        collection.getRadarStationTimes(query.getStation(),
-                            query.getProduct(), fromDate, toDate);
-                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
-                            timeIdx++) {
-                        Object timeObj = collectionTimes.get(timeIdx);
-                        Date   date;
-                        if (timeObj instanceof Date) {
-                            date = (Date) timeObj;
-                        } else {
-                            date = DateUnit.getStandardOrISO(
-                                timeObj.toString());
-                        }
-                        allTimes.add(new DatedObject(date));
-                    }
-
-                    times = DatedObject.unwrap(
-                        query.getDateSelection().apply(allTimes));
-                    Collections.sort(times);
-                    initTimes = times;
-                    List selectedIdx = new ArrayList();
-                    Collections.sort(collectionTimes);
-                    if(dateSelection.getTimes() != null){
-                        List selectedTimes =
-                                selectTimesFromList0(collectionTimes, dateSelection.getTimes(), selectedIdx);
-                        times = selectedTimes;
-                      //  setDateTimeSelection(selectedIdx);
-                    }
-                } else {
+                }  else {
                     List timeSpan = collection.getRadarTimeSpan();
                     Date fromDate =
                         DateUnit.getStandardOrISO((String) timeSpan.get(0));
@@ -329,7 +299,8 @@ public class CDMRadarDataSource extends RadarDataSource {
                     //  System.err.println("Selected times:" + times);
                 }
             }
-
+            if(times == null || times.size() == 0)
+                return;
             for (int i = 0; i < times.size(); i++) {
                 Date date = (Date) times.get(i);
                 java.net.URI uri =
@@ -385,71 +356,20 @@ public class CDMRadarDataSource extends RadarDataSource {
                 collection.getRadarStationTimes(query.getStation(),
                     query.getProduct(), fromDate, toDate);
         } catch (Exception e) {}
-        Collections.sort(collectionTimes);
-        initTimes = collectionTimes;
 
-        return collectionTimes;
+        List results = null;
+        try {
+            results = DataUtil.selectDatesFromList(collectionTimes, timeDriverTimes );
+        } catch (Exception e){
 
-    }
-
-    /**
-     * _more_
-     *
-     * @param sourceTimes _more_
-     * @param driverTimes _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public  List<Date> selectTimesFromList0(List sourceTimes,
-            List<Date> driverTimes, List selectedIdx)
-            throws Exception {
-        List<Date> results = new ArrayList<Date>();
-        //First convert the source times to a list of Date objects
-        List<Date> sourceDates = new ArrayList<Date>();
-        for (int i = 0; i < sourceTimes.size(); i++) {
-            Object object = sourceTimes.get(i);
-            if (object instanceof DateTime) {
-                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
-            } else if (object instanceof Date) {
-                sourceDates.add((Date) object);
-            } else if (object instanceof TwoFacedObject) {  //relative time
-                return null;
-            } else {
-                System.err.println("Unknown time type: "
-                                   + object.getClass().getName());
-                return null;
-            }
         }
-        //This keeps track of what times in the source list we have used so far
-        HashSet seenTimes = new HashSet();
+        initTimes = results;
 
-        //Now look at each selection time and find the closest source time
-        //We need to have logic for when a selection time is outside the range of the source times
-        for (Date date : driverTimes) {
-           // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
-            long minTimeDiff = -1;
-            Date minDate     = null;
-            int idn = -1;
-            for (int i = 0; i < sourceDates.size(); i++) {
-                Date sourceDate = sourceDates.get(i);
-                long timeDiff = Math.abs(sourceDate.getTime()
-                                         - date.getTime());
-                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
-                    minTimeDiff = timeDiff;
-                    minDate     = sourceDate;
-                    idn = i;
-                }
-            }
-            if ((minDate != null) && !seenTimes.contains(minDate)) {
-                results.add(minDate);
-                selectedIdx.add(idn);
-                seenTimes.add(minDate);
-            }
-        }
         return results;
+
     }
+
+
     /**
      * Make and insert the <code>DataChoice</code>-s for this
      * <code>DataSource</code>.
