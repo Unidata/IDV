@@ -2122,7 +2122,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (givenDataSelection != null) {
             List<DateTime> timeDriverTimes =
                 givenDataSelection.getTimeDriverTimes();
-            Object ud = givenDataSelection.getProperty("Use Display");
+            Object ud = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
             boolean useTDT = false;
             if(ud != null){
                 useTDT = ((Boolean)ud).booleanValue();

@@ -47,6 +47,9 @@ public class DataSelection {
     /** Flag to use any times set elsewhere */
     public final static String PROP_DATESELECTION = "date_selection";
 
+       /** status template */
+    public static final String PROP_USESTIMEDRIVER =
+        "Use_Display_Driver_Times";
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
