@@ -26,11 +26,14 @@ import org.w3c.dom.Element;
 import ucar.nc2.units.DateUnit;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DataSource;
 
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.ui.IdvTimeline;
 import ucar.unidata.ui.ChooserList;
 import ucar.unidata.ui.ChooserPanel;
@@ -39,26 +42,17 @@ import ucar.unidata.ui.Timeline;
 import ucar.unidata.util.*;
 
 import ucar.visad.Util;
+import ucar.visad.display.Animation;
 
-import visad.CommonUnit;
-import visad.DateTime;
+import visad.*;
 
 import java.awt.*;
 import java.awt.event.*;
 
 import java.beans.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -164,6 +158,9 @@ public class TimesChooser extends IdvChooser {
     /** _more_          */
     JLabel driverLbl = new JLabel("Click to Select Time Matching  ");
 
+    /** _more_ */
+    private boolean readingDrivers = false;
+
     /**
      * Create me.
      *
@@ -173,6 +170,7 @@ public class TimesChooser extends IdvChooser {
      */
     public TimesChooser(IdvChooserManager mgr, Element root) {
         super(mgr, root);
+        setTimeDrivers(new ArrayList());
     }
 
 
@@ -397,7 +395,71 @@ public class TimesChooser extends IdvChooser {
     /**
      * _more_
      */
-    public void readDrivers() {}
+    public void readDrivers() {
+        if (readingDrivers) {
+            return;
+        }
+        readingDrivers = true;
+        List drivers = new ArrayList();
+        //   if (getDoTimeDrivers()) {
+        // ucar.unidata.util.Trace.call1("TDSRadarChooser.readDrivers");
+
+        try {
+            showWaitCursor();
+            setTimeDrivers(new ArrayList());
+            setStatus("Reading drivers ...");
+            drivers = updateTimeDriver();
+            showNormalCursor();
+        } catch (Exception exc) {
+            userMessage("Error reading drivers... ");
+            showNormalCursor();
+            readingDrivers = false;
+            return;
+        }
+
+        // ucar.unidata.util.Trace.call2("TDSRadarChooser.readDrivers");
+        //  }
+        readingDrivers = false;
+        setTimeDrivers(drivers);
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List updateTimeDriver() {
+        //GuiUtils.enableTree(timesPanel, !getTimeDriverEnabled());
+
+        List<ViewManager>    vms = getIdv().getVMManager().getViewManagers();
+        List<TwoFacedObject> driverNames = new ArrayList<TwoFacedObject>();
+
+        for (ViewManager vm : vms) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) vm.getControls()) {
+                if (control.getIsTimeDriver()) {
+                    try {
+                        visad.Set timeSet = control.getTimeSet();
+                        DateTime[] driverTimes =
+                            Animation.getDateTimeArray(timeSet);
+                        List dslist = new ArrayList();
+                        control.getDataChoice().getDataSources(dslist);
+                        DataSource ds    = (DataSource) dslist.get(0);
+                        String     lable = ds.getName();
+                        TwoFacedObject twoObj = new TwoFacedObject(lable,
+                                                    driverTimes);
+                        //   control.getDataChoice().getId());
+                        driverNames.add(twoObj);
+                    } catch (Exception e) {}
+
+                }
+            }
+        }
+        return driverNames;
+
+    }
 
     /**
      * Create the absolute/relative times selector
@@ -467,7 +529,10 @@ public class TimesChooser extends IdvChooser {
      */
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine) {
-        return makeTimesPanel(includeExtra, useTimeLine, false);
+        if(DisplayControl.DOTIMEDRIVER)
+            return makeTimesPanel(includeExtra, useTimeLine, true);
+        else
+            return makeTimesPanel(includeExtra, useTimeLine, false);
     }
 
     /**

@@ -147,8 +147,6 @@ public class TDSRadarChooser extends TimesChooser {
     /** Flag to keep from multiple time reading */
     private boolean readingTimes = false;
 
-    /** _more_ */
-    private boolean readingDrivers = false;
 
     /** Selection label text */
     protected static final String LABEL_SELECT = " -- Select -- ";
@@ -166,8 +164,6 @@ public class TDSRadarChooser extends TimesChooser {
     /** _more_ */
     private JComponent timesPanel;
 
-    /** _more_ */
-    private HashMap controlToDriverTimes;  //new HashMap()
 
 
     /**
@@ -354,47 +350,6 @@ public class TDSRadarChooser extends TimesChooser {
         outerContents = GuiUtils.center(GuiUtils.centerBottom(contents,
                 buttons));
         return outerContents;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-
-    protected List updateTimeDriver() {
-        //GuiUtils.enableTree(timesPanel, !getTimeDriverEnabled());
-
-        List<ViewManager>    vms = getIdv().getVMManager().getViewManagers();
-        List<TwoFacedObject> driverNames = new ArrayList<TwoFacedObject>();
-
-        controlToDriverTimes = new HashMap();
-        for (ViewManager vm : vms) {
-            for (DisplayControl control :
-                    (List<DisplayControl>) vm.getControls()) {
-                if (control.getIsTimeDriver()) {
-                    try {
-                        Set timeSet = control.getTimeSet();
-                        DateTime[] driverTimes =
-                            Animation.getDateTimeArray(timeSet);
-                        List dslist = new ArrayList();
-                        control.getDataChoice().getDataSources(dslist);
-                        DataSource ds    = (DataSource) dslist.get(0);
-                        String     lable = ds.getName();
-                        TwoFacedObject twoObj = new TwoFacedObject(lable,
-                                                    driverTimes);
-                        //   control.getDataChoice().getId());
-                        driverNames.add(twoObj);
-
-                        controlToDriverTimes.put(
-                            control.getDataChoice().getId(), driverTimes);
-                    } catch (Exception e) {}
-
-                }
-            }
-        }
-        return driverNames;
-
     }
 
 
@@ -823,31 +778,6 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void readDrivers() {
 
-        if (readingDrivers) {
-            return;
-        }
-        readingDrivers = true;
-        List drivers = new ArrayList();
-        //   if (getDoTimeDrivers()) {
-        // ucar.unidata.util.Trace.call1("TDSRadarChooser.readDrivers");
-
-        try {
-            showWaitCursor();
-            setTimeDrivers(new ArrayList());
-            setStatus("Reading drivers ...");
-            drivers = updateTimeDriver();
-            showNormalCursor();
-        } catch (Exception exc) {
-            userMessage("Error reading drivers... ");
-            showNormalCursor();
-            readingDrivers = false;
-            return;
-        }
-
-        // ucar.unidata.util.Trace.call2("TDSRadarChooser.readDrivers");
-        //  }
-        readingDrivers = false;
-        setTimeDrivers(drivers);
     }
 
     /**
@@ -876,9 +806,7 @@ public class TDSRadarChooser extends TimesChooser {
 
         DateTime[] driverTimes = (DateTime[]) id.getId();
 
-        //   (DateTime[]) controlToDriverTimes.get(obj);
-        //  DateTime[] driverTimes =
-        //     (DateTime[]) controlToDriverTimes.get(selectedDriver);
+
         List<DateTime> dtimes = new ArrayList<DateTime>();
 
         for (int i = 0; i < driverTimes.length; i++) {
