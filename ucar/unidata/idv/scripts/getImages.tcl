@@ -414,7 +414,7 @@ proc msg {msg} {
 
 set dirRoot /opt/bin/webcams/
 set logRoot /data/logs/
-set imgRoot /content/georesources/webcams/
+set imgRoot /georesources/webcams/
 #set dirRoot ""
 
 
