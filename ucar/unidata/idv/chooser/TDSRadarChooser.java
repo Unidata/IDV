@@ -775,13 +775,6 @@ public class TDSRadarChooser extends TimesChooser {
 
     /**
      * _more_
-     */
-    public void readDrivers() {
-
-    }
-
-    /**
-     * _more_
      *
      * @param id _more_
      */
