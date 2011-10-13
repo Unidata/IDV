@@ -56,7 +56,7 @@ public class GridMath {
     public static final String FUNC_PRCNTL = "ensemblePercentile";
 
     /** function for the applyFunctionOverTime routine */
-    public static final String FUNC_PROB = "ensembleProbability";
+    public static final String FUNC_UPROB = "ensembleUProbability";
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_SUM = "sum";
@@ -394,7 +394,7 @@ public class GridMath {
         return applyFunctionOverMembers(grid, percent, 0, 0, FUNC_PRCNTL);
     }
     /**
-     *  ensemble grid probability
+     *  ensemble grid univariate probability
      *
      *  @param grid   ensemble grid
      *  @param logicalOp gt or lt for P(X > | < pValue)
@@ -404,19 +404,19 @@ public class GridMath {
      *
      *  @throws VisADException  On badness
      */
-    public static FieldImpl ensembleProbabilityValues(FieldImpl grid,
+    public static FieldImpl ensembleUProbabilityValues(FieldImpl grid,
             String logicalOp, float pValue, float exptdLoBound, float exptdUpBound)
             throws VisADException {
 
-        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_PROB);
-        String probName = String.format("Ensemble Probability P(x %s %f)", logicalOp, pValue);;
+        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_UPROB);
+        String probName = String.format("Ensemble Univariate Probability P(x %s %f)", logicalOp, pValue);;
         RealType probType = visad.RealType.getRealType(probName, visad.CommonUnit.promiscuous);
 
         return GridUtil.setParamType(grid, probType, true);
 
     }
     /**
-     *  ensemble grid probability
+     *  ensemble grid univariate probability
      *
      *  @param grid   ensemble grid
      *  @param logicalOp gt or lt for P(X > | < pValue)
@@ -426,12 +426,12 @@ public class GridMath {
      *
      *  @throws VisADException  On badness
      */
-    public static FieldImpl ensembleProbabilityValues(FieldImpl grid,
+    public static FieldImpl ensembleUProbabilityValues(FieldImpl grid,
             String logicalOp, String pValue, String exptdLoBound, String exptdUpBound)
             throws VisADException {
 
-        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_PROB);
-        String probName = String.format("Ensemble Probability P(x %s %s)", logicalOp, pValue);
+        grid = applyFunctionOverMembers(grid, pValue, exptdLoBound, exptdUpBound, FUNC_UPROB);
+        String probName = String.format("Ensemble Univariate Probability P(x %s %s)", logicalOp, pValue);
 
         RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(probName,
@@ -1060,7 +1060,7 @@ public class GridMath {
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
-     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_PROB
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1100,7 +1100,7 @@ public class GridMath {
      * The function is one of the FUNC_ enums
      *
      * @param grid   grid to average
-     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_PROB
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1157,13 +1157,13 @@ public class GridMath {
                         values = Misc.cloneArray(ensStepValues);
                         valuesAll =
                             new float[values.length][values[0].length][numMembers];
-                        continue;
                     }
                     for (int i = 0; i < ensStepValues.length; i++) {
                         for (int j = 0; j < ensStepValues[i].length; j++) {
                             float value = ensStepValues[i][j];
                             if (value != value) {
-                                continue;
+                                continue; // ToDo am I missing something, or is this some Java VooDoo
+                                          //   that has to be done? ~SCA
                             }
                             valuesAll[i][j][k] = value;
                         }
@@ -1190,7 +1190,7 @@ public class GridMath {
                     }
                 }
 
-                if (function.equals(FUNC_PROB) && (numMembers > 1)) {
+                if (function.equals(FUNC_UPROB) && (numMembers > 1)) {
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
                             // check if ens values are within bounds.
@@ -1218,7 +1218,7 @@ public class GridMath {
                                 newValues[k] = tmpValues[k];
                             }
                             values[i][j] =
-                                evaluateProbability(newValues, statThreshold,
+                                evaluateUProbability(newValues, statThreshold,
                                     numMembers);
                         }
                     }
@@ -2226,18 +2226,18 @@ public class GridMath {
     }
 
     /**
-     * evaluate probability of "variable with n ensemble values" < pValue
+     * evaluate univariate probability of "variable with n ensemble values" < pValue
      *
      * @param values the values, within the userspecified range, at a given grid point
      *        from an ensemble model run
      * @param pValue the threshold used in the probability calculation - P(value < pValue)
      * @param length  number of ensemble members (might not be the same as values.length)
      *
-     * @return prob the probability that the value at the grid point is less than pValue
+     * @return prob the univariate probability that the value at the grid point is less than pValue
      *
      * @throws VisADException   VisAD Error
      */
-    public static float evaluateProbability(float[] values,
+    public static float evaluateUProbability(float[] values,
                                             final float pValue,
                                             final int length)
     throws VisADException {
@@ -2370,7 +2370,7 @@ public class GridMath {
             newValues[ii] = values[ii -1];
         }
         /*
-         * Start computing probability output.
+         * Start computing univariate probability output.
          */
         float prob = 0.0F; // probability of value at grid point < pValue)
 

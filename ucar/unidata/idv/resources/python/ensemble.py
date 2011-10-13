@@ -20,8 +20,8 @@ def ens_prcntl(grid, percent):
    """ percentile value """
    return GridMath.ensemblePercentileValues(grid, percent)
 
-def ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBound, exptdUpBound):
-   """ probability value """
+def ens_uprob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBound, exptdUpBound):
+   """ ensemble univariate probability calculation """
    #
    # define a few custom exception types
    #
@@ -34,7 +34,7 @@ def ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBoun
       pass
    #
    # Begin computing probabilities!
-   #  note: GridMath.ensembleProbabilityValues computes P(x < pValue)
+   #  note: GridMath.ensembleUProbabilityValues computes P(x < pValue)
    #
    if ((exptdLoBound != '') and (exptdUpBound != '')):
       if (exptdLoBound >= exptdUpBound):
@@ -44,9 +44,9 @@ def ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBoun
       raise Exception("Must have at least one valid probability statement - user input 'a' cannot be blank.")
 
    if (logicalOp1 == 'lt'):
-      prob1 = GridMath.ensembleProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
+      prob1 = GridMath.ensembleUProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
    elif (logicalOp1 == 'gt'):
-      prob1 = 1.0 - GridMath.ensembleProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
+      prob1 = 1.0 - GridMath.ensembleUProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
 
    if (logicalOp2 == 'NotUsed'):
       prob = prob1
@@ -57,9 +57,9 @@ def ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBoun
          raise FeatureNotImplemented("pValue1 and pValue2 are the same -> P(X = pValue) is not handled in the IDV.")
 
       if (logicalOp2 == 'lt'):
-         prob2 = GridMath.ensembleProbabilityValues(grid, logicalOp2, pValue2, exptdLoBound, exptdUpBound)
+         prob2 = GridMath.ensembleUProbabilityValues(grid, logicalOp2, pValue2, exptdLoBound, exptdUpBound)
       elif (logicalOp2 == 'gt'):
-         prob2 = 1.0 - GridMath.ensembleProbabilityValues(grid, logicalOp2, pValue2, exptdLoBound, exptdUpBound)
+         prob2 = 1.0 - GridMath.ensembleUProbabilityValues(grid, logicalOp2, pValue2, exptdLoBound, exptdUpBound)
       else:
          raise FeatureNotImplemented(exceptMsg[2])
 

@@ -204,8 +204,8 @@
     </operands>
   </derived>
   <derived
-     description="Ensemble grid probability"
-     formula="ens_prob(fieldimpl,
+     description="Ensemble grid univariate probability"
+     formula="ens_uprob(fieldimpl,
                        logicalOp1[isuser=true,type=choice,choices=lt;gt;,label=P(GridVariable lt|gt a)],
                        pValue1[isuser=true,label=a],
                        andOr[isuser=true,type=choice,choices=and;or;,label=P1 (and | or) P2],
@@ -214,7 +214,7 @@
                        exptdLoBound[isuser=true,label=Expected Lower Bound (optional)],
                        exptdUpBound[isuser=true,label=Expected Upper Bound (optional)])"
 
-     id="Ensemble grid probability"
+     id="Ensemble grid univariate probability"
      isdefault="false"
      isenduser="true">
      <categories>
