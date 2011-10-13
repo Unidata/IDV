@@ -33,27 +33,55 @@ def ens_uprob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBou
       # could do more fancy stuff, but just needed to define a new Exception Type
       pass
    #
-   # Begin computing probabilities!
-   #  note: GridMath.ensembleUProbabilityValues computes P(x < pValue)
+   # Begin basic error checking on user input
    #
-   if ((exptdLoBound != '') and (exptdUpBound != '')):
-      if (exptdLoBound >= exptdUpBound):
-         raise ValueError("The expected lower bound muss be less than the expected upper bound.")
-
    if pValue1 == '':
       raise Exception("Must have at least one valid probability statement - user input 'a' cannot be blank.")
 
+   if ((exptdLoBound != '') or (exptdUpBound != '')):
+      if ((exptdLoBound != '') and (exptdUpBound != '')):
+         if (exptdLoBound >= exptdUpBound):
+            raise ValueError("The expected lower bound muss be less than the expected upper bound.")
+         elif ((pValue1 > exptdUpBound) or (pValue1 < exptdLoBound)):
+            raise LogicError("a=%s is outside of the expected bounds %s<-<%s."%(str(pValue1),
+                                                                             str(exptdLoBound),
+                                                                             str(exptdUpBound)))
+         elif pValue2 != '':
+           if ((pValue2 > exptdUpBound) or (pValue2 < exptdLoBound)):
+               raise LogicError("b=%s is outside of the expected bounds %s<-<%s."%(str(pValue1),
+                                                                                   str(exptdLoBound),
+                                                                                   str(exptdUpBound)))
+      elif(exptdLoBound != ''):
+         if (pValue1 < exptdLoBound):
+            raise LogicError("a=%s is outside of the expected lower bound %s < a."%(str(pValue1),
+                                                                             str(exptdLoBound)))
+         elif (pValue2 != ''):
+            if (pValue2 < exptdLoBound):
+               raise LogicError("b=%s is outside of the expected lower bound %s < a."%(str(pValue2),
+                                                                             str(exptdLoBound)))
+      elif(exptdUpBound != ''):
+         if (pValue1 > exptdUpBound):
+            raise LogicError("a=%s is outside of the expected upper bound a < %s."%(str(pValue1),
+                                                                             str(exptdUpBound)))
+         elif (pValue2 != ''):
+            if (pValue1 < exptdLoBound):
+               raise LogicError("b=%s is outside of the expected upper bound a < %s."%(str(pValue2),
+                                                                             str(exptdUpBound)))
+   #
+   # End basic error checking on user input
+   #
+   # Begin computing probabilities!
+   #  note: GridMath.ensembleUProbabilityValues computes P(x < pValue)
+   #
    if (logicalOp1 == 'lt'):
       prob1 = GridMath.ensembleUProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
    elif (logicalOp1 == 'gt'):
       prob1 = 1.0 - GridMath.ensembleUProbabilityValues(grid, logicalOp1, pValue1, exptdLoBound, exptdUpBound)
 
-   if (logicalOp2 == 'NotUsed'):
+   if (pValue2 == ''):
       prob = prob1
    else:
-      if pValue2 == '':
-         raise Exception("Must have a valid 2nd probability statement - user input 'b' cannot be blank.")
-      elif (pValue1 == pValue2):
+      if (pValue1 == pValue2):
          raise FeatureNotImplemented("pValue1 and pValue2 are the same -> P(X = pValue) is not handled in the IDV.")
 
       if (logicalOp2 == 'lt'):

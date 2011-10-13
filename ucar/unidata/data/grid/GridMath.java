@@ -1162,8 +1162,7 @@ public class GridMath {
                         for (int j = 0; j < ensStepValues[i].length; j++) {
                             float value = ensStepValues[i][j];
                             if (value != value) {
-                                continue; // ToDo am I missing something, or is this some Java VooDoo
-                                          //   that has to be done? ~SCA
+                                continue;
                             }
                             valuesAll[i][j][k] = value;
                         }
@@ -2228,6 +2227,8 @@ public class GridMath {
     /**
      * evaluate univariate probability of "variable with n ensemble values" < pValue
      *
+     * code from $NAWIPS/gempak/source/diaglib/de/decprb.c used to make this function.
+     *
      * @param values the values, within the userspecified range, at a given grid point
      *        from an ensemble model run
      * @param pValue the threshold used in the probability calculation - P(value < pValue)
@@ -2242,7 +2243,6 @@ public class GridMath {
                                             final int length)
     throws VisADException {
         // TODO: allow users the chance to set custom weights
-        // TODO: Figure out how to do prob given to prob fields which have dependent variables :-( I think GEMPAK assumes vars are independent
         double floatDiffTol =  0.000001D; // tolerance for comparing if two floats are the same (used to replace G_DIFF calls from GEMPAK c code)
         double[] weights = new double[values.length]; // holder for fake weights until ens. weights are passed into function
         for (int ii = 0; ii < values.length; ii++){
