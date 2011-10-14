@@ -448,7 +448,7 @@ for {set i 0} {$i < [llength $argv]} {incr i} {
     }
 }
 
-set ::imageRoot http://www.unidata.ucar.edu$imagePath
+set ::imageRoot http://www.unidata.ucar.edu/georesources/webcams/images
 
 set cnt 0
 while {1} {
