@@ -448,28 +448,32 @@ public class ChartHolder {
             @Override
 			public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    displayPopupMenu(e.getX(), e.getY());
+                    showPopupMenu(e);
                 } 
                 else { //Usual Behavior
                 	super.mouseReleased(e);
                 }
 			}
-            
+
+            @Override            
 			public void mouseClicked(MouseEvent event) {
                 if (SwingUtilities.isRightMouseButton(event)) {
                     return;
                 }
                 super.mouseClicked(event);
             }
+			
+            @Override
             public void mousePressed(MouseEvent event) {
                 requestFocus();
                 if (SwingUtilities.isRightMouseButton(event)) {
-                    showPopupMenu(event);
+                	//Do nothing, for now.
                 } else {
                     super.mousePressed(event);
                 }
             }
 
+            @Override
             public void paintComponent(Graphics g) {
                 synchronized (chartManager.getMutex()) {
                     if (chartManager.getOkToDraw()
@@ -479,7 +483,7 @@ public class ChartHolder {
                 }
             }
 
-
+            @Override
             public void chartChanged(ChartChangeEvent event) {
                 synchronized (chartManager.getMutex()) {
                     if ( !chartManager.getSettingData()) {
