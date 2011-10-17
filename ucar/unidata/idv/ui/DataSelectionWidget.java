@@ -129,6 +129,7 @@ public class DataSelectionWidget {
     /** The chekcbox for selecting "All times" */
     private JCheckBox allTimesButton;
 
+    /** _more_          */
     private JComboBox timeOptionLabelBox;
 
     /** List of all the possible dttms */
@@ -186,9 +187,15 @@ public class DataSelectionWidget {
     /** list of data selection components */
     private List<DataSelectionComponent> dataSelectionComponents;
 
+    /** _more_          */
     int selectIdx = 999;
 
+    /** _more_          */
     private boolean doUseDisplay = true;
+
+    /** _more_          */
+    private boolean chooserDoTimeMatching = false;
+
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
      *
@@ -211,18 +218,21 @@ public class DataSelectionWidget {
         getContents();
     }
 
-        /**
+    /**
      * Constructor  for when we are a part of the {@link DataSelector}
      *
      * @param idv Reference to the IDV
      * @param doSettings include the display settings in the tab
+     * @param doUseDisplay _more_
      */
-    public DataSelectionWidget(IntegratedDataViewer idv, boolean doSettings, boolean doUseDisplay) {
-        this.doSettings = doSettings;
-        this.idv        = idv;
+    public DataSelectionWidget(IntegratedDataViewer idv, boolean doSettings,
+                               boolean doUseDisplay) {
+        this.doSettings   = doSettings;
+        this.idv          = idv;
         this.doUseDisplay = doUseDisplay;
         getContents();
     }
+
     /**
      * get the gui contents
      *
@@ -376,8 +386,15 @@ public class DataSelectionWidget {
             newDataSource = true;
         }
         lastDataSource = dataSource;
-        if(dc != null)
-            lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER, false);
+        if (dc != null) {
+            lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                       false);
+            Object cu = dataSource.getProperty(
+                            DataSelection.PROP_CHOOSERTIMEMATCHING);
+            if (cu != null) {
+                chooserDoTimeMatching = ((Boolean) cu).booleanValue();
+            }
+        }
         if (selectionTab == null) {
             return newDataSource;
         }
@@ -698,7 +715,13 @@ public class DataSelectionWidget {
             dataSelection = new DataSelection(getSelectedDateTimes());
         }
 
-        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, selectIdx==2);
+        if (chooserDoTimeMatching) {
+            dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                      true);
+        } else {
+            dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                      selectIdx == 2);
+        }
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
             if (strideCbx.isSelected()) {
@@ -890,12 +913,12 @@ public class DataSelectionWidget {
      *  @return List of indices.
      */
     public List getSelectedDateTimes() {
-        if(DisplayControl.DOTIMEDRIVER) {
+        if (DisplayControl.DOTIMEDRIVER) {
             if (timeOptionLabelBox == null) {
                 return null;
             }
         } else {
-            if (allTimesButton == null ) {
+            if (allTimesButton == null) {
                 return null;
             }
         }
@@ -955,7 +978,7 @@ public class DataSelectionWidget {
         } else {
             return false;
             }*/
-        if(DisplayControl.DOTIMEDRIVER) {
+        if (DisplayControl.DOTIMEDRIVER) {
             if (timeOptionLabelBox == null) {
                 return true;
             }
@@ -982,17 +1005,18 @@ public class DataSelectionWidget {
             selected = getSelectedDateTimesInList();
         }
 
-        if(DisplayControl.DOTIMEDRIVER) {
+        if (DisplayControl.DOTIMEDRIVER) {
             setTimes(timesList, timeOptionLabelBox, all, selected);
             if (all != null) {
                 allDateTimes = new ArrayList(all);
             }
             int idx = timeOptionLabelBox.getSelectedIndex();
 
-            if(idx == 1)
+            if (idx == 1) {
                 timesList.setEnabled(true);
-            else
+            } else {
                 timesList.setEnabled(false);
+            }
 
         } else {
             setTimes(timesList, allTimesButton, all, selected);
@@ -1014,21 +1038,20 @@ public class DataSelectionWidget {
      * @param useAllTimes  true to use all times
      */
     public void setUseAllTimes(boolean useAllTimes) {
-        if(DisplayControl.DOTIMEDRIVER)
+        if (DisplayControl.DOTIMEDRIVER) {
             if (timeOptionLabelBox != null) {
-                if(useAllTimes){
+                if (useAllTimes) {
                     timeOptionLabelBox.setSelectedIndex(0);
-                    timesList.setEnabled( false);
+                    timesList.setEnabled(false);
                 } else {
                     timeOptionLabelBox.setSelectedIndex(1);
-                    timesList.setEnabled( true);
+                    timesList.setEnabled(true);
                 }
-            }
-        else
-            if (allTimesButton != null) {
+            } else if (allTimesButton != null) {
                 allTimesButton.setSelected(useAllTimes);
                 timesList.setEnabled( !allTimesButton.isSelected());
             }
+        }
     }
 
 
@@ -1058,12 +1081,13 @@ public class DataSelectionWidget {
      */
     public JComponent getTimesList(String cbxLabel) {
         if (timesListInfo == null) {
-            timesListInfo  = makeTimesListAndPanel(cbxLabel, null);
-            timesList      = (JList) timesListInfo[0];
-            if(DisplayControl.DOTIMEDRIVER)
-                timeOptionLabelBox  = (JComboBox) timesListInfo[1];
-            else
+            timesListInfo = makeTimesListAndPanel(cbxLabel, null);
+            timesList     = (JList) timesListInfo[0];
+            if (DisplayControl.DOTIMEDRIVER) {
+                timeOptionLabelBox = (JComboBox) timesListInfo[1];
+            } else {
                 allTimesButton = (JCheckBox) timesListInfo[1];
+            }
         }
         return timesListInfo[2];
     }
@@ -1146,8 +1170,9 @@ public class DataSelectionWidget {
      * @param all All the times
      * @param selected The selected times
      */
-    private static void setTimes(JList timesList, JComboBox timeOptionLabelBox,
-                                 List all, List selected) {
+    private static void setTimes(JList timesList,
+                                 JComboBox timeOptionLabelBox, List all,
+                                 List selected) {
 
         selected = DataSourceImpl.getDateTimes(selected, all);
 
@@ -1196,7 +1221,7 @@ public class DataSelectionWidget {
         //Don't automatically toggle the checkbox
         //OLD
         int idx = timeOptionLabelBox.getSelectedIndex();
-        timesList.setEnabled( idx==0);
+        timesList.setEnabled(idx == 0);
         //        allTimesButton.setSelected(allSelected);
     }
 
@@ -1213,7 +1238,7 @@ public class DataSelectionWidget {
     private JComponent[] makeTimesListAndPanel(String cbxLabel,
             JComponent extra) {
         final JComboBox timeOptionLabelBox = new JComboBox();
-        final JList     timesList      = new JList();
+        final JList     timesList          = new JList();
         timesList.setBorder(null);
         //        timeline = new Timeline();
         TimesChooser.addTimeSelectionListener(timesList, timeline);
@@ -1239,11 +1264,15 @@ public class DataSelectionWidget {
                     selectIdx = 1;
                     timesList.setVisible(true);
                     timesList.setEnabled(true);
+                    chooserDoTimeMatching = false;
                 } else {
                     selectIdx = 2;
                     timesList.setVisible(false);
                     timesList.setEnabled(false);
-                    lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                    if (lastDataChoice != null) {
+                        lastDataChoice.setProperty(
+                            DataSelection.PROP_USESTIMEDRIVER, true);
+                    }
                 }
             }
 
@@ -1255,14 +1284,15 @@ public class DataSelectionWidget {
         List<String> driverNames = new ArrayList<String>();
         driverNames.add("Use Default");
         driverNames.add("Use Selected");
-        if(DisplayControl.DOTIMEDRIVER && doUseDisplay)
+        if (DisplayControl.DOTIMEDRIVER && doUseDisplay) {
             driverNames.add("TimeDriverTimes");
+        }
         GuiUtils.setListData(timeOptionLabelBox, driverNames);
         //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
         //                                            allTimesButton);
         JComponent top;
 
-        if(DisplayControl.DOTIMEDRIVER) {
+        if (DisplayControl.DOTIMEDRIVER) {
             if (extra != null) {
                 top = GuiUtils.leftRight(extra, timeOptionLabelBox);
             } else {
@@ -1280,12 +1310,13 @@ public class DataSelectionWidget {
         //        JComponent top      = GuiUtils.left(new JLabel("Times"));
         JComponent scroller = GuiUtils.makeScrollPane(timesList, 300, 100);
         //      scroller.setBorder(BorderFactory.createMatteBorder(1,2,0,0,Color.gray));
-        if(DisplayControl.DOTIMEDRIVER)
+        if (DisplayControl.DOTIMEDRIVER) {
             return new JComponent[] { timesList, timeOptionLabelBox,
-                                  GuiUtils.topCenter(top, scroller) };
-        else
+                                      GuiUtils.topCenter(top, scroller) };
+        } else {
             return new JComponent[] { timesList, allTimesButton,
-                                  GuiUtils.topCenter(top, scroller) };
+                                      GuiUtils.topCenter(top, scroller) };
+        }
     }
 
 
