@@ -38,6 +38,7 @@ import ucar.nc2.units.DateUnit;
 
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DataSelection;
 
 import ucar.unidata.data.radar.RadarQuery;
 import ucar.unidata.geoloc.StationImpl;
@@ -858,7 +859,7 @@ public class TDSRadarChooser extends TimesChooser {
         if (selectedStation != null) {
             ht.put(ucar.unidata.data.radar.RadarDataSource.STATION_LOCATION,
                    selectedStation.getNamedLocation());
-            ht.put("useDriver", getDoTimeDrivers());
+            ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING, getDoTimeDrivers());
          /*   if (selectedDriver != null) {
                 ht.put("TimeDriver", selectedDriver);
             }    */
