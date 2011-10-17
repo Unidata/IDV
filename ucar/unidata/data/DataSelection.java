@@ -50,6 +50,10 @@ public class DataSelection {
        /** status template */
     public static final String PROP_USESTIMEDRIVER =
         "Use_Display_Driver_Times";
+
+    public static final String PROP_CHOOSERTIMEMATCHING =
+        "Chooser_Do_Time_Matching";
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
