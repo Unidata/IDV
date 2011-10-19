@@ -31,6 +31,9 @@ import ucar.unidata.data.imagery.AddeImageInfo;
 import ucar.unidata.data.imagery.BandInfo;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.imagery.ImageDataset;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.radar.RadarQuery;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.chooser.IdvChooser;
@@ -61,6 +64,7 @@ import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
+import ucar.nc2.units.DateUnit;
 
 
 import visad.*;
@@ -3378,6 +3382,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         // make properties Hashtable to hand the station name
         // to the AddeImageDataSource
         Hashtable ht = new Hashtable();
+        ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING, getDoTimeDrivers());
         getDataSourceProperties(ht);
         Object bandName = getSelectedBandName();
         if ((bandName != null) && !(bandName.equals(ALLBANDS.toString()))) {

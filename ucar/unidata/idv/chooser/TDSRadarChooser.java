@@ -779,7 +779,7 @@ public class TDSRadarChooser extends TimesChooser {
      *
      * @param id _more_
      */
-    public void updatetimeline(TwoFacedObject id) {
+    public void updatetimelineOld(TwoFacedObject id) {
         super.updatetimeline(id);
         String collectionUrl =
             TwoFacedObject.getIdString(collectionSelector.getSelectedItem());

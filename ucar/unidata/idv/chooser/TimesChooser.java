@@ -834,7 +834,60 @@ public class TimesChooser extends IdvChooser {
     public void updatetimeline(TwoFacedObject id) {
         doTimeDrivers  = true;
         selectedDriver = id;
+
+        DateTime[] driverTimes = (DateTime[]) id.getId();
+        List<DateTime> dtimes = new ArrayList<DateTime>();
+
+        for (int i = 0; i < driverTimes.length; i++) {
+            dtimes.add(driverTimes[i]);
+        }
+        Collections.sort(dtimes);
+        int n = driverTimes.length;
+
+
+        List absTimes = null;
+        List allTimes = new ArrayList();
+        List selectedTimes   = null;
+
+        try {
+            absTimes = makeDatedObjects(getAbsoluteTimes());
+
+            for(Object od : absTimes){
+                Date de = ((DatedObject)od).getDate();
+                 allTimes.add(new DateTime(de));
+            }
+            selectedTimes = DataUtil.selectTimesFromList(allTimes,
+                    dtimes);
+
+            List newAbsoluteTimes = makeDatedObjects(selectedTimes);
+
+            int size = newAbsoluteTimes.size();
+            Date endDate, startDate;
+            if(size >= 1) {
+                endDate =
+                        ((DatedThing) newAbsoluteTimes.get(size-1)).getDate();
+                int index = Math.max(0, size
+                                     - getNumTimesToSelect());
+                startDate =
+                    ((DatedThing) newAbsoluteTimes.get(index)).getDate();
+                getTimeLine().setDateSelection(new Date[]{startDate, endDate});
+
+            }
+            int[] indices  = new int[selectedTimes.size()];
+            for (int i = 0; i < selectedTimes.size(); i++) {
+                if(newAbsoluteTimes.get(i) instanceof DatedThing && allTimes.get(i) instanceof DatedThing ){
+                    System.out.println("dd");
+                }
+                indices[i] = allTimes.indexOf(selectedTimes.get(i));
+            }
+            setSelectedAbsoluteTimes(indices);
+            setDoTimeDrivers(true);
+            absoluteTimesSelectionChanged();
+
+        } catch (Exception e) {}
+
     }
+
 
     /**
      * _more_
