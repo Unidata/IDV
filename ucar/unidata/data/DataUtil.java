@@ -775,6 +775,8 @@ public class DataUtil {
                 sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
             } else if (object instanceof Date) {
                 sourceDates.add((Date) object);
+            }else if (object instanceof DatedObject) {
+                sourceDates.add(((DatedObject) object).getDate());
             } else if (object instanceof TwoFacedObject) {  //relative time
                 return null;
             } else {
