@@ -21,13 +21,22 @@ When you are ready to make a release, run:
 cd /share/idv/build
 ./buildIdv release
 
-Note that this script has a dependency on install4j which requires a license.
-The user running this script must have a valid license key associated with
-install4j. 
+Note that this script has a dependency on install4j license server.
+The user running this script must point to the right license server.
+As of October 2011, the license server is running on sherman (not zero).
+License server configuration information can be found in ~/.install4j4/config.xml.
+Therein you will find the license server host. More information on the
+install4j license server (including where to download the server) can 
+be found here: 
 
-That will run the build, generate the installers, move all relevant files 
-(installers, docs, webstart) to conan.  The following directories will be
-created:
+https://www.unidata.ucar.edu/unidata_only/admin/idv_software_license_info.html
+
+To start the server on Sherman the startup script is /etc/init.d/ejtserver 
+and the install at /opt/ejtserver.
+
+The above buildIdv command  will run the build, generate the installers, move all 
+relevant files (installers, docs, webstart) to conan.  The following directories 
+will be created:
 
 /content/software/idv/<release_dir>
 /content/downloads/idv/<release_dir>
@@ -235,7 +244,7 @@ multi-platform license which means that only one copy can run at
 a time, but on any machine you want.  Website for install4j is
 http://www.ej-technologies.com/products/install4j/overview.html.
 The Unidata Admin staff has the license information.  The license server
-runs on zero.
+runs on sherman as of October 2011.
 
 The configuration file is in svn:
 /ucar/unidata/idv/release/installer/idv.install4j.  This file is used
@@ -263,7 +272,7 @@ The only platform that is problematic is Windows because when you install
 the JRE, it makes it the default on your system.  So, you have to install
 it on your system, not to a temporary directory.  You also have to install a
 copy of install4j on your system to run the bundle generator.  You can copy the
-c:/Program Files/Java/jre6 (or whereever the JRE was installed) over to
+c:/Program Files/Java/jre6 (or where ever the JRE was installed) over to
 /share/idv/windows, unzip the Java 3D on it and then pack it up using the
 Windows version of install4j.
 
