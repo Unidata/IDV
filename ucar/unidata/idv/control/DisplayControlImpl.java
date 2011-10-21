@@ -3507,6 +3507,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         List<DateTime> times = vm.getTimeDriverTimes();
         //        System.err.println("\tdriver times to use:" + times);
+        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                      true);
         dataSelection.setTheTimeDriverTimes(times);
         return dataSelection;
     }
