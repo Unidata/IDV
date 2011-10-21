@@ -169,6 +169,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -5170,17 +5171,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(GuiUtils.MENU_SEPARATOR);
         }
 
-        if (DOTIMEDRIVER) {
-            items.add(
-                GuiUtils.makeCheckboxMenuItem(
-                    "Drive Times with this Display", this, "isTimeDriver",
-                    null));
-            items.add(GuiUtils.makeCheckboxMenuItem("Uses Time Driver Times",
-                    this, "usesTimeDriver", usesTimeDriver, null)); //dataSelection.getUseTDT(), null));
-            items.add(GuiUtils.MENU_SEPARATOR);
-
-        }
-
         items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Display Settings...",
                 this,
                 "showDisplaySettingsDialog"), "/auxdata/ui/icons/Settings16.png"));
@@ -6184,8 +6174,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         if (haveDataTimes()) {
-            items.add(GuiUtils.makeCheckboxMenuItem("Use Times In Animation",
-                    this, "useTimesInAnimation", null));
+            JCheckBoxMenuItem jcmi = 
+                GuiUtils.makeCheckboxMenuItem("Use Times In Animation",
+                    this, "useTimesInAnimation", null);
+            if (DOTIMEDRIVER) {
+                JMenu jm = new JMenu("Times");
+                jm.add(jcmi);
+                jm.add(
+                    GuiUtils.makeCheckboxMenuItem(
+                        "Drive Times with this Display", this, "isTimeDriver",
+                        null));
+                jm.add(GuiUtils.makeCheckboxMenuItem("Uses Time Driver Times",
+                        this, "usesTimeDriver", usesTimeDriver, null));
+                items.add(jm);
+            } else {
+                items.add(jcmi);
+            }
         }
 
         if (getDisplayInfos().size() > 0) {
