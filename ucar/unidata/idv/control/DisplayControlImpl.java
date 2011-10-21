@@ -3498,6 +3498,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (getIsTimeDriver() || !getUsesTimeDriver()) {
             if ( !getUsesTimeDriver()) {
                 dataSelection.setTheTimeDriverTimes(null);
+                dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                      getUsesTimeDriver());
             }
             return dataSelection;
         }
