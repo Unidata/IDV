@@ -1285,7 +1285,7 @@ public class DataSelectionWidget {
         driverNames.add("Use Default");
         driverNames.add("Use Selected");
         if (DisplayControl.DOTIMEDRIVER && doUseDisplay) {
-            driverNames.add("TimeDriverTimes");
+            driverNames.add("Use Time Driver");
         }
         GuiUtils.setListData(timeOptionLabelBox, driverNames);
         //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
