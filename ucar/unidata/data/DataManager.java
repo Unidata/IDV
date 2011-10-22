@@ -43,6 +43,7 @@ import org.w3c.dom.NodeList;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
+import ucar.unidata.idv.StateManager;
 import ucar.unidata.util.AccountManager;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
@@ -359,8 +360,11 @@ public class DataManager {
             }
             AccountManager provider = accountManager;
             HTTPSession.setGlobalCredentialsProvider(provider);
-            HTTPSession.setGlobalUserAgent("IDV xxxx" ); //TODO!!!!
-                        
+            // Get the current version
+            String version =  dataContext.getIdv().getStateManager().getVersion();
+            if(version == null) version = "xxx";
+            HTTPSession.setGlobalUserAgent("IDV "+version);
+
 //            try {
 //                HttpWrap client = new HttpWrap();
 //                client.setGlobalCredentialsProvider(provider);
