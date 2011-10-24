@@ -403,10 +403,12 @@ public class DataSelectionWidget {
         if (dc != null) {
             lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
                                        false);
-            Object cu = dataSource.getProperty(
-                            DataSelection.PROP_CHOOSERTIMEMATCHING);
-            if (cu != null) {
-                chooserDoTimeMatching = ((Boolean) cu).booleanValue();
+            if(dataSource != null) {
+                Object cu = dataSource.getProperty(
+                                DataSelection.PROP_CHOOSERTIMEMATCHING);
+                if (cu != null) {
+                    chooserDoTimeMatching = ((Boolean) cu).booleanValue();
+                }
             }
         }
         if (selectionTab == null) {
