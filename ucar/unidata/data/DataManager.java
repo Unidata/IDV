@@ -364,6 +364,9 @@ public class DataManager {
             String version =  dataContext.getIdv().getStateManager().getVersion();
             if(version == null) version = "xxx";
             HTTPSession.setGlobalUserAgent("IDV "+version);
+            // Force long timeouts
+            HTTPSession.setGlobalSoTimeout(5*60*1000);
+            HTTPSession.setGlobalConnectionTimeout(5*60*1000);
 
 //            try {
 //                HttpWrap client = new HttpWrap();
