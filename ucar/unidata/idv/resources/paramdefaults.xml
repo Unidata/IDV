@@ -404,7 +404,7 @@ specified  -->
      unit="K/(100km)/(3h)"/>
   <param
      name="PROB"
-     table="VisAD"
+     table="Probability"
      range_min="0"
      range_max="1"
      ci_interval="0.25"

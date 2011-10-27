@@ -93,7 +93,6 @@ AAAAAAAAAAA=</parray>
             </property>
         </object>
     </method>
-
     <method name="add">
         <object class="ucar.unidata.util.ColorTable">
             <property name="Name">
@@ -132,8 +131,6 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
             </property>
         </object>
     </method>
-
-
     <method name="add">
 <object class="ucar.unidata.util.ColorTable">
     <property name="Name">
@@ -183,10 +180,6 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
 
 
     </method>
-
-
-
-
     <method name="add">
         <object class="ucar.unidata.util.ColorTable">
             <property name="Name">
@@ -873,10 +866,7 @@ wME/QMDBP0DAwT9AwME/QMDBP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
             </property>
         </object>
     </method>
-
-
-
-<method name="add">
+    <method name="add">
 <object class="ucar.unidata.util.ColorTable">
     <property name="Name">
         <string><![CDATA[Radar Precip (Transparent)]]></string>
@@ -925,9 +915,6 @@ wME/QMDBP0DAwT9AwME/QMDBP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
     </property>
 </object>
 </method>
-
-
-
     <method name="add">
         <object class="ucar.unidata.util.ColorTable">
             <property name="Name">
@@ -2485,6 +2472,59 @@ AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
                 </array>
             </property>
         </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Probability]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAADzAwME9UNDRPZiYmT4MjI0+MLCxPlTU1T54+Pk+jIyNPp7lhD6wjT4+wjT3PtPcsT7lhGo+9ywjPwRp7j8NPcs/FhGoPx7lhD8nuWE/MI0+PzlhGj9CNPc/SwjUP1PcsT9csI0/ZYRqP25YRz93LCM/gAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD1Q0NE90NDRPhycnT6MjI0+sLCxPtTU1T729vc/DY2OPx7lhD8wjT4/QjT3P1PcsT9lhGo/dywjP3csJD9lhGo/U9ywP0I0+D8wjT4/HuWEPw09zD73LCQ+09ywPrCNPD6NPcw+U9ywPg09yD2NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD95+fo/cvLzP2zs7T9c3N0/U9PUP0rKyz9BwcI/Obm6PzCNPj8nuWE/HuWEPxYRqD8NPcs/BGnuPvcsJD7lhGo+09ywPsI0+D6wjT4+nuWEPo09zD53LCQ+U9ywPjCNPD4NPcw909ywPY09yD0NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD7+/v8/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+                </array>
+            </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <field name="min">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </field>
+                    <field name="max">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </field>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>1.0</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.06</double>
+                            </property>
+                        </object>
+                    </method>
+                </object>
+            </property>
+            <property name="ScaleFactor">
+                <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+            </property>
+        </object>
+
     </method>
 </object>
 
