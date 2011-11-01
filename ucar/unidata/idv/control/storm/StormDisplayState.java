@@ -648,7 +648,8 @@ public class StormDisplayState {
      */
     protected boolean okToShowWay(Way way) {
         if (wayCnt == -1) {
-
+            if(trackCollection == null)
+                return true;
             List<StormTrack> tracks = trackCollection.getTracks();
             Hashtable        ways   = new Hashtable();
             wayCnt = 0;
@@ -2690,6 +2691,14 @@ public class StormDisplayState {
      * _more_
      */
     public boolean isColorRangeChanged(){
+         return  colorRangeChanged;
+    }
+
+    public void setColorRangeChanged(boolean value){
+         colorRangeChanged = value;
+    }
+
+    public boolean getColorRangeChanged(){
          return  colorRangeChanged;
     }
 }
