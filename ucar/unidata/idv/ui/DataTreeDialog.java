@@ -32,9 +32,7 @@ import ucar.unidata.data.DerivedDataChoice;
 
 
 import ucar.unidata.idv.*;
-
-
-
+import ucar.unidata.idv.control.DisplayControlImpl;
 
 
 import ucar.unidata.util.GuiUtils;
@@ -44,8 +42,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import visad.VisADException;
-
-
+import visad.DateTime;
 
 
 import java.awt.*;
@@ -56,6 +53,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.rmi.RemoteException;
 
 import javax.swing.*;
 import javax.swing.BoxLayout;
@@ -410,6 +408,18 @@ public class DataTreeDialog implements ActionListener {
             DataTree dataTree = (DataTree) dataTrees.get(i);
             List selectedFromTree = DataChoice.cloneDataChoices(
                                         dataTree.getSelectedDataChoices());
+
+            if(DisplayControl.DOTIMEDRIVER && dsw.selectIdx == 2) {
+                ViewManager vm = idv.getViewManager();
+                dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                try{
+                    List<DateTime> times = vm.getTimeDriverTimes();
+                    dataSelection.setTheTimeDriverTimes(times);
+                } catch ( Exception e){
+
+                }
+            }
+
             for (int dataChoiceIdx = 0;
                     dataChoiceIdx < selectedFromTree.size();
                     dataChoiceIdx++) {
