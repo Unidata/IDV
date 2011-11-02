@@ -23,18 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.data.DataCancelException;
-import ucar.unidata.data.DataChangeListener;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.DataOperand;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSelectionComponent;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DataTimeRange;
-import ucar.unidata.data.GeoSelection;
-import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ControlContext;
@@ -1100,6 +1089,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
 
+        if(myDataChoices.size() > 0 && myDataChoices.get(0) instanceof DerivedDataChoice){
+            List cdcs = ((DerivedDataChoice)myDataChoices.get(0)).getChoices();
+            if(cdcs.size() > 0)  {
+                DataChoice dc = (DataChoice)cdcs.get(0);
+                DataSelection ds = dc.getDataSelection();
+                if(ds != null){
+                    List dtimes = ds.getTimeDriverTimes();
+                    Object ud1 = ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if(dtimes != null && dtimes.size() > 0 && ud1 != null){
+                        this.usesTimeDriver = ((Boolean)ud1).booleanValue();
+                    }
+                }
+            }
+        }
 
 
         //Check if we have been removed
