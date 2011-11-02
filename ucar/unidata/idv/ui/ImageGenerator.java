@@ -4579,8 +4579,13 @@ public class ImageGenerator extends IdvManager {
                             } else {
                                 y = baseY - height;
                             }
-                            x = baseX
-                                + (int) (range.getPercent(value) * width);
+
+                            if(range != null)
+                                x = baseX
+                                    + (int) (range.getPercent(value) * width);
+                            else
+                                x = baseX;
+
                             if (x > baseX + width) {
                                 break;
                             }
