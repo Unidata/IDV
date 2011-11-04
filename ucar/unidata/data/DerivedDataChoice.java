@@ -549,6 +549,13 @@ public class DerivedDataChoice extends ListDataChoice {
             List selected = dataContext.selectDataChoices(unboundOperands);
             if (selected == null) {
                 return null;
+            } else {  //yuanho added time
+                DataChoice dc0 = (DataChoice)selected.get(0);
+                DataSelection ds0 = dc0.getDataSelection();
+                Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                if(ud != null && ((Boolean)ud).booleanValue()){
+                    dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                }
             }
             for (int i = 0; i < unboundOperands.size(); i++) {
                 DataOperand op = (DataOperand) unboundOperands.get(i);
