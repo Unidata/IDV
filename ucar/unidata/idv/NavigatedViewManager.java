@@ -2,97 +2,88 @@
  * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv;
 
-
+//~--- non-JDK imports --------------------------------------------------------
 
 import ucar.unidata.collab.Sharable;
-
-import ucar.unidata.geoloc.*;
-
-import ucar.unidata.idv.ui.*;
-import ucar.unidata.ui.Command;
-
-import ucar.unidata.ui.CommandManager;
-import ucar.unidata.ui.XmlUi;
-
-
+import ucar.unidata.idv.ui.CursorReadoutWindow;
+import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.util.BooleanProperty;
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.view.geoloc.*;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.view.geoloc.NavigatedDisplayCursorReadout;
+import ucar.unidata.view.geoloc.NavigatedDisplayToolBar;
+import ucar.unidata.view.geoloc.VertScaleDialog;
+import ucar.unidata.view.geoloc.VertScaleInfo;
+import ucar.unidata.view.geoloc.ViewpointControl;
 
+import ucar.visad.display.DisplayMaster;
 
-import ucar.unidata.xml.XmlUtil;
+import visad.ControlEvent;
+import visad.CoordinateSystem;
+import visad.DisplayEvent;
+import visad.MouseHelper;
+import visad.Unit;
+import visad.VisADException;
 
+//~--- JDK imports ------------------------------------------------------------
 
-
-
-
-import ucar.visad.GeoUtils;
-import ucar.visad.display.*;
-
-import visad.*;
-
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
-
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 
 import java.rmi.RemoteException;
 
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
-
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author IDV development team
  */
-
 public abstract class NavigatedViewManager extends ViewManager {
 
-    /** Vertical range property */
-    public static final String PROP_VERTICALRANGE =
-        "idv.viewmanager.verticalrange";
+    /** Action command to  pan down */
+    public static final String CMD_NAV_DOWN = "cmd.nav.down";
 
-    /** How far do we zoom on a zoom in or out */
-    public static final double ZOOM_FACTOR =
-        NavigatedDisplayToolBar.ZOOM_FACTOR;
+    /** Action command to  reset zoom and pan */
+    public static final String CMD_NAV_HOME = "cmd.nav.home";
 
-    /** How far do we zoom on a zoom in or out */
-    public static final double TRANSLATE_FACTOR =
-        NavigatedDisplayToolBar.TRANSLATE_FACTOR;
+    /** Action command to  pan left */
+    public static final String CMD_NAV_LEFT = "cmd.nav.left";
 
-    /** Action command to  zoom in */
-    public static final String CMD_NAV_ZOOMIN = "cmd.nav.zoomin";
+    /** Action command to  pan right */
+    public static final String CMD_NAV_RIGHT = "cmd.nav.right";
 
     /** Action command to  rotate */
     public static final String CMD_NAV_ROTATELEFT = "cmd.nav.rotateleft";
@@ -100,69 +91,71 @@ public abstract class NavigatedViewManager extends ViewManager {
     /** Action command to  rotate */
     public static final String CMD_NAV_ROTATERIGHT = "cmd.nav.rotateright";
 
-    /** Action command to zoom out */
-    public static final String CMD_NAV_ZOOMOUT = "cmd.nav.zoomout";
-
-    /** Action command to  reset zoom and pan */
-    public static final String CMD_NAV_HOME = "cmd.nav.home";
-
-    /** Action command to  pan right */
-    public static final String CMD_NAV_RIGHT = "cmd.nav.right";
-
-    /** Action command to  pan left */
-    public static final String CMD_NAV_LEFT = "cmd.nav.left";
-
-    /** Action command to  pan up */
-    public static final String CMD_NAV_UP = "cmd.nav.up";
-
     /** Action command to  pan down */
-    public static final String CMD_NAV_DOWN = "cmd.nav.down";
-
-    /** Action command to  zoom in */
-    public static final String CMD_NAV_SMALLZOOMIN = "cmd.nav.small.zoomin";
-
-    /** Action command to  rotate */
-    public static final String CMD_NAV_SMALLROTATELEFT =
-        "cmd.nav.small.rotateleft";
-
-    /** Action command to  rotate */
-    public static final String CMD_NAV_SMALLROTATERIGHT =
-        "cmd.nav.small.rotateright";
-
-    /** Action command to  tilt */
-    public static final String CMD_NAV_SMALLTILTUP = "cmd.nav.small.tiltup";
-
-    /** Action command to  tilt */
-    public static final String CMD_NAV_SMALLTILTDOWN =
-        "cmd.nav.small.tiltdown";
-
-    /** Action command to zoom out */
-    public static final String CMD_NAV_SMALLZOOMOUT = "cmd.nav.small.zoomout";
-
-
-    /** Action command to  pan right */
-    public static final String CMD_NAV_SMALLRIGHT = "cmd.nav.small.right";
+    public static final String CMD_NAV_SMALLDOWN = "cmd.nav.small.down";
 
     /** Action command to  pan left */
     public static final String CMD_NAV_SMALLLEFT = "cmd.nav.small.left";
 
+    /** Action command to  pan right */
+    public static final String CMD_NAV_SMALLRIGHT = "cmd.nav.small.right";
+
+    /** Action command to  rotate */
+    public static final String CMD_NAV_SMALLROTATELEFT = "cmd.nav.small.rotateleft";
+
+    /** Action command to  rotate */
+    public static final String CMD_NAV_SMALLROTATERIGHT = "cmd.nav.small.rotateright";
+
+    /** Action command to  tilt */
+    public static final String CMD_NAV_SMALLTILTDOWN = "cmd.nav.small.tiltdown";
+
+    /** Action command to  tilt */
+    public static final String CMD_NAV_SMALLTILTUP = "cmd.nav.small.tiltup";
+
     /** Action command to  pan up */
     public static final String CMD_NAV_SMALLUP = "cmd.nav.small.up";
 
-    /** Action command to  pan down */
-    public static final String CMD_NAV_SMALLDOWN = "cmd.nav.small.down";
+    /** Action command to  zoom in */
+    public static final String CMD_NAV_SMALLZOOMIN = "cmd.nav.small.zoomin";
 
+    /** Action command to zoom out */
+    public static final String CMD_NAV_SMALLZOOMOUT = "cmd.nav.small.zoomout";
+
+    /** Action command to  pan up */
+    public static final String CMD_NAV_UP = "cmd.nav.up";
+
+    /** Action command to  zoom in */
+    public static final String CMD_NAV_ZOOMIN = "cmd.nav.zoomin";
+
+    /** Action command to zoom out */
+    public static final String CMD_NAV_ZOOMOUT = "cmd.nav.zoomout";
+
+    /** Vertical range property */
+    public static final String PROP_VERTICALRANGE = "idv.viewmanager.verticalrange";
 
     /** Defines the viewpoint matrix when sharing state */
     public static final String SHARE_MATRIX = "MapViewManager.SHARE_MATRIX";
 
+    /** How far do we zoom on a zoom in or out */
+    public static final double ZOOM_FACTOR = NavigatedDisplayToolBar.ZOOM_FACTOR;
 
-
-    /** User to control the viewpoint */
-    private ViewpointControl viewpointControl;
+    /** How far do we zoom on a zoom in or out */
+    public static final double TRANSLATE_FACTOR = NavigatedDisplayToolBar.TRANSLATE_FACTOR;
 
     /** Keep this around to know when to share viewpoint state */
     private double[] lastSharedMatrix = null;
+
+    /** time of the mouse moved */
+    private long mouseMovedTime = -1;
+
+    /** time of the mouse pressed */
+    private long mousePressedTime = -1;
+
+    /** The tmpVertRangeUnit? */
+    private Unit tmpVertRangeUnit = null;
+
+    /** cursor readout window */
+    protected CursorReadoutWindow cursorReadoutWindow;
 
     /** last vertical range */
     private double[] lastVerticalRange;
@@ -170,34 +163,30 @@ public abstract class NavigatedViewManager extends ViewManager {
     /** last vertical unit */
     private Unit lastVerticalRangeUnit;
 
+    /** start point */
+    private Point mouseStartPoint;
+
+    /** Used to show the cursor readout */
+    private NavigatedDisplayCursorReadout readout;
+
+    /** start matrix */
+    private double[] startMoveMatrix;
 
     /**
      *  For unpersistence
      */
     private double[] tmpVerticalRange;
 
-    /** The tmpVertRangeUnit? */
-    private Unit tmpVertRangeUnit = null;
-
-
-
-    /** Used to show the cursor readout */
-    private NavigatedDisplayCursorReadout readout;
-
-    /** cursor readout window */
-    protected CursorReadoutWindow cursorReadoutWindow;
-
     /** vert scale widget */
     private VertScaleDialog vertScaleWidget;
+
+    /** User to control the viewpoint */
+    private ViewpointControl viewpointControl;
 
     /**
      *  Default constructor
      */
     public NavigatedViewManager() {}
-
-
-
-
 
     /**
      * Construct a <code>NavigatedViewManager</code> from an IDV
@@ -217,41 +206,33 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @throws RemoteException
      * @throws VisADException
      */
-    public NavigatedViewManager(ViewContext viewContext, ViewDescriptor desc,
-                                String properties)
+    public NavigatedViewManager(ViewContext viewContext, ViewDescriptor desc, String properties)
             throws VisADException, RemoteException {
         super(viewContext, desc, properties);
     }
-
 
     /**
      * Initialize the default vertical range
      */
     private void initVerticalRange() {
-        String typeName = getTypeName().toLowerCase();
+        String typeName         = getTypeName().toLowerCase();
+        String verticalRangeStr = getIdv().getProperty("idv.viewmanager." + typeName + ".verticalrange", (String) null);
 
-        String verticalRangeStr = getIdv().getProperty("idv.viewmanager."
-                                      + typeName
-                                      + ".verticalrange", (String) null);
         if (verticalRangeStr != null) {
             List toks = StringUtil.split(verticalRangeStr, ",", true, true);
+
             if (toks.size() >= 2) {
-                tmpVerticalRange = new double[] {
-                    new Double(toks.get(0).toString()).doubleValue(),
-                    new Double(toks.get(1).toString()).doubleValue() };
+                tmpVerticalRange = new double[] { new Double(toks.get(0).toString()).doubleValue(),
+                                                  new Double(toks.get(1).toString()).doubleValue() };
+
                 if (toks.size() == 3) {
                     try {
-                        tmpVertRangeUnit =
-                            ucar.visad.Util.parseUnit(toks.get(2).toString());
+                        tmpVertRangeUnit = ucar.visad.Util.parseUnit(toks.get(2).toString());
                     } catch (Exception exc) {}
                 }
-
             }
         }
-
     }
-
-
 
     /**
      * Get the NavigatedDisplay associated with this ViewManager
@@ -269,24 +250,23 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void setDisplayMaster(DisplayMaster master) {
         super.setDisplayMaster(master);
+
         try {
             NavigatedDisplay navDisplay = (NavigatedDisplay) master;
+
             if (tmpVertRangeUnit != null) {
                 navDisplay.setVerticalRangeUnit(tmpVertRangeUnit);
             }
 
             if (tmpVerticalRange != null) {
-                navDisplay.setVerticalRange(tmpVerticalRange[0],
-                                            tmpVerticalRange[1]);
+                navDisplay.setVerticalRange(tmpVerticalRange[0], tmpVerticalRange[1]);
             }
+
             navDisplay.setCursorStringOn(false);
         } catch (Exception e) {
             logException("setDisplayMaster", e);
         }
-
     }
-
-
 
     /**
      * Initialize this object.
@@ -298,41 +278,37 @@ public abstract class NavigatedViewManager extends ViewManager {
         if (getHaveInitialized()) {
             return;
         }
+
         super.init();
-
-
         initVerticalRange();
-
 
         if (isInteractive()) {
             if (readout == null) {
-                readout =
-                    new NavigatedDisplayCursorReadout(getNavigatedDisplay(),
-                        null) {
+                readout = new NavigatedDisplayCursorReadout(getNavigatedDisplay(), null) {
                     protected JLabel getValueDisplay() {
                         JLabel label = super.getValueDisplay();
+
                         if (label == null) {
-                            IdvWindow window =
-                                IdvWindow.findWindow(fullContents);
+                            IdvWindow window = IdvWindow.findWindow(fullContents);
+
                             if (window != null) {
                                 label = ((IdvWindow) window).getMsgLabel();
                                 setValueDisplay(label);
                             }
                         }
+
                         return label;
                     }
                 };
             }
+
             readout.setActive(getShowCursor());
 
-
-
             IdvWindow myWindow = IdvWindow.findWindow(fullContents);
+
             initReadout(myWindow);
         }
-
     }
-
 
     /**
      * Initialize this object's state with the state from that.
@@ -343,26 +319,29 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    protected void initWithInner(ViewManager that, boolean ignoreWindow)
-            throws VisADException, RemoteException {
-        if ( !(that instanceof NavigatedViewManager)) {
+    protected void initWithInner(ViewManager that, boolean ignoreWindow) throws VisADException, RemoteException {
+        if (!(that instanceof NavigatedViewManager)) {
             return;
         }
+
         super.initWithInner(that, ignoreWindow);
+
         NavigatedViewManager nvm = (NavigatedViewManager) that;
 
         if (this != that) {
             Unit verticalRangeUnit = nvm.getVerticalRangeUnit();
+
             if (verticalRangeUnit != null) {
                 setVerticalRangeUnit(verticalRangeUnit);
             }
+
             double[] verticalRange = nvm.getVerticalRange();
+
             if (verticalRange != null) {
                 setVerticalRange(verticalRange);
             }
         }
     }
-
 
     /**
      * Initialize the Readout
@@ -371,12 +350,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     private void initReadout(IdvWindow w) {
         if ((w != null) && (readout != null)) {
-            //GuiUtils.setFixedWidthFont(w.getMsgLabel());
+
+            // GuiUtils.setFixedWidthFont(w.getMsgLabel());
             readout.setValueDisplay(w.getMsgLabel());
             setReadoutFormat();
         }
     }
-
 
     /**
      * Apply properties.  Override super class to set class specific props.
@@ -384,12 +363,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return true if successful
      */
     public boolean applyProperties() {
-        if ( !super.applyProperties()) {
+        if (!super.applyProperties()) {
             return false;
         }
+
         return vertScaleWidget.doApply();
     }
-
 
     /**
      * Add components to the properties dialog
@@ -402,35 +381,31 @@ public abstract class NavigatedViewManager extends ViewManager {
         tabbedPane.add("Coordinate Scale", GuiUtils.topLeft(vertScaleWidget));
     }
 
-
     /**
      * Initialize the toolbars for the GUI
      */
     protected void initToolBars() {
-        addToolBar(doMakeZoomPanToolBar(JToolBar.VERTICAL), "zoompan",
-                   "Zoom/Pan toolbar");
+        addToolBar(doMakeZoomPanToolBar(JToolBar.VERTICAL), "zoompan", "Zoom/Pan toolbar");
 
         JComponent backButton    = getCommandManager().getBackButton();
         JComponent forwardButton = getCommandManager().getForwardButton();
+
         backButton.setToolTipText(
             "<html>Undo the viewpoint/projection change<br>Shift-click to go 10 steps back</html>");
         forwardButton.setToolTipText(
             "<html>Redo the viewpoint/projection change<br>Shift-click to go 10 steps forward</html>");
 
         JToolBar undoToolbar = new JToolBar(JToolBar.VERTICAL);
+
         undoToolbar.setFloatable(getToolbarsFloatable());
         undoToolbar.add(backButton);
         undoToolbar.add(forwardButton);
+        addToolBar(GuiUtils.top(undoToolbar), "undoredo", "Undo/Redo toolbar");
 
-        addToolBar(GuiUtils.top(undoToolbar), "undoredo",
-                   "Undo/Redo toolbar");
-
-        //        JPanel undoPanel = GuiUtils.inset(GuiUtils.vbox(backButton,
-        //                               forwardButton), new Insets(10, 0, 0, 0));
-        //        addToolBar(undoPanel, "undoredo", "Undo/Redo toolbar");
-
+        // JPanel undoPanel = GuiUtils.inset(GuiUtils.vbox(backButton,
+        // forwardButton), new Insets(10, 0, 0, 0));
+        // addToolBar(undoPanel, "undoredo", "Undo/Redo toolbar");
     }
-
 
     /**
      * Has a viewpoint control
@@ -448,29 +423,30 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected ViewpointControl getViewpointControl() {
         if (viewpointControl == null) {
-            ViewpointControl tmp =
-                new ViewpointControl(getNavigatedDisplay()) {
+            ViewpointControl tmp = new ViewpointControl(getNavigatedDisplay()) {
                 public void changePerspectiveView(boolean v) {
                     if (viewpointControl == null) {
                         return;
                     }
+
                     super.changePerspectiveView(v);
                     perspectiveViewChanged(v);
                 }
-
-                protected void applyVerticalScale(VertScaleInfo transfer)
-                        throws Exception {
+                protected void applyVerticalScale(VertScaleInfo transfer) throws Exception {
                     if (viewpointControl == null) {
                         return;
                     }
+
                     super.applyVerticalScale(transfer);
                     verticalScaleChanged();
                 }
             };
-            //            System.err.println("making viewpoint control " +getPerspectiveView());
+
+            // System.err.println("making viewpoint control " +getPerspectiveView());
             tmp.setPerspectiveView(getPerspectiveView());
             viewpointControl = tmp;
         }
+
         return viewpointControl;
     }
 
@@ -489,16 +465,16 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void verticalScaleChanged() {}
 
-
-
     /**
      * Cleanup when destroying this object.
      */
     public void destroy() {
         viewpointControl = null;
+
         if (readout != null) {
             readout.destroy();
         }
+
         readout = null;
         super.destroy();
     }
@@ -510,14 +486,15 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @param dataId What is it
      * @param data Here it is
      */
-    public void receiveShareData(Sharable from, Object dataId,
-                                 Object[] data) {
-        if ( !getInitDone()) {
+    public void receiveShareData(Sharable from, Object dataId, Object[] data) {
+        if (!getInitDone()) {
             return;
         }
-        if ((from != null) && !from.getClass().equals(getClass())) {
+
+        if ((from != null) &&!from.getClass().equals(getClass())) {
             return;
         }
+
         if (dataId.equals(SHARE_MATRIX)) {
             try {
                 lastSharedMatrix = (double[]) data[0];
@@ -526,14 +503,12 @@ public abstract class NavigatedViewManager extends ViewManager {
             } catch (Exception e) {
                 logException("setDisplayMatrix", e);
             }
+
             return;
         }
+
         super.receiveShareData(from, dataId, data);
     }
-
-
-
-
 
     /**
      * Respond to <code>ControlEvent</code>s.
@@ -542,33 +517,20 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void handleControlChanged(ControlEvent e) {
         checkHistoryMatrix();
+
         NavigatedDisplay navDisplay = getNavigatedDisplay();
+
         if ((lastVerticalRangeUnit != null) && (lastVerticalRange != null)) {
-            if ( !(Misc.equals(
-                    lastVerticalRangeUnit,
-                    navDisplay.getVerticalRangeUnit()) && Arrays.equals(
-                        lastVerticalRange, navDisplay.getVerticalRange()))) {
+            if (!(Misc.equals(lastVerticalRangeUnit, navDisplay.getVerticalRangeUnit())
+                    && Arrays.equals(lastVerticalRange, navDisplay.getVerticalRange()))) {
                 verticalRangeChanged();
             }
         }
+
         lastVerticalRangeUnit = navDisplay.getVerticalRangeUnit();
         lastVerticalRange     = navDisplay.getVerticalRange();
         super.handleControlChanged(e);
     }
-
-
-    /** time of the mouse moved */
-    private long mouseMovedTime = -1;
-
-    /** time of the mouse pressed */
-    private long mousePressedTime = -1;
-
-    /** start matrix */
-    private double[] startMoveMatrix;
-
-    /** start point */
-    private Point mouseStartPoint;
-
 
     /**
      *  An implementation of the the DisplayListener interface.
@@ -582,36 +544,38 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @throws RemoteException
      * @throws VisADException
      */
-    public void displayChanged(DisplayEvent de)
-            throws VisADException, RemoteException {
+    public void displayChanged(DisplayEvent de) throws VisADException, RemoteException {
         if (getIsDestroyed()) {
             return;
         }
+
         int        eventId    = de.getId();
         InputEvent inputEvent = de.getInputEvent();
-        if ((inputEvent instanceof MouseEvent)
-                && (eventId == DisplayEvent.MOUSE_PRESSED)) {
+
+        if ((inputEvent instanceof MouseEvent) && (eventId == DisplayEvent.MOUSE_PRESSED)) {
             mousePressedTime = System.currentTimeMillis();
             getViewpointControl().setAutoRotate(false);
             startMoveMatrix = getProjectionControl().getMatrix();
+
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
+
             mouseStartPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
-            if ((mouseEvent.getClickCount() > 1)
-                    && mouseEvent.isShiftDown()) {
+
+            if ((mouseEvent.getClickCount() > 1) && mouseEvent.isShiftDown()) {
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
-                double[] box = navDisplay.getSpatialCoordinatesFromScreen(
-                                   mouseEvent.getX(), mouseEvent.getY());
+                double[]         box        = navDisplay.getSpatialCoordinatesFromScreen(mouseEvent.getX(),
+                                                  mouseEvent.getY());
 
                 navDisplay.center(navDisplay.getEarthLocation(box));
             }
         }
 
-
-        if ((eventId == DisplayEvent.MOUSE_PRESSED)
-                || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
+        if ((eventId == DisplayEvent.MOUSE_PRESSED) || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
             mouseMovedTime = System.currentTimeMillis();
+
             MouseEvent mouseEvent  = (MouseEvent) inputEvent;
             int[][][]  functionMap = getMaster().getMouseFunctionMap();
+
             if (functionMap != null) {
                 int ctrlIdx  = (GuiUtils.isControlKey(mouseEvent)
                                 ? 1
@@ -619,57 +583,56 @@ public abstract class NavigatedViewManager extends ViewManager {
                 int shiftIdx = (mouseEvent.isShiftDown()
                                 ? 1
                                 : 0);
-                int mouseIdx =
-                    ((SwingUtilities.isLeftMouseButton(mouseEvent)
-                      && !SwingUtilities.isRightMouseButton(mouseEvent))
-                     ? 0
-                     : (SwingUtilities.isMiddleMouseButton(mouseEvent)
-                        ? 1
-                        : ((SwingUtilities.isRightMouseButton(mouseEvent)
-                            && !SwingUtilities.isLeftMouseButton(mouseEvent))
-                           ? 2
-                           : 1)));
+                int mouseIdx = ((SwingUtilities.isLeftMouseButton(mouseEvent)
+                                 &&!SwingUtilities.isRightMouseButton(mouseEvent))
+                                ? 0
+                                : (SwingUtilities.isMiddleMouseButton(mouseEvent)
+                                   ? 1
+                                   : ((SwingUtilities.isRightMouseButton(mouseEvent)
+                                       &&!SwingUtilities.isLeftMouseButton(mouseEvent))
+                                      ? 2
+                                      : 1)));
                 int function = functionMap[mouseIdx][ctrlIdx][shiftIdx];
+
                 if (function == MouseHelper.CURSOR_TRANSLATE) {
                     if (cursorReadoutWindow == null) {
                         cursorReadoutWindow = new CursorReadoutWindow(this);
                     }
-                    cursorReadoutWindow.handleMousePressedOrDragged(
-                        mouseEvent);
+
+                    cursorReadoutWindow.handleMousePressedOrDragged(mouseEvent);
                 }
             }
         } else if (eventId == DisplayEvent.MOUSE_RELEASED) {
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
+
             if (cursorReadoutWindow != null) {
                 cursorReadoutWindow.handleMouseReleased(mouseEvent);
                 cursorReadoutWindow = null;
             }
+
             Point mouseStart = mouseStartPoint;
+
             if (mouseStart != null) {
-                Point toPoint = new Point(mouseEvent.getX(),
-                                          mouseEvent.getY());
-                double distance = GuiUtils.distance(mouseStart.x,
-                                      mouseStart.y, toPoint.x, toPoint.y);
-                long deltaTime = System.currentTimeMillis() - mouseMovedTime;
+                Point  toPoint   = new Point(mouseEvent.getX(), mouseEvent.getY());
+                double distance  = GuiUtils.distance(mouseStart.x, mouseStart.y, toPoint.x, toPoint.y);
+                long   deltaTime = System.currentTimeMillis() - mouseMovedTime;
+
                 if (System.currentTimeMillis() - mousePressedTime > 0) {
-                    double speed = distance
-                                   / (System.currentTimeMillis()
-                                      - mousePressedTime);
-                    if ((distance > 50) && (deltaTime < 200)
-                            && (speed > 0.5)) {
-                        double[] endMatrix =
-                            getProjectionControl().getMatrix();
-                        mouseFlicked(mouseStart, toPoint, startMoveMatrix,
-                                     endMatrix, speed);
+                    double speed = distance / (System.currentTimeMillis() - mousePressedTime);
+
+                    if ((distance > 50) && (deltaTime < 200) && (speed > 0.5)) {
+                        double[] endMatrix = getProjectionControl().getMatrix();
+
+                        mouseFlicked(mouseStart, toPoint, startMoveMatrix, endMatrix, speed);
                     }
                 }
             }
+
             mouseMovedTime = -1;
         }
+
         super.displayChanged(de);
     }
-
-
 
     /**
      * Handle a mouse flicked
@@ -680,47 +643,42 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @param endMatrix    the end matrix
      * @param speed        how fast to move
      */
-    protected void mouseFlicked(Point startPoint, Point endPoint,
-                                double[] startMatrix, double[] endMatrix,
+    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double[] endMatrix,
                                 double speed) {}
-
 
     /**
      * Handle an animation time change
      */
     protected void animationTimeChanged() {
         super.animationTimeChanged();
+
         if (cursorReadoutWindow != null) {
             cursorReadoutWindow.updateReadout();
         }
     }
-
 
     /**
      * Handle the change to the matrix
      */
     protected void matrixChanged() {}
 
-
     /**
      * Handle a change to the vertical range
      */
     protected void verticalRangeChanged() {}
-
 
     /**
      * Set the format for the curso readout
      */
     protected void setReadoutFormat() {
         if (readout != null) {
-            String format =
-                (String) getStore().get(IdvConstants.PREF_LATLON_FORMAT);
+            String format = (String) getStore().get(IdvConstants.PREF_LATLON_FORMAT);
+
             if (format != null) {
                 readout.setFormatPattern(format);
             }
         }
     }
-
 
     /**
      * Apply preferences
@@ -729,9 +687,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         super.applyPreferences();
         setReadoutFormat();
     }
-
-
-
 
     /**
      * The BooleanProperty identified byt he given id has changed.
@@ -742,8 +697,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      *
      * @throws Exception problem handeling the change
      */
-    protected void handleBooleanPropertyChange(String id, boolean value)
-            throws Exception {
+    protected void handleBooleanPropertyChange(String id, boolean value) throws Exception {
         if (id.equals(PREF_SHOWCURSOR)) {
             if (readout != null) {
                 readout.setActive(value);
@@ -757,7 +711,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         }
     }
 
-
     /**
      * Get the intial BooleanProperty-s
      *
@@ -765,42 +718,37 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void getInitialBooleanProperties(List props) {
         super.getInitialBooleanProperties(props);
-        props.add(new BooleanProperty(PREF_3DCLIP, "Clip View At Box", "",
-                                      false));
-        props.add(new BooleanProperty(PREF_SHOWCURSOR, "Show Cursor Readout",
-                                      "", true));
-
-        props.add(new BooleanProperty(PREF_SHOWDISPLAYLIST,
-                                      "Show Display List", "", false));
+        props.add(new BooleanProperty(PREF_3DCLIP, "Clip View At Box", "", false));
+        props.add(new BooleanProperty(PREF_SHOWCURSOR, "Show Cursor Readout", "", true));
+        props.add(new BooleanProperty(PREF_SHOWDISPLAYLIST, "Show Display List", "", false));
     }
-
 
     /**
      * Check the matrix history.
      */
     protected void checkHistoryMatrix() {
         try {
-            if ( !getInitDone()) {
+            if (!getInitDone()) {
                 return;
             }
+
             double[] newMatrix = getProjectionControl().getMatrix();
-            if ((lastSharedMatrix == null)
-                    || !Arrays.equals(newMatrix, lastSharedMatrix)) {
+
+            if ((lastSharedMatrix == null) ||!Arrays.equals(newMatrix, lastSharedMatrix)) {
                 matrixChanged();
-                if ((lastSharedMatrix != null)
-                        && !getCommandManager().getApplyingCommand()) {
-                    if ( !mouseDown) {
-                        addCommand(new MatrixCommand(this, lastSharedMatrix,
-                                getMaster().getProjectionMatrix()));
+
+                if ((lastSharedMatrix != null) &&!getCommandManager().getApplyingCommand()) {
+                    if (!mouseDown) {
+                        addCommand(new MatrixCommand(this, lastSharedMatrix, getMaster().getProjectionMatrix()));
                     }
                 }
+
                 lastSharedMatrix = newMatrix;
                 doShare(SHARE_MATRIX, newMatrix);
             }
         } catch (Exception exc) {
             logException("controlChanged", exc);
         }
-
     }
 
     /**
@@ -816,8 +764,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         initReadout(w);
     }
 
-
-
     /**
      * Creates the Viewpoint Toolbar in the specified orientation.
      * @param orientation orientation of the toolbar
@@ -825,12 +771,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return the toolbar component
      */
     public Component doMakeViewPointToolBar(int orientation) {
-        JToolBar toolbar =
-            getViewpointControl().getToolBar(getToolbarsFloatable());
+        JToolBar toolbar = getViewpointControl().getToolBar(getToolbarsFloatable());
+
         toolbar.setOrientation(orientation);
+
         return GuiUtils.top(toolbar);
     }
-
 
     /**
      * Creates the Zoom/Pan Toolbar in the specified orientation.
@@ -839,12 +785,10 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return the toolbar component
      */
     protected Component doMakeZoomPanToolBar(int orientation) {
-        JToolBar toolbar =
-            getNavigatedDisplay().getNavigationToolBar(orientation,
-                getToolbarsFloatable());
+        JToolBar toolbar = getNavigatedDisplay().getNavigationToolBar(orientation, getToolbarsFloatable());
+
         return GuiUtils.top(toolbar);
     }
-
 
     /**
      * Required interface for ActionEvents, to implement ActionListener
@@ -854,6 +798,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
+
         if (cmd.equals(CMD_NAV_ZOOMIN)) {
             getNavigatedDisplay().zoom(ZOOM_FACTOR);
         } else if (cmd.equals(CMD_NAV_ROTATELEFT)) {
@@ -896,14 +841,12 @@ public abstract class NavigatedViewManager extends ViewManager {
             getNavigatedDisplay().translate(0.0, 0.02);
         } else {
             super.actionPerformed(event);
+
             return;
         }
+
         checkHistoryMatrix();
     }
-
-
-
-
 
     /**
      * Create and return the show menu.
@@ -912,13 +855,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected JMenu makeShowMenu() {
         JMenu showMenu = super.makeShowMenu();
+
         createCBMI(showMenu, PREF_3DCLIP);
         createCBMI(showMenu, PREF_SHOWCURSOR);
+
         return showMenu;
     }
-
-
-
 
     /**
      * Set the  show cursor flag
@@ -971,10 +913,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         return getBp(PREF_SHOWTRANSECTSCALES);
     }
 
-
-
-
-
     /**
      * Set the  clipping  flag
      *
@@ -992,7 +930,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         return getBp(PREF_3DCLIP);
     }
 
-
     /**
      * Set the <code>Unit</code> used for the vertical range.
      *
@@ -1000,12 +937,15 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     public void setVerticalRangeUnit(Unit u) {
         tmpVertRangeUnit = u;
+
         if (u == null) {
             return;
         }
-        if ( !hasDisplayMaster()) {
+
+        if (!hasDisplayMaster()) {
             return;
         }
+
         try {
             getNavigatedDisplay().setVerticalRangeUnit(u);
         } catch (Exception exc) {}
@@ -1017,9 +957,10 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return unit of vertical range values
      */
     public Unit getVerticalRangeUnit() {
-        if ( !hasDisplayMaster()) {
+        if (!hasDisplayMaster()) {
             return tmpVertRangeUnit;
         }
+
         return getNavigatedDisplay().getVerticalRangeUnit();
     }
 
@@ -1029,12 +970,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @return array of vertical range values (double[] {min, max})
      */
     public double[] getVerticalRange() {
-        if ( !hasDisplayMaster()) {
+        if (!hasDisplayMaster()) {
             return tmpVerticalRange;
         }
+
         return getNavigatedDisplay().getVerticalRange();
     }
-
 
     /**
      * Set the min/max used for the vertical range.
@@ -1043,17 +984,19 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     public void setVerticalRange(double[] r) {
         tmpVerticalRange = r;
+
         if (r == null) {
             return;
         }
-        if ( !hasDisplayMaster()) {
+
+        if (!hasDisplayMaster()) {
             return;
         }
+
         try {
             getNavigatedDisplay().setVerticalRange(r[0], r[1]);
         } catch (Exception exc) {}
     }
-
 
     /**
      * Set the vertical range unit from the preference
@@ -1063,20 +1006,20 @@ public abstract class NavigatedViewManager extends ViewManager {
      * @throws RemoteException  problem with remote display
      * @throws VisADException problem with local display
      */
-    protected void setVerticalRangeUnitPreference(NavigatedDisplay nd)
-            throws VisADException, RemoteException {
+    protected void setVerticalRangeUnitPreference(NavigatedDisplay nd) throws VisADException, RemoteException {
         Unit u = null;
+
         try {
-            u = ucar.visad.Util.parseUnit(
-                getIdv().getObjectStore().get(
-                    IdvConstants.PREF_VERTICALUNIT, "m"));
+            u = ucar.visad.Util.parseUnit(getIdv().getObjectStore().get(IdvConstants.PREF_VERTICALUNIT, "m"));
         } catch (Exception exc) {
             u = null;
         }
+
         if (u != null) {
             double[] range       = nd.getVerticalRange();
             Unit     defaultUnit = nd.getVerticalRangeUnit();
-            if ( !u.equals(defaultUnit) && Unit.canConvert(u, defaultUnit)) {
+
+            if (!u.equals(defaultUnit) && Unit.canConvert(u, defaultUnit)) {
                 range = u.toThis(range, defaultUnit);
                 nd.setVerticalRangeUnit(u);
                 nd.setVerticalRange(range[0], range[1]);
@@ -1092,5 +1035,4 @@ public abstract class NavigatedViewManager extends ViewManager {
     public CoordinateSystem getDisplayCoordinateSystem() {
         return getNavigatedDisplay().getDisplayCoordinateSystem();
     }
-
 }

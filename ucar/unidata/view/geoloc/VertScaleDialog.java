@@ -26,23 +26,26 @@ package ucar.unidata.view.geoloc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.visad.Util;
-
 import visad.CommonUnit;
 import visad.Unit;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
 
 /**
  * A widget to get vertical range or scaling info from the user
@@ -55,12 +58,6 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     /** Lat lon scale info */
     private LatLonScaleInfo latLonInfo = new LatLonScaleInfo();
 
-    /** Major tick spinner */
-    JSpinner                majorTickSpinner;
-
-    /** Minor tick spinner */
-    JSpinner                minorTickSpinner;
-
     /** Abscissa (x-axis) Label */
     private JTextField abscissaLabel;
 
@@ -70,8 +67,14 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     /** The dialog whe in dialog mode */
     JDialog dialog;
 
+    /** Major tick spinner */
+    JSpinner majorTickSpinner;
+
     /** input fields for max/min values */
     private JTextField min, max;
+
+    /** Minor tick spinner */
+    JSpinner minorTickSpinner;
 
     /** flag for whether the user hit cancel or not */
     private boolean ok;
@@ -121,8 +124,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             max = new JTextField(""), GuiUtils.rLabel("Units: "),
             unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null),
             GuiUtils.rLabel("Abscissa (x-axis) Label: "), abscissaLabel = new JTextField(this.latLonInfo.abscissaLabel),
-            GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4,0,10,1)),
-            GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8,0,10,1))
+            GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4, 0, 10, 1)),
+            GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8, 0, 10, 1))
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         min.setActionCommand(GuiUtils.CMD_OK);
@@ -244,7 +247,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             }
         }
 
-        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(),Integer.parseInt(majorTickSpinner.getModel().getValue()+""),Integer.parseInt(minorTickSpinner.getModel().getValue()+""));
+        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(),
+                                            Integer.parseInt(majorTickSpinner.getModel().getValue() + ""),
+                                            Integer.parseInt(minorTickSpinner.getModel().getValue() + ""));
 
         if (!newLatLonInfo.equals(latLonInfo)) {
             latLonInfo = newLatLonInfo;
