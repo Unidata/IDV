@@ -435,7 +435,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation ur = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
 
-            updateLatLonScale(latScale, "Latitude", zRange, ll, ur, true);
+            updateLatLonScale(latScale, getLatLonScaleInfo().ordinateLabel, zRange, ll, ur, true);
         }
 
         if (lonScale != null) {

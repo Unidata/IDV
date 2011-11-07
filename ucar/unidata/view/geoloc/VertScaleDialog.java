@@ -61,6 +61,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     /** Abscissa (x-axis) Label */
     private JTextField abscissaLabel;
 
+    /** Ordinate (y-axis) Label */
+    private JTextField ordinateLabel;
+
     /** The control */
     ViewpointControl control;
 
@@ -124,6 +127,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             max = new JTextField(""), GuiUtils.rLabel("Units: "),
             unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null),
             GuiUtils.rLabel("Abscissa (x-axis) Label: "), abscissaLabel = new JTextField(this.latLonInfo.abscissaLabel),
+            GuiUtils.rLabel("Ordinate (y-axis) Label: "), ordinateLabel = new JTextField(this.latLonInfo.ordinateLabel),
             GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4, 0, 10, 1)),
             GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8, 0, 10, 1))
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -247,7 +251,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             }
         }
 
-        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(),
+        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(), ordinateLabel.getText(),
                                             Integer.parseInt(majorTickSpinner.getModel().getValue() + ""),
                                             Integer.parseInt(minorTickSpinner.getModel().getValue() + ""));
 
