@@ -128,8 +128,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null),
             GuiUtils.rLabel("Abscissa (x-axis) Label: "), abscissaLabel = new JTextField(this.latLonInfo.abscissaLabel),
             GuiUtils.rLabel("Ordinate (y-axis) Label: "), ordinateLabel = new JTextField(this.latLonInfo.ordinateLabel),
-            GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4, 0, 10, 1)),
-            GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8, 0, 10, 1))
+            GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4, 0, 10, 2)),
+            GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8, 0, 10, 2))
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         min.setActionCommand(GuiUtils.CMD_OK);
