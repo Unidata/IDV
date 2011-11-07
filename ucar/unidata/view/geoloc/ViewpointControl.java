@@ -890,13 +890,19 @@ public class ViewpointControl implements ActionListener {
         navDisplay.setVerticalRangeUnit(transfer.unit);
         navDisplay.setVerticalRange(transfer.minVertScale,
                                     transfer.maxVertScale);
-
         navDisplay.setDisplayActive();
     }
 
-
-
-
-
+    /**
+     * Apply the lat/lon info
+     * 
+     * @param latLonInfo
+     * @throws Exception
+     */
+	public void applyLatLonScale(LatLonScaleInfo latLonInfo) throws Exception {
+        navDisplay.setDisplayInactive();
+        navDisplay.setLatLonScaleInfo(latLonInfo);
+        navDisplay.setDisplayActive();
+	}
 }
 

@@ -399,7 +399,7 @@ public abstract class NavigatedViewManager extends ViewManager {
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
         vertScaleWidget = getViewpointControl().getVerticalScaleWidget();
-        tabbedPane.add("Vertical Scale", GuiUtils.topLeft(vertScaleWidget));
+        tabbedPane.add("Coordinate Scale", GuiUtils.topLeft(vertScaleWidget));
     }
 
 

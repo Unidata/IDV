@@ -431,28 +431,76 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             zRange = new double[] { 0, 0 };
         }
         if (latScale != null) {
-            latScale.setVisible(false);
+            latScale.setVisible(true);
             EarthLocation ll = getEarthLocation(new double[] { xRange[0],
                     yRange[0], zRange[0] });
             EarthLocation ur = getEarthLocation(new double[] { xRange[0],
                     yRange[1], zRange[0] });
-            updateScale(latScale, "Latitude", zRange,
-                        ll.getLatitude().getValue(),
-                        ur.getLatitude().getValue());
+            updateLatLonScale(latScale, "Latitude", zRange,
+                        ll,
+                        ur,true);
         }
         if (lonScale != null) {
-            lonScale.setVisible(false);
+            lonScale.setVisible(true);
             EarthLocation ll = getEarthLocation(new double[] { xRange[0],
                     yRange[0], zRange[0] });
             EarthLocation lr = getEarthLocation(new double[] { xRange[1],
                     yRange[0], zRange[0] });
-            updateScale(lonScale, "Longitude", xRange,
-                        ll.getLatitude().getValue(),
-                        lr.getLatitude().getValue());
+            updateLatLonScale(lonScale, getLatLonScaleInfo().abscissaLabel, xRange,
+                        ll,
+                        lr,false);
         }
         setDisplayActive();
     }
 
+    /**
+     * Method to update lat lon scale
+     * 
+     * @param scale    AxisScale to update
+     * @param title    Title
+     * @param maxmin   max/min limits of axis
+     * @param bottom   value for lower limit
+     * @param top      value for upper limit
+     *
+     * @throws VisADException   problem creating some VisAD object
+     * @throws RemoteException   problem creating remote object
+     */
+    private void updateLatLonScale(AxisScale scale, String title, double[] maxmin,
+    		EarthLocation left, EarthLocation right, boolean absicca)
+                throws VisADException, RemoteException {
+    	
+    	double bottom = absicca ? left.getLatitude().getValue() :  left.getLongitude().getValue();
+    	double top = absicca ?  right.getLatitude().getValue() : right.getLongitude().getValue();
+    	       
+        Hashtable labelTable = new Hashtable();
+        //Labeling extremities
+        labelTable.put(new Double(maxmin[0]), labelFormat.format(bottom));
+        labelTable.put(new Double(maxmin[1]), labelFormat.format(top));
+        
+//		for (double i = bottom; i < top; i += 10) {
+//			RealTuple spatialCoordinates = getSpatialCoordinates(absicca ? new EarthLocationTuple(
+//					i, left.getLongitude().getValue(), 0) : new EarthLocationTuple(right.getLatitude().getValue(), i, 0));
+//			double[] values = spatialCoordinates.getValues();
+//	        labelTable.put(new Double(values[absicca ? 1 : 0]), labelFormat.format(i));
+//		} 
+
+		double minorTickSpacing = Math.abs(maxmin[1] - maxmin[0])/getLatLonScaleInfo().minorTickSpacing;
+		double majorTickSpacing = Math.abs(maxmin[1] - maxmin[0])/getLatLonScaleInfo().majorTickSpacing;
+		
+		for (double i = -1 ; i < 1 ;  i += majorTickSpacing) {
+			EarthLocation el  = absicca ? getEarthLocation(-1, i, -1) : getEarthLocation(i, -1, -1);
+	        labelTable.put(i, labelFormat.format( absicca ? el.getLatitude().getValue() : el.getLongitude().getValue()));
+//			System.out.println(i + " " +  (absicca ? el.getLatitude().getValue() : el.getLongitude().getValue()));
+		}
+		        
+        scale.setSnapToBox(true);
+        scale.setTitle(title);
+        scale.setLabelTable(labelTable);
+        scale.setTicksVisible(true);
+        
+        scale.setMajorTickSpacing(minorTickSpacing);
+        scale.setMinorTickSpacing(majorTickSpacing);
+    }
 
     /**
      * Method to update the properties of an AxisScale
@@ -466,7 +514,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws VisADException   problem creating some VisAD object
      * @throws RemoteException   problem creating remote object
      */
-    private void updateScale(AxisScale scale, String title, double[] maxmin,
+    private void updateVertScale(AxisScale scale, String title, double[] maxmin,
                              double bottom, double top)
             throws VisADException, RemoteException {
         scale.setSnapToBox(true);
@@ -494,7 +542,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double[] zRange = zMap.getRange();
         String title = verticalParameter.getName() + "("
                        + verticalRangeUnit.getIdentifier() + ")";
-        updateScale(verticalScale, title, zRange, minVerticalRange,
+        updateVertScale(verticalScale, title, zRange, minVerticalRange,
                     maxVerticalRange);
         /*
         verticalScale.setSnapToBox(true);
@@ -538,7 +586,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         latitudeMap = new ScalarMap(RealType.Latitude, displayLatitudeType);
         mapSet.add(latitudeMap);
         latitudeMap.setRangeByUnits();
-        latitudeMap.setScaleEnable(false);
+        latitudeMap.setScaleEnable(true);
 
         if (longitudeMap != null) {
             removeScalarMap(longitudeMap);
@@ -547,7 +595,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                      displayLongitudeType);
         mapSet.add(longitudeMap);
         longitudeMap.setRangeByUnits();
-        longitudeMap.setScaleEnable(false);
+        longitudeMap.setScaleEnable(true);
 
         if (getDisplayMode() == MODE_3D) {
             ScalarMapSet newVertMaps = new ScalarMapSet();
@@ -556,7 +604,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                         iter.hasNext(); ) {
                     ScalarType r      = ((ScalarMap) iter.next()).getScalar();
                     ScalarMap  newMap = new ScalarMap(r, displayAltitudeType);
-                    newMap.setScaleEnable(false);
+                    newMap.setScaleEnable(true);
                     if (r.equals(RealType.Altitude)) {
                         altitudeMap = newMap;
                     }
@@ -565,7 +613,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             } else {  // add Altitude at least
                 altitudeMap = new ScalarMap(RealType.Altitude,
                                             displayAltitudeType);
-                altitudeMap.setScaleEnable(false);
+                altitudeMap.setScaleEnable(true);
                 newVertMaps.add(altitudeMap);
             }
             removeScalarMaps(verticalMapSet);
@@ -677,6 +725,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
         makeVerticalScale();
     }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setLatLonScaleInfo(LatLonScaleInfo latLonScaleInfo) throws RemoteException, VisADException {
+    	super.setLatLonScaleInfo(latLonScaleInfo);
+    	makeLatLonScales();
+	}
+
 
     /**
      * Set the range of the vertical coordinate

@@ -240,6 +240,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /** A virtual timestamp for when we rotate */
     private int rotateTimeStamp = 0;
 
+    /** Lat / Lon Scale info */
+	private LatLonScaleInfo latLonScaleInfo = new LatLonScaleInfo();
+
 
     /**
      * Default Constructor
@@ -2476,6 +2479,24 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         return this.clipDistanceFront;
     }
 
+    /**
+     * Set the lat lon scale info
+     * 
+     * @param latLonScaleInfo
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public void setLatLonScaleInfo(LatLonScaleInfo latLonScaleInfo) throws RemoteException, VisADException {
+		this.latLonScaleInfo = latLonScaleInfo;
+	}
 
 
+    /**
+     * Get the lat lon scale info
+     * 
+     * @return
+     */
+	public LatLonScaleInfo getLatLonScaleInfo() {
+		return latLonScaleInfo;
+	}
 }
