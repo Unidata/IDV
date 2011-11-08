@@ -2675,6 +2675,8 @@ public class StormDisplayState {
     }
 
     public void colorRangeChanged() {
+        if(stormTrackControl == null)
+            return;
         DisplayMaster displayMaster = stormTrackControl.getDisplayMaster();
         colorRangeChanged = true;
         boolean       wasActive     = displayMaster.ensureInactive();
