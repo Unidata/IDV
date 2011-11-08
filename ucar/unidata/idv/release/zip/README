@@ -21,7 +21,7 @@ this:
    this on machines with 512 Mb or more, you can bump up the 
    max-heap-size parameter to "384m" or "512m" for better performance:
 
-         <j2se version="1.5" max-heap-size="512m" /> 
+         <j2se version="1.6" max-heap-size="512m" /> 
 
 3) Configure your Web server so that all files with the .jnlp file 
    extension are set to the application/x-java-jnlp-file MIME type.
