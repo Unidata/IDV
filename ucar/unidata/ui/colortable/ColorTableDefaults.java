@@ -211,14 +211,13 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Create a ColorTable and add it to the given list
      *
-     * @param l _more_
-     * @param name _more_
-     * @param category _more_
-     * @param table _more_
-     *
-     * @return _more_
+     * @param l List to add the ColorTable to
+     * @param name The CT name
+     * @param category Its category
+     * @param table The actual data
+     * @return The color table
      */
     public static ColorTable createColorTable(ArrayList l, String name,
             String category, float[][] table) {
@@ -1417,12 +1416,13 @@ public class ColorTableDefaults {
     }
 
     /**
-     * _more_
+     * Make a color table representing this color.
      *
-     * @param color _more_
-     * @param addAlpha _more_
+     * @param  color  color to use
+     * @return the color table this color
+     * @param addAlpha true to add an alpha channel
      *
-     * @return _more_
+     * @return the table
      */
     public static final float[][] allOneColor(Color color, boolean addAlpha) {
         int       len   = 5;
@@ -1776,13 +1776,13 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Make GEMPAK color tables
      *
-     * @param name _more_
-     * @param category _more_
-     * @param file _more_
+     * @param name  name of the table
+     * @param category  the category
+     * @param file  the file to read
      *
-     * @return _more_
+     * @return  a list of colors in the table (why a list, I don't know)
      */
     public static List makeGempakColorTables(String name, String category,
                                              String file) {
@@ -1839,11 +1839,11 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Main method
      *
-     * @param args _more_
+     * @param args arguments
      *
-     * @throws Exception _more_
+     * @throws Exception  something bad happened
      */
     public static void main(String[] args) throws Exception {
 
@@ -1856,16 +1856,16 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Make ColorTables from NCAR Command Language (NCL) RGB files
      *
-     * @param name _more_
-     * @param cat _more_
-     * @param file _more_
-     * @param contents _more_
+     * @param name  name of table
+     * @param cat  category
+     * @param file  the file
+     * @param contents  the file contents
      *
-     * @return _more_
+     * @return  the color table in a List
      *
-     * @throws IOException _more_
+     * @throws IOException problem opening file
      */
     public static List makeNclRgbColorTables(String name, String cat,
                                              String file, String contents)
@@ -1904,15 +1904,15 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Make color tables from RGB tuples in a file
      *
-     * @param name _more_
-     * @param cat _more_
-     * @param file _more_
-     * @param lines _more_
-     * @param delimiter _more_
+     * @param name  the name of the color table
+     * @param cat  the category
+     * @param file  the file to read
+     * @param lines  the lines
+     * @param delimiter  the rgb tuple delimiters
      *
-     * @return _more_
+     * @return  the color table in a list
      */
     public static List makeRgbColorTables(String name, String cat,
                                           String file, List lines,
@@ -1948,11 +1948,11 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Turn the object into an int
      *
-     * @param o _more_
+     * @param o  the object
      *
-     * @return _more_
+     * @return  as an int
      */
     private static int toInt(Object o) {
         String s = o.toString().trim();
@@ -1960,11 +1960,11 @@ public class ColorTableDefaults {
     }
 
     /**
-     * _more_
+     * Strip comments from a line
      *
-     * @param line _more_
+     * @param line  the line.
      *
-     * @return _more_
+     * @return  the stripped down line
      */
     private static String stripComments(String line) {
         int commentIdx = line.indexOf("/*");
@@ -1985,16 +1985,16 @@ public class ColorTableDefaults {
     }
 
     /**
-     * _more_
+     * Make color tables from RGB files
      *
      *
-     * @param name _more_
-     * @param cat _more_
-     * @param file _more_
+     * @param name  name of the color table
+     * @param cat   category
+     * @param file  the file to read
      *
-     * @return _more_
+     * @return  the color table in a List
      *
-     * @throws IOException _more_
+     * @throws IOException  problem reading the file
      */
     public static List makeRgbColorTables(String name, String cat,
                                           String file)
@@ -2088,13 +2088,13 @@ public class ColorTableDefaults {
 
 
     /**
-     * _more_
+     * Make a color table from a list of colors
      *
-     * @param name _more_
-     * @param cat _more_
-     * @param colors _more_
+     * @param name  name for the table
+     * @param cat   category for the table
+     * @param colors  the list of colors
      *
-     * @return _more_
+     * @return  the corresponding ColorTable
      */
     private static ColorTable makeColorTable(String name, String cat,
                                              ArrayList colors) {
