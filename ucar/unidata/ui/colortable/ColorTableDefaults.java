@@ -237,7 +237,7 @@ public class ColorTableDefaults {
      */
     public static ColorTable createColorTable(ArrayList l, String name,
             String category, float[][] table, boolean tableFlipped) {
-        return createColorTable(l, name, category, table, false, null);
+        return createColorTable(l, name, category, table, tableFlipped, null);
     }
 
     /**
