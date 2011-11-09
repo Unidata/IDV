@@ -1038,9 +1038,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Set the myDataChoices member and add this object as a DataChangeListener
         setDataChoices(choices);
-        Object ud = this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-        if(ud != null){
-             this.usesTimeDriver = ((Boolean)ud).booleanValue();
+        Object ud =
+            this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        if (ud != null) {
+            this.usesTimeDriver = ((Boolean) ud).booleanValue();
         }
 
         if (properties != null) {
@@ -1089,16 +1090,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
 
-        if(myDataChoices.size() > 0 && myDataChoices.get(0) instanceof DerivedDataChoice){
-            List cdcs = ((DerivedDataChoice)myDataChoices.get(0)).getChoices();
-            if(cdcs.size() > 0)  {
-                DataChoice dc = (DataChoice)cdcs.get(0);
+        if ((myDataChoices.size() > 0)
+                && (myDataChoices.get(0) instanceof DerivedDataChoice)) {
+            List cdcs =
+                ((DerivedDataChoice) myDataChoices.get(0)).getChoices();
+            if (cdcs.size() > 0) {
+                DataChoice    dc = (DataChoice) cdcs.get(0);
                 DataSelection ds = dc.getDataSelection();
-                if(ds != null){
+                if (ds != null) {
                     List dtimes = ds.getTimeDriverTimes();
-                    Object ud1 = ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if(dtimes != null && dtimes.size() > 0 && ud1 != null){
-                        this.usesTimeDriver = ((Boolean)ud1).booleanValue();
+                    Object ud1 =
+                        ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if ((dtimes != null) && (dtimes.size() > 0)
+                            && (ud1 != null)) {
+                        this.usesTimeDriver = ((Boolean) ud1).booleanValue();
                     }
                 }
             }
@@ -3502,7 +3507,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if ( !getUsesTimeDriver()) {
                 dataSelection.setTheTimeDriverTimes(null);
                 dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                      getUsesTimeDriver());
+                                          getUsesTimeDriver());
             }
             return dataSelection;
         }
@@ -3512,8 +3517,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         List<DateTime> times = vm.getTimeDriverTimes();
         //        System.err.println("\tdriver times to use:" + times);
-        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                      true);
+        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
         dataSelection.setTheTimeDriverTimes(times);
         return dataSelection;
     }
@@ -6181,18 +6185,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         if (haveDataTimes()) {
-            JCheckBoxMenuItem jcmi = 
-                GuiUtils.makeCheckboxMenuItem("Use Times In Animation",
-                    this, "useTimesInAnimation", null);
+            JCheckBoxMenuItem jcmi =
+                GuiUtils.makeCheckboxMenuItem("Use Times In Animation", this,
+                    "useTimesInAnimation", null);
             if (DOTIMEDRIVER) {
                 JMenu jm = new JMenu("Times");
                 jm.add(jcmi);
-                jm.add(
-                    GuiUtils.makeCheckboxMenuItem(
-                        "Drive Times with this Display", this, "isTimeDriver",
-                        null));
-                jm.add(GuiUtils.makeCheckboxMenuItem("Uses Time Driver Times",
-                        this, "usesTimeDriver", usesTimeDriver, null));
+                jm.add(GuiUtils.makeCheckboxMenuItem(
+                    "Drive Times with this Display", this, "isTimeDriver",
+                    null));
+                jm.add(GuiUtils.makeCheckboxMenuItem(
+                    "Uses Time Driver Times", this, "usesTimeDriver",
+                    usesTimeDriver, null));
                 items.add(jm);
             } else {
                 items.add(jcmi);
@@ -7710,6 +7714,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (applyToDisplayable) {
                 applyDisplayUnit();
             }
+            updateListOrLegendWithMacro(MACRO_DISPLAYUNIT);
+
             displayUnitChanged(oldUnit, newUnit);
         } catch (Exception exc) {
             //logException ("Error setting unit from: " + oldUnit + " to: " + newUnit + "\n", exc);
@@ -7721,6 +7727,25 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return true;
     }
 
+    /**
+     * If the display list or legend templates contain <code>macro</code>
+     * update the appropriate UI component
+     *
+     * @param macro  the macro to check for
+     */
+    private void updateListOrLegendWithMacro(String macro) {
+        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean legendUpdate =
+            ((getLegendLabelTemplate().indexOf(macro) >= 0)
+             || (getExtraLabelTemplate().indexOf(macro) >= 0));
+        if (legendUpdate && listUpdate) {
+            updateLegendAndList();
+        } else if (listUpdate) {
+            updateDisplayList();
+        } else if (legendUpdate) {
+            updateLegendLabel();
+        }
+    }
 
     /**
      * The user has chosen a new unit for color.
