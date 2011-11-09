@@ -1,20 +1,18 @@
 /*
- * $Id: ColorTableDefaults.java,v 1.15 2007/05/04 19:56:06 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -35,6 +33,7 @@ import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 
@@ -238,6 +237,23 @@ public class ColorTableDefaults {
      */
     public static ColorTable createColorTable(ArrayList l, String name,
             String category, float[][] table, boolean tableFlipped) {
+        return createColorTable(l, name, category, table, false, null);
+    }
+
+    /**
+     * Create a ColorTable and add it to the given list
+     *
+     * @param l List to add the ColorTable to
+     * @param name The CT name
+     * @param category Its category
+     * @param table The actual data
+     * @param tableFlipped If true then the table data is not in row major order
+     * @param range the color table range
+     * @return The color table
+     */
+    public static ColorTable createColorTable(ArrayList l, String name,
+            String category, float[][] table, boolean tableFlipped,
+            Range range) {
 
         // ensure all R G and B values in the table are in 0.0 to 1.0 range
         for (int i = 0; i < table.length; i++) {
@@ -255,6 +271,9 @@ public class ColorTableDefaults {
 
         ColorTable colorTable = new ColorTable(name.toUpperCase(), name,
                                     category, table, tableFlipped);
+        if (range != null) {
+            colorTable.setRange(range);
+        }
         l.add(colorTable);
         return colorTable;
     }
@@ -306,7 +325,8 @@ public class ColorTableDefaults {
         createColorTable(l, NAME_H2O, ColorTable.CATEGORY_SATELLITE,
                          makeTableFromET("H2O.ET"));
         createColorTable(l, NAME_TOPOBATHY, ColorTable.CATEGORY_MISC,
-                         makeTableFromET("TOPO.ET"));
+                         makeTableFromET("TOPO.ET"), false,
+                         new Range(-12458, 8791));
         createColorTable(l, NAME_RADAR_PRECIP, ColorTable.CATEGORY_RADAR,
                          makeTableFromET("PRET.ET"));
         createColorTable(l, NAME_VIS_FOG, ColorTable.CATEGORY_SATELLITE,
@@ -1396,15 +1416,26 @@ public class ColorTableDefaults {
         return allOneColor(color, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param color _more_
+     * @param addAlpha _more_
+     *
+     * @return _more_
+     */
     public static final float[][] allOneColor(Color color, boolean addAlpha) {
         int       len   = 5;
-        float[][] table = new float[(addAlpha?4:3)][len];
+        float[][] table = new float[(addAlpha
+                                     ? 4
+                                     : 3)][len];
         for (int m = 0; m < len; m++) {
             table[0][m] = color.getRed() / 255.f;    // Red amount  
             table[1][m] = color.getGreen() / 255.f;  // Green
             table[2][m] = color.getBlue() / 255.f;   // Blue  
-            if(addAlpha) 
+            if (addAlpha) {
                 table[3][m] = 1.0f;
+            }
         }
         return table;
     }
@@ -2382,4 +2413,3 @@ public class ColorTableDefaults {
 
 
 }
-
