@@ -607,7 +607,7 @@ public class ValuePlanViewControl extends PlanViewControl {
         Rectangle glyphBounds = getLayoutModel().getBounds();
         float myScale = getScaleFromDisplayable() * .0025f
                         * getDeclutterFilter();
-        //System.out.println("\ndecluttering  myScale=" + myScale + 
+        //System.out.println("\ndecluttering  myScale=" + myScale +
         //                           " filter=" +getDeclutterFilter());
         Rectangle2D scaledGlyphBounds =
             new Rectangle2D.Double(glyphBounds.getX() * myScale,
@@ -625,23 +625,25 @@ public class ValuePlanViewControl extends PlanViewControl {
         }
         stationGrid.clear();
         stationGrid.setGrid(getBounds(), scaledGlyphBounds);
-        if (getDeclutterFilter() < 0.3f) {
-            //      stationGrid.setOverlap((int)((1.0-getDeclutterFilter())*100));
-            //      stationGrid.setOverlap(          (int)((.5f-getDeclutterFilter())*100));
-        } else {
-            //      stationGrid.setOverlap(0);
-        }
+        //if (getDeclutterFilter() < 0.3f) {
+        //      stationGrid.setOverlap((int)((1.0-getDeclutterFilter())*100));
+        //      stationGrid.setOverlap(          (int)((.5f-getDeclutterFilter())*100));
+        //} else {
+        //      stationGrid.setOverlap(0);
+        //}
 
         double[] xyz = new double[3];
         //TODO: The repeated getSpatialCoords is a bit expensive
         for (int i = 0; i < numObs; i++) {
-            PointOb ob = (PointOb) pointObs.getSample(i);
-            xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
-                    xyz);
-            obBounds.x = xyz[0];
-            obBounds.y = xyz[1];
-            if (stationGrid.markIfClear(obBounds, "")) {
-                v.add(ob);  // is in the bounds
+            if (pointObs.getSample(i) instanceof PointOb) {  //Ghansham
+                PointOb ob = (PointOb) pointObs.getSample(i);
+                xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
+                        xyz);
+                obBounds.x = xyz[0];
+                obBounds.y = xyz[1];
+                if (stationGrid.markIfClear(obBounds, "")) {
+                    v.add(ob);  // is in the bounds
+                }
             }
         }
         //      stationGrid.print();
