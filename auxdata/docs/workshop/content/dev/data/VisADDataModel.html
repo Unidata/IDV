@@ -55,10 +55,13 @@ grid can take the form of:
   (t -> (index -> (x,y,z) -> (parm1, ..., parmN)))
 </PRE>
 
-In general, t is a time variable, but it might also be just an index.
-The [dg::class ucar.unidata.data.grid.GridUtil] class provides a
-set of utilities for slicing, dicing and querying data that fits 
-into these forms.
+In general, <code>t</code> is a time variable, but it might also be 
+just an index.  In the last 4 examples, index can be an index to a
+set of radar rays for an RHI, or an ensemble index.
+The [dg::class ucar.unidata.data.grid.GridUtil]  and
+[dg::class ucar.unidata.data.grid.GridMath] classes provide 
+utilities for slicing, dicing, querying and performing mathematical
+operations on data that fits into these forms.
 
 <h3>Images (satellite, radar)</h3>
 Just like grids, images are modelled as [dg::className FieldImpl-s] 
