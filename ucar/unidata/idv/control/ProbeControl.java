@@ -3039,7 +3039,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public TimeSeriesChart getChart() {
         if (timeSeries == null) {
-            timeSeries = new TimeSeriesChart(this, "Data Probe");
+            timeSeries = new TimeSeriesChart(this, "Time Series");
             timeSeries.showAnimationTime(true);
         }
         return timeSeries;
