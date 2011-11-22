@@ -22,28 +22,22 @@ package ucar.unidata.data.grid;
 
 
 import ucar.ma2.Array;
-import ucar.ma2.Index;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-import ucar.nc2.dataset.*;
-
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.dataset.CoordinateAxis2D;
 import ucar.nc2.dt.GridCoordSystem;
-
-import ucar.nc2.dt.grid.*;
+import ucar.nc2.dt.grid.GeoGrid;
 
 import ucar.unidata.data.DataContext;
-import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DataUtil;
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-import ucar.unidata.geoloc.vertical.*;
-
-import ucar.unidata.util.IOUtil;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.vertical.VerticalTransform;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -54,7 +48,6 @@ import ucar.unidata.util.WrapperException;
 
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;
-import ucar.visad.Util;
 import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
@@ -68,10 +61,8 @@ import visad.DateTime;
 import visad.EmpiricalCoordinateSystem;
 import visad.ErrorEstimate;
 import visad.FieldImpl;
-import visad.FlatField;
 import visad.FunctionType;
 import visad.Gridded1DSet;
-import visad.Gridded2DSet;
 import visad.Gridded3DSet;
 import visad.GriddedSet;
 import visad.IdentityCoordinateSystem;
@@ -85,7 +76,6 @@ import visad.RealTuple;
 import visad.RealTupleType;
 import visad.RealType;
 import visad.SampledSet;
-import visad.Set;
 import visad.SetException;
 import visad.SetType;
 import visad.SingletonSet;
@@ -93,11 +83,8 @@ import visad.Unit;
 import visad.VisADException;
 
 import visad.data.CachedFlatField;
-
 import visad.data.in.ArithProg;
 import visad.data.in.LonArithProg;
-
-import visad.jmet.MetUnits;
 
 import visad.util.ThreadManager;
 
@@ -106,13 +93,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
-import java.util.Hashtable;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-
 
 
 
@@ -948,9 +931,11 @@ public class GeoGridAdapter {
         if (axis1D.isRegular()) {
             double first = axis1D.getCoordValue(0);
             double last  = axis1D.getCoordValue((int) axis1D.getSize() - 1);
-            if (first + 360 != last) {
+            if (first + 360. != last) {
                 double newLast = last + axis1D.getIncrement();
-                if (first + 360 == newLast) {
+                // Sometimes the increment has a roundoff error
+                if (visad.util.Util.isApproximatelyEqual(first + 360.,
+                        newLast, 0.0005)) {
                     return true;
                 }
             }
