@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,44 +21,51 @@
 package ucar.unidata.idv.ui;
 
 
-import ucar.unidata.data.*;
-
-
-import ucar.unidata.idv.*;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.GeoSelection;
+import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.chooser.TimesChooser;
-
-
-import ucar.unidata.idv.control.DisplaySetting;
-
-
-
 import ucar.unidata.ui.Timeline;
-
-import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
-import visad.DateTime;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.BoxLayout;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
 
 
 
@@ -129,7 +136,7 @@ public class DataSelectionWidget {
     /** The chekcbox for selecting "All times" */
     private JCheckBox allTimesButton;
 
-    /** _more_ */
+    /** time options label box */
     private JComboBox timeOptionLabelBox;
 
     /** List of all the possible dttms */
@@ -174,7 +181,7 @@ public class DataSelectionWidget {
     /** Last data source we were displaying for */
     private DataSource lastDataSource;
 
-    /** _more_ */
+    /** last choice requires volume */
     private boolean lastChoiceRequiresVolume = false;
 
     /** last DataChoice */
@@ -187,28 +194,33 @@ public class DataSelectionWidget {
     /** list of data selection components */
     private List<DataSelectionComponent> dataSelectionComponents;
 
-    /** _more_ */
-    int selectIdx = 999;
-
-    /** _more_ */
+    /** flag for using the display */
     private boolean doUseDisplay = true;
 
-    /** _more_ */
+    /** flag for chooser using time matching */
     private boolean chooserDoTimeMatching = false;
 
-    /** _more_ */
-    private final static String useDefault = new String("Use Default");
+    /** use default times identifier */
+    public final static String USE_DEFAULTTIMES = "Use Default";
 
-    /** _more_ */
-    private final static String useSelect = new String("Use Select");
+    /** use selected times identifier */
+    public final static String USE_SELECTEDTIMES = "Use Selected";
 
-    /** _more_ */
-    private final static String useDriver = new String("Use Time Driver");
+    /** use time driver times */
+    public final static String USE_DRIVERTIMES = "Use Time Driver";
 
-    /** _more_ */
-    private final static String[] timeSubsetOptionLabels = new String[] {
-                                                               useDefault,
-            useSelect, useDriver };
+    /** options for time selection type */
+    private final static String[] timeSubsetOptionLabels =
+        new String[] { USE_DEFAULTTIMES,
+                       USE_SELECTEDTIMES, USE_DRIVERTIMES };
+
+    /** timeline */
+    private Timeline timeline;
+
+    /** the time selection type */
+    private String timeOption = USE_DEFAULTTIMES;
+
+
 
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
@@ -237,7 +249,7 @@ public class DataSelectionWidget {
      *
      * @param idv Reference to the IDV
      * @param doSettings include the display settings in the tab
-     * @param doUseDisplay _more_
+     * @param doUseDisplay true to use display times
      */
     public DataSelectionWidget(IntegratedDataViewer idv, boolean doSettings,
                                boolean doUseDisplay) {
@@ -403,7 +415,7 @@ public class DataSelectionWidget {
         if (dc != null) {
             lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
                                        false);
-            if(dataSource != null) {
+            if (dataSource != null) {
                 Object cu = dataSource.getProperty(
                                 DataSelection.PROP_CHOOSERTIMEMATCHING);
                 if (cu != null) {
@@ -736,7 +748,7 @@ public class DataSelectionWidget {
                                       true);
         } else {
             dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                      selectIdx == 2);
+                                      timeOption.equals(USE_DRIVERTIMES));
         }
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
@@ -1109,10 +1121,6 @@ public class DataSelectionWidget {
     }
 
 
-    /** timeline */
-    private Timeline timeline;
-
-
     /**
      * Add the given times in the all/selected list into the
      * given JList. Configure the allTimeButton  appropriately
@@ -1318,25 +1326,26 @@ public class DataSelectionWidget {
     }
 
     /**
-     * _more_
+     * Set the time option from the selected object
      *
-     * @param selectedObject _more_
+     * @param selectedObject  the selected time mode
      */
     public void setTimeOptions(Object selectedObject) {
         if (timesList == null) {
             return;
         }
-        if (selectedObject.equals(useDefault)) {
-            selectIdx = 0;
+        timeOption = selectedObject.toString();
+        if (selectedObject.equals(USE_DEFAULTTIMES)) {
+            //selectIdx = 0;
             timesList.setVisible(true);
             timesList.setEnabled(false);
-        } else if (selectedObject.equals(useSelect)) {
-            selectIdx = 1;
+        } else if (selectedObject.equals(USE_SELECTEDTIMES)) {
+            //selectIdx = 1;
             timesList.setVisible(true);
             timesList.setEnabled(true);
             chooserDoTimeMatching = false;
-        } else {
-            selectIdx = 2;
+        } else if (selectedObject.equals(USE_DRIVERTIMES)) {
+            //selectIdx = 2;
             timesList.setVisible(false);
             timesList.setEnabled(false);
             if (lastDataChoice != null) {
@@ -1345,6 +1354,15 @@ public class DataSelectionWidget {
             }
         }
     }
+
+    /**
+     * Get the time option type
+     * @return time s
+     */
+    public String getTimeOption() {
+        return timeOption;
+    }
+
 
     /**
      * Set levels from the display
@@ -1381,7 +1399,7 @@ public class DataSelectionWidget {
      *
      * The DefaultMemberToAll
      *
-     * @param value _more_
+     * @param value  tru to set the default member to all
      */
     public void setDefaultMemberToAll(boolean value) {
         defaultMemberToAll = value;

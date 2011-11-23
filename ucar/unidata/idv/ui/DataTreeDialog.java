@@ -409,7 +409,7 @@ public class DataTreeDialog implements ActionListener {
             List selectedFromTree = DataChoice.cloneDataChoices(
                                         dataTree.getSelectedDataChoices());
 
-            if(DisplayControl.DOTIMEDRIVER && dsw.selectIdx == 2) {
+            if(DisplayControl.DOTIMEDRIVER && dsw.getTimeOption().equals(DataSelectionWidget.USE_DRIVERTIMES)) {
                 ViewManager vm = idv.getViewManager();
                 dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
                 try{
