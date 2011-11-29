@@ -11,31 +11,18 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.9u3 release.
+The items below reflect changes since the 3.0 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
 <faqitem q="IDV memory allocation" id="idvmemory">
-Upon IDV start up, memory allocation is done automatically according to the user's machine specifications,
-also IDV memory allocation can be changed via Edit --> Preferences, System tab.
-</faqitem>
-
-<faqitem q="Mac OS X bundle" id="macOS">
-The IDV can now be installed as a Mac OS X bundle.
-</faqitem>
-
-<faqitem q="IDV logo" id="idvLOGO">
-The IDV add new user interface to add logo easily via Edit --> Preferences, View tab .
+Memory allocation in the window XP 32 bit machine has been scaled back to 80%
 </faqitem>
 
 <faqitem q="New netCDF-Java Version" id="nj42">
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">netCDF-Java change log</a> 
-</faqitem>
-
-<faqitem q="New Jython library" id="jython">
-Jython library 1.5.2 is in the IDV library.
 </faqitem>
 
 <faqitem q="New ViSAD library" id="visad">
@@ -44,30 +31,12 @@ New version of ViSAD library is installed.
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Contour labeling" id="contourlabel">
-Added user interface  to resize the contour labels (with the consideration of the aspect ratio in the IDV),
-    changing font, show and hide, and align (in globe view too).
-</faqitem>
-
-<faqitem q="Ensemble grid capability" id="ensemble">         
-Added Ensemble grids UIs to support selecting all or partial members.
+<faqitem q="Wind Barb display" id="windbarbdisplay">
+Use custom IDV wind barb renderer.
 </faqitem>
 
 <faqitem q="Ensemble grid Diagnostic functions" id="ensFunctions">
-Added Ensemble grids diagnostic functions, including Average, Highest, Lowest, Mode, Percentile, Range, and Standard Deviation.
-</faqitem>
-
-<faqitem q="Hovmoller display" id="hovmoller">
-Added a new display type to do the Hovmoller display.
-</faqitem>
-
-<faqitem q="As topography displays" id="asTopo">
- Added 2D parameter as topography displays, including Color-Shaded Parameter As Topography, Contoured Parameter As Topography,
-    Color-Filled Contoured Parameter As Topography, and Radar Sweep As Topography.
-</faqitem>
-
-<faqitem q="New support of GrADS" id="grads">
- Added support for GrADS dataset.
+Added Ensemble grids diagnostic functions: single variable probability.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
@@ -75,9 +44,12 @@ Added a new display type to do the Hovmoller display.
 <faqitem q="Bug Fixes" id="bugfix">
 Several bug fixes were made in this release, including:
 <ul>
-<li>Fixed wind barb issue.
-<li>Fixed hurricane track color control issue.
-<li>Fixed CAP profile display bug.
+<li>ncIDV library fixed severl bugs related to grid dataset.
+<li>Fixed a bug when ehre is no animation time and the default template is being used.
+<li>Fixed a bug when the point observation is NaN.
+<li>Fixed a bug of timeout when access remote opendap server.
+<li>Fixed a bug of generating track image.
+<li>Fixed a bug in the storm track display.
 </ul>
 </faqitem>
 
