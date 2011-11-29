@@ -11,15 +11,23 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 3.0 release.
+The items below reflect changes since the 2.9u3 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
 <faqitem q="IDV memory allocation" id="idvmemory">
-Automatic memory allocation for Window XP 32 bit machines has been adjusted 
-to fix a problem where some systems would not start with version 3.0.
+Upon IDV start up, memory allocation is done automatically according to the user's machine specifications,
+also IDV memory allocation can be changed via Edit --> Preferences, System tab.
+</faqitem>
+
+<faqitem q="Mac OS X bundle" id="macOS">
+The IDV can now be installed as a Mac OS X bundle.
+</faqitem>
+
+<faqitem q="IDV logo" id="idvLOGO">
+The IDV add new user interface to add logo easily via Edit --> Preferences, View tab .
 </faqitem>
 
 <faqitem q="New netCDF-Java Version" id="nj42">
@@ -28,11 +36,20 @@ Among the changes are a fix for Gaussian latitude grids in GRIB format.  See the
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">netCDF-Java change log</a> for a complete list of changes.
 </faqitem>
 
+<faqitem q="New Jython library" id="jython">
+Jython library 1.5.2 is in the IDV library.
+</faqitem>
+
 <faqitem q="New ViSAD library" id="visad">
 A new version of ViSAD library is used in this release.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
+
+<faqitem q="Contour labeling" id="contourlabel">
+Added user interface  to resize the contour labels (with the consideration of the aspect ratio in the IDV),
+    changing font, show and hide, and align (in globe view too).
+</faqitem>
 
 <faqitem q="Wind Barb display" id="windbarbdisplay">
 All wind barb displays now use the same rendering scheme.  The effect is that
@@ -40,9 +57,26 @@ winds less than 2.5 knots, but greater than 0 will show as a staff with no
 flags.  Previously, they were drawn as circles (calm). 
 </faqitem>
 
+<faqitem q="Ensemble grid capability" id="ensemble">
+Added Ensemble grids UIs to support selecting all or partial members.
+</faqitem>
+
 <faqitem q="Ensemble grid Diagnostic functions" id="ensFunctions">
-A new ensemble grid diagnostic function was added to compute a single 
-variable probability of occurrence.
+Added Ensemble grids diagnostic functions, including Average, Highest, Lowest, Mode, Percentile, Range,
+    , Standard Deviation, and a single variable probability of occurrence.
+</faqitem>
+
+<faqitem q="Hovmoller display" id="hovmoller">
+Added a new display type to do the Hovmoller display.
+</faqitem>
+
+<faqitem q="As topography displays" id="asTopo">
+ Added 2D parameter as topography displays, including Color-Shaded Parameter As Topography, Contoured Parameter As Topography,
+    Color-Filled Contoured Parameter As Topography, and Radar Sweep As Topography.
+</faqitem>
+
+<faqitem q="New support of GrADS" id="grads">
+ Added support for GrADS dataset.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
@@ -50,6 +84,8 @@ variable probability of occurrence.
 <faqitem q="Bug Fixes" id="bugfix">
 Several bug fixes were made in this release, including:
 <ul>
+<li>Automatic memory allocation for Window XP 32 bit machines has been adjusted
+to fix a problem where some systems would not start with version 3.0.
 <li>the new netCDF-Java library fixed several bugs related to grids.
 <li>Fixed a bug when there is no animation time and the 
 default template is being used.
@@ -57,6 +93,9 @@ default template is being used.
 <li>Fixed a problem that was creating timeouts when accessing an OPeNDAP server.
 <li>Fixed a problem when generating a track image.
 <li>Fixed several bugs in the storm track display.
+<li>Fixed wind barb issue.
+<li>Fixed hurricane track color control issue.
+<li>Fixed CAP profile display bug.
 </ul>
 </faqitem>
 
