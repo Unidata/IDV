@@ -251,21 +251,21 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             }
         }
 
-        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(), ordinateLabel.getText(),
-                                            Integer.parseInt(majorTickSpinner.getModel().getValue() + ""),
-                                            Integer.parseInt(minorTickSpinner.getModel().getValue() + ""));
-
-        if (!newLatLonInfo.equals(latLonInfo)) {
-            latLonInfo = newLatLonInfo;
-
-            try {
-                control.applyLatLonScale(latLonInfo);
-            } catch (Exception e) {
-                LogUtil.userMessage("An error has occurred:" + e);
-
-                return false;
-            }
-        }
+//        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(), ordinateLabel.getText(),
+//                                            Integer.parseInt(majorTickSpinner.getModel().getValue() + ""),
+//                                            Integer.parseInt(minorTickSpinner.getModel().getValue() + ""));
+//
+//        if (!newLatLonInfo.equals(latLonInfo)) {
+//            latLonInfo = newLatLonInfo;
+//
+//            try {
+//                control.applyLatLonScale(latLonInfo);
+//            } catch (Exception e) {
+//                LogUtil.userMessage("An error has occurred:" + e);
+//
+//                return false;
+//            }
+//        }
 
         return true;
     }
