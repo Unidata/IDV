@@ -430,7 +430,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (latScale != null) {
-            latScale.setVisible(true);
+            latScale.setVisible(false);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation ur = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
@@ -439,7 +439,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (lonScale != null) {
-            lonScale.setVisible(true);
+            lonScale.setVisible(false);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation lr = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
