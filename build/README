@@ -16,6 +16,26 @@ So we have(in an abbreviated way):
 Run the test suite (see below) and make sure to update and
 check in /ucar/unidata/idv/resources/version.properties.
 
+Before making a release, make sure to update the release notes
+in auxdata/docs/userguide/content/ReleaseNotes.html
+******************************************************
+- Try to add descriptive verbage to each item in the Release Notes.
+- The questions (q attribute) should be camel cased (i.e. first letter of each word should be capitalized).
+  Words like for, and, a, the don't need to be capitalized.
+- If there are other pages in the user guide with more information on the
+  change (like a new control page, or something in the preferences), add a link to it from the description.
+- The format for menus and submenus is Menu->Submenu->Sub-submenu.
+  You can use the [ug::menu] macro which will format and bold the menus for you.
+  If there are multiple words in a menu, enclose them in braces {}.
+  Examples:  [ug::menu Edit Preferences] will show up as Edit->Preferences.
+  [ug:menu Edit {Remove All Displays}] will show up as Edit->Remove All Displays
+- Release Notes should include items since the last previous major release.
+  Updates (e.g. 3.0u1) should include all the notes from the first release of that series (e.g. 3.0)
+  up to the current one.
+- It's good to update the Release Notes when you add something new so you don't forget about it
+  when the official release comes around.
+********************************************************
+
 When you are ready to make a release, run:
 
 cd /share/idv/build
