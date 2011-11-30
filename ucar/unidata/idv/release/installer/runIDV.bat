@@ -33,19 +33,17 @@ REM See important note about this above. To bootstrap the IDV memory, uncomment
 REM the line below and set to a value  in megabytes. 
 REM set idv_memory=512
 
-
 REM To avoid IDV crashes, in some situations it may be necessary to increase MaxPermSize. We have 
-REM especially noticed this problem on the OS X platform. The deault MaxPermSize is 64m. To
-REM increase it to 128m please adjust the idv_maxpermsize to 128 below
-
-set idv_maxpermsize=64
+REM especially noticed this problem on the OS X platform. The default MaxPermSize is 64m. To
+REM increase it to 128m please comment out next line and uncomment the following line.
 
 @echo on    
-jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermsize%m -Didv.enableStereo=false -jar idv.jar %*
+jre\bin\java -Xmx%idv_memory%m -Didv.enableStereo=false -jar idv.jar %*
+REM jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=128m -Didv.enableStereo=false -jar idv.jar %*
 @echo off
 
 REM Use the line below instead if you want to use the D3D version of Java 3D
-REM jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermsize%m -Dj3d.rend=d3d -jar idv.jar %*
+REM jre\bin\java -Xmx%idv_memory%m -Dj3d.rend=d3d -jar idv.jar %*
 	    
 endlocal
    
