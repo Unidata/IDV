@@ -33,9 +33,9 @@ REM See important note about this above. To bootstrap the IDV memory, uncomment
 REM the line below and set to a value  in megabytes. 
 REM set idv_memory=512
 
-REM To avoid IDV crashes, in some situations it may be necessary to increase MaxPermSize. We have 
-REM especially noticed this problem on the OS X platform. The default MaxPermSize is 64m. To
-REM increase it to 128m please comment out next line and uncomment the following line.
+REM To avoid IDV OutOfMemory problems, it may be necessary to increase the MaxPermSize in the Java
+REM Virtual Machine. The default MaxPermSize is 64m. To increase it to 128m please comment out next
+REM line and uncomment the line following that. 
 
 @echo on    
 jre\bin\java -Xmx%idv_memory%m -Didv.enableStereo=false -jar idv.jar %*
