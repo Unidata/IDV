@@ -156,6 +156,7 @@
       <station name="OKLAHOMA_CITY/Kegelman_Aux_F OK" value="VNX" lat="36.73" lon="-98.12"/>
       <station name="LOS_ANGELES/Ventura_County CA" value="VTX" lat="34.4" lon="-119.17"/>
       <station name="PHOENIX/Yuma AZ" value="YUX" lat="32.48" lon="-114.65"/>
+      <station name="Langley Hill WA" value="LGX" lat="47.13" lon="-124.10"/>
      </selectStations>
   
      <selectList id="product" label="Product:" >
