@@ -30,13 +30,7 @@ package ucar.unidata.idv;
 
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.idv.control.GridDisplayControl;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-
-
-
 import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.xml.XmlUtil;
 
 
 
@@ -131,7 +125,7 @@ public interface IdvConstants {
     /** is isl scripting interactive or batch */
     public static final String ARG_ISLINTERACTIVE = "-islinteractive";
 
-    /** _more_ */
+    /** base64 isl encoding flag */
     public static final String ARG_B64ISL = "-b64isl";
 
     /** an isl file */
@@ -311,54 +305,48 @@ public interface IdvConstants {
     /** Id used in hashtable bundle to define commands to run (e.g., to show the color table editor) */
     public static final String ID_COMMANDSTORUN = "commandstorun";
 
-
-    /** _more_ */
+    /** Id used for showing the legend icons */
     public static final String PREF_LEGEND_SHOWICONS = "idv.legend.showicons";
 
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
-    /** _more_ */
+    /** Property used for showing the clock */
     public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
 
-    /** _more_ */
+    /** Property for the minimum frame cycle time */
     public static final String PROP_MINIMUMFRAMECYCLETIME =
         "idv.minimumframecycletime";
 
-    /** _more_ */
+    /** The fix file lockup property id */
     public static final String PROP_FIXFILELOCKUP = "idv.fixfilelockup";
 
-    /** _more_ */
+    /** The display list group property id */
     public static final String PROP_DISPLAYLIST_GROUP =
         "idv.displaylist.group";
-
-
 
     /** Holds the preference for the one instance port */
     public static final String PROP_ONEINSTANCEPORT = "idv.oneinstanceport";
 
-
-
-    /** _more_ */
+    /** The map globe level property id */
     public static final String PROP_MAP_GLOBE_LEVEL = "idv.map.globe.level";
 
-    /** _more_ */
+    /** The map map level property id */
     public static final String PROP_MAP_MAP_LEVEL = "idv.map.map.level";
 
-    /** _more_ */
+    /** The monitor port id */
     public static final String PROP_MONITORPORT = "idv.monitorport";
 
-    /** _more_ */
+    /** The id for the maximum number of rendering threads preference */
     public static final String PREF_THREADS_RENDER = "idv.threads.render.max";
 
-    /** _more_ */
+    /** The id for the maximum number of data reading threads preference */
     public static final String PREF_THREADS_DATA = "idv.threads.render.data";
-
 
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";
 
-    /** _more_ */
+    /** The show hidden files preference id */
     public static final String PREF_SHOWHIDDENFILES = "idv.showhiddenfiles";
 
     /** preference for scroll wheel */
@@ -367,7 +355,6 @@ public interface IdvConstants {
     /** preference for key mappings */
     public static final String PREF_EVENT_KEYBOARDMAP =
         "idv.event.keyboardmap";
-
 
     /** look and feel preference */
     public static final String PREF_LOOKANDFEEL = "idv.ui.lookandfeel";
@@ -411,14 +398,11 @@ public interface IdvConstants {
         "idv.locations.default";
 
 
-
     /** Property name for   showing the splash */
     public static final String PROP_SHOWSPLASH = "idv.splash.show";
 
-
     /** Property name for  splash icon */
     public static final String PROP_SPLASHICON = "idv.splash.icon";
-
 
 
     /**
@@ -592,6 +576,12 @@ public interface IdvConstants {
 
     /** IDV memory usage */
     public static final String PREF_MEMORY = "idv.memory";
+
+    /** IDV max perm gen memory usage */
+    public static final String PREF_MAX_PERMGENSIZE = "idv.maxpermgensize";
+
+    /** default max perm gen memory usage  (megabytes) */
+    public static final int DEFAULT_MAX_PERMGENSIZE = 128;
 
     /** Preference to store what choosers to show */
     public static final String PROP_CHOOSERS = "idv.choosers";

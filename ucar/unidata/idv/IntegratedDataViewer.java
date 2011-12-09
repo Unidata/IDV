@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,60 +21,38 @@
 package ucar.unidata.idv;
 
 
-
-import org.python.core.*;
-import org.python.util.*;
-
-import org.w3c.dom.Document;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-
-import ucar.unidata.data.*;
+import ucar.unidata.data.CacheDataSource;
+import ucar.unidata.data.DataCancelException;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataContext;
+import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataSourceResults;
+import ucar.unidata.data.DerivedDataDescriptor;
 import ucar.unidata.data.gis.WmsDataSource;
 import ucar.unidata.data.gis.WmsSelection;
 import ucar.unidata.idv.chooser.IdvChooser;
-
-import ucar.unidata.idv.chooser.IdvChooserManager;
-import ucar.unidata.idv.collab.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
-
 import ucar.unidata.idv.control.DisplaySettingsDialog;
-import ucar.unidata.idv.control.WMSControl;
-import ucar.unidata.idv.control.WMSInfo;
-
-import ucar.unidata.idv.publish.PublishManager;
-
-
-import ucar.unidata.idv.ui.*;
-import ucar.unidata.ui.colortable.ColorTableManager;
-
+import ucar.unidata.idv.ui.DataSelector;
+import ucar.unidata.idv.ui.IdvUIManager;
+import ucar.unidata.idv.ui.IdvWindow;
+import ucar.unidata.idv.ui.QuicklinkPanel;
 import ucar.unidata.ui.symbol.StationModelManager;
-
-
 import ucar.unidata.util.CacheManager;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Msg;
-import ucar.unidata.util.ObjectPair;
-
 import ucar.unidata.util.PropertyValue;
-import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.xml.PreferenceManager;
 import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.VisADPersistence;
@@ -82,34 +60,38 @@ import ucar.visad.VisADPersistence;
 import visad.Data;
 import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.io.*;
 
 
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-import java.lang.reflect.*;
+import java.io.File;
+import java.io.FileInputStream;
 
-import java.net.Socket;
-
-import java.net.URL;
+import java.lang.reflect.Method;
 
 import java.rmi.RemoteException;
 
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
-import javax.media.j3d.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 
 /**
@@ -361,9 +343,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
     /**
-     * _more_
+     * See if we are in server mode or not
      *
-     * @return _more_
+     * @return true if in server mode
      */
     public boolean getServerMode() {
         return !interactiveMode;
@@ -882,7 +864,7 @@ Misc.run(new Runnable() {
                 null,
                 "<html><center>You are now running IDV version "
                 + currentVersion
-                + "<p>Would you like to see the Release Notes?</center></html>", "Show Release Notes?")){ 
+                + "<p>Would you like to see the Release Notes?</center></html>", "Show Release Notes?")) {
             getIdvUIManager().showHelp("idv.releasenotes");;
         }
     }
@@ -2056,7 +2038,7 @@ Misc.run(new Runnable() {
     public String selectDataType(Object definingObject, String message) {
         JComboBox dataSourcesCbx = IdvChooser.getDataSourcesComponent(false,
                                        getDataManager(), false);
-        JLabel label = new JLabel(message);
+        JLabel label    = new JLabel(message);
         JPanel contents = GuiUtils.vbox(
                               GuiUtils.inset(label, 5),
                               GuiUtils.inset(
@@ -2100,11 +2082,11 @@ Misc.run(new Runnable() {
             if ( !getProperty(PROP_LOADINGXML, false)) {
                 if (getStore().get(PREF_AUTODISPLAYS_ENABLE, true)) {
                     JDialog notifyWindow = null;
-                    List pairs =
+                    List    pairs        =
                         getAutoDisplayEditor().getDisplaysForDataSource(
                             dataSource);
                     for (int i = 0; i < pairs.size(); i += 2) {
-                        DataChoice dc = (DataChoice) pairs.get(i);
+                        DataChoice        dc = (DataChoice) pairs.get(i);
                         ControlDescriptor cd =
                             (ControlDescriptor) pairs.get(i + 1);
                         doMakeControl(dc, cd, NULL_STRING);
@@ -2180,6 +2162,15 @@ Misc.run(new Runnable() {
      */
     public int getMaxDataThreadCount() {
         return getStore().get(PREF_THREADS_DATA, 4);
+    }
+
+    /**
+     * Get the max size of the perm gen space
+     *
+     * @return max size of perm gen space
+     */
+    public int getMaxPermGenSize() {
+        return getStore().get(PREF_MAX_PERMGENSIZE, DEFAULT_MAX_PERMGENSIZE);
     }
 
 
@@ -2916,6 +2907,11 @@ Misc.run(new Runnable() {
     }
 
 
+    /**
+     * Get the XmlEncoder for this instance
+     *
+     * @return  the encoder
+     */
     protected XmlEncoder getEncoder() {
         return getEncoder(true);
     }
@@ -2941,18 +2937,22 @@ Misc.run(new Runnable() {
             "org.ramadda.repository.client.InteractiveRepositoryClient");
 
         encoder.registerNewClassName(
-                                     "org.ramadda.repository.InteractiveRepositoryClient",
-                                     "org.ramadda.repository.client.InteractiveRepositoryClient");
+            "org.ramadda.repository.InteractiveRepositoryClient",
+            "org.ramadda.repository.client.InteractiveRepositoryClient");
 
         encoder.registerNewClassName(
             "ucar.unidata.idv.FlythroughPoint",
             "ucar.unidata.idv.flythrough.FlythroughPoint");
-        
+
         //A hack to support the new geon package structure
         //Sometime we need to have this be a property or some xml format
-        encoder.addClassPatternReplacement("ucar.unidata.apps.geon","org.unavco.idv.geon");
-        encoder.addClassPatternReplacement("ucar.unidata.repository","org.ramadda.repository");
-        encoder.addClassPatternReplacement("org.ramadda.repository.idv.RamaddaPublisher","org.ramadda.geodata.publisher.RamaddaPublisher");
+        encoder.addClassPatternReplacement("ucar.unidata.apps.geon",
+                                           "org.unavco.idv.geon");
+        encoder.addClassPatternReplacement("ucar.unidata.repository",
+                                           "org.ramadda.repository");
+        encoder.addClassPatternReplacement(
+            "org.ramadda.repository.idv.RamaddaPublisher",
+            "org.ramadda.geodata.publisher.RamaddaPublisher");
 
 
         VisADPersistence.init(encoder);
@@ -2980,7 +2980,7 @@ Misc.run(new Runnable() {
      */
     public boolean quit() {
         if (getStore().get(PREF_SHOWQUITCONFIRM, true)) {
-            JCheckBox cbx = new JCheckBox("Always ask", true);
+            JCheckBox  cbx  = new JCheckBox("Always ask", true);
             JComponent comp =
                 GuiUtils
                     .vbox(new JLabel(
