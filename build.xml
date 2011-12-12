@@ -384,7 +384,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
       <echo message="dir1=${srcdir}/auxdata/docs/${docgen_dir}"/>
 
       <exec failifexecutionfails="false"
-            dir="${srcdir}/auxdata/docs/${docgen_dir}"
+            dir="${basedir}/auxdata/docs/${docgen_dir}"
             executable="/usr/bin/tclsh" os="Linux" >
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
