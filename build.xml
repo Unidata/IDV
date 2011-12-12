@@ -6,7 +6,7 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir=".." default="all" name="IDV">
+<project basedir="." default="all" name="IDV">
 
     <target name="init">
 
@@ -15,7 +15,7 @@ argument -Dfoo=bar) -->
        </tstamp>
 
         <!-- The directory  that contains the source trees (from cvs) -->
-        <property name="srcdir" value="${basedir}"/>
+        <property name="srcdir" value="${basedir}/src"/>
 
        <property environment="env"/>
 
@@ -50,7 +50,7 @@ argument -Dfoo=bar) -->
         <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
         <mkdir dir="${docs_javadoc_dest}"/>
 
-        <property name="docs_generate_script" value="${srcdir}/auxdata/docs/build/generate.tcl" />
+        <property name="docs_generate_script" value="${basedir}/auxdata/docs/build/generate.tcl" />
         <property name="docs_userguide_dest" value="${docs_dest}/userguide"/>
         <property name="docs_workshop_dest" value="${docs_dest}/workshop"/>
         <property name="docs_devworkshop_dest" value="${docs_dest}/devworkshop"/>
@@ -59,8 +59,8 @@ argument -Dfoo=bar) -->
 <!-- Have this here so we have some blank value of this property
        for those doc gen tasks  that don't se this argument -->
 
-        <property name="docgen_extra_arg" value=""/> 
-        <property name="docgen_target" value="../processed"/> 
+        <property name="docgen_extra_arg" value=""/>
+        <property name="docgen_target" value="../processed"/>
 
 
         <!-- Location of 3-rd party jarfiles -->
@@ -69,7 +69,7 @@ argument -Dfoo=bar) -->
 
 
         <!-- The Ant build uses its own classpath -->
- 
+
 
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
 
@@ -137,7 +137,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/abom.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libsrc}/AppleJavaExtensions.jar" dest="${tmpjardir}"/>
-        <jar 
+        <jar
             basedir="${tmpjardir}"
             compress="true"
             jarfile="${libsdir}/external.jar">
@@ -185,7 +185,7 @@ argument -Dfoo=bar) -->
         <antcall target="jhindex"/>
 
        <!-- Jar em up -->
-        <jar 
+        <jar
             basedir="${srcdir}"
             compress="true"
             jarfile="${jars_dest}/auxdata.jar">
@@ -203,7 +203,7 @@ argument -Dfoo=bar) -->
 
 
     <target name="idvmaps" depends="init">
-        <jar 
+        <jar
             basedir="${srcdir}"
             compress="true"
             jarfile="${jars_dest}/idvmaps.jar">
@@ -218,7 +218,7 @@ argument -Dfoo=bar) -->
         <exec output="dummyfile"
             executable="/share/jh/javahelp/bin/jhindexer"
             failifexecutionfails="false"
-            dir="${srcdir}/auxdata/docs/userguide">
+            dir="${basedir}/auxdata/docs/userguide">
             <arg line="${env.JAVA_HOME}/bin/java -logfile jh.out processed"/>
 <!--
             <env key="PATH" value="/bin:/usr/bin"/>
@@ -237,19 +237,19 @@ argument -Dfoo=bar) -->
 
     <target name="jaridv" depends="init">
         <antcall target="idv"/>
-        <copy overwrite="true" file="ucar/unidata/idv/resources/version.properties" tofile="ucar/unidata/idv/resources/build.properties">
+        <copy overwrite="true" file="${srcdir}/ucar/unidata/idv/resources/version.properties" tofile="${srcdir}/ucar/unidata/idv/resources/build.properties">
             <filterset>
                 <filter token="DATE" value="${date}"/>
             </filterset>
         </copy>
 
-        <antcall target="jarmf"> 
-            <param name="jarfile" value="idv"/> 
-            <param 
+        <antcall target="jarmf">
+            <param name="jarfile" value="idv"/>
+            <param
                 name="excludes"
                 value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geoloc/**,ucar/unidata/repository/**"
 
-            /> 
+            />
         </antcall>
     </target>
 
@@ -259,9 +259,9 @@ argument -Dfoo=bar) -->
             debug="true"
             source="${srcversion}"
             target="${srcversion}"
-            deprecation="false" 
+            deprecation="false"
             destdir="${compiledir}"
-            failonerror="${failonerror}" 
+            failonerror="${failonerror}"
             srcdir="${srcdir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
@@ -271,7 +271,7 @@ argument -Dfoo=bar) -->
 -->
             <include name="ucar/unidata/ui/TimelineApplet.java"/>
            </javac>
-        <jar 
+        <jar
             basedir="${compiledir}"
             compress="true"
             jarfile="${jars_dest}/timeline.jar"
@@ -287,9 +287,9 @@ argument -Dfoo=bar) -->
             debug="true"
             source="${srcversion}"
             target="${srcversion}"
-            deprecation="false" 
+            deprecation="false"
             destdir="${compiledir}"
-            failonerror="${failonerror}" 
+            failonerror="${failonerror}"
             srcdir="${srcdir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
@@ -325,9 +325,9 @@ argument -Dfoo=bar) -->
             debug="true"
             source="${srcversion}"
             target="${srcversion}"
-            deprecation="false" 
+            deprecation="false"
             destdir="${compiledir}"
-            failonerror="${failonerror}" 
+            failonerror="${failonerror}"
             srcdir="${srcdir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
@@ -384,25 +384,25 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
       <echo message="dir1=${srcdir}/auxdata/docs/${docgen_dir}"/>
 
       <exec failifexecutionfails="false"
-            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            dir="${srcdir}/auxdata/docs/${docgen_dir}"
             executable="/usr/bin/tclsh" os="Linux" >
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
 
       <exec failifexecutionfails="false"
-            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            dir="${srcdir}/auxdata/docs/${docgen_dir}"
             executable="/opt/bin/tclsh" os="SunOS" >
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
 
 	  <exec failifexecutionfails="false"
-	        dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+	        dir="${basedir}/auxdata/docs/${docgen_dir}"
 	        executable="/usr/bin/tclsh" os="Mac OS X" >
 	    <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
 	  </exec>
 
       <exec failifexecutionfails="false"
-            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            dir="${srcdir}/auxdata/docs/${docgen_dir}"
             executable="c:/Tcl/bin/tclsh" os="Windows XP" >
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
@@ -412,14 +412,14 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
 
     <target name="docs_userguide_forweb" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="userguide/content"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="userguide/content"/>
         </antcall>
     </target>
 
 
     <target name="docs_pdf" depends="init">
-        <antcall target="docs_userguide_forpdf"/> 
+        <antcall target="docs_userguide_forpdf"/>
         <exec output="dummyfile"
               executable="${htmldoc}"
               failifexecutionfails="false"
@@ -431,7 +431,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <fileset file="${srcdir}/auxdata/docs/userguide/processed/userguide.pdf"/>
         </copy>
 
-        <antcall target="docs_workshop_forpdf"/> 
+        <antcall target="docs_workshop_forpdf"/>
         <exec output="dummyfile"
               executable="${htmldoc}"
               failifexecutionfails="false"
@@ -446,57 +446,57 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
 
     <target name="docs_userguide_forpdf" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="userguide/content"/> 
-            <param name="docgen_extra_arg" value="-clean -doall"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="userguide/content"/>
+            <param name="docgen_extra_arg" value="-clean -doall"/>
         </antcall>
     </target>
 
 
     <target name="docs_workshop_forpdf" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="workshop/content"/> 
-            <param name="docgen_extra_arg" value="-clean -doall"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="workshop/content"/>
+            <param name="docgen_extra_arg" value="-clean -doall"/>
         </antcall>
     </target>
 
 
     <target name="docs_devworkshop_forpdf" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="workshop/content"/> 
-            <param name="docgen_target" value="../devprocessed"/> 
-            <param name="docgen_extra_arg" value="-clean -doall -fordev"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="workshop/content"/>
+            <param name="docgen_target" value="../devprocessed"/>
+            <param name="docgen_extra_arg" value="-clean -doall -fordev"/>
         </antcall>
     </target>
 
 
     <target name="docs_userguide_forjar" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="userguide/content"/> 
-            <param name="docgen_extra_arg" value="-clean -forjavahelp"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="userguide/content"/>
+            <param name="docgen_extra_arg" value="-clean -forjavahelp"/>
         </antcall>
     </target>
 
 
     <target name="docs_workshop" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="workshop/content"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="workshop/content"/>
         </antcall>
     </target>
 
 
     <target name="docs_devworkshop" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="workshop/content"/> 
-            <param name="docgen_target" value="../devprocessed"/> 
-            <param name="docgen_extra_arg" value="-clean -fordev"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="workshop/content"/>
+            <param name="docgen_target" value="../devprocessed"/>
+            <param name="docgen_extra_arg" value="-clean -fordev"/>
         </antcall>
     </target>
 
 
     <target name="docs_developer" depends="init">
-        <antcall target="docs_gen"> 
-            <param name="docgen_dir" value="developer/content"/> 
+        <antcall target="docs_gen">
+            <param name="docgen_dir" value="developer/content"/>
         </antcall>
     </target>
 
@@ -615,7 +615,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="srchtml" depends="init">
         <taskdef name="java2html" classname="com.java2html.Java2HTMLTask"/>
-        <java2html title="IDV Source" 
+        <java2html title="IDV Source"
                 simple="no"
                 tabsize="4"
                 marginsize="2"
@@ -632,7 +632,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="jar" depends="init">
         <antcall target="copyauxfiles"/>
-        <jar 
+        <jar
             basedir="${compiledir}"
             compress="true"
             jarfile="${jars_dest}/${jarfile}.jar"
@@ -659,7 +659,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
 
     <target name="srcjar" depends="init">
-        <jar 
+        <jar
             basedir="${compiledir}"
             compress="true"
             jarfile="idv_src_${idv.version}.jar"
@@ -668,13 +668,13 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <exclude name="ucar/**/CVS/**"/>
             <exclude name="ucar/**/*.class"/>
             <exclude name="ucar/**/*.map"/>
-            <exclude name="ucar/**/*.jar"/>            
-            <exclude name="ucar/**/*.ascii"/>            
-            <exclude name="ucar/**/*.tml"/>            
-            <exclude name="ucar/**/*.bak"/>            
-            <exclude name="ucar/**/*.zip"/>            
-            <exclude name="ucar/**/*.shp"/>            
-            <exclude name="ucar/**/*.nc"/>            
+            <exclude name="ucar/**/*.jar"/>
+            <exclude name="ucar/**/*.ascii"/>
+            <exclude name="ucar/**/*.tml"/>
+            <exclude name="ucar/**/*.bak"/>
+            <exclude name="ucar/**/*.zip"/>
+            <exclude name="ucar/**/*.shp"/>
+            <exclude name="ucar/**/*.nc"/>
             <exclude name="ucar/unidata/data/storm/*ADOT*"/>
             <exclude name="ucar/unidata/idv/control/storm/*ADOT*"/>
             <exclude name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
@@ -710,7 +710,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
               <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
-            </manifest> 
+            </manifest>
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
             <include name="ucar/**/*.xml"/>
@@ -721,8 +721,8 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.py"/>
             <include name="ucar/**/*.jnlp"/>
             <include name="ucar/**/*.gif"/>
-            <include name="ucar/**/*.jpg"/>                  
-            <include name="ucar/**/*.png"/>                  
+            <include name="ucar/**/*.jpg"/>
+            <include name="ucar/**/*.png"/>
             <include name="ucar/**/*.jpeg"/>
             <include name="ucar/**/*.tbl"/>
             <include name="ucar/unidata/data/**/*.sql"/>
@@ -749,7 +749,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
               <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
-            </manifest> 
+            </manifest>
             <include name="ucar/**/README*"/>
         </jar>
     </target>
@@ -802,9 +802,9 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             debug="true"
             source="${srcversion}"
             target="${srcversion}"
-            deprecation="false" 
+            deprecation="false"
             destdir="${compiledir}"
-            failonerror="${failonerror}" 
+            failonerror="${failonerror}"
             srcdir="${srcdir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}">
@@ -824,7 +824,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
            </javac>
 
 
-        <jar 
+        <jar
             basedir="${compiledir}"
             compress="true"
             jarfile="${jars_dest}/unidatautil.jar">
@@ -833,7 +833,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/unidata/gis/geotiff/tables/*"/>
         </jar>
 
-        <jar 
+        <jar
             update="yes"
             basedir="${tmpjardir}"
             compress="true"
