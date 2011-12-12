@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<!-- 
+<!--
 To do a jnlp/jar release you do:
 
 ant release
@@ -17,7 +17,7 @@ By default the base directory of the build is relative to where
 this build.xml file is (even if you are running ant from some other
 directory), thus the ".." implies the base directory is the parent
 directory of this libs directory.  This can be overridden at the command
-line using: and -Dbasedir=/some/other/dir 
+line using: and -Dbasedir=/some/other/dir
 -->
 
 <project basedir=".." default="all" name="IDV">
@@ -28,7 +28,7 @@ line using: and -Dbasedir=/some/other/dir
     </tstamp>
 
         <!-- srcdir is where we check out cvs code -->
-        <property name="srcdir"  value="${basedir}" />
+        <property name="srcdir"  value="${basedir}/src" />
         <property name="svn_root"  value="http://sub.unidata.ucar.edu/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
@@ -95,27 +95,27 @@ line using: and -Dbasedir=/some/other/dir
                classpath="${install4jdir}/bin/ant.jar"/>
         <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
     </target>
-               
+
     <target name="all" depends="init">
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="svnco" /> 
+        <antcall target="svnco" />
 <!--  No need to do this automatically
         <echo message="FTPing visad." />
-        <antcall target="visad" /> 
+        <antcall target="visad" />
 -->
         <echo message="Building ucar packages." />
-        <ant antfile="${srcdir}/ucar/build.xml" target="all" />
+        <ant antfile="${basedir}/build.xml" target="all" />
     </target>
- 
+
     <target name="quick" depends="init">
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="svnco" /> 
+        <antcall target="svnco" />
         <echo message="FTPing visad." />
-        <antcall target="visad" /> 
+        <antcall target="visad" />
         <echo message="Building ucar packages." />
         <ant antfile="${srcdir}/ucar/build.xml" target="justjars" />
         <!-- <antcall target="webstart_jars" /> -->
@@ -144,13 +144,13 @@ line using: and -Dbasedir=/some/other/dir
             <include name="idv/ucar/**"/>
             <exclude name="idv/ucar/**/*.class"/>
             <exclude name="idv/ucar/**/*.map"/>
-            <exclude name="idv/ucar/**/*.jar"/>            
-            <exclude name="idv/ucar/**/*.ascii"/>            
-            <exclude name="idv/ucar/**/*.tml"/>            
-            <exclude name="idv/ucar/**/*.bak"/>            
-            <exclude name="idv/ucar/**/*.zip"/>            
-            <exclude name="idv/ucar/**/*.shp"/>            
-            <exclude name="idv/ucar/**/*.nc"/>            
+            <exclude name="idv/ucar/**/*.jar"/>
+            <exclude name="idv/ucar/**/*.ascii"/>
+            <exclude name="idv/ucar/**/*.tml"/>
+            <exclude name="idv/ucar/**/*.bak"/>
+            <exclude name="idv/ucar/**/*.zip"/>
+            <exclude name="idv/ucar/**/*.shp"/>
+            <exclude name="idv/ucar/**/*.nc"/>
             <exclude name="idv/ucar/unidata/data/storm/*ADOT*"/>
             <exclude name="idv/ucar/unidata/idv/control/storm/*ADOT*"/>
             <exclude name="idv/ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
@@ -182,13 +182,13 @@ line using: and -Dbasedir=/some/other/dir
             <include name="idv/ucar/**"/>
             <exclude name="idv/ucar/**/*.class"/>
             <exclude name="idv/ucar/**/*.map"/>
-            <exclude name="idv/ucar/**/*.jar"/>            
-            <exclude name="idv/ucar/**/*.ascii"/>            
-            <exclude name="idv/ucar/**/*.tml"/>            
-            <exclude name="idv/ucar/**/*.bak"/>            
-            <exclude name="idv/ucar/**/*.zip"/>            
-            <exclude name="idv/ucar/**/*.shp"/>            
-            <exclude name="idv/ucar/**/*.nc"/>            
+            <exclude name="idv/ucar/**/*.jar"/>
+            <exclude name="idv/ucar/**/*.ascii"/>
+            <exclude name="idv/ucar/**/*.tml"/>
+            <exclude name="idv/ucar/**/*.bak"/>
+            <exclude name="idv/ucar/**/*.zip"/>
+            <exclude name="idv/ucar/**/*.shp"/>
+            <exclude name="idv/ucar/**/*.nc"/>
             <exclude name="idv/ucar/unidata/data/storm/*ADOT*"/>
             <exclude name="idv/ucar/unidata/idv/control/storm/*ADOT*"/>
             <exclude name="idv/ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
@@ -257,14 +257,14 @@ line using: and -Dbasedir=/some/other/dir
     </target>
 
     <target name="visad" depends="init">
-        <ftp action="get" 
+        <ftp action="get"
              server="ftp.ssec.wisc.edu"
-             password="idv@unidata.ucar.edu"       
+             password="idv@unidata.ucar.edu"
              userid="anonymous"
-             remotedir="/pub/visad-2.0"              
-             depends="yes" 
-             passive="yes" 
-             skipFailedTransfers="true" 
+             remotedir="/pub/visad-2.0"
+             depends="yes"
+             passive="yes"
+             skipFailedTransfers="true"
          >
             <fileset  dir="${libsdir}" includes="visad.jar"/>
         </ftp>
@@ -383,27 +383,27 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="Making conan directory: ${snapshot_path}"/>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path};"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/docs;"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/docs/userguide;"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/docs/workshop;"/>
-        </exec>       
+        </exec>
 
         <echo message="Making download directory: /content${snapshot_download_path}"/>
         <exec executable="ssh">
             <arg line="conan cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_download_path};"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan cd /content${snapshot_download_path};if !(-e idv) ln -s /web/ftp/pub/idv idv;if (-e ftp) rm ftp;ln -s idv/${snapshot_dir} ftp"/>
-        </exec>       
+        </exec>
 
 
         <echo message="Copying installers to downloads directory"/>
@@ -418,15 +418,15 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="Making webstart directory: ${snapshot_path}/webstart"/>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/webstart;"/>
-        </exec>       
+        </exec>
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/webstart/IDV;"/>
-        </exec>       
+        </exec>
 
 <!--  Not needed after 2.6a2
         <exec executable="ssh">
             <arg line="conan cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
-        </exec>       
+        </exec>
 -->
 
        <antcall target="webstart_release">
@@ -456,11 +456,11 @@ line using: and -Dbasedir=/some/other/dir
 
         <exec executable="ssh">
             <arg line="conan cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
-        </exec>       
+        </exec>
 
         <exec executable="ssh">
             <arg line="conan cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
-        </exec>       
+        </exec>
 
         <echo message="Copying index.html file: /content${snapshot_path}"/>
 
@@ -505,16 +505,16 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="Flipping links: ln -s ${snapshot_dir} ${snapshot_name}"/>
         <exec executable="ssh">
             <arg line="conan cd /content${idv_release_path}; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
-        </exec>       
+        </exec>
 
         <exec executable="ssh">
             <arg line="conan cd /home/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
-        </exec>       
+        </exec>
 
         <echo message="Setting mode g+w"/>
         <exec executable="ssh">
             <arg line="conan cd /content${idv_release_path} ; chmod -R g+w ${snapshot_dir}"/>
-        </exec>       
+        </exec>
 
 
     </target>
@@ -654,7 +654,7 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="zipdocs" depends="init">
 <!-- TODO: What do we want zipped here? -->
-        <ant antfile="${srcdir}/ucar/build.xml" target="docs" />
+        <ant antfile="${basedir}/build.xml" target="docs" />
         <zip
             zipfile="${ftpdir}/idv_userguide_${idv.version}.zip"
             compress="true">
@@ -672,7 +672,7 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="installers" depends="init">
        <copy file="${installer_src_dir}/idv.install4j" tofile="${installerdir}/idv.install4j.${idv.version}" overwrite="true"/>
-      <install4j 
+      <install4j
           projectfile="${installerdir}/idv.install4j.${idv.version}"
           release="${idv.version}"
           destination="${installerdir}"
