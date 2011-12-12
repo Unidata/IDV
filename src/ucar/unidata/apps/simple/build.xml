@@ -8,16 +8,16 @@ argument -Dfoo=bar) -->
 
 <project basedir="../../../../" default="install_plugin" name="SimpleIdv">
 
-    <import file="../../../build.xml"/>
+    <import file="../../../../../build.xml"/>
 
     <target name="simpleidv" depends="init">
         <javac
             classpath="${classpath}"
             debug="true"
             source="${srcversion}"
-            deprecation="false" 
+            deprecation="false"
             destdir="${compiledir}"
-            failonerror="${failonerror}" 
+            failonerror="${failonerror}"
             nowarn="true"
             srcdir="${srcdir}"
         >
@@ -27,7 +27,7 @@ argument -Dfoo=bar) -->
 
 
     <target name="jar" depends="simpleidv">
-        <jar 
+        <jar
             basedir="${srcdir}"
             compress="true"
             update="false"
@@ -38,7 +38,7 @@ argument -Dfoo=bar) -->
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
               <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
-            </manifest> 
+            </manifest>
             <include name="ucar/unidata/apps/simple/**"/>
         </jar>
     </target>
