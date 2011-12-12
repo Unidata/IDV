@@ -788,7 +788,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="clean" depends="init" >
         <delete>
-            <fileset dir="${compiledir}/ucar" includes="**/*.class"/>
+            <fileset dir="${compiledir}/src/ucar" includes="**/*.class"/>
         </delete>
     </target>
 
