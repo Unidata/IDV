@@ -29,7 +29,7 @@ line using: and -Dbasedir=/some/other/dir
 
         <!-- srcdir is where we check out cvs code -->
         <property name="srcdir"  value="${basedir}/src" />
-        <property name="svn_root"  value="http://sub.unidata.ucar.edu/idv/trunk" />
+        <property name="svn_root"  value="https://sub.unidata.ucar.edu/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
         <property name="install4jdir"  value="/share/install4j" />
@@ -54,14 +54,14 @@ line using: and -Dbasedir=/some/other/dir
 
         <property name="ploogindir" value="auxdata/plugins" />
 
+<!--
         <property name="tmpbuilddir" value="${srcdir}/tmpbuilddir"/>
 
         <mkdir dir="${srcdir}" />
-<!--
         <mkdir dir="${libsdir}"/>
--->
         <mkdir dir="${tmpbuilddir}"/>
 
+-->
         <property name="release_src_dir"   value="${srcdir}/ucar/unidata/idv/release" />
 
         <property name="webstart_root" value="webstart"/>
@@ -247,7 +247,7 @@ line using: and -Dbasedir=/some/other/dir
     <target name="svnco" depends="init">
         <echo message="Checking out ${svn_root}"/>
         <exec executable="svn">
-            <arg line="--quiet co ${svn_root} ${srcdir}" />
+            <arg line="--quiet co ${svn_root} ${basedir}" />
         </exec>
 <!--
         <svn>
