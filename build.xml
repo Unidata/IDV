@@ -33,12 +33,12 @@ argument -Dfoo=bar) -->
 
 
         <!-- Where to put the jar files -->
-        <property name="jars_dest" value="${basedir}/lib"/>
-        <property name="libsrc" value="${basedir}/libsrc"/>
+        <property name="jars_dest" value="${srcdir}/lib"/>
+        <property name="libsrc" value="${srcdir}/libsrc"/>
         <mkdir dir="${jars_dest}"/>
 
         <!-- Where to put the plugin jar files -->
-        <property name="aux_plugins" value="${basedir}/auxdata/plugins"/>
+        <property name="aux_plugins" value="${srcdir}/auxdata/plugins"/>
         <mkdir dir="${aux_plugins}"/>
 
         <!-- Where to put the generated docs (e.g., javadoc, userguide, etc.) -->
