@@ -18,7 +18,7 @@ argument -Dfoo=bar) -->
         <property name="srcdir" value="${basedir}"/>
 
         <!-- The Java package root  -->
-        <property name="sourcedir" value="${basedir}/src"/>
+        <property name="sourcedir" value="${srcdir}/src"/>
 
        <property environment="env"/>
 
