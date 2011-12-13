@@ -15,17 +15,20 @@ argument -Dfoo=bar) -->
        </tstamp>
 
         <!-- The directory  that contains the source trees (from cvs) -->
-        <property name="srcdir" value="${basedir}/src"/>
+        <property name="srcdir" value="${basedir}"/>
+
+        <!-- The Java package root  -->
+        <property name="sourcedir" value="${basedir}/src"/>
 
        <property environment="env"/>
 
        <!-- Read in the version from the properties file -->
-       <property file="${srcdir}/ucar/unidata/idv/resources/version.properties"/>
+       <property file="${sourcedir}/ucar/unidata/idv/resources/version.properties"/>
        <property name="idv.version" value="${idv.version.major}.${idv.version.minor}${idv.version.revision}"/>
 
 
         <!-- Where the .class files (and other files for the jars) go -->
-        <property name="compiledir" value="${srcdir}"/>
+        <property name="compiledir" value="${sourcedir}"/>
         <mkdir dir="${compiledir}"/>
 
 
@@ -50,7 +53,7 @@ argument -Dfoo=bar) -->
         <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
         <mkdir dir="${docs_javadoc_dest}"/>
 
-        <property name="docs_generate_script" value="${basedir}/auxdata/docs/build/generate.tcl" />
+        <property name="docs_generate_script" value="${srcdir}/auxdata/docs/build/generate.tcl" />
         <property name="docs_userguide_dest" value="${docs_dest}/userguide"/>
         <property name="docs_workshop_dest" value="${docs_dest}/workshop"/>
         <property name="docs_devworkshop_dest" value="${docs_dest}/devworkshop"/>
@@ -172,11 +175,11 @@ argument -Dfoo=bar) -->
 
 
     <target name="simplejar" depends="init" >
-        <ant antfile="${srcdir}/ucar/unidata/apps/simple/build.xml" target="jar" />
+        <ant antfile="${sourcedir}/ucar/unidata/apps/simple/build.xml" target="jar" />
     </target>
 
     <target name="workshopjar" depends="init" >
-        <ant antfile="${srcdir}/ucar/unidata/apps/workshop/build.xml" target="jar" />
+        <ant antfile="${sourcedir}/ucar/unidata/apps/workshop/build.xml" target="jar" />
     </target>
 
 
@@ -218,7 +221,7 @@ argument -Dfoo=bar) -->
         <exec output="dummyfile"
             executable="/share/jh/javahelp/bin/jhindexer"
             failifexecutionfails="false"
-            dir="${basedir}/auxdata/docs/userguide">
+            dir="${srcdir}/auxdata/docs/userguide">
             <arg line="${env.JAVA_HOME}/bin/java -logfile jh.out processed"/>
 <!--
             <env key="PATH" value="/bin:/usr/bin"/>
@@ -237,7 +240,7 @@ argument -Dfoo=bar) -->
 
     <target name="jaridv" depends="init">
         <antcall target="idv"/>
-        <copy overwrite="true" file="${srcdir}/ucar/unidata/idv/resources/version.properties" tofile="${srcdir}/ucar/unidata/idv/resources/build.properties">
+        <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
             <filterset>
                 <filter token="DATE" value="${date}"/>
             </filterset>
@@ -262,7 +265,7 @@ argument -Dfoo=bar) -->
             deprecation="false"
             destdir="${compiledir}"
             failonerror="${failonerror}"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
         >
@@ -290,7 +293,7 @@ argument -Dfoo=bar) -->
             deprecation="false"
             destdir="${compiledir}"
             failonerror="${failonerror}"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
         >
@@ -328,7 +331,7 @@ argument -Dfoo=bar) -->
             deprecation="false"
             destdir="${compiledir}"
             failonerror="${failonerror}"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}"
         >
@@ -384,7 +387,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
       <echo message="dir1=${srcdir}/auxdata/docs/${docgen_dir}"/>
 
       <exec failifexecutionfails="false"
-            dir="${basedir}/auxdata/docs/${docgen_dir}"
+            dir="${srcdir}/auxdata/docs/${docgen_dir}"
             executable="/usr/bin/tclsh" os="Linux" >
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
@@ -396,7 +399,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
       </exec>
 
 	  <exec failifexecutionfails="false"
-	        dir="${basedir}/auxdata/docs/${docgen_dir}"
+	        dir="${srcdir}/auxdata/docs/${docgen_dir}"
 	        executable="/usr/bin/tclsh" os="Mac OS X" >
 	    <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
 	  </exec>
@@ -512,7 +515,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             classpath="${classpath}:/upc/share/junit/junit.jar"
             destdir="${docs_javadoc_dest}"
             maxmemory="512m"
-            sourcepath="${srcdir}"
+            sourcepath="${sourcedir}"
                  >
             <link href="http://www.ssec.wisc.edu/visad-docs/javadoc"/>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
@@ -558,7 +561,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             doclet="com.jollem.doclint.DocLint"
             docletpath="${libsdir}/doclint.jar"
             maxmemory="128m"
-            sourcepath="${srcdir}"
+            sourcepath="${sourcedir}"
         >
             <package name="ucar.multiarray"/>
             <package name="ucar.netcdf"/>
@@ -593,7 +596,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             doclet="com.jollem.doclint.DocLint"
             docletpath="${libsdir}/doclint.jar"
             maxmemory="128m"
-            sourcepath="${srcdir}"
+            sourcepath="${sourcedir}"
         >
             <package name="ucar.unidata.idv.*"/>
         </javadoc>
@@ -604,7 +607,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             doclet="com.jollem.doclint.DocLint"
             docletpath="${libsdir}/doclint.jar"
             maxmemory="128m"
-            sourcepath="${srcdir}"
+            sourcepath="${sourcedir}"
         >
             <fileset dir="ucar/unidata/util">
                 <include name="GuiUtils.java"/>
@@ -768,7 +771,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="copyauxfiles" depends="init">
          <copy overwrite="true"  todir="${compiledir}">
-             <fileset dir="${srcdir}">
+             <fileset dir="${sourcedir}">
                   <include name="ucar/**/*.properties"/>
                   <include name="ucar/**/*.xml"/>
                   <include name="ucar/**/*.rbi"/>
@@ -788,7 +791,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="clean" depends="init" >
         <delete>
-            <fileset dir="${srcdir}/ucar" includes="**/*.class"/>
+            <fileset dir="${compiledir}/ucar" includes="**/*.class"/>
         </delete>
     </target>
 
@@ -805,7 +808,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             deprecation="false"
             destdir="${compiledir}"
             failonerror="${failonerror}"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
             fork="${fork}"
             memoryMaximumSize="${maxmemory}">
             <include name="ucar/unidata/ui/HttpFormEntry.java"/>

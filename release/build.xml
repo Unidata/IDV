@@ -27,8 +27,8 @@ line using: and -Dbasedir=/some/other/dir
       <format property="start.time" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
     </tstamp>
 
-        <!-- srcdir is where we check out cvs code -->
-        <property name="srcdir"  value="${basedir}/src" />
+        <!-- srcdir is where we check out svn code -->
+        <property name="srcdir"  value="${basedir}/svnsrc" />
         <property name="svn_root"  value="https://sub.unidata.ucar.edu/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
@@ -37,7 +37,7 @@ line using: and -Dbasedir=/some/other/dir
 
 
        <!-- Read in the version from the properties file if it exists -->
-       <property name="versionfile" value="${srcdir}/ucar/unidata/idv/resources/version.properties"/>
+       <property name="versionfile" value="${srcdir}/src/ucar/unidata/idv/resources/version.properties"/>
        <property file="${versionfile}"/>
        <available file="${versionfile}" property="idv.version" value="${idv.version.major}.${idv.version.minor}${idv.version.revision}"/>
        <available file="${versionfile}" property="idv.version.under" value="${idv.version.major}_${idv.version.minor}${idv.version.revision}"/>
@@ -54,15 +54,15 @@ line using: and -Dbasedir=/some/other/dir
 
         <property name="ploogindir" value="auxdata/plugins" />
 
-<!--
         <property name="tmpbuilddir" value="${srcdir}/tmpbuilddir"/>
 
         <mkdir dir="${srcdir}" />
+<!--
         <mkdir dir="${libsdir}"/>
+-->
         <mkdir dir="${tmpbuilddir}"/>
 
--->
-        <property name="release_src_dir"   value="${srcdir}/ucar/unidata/idv/release" />
+        <property name="release_src_dir"   value="${srcdir}/src/ucar/unidata/idv/release" />
 
         <property name="webstart_root" value="webstart"/>
         <property name="webstart_jar_dir" value="webstart/IDV"/>
@@ -106,7 +106,7 @@ line using: and -Dbasedir=/some/other/dir
         <antcall target="visad" />
 -->
         <echo message="Building ucar packages." />
-        <ant antfile="${basedir}/build.xml" target="all" />
+        <ant antfile="${srcdir}/build.xml" target="all" />
     </target>
 
     <target name="quick" depends="init">
@@ -117,7 +117,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="FTPing visad." />
         <antcall target="visad" />
         <echo message="Building ucar packages." />
-        <ant antfile="${srcdir}/ucar/build.xml" target="justjars" />
+        <ant antfile="${srcdir}/build.xml" target="justjars" />
         <!-- <antcall target="webstart_jars" /> -->
     </target>
 
@@ -247,7 +247,7 @@ line using: and -Dbasedir=/some/other/dir
     <target name="svnco" depends="init">
         <echo message="Checking out ${svn_root}"/>
         <exec executable="svn">
-            <arg line="--quiet co ${svn_root} ${basedir}" />
+            <arg line="--quiet co ${svn_root} ${srcdir}" />
         </exec>
 <!--
         <svn>
@@ -654,7 +654,7 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="zipdocs" depends="init">
 <!-- TODO: What do we want zipped here? -->
-        <ant antfile="${basedir}/build.xml" target="docs" />
+        <ant antfile="${srcdir}/build.xml" target="docs" />
         <zip
             zipfile="${ftpdir}/idv_userguide_${idv.version}.zip"
             compress="true">
