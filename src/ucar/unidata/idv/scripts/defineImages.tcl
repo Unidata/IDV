@@ -46,16 +46,16 @@ defineImage {http://www.nps.gov/webcams-glac/tmcam.jpg} {Glacier NP - Two Medici
 defineImage {http://www.nps.gov/webcams-yell/oldfaithvc.jpg} {Old Faithful, WY} -ll {44.45972,-110.83139} -dz -7
 defineImage {http://nature.nps.gov/air/WebCams/parks/throcam/thro.jpg}  {Theodore Roosevelt National Park, ND} -ll {46.94889,-103.43306}  -dz -7
 defineImage {http://www.nature.nps.gov/air/webcams/parks/bibecam/bibe.jpg}  {Big Bend National Park,TX} -ll {29.25,-103.25}  -dz -6
-defineImage {http://www.nps.gov/webcams-olym/current_ridgecam.jpg}  {Olympic National Park} -ll {47.934,-123.371}  -dz -8	
+defineImage {http://www.nps.gov/webcams-olym/current_ridgecam.jpg}  {Olympic National Park} -ll {47.934,-123.371}  -dz -8
 defineImage {http://www.nature.nps.gov/air/webcams/parks/olymcam/olym.jpg} {Lake Crescent,WA}  -ll {48.094531,-123.805311}
 
 
-defineImage {http://www.nature.nps.gov/air/WebCams/parks/moracam/mora.jpg}  {Mount Rainier National Park} -ll {46.88333,-121.88333}  -dz -8	
-defineImage {http://www.nature.nps.gov/air/webcams/parks/nocacam/noca.jpg}  {North Cascades National Park} -ll {48.66667,-121.25028}  -dz -8	
-defineImage {http://www.nature.nps.gov/air/WebCams/parks/porecam/pore.jpg}  {Point Reyes National Seashore} -ll {38.06667,-122.88333}  -dz -8	
+defineImage {http://www.nature.nps.gov/air/WebCams/parks/moracam/mora.jpg}  {Mount Rainier National Park} -ll {46.88333,-121.88333}  -dz -8
+defineImage {http://www.nature.nps.gov/air/webcams/parks/nocacam/noca.jpg}  {North Cascades National Park} -ll {48.66667,-121.25028}  -dz -8
+defineImage {http://www.nature.nps.gov/air/WebCams/parks/porecam/pore.jpg}  {Point Reyes National Seashore} -ll {38.06667,-122.88333}  -dz -8
 defineImage {http://www.yosemiteconservancystore.com/DSN/wwwyosemiteassociationorg/Content/Webcam/ahwahnee.jpg}  {Yosemite National Park} -ll {37.85,-119.56667}  -dz -8
-defineImage {http://www.nature.nps.gov/air/webcams/parks/jotrcam/jotr.jpg}  {Joshua Tree National Park} -ll {35.12861,-116.03667}  -dz -8	
-defineImage {http://www.nature.nps.gov/air/WebCams/parks/nacccam/wash.jpg}  {Washington, D.C.} -ll {38.3,-77.0}  -dz -8	
+defineImage {http://www.nature.nps.gov/air/webcams/parks/jotrcam/jotr.jpg}  {Joshua Tree National Park} -ll {35.12861,-116.03667}  -dz -8
+defineImage {http://www.nature.nps.gov/air/WebCams/parks/nacccam/wash.jpg}  {Washington, D.C.} -ll {38.3,-77.0}  -dz -8
 
 defineImage {http://www.hazecam.net/images/photos-main/BALTIMORE_1.JPG} {Baltimore,MD}  -ll {39.290555,-76.609604}
 
@@ -63,9 +63,9 @@ defineImage {http://www.hazecam.net/images/photos-main/FROSTBURG.JPG} {Frostburg
 
 
 
-defineImage {http://www.nature.nps.gov/air/webcams/parks/grsmcam/grsm.jpg}  {Great Smoky Mountains National Park} -ll {35.60056,-83.50889}  -dz -8	
-defineImage {http://www.nature.nps.gov/air/webcams/parks/grcacam/grca.jpg}  {Grand Canyon - Yavapai Point} -ll {36.06502,-112.11841}  -dz -8	
-defineImage {http://www.nature.nps.gov/air/WebCams/parks/denacam/dena.jpg}  {Denali National Park } -ll {63.46,-150.87162}  -dz -10	
+defineImage {http://www.nature.nps.gov/air/webcams/parks/grsmcam/grsm.jpg}  {Great Smoky Mountains National Park} -ll {35.60056,-83.50889}  -dz -8
+defineImage {http://www.nature.nps.gov/air/webcams/parks/grcacam/grca.jpg}  {Grand Canyon - Yavapai Point} -ll {36.06502,-112.11841}  -dz -8
+defineImage {http://www.nature.nps.gov/air/WebCams/parks/denacam/dena.jpg}  {Denali National Park } -ll {63.46,-150.87162}  -dz -10
 
 defineImage {http://www.nature.nps.gov/air/webcams/parks/macacam/maca.jpg} {Mammoth Cave National Park}  -ll {37.186699,-86.098999}
 defineImage {http://hvo.wr.usgs.gov/cams/KIcam/images/M.jpg} {Hawaii Volcanoes National Park}  -ll {19.428749,-155.253677}
@@ -116,10 +116,11 @@ defineImage http://www.avo.alaska.edu/webcam/augtst.jpg {Augustine Volcano, AK} 
 
 
 defineGroup Southwest
-defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083} 
-defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ} -ll {35.24,-111.84} 
+defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083}
+defineImage http://icons.wunderground.com/webcamramdisk/p/o/pocomas/1/current.jpg {Mount Lemmon, AZ} -ll {32.4456,-110.7447}
+defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ} -ll {35.24,-111.84}
 
-defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359} 
+defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359}
 
 defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
 
@@ -191,7 +192,7 @@ defineImage http://vortex.plymouth.edu/webcam/2/latest.jpeg {Plymouth State Univ
 
 
 
-defineGroup {Southeast} 
+defineGroup {Southeast}
 defineImage http://images.ibsys.com/atl/images/weather/auto/towercam1_640x480.jpg {Atlanta,GA} -ll {33.74889,-84.38806} -dz -5
 defineImage http://files.wtoc.com/camera/misc/misc.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
 
@@ -218,7 +219,7 @@ defineImage {http://www.rwic.und.edu/webcam/webcam32.jpg} {Grand Forks,ND}  -ll 
 
 
 defineImage http://www.scottcountyiowa.com/webcams/images/live/112/cam112_00051.jpg {Scott County, IA}  -ll {41.61293,-90.606277}
- 
+
 
 
 
@@ -244,5 +245,3 @@ defineImage http://www.knmi.nl/webcam/images/ispy.jpg {KNMI, Netherlands}  -dz +
 
 defineGroup {Asia}
 defineImage http://www.discoverhongkong.com/eng/interactive/webcam/images/ig_webc_vict1.jpg {Hong Kong, China}  -dz +8 -ll {22.3, 114.18}
-
-
