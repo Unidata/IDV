@@ -14,7 +14,7 @@
     <variables>
       <variable name="INSTALLDIR" value="IDV_${compiler:sys.version}" />
       <variable name="NOJRE" value="nojre" />
-      <variable name="SRCDIR" value="/upc/share/idv" />
+      <variable name="SRCDIR" value="/upc/share/idv/src" />
     </variables>
   </application>
   <files>
