@@ -285,6 +285,7 @@ argument -Dfoo=bar) -->
 
 
     <target name="idv" depends="init">
+        <echo file="/tmp/debug.log" message="The idv target classpath is ${classpath}"/>
         <javac
             classpath="${classpath}"
             debug="true"
