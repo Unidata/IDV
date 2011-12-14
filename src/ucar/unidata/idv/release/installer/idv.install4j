@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.6" transformSequenceNumber="2">
-  <directoryPresets config="/share/idv/ucar/unidata/idv/release/installer/mac" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.9" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+  <directoryPresets config="/share/idv/src/ucar/unidata/idv/release/installer/mac" />
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.9" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -14,7 +14,7 @@
     <variables>
       <variable name="INSTALLDIR" value="IDV_${compiler:sys.version}" />
       <variable name="NOJRE" value="nojre" />
-      <variable name="SRCDIR" value="/upc/share/idv/src" />
+      <variable name="SRCDIR" value="/share/idv" />
     </variables>
   </application>
   <files>
@@ -33,12 +33,12 @@
       <mountPoint id="293" root="292" location="" mode="755" />
     </mountPoints>
     <entries>
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/idv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/auxdata.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/external.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
@@ -47,16 +47,16 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/jython.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/ncIdv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/simpleidv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/NOTICE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/NOTICE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv.gif" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="233" file="${compiler:SRCDIR}/jre/linux/java3d-1.3.1-linux.zip" overwrite="2" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="293" file="${compiler:SRCDIR}/libsrc/macos-java3d_jogl.zip" overwrite="2" shared="false" mode="644" uninstallMode="0" />
-      <dirEntry mountPoint="293" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/mac" overwrite="2" shared="false" mode="644" uninstallMode="0" excludeSuffixes="" dirMode="755">
+      <dirEntry mountPoint="293" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwrite="2" shared="false" mode="644" uninstallMode="0" excludeSuffixes="" dirMode="755">
         <exclude>
           <entry location="IDV.app/.svn" fileType="regular" />
           <entry location="IDV.app/Contents/MacOS/.svn" fileType="regular" />
@@ -119,7 +119,7 @@
     <launcher name="runIDV.bat" id="7" external="true" excludeFromMenu="true" menuName="" externalFile="runIDV.bat" />
     <launcher name="simpleIDV" id="4" external="true" excludeFromMenu="false" menuName="" externalFile="simpleIDV" />
     <launcher name="simpleIDV.bat" id="9" external="true" excludeFromMenu="true" menuName="" externalFile="simpleIDV.bat" />
-    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_16x16.png" pngIcon32File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_32x32.png" macServiceDependencies="" swtApp="false" fileset="">
+    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv_16x16.png" pngIcon32File="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv_32x32.png" macServiceDependencies="" swtApp="false" fileset="">
       <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -157,12 +157,12 @@
               </void>
               <void property="customPngIcon16File">
                 <object class="com.install4j.api.beans.ExternalFile">
-                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/installer_16x16.png</string>
+                  <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_16x16.png</string>
                 </object>
               </void>
               <void property="customPngIcon32File">
                 <object class="com.install4j.api.beans.ExternalFile">
-                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/installer_32x32.png</string>
+                  <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_32x32.png</string>
                 </object>
               </void>
               <void property="resizable">
@@ -199,7 +199,7 @@
                 <object class="com.install4j.runtime.beans.screens.WelcomeScreen">
                   <void property="bannerImageFile">
                     <object class="com.install4j.api.beans.ExternalFile">
-                      <string>${compiler:SRCDIR}/ucar/unidata/idv/images/logo.gif</string>
+                      <string>${compiler:SRCDIR}/src/ucar/unidata/idv/images/logo.gif</string>
                     </object>
                   </void>
                 </object>
@@ -218,7 +218,7 @@
                 <object class="com.install4j.runtime.beans.screens.LicenseScreen">
                   <void property="displayedTextFile">
                     <object class="com.install4j.api.beans.ExternalFile">
-                      <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/readme.txt</string>
+                      <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/readme.txt</string>
                     </object>
                   </void>
                 </object>
@@ -446,7 +446,7 @@
                           <object class="com.install4j.runtime.beans.screens.components.ProgramGroupEntryConfig">
                             <void property="iconFile">
                               <object class="com.install4j.api.beans.ExternalFile">
-                                <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico</string>
+                                <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico</string>
                               </object>
                             </void>
                             <void property="name">
@@ -488,7 +488,7 @@
                       </void>
                       <void property="winIconFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico</string>
+                          <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico</string>
                         </object>
                       </void>
                     </object>
@@ -502,7 +502,7 @@
                     <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
                       <void property="icon">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico</string>
+                          <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico</string>
                         </object>
                       </void>
                       <void property="itemName">
@@ -625,7 +625,7 @@
                 <object class="com.install4j.runtime.beans.screens.FinishedScreen">
                   <void property="bannerImageFile">
                     <object class="com.install4j.api.beans.ExternalFile">
-                      <string>${compiler:SRCDIR}/ucar/unidata/idv/images/logo.gif</string>
+                      <string>${compiler:SRCDIR}/src/ucar/unidata/idv/images/logo.gif</string>
                     </object>
                   </void>
                 </object>
@@ -681,7 +681,7 @@
                 <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen">
                   <void property="bannerImageFile">
                     <object class="com.install4j.api.beans.ExternalFile">
-                      <string>${compiler:SRCDIR}/ucar/unidata/idv/images/logo.gif</string>
+                      <string>${compiler:SRCDIR}/src/ucar/unidata/idv/images/logo.gif</string>
                     </object>
                   </void>
                 </object>
@@ -735,7 +735,7 @@
                 <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen">
                   <void property="bannerImageFile">
                     <object class="com.install4j.api.beans.ExternalFile">
-                      <string>${compiler:SRCDIR}/ucar/unidata/idv/images/logo.gif</string>
+                      <string>${compiler:SRCDIR}/src/ucar/unidata/idv/images/logo.gif</string>
                     </object>
                   </void>
                 </object>
