@@ -28,7 +28,7 @@ line using: and -Dbasedir=/some/other/dir
     </tstamp>
 
         <!-- srcdir is where we check out svn code -->
-        <property name="srcdir"  value="${basedir}/svnsrc" />
+        <property name="srcdir"  value="${basedir}" />
         <property name="svn_root"  value="https://sub.unidata.ucar.edu/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
