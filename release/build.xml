@@ -45,7 +45,7 @@ line using: and -Dbasedir=/some/other/dir
 
 
         <!-- libsdir is the cvs lib module -->
-        <property name="libsdir"   value="${basedir}/lib" />
+        <property name="libsdir"   value="${srcdir}/lib" />
 
         <!-- Where to put the jar files -->
         <property name="jardir" value="${libsdir}"/>
