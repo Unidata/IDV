@@ -179,33 +179,33 @@ line using: and -Dbasedir=/some/other/dir
             compress="true"
             basedir="${srcdir}/.."
         >
-            <include name="idv/ucar/**"/>
-            <exclude name="idv/ucar/**/*.class"/>
-            <exclude name="idv/ucar/**/*.map"/>
-            <exclude name="idv/ucar/**/*.jar"/>
-            <exclude name="idv/ucar/**/*.ascii"/>
-            <exclude name="idv/ucar/**/*.tml"/>
-            <exclude name="idv/ucar/**/*.bak"/>
-            <exclude name="idv/ucar/**/*.zip"/>
-            <exclude name="idv/ucar/**/*.shp"/>
-            <exclude name="idv/ucar/**/*.nc"/>
-            <exclude name="idv/ucar/unidata/data/storm/*ADOT*"/>
-            <exclude name="idv/ucar/unidata/idv/control/storm/*ADOT*"/>
-            <exclude name="idv/ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
-            <exclude name="idv/ucar/unidata/apps/demo/**"/>
-            <exclude name="idv/ucar/unidata/apps/imageviewer/**"/>
-            <exclude name="idv/ucar/unidata/apps/geon/**"/>
-            <exclude name="idv/ucar/unidata/apps/lead/**"/>
-            <exclude name="idv/ucar/unidata/apps/rico/**"/>
-            <exclude name="idv/ucar/unidata/apps/sti/**"/>
-            <exclude name="idv/ucar/unidata/apps/trex/**"/>
-            <exclude name="idv/ucar/unidata/apps/workshop/**"/>
-            <exclude name="idv/ucar/unidata/repository/**"/>
-            <exclude name="idv/ucar/unidata/gridviewer/**/*.*"/>
-            <exclude name="idv/ucar/unidata/grid/**"/>
-            <exclude name="idv/ucar/unidata/geoloc/**"/>
-            <exclude name="idv/ucar/unidata/idv/release/**"/>
-            <exclude name="idv/ucar/unidata/view/sounding/test/**"/>
+            <include name="idv/src/ucar/**"/>
+            <exclude name="idv/src/ucar/**/*.class"/>
+            <exclude name="idv/src/ucar/**/*.map"/>
+            <exclude name="idv/src/ucar/**/*.jar"/>
+            <exclude name="idv/src/ucar/**/*.ascii"/>
+            <exclude name="idv/src/ucar/**/*.tml"/>
+            <exclude name="idv/src/ucar/**/*.bak"/>
+            <exclude name="idv/src/ucar/**/*.zip"/>
+            <exclude name="idv/src/ucar/**/*.shp"/>
+            <exclude name="idv/src/ucar/**/*.nc"/>
+            <exclude name="idv/src/ucar/unidata/data/storm/*ADOT*"/>
+            <exclude name="idv/src/ucar/unidata/idv/control/storm/*ADOT*"/>
+            <exclude name="idv/src/ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
+            <exclude name="idv/src/ucar/unidata/apps/demo/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/geon/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/lead/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/rico/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/sti/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/trex/**"/>
+            <exclude name="idv/src/ucar/unidata/apps/workshop/**"/>
+            <exclude name="idv/src/ucar/unidata/repository/**"/>
+            <exclude name="idv/src/ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="idv/src/ucar/unidata/grid/**"/>
+            <exclude name="idv/src/ucar/unidata/geoloc/**"/>
+            <exclude name="idv/src/ucar/unidata/idv/release/**"/>
+            <exclude name="idv/src/ucar/unidata/view/sounding/test/**"/>
         </jar>
     </target>
 
@@ -483,7 +483,7 @@ line using: and -Dbasedir=/some/other/dir
 
 
         <echo message="Copying toc.xml file: ${snapshot_download_path}"/>
-        <copy overwrite="true" file="ucar/unidata/idv/release/installer/toc.xml" todir="${ftpdir}">
+        <copy overwrite="true" file="src/ucar/unidata/idv/release/installer/toc.xml" todir="${ftpdir}">
             <filterset>
                 <filter token="IDV_VERSION" value="${idv.version}"/>
                 <filter token="IDV_VERSION_DOT" value="${idv.version}"/>
