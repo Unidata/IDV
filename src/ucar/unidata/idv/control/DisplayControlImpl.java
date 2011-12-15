@@ -6100,6 +6100,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
     }
 
+
+    /**
+     * Called by ISL. 
+     * Write out some data defined by the what parameter to the given file. 
+     * This method throws an UnimplementedException. Derived classes need to
+     * overwrite this to write out the appropriate data
+     *
+     * @param what What is to be written out
+     * @param filename To what file
+     */
+    public void doExport(String what, String filename) throws Exception {
+        throw new IllegalArgumentException("doExport not implemented");
+    }
+
+
+
     /**
      * Save the state as parameter defaults
      */

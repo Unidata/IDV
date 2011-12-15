@@ -671,6 +671,21 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
     /**
+     * Called by ISL.
+     * Write out some data defined by the what parameter to the given file.
+     *
+     * @param what What is to be written out
+     * @param filename To what file
+     *
+     * @throws Exception _more_
+     */
+    public void doExport(String what, String filename) throws Exception {
+        //TODO: Implement this to write out the cross section data
+        throw new IllegalArgumentException("doExport not implemented");
+    }
+
+
+    /**
      * Transform VisAD box coordinates to and EarthLocation
      *
      * @param tuple  the tuple of VisAD coordinates
