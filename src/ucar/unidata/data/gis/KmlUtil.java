@@ -854,6 +854,29 @@ public class KmlUtil {
                                         String description, String url,
                                         double north, double south,
                                         double east, double west) {
+
+        return groundOverlay(parent, name, description, url, north, south, east, west, false);
+    }
+
+
+    /**
+     * Create a GroundOverlay element
+     *
+     * @param parent  the parent node
+     * @param name    the name of the GroundOverlay
+     * @param description    the description of the GroundOverlay
+     * @param url    the URL of the overlay
+     * @param north  the north coordinate
+     * @param south  the south coordinate
+     * @param east   the east coordinate
+     * @param west   the west coordinate
+     *
+     * @return the GroundOverlay
+     */
+    public static Element groundOverlay(Element parent, String name,
+                                        String description, String url,
+                                        double north, double south,
+                                        double east, double west, boolean visible) {
         Element node = makeElement(parent, TAG_GROUNDOVERLAY);
         name(node, name);
         description(node, description);
