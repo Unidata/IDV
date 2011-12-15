@@ -1106,6 +1106,30 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
+     * Process the export tag. This allows one to export data from a display. It requires
+     * a display identifier
+     *
+     * @param node isl xml node
+     *
+     * @return everything is cool
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagExport(Element node) throws Throwable {
+        DisplayControlImpl display = findDisplayControl(node);
+        if (display == null) {
+            throw new IllegalArgumentException("Could not find display:"
+                    + XmlUtil.toString(node));
+        }
+        String what     = applyMacros(node, ATTR_WHAT, (String) null);
+
+        String filename = XmlUtil.getAttribute(node, ATTR_FILE);
+        display.doExport(what, filename);
+        return true;
+    }
+
+
+    /**
      * Process the tag trace
      *
      * @param node  the node
