@@ -464,7 +464,7 @@ line using: and -Dbasedir=/some/other/dir
 
         <echo message="Copying index.html file: /content${snapshot_path}"/>
 
-        <copy overwrite="true" file="ucar/unidata/idv/release/installer/index.html" todir="webstart">
+        <copy overwrite="true" file="src/ucar/unidata/idv/release/installer/index.html" todir="webstart">
             <filterset>
                 <filter token="IDV_VERSION" value="${idv.version}"/>
                 <filter token="IDV_VERSION_DOT" value="${idv.version}"/>
