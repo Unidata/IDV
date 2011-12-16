@@ -790,9 +790,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
     </target>
 
     <target name="clean" depends="init" >
-        <delete>
-            <fileset dir="${compiledir}" includes="**/*.class"/>
-        </delete>
+      <delete dir="${compiledir}"/>
     </target>
 
     <target name="unidatautil" depends="init,clean" >
