@@ -28,7 +28,7 @@ argument -Dfoo=bar) -->
 
 
         <!-- Where the .class files (and other files for the jars) go -->
-        <property name="compiledir" value="${sourcedir}"/>
+        <property name="compiledir" value="${basedir}/build"/>
         <mkdir dir="${compiledir}"/>
 
 
@@ -791,7 +791,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
     <target name="clean" depends="init" >
         <delete>
-            <fileset dir="${compiledir}/ucar" includes="**/*.class"/>
+            <fileset dir="${compiledir}" includes="**/*.class"/>
         </delete>
     </target>
 
