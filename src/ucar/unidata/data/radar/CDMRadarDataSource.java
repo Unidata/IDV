@@ -42,6 +42,7 @@ import visad.*;
 import visad.georef.EarthLocation;
 
 import java.util.*;
+import java.util.Set;
 
 import javax.swing.*;
 
@@ -790,6 +791,16 @@ public class CDMRadarDataSource extends RadarDataSource {
             nexradStations =
                 getDataContext().getResourceManager().findLocations(
                     "NEXRAD Sites");
+            NamedStationTable userNexradStations = getDataContext().getResourceManager().findLocations(
+                    "NEXRAD User Sites");
+            if(userNexradStations.size() > 0) {
+                Set keys =  userNexradStations.keySet();
+                Iterator itr = keys.iterator();
+                while(itr.hasNext()){
+                    nexradStations.add(userNexradStations.get(itr.next().toString()));
+                }
+
+            }
         }
         return nexradStations;
     }
