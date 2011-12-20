@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <imagedefaults>
   <default
-     name="193.17.10.4"
+     name="adde.eumetsat.int"
      key="LATLON"
      place="CENTER"
      loc="0 0"
      size="928 928"
      mag="-4 -4"
-     user="DM"
-     proj="1053"/>
+     user="AW"
+     proj="1065"/>
 </imagedefaults>
