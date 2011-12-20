@@ -581,8 +581,11 @@ public interface IdvConstants {
     public static final String PREF_MAX_PERMGENSIZE = "idv.maxpermgensize";
 
     /** default max perm gen memory usage  (megabytes) */
-    public static final int DEFAULT_MAX_PERMGENSIZE = 128;
+    public static final int DEFAULT_MAX_PERMGENSIZE = 256;
 
+    /** IDV use time driver preference*/
+    public static final String PROP_USE_TIMEDRIVER = "idv.usetimedriver";
+    
     /** Preference to store what choosers to show */
     public static final String PROP_CHOOSERS = "idv.choosers";
 

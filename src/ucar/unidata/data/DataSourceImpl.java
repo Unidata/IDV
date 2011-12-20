@@ -3077,7 +3077,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            if(DisplayControl.DOTIMEDRIVER)
+            if(getIdv().getUseTimeDriver())
                 dsw = new DataSelectionWidget(getIdv(), true, false);
             else
                 dsw = new DataSelectionWidget(getIdv()); 

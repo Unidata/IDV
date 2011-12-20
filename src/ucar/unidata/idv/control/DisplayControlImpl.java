@@ -3478,7 +3478,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected DataInstance updateDataInstance(DataInstance dataInstance)
             throws VisADException, RemoteException {
-        if ( !DOTIMEDRIVER) {
+        if ( !getIdv().getUseTimeDriver()) {
             return dataInstance;
         }
         dataInstance.setDataSelection(
@@ -3500,7 +3500,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected DataSelection updateDataSelection(DataSelection dataSelection)
             throws VisADException, RemoteException {
-        if ( !DOTIMEDRIVER) {
+        if ( !getIdv().getUseTimeDriver()) {
             return dataSelection;
         }
         if (getIsTimeDriver() || !getUsesTimeDriver()) {
@@ -5820,7 +5820,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                              SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getShowNoteText()), "showNoteText",
                              "Show Note Text", SETTINGS_GROUP_FLAGS);
-        if (DOTIMEDRIVER) {
+        if (getIdv().getUseTimeDriver()) {
             dsd.addPropertyValue(new Boolean(getIsTimeDriver()),
                                  "isTimeDriver",
                                  "Drive Times with this Display",
@@ -6204,7 +6204,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             JCheckBoxMenuItem jcmi =
                 GuiUtils.makeCheckboxMenuItem("Use Times In Animation", this,
                     "useTimesInAnimation", null);
-            if (DOTIMEDRIVER) {
+            if (getIdv().getUseTimeDriver()) {
                 JMenu jm = new JMenu("Times");
                 jm.add(jcmi);
                 jm.add(GuiUtils.makeCheckboxMenuItem(

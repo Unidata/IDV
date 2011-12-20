@@ -529,7 +529,7 @@ public class TimesChooser extends IdvChooser {
      */
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine) {
-        if(DisplayControl.DOTIMEDRIVER)
+        if(getIdv().getUseTimeDriver())
             return makeTimesPanel(includeExtra, useTimeLine, true);
         else
             return makeTimesPanel(includeExtra, useTimeLine, false);

@@ -323,7 +323,7 @@ public class TDSRadarChooser extends TimesChooser {
         JComponent stationMap = getStationMap();
         JComponent buttons    = getDefaultButtons();
 
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (getIdv().getUseTimeDriver()) {
             timesPanel = makeTimesPanel(true, true, true);
         } else {
             timesPanel = makeTimesPanel(true, true);

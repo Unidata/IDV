@@ -3687,7 +3687,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     //next do the ones that aren't
                     //Note: This will screw up z ordering because the time driver
                     //displays will always get added first
-                    int numberOfInitSteps = (DisplayControl.DOTIMEDRIVER
+                    int numberOfInitSteps = (getIdv().getUseTimeDriver()
                                              ? 2
                                              : 1);
                     for (int initStep = 0; initStep < numberOfInitSteps;
@@ -3695,7 +3695,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         for (int i = 0; i < newControls.size(); i++) {
                             final DisplayControl displayControl =
                                 (DisplayControl) newControls.get(i);
-                            if (DisplayControl.DOTIMEDRIVER) {
+                            if (getIdv().getUseTimeDriver()) {
                                 if ((initStep == 0)
                                         && !displayControl
                                             .getIsTimeDriver()) {

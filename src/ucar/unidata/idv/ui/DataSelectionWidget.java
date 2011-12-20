@@ -941,7 +941,7 @@ public class DataSelectionWidget {
      *  @return List of indices.
      */
     public List getSelectedDateTimes() {
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             if (timeOptionLabelBox == null) {
                 return null;
             }
@@ -1006,7 +1006,7 @@ public class DataSelectionWidget {
         } else {
             return false;
             }*/
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             if (timeOptionLabelBox == null) {
                 return true;
             }
@@ -1033,7 +1033,7 @@ public class DataSelectionWidget {
             selected = getSelectedDateTimesInList();
         }
 
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             setTimes(timesList, timeOptionLabelBox, all, selected);
             if (all != null) {
                 allDateTimes = new ArrayList(all);
@@ -1066,7 +1066,7 @@ public class DataSelectionWidget {
      * @param useAllTimes  true to use all times
      */
     public void setUseAllTimes(boolean useAllTimes) {
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             if (timeOptionLabelBox != null) {
                 if (useAllTimes) {
                     timeOptionLabelBox.setSelectedIndex(0);
@@ -1111,7 +1111,7 @@ public class DataSelectionWidget {
         if (timesListInfo == null) {
             timesListInfo = makeTimesListAndPanel(cbxLabel, null);
             timesList     = (JList) timesListInfo[0];
-            if (DisplayControl.DOTIMEDRIVER) {
+            if (idv.getUseTimeDriver()) {
                 timeOptionLabelBox = (JComboBox) timesListInfo[1];
             } else {
                 allTimesButton = (JCheckBox) timesListInfo[1];
@@ -1290,7 +1290,7 @@ public class DataSelectionWidget {
 
         List timeOptionNames = Misc.toList(timeSubsetOptionLabels);
 
-        if (DisplayControl.DOTIMEDRIVER && !doUseDisplay) {
+        if (idv.getUseTimeDriver() && !doUseDisplay) {
             timeOptionNames.remove(2);
         }
         GuiUtils.setListData(timeOptionLabelBox, timeOptionNames);
@@ -1298,7 +1298,7 @@ public class DataSelectionWidget {
         //                                            allTimesButton);
         JComponent top;
 
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             if (extra != null) {
                 top = GuiUtils.leftRight(extra, timeOptionLabelBox);
             } else {
@@ -1316,7 +1316,7 @@ public class DataSelectionWidget {
         //        JComponent top      = GuiUtils.left(new JLabel("Times"));
         JComponent scroller = GuiUtils.makeScrollPane(timesList, 300, 100);
         //      scroller.setBorder(BorderFactory.createMatteBorder(1,2,0,0,Color.gray));
-        if (DisplayControl.DOTIMEDRIVER) {
+        if (idv.getUseTimeDriver()) {
             return new JComponent[] { timesList, timeOptionLabelBox,
                                       GuiUtils.topCenter(top, scroller) };
         } else {

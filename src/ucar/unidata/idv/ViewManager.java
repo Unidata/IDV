@@ -2438,7 +2438,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.timeSet = timeSet;
             this.control = control;
             this.label   = control.makeLegendLabel();
-            if (DisplayControl.DOTIMEDRIVER) {
+            if (idv.getUseTimeDriver()) {
                 this.rightComp = GuiUtils.rLabel(control.getIsTimeDriver()
                         ? "Time Driver"
                         : "");
@@ -4119,7 +4119,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param displayControl  the control
      */
     public void displayDataChanged(DisplayControl displayControl) {
-        if (DisplayControl.DOTIMEDRIVER && displayControl.getIsTimeDriver()) {
+        if (idv.getUseTimeDriver() && displayControl.getIsTimeDriver()) {
             for (DisplayControl control :
                     (List<DisplayControl>) getControls()) {
                 if ( !control.equals(displayControl)

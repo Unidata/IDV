@@ -2173,6 +2173,15 @@ Misc.run(new Runnable() {
         return getStore().get(PREF_MAX_PERMGENSIZE, DEFAULT_MAX_PERMGENSIZE);
     }
 
+    /**
+     * Get whether we are using the time driver facility
+     *
+     * @return true if using time matching
+     */
+    public boolean getUseTimeDriver() {
+        return getProperty(PROP_USE_TIMEDRIVER, false);
+    }
+
 
     /**
      * Create any default displays defined for the datasource descriptor
