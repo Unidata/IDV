@@ -6,18 +6,18 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir="../../../../" default="plugin" name="NoaaCSI">
+<project basedir="../../../../../" default="plugin" name="NoaaCSI">
 
-    <import file="../../../build.xml"/>
+    <import file="../../../../../build.xml"/>
 
     <target name="noaacsijar" depends="init">
         <jar 
-            basedir="${srcdir}"
+            basedir="${sourcedir}"
             compress="true"
             update="false"
             jarfile="${jars_dest}/noaacsi.jar">
             <include name="ucar/unidata/apps/noaacsi/**"/>
-            <exclude name="ucar/unidata/apps/trex/build.xml"/>
+            <exclude name="ucar/unidata/apps/noaacsi/build.xml"/>
         </jar>
     </target>
 
