@@ -725,8 +725,8 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.jnlp"/>
             <include name="ucar/**/*.gif"/>
             <include name="ucar/**/*.jpg"/>
-            <include name="ucar/**/*.png"/>
             <include name="ucar/**/*.jpeg"/>
+            <include name="ucar/**/*.png"/>
             <include name="ucar/**/*.tbl"/>
             <include name="ucar/unidata/data/**/*.sql"/>
             <include name="ucar/unidata/idv/isl/**/*.isl"/>
@@ -777,20 +777,29 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
                   <include name="ucar/**/*.rbi"/>
                   <include name="ucar/**/*.defaults"/>
                   <include name="ucar/**/*.txt"/>
+                  <include name="ucar/**/*.html"/>
                   <include name="ucar/**/*.py"/>
                   <include name="ucar/**/*.jnlp"/>
                   <include name="ucar/**/*.gif"/>
                   <include name="ucar/**/*.jpg"/>
                   <include name="ucar/**/*.jpeg"/>
+                  <include name="ucar/**/*.png"/>
+                  <include name="ucar/**/*.tbl"/>
                   <include name="ucar/**/README*"/>
                   <include name="ucar/**/VERSION*"/>
                   <include name="ucar/**/INSTALL*"/>
+                  <include name="ucar/unidata/data/**/*.sql"/>
+                  <include name="ucar/unidata/idv/isl/**/*.isl"/>
+                  <include name="ucar/unidata/idv/isl/**/*.kml"/>
              </fileset>
          </copy>
     </target>
 
     <target name="clean" depends="init" >
       <delete dir="${compiledir}"/>
+      <delete>
+         <fileset dir="${sourcedir}" includes="**/*.class"/>
+      </delete>
     </target>
 
     <target name="unidatautil" depends="init,clean" >
