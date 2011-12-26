@@ -100,14 +100,14 @@ public class DerivedGridFactory {
     public DerivedGridFactory() {}
 
     /**
-     * _more_
+     * Create an ensemble average
      *
-     * @param grid _more_
+     * @param grid the grid of ensembles
      *
-     * @return _more_
+     * @return  the average of the members
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException java RMI problem
+     * @throws VisADException  VisAD error
      */
     public static FieldImpl ensembleAverage(FieldImpl grid)
             throws VisADException, RemoteException {
@@ -239,8 +239,8 @@ public class DerivedGridFactory {
         FieldImpl result    = (FieldImpl) first.subtract(second);
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -355,12 +355,12 @@ public class DerivedGridFactory {
         GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
                                      false);
         TupleType paramType = GridUtil.getParamType(grid);
-        FieldImpl result =
+        FieldImpl result    =
             (FieldImpl) (first.add(second)).divide(new Real(2));
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -393,6 +393,7 @@ public class DerivedGridFactory {
     public static FieldImpl createRelativeVorticity(FieldImpl uFI,
             FieldImpl vFI)
             throws VisADException, RemoteException {
+
         boolean      UisSequence = (GridUtil.isTimeSequence(uFI));
         boolean      VisSequence = (GridUtil.isTimeSequence(vFI));
         FieldImpl    rvFI        = null;
@@ -408,8 +409,8 @@ public class DerivedGridFactory {
             // Implementation:  have to take the raw data FieldImpl-s
             // apart, make a FlatField by FlatField,
             // and put all back together again into a new FieldImpl
-            Set timeSet = uFI.getDomainSet();
-            Boolean ensble = GridUtil.hasEnsemble(uFI);
+            Set     timeSet = uFI.getDomainSet();
+            Boolean ensble  = GridUtil.hasEnsemble(uFI);
             // resample to domainSet of uFI. (???)  If they are the same, this
             // should be a no-op
             if ((timeSet.getLength() > 1) && (VisSequence == true)) {
@@ -418,25 +419,23 @@ public class DerivedGridFactory {
 
             // compute each rel vort  FlatField for time steps in turn;
             // load in FieldImpl
-            RealType rvRT = null;
-            TupleType rangeType  = null;
+            RealType     rvRT      = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
 
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FieldImpl funcFF = null;
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) uFI.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) vFI.getSample(i);
-                    Set ensDomain = sample1.getDomainSet();
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) uFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) vFI.getSample(i);
+                    Set       ensDomain = sample1.getDomainSet();
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
                         // System.out.print("      type of u FF is "+((FunctionType)uFF.getType()));
@@ -446,20 +445,19 @@ public class DerivedGridFactory {
                         // the derivative of v by x
                         dvdx = (FlatField) ddx(innerField2);
 
-                    // sum is dvdx - dudy  for final result at this time step
-                        FlatField innerrvFF = (FlatField) (dvdx.subtract(dudy));
+                        // sum is dvdx - dudy  for final result at this time step
+                        FlatField innerrvFF =
+                            (FlatField) (dvdx.subtract(dudy));
 
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerrvFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerrvFF.getType());
+                            rangeType = GridUtil.getParamType(innerrvFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerrvFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -475,8 +473,8 @@ public class DerivedGridFactory {
                     }
                     rvFI.setSample(i, funcFF, false);
                 } else {
-                // System.out.print(" "+i); //...
-                // get u and v single grids for this time step
+                    // System.out.print(" "+i); //...
+                    // get u and v single grids for this time step
                     uFF = (FlatField) uFI.getSample(i);
                     vFF = (FlatField) vFI.getSample(i);
 
@@ -519,6 +517,7 @@ public class DerivedGridFactory {
         RealType rvRT   = DataUtil.makeRealType("relvorticity", rvUnit);
 
         return GridUtil.setParamType(rvFI, rvRT, false);
+
     }  // end method create Relative Vorticity
 
     /**
@@ -677,6 +676,16 @@ public class DerivedGridFactory {
     }
 
 
+    /**
+     * Create true flow vectors from a uv grid.
+     *
+     * @param uvGrid  the uv grid
+     *
+     * @return  the grid converted to true (north) winds
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD problem
+     */
     public static FieldImpl createTrueFlowVector(FieldImpl uvGrid)
             throws VisADException, RemoteException {
         if ( !isVector(uvGrid)) {
@@ -687,47 +696,49 @@ public class DerivedGridFactory {
         ucar.unidata.util.Trace.call1("DGF:createTrueFlowVector");
         Boolean ensble = GridUtil.hasEnsemble(uvGrid);
 
-        if(ensble) {
-            FunctionType  outerFuncType = (FunctionType) uvGrid.getType();
-            Set timeSet = uvGrid.getDomainSet();
-            TupleType rangeType  = null;
-            FunctionType innerType = null;
-            FunctionType newinnerType = null;
+        if (ensble) {
+            FunctionType outerFuncType = (FunctionType) uvGrid.getType();
+            Set          timeSet       = uvGrid.getDomainSet();
+            TupleType    rangeType     = null;
+            FunctionType innerType     = null;
+            FunctionType newinnerType  = null;
 
             for (int i = 0; i < timeSet.getLength(); i++) {
-                FieldImpl funcFF = null;
-                FieldImpl funcFF0 = null;
-                FieldImpl sample = (FieldImpl) uvGrid.getSample(i);
-                Set ensDomain = sample.getDomainSet();
+                FieldImpl funcFF    = null;
+                FieldImpl funcFF0   = null;
+                FieldImpl sample    = (FieldImpl) uvGrid.getSample(i);
+                Set       ensDomain = sample.getDomainSet();
 
                 for (int j = 0; j < ensDomain.getLength(); j++) {
-                    FieldImpl innerField =
-                        (FieldImpl) sample.getSample(j, false);
-                    if (innerField == null ) {
+                    FieldImpl innerField = (FieldImpl) sample.getSample(j,
+                                               false);
+                    if (innerField == null) {
                         continue;
                     }
-                    if(newinnerType == null){
-                        newinnerType = new FunctionType(((SetType) timeSet.getType()).getDomain(), innerField.getType());
+                    if (newinnerType == null) {
+                        newinnerType = new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            innerField.getType());
                     }
-                    RealType index = RealType.getRealType("index");
-                    SingletonSet ss = new SingletonSet(new RealTuple(new Real[] {
-                                      new Real(index, 0) }));
+                    RealType     index = RealType.getRealType("index");
+                    SingletonSet ss    =
+                        new SingletonSet(new RealTuple(new Real[] {
+                            new Real(index, 0) }));
                     funcFF0 = new FieldImpl(newinnerType, ss);
                     funcFF0.setSample(0, innerField, false);
-                    FieldImpl innerrvFF =  (FieldImpl)GridRelativeHorizontalWind.cartesianHorizontalWind(
-                                                     funcFF0);
+                    FieldImpl innerrvFF =
+                        (FieldImpl) GridRelativeHorizontalWind
+                            .cartesianHorizontalWind(funcFF0);
 
                     if (rangeType == null) {
-                        rangeType =
-                            GridUtil.getParamType(innerrvFF);
-                        innerType =
-                            new FunctionType(
-                                DataUtility.getDomainType(ensDomain),
-                                innerrvFF.getSample(0).getType());
+                        rangeType = GridUtil.getParamType(innerrvFF);
+                        innerType = new FunctionType(
+                            DataUtility.getDomainType(ensDomain),
+                            innerrvFF.getSample(0).getType());
 
                     }
-                    if(funcFF == null) {
-                            funcFF = new FieldImpl(innerType, ensDomain);
+                    if (funcFF == null) {
+                        funcFF = new FieldImpl(innerType, ensDomain);
                     }
 
                     funcFF.setSample(j, innerrvFF.getSample(0), false);
@@ -743,8 +754,9 @@ public class DerivedGridFactory {
             }
 
         } else {
-            result = (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
-                    uvGrid);
+            result =
+                (FieldImpl) GridRelativeHorizontalWind
+                    .cartesianHorizontalWind(uvGrid);
         }
         ucar.unidata.util.Trace.call2("DGF:createTrueFlowVector");
 
@@ -837,10 +849,16 @@ public class DerivedGridFactory {
     public static FieldImpl create2DTopography(FieldImpl paramGrid,
             FieldImpl topoGrid, boolean resampleToTopography)
             throws VisADException, RemoteException {
-        FieldImpl grid     = paramGrid;
-        RealType  rt = GridUtil.getParamType(topoGrid).getRealComponents()[0];
-        Unit      topoUnit = rt.getDefaultUnit();
 
+        FieldImpl grid     = paramGrid;
+        TupleType tt       = GridUtil.getParamType(topoGrid);
+        RealType  rt       = tt.getRealComponents()[0];
+        Unit      topoUnit = rt.getDefaultUnit();
+        if (Unit.canConvert(topoUnit, CommonUnits.MILLIBAR)
+                && (tt.getDimension() == 1)) {
+            topoGrid = convertPressureToHeight(topoGrid,
+                    DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE));
+        }
         if ( !(Unit.canConvert(topoUnit,
                                GeopotentialAltitude
                                    .getGeopotentialMeter()) || Unit
@@ -930,6 +948,57 @@ public class DerivedGridFactory {
 
             return combineGrids(grid, topoGrid);
         }
+
+    }
+
+    /**
+     * Convert a pressure field to height values using the supplied coordinate system
+     *
+     * @param pressureField  the pressure field.  Must have units convertible with hPa 
+     *                       and have a single range dimension.
+     * @param pressToHeightCS The transform.  If null, standard atmosphere is used.
+     *
+     * @return  the height field
+     *
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  Illegal field or some other VisAD error
+     */
+    public static FieldImpl convertPressureToHeight(FieldImpl pressureField,
+            CoordinateSystem pressToHeightCS)
+            throws VisADException, RemoteException {
+        TupleType tt        = GridUtil.getParamType(pressureField);
+        RealType  rt        = tt.getRealComponents()[0];
+        Unit      pressUnit = rt.getDefaultUnit();
+        if ( !(Unit.canConvert(pressUnit, CommonUnits.MILLIBAR)
+                && (tt.getDimension() == 1))) {
+            throw new VisADException(
+                "Pressure field must have units convertible with hPa and have only one range type");
+        }
+
+        if (pressToHeightCS == null) {
+            pressToHeightCS =
+                DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+        }
+        // setParamType will create a new FieldImpl of the same structure as the original using Util.clone()
+        FieldImpl heightGrid = GridUtil.setParamType(pressureField,
+                                   RealType.getRealType("topo",
+                                       CommonUnit.meter));
+        if (GridUtil.isSequence(heightGrid)) {
+            Set seqSet = heightGrid.getDomainSet();
+            for (int i = 0; i < seqSet.getLength(); i++) {
+                FlatField ff = (FlatField) heightGrid.getSample(i, false);
+                float[][] pressVals  = ff.getFloats();
+                float[][] heightVals = pressToHeightCS.toReference(pressVals,
+                                           new Unit[] { pressUnit });
+                ff.setSamples(heightVals, false);
+            }
+        } else {
+            float[][] pressVals  = heightGrid.getFloats();
+            float[][] heightVals = pressToHeightCS.toReference(pressVals,
+                                       new Unit[] { pressUnit });
+            ((FlatField) heightGrid).setSamples(heightVals, false);
+        }
+        return heightGrid;
     }
 
     /**
@@ -946,8 +1015,7 @@ public class DerivedGridFactory {
     public static FieldImpl createFlowVectors(FieldImpl uGrid,
             FieldImpl vGrid)
             throws VisADException, RemoteException {
-        FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
-                                             true /* flatten */);
+        FieldImpl uvGrid      = combineGrids(uGrid, vGrid, true /* flatten */);
         FieldImpl retGrid     = uvGrid;
         Unit[]    units       = GridUtil.getParamUnits(uvGrid);
         boolean   isFlowUnits = true;
@@ -968,7 +1036,7 @@ public class DerivedGridFactory {
         if (isFlowUnits) {
 
             // System.out.println("making earth vector type");
-            TupleType paramType = GridUtil.getParamType(uvGrid);
+            TupleType  paramType = GridUtil.getParamType(uvGrid);
             RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                    CommonUnit.meterPerSecond);
             RealTupleType earthVectorType = new EarthVectorType(reals[0],
@@ -998,8 +1066,8 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
                 wGrid }, true);
-        TupleType paramType = GridUtil.getParamType(uvwGrid);
-        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+        TupleType  paramType = GridUtil.getParamType(uvwGrid);
+        RealType[] reals     = Util.ensureUnit(paramType.getRealComponents(),
                                            CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
                                             reals[1], reals[2]);
@@ -1173,6 +1241,7 @@ public class DerivedGridFactory {
                                          int samplingMode, int errorMode,
                                          boolean flatten, boolean copy)
             throws VisADException, RemoteException {
+
         boolean   isGrid1Sequence   = GridUtil.isTimeSequence(grid1);
         boolean   isGrid2Sequence   = GridUtil.isTimeSequence(grid2);
         boolean   isBothSequence    = (isGrid2Sequence && isGrid1Sequence);
@@ -1184,8 +1253,8 @@ public class DerivedGridFactory {
             // Implementation:  have to take the raw data FieldImpl
             // apart, combine FlatField by FlatField,
             // and put all back together again into a new combined FieldImpl
-            Set timeSet = grid1.getDomainSet();
-            Boolean ensble = GridUtil.hasEnsemble(grid1);
+            Set     timeSet = grid1.getDomainSet();
+            Boolean ensble  = GridUtil.hasEnsemble(grid1);
             // resample to domainSet of grid1.  If they are the same, this
             // should be a no-op
             if (timeSet.getLength() > 1) {
@@ -1193,40 +1262,37 @@ public class DerivedGridFactory {
             }
 
             // compute each combined Field in turn; load in FieldImpl
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FieldImpl funcFF = null;
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) grid1.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) grid2.getSample(i);
-                     Set ensDomain = sample1.getDomainSet();
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) grid1.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) grid2.getSample(i);
+                    Set       ensDomain = sample1.getDomainSet();
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerwvFF = (FlatField) FieldImpl.combine(new Field[] {
-                                         innerField1, innerField2 },
-                                         samplingMode, errorMode,
-                                         flatten, copy);
+                        FlatField innerwvFF =
+                            (FlatField) FieldImpl.combine(new Field[] {
+                                innerField1,
+                                innerField2 }, samplingMode, errorMode,
+                                    flatten, copy);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerwvFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerwvFF.getType());
+                            rangeType = GridUtil.getParamType(innerwvFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerwvFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -1242,11 +1308,11 @@ public class DerivedGridFactory {
                     }
                     wvFI.setSample(i, funcFF, false);
                 } else {
-                    FlatField wvFF = (FlatField) FieldImpl.combine(new Field[] {
-                                         (FlatField) grid1.getSample(i),
-                                         (FlatField) grid2.getSample(
-                                             i) }, samplingMode, errorMode,
-                                                 flatten, copy);
+                    FlatField wvFF =
+                        (FlatField) FieldImpl.combine(new Field[] {
+                            (FlatField) grid1.getSample(i),
+                            (FlatField) grid2.getSample(i) }, samplingMode,
+                                errorMode, flatten, copy);
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
@@ -1307,6 +1373,7 @@ public class DerivedGridFactory {
         }  // end single time
 
         return wvFI;
+
     }  // end combineGrids
 
     /**
@@ -1391,16 +1458,14 @@ public class DerivedGridFactory {
         FieldImpl wsgridFI =
             (FieldImpl) (uFI.multiply(uFI)).add((vFI.multiply(vFI))).sqrt();
         Boolean ensble = GridUtil.hasEnsemble(wsgridFI);
-        Unit spdUnit;
-        if(ensble){
-            FieldImpl sample =
-                        (FieldImpl) uFI.getSample(0);
-            FlatField innerField =
-                                (FlatField) sample.getSample(0, false);
-            spdUnit   = innerField.getRangeUnits()[0][0];
+        Unit    spdUnit;
+        if (ensble) {
+            FieldImpl sample     = (FieldImpl) uFI.getSample(0);
+            FlatField innerField = (FlatField) sample.getSample(0, false);
+            spdUnit = innerField.getRangeUnits()[0][0];
 
         } else {
-            spdUnit   = ((FlatField) uFI.getSample(0)).getRangeUnits()[0][0];
+            spdUnit = ((FlatField) uFI.getSample(0)).getRangeUnits()[0][0];
         }
         RealType spdRT = DataUtil.makeRealType(name, spdUnit);
 
@@ -1558,41 +1623,38 @@ public class DerivedGridFactory {
             if (timeSet.getLength() > 1) {
                 vGrid = (FieldImpl) vGrid.resample(timeSet);
             }
-            Boolean ensble = GridUtil.hasEnsemble(uGrid);
-            TupleType rangeType  = null;
+            Boolean      ensble    = GridUtil.hasEnsemble(uGrid);
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // compute each divFlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
                 FieldImpl funcFF = null;
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) uGrid.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) uGrid.getSample(i);
-                    Set ensDomain = sample1.getDomainSet();
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) uGrid.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) uGrid.getSample(i);
+                    Set       ensDomain = sample1.getDomainSet();
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = makeHorizontalDivergence(innerField1,
-                                                 innerField2);
+                        FlatField innerdivFF =
+                            makeHorizontalDivergence(innerField1,
+                                innerField2);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -1608,9 +1670,9 @@ public class DerivedGridFactory {
                     }
                     divFI.setSample(i, funcFF, false);
                 } else {
-                    FlatField divFF =
-                        makeHorizontalDivergence((FlatField) uGrid.getSample(i),
-                                                 (FlatField) vGrid.getSample(i));
+                    FlatField divFF = makeHorizontalDivergence(
+                                          (FlatField) uGrid.getSample(i),
+                                          (FlatField) vGrid.getSample(i));
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
@@ -1713,8 +1775,8 @@ public class DerivedGridFactory {
             // Implementation:  have to take the raw data FieldImpl
             // apart, make advection FlatField by FlatField,
             // and put all back together again into a new advection FieldImpl
-            Set timeSet = uGrid.getDomainSet();
-            Boolean ensble = (GridUtil.hasEnsemble(uGrid)
+            Set     timeSet = uGrid.getDomainSet();
+            Boolean ensble  = (GridUtil.hasEnsemble(uGrid)
                               && GridUtil.hasEnsemble(vGrid)
                               && GridUtil.hasEnsemble(paramGrid));
             // resample to domainSet of uGrid.  If they are the same, this
@@ -1722,20 +1784,17 @@ public class DerivedGridFactory {
             if (timeSet.getLength() > 1) {
                 vGrid = (FieldImpl) vGrid.resample(timeSet);
             }
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // compute each divFlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
                 FieldImpl funcFF = null;
-                if(ensble) {
-                    FieldImpl sample1 =
-                        (FieldImpl) uGrid.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) vGrid.getSample(i);
-                    FieldImpl sample3 =
-                        (FieldImpl) paramGrid.getSample(i);
-                    Set ensDomain = sample1.getDomainSet();
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) uGrid.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) vGrid.getSample(i);
+                    FieldImpl sample3   = (FieldImpl) paramGrid.getSample(i);
+                    Set       ensDomain = sample1.getDomainSet();
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -1744,24 +1803,21 @@ public class DerivedGridFactory {
                             (FlatField) sample2.getSample(j, false);
                         FlatField innerField3 =
                             (FlatField) sample3.getSample(j, false);
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = makeHorizontalAdvection(
-                                          innerField3,
-                                          innerField1,
-                                          innerField2);
+                        FlatField innerdivFF =
+                            makeHorizontalAdvection(innerField3, innerField1,
+                                innerField2);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -1784,9 +1840,8 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) paramGrid.getType()).getDomain(),
-                                divFF.getType());
+                            new FunctionType(((FunctionType) paramGrid
+                                .getType()).getDomain(), divFF.getType());
 
                         // make the new FieldImpl for advection
                         divFI = new FieldImpl(functionType, timeSet);
@@ -1864,19 +1919,17 @@ public class DerivedGridFactory {
 
             Boolean ensble = (GridUtil.hasEnsemble(temperFI)
                               && GridUtil.hasEnsemble(rhFI));
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // compute each dewpoint FlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble) {
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) rhFI.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -1884,22 +1937,20 @@ public class DerivedGridFactory {
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = makeDewpointFromTAndRH(innerField1,
-                                               innerField2);
+                        FlatField innerdivFF =
+                            makeDewpointFromTAndRH(innerField1, innerField2);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -1917,14 +1968,14 @@ public class DerivedGridFactory {
                 } else {
 
                     FlatField dewptFF =
-                        makeDewpointFromTAndRH((FlatField) temperFI.getSample(i),
-                                               (FlatField) rhFI.getSample(i));
+                        makeDewpointFromTAndRH(
+                            (FlatField) temperFI.getSample(i),
+                            (FlatField) rhFI.getSample(i));
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                dewptFF.getType());
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), dewptFF.getType());
 
                         // make the new FieldImpl for dewpoint
                         // (but as yet empty of data)
@@ -1990,6 +2041,7 @@ public class DerivedGridFactory {
     public static FieldImpl createEquivalentPotentialTemperature(
             FieldImpl temperFI, FieldImpl rhFI)
             throws VisADException, RemoteException {
+
         FieldImpl mixingRatioFI = createMixingRatio(temperFI, rhFI);
         EquivalentPotentialTemperature ept   = null;
         FieldImpl                      eptFI = null;
@@ -2000,18 +2052,18 @@ public class DerivedGridFactory {
 
         // get a grid of pressure values
         Boolean ensble = (GridUtil.hasEnsemble(temperFI)
-                              && GridUtil.hasEnsemble(rhFI));
-        TupleType rangeType  = null;
+                          && GridUtil.hasEnsemble(rhFI));
+        TupleType    rangeType = null;
         FunctionType innerType = null;
-        FlatField press = null;
-        if(ensble) {
-            FieldImpl sample1 =
-                    (FieldImpl) temperFI.getSample(0);
-            press = createPressureGridFromDomain(
-                              (FlatField) sample1.getSample(0, false));
+        FlatField    press     = null;
+        if (ensble) {
+            FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
+            press =
+                createPressureGridFromDomain((FlatField) sample1.getSample(0,
+                    false));
         } else {
             press = createPressureGridFromDomain(
-                              (FlatField) temperFI.getSample(0));
+                (FlatField) temperFI.getSample(0));
         }
 
 
@@ -2031,14 +2083,12 @@ public class DerivedGridFactory {
             // compute each FlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble) {
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) rhFI.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -2046,22 +2096,20 @@ public class DerivedGridFactory {
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = makeDewpointFromTAndRH(innerField1,
-                                               innerField2);
+                        FlatField innerdivFF =
+                            makeDewpointFromTAndRH(innerField1, innerField2);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -2077,16 +2125,16 @@ public class DerivedGridFactory {
                     }
                     eptFI.setSample(i, funcFF, false);
                 } else {
-                    FlatField eptFF = (FlatField) ept.create(press,
-                                          (FlatField) temperFI.getSample(i),
-                                          (FlatField) mixingRatioFI.getSample(i));
+                    FlatField eptFF =
+                        (FlatField) ept.create(press,
+                            (FlatField) temperFI.getSample(i),
+                            (FlatField) mixingRatioFI.getSample(i));
 
                     // first time through
                     if (i == 0) {
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                eptFF.getType());
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), eptFF.getType());
 
                         // make the new FieldImpl for mixing ratio
                         // (but as yet empty of data)
@@ -2111,6 +2159,7 @@ public class DerivedGridFactory {
         }  // end single time
 
         return eptFI;
+
     }
 
     /**
@@ -2149,28 +2198,28 @@ public class DerivedGridFactory {
     public static FieldImpl createRelativeHumidity(FieldImpl temperFI,
             FieldImpl mixingRatioFI, boolean isSpecificHumidity)
             throws VisADException, RemoteException {
+
         FieldImpl rhFI          = null;
         FlatField mixingRatioFF = null;
         FlatField press         = null;
-        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+        boolean   isSequence    = (GridUtil.isTimeSequence(temperFI)
                               && GridUtil.isTimeSequence(mixingRatioFI));
 
         Boolean ensble = (GridUtil.hasEnsemble(temperFI)
-                              && GridUtil.hasEnsemble(mixingRatioFI));
-        TupleType rangeType  = null;
+                          && GridUtil.hasEnsemble(mixingRatioFI));
+        TupleType    rangeType = null;
         FunctionType innerType = null;
 
         if (isSequence) {
 
             // get a grid of pressure values
-            if(ensble) {
-                FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(0);
+            if (ensble) {
+                FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
                 press = createPressureGridFromDomain(
-                                  (FlatField) sample1.getSample(0, false));
+                    (FlatField) sample1.getSample(0, false));
             } else {
                 press = createPressureGridFromDomain(
-                                  (FlatField) temperFI.getSample(0));
+                    (FlatField) temperFI.getSample(0));
             }
 
             Set timeSet = temperFI.getDomainSet();
@@ -2184,14 +2233,13 @@ public class DerivedGridFactory {
             // compute each FlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1 = (FieldImpl) temperFI.getSample(i);
                     FieldImpl sample2 =
                         (FieldImpl) mixingRatioFI.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -2199,23 +2247,22 @@ public class DerivedGridFactory {
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
 
-                        FlatField innerdivFF =  (FlatField) RelativeHumidity.create(innerField2, press,
-                            innerField1);
+                        FlatField innerdivFF =
+                            (FlatField) RelativeHumidity.create(innerField2,
+                                press, innerField1);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -2235,20 +2282,20 @@ public class DerivedGridFactory {
                     mixingRatioFF = (FlatField) mixingRatioFI.getSample(i);
 
                     if (isSpecificHumidity) {
-                        mixingRatioFF = (FlatField) WaterVaporMixingRatio.create(
-                            mixingRatioFF);
+                        mixingRatioFF =
+                            (FlatField) WaterVaporMixingRatio.create(
+                                mixingRatioFF);
                     }
 
                     FlatField rhFF =
-                        (FlatField) RelativeHumidity.create(mixingRatioFF, press,
-                            temperFI.getSample(i));
+                        (FlatField) RelativeHumidity.create(mixingRatioFF,
+                            press, temperFI.getSample(i));
 
                     // first time through
                     if (i == 0) {
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                rhFF.getType());
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), rhFF.getType());
 
                         // make the new FieldImpl for relative humidity
                         // (but as yet empty of data)
@@ -2263,8 +2310,7 @@ public class DerivedGridFactory {
         else {
 
             // get a grid of pressure values
-            press         =
-                createPressureGridFromDomain((FlatField) temperFI);
+            press         = createPressureGridFromDomain((FlatField) temperFI);
             mixingRatioFF = (FlatField) mixingRatioFI;
 
             if (isSpecificHumidity) {
@@ -2278,6 +2324,7 @@ public class DerivedGridFactory {
         }  // end single time
 
         return rhFI;
+
     }
 
     /**
@@ -2294,6 +2341,7 @@ public class DerivedGridFactory {
     public static FieldImpl createMixingRatio(FieldImpl temperFI,
             FieldImpl rhFI)
             throws VisADException, RemoteException {
+
         boolean isSequence = (GridUtil.isTimeSequence(temperFI)
                               && GridUtil.isTimeSequence(rhFI));
         FieldImpl mixFI = null;
@@ -2312,29 +2360,26 @@ public class DerivedGridFactory {
             }
             Boolean ensble = (GridUtil.hasEnsemble(temperFI)
                               && GridUtil.hasEnsemble(rhFI));
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
-            FlatField press = null;
-            if(ensble) {
-                FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(0);
+            FlatField    press     = null;
+            if (ensble) {
+                FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
                 press = createPressureGridFromDomain(
-                                  (FlatField) sample1.getSample(0, false));
+                    (FlatField) sample1.getSample(0, false));
             } else {
                 press = createPressureGridFromDomain(
-                                  (FlatField) temperFI.getSample(0));
+                    (FlatField) temperFI.getSample(0));
             }
             // compute each mixing ratio FlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) rhFI.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -2342,23 +2387,22 @@ public class DerivedGridFactory {
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = makeMixFromTAndRHAndP(innerField1,
-                                              innerField2, press);
+                        FlatField innerdivFF =
+                            makeMixFromTAndRHAndP(innerField1, innerField2,
+                                press);
 
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -2374,16 +2418,15 @@ public class DerivedGridFactory {
                     }
                     mixFI.setSample(i, funcFF, false);
                 } else {
-                    FlatField mixFF =
-                        makeMixFromTAndRHAndP((FlatField) temperFI.getSample(i),
-                                              (FlatField) rhFI.getSample(i),
-                                              press);
+                    FlatField mixFF = makeMixFromTAndRHAndP(
+                                          (FlatField) temperFI.getSample(i),
+                                          (FlatField) rhFI.getSample(i),
+                                          press);
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                mixFF.getType());
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), mixFF.getType());
 
                         // make the new FieldImpl for mixing ratio
                         // (but as yet empty of data)
@@ -2402,6 +2445,7 @@ public class DerivedGridFactory {
         }  // end single time
 
         return mixFI;
+
     }  // end make mixing_ratio fieldimpl
 
     /**
@@ -2447,24 +2491,23 @@ public class DerivedGridFactory {
      */
     public static FieldImpl createPotentialTemperature(FieldImpl temperFI)
             throws VisADException, RemoteException {
-        Boolean ensble = GridUtil.hasEnsemble(temperFI);
+        Boolean   ensble = GridUtil.hasEnsemble(temperFI);
 
-        FlatField press = null;
-        if(ensble) {
-            FieldImpl sample1 =
-                    (FieldImpl) temperFI.getSample(0);
-            press = createPressureGridFromDomain(
-                              (FlatField) sample1.getSample(0, false));
+        FlatField press  = null;
+        if (ensble) {
+            FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
+            press =
+                createPressureGridFromDomain((FlatField) sample1.getSample(0,
+                    false));
         } else {
-            if(GridUtil.isTimeSequence(temperFI) == true)
+            if (GridUtil.isTimeSequence(temperFI) == true) {
                 press = createPressureGridFromDomain(
-                              (FlatField) temperFI.getSample(0));
-            else
-                press = createPressureGridFromDomain(
-                              (FlatField) temperFI);
+                    (FlatField) temperFI.getSample(0));
+            } else {
+                press = createPressureGridFromDomain((FlatField) temperFI);
+            }
         }
-        return createPotentialTemperature(
-            temperFI, press);
+        return createPotentialTemperature(temperFI, press);
 
     }
 
@@ -2483,6 +2526,7 @@ public class DerivedGridFactory {
     public static FieldImpl createPotentialTemperature(FieldImpl temperFI,
             FieldImpl pressFI)
             throws VisADException, RemoteException {
+
         boolean   TisSequence = (GridUtil.isTimeSequence(temperFI));
         boolean   PisSequence = (GridUtil.isTimeSequence(pressFI));
         FieldImpl thetaFI     = null;
@@ -2499,44 +2543,47 @@ public class DerivedGridFactory {
             if ((timeSet.getLength() > 1) && (PisSequence == true)) {
                 pressFI = (FieldImpl) pressFI.resample(timeSet);
             }
-            Boolean ensble = GridUtil.hasEnsemble(temperFI);
+            Boolean      ensble    = GridUtil.hasEnsemble(temperFI);
 
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // compute each theta FlatField in turn; load in FieldImpl
 
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
-                    FieldImpl sample2 = (FieldImpl)((PisSequence == true)? pressFI.getSample(0) : pressFI);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) ((PisSequence == true)
+                            ? pressFI.getSample(0)
+                            : pressFI);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
-                        FlatField innerField2 = (FlatField)((PisSequence == true)?
-                            (FlatField) sample2.getSample(j, false) : sample2);
+                        FlatField innerField2 = (FlatField) ((PisSequence
+                                                    == true)
+                                ? (FlatField) sample2.getSample(j, false)
+                                : sample2);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = (FlatField) PotentialTemperature.create(innerField2 , innerField1);
+                        FlatField innerdivFF =
+                            (FlatField) PotentialTemperature.create(
+                                innerField2, innerField1);
 
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
                         funcFF.setSample(j, innerdivFF, false);
@@ -2559,9 +2606,8 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                thetaFF.getType());
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), thetaFF.getType());
 
                         // ((FunctionType)temperFI.getType()).getDomain() = "Time"
                         // make the new FieldImpl for theta  (but as yet empty of data)
@@ -2581,6 +2627,7 @@ public class DerivedGridFactory {
         }  // end single time
 
         return thetaFI;
+
     }  // end make potential temperature fieldimpl
 
     /**
@@ -2598,24 +2645,24 @@ public class DerivedGridFactory {
     public static FieldImpl createIPV(FieldImpl temperFI, FieldImpl absvor)
             throws VisADException, RemoteException {
 
-        Boolean ensble = GridUtil.hasEnsemble(temperFI);
+        Boolean   ensble = GridUtil.hasEnsemble(temperFI);
 
-        FlatField press = null;
-        if(ensble) {
-            FieldImpl sample1 =
-                    (FieldImpl) temperFI.getSample(0);
-            press = createPressureGridFromDomain(
-                              (FlatField) sample1.getSample(0, false));
+        FlatField press  = null;
+        if (ensble) {
+            FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
+            press =
+                createPressureGridFromDomain((FlatField) sample1.getSample(0,
+                    false));
         } else {
-            if(GridUtil.isTimeSequence(temperFI) == true)
+            if (GridUtil.isTimeSequence(temperFI) == true) {
                 press = createPressureGridFromDomain(
-                              (FlatField) temperFI.getSample(0));
-            else
-                press = createPressureGridFromDomain(
-                              (FlatField) temperFI);
+                    (FlatField) temperFI.getSample(0));
+            } else {
+                press = createPressureGridFromDomain((FlatField) temperFI);
+            }
         }
 
-        return createIPV( temperFI, press, absvor);
+        return createIPV(temperFI, press, absvor);
     }
 
     /**
@@ -2634,6 +2681,7 @@ public class DerivedGridFactory {
     public static FieldImpl createIPV(FieldImpl temperFI, FieldImpl pressFI,
                                       FieldImpl absvor)
             throws VisADException, RemoteException {
+
         boolean        TisSequence = (GridUtil.isTimeSequence(temperFI));
         boolean        PisSequence = (GridUtil.isTimeSequence(pressFI));
         FieldImpl      ipvFI       = null;
@@ -2659,48 +2707,53 @@ public class DerivedGridFactory {
             Real g = ucar.visad.quantities.Gravity.newReal();
 
             // System.out.println ("    g = "+g.getValue() );
-            Boolean ensble = GridUtil.hasEnsemble(temperFI) && GridUtil.hasEnsemble(absvor);
+            Boolean ensble = GridUtil.hasEnsemble(temperFI)
+                             && GridUtil.hasEnsemble(absvor);
 
-            TupleType rangeType  = null;
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // compute each theta FlatField for time steps in turn;
             // make IPV from it and load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) temperFI.getSample(i);
-                    FieldImpl sample2 = (FieldImpl)((PisSequence == true)? pressFI.getSample(0) : pressFI);
-                    FieldImpl sample3 =
-                        (FieldImpl) absvor.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) ((PisSequence == true)
+                            ? pressFI.getSample(0)
+                            : pressFI);
+                    FieldImpl sample3   = (FieldImpl) absvor.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
-                        FlatField innerField2 = (FlatField)((PisSequence == true)?
-                            (FlatField) sample2.getSample(j, false) : sample2);
+                        FlatField innerField2 = (FlatField) ((PisSequence
+                                                    == true)
+                                ? (FlatField) sample2.getSample(j, false)
+                                : sample2);
                         FlatField innerField3 =
                             (FlatField) sample3.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
-                        FlatField innerdivFF = (FlatField) PotentialTemperature.create(innerField2 , innerField1);
+                        FlatField innerdivFF =
+                            (FlatField) PotentialTemperature.create(
+                                innerField2, innerField1);
 
                         if (pressure == null) {
 
-                        // first time through
-                        // get the "level" coord of the grid; x,y,level; a "RealType"
+                            // first time through
+                            // get the "level" coord of the grid; x,y,level; a "RealType"
                             pressure =
-                                (RealType) ((FunctionType) innerdivFF.getType())
-                                    .getDomain().getComponent(2);
+                                (RealType) ((FunctionType) innerdivFF
+                                    .getType()).getDomain().getComponent(2);
                         }
 
                         if ( !Unit.canConvert(pressure.getDefaultUnit(),
-                                              CommonUnits.HECTOPASCAL)) {
+                                CommonUnits.HECTOPASCAL)) {
                             throw new VisADException(
                                 "Need a pressure vertical coordinate");
                         }
@@ -2715,19 +2768,19 @@ public class DerivedGridFactory {
 
                         if (rangeType == null) {
                             Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
-                            RealType ipvRT   = DataUtil.makeRealType("ipv", ipvUnit);
+                            RealType ipvRT   = DataUtil.makeRealType("ipv",
+                                                 ipvUnit);
                             ipvFFType = new FunctionType(
-                                ((FunctionType) dtdp.getType()).getDomain(), ipvRT);
+                                ((FunctionType) dtdp.getType()).getDomain(),
+                                ipvRT);
 
-                            rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                            innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        ipvFFType);
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                ipvFFType);
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
                         dtdp = (FlatField) dtdp.changeMathType(ipvFFType);
 
@@ -2781,18 +2834,19 @@ public class DerivedGridFactory {
                         // first time through, set up ipvFI
                         // make the VisAD FunctionType for the IPV; several steps
                         Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
-                        RealType ipvRT   = DataUtil.makeRealType("ipv", ipvUnit);
+                        RealType ipvRT   = DataUtil.makeRealType("ipv",
+                                             ipvUnit);
 
                         // change unit from 0.01 s-1 K kg-1 m2 to
                         // E-6 s-1 K kg-1 m2 the "IPV Unit"
                         // ipvUnit.scale(0.0001);
                         ipvFFType = new FunctionType(
-                            ((FunctionType) dtdp.getType()).getDomain(), ipvRT);
+                            ((FunctionType) dtdp.getType()).getDomain(),
+                            ipvRT);
 
                         FunctionType functionType =
-                            new FunctionType(
-                                ((FunctionType) temperFI.getType()).getDomain(),
-                                ipvFFType);
+                            new FunctionType(((FunctionType) temperFI
+                                .getType()).getDomain(), ipvFFType);
 
                         // System.out.println ("    first func type = "+functionType);
                         // make the new FieldImpl for IPV (but as yet empty of data)
@@ -2812,6 +2866,7 @@ public class DerivedGridFactory {
         // System.out.println(" ");
 
         return ipvFI;
+
     }  // end make IPV
 
     /**
@@ -2849,20 +2904,19 @@ public class DerivedGridFactory {
                 absvorFI = (FieldImpl) absvorFI.resample(timeSet);
             }
 
-            Boolean ensble = GridUtil.hasEnsemble(thetaFI) && GridUtil.hasEnsemble(vectorFI);
-            TupleType rangeType  = null;
+            Boolean ensble = GridUtil.hasEnsemble(thetaFI)
+                             && GridUtil.hasEnsemble(vectorFI);
+            TupleType    rangeType = null;
             FunctionType innerType = null;
             // make PVOR from it and load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
 
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) thetaFI.getSample(i);
-                    FieldImpl sample2 =
-                        (FieldImpl) absvorFI.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) thetaFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) absvorFI.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
-                    FieldImpl funcFF = null;
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
@@ -2870,22 +2924,20 @@ public class DerivedGridFactory {
                         FlatField innerField2 =
                             (FlatField) sample2.getSample(j, false);
 
-                        if (innerField1 == null || innerField2 == null) {
+                        if ((innerField1 == null) || (innerField2 == null)) {
                             continue;
                         }
                         FlatField innerdivFF = createPVOR(innerField1,
-                                   innerField2);
+                                                   innerField2);
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerdivFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerdivFF.getType());
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
                         }
-                        if(funcFF == null) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (funcFF == null) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
                         funcFF.setSample(j, innerdivFF, false);
 
@@ -3185,8 +3237,8 @@ public class DerivedGridFactory {
         newField = new FlatField(newType, gridToMask.getDomainSet());
         mask     = (FlatField) mask.resample(gridToMask.getDomainSet());
 
-        float[][] maskValues = mask.getFloats(false);
-        float[][] gridValues = gridToMask.getFloats(false);
+        float[][] maskValues   = mask.getFloats(false);
+        float[][] gridValues   = gridToMask.getFloats(false);
         float[][] maskedValues =
             new float[gridValues.length][gridValues[0].length];
 
@@ -3272,11 +3324,12 @@ public class DerivedGridFactory {
     private static FieldImpl createLatitudeGrid(FieldImpl fi,
             boolean makeCoriolis)
             throws VisADException, RemoteException {
+
         SampledSet ss = GridUtil.getSpatialDomain(fi);
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
@@ -3308,48 +3361,45 @@ public class DerivedGridFactory {
         FieldImpl latField = null;
 
         if (GridUtil.isTimeSequence(fi)) {
-            Set       timeSet          = fi.getDomainSet();
-            boolean   isConstantDomain = GridUtil.isConstantSpatialDomain(fi);
-            FlatField latFF            = null;
-            Boolean ensble = GridUtil.hasEnsemble(fi);
-            TupleType rangeType  = null;
-            FunctionType innerType = null;
+            Set          timeSet     = fi.getDomainSet();
+            boolean isConstantDomain = GridUtil.isConstantSpatialDomain(fi);
+            FlatField    latFF       = null;
+            Boolean      ensble      = GridUtil.hasEnsemble(fi);
+            TupleType    rangeType   = null;
+            FunctionType innerType   = null;
 
             for (int i = 0; i < timeSet.getLength(); i++) {
 
                 FieldImpl funcFF = null;
-                if(ensble){
-                    FieldImpl sample1 =
-                        (FieldImpl) fi.getSample(i);
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) fi.getSample(i);
 
-                    Set ensDomain = sample1.getDomainSet();
+                    Set       ensDomain = sample1.getDomainSet();
 
                     for (int j = 0; j < ensDomain.getLength(); j++) {
                         FlatField innerField1 =
                             (FlatField) sample1.getSample(j, false);
 
-                        if (innerField1 == null ) {
+                        if (innerField1 == null) {
                             continue;
                         }
 
 
-                    // sum is dvdx - dudy  for final result at this time step
+                        // sum is dvdx - dudy  for final result at this time step
                         FlatField innerlatFF = null;
                         if ( !isConstantDomain || (latFF == null)) {
-                            innerlatFF =
-                                createLatitudeBasedGrid(innerField1, latType, domIsLatLon, makeCoriolis);
+                            innerlatFF = createLatitudeBasedGrid(innerField1,
+                                    latType, domIsLatLon, makeCoriolis);
                         }
 
                         if (rangeType == null) {
-                                rangeType =
-                                    GridUtil.getParamType(innerlatFF);
-                                innerType =
-                                    new FunctionType(
-                                        DataUtility.getDomainType(ensDomain),
-                                        innerlatFF.getType());
+                            rangeType = GridUtil.getParamType(innerlatFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerlatFF.getType());
                         }
-                        if(j == 0) {
-                                funcFF = new FieldImpl(innerType, ensDomain);
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
                         }
 
 
@@ -3366,15 +3416,16 @@ public class DerivedGridFactory {
                     latField.setSample(i, funcFF, false);
                 } else {
                     if ( !isConstantDomain || (latFF == null)) {
-                        latFF =
-                            createLatitudeBasedGrid((FlatField) fi.getSample(i,
-                                false), latType, domIsLatLon, makeCoriolis);
+                        latFF = createLatitudeBasedGrid(
+                            (FlatField) fi.getSample(i, false), latType,
+                            domIsLatLon, makeCoriolis);
                     }
 
                     if (i == 0) {
                         FunctionType latFIType =
-                            new FunctionType(DataUtility.getDomainType(timeSet),
-                                             (FunctionType) latFF.getType());
+                            new FunctionType(
+                                DataUtility.getDomainType(timeSet),
+                                (FunctionType) latFF.getType());
 
                         latField = new FieldImpl(latFIType, timeSet);
                     }
@@ -3388,6 +3439,7 @@ public class DerivedGridFactory {
         }
 
         return latField;
+
     }
 
     /**
@@ -3407,7 +3459,7 @@ public class DerivedGridFactory {
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
