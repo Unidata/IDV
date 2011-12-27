@@ -856,8 +856,7 @@ public class DerivedGridFactory {
         Unit      topoUnit = rt.getDefaultUnit();
         if (Unit.canConvert(topoUnit, CommonUnits.MILLIBAR)
                 && (tt.getDimension() == 1)) {
-            topoGrid = convertPressureToHeight(topoGrid,
-                    DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE));
+            topoGrid = convertPressureToHeight(topoGrid);
         }
         if ( !(Unit.canConvert(topoUnit,
                                GeopotentialAltitude
@@ -954,7 +953,25 @@ public class DerivedGridFactory {
     /**
      * Convert a pressure field to height values using the supplied coordinate system
      *
-     * @param pressureField  the pressure field.  Must have units convertible with hPa 
+     * @param pressureField  the pressure field.  Must have units convertible with hPa
+     *                       and have a single range dimension.
+     *
+     * @return  the height field
+     *
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  Illegal field or some other VisAD error
+     */
+    public static FieldImpl convertPressureToHeight(FieldImpl pressureField)
+            throws VisADException, RemoteException {
+        return convertPressureToHeight(
+            pressureField,
+            DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE));
+    }
+
+    /**
+     * Convert a pressure field to height values using the supplied coordinate system
+     *
+     * @param pressureField  the pressure field.  Must have units convertible with hPa
      *                       and have a single range dimension.
      * @param pressToHeightCS The transform.  If null, standard atmosphere is used.
      *
