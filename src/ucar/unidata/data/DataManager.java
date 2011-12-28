@@ -1469,7 +1469,7 @@ public class DataManager {
                                      properties);
         }
         DataSourceResults results = new DataSourceResults();
-        if ((dataTypes == null) || (dataTypes.size() == 0)) {
+        if ((dataTypes == null) || (dataTypes.size() == 0) || (((ArrayList) definingObject).size() > 1)) {
             //If it is a string then let's just try the VisadDataSource
             if (definingObject instanceof String) {
                 String overrideDataType =
@@ -1479,7 +1479,24 @@ public class DataManager {
                             definingObject));
                 } else {
                     return results;
-                    //              dataTypes = Misc.newList("FILE.ANY");
+                    // dataTypes = Misc.newList("FILE.ANY");
+                }
+            /* If it is an ArrayList (multiple files selected), then
+              we need to crack into each member to try the string test
+              from above (if string then try the as a VisadDataSource) */
+            } else if (definingObject instanceof ArrayList) {
+                if (dataTypes.get(0).toString().contains("null")) {
+                    String overrideDataType =
+                        dataContext.selectDataType(((ArrayList) definingObject).get(0));
+                    if (overrideDataType != null) {
+                        for (int i = 0; i < dataTypes.size(); i++) {
+                            dataTypes.set(i,new DataType(overrideDataType,
+                            definingObject));
+                        }
+                    }
+                } else {
+                    return results;
+                    // dataTypes = Misc.newList("FILE.ANY");
                 }
             } else {
                 results.addFailed(
