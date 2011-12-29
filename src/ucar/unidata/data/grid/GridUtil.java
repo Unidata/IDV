@@ -7698,6 +7698,44 @@ public class GridUtil {
         return true;
     }
 
+    // Still a work in progress doesn't do anything yet
+    public static FieldImpl lonFlip(FieldImpl grid) throws VisADException, RemoteException {
+        FieldImpl flipped = grid;
+        if (isSequence(grid)) {
+            Set          timeDomain = grid.getDomainSet();
+            flipped = new FieldImpl(((FunctionType)grid.getType()),timeDomain);
+            FieldImpl flippedField = null;
+            for (int timeStepIdx = 0;
+                    timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                FieldImpl sample =
+                    (FieldImpl) grid.getSample(timeStepIdx, false);
+                if (sample == null) {
+                    continue;
+                }
+                if ( !isSequence(sample)) {
+                    flippedField = lonFlipFF((FlatField) sample);
+                } else {  // ensembles & such
+                    Set ensDomain = sample.getDomainSet();
+                    flippedField = new FieldImpl(((FunctionType)sample.getType()), ensDomain);
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField =
+                            (FlatField) sample.getSample(j, false);
+                        if (innerField == null) {
+                            continue;
+                        }
+                        FlatField flippedFF = lonFlipFF(innerField);
+                        flippedField.setSample(j, flippedFF, false, false);
+                    }
+                }
+                flipped.setSample(timeStepIdx, flippedField, false, false);
+            }
+        } else {
+            flipped = (FieldImpl) lonFlipFF((FlatField) grid);
+        }
+        return flipped;
+    }
 
-
+    private static FlatField lonFlipFF(FlatField grid) throws VisADException, RemoteException {
+        return grid;
+    }
 }
