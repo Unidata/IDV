@@ -1448,8 +1448,8 @@ public class GridMath {
                 Gridded2DSet newDomain  = null;
                 for (int timeStepIdx = 0;
                         timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
-                    FlatField sample =
-                        (FlatField) grid.getSample(timeStepIdx);
+                    FieldImpl sample =
+                        (FieldImpl) grid.getSample(timeStepIdx);
                     if (sample == null) {
                         continue;
                     }
