@@ -410,4 +410,8 @@ def wgt_runave(grid, wgts, option=0):
     opt = int(option)
     return GridMath.timeWeightedRunningAverage(grid,weights,opt)
 
-
+def lonFlip(grid):
+    """ Flip the longitudes in a grid from -180-180 to 0-360 (or vice-versa).
+        Only works for cyclic rectilinear grids.
+    """
+    return GridUtil.lonFlip(grid)
