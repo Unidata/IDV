@@ -7694,11 +7694,9 @@ public class GridUtil {
         return true;
     }
 
-    // Still a work in progress doesn't do anything yet
-
     /**
      * Flip the grid along the central longitude.  Useful for converting 0-360 to
-     * -180 to 180.
+     * -180 to 180 or vice-versa.
      *
      * @param grid  the grid to flip
      *
