@@ -552,9 +552,11 @@ public class DerivedDataChoice extends ListDataChoice {
             } else {  //yuanho added time
                 DataChoice dc0 = (DataChoice)selected.get(0);
                 DataSelection ds0 = dc0.getDataSelection();
-                Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                if(ud != null && ((Boolean)ud).booleanValue()){
-                    dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                if(ds0 != null) {
+                    Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if(ud != null && ((Boolean)ud).booleanValue()){
+                        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                    }
                 }
             }
             for (int i = 0; i < unboundOperands.size(); i++) {
