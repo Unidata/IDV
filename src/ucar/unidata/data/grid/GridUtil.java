@@ -7752,13 +7752,14 @@ public class GridUtil {
      *
      * @param grid  the grid to flip
      *
-     * @return the flipped grid 
+     * @return the flipped grid
      *
      * @throws RemoteException Java RMI problem
      * @throws VisADException  VisAD problem reading data
      */
     private static FlatField lonFlipFF(FlatField grid)
             throws VisADException, RemoteException {
+
         FlatField     flipped    = grid;
         GriddedSet    domainSet  = (GriddedSet) grid.getDomainSet();
         RealTupleType domainType =
@@ -7778,13 +7779,35 @@ public class GridUtil {
         if (refCS != null) {
             refType = refCS.getReference();
         }
+        int     halfX    = (int) sizeX / 2;
+        boolean is360    = highs[0] > 300;
+        boolean isCyclic = isLonCyclic(lows[0], highs[0]);
+        if ( !isCyclic) {
+            // check to see if it could be cyclic
+            if (domainSet instanceof LinearSet) {
+                Linear1DSet xSet =
+                    ((LinearSet) domainSet).getLinear1DComponent(0);
+                double step    = xSet.getStep();
+                double first   = xSet.getFirst();
+                double last    = xSet.getLast();
+                double newLast = last + step;
+                if ( !isLonCyclic(first, newLast)) {
+                    throw new VisADException("not a cyclic grid");
+                }
+            } else {
+                double first   = lows[0];
+                double last    = highs[0];
+                double step    = Math.abs((last - first + 1 / sizeX));
+                double newLast = last + step;
+                if ( !isLonCyclic(first, newLast)) {
+                    throw new VisADException("not a cyclic grid");
+                }
+            }
+        }
         float[][] values    = grid.getFloats(false);
         float[][] newValues = new float[values.length][values[0].length];
-        int       halfX     = (int) sizeX / 2;
-        boolean   is360     = highs[0] > 300;
-        boolean   isCyclic  = highs[0] % 360.f == lows[0] % 360.f;
         if ((domainSet instanceof LinearSet) && false) {
-        	//TODO: figure out LinearSet
+            //TODO: figure out LinearSet
         } else {  // griddedNDSet
             float[][] samples    = domainSet.getSamples(false);
             float[][] newSamples =
@@ -7804,12 +7827,10 @@ public class GridUtil {
                         float oldX = samples[0][oldIndex];
                         float newX = oldX;
                         if (is360) {
-                            //if (oldX > 180) newX -= ((isCyclic && i == sizeX-1)?180: 360);
                             if (oldX >= 180) {
                                 newX -= 360;
                             }
                         } else {
-                            //if (oldX < 0) newX += ((isCyclic && i == sizeX-1)?180: 360);
                             if (oldX < 0) {
                                 newX += 360;
                             }
@@ -7842,5 +7863,35 @@ public class GridUtil {
             flipped.setSamples(newValues, false);
         }
         return flipped;
+
+    }
+
+    /**
+     * Check to see if the longitude values are cyclic within the default epsilon
+     * (i.e., last == first+360 +- 0.0005)
+     *
+     * @param first  first value
+     * @param last   last value
+     *
+     * @return  true if they are cyclic
+     */
+    public static boolean isLonCyclic(double first, double last) {
+        return isLonCyclic(first, last, 0.0005);
+    }
+
+    /**
+     * Check to see if the longitude values are cyclic (i.e., last == first+360
+     * within esplion)
+     *
+     * @param first  first value
+     * @param last   last value
+     * @param epsilon   last value
+     *
+     * @return  true if they are cyclic
+     */
+    public static boolean isLonCyclic(double first, double last,
+                                      double epsilon) {
+        return visad.util.Util.isApproximatelyEqual(first + 360., last,
+                epsilon);
     }
 }

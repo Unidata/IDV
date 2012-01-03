@@ -934,8 +934,7 @@ public class GeoGridAdapter {
             if (first + 360. != last) {
                 double newLast = last + axis1D.getIncrement();
                 // Sometimes the increment has a roundoff error
-                if (visad.util.Util.isApproximatelyEqual(first + 360.,
-                        newLast, 0.0005)) {
+                if (GridUtil.isLonCyclic(first, newLast)) {
                     return true;
                 }
             }
