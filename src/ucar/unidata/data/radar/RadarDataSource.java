@@ -397,7 +397,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      *
      * @return is real time
      */
-    private boolean isRealTime() {
+    protected boolean isRealTime() {
         return (getPollingInfo().getFileCount() > 0);
     }
 

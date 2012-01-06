@@ -80,6 +80,9 @@ public class CDMRadarDataSource extends RadarDataSource {
 
     /** _more_          */
     List<DateTime> initTimes;
+
+    /** _more_ */
+    private boolean isRelativeTime = false;
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -296,6 +299,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     //  System.err.println("Query date range:" + fromDate + " -- " + toDate);
                     //  System.err.println("Collection times:" + collectionTimes);
                     //  System.err.println("Selected times:" + times);
+                    isRelativeTime = true;
                 }
             }
             if(times == null || times.size() == 0)
@@ -315,15 +319,16 @@ public class CDMRadarDataSource extends RadarDataSource {
 
     }
 
+    /**
+     * Are we doing real time and relative time
+     *
+     * @return is real time
+     */
+    protected boolean isRealTime() {
+        boolean isRealTime = super.isRealTime();
+        return ( isRealTime  || isRelativeTime);
+    }
 
-     /*
-    public List doMakeDateTimes() {
-        if(!isRelativeTime)
-            return super.doMakeDateTimes();
-        else
-            return getSources();
-
-    }  */
     /**
      * _more_
      *
