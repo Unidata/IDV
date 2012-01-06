@@ -226,24 +226,23 @@ public class CDMRadarDataSource extends RadarDataSource {
             if ((times == null) || (times.size() == 0) || useDriverTime) {
                 List allTimes        = new ArrayList();
                 List collectionTimes = null;
-                if (useDriverTime) {                                
-                    if((initTimes != null))  {
-                        collectionTimes = initTimes;
+                if (useDriverTime && initTimes != null) {
 
-                        for (int timeIdx = 0; timeIdx < collectionTimes.size();
-                                timeIdx++) {
-                            Object timeObj = collectionTimes.get(timeIdx);
-                            Date   date;
-                            if (timeObj instanceof Date) {
-                                date = (Date) timeObj;
-                            } else {
-                                date = DateUnit.getStandardOrISO(
-                                    timeObj.toString());
-                            }
-                            allTimes.add(new DatedObject(date));
+                    collectionTimes = initTimes;
+                    for (int timeIdx = 0; timeIdx < collectionTimes.size();
+                            timeIdx++) {
+                        Object timeObj = collectionTimes.get(timeIdx);
+                        Date   date;
+                        if (timeObj instanceof Date) {
+                            date = (Date) timeObj;
+                        } else {
+                            date = DateUnit.getStandardOrISO(
+                                timeObj.toString());
                         }
-                        times = DatedObject.unwrap(allTimes);
+                        allTimes.add(new DatedObject(date));
                     }
+                    times = DatedObject.unwrap(allTimes);
+
                 }  else {
                     List timeSpan = collection.getRadarTimeSpan();
                     Date fromDate =
@@ -317,8 +316,14 @@ public class CDMRadarDataSource extends RadarDataSource {
     }
 
 
+     /*
+    public List doMakeDateTimes() {
+        if(!isRelativeTime)
+            return super.doMakeDateTimes();
+        else
+            return getSources();
 
-
+    }  */
     /**
      * _more_
      *
