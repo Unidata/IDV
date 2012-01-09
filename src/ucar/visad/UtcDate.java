@@ -24,6 +24,10 @@ package ucar.visad;
 import ucar.unidata.util.StringUtil;
 
 import visad.DateTime;
+import visad.Gridded1DSet;
+import visad.RealTupleType;
+import visad.SetType;
+import visad.VisADException;
 
 import java.util.TimeZone;
 
@@ -57,8 +61,11 @@ public final class UtcDate {
     /** hour format string (HH) */
     public static final String HH_FORMAT = "HH";
 
-    /** Year-Month-Day format string */
+    /** Year-Day format string */
     public static final String IYD_FORMAT = "yyyyDDD";
+
+    /** Julian day format string */
+    public static final String JDAY_FORMAT = "DDD";
 
     /** GMT Timezone */
     public static final TimeZone GMT = DateTime.DEFAULT_TIMEZONE;
@@ -328,6 +335,38 @@ public final class UtcDate {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    /**
+     * Convert an array of DateTime objects to an array of the Julian day of each date
+     * @param dates  array of dates
+     * @return the corresponding Julian Days
+     */
+    public static int[] convertDateTimeToJulianDay(DateTime[] dates) {
+        int[] jdays = new int[dates.length];
+        for (int i = 0; i < dates.length; i++) {
+            jdays[i] = Integer.parseInt(formatUtcDate(dates[i], JDAY_FORMAT,
+                    GMT));
+        }
+        return jdays;
+    }
+
+    /**
+     * Convert the time set to an array of the Julian days of each date in the set
+     *
+     * @param timeSet set of dates
+     * @return the corresponding Julian Days
+     *
+     * @throws VisADException set must have type of RealType.Time
+     */
+    public static int[] convertDateTimeToJulianDay(Gridded1DSet timeSet)
+            throws VisADException {
+        if ( !((SetType) timeSet.getType()).getDomain().equals(
+                RealTupleType.Time1DTuple)) {
+            throw new VisADException("Set must have type of RealType.Time");
+        }
+        DateTime[] dates = DateTime.timeSetToArray(timeSet);
+        return convertDateTimeToJulianDay(dates);
     }
 
 }
