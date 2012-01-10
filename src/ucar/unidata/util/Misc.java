@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.util;
@@ -2800,13 +2799,13 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Does the the list contain the string
      *
-     * @param string _more_
-     * @param objects _more_
-     * @param lowerCase _more_
+     * @param string  the string to search for
+     * @param objects the list of objects
+     * @param lowerCase  check case insensibly
      *
-     * @return _more_
+     * @return true if the string matches the string values of the objects
      */
     public static boolean containsString(String string, List objects,
                                          boolean lowerCase) {
@@ -4056,11 +4055,11 @@ public class Misc {
     }
 
     /**
-     * _more_
+     * Reverse the array
      *
-     * @param a _more_
+     * @param a  input array
      *
-     * @return _more_
+     * @return  the array in reverse order
      */
     public static float[] reverseArray(float[] a) {
         float[] b = new float[a.length];
@@ -4125,7 +4124,7 @@ public class Misc {
         float[] range = { Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY };
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a[i].length; j++) {
-            	float val = a[i][j];
+                float val = a[i][j];
                 if (val == val) {
                     range[0] = (float) Math.min(range[0], val);
                     range[1] = (float) Math.max(range[1], val);
@@ -4146,7 +4145,9 @@ public class Misc {
     public static float[][] getRanges(float[][] a) {
         float[][] ranges = new float[a.length][];
         for (int i = 0; i < a.length; i++) {
-              ranges[i] = getRange(new float[][] {a[i]});
+            ranges[i] = getRange(new float[][] {
+                a[i]
+            });
         }
         return ranges;
     }
@@ -4500,12 +4501,12 @@ public class Misc {
     }
 
     /**
-     * _more_
+     * Copy an array to another
      *
-     * @param pts _more_
-     * @param pointCnt _more_
+     * @param pts  the input
+     * @param pointCnt  the number of points to copy
      *
-     * @return _more_
+     * @return the copied array
      */
     public static float[][] copy(float[][] pts, int pointCnt) {
         int       numFields = pts.length;
@@ -4519,11 +4520,11 @@ public class Misc {
     }
 
     /**
-     * _more_
+     * Expand an array of points
      *
-     * @param pts _more_
+     * @param pts  the points
      *
-     * @return _more_
+     * @return  the expanded array
      */
     public static float[][] expand(float[][] pts) {
         int       numFields = pts.length;
@@ -4585,9 +4586,9 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Get a Runnable object
      *
-     * @return _more_
+     * @return the Runnable
      */
     public static Runnable getRunnable() {
         return new Runnable() {
@@ -4659,9 +4660,9 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Test this class
      *
-     * @param args _more_
+     * @param args  ignored
      */
     public static void main(String[] args) {
         long   t1 = System.currentTimeMillis();
@@ -4723,5 +4724,73 @@ public class Misc {
 
     }
 
+    /**
+     * Find the indices of the array where it is equal to the value
+     *
+     * @param value  the value to look for
+     * @param array  the array
+     *
+     * @return the array of indices
+     */
+    public static int[] find(int value, int[] array) {
+        List<Integer> indices = new ArrayList<Integer>(array.length);
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                indices.add(i);
+            }
+        }
+        int   m  = indices.size();
+        int[] rv = new int[m];
+        for (int i = 0; i < m; i++) {
+            rv[i] = indices.get(i);
+        }
+        return rv;
+    }
+
+    /**
+     * Find the indices of the array where it is equal to the value
+     *
+     * @param value  the value to look for
+     * @param array  the array
+     *
+     * @return the array of indices
+     */
+    public static int[] find(float value, float[] array) {
+        List<Integer> indices = new ArrayList<Integer>(array.length);
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                indices.add(i);
+            }
+        }
+        int   m  = indices.size();
+        int[] rv = new int[m];
+        for (int i = 0; i < m; i++) {
+            rv[i] = indices.get(i);
+        }
+        return rv;
+    }
+
+    /**
+     * Find the indices of the array where it is equal to the value
+     *
+     * @param value  the value to look for
+     * @param array  the array
+     *
+     * @return the array of indices
+     */
+    public static int[] find(double value, double[] array) {
+        List<Integer> indices = new ArrayList<Integer>(array.length);
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                indices.add(i);
+            }
+        }
+        int   m  = indices.size();
+        int[] rv = new int[m];
+        for (int i = 0; i < m; i++) {
+            rv[i] = indices.get(i);
+        }
+        return rv;
+    }
 
 }
