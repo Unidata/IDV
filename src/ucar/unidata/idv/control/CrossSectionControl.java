@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -144,12 +144,22 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** initial ending point */
     private RealTuple initEndPoint;
 
-    private double initLat1= Double.NaN;
-    private double initLon1= Double.NaN;
-    private double initLat2= Double.NaN;
-    private double initLon2= Double.NaN;
-    private double initAlt=16000;
+    /** _more_ */
+    private double initLat1 = Double.NaN;
 
+    /** _more_ */
+    private double initLon1 = Double.NaN;
+
+    /** _more_ */
+    private double initLat2 = Double.NaN;
+
+    /** _more_ */
+    private double initLon2 = Double.NaN;
+
+    /** _more_ */
+    private double initAlt = 16000;
+
+    /** _more_ */
     private boolean lineVisible = true;
 
     /** the control window's view manager */
@@ -554,16 +564,18 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             RealTuple start = initStartPoint;
             RealTuple end   = initEndPoint;
 
-            if(start == null && initLat1==initLat1 && initLon1 ==initLon1) {
-                start =
-                    new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                                  new double[] { initLon1,initLat1, initAlt });
+            if ((start == null) && (initLat1 == initLat1)
+                    && (initLon1 == initLon1)) {
+                start = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                      new double[] { initLon1,
+                        initLat1, initAlt });
             }
 
-            if(end == null && initLat2==initLat2 && initLon2 ==initLon2) {
-                end =
-                    new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                                  new double[] { initLon2,initLat2, initAlt });
+            if ((end == null) && (initLat2 == initLat2)
+                    && (initLon2 == initLon2)) {
+                end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                    new double[] { initLon2,
+                        initLat2, initAlt });
             }
 
             if (csSelector != null) {
@@ -714,8 +726,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public boolean constrainDragPoint(float[] position) {
         try {
-            double altitude = getSelectorAltitude();
-            EarthLocation pt = boxToEarth(position[0], position[1],
+            double        altitude = getSelectorAltitude();
+            EarthLocation pt       = boxToEarth(position[0], position[1],
                                           position[2], false);
             double[] xyz = earthToBox(
                                new EarthLocationTuple(
@@ -1206,9 +1218,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     private RealTuple getXYPosition(double x, double y, double z,
                                     boolean convert)
             throws VisADException, RemoteException {
-        Coord to = (convert)
-                   ? convertToDisplay(new Coord(x, y, z))
-                   : new Coord(x, y, z);
+        Coord     to      = (convert)
+                            ? convertToDisplay(new Coord(x, y, z))
+                            : new Coord(x, y, z);
 
 
         RealTuple xyTuple =
@@ -1554,7 +1566,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             List            points = transect.getPoints();
             LatLonPointImpl llp0   = (LatLonPointImpl) points.get(0);
             LatLonPointImpl llp1   = (LatLonPointImpl) points.get(1);
-            EarthLocation el0 = makeEarthLocation(llp0.getLatitude(),
+            EarthLocation   el0    = makeEarthLocation(llp0.getLatitude(),
                                     llp0.getLongitude(), 0.0);
             EarthLocation el1 = makeEarthLocation(llp1.getLatitude(),
                                     llp1.getLongitude(), 0.0);
@@ -1610,7 +1622,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         LatLonPoint      latLon2 = endLocation.getLatLonPoint();
 
         GridDataInstance gdi     = getGridDataInstance();
-        FieldImpl slice = gdi.sliceAlongLatLonLine(
+        FieldImpl        slice   = gdi.sliceAlongLatLonLine(
                               latLon1, latLon2,
                               getSamplingModeValue(
                                   getObjectStore().get(
@@ -1906,11 +1918,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         RealTupleType xzRTT   = new RealTupleType(xType, RealType.Altitude);
 
         Gridded2DSet  vcsG2DS = (dataIs3D)
-                                ? new Gridded2DSet(xzRTT, plane, sizeX,
-                                    sizeZ, (CoordinateSystem) null,
+                                ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,
+                                    (CoordinateSystem) null,
                                     new Unit[] { CommonUnits.KILOMETER,
                 CommonUnit.meter }, (ErrorEstimate[]) null, false, false)
-                                : new Gridded2DSet(xzRTT, plane, sizeX);
+                                : new Gridded2DSet(xzRTT, plane, sizeX,
+                                    (CoordinateSystem) null,
+                                    new Unit[] { CommonUnits.KILOMETER,
+                CommonUnit.meter }, (ErrorEstimate[]) null, false);
         return vcsG2DS;
 
         //return GridUtil.setSpatialDomain(xsectSequence, vcsG2DS);
