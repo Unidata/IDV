@@ -244,8 +244,8 @@ public class DerivedGridFactory {
         FieldImpl result    = (FieldImpl) first.subtract(second);
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -360,12 +360,12 @@ public class DerivedGridFactory {
         GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
                                      false);
         TupleType paramType = GridUtil.getParamType(grid);
-        FieldImpl result =
+        FieldImpl result    =
             (FieldImpl) (first.add(second)).divide(new Real(2));
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -725,8 +725,8 @@ public class DerivedGridFactory {
                             ((SetType) timeSet.getType()).getDomain(),
                             innerField.getType());
                     }
-                    RealType index = RealType.getRealType("index");
-                    SingletonSet ss =
+                    RealType     index = RealType.getRealType("index");
+                    SingletonSet ss    =
                         new SingletonSet(new RealTuple(new Real[] {
                             new Real(index, 0) }));
                     funcFF0 = new FieldImpl(newinnerType, ss);
@@ -1009,13 +1009,13 @@ public class DerivedGridFactory {
             Set seqSet = heightGrid.getDomainSet();
             for (int i = 0; i < seqSet.getLength(); i++) {
                 FlatField ff = (FlatField) heightGrid.getSample(i, false);
-                float[][] pressVals = ff.getFloats();
+                float[][] pressVals  = ff.getFloats();
                 float[][] heightVals = pressToHeightCS.toReference(pressVals,
                                            new Unit[] { pressUnit });
                 ff.setSamples(heightVals, false);
             }
         } else {
-            float[][] pressVals = heightGrid.getFloats();
+            float[][] pressVals  = heightGrid.getFloats();
             float[][] heightVals = pressToHeightCS.toReference(pressVals,
                                        new Unit[] { pressUnit });
             ((FlatField) heightGrid).setSamples(heightVals, false);
@@ -1037,8 +1037,7 @@ public class DerivedGridFactory {
     public static FieldImpl createFlowVectors(FieldImpl uGrid,
             FieldImpl vGrid)
             throws VisADException, RemoteException {
-        FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
-                                             true /* flatten */);
+        FieldImpl uvGrid      = combineGrids(uGrid, vGrid, true /* flatten */);
         FieldImpl retGrid     = uvGrid;
         Unit[]    units       = GridUtil.getParamUnits(uvGrid);
         boolean   isFlowUnits = true;
@@ -1059,7 +1058,7 @@ public class DerivedGridFactory {
         if (isFlowUnits) {
 
             // System.out.println("making earth vector type");
-            TupleType paramType = GridUtil.getParamType(uvGrid);
+            TupleType  paramType = GridUtil.getParamType(uvGrid);
             RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                    CommonUnit.meterPerSecond);
             RealTupleType earthVectorType = new EarthVectorType(reals[0],
@@ -1089,8 +1088,8 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
                 wGrid }, true);
-        TupleType paramType = GridUtil.getParamType(uvwGrid);
-        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+        TupleType  paramType = GridUtil.getParamType(uvwGrid);
+        RealType[] reals     = Util.ensureUnit(paramType.getRealComponents(),
                                            CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
                                             reals[1], reals[2]);
@@ -1798,8 +1797,8 @@ public class DerivedGridFactory {
             // Implementation:  have to take the raw data FieldImpl
             // apart, make advection FlatField by FlatField,
             // and put all back together again into a new advection FieldImpl
-            Set timeSet = uGrid.getDomainSet();
-            Boolean ensble = (GridUtil.hasEnsemble(uGrid)
+            Set     timeSet = uGrid.getDomainSet();
+            Boolean ensble  = (GridUtil.hasEnsemble(uGrid)
                               && GridUtil.hasEnsemble(vGrid)
                               && GridUtil.hasEnsemble(paramGrid));
             // resample to domainSet of uGrid.  If they are the same, this
@@ -2225,7 +2224,7 @@ public class DerivedGridFactory {
         FieldImpl rhFI          = null;
         FlatField mixingRatioFF = null;
         FlatField press         = null;
-        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+        boolean   isSequence    = (GridUtil.isTimeSequence(temperFI)
                               && GridUtil.isTimeSequence(mixingRatioFI));
 
         Boolean ensble = (GridUtil.hasEnsemble(temperFI)
@@ -2333,8 +2332,7 @@ public class DerivedGridFactory {
         else {
 
             // get a grid of pressure values
-            press         =
-                createPressureGridFromDomain((FlatField) temperFI);
+            press         = createPressureGridFromDomain((FlatField) temperFI);
             mixingRatioFF = (FlatField) mixingRatioFI;
 
             if (isSpecificHumidity) {
@@ -2791,8 +2789,8 @@ public class DerivedGridFactory {
                         dtdp = (FlatField) (dtdp.multiply(innerField3));
 
                         if (rangeType == null) {
-                            Unit ipvUnit = dtdp.getRangeUnits()[0][0];
-                            RealType ipvRT = DataUtil.makeRealType("ipv",
+                            Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
+                            RealType ipvRT   = DataUtil.makeRealType("ipv",
                                                  ipvUnit);
                             ipvFFType = new FunctionType(
                                 ((FunctionType) dtdp.getType()).getDomain(),
@@ -2858,7 +2856,7 @@ public class DerivedGridFactory {
                         // first time through, set up ipvFI
                         // make the VisAD FunctionType for the IPV; several steps
                         Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
-                        RealType ipvRT = DataUtil.makeRealType("ipv",
+                        RealType ipvRT   = DataUtil.makeRealType("ipv",
                                              ipvUnit);
 
                         // change unit from 0.01 s-1 K kg-1 m2 to
@@ -3261,8 +3259,8 @@ public class DerivedGridFactory {
         newField = new FlatField(newType, gridToMask.getDomainSet());
         mask     = (FlatField) mask.resample(gridToMask.getDomainSet());
 
-        float[][] maskValues = mask.getFloats(false);
-        float[][] gridValues = gridToMask.getFloats(false);
+        float[][] maskValues   = mask.getFloats(false);
+        float[][] gridValues   = gridToMask.getFloats(false);
         float[][] maskedValues =
             new float[gridValues.length][gridValues[0].length];
 
@@ -3353,7 +3351,7 @@ public class DerivedGridFactory {
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
@@ -3483,7 +3481,7 @@ public class DerivedGridFactory {
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
@@ -3838,7 +3836,7 @@ public class DerivedGridFactory {
             throws VisADException {
         FieldImpl dailyClim = null;
         Set       timeSet   = GridUtil.getTimeSet(dailyData);
-        int[] jdays =
+        int[]     jdays     =
             UtcDate.convertDateTimeToJulianDay((Gridded1DSet) timeSet);
         // sanity check on the input
         int day1    = jdays[0];
@@ -3848,7 +3846,7 @@ public class DerivedGridFactory {
             throw new VisADException(
                 "createDailyClimatology: Input field must be daily data");
         }
-        int numDays = 366;
+        int          numDays   = 366;
         Integer1DSet climTimes = new Integer1DSet(RealTupleType.Time1DTuple,
                                      numDays, null,
                                      new Unit[] { CLIMATE_UNITS }, null);
@@ -3886,13 +3884,81 @@ public class DerivedGridFactory {
         } catch (RemoteException re) {}
         return dailyClim;
     }
-    
-    public static FieldImpl calculateDailyAnomaly(FieldImpl dailyData, FieldImpl dailyClim) throws VisADException {
+
+    /**
+     * Calculate the daily anomaly
+     *
+     * @param dailyData  the daily data
+     * @param dailyClim  the climatology
+     *
+     * @return  the daily anomaly
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl calculateDailyAnomaly(FieldImpl dailyData,
+            FieldImpl dailyClim)
+            throws VisADException {
         // TODO:  make some sanity checks
-        Gridded1DSet dailyTimes = (Gridded1DSet) GridUtil.getTimeSet(dailyData);
-        Gridded1DSet climTimes = (Gridded1DSet) GridUtil.getTimeSet(dailyClim);
-        int[] jdays = UtcDate.convertDateTimeToJulianDay(dailyTimes);
-        int[] climdays = UtcDate.convertDateTimeToJulianDay(climTimes);
-        return null;
+        Gridded1DSet dailyTimes =
+            (Gridded1DSet) GridUtil.getTimeSet(dailyData);
+        Gridded1DSet climTimes =
+            (Gridded1DSet) GridUtil.getTimeSet(dailyClim);
+        int[]     jdays     = UtcDate.convertDateTimeToJulianDay(dailyTimes);
+        int[]     climdays  = UtcDate.convertDateTimeToJulianDay(climTimes);
+        boolean   leapClim  = climdays.length == 366;
+        int[]     leaps     = Misc.find(366, climdays);
+        FieldImpl dailyAnom = null;
+        try {
+            for (int i = 0; i < jdays.length; i++) {
+                int     climDay    = jdays[i] - 1;
+                boolean isLeapYear = false;
+                if (leaps.length > 0) {
+                    for (int l = 0; l < leaps.length; l++) {
+                        if (i == leaps[l] - 300) {
+                            isLeapYear = true;
+                        }
+                    }
+                }
+                FlatField dayData  = (FlatField) dailyData.getSample(i, false);
+                FlatField climData = null;
+                // TODO: figure out leap years
+                if (isLeapYear) {
+                    if ( !leapClim) {
+                        if (climDay == 60) {  // Feb 29 = average Feb 28 and March 1
+                            FlatField climData1 =
+                                (FlatField) dailyClim.getSample(59, false);
+                            FlatField climData2 =
+                                (FlatField) dailyClim.getSample(59, false);
+                            climData = (FlatField) GridMath.add(climData1,
+                                    climData2).subtract(new Real(2));
+                            climData =
+                                (FlatField) GridUtil.setParamType(climData,
+                                    GridUtil.getParamType(climData1), false);
+                        } else {
+                            climData =
+                                (FlatField) dailyClim.getSample(climDay - 1,
+                                    false);
+                        }
+                    } else {
+                        climData = (FlatField) dailyClim.getSample(climDay,
+                                false);
+                    }
+                } else {
+                    climData = (FlatField) dailyClim.getSample(climDay,
+                            false);
+                }
+                FlatField dayAnom = (FlatField) GridMath.subtract(dayData,
+                                        climData);
+                if (dailyAnom == null) {
+                    FunctionType ft =
+                        new FunctionType(
+                            ((SetType) dailyTimes.getType()).getDomain(),
+                            dayAnom.getType());
+                    dailyAnom = new FieldImpl(ft, dailyTimes);
+                }
+                dailyAnom.setSample(i, dayAnom, false, false);
+            }
+        } catch (RemoteException e) {}
+        return dailyAnom;
     }
 }
