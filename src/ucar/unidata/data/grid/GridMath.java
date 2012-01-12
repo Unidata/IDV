@@ -629,6 +629,7 @@ public class GridMath {
         }
     }
 
+
     /**
      * Create a running average across the time dimension.
      *
@@ -686,7 +687,69 @@ public class GridMath {
     public static FieldImpl timeWeightedRunningAverage(FieldImpl grid,
             float[] wgts, int opt)
             throws VisADException {
-        return runave(grid, wgts, -1, opt);
+        return timeWeightedRunningAverage(grid, wgts, opt, true);
+    }
+
+    /**
+     * Create a running average across the time dimension.
+     *
+     * @param grid    grid to average
+     * @param wgts    weights per step (usually odd and add to 1)
+     * @param opt     options for end points
+     * <pre>
+     *     N = {last point in the series}
+     *    xi = {input series}
+     *    xo = {output series}
+     *    nwgt = {number of wgts}
+     *
+     *    opt < 0 : utilize cyclic conditions
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = w(0) * xi(N) + w(1) * xi(0)
+     *          e.g., nwgt = 3
+     *                 xo(0) = w(0) * xi(N) + w(1) * xi(0) + w(2) * xi(1)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(0)
+     *          e.g., nwgt = 4
+     *                 xo(0) = w(0) * xi(N) + w(1) * xi(0) + w(2) * xi(1) + w(3) * xi(2)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(1) + w(3) * xi(2)
+     *
+     *    opt = 0 : set unsmoothed beginning and end pts to x@_FillValue (most common)
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = xi@_FillValue
+     *          e.g., nwgt = 3
+     *                 xo(0) = xi@_FillValue
+     *                 xo(1) = w(0) * xi(0) + w(1) * xi(1) + w(2) * xi(2)
+     *                 xi(N) = xi@_FillValue
+     *          e.g., nwgt = 4
+     *                 xo(0)     = xi@_FillValue
+     *                 xo(1)     = w(0) * xi(0) + w(1) * xi(1) + w(2) * xi(2) + w(3) * xi(3)
+     *                 xo(N - 2) = w(0) * xi(N - 3) + w(1) * xi(N - 2) + w(2) * xi(N - 1) + w(3) * xi(N)
+     *                 xo(N - 1) = xi@_FillValue
+     *                 xo(N)     = xi@_FillValue
+     *
+     *    opt > 0 : utilize reflective (symmetric) conditions
+     *          e.g., nwgt = 2
+     *                 xo(0) = w(0) * xi(0) + w(1) * xi(1)
+     *                 xo(N) = w(0) * xi(N) + w(0) * xi(0)
+     *          e.g., nwgt = 3
+     *                 xo(0) = w(0) * xi(1) + w(1) * xi(0) + w(2) * xi(1)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(N - 1)
+     *          e.g., nwgt = 4
+     *                 xo(0) = w(0) * xi(1) + w(1) * xi(0) + w(2) * xi(1) + w(3) * xi(2)
+     *                 xo(N) = w(0) * xi(N - 1) + w(1) * xi(N) + w(2) * xi(0) + w(3) * xi(2)
+     * </pre>
+     * @param skipMissing  if true, missing timesteps will not be included in the average
+     *                     and the average will be done on the non-missing times
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeWeightedRunningAverage(FieldImpl grid,
+            float[] wgts, int opt, boolean skipMissing)
+            throws VisADException {
+        return runave(grid, wgts, -1, opt, skipMissing);
     }
 
     /**
@@ -746,7 +809,70 @@ public class GridMath {
     public static FieldImpl timeRunningAverage(FieldImpl grid, int nave,
             int opt)
             throws VisADException {
-        return runave(grid, null, nave, opt);
+        return timeRunningAverage(grid, nave, opt, true);
+    }
+
+    /**
+     * Create a running average across the time dimension.
+     *
+     * @param grid    grid to average
+     * @param nave    number of steps to average
+     * @param opt     options for end points
+     * <pre>
+     *     In the following:
+     *
+     *         N = {last point in the series, i.e. N = npts - 1}
+     *         xi = {input series}
+     *         xo = {output series}
+     *
+     *     opt < 0 : utilize cyclic conditions
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1))/nave
+     *                      xo(N) = (xi(N) + xi(0))/nave
+     *                e.g., nave = 3
+     *                      xo(0) = (xi(N) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(0)) / nave
+     *                e.g., nave = 4
+     *                      xo(0) = (xi(N) + xi(0) + xi(1) + xi(2)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(0) + xi(1)) / nave
+     *
+     *     opt = 0 : set unsmoothed beginning and end pts to x@_FillValue [most common]
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1)) / nave
+     *                      xo(N) = xi@_FillValue
+     *                e.g., nave = 3
+     *                      xo(0) = xi@_FillValue
+     *                      xo(1) = (xi(0) + xi(1) + xi(2)) / nave
+     *                      xi(N) = xi@_FillValue
+     *                e.g., nave = 4
+     *                      xo(0) = xi@_FillValue
+     *                      xo(1) = (xi(0) + xi(1) + xi(2) + xi(3)) / nave
+     *                      xo(N - 2) = (xi(N - 3) + xi(N - 2) + xi(N - 1) + xi(N)) / nave
+     *                      xo(N - 1)= xi@_FillValue
+     *                      xo(N)= xi@_FillValue
+     *
+     *     opt > 0 : utilize reflective (symmetric) conditions
+     *                e.g., nave = 2
+     *                      xo(0) = (xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N) + xi(N-1)) / nave
+     *                e.g., nave = 3
+     *                      xo(0) = (xi(1) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(N-1)) / nave
+     *                e.g., nave = 4
+     *                      xo(0) = (xi(2) + xi(1) + xi(0) + xi(1)) / nave
+     *                      xo(N) = (xi(N - 1) + xi(N) + xi(N - 1) + xi(N - 2)) / nave
+     * </pre>
+     * @param skipMissing  if true, missing timesteps will not be included in the average
+     *                     and the average will be done on the non-missing times
+     *
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeRunningAverage(FieldImpl grid, int nave,
+            int opt, boolean skipMissing)
+            throws VisADException {
+        return runave(grid, null, nave, opt, skipMissing);
     }
 
     /**
@@ -757,12 +883,14 @@ public class GridMath {
      * @param wgts    weights per step (usually odd and add to 1)
      * @param nave    number of steps to average
      * @param opt     options for end points (OPT_MISSING, OPT_CYCLIC, OPT_SYMMETRIC)
+     * @param skipMissing  if true, missing timesteps will not be included in the average
+     *                     and the average will be done on the non-missing times
      * @return the new field
      *
      * @throws VisADException  On badness
      */
     private static FieldImpl runave(FieldImpl grid, float[] wgts, int nave,
-                                    int opt)
+                                    int opt, boolean skipMissing)
             throws VisADException {
 
         float wsum = 0;
@@ -848,21 +976,37 @@ public class GridMath {
                 int       mlast  = mstart + nave;
                 float[][] sum    = Misc.cloneArray(missingData);
                 Misc.fillArray(sum, 0);
-                boolean haveMissing = false;
+                boolean   haveMissing = false;
+                boolean[] missData    = new boolean[nave];
+                int       idx         = 0;
                 for (int m = mstart; m < mlast; m++) {
                     //System.out.println("for time " + n + ", adding time " + timeIndices[m]);
                     values = work[m];
-                    if ( !Misc.equals(values, missingData)) {
+                    if ( !Misc.isNaN(values)) {
+                        // TODO:  what if single timestep values are missing?
                         for (int i = 0; i < values.length; i++) {
                             for (int j = 0; j < values[i].length; j++) {
                                 sum[i][j] += values[i][j] * wgts[m - mstart];
                             }
                         }
                     } else {
-                        haveMissing = true;
+                        haveMissing   = true;
+                        missData[idx] = true;
+                        continue;
+                    }
+                    idx++;
+                }
+                if (haveMissing) {  // recalculate wsum
+                    for (int i = 0; i < nave; i++) {
+                        if ( !missData[i]) {
+                            wsum += wgts[i];
+                        }
+                    }
+                    if (wsum > 1.0) {
+                        wsum = 1f / wsum;
                     }
                 }
-                if ( !haveMissing) {
+                if ( !haveMissing || skipMissing) {
                     for (int i = 0; i < values.length; i++) {
                         for (int j = 0; j < values[i].length; j++) {
                             sum[i][j] *= wsum;
@@ -1099,7 +1243,7 @@ public class GridMath {
             int[][]       nums    = null;
 
             for (int gridIdx = 0; gridIdx < numGrids; gridIdx++) {
-                FieldImpl sample         = (FieldImpl) grids[gridIdx];
+                FieldImpl sample     = (FieldImpl) grids[gridIdx];
                 float[][] gridValues = sample.getFloats(false);
                 if (values == null) {  // first pass through
                     values = Misc.cloneArray(gridValues);
