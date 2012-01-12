@@ -4793,4 +4793,49 @@ public class Misc {
         return rv;
     }
 
+    /**
+     * Check if all the values in the array are NaNs
+     *
+     * @param values  the array values
+     *
+     * @return  true if all NaN
+     */
+    public static boolean isNaN(float[][] values) {
+        // if first data value is NaN, check if all are.
+        if (Float.isNaN(values[0][0])) {
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[i].length; j++) {
+                    float value = values[i][j];
+                    if (value == value) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if all the values in the array are NaNs
+     *
+     * @param values  array values
+     *
+     * @return  true if all NaN
+     */
+    public static boolean isNaN(double[][] values) {
+        // if first data value is NaN, check if all are.
+        if (Double.isNaN(values[0][0])) {
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[i].length; j++) {
+                    double value = values[i][j];
+                    if (value == value) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
