@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin embedded="true">
+<!-- 
+See: /auxdata/docs/developer/contents/XmlUi.html
+    -->
+  <properties>
+    <property
+       name="view.size"
+       value="200:200"/>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+  <ui>
+    <panel layout="border">
+      <idv.menubar place="North"/>
+      <panel
+         place="Center"
+         layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <panel embeddednode="true"
+           layout="grid"
+           cols="3"
+           place="Center">
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view1%version%"
+             id="view1"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view2%version%"
+             id="view2"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view3%version%"
+             id="view3"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view4%version%"
+             id="view4"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view5%version%"
+             id="view5"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="ucar.unidata.idv.MapViewManager"
+             viewid="view6%version%"
+             id="view6"
+             properties="useGlobeDisplay=${useglobe};clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+        </panel>
+      </panel>
+      <idv.statusbar place="South"  id="bottom_bar"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components/>
+</skin>
