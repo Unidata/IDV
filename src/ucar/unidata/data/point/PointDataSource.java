@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -275,7 +275,7 @@ public abstract class PointDataSource extends FilesDataSource {
         public PlotModelSelectionComponent(PointDataSource pointDataSource) {
             super("Layout Model");
             this.pointDataSource = pointDataSource;
-            pmc = new PlotModelComponent(
+            pmc                  = new PlotModelComponent(
                 pointDataSource.getDataContext().getIdv(), this,
                 "setPlotModel", null);
         }
@@ -634,8 +634,16 @@ public abstract class PointDataSource extends FilesDataSource {
                 || !(dataChoice.getId() instanceof List)) {
             components.add(new PlotModelSelectionComponent(this));
         } else {
-            components.add(new GridParameters(this));
+            components.add(initGridParameters());
         }
+    }
+
+    /**
+     * Allow subclasses to initialize a GridParameters
+     * @return a GridParameters instance
+     */
+    protected GridParameters initGridParameters() {
+        return new GridParameters(this);
     }
 
 
@@ -774,7 +782,7 @@ public abstract class PointDataSource extends FilesDataSource {
         boolean changed = false;
         String  what    = "";
         try {
-            what = "Bad bin value";
+            what    = "Bad bin value";
             changed |= (binRoundToField.getTime() != binRoundTo)
                        || (binWidth != binWidthField.getTime());
             binRoundTo = binRoundToField.getTime();
@@ -785,12 +793,11 @@ public abstract class PointDataSource extends FilesDataSource {
             what       = "Bad grid points Y value";
             changed    |= (gridY != gridProperties.getGridY());
             what       = "Bad grid passes value";
-            changed    |= (numGridPasses
-                           != gridProperties.getNumGridPasses());
+            changed    |= (numGridPasses != gridProperties.getNumGridPasses());
             what       = "Bad grid unit value";
             changed    |= ( !gridUnit.equals(gridProperties.getGridUnit()));
             what       = "Bad grid search value";
-            changed |= (gridSearchRadius
+            changed    |= (gridSearchRadius
                         != gridProperties.getGridSearchRadius());
             what    = "Bad grid gain value";
             changed |= (gridGain != gridProperties.getGridGain());
@@ -869,7 +876,7 @@ public abstract class PointDataSource extends FilesDataSource {
             return;
         }
         String stationModelName = (String) getProperty(PROP_STATIONMODELNAME);
-        Hashtable properties = Misc.newHashtable(DataChoice.PROP_ICON,
+        Hashtable properties    = Misc.newHashtable(DataChoice.PROP_ICON,
                                    "/auxdata/ui/icons/Placemark16.gif");
         if (stationModelName != null) {
             properties.put(PROP_STATIONMODELNAME, stationModelName);
@@ -940,8 +947,7 @@ public abstract class PointDataSource extends FilesDataSource {
                                 sample)) {
                             sample = (FieldImpl) sample.getSample(0);
                         }
-                        PointOb             ob =
-                            (PointOb) sample.getSample(0);
+                        PointOb             ob = (PointOb) sample.getSample(0);
                         Tuple               tuple = (Tuple) ob.getData();
                         TupleType tupleType = (TupleType) tuple.getType();
                         MathType[]          types = tupleType.getComponents();
@@ -1119,7 +1125,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 DataChoice firstGuessDataChoice =
                     (DataChoice) dataChoice.getProperty(PROP_FIRSTGUESS);
                 if (firstGuessDataChoice == null) {
-                    List operands = new ArrayList();
+                    List operands   = new ArrayList();
                     List categories = DataCategory.parseCategories(
                                           "GRID-2D-TIME;GRID-3D-TIME", false);
                     operands.add(new DataOperand("First Guess Field",
