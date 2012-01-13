@@ -1502,6 +1502,8 @@ public class GridUtil {
             if (values == null) {
                 return true;
             }
+            if (Misc.isNaN(values)) {
+            /* moved to Misc.isMissing
             // if first data value is NaN, check if all are.
             if (Float.isNaN(values[0][0])) {
                 for (int i = 0; i < values.length; i++) {
@@ -1512,6 +1514,7 @@ public class GridUtil {
                         }
                     }
                 }
+                */
                 if (popupErrorMessage) {
                     String msg =
                         new String("All " + values.length * values[0].length

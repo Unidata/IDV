@@ -1245,6 +1245,8 @@ public class GridMath {
             for (int gridIdx = 0; gridIdx < numGrids; gridIdx++) {
                 FieldImpl sample     = (FieldImpl) grids[gridIdx];
                 float[][] gridValues = sample.getFloats(false);
+                // be careful about missing grids
+                if (Misc.isNaN(gridValues)) continue;
                 if (values == null) {  // first pass through
                     values = Misc.cloneArray(gridValues);
                     nums   = new int[values.length][values[0].length];
@@ -1286,6 +1288,8 @@ public class GridMath {
                     }
                 }
             }
+            // all grids were missing
+            if (newGrid == null) return null;
             if (function.equals(FUNC_AVERAGE)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
