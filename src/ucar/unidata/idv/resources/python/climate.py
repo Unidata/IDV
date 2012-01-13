@@ -71,3 +71,13 @@ def stdMon(grid):
   return stdev
 
 
+def clmDay(grid, use366=1):
+  """ Create a daily climatology from a grid of daily data over a period
+      of years. 
+  """
+  return DerivedGridFactory.createDailyClimatology(grid, use366)
+
+def calcDayAnom(daily, ltm):
+  """ Calculate the daily anomaly from a long term mean. 
+  """
+  return DerivedGridFactory.calculateDailyAnomaly(daily, ltm)
