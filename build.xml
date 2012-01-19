@@ -398,11 +398,11 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
         <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
       </exec>
 
-	  <exec failifexecutionfails="false"
-	        dir="${srcdir}/auxdata/docs/${docgen_dir}"
-	        executable="/usr/bin/tclsh" os="Mac OS X" >
-	    <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
-	  </exec>
+          <exec failifexecutionfails="false"
+                dir="${srcdir}/auxdata/docs/${docgen_dir}"
+                executable="/usr/bin/tclsh" os="Mac OS X" >
+            <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
+          </exec>
 
       <exec failifexecutionfails="false"
             dir="${srcdir}/auxdata/docs/${docgen_dir}"
@@ -662,8 +662,9 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
 
     <target name="srcjar" depends="init">
+        <echo message="${sourcedir}" />
         <jar
-            basedir="${compiledir}"
+            basedir="${sourcedir}"
             compress="true"
             jarfile="idv_src_${idv.version}.jar"
         >
