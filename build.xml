@@ -662,7 +662,6 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
 
     <target name="srcjar" depends="init">
-        <echo message="${sourcedir}" />
         <jar
             basedir="${sourcedir}"
             compress="true"
