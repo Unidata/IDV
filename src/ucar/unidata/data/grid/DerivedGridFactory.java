@@ -21,11 +21,19 @@
 package ucar.unidata.data.grid;
 
 
+import ucar.ma2.Range;
+
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.VarInfo;
+import ucar.unidata.data.point.PointObTuple;
+import ucar.unidata.data.sounding.TrackDataSource;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.display.Animation;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.DewPoint;
@@ -43,9 +51,15 @@ import ucar.visad.quantities.WaterVaporMixingRatio;
 
 import visad.*;
 
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
+
 import visad.util.DataUtility;
 
 import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -244,8 +258,8 @@ public class DerivedGridFactory {
         FieldImpl result    = (FieldImpl) first.subtract(second);
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -360,12 +374,12 @@ public class DerivedGridFactory {
         GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
                                      false);
         TupleType paramType = GridUtil.getParamType(grid);
-        FieldImpl result =
+        FieldImpl result    =
             (FieldImpl) (first.add(second)).divide(new Real(2));
 
         if (paramType.getDimension() == 1) {
-            RealType rt = (RealType) paramType.getComponent(0);
-            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+            RealType rt      = (RealType) paramType.getComponent(0);
+            String   newName = rt.getName() + "_LDF_" + (int) value1 + "-"
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
@@ -725,8 +739,8 @@ public class DerivedGridFactory {
                             ((SetType) timeSet.getType()).getDomain(),
                             innerField.getType());
                     }
-                    RealType index = RealType.getRealType("index");
-                    SingletonSet ss =
+                    RealType     index = RealType.getRealType("index");
+                    SingletonSet ss    =
                         new SingletonSet(new RealTuple(new Real[] {
                             new Real(index, 0) }));
                     funcFF0 = new FieldImpl(newinnerType, ss);
@@ -1009,16 +1023,71 @@ public class DerivedGridFactory {
             Set seqSet = heightGrid.getDomainSet();
             for (int i = 0; i < seqSet.getLength(); i++) {
                 FlatField ff = (FlatField) heightGrid.getSample(i, false);
-                float[][] pressVals = ff.getFloats();
+                float[][] pressVals  = ff.getFloats();
                 float[][] heightVals = pressToHeightCS.toReference(pressVals,
                                            new Unit[] { pressUnit });
                 ff.setSamples(heightVals, false);
             }
         } else {
-            float[][] pressVals = heightGrid.getFloats();
+            float[][] pressVals  = heightGrid.getFloats();
             float[][] heightVals = pressToHeightCS.toReference(pressVals,
                                        new Unit[] { pressUnit });
             ((FlatField) heightGrid).setSamples(heightVals, false);
+        }
+        return heightGrid;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param pressureVelField _more_
+     * @param hField _more_
+     * @param pressToHeightCS _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl convertPressureVelocityToHeightVelocity(
+            FieldImpl pressureVelField, FieldImpl hField,
+            CoordinateSystem pressToHeightCS)
+            throws VisADException, RemoteException {
+        TupleType tt        = GridUtil.getParamType(pressureVelField);
+        RealType  rt        = tt.getRealComponents()[0];
+        Unit      pressUnit = rt.getDefaultUnit().multiply(CommonUnit.second);
+        if (Unit.canConvert(pressUnit, CommonUnit.meter)) {
+            return pressureVelField;
+        } else if ( !(Unit.canConvert(pressUnit, CommonUnits.MILLIBAR)
+                      && (tt.getDimension() == 1))) {
+            throw new VisADException(
+                "Pressure velocity field must have units convertible with hPa and have only one range type");
+        }
+
+        if (pressToHeightCS == null) {
+            pressToHeightCS =
+                DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+        }
+        // setParamType will create a new FieldImpl of the same structure as the original using Util.clone()
+
+        FieldImpl dhdp       = GridMath.partial(hField, 2);
+        FieldImpl dhdt       = GridMath.multiply(pressureVelField, dhdp);
+        FieldImpl heightGrid = GridUtil.setParamType(dhdt,
+                                   RealType.getRealType("zVel",
+                                       CommonUnits.METERS_PER_SECOND));
+
+        if (GridUtil.isSequence(heightGrid)) {
+            Set seqSet = heightGrid.getDomainSet();
+            for (int i = 0; i < seqSet.getLength(); i++) {
+                FlatField ff = (FlatField) heightGrid.getSample(i, false);
+                float[][] pressVals = ff.getFloats();
+                ff.setSamples(pressVals, false);
+            }
+        } else {
+            float[][] pressVals = heightGrid.getFloats();
+
+            ((FlatField) heightGrid).setSamples(pressVals, false);
         }
         return heightGrid;
     }
@@ -1037,8 +1106,7 @@ public class DerivedGridFactory {
     public static FieldImpl createFlowVectors(FieldImpl uGrid,
             FieldImpl vGrid)
             throws VisADException, RemoteException {
-        FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
-                                             true /* flatten */);
+        FieldImpl uvGrid      = combineGrids(uGrid, vGrid, true /* flatten */);
         FieldImpl retGrid     = uvGrid;
         Unit[]    units       = GridUtil.getParamUnits(uvGrid);
         boolean   isFlowUnits = true;
@@ -1059,7 +1127,7 @@ public class DerivedGridFactory {
         if (isFlowUnits) {
 
             // System.out.println("making earth vector type");
-            TupleType paramType = GridUtil.getParamType(uvGrid);
+            TupleType  paramType = GridUtil.getParamType(uvGrid);
             RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                    CommonUnit.meterPerSecond);
             RealTupleType earthVectorType = new EarthVectorType(reals[0],
@@ -1089,8 +1157,8 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
                 wGrid }, true);
-        TupleType paramType = GridUtil.getParamType(uvwGrid);
-        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+        TupleType  paramType = GridUtil.getParamType(uvwGrid);
+        RealType[] reals     = Util.ensureUnit(paramType.getRealComponents(),
                                            CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
                                             reals[1], reals[2]);
@@ -1798,8 +1866,8 @@ public class DerivedGridFactory {
             // Implementation:  have to take the raw data FieldImpl
             // apart, make advection FlatField by FlatField,
             // and put all back together again into a new advection FieldImpl
-            Set timeSet = uGrid.getDomainSet();
-            Boolean ensble = (GridUtil.hasEnsemble(uGrid)
+            Set     timeSet = uGrid.getDomainSet();
+            Boolean ensble  = (GridUtil.hasEnsemble(uGrid)
                               && GridUtil.hasEnsemble(vGrid)
                               && GridUtil.hasEnsemble(paramGrid));
             // resample to domainSet of uGrid.  If they are the same, this
@@ -2225,7 +2293,7 @@ public class DerivedGridFactory {
         FieldImpl rhFI          = null;
         FlatField mixingRatioFF = null;
         FlatField press         = null;
-        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+        boolean   isSequence    = (GridUtil.isTimeSequence(temperFI)
                               && GridUtil.isTimeSequence(mixingRatioFI));
 
         Boolean ensble = (GridUtil.hasEnsemble(temperFI)
@@ -2333,8 +2401,7 @@ public class DerivedGridFactory {
         else {
 
             // get a grid of pressure values
-            press         =
-                createPressureGridFromDomain((FlatField) temperFI);
+            press         = createPressureGridFromDomain((FlatField) temperFI);
             mixingRatioFF = (FlatField) mixingRatioFI;
 
             if (isSpecificHumidity) {
@@ -2791,8 +2858,8 @@ public class DerivedGridFactory {
                         dtdp = (FlatField) (dtdp.multiply(innerField3));
 
                         if (rangeType == null) {
-                            Unit ipvUnit = dtdp.getRangeUnits()[0][0];
-                            RealType ipvRT = DataUtil.makeRealType("ipv",
+                            Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
+                            RealType ipvRT   = DataUtil.makeRealType("ipv",
                                                  ipvUnit);
                             ipvFFType = new FunctionType(
                                 ((FunctionType) dtdp.getType()).getDomain(),
@@ -2858,7 +2925,7 @@ public class DerivedGridFactory {
                         // first time through, set up ipvFI
                         // make the VisAD FunctionType for the IPV; several steps
                         Unit     ipvUnit = dtdp.getRangeUnits()[0][0];
-                        RealType ipvRT = DataUtil.makeRealType("ipv",
+                        RealType ipvRT   = DataUtil.makeRealType("ipv",
                                              ipvUnit);
 
                         // change unit from 0.01 s-1 K kg-1 m2 to
@@ -3261,8 +3328,8 @@ public class DerivedGridFactory {
         newField = new FlatField(newType, gridToMask.getDomainSet());
         mask     = (FlatField) mask.resample(gridToMask.getDomainSet());
 
-        float[][] maskValues = mask.getFloats(false);
-        float[][] gridValues = gridToMask.getFloats(false);
+        float[][] maskValues   = mask.getFloats(false);
+        float[][] gridValues   = gridToMask.getFloats(false);
         float[][] maskedValues =
             new float[gridValues.length][gridValues[0].length];
 
@@ -3353,7 +3420,7 @@ public class DerivedGridFactory {
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
@@ -3483,7 +3550,7 @@ public class DerivedGridFactory {
 
         // Determine the types latitude and longitude parameters.
         RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
-        RealType latType = findComponent(spatialDomType, "lat",
+        RealType      latType        = findComponent(spatialDomType, "lat",
                                          RealType.Latitude);
         RealType lonType = findComponent(spatialDomType, "lon",
                                          RealType.Longitude);
@@ -3523,21 +3590,21 @@ public class DerivedGridFactory {
                 if ( !isConstantDomain || (lonFF == null)) {
                     lonFF =
                         createLongitudeBasedGrid((FlatField) fi.getSample(i,
-                            false), latType, domIsLatLon);
+                            false), lonType, domIsLatLon);
                 }
 
                 if (i == 0) {
-                    FunctionType latFIType =
+                    FunctionType lonFIType =
                         new FunctionType(DataUtility.getDomainType(timeSet),
                                          (FunctionType) lonFF.getType());
 
-                    lonField = new FieldImpl(latFIType, timeSet);
+                    lonField = new FieldImpl(lonFIType, timeSet);
                 }
 
                 lonField.setSample(i, lonFF);
             }
         } else {
-            lonField = createLongitudeBasedGrid((FlatField) fi, latType,
+            lonField = createLongitudeBasedGrid((FlatField) fi, lonType,
                     domIsLatLon);
         }
 
@@ -3554,7 +3621,7 @@ public class DerivedGridFactory {
      *                    If false, then the latitude and longitude
      *                    are found in
      *                    the reference {@link visad.RealTupleType} of the
-     *                    {@link visad.CoodinateSystem} of the domain.
+     *                    {@link visad.CoordinateSystem} of the domain.
      *
      * @param makeCoriolis  true to return a grid of the coriolis factor
      * @return extracted grid of latitudes or coriolis at the grid points
@@ -3619,6 +3686,453 @@ public class DerivedGridFactory {
         }, false);
 
         return latff;
+    }
+
+    /**
+     * Based on point data trajectory control, create all individual tracks and then merge them
+     *
+     * @param uFI _more_
+     * @param vFI _more_
+     * @param pwFI _more_
+     * @param sFI _more_
+     * @param s0FI _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl createTrajectoryGrid(FieldImpl uFI,
+            FieldImpl vFI, FieldImpl pwFI, FieldImpl sFI, FieldImpl s0FI)
+            throws VisADException, RemoteException, Exception {
+
+        //s0FI is single level, single time step grid var
+        float        radius   = 6371000.0f;
+        Set          timeSet  = sFI.getDomainSet();
+        int          numTimes = timeSet.getLength();
+        Unit         timeUnit = timeSet.getSetUnits()[0];
+        Unit paramUnit = ((FlatField) sFI.getSample(0)).getRangeUnits()[0][0];
+        FunctionType rt       =
+            (FunctionType) ((FlatField) sFI.getSample(0)).getType();
+        String paramName = rt.getFlatRange().getRealComponents()[0].getName();
+
+        double[]   timeVals = timeSet.getDoubles()[0];
+
+        SampledSet domain0  = GridUtil.getSpatialDomain(s0FI);
+        FieldImpl  pFI      =
+            createPressureGridFromDomain((FlatField) pwFI.getSample(0));
+        FieldImpl hPI = convertPressureToHeight(pFI);
+        FieldImpl wFI = convertPressureVelocityToHeightVelocity(pwFI, hPI,
+                            null);
+
+        int       numPoints = domain0.getLength();
+        float[][] geoVals   =
+            GridUtil.getEarthLocationPoints((GriddedSet) domain0);
+
+        float[][]  lats         = new float[numPoints][numTimes];
+        float[][]  lons         = new float[numPoints][numTimes];
+        float[][]  alts         = new float[numPoints][numTimes];
+        double[]   ttts         = timeSet.getDoubles()[0];
+        double[][] parcels      = new double[numPoints][numTimes];
+
+        boolean    isLatLon     = GridUtil.isLatLonOrder(domain0);
+        int        latIndex     = isLatLon
+                                  ? 0
+                                  : 1;
+        int        lonIndex     = isLatLon
+                                  ? 1
+                                  : 0;
+        boolean    haveAlt      = geoVals.length > 2;
+        float[]    u            = new float[numPoints];
+        float[]    v            = new float[numPoints];
+        float[]    w            = new float[numPoints];
+        float      s            = 0;
+
+        boolean    normalizeLon = true;
+        //first step  init  u,v, w, and s at all initial points
+        for (int i = 0; i < numPoints; i++) {
+            float lat = geoVals[latIndex][i];
+            float lon = geoVals[lonIndex][i];
+            float alt = haveAlt
+                        ? geoVals[2][i]
+                        : 0;
+            lats[i][0] = lat;
+            if (normalizeLon) {
+                lon = (float) LatLonPointImpl.lonNormal(lon);
+            }
+            lons[i][0] = lon;
+            alts[i][0] = alt;
+
+            EarthLocation el      = new EarthLocationLite(lat, lon, alt);
+            FieldImpl     ssample = GridUtil.sample(sFI, el);
+            Data          srt     = ssample.getSample(0);
+            Real          sreal   = (srt instanceof RealTuple)
+                                    ? (Real) ((RealTuple) srt).getComponent(0)
+                                    : (Real) srt;
+            s             = (float) sreal.getValue();
+            parcels[i][0] = s;
+
+            FieldImpl usample = GridUtil.sample(uFI, el);
+            Data      urt     = usample.getSample(0);
+            Real      ureal   = (urt instanceof RealTuple)
+                                ? (Real) ((RealTuple) urt).getComponent(0)
+                                : (Real) urt;
+            u[i] = (float) ureal.getValue();
+
+            FieldImpl vsample = GridUtil.sample(vFI, el);
+            Data      vrt     = vsample.getSample(0);
+            Real      vreal   = (vrt instanceof RealTuple)
+                                ? (Real) ((RealTuple) vrt).getComponent(0)
+                                : (Real) vrt;
+            v[i] = (float) vreal.getValue();
+
+            FieldImpl wsample = GridUtil.sample(wFI, el);
+            Data      wrt     = wsample.getSample(0);
+            Real      wreal   = (wrt instanceof RealTuple)
+                                ? (Real) ((RealTuple) wrt).getComponent(0)
+                                : (Real) wrt;
+            if (wreal.isMissing()) {
+                w[i] = 0;
+            } else {
+                w[i] = (float) wreal.getValue();
+            }
+
+
+        }
+        // now cal every point at each following time step
+        float f = 180.0f / 3.1415926f;
+        for (int timeStepIdx = 1; timeStepIdx < numTimes; timeStepIdx++) {
+
+            double delt = ttts[timeStepIdx] - ttts[timeStepIdx - 1];
+            for (int i = 0; i < numPoints; i++) {
+                float lat  = lats[i][timeStepIdx - 1];
+                float lon  = lons[i][timeStepIdx - 1];
+                float alt  = alts[i][timeStepIdx - 1];
+
+
+                float lat1 = (float) (lat
+                                      + f * (v[i] * delt) / (radius + alt));
+                float lon1 = (float) (lon
+                                      + f * (u[i] * delt) / (radius + alt));
+                float alt1 = (float) (alt + (w[i] * delt));
+                if (alt1 < 0) {
+                    alt1 = 0;
+                }
+                EarthLocation el = new EarthLocationLite(lat1, lon1, alt1);
+
+                //GridUtil.sampleAtPoint for u, v, w
+                FieldImpl usample = GridUtil.sample(uFI, el);
+                FieldImpl vsample = GridUtil.sample(vFI, el);
+                FieldImpl wsample = GridUtil.sample(wFI, el);
+                FieldImpl ssample = GridUtil.sample(sFI, el);
+
+                if ((usample == null) && (vsample == null)
+                        && (wsample == null) && (ssample == null)) {
+                    //outside the domain
+                    lats[i][timeStepIdx]    = lats[i][timeStepIdx - 1];
+                    lons[i][timeStepIdx]    = lons[i][timeStepIdx - 1];
+                    alts[i][timeStepIdx]    = alts[i][timeStepIdx - 1];
+                    parcels[i][timeStepIdx] = parcels[i][timeStepIdx - 1];
+                } else {
+                    lats[i][timeStepIdx] = lat1;
+                    lons[i][timeStepIdx] = lon1;
+                    alts[i][timeStepIdx] = alt1;
+
+                    Data urt   = usample.getSample(timeStepIdx);
+                    Real ureal = (urt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) urt).getComponent(0)
+                                 : (Real) urt;
+                    u[i] = (float) ureal.getValue();
+
+
+                    Data vrt   = vsample.getSample(timeStepIdx);
+                    Real vreal = (vrt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) vrt).getComponent(0)
+                                 : (Real) vrt;
+                    v[i] = (float) vreal.getValue();
+
+
+                    Data wrt   = wsample.getSample(timeStepIdx);
+                    Real wreal = (wrt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) wrt).getComponent(0)
+                                 : (Real) wrt;
+                    if (wreal.isMissing()) {
+                        w[i] = 0;
+                    } else {
+                        w[i] = (float) wreal.getValue();
+                    }
+
+                    Data srt   = ssample.getSample(timeStepIdx);
+                    Real sreal = (srt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) srt).getComponent(0)
+                                 : (Real) srt;
+                    s                       = (float) sreal.getValue();
+                    parcels[i][timeStepIdx] = s;
+
+                }
+
+            }
+        }
+        /*
+        // create FI of traj based on SSEC  NearTraj control
+        int          numParcels = numPoints;  //10;
+        FunctionType ft         = new FunctionType(
+                              RealType.Generic,
+                              new FunctionType(
+                                  RealTupleType.SpatialEarth3DTuple,
+                                  RealType.getRealType("paramName")));
+        FieldImpl trajField = new FieldImpl(ft, new Integer1DSet(numParcels));
+        FieldImpl trajTimeField =
+            new FieldImpl(new FunctionType(RealType.Time,
+                                           trajField.getType()), timeSet);
+
+        for (int t = 0; t < numTimes; t++) {
+
+            trajField = new FieldImpl(ft, new Integer1DSet(numParcels));
+            for (int k = 0; k < numParcels; k++) {
+                float[]   latsK    = subArray(lats[k], 0, t + 1, 0);
+                float[]   lonsK    = subArray(lons[k], 0, t + 1, 0);
+                float[]   altsK    = subArray(alts[k], 0, t + 1, 0);
+                double[]  parcelsK = subArray(parcels[k], 0, t + 1, 0);
+
+                FlatField fld = createSingleTraj("paramName", latsK, lonsK,
+                                    altsK, parcelsK);
+                trajField.setSample(k, fld);
+            }
+
+            trajTimeField.setSample(t, trajField);
+        }
+         */
+        // create FI
+
+        int          numParcels = numPoints;  //10;
+        FunctionType ft         = new FunctionType(
+                              RealType.Generic,
+                              new FunctionType(
+                                  RealTupleType.SpatialEarth3DTuple,
+                                  RealType.getRealType(paramName)));
+
+        List tracks = new ArrayList();
+        for (int k = 0; k < numParcels; k++) {
+            FlatField fft = createSingleTrack(paramName, lats[k], lons[k],
+                                alts[k], parcels[k], timeSet, ft, paramUnit);
+            tracks.add(fft);
+        }
+
+        FlatField    mergedTracks = mergeTracks(tracks);
+        FunctionType fiType       = new FunctionType(RealType.Time,
+                                  mergedTracks.getType());
+
+        DateTime  endTime = new DateTime(timeVals[numTimes - 1], timeUnit);
+
+        FieldImpl fi      =
+            new FieldImpl(fiType,
+                          new SingletonSet(new RealTuple(new Real[] {
+                              endTime })));
+        fi.setSample(0, mergedTracks, false);
+        return fi;
+
+
+    }
+
+    /**
+     * This is a duplication and should be removed later
+     * @param datas _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static FlatField mergeTracks(List datas) throws VisADException {
+
+        if (datas.isEmpty()) {
+            return null;
+        }
+        if (datas.size() == 1) {
+            return (FlatField) datas.get(0);
+        }
+        FlatField retField = null;
+        try {
+            int        numObs    = 0;
+            GriddedSet domainSet = null;
+            FlatField  ff        = null;
+            for (int i = 0; i < datas.size(); i++) {
+                ff        = (FlatField) datas.get(i);
+                domainSet = (GriddedSet) ff.getDomainSet();
+                numObs    += domainSet.getLength();
+            }
+            FunctionType  retType    = (FunctionType) ff.getType();
+            RealTupleType rtt        = DataUtility.getFlatRangeType(ff);
+            double[][]    domainVals =
+                new double[domainSet.getDimension()][numObs];
+            float[][] values = new float[rtt.getDimension()][numObs];
+            int       curPos = 0;
+            for (int i = 0; i < datas.size(); i++) {
+                FlatField  data    = (FlatField) datas.get(i);
+                GriddedSet dset    = (GriddedSet) data.getDomainSet();
+                double[][] samples = dset.getDoubles(false);
+                int        length  = dset.getLength();
+                float[][]  vals    = data.getFloats(false);
+                for (int j = 0; j < samples.length; j++) {
+                    System.arraycopy(samples[j], 0, domainVals[j], curPos,
+                                     length);
+                }
+                for (int j = 0; j < vals.length; j++) {
+                    System.arraycopy(vals[j], 0, values[j], curPos, length);
+                }
+                curPos += length;
+            }
+            // now make the new data
+            // First make the domain set
+            GriddedSet newDomain = null;
+            if (domainSet instanceof Gridded1DDoubleSet) {
+                newDomain = new Gridded1DDoubleSet(domainSet.getType(),
+                        domainVals, numObs, domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors());
+            } else {
+                newDomain = GriddedSet.create(domainSet.getType(),
+                        Set.doubleToFloat(domainVals), new int[] { numObs },
+                        domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors());
+            }
+            retField = new FlatField(retType, newDomain);
+            retField.setSamples(values, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("got RemoteException " + re);
+        }
+        return retField;
+    }
+
+    /**
+     * _more_
+     *
+     * @param a _more_
+     * @param start _more_
+     * @param count _more_
+     * @param strike _more_
+     *
+     * @return _more_
+     */
+    public static float[] subArray(float[] a, int start, int count,
+                                   int strike) {
+        float[] b = new float[count];
+        for (int i = 0; i < count; i++) {
+            b[i] = a[i + start];
+        }
+        return b;
+    }
+
+    /**
+     * _more_
+     *
+     * @param a _more_
+     * @param start _more_
+     * @param count _more_
+     * @param strike _more_
+     *
+     * @return _more_
+     */
+    public static double[] subArray(double[] a, int start, int count,
+                                    int strike) {
+        double[] b = new double[count];
+        for (int i = 0; i < count; i++) {
+            b[i] = a[i + start];
+        }
+        return b;
+    }
+
+    /**
+     * _more_
+     *
+     * @param paramName _more_
+     * @param lats _more_
+     * @param lons _more_
+     * @param alts _more_
+     * @param param _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static FlatField createSingleTraj(String paramName, float[] lats,
+                                             float[] lons, float[] alts,
+                                             double[] param)
+            throws Exception {
+        float        trajCoords[][] = {
+            lons, lats, alts
+        };
+        Gridded3DSet domain         =
+            new Gridded3DSet(RealTupleType.SpatialEarth3DTuple, trajCoords,
+                             trajCoords[0].length);
+        FunctionType fncType =
+            new FunctionType(RealTupleType.SpatialEarth3DTuple,
+                             RealType.getRealType(paramName));
+        FlatField traj = new FlatField(fncType, domain);
+        traj.setSamples(new double[][] {
+            param
+        }, false);
+        return traj;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param variableName _more_
+     * @param lats _more_
+     * @param lons _more_
+     * @param alts _more_
+     * @param param _more_
+     * @param timeSet _more_
+     * @param ft _more_
+     * @param varUnit _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static FlatField createSingleTrack(String variableName,
+            float[] lats, float[] lons, float[] alts, double[] param,
+            Set timeSet, FunctionType ft, Unit varUnit)
+            throws Exception {
+
+        Unit       timeUnit     = timeSet.getSetUnits()[0];
+        double[][] newRangeVals = new double[2][param.length];
+        double[]   timeVals     = timeSet.getDoubles()[0];
+        newRangeVals[0] = param;
+        RealType timeType =
+            RealType.getRealType(DataUtil.cleanName(variableName + "_"
+                + timeUnit), timeUnit);
+        RealType varType =
+            RealType.getRealType(DataUtil.cleanName(variableName + "_"
+                + varUnit), varUnit);
+        RealTupleType rangeType = new RealTupleType(varType, timeType);
+        newRangeVals[1] = timeVals;
+
+        Set[] rangeSets = new Set[2];
+        rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
+        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
+
+        float        trajCoords[][] = {
+            lons, lats, alts
+        };
+        Gridded3DSet domain         =
+            new Gridded3DSet(RealTupleType.SpatialEarth3DTuple, trajCoords,
+                             trajCoords[0].length);
+        GriddedSet   llaSet  = domain;
+        FunctionType newType =
+            new FunctionType(((SetType) llaSet.getType()).getDomain(),
+                             rangeType);
+        FlatField timeTrack = new FlatField(newType, llaSet,
+                                            (CoordinateSystem) null,
+                                            rangeSets, new Unit[] { varUnit,
+                timeUnit });
+        timeTrack.setSamples(newRangeVals, false);
+
+        return timeTrack;
     }
 
     /**
@@ -3840,7 +4354,7 @@ public class DerivedGridFactory {
             throws VisADException {
         FieldImpl dailyClim = null;
         Set       timeSet   = GridUtil.getTimeSet(dailyData);
-        int[] jdays =
+        int[]     jdays     =
             UtcDate.convertDateTimeToJulianDay((Gridded1DSet) timeSet);
         // sanity check on the input
         int day1    = jdays[0];
@@ -3850,9 +4364,9 @@ public class DerivedGridFactory {
             throw new VisADException(
                 "createDailyClimatology: Input field must be daily data");
         }
-        int numDays = use366
-                      ? 366
-                      : 365;
+        int          numDays   = use366
+                                 ? 366
+                                 : 365;
         Integer1DSet climTimes = new Integer1DSet(RealTupleType.Time1DTuple,
                                      numDays, null,
                                      new Unit[] { CLIMATE_UNITS }, null);
@@ -3930,8 +4444,7 @@ public class DerivedGridFactory {
                         }
                     }
                 }
-                FlatField dayData  = (FlatField) dailyData.getSample(i,
-                                         false);
+                FlatField dayData  = (FlatField) dailyData.getSample(i, false);
                 FlatField climData = null;
                 // TODO: figure out leap years
                 if (isLeapDay) {
