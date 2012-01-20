@@ -517,7 +517,11 @@ public class TrackControl extends GridDisplayControl {
         Unit[]          ut     = fi.getDomainUnits();
         float[][]       t      = st.getSamples();
         DateTime[]      times  = new DateTime[1];
-        times[0] = new DateTime(t[0][2], ut[0]);
+        if(t[0].length > 2)
+            times[0] = new DateTime(t[0][2], ut[0]);
+        else
+            times[0] = new DateTime(t[0][0], ut[0]);
+
         for (int i = 0; i < len; i++) {
             datas.add((FlatField) fi.getSample(i));
         }
@@ -611,7 +615,13 @@ public class TrackControl extends GridDisplayControl {
             timesHolder.setData(DUMMY_DATA);
             return;
         }
-        FlatField f = (FlatField) ((FieldImpl) d).getSample(0);
+        FlatField f ;
+        try {
+            f = (FlatField)((FieldImpl) d).getSample(0);
+        } catch (ClassCastException e) {
+            f = (FlatField)d;
+        }
+
         //System.out.println(f.getType());
         double[][] samples  = f.getValues(false);
         int        numTimes = samples[1].length;
