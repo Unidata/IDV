@@ -25,7 +25,7 @@ gen::defineMacro {<%release.date%>} [clock format [clock seconds] -format {%B %d
 ##read in the version.properties file in
 ##../../../../ucar/unidata/idv/resources/build.properties file
 catch {
-    set fp [open [file join .. .. .. .. ucar unidata idv resources build.properties] r]
+    set fp [open [file join .. .. .. .. src ucar unidata idv resources build.properties] r]
     set contents [read $fp]
     close $fp
     set ok 1
