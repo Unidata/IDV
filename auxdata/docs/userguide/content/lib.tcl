@@ -16,8 +16,8 @@ gen::addHandler {controls/.*\.html} ug::handleControls
 gen::setDoChildOverview 0
 
 ##We use this for referencing install anywhere file names
-gen::defineMacro {<%idv.version%>} {2.8}
-gen::defineMacro {<%idv.under.version%>} {2_8}
+gen::defineMacro {<%idv.version%>} {3.0}
+gen::defineMacro {<%idv.under.version%>} {3_0}
 gen::defineMacro {<%release.date%>} [clock format [clock seconds] -format {%B %d, %Y}]
 
 
