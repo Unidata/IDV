@@ -50,7 +50,7 @@ gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
 ##read in the version.properties file in
 ##../../../../ucar/unidata/idv/resources/version.properties file
 catch {
-    set fp [open [file join .. .. .. .. ucar unidata idv resources build.properties] r]
+    set fp [open [file join .. .. .. .. src ucar unidata idv resources build.properties] r]
     set contents [read $fp]
     close $fp
     set ok 1
