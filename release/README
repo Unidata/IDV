@@ -16,6 +16,8 @@ So we have(in an abbreviated way):
 Run the test suite (see below) and make sure to update and
 check in /ucar/unidata/idv/resources/version.properties.
 
+Update the lib.tcl in the /auxdata/doc/userguide/content and   /auxdata/doc/workshopguide/content
+
 Before making a release, make sure to update the release notes
 in auxdata/docs/userguide/content/ReleaseNotes.html
 ******************************************************
