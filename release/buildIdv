@@ -6,6 +6,9 @@ export ANT_HOME=/share/jakarta-ant
 export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/csw/bin:/opt/bin:/bin
 export ANT_OPTS=-Xmx512m
 export CLASSPATH=
+export BUILD_DIR=$PWD/..
+
+newdir=build$(date '+%Y%m%dT%H%M')
 
 errmsg()
 {
@@ -24,43 +27,41 @@ build()
         status=1
         ant -version
         java -version
-        if cd /share/idv; then
-	    newdir=build$(date '+%Y%m%dT%H%M')
-	    if test -d $newdir; then
-		echo 1>&2 "Directory \"$newdir\" exists!"
-	    else
-		umask 02
-		if mkdir $newdir; then
-		    svn update build/build.xml
-		    if test "$1"; then
-			ant -Dbasedir=`pwd`/$newdir -buildfile build/build.xml \
-			    "$@"
-		    else
-			ant -Dbasedir=`pwd`/$newdir -buildfile build/build.xml
-		    fi
-		    if test $? -eq 0; then
-			olddir=$(ls -l runtime | awk '{print $NF}')
+        if cd $BUILD_DIR; then
+            if test -d $newdir; then
+                echo 1>&2 "Directory \"$newdir\" exists!"
+            else
+                umask 02
+                if mkdir $newdir; then
+                    if test "$1"; then
+                        ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml \
+                            "$@"
+                    else
+                        ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml
+                    fi
+                    if test $? -eq 0; then
+                        olddir=$(ls -l runtime | awk '{print $NF}')
                         if test $olddir != $newdir; then
                             rm -rf $olddir || echo 1>&2 \
                                 "Couldn't remove old directory $olddir"
                         fi
-			rm runtime
-			if ln -s $newdir runtime; then
-				echo "IDV package built"
-				status=0
-			else
-			    echo 1>&2 "Couldn't throw runtime switch"
-			fi
-		    else
-			echo 1>&2 "Couldn't build IDV package"
-		    fi
-		    if test $status != 0; then
-			rm -rf $newdir
-		    fi
-		else
-		    echo 1>&2 "Couldn't make directory $newdir"
-		fi
-	    fi
+                        rm runtime
+                        if ln -s $newdir runtime; then
+                                echo "IDV package built"
+                                status=0
+                        else
+                            echo 1>&2 "Couldn't throw runtime switch"
+                        fi
+                    else
+                        echo 1>&2 "Couldn't build IDV package"
+                    fi
+                    if test $status != 0; then
+                        rm -rf $newdir
+                    fi
+                else
+                    echo 1>&2 "Couldn't make directory $newdir"
+                fi
+            fi
         else
             echo 1>&2 "Couldn't change to idv directory"
         fi
@@ -72,14 +73,14 @@ ftp()
 {
     (
         status=1
-        if cd /share/idv; then
-	    umask 02
-	    if ant -Dbasedir=`pwd` -buildfile build/build.xml ftp; then
-		echo "IDV FTP done"
-		status=0
-	    else
-		echo 1>&2 "Couldn't do IDV FTP stuff"
-	    fi
+        if cd $BUILD_DIR; then
+            umask 02
+            if ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml ftp; then
+                echo "IDV FTP done"
+                status=0
+            else
+                echo 1>&2 "Couldn't do IDV FTP stuff"
+            fi
         fi
         return $status
     )
@@ -91,14 +92,14 @@ nightly()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /share/idv; then
-	      umask 02
-	      if ant -Dbasedir=`pwd` -buildfile build/build.xml nightly_release; then
-	        echo "IDV release done"
-	        status=0
-    	      else
-	        echo 1>&2 "Couldn't do IDV release stuff"
-	      fi
+            if cd $BUILD_DIR; then
+              umask 02
+              if ant -Dbasedir=`pwd`/$newdir  -buildfile release/build.xml nightly_release; then
+                echo "IDV release done"
+                status=0
+              else
+                echo 1>&2 "Couldn't do IDV release stuff"
+              fi
             fi
           fi
         fi
@@ -112,14 +113,14 @@ release()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /share/idv; then
-	      umask 02
-	      if ant -Dbasedir=`pwd` -buildfile build/build.xml release; then
-	        echo "IDV release done"
-	        status=0
-    	      else
-	        echo 1>&2 "Couldn't do IDV release stuff"
-	      fi
+            if cd $BUILD_DIR; then
+              umask 02
+              if ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml release; then
+                echo "IDV release done"
+                status=0
+              else
+                echo 1>&2 "Couldn't do IDV release stuff"
+              fi
             fi
           fi
         fi
@@ -133,14 +134,14 @@ test_release()
         status=1
         if (build "$@"); then
           if (installers); then
-            if cd /share/idv; then
-	      umask 02
-	      if ant -Dbasedir=`pwd` -buildfile build/build.xml test_release; then
-	        echo "IDV release done"
-	        status=0
-    	      else
-	        echo 1>&2 "Couldn't do IDV release stuff"
-	      fi
+            if cd $BUILD_DIR; then
+              umask 02
+              if ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml test_release; then
+                echo "IDV release done"
+                status=0
+              else
+                echo 1>&2 "Couldn't do IDV release stuff"
+              fi
             fi
           fi
         fi
@@ -152,14 +153,14 @@ installers()
 {
     (
         status=1
-        if cd /share/idv; then
-	    umask 02
-	    if ant -Dbasedir=`pwd` -buildfile build/build.xml installers; then
-		echo "IDV installers built"
-		status=0
-	    else
-		echo 1>&2 "Couldn't build IDV installers"
-	    fi
+        if cd $BUILD_DIR; then
+            umask 02
+            if ant -Dbasedir=`pwd`/$newdir -buildfile release/build.xml installers; then
+                echo "IDV installers built"
+                status=0
+            else
+                echo 1>&2 "Couldn't build IDV installers"
+            fi
         fi
         return $status
     )

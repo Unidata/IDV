@@ -177,35 +177,35 @@ line using: and -Dbasedir=/some/other/dir
         <jar
             jarfile="${ftpdir}/idv_src_${idv.version}.jar"
             compress="true"
-            basedir="${srcdir}/.."
+            basedir="${basedir}/src"
         >
-            <include name="idv/src/ucar/**"/>
-            <exclude name="idv/src/ucar/**/*.class"/>
-            <exclude name="idv/src/ucar/**/*.map"/>
-            <exclude name="idv/src/ucar/**/*.jar"/>
-            <exclude name="idv/src/ucar/**/*.ascii"/>
-            <exclude name="idv/src/ucar/**/*.tml"/>
-            <exclude name="idv/src/ucar/**/*.bak"/>
-            <exclude name="idv/src/ucar/**/*.zip"/>
-            <exclude name="idv/src/ucar/**/*.shp"/>
-            <exclude name="idv/src/ucar/**/*.nc"/>
-            <exclude name="idv/src/ucar/unidata/data/storm/*ADOT*"/>
-            <exclude name="idv/src/ucar/unidata/idv/control/storm/*ADOT*"/>
-            <exclude name="idv/src/ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
-            <exclude name="idv/src/ucar/unidata/apps/demo/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/imageviewer/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/geon/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/lead/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/rico/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/sti/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/trex/**"/>
-            <exclude name="idv/src/ucar/unidata/apps/workshop/**"/>
-            <exclude name="idv/src/ucar/unidata/repository/**"/>
-            <exclude name="idv/src/ucar/unidata/gridviewer/**/*.*"/>
-            <exclude name="idv/src/ucar/unidata/grid/**"/>
-            <exclude name="idv/src/ucar/unidata/geoloc/**"/>
-            <exclude name="idv/src/ucar/unidata/idv/release/**"/>
-            <exclude name="idv/src/ucar/unidata/view/sounding/test/**"/>
+            <include name="ucar/**"/>
+            <exclude name="ucar/**/*.class"/>
+            <exclude name="ucar/**/*.map"/>
+            <exclude name="ucar/**/*.jar"/>
+            <exclude name="ucar/**/*.ascii"/>
+            <exclude name="ucar/**/*.tml"/>
+            <exclude name="ucar/**/*.bak"/>
+            <exclude name="ucar/**/*.zip"/>
+            <exclude name="ucar/**/*.shp"/>
+            <exclude name="ucar/**/*.nc"/>
+            <exclude name="ucar/unidata/data/storm/*ADOT*"/>
+            <exclude name="ucar/unidata/idv/control/storm/*ADOT*"/>
+            <exclude name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
+            <exclude name="ucar/unidata/apps/demo/**"/>
+            <exclude name="ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="ucar/unidata/apps/geon/**"/>
+            <exclude name="ucar/unidata/apps/lead/**"/>
+            <exclude name="ucar/unidata/apps/rico/**"/>
+            <exclude name="ucar/unidata/apps/sti/**"/>
+            <exclude name="ucar/unidata/apps/trex/**"/>
+            <exclude name="ucar/unidata/apps/workshop/**"/>
+            <exclude name="ucar/unidata/repository/**"/>
+            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="ucar/unidata/grid/**"/>
+            <exclude name="ucar/unidata/geoloc/**"/>
+            <exclude name="ucar/unidata/idv/release/**"/>
+            <exclude name="ucar/unidata/view/sounding/test/**"/>
         </jar>
     </target>
 
@@ -665,8 +665,7 @@ line using: and -Dbasedir=/some/other/dir
         </zip>
         <jar
             jarfile="${ftpdir}/idv_javadoc_${idv.version}.jar"
-            basedir="${basedir}/.."
-            includes="idv/docs/javadoc/**"
+            basedir="${basedir}/docs/javadoc"
         />
     </target>
 
