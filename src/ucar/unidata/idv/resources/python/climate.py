@@ -48,8 +48,8 @@ def calcMonAnom(monthly, ltm, normalize=0):
   return monAnom
   
 def stdMon(grid):
-  """ Create monthly standard deviations from a grid of monthly data over a period
-      of years. The number of timesteps must be a multiple of 12.
+  """ Create monthly standard deviations from a grid of monthly data over 
+      a period of years. The number of timesteps must be a multiple of 12.
   """
   from visad import VisADException
   from visad import Gridded1DDoubleSet
@@ -77,7 +77,10 @@ def clmDay(grid, use366=1):
   """
   return DerivedGridFactory.createDailyClimatology(grid, use366)
 
-def calcDayAnom(daily, ltm):
-  """ Calculate the daily anomaly from a long term mean. 
+def calcDayAnom(daily, ltm, asPercent=0):
+  """ Calculate the daily anomaly from a long term mean. <br>
+      grid - daily values <br>
+      ltm  - long term mean (climatology) <br>
+      asPercent - if 1, return percentage of climatology normal (+/-) <br>
   """
-  return DerivedGridFactory.calculateDailyAnomaly(daily, ltm)
+  return DerivedGridFactory.calculateDailyAnomaly(daily, ltm, asPercent)
