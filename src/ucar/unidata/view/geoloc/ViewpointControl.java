@@ -1,37 +1,30 @@
 /*
- * $Id: ViewpointControl.java,v 1.31 2007/06/11 21:28:20 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
 import visad.Unit;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -56,6 +49,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 /**
  * This class has a menu and ToolBar to control the viewpoint of
@@ -94,7 +88,8 @@ public class ViewpointControl implements ActionListener {
     private static final String CMD_SETWEST = "cmd.setwestview";
 
     /** Icon for toolbar */
-    private static final String ICON_BOTTOM = "/auxdata/ui/icons/Bottom16.gif";
+    private static final String ICON_BOTTOM =
+        "/auxdata/ui/icons/Bottom16.gif";
 
     /** Icon for toolbar */
     private static final String ICON_EAST = "/auxdata/ui/icons/East16.gif";
@@ -103,13 +98,16 @@ public class ViewpointControl implements ActionListener {
     private static final String ICON_NORTH = "/auxdata/ui/icons/North16.gif";
 
     /** Icon for toolbar */
-    private static final String ICON_PARALLEL = "/auxdata/ui/icons/parallel_view.gif";
+    private static final String ICON_PARALLEL =
+        "/auxdata/ui/icons/parallel_view.gif";
 
     /** Icon for toolbar */
-    private static final String ICON_PERSPECTIVE = "/auxdata/ui/icons/perspective_view.gif";
+    private static final String ICON_PERSPECTIVE =
+        "/auxdata/ui/icons/perspective_view.gif";
 
     /** Icon for toolbar */
-    private static final String ICON_SETVERTICALSCALE = "/auxdata/ui/icons/Vert16.gif";
+    private static final String ICON_SETVERTICALSCALE =
+        "/auxdata/ui/icons/Vert16.gif";
 
     /** Icon for toolbar */
     private static final String ICON_SOUTH = "/auxdata/ui/icons/South16.gif";
@@ -118,7 +116,8 @@ public class ViewpointControl implements ActionListener {
     private static final String ICON_TOP = "/auxdata/ui/icons/Top16.gif";
 
     /** Icon for toolbar */
-    private static final String ICON_USERVIEW = "/auxdata/ui/icons/UserView16.gif";
+    private static final String ICON_USERVIEW =
+        "/auxdata/ui/icons/UserView16.gif";
 
     /** Icon for toolbar */
     private static final String ICON_WEST = "/auxdata/ui/icons/West16.gif";
@@ -135,9 +134,17 @@ public class ViewpointControl implements ActionListener {
     /** rotate up identifier */
     private static final String ROTATE_UP = "rotate.up";
 
+    /** rotate clockwise identifier */
+    private static final String ROTATE_CLOCKWISE = "rotate.clockwise";
+
+    /** rotate counterclockwise identifier */
+    private static final String ROTATE_COUNTERCLOCKWISE =
+        "rotate.counterclockwise";
+
     /** Commands for changing perspectives */
     private static final String[] perspectiveCmds = {
-        CMD_SETTOP, CMD_SETBOTTOM, CMD_SETNORTH, CMD_SETEAST, CMD_SETSOUTH, CMD_SETWEST
+        CMD_SETTOP, CMD_SETBOTTOM, CMD_SETNORTH, CMD_SETEAST, CMD_SETSOUTH,
+        CMD_SETWEST
     };
 
     /** Icons for changing perspectives */
@@ -210,14 +217,16 @@ public class ViewpointControl implements ActionListener {
      */
     public ViewpointControl(NavigatedDisplay navDisplay) {
         if (navDisplay == null) {
-            throw new NullPointerException("ViewPointControl.ctor: NavigatedDisplay cannot be null");
+            throw new NullPointerException(
+                "ViewPointControl.ctor: NavigatedDisplay cannot be null");
         }
 
         this.navDisplay  = navDisplay;
         isPerspective    = navDisplay.isPerspectiveView();
         perspectiveNames = new String[] {
-            navDisplay.getTopViewName(), navDisplay.getBottomViewName(), navDisplay.getNorthViewName(),
-            navDisplay.getEastViewName(), navDisplay.getSouthViewName(), navDisplay.getWestViewName()
+            navDisplay.getTopViewName(), navDisplay.getBottomViewName(),
+            navDisplay.getNorthViewName(), navDisplay.getEastViewName(),
+            navDisplay.getSouthViewName(), navDisplay.getWestViewName()
         };
     }
 
@@ -327,16 +336,19 @@ public class ViewpointControl implements ActionListener {
 
         for (int i = 0; i < perspectiveCmds.length; i++) {
             toolbar.add(makeButton(perspectiveIcons[i], perspectiveCmds[i],
-                                   "Rotate to " + perspectiveNames[i].toLowerCase() + " viewpoint"));
+                                   "Rotate to "
+                                   + perspectiveNames[i].toLowerCase()
+                                   + " viewpoint"));
         }
 
-        pButton = GuiUtils.getToggleImageButton(GuiUtils.getScaledImageIcon(ICON_PERSPECTIVE, null, true),
-                GuiUtils.getScaledImageIcon(ICON_PARALLEL, null, true), 2, 2);
+        pButton = GuiUtils.getToggleImageButton(
+            GuiUtils.getScaledImageIcon(ICON_PERSPECTIVE, null, true),
+            GuiUtils.getScaledImageIcon(ICON_PARALLEL, null, true), 2, 2);
         pButton.setSelected(isPerspective);
         pButton.setToolTipText("Set parallel/perspective projection");
         pButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!okToAcceptChangesFromPerspectiveWidgets) {
+                if ( !okToAcceptChangesFromPerspectiveWidgets) {
                     return;
                 }
 
@@ -346,7 +358,8 @@ public class ViewpointControl implements ActionListener {
             }
         });
         toolbar.add(pButton);
-        toolbar.add(makeButton(ICON_USERVIEW, CMD_ROTATEDIALOG, "Rotate to user specified view"));
+        toolbar.add(makeButton(ICON_USERVIEW, CMD_ROTATEDIALOG,
+                               "Rotate to user specified view"));
 
         JButton vertScaleButton =
             makeButton(
@@ -355,7 +368,7 @@ public class ViewpointControl implements ActionListener {
 
         vertScaleButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
-                if (!SwingUtilities.isRightMouseButton(me)) {
+                if ( !SwingUtilities.isRightMouseButton(me)) {
                     return;
                 }
 
@@ -364,29 +377,36 @@ public class ViewpointControl implements ActionListener {
                     double   diff  = range[1] - range[0];
 
                     diff = (range[1] - range[0]) * (me.isControlDown()
-                                                    ? -0.1
-                                                    : 0.1);
+                            ? -0.1
+                            : 0.1);
 
                     if (me.isShiftDown()) {
-                        navDisplay.setVerticalRange(range[0] - diff, range[1]);
+                        navDisplay.setVerticalRange(range[0] - diff,
+                                range[1]);
                     } else {
-                        navDisplay.setVerticalRange(range[0], range[1] + diff);
+                        navDisplay.setVerticalRange(range[0],
+                                range[1] + diff);
                     }
 
                     range = navDisplay.getVerticalRange();
-                    ucar.unidata.util.LogUtil.message("Setting vertical range to: " + Misc.format(range[0]) + " - "
-                                                      + Misc.format(range[1]) + " "
-                                                      + navDisplay.getVerticalRangeUnit());
+                    ucar.unidata.util.LogUtil.message(
+                        "Setting vertical range to: " + Misc.format(range[0])
+                        + " - " + Misc.format(range[1]) + " "
+                        + navDisplay.getVerticalRangeUnit());
                 } catch (Exception exp) {
-                    ucar.unidata.util.LogUtil.logException("Setting vertical scale", exp);
+                    ucar.unidata.util.LogUtil.logException(
+                        "Setting vertical scale", exp);
                 }
             }
         });
         toolbar.add(vertScaleButton);
         rotateButton =
-            GuiUtils.getToggleImageButton(GuiUtils.getScaledImageIcon("/auxdata/ui/icons/arrow_rotate_clockwise.png",
-                null, true), GuiUtils.getScaledImageIcon("/auxdata/ui/icons/arrow_rotate_clockwise.png", null, true),
-                             2, 2);
+            GuiUtils.getToggleImageButton(
+                GuiUtils.getScaledImageIcon(
+                    "/auxdata/ui/icons/arrow_rotate_clockwise.png", null,
+                    true), GuiUtils.getScaledImageIcon(
+                        "/auxdata/ui/icons/arrow_rotate_clockwise.png", null,
+                        true), 2, 2);
         rotateButton.setToolTipText("Auto-rotate;Right click to show menu");
         rotateButton.setSelected(getAutoRotate());
         rotateButton.addActionListener(new ActionListener() {
@@ -396,19 +416,31 @@ public class ViewpointControl implements ActionListener {
         });
         rotateButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
-                if (!SwingUtilities.isRightMouseButton(me)) {
+                if ( !SwingUtilities.isRightMouseButton(me)) {
                     return;
                 }
 
                 List<Object> items = new ArrayList<Object>();
 
-                items.add(GuiUtils.makeMenuItem("Rotate Right", ViewpointControl.this, "setRotate", ROTATE_RIGHT));
-                items.add(GuiUtils.makeMenuItem("Rotate Left", ViewpointControl.this, "setRotate", ROTATE_LEFT));
-                items.add(GuiUtils.makeMenuItem("Rotate Up", ViewpointControl.this, "setRotate", ROTATE_UP));
-                items.add(GuiUtils.makeMenuItem("Rotate Down", ViewpointControl.this, "setRotate", ROTATE_DOWN));
+                items.add(GuiUtils.makeMenuItem("Rotate Right",
+                        ViewpointControl.this, "setRotate", ROTATE_RIGHT));
+                items.add(GuiUtils.makeMenuItem("Rotate Left",
+                        ViewpointControl.this, "setRotate", ROTATE_LEFT));
+                items.add(GuiUtils.makeMenuItem("Rotate Up",
+                        ViewpointControl.this, "setRotate", ROTATE_UP));
+                items.add(GuiUtils.makeMenuItem("Rotate Down",
+                        ViewpointControl.this, "setRotate", ROTATE_DOWN));
+                items.add(GuiUtils.makeMenuItem("Rotate Clockwise",
+                        ViewpointControl.this, "setRotate",
+                        ROTATE_CLOCKWISE));
+                items.add(GuiUtils.makeMenuItem("Rotate CounterClockwise",
+                        ViewpointControl.this, "setRotate",
+                        ROTATE_COUNTERCLOCKWISE));
                 items.add(GuiUtils.MENU_SEPARATOR);
-                items.add(GuiUtils.makeMenuItem("Rotate Faster", navDisplay, "rotateFaster"));
-                items.add(GuiUtils.makeMenuItem("Rotate Slower", navDisplay, "rotateSlower"));
+                items.add(GuiUtils.makeMenuItem("Rotate Faster", navDisplay,
+                        "rotateFaster"));
+                items.add(GuiUtils.makeMenuItem("Rotate Slower", navDisplay,
+                        "rotateSlower"));
                 GuiUtils.showPopupMenu(items, rotateButton);
             }
         });
@@ -433,6 +465,10 @@ public class ViewpointControl implements ActionListener {
             navDisplay.setRotationMultiplierMatrix(1, 0, 0);
         } else if (dir.equals(ROTATE_DOWN)) {
             navDisplay.setRotationMultiplierMatrix(-1, 0, 0);
+        } else if (dir.equals(ROTATE_CLOCKWISE)) {
+            navDisplay.setRotationMultiplierMatrix(0, 0, 1);
+        } else if (dir.equals(ROTATE_COUNTERCLOCKWISE)) {
+            navDisplay.setRotationMultiplierMatrix(0, 0, -1);
         }
 
         setAutoRotate(true);
@@ -448,7 +484,8 @@ public class ViewpointControl implements ActionListener {
      * @return The button
      */
     private JButton makeButton(String icon, String cmd, String tooltip) {
-        JButton button = GuiUtils.getScaledImageButton(icon, getClass(), 2, 2);
+        JButton button = GuiUtils.getScaledImageButton(icon, getClass(), 2,
+                             2);
 
         button.setToolTipText(tooltip);
         button.setActionCommand(cmd);
@@ -488,21 +525,24 @@ public class ViewpointControl implements ActionListener {
         for (int i = 0; i < perspectiveCmds.length; i++) {
             mi = new JMenuItem(perspectiveNames[i]);
             mi.setMnemonic(perspectiveNames[i].charAt(0));
-            mi.setIcon(GuiUtils.getScaledImageIcon(perspectiveIcons[i], null, true));
+            mi.setIcon(GuiUtils.getScaledImageIcon(perspectiveIcons[i], null,
+                    true));
             mi.setActionCommand(perspectiveCmds[i]);
             mi.addActionListener(this);
             viewMenu.add(mi);
         }
 
-        viewMenu.add(pMenu = new JCheckBoxMenuItem("Perspective View", isPerspective));
+        viewMenu.add(pMenu = new JCheckBoxMenuItem("Perspective View",
+                isPerspective));
         pMenu.setMnemonic('P');
         pMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!okToAcceptChangesFromPerspectiveWidgets) {
+                if ( !okToAcceptChangesFromPerspectiveWidgets) {
                     return;
                 }
 
-                changePerspectiveView(((JCheckBoxMenuItem) e.getSource()).isSelected());
+                changePerspectiveView(
+                    ((JCheckBoxMenuItem) e.getSource()).isSelected());
             }
         });
         viewMenu.add(mi = new JMenuItem("Viewpoint Dialog..."));
@@ -511,15 +551,17 @@ public class ViewpointControl implements ActionListener {
         mi.setActionCommand(CMD_ROTATEDIALOG);
         mi.addActionListener(this);
         makeVerticalScaleMenuItem(viewMenu);
-        viewMenu.add(rotateMenu = new JCheckBoxMenuItem("Auto-Rotate View", autoRotate));
+        viewMenu.add(rotateMenu = new JCheckBoxMenuItem("Auto-Rotate View",
+                autoRotate));
         rotateMenu.setMnemonic('R');
         rotateMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!okToAcceptChangesFromPerspectiveWidgets) {
+                if ( !okToAcceptChangesFromPerspectiveWidgets) {
                     return;
                 }
 
-                changeAutoRotate(((JCheckBoxMenuItem) e.getSource()).isSelected());
+                changeAutoRotate(
+                    ((JCheckBoxMenuItem) e.getSource()).isSelected());
             }
         });
 
@@ -543,7 +585,8 @@ public class ViewpointControl implements ActionListener {
 
         viewMenu.add(mi);
         mi.setMnemonic('V');
-        mi.setIcon(GuiUtils.getScaledImageIcon(ICON_SETVERTICALSCALE, null, true));
+        mi.setIcon(GuiUtils.getScaledImageIcon(ICON_SETVERTICALSCALE, null,
+                true));
         mi.setActionCommand(CMD_SETVERTICALSCALE);
         mi.addActionListener(this);
     }
@@ -637,7 +680,8 @@ public class ViewpointControl implements ActionListener {
      */
     public void changeEyePosition() {
         final JLabel  label  = new JLabel(Misc.format(eyePosition));
-        final JSlider slider = new JSlider(0, 1000, (int) (eyePosition * 1000));
+        final JSlider slider = new JSlider(0, 1000,
+                                           (int) (eyePosition * 1000));
 
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -645,11 +689,12 @@ public class ViewpointControl implements ActionListener {
 
                 label.setText(Misc.format(value));
 
-                if (!slider.getValueIsAdjusting()) {
+                if ( !slider.getValueIsAdjusting()) {
                     try {
                         navDisplay.setEyePosition(value);
                     } catch (Exception exp) {
-                        System.out.println("  set the eye position got " + exp);
+                        System.out.println("  set the eye position got "
+                                           + exp);
                     }
 
                     eyePosition = value;
@@ -662,7 +707,8 @@ public class ViewpointControl implements ActionListener {
         p.setLayout(new BorderLayout());
         p.add(BorderLayout.CENTER, slider);
         p.add(BorderLayout.EAST, label);
-        GuiUtils.showOkCancelDialog(null, "Set Eye Position", p, eyePositionMenu);
+        GuiUtils.showOkCancelDialog(null, "Set Eye Position", p,
+                                    eyePositionMenu);
     }
 
     /**
@@ -710,7 +756,8 @@ public class ViewpointControl implements ActionListener {
             okToAcceptChangesFromPerspectiveWidgets = true;
         } catch (Exception exp) {
             exp.printStackTrace();
-            System.out.println("  set perspective to " + perspective + " got " + exp);
+            System.out.println("  set perspective to " + perspective
+                               + " got " + exp);
         }
     }
 
@@ -748,18 +795,21 @@ public class ViewpointControl implements ActionListener {
             okToAcceptChangesFromAutoRotateWidgets = false;
             navDisplay.setAutoRotate(autoRotate);
 
-            if ((rotateMenu != null) && (autoRotate != rotateMenu.isSelected())) {
+            if ((rotateMenu != null)
+                    && (autoRotate != rotateMenu.isSelected())) {
                 rotateMenu.setSelected(autoRotate);
             }
 
-            if ((rotateButton != null) && (rotate != rotateButton.isSelected())) {
+            if ((rotateButton != null)
+                    && (rotate != rotateButton.isSelected())) {
                 rotateButton.setSelected(rotate);
             }
 
             okToAcceptChangesFromAutoRotateWidgets = true;
         } catch (Exception exp) {
             exp.printStackTrace();
-            System.out.println("  set autorotate to " + rotate + " got " + exp);
+            System.out.println("  set autorotate to " + rotate + " got "
+                               + exp);
         }
     }
 
@@ -771,7 +821,8 @@ public class ViewpointControl implements ActionListener {
      */
     public ViewpointInfo rotateViewpoint(ViewpointInfo transfer) {
         if (viewpointDialog == null) {
-            viewpointDialog = new ViewpointDialog(this, GuiUtils.getFrame(navDisplay.getComponent()));
+            viewpointDialog = new ViewpointDialog(this,
+                    GuiUtils.getFrame(navDisplay.getComponent()));
         }
 
         viewpointDialog.showDialog(transfer);
@@ -799,7 +850,8 @@ public class ViewpointControl implements ActionListener {
 
         try {
             if (navDisplay != null) {
-                navDisplay.rotateView(navDisplay.getSavedProjectionMatrix(), vpi.azimuth, vpi.tilt);
+                navDisplay.rotateView(navDisplay.getSavedProjectionMatrix(),
+                                      vpi.azimuth, vpi.tilt);
             }
         } catch (Exception exp) {
             System.out.println("   rotateViewpoint got " + exp);
@@ -818,9 +870,11 @@ public class ViewpointControl implements ActionListener {
         VertScaleDialog vsd   = null;
 
         if (navDisplay instanceof GlobeDisplay) {
-            vsd = new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
+            vsd = new VertScaleDialog(
+                GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
         } else {
-            vsd = new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
+            vsd = new VertScaleDialog(
+                GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
         }
 
         return vsd;
@@ -834,9 +888,11 @@ public class ViewpointControl implements ActionListener {
     public void changeVerticalScale(VertScaleInfo transfer) {
         if (vsDialog == null) {
             if (navDisplay instanceof GlobeDisplay) {
-                vsDialog = new GlobeScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this);
+                vsDialog = new GlobeScaleDialog(
+                    GuiUtils.getFrame(navDisplay.getComponent()), this);
             } else {
-                vsDialog = new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this);
+                vsDialog = new VertScaleDialog(
+                    GuiUtils.getFrame(navDisplay.getComponent()), this);
             }
         }
 
@@ -850,10 +906,12 @@ public class ViewpointControl implements ActionListener {
      *
      * @throws Exception On badness
      */
-    protected void applyVerticalScale(VertScaleInfo transfer) throws Exception {
+    protected void applyVerticalScale(VertScaleInfo transfer)
+            throws Exception {
         navDisplay.setDisplayInactive();
         navDisplay.setVerticalRangeUnit(transfer.unit);
-        navDisplay.setVerticalRange(transfer.minVertScale, transfer.maxVertScale);
+        navDisplay.setVerticalRange(transfer.minVertScale,
+                                    transfer.maxVertScale);
         navDisplay.setDisplayActive();
     }
 
@@ -863,7 +921,8 @@ public class ViewpointControl implements ActionListener {
      * @param latLonInfo
      * @throws Exception
      */
-    public void applyLatLonScale(LatLonScaleInfo latLonInfo) throws Exception {
+    public void applyLatLonScale(LatLonScaleInfo latLonInfo)
+            throws Exception {
         navDisplay.setDisplayInactive();
         navDisplay.setLatLonScaleInfo(latLonInfo);
         navDisplay.setDisplayActive();
