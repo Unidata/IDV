@@ -103,13 +103,18 @@ public class DerivedGridFactory {
     /** climatology units */
     public static final Unit CLIMATE_UNITS;
 
+    /** anomaly percentage type */
+    private static final RealType ANOM_PERCENT_TYPE;
+
     static {
         try {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);
             EARTH_TWO_OMEGA = new Real(DataUtil.makeRealType("frequency",
                     SI.second.pow(-1)), 0.00014584, SI.second.pow(-1));
-            GRAVITY       = Gravity.newReal();
+            GRAVITY           = Gravity.newReal();
             CLIMATE_UNITS = Util.parseUnit("days since 0001-01-01 00:00:00");
+            ANOM_PERCENT_TYPE = RealType.getRealType("percent_of_normal",
+                    CommonUnits.PERCENT);
         } catch (Exception ex) {
             throw new ExceptionInInitializerError(ex.toString());
         }
@@ -4410,6 +4415,7 @@ public class DerivedGridFactory {
         return dailyClim;
     }
 
+
     /**
      * Calculate the daily anomaly
      *
@@ -4422,6 +4428,23 @@ public class DerivedGridFactory {
      */
     public static FieldImpl calculateDailyAnomaly(FieldImpl dailyData,
             FieldImpl dailyClim)
+            throws VisADException {
+        return calculateDailyAnomaly(dailyData, dailyClim, false);
+    }
+
+    /**
+     * Calculate the daily anomaly
+     *
+     * @param dailyData  the daily data
+     * @param dailyClim  the climatology
+     * @param asPercent  return the values as a percentage of normal (+/-)
+     *
+     * @return  the daily anomaly
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl calculateDailyAnomaly(FieldImpl dailyData,
+            FieldImpl dailyClim, boolean asPercent)
             throws VisADException {
         // TODO:  make some sanity checks
         Gridded1DSet dailyTimes =
@@ -4486,8 +4509,18 @@ public class DerivedGridFactory {
                     climData = (FlatField) dailyClim.getSample(climDay,
                             false);
                 }
-                FlatField dayAnom = (FlatField) GridMath.subtract(dayData,
-                                        climData);
+                FlatField dayAnom;
+                if (asPercent) {
+                    dayAnom = (FlatField) GridMath.divide(dayData, climData);
+                    dayAnom = (FlatField) GridUtil.setParamType(dayAnom,
+                            ANOM_PERCENT_TYPE, false);
+                    // subtract 100% to get the percent change from normal
+                    dayAnom = (FlatField) dayAnom.subtract(
+                        new Real(ANOM_PERCENT_TYPE, 100));
+                } else {
+                    dayAnom = (FlatField) GridMath.subtract(dayData,
+                            climData);
+                }
                 if (dailyAnom == null) {
                     FunctionType ft =
                         new FunctionType(
