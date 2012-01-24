@@ -285,6 +285,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** For the visibility of the please wait message */
     public static final String PREF_WAITMSG = "View.WaitVisible";
 
+    /** For the visibility of the top compenent */
+    public static final String PREF_TOPBAR_VISIBLE = "View.TopBarVisible";
+
     /** for the contour label size */
     public static final String PREF_CONTOUR_LABELSIZE =
         "idv.contour.labelsize";
@@ -491,6 +494,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The menu bar */
     private JMenuBar menuBar;
 
+    /** The menu bar */
+    private Component topBar;
 
     /** List of Components that are shown in the left side, vertical tool bar */
     protected List toolbars = new ArrayList();
@@ -1085,8 +1090,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
                              GuiUtils.WT_N, GuiUtils.WT_N), null);
 
 
-        Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
-                               GuiUtils.bottom(nameLabel), topRight);
+        //Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
+        topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
+                                          GuiUtils.bottom(nameLabel),
+                                          topRight);
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
@@ -2304,6 +2311,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if (master != null) {
                 master.setAnimationStringVisible(value);
             }
+        } else if (id.equals(PREF_TOPBAR_VISIBLE)) {
+            if (topBar != null) {
+                topBar.setVisible(value);
+            }
         } else if (id.equals(PREF_WAITMSG)) {
             DisplayMaster master = getMaster();
             if (master != null) {
@@ -2866,6 +2877,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                       true));
         props.add(new BooleanProperty(PREF_LOGO_VISIBILITY, "Show Logo",
                                       "Toggle logo in display", false));
+        props.add(new BooleanProperty(PREF_TOPBAR_VISIBLE, "Show Top Bar",
+                                      "Toggle top bar", true));
 
     }
 
@@ -4615,6 +4628,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         createCBMI(showMenu, PREF_WIREFRAME);
         createCBMI(showMenu, PREF_WAITMSG);
         createCBMI(showMenu, PREF_SHOWDISPLAYLIST);
+        createCBMI(showMenu, PREF_TOPBAR_VISIBLE);
         return showMenu;
     }
 
@@ -7077,12 +7091,28 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * Toggle the animation string visibility.
+     * Get the animation string visibility.
      * @return visible  true to make it visible
      * @deprecated Use getAniReadout now
      */
     public boolean getAnimationStringVisible() {
         return getAniReadout();
+    }
+
+    /**
+     * Toggle the top component visibility.
+     * @param visible  true to make it visible
+     */
+    public void setTopBarVisible(boolean visible) {
+        setBp(PREF_TOPBAR_VISIBLE, visible);
+    }
+
+    /**
+     * Get the top component visibility.
+     * @return visible  true to make it visible
+     */
+    public boolean getTopBarVisible() {
+        return getBp(PREF_TOPBAR_VISIBLE);
     }
 
 
