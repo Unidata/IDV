@@ -1095,6 +1095,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                           GuiUtils.bottom(nameLabel),
                                           topRight);
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
+        topBar.setVisible(getTopBarVisible());
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
             addRemovable(bottomLegend);
