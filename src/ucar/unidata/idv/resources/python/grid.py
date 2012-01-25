@@ -362,9 +362,9 @@ def substitute(data, low, high, newValue):
         rangeObject.setSamples(values,1);
     return newData;
 
-def maskGrid(grid, mask, value=0):
+def maskGrid(grid, mask, value=0,resample=0):
     """mask one grid by the values in the other.  value is the masking value"""
-    return DerivedGridFactory.mask(grid, mask, value)
+    return DerivedGridFactory.mask(grid, mask, value, resample)
 
 def GP2Z(gp):
     """Convert Geopotential (GP) to Height (Z)"""
