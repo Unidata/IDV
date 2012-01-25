@@ -491,8 +491,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         for (int i = 0; i < controlDescriptors.size(); i++) {
             ControlDescriptor cd =
                 (ControlDescriptor) controlDescriptors.get(i);
-            String                displayCategory = cd.getDisplayCategory();
-            CheckboxCategoryPanel catPanel        =
+            String displayCategory = cd.getDisplayCategory();
+            CheckboxCategoryPanel catPanel =
                 (CheckboxCategoryPanel) catMap.get(displayCategory);
 
             if (catPanel == null) {
@@ -556,8 +556,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         JComponent exportComp =
             GuiUtils.right(GuiUtils.makeButton("Export to Plugin", this,
                 "exportControlsToPlugin"));
-        JComponent cbComp      = GuiUtils.centerBottom(cbScroller, exportComp);
-        JPanel     bottomPanel =
+        JComponent cbComp = GuiUtils.centerBottom(cbScroller, exportComp);
+        JPanel bottomPanel =
             GuiUtils.leftCenter(
                 GuiUtils.inset(
                     GuiUtils.top(GuiUtils.vbox(allOn, allOff)),
@@ -598,7 +598,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 for (Enumeration keys =
                         table.keys(); keys.hasMoreElements(); ) {
                     JCheckBox         cbx = (JCheckBox) keys.nextElement();
-                    ControlDescriptor cd  = (ControlDescriptor) table.get(cbx);
+                    ControlDescriptor cd  =
+                        (ControlDescriptor) table.get(cbx);
 
                     controlDescriptorsToShow.put(cd.getControlId(),
                             new Boolean(cbx.isSelected()));
@@ -623,10 +624,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      */
     protected void addSystemPreferences() {
 
-        Hashtable        systemWidgets = new Hashtable();
-        List             systemComps   = new ArrayList();
+        Hashtable systemWidgets = new Hashtable();
+        List      systemComps   = new ArrayList();
 
-        final AtomicLong memVal        =
+        final AtomicLong memVal =
             new AtomicLong(
                 getStore().get(
                     IdvConstants.PREF_MEMORY,
@@ -807,7 +808,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         Hashtable    selected           = new Hashtable();
         Hashtable    table              = cbxToCdMap;
         List         controlDescriptors = getIdv().getAllControlDescriptors();
-        StringBuffer sb                 = new StringBuffer(XmlUtil.XML_HEADER);
+        StringBuffer sb                 =
+            new StringBuffer(XmlUtil.XML_HEADER);
 
         sb.append("<" + ControlDescriptor.TAG_CONTROLS + ">\n");
 
@@ -833,11 +835,11 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
     protected void addChooserPreferences() {
 
         Hashtable choosersData = new Hashtable();
-        Boolean   choosersAll  =
+        Boolean choosersAll =
             (Boolean) getIdv().getPreference(PROP_CHOOSERS_ALL, Boolean.TRUE);
         List chooserIdList = getIdv().getIdvChooserManager().getChooserIds();
-        final List         choosersList = new ArrayList();
-        final JRadioButton useAllBtn    = new JRadioButton("Use all choosers",
+        final List choosersList = new ArrayList();
+        final JRadioButton useAllBtn = new JRadioButton("Use all choosers",
                                            choosersAll.booleanValue());
         final JRadioButton useTheseBtn =
             new JRadioButton("Use selected choosers:",
@@ -867,7 +869,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         for (int i = 0; i < chooserIdList.size(); i++) {
             String chooserId = (String) chooserIdList.get(i);
-            String name      =
+            String name =
                 getIdv().getIdvChooserManager().getChooserName(chooserId);
             JCheckBox cb = new JCheckBox(name,
                                          shouldShowChooser(chooserId, true));
@@ -991,8 +993,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 }
             }
         };
-        Hashtable  widgets       = new Hashtable();
-        List       miscList      = new ArrayList();
+        Hashtable widgets  = new Hashtable();
+        List      miscList = new ArrayList();
         JTextField sitePathField =
             new JTextField(getStore().get(PREF_SITEPATH, ""), 40);
 
@@ -1069,6 +1071,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
             { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES,
               Boolean.FALSE },
+            { "Show Toolbar in Windows", PREF_WINDOW_SHOWTOOLBAR,
+              Boolean.TRUE },
             /*
              * { "Check for Updates", InstallManager.PREF_CHECKFORNEWRELEASE,
              * Boolean.TRUE },
@@ -1130,8 +1134,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         widgets.put(PREF_DATE_FORMAT, dateFormatBox);
 
-        final JComboBox timeZoneBox    = new JComboBox();
-        String          timezoneString = getStore().get(PREF_TIMEZONE,
+        final JComboBox timeZoneBox = new JComboBox();
+        String timezoneString = getStore().get(PREF_TIMEZONE,
                                     DEFAULT_TIMEZONE);
         String[] zones = TimeZone.getAvailableIDs();
 
@@ -1173,7 +1177,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         dateFormatBox.addActionListener(timeLabelListener);
         timeZoneBox.addActionListener(timeLabelListener);
 
-        String defaultLocale   = getStore().get(PREF_LOCALE, "SYSTEM_LOCALE");
+        String defaultLocale = getStore().get(PREF_LOCALE, "SYSTEM_LOCALE");
         JRadioButton sysLocale = new JRadioButton("System Default",
                                      defaultLocale.equals("SYSTEM_LOCALE"));
 
@@ -1240,7 +1244,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(DataUtil.VIS5D_VERTICALCS, v5d);
         GuiUtils.buttonGroup(sa, v5d);
 
-        String    formatString = getStore().get(PREF_LATLON_FORMAT, "##0.0");
+        String formatString = getStore().get(PREF_LATLON_FORMAT, "##0.0");
         JComboBox formatBox = GuiUtils.getEditableBox(getDefaultFormatList(),
                                   formatString);
         JLabel formatLabel = new JLabel("");
@@ -1346,7 +1350,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
         JPanel rightPanel = panel3;
-        JPanel leftPanel  = GuiUtils.inset(GuiUtils.vbox(panel1, panel2),
+        JPanel leftPanel = GuiUtils.inset(GuiUtils.vbox(panel1, panel2),
                                           new Insets(0, 40, 0, 0));
 
         List panelComps = Misc.newList(GuiUtils.top(leftPanel),
@@ -1441,7 +1445,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                       shouldRemove);
             JCheckBox changeDataCbx = getIdv().getChangeDataPathCbx();
             JPanel    btnPanel      = GuiUtils.left(removeCbx);
-            JCheckBox mergeCbx      =
+            JCheckBox mergeCbx =
                 new JCheckBox("Try to add displays to current windows",
                               shouldMerge);
             JPanel inner = GuiUtils.vbox(new Component[] {
@@ -1587,7 +1591,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         if ( !haveInitedChoosersToShow) {
             haveInitedChoosersToShow = true;
-            showAllChoosers          =
+            showAllChoosers =
                 ((Boolean) getIdv().getPreference(PROP_CHOOSERS_ALL,
                     Boolean.TRUE)).booleanValue();
             choosersToShow =
@@ -1716,7 +1720,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
     }
 
     /**
-     * Apply teh mouse/scroll/keyboard preferences
+     * Apply the mouse/scroll/keyboard preferences
      *
      * @param theStore The store
      */
@@ -1792,7 +1796,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      */
     private JComboBox makeMouseEventBox(int[][][] map, int mouse,
                                         int control, int shift) {
-        int       function = map[mouse][control][shift];
+        int function = map[mouse][control][shift];
         JComboBox box = GuiUtils.makeComboBox(EventMap.MOUSE_FUNCTION_VALUES,
                             EventMap.MOUSE_FUNCTION_NAMES, function);
 
@@ -1812,7 +1816,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      * @return gui comp for scroll wheel
      */
     private JComboBox makeWheelEventBox(int[][] map, int control, int shift) {
-        int       function = map[control][shift];
+        int function = map[control][shift];
         JComboBox box = GuiUtils.makeComboBox(EventMap.WHEEL_FUNCTION_VALUES,
                             EventMap.WHEEL_FUNCTION_NAMES, function);
 
@@ -1923,12 +1927,12 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         eventPanelMap = new Hashtable();
         keyInfos      = new ArrayList();
 
-        int[][][] mouse           = getMouseMap();
-        int[][]   wheel           = getWheelMap();
-        int[][]   keyboard        = getKeyboardMap();
-        List      current         = Misc.newList(mouse, wheel, keyboard);
-        String[]  predefinedNames = { "IDV", "VisAD", "Google Earth",
-                                      "Custom:" };
+        int[][][] mouse    = getMouseMap();
+        int[][]   wheel    = getWheelMap();
+        int[][]   keyboard = getKeyboardMap();
+        List      current  = Misc.newList(mouse, wheel, keyboard);
+        String[] predefinedNames = { "IDV", "VisAD", "Google Earth",
+                                     "Custom:" };
         List[] predefinedData = { Misc.newList(EventMap.IDV_MOUSE_FUNCTIONS,
                                     EventMap.IDV_WHEEL_FUNCTIONS,
                                     EventMap.IDV_KEYBOARD_FUNCTIONS),
@@ -2011,7 +2015,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         comps.add(makeMouseEventBox(mouse, 2, CONTROL_ON, SHIFT_ON));
         comps.add(makeWheelEventBox(wheel, CONTROL_ON, SHIFT_ON));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        mousePanel         = GuiUtils.doLayout(comps, 5, GuiUtils.WT_N,
+        mousePanel = GuiUtils.doLayout(comps, 5, GuiUtils.WT_N,
                                        GuiUtils.WT_N);
         mousePanel = GuiUtils.leftCenter(keyLabel, mousePanel);
 
@@ -2037,7 +2041,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         }
 
         GuiUtils.tmpInsets = new Insets(3, 0, 0, 0);
-        keyPanel           = GuiUtils.doLayout(keyComps, 4, GuiUtils.WT_N,
+        keyPanel = GuiUtils.doLayout(keyComps, 4, GuiUtils.WT_N,
                                      GuiUtils.WT_N);
 
         JTabbedPane tab = new JTabbedPane();
