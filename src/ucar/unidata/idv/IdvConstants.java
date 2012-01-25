@@ -418,6 +418,9 @@ public interface IdvConstants {
     /** Holds the preference for */
     public static final String PROP_SHOWFORMULAS = "idv.ui.showformulas";
 
+    /** Preference used for showing the toolbar */
+    public static final String PREF_WINDOW_SHOWTOOLBAR = "idv.window.showtoolbar";
+    
     /**
      *  Should we size the window wrt the screen size
      */
