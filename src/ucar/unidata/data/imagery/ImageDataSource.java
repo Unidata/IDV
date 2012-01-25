@@ -1451,7 +1451,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private List getDescriptors(DataChoice dataChoice, DataSelection subset) {
 
         List    times = getTimesFromDataSelection(subset, dataChoice);
-        boolean usingTimeDriver = subset.getTimeDriverTimes() != null;
+        boolean usingTimeDriver = 
+            (subset != null && subset.getTimeDriverTimes() != null);
         if (usingTimeDriver) {
             times = subset.getTimeDriverTimes();
         }
