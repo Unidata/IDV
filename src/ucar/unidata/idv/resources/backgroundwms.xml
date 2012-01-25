@@ -150,4 +150,8 @@
          layer="fixed-solid-green"
          title="Solid Green"/>
 
+  <image file="/auxdata/images/gray.jpg"
+         layer="fixed-solid-gray"
+         title="Solid Gray"/>
+
 </backgroundwms>
