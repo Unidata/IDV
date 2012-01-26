@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -156,7 +156,7 @@ public class IdvUIManager extends IdvManager {
     public static final String FIELDTYPE_AREA = "area";
 
 
-    /** The icon used to show locked legend components */   
+    /** The icon used to show locked legend components */
     public static ImageIcon ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
@@ -167,9 +167,12 @@ public class IdvUIManager extends IdvManager {
     public static ImageIcon ICON_REMOVE;
 
     static {
-        ICON_REMOVE = GuiUtils.getImageIcon("/ucar/unidata/idv/images/delete.png");
-        ICON_LOCK =  GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock.png");
-        ICON_UNLOCK = GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock_open.png");
+        ICON_REMOVE =
+            GuiUtils.getImageIcon("/ucar/unidata/idv/images/delete.png");
+        ICON_LOCK =
+            GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock.png");
+        ICON_UNLOCK =
+            GuiUtils.getImageIcon("/ucar/unidata/idv/images/lock_open.png");
     }
 
 
@@ -480,8 +483,9 @@ public class IdvUIManager extends IdvManager {
     /** default screen */
     private GraphicsDevice defaultScreen;
 
-    /** light weight popup **/
-    public static final String PREF_LightWeightPopupEnabled = "LightWeightPopupEnabled";
+    /** light weight popup */
+    public static final String PREF_LightWeightPopupEnabled =
+        "LightWeightPopupEnabled";
 
     /**
      * Create me with the IDV
@@ -498,13 +502,15 @@ public class IdvUIManager extends IdvManager {
     public void loadLookAndFeel() {
 
 
-        if(!GuiUtils.isMac()) {
-            String lookAndFeel = getStore().get(PREF_LOOKANDFEEL, (String) null);
+        if ( !GuiUtils.isMac()) {
+            String lookAndFeel = getStore().get(PREF_LOOKANDFEEL,
+                                     (String) null);
             if (lookAndFeel != null) {
                 try {
                     UIManager.setLookAndFeel(lookAndFeel);
                 } catch (Exception exc) {
-                    System.err.println("Unknown look and feel:" + lookAndFeel);
+                    System.err.println("Unknown look and feel:"
+                                       + lookAndFeel);
                 }
             }
         }
@@ -936,11 +942,14 @@ public class IdvUIManager extends IdvManager {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         // ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
-        String ut = (String)getIdv().getStateManager().getPreferenceOrProperty(PREF_LightWeightPopupEnabled);
-        if(ut != null && ut.equalsIgnoreCase("yes")){
+        String ut =
+            (String) getIdv().getStateManager().getPreferenceOrProperty(
+                PREF_LightWeightPopupEnabled);
+        if ((ut != null) && ut.equalsIgnoreCase("yes")) {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
-        } else
+        } else {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+        }
 
         if (getIdv().getStateManager().getShowDashboardOnStart()) {
             //            showBasicWindow(true);
@@ -1567,7 +1576,8 @@ public class IdvUIManager extends IdvManager {
                     (ControlDescriptor) selectedControls[i];
 
                 //Check if the data selection is ok
-                if(!dcd.getDataSelectionWidget().okToCreateTheDisplay(cd.doesLevels())) {
+                if ( !dcd.getDataSelectionWidget().okToCreateTheDisplay(
+                        cd.doesLevels())) {
                     return;
                 }
 
@@ -3085,7 +3095,10 @@ public class IdvUIManager extends IdvManager {
             }
 
             toolbar.removeAll();
-            toolbar.setVisible(false);
+            boolean wasVisible = toolbar.isVisible();
+            if (wasVisible) {
+                toolbar.setVisible(false);
+            }
             List      comps = new ArrayList();
             Hashtable menus = new Hashtable();
             //            JMenuBar menuBar = new JMenuBar();
@@ -3171,7 +3184,7 @@ public class IdvUIManager extends IdvManager {
                 toolbar.add(GuiUtils.inset(GuiUtils.hbox(comps, 4),
                                            new Insets(4, 0, 0,
                                                0)), BorderLayout.WEST);
-                toolbar.setVisible(true);
+                toolbar.setVisible(wasVisible);
             }
             toolbar.validate();
         }
@@ -4397,6 +4410,7 @@ public class IdvUIManager extends IdvManager {
             }
             updateToolbars();
             Msg.translateTree(contents);
+            checkToolbarVisibility();
             window.setContents(contents);
             //            if (viewManagers.size() > 0) {
             associateWindowWithViewManagers(window, viewManagers);
@@ -4524,6 +4538,28 @@ public class IdvUIManager extends IdvManager {
             comp.removeAll();
             comp.add(BorderLayout.CENTER, toolbar);
             comp.repaint();
+        }
+    }
+
+    /**
+     * Check and toggle the toolbar visibility
+     */
+    public void checkToolbarVisibility() {
+        boolean toolbarsVisible = (Boolean) getIdv().getPreference(
+                                      IdvConstants.PREF_WINDOW_SHOWTOOLBAR,
+                                      true);
+        List toolbarComps = getWindowGroup(IdvWindow.GROUP_TOOLBARS);
+        for (int i = 0; i < toolbarComps.size(); i++) {
+            JComponent comp = (JComponent) toolbarComps.get(i);
+            comp.setVisible(toolbarsVisible);
+        }
+        List windows = IdvWindow.getWindows();
+        for (int i = 0; i < windows.size(); i++) {
+            JPanel toolbar = (JPanel) ((IdvWindow) windows.get(
+                                 i)).getComponent(COMP_FAVORITESBAR);
+            if (toolbar != null) {
+                toolbar.setVisible(toolbarsVisible);
+            }
         }
     }
 
@@ -4758,8 +4794,8 @@ public class IdvUIManager extends IdvManager {
      */
     private List<String> getInitialSkins() {
         return StringUtil.split(
-                                getStateManager().getProperty(
-                                                              "idv.ui.initskins", ""), ";", true, true);
+            getStateManager().getProperty("idv.ui.initskins", ""), ";", true,
+            true);
 
     }
 
@@ -4772,12 +4808,12 @@ public class IdvUIManager extends IdvManager {
     public boolean haveBasicWindow() {
         List windows = new ArrayList(IdvWindow.getWindows());
 
-        List skins = getInitialSkins();
+        List skins   = getInitialSkins();
 
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            if (window.getSkinPath() != null)  {
-                if(skins.contains(window.getSkinPath())) {
+            if (window.getSkinPath() != null) {
+                if (skins.contains(window.getSkinPath())) {
                     return true;
                 }
             }
@@ -4799,11 +4835,11 @@ public class IdvUIManager extends IdvManager {
     public boolean showBasicWindow(boolean createThemIfNotThere) {
         List windows = new ArrayList(IdvWindow.getWindows());
 
-        List skins = getInitialSkins();
+        List skins   = getInitialSkins();
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            if (window.getSkinPath() != null)  {
-                if(skins.contains(window.getSkinPath())) {
+            if (window.getSkinPath() != null) {
+                if (skins.contains(window.getSkinPath())) {
                     //&& !window.hasViewManagers()) {
                     //got one
                     window.show();
@@ -6032,7 +6068,7 @@ public class IdvUIManager extends IdvManager {
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
                                       "Subject:"));
 
-        String nag = getProperty("idv.supportform.message","");
+        String nag = getProperty("idv.supportform.message", "");
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_LABEL, "", nag));
         entries.add(descriptionEntry =
             new HttpFormEntry(HttpFormEntry.TYPE_AREA, "description",
@@ -6505,9 +6541,9 @@ public class IdvUIManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * Get the map locations
      *
-     * @return _more_
+     * @return the map locations
      */
     public List getMapLocations() {
         try {
