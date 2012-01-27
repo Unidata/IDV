@@ -6,7 +6,7 @@ export ANT_HOME=/share/jakarta-ant
 export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/csw/bin:/opt/bin:/bin
 export ANT_OPTS=-Xmx512m
 export CLASSPATH=
-export BUILD_DIR=$PWD/..
+export BUILD_DIR=`dirname $0`/..
 
 newdir=build$(date '+%Y%m%dT%H%M')
 
