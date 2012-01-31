@@ -207,11 +207,13 @@ public class GridMath {
         boolean   isVolume2 = GridUtil.isVolume(grid2);
         boolean   isSlice1  = !isVolume1 && is3D1;
         boolean   isSlice2  = !isVolume2 && is3D2;
-        boolean equalDomains = Misc.equals(GridUtil.getSpatialDomain(grid1),
-                                           GridUtil.getSpatialDomain(grid2));
+        //boolean equalDomains = Misc.equals(GridUtil.getSpatialDomain(grid1),
+        //                                   GridUtil.getSpatialDomain(grid2));
 
         if (isSlice1 && isSlice2) {
-            if ( !equalDomains) {
+            //if ( !equalDomains) {
+            if ( !Misc.equals(GridUtil.getSpatialDomain(grid1),
+                              GridUtil.getSpatialDomain(grid2))) {
                 a = GridUtil.make2DGridFromSlice(grid1, false);
                 b = GridUtil.make2DGridFromSlice(grid2, false);
             }
@@ -220,9 +222,11 @@ public class GridMath {
         } else if ( !is3D1 && isSlice2) {
             b = GridUtil.make2DGridFromSlice(grid2, false);
         }
-        int     mode      = (equalDomains)
-                            ? Data.NEAREST_NEIGHBOR
-                            : Data.WEIGHTED_AVERAGE;
+        // VisAD Default is NEAREST_NEIGHBOR
+        //int     mode      = (equalDomains)
+        //                    ? Data.NEAREST_NEIGHBOR
+        //                    : Data.WEIGHTED_AVERAGE;
+        int     mode      = Data.NEAREST_NEIGHBOR;
 
         boolean isLatLon1 = GridUtil.isLatLonOrder(a);
         boolean isLatLon2 = GridUtil.isLatLonOrder(b);
@@ -1227,6 +1231,7 @@ public class GridMath {
     public static FlatField applyFunctionOverGrids(FlatField[] grids,
             String function)
             throws VisADException {
+
         try {
             int       numGrids = grids.length;
             FlatField newGrid  = null;
@@ -1246,7 +1251,9 @@ public class GridMath {
                 FieldImpl sample     = (FieldImpl) grids[gridIdx];
                 float[][] gridValues = sample.getFloats(false);
                 // be careful about missing grids
-                if (Misc.isNaN(gridValues)) continue;
+                if (Misc.isNaN(gridValues)) {
+                    continue;
+                }
                 if (values == null) {  // first pass through
                     values = Misc.cloneArray(gridValues);
                     nums   = new int[values.length][values[0].length];
@@ -1289,7 +1296,9 @@ public class GridMath {
                 }
             }
             // all grids were missing
-            if (newGrid == null) return null;
+            if (newGrid == null) {
+                return null;
+            }
             if (function.equals(FUNC_AVERAGE)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
@@ -1324,6 +1333,7 @@ public class GridMath {
             throw new VisADException(
                 "RemoteException in applyFunctionOverTime");
         }
+
     }
 
     /**
