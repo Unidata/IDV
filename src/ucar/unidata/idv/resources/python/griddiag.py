@@ -16,45 +16,50 @@ def GRAVITY():
   return DerivedGridFactory.GRAVITY;
 
 # Math functions
-def atn2(S1,S2):
+def atn2(S1,S2,WA=0):
   """ Wrapper for atan2 built-in 
   <div class=jython>
-      ATN2 (S1, S2) = ATAN ( S1 / S2 )
+      ATN2 (S1, S2) = ATAN ( S1 / S2 )<br>
+      WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
   </div>
   """
-  return GridMath.atan2(S1,S2)
+  return GridMath.atan2(S1,S2,WA)
 
-def add(S1,S2):
+def add(S1,S2,WA=0):
   """ Addition 
   <div class=jython>
-      ADD  (S1, S2) = S1 + S2
+      ADD  (S1, S2) = S1 + S2<br>
+      WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
   </div>
   """
-  return GridMath.add(S1,S2)
+  return GridMath.add(S1,S2,WA)
 
-def mul(S1,S2):
+def mul(S1,S2,WA=0):
   """ Multiply 
   <div class=jython>
-      MUL  (S1, S2) = S1 * S2
+      MUL  (S1, S2) = S1 * S2<br>
+      WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
   </div>
   """
-  return GridMath.multiply(S1,S2)
+  return GridMath.multiply(S1,S2,WA)
 
-def quo(S1,S2):
+def quo(S1,S2,WA=0):
   """ Divide 
   <div class=jython>
-      QUO  (S1, S2) = S1 / S2
+      QUO  (S1, S2) = S1 / S2<br>
+      WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
   </div>
   """
-  return GridMath.divide(S1,S2)
+  return GridMath.divide(S1,S2,WA)
 
-def sub(S1,S2):
+def sub(S1,S2,WA=0):
   """ Subtract 
   <div class=jython>
-      SUB  (S1, S2) = S1 - S2
+      SUB  (S1, S2) = S1 - S2<br>
+      WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
   </div>
   """
-  return GridMath.subtract(S1,S2)
+  return GridMath.subtract(S1,S2,WA)
 
 # Scalar quantities
 def adv(S,V):
