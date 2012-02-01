@@ -320,6 +320,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Specifies the display rate in the generated movie */
     JTextField displayRateFld;
 
+    /** Specifies the display rate in the generated movie */
+    JTextField endPauseFld;
+
     /** Specifies the capture rate */
     JTextField captureRateFld;
 
@@ -696,6 +699,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         displayRateFld = new JTextField("2", 3);
 
+        endPauseFld    = new JTextField("2", 3);
+        endPauseFld.setToolTipText(
+            "Number of seconds to pause on last frame of animated GIF");
+
         captureRateFld = new JTextField("2", 3);
 
         String imgp = "/auxdata/ui/icons/";
@@ -793,7 +800,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 "Note: Make sure the view window is not obscured");
         JPanel titlePanel = GuiUtils.inset(titleLbl, 8);
 
-        JPanel runPanel =
+        JPanel runPanel   =
             GuiUtils.hflow(Misc.newList(GuiUtils.rLabel(" Rate: "),
                                         captureRateFld,
                                         new JLabel(" seconds")));
@@ -1387,10 +1394,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
             List accessoryComps = new ArrayList();
             accessoryComps.add(
-                GuiUtils.hflow(
-                    Misc.newList(
-                        GuiUtils.rLabel(" Frames per second: "),
-                        displayRateFld)));
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" Frames per second: "), displayRateFld));
+            accessoryComps.add(
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
             accessoryComps.add(writePositionsCbx);
             if (publishCbx == null) {
                 publishCbx = idv.getPublishManager().makeSelector();
@@ -1587,7 +1595,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             System.err.println(formatString);
             DecimalFormat format         = new DecimalFormat(formatString);
             String        formattedValue = format.format(cnt);
-            String tmp = StringUtil.replace(template,
+            String        tmp            = StringUtil.replace(template,
                                             "%count:" + formatString + "%",
                                             formattedValue);
             if (tmp.equals(template)) {
@@ -1607,8 +1615,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 timeString = StringUtil.replace(timeString, "-", "_");
                 timeString = StringUtil.replace(timeString, " ", "_");
                 template = StringUtil.replace(template, "%time%", timeString);
-                template   = ucar.visad.UtcDate.applyTimeMacro(template,
-                        dttm);
+                template   = ucar.visad.UtcDate.applyTimeMacro(template, dttm);
             } else {
                 String stub = usingDefault
                               ? "_%time%"
@@ -1746,8 +1753,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                             comp = viewManager.getMaster().getComponent();
                         } else if (fullScreenBtn.isSelected()) {
                             comp = viewManager.getMaster().getComponent();
-                            dim  = Toolkit.getDefaultToolkit()
-                                .getScreenSize();
+                            dim  = Toolkit.getDefaultToolkit().getScreenSize();
                             loc  = new Point(0, 0);
                         } else {
                             comp = viewManager.getContents();
@@ -1878,7 +1884,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         double displayRate =
             (new Double(displayRateFld.getText())).doubleValue();
-        double endPause = -1;
+        double endPause = (new Double(endPauseFld.getText())).doubleValue();
         if (scriptingNode != null) {
             displayRate = imageGenerator.applyMacros(scriptingNode,
                     imageGenerator.ATTR_FRAMERATE, displayRate);
@@ -1930,8 +1936,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                    (Color) null);
             List sizedImages = new ArrayList();
             for (ImageWrapper imageWrapper : images) {
-                String imageFile = imageWrapper.getPath();
-                Image  image     = ImageUtils.readImage(imageFile);
+                String        imageFile     = imageWrapper.getPath();
+                Image         image         = ImageUtils.readImage(imageFile);
                 BufferedImage bufferedImage =
                     ImageUtils.toBufferedImage(image);
                 image = imageGenerator.resize(bufferedImage, scriptingNode);
@@ -2134,8 +2140,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                  ImageGenerator.TAG_KMZFILE);
                 for (int i = 0; i < nodes.size(); i++) {
                     Element child = (Element) nodes.get(i);
-                    String  file  = XmlUtil.getAttribute(child,
-                                        ATTR_FILENAME);
+                    String  file  = XmlUtil.getAttribute(child, ATTR_FILENAME);
                     if (zos != null) {
                         zos.putNextEntry(
                             new ZipEntry(IOUtil.getFileTail(file)));
