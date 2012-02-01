@@ -122,7 +122,24 @@ public class GridMath {
      */
     public static FieldImpl add(FieldImpl grid1, FieldImpl grid2)
             throws VisADException {
-        return doMath(grid1, grid2, Data.ADD);
+        return add(grid1, grid2, false);
+    }
+
+    /**
+     * Add two grids together
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param useWA  use WEIGHTED_AVERAGE for resampling
+     *
+     * @return  the sum of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl add(FieldImpl grid1, FieldImpl grid2,
+                                boolean useWA)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.ADD, useWA);
     }
 
     /**
@@ -137,7 +154,24 @@ public class GridMath {
      */
     public static FieldImpl subtract(FieldImpl grid1, FieldImpl grid2)
             throws VisADException {
-        return doMath(grid1, grid2, Data.SUBTRACT);
+        return subtract(grid1, grid2, false);
+    }
+
+    /**
+     * Subtract two grids
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param useWA _more_
+     *
+     * @return  the difference of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl subtract(FieldImpl grid1, FieldImpl grid2,
+                                     boolean useWA)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.SUBTRACT, useWA);
     }
 
     /**
@@ -152,7 +186,24 @@ public class GridMath {
      */
     public static FieldImpl multiply(FieldImpl grid1, FieldImpl grid2)
             throws VisADException {
-        return doMath(grid1, grid2, Data.MULTIPLY);
+        return multiply(grid1, grid2, false);
+    }
+
+    /**
+     * Multiply two grids
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param useWA _more_
+     *
+     * @return  the product of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl multiply(FieldImpl grid1, FieldImpl grid2,
+                                     boolean useWA)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.MULTIPLY, useWA);
     }
 
     /**
@@ -167,7 +218,24 @@ public class GridMath {
      */
     public static FieldImpl divide(FieldImpl grid1, FieldImpl grid2)
             throws VisADException {
-        return doMath(grid1, grid2, Data.DIVIDE);
+        return divide(grid1, grid2, false);
+    }
+
+    /**
+     * Divide two grids
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param useWA _more_
+     *
+     * @return  the quotient of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl divide(FieldImpl grid1, FieldImpl grid2,
+                                   boolean useWA)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.DIVIDE, useWA);
     }
 
     /**
@@ -182,7 +250,24 @@ public class GridMath {
      */
     public static FieldImpl atan2(FieldImpl grid1, FieldImpl grid2)
             throws VisADException {
-        return doMath(grid1, grid2, Data.ATAN2);
+        return atan2(grid1, grid2, false);
+    }
+
+    /**
+     * Take the arctangent of two grids
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param useWA _more_
+     *
+     * @return  the arctangent of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl atan2(FieldImpl grid1, FieldImpl grid2,
+                                  boolean useWA)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.ATAN2, useWA);
     }
 
     /**
@@ -198,6 +283,25 @@ public class GridMath {
      * @throws VisADException  problem doing the math
      */
     private static FieldImpl doMath(FieldImpl grid1, FieldImpl grid2, int op)
+            throws VisADException {
+        return doMath(grid1, grid2, op, false);
+    }
+
+    /**
+     * Do the math.  This method handles making the data as compatible
+     * as possible before actually going off and doing the math.
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     * @param op  the VisAD math operand  (see visad.Data)
+     * @param useWA  use WEIGHTED_AVERAGE
+     *
+     * @return the grid
+     *
+     * @throws VisADException  problem doing the math
+     */
+    private static FieldImpl doMath(FieldImpl grid1, FieldImpl grid2, int op,
+                                    boolean useWA)
             throws VisADException {
         FieldImpl a         = grid1;
         FieldImpl b         = grid2;
@@ -226,7 +330,9 @@ public class GridMath {
         //int     mode      = (equalDomains)
         //                    ? Data.NEAREST_NEIGHBOR
         //                    : Data.WEIGHTED_AVERAGE;
-        int     mode      = Data.NEAREST_NEIGHBOR;
+        int     mode      = useWA
+                            ? Data.WEIGHTED_AVERAGE
+                            : Data.NEAREST_NEIGHBOR;
 
         boolean isLatLon1 = GridUtil.isLatLonOrder(a);
         boolean isLatLon2 = GridUtil.isLatLonOrder(b);
