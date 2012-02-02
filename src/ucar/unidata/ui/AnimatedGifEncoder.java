@@ -1,20 +1,18 @@
 /*
- * $Id: AnimatedGifEncoder.java,v 1.10 2007/07/06 20:45:28 jeffmc Exp $
- *
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -122,109 +120,109 @@ import java.util.List;
 
 public class AnimatedGifEncoder {
 
-    /** _more_ */
+    /** Repeat forever flag */
     public static final int REPEAT_FOREVER = 0;
 
-    /** _more_ */
+    /** image width */
     protected int width;  // image size
 
-    /** _more_ */
+    /** image height */
     protected int height;
 
-    /** _more_ */
+    /** transparent flag */
     protected boolean transparent = false;  // transparent color if given
 
-    /** _more_ */
+    /** transparency index */
     protected int transIndex;  // transparent index in color table
 
-    /** _more_ */
+    /** repeat factor */
     protected int repeat = -1;  // no repeat
 
-    /** _more_ */
+    /** frame delay */
     protected int delay = 50;  // frame delay (hundredths)
 
-    /** _more_ */
+    /** started flag */
     protected boolean started = false;  // ready to output frames
 
-    /** _more_ */
+    /** output stream */
     protected OutputStream out;
 
-    /** _more_ */
+    /** current frame */
     protected ImagePlus image;  // current frame
 
-    /** _more_ */
+    /** BGR byte array from frame */
     protected byte[] pixels;  // BGR byte array from frame
 
-    /** _more_ */
+    /** converted frame indexed to palette */
     protected byte[] indexedPixels;  // converted frame indexed to palette
 
-    /** _more_ */
+    /** number of bit planes */
     protected int colorDepth;  // number of bit planes
 
-    /** _more_ */
+    /** RGB palette */
     protected byte[] colorTab;  // RGB palette
 
-    /** _more_ */
+    /** local color table size */
     protected int lctSize = 7;  // local color table size (bits-1)
 
-    /** _more_ */
+    /** disposal code */
     protected int dispose = 0;  // disposal code (-1 = use default)
 
-    /** _more_ */
+    /** closeStream flag */
     protected boolean closeStream = false;  // close stream when finished
 
-    /** _more_ */
+    /** first frame flag */
     protected boolean firstFrame = true;
 
-    /** _more_ */
+    /** set size flag */
     protected boolean sizeSet = false;  // if false, get size from first frame
 
-    /** _more_ */
+    /** default sample interval */
     protected int sample = 2;  // default sample interval for quantizer distance should be small for small icons
 
-    /** _more_ */
+    /** global color table */
     protected byte[] gct = null;  //Global color table
 
-    /** _more_ */
+    /** use global color table flag */
     protected boolean gctused = false;  // Set to true to use Global color table
 
-    /** _more_ */
+    /** autotransparency flag */
     protected boolean autotransparent = false;  // Set True if transparency index coming from image 8 bit only
 
-    /** _more_ */
+    /** flag for extracting global color table */
     protected boolean GCTextracted = false;  // Set if global color table extracted from rgb image 
 
-    /** _more_ */
+    /** flag for global color table from external image */
     protected boolean GCTloadedExternal = false;  // Set if global color table loaded directly from external image 
 
-    /** _more_ */
+    /** red color */
     protected int GCTred = 0;  //Transparent Color
 
-    /** _more_ */
+    /** green color */
     protected int GCTgrn = 0;  // green
 
-    /** _more_ */
+    /** blue color */
     protected int GCTbl = 0;  // blue
 
-    /** _more_ */
+    /** global color table index */
     protected int GCTcindex = 0;  //index into color table
 
-    /** _more_ */
+    /** gct transparency flag */
     protected boolean GCTsetTransparent = false;  //If true then Color table transparency index is set
 
-    /** _more_ */
+    /** gct overide index flag */
     protected boolean GCToverideIndex = false;  //If true Transparent index is set to index with closest colors
 
-    /** _more_ */
+    /** gct overide color flag */
     protected boolean GCToverideColor = false;  //if true Color at Transparent index is set to GCTred, GCTgrn GCTbl
 
 
 
     /**
-     * _more_
+     * Create a GIF
      *
-     * @param filename _more_
-     * @param image _more_
+     * @param filename  output file name
+     * @param image     the image object
      */
     public static void createGif(String filename, Image image) {
         AnimatedGifEncoder e = new AnimatedGifEncoder();
@@ -234,10 +232,10 @@ public class AnimatedGifEncoder {
     }
 
     /**
-     * _more_
+     * Create a GIF
      *
-     * @param outputStream
-     * @param image _more_
+     * @param outputStream  the output stream
+     * @param image     the image object
      */
     public static void createGif(OutputStream outputStream, Image image) {
         AnimatedGifEncoder e = new AnimatedGifEncoder();
@@ -250,41 +248,58 @@ public class AnimatedGifEncoder {
 
 
     /**
-     * _more_
+     * Create an animated GIF
      *
-     * @param filename _more_
-     * @param images _more_
+     * @param filename  output file name
+     * @param images    list of images
      */
     public static void createGif(String filename, List images) {
         createGif(filename, images, REPEAT_FOREVER, 500);
     }
 
     /**
-     * _more_
+     * Create an animated GIF
      *
-     * @param filename _more_
-     * @param images _more_
-     * @param repeat _more_
-     * @param delay _more_
+     * @param filename  output file name
+     * @param images    list of images
+     * @param repeat    number of times to repeat
+     * @param delay     delay between images
      */
     public static void createGif(String filename, List images, int repeat,
                                  int delay) {
-    	createGif(filename, images, repeat, delay, -1);
+        createGif(filename, images, repeat, delay, -1);
     }
 
 
     /**
-     * _more_
+     * Create an animated GIF
      *
-     * @param filename _more_
-     * @param images _more_
-     * @param repeat _more_
-     * @param delay _more_
-     * @param endDelay _more_
+     * @param filename  output file name
+     * @param images    list of images
+     * @param repeat    number of times to repeat
+     * @param delay     delay between images
+     * @param endDelay  delay on last image
      */
     public static void createGif(String filename, List images, int repeat,
                                  int delay, int endDelay) {
+        createGif(filename, images, repeat, delay, endDelay, false);
+    }
+
+    /**
+     * Create an animated GIF
+     *
+     * @param filename  output file name
+     * @param images    list of images
+     * @param repeat    number of times to repeat
+     * @param delay     delay between images
+     * @param endDelay  delay on last image
+     * @param useGlobalTable true to use a global color table
+     */
+    public static void createGif(String filename, List images, int repeat,
+                                 int delay, int endDelay,
+                                 boolean useGlobalTable) {
         AnimatedGifEncoder e = new AnimatedGifEncoder();
+        e.setGCT(useGlobalTable);
         e.setRepeat(repeat);
         e.setDelay(delay);
         e.start(filename);
@@ -294,11 +309,11 @@ public class AnimatedGifEncoder {
             e.addFrame(image);
         }
         if (endDelay != -1) {
-        	int endPause = endDelay - delay;
-        	if (endPause > 0) {
-               e.setDelay(endPause);
-               e.addFrame(image);
-        	}
+            int endPause = endDelay - delay;
+            if (endPause > 0) {
+                e.setDelay(endPause);
+                e.addFrame(image);
+            }
         }
         e.finish();
     }
@@ -311,7 +326,7 @@ public class AnimatedGifEncoder {
      * frames.  If <code>setSize</code> was not invoked, the size of the
      * first image is used for all subsequent frames.
      *
-     * @param image _more_
+     * @param image  the image to add
      * @return true if successful.
      */
     public boolean addFrame(ImagePlus image) {
@@ -320,12 +335,11 @@ public class AnimatedGifEncoder {
 
 
     /**
-     * _more_
+     * Adds next GIF frame.  
      *
-     * @param image _more_
-     * @param theDelay _more_
-     *
-     * @return _more_
+     * @param image  the image to add
+     * @param theDelay delay in loop
+     * @return true if successful.
      */
     public boolean addFrame(ImagePlus image, int theDelay) {
         if ((image == null) || !started) {
@@ -397,16 +411,11 @@ public class AnimatedGifEncoder {
         return ok;
     }
 
-    /*
-
-           Handles transparency color Index
-           Assumes colors and index are already checked for validity
-    */
-
     /**
-     * _more_
+     * Handles transparency color Index
+     * Assumes colors and index are already checked for validity
      *
-     * @param colorTab _more_
+     * @param colorTab  color table
      */
     void TransparentIndex(byte[] colorTab) {
         if (autotransparent || !GCTsetTransparent) {
@@ -459,7 +468,7 @@ public class AnimatedGifEncoder {
    */
 
     /**
-     * _more_
+     * Set the options
      */
     public void setoptions() {
 
@@ -673,9 +682,9 @@ public class AnimatedGifEncoder {
     }
 
     /**
-     *    Gets Color lookup Table from  8 bit image plus pointer to image
+     * Gets Color lookup Table from  8 bit image plus pointer to image
      *
-     * @param image _more_
+     * @param image  the image
      */
     void Process8bitCLT(ImagePlus image) {
 
@@ -739,7 +748,7 @@ public class AnimatedGifEncoder {
      * If writing to an OutputStream, the stream is not
      * closed.
      *
-     * @return _more_
+     * @return true if successful
      */
     public boolean finish() {
         if ( !started) {
@@ -774,15 +783,11 @@ public class AnimatedGifEncoder {
         return ok;
     }
 
-    /*
-        * Function to load Global Color Table from 8 bit  ImagePlus
-        * This function has to be called before addFrame
-        */
-
     /**
-     * _more_
+     * Function to load Global Color Table from 8 bit  ImagePlus
+     * This function has to be called before addFrame
      *
-     * @param image _more_
+     * @param image the image
      */
     public void loadGCT8bit(ImagePlus image) {
         int type = image.getType();
@@ -796,15 +801,11 @@ public class AnimatedGifEncoder {
         Process8bitCLT(image);
     }
 
-    /*
-        * Function to extract Global Color Table from RGB ImagePlus
-        * This function has to be called before addFrame
-        */
-
     /**
-     * _more_
+     * Function to extract Global Color Table from RGB ImagePlus
+     * This function has to be called before addFrame
      *
-     * @param image _more_
+     * @param image the image
      */
     public void extractGCTrgb(ImagePlus image) {
         if ((image == null) || (4 != image.getType())) {
@@ -822,9 +823,9 @@ public class AnimatedGifEncoder {
     }
 
     /**
-     * _more_
+     * Pack the rgb value
      *
-     * @param image _more_
+     * @param image  the image
      */
     void packrgb(ImagePlus image) {
         int            len = image.getWidth() * image.getHeight();
@@ -840,16 +841,11 @@ public class AnimatedGifEncoder {
         }
     }
 
-    /*
-        * Function to use the first up to 255 elements of a RGB ImagePlus to construct
-        *    a global color table
-        * This function has to be called before addFrame
-        */
-
     /**
-     * _more_
+     * Function to use the first up to 255 elements of a RGB ImagePlus to construct
+     * a global color table. This function has to be called before addFrame
      *
-     * @param image _more_
+     * @param image  the image
      */
     public void loadGCTrgb(ImagePlus image) {
         if ((image == null) || (4 != image.getType())) {
@@ -878,7 +874,7 @@ public class AnimatedGifEncoder {
      * If gct = true then a global color table is use
      *
      *
-     * @param flag _more_
+     * @param flag  the gct flag
      */
     public void setGCT(boolean flag) {
         gctused = flag;
@@ -939,11 +935,11 @@ public class AnimatedGifEncoder {
     }
 
     /**
-     *      Set True for Global Color Table use
-     *      This saves space in the output file but colors may not be so goodif the stack uses
-     *      True color images
+     *  Set True for Global Color Table use
+     *  This saves space in the output file but colors may not be so goodif the stack uses
+     *  True color images
      *
-     * @param gtu _more_
+     * @param gtu  the gtu flag
      */
     public void GlobalColorTableused(boolean gtu) {
         gctused = gtu;
@@ -1036,8 +1032,7 @@ public class AnimatedGifEncoder {
     public boolean start(String file) {
         boolean ok = true;
         try {
-            out         =
-                new BufferedOutputStream(new FileOutputStream(file));
+            out         = new BufferedOutputStream(new FileOutputStream(file));
             ok          = start(out);
             closeStream = true;
         } catch (IOException e) {
@@ -1050,7 +1045,7 @@ public class AnimatedGifEncoder {
      *       Sets Net sample size depending on image size
      *
      *
-     * @param npixs _more_
+     * @param npixs  the number of pixels
      */
     public void OverRideQuality(int npixs) {
         if (npixs > 100000) {
@@ -1145,12 +1140,12 @@ public class AnimatedGifEncoder {
      * Returns index of palette color closest to c
      *
      *
-     * @param colorTab _more_
-     * @param r _more_
-     * @param g _more_
-     * @param b _more_
+     * @param colorTab  the table
+     * @param r red
+     * @param g green
+     * @param b blue
      *
-     * @return _more_
+     * @return  the index
      */
     protected int findClosest(byte[] colorTab, int r, int g, int b) {
         if (colorTab == null) {
@@ -1180,8 +1175,8 @@ public class AnimatedGifEncoder {
      * Writes Graphic Control Extension
      *
      *
-     * @param delay _more_
-     * @throws IOException _more_
+     * @param delay  the delay
+     * @throws IOException  problem writing
      */
     protected void writeGraphicCtrlExt(int delay) throws IOException {
         out.write(0x21);  // extension introducer
@@ -1215,7 +1210,7 @@ public class AnimatedGifEncoder {
     /**
      * Writes Image Descriptor
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writeImageDesc() throws IOException {
         out.write(0x2c);    // image separator
@@ -1240,7 +1235,7 @@ public class AnimatedGifEncoder {
     /**
      * Writes Logical Screen Descriptor with global color table
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writeLSDgct() throws IOException {
         // logical screen size
@@ -1259,7 +1254,7 @@ public class AnimatedGifEncoder {
     /**
      *   Writes Logical Screen Descriptor without global color table
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writeLSD() throws IOException {
         // logical screen size
@@ -1280,7 +1275,7 @@ public class AnimatedGifEncoder {
      * Writes Netscape application extension to define
      * repeat count.
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writeNetscapeExt() throws IOException {
         out.write(0x21);                  // extension introducer
@@ -1297,7 +1292,7 @@ public class AnimatedGifEncoder {
     /**
      * Writes color table
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writePalette() throws IOException {
         out.write(colorTab, 0, colorTab.length);
@@ -1311,7 +1306,7 @@ public class AnimatedGifEncoder {
     /**
      * Encodes and writes pixel data
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writePixels() throws IOException {
         LZWEncoder encoder = new LZWEncoder(width, height, indexedPixels,
@@ -1323,9 +1318,9 @@ public class AnimatedGifEncoder {
     /**
      *    Write 16-bit value to output stream, LSB first
      *
-     * @param value _more_
+     * @param value the value
      *
-     * @throws IOException _more_
+     * @throws IOException problem writing
      */
     protected void writeShort(int value) throws IOException {
         out.write(value & 0xff);
@@ -1336,9 +1331,9 @@ public class AnimatedGifEncoder {
     /**
      * Writes string to output stream
      *
-     * @param s _more_
+     * @param s  the string
      *
-     * @throws IOException _more_
+     * @throws IOException  problem writing
      */
     protected void writeString(String s) throws IOException {
         for (int i = 0; i < s.length(); i++) {
@@ -1356,14 +1351,14 @@ public class AnimatedGifEncoder {
 class Gif_Stack_Writer implements PlugIn {
 
 
-    /** _more_ */
+    /** type */
     static String type = "gif";
 
 
     /**
-     * _more_
+     * Run the plugin
      *
-     * @param arg _more_
+     * @param arg  the name
      */
     public void run(String arg) {
 
@@ -1445,11 +1440,8 @@ class Gif_Stack_Writer implements PlugIn {
 
 
 /**
- * Class LZWEncoder _more_
+ * Class LZWEncoder 
  *
- *
- * @author IDV Development Team
- * @version $Revision: 1.10 $
  */
 class LZWEncoder {
 
@@ -2498,4 +2490,3 @@ class NeuQuant {
         return (bestbiaspos);
     }
 }
-
