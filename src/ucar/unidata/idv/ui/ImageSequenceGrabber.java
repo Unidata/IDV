@@ -2024,12 +2024,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 if (movieFile.toLowerCase().endsWith(
                         FileManager.SUFFIX_GIF)) {
                     double rate = 1.0 / displayRate;
+                    boolean useGCT =
+                        idv.getStateManager().getProperty("idv.capture.gif.useGlobalTable", false);
                     AnimatedGifEncoder.createGif(movieFile,
                             ImageWrapper.makeFileList(images),
                             AnimatedGifEncoder.REPEAT_FOREVER,
                             (int) (rate * 1000), (int) ((endPause == -1)
                             ? -1
-                            : endPause * 1000));
+                            : endPause * 1000), useGCT);
                 } else if (movieFile.toLowerCase().endsWith(".htm")
                            || movieFile.toLowerCase().endsWith(".html")) {
                     createAnisHtml(movieFile, images, size, displayRate,
