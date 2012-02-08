@@ -3228,6 +3228,13 @@ public final class Util {
             argument = parseUnit(value.toString());
         } else if (paramType.equals(ColorScaleInfo.class)) {
             argument = new ColorScaleInfo(value.toString(), true);
+        } else if(paramType.equals(EarthLocation.class)) {
+            List<String> toks = ucar.unidata.util.StringUtil.split(value.toString(), ",",true, true);
+            if(toks.size()!=2) throw new IllegalArgumentException("Bad EarthLocation value:" + value);
+            double lat = Double.parseDouble(toks.get(0));
+            double lon = Double.parseDouble(toks.get(1));
+            EarthLocation earthLocation = ucar.visad.Util.makeEarthLocation(lat,lon);
+            argument  = earthLocation;
         }
         if (argument != null) {
             method.invoke(object, new Object[] { argument });
