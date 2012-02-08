@@ -246,7 +246,20 @@ public abstract class ChartManager implements ImageObserver {
         }
     }
 
-
+    /**
+     * The chart name has changed
+     *
+     * @param newName new name
+     */
+    public void setChartName(String newName) {
+        if (currentLineStates == null) {
+            return;
+        }
+        for (int i = 0; i < currentLineStates.size(); i++) {
+            LineState lineState = (LineState) currentLineStates.get(i);
+            lineState.setChartName(newName);
+        }
+    }
     /**
      * init all charts
      */
