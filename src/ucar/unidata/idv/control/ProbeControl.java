@@ -582,6 +582,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             }
             double[] xyz = earthToBox(el);
             resetProbePosition(xyz[0], xyz[1], xyz[2]);
+            updatePosition();
         } catch (Exception exc) {
             logException("Error setting probe position", exc);
         }
@@ -3045,7 +3046,15 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         return timeSeries;
     }
 
-
+    /**
+     * Set the chart Name
+     *
+     * @return The chart_
+     */
+    public void setChartName(String newName) {
+        timeSeries.setChartName(newName);
+        updateDisplayList();
+    }
     /**
      * Set the ShowThumbNail property.
      *
