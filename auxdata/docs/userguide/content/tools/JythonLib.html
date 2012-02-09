@@ -72,11 +72,15 @@ horizontal advection</p>
 <p><a name="horizontalDivergence"></a><code class="command">horizontalDivergence(param, u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
 horizontal flux divergence</p>
 <meta name="jhid" value="layerAverage">
-<p><a name="layerAverage"></a><code class="command">layerAverage(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="layerAverage"></a><code class="command">layerAverage(grid, top, bottom, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Wrapper for calculating layer average</p>
 <meta name="jhid" value="layerDiff">
-<p><a name="layerDiff"></a><code class="command">layerDiff(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="layerDiff"></a><code class="command">layerDiff(grid, top, bottom, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Wrapper for calculating layer difference</p>
+<meta name="jhid" value="lonFlip">
+<p><a name="lonFlip"></a><code class="command">lonFlip(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+Flip the longitudes in a grid from -180-180 to 0-360 (or vice-versa).
+Only works for cyclic rectilinear grids.</p>
 <meta name="jhid" value="make2D">
 <p><a name="make2D"></a><code class="command">make2D(slice):</code><p style="padding:0;margin-left:20;margin-top:0">
 Make a 2D slice from a 3D slice at a single level</p>
@@ -102,7 +106,7 @@ Make a vector from 2 components
 makeVector(a,b) = \[a,b\]
 </div></p>
 <meta name="jhid" value="maskGrid">
-<p><a name="maskGrid"></a><code class="command">maskGrid(grid, mask, value):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="maskGrid"></a><code class="command">maskGrid(grid, mask, value, resample):</code><p style="padding:0;margin-left:20;margin-top:0">
 mask one grid by the values in the other.  value is the masking value</p>
 <meta name="jhid" value="maxOverTime">
 <p><a name="maxOverTime"></a><code class="command">maxOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -185,13 +189,13 @@ option - option for unsmoothed end points<br>
 -1 - assume cyclic <br>
 </div></p>
 <meta name="jhid" value="windShear">
-<p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the wind shear between discrete layers
 <div class=jython>
 shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>
 </div></p>
 <meta name="jhid" value="windShearVector">
-<p><a name="windShearVector"></a><code class="command">windShearVector(u, v, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="windShearVector"></a><code class="command">windShearVector(u, v, top, bottom, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the u and v layer difference and return as vector</p>
 <meta name="jhid" value="writeGridToXls">
 <p><a name="writeGridToXls"></a><code class="command">writeGridToXls(grid, filename):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -215,10 +219,11 @@ Write out the grid data to an excel spreadsheet</p>
 <p><a name="GRAVITY"></a><code class="command">GRAVITY():</code><p style="padding:0;margin-left:20;margin-top:0">
 Gravity constant</p>
 <meta name="jhid" value="add">
-<p><a name="add"></a><code class="command">add(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="add"></a><code class="command">add(S1, S2, WA):</code><p style="padding:0;margin-left:20;margin-top:0">
 Addition
 <div class=jython>
-ADD  (S1, S2) = S1 + S2
+ADD  (S1, S2) = S1 + S2<br>
+WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
 </div></p>
 <meta name="jhid" value="adv">
 <p><a name="adv"></a><code class="command">adv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -233,10 +238,11 @@ Ageostrophic wind
 AGE ( S ) = \[ u (OBS) - u (GEO(S)), v (OBS) - v (GEO(S)) \]
 </div></p>
 <meta name="jhid" value="atn2">
-<p><a name="atn2"></a><code class="command">atn2(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="atn2"></a><code class="command">atn2(S1, S2, WA):</code><p style="padding:0;margin-left:20;margin-top:0">
 Wrapper for atan2 built-in
 <div class=jython>
-ATN2 (S1, S2) = ATAN ( S1 / S2 )
+ATN2 (S1, S2) = ATAN ( S1 / S2 )<br>
+WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
 </div></p>
 <meta name="jhid" value="avg">
 <p><a name="avg"></a><code class="command">avg(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -399,13 +405,13 @@ LAP ( S ) = DIV ( GRAD (S) )
 <p><a name="latr"></a><code class="command">latr(S):</code><p style="padding:0;margin-left:20;margin-top:0">
 Latitudue all points in a grid</p>
 <meta name="jhid" value="lav">
-<p><a name="lav"></a><code class="command">lav(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="lav"></a><code class="command">lav(S, level1, level2, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Layer Average of a multi layer grid
 <div class=jython>
 LAV ( S ) = ( S (level1) + S (level2) ) / 2.
 </div></p>
 <meta name="jhid" value="ldf">
-<p><a name="ldf"></a><code class="command">ldf(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="ldf"></a><code class="command">ldf(S, level1, level2, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Layer Difference
 <div class=jython>
 LDF ( S ) = S (level1) - S (level2)
@@ -417,19 +423,21 @@ Magnitude of a vector</p>
 <p><a name="mixr"></a><code class="command">mixr(temp, rh):</code><p style="padding:0;margin-left:20;margin-top:0">
 Mixing Ratio from Temperature, RH (requires pressure domain)</p>
 <meta name="jhid" value="mul">
-<p><a name="mul"></a><code class="command">mul(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="mul"></a><code class="command">mul(S1, S2, WA):</code><p style="padding:0;margin-left:20;margin-top:0">
 Multiply
 <div class=jython>
-MUL  (S1, S2) = S1 * S2
+MUL  (S1, S2) = S1 * S2<br>
+WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
 </div></p>
 <meta name="jhid" value="pvor">
 <p><a name="pvor"></a><code class="command">pvor(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Potetial Vorticity (usually from theta and wind)</p>
 <meta name="jhid" value="quo">
-<p><a name="quo"></a><code class="command">quo(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="quo"></a><code class="command">quo(S1, S2, WA):</code><p style="padding:0;margin-left:20;margin-top:0">
 Divide
 <div class=jython>
-QUO  (S1, S2) = S1 / S2
+QUO  (S1, S2) = S1 / S2<br>
+WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
 </div></p>
 <meta name="jhid" value="qvcl">
 <p><a name="qvcl"></a><code class="command">qvcl(THTA, V):</code><p style="padding:0;margin-left:20;margin-top:0">
@@ -522,13 +530,14 @@ Stretching Deformation
 STRD ( V ) = DDX ( u ) - DDY ( v )
 </div></p>
 <meta name="jhid" value="sub">
-<p><a name="sub"></a><code class="command">sub(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="sub"></a><code class="command">sub(S1, S2, WA):</code><p style="padding:0;margin-left:20;margin-top:0">
 Subtract
 <div class=jython>
-SUB  (S1, S2) = S1 - S2
+SUB  (S1, S2) = S1 - S2<br>
+WA = use WEIGHTED_AVERAGE (default NEAREST_NEIGHBOR)
 </div></p>
 <meta name="jhid" value="thrm">
-<p><a name="thrm"></a><code class="command">thrm(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="thrm"></a><code class="command">thrm(S, level1, level2, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Thermal wind
 <div class=jython>
 THRM ( S ) = \[ u (GEO(S)) (level1) - u (GEO(S)) (level2),
@@ -566,14 +575,14 @@ Make a vector from two components
 VECR ( S1, S2 ) = \[ S1, S2 \]
 </div></p>
 <meta name="jhid" value="vlav">
-<p><a name="vlav"></a><code class="command">vlav(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="vlav"></a><code class="command">vlav(V, level1, level2, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the vector layer average
 <div class=jython>
 VLDF(V) = \[(u(level1) - u(level2))/2,
 (v(level1) - v(level2))/2\]
 </div></p>
 <meta name="jhid" value="vldf">
-<p><a name="vldf"></a><code class="command">vldf(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="vldf"></a><code class="command">vldf(V, level1, level2, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the vector layer difference
 <div class=jython>
 VLDF(V) = \[u(level1) - u(level2),
@@ -675,17 +684,6 @@ mode value</p>
 <meta name="jhid" value="ens_prcntl">
 <p><a name="ens_prcntl"></a><code class="command">ens_prcntl(grid, percent):</code><p style="padding:0;margin-left:20;margin-top:0">
 percentile value</p>
-<p><a name="ens_prob"></a><code class="command">ens_prob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBound, exptdUpBound):</code><p style="padding:0;margin-left:20;margin-top:0">
-Computes the probability value at each point on the grid such that:<br>
-<br>
-P(X logicalOp1 pValue1),<br>
-<br>
-where logicalOp1 is either lt or gt. Optionally, a second condition on the same field
-can be prescribed and combined with the first condition using and / or.<br>
-<br>
-exptdLoBound and exptdUpBound are optionally used to
-provide the expected numerical bounds for the variable on the grid.
-</p>
 <meta name="jhid" value="ens_savg">
 <p><a name="ens_savg"></a><code class="command">ens_savg(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
 basic ensemble average</p>
@@ -701,6 +699,9 @@ max - min grid value</p>
 <meta name="jhid" value="ens_ssprd">
 <p><a name="ens_ssprd"></a><code class="command">ens_ssprd(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
 basic ensemble average</p>
+<meta name="jhid" value="ens_uprob">
+<p><a name="ens_uprob"></a><code class="command">ens_uprob(grid, logicalOp1, pValue1, and_or, logicalOp2, pValue2, exptdLoBound, exptdUpBound):</code><p style="padding:0;margin-left:20;margin-top:0">
+ensemble univariate probability calculation</p>
 <a name="image">
 <h2> Module: image</h2>
 <hr>
@@ -721,19 +722,29 @@ and adds a lat/lon domain to the data. Use it in conjunction with a formula:</p>
 
 <hr>
 
+<meta name="jhid" value="calcDayAnom">
+<p><a name="calcDayAnom"></a><code class="command">calcDayAnom(daily, ltm, asPercent):</code><p style="padding:0;margin-left:20;margin-top:0">
+Calculate the daily anomaly from a long term mean. <br>
+grid - daily values <br>
+ltm  - long term mean (climatology) <br>
+asPercent - if 1, return percentage of climatology normal (+/-) <br></p>
 <meta name="jhid" value="calcMonAnom">
 <p><a name="calcMonAnom"></a><code class="command">calcMonAnom(monthly, ltm, normalize):</code><p style="padding:0;margin-left:20;margin-top:0">
 Calculate the monthly anomaly from a long term mean.
 The number of timesteps in ltm must be 12 and the monthly
 data must start in January.</p>
+<meta name="jhid" value="clmDay">
+<p><a name="clmDay"></a><code class="command">clmDay(grid, use366):</code><p style="padding:0;margin-left:20;margin-top:0">
+Create a daily climatology from a grid of daily data over a period
+of years.</p>
 <meta name="jhid" value="clmMon">
 <p><a name="clmMon"></a><code class="command">clmMon(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
 Create a monthly climatology from a grid of monthly data over a period
 of years. The number of timesteps must be a multiple of 12.</p>
 <meta name="jhid" value="stdMon">
 <p><a name="stdMon"></a><code class="command">stdMon(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
-Create monthly standard deviations from a grid of monthly data over a period
-of years. The number of timesteps must be a multiple of 12.</p>
+Create monthly standard deviations from a grid of monthly data over
+a period of years. The number of timesteps must be a multiple of 12.</p>
 <a name="maps">
 <h2> Module: maps</h2>
 <hr>
@@ -885,7 +896,7 @@ A set of miscellaneous utilities.
 A utility to make a 2 dimensional float array filled
 with the given value</p>
 <meta name="jhid" value="idveval">
-<p><a name="idveval"></a><code class="command">idveval(formula, name):</code><p style="padding:0;margin-left:20;margin-top:0">
+<p><a name="idveval"></a><code class="command">idveval(formula):</code><p style="padding:0;margin-left:20;margin-top:0">
 evaluate a formula  and return a DerivedDataChoice</p>
 <meta name="jhid" value="makeFloatArray">
 <p><a name="makeFloatArray"></a><code class="command">makeFloatArray(rows, cols, value):</code><p style="padding:0;margin-left:20;margin-top:0">
