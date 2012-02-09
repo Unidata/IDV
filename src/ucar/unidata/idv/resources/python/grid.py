@@ -83,13 +83,13 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
 
 
 
-def layerAverage(grid, top, bottom):
+def layerAverage(grid, top, bottom, unit=None):
    """ Wrapper for calculating layer average """
-   return DerivedGridFactory.createLayerAverage(grid, top, bottom)
+   return DerivedGridFactory.createLayerAverage(grid, top, bottom, unit)
 
-def layerDiff(grid, top, bottom):
+def layerDiff(grid, top, bottom, unit=None):
    """ Wrapper for calculating layer difference """
-   return DerivedGridFactory.createLayerDifference(grid, top, bottom, None)
+   return DerivedGridFactory.createLayerDifference(grid, top, bottom, unit)
 
 def getAltitude(z):
    """ Change units from geopotential meters to meters """
@@ -101,26 +101,26 @@ def getAltitude(z):
    return z
 
 
-def windShear(u, v, z, top, bottom):
+def windShear(u, v, z, top, bottom, unit=None):
    """ calculate the wind shear between discrete layers
    <div class=jython>
    shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>
    </div>
    """
-   udiff = layerDiff(u, top, bottom)
-   vdiff = layerDiff(v, top, bottom)
-   zdiff = layerDiff(z, top, bottom)
+   udiff = layerDiff(u, top, bottom, unit)
+   vdiff = layerDiff(v, top, bottom, unit)
+   zdiff = layerDiff(z, top, bottom, unit)
 #  adjust to altitude if units are gpm
    zdiff = getAltitude(zdiff)
    windDiff = sqrt(udiff*udiff + vdiff*vdiff)
    return windDiff/zdiff
 
 
-def windShearVector(u, v, top, bottom):
+def windShearVector(u, v, top, bottom, unit=None):
    """ calculate the u and v layer difference and return as vector
    """
-   udiff = layerDiff(u, top, bottom)
-   vdiff = layerDiff(v, top, bottom)
+   udiff = layerDiff(u, top, bottom, unit)
+   vdiff = layerDiff(v, top, bottom, unit)
    return makeVector(udiff, vdiff)
 
 def resampleGrid(oldGrid, gridwithNewDomain):

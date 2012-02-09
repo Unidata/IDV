@@ -206,7 +206,7 @@ def lap(S):
   grads = grad(S)
   return div(ur(grads),vr(grads))
 
-def lav(S,level1=None,level2=None):
+def lav(S,level1=None,level2=None, unit=None):
   """ Layer Average of a multi layer grid
   <div class=jython>
       LAV ( S ) = ( S (level1) + S (level2) ) / 2.
@@ -215,15 +215,15 @@ def lav(S,level1=None,level2=None):
   if level1 == None:
      return GridMath.applyFunctionOverLevels(S, GridMath.FUNC_AVERAGE)
   else:
-     return layerAverage(S,level1,level2)
+     return layerAverage(S,level1,level2, unit)
 
-def ldf(S,level1,level2):
+def ldf(S,level1,level2, unit=None):
   """ Layer Difference 
   <div class=jython>
       LDF ( S ) = S (level1) - S (level2)
   </div>
   """
-  return layerDiff(S,level1,level2);
+  return layerDiff(S,level1,level2, unit);
 
 def mag(*a):
   """ Magnitude of a vector 
@@ -591,14 +591,14 @@ def sm9v(V):
   """
   return sm9s(V)
 
-def thrm(S, level1, level2):
+def thrm(S, level1, level2, unit=None):
   """ Thermal wind 
   <div class=jython>
       THRM ( S ) = [ u (GEO(S)) (level1) - u (GEO(S)) (level2),	
                      v (GEO(S)) (level1) - v (GEO(S)) (level2) ] 
   </div>
   """
-  return vldf(geo(S),level1,level2)
+  return vldf(geo(S),level1,level2, unit)
 
 def vadd(V1,V2):
   """ add the components of 2 vectors
@@ -624,23 +624,23 @@ def vecr(S1,S2):
   """
   return makeVector(S1,S2)
 
-def vlav(V,level1,level2):
+def vlav(V,level1,level2, unit=None):
   """ calculate the vector layer average 
   <div class=jython>
       VLDF(V) = [(u(level1) - u(level2))/2,
                  (v(level1) - v(level2))/2] 
   </div>
   """
-  return layerAverage(V, level1, level2)
+  return layerAverage(V, level1, level2, unit)
   
-def vldf(V,level1,level2):
+def vldf(V,level1,level2, unit=None):
   """ calculate the vector layer difference 
   <div class=jython>
       VLDF(V) = [u(level1) - u(level2),
                  v(level1) - v(level2)] 
   </div>
   """
-  return layerDiff(V,level1,level2)
+  return layerDiff(V,level1,level2, unit)
 
 def vmul(V1,V2):
   """ Multiply the components of 2 vectors
