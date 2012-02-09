@@ -18,9 +18,10 @@ The items below reflect changes since the 2.9u3 release.
 <faqitem cat="System Changes"></faqitem>
 
 
-<faqitem q="Restructure Source Tree" id="srcAdded">
-Restructured source code directory tree with additions of
-src directory for all source codes and build directory for the output.
+<faqitem q="Restructure of the Source Tree" id="srcAdded">
+Restructured the source code directory tree adding a 
+src directory for all source code and a build directory for the 
+compiled classes.
 </faqitem>
 
 
@@ -94,22 +95,28 @@ flags.  Previously, they were drawn as circles (calm). (Update 1)
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="Support for new NEXRAD AR2V007" id="nexs">
-Added support for new NEXRAD AR2V007 format into the IDV.
+<faqitem q="Support for new NEXRAD AR2V007 format" id="nexs">
+Added support for new NEXRAD AR2V007 format into the IDV.  Added
+new station Langley Hill, Washington (KLGX) to the station tables.
 </faqitem>
 
-<faqitem q="New Climatology Functions" id="climate">
+<faqitem q="New Climatology Functions" id="clmday">
  Added daily climatology functions clmDay and calcDayAnom.
 </faqitem>
 
-<faqitem q="New LonFlip Procedure" id="lonflip">
+<faqitem q="Allow User to Specify Level Unit" id="levunit">
+Modified some of the Jython grid diagnostics to allow the user to
+specify the unit of the level for layer differencing and averaging.
+</faqitem>
+
+<faqitem q="New lonFlip Jython Procedure" id="lonflip">
  Flip the grid along the central longitude.  Useful for converting 0-360 to
  -180 to 180 or vice-versa.
 </faqitem>
 
 <faqitem q="Converting Pressure to Topography" id="p2t">
 Added a method to convert pressure to topography, defaulting to the
-standard atmosphere if a CS is not provided.
+standard atmosphere if another transform is not provided.  
 </faqitem>
 
 <faqitem q="Support for GrADS Binary Grid Files" id="grads">
@@ -147,7 +154,7 @@ default template is being used.
 <li>Fixed CAP profile display bug.
 <li>Fixed the file extension issue in the writeMovie api.
 <li>Fixed a null point exception when using formula merge time sequences.
-<li>Fixed the problem of auto-detection of the file type when selecting for multiple files.
+<li>Fixed the problem of auto-detection of the file type when selecting multiple files.
 <li>Fixed a bug in the  extractLongitudeFromNWPGrid api.
 </ul>
 </faqitem>
