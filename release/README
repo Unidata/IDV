@@ -38,7 +38,7 @@ in auxdata/docs/userguide/content/ReleaseNotes.html
 
 When you are ready to make a release, run:
 
-cd /share/idv/build
+cd /share/idv/release
 ./buildIdv release
 
 Note that this script has a dependency on install4j license server.
