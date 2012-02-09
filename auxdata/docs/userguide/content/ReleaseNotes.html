@@ -17,6 +17,13 @@ The items below reflect changes since the 2.9u3 release.
 
 <faqitem cat="System Changes"></faqitem>
 
+
+<faqitem q="Restructure Source Tree" id="srcAdded">
+Restructured source code directory tree with additions of
+src directory for all source codes and build directory for the output.
+</faqitem>
+
+
 <faqitem q="IDV Memory Allocation" id="idvmemory">
 Upon IDV start up, memory allocation is done automatically according to the 
 user's machine specifications.  The default memory allocation can be changed 
@@ -29,8 +36,8 @@ The IDV can now be installed as a Mac OS X bundle.
 </faqitem>
 
 <faqitem q="Latest netCDF-Java Version" id="nj42">
-A new version of the netCDF-Java library (4.2.27) is included in this release.
-Among the changes are a fix for Gaussian latitude grids in GRIB format.  See the
+A new version of the netCDF-Java library (4.2.30) is included in this release.
+Among the changes are a fix for Gaussian latitude grids in GRIB format and a fix for NARR.  See the
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">
 netCDF-Java change log</a> for a complete list of changes. (update 1)
 </faqitem>
@@ -44,6 +51,13 @@ The latest version of the VisAD library is used in this release.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
+Add clockwise and counterclockwise rotation options so you can rotate about the north and south poles in globe view (or others)
+
+<faqitem q="Rotation Option" id="rotationOpt">
+Add clockwise and counterclockwise rotation options so you can
+rotate about the north and south poles in globe view (or others).
+</faqitem>
+
 
 <faqitem q="Contour Labeling" id="contourlabel">
 Added a user interface  to set the size, font and alignment of the 
@@ -80,6 +94,24 @@ flags.  Previously, they were drawn as circles (calm). (Update 1)
 
 <faqitem cat="Data Changes"></faqitem>
 
+<faqitem q="Support for new NEXRAD AR2V007" id="nexs">
+Added support for new NEXRAD AR2V007 format into the IDV.
+</faqitem>
+
+<faqitem q="New Climatology Functions" id="climate">
+ Added daily climatology functions clmDay and calcDayAnom.
+</faqitem>
+
+<faqitem q="New LonFlip Procedure" id="lonflip">
+ Flip the grid along the central longitude.  Useful for converting 0-360 to
+ -180 to 180 or vice-versa.
+</faqitem>
+
+<faqitem q="Converting Pressure to Topography" id="p2t">
+Added a method to convert pressure to topography, defaulting to the
+standard atmosphere if a CS is not provided.
+</faqitem>
+
 <faqitem q="Support for GrADS Binary Grid Files" id="grads">
 Added support for reading GrADS grids into the IDV.  The control file is used
 to read in the data.  This only supports GrADS binary grids.
@@ -113,6 +145,10 @@ default template is being used.
 <li>Fixed wind barb issue.
 <li>Fixed hurricane track color control issue.
 <li>Fixed CAP profile display bug.
+<li>Fixed the file extension issue in the writeMovie api.
+<li>Fixed a null point exception when using formula merge time sequences.
+<li>Fixed the problem of auto-detection of the file type when selecting for multiple files.
+<li>Fixed a bug in the  extractLongitudeFromNWPGrid api.
 </ul>
 </faqitem>
 
