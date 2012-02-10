@@ -1,0 +1,22 @@
+<html><head>
+  <title>Changing Bundle Properties</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+[isl::tagdef displayproperties  {Changing bundle display properties} -attrs {display+ {the display with properties that need to be changed}
+property+ {name and new value of the existing property } }]
+The [isl::tag displayproperties] tag allows you to change the existing properties in a bundle file. For example,
+this could be used to change the probe location, chart name, etc.
+
+<p>
+In this example, we use the displayproperties tag to change two existing properties in the bundle RUC.xidv. First, the IDV
+needs to identify the display to search for existing properties, which is the ProbeControl. After we identify the display,
+the IDV uses the property name and new value to replace the existing property, and the two properties being changed are probe location
+ and chart name.
+<p>
+
+[isl::importxml probeTimeSeries.isl]
+
+
+</body>
