@@ -39,6 +39,7 @@ in auxdata/docs/userguide/content/ReleaseNotes.html
 When you are ready to make a release, run:
 
 cd /share/idv/release
+svn update build.xml
 ./buildIdv release
 
 Note that this script has a dependency on install4j license server.
@@ -98,10 +99,10 @@ Expand the javadoc
 
 cd /content/software/idv/<release>/docs
 jar xvf ~ftp/pub/idv/<release_dir>/idv_javadoc_<version>.jar
-cd idv/docs
-mv javadoc ../..
-cd ../..
-rm -rf META-INF/ idv
+cd docs
+mv javadoc ..
+cd ..
+rm -rf META-INF/ docs
 
 ***********************************************************************
 Generate the PDFs
@@ -110,7 +111,7 @@ You  need to build the userguide.pdf and workshop.pdf files.
 To do this you need to be on harpo (which has the htmldoc executable)
 and run:
 ant docs_pdf
-from /share/idv/ucar
+from /share/idv/runtime
 This will generate the userguide.pdf and workshop.pdf and place them in the
 docs directory.
 
