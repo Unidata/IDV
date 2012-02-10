@@ -672,8 +672,8 @@ line using: and -Dbasedir=/some/other/dir
         </zip>
         <jar
             jarfile="${ftpdir}/idv_javadoc_${idv.version}.jar"
-            basedir="${basedir}/.."
-            includes="idv/docs/javadoc/**"
+            basedir="${basedir}"
+            includes = "docs/javadoc/**"
         />
     </target>
 
