@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -28,6 +28,8 @@ import ucar.unidata.util.Trace;
 import ucar.visad.Util;
 
 import visad.*;
+
+import visad.georef.MapProjection;
 
 import visad.util.DataUtility;
 
@@ -162,7 +164,7 @@ public class GridMath {
      *
      * @param grid1  first grid
      * @param grid2  second grid
-     * @param useWA _more_
+     * @param useWA  true to use weighted average
      *
      * @return  the difference of the grids
      *
@@ -194,7 +196,7 @@ public class GridMath {
      *
      * @param grid1  first grid
      * @param grid2  second grid
-     * @param useWA _more_
+     * @param useWA  true to use WEIGHTED_AVERAGE
      *
      * @return  the product of the grids
      *
@@ -226,7 +228,7 @@ public class GridMath {
      *
      * @param grid1  first grid
      * @param grid2  second grid
-     * @param useWA _more_
+     * @param useWA  true to use WEIGHTED_AVERAGE
      *
      * @return  the quotient of the grids
      *
@@ -258,7 +260,7 @@ public class GridMath {
      *
      * @param grid1  first grid
      * @param grid2  second grid
-     * @param useWA _more_
+     * @param useWA  true to use WEIGHTED_AVERAGE
      *
      * @return  the arctangent of the grids
      *
@@ -476,7 +478,7 @@ public class GridMath {
      * ensemble grid min values
      *
      * @param grid   ensemble grid
-     * @param percent _more_
+     * @param percent  the percent
      *
      * @return the new field
      *
@@ -492,7 +494,7 @@ public class GridMath {
      *  ensemble grid min values
      *
      *  @param grid   ensemble grid
-     *  @param percent _more_
+     *  @param percent  the percent
      *
      *  @return the new field
      *
@@ -510,8 +512,8 @@ public class GridMath {
      *  @param grid   ensemble grid
      *  @param logicalOp gt or lt for P(X > | < pValue)
      *  @param pValue probability threshold value P(valueAtGridPoint < pValue)
-     * @param exptdLoBound _more_
-     * @param exptdUpBound _more_
+     * @param exptdLoBound  expected lo bound
+     * @param exptdUpBound  expected hi bound
      *
      *  @return the new field
      *
@@ -540,8 +542,8 @@ public class GridMath {
      *  @param grid   ensemble grid
      *  @param logicalOp gt or lt for P(X > | < pValue)
      *  @param pValue probability threshold value P(valueAtGridPoint < pValue)
-     * @param exptdLoBound _more_
-     * @param exptdUpBound _more_
+     * @param exptdLoBound  expected lo bound
+     * @param exptdUpBound  expected hi bound
      *
      *  @return the new field
      *
@@ -1448,8 +1450,8 @@ public class GridMath {
      *
      * @param grid   grid to average
      * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
-     * @param exptdLoBoundIn _more_
-     * @param exptdUpBoundIn _more_
+     * @param exptdLoBoundIn expected lo bound
+     * @param exptdUpBoundIn expected hi bound
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1487,8 +1489,8 @@ public class GridMath {
      *
      * @param grid   grid to average
      * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
-     * @param exptdLoBound _more_
-     * @param exptdUpBound _more_
+     * @param exptdLoBound expected lo bound
+     * @param exptdUpBound expected hi bound
      * @param function One of the FUNC_ enums
      *
      * @return the new field
@@ -1543,7 +1545,7 @@ public class GridMath {
 
                     float[][] ensStepValues = innerField.getFloats(false);
                     if (values == null) {
-                        values = Misc.cloneArray(ensStepValues);
+                        values    = Misc.cloneArray(ensStepValues);
                         valuesAll =
                             new float[values.length][values[0].length][numMembers];
                     }
@@ -1948,10 +1950,10 @@ public class GridMath {
             int[] lengths = domainSet.getLengths();
             int   sizeX   = lengths[0];
             int   sizeY   = lengths[1];
-            int sizeZ = ((lengths.length == 2)
+            int   sizeZ   = ((lengths.length == 2)
                          || (domainSet.getManifoldDimension() == 2))
-                        ? 1
-                        : lengths[2];
+                            ? 1
+                            : lengths[2];
             float[][] samples   = grid.getFloats(false);
             float[][] newValues = new float[samples.length][sizeX * sizeY];
             for (int np = 0; np < samples.length; np++) {
@@ -2123,10 +2125,10 @@ public class GridMath {
             int[] lengths = domainSet.getLengths();
             int   sizeX   = lengths[0];
             int   sizeY   = lengths[1];
-            int sizeZ = ((lengths.length == 2)
+            int   sizeZ   = ((lengths.length == 2)
                          || (domainSet.getManifoldDimension() == 2))
-                        ? 1
-                        : lengths[2];
+                            ? 1
+                            : lengths[2];
             float[][] samples   = grid.getFloats(false);
             float[][] newValues = newField.getFloats(false);
             for (int np = 0; np < samples.length; np++) {
@@ -2299,10 +2301,10 @@ public class GridMath {
             int[] lengths = domainSet.getLengths();
             int   sizeX   = lengths[0];
             int   sizeY   = lengths[1];
-            int sizeZ = ((lengths.length == 2)
+            int   sizeZ   = ((lengths.length == 2)
                          || (domainSet.getManifoldDimension() == 2))
-                        ? 1
-                        : lengths[2];
+                            ? 1
+                            : lengths[2];
             float[][] samples   = grid.getFloats(false);
             float[][] newValues = newField.getFloats(false);
             int       outer     = (axis.equals(AXIS_X))
@@ -2376,7 +2378,7 @@ public class GridMath {
      */
     public static FieldImpl ddx(FieldImpl grid)
             throws VisADException, RemoteException {
-        return partial(grid, 0);
+        return partial(grid, getIndex(grid, AXIS_X));
     }
 
     /**
@@ -2389,7 +2391,31 @@ public class GridMath {
      */
     public static FieldImpl ddy(FieldImpl grid)
             throws VisADException, RemoteException {
-        return partial(grid, 1);
+        return partial(grid, getIndex(grid, AXIS_Y));
+    }
+
+    /**
+     * Get the index of the X or Y coordinate value.  
+     * Some grids (e.g. Vis5D) are in YX order.
+     *
+     * @param grid  the grid
+     * @param xOry  AXIS_X or AXIS_Y
+     *
+     * @return  the appropriate index
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   problem reading data
+     */
+    private static int getIndex(FieldImpl grid, String xOry)
+            throws VisADException, RemoteException {
+        int           index = xOry.equalsIgnoreCase(AXIS_X)
+                              ? 0
+                              : 1;
+        MapProjection mp    = GridUtil.getNavigation(grid);
+        if ( !mp.isXYOrder()) {
+            index = 1 - index;
+        }
+        return index;
     }
 
     /**
@@ -2404,7 +2430,7 @@ public class GridMath {
     public static FieldImpl partial(FieldImpl grid, int domainIndex)
             throws VisADException, RemoteException {
         SampledSet ss = GridUtil.getSpatialDomain(grid);
-        RealType rt =
+        RealType   rt =
             (RealType) ((SetType) ss.getType()).getDomain().getComponent(
                 domainIndex);
         return partial(grid, rt);
@@ -2585,8 +2611,7 @@ public class GridMath {
     /**
      * evaluate mode value
      *
-     *
-     * @param data _more_
+     * @param data  the data
      * @return the percentile
      *
      */
