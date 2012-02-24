@@ -223,6 +223,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public static final String PREF_SHOWTRANSECTSCALES =
         "View.ShowTransectScales";
 
+    /** Property id for component resizing */
+    public static final String PROP_COMPONENT_RESIZED =
+        "View.ComponentResized";
 
     /** Preference for showing cursor readout */
     public static final String PREF_SHOWCURSOR = "View.ShowCursor";
@@ -5603,6 +5606,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     if (myComponentResizeCnt == componentResizeCnt) {
                         updateAnnotations();
                         updateDisplayList();
+                        notifyDisplayControls(PROP_COMPONENT_RESIZED);
                     }
                 }
             });
