@@ -7,8 +7,13 @@ lib/idv.jar
 #############
 # IDE files #
 #############
-.idea/
-ide/.idea
+#
+# IntelliJ files
+#
+ide/intellij/.idea/workspace.xml
+ide/intellij/.idea/tasks.xml
+ide/intellij/.idea/misc.xml
+ide/intellij/.idea/vcs.xml
 
 ######################
 # OS generated files #
