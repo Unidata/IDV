@@ -1,7 +1,7 @@
 #############
 # IDV files #
 #############
-build/ucar
+build/
 lib/idv.jar
 
 #############
