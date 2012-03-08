@@ -1,0 +1,19 @@
+#############
+# IDV files #
+#############
+build/
+lib/idv.jar
+
+#############
+# IDE files #
+#############
+.idea/
+ide/.idea
+
+######################
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
