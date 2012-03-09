@@ -204,7 +204,7 @@
 
   <datasource
      id="FILE.RADAR"
-     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*NEXRAD.*$,.*\.raw$"
+     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*\.raw$"
      fileselection="true"
      doesmultiples="true"
      factory="ucar.unidata.data.radar.CDMRadarDataSource"
@@ -212,7 +212,7 @@
 
   <datasource
      id="OPENDAP.Radial"
-     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,.*6500KHGX.*$,.*NEXRAD.*$,.*\.raw$"
+     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,.*6500KHGX.*$,.*\.raw$"
      fileselection="false"
      doesmultiples="true"
      factory="ucar.unidata.data.radar.CDMRadarDataSource"
