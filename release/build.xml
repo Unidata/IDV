@@ -27,14 +27,17 @@ line using: and -Dbasedir=/some/other/dir
       <format property="start.time" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
     </tstamp>
 
-        <!-- srcdir is where we check out svn code -->
+    <!-- srcdir is where we check out code -->
         <property name="srcdir"  value="${basedir}" />
-        <property name="svn_root"  value="https://sub.unidata.ucar.edu/idv/trunk" />
+        <property name="rootdir"  value="${basedir}/.." />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
         <property name="install4jdir"  value="/share/install4j" />
         <property name="makedir"  value="mkdir -p -m 775 " />
 
+        <property name="idvgitrepo" value="https://github.com/Unidata/IDV.git"/>
+        <property name="idvgitbranch" value="master"/>
+        <property name="localgitrepo" value="${rootdir}/localgitrepo/idv"/>
 
        <!-- Read in the version from the properties file if it exists -->
        <property name="versionfile" value="${srcdir}/src/ucar/unidata/idv/resources/version.properties"/>
@@ -93,14 +96,13 @@ line using: and -Dbasedir=/some/other/dir
         <taskdef name="install4j"
                classname="com.install4j.Install4JTask"
                classpath="${install4jdir}/bin/ant.jar"/>
-        <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
     </target>
 
     <target name="all" depends="init">
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="svnco" />
+    <antcall target="gitclone" />
 <!--  No need to do this automatically
         <echo message="FTPing visad." />
         <antcall target="visad" />
@@ -113,7 +115,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="svnco" />
+    <antcall target="gitclone" />
         <echo message="FTPing visad." />
         <antcall target="visad" />
         <echo message="Building ucar packages." />
@@ -250,17 +252,35 @@ line using: and -Dbasedir=/some/other/dir
         <cvs package="metapps" dest="${srcdir}" quiet="true" error="dummyfile" output="dummyfile"/>
     </target>
 
+  <target name="-check-localgitrepo">
+    <available file="${localgitrepo}/.git" type="dir" property="localgitrepo.present"/>
+  </target>
 
-    <target name="svnco" depends="init">
-        <echo message="Checking out ${svn_root}"/>
-        <exec executable="svn">
-            <arg line="--quiet co ${svn_root} ${srcdir}" />
-        </exec>
-<!--
-        <svn>
-        <checkout url="svn://zero/idv/trunk" destPath="${srcdir}"/>
-        </svn>
--->
+  <target name="-if-localgitrepo" depends="-check-localgitrepo" if="localgitrepo.present">
+    <exec executable="git">
+      <arg line="--git-dir=${localgitrepo}/.git pull" />
+    </exec>
+  </target>
+
+  <target name="-unless-localgitrepo" depends="-check-localgitrepo" unless="localgitrepo.present">
+    <mkdir dir="${localgitrepo}"/>
+    <echo message="This clone may take a while, but subsequently repo will be on local file system, and this lengthy clone step will not be necessary." />
+    <echo message="git clone ${idvgitrepo} -b ${idvgitbranch} ${localgitrepo}"/>
+    <exec executable="git">
+      <arg line="clone ${idvgitrepo} -b ${idvgitbranch} ${localgitrepo}" />
+    </exec>
+  </target>
+
+  <target name="gitlocalrepo">
+    <antcall target="-if-localgitrepo"/>
+    <antcall target="-unless-localgitrepo"/>
+  </target>
+
+  <target name="gitclone" depends="gitlocalrepo">
+    <echo message="git cloning ${localgitrepo}"/>
+    <copy todir="${srcdir}">
+      <fileset dir="${localgitrepo}"/>
+    </copy>
     </target>
 
     <target name="visad" depends="init">
@@ -282,10 +302,10 @@ line using: and -Dbasedir=/some/other/dir
         </exec>
         -->
 
+    <!-- Not sure what this is, or even if it is being used. -JCC 2/29/2012
         <exec executable="svn" dir="${libsdir}">
             <arg line="commit -m idv_build_snapshot visad.jar"/>
         </exec>
-<!--
         <svn>
         <commit file="${libsdir}/visad.jar" message="idv_build_snapshot"/>
         </svn>
