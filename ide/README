@@ -8,7 +8,7 @@ Once the project is loaded into the IDE, Open "Project Structure" under "File" a
 
 In the "Project Structure" settings, make sure j3dutils.jar, vecmath.jar, and j3dcore.jar are in the classpath for your SDK (found under "Platform Settings -> SDKs"). Note that these three files come from the Java-3D package and must be located on your system.
 
-Now that the basic settings are configured, we need to setup IntelliJ to run the IDV. From the toolbar, click "Run" -> "Edit Configurations".  From the "Edit Configurations" widgit, click the '+' sign to add a new "Application" configuration, and use the following settings:
+Now that the basic settings are configured, we need to setup IntelliJ to run the IDV. From the toolbar, click "Run" -> "Edit Configurations".  From the "Edit Configurations" widget, click the '+' sign to add a new "Application" configuration, and use the following settings:
 
      Main class: ucar.unidata.idv.DefaultIdv
      VM Parameters: -Xmx2048m -XX:MaxPermSize=128m
@@ -18,3 +18,14 @@ Now that the basic settings are configured, we need to setup IntelliJ to run the
 
 Now it’s time to build the IDV from source. On the right side of the screen, open the "Ant Build" tab and double-click "idvjar" to build the IDV. After the build completes and the files are re-indexed (which automatically happens after the build), click the green "play" button ( l> ) on the toolbar to start the IDV (make sure DefaultIdv is selected in the Configuration dropdown bock next to the run button). If all goes well, the IDV should start up via the IntelliJ IDE.
 
+
+##################################################################
+# * Instructions for working with the IDV in the Eclipse  IDE: * #
+##################################################################
+
+From the IDV source root directory:
+
+ln -s ide/eclipse/.classpath .classpath
+ln -s ide/eclipse/.project .project
+
+Note that this set up does not rely on the ant build.xml

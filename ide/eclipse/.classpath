@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding=".classpath|.project|.settings/|build.xml|build/|examples/|lib/|libsrc/|release/|src|src/|test/" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/commons-net-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/doclint.jar"/>
+	<classpathentry kind="lib" path="lib/dummy.jar"/>
+	<classpathentry kind="lib" path="lib/external.jar"/>
+	<classpathentry kind="lib" path="lib/extra.jar"/>
+	<classpathentry kind="lib" path="lib/j2h.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/jython.jar"/>
+	<classpathentry kind="lib" path="lib/local-visad.jar"/>
+	<classpathentry kind="lib" path="lib/ncIdv.jar"/>
+	<classpathentry kind="lib" path="lib/repositorytds.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="lib/texttonc.jar"/>
+	<classpathentry kind="lib" path="lib/unidatacommon.jar"/>
+	<classpathentry kind="lib" path="lib/visad.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

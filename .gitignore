@@ -14,6 +14,11 @@ ide/intellij/.idea/workspace.xml
 ide/intellij/.idea/tasks.xml
 ide/intellij/.idea/misc.xml
 ide/intellij/.idea/vcs.xml
+#
+# Eclipse files
+#
+.classpath
+.project
 
 ######################
 # OS generated files #
