@@ -1,7 +1,6 @@
 /*
- * $Id: VertScaleDialog.java,v 1.24 2007/05/04 14:17:36 dmurray Exp $
  *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -26,26 +25,29 @@ package ucar.unidata.view.geoloc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+
+import ucar.visad.Util;
+
+import visad.CommonUnit;
+import visad.Unit;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.visad.Util;
-import visad.CommonUnit;
-import visad.Unit;
 
 /**
  * A widget to get vertical range or scaling info from the user
@@ -55,29 +57,14 @@ import visad.Unit;
  */
 public class VertScaleDialog extends JPanel implements ActionListener {
 
-    /** Lat lon scale info */
-    private LatLonScaleInfo latLonInfo = new LatLonScaleInfo();
-
-    /** Abscissa (x-axis) Label */
-    private JTextField abscissaLabel;
-
-    /** Ordinate (y-axis) Label */
-    private JTextField ordinateLabel;
-
     /** The control */
     ViewpointControl control;
 
-    /** The dialog whe in dialog mode */
+    /** The dialog when in dialog mode */
     JDialog dialog;
-
-    /** Major tick spinner */
-    JSpinner majorTickSpinner;
 
     /** input fields for max/min values */
     private JTextField min, max;
-
-    /** Minor tick spinner */
-    JSpinner minorTickSpinner;
 
     /** flag for whether the user hit cancel or not */
     private boolean ok;
@@ -85,11 +72,14 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     /** The frame parent */
     JFrame parent;
 
-    /** Holds the info */
+    /** Holds the vertical scale info */
     VertScaleInfo transfer;
 
     /** combo box for selecting units */
     private JComboBox unitCombo;
+
+    /** Is the vertical scale visible */
+    private JCheckBox visible;
 
     /**
      * Create a new dialog for setting the vertical range of the display
@@ -125,11 +115,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         JPanel p1 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Min value: "), min = new JTextField(""), GuiUtils.rLabel("Max value: "),
             max = new JTextField(""), GuiUtils.rLabel("Units: "),
-            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null)
-//            GuiUtils.rLabel("Abscissa (x-axis) Label: "), abscissaLabel = new JTextField(this.latLonInfo.abscissaLabel),
-//            GuiUtils.rLabel("Ordinate (y-axis) Label: "), ordinateLabel = new JTextField(this.latLonInfo.ordinateLabel),
-//            GuiUtils.rLabel("Major tick: "), majorTickSpinner = new JSpinner(new SpinnerNumberModel(4, 0, 10, 2)),
-//            GuiUtils.rLabel("Minor tick: "), minorTickSpinner = new JSpinner(new SpinnerNumberModel(8, 0, 10, 2))
+            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null),
+            GuiUtils.rLabel("Visible: "), visible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         min.setActionCommand(GuiUtils.CMD_OK);
@@ -145,6 +132,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             if (transfer.unit != null) {
                 unitCombo.setSelectedItem(transfer.unit.toString());
             }
+
+            visible.setSelected(transfer.visible);
         }
     }
 
@@ -202,6 +191,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         min.setText(Misc.format(transfer.minVertScale));
         max.setText(Misc.format(transfer.maxVertScale));
         unitCombo.setSelectedItem(transfer.unit.toString());
+        visible.setSelected(transfer.visible);
         dialog.setVisible(true);
     }
 
@@ -239,6 +229,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
 
         VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue, newUnit);
 
+        newTransfer.visible = visible.isSelected();
+
         if (!Misc.equals(newTransfer, transfer)) {
             transfer = newTransfer;
 
@@ -250,22 +242,6 @@ public class VertScaleDialog extends JPanel implements ActionListener {
                 return false;
             }
         }
-
-//        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo(abscissaLabel.getText(), ordinateLabel.getText(),
-//                                            Integer.parseInt(majorTickSpinner.getModel().getValue() + ""),
-//                                            Integer.parseInt(minorTickSpinner.getModel().getValue() + ""));
-//
-//        if (!newLatLonInfo.equals(latLonInfo)) {
-//            latLonInfo = newLatLonInfo;
-//
-//            try {
-//                control.applyLatLonScale(latLonInfo);
-//            } catch (Exception e) {
-//                LogUtil.userMessage("An error has occurred:" + e);
-//
-//                return false;
-//            }
-//        }
 
         return true;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -91,15 +91,19 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.math.BigDecimal;
+
 import java.net.URL;
 
 import java.rmi.RemoteException;
 
 import java.text.DecimalFormat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -247,6 +251,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /** the display tuple type */
     private DisplayTupleType displayTupleType;
+
+    /** The lat/lon scale info */
+    private LatLonScaleInfo latLonScaleInfo;
 
     /** The MapProjection */
     private MapProjection mapProjection;
@@ -430,7 +437,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (latScale != null) {
-            latScale.setVisible(false);
+            latScale.setVisible(getLatLonScaleInfo().xVisible);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation ur = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
@@ -439,7 +446,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (lonScale != null) {
-            lonScale.setVisible(false);
+            lonScale.setVisible(getLatLonScaleInfo().yVisible);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation lr = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
@@ -451,14 +458,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     }
 
     /**
-     * Method to update lat lon scale
+     * Method to update lat lon scale.
      *
      * @param scale    AxisScale to update
      * @param title    Title
      * @param maxmin   max/min limits of axis
-     * @param bottom   value for lower limit
-     * @param top      value for upper limit
-     *
+     * @param left the left
+     * @param right the right
+     * @param absicca the absicca
      * @throws VisADException   problem creating some VisAD object
      * @throws RemoteException   problem creating remote object
      */
@@ -472,38 +479,111 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                ? right.getLatitude().getValue()
                                : right.getLongitude().getValue();
         Hashtable labelTable = new Hashtable();
+        String    baseLabel  = absicca
+                               ? getLatLonScaleInfo().latBaseLabel
+                               : getLatLonScaleInfo().lonBaseLabel;
+        double    base       = Double.parseDouble(baseLabel);
+
+        if ((base < bottom) || (base > top)) {
+            base = bottom;
+        }
 
         // Labeling extremities
         labelTable.put(new Double(maxmin[0]), labelFormat.format(bottom));
         labelTable.put(new Double(maxmin[1]), labelFormat.format(top));
 
-//      for (double i = bottom; i < top; i += 10) {
-//              RealTuple spatialCoordinates = getSpatialCoordinates(absicca ? new EarthLocationTuple(
-//                              i, left.getLongitude().getValue(), 0) : new EarthLocationTuple(right.getLatitude().getValue(), i, 0));
-//              double[] values = spatialCoordinates.getValues();
-//      labelTable.put(new Double(values[absicca ? 1 : 0]), labelFormat.format(i));
-//      } 
-        double minorTickSpacing = Math.abs(maxmin[1] - maxmin[0]) / getLatLonScaleInfo().minorTickSpacing;
-        double majorTickSpacing = Math.abs(maxmin[1] - maxmin[0]) / getLatLonScaleInfo().majorTickSpacing;
+        List<Double> majorTicks   = new ArrayList<Double>();
+        int          minorTickInc = absicca
+                                    ? getLatLonScaleInfo().latMinorIncrement
+                                    : getLatLonScaleInfo().lonMinorIncrement;
+        List<Double> minorTicks   = new ArrayList<Double>();
 
-        for (double i = -1; i < 1; i += majorTickSpacing) {
-            EarthLocation el = absicca
-                               ? getEarthLocation(-1, i, -1)
-                               : getEarthLocation(i, -1, -1);
+        majorTicks.add(-1.0);
 
-            labelTable.put(i, labelFormat.format(absicca
-                    ? el.getLatitude().getValue()
-                    : el.getLongitude().getValue()));
+        String incLabel = absicca
+                          ? getLatLonScaleInfo().latIncrement
+                          : getLatLonScaleInfo().lonIncrement;
+        double inc      = Double.parseDouble(incLabel);
+        int    cnt      = 0;
 
-//          System.out.println(i + " " +  (absicca ? el.getLatitude().getValue() : el.getLongitude().getValue()));
+        for (double i = base; i < top; i += inc / minorTickInc) {
+            EarthLocationTuple elt    = absicca
+                                        ? new EarthLocationTuple(i, left.getLongitude().getValue(), 0)
+                                        : new EarthLocationTuple(right.getLatitude().getValue(), i, 0);
+            double[]           values = newton(elt, absicca);
+            Double             d      = new Double(values[absicca
+                    ? 1
+                    : 0]);
+
+            if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
+                majorTicks.add(d);
+                labelTable.put(d, labelFormat.format(i));
+            } else {
+                minorTicks.add(d);
+            }
+
+            cnt++;
         }
 
+        majorTicks.add(1.0);
+
+        double[] mjt = new double[majorTicks.size()];
+        double[] mnt = new double[minorTicks.size()];
+
+        for (int i = 0; i < mjt.length; i++) {
+            mjt[i] = majorTicks.get(i);
+        }
+
+        for (int i = 0; i < mnt.length; i++) {
+            mnt[i] = minorTicks.get(i);
+        }
+
+        scale.setAutoComputeTicks(false);
         scale.setSnapToBox(true);
+        scale.setMajorTicks(mjt);
+        scale.setMinorTicks(mnt);
         scale.setTitle(title);
         scale.setLabelTable(labelTable);
         scale.setTicksVisible(true);
-        scale.setMajorTickSpacing(minorTickSpacing);
-        scale.setMinorTickSpacing(majorTickSpacing);
+        scale.setMajorTickSpacing(0);
+        scale.setMinorTickSpacing(0);
+    }
+
+    /**
+     * Numerically arriving at the screen coordinates needed for the intersection between the wire frame axis
+     * and the latitude or longitude.
+     *
+     * @param elt the earth location tuple.
+     * @param absicca is it the absicca or the ordinate
+     * @return the spatial coordinates
+     * @throws RemoteException the remote exception
+     * @throws VisADException the vis ad exception
+     */
+    private double[] newton(EarthLocationTuple elt, boolean absicca) throws RemoteException, VisADException {
+
+        // TODO: There could be some problems here if the solution does not converge. Could implement a safety valve.
+        double[] values = getSpatialCoordinates(elt).getValues();
+
+        values[absicca
+               ? 0
+               : 1] = -1;
+
+        EarthLocation el   = getEarthLocation(values);
+        double        diff = Math.abs(absicca
+                                      ? el.getLatitude().getValue() - elt.getLatitude().getValue()
+                                      : el.getLongitude().getValue() - elt.getLongitude().getValue());
+
+        if (diff < 0.02) {
+            return getSpatialCoordinates(el).getValues();
+        } else {
+            EarthLocationTuple t = absicca
+                                   ? new EarthLocationTuple(el.getLatitude().getValue() + diff,
+                                       el.getLongitude().getValue(), 0)
+                                   : new EarthLocationTuple(el.getLatitude().getValue(),
+                                       el.getLongitude().getValue() + diff, 0);
+
+            return newton(t, absicca);
+        }
     }
 
     /**
@@ -520,6 +600,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void updateVertScale(AxisScale scale, String title, double[] maxmin, double bottom, double top)
             throws VisADException, RemoteException {
+        scale.setVisible(getVerticalRangeVisible());
         scale.setSnapToBox(true);
         scale.setTitle(title);
 
@@ -738,8 +819,53 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * {@inheritDoc}
      */
     public void setLatLonScaleInfo(LatLonScaleInfo latLonScaleInfo) throws RemoteException, VisADException {
-        super.setLatLonScaleInfo(latLonScaleInfo);
+        this.latLonScaleInfo = latLonScaleInfo;
         makeLatLonScales();
+    }
+
+    /**
+     * Gets the lat lon scale info.
+     *
+     * @return the lat lon scale info
+     */
+    public LatLonScaleInfo getLatLonScaleInfo() {
+        if (this.latLonScaleInfo == null) {
+            double[]        xRange = xMap.getRange();
+            double[]        yRange = yMap.getRange();
+            double[]        zRange = zMap.getRange();
+            EarthLocation   ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
+            EarthLocation   ur     = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
+            LatLonScaleInfo llsi   = new LatLonScaleInfo();
+
+            llsi.abscissaLabel     = "Latitude";
+            llsi.ordinateLabel     = "Longitude";
+            llsi.latBaseLabel      = round(ll.getLatitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
+            llsi.lonBaseLabel      = round(ll.getLongitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
+            llsi.latIncrement      = 10 + "";
+            llsi.latMinorIncrement = 1;
+            llsi.lonIncrement      = 10 + "";
+            llsi.lonMinorIncrement = 1;
+            llsi.xVisible          = true;
+            llsi.yVisible          = true;
+            latLonScaleInfo        = llsi;
+        }
+
+        return latLonScaleInfo;
+    }
+
+    /**
+     * Rounding convenience method.
+     *
+     * @param unrounded the unrounded
+     * @param precision the precision
+     * @param roundingMode the rounding mode
+     * @return the rounded value
+     */
+    private static double round(double unrounded, int precision, int roundingMode) {
+        BigDecimal bd      = new BigDecimal(unrounded);
+        BigDecimal rounded = bd.setScale(precision, roundingMode);
+
+        return rounded.doubleValue();
     }
 
     /**
@@ -1032,7 +1158,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double[]          aspect   = getDisplayAspect();
 
         // Misc.printArray("aspect", aspect);
-
         // We have to figure the component coordinates of the region.
         // To do this, we calculate the number of display units per pixel
         // in the x and y.  This logic comes from visad.MouseHelper.
@@ -1081,7 +1206,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         0.0, 0.0, 0.0);
 
         // printMatrix("trot", trot);
-
         // WLH 17 Aug 2000
         double[] xmat = behavior.make_translate(center_ray_x[0] - center_ray[0], center_ray_x[1] - center_ray[1],
                             center_ray_x[2] - center_ray[2]);
@@ -1109,7 +1233,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double ymul = trans[1];
 
         // System.out.println("Multipliers = " + xmul + "," + ymul);
-
         // make sure that we don't divide by 0 (happens if display
         // component is not yet on screen
         if ((Math.abs(xmul) > 0) && (Math.abs(ymul) > 0)) {
@@ -1159,7 +1282,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
                 // zoom out if this is a bigger region than the component
                 // System.out.println("zoom factor = " + zoom);
-
                 translate(transx, -transy);
                 zoom(zoom);
             }
@@ -1258,7 +1380,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
              *                  + "; use360 = " + use360 + "; adjust lons = "
              *                  + adjustLons);
              */
-
             displayLatitudeType = new DisplayRealType("ProjectionLat" + myInstance, true, -90.0, 90.0, 0.0,
                     CommonUnit.degree);
             displayLongitudeType = new DisplayRealType("ProjectionLon" + myInstance, true, minLon, maxLon, centerLon,
@@ -1269,8 +1390,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                               : -1.0;
 
             displayAltitudeType = new DisplayRealType("ProjectionAlt" + myInstance, true, -1.0, 1.0, defaultZ, null);
-            displayTupleType    = new DisplayTupleType(new DisplayRealType[] { displayLatitudeType,
-                    displayLongitudeType, displayAltitudeType }, coordinateSystem);
+            displayTupleType    = new DisplayTupleType(new DisplayRealType[] { displayLatitudeType, displayLongitudeType,
+                    displayAltitudeType }, coordinateSystem);
         }
 
         setSpatialScalarMaps();
@@ -1769,7 +1890,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
              *                  " xIndex = " + xIndex +
              *                  " yIndex = " + yIndex);
              */
-
             java.awt.geom.Rectangle2D bounds = mapProjection.getDefaultMapArea();
 
             /*
@@ -1916,7 +2036,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             t2 = theCoordinateSystem.fromReference(t2);
 
             // call2("mapProjection.fromReference", numpoints);
-
             if (t2 == null) {
                 throw new VisADException("MapProjection.toReference: " + "Can't do (lat,lon) to (x,y) transformation");
             }

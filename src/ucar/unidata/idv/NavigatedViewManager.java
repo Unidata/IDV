@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -31,6 +31,8 @@ import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.view.geoloc.LatLonScaleDialog;
+import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplayCursorReadout;
 import ucar.unidata.view.geoloc.NavigatedDisplayToolBar;
@@ -162,6 +164,9 @@ public abstract class NavigatedViewManager extends ViewManager {
 
     /** last vertical unit */
     private Unit lastVerticalRangeUnit;
+
+    /** lat/lon scale widget */
+    private LatLonScaleDialog latLonScaleWidget;
 
     /** start point */
     private Point mouseStartPoint;
@@ -367,7 +372,9 @@ public abstract class NavigatedViewManager extends ViewManager {
             return false;
         }
 
-        return vertScaleWidget.doApply();
+        return vertScaleWidget.doApply() && ((latLonScaleWidget != null)
+                ? latLonScaleWidget.doApply()
+                : true);
     }
 
     /**
@@ -378,8 +385,14 @@ public abstract class NavigatedViewManager extends ViewManager {
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
         vertScaleWidget = getViewpointControl().getVerticalScaleWidget();
-//        tabbedPane.add("Coordinate Scale", GuiUtils.topLeft(vertScaleWidget));
         tabbedPane.add("Vertical Scale", GuiUtils.topLeft(vertScaleWidget));
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
+
+            latLonScaleWidget = new LatLonScaleDialog(mpDisplay);
+            tabbedPane.add("Horizontal Scale", GuiUtils.topLeft(latLonScaleWidget));
+        }
     }
 
     /**
@@ -564,8 +577,7 @@ public abstract class NavigatedViewManager extends ViewManager {
 
             if ((mouseEvent.getClickCount() > 1) && mouseEvent.isShiftDown()) {
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
-                double[]         box        = navDisplay.getSpatialCoordinatesFromScreen(mouseEvent.getX(),
-                                                  mouseEvent.getY());
+                double[]         box        = navDisplay.getSpatialCoordinatesFromScreen(mouseEvent.getX(), mouseEvent.getY());
 
                 navDisplay.center(navDisplay.getEarthLocation(box));
             }

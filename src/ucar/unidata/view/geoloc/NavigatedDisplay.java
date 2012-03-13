@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -24,32 +24,19 @@ package ucar.unidata.view.geoloc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.awt.Color;
-import java.awt.event.InputEvent;
-import java.awt.geom.Rectangle2D;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.media.j3d.Transform3D;
-import javax.media.j3d.View;
-import javax.swing.JToolBar;
-import javax.vecmath.Point3d;
-import javax.vecmath.Quat4d;
-import javax.vecmath.Vector3d;
-
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.RubberBandBox;
 import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.GeopotentialAltitude;
+
 import visad.CommonUnit;
 import visad.CoordinateSystem;
 import visad.DisplayEvent;
@@ -65,9 +52,32 @@ import visad.ScalarMap;
 import visad.Unit;
 import visad.VisADException;
 import visad.VisADRay;
+
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
+
 import visad.java3d.DisplayRendererJ3D;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.Color;
+import java.awt.event.InputEvent;
+import java.awt.geom.Rectangle2D;
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.View;
+
+import javax.swing.JToolBar;
+
+import javax.vecmath.Point3d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 
 /**
  * Provides support for a navigated VisAD DisplayImplJ3D for
@@ -188,14 +198,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /** displayable for rubberbanding */
     private RubberBandBox rubberBandBox = null;
 
-    /** Lat / Lon Scale info */
-    private LatLonScaleInfo latLonScaleInfo = new LatLonScaleInfo();
-
     /** isAnimating */
     private boolean isAnimating = false;
 
     /** flag for clipping */
     private boolean clipping = false;    // clipping not enabled by default
+
+    /**
+     * Vertical range visible
+     */
+    private boolean verticalRangeVisible = true;
 
     /** flag for the visibility of the VisAD box */
     private boolean box;
@@ -1181,7 +1193,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             numSteps = Math.min(numSteps, 100);
 
             // System.err.println("     numSteps:" + numSteps);
-
             Quat4d q1 = new Quat4d();
             Quat4d q2 = new Quat4d();
 
@@ -1604,7 +1615,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[]           tpt    = getSpatialCoordinatesFromScreen(0, 0, -1);
 
         // System.err.println ("tpt:" + tpt[0] + " " + tpt[1]);
-
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
                 double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx], (int) ys[yidx], -1);
@@ -1684,7 +1694,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
                 // if(xs[xidx]==0)
                 // System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
-
                 if (pt[0] == pt[0]) {
                     if ((yidx == 0) || (pt[0] < left)) {
                         left = pt[0];
@@ -1908,8 +1917,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             double[]           rot           = { 0.0, 0.0, 0.0 };
             double[]           scale         = { 0.0 };
             double[]           xy            = getSpatialCoordinates(el, null);
-            double[]           centerXY      = getSpatialCoordinatesFromScreen(screenBounds.width / 2,
-                                                   screenBounds.height / 2);
+            double[]           centerXY      = getSpatialCoordinatesFromScreen(screenBounds.width / 2, screenBounds.height / 2);
 
             mouseBehavior.instance_unmake_matrix(rot, scale, trans, currentMatrix);
 
@@ -2305,23 +2313,21 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * Set the lat lon scale info
+     * Sets the vertical range visible.
      *
-     * @param latLonScaleInfo
-     * @throws RemoteException
-     * @throws VisADException
+     * @param visible the new vertical range visible
      */
-    public void setLatLonScaleInfo(LatLonScaleInfo latLonScaleInfo) throws RemoteException, VisADException {
-        this.latLonScaleInfo = latLonScaleInfo;
+    public void setVerticalRangeVisible(boolean visible) {
+        verticalRangeVisible = visible;
     }
 
     /**
-     * Get the lat lon scale info
+     * Gets the vertical range visible.
      *
-     * @return
+     * @return the vertical range visible
      */
-    public LatLonScaleInfo getLatLonScaleInfo() {
-        return latLonScaleInfo;
+    public boolean getVerticalRangeVisible() {
+        return verticalRangeVisible;
     }
 
     /**

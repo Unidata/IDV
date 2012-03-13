@@ -1,7 +1,6 @@
 /*
- * $Id: VertScaleInfo.java,v 1.6 2006/03/22 16:16:41 jeffmc Exp $
  *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -20,15 +19,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.view.geoloc;
 
+//~--- non-JDK imports --------------------------------------------------------
 
-
-import visad.Unit;
 import visad.CommonUnit;
-
-import ucar.unidata.util.Misc;
-
+import visad.Unit;
 
 /**
  * A class to hold vertical scale settings for a VisAD display from the
@@ -40,14 +38,17 @@ import ucar.unidata.util.Misc;
  */
 public class VertScaleInfo {
 
-    /** minimum range of the vertical scale */
-    public double minVertScale;
-
     /** maximum range of the vertical scale */
     public double maxVertScale;
 
+    /** minimum range of the vertical scale */
+    public double minVertScale;
+
     /** Units of the range values */
     public Unit unit;
+
+    /** Is visible */
+    public boolean visible;
 
     /**
      * Construct a <code>VertScaleInfo</code> with the specified range.
@@ -73,22 +74,70 @@ public class VertScaleInfo {
         this.unit         = unit;
     }
 
-    /**
-     * is equals
-     *
-     * @param obj object
-     *
-     * @return is equals
-     */
-    public boolean equals(Object obj) {
-        if ( !(obj instanceof VertScaleInfo)) {
-            return false;
-        }
-        VertScaleInfo that = (VertScaleInfo) obj;
-        return (this.minVertScale == that.minVertScale)
-               && (this.maxVertScale == that.maxVertScale)
-               && Misc.equals(this.unit, that.unit);
+    @Override
 
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode() {
+        final int prime  = 31;
+        int       result = 1;
+        long      temp;
+
+        temp   = Double.doubleToLongBits(maxVertScale);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp   = Double.doubleToLongBits(minVertScale);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((unit == null)
+                                   ? 0
+                                   : unit.hashCode());
+        result = prime * result + (visible
+                                   ? 1231
+                                   : 1237);
+
+        return result;
     }
 
+    @Override
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        VertScaleInfo other = (VertScaleInfo) obj;
+
+        if (Double.doubleToLongBits(maxVertScale) != Double.doubleToLongBits(other.maxVertScale)) {
+            return false;
+        }
+
+        if (Double.doubleToLongBits(minVertScale) != Double.doubleToLongBits(other.minVertScale)) {
+            return false;
+        }
+
+        if (unit == null) {
+            if (other.unit != null) {
+                return false;
+            }
+        } else if (!unit.equals(other.unit)) {
+            return false;
+        }
+
+        if (visible != other.visible) {
+            return false;
+        }
+
+        return true;
+    }
 }
