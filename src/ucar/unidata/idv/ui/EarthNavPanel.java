@@ -221,7 +221,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         JComponent addressPanel = GuiUtils.vbox(addressSearchBtn, addressBox);
         addressPanel = GuiUtils.inset(GuiUtils.top(addressPanel), 5);
         if (showAddress) {
-            add(BorderLayout.WEST, addressPanel);
+        //    add(BorderLayout.WEST, addressPanel);
         }
 
         initLocations();
@@ -271,55 +271,55 @@ public class EarthNavPanel extends JPanel implements MouseListener,
     }
 
     /** location in icon */
-    private static int width0 = 10;
+    private static int width0 = 20;
 
     /** location in icon */
-    private static int width1 = 18;
+    private static int width1 = 36;
 
     /** location in icon */
-    private static int width2 = 20;
+    private static int width2 = 40;
 
     /** location in icon */
-    private static int width3 = 32;
+    private static int width3 = 64;
 
     /** location in icon */
-    private static int topY1 = 33;
+    private static int topY1 = 70;
 
     /** location in icon */
-    private static int bottomY1 = 70;
+    private static int bottomY1 = 140;
 
     /** location in icon */
-    private static int zoomX = 20;
+    private static int zoomX = 40;
 
     /** location in icon */
-    private static int tiltX = 275;
+    private static int tiltX = 550;
 
     /** location in icon */
-    private static int rotateY = 23;
+    private static int rotateY = 46;
 
     /** location in icon */
-    private static int rotateLeftX = 66;
+    private static int rotateLeftX = 132;
 
     /** location in icon */
-    private static int rotateRightX = 227;
+    private static int rotateRightX = 454;
 
     /** location in icon */
-    private static int panLeftX = 117;
+    private static int panLeftX = 234;
 
     /** location in icon */
-    private static int panRightX = 174;
+    private static int panRightX = 348;
 
     /** location in icon */
-    private static int panHY = 53;
+    private static int panHY = 106;
 
     /** location in icon */
-    private static int panVX = 145;
+    private static int panVX = 290;
 
     /** location in icon */
-    private static int panUpY = 28;
+    private static int panUpY = 56;
 
     /** location in icon */
-    private static int panDownY = 78;
+    private static int panDownY = 156;
 
     /** location in icon */
     private Location pressed;
@@ -402,10 +402,10 @@ public class EarthNavPanel extends JPanel implements MouseListener,
 
 
 
-        locations.add(new Location(216, 86, 22,
+        locations.add(new Location(432, 172, 44,
                                    "action:" + MapViewManager.CMD_NAV_HOME));
 
-        locations.add(new Location(76, 73, width2, "action:none"));
+        locations.add(new Location(152, 146, width2, "action:none"));
     }
 
 
