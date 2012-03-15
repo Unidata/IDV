@@ -27,7 +27,7 @@ that is compiled to run on harpo and the like
  
 To generate the Jython library docs:
 
-cd ucar/unidata/idv/resources/python
-java ucar.unidata.idv.JythonManager *.py > inner.html
+cd ucar/unidata/idv/resources/jython
+java ucar.unidata.idv.JythonManager *.jy > inner.html
 
 Cut and paste inner.html into the tools/JythonLib.html user guide page.

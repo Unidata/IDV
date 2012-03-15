@@ -114,14 +114,15 @@
   <resources name="idv.resource.userchooser">
   </resources>
 
-  <!-- Python libraries   -->
+  <!-- Jython libraries   -->
   <resources name="idv.resource.jython">
   </resources>
 
 
-  <!--We don't use this now. Python libraries    -->
+  <!--We don't use this now. Python libraries
   <resources name="idv.resource.jythontocopy">
   </resources>
+  -->
 
   <!-- Holds an xml specification of the menu bar used in the guis  -->
   <resources name="idv.resource.menubar">

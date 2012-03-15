@@ -2,7 +2,7 @@
 ##################################################
 #This is an example jython script
 #Run this:
-#idv -islfile example.py
+#idv -islfile example.jy
 ##################################################
 
 

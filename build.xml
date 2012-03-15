@@ -647,7 +647,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.rbi"/>
             <include name="ucar/**/*.html"/>
             <include name="ucar/**/*.txt"/>
-            <include name="ucar/**/*.py"/>
+            <include name="ucar/**/*.jy"/>
             <include name="ucar/**/*.jnlp"/>
             <include name="ucar/**/*.defaults"/>
             <include name="ucar/**/*.gif"/>
@@ -721,7 +721,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.rbi"/>
             <include name="ucar/**/*.defaults"/>
             <include name="ucar/**/*.txt"/>
-            <include name="ucar/**/*.py"/>
+            <include name="ucar/**/*.jy"/>
             <include name="ucar/**/*.jnlp"/>
             <include name="ucar/**/*.gif"/>
             <include name="ucar/**/*.jpg"/>
@@ -778,7 +778,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
                   <include name="ucar/**/*.defaults"/>
                   <include name="ucar/**/*.txt"/>
                   <include name="ucar/**/*.html"/>
-                  <include name="ucar/**/*.py"/>
+                  <include name="ucar/**/*.jy"/>
                   <include name="ucar/**/*.jnlp"/>
                   <include name="ucar/**/*.gif"/>
                   <include name="ucar/**/*.jpg"/>
