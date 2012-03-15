@@ -434,93 +434,93 @@
   <resources name="idv.resource.jython">
     <resource
        label="User's library"
-       location="%USERPATH%/python/default.py"/>
+       location="%USERPATH%/jython/default.jy"/>
 
     <resource
-      location="%USERPATH%/python">
+      location="%USERPATH%/jython">
       <property
          name="category"
          value="Local Library"/>
     </resource>
     <resource
        label="Site library"
-       location="%SITEPATH%/default.py"/>
+       location="%SITEPATH%/default.jy"/>
     <resource
        label="Application library"
-       location="%APPPATH%/default.py"/>
+       location="%APPPATH%/default.jy"/>
     <resource
        label="Grid routines"
-       location="%IDVPATH%/python/grid.py">
+       location="%IDVPATH%/jython/grid.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Ensemble grid routines"
-       location="%IDVPATH%/python/ensemble.py">
+       location="%IDVPATH%/jython/ensemble.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Image routines"
-       location="%IDVPATH%/python/image.py">
+       location="%IDVPATH%/jython/image.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Shell utilities"
-       location="%IDVPATH%/python/shell.py">
+       location="%IDVPATH%/jython/shell.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Miscellaneous routines"
-       location="%IDVPATH%/python/misc.py">
+       location="%IDVPATH%/jython/misc.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Constants"
-       location="%IDVPATH%/python/constants.py">
+       location="%IDVPATH%/jython/constants.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Grid Diagnostics"
-       location="%IDVPATH%/python/griddiag.py">
+       location="%IDVPATH%/jython/griddiag.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Radar Diagnostics"
-       location="%IDVPATH%/python/radar.py">
+       location="%IDVPATH%/jython/radar.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Map routines"
-       location="%IDVPATH%/python/maps.py">
+       location="%IDVPATH%/jython/maps.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="Climatology Diagnostics"
-       location="%IDVPATH%/python/climate.py">
+       location="%IDVPATH%/jython/climate.jy">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
        label="ISL"
-       location="%IDVPATH%/isl.py">
+       location="%IDVPATH%/isl.jy">
       <property
          name="category"
          value="System"/>
@@ -530,7 +530,7 @@
      </resource>
     <resource
        label="Test routines"
-       location="%IDVPATH%/python/test.py">
+       location="%IDVPATH%/jython/test.jy">
       <property
          name="category"
          value="System"/>
@@ -540,11 +540,12 @@
      </resource>
   </resources>
 
-<!--We don't use this now. Python libraries     -->
+<!--We don't use this now. Python libraries     
   <resources name="idv.resource.jythontocopy">
     <resource location="/auxdata/jython/lib/subs.py"/>
     <resource location="/auxdata/jython/lib/graph.py"/>
   </resources>
+-->
 
 <!-- Holds an xml specification of the menu bar used in the guis   -->
   <resources name="idv.resource.menubar">
