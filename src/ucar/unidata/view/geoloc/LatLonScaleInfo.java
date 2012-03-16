@@ -22,10 +22,55 @@
 
 package ucar.unidata.view.geoloc;
 
+import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
+import ucar.unidata.view.geoloc.CoordinateFormat.DegMinSec;
+
 /**
  * Struct containing Latitude / Longitude scale information.
  */
 public class LatLonScaleInfo {
+	
+	public enum CoordSys {
+	    DDC("ex 40N"), 
+	    DDMMC("ex 40¡26'N"),
+	    DDMMSSC("ex 40¡26'13\"N"),;
+
+	    private final String coordSys;
+
+	    private CoordSys(final String coordSys) {
+	        this.coordSys = coordSys;
+	    }
+	    
+	    public String format(double i, Cardinality card){
+	    	switch (this) {
+	    	case DDC:
+	    		return CoordinateFormat.convert(i, 
+	    				new CoordinateFormat.CoordFormat(0, DegMinSec.DEGREE),
+	    				new CoordinateFormat.EmptyFormat(),
+	    				new CoordinateFormat.EmptyFormat(),card);
+	    	case DDMMC:
+	    		return CoordinateFormat.convert(i, 
+	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
+	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
+	    				new CoordinateFormat.EmptyFormat(),card);
+	    	case DDMMSSC:
+	    		return CoordinateFormat.convert(i, 
+	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
+	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
+	    				new CoordinateFormat.CoordFormat( DegMinSec.SECOND),card);
+			default:
+	    		return CoordinateFormat.convert(i, 
+	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
+	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
+	    				new CoordinateFormat.CoordFormat( DegMinSec.SECOND),card);
+	    	}
+	    }
+
+	    @Override
+	    public String toString() {
+	        return coordSys;
+	    }
+	}
 
     /** The abscissa label. */
     public String abscissaLabel;
@@ -57,132 +102,93 @@ public class LatLonScaleInfo {
     /** Is y axis visible */
     public boolean yVisible;
 
+	public LatLonScaleInfo.CoordSys coordFormat;
+
     /**
      * Instantiates a new lat lon scale info.
      */
     public LatLonScaleInfo() {}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        final int prime  = 31;
-        int       result = 1;
+  /**
+  * {@inheritDoc}
+  */
+ @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((abscissaLabel == null) ? 0 : abscissaLabel.hashCode());
+		result = prime * result
+				+ ((coordFormat == null) ? 0 : coordFormat.hashCode());
+		result = prime * result
+				+ ((latBaseLabel == null) ? 0 : latBaseLabel.hashCode());
+		result = prime * result
+				+ ((latIncrement == null) ? 0 : latIncrement.hashCode());
+		result = prime * result + latMinorIncrement;
+		result = prime * result
+				+ ((lonBaseLabel == null) ? 0 : lonBaseLabel.hashCode());
+		result = prime * result
+				+ ((lonIncrement == null) ? 0 : lonIncrement.hashCode());
+		result = prime * result + lonMinorIncrement;
+		result = prime * result
+				+ ((ordinateLabel == null) ? 0 : ordinateLabel.hashCode());
+		result = prime * result + (xVisible ? 1231 : 1237);
+		result = prime * result + (yVisible ? 1231 : 1237);
+		return result;
+	}
 
-        result = prime * result + ((abscissaLabel == null)
-                                   ? 0
-                                   : abscissaLabel.hashCode());
-        result = prime * result + ((latBaseLabel == null)
-                                   ? 0
-                                   : latBaseLabel.hashCode());
-        result = prime * result + ((latIncrement == null)
-                                   ? 0
-                                   : latIncrement.hashCode());
-        result = prime * result + latMinorIncrement;
-        result = prime * result + ((lonBaseLabel == null)
-                                   ? 0
-                                   : lonBaseLabel.hashCode());
-        result = prime * result + ((lonIncrement == null)
-                                   ? 0
-                                   : lonIncrement.hashCode());
-        result = prime * result + lonMinorIncrement;
-        result = prime * result + ((ordinateLabel == null)
-                                   ? 0
-                                   : ordinateLabel.hashCode());
-        result = prime * result + (xVisible
-                                   ? 1231
-                                   : 1237);
-        result = prime * result + (yVisible
-                                   ? 1231
-                                   : 1237);
-
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        LatLonScaleInfo other = (LatLonScaleInfo) obj;
-
-        if (abscissaLabel == null) {
-            if (other.abscissaLabel != null) {
-                return false;
-            }
-        } else if (!abscissaLabel.equals(other.abscissaLabel)) {
-            return false;
-        }
-
-        if (latBaseLabel == null) {
-            if (other.latBaseLabel != null) {
-                return false;
-            }
-        } else if (!latBaseLabel.equals(other.latBaseLabel)) {
-            return false;
-        }
-
-        if (latIncrement == null) {
-            if (other.latIncrement != null) {
-                return false;
-            }
-        } else if (!latIncrement.equals(other.latIncrement)) {
-            return false;
-        }
-
-        if (latMinorIncrement != other.latMinorIncrement) {
-            return false;
-        }
-
-        if (lonBaseLabel == null) {
-            if (other.lonBaseLabel != null) {
-                return false;
-            }
-        } else if (!lonBaseLabel.equals(other.lonBaseLabel)) {
-            return false;
-        }
-
-        if (lonIncrement == null) {
-            if (other.lonIncrement != null) {
-                return false;
-            }
-        } else if (!lonIncrement.equals(other.lonIncrement)) {
-            return false;
-        }
-
-        if (lonMinorIncrement != other.lonMinorIncrement) {
-            return false;
-        }
-
-        if (ordinateLabel == null) {
-            if (other.ordinateLabel != null) {
-                return false;
-            }
-        } else if (!ordinateLabel.equals(other.ordinateLabel)) {
-            return false;
-        }
-
-        if (xVisible != other.xVisible) {
-            return false;
-        }
-
-        if (yVisible != other.yVisible) {
-            return false;
-        }
-
-        return true;
-    }
+  /**
+  * {@inheritDoc}
+  */
+ @Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LatLonScaleInfo other = (LatLonScaleInfo) obj;
+		if (abscissaLabel == null) {
+			if (other.abscissaLabel != null)
+				return false;
+		} else if (!abscissaLabel.equals(other.abscissaLabel))
+			return false;
+		if (coordFormat != other.coordFormat)
+			return false;
+		if (latBaseLabel == null) {
+			if (other.latBaseLabel != null)
+				return false;
+		} else if (!latBaseLabel.equals(other.latBaseLabel))
+			return false;
+		if (latIncrement == null) {
+			if (other.latIncrement != null)
+				return false;
+		} else if (!latIncrement.equals(other.latIncrement))
+			return false;
+		if (latMinorIncrement != other.latMinorIncrement)
+			return false;
+		if (lonBaseLabel == null) {
+			if (other.lonBaseLabel != null)
+				return false;
+		} else if (!lonBaseLabel.equals(other.lonBaseLabel))
+			return false;
+		if (lonIncrement == null) {
+			if (other.lonIncrement != null)
+				return false;
+		} else if (!lonIncrement.equals(other.lonIncrement))
+			return false;
+		if (lonMinorIncrement != other.lonMinorIncrement)
+			return false;
+		if (ordinateLabel == null) {
+			if (other.ordinateLabel != null)
+				return false;
+		} else if (!ordinateLabel.equals(other.ordinateLabel))
+			return false;
+		if (xVisible != other.xVisible)
+			return false;
+		if (yVisible != other.yVisible)
+			return false;
+		return true;
+	}
 }
