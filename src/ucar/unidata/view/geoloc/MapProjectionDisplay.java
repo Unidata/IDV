@@ -481,10 +481,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             base = bottom;
         }
 
-        // Labeling extremities
-        labelTable.put(new Double(maxmin[0]), labelFormat.format(bottom));
-        labelTable.put(new Double(maxmin[1]), labelFormat.format(top));
-
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = absicca
                                     ? getLatLonScaleInfo().latMinorIncrement
@@ -858,7 +854,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             llsi.lonMinorIncrement = 1;
             llsi.xVisible          = true;
             llsi.yVisible          = true;
-            llsi.coordFormat       = CoordSys.DDC;
+            llsi.coordFormat       = CoordSys.A;
             latLonScaling();
         }
         return latLonScaleInfo;

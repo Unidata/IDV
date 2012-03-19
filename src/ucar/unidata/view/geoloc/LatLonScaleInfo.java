@@ -22,58 +22,25 @@
 
 package ucar.unidata.view.geoloc;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
+import ucar.unidata.view.geoloc.CoordinateFormat.DecimalCoordFormat;
 import ucar.unidata.view.geoloc.CoordinateFormat.DegMinSec;
+import ucar.unidata.view.geoloc.CoordinateFormat.FloorCoordFormat;
+
+import static ucar.unidata.view.geoloc.CoordinateFormat.EMPTY_FORMAT;
 
 /**
  * Struct containing Latitude / Longitude scale information.
  */
 public class LatLonScaleInfo {
-	
-	public enum CoordSys {
-	    DDC("ex 40N"), 
-	    DDMMC("ex 40¡26'N"),
-	    DDMMSSC("ex 40¡26'13\"N"),;
-
-	    private final String coordSys;
-
-	    private CoordSys(final String coordSys) {
-	        this.coordSys = coordSys;
-	    }
-	    
-	    public String format(double i, Cardinality card){
-	    	switch (this) {
-	    	case DDC:
-	    		return CoordinateFormat.convert(i, 
-	    				new CoordinateFormat.CoordFormat(0, DegMinSec.DEGREE),
-	    				new CoordinateFormat.EmptyFormat(),
-	    				new CoordinateFormat.EmptyFormat(),card);
-	    	case DDMMC:
-	    		return CoordinateFormat.convert(i, 
-	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
-	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
-	    				new CoordinateFormat.EmptyFormat(),card);
-	    	case DDMMSSC:
-	    		return CoordinateFormat.convert(i, 
-	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
-	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
-	    				new CoordinateFormat.CoordFormat( DegMinSec.SECOND),card);
-			default:
-	    		return CoordinateFormat.convert(i, 
-	    				new CoordinateFormat.CoordFormat( DegMinSec.DEGREE),
-	    				new CoordinateFormat.CoordFormat( DegMinSec.MINUTE),
-	    				new CoordinateFormat.CoordFormat( DegMinSec.SECOND),card);
-	    	}
-	    }
-
-	    @Override
-	    public String toString() {
-	        return coordSys;
-	    }
-	}
 
     /** The abscissa label. */
     public String abscissaLabel;
+
+    /** The coord format. */
+    public LatLonScaleInfo.CoordSys coordFormat;
 
     /** The latitude base label. */
     public String latBaseLabel;
@@ -81,7 +48,7 @@ public class LatLonScaleInfo {
     /** The latitude increment. */
     public String latIncrement;
 
-    /** Latitude minor increment */
+    /** Latitude minor increment. */
     public int latMinorIncrement;
 
     /** The longitude base label. */
@@ -90,29 +57,127 @@ public class LatLonScaleInfo {
     /** The longitude increment. */
     public String lonIncrement;
 
-    /** Longitude minor increment */
+    /** Longitude minor increment. */
     public int lonMinorIncrement;
 
     /** The ordinate label. */
     public String ordinateLabel;
 
-    /** Is x axis visible */
+    /** Is x axis visible. */
     public boolean xVisible;
 
-    /** Is y axis visible */
+    /** Is y axis visible. */
     public boolean yVisible;
-
-	public LatLonScaleInfo.CoordSys coordFormat;
 
     /**
      * Instantiates a new lat lon scale info.
      */
     public LatLonScaleInfo() {}
 
-  /**
-  * {@inheritDoc}
-  */
- @Override
+    /**
+     * The Enum CoordSys.
+     */
+    public enum CoordSys {
+
+        /** The A. */
+        A("ex 51¡N"),
+
+        /** The B. */
+        B("ex 51¡28'N"),
+
+        /** The C. */
+        C("ex 51¡27.635'N"),
+
+        /** The D. */
+        D("ex 51¡27'38\"N"),
+
+        /** The E. */
+        E("ex 51:28N"),
+
+        /** The F. */
+        F("ex 51:27:38N"),
+
+        /** The G. */
+        G("ex 51:27:38.11536N"),
+
+        /** The H. */
+        H("ex 51.46059");
+
+        /** The coord sys. */
+        private final String coordSys;
+
+        /**
+         * Instantiates a new coord sys.
+         *
+         * @param coordSys the coord sys
+         */
+        private CoordSys(final String coordSys) {
+            this.coordSys = coordSys;
+        }
+
+        /**
+         * Format.
+         *
+         * @param i the i
+         * @param card the card
+         * @return the string
+         */
+        public String format(double i, Cardinality card) {
+            switch (this) {
+            case A :
+                return CoordinateFormat.convert(i, new DecimalCoordFormat(0, DegMinSec.DEGREE), EMPTY_FORMAT,
+                                                EMPTY_FORMAT, card);
+
+            case B :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.DEGREE),
+                                                new DecimalCoordFormat(0, DegMinSec.MINUTE), EMPTY_FORMAT, card);
+
+            case C :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.DEGREE),
+                                                new DecimalCoordFormat(3, DegMinSec.MINUTE), EMPTY_FORMAT, card);
+
+            case D :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.COLON),
+                                                new DecimalCoordFormat(0, DegMinSec.NONE), EMPTY_FORMAT, card);
+
+            case E :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.COLON),
+                                                new DecimalCoordFormat(0, DegMinSec.NONE), EMPTY_FORMAT, card);
+
+            case F :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.COLON),
+                                                new FloorCoordFormat(DegMinSec.COLON),
+                                                new DecimalCoordFormat(0, DegMinSec.NONE), card);
+
+            case G :
+                return CoordinateFormat.convert(i, new FloorCoordFormat(DegMinSec.COLON),
+                                                new FloorCoordFormat(DegMinSec.COLON),
+                                                new DecimalCoordFormat(5, DegMinSec.NONE), card);
+
+            case H :
+                return CoordinateFormat.convert(i, new DecimalCoordFormat(5, DegMinSec.NONE), EMPTY_FORMAT,
+                                                EMPTY_FORMAT, card);
+
+            default :
+                return CoordinateFormat.convert(i, new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.DEGREE),
+                                                new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.MINUTE),
+                                                new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.SECOND), card);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return coordSys;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -137,10 +202,10 @@ public class LatLonScaleInfo {
 		return result;
 	}
 
-  /**
-  * {@inheritDoc}
-  */
- @Override
+    /**
+     * {@inheritDoc}
+     */
+    @Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -191,4 +256,5 @@ public class LatLonScaleInfo {
 			return false;
 		return true;
 	}
+
 }
