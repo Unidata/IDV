@@ -3808,8 +3808,8 @@ public class DerivedGridFactory {
         FieldImpl         pwFI = future2.get();
         FieldImpl         sFI  = future3.get();
 
-        System.out.println("Time used to read = "
-                + (System.currentTimeMillis() - start) / 1000.0);
+        //System.out.println("Time used to read = "
+        //        + (System.currentTimeMillis() - start) / 1000.0);
         start    = System.currentTimeMillis();
         /*
         FieldImpl         uFI       = (FieldImpl)uFI0.clone(); //future.get();
@@ -3934,8 +3934,8 @@ public class DerivedGridFactory {
                           new SingletonSet(new RealTuple(new Real[] {
                               endTime })));
         fi.setSample(0, mergedTracks, false);
-        System.out.println("Time used to compute = "
-                           + (System.currentTimeMillis() - start) / 1000.0);
+        //System.out.println("Time used to compute = "
+        //                   + (System.currentTimeMillis() - start) / 1000.0);
         return fi;
 
 
