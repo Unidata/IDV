@@ -622,6 +622,20 @@ public class MapDisplayControl extends DisplayControlImpl {
         setDisplayActive();
     }
 
+    /**
+     * set the visible of the given MapStates
+     *
+     * @param visible
+     */
+    public void setVisible(boolean visible) {
+        if(mapStates != null && mapStates.size() > 0) {
+            int len = mapStates.size();
+            for(int i = 0; i < len; i=i+1) {
+                MapState ms = mapStates.get(i);
+                ms.setVisible(visible);
+            }
+        }
+    }
 
     /**
      * Add the  relevant view menu items into the list
