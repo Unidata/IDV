@@ -30,21 +30,21 @@ public class CoordinateFormatTest {
     public void testDecodeLatLonsString() {
         @SuppressWarnings("serial") final Map<String, String> map = new HashMap<String, String>() {
             {
-                put("0¡",
+                put("0 ",
                     CoordinateFormat.convert(0, new DecimalCoordFormat(0, DegMinSec.DEGREE), EMPTY_FORMAT,
                                              EMPTY_FORMAT, Cardinality.NONE));
-                put("51¡N",
+                put("51 N",
                     CoordinateFormat.convert(51.4605876, new DecimalCoordFormat(0, DegMinSec.DEGREE), EMPTY_FORMAT,
                                              EMPTY_FORMAT, Cardinality.NORTH));
-                put("51¡28'N",
+                put("51 28'N",
                     CoordinateFormat.convert(51.4605876, new FloorCoordFormat(DegMinSec.DEGREE),
                                              new DecimalCoordFormat(0, DegMinSec.MINUTE), EMPTY_FORMAT,
                                              Cardinality.NORTH));
-                put("51¡27.635'N",
+                put("51 27.635'N",
                     CoordinateFormat.convert(51.4605876, new FloorCoordFormat(DegMinSec.DEGREE),
                                              new DecimalCoordFormat(3, DegMinSec.MINUTE), EMPTY_FORMAT,
                                              Cardinality.NORTH));
-                put("51¡27'38\"N",
+                put("51 27'38\"N",
                     CoordinateFormat.convert(51.4605876, new FloorCoordFormat(DegMinSec.DEGREE),
                                              new FloorCoordFormat(DegMinSec.MINUTE),
                                              new DecimalCoordFormat(0, DegMinSec.SECOND), Cardinality.NORTH));

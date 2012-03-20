@@ -24,36 +24,6 @@ package ucar.unidata.view.geoloc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -65,12 +35,14 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
 import ucar.unidata.view.geoloc.LatLonScaleInfo.CoordSys;
+
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.MapLines;
 import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
+
 import visad.AxisScale;
 import visad.CachingCoordinateSystem;
 import visad.CommonUnit;
@@ -95,12 +67,52 @@ import visad.Unit;
 import visad.UnitException;
 import visad.VisADException;
 import visad.VisADRay;
+
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.BaseMapAdapter;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import java.math.BigDecimal;
+
+import java.net.URL;
+
+import java.rmi.RemoteException;
+
+import java.text.DecimalFormat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 /**
  * Provides a navigated VisAD DisplayImpl for displaying data.
@@ -428,7 +440,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (latScale != null) {
-            latScale.setVisible(getLatLonScaleInfo().xVisible);
+            latScale.setVisible(getLatLonScaleInfo().yVisible);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation ur = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
@@ -437,14 +449,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         if (lonScale != null) {
-            lonScale.setVisible(getLatLonScaleInfo().yVisible);
+            lonScale.setVisible(getLatLonScaleInfo().xVisible);
 
             EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation lr = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
-            
-            //Crossing the meridian so split into two
-            updateLatLonScale(lonScale, getLatLonScaleInfo().abscissaLabel, xRange, ll, lr, false);
 
+            updateLatLonScale(lonScale, getLatLonScaleInfo().abscissaLabel, xRange, ll, lr, false);
         }
 
         setDisplayActive();
@@ -477,6 +487,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                : getLatLonScaleInfo().lonBaseLabel;
         double    base       = Double.parseDouble(baseLabel);
 
+        // In case user inputs something bogus.
         if ((base < bottom) || (base > top)) {
             base = bottom;
         }
@@ -494,50 +505,56 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                           : getLatLonScaleInfo().lonIncrement;
         double inc      = Double.parseDouble(incLabel);
         int    cnt      = 0;
-        
-        //Need to do the following to deal with crossing the meridian in Northern Hemisphere only!
+
+        // Need to do the following to deal with crossing the meridian in Northern Hemisphere only!
         List<Double> increment = new LinkedList<Double>();
+
         if (base < top) {
             for (double i = base; i < top; i += inc / minorTickInc) {
-            	increment.add(i);
+                increment.add(i);
             }
         } else {
-            for (double i = base; i <  top + 360; i += inc / minorTickInc) {
-            	increment.add(i > 360 ? (i - 360) : i);
+            for (double i = base; i < top + 360; i += inc / minorTickInc) {    // TODO: Assuming too much here.
+                increment.add((i > 360)
+                              ? (i - 360)
+                              : i);
             }
         }
-        
+
         for (Double i : increment) {
             EarthLocationTuple elt    = absicca
                                         ? new EarthLocationTuple(i, left.getLongitude().getValue(), 0)
                                         : new EarthLocationTuple(right.getLatitude().getValue(), i, 0);
-            double[]           values = newton(elt, absicca);
+            double[]           values = newton(elt, absicca, 0);
             Double             d      = new Double(values[absicca
                     ? 1
                     : 0]);
 
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
+
                 LatLonScaleInfo.CoordSys coordSys = latLonScaleInfo.coordFormat;
-                if (absicca && i > 0) {
+
+                if (absicca && (i > 0)) {
                     labelTable.put(d, coordSys.format(i, Cardinality.NORTH));
-                } else if (absicca && i < 0) {
+                } else if (absicca && (i < 0)) {
                     labelTable.put(d, coordSys.format(Math.abs(i), Cardinality.SOUTH));
-                } else if (!absicca && i > 0 && i <= 180) {
+                } else if (!absicca && (i > 0) && (i <= 180)) {
                     labelTable.put(d, coordSys.format(i, Cardinality.EAST));
-                } else if (!absicca && i > 180 && i < 360) {
-                    labelTable.put(d, coordSys.format(360-i, Cardinality.WEST));
-                } else if (!absicca && i < 0 ) {
+                } else if (!absicca && (i > 180) && (i < 360)) {
+                    labelTable.put(d, coordSys.format(360 - i, Cardinality.WEST));
+                } else if (!absicca && (i < 0)) {
                     labelTable.put(d, coordSys.format(Math.abs(i), Cardinality.WEST));
-                } else  {
+                } else {
                     labelTable.put(d, coordSys.format(i, Cardinality.NONE));
                 }
             } else {
                 minorTicks.add(d);
             }
+
             cnt++;
         }
-        
+
         majorTicks.add(1.0);
 
         double[] mjt = new double[majorTicks.size()];
@@ -568,13 +585,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @param elt the earth location tuple.
      * @param absicca is it the absicca or the ordinate
+     * @param cnt must maintain a count in case of numerical problems
      * @return the spatial coordinates
      * @throws RemoteException the remote exception
      * @throws VisADException the vis ad exception
      */
-    private double[] newton(EarthLocationTuple elt, boolean absicca) throws RemoteException, VisADException {
-
-        // TODO: There could be some problems here if the solution does not converge. Could implement a safety valve.
+    private double[] newton(EarthLocationTuple elt, boolean absicca, int cnt) throws RemoteException, VisADException {
         double[] values = getSpatialCoordinates(elt).getValues();
 
         values[absicca
@@ -586,7 +602,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                       ? el.getLatitude().getValue() - elt.getLatitude().getValue()
                                       : el.getLongitude().getValue() - elt.getLongitude().getValue());
 
-        if (diff < 0.02) {
+        if ((diff < 0.02) || (cnt > 10)) {    // cnt > 10 in case solution does not converge. Safety valve.
             return getSpatialCoordinates(el).getValues();
         } else {
             EarthLocationTuple t = absicca
@@ -595,7 +611,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                    : new EarthLocationTuple(el.getLatitude().getValue(),
                                        el.getLongitude().getValue() + diff, 0);
 
-            return newton(t, absicca);
+            return newton(t, absicca, ++cnt);
         }
     }
 
@@ -843,9 +859,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     public LatLonScaleInfo getLatLonScaleInfo() {
         if (this.latLonScaleInfo == null) {
-            LatLonScaleInfo llsi   = new LatLonScaleInfo();
-            latLonScaleInfo        = llsi;
+            LatLonScaleInfo llsi = new LatLonScaleInfo();
 
+            latLonScaleInfo        = llsi;
             llsi.abscissaLabel     = "Latitude";
             llsi.ordinateLabel     = "Longitude";
             llsi.latIncrement      = 10 + "";
@@ -855,21 +871,27 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             llsi.xVisible          = true;
             llsi.yVisible          = true;
             llsi.coordFormat       = CoordSys.A;
-            latLonScaling();
         }
+
+        latLonScaling();
+
         return latLonScaleInfo;
     }
 
-	private void latLonScaling() {
-		if (latLonScaleInfo != null) {
-			double[]        xRange = xMap.getRange();
-			double[]        yRange = yMap.getRange();
-			double[]        zRange = zMap.getRange();
-			EarthLocation   ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-			latLonScaleInfo.latBaseLabel      = round(ll.getLatitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
-			latLonScaleInfo.lonBaseLabel      = round(ll.getLongitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
-		}
-	}
+    /**
+     * Resetting some lat/lon info before projection changes.
+     */
+    private void latLonScaling() {
+        if (latLonScaleInfo != null) {
+            double[]      xRange = xMap.getRange();
+            double[]      yRange = yMap.getRange();
+            double[]      zRange = zMap.getRange();
+            EarthLocation ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
+
+            latLonScaleInfo.latBaseLabel = round(ll.getLatitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
+            latLonScaleInfo.lonBaseLabel = round(ll.getLongitude().getValue(), 1, BigDecimal.ROUND_HALF_UP) + "";
+        }
+    }
 
     /**
      * Rounding convenience method.
@@ -1048,13 +1070,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws  RemoteException        Couldn't create a remote object
      */
     public void setMapProjection(MapProjection mapProjection) throws VisADException, RemoteException {
-    	
-    	latLonScaling();
-    	
+        latLonScaling();
+
         if (mapProjection.equals(this.mapProjection)) {
             return;
         }
-        
+
         this.mapProjection = mapProjection;
         coordinateSystem   = makeCoordinateSystem(mapProjection);
         resetMapParameters();

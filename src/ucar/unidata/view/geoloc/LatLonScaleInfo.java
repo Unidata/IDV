@@ -80,16 +80,16 @@ public class LatLonScaleInfo {
     public enum CoordSys {
 
         /** The A. */
-        A("ex 51¡N"),
+        A("ex 51 N"),
 
         /** The B. */
-        B("ex 51¡28'N"),
+        B("ex 51 28'N"),
 
         /** The C. */
-        C("ex 51¡27.635'N"),
+        C("ex 51 27.635'N"),
 
         /** The D. */
-        D("ex 51¡27'38\"N"),
+        D("ex 51 27'38\"N"),
 
         /** The E. */
         E("ex 51:28N"),
