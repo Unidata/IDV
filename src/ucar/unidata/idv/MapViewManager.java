@@ -3289,9 +3289,9 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The flag value
      */
     public boolean getUseProjectionFromData() {
-        if ( !isInteractive()) {
-            return true;
-        }
+     //   if ( !isInteractive()) {
+     //       return true;
+     //   }
         return getBp(PREF_PROJ_USEFROMDATA);
     }
 
