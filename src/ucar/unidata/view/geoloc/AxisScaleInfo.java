@@ -32,47 +32,33 @@ import ucar.unidata.view.geoloc.CoordinateFormat.FloorCoordFormat;
 import static ucar.unidata.view.geoloc.CoordinateFormat.EMPTY_FORMAT;
 
 /**
- * Struct containing Latitude / Longitude scale information.
+ * Struct containing axis scale information.
  */
-public class LatLonScaleInfo {
+public class AxisScaleInfo {
 
-    /** The abscissa label. */
-    public String abscissaLabel;
+	/** The axis label. */
+    public String label;
 
     /** The coord format. */
-    public LatLonScaleInfo.CoordSys coordFormat;
+    public AxisScaleInfo.CoordSys coordFormat;
 
-    /** The latitude base label. */
-    public String latBaseLabel;
+    /** The base label. */
+    public String baseLabel;
 
-    /** The latitude increment. */
-    public String latIncrement;
+    /** The  increment. */
+    public String increment;
 
-    /** Latitude minor increment. */
-    public int latMinorIncrement;
+    /** Minor increment. */
+    public int minorIncrement;
 
-    /** The longitude base label. */
-    public String lonBaseLabel;
-
-    /** The longitude increment. */
-    public String lonIncrement;
-
-    /** Longitude minor increment. */
-    public int lonMinorIncrement;
-
-    /** The ordinate label. */
-    public String ordinateLabel;
-
-    /** Is x axis visible. */
-    public boolean xVisible;
-
-    /** Is y axis visible. */
-    public boolean yVisible;
+    /** Is axis visible. */
+    public boolean visible;
 
     /**
      * Instantiates a new lat lon scale info.
      */
-    public LatLonScaleInfo() {}
+    public AxisScaleInfo() {}
+    
 
     /**
      * The Enum CoordSys.
@@ -174,38 +160,25 @@ public class LatLonScaleInfo {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((abscissaLabel == null) ? 0 : abscissaLabel.hashCode());
+				+ ((baseLabel == null) ? 0 : baseLabel.hashCode());
 		result = prime * result
 				+ ((coordFormat == null) ? 0 : coordFormat.hashCode());
 		result = prime * result
-				+ ((latBaseLabel == null) ? 0 : latBaseLabel.hashCode());
-		result = prime * result
-				+ ((latIncrement == null) ? 0 : latIncrement.hashCode());
-		result = prime * result + latMinorIncrement;
-		result = prime * result
-				+ ((lonBaseLabel == null) ? 0 : lonBaseLabel.hashCode());
-		result = prime * result
-				+ ((lonIncrement == null) ? 0 : lonIncrement.hashCode());
-		result = prime * result + lonMinorIncrement;
-		result = prime * result
-				+ ((ordinateLabel == null) ? 0 : ordinateLabel.hashCode());
-		result = prime * result + (xVisible ? 1231 : 1237);
-		result = prime * result + (yVisible ? 1231 : 1237);
+				+ ((increment == null) ? 0 : increment.hashCode());
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + minorIncrement;
+		result = prime * result + (visible ? 1231 : 1237);
 		return result;
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -213,48 +186,28 @@ public class LatLonScaleInfo {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LatLonScaleInfo other = (LatLonScaleInfo) obj;
-		if (abscissaLabel == null) {
-			if (other.abscissaLabel != null)
+		AxisScaleInfo other = (AxisScaleInfo) obj;
+		if (baseLabel == null) {
+			if (other.baseLabel != null)
 				return false;
-		} else if (!abscissaLabel.equals(other.abscissaLabel))
+		} else if (!baseLabel.equals(other.baseLabel))
 			return false;
 		if (coordFormat != other.coordFormat)
 			return false;
-		if (latBaseLabel == null) {
-			if (other.latBaseLabel != null)
+		if (increment == null) {
+			if (other.increment != null)
 				return false;
-		} else if (!latBaseLabel.equals(other.latBaseLabel))
+		} else if (!increment.equals(other.increment))
 			return false;
-		if (latIncrement == null) {
-			if (other.latIncrement != null)
+		if (label == null) {
+			if (other.label != null)
 				return false;
-		} else if (!latIncrement.equals(other.latIncrement))
+		} else if (!label.equals(other.label))
 			return false;
-		if (latMinorIncrement != other.latMinorIncrement)
+		if (minorIncrement != other.minorIncrement)
 			return false;
-		if (lonBaseLabel == null) {
-			if (other.lonBaseLabel != null)
-				return false;
-		} else if (!lonBaseLabel.equals(other.lonBaseLabel))
-			return false;
-		if (lonIncrement == null) {
-			if (other.lonIncrement != null)
-				return false;
-		} else if (!lonIncrement.equals(other.lonIncrement))
-			return false;
-		if (lonMinorIncrement != other.lonMinorIncrement)
-			return false;
-		if (ordinateLabel == null) {
-			if (other.ordinateLabel != null)
-				return false;
-		} else if (!ordinateLabel.equals(other.ordinateLabel))
-			return false;
-		if (xVisible != other.xVisible)
-			return false;
-		if (yVisible != other.yVisible)
+		if (visible != other.visible)
 			return false;
 		return true;
 	}
-
 }

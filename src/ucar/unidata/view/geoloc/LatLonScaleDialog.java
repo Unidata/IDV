@@ -27,7 +27,7 @@ package ucar.unidata.view.geoloc;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.view.geoloc.LatLonScaleInfo.CoordSys;
+import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -51,9 +51,7 @@ import javax.swing.SpinnerNumberModel;
  * @author   IDV Development Team
  */
 public class LatLonScaleDialog extends JPanel implements ActionListener {
-
-    /** Abscissa (x-axis) Label */
-    private JTextField abscissaLabel;
+    private JComboBox coordFormat;
 
     /** Latitude base label */
     private JTextField latBaseLabel;
@@ -61,11 +59,14 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
     /** Latitude increment */
     private JTextField latIncrement;
 
-    /** Lat lon scale info */
-    private LatLonScaleInfo latLonScaleInfo;
+    /** Lat (y-axis) Label */
+    private JTextField latLabel;
 
     /** Latitude minor increment */
     private JSpinner latMinorSpinner;
+
+    /** Lat scale info */
+    private AxisScaleInfo latScaleInfo;
 
     /** Longitude base label */
     private JTextField lonBaseLabel;
@@ -73,17 +74,20 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
     /** Longitude increment */
     private JTextField lonIncrement;
 
+    /** Lon (x-axis) Label */
+    private JTextField lonLabel;
+
     /** Longitude minor increment */
-    private JSpinner             lonMinorSpinner;
-    
+    private JSpinner lonMinorSpinner;
+
+    /** Lon scale info */
+    private AxisScaleInfo lonScaleInfo;
+
     /** Map projection display */
     private MapProjectionDisplay mpDisplay;
 
     /** flag for whether the user hit cancel or not */
     private boolean ok;
-
-    /** Ordinate (y-axis) Label */
-    private JTextField ordinateLabel;
 
     /** The frame parent */
     JFrame parent;
@@ -93,17 +97,16 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
 
     /** y axis visible */
     private JCheckBox yVisible;
-    
-    private JComboBox coordFormat;
 
     /**
      * Create a new dialog for setting the coordinate range of the display
      *
      */
     public LatLonScaleDialog(MapProjectionDisplay mpDisplay) {
-        this.mpDisplay       = mpDisplay;
-        this.parent          = GuiUtils.getFrame(mpDisplay.getComponent());
-        this.latLonScaleInfo = mpDisplay.getLatLonScaleInfo();
+        this.mpDisplay    = mpDisplay;
+        this.parent       = GuiUtils.getFrame(mpDisplay.getComponent());
+        this.latScaleInfo = mpDisplay.getLatScaleInfo();
+        this.lonScaleInfo = mpDisplay.getLonScaleInfo();
         doMakeContents();
     }
 
@@ -115,8 +118,8 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Abscissa (x-axis) Label: "), abscissaLabel = new JTextField(""),
-            GuiUtils.rLabel("Ordinate (y-axis) Label: "), ordinateLabel = new JTextField(""),
+            GuiUtils.rLabel("Longitude (x-axis) Label: "), lonLabel = new JTextField(""),
+            GuiUtils.rLabel("Latitude (y-axis) Label: "), latLabel = new JTextField(""),
             GuiUtils.rLabel("Latitude Base: "), latBaseLabel = new JTextField(""), GuiUtils.rLabel("Longitude Base: "),
             lonBaseLabel = new JTextField(""), GuiUtils.rLabel("Latitude Increment: "),
             latIncrement = new JTextField(""), GuiUtils.rLabel("Latitude Minor Increment: "),
@@ -126,13 +129,17 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
             GuiUtils.rLabel("Abscissa (x-axis) Visible: "), xVisible = new JCheckBox("", true),
             GuiUtils.rLabel("Ordinate (y-axis) Visible: "), yVisible = new JCheckBox("", true),
-            GuiUtils.rLabel("Coordinate: "), coordFormat = new JComboBox(LatLonScaleInfo.CoordSys.values())
+            GuiUtils.rLabel("Coordinate: "), coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values())
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         this.add("Center", GuiUtils.inset(p1, 5));
 
-        if (latLonScaleInfo != null) {
-            populateLatLonScaleInfo();
+        if (latScaleInfo != null) {
+            populateLatScaleInfo();
+        }
+
+        if (lonScaleInfo != null) {
+            populateLonScaleInfo();
         }
     }
 
@@ -159,20 +166,27 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
     }
 
     /**
-     * Populate lat lon scale info.
+     * Populate lat scale info.
      */
-    private void populateLatLonScaleInfo() {
-        abscissaLabel.setText(latLonScaleInfo.abscissaLabel);
-        ordinateLabel.setText(latLonScaleInfo.ordinateLabel);
-        latBaseLabel.setText(latLonScaleInfo.latBaseLabel);
-        lonBaseLabel.setText(latLonScaleInfo.lonBaseLabel);
-        latIncrement.setText(latLonScaleInfo.latIncrement);
-        latMinorSpinner.setValue(latLonScaleInfo.latMinorIncrement);
-        lonIncrement.setText(latLonScaleInfo.lonIncrement);
-        lonMinorSpinner.setValue(latLonScaleInfo.lonMinorIncrement);
-        xVisible.setSelected(latLonScaleInfo.xVisible);
-        xVisible.setSelected(latLonScaleInfo.yVisible);
-        coordFormat.setSelectedItem(latLonScaleInfo.coordFormat);
+    private void populateLatScaleInfo() {
+        latLabel.setText(latScaleInfo.label);
+        latBaseLabel.setText(latScaleInfo.baseLabel);
+        latIncrement.setText(latScaleInfo.increment);
+        latMinorSpinner.setValue(latScaleInfo.minorIncrement);
+        yVisible.setSelected(latScaleInfo.visible);
+        coordFormat.setSelectedItem(latScaleInfo.coordFormat);
+    }
+
+    /**
+     * Populate lon scale info.
+     */
+    private void populateLonScaleInfo() {
+        lonLabel.setText(lonScaleInfo.label);
+        lonBaseLabel.setText(lonScaleInfo.baseLabel);
+        lonIncrement.setText(lonScaleInfo.increment);
+        lonMinorSpinner.setValue(lonScaleInfo.minorIncrement);
+        xVisible.setSelected(lonScaleInfo.visible);
+        coordFormat.setSelectedItem(lonScaleInfo.coordFormat);
     }
 
     /**
@@ -181,39 +195,63 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
      * @return Was it successful
      */
     public boolean doApply() {
-        LatLonScaleInfo newLatLonInfo = new LatLonScaleInfo();
+    	
+        AxisScaleInfo newLatInfo = new AxisScaleInfo();
+        newLatInfo.label          = latLabel.getText();
+        newLatInfo.baseLabel      = latBaseLabel.getText();
+        newLatInfo.increment      = latIncrement.getText();
+        newLatInfo.minorIncrement = Integer.valueOf(latMinorSpinner.getValue().toString());
+        newLatInfo.increment      = latIncrement.getText();
+        newLatInfo.visible        = yVisible.isSelected();
+        newLatInfo.coordFormat    = (CoordSys) coordFormat.getSelectedItem();
 
-        newLatLonInfo.abscissaLabel     = abscissaLabel.getText();
-        newLatLonInfo.ordinateLabel     = ordinateLabel.getText();
-        newLatLonInfo.latBaseLabel      = latBaseLabel.getText();
-        newLatLonInfo.lonBaseLabel      = lonBaseLabel.getText();
-        newLatLonInfo.latIncrement      = latIncrement.getText();
-        newLatLonInfo.latMinorIncrement = Integer.valueOf(latMinorSpinner.getValue().toString());
-        newLatLonInfo.lonIncrement      = lonIncrement.getText();
-        newLatLonInfo.lonMinorIncrement = Integer.valueOf(lonMinorSpinner.getValue().toString());
-        newLatLonInfo.xVisible          = xVisible.isSelected();
-        newLatLonInfo.yVisible          = yVisible.isSelected();
-        newLatLonInfo.coordFormat       = (CoordSys) coordFormat.getSelectedItem();
+        if (!newLatInfo.equals(latScaleInfo)) {
+            latScaleInfo = newLatInfo;
+        }
 
-        if (!newLatLonInfo.equals(latLonScaleInfo)) {
-            latLonScaleInfo = newLatLonInfo;
+        AxisScaleInfo newLonInfo = new AxisScaleInfo();
+
+        newLonInfo.label          = lonLabel.getText();
+        newLonInfo.baseLabel      = lonBaseLabel.getText();
+        newLonInfo.increment      = lonIncrement.getText();
+        newLonInfo.minorIncrement = Integer.valueOf(lonMinorSpinner.getValue().toString());
+        newLonInfo.increment      = lonIncrement.getText();
+        newLonInfo.visible        = xVisible.isSelected();
+        newLonInfo.coordFormat    = (CoordSys) coordFormat.getSelectedItem();
+
+        if (!newLonInfo.equals(lonScaleInfo)) {
+            lonScaleInfo = newLonInfo;
         }
 
         mpDisplay.setDisplayInactive();
 
         try {
-            mpDisplay.setLatLonScaleInfo(latLonScaleInfo);
+            mpDisplay.setLatScaleInfo(latScaleInfo);
+            mpDisplay.setLonScaleInfo(lonScaleInfo);
             mpDisplay.setDisplayActive();
         } catch (Exception e) {
             LogUtil.userMessage("An error has occurred:" + e);
-
             return false;
         }
 
         return true;
     }
 
-    public void setLatLonScaleInfo(LatLonScaleInfo latLonScaleInfo) {
-        this.latLonScaleInfo = latLonScaleInfo;
+    /**
+     * Sets the lat scale info.
+     *
+     * @param latScaleInfo the new lat scale info
+     */
+    public void setLatScaleInfo(AxisScaleInfo latScaleInfo) {
+        this.latScaleInfo = latScaleInfo;
+    }
+
+    /**
+     * Sets the lon scale info.
+     *
+     * @param lonScaleInfo the new lon scale info
+     */
+    public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) {
+        this.lonScaleInfo = lonScaleInfo;
     }
 }
