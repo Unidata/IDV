@@ -1142,6 +1142,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // First, let's figure out our component size.
         Dimension d = getComponent().getSize();
 
+        //if running the isl non interactively, d is not assigned, the component is
+        // one layer deeper.
+        if( d.width == 0 || d.height == 0) {
+            JPanel jp = (JPanel)getComponent();
+            d = jp.getComponent(0).getSize();
+        }
         // System.out.println("Component size = " + d);
         int componentCenterX = d.width / 2;
         int componentCenterY = d.height / 2;
