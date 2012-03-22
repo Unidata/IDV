@@ -832,7 +832,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         if (this.latLonScaleInfo == null) {
             double[]        xRange = xMap.getRange();
             double[]        yRange = yMap.getRange();
-            double[]        zRange = zMap.getRange();
+            double[]        zRange = (getDisplayMode() == NavigatedDisplay.MODE_3D) 
+                                     ? zMap.getRange() 
+                                     : new double[] { 0.0, 0.0 };
             EarthLocation   ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             EarthLocation   ur     = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
             LatLonScaleInfo llsi   = new LatLonScaleInfo();
