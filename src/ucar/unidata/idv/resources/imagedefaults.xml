@@ -958,7 +958,52 @@ Note: we can use place="default", etc., to use the default
      mag="-3 -3"
      unit="RAIN"/>
   <default
-     pattern="NEXRCOMP/4KNTP-NAT"
+     pattern="NEXRCALL/10KRCM-NAT"
+     key="LINELE"
+     enh="MDR"
+     place="CENTER"
+     size="600 800"
+     loc="180 230"
+     mag="2 2"
+     unit="VIP"/>
+  <default
+     pattern="NEXRCALL/6KN0R-NAT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="500 800"
+     loc="250 400"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCALL/1KN0R-NAT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="600 950"
+     loc="1499 2367"
+     mag="-5 -5"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCALL/1KN0R-FLT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="500 720"
+     loc="250 360"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCALL/2KN1P-NAT"
+     key="LINELE"
+     enh="RAIN"
+     place="CENTER"
+     size="500 787"
+     loc="750 1184"
+     mag="-3 -3"
+     unit="RAIN"/>
+  <default
+     pattern="NEXRCALL/4KNTP-NAT"
      key="LINELE"
      enh="RAIN"
      place="CENTER"
