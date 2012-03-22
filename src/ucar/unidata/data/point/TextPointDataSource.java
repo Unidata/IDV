@@ -1851,8 +1851,9 @@ public class TextPointDataSource extends PointDataSource {
                                 numReals++;
                                 isVarNumeric[varIdx] = true;
                                 numericTypes.add(d.getType());
-                                varUnits[varIdx] =
-                                    ((RealType) d.getType()).getDefaultUnit();
+                                varUnits[varIdx] = ((Real) d).getUnit();
+                                //varUnits[varIdx] =
+                                //    ((RealType) d.getType()).getDefaultUnit();
                                 varNames.add(
                                     ((RealType) d.getType()).getName());
                                 numericUnits.add(varUnits[varIdx]);
@@ -1871,8 +1872,8 @@ public class TextPointDataSource extends PointDataSource {
                         varNames.add(
                             ((RealType) dfltReal.getType()).getName());
                         numericTypes.add(dfltReal.getType());
-                        varUnits[0] =
-                            ((RealType) dfltReal.getType()).getDefaultUnit();
+                        varUnits[0] = dfltReal.getUnit();
+                        //    ((RealType) dfltReal.getType()).getDefaultUnit();
                         numericUnits.add(varUnits[0]);
                     }
 
@@ -2234,8 +2235,9 @@ public class TextPointDataSource extends PointDataSource {
                         varNames.add(
                             ((RealType) dfltReal.getType()).getName());
                         numericTypes.add(dfltReal.getType());
-                        varUnits[0] =
-                            ((RealType) dfltReal.getType()).getDefaultUnit();
+                        varUnits[0] = dfltReal.getUnit();
+                        //varUnits[0] =
+                        //    ((RealType) dfltReal.getType()).getDefaultUnit();
                         numericUnits.add(varUnits[0]);
                     }
 
