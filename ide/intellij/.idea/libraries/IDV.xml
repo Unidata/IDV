@@ -6,7 +6,6 @@
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../../libsrc" />
-      <root url="file://$PROJECT_DIR$/../../src" />
       <root url="file://$PROJECT_DIR$/../../test" />
     </SOURCES>
   </library>
