@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>Analysis and Visualization of WRF output with the IDV and Jython: The Basics</title>
+</head>
+<body>
+
+<div class="overview">
+Creating basic WRF displays with Jython and the IDV
+</div>
+
+<p>
+The IDV and associated Jython scripting environment is capable of reading <b>post-processed</b> WRF output. Specifically, the output need to be de-staggered for optimal performance.
+</p>
+
+<p>
+If you have participated in the WRF tutorial, then you are likely familiar with the output from Hurricane Gustav simulation which is what we will use in our example (although any WRF post-processed output should do fine). For those that haven't participated in the tutorial, you may download the data "here".
+</p>
+
+<p>
+The first step to working with the IDV and WRF output is to load the data. Before we load the data, let's take a moment to create a few helper variables to simplify changing datasets in the future:
+</p>
+
+[ht::codetable {
+<b>filename = './wrfprs_d01.060'
+file_opener = 'file.grid'</b>
+}]
+
+<table width="600" border="1">
+<tr>
+ <td>Variable</td>
+ <td>Usage</td>
+</tr>
+<tr>
+ <td><code>filename</code></td>
+ <td>name of data file (use full path to file or the path relative to the location where the script will run)</td>
+</tr>
+<tr>
+ <td><code>file_opener</code></td>
+ <td>Type of data file</td>
+</tr>
+</table>
+<br>
+
+<p>
+The lines in the above code snippet hold the basic information needed to open a file. The variable <code>filename</code> is the name of the WRF to be opened; <code>file_opener</code> must point to the <code>id</code> of the datasource types the IDV knows - a list of these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/datasource.xml} {datasource.xml}] (note that the "label" properties in datasource.xml may look familiar, as these names are used in the IDV data chooser). In our example, a GRIB file is what we wish to open, which coresponds to the <code>id</code> "file.grid" (the <code>label</code> is "Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)"). Now that the basic information about the file has been defined, we can create a dataSource using the Jython method <code>makeDataSource</code>.
+</p>
+
+[ht::codetable {
+filename = './wrfprs_d01.060'
+file_opener = 'file.grid'
+<b>ds = makeDataSource(filename, file_opener)</b>
+}]
+
+<p>
+Note that <code>makeDataSource</code> returns a [ht::classpopup {https://www.unidata.ucar.edu/software/idv/docs/javadoc/ucar/unidata/data/DataSource.html} {DataSource}] object, which we've named <code>ds</code> in our example.
+</p>
+
+<p>
+Now we need to make some decisions regarding which data and display types we would like to utilize. As in our first step, let's create a few helper variables to hold this information:
+</p>
+
+[ht::codetable {
+filename = './wrfprs_d01.060'
+file_opener = 'file.grid'
+ds = makeDataSource(filename, file_opener)
+<b>variable = 'Pressure_reduced_to_MSL @ msl'
+display_type = 'planviewcontour'
+image_dimensions = (800, 600)
+output_name = 'contour2D.png'</b>
+}]
+
+<p>Four new variables were added to the example:</p>
+
+
+<table width="600" border="1">
+<tr>
+ <td>Variable</td>
+ <td>Usage</td>
+</tr>
+<tr>
+ <td><code>variable</code></td>
+ <td>Data variable to be displayed</td>
+</tr>
+<tr>
+ <td><code>display_type</code></td>
+ <td>Type of display to produce</td>
+</tr>
+<tr>
+ <td><code>image_dimensions</code></td>
+ <td>Dimensions of the output image</td>
+</tr>
+<tr>
+ <td><code>output_name</code></td>
+ <td>Name of the image file to produce*</td>
+</tr>
+<tr>
+ <td colspan="2">*note: the format of the image is controlled by the extension used, e.g. .png)</td>
+</tr>
+</table>
+<br>
+
+<p>
+<code>display_type</code> must be one of the types that the IDV knows - these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/controls.xml} {controls.xml}]. controls.xml contains a listing of the display controls available in the IDV. Each control has various properties, some of which you may be familiar with if you've used the IDV (for example, the <code>label</code> property); however, for the purposes of Jython scripting, we need to use the <code>id</code> property. In our example, we are going to create a "Contour Plan View" display (the <code>label</code> property) which has the <code>id</code> 'planviewcontour'.
+</p>
+
+<p>
+We are now at the point where we can generate an image with a few additional lines of Jython:
+</p>
+
+[ht::codetable {
+filename = './wrfprs_d01.060'
+file_opener = 'file.grid'
+ds = makeDataSource(filename, file_opener)
+variable = 'Pressure_reduced_to_MSL @ msl'
+display_type = 'planviewcontour'
+image_dimensions = (800, 600)
+output_name = 'contour2D.png'
+<b>setOffScreen(1)
+idv.getStateManager().setViewSize(java.awt.Dimension(image_dimensions[0], image_dimensions[1]))
+pressure = getData(ds.getName(), variable)
+createDisplay(display_type, pressure)
+pause()
+image = getImage()
+writeImage(output_name)</b>}
+]
+
+<p>
+The resulting image will look something like this:
+</p>
+<br>
+[ht::img images/WRF_Contour2D_1.png]
+<br>
+<p>It's not the prettiest, but it does show the data. However...</p>
+<!-- numbered list -->
+<ol class="step">
+  <li>It appears the units are in Pa - what if I want them in mb?</li>
+  <li>I would like to change the color and interval of the contours.</li>
+  <li>What is up with the legend (Data?)? Can I add a color scale?</li>
+</ol>
+
+Let's take a moment to address these issues one at a time.
+
+</body>
+</html>

@@ -2,7 +2,13 @@
 # IDV files #
 #############
 build/
+!/auxdata/docs/build
 lib/idv.jar
+auxdata/docs/workshop/processed/
+auxdata/docs/workshop/content/processed/
+auxdata/docs/processed/
+auxdata/docs/workshop/content/dev/arch/images/*.gif
+auxdata/docs/workshop/content/dev/arch/images/*.jpg
 
 #############
 # IDE files #

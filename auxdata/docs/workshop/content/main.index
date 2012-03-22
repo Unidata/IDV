@@ -151,6 +151,13 @@ index.html
 >>>datadisplays/profiler/ThreeDView.html
 >>>datadisplays/profiler/DoingMoreProfiler.html
 
+>>datadisplays/wrf/index.html
+>>>datadisplays/wrf/JythonForWRFBasics.html
+>>>datadisplays/wrf/JythonForWRFUnits.html
+>>>datadisplays/wrf/JythonForWRFContours.html
+>>>datadisplays/wrf/JythonForWRFLabAndScale.html
+>>>datadisplays/wrf/JythonForWRFTwoDisplays.html
+
 |Conventions.html
 
 
@@ -254,7 +261,7 @@ index.html
 -dev/data/choosers.xml.txt
 >>>dev/data/WxTextDataChooser.html
 
->>title: Data Sources 
+>>title: Data Sources
 >>>dev/data/DataSource.html
 -dev/data/datasource.xml.txt
 >>>dev/data/VisADDataModel.html

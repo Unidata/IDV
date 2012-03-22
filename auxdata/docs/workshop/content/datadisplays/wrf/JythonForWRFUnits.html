@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>Analysis and Visualization of WRF output with the IDV and Jython: Units</title>
+</head>
+<body>
+
+<div class="overview">
+How to change the units shown in a display.
+</div>
+
+<p>Changing units on a display can be done by <i>modifying</i> one line of code and adding one new line:</p>
+
+[ht::codetable {
+filename = './wrfprs_d01.060'
+file_opener = 'file.grid'
+ds = makeDataSource(filename, file_opener)
+variable = 'Pressure_reduced_to_MSL @ msl'
+display_type = 'planviewcontour'
+image_dimensions = (800, 600)
+output_name = 'contour2D.png'
+setOffScreen(1)
+idv.getStateManager().setViewSize(java.awt.Dimension(image_dimensions[0], image_dimensions[1]))
+pressure = getData(ds.getName(), variable)
+<b><i>dc = createDisplay(display_type, pressure)</i>
+dc.setDisplayUnitName('mb')</b>
+pause()
+image = getImage()
+writeImage(output_name)</b>}]
+<br>
+[ht::img images/WRF_Contour2D_2.png]
+<br>
+<p>Note that we've created a [ht::classpopup {https://www.unidata.ucar.edu/software/idv/docs/javadoc/ucar/unidata/idv/control/DisplayControlBase.html} {DisplayControlBase}] object <code>dc</code>(specifically a [ht::classpopup  {https://www.unidata.ucar.edu/software/idv/docs/javadoc/ucar/unidata/idv/control/ContourPlanViewControl.html} {ContourPlanViewControl}] object, a subclass of <code>DisplayControlBase</code>), and changed the unit using the method <code>setDisplayUnitName</code>. While the goal of changing units has been accomplished, notice that it seems as though we have lost the characteristic of the contours to be colored based on value. However, this is not the case - we simply need to update the color range, as it still reflects the range of values in units of Pa:</p>
+
+[ht::codetable {
+filename = './wrfprs_d01.060'
+file_opener = 'file.grid'
+ds = makeDataSource(filename, file_opener)
+variable = 'Pressure_reduced_to_MSL @ msl'
+display_type = 'planviewcontour'
+image_dimensions = (800, 600)
+output_name = 'contour2D.png'
+setOffScreen(1)
+idv.getStateManager().setViewSize(java.awt.Dimension(image_dimensions[0], image_dimensions[1]))
+pressure = getData(ds.getName(), variable)
+dc = createDisplay(display_type, pressure)
+<b>old_unit = dc.getDisplayUnit()</b>
+dc.setDisplayUnitName('mb')
+<b>new_range = dc.convertColorRange(dc.getRange(),old_unit)
+dc.setRange(new_range)</b>
+pause()
+image = getImage()
+writeImage(output_name)}]
+<br>
+[ht::img images/WRF_Contour2D_3.png]
+<br>
+<p>The first thing needed is to save the <code>old_unit</code> (Pa), which has to be used in the function to get the <code>new_range</code> (the range after converting the display unit to mb). Finally, we set the color range to <code>new_range</code> using the <code>setRange</code> method, and voil&agrave!</p>
+
+</body>
+</html>

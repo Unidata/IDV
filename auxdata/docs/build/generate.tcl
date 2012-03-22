@@ -32,6 +32,17 @@ proc ht::codep {args} {
     return "<p><code>[join $args { }]</code><p>"
 }
 
+proc ht::codetable {args} {
+    #
+    # Create a one cell table to hold code examples.
+    #  `args` holds the code
+    #
+    set tmp1 [list "<br><table border=\"2\"><tr><td>"]
+    lappend tmp1 "<pre><code>[join $args { }]</code></pre>"
+    lappend tmp1 "</td></tr></table><br>"
+    return [join $tmp1]
+}
+
 proc ht::head {title} {
 return "
 <html><head>
@@ -79,6 +90,12 @@ proc ht::popup {url label args} {
 ##    return "<a name=\"$anchor\"></a><a href=\"#$anchor\" onClick=\"window.open('$url', $wargs);return false;\">$label$img</a>"
 }
 
+proc ht::classpopup {url classname} {
+    #
+    # create a popup that links to a JavaDoc
+    #
+    return [ht::popup $url "<code>$classname</code>"]
+}
 
 proc ht::subhead {id label {extra {}}} {
     return "<subhead [ht::attrs id $id] $extra>$label</subhead>"
@@ -197,13 +214,11 @@ proc gen::getIconImg {from img desc} {
     return  "<img src=\"$top/$img\" border=\"0\" [gen::getIconWidthAttr]  alt=\"$desc\" title=\"$desc\">"
 }
 
-
 proc gen::getIconWidthAttr {} {
     set w [gen::getIconWidth]
     if {$w != ""} {return " width=\"$w\" height=\"$w\" "}
     return ""
 }
-
 
 proc gen::js::process {body from depth fileIdx} {
     if {![gen::getDoJSNav]} {return $body}
@@ -246,7 +261,21 @@ proc gen::js::process {body from depth fileIdx} {
 }
 
 
-
+proc gen::includeSrc {file} {
+    #
+    # Include code from a src file `file`
+    #
+    set f [open $file r]
+    set file_data [read $f]
+    close $f
+    set src_data [split $file_data "\n"]
+    set tmp1 [list "<br><table border=\"2\"><tr><td><code><pre>"]
+    foreach line $src_data {
+        lappend tmp1 $line "<br>"
+    }
+    lappend tmp1 "</pre></code></td></tr></table>"
+    return [join $tmp1]
+}
 
 proc gen::include {file {tag ""}} {
     set fp [open $file r]
