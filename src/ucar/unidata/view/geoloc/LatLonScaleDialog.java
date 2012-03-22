@@ -27,6 +27,7 @@ package ucar.unidata.view.geoloc;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.NumericTextField;
 import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -54,13 +55,13 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
     private JComboBox coordFormat;
 
     /** Latitude base label */
-    private JTextField latBaseLabel;
+    private NumericTextField latBaseLabel;
 
     /** Latitude increment */
-    private JTextField latIncrement;
+    private NumericTextField latIncrement;
 
     /** Lat (y-axis) Label */
-    private JTextField latLabel;
+    private NumericTextField latLabel;
 
     /** Latitude minor increment */
     private JSpinner latMinorSpinner;
@@ -69,13 +70,13 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
     private AxisScaleInfo latScaleInfo;
 
     /** Longitude base label */
-    private JTextField lonBaseLabel;
+    private NumericTextField lonBaseLabel;
 
     /** Longitude increment */
-    private JTextField lonIncrement;
+    private NumericTextField lonIncrement;
 
     /** Lon (x-axis) Label */
-    private JTextField lonLabel;
+    private NumericTextField lonLabel;
 
     /** Longitude minor increment */
     private JSpinner lonMinorSpinner;
@@ -118,17 +119,17 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Longitude (x-axis) Label: "), lonLabel = new JTextField(""),
-            GuiUtils.rLabel("Latitude (y-axis) Label: "), latLabel = new JTextField(""),
-            GuiUtils.rLabel("Latitude Base: "), latBaseLabel = new JTextField(""), GuiUtils.rLabel("Longitude Base: "),
-            lonBaseLabel = new JTextField(""), GuiUtils.rLabel("Latitude Increment: "),
-            latIncrement = new JTextField(""), GuiUtils.rLabel("Latitude Minor Increment: "),
+            GuiUtils.rLabel("Longitude Label: "), lonLabel = new NumericTextField(),
+            GuiUtils.rLabel("Latitude Label: "), latLabel = new NumericTextField(),
+            GuiUtils.rLabel("Latitude Base (-90 90): "), latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Longitude Base (-180 180): "),
+            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Latitude Increment: "),
+            latIncrement = new NumericTextField(), GuiUtils.rLabel("Latitude Minor Increment: "),
             latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
-            GuiUtils.rLabel("Longitude Increment: "), lonIncrement = new JTextField(""),
+            GuiUtils.rLabel("Longitude Increment: "), lonIncrement = new NumericTextField(),
             GuiUtils.rLabel("Longitude Minor Increment: "),
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
-            GuiUtils.rLabel("Abscissa (x-axis) Visible: "), xVisible = new JCheckBox("", true),
-            GuiUtils.rLabel("Ordinate (y-axis) Visible: "), yVisible = new JCheckBox("", true),
+            GuiUtils.rLabel("Longitude Visible: "), xVisible = new JCheckBox("", true),
+            GuiUtils.rLabel("Latitude Visible: "), yVisible = new JCheckBox("", true),
             GuiUtils.rLabel("Coordinate: "), coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values())
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
@@ -201,7 +202,6 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
         newLatInfo.baseLabel      = latBaseLabel.getText();
         newLatInfo.increment      = latIncrement.getText();
         newLatInfo.minorIncrement = Integer.valueOf(latMinorSpinner.getValue().toString());
-        newLatInfo.increment      = latIncrement.getText();
         newLatInfo.visible        = yVisible.isSelected();
         newLatInfo.coordFormat    = (CoordSys) coordFormat.getSelectedItem();
 
@@ -215,7 +215,6 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
         newLonInfo.baseLabel      = lonBaseLabel.getText();
         newLonInfo.increment      = lonIncrement.getText();
         newLonInfo.minorIncrement = Integer.valueOf(lonMinorSpinner.getValue().toString());
-        newLonInfo.increment      = lonIncrement.getText();
         newLonInfo.visible        = xVisible.isSelected();
         newLonInfo.coordFormat    = (CoordSys) coordFormat.getSelectedItem();
 

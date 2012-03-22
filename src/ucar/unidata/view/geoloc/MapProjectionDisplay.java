@@ -32,6 +32,7 @@ import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.geoloc.projection.LatLonProjection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
@@ -428,7 +429,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws RemoteException   problem creating remote object
      */
     private void makeLatScales() throws VisADException, RemoteException {
-
         setDisplayInactive();
 
         double[] xRange = xMap.getRange();
@@ -445,13 +445,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         if (latScale != null) {
             latScale.setVisible(getLatScaleInfo().visible);
+
             EarthLocation ur = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
+
             updateLatScale(latScale, getLatScaleInfo().label, zRange, ll, ur);
         }
 
         setDisplayActive();
     }
-    
+
     /**
      * Set the lon scales
      *
@@ -459,7 +461,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws RemoteException   problem creating remote object
      */
     private void makeLonScales() throws VisADException, RemoteException {
-
         setDisplayInactive();
 
         double[] xRange = xMap.getRange();
@@ -476,13 +477,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         if (lonScale != null) {
             lonScale.setVisible(getLonScaleInfo().visible);
+
             EarthLocation lr = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
+
             updateLonScale(lonScale, getLonScaleInfo().label, xRange, ll, lr);
         }
 
         setDisplayActive();
     }
-
 
     /**
      * Method to update lat scale.
@@ -501,7 +503,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double    top        = right.getLatitude().getValue();
         Hashtable labelTable = new Hashtable();
         String    baseLabel  = getLatScaleInfo().baseLabel;
-        double    base       = Double.parseDouble(baseLabel);
+        double    base       = Misc.parseNumber(baseLabel);
 
         // In case user inputs something bogus.
         if ((base < bottom) || (base > top)) {
@@ -511,15 +513,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLatScaleInfo().minorIncrement;
         List<Double> minorTicks   = new ArrayList<Double>();
-
-        String incLabel = getLatScaleInfo().increment;
-        double inc      = Double.parseDouble(incLabel);
-        int    cnt      = 0;
+        String       incLabel     = getLatScaleInfo().increment;
+        double       inc          = Double.parseDouble(incLabel);
+        int          cnt          = 0;
 
         for (double i = base; i < top; i += inc / minorTickInc) {
-        	if (i < -90 || i > 90) { //Latitudes that are not in this range do not make sense.
-        		continue;
-        	}
+            if ((i < -90) || (i > 90)) {    // Latitudes that are not in this range do not make sense.
+                continue;
+            }
+
             EarthLocationTuple elt    = new EarthLocationTuple(i, left.getLongitude().getValue(), 0);
             double[]           values = newton(elt, true, 0);
             Double             d      = new Double(values[1]);
@@ -582,7 +584,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double    top        = right.getLongitude().getValue();
         Hashtable labelTable = new Hashtable();
         String    baseLabel  = getLonScaleInfo().baseLabel;
-        double    base       = Double.parseDouble(baseLabel);
+        double    base       = Misc.parseNumber(baseLabel);
+
+        // Need to adjust negative base coming from user
+        base = (base < 0)
+               ? base + 360
+               : base;
 
 //      In case user inputs something bogus.
         if ((base < bottom) || (base > top)) {
@@ -592,10 +599,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().minorIncrement;
         List<Double> minorTicks   = new ArrayList<Double>();
-
-        String incLabel = getLonScaleInfo().increment;
-        double inc      = Double.parseDouble(incLabel);
-        int    cnt      = 0;
+        String       incLabel     = getLonScaleInfo().increment;
+        double       inc          = Double.parseDouble(incLabel);
+        int          cnt          = 0;
 
 //      Need to do the following to deal with crossing the meridian in Northern Hemisphere only!
         List<Double> increment = new LinkedList<Double>();
@@ -624,7 +630,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
                 if ((i > 0) && (i <= 180)) {
                     labelTable.put(d, coordSys.format(i, Cardinality.EAST));
-                } else if ( (i > 180) && (i < 360)) {
+                } else if ((i > 180) && (i < 360)) {
                     labelTable.put(d, coordSys.format(360 - i, Cardinality.WEST));
                 } else if ((i < 0)) {
                     labelTable.put(d, coordSys.format(Math.abs(i), Cardinality.WEST));
@@ -948,15 +954,34 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     public AxisScaleInfo getLatScaleInfo() {
         if (latScaleInfo == null) {
-            AxisScaleInfo llsi = new AxisScaleInfo();
+            AxisScaleInfo lsi = new AxisScaleInfo();
 
-            latScaleInfo        = llsi;
-            llsi.label          = "Latitude";
-            llsi.increment      = 10 + "";
-            llsi.minorIncrement = 1;
-            llsi.visible        = true;
-            llsi.coordFormat    = CoordSys.A;
-            latScaling();
+            latScaleInfo       = lsi;
+            lsi.label          = "Latitude";
+            lsi.increment      = 10 + "";
+            lsi.minorIncrement = 1;
+            lsi.visible        = true;
+            lsi.coordFormat    = CoordSys.A;
+
+            double[]      xRange = xMap.getRange();
+            double[]      yRange = yMap.getRange();
+            double[]      zRange = zMap.getRange();
+            EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
+            double        base   = el1.getLatitude().getValue();
+            EarthLocation el2    = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
+            double        end    = el2.getLatitude().getValue();
+            int           inc    = (int) round(Math.abs(end - base) / 5d, 0, BigDecimal.ROUND_HALF_UP);
+
+            lsi.increment          = ((inc  == 0)
+                                      ? 10
+                                      : inc) + "";    // Keep the number reasonable
+            base                   = (base < -90)
+                                     ? -90
+                                     : base;
+            base                   = (base > 90)
+                                     ? 90
+                                     : base;
+            latScaleInfo.baseLabel = round(base, 0, BigDecimal.ROUND_HALF_UP) + "";
         }
 
         return latScaleInfo;
@@ -969,47 +994,37 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     public AxisScaleInfo getLonScaleInfo() {
         if (this.lonScaleInfo == null) {
-            AxisScaleInfo llsi = new AxisScaleInfo();
+            AxisScaleInfo lsi = new AxisScaleInfo();
 
-            lonScaleInfo        = llsi;
-            llsi.label          = "Longitude";
-            llsi.increment      = 10 + "";
-            llsi.minorIncrement = 1;
-            llsi.visible        = true;
-            llsi.coordFormat    = CoordSys.A;
-            lonScaling();
+            lonScaleInfo       = lsi;
+            lsi.label          = "Longitude";
+            lsi.minorIncrement = 1;
+            lsi.visible        = true;
+            lsi.coordFormat    = CoordSys.A;
+
+            double[]      xRange = xMap.getRange();
+            double[]      yRange = yMap.getRange();
+            double[]      zRange = zMap.getRange();
+            EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
+            double        base   = el1.getLongitude().getValue();
+            EarthLocation el2    = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
+            double        end    = el2.getLongitude().getValue();
+
+            // Must deal with meridian
+            int inc = (int) round(Math.abs(end - ((base > end)
+                    ? base - 360
+                    : base)) / 5d, 0, BigDecimal.ROUND_HALF_UP);
+
+            lsi.increment          = ((inc == 0)
+                                      ? 10
+                                      : inc) + "";    // Keep the number reasonable
+            base                   = (base > 180)
+                                     ? (base - 360)
+                                     : base;
+            lonScaleInfo.baseLabel = round(base, 0, BigDecimal.ROUND_HALF_UP) + "";
         }
-
 
         return lonScaleInfo;
-    }
-
-    /**
-     * Resetting some lat info before projection changes.
-     */
-    private void latScaling() {
-        if (latScaleInfo != null) {
-            double[]      xRange = xMap.getRange();
-            double[]      yRange = yMap.getRange();
-            double[]      zRange = zMap.getRange();
-            EarthLocation ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-
-            latScaleInfo.baseLabel = round(ll.getLatitude().getValue(), 0, BigDecimal.ROUND_HALF_UP) + "";
-        }
-    }
-
-    /**
-     * Resetting some lat info before projection changes.
-     */
-    private void lonScaling() {
-        if (lonScaleInfo != null) {
-            double[]      xRange = xMap.getRange();
-            double[]      yRange = yMap.getRange();
-            double[]      zRange = zMap.getRange();
-            EarthLocation ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-
-            lonScaleInfo.baseLabel = round(ll.getLongitude().getValue(), 0, BigDecimal.ROUND_HALF_UP) + "";
-        }
     }
 
     /**
@@ -1195,13 +1210,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         this.mapProjection = mapProjection;
         coordinateSystem   = makeCoordinateSystem(mapProjection);
+
+        // Need to reset these for new projection.
+        this.latScaleInfo = null;
+        this.lonScaleInfo = null;
         resetMapParameters();
 
         EarthLocation el = getEarthLocation(new double[] { 0, 0, 0 });
 
         centerLLP.set(el.getLatitude().getValue(CommonUnit.degree), el.getLongitude().getValue(CommonUnit.degree));
-        latScaling();
-        lonScaling();
     }
 
     /**

@@ -87,7 +87,7 @@ public class AxisScaleInfo {
         G("ex 51:27:38.11536N"),
 
         /** The H. */
-        H("ex 51.46059");
+        H("ex 51.46059N");
 
         /** The coord sys. */
         private final String coordSys;
@@ -111,7 +111,7 @@ public class AxisScaleInfo {
         public String format(double i, Cardinality card) {
             switch (this) {
             case A :
-                return CoordinateFormat.convert(i, new DecimalCoordFormat(0, DegMinSec.DEGREE), EMPTY_FORMAT,
+                return CoordinateFormat.convert(i, new DecimalCoordFormat(0, DegMinSec.NONE), EMPTY_FORMAT,
                                                 EMPTY_FORMAT, card);
 
             case B :
@@ -145,9 +145,8 @@ public class AxisScaleInfo {
                                                 EMPTY_FORMAT, card);
 
             default :
-                return CoordinateFormat.convert(i, new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.DEGREE),
-                                                new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.MINUTE),
-                                                new CoordinateFormat.DecimalCoordFormat(0, DegMinSec.SECOND), card);
+                return CoordinateFormat.convert(i, new DecimalCoordFormat(0, DegMinSec.NONE), EMPTY_FORMAT,
+                        EMPTY_FORMAT, card);
             }
         }
 
