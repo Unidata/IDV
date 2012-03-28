@@ -5,6 +5,7 @@ build.xml file is in ucar the basedir is "..", the parent directory of
 ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
+<!-- mike -->
 
 <project basedir="." default="all" name="IDV">
 
