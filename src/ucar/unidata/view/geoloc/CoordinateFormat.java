@@ -60,7 +60,7 @@ public class CoordinateFormat {
     public enum DegMinSec {
 
         /** Degrees. */
-        DEGREE(" "), //Just a space for now since VisAD does not support ¡ symbol.
+        DEGREE(" "), //Just a space for now since VisAD does not support degree symbol.
 
         /** Minutes. */
         MINUTE("''"),
