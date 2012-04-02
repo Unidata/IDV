@@ -275,18 +275,25 @@ public class GeoUtils {
             }
             if ((latString == null) || (lonString == null)) {
                 try {
+                    //String url =
+                    //    "http://api.local.yahoo.com/MapsService/V1/geocode?appid=idvunidata&location="
+                    //    + encodedAddress;
+                    String tmp = address;
+                    while (tmp.indexOf(" ") >= 0) {
+                        tmp = StringUtil.replace(address, " ", "+");
+                    }
                     String url =
-                        "http://api.local.yahoo.com/MapsService/V1/geocode?appid=idvunidata&location="
-                        + encodedAddress;
+                            "http://where.yahooapis.com/geocode?appid=idvunidata&location=" + tmp;
+
                     String result = IOUtil.readContents(url, GeoUtils.class);
                     if ((master != null) && (master[0] != timestamp)) {
                         return null;
                     }
                     Element root    = XmlUtil.getRoot(result);
                     Element latNode = XmlUtil.findDescendant(root,
-                                          "Latitude");
+                                          "latitude");
                     Element lonNode = XmlUtil.findDescendant(root,
-                                          "Longitude");
+                                          "longitude");
                     if ((latNode != null) && (lonNode != null)) {
                         latString = XmlUtil.getChildText(latNode);
                         lonString = XmlUtil.getChildText(lonNode);
