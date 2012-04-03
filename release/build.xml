@@ -257,8 +257,9 @@ line using: and -Dbasedir=/some/other/dir
   </target>
 
   <target name="-if-localgitrepo" depends="-check-localgitrepo" if="localgitrepo.present">
+    <!-- Pulling the git repo, but from outside the git repo. This requires some special command line arguments as explained below. -->
     <exec executable="git">
-      <arg line="--git-dir=${localgitrepo}/.git pull" />
+      <arg line="--git-dir=${localgitrepo}/.git --work-tree=${localgitrepo} pull" />
     </exec>
   </target>
 
@@ -276,7 +277,8 @@ line using: and -Dbasedir=/some/other/dir
     <antcall target="-unless-localgitrepo"/>
   </target>
 
-  <target name="gitclone" depends="gitlocalrepo">
+  <target name="gitclone" depends="gitlocalrepo"
+    <!-- Actually not a git clone, strictly speaking. Simply copying the local git repo -->
     <echo message="git cloning ${localgitrepo}"/>
     <copy todir="${srcdir}">
       <fileset dir="${localgitrepo}"/>
