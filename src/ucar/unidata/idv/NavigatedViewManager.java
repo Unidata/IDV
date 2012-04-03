@@ -31,7 +31,7 @@ import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.view.geoloc.LatLonScaleDialog;
+import ucar.unidata.view.geoloc.LatLonScalePanel;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplayCursorReadout;
@@ -166,7 +166,7 @@ public abstract class NavigatedViewManager extends ViewManager {
     private Unit lastVerticalRangeUnit;
 
     /** lat/lon scale widget */
-    private LatLonScaleDialog latLonScaleWidget;
+    private LatLonScalePanel latLonScaleWidget;
 
     /** start point */
     private Point mouseStartPoint;
@@ -390,7 +390,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
             MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
 
-            latLonScaleWidget = new LatLonScaleDialog(mpDisplay);
+            latLonScaleWidget = new LatLonScalePanel(mpDisplay);
             tabbedPane.add("Horizontal Scale", GuiUtils.topLeft(latLonScaleWidget));
         }
     }

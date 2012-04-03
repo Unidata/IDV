@@ -103,7 +103,7 @@ public class CoordinateFormat {
      */
     private static String accuracy(final int accuracy) {
         if (accuracy == 0) {
-            return "#";
+            return "00";
         } else {
             final StringBuffer sb = new StringBuffer();
 
@@ -111,7 +111,7 @@ public class CoordinateFormat {
                 sb.append("#");
             }
 
-            return "#." + sb.toString();
+            return "00." + sb.toString();
         }
     }
 
