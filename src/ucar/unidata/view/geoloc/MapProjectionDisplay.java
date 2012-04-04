@@ -538,7 +538,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             double[]           values = newtonLat(elt, 0);
             Double             d      = round(values[1], 3, BigDecimal.ROUND_HALF_UP);
 
-            
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
 
@@ -572,29 +571,31 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void updateLonScale(AxisScale scale, EarthLocation left, EarthLocation right)
             throws VisADException, RemoteException {
-        final int    MAX_LON      = 360;
-        final int    MID_LON      = 180;
-        final int    MIN_LON      = 0;
-        double       leftLon      = left.getLongitude().getValue();
-        double       rightLon     = right.getLongitude().getValue();
-        boolean      isMeridianCross  = leftLon > rightLon;
-        Hashtable    labelTable   = new Hashtable();
-        double       base         = Misc.parseNumber(getLonScaleInfo().baseLabel);
-        List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().minorIncrement;
-        List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc          = Misc.parseNumber(getLonScaleInfo().increment);
-        int          cnt          = 0;
-        List<Double> increment    = new LinkedList<Double>();
-        
-        leftLon = isMeridianCross ? leftLon - MAX_LON : leftLon; 
-        
-        //First try to fix
+        final int    MAX_LON         = 360;
+        final int    MID_LON         = 180;
+        final int    MIN_LON         = 0;
+        double       leftLon         = left.getLongitude().getValue();
+        double       rightLon        = right.getLongitude().getValue();
+        boolean      isMeridianCross = leftLon > rightLon;
+        Hashtable    labelTable      = new Hashtable();
+        double       base            = Misc.parseNumber(getLonScaleInfo().baseLabel);
+        List<Double> majorTicks      = new ArrayList<Double>();
+        int          minorTickInc    = getLonScaleInfo().minorIncrement;
+        List<Double> minorTicks      = new ArrayList<Double>();
+        double       inc             = Misc.parseNumber(getLonScaleInfo().increment);
+        int          cnt             = 0;
+        List<Double> increment       = new LinkedList<Double>();
+
+        leftLon = isMeridianCross
+                  ? leftLon - MAX_LON
+                  : leftLon;
+
+        // First try to fix
         if ((base < leftLon) || (base > rightLon)) {
             base += MAX_LON;
         }
 
-        //May still be messed up
+        // May still be messed up
         if ((base < leftLon) || (base > rightLon)) {
             base = leftLon;
         }
@@ -1019,7 +1020,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the lat scale info.
+     *
+     * @param latScaleInfo the new lat scale info
+     * @throws RemoteException the remote exception
+     * @throws VisADException the vis ad exception
      */
     public void setLatScaleInfo(AxisScaleInfo latScaleInfo) throws RemoteException, VisADException {
         this.latScaleInfo = latScaleInfo;
@@ -1027,7 +1032,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the lon scale info.
+     *
+     * @param lonScaleInfo the new lon scale info
+     * @throws RemoteException the remote exception
+     * @throws VisADException the vis ad exception
      */
     public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) throws RemoteException, VisADException {
         this.lonScaleInfo = lonScaleInfo;
@@ -1414,12 +1423,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // First, let's figure out our component size.
         Dimension d = getComponent().getSize();
 
-        //if running the isl non interactively, d is not assigned, the component is
+        // if running the isl non interactively, d is not assigned, the component is
         // one layer deeper.
-        if( d.width == 0 || d.height == 0) {
-            JPanel jp = (JPanel)getComponent();
+        if ((d.width == 0) || (d.height == 0)) {
+            JPanel jp = (JPanel) getComponent();
+
             d = jp.getComponent(0).getSize();
         }
+
         // System.out.println("Component size = " + d);
         int componentCenterX = d.width / 2;
         int componentCenterY = d.height / 2;

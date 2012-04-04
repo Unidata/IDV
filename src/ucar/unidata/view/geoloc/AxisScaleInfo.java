@@ -66,28 +66,28 @@ public class AxisScaleInfo {
     public enum CoordSys {
 
         /** The A. */
-        A("ex 51 N"),
+        A("dd D"),
 
         /** The B. */
-        B("ex 51 28'N"),
+        B("dd mm'D"),
 
         /** The C. */
-        C("ex 51 27.635'N"),
+        C("dd mm.mmm'D"),
 
         /** The D. */
-        D("ex 51 27'38\"N"),
+        D("dd mm'ss\"D"),
 
         /** The E. */
-        E("ex 51:28N"),
+        E("dd:mmD"),
 
         /** The F. */
-        F("ex 51:27:38N"),
+        F("dd:mm:ssD"),
 
         /** The G. */
-        G("ex 51:27:38.11536N"),
+        G("dd:mm:ss.sssssD"),
 
         /** The H. */
-        H("ex 51.46059N");
+        H("dd.dddddD");
 
         /** The coord sys. */
         private final String coordSys;
