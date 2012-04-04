@@ -277,7 +277,7 @@ line using: and -Dbasedir=/some/other/dir
     <antcall target="-unless-localgitrepo"/>
   </target>
 
-  <target name="gitclone" depends="gitlocalrepo"
+  <target name="gitclone" depends="gitlocalrepo">
     <!-- Actually not a git clone, strictly speaking. Simply copying the local git repo -->
     <echo message="git cloning ${localgitrepo}"/>
     <copy todir="${srcdir}">
