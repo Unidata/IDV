@@ -28,22 +28,24 @@ IF %idv_memory%.==. (
 	    
 REM Stripping quotes
 set idv_memory=%idv_memory:"=%
+set idv_maxpermgensize=%idv_maxpermgensize:"=%
 
 REM See important note about this above. To bootstrap the IDV memory, uncomment 
 REM the line below and set to a value  in megabytes. 
 REM set idv_memory=512
 
-REM To avoid IDV OutOfMemory problems, it may be necessary to increase the MaxPermSize in the Java
-REM Virtual Machine. The default MaxPermSize is 64m. To increase it to 128m please comment out next
-REM line and uncomment the line following that. 
+REM To avoid IDV OutOfMemory problems, it may be necessary to increase the 
+REM MaxPermSize in the Java Virtual Machine. The default MaxPermSize is 64m. 
+REM To increase it, set a higher value in the User Preferences or uncomment
+REM the line below
+REM set idv_maxpermgensize=128
 
 @echo on    
-jre\bin\java -Xmx%idv_memory%m -Didv.enableStereo=false -jar idv.jar %*
-REM jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=128m -Didv.enableStereo=false -jar idv.jar %*
+jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermgensize%m -Didv.enableStereo=false -jar idv.jar %*
 @echo off
 
 REM Use the line below instead if you want to use the D3D version of Java 3D
-REM jre\bin\java -Xmx%idv_memory%m -Dj3d.rend=d3d -jar idv.jar %*
+REM jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermgensize%m -Dj3d.rend=d3d -jar idv.jar %*
 	    
 endlocal
    
