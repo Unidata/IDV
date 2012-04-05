@@ -1037,6 +1037,12 @@ public class TrackControl extends GridDisplayControl {
                               && (aniValue instanceof Real))
                              ? ((Real) aniValue).getValue(dataTimeUnit)
                              : endDate;
+            DataTimeRange dtr = getDataTimeRange();
+            if(dtr != null && trackDisplay != null && useTrackTimes){
+                dtr.setEndMode(dtr.MODE_ANIMATION);
+                trackDisplay.setSelectedRange(startDate, aniDate);
+            }
+
             int      index = 0;
             double[] times = flatField.getValues(false)[1];
             for (; index < times.length; index++) {
