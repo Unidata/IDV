@@ -51,7 +51,7 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author   IDV Development Team
  */
-public class LatLonScaleDialog extends JPanel implements ActionListener {
+public class LatLonScalePanel extends JPanel implements ActionListener {
     private JComboBox coordFormat;
 
     /** Latitude base label */
@@ -103,7 +103,7 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
      * Create a new dialog for setting the coordinate range of the display
      *
      */
-    public LatLonScaleDialog(MapProjectionDisplay mpDisplay) {
+    public LatLonScalePanel(MapProjectionDisplay mpDisplay) {
         this.mpDisplay    = mpDisplay;
         this.parent       = GuiUtils.getFrame(mpDisplay.getComponent());
         this.latScaleInfo = mpDisplay.getLatScaleInfo();
@@ -130,7 +130,7 @@ public class LatLonScaleDialog extends JPanel implements ActionListener {
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
             GuiUtils.rLabel("Longitude Visible: "), xVisible = new JCheckBox("", true),
             GuiUtils.rLabel("Latitude Visible: "), yVisible = new JCheckBox("", true),
-            GuiUtils.rLabel("Coordinate: "), coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values())
+            GuiUtils.rLabel("Format: "), coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values())
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         this.add("Center", GuiUtils.inset(p1, 5));

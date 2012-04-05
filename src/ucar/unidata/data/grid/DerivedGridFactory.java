@@ -54,6 +54,8 @@ import visad.*;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
+import visad.georef.LatLonPoint;
+
 import visad.util.DataUtility;
 
 import java.rmi.RemoteException;
@@ -3767,6 +3769,148 @@ public class DerivedGridFactory {
      *
      * @param uFI0 _more_
      * @param vFI0 _more_
+     * @param sFI0 _more_
+     * @param s0FI _more_
+     * @return _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl createTrajectoryGrid(final FieldImpl uFI0,
+            final FieldImpl vFI0, final FieldImpl sFI0, final FieldImpl s0FI)
+            throws VisADException, RemoteException, Exception {
+
+
+
+        if (GridUtil.isVolume(uFI0) || GridUtil.isVolume(vFI0)
+                || GridUtil.isVolume(sFI0)) {
+            throw new IllegalArgumentException(
+                "Grids U, V W and S can not be 3D volume");
+        }
+
+        long              start    = System.currentTimeMillis();
+        ExecutorService   executor = Executors.newFixedThreadPool(4);
+
+
+        Callable          pt       = new Varbar(uFI0);
+        Future<FieldImpl> future   = executor.submit(pt);
+
+
+        Callable          pt1      = new Varbar(vFI0);
+        Future<FieldImpl> future1  = executor.submit(pt1);
+
+
+        Callable          pt3      = new Varbar(sFI0);
+        Future<FieldImpl> future3  = executor.submit(pt3);
+
+        FieldImpl         uFI      = future.get();
+        FieldImpl         vFI      = future1.get();
+        FieldImpl         sFI      = future3.get();
+
+        try {
+            if (GridUtil.is3D(sFI0)) {
+                sFI = GridUtil.make2DGridFromSlice(sFI, false);
+            }
+            if (GridUtil.is3D(uFI0)) {
+                uFI = GridUtil.make2DGridFromSlice(uFI, false);
+            }
+            if (GridUtil.is3D(vFI0)) {
+                vFI = GridUtil.make2DGridFromSlice(vFI, false);
+            }
+        } catch (Exception ee) {}
+
+        //System.out.println("Time used to read = "
+        //        + (System.currentTimeMillis() - start) / 1000.0);
+        start = System.currentTimeMillis();
+
+
+
+        final Set  timeSet   = sFI.getDomainSet();
+        int        numTimes  = timeSet.getLength();
+        Unit       timeUnit  = timeSet.getSetUnits()[0];
+        final Unit paramUnit =
+            ((FlatField) sFI.getSample(0)).getRangeUnits()[0][0];
+        FunctionType rt =
+            (FunctionType) ((FlatField) sFI.getSample(0)).getType();
+        final String paramName =
+            rt.getFlatRange().getRealComponents()[0].getName();
+
+        double[]   timeVals  = timeSet.getDoubles()[0];
+
+        SampledSet domain0   = GridUtil.getSpatialDomain(s0FI);
+
+
+        int        numPoints = domain0.getLength();
+
+
+        float[][]  geoVals   =
+            GridUtil.getEarthLocationPoints((GriddedSet) domain0);
+
+
+
+        double[] ttts         = timeSet.getDoubles()[0];
+
+
+        boolean  isLatLon     = GridUtil.isLatLonOrder(domain0);
+        int      latIndex     = isLatLon
+                                ? 0
+                                : 1;
+        int      lonIndex     = isLatLon
+                                ? 1
+                                : 0;
+        boolean  haveAlt      = geoVals.length > 2;
+
+
+        boolean  normalizeLon = true;
+
+        //first step  init  u,v, w, and s at all initial points
+        List<TrajInfo> tj = calculateTrackPoints(uFI, vFI, null, sFI, ttts,
+                                geoVals, numPoints, numTimes, latIndex,
+                                lonIndex, haveAlt, normalizeLon);
+
+
+        int                numParcels = numPoints;  //10;
+        final FunctionType ft         = new FunctionType(
+                                    RealType.Generic,
+                                    new FunctionType(
+                                        RealTupleType.SpatialEarth3DTuple,
+                                        RealType.getRealType(paramName)));
+
+        List tracks;
+        /*   for (int k = 0; k < numParcels; k++) {
+               FlatField fft = createSingleTrack(paramName, lats[k], lons[k],
+                                   alts[k], parcels[k], timeSet, ft, paramUnit);
+               tracks.add(fft);
+           }  */
+
+        tracks = createTracks(paramName, tj, timeSet, ft, paramUnit,
+                              numParcels);
+        FlatField    mergedTracks = mergeTracks(tracks);
+
+        FunctionType fiType       = new FunctionType(RealType.Time,
+                                  mergedTracks.getType());
+
+        DateTime  endTime = new DateTime(timeVals[numTimes - 1], timeUnit);
+
+        FieldImpl fi      =
+            new FieldImpl(fiType,
+                          new SingletonSet(new RealTuple(new Real[] {
+                              endTime })));
+        fi.setSample(0, mergedTracks, false);
+        //System.out.println("Time used to compute = "
+        //                   + (System.currentTimeMillis() - start) / 1000.0);
+        return fi;
+
+
+
+    }
+
+    /**
+     * Based on point data trajectory control, create all individual tracks and then merge them
+     *
+     * @param uFI0 _more_
+     * @param vFI0 _more_
      * @param pwFI0 _more_
      * @param sFI0 _more_
      * @param s0FI _more_
@@ -3776,8 +3920,6 @@ public class DerivedGridFactory {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-
-
     public static FieldImpl createTrajectoryGrid(final FieldImpl uFI0,
             final FieldImpl vFI0, final FieldImpl pwFI0,
             final FieldImpl sFI0, final FieldImpl s0FI)
@@ -3803,14 +3945,14 @@ public class DerivedGridFactory {
         Callable          pt3      = new Varbar(sFI0);
         Future<FieldImpl> future3  = executor.submit(pt3);
 
-        FieldImpl         uFI  = future.get();
-        FieldImpl         vFI  = future1.get();
-        FieldImpl         pwFI = future2.get();
-        FieldImpl         sFI  = future3.get();
+        FieldImpl         uFI      = future.get();
+        FieldImpl         vFI      = future1.get();
+        FieldImpl         pwFI     = future2.get();
+        FieldImpl         sFI      = future3.get();
 
         //System.out.println("Time used to read = "
         //        + (System.currentTimeMillis() - start) / 1000.0);
-        start    = System.currentTimeMillis();
+        start = System.currentTimeMillis();
         /*
         FieldImpl         uFI       = (FieldImpl)uFI0.clone(); //future.get();
         FieldImpl         vFI       = (FieldImpl)vFI0.clone(); //future1.get();
@@ -4186,6 +4328,7 @@ public class DerivedGridFactory {
      * @author
      */
     static class pointsThredds implements Callable<TrajInfo> {
+
         /** _more_ */
         FieldImpl uFI;
 
@@ -4204,10 +4347,10 @@ public class DerivedGridFactory {
         /** _more_ */
         float lat;
 
-        /** _more_          */
+        /** _more_ */
         float lon;
 
-        /** _more_          */
+        /** _more_ */
         float alt;
 
         /** _more_ */
@@ -4237,21 +4380,21 @@ public class DerivedGridFactory {
          * @param lon _more_
          * @param alt _more_
          * @param numTimes _more_
-
+         *
          */
-        private pointsThredds( FieldImpl uFI, FieldImpl vFI,
-                              FieldImpl wFI, FieldImpl sFI, double[] ttts,
-                              float lat, float lon, float alt, int numTimes) {
+        private pointsThredds(FieldImpl uFI, FieldImpl vFI, FieldImpl wFI,
+                              FieldImpl sFI, double[] ttts, float lat,
+                              float lon, float alt, int numTimes) {
 
-            this.uFI          = uFI;
-            this.vFI          = vFI;
-            this.wFI          = wFI;
-            this.sFI          = sFI;
-            this.ttts         = ttts;
-            this.lat          = lat;
-            this.lon          = lon;
-            this.alt          = alt;
-            this.numTimes     = numTimes;
+            this.uFI      = uFI;
+            this.vFI      = vFI;
+            this.wFI      = wFI;
+            this.sFI      = sFI;
+            this.ttts     = ttts;
+            this.lat      = lat;
+            this.lon      = lon;
+            this.alt      = alt;
+            this.numTimes = numTimes;
 
         }
 
@@ -4261,11 +4404,165 @@ public class DerivedGridFactory {
          * @return _more_
          */
         public TrajInfo call() {
-            TrajInfo tj = calculateSingleTrackPoints(uFI, vFI, wFI, sFI,
-                              ttts, lat, lon, alt, numTimes);
-            //System.out.println("Thredds = " + i);
-            return tj;
+            if (wFI != null) {
+                return calculateSingleTrackPoints(uFI, vFI, wFI, sFI, ttts,
+                        lat, lon, alt, numTimes);
+            } else {
+                return calculateSingleTrackPoints(uFI, vFI, sFI, ttts, lat,
+                        lon, alt, numTimes);
+            }
         }
+    }
+
+    /**
+     * _more_
+     *
+     * @param uFI _more_
+     * @param vFI _more_
+     * @param sFI _more_
+     * @param ttts _more_
+     * @param lat0 _more_
+     * @param lon0 _more_
+     * @param alt0 _more_
+     * @param numTimes _more_
+     *
+     *
+     * @return _more_
+     *
+     */
+    public static TrajInfo calculateSingleTrackPoints(final FieldImpl uFI,
+            final FieldImpl vFI, final FieldImpl sFI, final double[] ttts,
+            final float lat0, final float lon0, final float alt0,
+            final int numTimes) {
+
+        final float radius   = 6371000.0f;
+        final float f        = 180.0f / 3.1415926f;
+        TrajInfo    trajInfo = new TrajInfo(numTimes);
+
+
+        try {
+
+            float[] u = new float[numTimes];
+            float[] v = new float[numTimes];
+
+
+            for (int timeStepIdx = 0; timeStepIdx < numTimes; timeStepIdx++) {
+                if (timeStepIdx == 0) {
+
+                    trajInfo.lats[timeStepIdx] = lat0;
+
+                    trajInfo.lons[timeStepIdx] = lon0;
+                    trajInfo.alts[timeStepIdx] = alt0;
+
+                    EarthLocation el = new EarthLocationLite(lat0, lon0,
+                                           alt0);
+                    LatLonPoint llp     = el.getLatLonPoint();
+
+                    FieldImpl   ssample = GridUtil.sample(sFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+                    Data srt   = ssample.getSample(0);
+                    Real sreal = (srt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) srt).getComponent(0)
+                                 : (Real) srt;
+                    trajInfo.parcels[timeStepIdx] = (float) sreal.getValue();
+
+
+                    FieldImpl usample = GridUtil.sample(uFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+                    Data urt   = usample.getSample(0);
+                    Real ureal = (urt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) urt).getComponent(0)
+                                 : (Real) urt;
+                    u[timeStepIdx] = (float) ureal.getValue();
+
+                    FieldImpl vsample = GridUtil.sample(vFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+                    Data vrt   = vsample.getSample(0);
+                    Real vreal = (vrt instanceof RealTuple)
+                                 ? (Real) ((RealTuple) vrt).getComponent(0)
+                                 : (Real) vrt;
+                    v[timeStepIdx] = (float) vreal.getValue();
+
+
+
+                } else {
+                    double delt = ttts[timeStepIdx] - ttts[timeStepIdx - 1];
+
+                    float  lat  = trajInfo.lats[timeStepIdx - 1];
+                    float  lon  = trajInfo.lons[timeStepIdx - 1];
+                    float  alt  = trajInfo.alts[timeStepIdx - 1];
+
+                    float  lat1 = (float) (lat
+                                          + f * (v[timeStepIdx - 1] * delt)
+                                            / (radius + alt));
+                    float lon1 = (float) (lon
+                                          + f * (u[timeStepIdx - 1] * delt)
+                                            / (radius + alt));
+                    float         alt1 = alt;
+
+                    EarthLocation el   = new EarthLocationLite(lat1, lon1,
+                                           alt1);
+                    LatLonPoint llp = el.getLatLonPoint();
+                    //GridUtil.sampleAtPoint for u, v, w
+                    FieldImpl usample = GridUtil.sample(uFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+                    FieldImpl vsample = GridUtil.sample(vFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+
+                    FieldImpl ssample = GridUtil.sample(sFI, llp,
+                                            Data.NEAREST_NEIGHBOR);
+
+                    if ((usample == null) && (vsample == null)
+                            && (ssample == null)) {
+                        //outside the domain
+                        trajInfo.lats[timeStepIdx] =
+                            trajInfo.lats[timeStepIdx - 1];
+                        trajInfo.lons[timeStepIdx] =
+                            trajInfo.lons[timeStepIdx - 1];
+                        trajInfo.alts[timeStepIdx] =
+                            trajInfo.alts[timeStepIdx - 1];
+                        trajInfo.parcels[timeStepIdx] =
+                            trajInfo.parcels[timeStepIdx - 1];
+                    } else {
+                        trajInfo.lats[timeStepIdx] = lat1;
+                        trajInfo.lons[timeStepIdx] = lon1;
+                        trajInfo.alts[timeStepIdx] = alt1;
+
+                        Data urt   = usample.getSample(timeStepIdx);
+                        Real ureal = (urt instanceof RealTuple)
+                                     ? (Real) ((RealTuple) urt).getComponent(
+                                         0)
+                                     : (Real) urt;
+                        u[timeStepIdx] = (float) ureal.getValue();
+
+
+                        Data vrt   = vsample.getSample(timeStepIdx);
+                        Real vreal = (vrt instanceof RealTuple)
+                                     ? (Real) ((RealTuple) vrt).getComponent(
+                                         0)
+                                     : (Real) vrt;
+                        v[timeStepIdx] = (float) vreal.getValue();
+
+
+                        Data srt   = ssample.getSample(timeStepIdx);
+                        Real sreal = (srt instanceof RealTuple)
+                                     ? (Real) ((RealTuple) srt).getComponent(
+                                         0)
+                                     : (Real) srt;
+                        trajInfo.parcels[timeStepIdx] =
+                            (float) sreal.getValue();
+
+                    }
+
+                }
+
+            }
+
+
+        } catch (Exception ee) {}
+
+
+        return trajInfo;
     }
 
     /**
@@ -4280,7 +4577,7 @@ public class DerivedGridFactory {
      * @param lon0 _more_
      * @param alt0 _more_
      * @param numTimes _more_
-
+     *
      *
      * @return _more_
      *
@@ -4288,7 +4585,7 @@ public class DerivedGridFactory {
     public static TrajInfo calculateSingleTrackPoints(final FieldImpl uFI,
             final FieldImpl vFI, final FieldImpl wFI, final FieldImpl sFI,
             final double[] ttts, final float lat0, final float lon0,
-            final float alt0, final int numTimes ) {
+            final float alt0, final int numTimes) {
 
         final float radius   = 6371000.0f;
         final float f        = 180.0f / 3.1415926f;

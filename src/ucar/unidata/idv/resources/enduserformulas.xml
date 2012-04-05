@@ -226,6 +226,34 @@
      </operands>
   </derived>
   <derived
+        description="Create 3D Flow Trajectory"
+        formula="makeFlowTraj(u,v,w,s,s0)"
+        id="gridFlowTraj"
+        isdefault="false"
+        isenduser="true">
+      <categories>
+          <category
+                  display="true"
+                  value="Grids"/>
+          <category value="display:trackcontrol"/>
+      </categories>
+    <operands/>
+  </derived>
+  <derived
+        description="Create 2D Flow Trajectory"
+        formula="make2DFlowTraj(u,v,s,s0)"
+        id="grid2DFlowTraj"
+        isdefault="false"
+        isenduser="true">
+    <categories>
+        <category
+                display="true"
+                value="Grids"/>
+        <category value="display:trackcontrol"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
      description="Find latitude of grid points"
      formula="extractLatitudeFromNWPGrid(fieldimpl)"
      id="latitudeGrid"
