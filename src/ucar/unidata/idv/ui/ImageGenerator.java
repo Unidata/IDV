@@ -2763,12 +2763,21 @@ public class ImageGenerator extends IdvManager {
             Attr   attr   = (Attr) attrs.item(i);
             String var    = attr.getNodeName();
             String values = applyMacros(attr.getNodeValue());
-            List   tokens = StringUtil.split(values, ",");
+            List tokens;
+            //Check if it starts with file:, if so read the contents and split on new line
+            if(values.startsWith("file:")) {
+                String filename = applyMacros(values.substring("file:".length()));
+                values = IOUtil.readContents(filename, getClass()).trim();
+                tokens = StringUtil.split(values, "\n");
+            } else {
+                tokens = StringUtil.split(values, ",");
+            }
+
             if (allValues.size() == 0) {
                 numElements = tokens.size();
             } else if (numElements != tokens.size()) {
-                return error("Bad number of tokens in foreach argument:\n"
-                             + var + "=" + values);
+                return error("Bad number of tokens (" +tokens.size() +" should be:" + numElements +") in foreach argument:\n"
+                             + var + "=" + tokens);
             }
             allValues.add(new Object[] { var, tokens });
             cnt++;
