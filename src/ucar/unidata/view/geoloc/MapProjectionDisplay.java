@@ -512,25 +512,25 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void updateLatScale(AxisScale scale, EarthLocation bottom, EarthLocation top)
             throws VisADException, RemoteException {
-        final int    LAT_MIN      = -90;
-        final int    LAT_MAX      = 90;
-        double       bottomLat    = bottom.getLatitude().getValue();
-        double       topLat       = top.getLatitude().getValue();
-        Hashtable    labelTable   = new Hashtable();
-        double       base         = Misc.parseNumber(getLatScaleInfo().baseLabel);
-        List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLatScaleInfo().minorIncrement;
-        List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc          = Misc.parseNumber(getLatScaleInfo().increment);
-        int          cnt          = 0;
+        final int                 LAT_MIN      = -90;
+        final int                 LAT_MAX      = 90;
+        double                    bottomLat    = bottom.getLatitude().getValue();
+        double                    topLat       = top.getLatitude().getValue();
+        Hashtable<Double, String> labelTable   = new Hashtable<Double, String>();
+        double                    base         = Misc.parseNumber(getLatScaleInfo().baseLabel);
+        List<Double>              majorTicks   = new ArrayList<Double>();
+        int                       minorTickInc = getLatScaleInfo().minorIncrement;
+        List<Double>              minorTicks   = new ArrayList<Double>();
+        double                    inc          = Misc.parseNumber(getLatScaleInfo().increment);
+        int                       cnt          = 0;
 
         // In case user inputs something bogus.
-        if ((base < bottomLat) || (base > topLat)) {
+        if ((base < LAT_MIN) || (base > LAT_MAX)) {
             base = bottomLat;
         }
 
         for (double i = base; i < topLat; i += inc / minorTickInc) {
-            if ((i < LAT_MIN) || (i > LAT_MAX)) {    // Latitudes that are not in this range do not make sense.
+            if (i < bottomLat) {    // Latitudes that are not in this range are not visible.
                 continue;
             }
 
@@ -571,36 +571,37 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void updateLonScale(AxisScale scale, EarthLocation left, EarthLocation right)
             throws VisADException, RemoteException {
-        final int    MAX_LON         = 360;
-        final int    MID_LON         = 180;
-        final int    MIN_LON         = 0;
-        double       leftLon         = left.getLongitude().getValue();
-        double       rightLon        = right.getLongitude().getValue();
-        boolean      isMeridianCross = leftLon > rightLon;
-        Hashtable    labelTable      = new Hashtable();
-        double       base            = Misc.parseNumber(getLonScaleInfo().baseLabel);
-        List<Double> majorTicks      = new ArrayList<Double>();
-        int          minorTickInc    = getLonScaleInfo().minorIncrement;
-        List<Double> minorTicks      = new ArrayList<Double>();
-        double       inc             = Misc.parseNumber(getLonScaleInfo().increment);
-        int          cnt             = 0;
-        List<Double> increment       = new LinkedList<Double>();
+        final int                 MAX_LON         = 360;
+        final int                 MID_LON         = 180;
+        final int                 MIN_LON         = 0;
+        final int                 MIN_LON2        = -180;
+        double                    leftLon         = left.getLongitude().getValue();
+        double                    rightLon        = right.getLongitude().getValue();
+        boolean                   isMeridianCross = leftLon > rightLon;
+        Hashtable<Double, String> labelTable      = new Hashtable<Double, String>();
+        double                    base            = Misc.parseNumber(getLonScaleInfo().baseLabel);
+        List<Double>              majorTicks      = new ArrayList<Double>();
+        int                       minorTickInc    = getLonScaleInfo().minorIncrement;
+        List<Double>              minorTicks      = new ArrayList<Double>();
+        double                    inc             = Misc.parseNumber(getLonScaleInfo().increment);
+        int                       cnt             = 0;
+        List<Double>              increment       = new LinkedList<Double>();
 
+        // Northen hemisphere meridian cross
         leftLon = isMeridianCross
                   ? leftLon - MAX_LON
                   : leftLon;
 
-        // First try to fix
-        if ((base < leftLon) || (base > rightLon)) {
-            base += MAX_LON;
-        }
-
-        // May still be messed up
-        if ((base < leftLon) || (base > rightLon)) {
+        // In case user inputs something bogus.
+        if ((base < MIN_LON2) || (base > MAX_LON)) {
             base = leftLon;
         }
 
         for (double i = base; i < rightLon; i += inc / minorTickInc) {
+            if (i < leftLon) {    // Longitudes that are not in this range are not visible.
+                continue;
+            }
+
             increment.add(i);
         }
 
@@ -644,25 +645,31 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void updateSouthPoleLonScale(AxisScale scale, EarthLocation left, EarthLocation right)
             throws VisADException, RemoteException {
-        final int    MAX_LON      = 360;
-        final int    MID_LON      = 180;
-        final int    MIN_LON      = 0;
-        double       leftLon      = left.getLongitude().getValue();
-        double       rightLon     = right.getLongitude().getValue() - MAX_LON;
-        Hashtable    labelTable   = new Hashtable();
-        double       base         = Misc.parseNumber(getLonScaleInfo().baseLabel);
-        List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().minorIncrement;
-        List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc          = Misc.parseNumber(getLonScaleInfo().increment);
-        int          cnt          = 0;
-        List<Double> increment    = new LinkedList<Double>();
+        final int                 MAX_LON      = 360;
+        final int                 MID_LON      = 180;
+        final int                 MIN_LON      = 0;
+        final int                 MIN_LON2     = -180;
+        double                    leftLon      = left.getLongitude().getValue();
+        double                    rightLon     = right.getLongitude().getValue() - MAX_LON;
+        Hashtable<Double, String> labelTable   = new Hashtable<Double, String>();
+        double                    base         = Misc.parseNumber(getLonScaleInfo().baseLabel);
+        List<Double>              majorTicks   = new ArrayList<Double>();
+        int                       minorTickInc = getLonScaleInfo().minorIncrement;
+        List<Double>              minorTicks   = new ArrayList<Double>();
+        double                    inc          = Misc.parseNumber(getLonScaleInfo().increment);
+        int                       cnt          = 0;
+        List<Double>              increment    = new LinkedList<Double>();
 
-        if ((base > leftLon) || (base < rightLon)) {
+        // In case the user enters something bogus
+        if ((base < MIN_LON2) || (base > MAX_LON)) {
             base = leftLon;
         }
 
         for (double i = base; i > rightLon; i -= inc / minorTickInc) {
+            if (i > leftLon) {    // Longitudes that are not in this range are not visible.
+                continue;
+            }
+
             increment.add(i);
         }
 
@@ -705,8 +712,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @param minorTicks the minor ticks
      * @throws VisADException the vis ad exception
      */
-    private void finalizeAxis(AxisScale scale, String title, Hashtable labelTable, List<Double> majorTicks,
-                              List<Double> minorTicks)
+    private void finalizeAxis(AxisScale scale, String title, Hashtable<? extends Double, ? extends String> labelTable,
+                              List<Double> majorTicks, List<Double> minorTicks)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
@@ -808,7 +815,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setSnapToBox(true);
         scale.setTitle(title);
 
-        Hashtable labelTable = new Hashtable();
+        Hashtable<Double, String> labelTable = new Hashtable<Double, String>();
 
         labelTable.put(new Double(maxmin[0]), labelFormat.format(bottom));
         labelTable.put(new Double(maxmin[1]), labelFormat.format(top));
