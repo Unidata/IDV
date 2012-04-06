@@ -73,7 +73,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     JFrame parent;
 
     /** Holds the vertical scale info */
-    VertScaleInfo transfer;
+    VertScaleInfo vertScaleInfo;
 
     /** combo box for selecting units */
     private JComboBox unitCombo;
@@ -96,12 +96,12 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @param parent   parent for model dialog
      * @param control The control
-     * @param transfer The info to use
+     * @param vertScaleInfo The info to use
      */
-    public VertScaleDialog(JFrame parent, ViewpointControl control, VertScaleInfo transfer) {
+    public VertScaleDialog(JFrame parent, ViewpointControl control, VertScaleInfo vertScaleInfo) {
         this.control  = control;
         this.parent   = parent;
-        this.transfer = transfer;
+        this.vertScaleInfo = vertScaleInfo;
         doMakeContents();
     }
 
@@ -125,15 +125,15 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         max.addActionListener(this);
         this.add("Center", GuiUtils.inset(p1, 5));
 
-        if (transfer != null) {
-            min.setText(Misc.format(transfer.minVertScale));
-            max.setText(Misc.format(transfer.maxVertScale));
+        if (vertScaleInfo != null) {
+            min.setText(Misc.format(vertScaleInfo.minVertScale));
+            max.setText(Misc.format(vertScaleInfo.maxVertScale));
 
-            if (transfer.unit != null) {
-                unitCombo.setSelectedItem(transfer.unit.toString());
+            if (vertScaleInfo.unit != null) {
+                unitCombo.setSelectedItem(vertScaleInfo.unit.toString());
             }
 
-            visible.setSelected(transfer.visible);
+            visible.setSelected(vertScaleInfo.visible);
         }
     }
 
@@ -187,7 +187,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             dialog.setLocation(100, 100);
         }
 
-        this.transfer = transfer;
+        this.vertScaleInfo = transfer;
         min.setText(Misc.format(transfer.minVertScale));
         max.setText(Misc.format(transfer.maxVertScale));
         unitCombo.setSelectedItem(transfer.unit.toString());
@@ -231,11 +231,11 @@ public class VertScaleDialog extends JPanel implements ActionListener {
 
         newTransfer.visible = visible.isSelected();
 
-        if (!Misc.equals(newTransfer, transfer)) {
-            transfer = newTransfer;
+        if (!Misc.equals(newTransfer, vertScaleInfo)) {
+            vertScaleInfo = newTransfer;
 
             try {
-                control.applyVerticalScale(transfer);
+                control.applyVerticalScale(vertScaleInfo);
             } catch (Exception exc) {
                 LogUtil.userMessage("An error has occurred:" + exc);
 
@@ -245,4 +245,12 @@ public class VertScaleDialog extends JPanel implements ActionListener {
 
         return true;
     }
+
+    public boolean isAxisVisible() {
+    	return visible.isSelected();
+    }
+
+	public VertScaleInfo getVertScaleInfo() {
+		return this.vertScaleInfo;
+	}
 }

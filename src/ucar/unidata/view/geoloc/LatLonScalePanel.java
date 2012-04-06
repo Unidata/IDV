@@ -262,4 +262,12 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) {
         this.lonScaleInfo = lonScaleInfo;
     }
+
+    public boolean isLonVisible() {
+        return xVisible.isSelected();
+    }
+
+    public boolean isLatVisible() {
+        return yVisible.isSelected();
+    }
 }

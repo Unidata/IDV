@@ -372,9 +372,18 @@ public abstract class NavigatedViewManager extends ViewManager {
             return false;
         }
 
-        return vertScaleWidget.doApply() && ((latLonScaleWidget != null)
-                ? latLonScaleWidget.doApply()
-                : true);
+        boolean b;
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            b = (latLonScaleWidget.isVisible() || latLonScaleWidget.isVisible()
+                 || vertScaleWidget.isAxisVisible());
+        } else {
+            b = vertScaleWidget.isAxisVisible();
+        }
+
+        setBp(PREF_SHOWSCALES, b);
+        
+        return vertScaleWidget.doApply() && latLonScaleWidget.doApply();
     }
 
     /**
@@ -384,13 +393,16 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
-        vertScaleWidget = getViewpointControl().getVerticalScaleWidget();
+        vertScaleWidget = getViewpointControl().makeVerticalScaleWidget(getBp(PREF_SHOWSCALES));        		
         tabbedPane.add("Vertical Scale", GuiUtils.topLeft(vertScaleWidget));
-
+        
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
             MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
 
-            latLonScaleWidget = new LatLonScalePanel(mpDisplay);
+            mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            vertScaleWidget.getVertScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            latLonScaleWidget                   = new LatLonScalePanel(mpDisplay);
             tabbedPane.add("Horizontal Scale", GuiUtils.topLeft(latLonScaleWidget));
         }
     }
