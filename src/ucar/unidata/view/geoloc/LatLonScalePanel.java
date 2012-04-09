@@ -53,6 +53,8 @@ import javax.swing.SpinnerNumberModel;
  * @author   IDV Development Team
  */
 public class LatLonScalePanel extends JPanel implements ActionListener {
+    
+    /** The coord format. */
     private JComboBox coordFormat;
 
     /** Latitude base label */
@@ -103,6 +105,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     /**
      * Create a new dialog for setting the coordinate range of the display
      *
+     * @param mpDisplay the mp display
      */
     public LatLonScalePanel(MapProjectionDisplay mpDisplay) {
         this.mpDisplay    = mpDisplay;
@@ -263,10 +266,20 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         this.lonScaleInfo = lonScaleInfo;
     }
 
+    /**
+     * Checks if is lon visible.
+     *
+     * @return true, if is lon visible
+     */
     public boolean isLonVisible() {
         return xVisible.isSelected();
     }
 
+    /**
+     * Checks if is lat visible.
+     *
+     * @return true, if is lat visible
+     */
     public boolean isLatVisible() {
         return yVisible.isSelected();
     }

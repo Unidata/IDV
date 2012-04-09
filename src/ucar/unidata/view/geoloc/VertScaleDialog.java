@@ -246,10 +246,20 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         return true;
     }
 
+    /**
+     * Checks if is axis visible.
+     *
+     * @return true, if is axis visible
+     */
     public boolean isAxisVisible() {
     	return visible.isSelected();
     }
 
+	/**
+	 * Gets the vert scale info.
+	 *
+	 * @return the vert scale info
+	 */
 	public VertScaleInfo getVertScaleInfo() {
 		return this.vertScaleInfo;
 	}
