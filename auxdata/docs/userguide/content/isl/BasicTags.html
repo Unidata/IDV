@@ -234,7 +234,9 @@ The [isl::tag foreach] tag allows you to iterate across a set of comma separated
 For example, here we are generating three different image types:
 [isl::importxml foreach.isl]
 
-
+Another example is to read each line from a file using the [isl::tag foreach]:
+[isl::importxml foreachlineinafile.isl]
+[isl::importxml test.txt]
 
 [isl::tagdef exec {Execute a shell command} -attrs {command+ {some shell command to exec}}]
 The [isl::tag exec] tag allows you to execute external programs.
