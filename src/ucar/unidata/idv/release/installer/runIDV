@@ -8,13 +8,13 @@
 # Syntax:  runIDV <idv options>
 #
 # Notes:   In past versions of the IDV, users had to change this script to
-# manipulate memory settings. The IDV now configures the  appropriate memory. 
-# Users can also change the memory via the Preferences  menu. In exceptional 
-# situations where the IDV may not start due to memory issues, it may be 
-# necessary to bootstrap the memory size. In this case, please uncomment the 
+# manipulate memory settings. The IDV now configures the  appropriate memory.
+# Users can also change the memory via the Preferences  menu. In exceptional
+# situations where the IDV may not start due to memory issues, it may be
+# necessary to bootstrap the memory size. In this case, please uncomment the
 # idv_memory section below and subsequently choose memory via the Preferences
-# menu.  Be sure to comment it out that after setting the memory via the 
-# Preferences if you want the preference to take effect. 
+# menu.  Be sure to comment it out that after setting the memory via the
+# Preferences if you want the preference to take effect.
 ###############################################################################
 
 ##Error message, if needed.
@@ -30,23 +30,27 @@ else
 ##Try using the dirname of this script
     if test -f ${dirname}/jre/bin/java; then
        java=${dirname}/jre/bin/${java}
-    else 
+    else
        if test  ${JAVA_HOME}; then
 ##Try using JAVA_HOME
           java=${JAVA_HOME}/bin/${java}
-       else 
+       else
 ##Try just using java
           java=${java}
       fi
     fi
 fi
 
+# On some UNIX operating systems, the line below will not work. The
+# root issue is that /bin/sh is not completely standard across all
+# UNIX operating systems. If that is the case, try this line instead
+# prefs=`${java} -client -cp ${dirname}/idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1`
 prefs="$(${java} -client -cp ${dirname}/idv.jar ucar.unidata.idv.IdvCommandLinePrefs $* 2>&1 )"
 
 if [ $? -eq 1 ]; then
     echo "${error_msg}"
     exit 1
-fi    
+fi
 
 eval "${prefs}"
 
@@ -56,17 +60,17 @@ if test -z ${idv_memory}; then
     exit 1
 fi
 
-## See important note about this above. To bootstrap the IDV memory, uncomment 
-## this line and set to a value  in megabytes. 
+## See important note about this above. To bootstrap the IDV memory, uncomment
+## this line and set to a value  in megabytes.
 ## idv_memory=512
 
-## To avoid IDV crashes, in some situations it may be necessary to increase MaxPermSize. We have 
+## To avoid IDV crashes, in some situations it may be necessary to increase MaxPermSize. We have
 ## especially noticed this problem on the OS X platform. The default MaxPermSize is 64m. To
 ## increase it to 128m please comment out next line and uncomment the following line.
 
 ## To avoid IDV OutOfMemory problems, it may be necessary to increase the MaxPermSize in the Java
 ## Virtual Machine. We have especially noticed this problem on the OS X platform. The default MaxPermSize
-## is 64m. To increase it to 128m please comment out next line and uncomment the line following that. 
+## is 64m. To increase it to 128m please comment out next line and uncomment the line following that.
 
 ${java} -Xmx${idv_memory}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
 ## ${java} -Xmx${idv_memory}m -XX:MaxPermSize=128m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
