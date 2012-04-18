@@ -1212,7 +1212,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         });
 
 
-        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Display All", this,
+        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Display All Times", this,
                                        "allProfilesVisibility");
         allProfilesBox.setSelected(false);
         final JComboBox parcelModeBox = new JComboBox(parcelModeInfos);
@@ -1863,7 +1863,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         aeroDisplay.setProfilesVisibility(visible);
         AnimationWidget aniWidget = this.getAnimationWidget();
         aniWidget.setBoxPanelVisible(!visible);
-        aniWidget.setRunning(false);
+        if(visible){
+            aniWidget.gotoIndex(0);
+            aniWidget.setRunning(false);
+        }
         GuiUtils.enableTree(aniWidget.getContents(), !visible);
         // now update the display list label
 
