@@ -38,6 +38,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -119,21 +120,28 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Longitude Label: "), lonLabel = new JTextField(),
-            GuiUtils.rLabel("Latitude Label: "), latLabel = new JTextField(),
-            GuiUtils.rLabel("Latitude Base (-90 90): "), latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Longitude Base (-180 180): "),
-            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Latitude Increment: "),
-            latIncrement = new NumericTextField(), GuiUtils.rLabel("Latitude Minor Increment: "),
-            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
-            GuiUtils.rLabel("Longitude Increment: "), lonIncrement = new NumericTextField(),
-            GuiUtils.rLabel("Longitude Minor Increment: "),
-            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)),
-            GuiUtils.rLabel("Longitude Visible: "), xVisible = new JCheckBox("", true),
-            GuiUtils.rLabel("Latitude Visible: "), yVisible = new JCheckBox("", true),
-            GuiUtils.rLabel("Format: "), coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values())
+            GuiUtils.rLabel("Label: "), latLabel = new JTextField(), GuiUtils.rLabel("Base (-90 90): "),
+            latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
+            latIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
+            yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        JPanel p2 = GuiUtils.doLayout(new Component[] {
+            GuiUtils.rLabel("Label: "), lonLabel = new JTextField(), GuiUtils.rLabel("Base (-180 180): "),
+            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
+            lonIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
+            xVisible = new JCheckBox("", true),
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        JPanel p3 = GuiUtils.doLayout(new Component[] { GuiUtils.rLabel("Format: "),
+                coordFormat = new JComboBox(AxisScaleInfo.CoordSys.values()) }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
-        this.add("Center", GuiUtils.inset(p1, 5));
+        p1.setBorder(BorderFactory.createTitledBorder("Latitude"));
+        p2.setBorder(BorderFactory.createTitledBorder("Longitude"));
+
+        JPanel p = GuiUtils.doLayout(new Component[] { p1, p2, p3 }, 1, GuiUtils.WT_NY, GuiUtils.WT_N);
+
+        this.add("Center", p);
 
         if (latScaleInfo != null) {
             populateLatScaleInfo();
@@ -196,8 +204,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      * @return Was it successful
      */
     public boolean doApply() {
-    	
         AxisScaleInfo newLatInfo = new AxisScaleInfo();
+
         newLatInfo.label          = latLabel.getText();
         newLatInfo.baseLabel      = latBaseLabel.getText();
         newLatInfo.increment      = latIncrement.getText();
@@ -230,6 +238,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
             mpDisplay.setDisplayActive();
         } catch (Exception e) {
             LogUtil.userMessage("An error has occurred:" + e);
+
             return false;
         }
 

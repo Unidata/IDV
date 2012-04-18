@@ -1,0 +1,23 @@
+http://www.oracle.com/technetwork/java/javase/downloads/jre-6u31-download-1501637.html
+http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html#java3d-1.5.1-oth-JPR
+
+|-----------------------+------------------+----------+----------------------------------+----------------------+------------------+------------+----------+-----+----------------------------------------+------|
+| Operating System      | 32/64            | size     | install                          | /share/idv directory | host             | downloaded | unpacked | j3d | /share/install4j4.2.6/jres             | idv? |
+|-----------------------+------------------+----------+----------------------------------+----------------------+------------------+------------+----------+-----+----------------------------------------+------|
+| Linux x86             | (32-bit)         | 20.17 MB | jre-6u31-linux-i586-rpm.bin      |                      |                  |            |          |     |                                        |      |
+| Linux x86             | (32-bit)         | 20.69 MB | jre-6u31-linux-i586.bin          | linux                | joey,ams         | x          | x        | x   | linux-i386-1.6.0_31_j3d1.5.2.tar.gz    |      |
+| Linux Intel Itanium   | (64-bit)         | 19.33 MB | jre-6u31-linux-ia64-rpm.bin      |                      |                  |            |          |     |                                        |      |
+| Linux Intel Itanium   | (64-bit)         | 21.82 MB | jre-6u31-linux-ia64.bin          |                      |                  |            |          |     |                                        |      |
+| Linux x64             | (64-bit)         | 19.75 MB | jre-6u31-linux-x64-rpm.bin       |                      |                  |            |          |     |                                        |      |
+| Linux x64             | (64-bit)         | 20.33 MB | jre-6u31-linux-x64.bin           | linux64              | harpo            | x          | x        | x   | linux-amd64-1.6.0_31_j3d1.5.2.tar.gz   |      |
+| Solaris x86           | (32-bit)         | 20.34 MB | jre-6u31-solaris-i586.sh         | solarisx86           | motherlode,buddy | x          | x        | x   | solaris-x86-1.6.0_31_j3d1.5.2.tar.gz   |      |
+| Solaris x64           | (64-bit)         | 7.49 MB  | jre-6u31-solaris-x64.sh          |                      |                  |            |          |     |                                        |      |
+| Solaris SPARC         | (32-bit)         | 25.17 MB | jre-6u31-solaris-sparc.sh        | solarisSPARC         | conan,zero       | x          | x        | x   | solaris-sparc-1.6.0_31_j3d1.5.2.tar.gz |      |
+| Solaris SPARC         | (64-bit)         | 11.19 MB | jre-6u31-solaris-sparcv9.sh      |                      |                  |            |          |     |                                        |      |
+| Windows x86           | (32-bit) Kernel  | 0.87 MB  | jre-6u31-windows-i586-iftw-k.exe |                      |                  |            |          |     |                                        |      |
+| Windows x86           | (32-bit) Online  | 0.87 MB  | jre-6u31-windows-i586-iftw.exe   |                      |                  |            |          |     |                                        |      |
+| Windows x86           | (32-bit) Offline | 16.19 MB | jre-6u31-windows-i586.exe        | windows              | taz              | x          | x        | x   | windows-x86-1.6.0_31_j3d1.5.2.tar.gz   |      |
+| Windows Intel Itanium | (64-bit)         | 18.93 MB | jre-6u31-windows-ia64.exe        |                      |                  |            |          |     |                                        |      |
+| Windows x64           | (64-bit)         | 16.45 MB | jre-6u31-windows-x64.exe         | windows64            | yuan             | x          | x        | x   | windows-amd64-1.6.0_31_j3d1.5.2.tar.gz |      |
+| OS X                  | (64-bit)         |          |                                  | mac                  | fufu             |            |          |     |                                        |      |
+|-----------------------+------------------+----------+----------------------------------+----------------------+------------------+------------+----------+-----+----------------------------------------+------|
