@@ -1862,6 +1862,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     public void setAllProfilesVisibility(boolean visible) throws Exception {
         aeroDisplay.setProfilesVisibility(visible);
         AnimationWidget aniWidget = this.getAnimationWidget();
+        aniWidget.setBoxPanelVisible(!visible);
         aniWidget.setRunning(false);
         GuiUtils.enableTree(aniWidget.getContents(), !visible);
         // now update the display list label
