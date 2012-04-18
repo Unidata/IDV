@@ -161,7 +161,7 @@ public final class Isobars extends BackgroundContours {
                                    rangeMaximum);
         float      minX = (float) coordinateSystem.getMinimumX().getValue();
         float      maxX = (float) coordinateSystem.getMaximumX().getValue();
-        float[][]  domainSamples = new float[2][2 * isobarValues.length];
+        float[][]  domainSamples = new float[2][3 * isobarValues.length];
         double[][] ptCoordinates = new double[2][1];
         int        j             = 0;
 
@@ -174,6 +174,8 @@ public final class Isobars extends BackgroundContours {
 
             domainSamples[0][j]   = minX;
             domainSamples[1][j++] = y;
+            domainSamples[0][j]   = 0;
+            domainSamples[1][j++] = y;
             domainSamples[0][j]   = maxX;
             domainSamples[1][j++] = y;
         }
@@ -183,14 +185,15 @@ public final class Isobars extends BackgroundContours {
                 RealTupleType
                     .SpatialCartesian2DTuple, getPressureType()), new Gridded2DSet(
                         RealTupleType
-                            .SpatialCartesian2DTuple, domainSamples, 2, isobarValues
+                            .SpatialCartesian2DTuple, domainSamples, 3, isobarValues
                             .length));
 
-        float[] rangeSamples = new float[2 * isobarValues.length];
+        float[] rangeSamples = new float[3 * isobarValues.length];
 
         j = 0;
 
         for (int i = 0; i < isobarValues.length; ++i) {
+            rangeSamples[j++] = isobarValues[i];
             rangeSamples[j++] = isobarValues[i];
             rangeSamples[j++] = isobarValues[i];
         }
