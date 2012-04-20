@@ -1,26 +1,22 @@
 /*
- * $Id: AerologicalDisplay.java,v 1.53 2007/01/30 22:46:00 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.view.sounding;
 
@@ -301,6 +297,9 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     /** flag for whether we've been initialized */
     private boolean init = false;
 
+    /** flag for whether to display all profiles */
+    private boolean profilesVisibility = false;
+
     /**
      * Constructs.  The value of the constrainProfiles property is
      * initially <code>true</code>.
@@ -563,6 +562,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         addDisplayable(pseudoAdiabaticTrajectory);
         addDisplayable(box = new Box(coordinateSystem));
         addDisplayable(isobars = new Isobars(coordinateSystem));
+        isobars.setVisible(true);
         addDisplayable(isotherms = new Isotherms(coordinateSystem));
         setBackgroundLineColor(getForeground());
         addDisplayable(dryAdiabats = new DryAdiabats(coordinateSystem));
@@ -892,14 +892,15 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
 
 
         Sounding sounding = (Sounding) soundings.getDisplayable(index);
-        if(sounding==null) {
+        if (sounding == null) {
             sounding = new Sounding(getDisplay());
             soundings.addSounding(index, sounding);
         }
-        WindBarbProfile windBarbs = (WindBarbProfile)winds.getDisplayable(index);
-        if(windBarbs==null){
+        WindBarbProfile windBarbs =
+            (WindBarbProfile) winds.getDisplayable(index);
+        if (windBarbs == null) {
             windBarbs = new WindBarbProfile(getDisplay(),
-                                        getCoordinateSystem());
+                                            getCoordinateSystem());
             winds.addWindProfile(index, windBarbs);
         }
         sounding.setFields(temperature, dewPoint);
@@ -961,6 +962,52 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
 
         soundings.setVisible(visible, index, index);
         winds.setVisible(visible, index, index);
+    }
+
+    /**
+     * Sets the visibility of all soundings.
+     * @param visible           Whether or not the sounding should be visible.
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void setProfilesVisibility(boolean visible)
+            throws VisADException, RemoteException {
+
+        profilesVisibility = visible;
+
+        int n = soundings.displayableCount();
+        for (int i = 0; i < n; i++) {
+            int index = i;
+            soundings.setVisible(visible, index, index);
+            // winds.setVisible(visible, index, index);
+        }
+
+        if (visible) {
+            for (int i = 0; i < n; i++) {
+                int style = ((i == 0)
+                             ? GraphicsModeControl.DASH_STYLE
+                             : GraphicsModeControl.SOLID_STYLE);
+                soundings.setLineStyle(style, i);
+
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+
+                int style = GraphicsModeControl.SOLID_STYLE;
+                soundings.setLineStyle(style, i);
+            }
+            soundings.setVisible(true, 0, 0);
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getProfilesVisibility() {
+        return profilesVisibility;
     }
 
     /**
@@ -1277,11 +1324,34 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     }
 
     /**
+     * _more_
+     *
+     * @param on _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setIsobarsVisibility(boolean on)
+            throws VisADException, RemoteException {
+        isobars.setVisible(on);
+    }
+
+    /**
      * Get the visibility of the background dry adiabats.
      * @return true if visible
      */
     public boolean getDryAdiabatVisibility() {
         return dryAdiabats.getVisible();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsoBarsVisibility() {
+        return isobars.getVisible();
     }
 
     /**
@@ -1559,7 +1629,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
 
             RealTupleType inputType =
                 (RealTupleType) ((FunctionType) input.getType()).getRange();
-            ErrorEstimate[] inputErrors = input.getRangeErrors();
+            ErrorEstimate[] inputErrors  = input.getRangeErrors();
             ErrorEstimate[] outputErrors =
                 new ErrorEstimate[inputErrors.length];
 
@@ -1662,7 +1732,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
                            Real temperature, double separation)
                 throws RemoteException, VisADException {
 
-            double x = xValue.getValue();
+            double  x              = xValue.getValue();
             float[] pressureValues =
                 contourLevels.getLevels(
                     (float) coordinateSystem.fromReference(new double[][] {
@@ -1904,7 +1974,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
                 ContourLevels contourLevels, Real pressure, double separation)
                 throws RemoteException, VisADException {
 
-            double y = yValue.getValue();
+            double  y                 = yValue.getValue();
             float[] temperatureValues =
                 contourLevels.getLevels(
                     (float) coordinateSystem.fromReference(new double[][] {
@@ -2140,7 +2210,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             temperatureType       = AirTemperature.getRealType();
             dryTrajectory         = new DryTrajectory();
             mixingRatioTrajectory = new MixingRatioTrajectory();
-            wetTrajectory = new SaturationTrajectory(
+            wetTrajectory         = new SaturationTrajectory(
                 new MyWetTemperatureCalculatorFactory());
 
             dryTrajectory.setLineWidth(2);
@@ -2485,7 +2555,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     /**
      * Set the wind flag color
      *
-     * @param color  the color 
+     * @param color  the color
      */
     public void setWindColor(Color color) {
         try {
@@ -2513,4 +2583,3 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     }
 
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -44,11 +44,9 @@ import ucar.unidata.view.sounding.PseudoAdiabaticDisplayable;
 import ucar.unidata.view.sounding.RealEvaluatorCell;
 import ucar.unidata.view.sounding.Sounding;
 
-import ucar.visad.display.Displayable;
+import ucar.visad.UtcDate;
+import ucar.visad.display.*;
 
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.DisplayableDataRef;
-import ucar.visad.display.LineDrawing;
 import ucar.visad.functiontypes.AirTemperatureProfile;
 import ucar.visad.functiontypes.CartesianHorizontalWindOfPressure;
 import ucar.visad.functiontypes.DewPointProfile;
@@ -57,25 +55,7 @@ import ucar.visad.quantities.AirTemperature;
 import ucar.visad.quantities.CartesianHorizontalWind;
 import ucar.visad.quantities.PolarHorizontalWind;
 
-import visad.ActionImpl;
-import visad.CommonUnit;
-import visad.CoordinateSystem;
-import visad.DataReference;
-import visad.DataReferenceImpl;
-import visad.ErrorEstimate;
-import visad.Field;
-import visad.FieldImpl;
-import visad.FlowControl;
-import visad.GraphicsModeControl;
-import visad.Gridded1DSet;
-import visad.Linear1DSet;
-import visad.Real;
-import visad.RealTuple;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.SampledSet;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
@@ -1231,6 +1211,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             }
         });
 
+
+        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Display All Times", this,
+                                       "allProfilesVisibility");
+        allProfilesBox.setSelected(false);
         final JComboBox parcelModeBox = new JComboBox(parcelModeInfos);
 
         parcelModeBox.setToolTipText("Parcel Determination Mode");
@@ -1309,7 +1293,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
            GuiUtils.WT_N   //Don't expand the grid  vertically
                );
 
-        Container checkBoxes = GuiUtils.vbox(trajBox, virtTempBox, showBox);
+        Container checkBoxes = GuiUtils.vbox(trajBox, virtTempBox, showBox,
+                                             allProfilesBox);
 
         /*
          * Do not fill the widgets in the gridbag.
@@ -1350,9 +1335,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        JComponent left = (specificWidget != null)
-                          ? GuiUtils.centerBottom(sp, specificWidget)
-                          : sp;
+        JComponent  left   = (specificWidget != null)
+                             ? GuiUtils.centerBottom(sp, specificWidget)
+                             : sp;
         JScrollPane leftSP =
             new JScrollPane(
                 left, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -1864,6 +1849,74 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     }
 
+    /** _more_          */
+    String listlabel = null;
+
+    /**
+     * _more_
+     *
+     * @param visible _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setAllProfilesVisibility(boolean visible) throws Exception {
+        aeroDisplay.setProfilesVisibility(visible);
+        AnimationWidget aniWidget = this.getAnimationWidget();
+        aniWidget.setBoxPanelVisible(!visible);
+        if(visible){
+            aniWidget.gotoIndex(0);
+            aniWidget.setRunning(false);
+        }
+        GuiUtils.enableTree(aniWidget.getContents(), !visible);
+        // now update the display list label
+
+        StringBuffer additonalTimeLabel = new StringBuffer();;
+        Set          s                  = getDataTimeSet();
+        if (visible) {
+            if (s != null) {
+                double[][] samples = s.getDoubles();
+                DateTime dt = new DateTime(samples[0][0], s.getSetUnits()[0]);
+                additonalTimeLabel.append(dt.dateString() + ":"
+                                          + dt.timeString());
+                for (int i = 1; i < s.getLength(); i++) {
+                    dt = new DateTime(samples[0][i], s.getSetUnits()[0]);
+                    if (i == (s.getLength() - 1)) {
+                        additonalTimeLabel.append(" and " + dt.dateString()
+                                + ":" + dt.timeString());
+                    } else {
+                        additonalTimeLabel.append(", " + dt.dateString()
+                                + ":" + dt.timeString());
+                    }
+                }
+            }
+            listlabel = additonalTimeLabel.toString();
+        } else {
+            listlabel = null;
+        }
+        updateDisplayList();
+    }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected Data getDisplayListData() {
+        Data     data = null;
+        Data     d    = super.getDisplayListData();
+        TextType tt   = TextType.getTextType(DISPLAY_LIST_NAME);
+
+        if (listlabel != null) {
+            try {
+                String label = "Skew-T ";
+                data = new Text(tt, label + listlabel);
+            } catch (Exception e) {}
+
+            return data;
+        } else {
+            return d;
+        }
+
+    }
 }

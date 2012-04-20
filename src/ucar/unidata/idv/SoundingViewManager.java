@@ -70,6 +70,8 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     /** dry adiabat visibility */
     private boolean dryAdiabatVisibility = true;
 
+    /** isobars visibility */
+    private boolean isobarsVisibility = false;
     /**
      *  A paramterless ctor for XmlEncoder  based decoding.
      */
@@ -306,6 +308,7 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
         aeroDisplay.setSaturationAdiabatVisibility(
             saturationAdiabatVisibility);
         aeroDisplay.setDryAdiabatVisibility(dryAdiabatVisibility);
+        aeroDisplay.setIsobarsVisibility(isobarsVisibility);
     }
 
     /**
@@ -381,6 +384,13 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     }
 
     /**
+     * Get the isobars visibility
+     * @return true if visiable
+     */
+    public boolean getIsobarsVisibility() {
+        return isobarsVisibility;
+    }
+    /**
      * Set the dry adiabat visibility
      * @param value  true if visiable
      */
@@ -393,6 +403,18 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
         }
     }
 
+    /**
+     * Set the isobars visibility
+     * @param value  true if visiable
+     */
+    public void setIsobarsVisibility(boolean value) {
+        isobarsVisibility = value;
+        if (getHaveInitialized()) {
+            try {
+                setLineVisibility(getAerologicalDisplay());
+            } catch (Exception ignore) {}
+        }
+    }
     /**
      * Get the saturation mixing ratio visibility
      * @return true if visiable

@@ -1,25 +1,22 @@
 /*
- * $Id: SoundingSet.java,v 1.25 2005/08/02 20:49:15 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.view.sounding;
 
@@ -448,5 +445,56 @@ public class SoundingSet extends CompositeDisplayable {
         sounding.removePropertyChangeListener(Sounding.DEW_POINT,
                 dewPointListener);
     }
-}
 
+    /**
+     * _more_
+     *
+     * @param width _more_
+     * @param lowerIndex _more_
+     * @param upperIndex _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setLinesWidth(float width, int lowerIndex, int upperIndex)
+            throws RemoteException, VisADException {
+
+        for (int index = lowerIndex; index <= upperIndex; ++index) {
+            AirTemperatureProfile displayable =
+                (AirTemperatureProfile) getDisplayable(index);
+            if (displayable != null) {
+                displayable.setLineWidth(width);
+            }
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param style _more_
+     * @param index _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setLineStyle(int style, int index)
+            throws RemoteException, VisADException {
+
+        CompositeDisplayable cdisplayable =
+            (CompositeDisplayable) getDisplayable(index);
+        if (cdisplayable != null) {
+            int n = cdisplayable.displayableCount();
+            for (int i = 0; i < n; i++) {
+
+                Displayable displayable = cdisplayable.getDisplayable(i);
+                if ((displayable != null)
+                        && (displayable instanceof AirTemperatureProfile)) {
+                    ((AirTemperatureProfile) displayable).setLineStyle(style);
+                } else if (displayable instanceof DewPointProfile) {
+                    ((DewPointProfile) displayable).setLineStyle(style);
+                }
+            }
+        }
+    }
+}
