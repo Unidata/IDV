@@ -7,7 +7,10 @@
          <offline-allowed/> 
        </information> 
        <resources> 
-           <j2se version="1.4+" max-heap-size="512m" /> 
+           <j2se
+             max-heap-size="10242m"
+             java-vm-args="-XX:MaxPermSize=128m"
+             version="1.6+"/>
            <jar href="IDV/idv.jar"/>
            <extension name="IDV Base" href="IDV/idvbase.jnlp"/>
        </resources>

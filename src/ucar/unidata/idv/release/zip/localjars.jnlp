@@ -15,7 +15,7 @@
         <offline-allowed/> 
        </information> 
        <resources> 
-         <j2se version="1.6+" max-heap-size="1024m" /> 
+         <j2se version="1.6+" max-heap-size="1024m" java-vm-args="-XX:MaxPermSize=128m" /> 
            <jar href="idv.jar"/>
            <jar href="auxdata.jar"/>
            <jar href="external.jar"/>

@@ -64,13 +64,11 @@ fi
 ## this line and set to a value  in megabytes.
 ## idv_memory=512
 
-## To avoid IDV crashes, in some situations it may be necessary to increase MaxPermSize. We have
-## especially noticed this problem on the OS X platform. The default MaxPermSize is 64m. To
-## increase it to 128m please comment out next line and uncomment the following line.
 
-## To avoid IDV OutOfMemory problems, it may be necessary to increase the MaxPermSize in the Java
-## Virtual Machine. We have especially noticed this problem on the OS X platform. The default MaxPermSize
-## is 64m. To increase it to 128m please comment out next line and uncomment the line following that.
+## To avoid IDV OutOfMemory problems, it may be necessary to increase the 
+## MaxPermSize in the Java Virtual Machine. We have especially noticed this 
+## problem on the OS X platform. The default MaxPermSize is 64m. Increase it
+## to a multiple of 64 (e.g. 128) if you are running into PermGenSpace problems
+##idv_maxpermgensize=128
 
-${java} -Xmx${idv_memory}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
-## ${java} -Xmx${idv_memory}m -XX:MaxPermSize=128m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
+${java} -Xmx${idv_memory}m -XX:MaxPermSize=${idv_maxpermgensize}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
