@@ -819,26 +819,16 @@ public class ViewpointControl implements ActionListener {
     }
 
     /**
-     * Get the vertical scale widget
+     * Make the vertical scale widget
      *
      * @return vertical scale widget
      */
-    public VertScaleDialog getVerticalScaleWidget() {
+    public VertScaleDialog makeVerticalScaleWidget(boolean visible) {
         double[]      range = navDisplay.getVerticalRange();
         Unit          u     = navDisplay.getVerticalRangeUnit();
         VertScaleInfo temp  = new VertScaleInfo(range[0], range[1], u);
-
-        temp.visible = navDisplay.getVerticalRangeVisible();
-
-        VertScaleDialog vsd = null;
-
-        if (navDisplay instanceof GlobeDisplay) {
-            vsd = new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
-        } else {
-            vsd = new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
-        }
-
-        return vsd;
+        temp.visible = visible;
+        return new VertScaleDialog(GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
     }
 
     /**
