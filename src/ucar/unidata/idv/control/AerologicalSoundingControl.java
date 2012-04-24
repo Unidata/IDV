@@ -1212,7 +1212,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         });
 
 
-        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Display pair Profiles",
+        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Consecutive Profiles",
                                        this, "pairProfilesVisibility");
         allProfilesBox.setSelected(false);
         final JComboBox parcelModeBox = new JComboBox(parcelModeInfos);

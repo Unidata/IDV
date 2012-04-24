@@ -344,19 +344,12 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
      *
      * @throws Exception _more_
      */
-    public Set pairProfilesTimeSet(String st) throws Exception {
+    public Set subSetProfilesTimeSet(String st) throws Exception {
 
         List<DateTime> timeList      = stationsTimes.get(st);
-        List<DateTime> timeList1     = new ArrayList<DateTime>();
+        int size = timeList.size();
 
-        for (int i = 0; i < timeList.size(); i++) {
-            if (i % 2 == 0) {
-                timeList1.add(timeList.get(i));
-            }
-
-        }
-
-        return Util.makeTimeSet(timeList1);
+        return Util.makeTimeSet(timeList.subList(0, size-1));
     }
 
     /**
@@ -383,7 +376,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         if (visible) {
             int    i       = stMenu.getSelectedIndex();
             String st      = (String) stations.get(i);
-            Set    timeset = pairProfilesTimeSet(st);
+            Set    timeset = subSetProfilesTimeSet(st);
             dataNode.setOutputTimes((SampledSet) timeset);
         } else {
             Set timeset = getDataTimeSet();
@@ -492,26 +485,18 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
                 }
 
-                aeroDisplay.setProfilesVisibility(true, idx * 2);
+                aeroDisplay.setProfilesVisibility(true, idx);
                 // display list update
                 Set s   = getDataTimeSet();
                 if (s != null) {
                     double[][] samples = s.getDoubles();
-                    if(samples[0].length < idx*2+2) {
-
-                        DateTime dt1 = new DateTime(samples[0][idx*2],
-                                s.getSetUnits()[0]);
-                        listlabel = dt1.dateString() + ":" + dt1.timeString();
-
-                    } else {
-                        DateTime   dt      = new DateTime(samples[0][idx*2+1],
-                                s.getSetUnits()[0]);
-                        DateTime dt1 = new DateTime(samples[0][idx*2],
-                                s.getSetUnits()[0]);
-                        listlabel = dt1.dateString() + ":" + dt1.timeString()
-                                + " and " + dt.dateString() + ":"
-                                + dt.timeString();
-                    }
+                    DateTime   dt      = new DateTime(samples[0][idx+1],
+                            s.getSetUnits()[0]);
+                    DateTime dt1 = new DateTime(samples[0][idx],
+                            s.getSetUnits()[0]);
+                    listlabel = dt1.dateString() + ":" + dt1.timeString()
+                            + " and " + dt.dateString() + ":"
+                            + dt.timeString();
                 }
 
                 updateDisplayList();
