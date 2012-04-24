@@ -1,11 +1,11 @@
 @echo off
 
 REM ##############################################################################
-REM  Script:  runIDV
+REM  Script:  runIDV.bat
 REM 
-REM  Purpose: script to launch the IDV
+REM  Purpose: script to launch the IDV on Windows
 REM 
-REM  Syntax:  runIDV <idv options>
+REM  Syntax:  runIDV.bat <idv options>
 REM 
 REM  Notes:   In past versions of the IDV, users had to change this script to
 REM  manipulate memory settings. The IDV now configures the  appropriate memory. 
@@ -15,6 +15,11 @@ REM  necessary to bootstrap the memory size. In this case, please uncomment the
 REM  idv_memory section below and subsequently choose memory via the Preferences
 REM  menu.  Be sure to comment it out that after setting the memory via the 
 REM  Preferences if you want the preference to take effect. 
+REM  A similar problem exists with "PermGenSpace" memory.  This can also be set in
+REM  the Preferences under the System Tab.  However, if you cannot start the IDV
+REM  and have error messages about "PermGenSpace", uncomment the 
+REM  idv_maxpermgensize=128 line below and then start the IDV.  Set this value
+REM  in the Preferences, then comment out the line again and restart the IDV.
 REM ##############################################################################
 
 setlocal
@@ -34,10 +39,8 @@ REM See important note about this above. To bootstrap the IDV memory, uncomment
 REM the line below and set to a value  in megabytes. 
 REM set idv_memory=512
 
-REM To avoid IDV OutOfMemory problems, it may be necessary to increase the 
-REM MaxPermSize in the Java Virtual Machine. The default MaxPermSize is 64m. 
-REM To increase it, set a higher value in the User Preferences or uncomment
-REM the line below
+REM See important note about this above. If you cannot start the IDV because of
+REM PermGenSpace errors, uncomment the line below.
 REM set idv_maxpermgensize=128
 
 @echo on    

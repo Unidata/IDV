@@ -15,6 +15,11 @@
 # idv_memory section below and subsequently choose memory via the Preferences
 # menu.  Be sure to comment it out that after setting the memory via the
 # Preferences if you want the preference to take effect.
+# A similar problem exists with "PermGenSpace" memory.  This can also be set in
+# the Preferences under the System Tab.  However, if you cannot start the IDV
+# and have error messages about "PermGenSpace", uncomment the 
+# idv_maxpermgensize=128 line below and then start the IDV.  Set this value
+# in the Preferences, then comment out the line again and restart the IDV.
 ###############################################################################
 
 ##Error message, if needed.
@@ -65,8 +70,8 @@ fi
 ## idv_memory=512
 
 
-## To avoid IDV OutOfMemory problems, it may be necessary to increase the 
-## MaxPermSize in the Java Virtual Machine. We have especially noticed this 
+## See important note about this above. If you cannot start the IDV because of
+## PermGenSpace errors, uncomment this line. We have especially noticed this 
 ## problem on the OS X platform. The default MaxPermSize is 64m. Increase it
 ## to a multiple of 64 (e.g. 128) if you are running into PermGenSpace problems
 ##idv_maxpermgensize=128
