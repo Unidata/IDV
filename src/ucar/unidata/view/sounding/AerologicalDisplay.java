@@ -1065,16 +1065,15 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         winds.setVisible(false, 0, n - 1);
         winds1.setVisible(false, 0, n - 1);
         windStaff1.setVisible(visible);
-
+        for (int i = 0; i < n; i++) {
+            soundings.setLineStyle(GraphicsModeControl.SOLID_STYLE, i);
+        }
         if (visible) {
             soundings.setVisible(true, index, index + 1);
             winds.setVisible(true, index, index);
             winds1.setVisible(true, index + 1, index + 1);
             soundings.setLineStyle(GraphicsModeControl.DASH_STYLE, index);
         } else {
-            for (int i = 0; i < n; i++) {
-                soundings.setLineStyle(GraphicsModeControl.SOLID_STYLE, i);
-            }
             soundings.setVisible(true, 0, 0);
             soundings.setActiveSounding(0);
             winds.setActiveWindProfile(0);
