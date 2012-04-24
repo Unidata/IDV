@@ -130,6 +130,9 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
      */
     private WindProfileSet winds;
 
+    /** _more_ */
+    private WindProfileSet winds1;
+
     /**
      * The type of the display pressure.
      */
@@ -230,6 +233,9 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
      */
     private MyWindStaff windStaff;
 
+    /** _more_ */
+    private MyWindStaff windStaff1;
+
     /**
      * The mouse-pointer pressure.
      * @serial
@@ -296,9 +302,6 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
 
     /** flag for whether we've been initialized */
     private boolean init = false;
-
-    /** flag for whether to display all profiles */
-    private boolean profilesVisibility = false;
 
     /**
      * Constructs.  The value of the constrainProfiles property is
@@ -391,7 +394,9 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         soundings = new SoundingSet(display);
         winds     = new WindProfileSet(new WindBarbProfile(display), display);
         winds.addConstantMap(new ConstantMap(WIND_STAFF_XPOS, Display.XAxis));
-
+        winds1 = new WindProfileSet(new WindBarbProfile(display), display);
+        winds1.addConstantMap(new ConstantMap(WIND_STAFF_XPOS + 0.4,
+                Display.XAxis));
         soundings.setConstrainProfiles(constrainProfiles);
 
         pseudoAdiabaticTrajectory =
@@ -468,6 +473,38 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
 
             }
         });
+        winds1.addPropertyChangeListener(WindProfileSet.SPEED,
+                                         new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent event) {
+
+                PropertyChangeEvent newEvent =
+                    new PropertyChangeEvent(AerologicalDisplay.this,
+                                            PROFILE_WIND_SPEED,
+                                            event.getOldValue(),
+                                            event.getNewValue());
+
+                newEvent.setPropagationId(event.getPropagationId());
+                AerologicalDisplay.this.firePropertyChange(newEvent);
+
+            }
+        });
+        winds1.addPropertyChangeListener(WindProfileSet.DIRECTION,
+                                         new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent event) {
+
+                PropertyChangeEvent newEvent =
+                    new PropertyChangeEvent(AerologicalDisplay.this,
+                                            PROFILE_WIND_DIRECTION,
+                                            event.getOldValue(),
+                                            event.getNewValue());
+
+                newEvent.setPropagationId(event.getPropagationId());
+                AerologicalDisplay.this.firePropertyChange(newEvent);
+
+            }
+        });
         soundings.addPropertyChangeListener(soundings.ACTIVE_SOUNDING,
                                             new PropertyChangeListener() {
 
@@ -495,6 +532,25 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         });
         winds.addPropertyChangeListener(winds.ACTIVE_WIND_PROFILE,
                                         new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent event) {
+
+                try {
+
+                    PropertyChangeEvent newEvent =
+                        new PropertyChangeEvent(AerologicalDisplay.this,
+                            ACTIVE_WIND_PROFILE, null, event.getNewValue());
+
+                    newEvent.setPropagationId(event.getPropagationId());
+                    firePropertyChange(newEvent);
+                } catch (Exception e) {
+                    System.err.println("ACTIVE_WIND_PROFILE: "
+                                       + e.toString());
+                }
+            }
+        });
+        winds1.addPropertyChangeListener(winds1.ACTIVE_WIND_PROFILE,
+                                         new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent event) {
 
@@ -559,6 +615,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         addDisplayable(soundings);
         setWindColor(getForeground());
         addDisplayable(winds);
+        addDisplayable(winds1);
         addDisplayable(pseudoAdiabaticTrajectory);
         addDisplayable(box = new Box(coordinateSystem));
         addDisplayable(isobars = new Isobars(coordinateSystem));
@@ -572,8 +629,9 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             new SaturationMixingRatioContours(coordinateSystem));
         satMixingRatios.setVisible(false);
         addDisplayable(windStaff = new MyWindStaff(coordinateSystem));
+        addDisplayable(windStaff1 = new MyWindStaff(coordinateSystem, 0.4));
         windStaff.setVisible(false);  // set to false until we get data
-
+        windStaff1.setVisible(false);
         /*
          * Define the labels for the axes.
          */
@@ -826,12 +884,20 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         lowerTemperatureLabels.setCoordinateSystem(acs);
         upperTemperatureLabels.setCoordinateSystem(acs);
         windStaff.setCoordinateSystem(acs);
+        windStaff1.setCoordinateSystem(acs);
         for (Iterator iter = winds.iterator(); iter.hasNext(); ) {
             WindBarbProfile wbp = (WindBarbProfile) iter.next();
             if (wbp != null) {
                 wbp.setCoordinateSystem(acs);
             }
         }
+        for (Iterator iter = winds1.iterator(); iter.hasNext(); ) {
+            WindBarbProfile wbp = (WindBarbProfile) iter.next();
+            if (wbp != null) {
+                wbp.setCoordinateSystem(acs);
+            }
+        }
+
         coordinateSystem = acs;
         setDisplayTypes();
         setDisplayActive();
@@ -898,11 +964,19 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         }
         WindBarbProfile windBarbs =
             (WindBarbProfile) winds.getDisplayable(index);
+        WindBarbProfile windBarbs1 =
+            (WindBarbProfile) winds1.getDisplayable(index);
         if (windBarbs == null) {
             windBarbs = new WindBarbProfile(getDisplay(),
                                             getCoordinateSystem());
             winds.addWindProfile(index, windBarbs);
         }
+        if (windBarbs1 == null) {
+            windBarbs1 = new WindBarbProfile(getDisplay(),
+                                             getCoordinateSystem());
+            winds1.addWindProfile(index, windBarbs1);
+        }
+
         sounding.setFields(temperature, dewPoint);
         //        sounding.setVisible(false);
         //        soundings.addSounding(index, sounding);
@@ -913,9 +987,16 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             windBarbs.setProfile(ff);
             windStaff.setVisible(true);
         }
+
+        if (ff != null) {
+            windBarbs1.setProfile(ff);
+            windStaff1.setVisible(false);
+        }
         windBarbs.setVisible(false);
+        windBarbs1.setVisible(false);
         //winds.addWindProfile(index, windBarbs);
     }
+
 
     /**
      * Returns the number of profiles in the display.
@@ -934,6 +1015,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     public void removeProfiles() throws VisADException, RemoteException {
         soundings.clear();
         winds.clear();
+        winds1.clear();
     }
 
     /**
@@ -948,6 +1030,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             throws VisADException, RemoteException {
         soundings.removeSounding(index);
         winds.removeWindProfile(index);
+        winds1.removeWindProfile(index);
     }
 
     /**
@@ -965,50 +1048,43 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     }
 
     /**
-     * Sets the visibility of all soundings.
+     * Sets the visibility of last two soundings.
      * @param visible           Whether or not the sounding should be visible.
+     * @param index _more_
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public void setProfilesVisibility(boolean visible)
+    public void setProfilesVisibility(boolean visible, int index)
             throws VisADException, RemoteException {
 
-        profilesVisibility = visible;
-
         int n = soundings.displayableCount();
-        for (int i = 0; i < n; i++) {
-            int index = i;
-            soundings.setVisible(visible, index, index);
-            // winds.setVisible(visible, index, index);
+        if (n < 2) {
+            return;
         }
+        soundings.setVisible(false, 0, n - 1);
+        winds.setVisible(false, 0, n - 1);
+        winds1.setVisible(false, 0, n - 1);
+        windStaff1.setVisible(visible);
 
         if (visible) {
-            for (int i = 0; i < n; i++) {
-                int style = ((i == 0)
-                             ? GraphicsModeControl.DASH_STYLE
-                             : GraphicsModeControl.SOLID_STYLE);
-                soundings.setLineStyle(style, i);
-
-            }
+            soundings.setVisible(true, index, index + 1);
+            winds.setVisible(true, index, index);
+            winds1.setVisible(true, index + 1, index + 1);
+            soundings.setLineStyle(GraphicsModeControl.DASH_STYLE, index);
         } else {
             for (int i = 0; i < n; i++) {
-
-                int style = GraphicsModeControl.SOLID_STYLE;
-                soundings.setLineStyle(style, i);
+                soundings.setLineStyle(GraphicsModeControl.SOLID_STYLE, i);
             }
             soundings.setVisible(true, 0, 0);
+            soundings.setActiveSounding(0);
+            winds.setActiveWindProfile(0);
+            winds.setVisible(true, 0, 0);
         }
 
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getProfilesVisibility() {
-        return profilesVisibility;
-    }
+
+
 
     /**
      * Sets the "active" sounding.  This is necessary for determining the
@@ -1047,6 +1123,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     public void clearProfiles() throws VisADException, RemoteException {
         soundings.clear();
         winds.clear();
+        winds1.clear();
         pseudoAdiabaticTrajectory.clear();
     }
 
@@ -2436,6 +2513,25 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         }
 
         /**
+         * _more_
+         *
+         * @param acs _more_
+         * @param xp0 _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public MyWindStaff(AerologicalCoordinateSystem acs, double xp0)
+                throws VisADException, RemoteException {
+
+            super("WindStaff");
+            setColor(java.awt.Color.yellow);
+            addConstantMap(new ConstantMap(WIND_STAFF_XPOS + xp0,
+                                           Display.XAxis));
+            setCoordinateSystem(acs);
+        }
+
+        /**
          * Set the data based on the coordinate system
          *
          * @param acs   AerologicalCoordinateSystem
@@ -2561,6 +2657,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         try {
             if (winds != null) {
                 winds.setColor(color);
+                winds1.setColor(color);
             }
         } catch (VisADException ve) {}
         catch (RemoteException re) {}
