@@ -129,15 +129,15 @@ public class GlobeScaleDialog extends VertScaleDialog {
             BorderFactory.createTitledBorder("Vertical Exaggeration"));
 
         this.add("Center", GuiUtils.inset(p1, 5));
-        this.transfer = transfer;
-        if (transfer != null) {
-            double radius = Math.abs(transfer.minVertScale);
-            if (transfer.unit != null) {
+        this.vertScaleInfo = vertScaleInfo;
+        if (vertScaleInfo != null) {
+            double radius = Math.abs(vertScaleInfo.minVertScale);
+            if (vertScaleInfo.unit != null) {
                 try {
-                    radius = CommonUnit.meter.toThis(radius, transfer.unit);
+                    radius = CommonUnit.meter.toThis(radius, vertScaleInfo.unit);
                 } catch (VisADException ve) {
                     LogUtil.userMessage("Incompatible units for range "
-                                        + transfer.unit);
+                                        + vertScaleInfo.unit);
                 }
             }
             setWidgetValues(radiusToVex(radius));
@@ -175,9 +175,9 @@ public class GlobeScaleDialog extends VertScaleDialog {
     /**
      * Show the dialog box and wait for results and deal with them.
      *
-     * @param transfer   default values for the dialog
+     * @param vertScaleInfo   default values for the dialog
      */
-    public void showDialog(VertScaleInfo transfer) {
+    public void showDialog(VertScaleInfo vertScaleInfo) {
         if (dialog == null) {
             JPanel buttons = GuiUtils.makeApplyOkCancelButtons(this);
             this.add("South", buttons);
@@ -188,8 +188,8 @@ public class GlobeScaleDialog extends VertScaleDialog {
             dialog.pack();
             dialog.setLocation(100, 100);
         }
-        this.transfer = transfer;
-        setWidgetValues(radiusToVex(Math.abs(transfer.maxVertScale)));
+        this.vertScaleInfo = vertScaleInfo;
+        setWidgetValues(radiusToVex(Math.abs(vertScaleInfo.maxVertScale)));
         dialog.setVisible(true);
     }
 
@@ -212,10 +212,10 @@ public class GlobeScaleDialog extends VertScaleDialog {
 
         VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue,
                                         CommonUnit.meter);
-        if ( !Misc.equals(newTransfer, transfer)) {
-            transfer = newTransfer;
+        if ( !Misc.equals(newTransfer, vertScaleInfo)) {
+            vertScaleInfo = newTransfer;
             try {
-                control.applyVerticalScale(transfer);
+                control.applyVerticalScale(vertScaleInfo);
             } catch (Exception exc) {
                 LogUtil.userMessage("An error has occurred:" + exc);
                 return false;

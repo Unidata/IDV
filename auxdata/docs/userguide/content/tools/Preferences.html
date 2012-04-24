@@ -394,6 +394,13 @@ You can set the amount of memory allocated to the IDV as a percentage of
 the total system memory or a specific amount (in megabytes).  On 32-bit
 systems, the maximum is 1.5 gigabytes (1500 MB).
 
+[ug::preference  {PermGen Size}]
+You can adjust the amount of "PermGenSpace" that the IDV uses if you are
+getting errors.  This has been particularly a problem on Mac OS-X which
+has a default size of 64Mb.  If you have problems with "PermGenSpace" errors,
+set the value to 128 or higher.  The total of Memory and PermGenSpace should
+not exceed your system memory (or the maximum allowable).
+
 [ug::preference  {Cache Data in Memory}]
 The IDV normally tries to cache data that it loads in memory. You can turn this behavior off with a preference.
 

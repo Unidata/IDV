@@ -658,12 +658,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             new Integer(getIdv().getMaxPermGenSize()));
         systemWidgets.put(PREF_MAX_PERMGENSIZE, maxPermGenCbx);
 
-        /*  Uncomment this to add the widgets to the System tab
         systemComps.add(GuiUtils.rLabel("PermGen Size:"));
 
         systemComps.add(GuiUtils.leftRight(GuiUtils.hbox(maxPermGenCbx,
                 new JLabel("megabytes")), GuiUtils.filler()));
-        */
 
         systemComps.add(GuiUtils.rLabel("Caching:"));
 

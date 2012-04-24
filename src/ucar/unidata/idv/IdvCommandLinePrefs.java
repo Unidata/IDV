@@ -95,6 +95,9 @@ public class IdvCommandLinePrefs {
         checkMemory(userPrefMap);
 
         // Eventually check more stuff
+        if (!userPrefMap.containsKey(IdvConstants.PREF_MAX_PERMGENSIZE)) {
+            userPrefMap.put(IdvConstants.PREF_MAX_PERMGENSIZE, IdvConstants.DEFAULT_MAX_PERMGENSIZE);
+        }
     }
 
     /**
