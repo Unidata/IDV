@@ -124,15 +124,15 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), latLabel = new JTextField(), GuiUtils.rLabel("Base (-90 90): "),
-            latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
-            latIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Major Increment: "),
+            latIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Division: "),
             latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
             yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         JPanel p2 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), lonLabel = new JTextField(), GuiUtils.rLabel("Base (-180 180): "),
-            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
-            lonIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Major Increment: "),
+            lonIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Division: "),
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
             xVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
