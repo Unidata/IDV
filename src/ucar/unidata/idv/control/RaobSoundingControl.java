@@ -368,10 +368,10 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         }
         AnimationWidget aniWidget = this.getAnimationWidget();
         // aniWidget.setBoxPanelVisible( !visible);
-        if (visible) {
-            aniWidget.gotoIndex(0);
-            aniWidget.setRunning(false);
-        }
+        //if (visible) {
+        aniWidget.gotoIndex(0);
+        aniWidget.setRunning(false);
+        //}
 
         if (visible) {
             int    i       = stMenu.getSelectedIndex();
