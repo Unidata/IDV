@@ -1212,8 +1212,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         });
 
 
-        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Display All Times", this,
-                                       "allProfilesVisibility");
+        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Consecutive Profiles",
+                                       this, "pairProfilesVisibility");
         allProfilesBox.setSelected(false);
         final JComboBox parcelModeBox = new JComboBox(parcelModeInfos);
 
@@ -1482,9 +1482,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             EarthLocationTuple elt =
                 (EarthLocationTuple) boxToEarth(new double[] {
                     reals[0].getValue(),
-                    reals[1].getValue(), (xy.getDimension() == 3)
-                                         ? reals[0].getValue()
-                                         : 1.0 });
+                    reals[1].getValue(),
+                    (xy.getDimension() == 3)
+                    ? reals[0].getValue()
+                    : 1.0 });
 
             if (elt != null) {
                 latLon = elt.getLatLonPoint();
@@ -1849,74 +1850,5 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     }
 
-    /** _more_          */
-    String listlabel = null;
 
-    /**
-     * _more_
-     *
-     * @param visible _more_
-     *
-     * @throws Exception _more_
-     */
-    public void setAllProfilesVisibility(boolean visible) throws Exception {
-        aeroDisplay.setProfilesVisibility(visible);
-        AnimationWidget aniWidget = this.getAnimationWidget();
-        aniWidget.setBoxPanelVisible(!visible);
-        if(visible){
-            aniWidget.gotoIndex(0);
-            aniWidget.setRunning(false);
-        }
-        GuiUtils.enableTree(aniWidget.getContents(), !visible);
-        // now update the display list label
-
-        StringBuffer additonalTimeLabel = new StringBuffer();;
-        Set          s                  = getDataTimeSet();
-        if (visible) {
-            if (s != null) {
-                double[][] samples = s.getDoubles();
-                DateTime dt = new DateTime(samples[0][0], s.getSetUnits()[0]);
-                additonalTimeLabel.append(dt.dateString() + ":"
-                                          + dt.timeString());
-                for (int i = 1; i < s.getLength(); i++) {
-                    dt = new DateTime(samples[0][i], s.getSetUnits()[0]);
-                    if (i == (s.getLength() - 1)) {
-                        additonalTimeLabel.append(" and " + dt.dateString()
-                                + ":" + dt.timeString());
-                    } else {
-                        additonalTimeLabel.append(", " + dt.dateString()
-                                + ":" + dt.timeString());
-                    }
-                }
-            }
-            listlabel = additonalTimeLabel.toString();
-        } else {
-            listlabel = null;
-        }
-        updateDisplayList();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected Data getDisplayListData() {
-        Data     data = null;
-        Data     d    = super.getDisplayListData();
-        TextType tt   = TextType.getTextType(DISPLAY_LIST_NAME);
-
-        if (listlabel != null) {
-            try {
-                String label = "Skew-T ";
-                data = new Text(tt, label + listlabel);
-            } catch (Exception e) {}
-
-            return data;
-        } else {
-            return d;
-        }
-
-    }
 }

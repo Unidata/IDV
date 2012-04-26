@@ -10,8 +10,9 @@
   </information>
   <resources>
     <j2se
-       max-heap-size="512m"
-       version="1.5+"/>
+       max-heap-size="10242m"
+       java-vm-args="-XX:MaxPermSize=128m"
+       version="1.6+"/>
     <jar href="IDV/idv.jar"/>
     <extension
        href="IDV/idvbase.jnlp"

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -22,6 +22,7 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
@@ -134,7 +135,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
         super(true);
 
-        stationProbes = new PickableLineDrawing("RAOB Points");
+        stationProbes   = new PickableLineDrawing("RAOB Points");
         selectedStation =
             new IndicatorPoint("Selected Station",
                                RealTupleType.LatitudeLongitudeTuple);
@@ -262,6 +263,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                     dataNode.setData(stationsTuple.get(st));
                     Set timeset = getDataTimeSet();
                     dataNode.setOutputTimes((SampledSet) timeset);
+                    if (getProfilesVisibility()) {
+                        setPairProfilesVisibility(true);
+                    }
                     //DateTime dt = times.get(0);
                     //dataNode.setTime(dt);
                     //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
@@ -331,6 +335,115 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param st _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Set subSetProfilesTimeSet(String st) throws Exception {
+
+        List<DateTime> timeList      = stationsTimes.get(st);
+        int size = timeList.size();
+
+        return Util.makeTimeSet(timeList.subList(0, size-1));
+    }
+
+    /**
+     * _more_
+     *
+     * @param visible _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setPairProfilesVisibility(boolean visible) throws Exception {
+        profilesVisibility = visible;
+        Set s   = getDataTimeSet();
+        int len = s.getLength();
+        if (len < 2) {  // no pair do nothing
+            return;
+        }
+        AnimationWidget aniWidget = this.getAnimationWidget();
+        // aniWidget.setBoxPanelVisible( !visible);
+        if (visible) {
+            aniWidget.gotoIndex(0);
+            aniWidget.setRunning(false);
+        }
+
+        if (visible) {
+            int    i       = stMenu.getSelectedIndex();
+            String st      = (String) stations.get(i);
+            Set    timeset = subSetProfilesTimeSet(st);
+            dataNode.setOutputTimes((SampledSet) timeset);
+        } else {
+            Set timeset = getDataTimeSet();
+            dataNode.setOutputTimes((SampledSet) timeset);
+        }
+        // GuiUtils.enableTree(aniWidget.getContents(), !visible);
+        // now update the display list label
+        aeroDisplay.setProfilesVisibility(visible, 0);
+
+        if (visible) {
+            if (s != null) {
+                double[][] samples = s.getDoubles();
+                DateTime   dt      = new DateTime(samples[0][1],
+                                           s.getSetUnits()[0]);
+                DateTime dt1 = new DateTime(samples[0][0],
+                                            s.getSetUnits()[0]);
+                listlabel = dt1.dateString() + ":" + dt1.timeString()
+                            + " and " + dt.dateString() + ":"
+                            + dt.timeString();
+            }
+
+        } else {
+            listlabel = null;
+        }
+
+        updateDisplayList();
+    }
+
+    /** _more_ */
+    String listlabel = null;
+
+    /** flag for whether to display all profiles */
+    private boolean profilesVisibility = false;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getProfilesVisibility() {
+        return profilesVisibility;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected Data getDisplayListData() {
+        Data     data = null;
+        Data     d    = super.getDisplayListData();
+        TextType tt   = TextType.getTextType(DISPLAY_LIST_NAME);
+
+        if (listlabel != null) {
+            try {
+                String label = "Skew-T ";
+                data = new Text(tt, label + listlabel);
+            } catch (Exception e) {}
+
+            return data;
+        } else {
+            return d;
+        }
+
+    }
 
     /**
      * Remove this control. Call the parent  class doRemove and clears
@@ -359,6 +472,35 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         try {
             super.timeChanged(time);
             dataNode.setTime(new DateTime(time));
+            if (getProfilesVisibility()) {
+                AnimationWidget aniWidget = this.getAnimationWidget();
+                int             n         = aniWidget.getTimes().length;
+                int             idx       = 0;
+                for (int i = 0; i < n; i++) {
+                    if ((new DateTime(time)).equals(
+                            aniWidget.getTimeAtIndex(i))) {
+                        idx = i;
+                        continue;
+                    }
+
+                }
+
+                aeroDisplay.setProfilesVisibility(true, idx);
+                // display list update
+                Set s   = getDataTimeSet();
+                if (s != null) {
+                    double[][] samples = s.getDoubles();
+                    DateTime   dt      = new DateTime(samples[0][idx+1],
+                            s.getSetUnits()[0]);
+                    DateTime dt1 = new DateTime(samples[0][idx],
+                            s.getSetUnits()[0]);
+                    listlabel = dt1.dateString() + ":" + dt1.timeString()
+                            + " and " + dt.dateString() + ":"
+                            + dt.timeString();
+                }
+
+                updateDisplayList();
+            }
         } catch (Exception ex) {
             logException("timeValueChanged", ex);
         }

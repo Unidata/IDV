@@ -53,6 +53,8 @@ import javax.swing.SpinnerNumberModel;
  * @author   IDV Development Team
  */
 public class LatLonScalePanel extends JPanel implements ActionListener {
+    
+    /** The coord format. */
     private JComboBox coordFormat;
 
     /** Latitude base label */
@@ -103,6 +105,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     /**
      * Create a new dialog for setting the coordinate range of the display
      *
+     * @param mpDisplay the mp display
      */
     public LatLonScalePanel(MapProjectionDisplay mpDisplay) {
         this.mpDisplay    = mpDisplay;
@@ -121,15 +124,15 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), latLabel = new JTextField(), GuiUtils.rLabel("Base (-90 90): "),
-            latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
-            latIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            latBaseLabel = new NumericTextField(), GuiUtils.rLabel("Major Increment: "),
+            latIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Division: "),
             latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
             yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         JPanel p2 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), lonLabel = new JTextField(), GuiUtils.rLabel("Base (-180 180): "),
-            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Increment: "),
-            lonIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Increment: "),
+            lonBaseLabel = new NumericTextField(), GuiUtils.rLabel("Major Increment: "),
+            lonIncrement = new NumericTextField(), GuiUtils.rLabel("Minor Division: "),
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1)), GuiUtils.rLabel("Visible: "),
             xVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -261,5 +264,23 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      */
     public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) {
         this.lonScaleInfo = lonScaleInfo;
+    }
+
+    /**
+     * Checks if is lon visible.
+     *
+     * @return true, if is lon visible
+     */
+    public boolean isLonVisible() {
+        return xVisible.isSelected();
+    }
+
+    /**
+     * Checks if is lat visible.
+     *
+     * @return true, if is lat visible
+     */
+    public boolean isLatVisible() {
+        return yVisible.isSelected();
     }
 }

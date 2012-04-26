@@ -4,11 +4,17 @@
 build/
 !/auxdata/docs/build
 lib/idv.jar
+lib/auxdata.jar
+lib/simpleidv.jar
+lib/workshop.jar
 auxdata/docs/workshop/processed/
 auxdata/docs/workshop/content/processed/
 auxdata/docs/processed/
 auxdata/docs/workshop/content/dev/arch/images/*.gif
 auxdata/docs/workshop/content/dev/arch/images/*.jpg
+auxdata/docs/userguide/processed
+auxdata/docs/userguide/content/isl/tags.index
+docs
 
 #############
 # IDE files #
