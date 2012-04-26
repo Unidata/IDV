@@ -514,6 +514,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             throws VisADException, RemoteException {
         final int                 LAT_MIN      = -90;
         final int                 LAT_MAX      = 90;
+        final double              DELTA        = 0.0001;
         double                    bottomLat    = bottom.getLatitude().getValue();
         double                    topLat       = top.getLatitude().getValue();
         Hashtable<Double, String> labelTable   = new Hashtable<Double, String>();
@@ -522,7 +523,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         int                       minorTickInc = getLatScaleInfo().minorIncrement;
         List<Double>              minorTicks   = new ArrayList<Double>();
         double                    inc          = Misc.parseNumber(getLatScaleInfo().increment);
-        int                       cnt          = 0;
 
         // In case user inputs something bogus.
         if ((base < LAT_MIN) || (base > LAT_MAX)) {
@@ -530,15 +530,16 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         for (double i = base; i < topLat; i += inc / minorTickInc) {
-            if (i < bottomLat) {    // Latitudes that are not in this range are not visible.
+            if (i < bottomLat) {                           // Latitudes that are not in this range are not visible.
                 continue;
             }
 
             EarthLocationTuple elt    = new EarthLocationTuple(i, bottom.getLongitude().getValue(), 0);
             double[]           values = newtonLat(elt, 0);
             Double             d      = round(values[1], 3, BigDecimal.ROUND_HALF_UP);
+            double             mm     = (i - base) % inc;
 
-            if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
+            if ((mm < DELTA) || (mm > (inc - DELTA))) {    // Must account for numerical leeway.
                 majorTicks.add(d);
 
                 AxisScaleInfo.CoordSys coordSys = latScaleInfo.coordFormat;
@@ -553,8 +554,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             } else {
                 minorTicks.add(d);
             }
-
-            cnt++;
         }
 
         finalizeAxis(scale, getLatScaleInfo().label, labelTable, majorTicks, minorTicks);

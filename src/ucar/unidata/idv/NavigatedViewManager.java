@@ -375,7 +375,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         boolean b;
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
-            b = (latLonScaleWidget.isVisible() || latLonScaleWidget.isVisible()
+            b = (latLonScaleWidget.isLatVisible() || latLonScaleWidget.isLonVisible()
                  || vertScaleWidget.isAxisVisible());
         } else {
             b = vertScaleWidget.isAxisVisible();
