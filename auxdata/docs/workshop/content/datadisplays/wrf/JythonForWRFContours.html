@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Analysis and Visualization of WRF output with the IDV and Jython: Contours</title>
+<title>Contours</title>
 </head>
 <body>
 
@@ -32,7 +32,7 @@ pause()
 image = getImage()
 writeImage(output_name)}]
 <br>
-[ht::img images/WRF_Contour2D_4.png]
+[ht::cimg images/WRF_Contour2D_4.png]
 <br>
 <p>If we would rather have a solid color, say white, then use the Color Table name "white":</p>
 
@@ -58,7 +58,7 @@ pause()
 image = getImage()
 writeImage(output_name)}]
 <br>
-[ht::img images/WRF_Contour2D_5.png]
+[ht::cimg images/WRF_Contour2D_5.png]
 <br>
 <p>If you would like to change the contour interval from the default (4 mb in our example) to a new interval (let's go with 2 mb), simply do the following:</p>
 
@@ -87,7 +87,7 @@ pause()
 image = getImage()
 writeImage(output_name)}]
 <br>
-[ht::img images/WRF_Contour2D_6.png]
+[ht::cimg images/WRF_Contour2D_6.png]
 <br>
 <p>Note that the variable <code>cinfo</code> contains the various properties for the contours, including turing on/off labels, font type, dash style, alignment, etc. For more information on the methods that can be used to change the contour properties through the <code>cinfo</code> variable, see the JavaDoc for [ht::classpopup https://www.unidata.ucar.edu/software/idv/docs/javadoc/ucar/unidata/util/ContourInfo.html ControurInfo].
 
