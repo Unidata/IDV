@@ -838,7 +838,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         setDisplayInactive();
 
-        double[] zRange = zMap.getRange();
+        double[] zRange = (zMap != null)
+                        ? zMap.getRange()
+                        : new double[] { 0.0, 0.0 };
         String   title  = verticalParameter.getName() + "(" + verticalRangeUnit.getIdentifier() + ")";
 
         updateVertScale(verticalScale, title, zRange, minVerticalRange, maxVerticalRange);
@@ -1068,7 +1070,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             double[]      xRange = xMap.getRange();
             double[]      yRange = yMap.getRange();
-            double[]      zRange = zMap.getRange();
+            double[]      zRange = (zMap != null)
+                                 ? zMap.getRange()
+                                 : new double[] { 0.0, 0.0 };
             EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             double        base   = el1.getLatitude().getValue();
             EarthLocation el2    = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
@@ -1107,7 +1111,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             double[]      xRange = xMap.getRange();
             double[]      yRange = yMap.getRange();
-            double[]      zRange = zMap.getRange();
+            double[]      zRange = (zMap != null)
+                                 ? zMap.getRange()
+                                 : new double[] { 0.0, 0.0 };
             EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
             double        base   = el1.getLongitude().getValue();
             EarthLocation el2    = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
@@ -1146,6 +1152,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the rounded value
      */
     private static double round(double unrounded, int precision, int roundingMode) {
+        if (Double.isNaN(unrounded) || Double.isInfinite(unrounded)) {
+            return 0.0;
+        }
         BigDecimal bd      = new BigDecimal(unrounded);
         BigDecimal rounded = bd.setScale(precision, roundingMode);
 
