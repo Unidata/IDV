@@ -15,7 +15,6 @@ auxdata/docs/workshop/content/dev/arch/images/*.jpg
 auxdata/docs/userguide/processed
 auxdata/docs/userguide/content/isl/tags.index
 auxdata/docs/userguide/content/JavaHelpSearch
-docs
 src/ucar/unidata/idv/resources/build.properites
 
 #############
