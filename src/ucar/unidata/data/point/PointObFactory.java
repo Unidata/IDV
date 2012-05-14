@@ -35,14 +35,15 @@ import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
 import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
+import ucar.nc2.dt.point.CFPointObWriter;
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
-import ucar.nc2.ft.point.writer.CFPointObWriter;
-import ucar.nc2.ft.point.writer.PointObVar;
+import ucar.nc2.ft.point.writer.CFPointWriter;
+import ucar.nc2.dt.point.PointObVar;
 import ucar.nc2.units.DateRange;
 
 import ucar.unidata.data.DataChoice;
