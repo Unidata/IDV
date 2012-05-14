@@ -38,6 +38,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 
 import ucar.visad.UtcDate;
 
@@ -177,9 +178,9 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
         this.isTime             = isTime;
         addMouseMotionListener(this);
         addMouseListener(this);
-        lowerLbl  = new JLabel(StringUtil.padRight("", 5), JLabel.RIGHT);
-        upperLbl  = new JLabel(StringUtil.padLeft("", 5), JLabel.LEFT);
-        middleLbl = new JLabel(StringUtil.padRight("", 5), JLabel.RIGHT);
+        lowerLbl  = new JLabel(StringUtil2.padRight("", 5), JLabel.RIGHT);
+        upperLbl  = new JLabel(StringUtil2.padLeft("", 5), JLabel.LEFT);
+        middleLbl = new JLabel(StringUtil2.padRight("", 5), JLabel.RIGHT);
         Font lblFont = lowerLbl.getFont();
         Font monoFont = new Font("Monospaced", lblFont.getStyle(),
                                  lblFont.getSize());
@@ -334,8 +335,8 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
             upper = "";
         }
         if ( !forSideLegend()) {
-            lowerLbl.setText(StringUtil.padLeft(lower, 5));
-            upperLbl.setText(StringUtil.padRight(upper, 5));
+            lowerLbl.setText(StringUtil2.padLeft(lower, 5));
+            upperLbl.setText(StringUtil2.padRight(upper, 5));
         } else {
             lowerLbl.setText(lower);
             middleLbl.setText(unitString);

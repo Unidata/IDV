@@ -53,6 +53,7 @@ import ucar.unidata.util.ResourceManager;
 import ucar.unidata.util.StringUtil;
 
 
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
 
@@ -522,8 +523,8 @@ public class ColorTableManager extends ResourceManager {
             for (int ci = 0; ci < 3; ci++) {
                 v = table[ci][i] * 255.0f;
                 line = StringUtil.replace(line, names[ci],
-                                          StringUtil.padLeft("" + (int) v,
-                                              3));
+                                          StringUtil2.padLeft("" + (int) v,
+                                                  3));
             }
             c.append(line);
             c.append("\n");

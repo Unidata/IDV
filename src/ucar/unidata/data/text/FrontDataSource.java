@@ -47,6 +47,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -320,7 +321,7 @@ public class FrontDataSource extends FilesDataSource {
             int    delta  = new Integer(deltas).intValue();
             now.add(java.util.Calendar.DAY_OF_YEAR, -delta);
             String days = "" + now.get(java.util.Calendar.DAY_OF_YEAR);
-            days = StringUtil.padLeft(days, 3, "0");
+            days = StringUtil2.padLeft(days, 3, "0");
             String yearDay = now.get(java.util.Calendar.YEAR) + "" + days;
             filename = StringUtil.replace(filename, "%DAY-" + delta + "%",
                                           yearDay);

@@ -20,7 +20,7 @@
 
 package ucar.unidata.util;
 
-
+import ucar.unidata.util.StringUtil2;
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -3509,7 +3509,7 @@ public class Misc {
      * @return The text with added br tags.
      */
     public static String breakText(String text, String insert, int lineSize) {
-        return StringUtil.breakText(text, insert, lineSize);
+        return StringUtil2.breakText(text, insert, lineSize);
     }
 
 
@@ -3530,7 +3530,7 @@ public class Misc {
      *  @return The whitespaceless result.
      */
     public static String removeWhitespace(String inputString) {
-        return StringUtil.removeWhitespace(inputString);
+        return StringUtil2.removeWhitespace(inputString);
     }
 
 
@@ -3554,7 +3554,7 @@ public class Misc {
      *         leading "0"-s if value &lt; 10E(numDigits-1)
      */
     public static String padZero(int value, int numDigits) {
-        return StringUtil.padZero(value, numDigits);
+        return StringUtil2.padZero(value, numDigits);
     }
 
 
@@ -3565,7 +3565,7 @@ public class Misc {
      * @return  padded String
      */
     public static String padLeft(String s, int desiredLength) {
-        return StringUtil.padLeft(s, desiredLength);
+        return StringUtil2.padLeft(s, desiredLength);
     }
 
 
@@ -3578,7 +3578,7 @@ public class Misc {
      */
     public static String padLeft(String s, int desiredLength,
                                  String padString) {
-        return StringUtil.padLeft(s, desiredLength, padString);
+        return StringUtil2.padLeft(s, desiredLength, padString);
     }
 
 
@@ -3590,7 +3590,7 @@ public class Misc {
      * @return  padded String
      */
     public static String padRight(String s, int desiredLength) {
-        return StringUtil.padRight(s, desiredLength);
+        return StringUtil2.padRight(s, desiredLength);
     }
 
 
@@ -3603,7 +3603,7 @@ public class Misc {
      */
     public static String padRight(String s, int desiredLength,
                                   String padString) {
-        return StringUtil.padRight(s, desiredLength, padString);
+        return StringUtil2.padRight(s, desiredLength, padString);
     }
 
 

@@ -31,6 +31,7 @@ import thredds.catalog.*;
 
 import ucar.nc2.dt.DataIterator;
 import ucar.nc2.dt.RadialDatasetSweep;
+import ucar.unidata.data.radar.TDSRadarDatasetCollection;
 import ucar.unidata.data.radar.StationRadarCollectionImpl;
 
 import ucar.nc2.thredds.*;

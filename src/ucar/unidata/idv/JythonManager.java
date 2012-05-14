@@ -99,7 +99,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
-
+import ucar.unidata.util.StringUtil2;
 
 
 
@@ -1433,7 +1433,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return Does the code  just call into idv or datamanager methods.
      */
     protected static boolean checkUntrustedJython(String jython) {
-        jython = StringUtil.removeWhitespace(jython);
+        jython = StringUtil2.removeWhitespace(jython);
         String argPattern  = "([^()',]+|'[^']*')";
         String argsPattern = "((" + argPattern + ",)*" + argPattern + "?)";
         String pattern = "^((idv|datamanager).[^\\s(]+\\(" + argsPattern

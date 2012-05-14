@@ -125,6 +125,25 @@ public class StringUtil {
 
 
   /**
+   * Find all occurences of the "match" in original, and substitute the "subst" string.
+   *
+   * @param original starting string
+   * @param match    string to match
+   * @param subst    string to substitute
+   * @return a new string with substitutions
+   */
+  static public String substitute(String original, String match,
+                                  String subst) {
+    String s = original;
+    int pos;
+    while (0 <= (pos = s.indexOf(match))) {
+      StringBuffer sb = new StringBuffer(s);
+      s = sb.replace(pos, pos + match.length(), subst).toString();
+    }
+    return s;
+  }
+
+  /**
    * Concatentate the given string cnt times
    *
    * @param s   base string
@@ -137,6 +156,57 @@ public class StringUtil {
       sb.append(s);
     }
     return sb.toString();
+  }
+
+  /**
+   * Find all occurences of match strings in original, and substitute the corresponding
+   * subst string.
+   *
+   * @param original starting string
+   * @param match    array of strings to match
+   * @param subst    array of strings to substitute
+   * @return a new string with substitutions
+   */
+  static public String substitute(String original, String[] match,
+                                  String[] subst) {
+
+    boolean ok = true;
+    for (int i = 0; i < match.length; i++) {
+      if (0 <= original.indexOf(match[i])) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) {
+      return original;
+    }
+
+    // gotta do it;
+    StringBuffer sb = new StringBuffer(original);
+    for (int i = 0; i < match.length; i++) {
+      substitute(sb, match[i], subst[i]);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Find all occurences of the "match" in original, and substitute the "subst" string,
+   * directly into the original.
+   *
+   * @param sbuff starting string buffer
+   * @param match string to match
+   * @param subst string to substitute
+   */
+  static public void substitute(StringBuffer sbuff, String match,
+                                String subst) {
+    int pos,
+            fromIndex = 0;
+    int substLen = subst.length();
+    int matchLen = match.length();
+    while (0 <= (pos = sbuff.indexOf(match, fromIndex))) {
+      sbuff.replace(pos, pos + matchLen, subst);
+      fromIndex = pos + substLen;  // make sure dont get into an infinite loop
+    }
   }
 
   /**
@@ -1989,7 +2059,7 @@ public class StringUtil {
    * @param value   replacement value
    * @return munged string
    */
-  private static String replace(String string, String pattern, String value) {
+  public static String replace(String string, String pattern, String value) {
     if (pattern.length() == 0)
       return string;
 

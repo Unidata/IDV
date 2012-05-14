@@ -48,6 +48,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
@@ -566,7 +567,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
                 bearingText = "" + getDisplayConventions().formatAngle(
                     result.getAngle());
             }
-            azimuthLbl.setText(StringUtil.padRight(bearingText, 15));
+            azimuthLbl.setText(StringUtil2.padRight(bearingText, 15));
         }
 
 
@@ -2278,9 +2279,9 @@ public class LocationIndicatorControl extends DisplayControlImpl {
             DisplayConventions dc =
                 getControlContext().getDisplayConventions();
             int pad = 0;
-            latLbl.setText(StringUtil.padLeft(latString =
+            latLbl.setText(StringUtil2.padLeft(latString =
                 dc.formatLatLon(lat), pad));
-            lonLbl.setText(StringUtil.padLeft(lonString =
+            lonLbl.setText(StringUtil2.padLeft(lonString =
                 dc.formatLatLon(lon), pad));
             altUnitLbl.setText(" " + el.getAltitude().getUnit());
             altLbl.setText(altString = "" + dc.formatDistance(alt));

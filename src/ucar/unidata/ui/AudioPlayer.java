@@ -35,6 +35,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 
 
 import java.awt.*;
@@ -537,7 +538,7 @@ public class AudioPlayer extends JPanel implements LineListener,
         }
 
         Font monoFont = Font.decode("monospaced");
-        timeLabel = new JLabel(StringUtil.padRight(" ", 12));
+        timeLabel = new JLabel(StringUtil2.padRight(" ", 12));
         timeLabel.setFont(monoFont);
         progressBar = new JProgressBar(0, 100);
         startBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/Play16.gif",
@@ -611,7 +612,7 @@ public class AudioPlayer extends JPanel implements LineListener,
      * _more_
      */
     public void updateControls() {
-        timeLabel.setText(StringUtil.padRight(" ", 12));
+        timeLabel.setText(StringUtil2.padRight(" ", 12));
         double seconds = getSeconds();
         if (midiEOM) {
             seconds = duration;
@@ -625,7 +626,7 @@ public class AudioPlayer extends JPanel implements LineListener,
         String s = String.valueOf(seconds);
         s = s.substring(0, s.indexOf('.') + 2);
         s = s + "/" + ((int) duration);
-        timeLabel.setText(StringUtil.padRight(s, 12));
+        timeLabel.setText(StringUtil2.padRight(s, 12));
         int progress = (int) (seconds / duration * 100);
         progressBar.setValue(progress);
     }

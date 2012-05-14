@@ -36,6 +36,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
@@ -1056,7 +1057,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
                 extra2 = extra1 = StringUtil.repeat("&nbsp;", 9);
             }
             rangeLbl.setText(
-                StringUtil.padLeft(
+                StringUtil2.padLeft(
                     getDisplayConventions().formatDistance(range), 8));
             bearingValueLbl.setText(
                 "<html>"

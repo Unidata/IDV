@@ -54,6 +54,7 @@ import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -643,7 +644,7 @@ public class PointObFactory {
             for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 if (isText[fieldIdx]) {
                     String s = ((Text) data[fieldIdx]).getValue();
-                    s             = StringUtil.padLeft(s, lengths[fieldIdx]);
+                    s             = StringUtil2.padLeft(s, lengths[fieldIdx]);
                     svals[scnt++] = s;
                     //                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {

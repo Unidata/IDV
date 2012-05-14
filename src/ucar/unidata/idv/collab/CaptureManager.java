@@ -27,6 +27,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.collab.*;
 
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.xml.*;
 
 import ucar.visad.display.AnimationWidget;
@@ -220,7 +221,7 @@ public class CaptureManager {
      */
     protected void addEvent(CaptureEvent event) {
         captureList.add(event);
-        captureLabel.setText(StringUtil.padRight("Events: "
+        captureLabel.setText(StringUtil2.padRight("Events: "
                                                  + (captureList.size()
                                                     + 1), 20));
     }
@@ -397,8 +398,8 @@ public class CaptureManager {
      */
     private void checkReplayLabel() {
         if ((replayList == null) || (replayList.size() == 0)) {
-            replayTimeLabel.setText(StringUtil.padRight("", 40));
-            replayEventLabel.setText(StringUtil.padRight("", 20));
+            replayTimeLabel.setText(StringUtil2.padRight("", 40));
+            replayEventLabel.setText(StringUtil2.padRight("", 20));
             rewindReplayBtn.setEnabled(false);
         } else {
             if (replayIndex == 0) {
@@ -418,10 +419,10 @@ public class CaptureManager {
             } else {
                 timeMsg = totalTime;
             }
-            replayTimeLabel.setText(StringUtil.padRight("Time: " + timeMsg,
+            replayTimeLabel.setText(StringUtil2.padRight("Time: " + timeMsg,
                                                         40));
             replayEventLabel.setText(
-                StringUtil.padLeft(
+                StringUtil2.padLeft(
                     "Event: " + (replayIndex) + "/" + replayList.size(), 20));
         }
     }
@@ -516,7 +517,7 @@ public class CaptureManager {
      */
     private void clearCapture() {
         captureList = new ArrayList();
-        captureLabel.setText(StringUtil.padRight("Events: 0", 20));
+        captureLabel.setText(StringUtil2.padRight("Events: 0", 20));
     }
 
 
@@ -569,7 +570,7 @@ public class CaptureManager {
         });
 
 
-        captureLabel    = new JLabel(StringUtil.padRight("Events: 0", 20));
+        captureLabel    = new JLabel(StringUtil2.padRight("Events: 0", 20));
         writeCaptureBtn = new JButton("Write Captured Events");
         writeCaptureBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {

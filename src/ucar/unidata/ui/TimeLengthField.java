@@ -28,7 +28,7 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-
+import ucar.unidata.util.StringUtil2;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -360,7 +360,7 @@ public class TimeLengthField {
     public void setTime(double minutes) {
         if (minutes != minutes) {
             time = minutes;
-            label.setText(StringUtil.padLeft("Undefined", 12));
+            label.setText(StringUtil2.padLeft("Undefined", 12));
             if (yearsFld != null) {
                 yearsFld.setText("");
             }
@@ -441,7 +441,7 @@ public class TimeLengthField {
         } else if (text.length() == 0) {
             text = text + "0" + "m";
         }
-        label.setText(StringUtil.padLeft(text, 12));
+        label.setText(StringUtil2.padLeft(text, 12));
         timeChanged();
     }
 

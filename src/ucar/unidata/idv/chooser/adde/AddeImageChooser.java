@@ -47,16 +47,12 @@ import ucar.unidata.ui.ChooserPanel;
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.LatLonWidget;
 
-import ucar.unidata.util.DateSelection;
-import ucar.unidata.util.DatedObject;
-import ucar.unidata.util.DatedThing;
-import ucar.unidata.util.Format;
+import ucar.unidata.util.*;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PreferenceList;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlNodeList;
 
@@ -1088,11 +1084,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 lineMagSlider.setToolTipText(
                     "Slide to set line magnification factor");
                 lineMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
+                    GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
                 elementMagSlider.setToolTipText(
                     "Slide to set element magnification factor");
                 elementMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
+                    GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
                 amSettingProperties = oldAmSettingProperties;
 
 
@@ -1227,7 +1223,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     public void changePlace(String newPlace) {
         this.place = newPlace;
         String s = translatePlace(place) + "=";
-        placeLbl.setText(StringUtil.padRight(s, 12));
+        placeLbl.setText(StringUtil2.padRight(s, 12));
     }
 
 
@@ -1248,7 +1244,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             }
         }
         //System.out.println(" changelistener: linesToElements = " + linesToElements);
-        elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
+        elementMagLbl.setText(StringUtil2.padLeft("" + value, 3));
         if ( !getLockButton().isSelected()) {
             if (value > 0) {
                 numElementsFld.setText("" + (int) (baseNumElements * value));
@@ -1268,7 +1264,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     private void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
-            lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
+            lineMagLbl.setText(StringUtil2.padLeft("" + value, 3));
             if (autoSetSize) {
                 if (value > 0) {
                     numLinesFld.setText("" + (int) (baseNumLines * value));
@@ -2728,8 +2724,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
             lineMagSlider.setValue(lineValue);
             elementMagSlider.setValue(elementValue);
-            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 3));
-            elementMagLbl.setText(StringUtil.padLeft(""
+            lineMagLbl.setText(StringUtil2.padLeft("" + getLineMagValue(), 3));
+            elementMagLbl.setText(StringUtil2.padLeft(""
                     + getElementMagValue(), 3));
             linesToElements = Math.abs(lineValue / (double) elementValue);
             if (Double.isNaN(linesToElements)) {
@@ -3313,7 +3309,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if (megs > SIZE_THRESHOLD) {
             final JCheckBox maintainSize =
                 new JCheckBox("Maintain spatial extent", false);
-            final JLabel sizeLbl = new JLabel(StringUtil.padRight("  "
+            final JLabel sizeLbl = new JLabel(StringUtil2.padRight("  "
                                        + (int) (((double) ((int) megs * 100))
                                            / 100.0) + " MB", 14));
             GuiUtils.setFixedWidthFont(sizeLbl);
@@ -3356,7 +3352,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                                         * listHolder[0].size();
                     int nmegs = (int) ((bytesPerPixel * numPixels)
                                        / (double) 1000000);
-                    sizeLbl.setText(StringUtil.padRight("  " + nmegs + " MB",
+                    sizeLbl.setText(StringUtil2.padRight("  " + nmegs + " MB",
                             14));
                 }
             };

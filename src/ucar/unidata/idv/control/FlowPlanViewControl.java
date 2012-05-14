@@ -939,7 +939,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             builder.append("]");
             result = builder.toString();
             int length = result.length();
-            result = StringUtil.padLeft(result, 8 * (20 - length), "&nbsp;");
+            result = StringUtil2.padLeft(result, 8 * (20 - length), "&nbsp;");
         }
 
         return result;

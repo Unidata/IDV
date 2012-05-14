@@ -122,7 +122,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-
+import ucar.unidata.util.StringUtil2;
 /**
  * Some display control oriented utilities
  * @author IDV development team
@@ -465,7 +465,7 @@ public abstract class DisplayControlBase extends SharableImpl {
         if (label.length() > size) {
             label = label.substring(0, size - 1);
         } else {
-            label = StringUtil.padRight(label, size);
+            label = StringUtil2.padRight(label, size);
         }
         return new TwoFacedObject(label, o);
     }

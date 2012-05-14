@@ -127,6 +127,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 
+import ucar.unidata.util.StringUtil2;
 
 
 /**
@@ -6529,7 +6530,7 @@ public class IdvUIManager extends IdvManager {
         LatLonPoint llp = el.getLatLonPoint();
         JMenuItem mi =
             new JMenuItem(
-                StringUtil.padRight(name + ": ", 15, " ")
+                StringUtil2.padRight(name + ": ", 15, " ")
                 + getIdv().getDisplayConventions().formatLatLonPoint(llp));
         GuiUtils.setFixedWidthFont(mi);
         mi.addActionListener(new ActionListener() {

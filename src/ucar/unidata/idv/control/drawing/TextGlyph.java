@@ -33,6 +33,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
@@ -684,10 +685,10 @@ public class TextGlyph extends DrawingGlyph {
         //Not sure if we want to replace new line with br
         //        String tmp = StringUtil.replace(text, "\n", "<br>");
         tmp = "<html><body style=\"margin:0;" + "color:#"
-              + StringUtil.padRight(Integer.toHexString(c.getRed()), 2, "0")
-              + StringUtil.padRight(
+              + StringUtil2.padRight(Integer.toHexString(c.getRed()), 2, "0")
+              + StringUtil2.padRight(
                   Integer.toHexString(c.getGreen()), 2,
-                  "0") + StringUtil.padRight(
+                  "0") + StringUtil2.padRight(
                       Integer.toHexString(c.getBlue()), 2, "0") + "; "
                           + ((font != null)
                              ? "font-size:" + font.getSize() + "pt;"

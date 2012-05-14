@@ -30,6 +30,7 @@ import ucar.unidata.ui.DropPanel;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -1080,7 +1081,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
          */
         public void addControlInfo(final ControlInfo controlInfo) {
             JToggleButton btn = controlInfo.button =
-                                    new JToggleButton(StringUtil.padRight("",
+                                    new JToggleButton(StringUtil2.padRight("",
                                         20), true) {
                 public void paint(Graphics g) {
                     paintButton(g, controlInfo);

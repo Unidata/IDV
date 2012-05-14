@@ -46,6 +46,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.TwoFacedObject;
 
 
@@ -489,7 +490,7 @@ public class JythonControl extends GridDisplayControl {
 
         label = label.trim();
         String id = "jythoncontrol_"
-                    + StringUtil.removeWhitespace(label.toLowerCase());
+                    + StringUtil2.removeWhitespace(label.toLowerCase());
         String props = prop("displayName", label)
                        + prop("windowVisible", "true")
                        + prop("probeType", probeType)

@@ -62,6 +62,7 @@ import ucar.unidata.util.Prototypable;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Removable;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.GlobeDisplay;
@@ -7179,7 +7180,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             result = Misc.format(value);
             result = result + "[" + unit + "]";
             int length = result.length();
-            result = StringUtil.padLeft(result, 8 * (20 - length), "&nbsp;");
+            result = StringUtil2.padLeft(result, 8 * (20 - length), "&nbsp;");
         }
 
         return result;
