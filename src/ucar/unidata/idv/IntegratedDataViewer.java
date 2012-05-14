@@ -50,6 +50,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlEncoder;
@@ -1532,7 +1533,7 @@ Misc.run(new Runnable() {
         boolean isFile = false;
 
         if (action.startsWith("idv:")) {
-            action = StringUtil.replace(action, "&", "&amp;");
+            action = StringUtil2.replace(action, "&", "&amp;");
             action = action.substring("idv:".length());
             getJythonManager().evaluateUntrusted(action, properties);
             return true;
