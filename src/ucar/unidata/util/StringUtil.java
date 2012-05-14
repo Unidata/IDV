@@ -73,8 +73,29 @@ public class StringUtil {
     return (s != null) && (s.trim().length() > 0);
   }
 
-
-
+  /**
+   * Collapse continuous whitespace into one single " ".
+   *
+   * @param s operate on this string
+   * @return result with collapsed whitespace
+   */
+  static public String collapseWhitespace(String s) {
+    int len = s.length();
+    StringBuilder b = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char c = s.charAt(i);
+      if (!Character.isWhitespace(c)) {
+        b.append(c);
+      } else {
+        b.append(' ');
+        while ((i + 1 < len)
+                && Character.isWhitespace(s.charAt(i + 1))) {
+          i++;  /// skip further whitespace
+        }
+      }
+    }
+    return b.toString();
+  }
 
 
   /**
@@ -103,7 +124,6 @@ public class StringUtil {
   }
 
 
-
   /**
    * Concatentate the given string cnt times
    *
@@ -118,8 +138,6 @@ public class StringUtil {
     }
     return sb.toString();
   }
-
-
 
   /**
    * Return true if all characters are numeric.
@@ -168,10 +186,6 @@ public class StringUtil {
     return sb.toString();
   }
 
-
-
-
-
   /**
    * Convert the given color to is string hex representation
    *
@@ -183,10 +197,6 @@ public class StringUtil {
             + StringUtil2.padRight(Integer.toHexString(c.getGreen()), 2, "0")
             + StringUtil2.padRight(Integer.toHexString(c.getBlue()), 2, "0");
   }
-
-
-
-
 
 
   /////////////////////////////////////////////////////////////
@@ -455,10 +465,6 @@ public class StringUtil {
   }
 
 
-
-
-
-
   /**
    * Remove any beginning or ending &lt;html&gt; tags
    *
@@ -544,8 +550,6 @@ public class StringUtil {
     stripped.append(s);
     return stripped.toString();
   }
-
-
 
 
   /**
@@ -799,7 +803,6 @@ public class StringUtil {
     }
     return result;
   }
-
 
 
   /**
@@ -1135,7 +1138,6 @@ public class StringUtil {
   }
 
 
-
   /**
    * Replaces all occurrences of "patterns" in "v" with "values"
    *
@@ -1147,7 +1149,7 @@ public class StringUtil {
   public static String replaceList(String v, String[] patterns,
                                    String[] values) {
     for (int i = 0; i < patterns.length; i++) {
-      v = StringUtil2.replace(v, patterns[i], values[i]);
+      v = replace(v, patterns[i], values[i]);
     }
     return v;
   }
@@ -1167,7 +1169,7 @@ public class StringUtil {
               "Patterns list not the same size as values list");
     }
     for (int i = 0; i < patterns.size(); i++) {
-      v = StringUtil2.replace(v, (String) patterns.get(i), (String) values.get(i));
+      v = replace(v, (String) patterns.get(i), (String) values.get(i));
     }
     return v;
   }
@@ -1191,7 +1193,7 @@ public class StringUtil {
       for (int patternIdx = 0; patternIdx < patterns.length;
            patternIdx++) {
         if (patterns[patternIdx] != null) {
-          str = StringUtil2.replace(str, patterns[patternIdx],
+          str = replace(str, patterns[patternIdx],
                   values[patternIdx]);
         }
       }
@@ -1358,10 +1360,10 @@ public class StringUtil {
           if (c == '\"') {
             state = INQUOTE;
           } else if (c == ',') {
-            line.add(StringUtil2.replace(word, "_QUOTE_", "\""));
+            line.add(replace(word, "_QUOTE_", "\""));
             word = "";
           } else if (c == '\n') {
-            line.add(StringUtil2.replace(word, "_QUOTE_", "\""));
+            line.add(replace(word, "_QUOTE_", "\""));
             word = "";
             if (!skipFirst || (lines.size() > 1)) {
               if (!line.get(0).toString().startsWith("#")) {
@@ -1377,7 +1379,7 @@ public class StringUtil {
 
         case INQUOTE:
           if (c == '\"') {
-            line.add(StringUtil2.replace(word, "_QUOTE_", "\""));
+            line.add(replace(word, "_QUOTE_", "\""));
             word = "";
             state = LOOKING;
           } else {
@@ -1389,7 +1391,7 @@ public class StringUtil {
 
     if ((line.size() > 0) || (word.length() > 0)) {
       if (word.length() > 0) {
-        line.add(StringUtil2.replace(word, "_QUOTE_", "\""));
+        line.add(replace(word, "_QUOTE_", "\""));
       }
       if (!skipFirst || (lines.size() > 1)) {
         if (!line.get(0).toString().startsWith("#")) {
@@ -1521,6 +1523,7 @@ public class StringUtil {
   public static boolean isLowerCase(String s) {
     return s.toLowerCase().equals(s);
   }
+
 
 
   /**
@@ -1827,9 +1830,6 @@ public class StringUtil {
   }
 
 
-
-
-
   /**
    * This parses the given string with the following  form.
    * <pre>some text ${macro1} more text ... ${macro2} ... ${macroN} end text</pre>
@@ -1908,16 +1908,16 @@ public class StringUtil {
    * @return coords
    */
   public static double[][] parseCoordinates(String coords) {
-    coords = StringUtil2.replace(coords, "\n", " ");
+    coords = replace(coords, "\n", " ");
     while (true) {
-      String newCoords = StringUtil2.replace(coords, " ,", ",");
+      String newCoords = replace(coords, " ,", ",");
       if (newCoords.equals(coords)) {
         break;
       }
       coords = newCoords;
     }
     while (true) {
-      String newCoords = StringUtil2.replace(coords, ", ", ",");
+      String newCoords = replace(coords, ", ", ",");
       if (newCoords.equals(coords)) {
         break;
       }
@@ -1963,7 +1963,6 @@ public class StringUtil {
     return result;
   }
 
-
   /**
    * Get "a" or "an" for prefixing to a string based on the first
    * character
@@ -1981,5 +1980,37 @@ public class StringUtil {
   }
 
 
+  ////////////////////////////////////
+  /**
+   * Replaces all occurrences of "pattern" in "string" with "value"
+   *
+   * @param string  string to munge
+   * @param pattern pattern to replace
+   * @param value   replacement value
+   * @return munged string
+   */
+  private static String replace(String string, String pattern, String value) {
+    if (pattern.length() == 0)
+      return string;
+
+    StringBuilder returnValue = new StringBuilder();
+    int patternLength = pattern.length();
+    while (true) {
+      int idx = string.indexOf(pattern);
+      if (idx < 0) {
+        break;
+      }
+      returnValue.append(string.substring(0, idx));
+      if (value != null) {
+        returnValue.append(value);
+      }
+      string = string.substring(idx + patternLength);
+    }
+    returnValue.append(string);
+    return returnValue.toString();
+  }
+
+
 }
+
 
