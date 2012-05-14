@@ -24,7 +24,6 @@ package ucar.unidata.idv.chooser;
 import org.w3c.dom.Element;
 
 
-import ucar.nc2.thredds.DqcRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
 
@@ -63,7 +62,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 
-
+import ucar.unidata.data.radar.DqcRadarDatasetCollection;
 
 
 
