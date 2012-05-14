@@ -21,7 +21,6 @@
 package ucar.unidata.data.radar;
 
 
-import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
 
