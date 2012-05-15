@@ -500,8 +500,8 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        ucar.grib.GribResourceReader.setGribResourceReader(
-            new ucar.grib.GribResourceReader() {
+        ucar.nc2.grib.GribResourceReader.setGribResourceReader(
+            new ucar.nc2.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
                     throws IOException {
                 try {
@@ -521,8 +521,9 @@ public class DataManager {
                 IdvResourceManager.RSC_GRIB1LOOKUPTABLES);
         for (int i = 0; i < grib1Resources.size(); i++) {
             try {
-                ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
-                    grib1Resources.get(i).toString());
+                ucar.nc2.grib.grib1.tables.Grib1ParamTables.addParameterTableLookup(grib1Resources.get(i).toString());
+               // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
+               //     grib1Resources.get(i).toString());
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
