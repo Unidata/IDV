@@ -31,7 +31,6 @@ import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil;
 
 import java.awt.*;
 import java.awt.event.*;
