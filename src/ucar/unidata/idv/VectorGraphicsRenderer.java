@@ -121,7 +121,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             l.add(makeImage(viewManager));
         }
 
-        images  = (BufferedImage) ImageUtils.gridImages(l, 3, Color.GRAY, columns);
+        images  = (BufferedImage) ImageUtils.gridImages2(l, 3, Color.GRAY, columns);
         fullDim = new Dimension(images.getWidth(), images.getHeight());
     }
 
