@@ -3,7 +3,7 @@
   <datasource
      id="DODS.GRID,OPENDAP.GRID"
      factory="ucar.unidata.data.grid.DodsGeoGridDataSource"
-     patterns="http://.*/dods/.*$,dods://.*$,http://.*/dodsC/.*$"
+     patterns="http://.*/dods/.*$,dods://.*$,http://.*/dodsC/.*$,.*entry.das$"
      label="Grids from an OPeNDAP server">
     <property
        name="icon"

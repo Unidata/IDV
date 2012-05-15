@@ -31,6 +31,7 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
 import ucar.visad.display.DisplayableData;
@@ -58,6 +59,7 @@ import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
@@ -269,6 +271,37 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
         try {
             super.timeChanged(time);
             dataNode.setTime(new DateTime(time));
+            if (getProfilesVisibility()) {
+                AnimationWidget aniWidget = this.getAnimationWidget();
+                int idx = 0;
+                if(aniWidget.getTimes() != null)  {
+                    int             n         = aniWidget.getTimes().length;
+                    for (int i = 0; i < n; i++) {
+                        if ((new DateTime(time)).equals(
+                                aniWidget.getTimeAtIndex(i))) {
+                            idx = i;
+                            continue;
+                        }
+
+                    }
+                }
+                aeroDisplay.setProfilesVisibility(true, idx);
+                // display list update
+                Set s   = getDataTimeSet();
+                if (s != null) {
+                    double[][] samples = s.getDoubles();
+                    DateTime   dt      = new DateTime(samples[0][idx+1],
+                            s.getSetUnits()[0]);
+                    DateTime dt1 = new DateTime(samples[0][idx],
+                            s.getSetUnits()[0]);
+                    listlabel = dt1.dateString() + ":" + dt1.timeString()
+                            + " and " + dt.dateString() + ":"
+                            + dt.timeString();
+                }
+
+                updateDisplayList();
+                updateHeaderLabel();
+            }
         } catch (Exception ex) {
             logException("timeValueChanged", ex);
         }
@@ -483,32 +516,34 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
             }
 
             timesHolder.setData(dummy);
+            if(widget==null) {
+                if (times.getLength() == 1) {
+                    DateTime time = new DateTime(new Real(timeType,
+                                        times.indexToDouble(new int[] {
+                                            0 })[0][0], times.getSetUnits()[0]));
 
-            if (times.getLength() == 1) {
-                DateTime time = new DateTime(new Real(timeType,
-                                    times.indexToDouble(new int[] {
-                                        0 })[0][0], times.getSetUnits()[0]));
+                    widget = GuiUtils.wrap(new JLabel(time.toString()));
+                    dataNode.setTime(time);
+                    setSounding(0);
+                } else {
+                    //
+                    // Set the animation.
+                     //
+                    Animation animation = getInternalAnimation(timeType);
+                    getSoundingView().setExternalAnimation(animation,
+                            getAnimationWidget());
+                    aeroDisplay.addDisplayable(animation);
+                    aeroDisplay.addDisplayable(timesHolder);
 
-                widget = GuiUtils.wrap(new JLabel(time.toString()));
-                dataNode.setTime(time);
-                setSounding(0);
-            } else {
-                /*
-                 * Set the animation.
-                 */
-                Animation animation = getInternalAnimation(timeType);
-                getSoundingView().setExternalAnimation(animation,
-                        getAnimationWidget());
-                aeroDisplay.addDisplayable(animation);
-                aeroDisplay.addDisplayable(timesHolder);
+                    Container container = Box.createHorizontalBox();
+                    //Wrap these components so they don't get stretched in the Y direction
+                    container.add(
+                        GuiUtils.wrap(getAnimationWidget().getContents(false)));
+                    //container.add(GuiUtils.wrap (animationWidget.getIndicatorComponent()));
 
-                Container container = Box.createHorizontalBox();
-                //Wrap these components so they don't get stretched in the Y direction
-                container.add(
-                    GuiUtils.wrap(getAnimationWidget().getContents(false)));
-                //container.add(GuiUtils.wrap (animationWidget.getIndicatorComponent()));
+                    widget = container;
 
-                widget = container;
+                }
             }
         }
 
@@ -640,4 +675,113 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
             super.updateHeaderLabel();
         }
     }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected Data getDisplayListData() {
+        Data     data = null;
+        Data     d    = super.getDisplayListData();
+        TextType tt   = TextType.getTextType(DISPLAY_LIST_NAME);
+
+        if (listlabel != null) {
+            try {
+                String label = "Skew-T ";
+                data = new Text(tt, label + listlabel);
+            } catch (Exception e) {}
+
+            return data;
+        } else {
+            return d;
+        }
+
+    }
+    public Set subSetProfilesTimeSet(Set tset) throws Exception {
+
+        List<DateTime> timeList      = (List<DateTime>) Util.toList(tset);
+        int size = timeList.size();
+        List<DateTime> subList = new ArrayList<DateTime>();
+        
+        for(int i = 0; i< size-1; i++){
+            Real r = timeList.get(i);
+            DateTime dt = new DateTime(r);
+            subList.add(dt);
+        }
+        
+
+        return Util.makeTimeSet(subList);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param visible _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setPairProfilesVisibility(boolean visible) throws Exception {
+        profilesVisibility = visible;
+        Set s   = getDataTimeSet();
+        int len = s.getLength();
+        if (len < 2) {  // no pair do nothing
+            return;
+        }
+        AnimationWidget aniWidget = this.getAnimationWidget();
+        // aniWidget.setBoxPanelVisible( !visible);
+       //if (visible) {
+        aniWidget.gotoIndex(0);
+        aniWidget.setRunning(false);
+        //}
+
+        if (visible) {
+
+            Set    timeset = subSetProfilesTimeSet(s);
+            dataNode.setOutputTimes((SampledSet) timeset);
+        } else {
+            Set timeset = getDataTimeSet();
+            dataNode.setOutputTimes((SampledSet) timeset);
+        }
+        // GuiUtils.enableTree(aniWidget.getContents(), !visible);
+        // now update the display list label
+        aeroDisplay.setProfilesVisibility(visible, 0);
+
+        if (visible) {
+            if (s != null) {
+                double[][] samples = s.getDoubles();
+                DateTime   dt      = new DateTime(samples[0][1],
+                        s.getSetUnits()[0]);
+                DateTime dt1 = new DateTime(samples[0][0],
+                        s.getSetUnits()[0]);
+                listlabel = dt1.dateString() + ":" + dt1.timeString()
+                        + " and " + dt.dateString() + ":"
+                        + dt.timeString();
+            }
+
+        } else {
+            listlabel = null;
+        }
+
+        updateDisplayList();
+        updateHeaderLabel();
+    }
+
+    /** _more_ */
+    String listlabel = null;
+
+    /** flag for whether to display all profiles */
+    private boolean profilesVisibility = false;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getProfilesVisibility() {
+        return profilesVisibility;
+    }
+
+
+
 }

@@ -848,7 +848,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /**
      * Sets the currently-displayed sounding.  The index is that of the
-     * soundings set by {@link #setSoundings(Field[], Field[], Field[]}.
+     * soundings set by {@link #setSoundings(Field[], Field[], Field[])}.
      * If there are no soundings, then nothing is done.
      *
      * @param index                The index of the sounding to display.
@@ -1212,9 +1212,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         });
 
 
-        JCheckBox allProfilesBox = GuiUtils.makeCheckbox("Consecutive Profiles",
+        JCheckBox pairProfilesBox = GuiUtils.makeCheckbox("",
                                        this, "pairProfilesVisibility");
-        allProfilesBox.setSelected(false);
+        pairProfilesBox.setSelected(false);
         final JComboBox parcelModeBox = new JComboBox(parcelModeInfos);
 
         parcelModeBox.setToolTipText("Parcel Determination Mode");
@@ -1287,14 +1287,14 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         Component comboBoxes = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Parcel mode:"), parcelModeBox, GuiUtils.filler(),
             GuiUtils.rLabel("Wind spacing:"), spacingBox,
-            GuiUtils.lLabel("(hPa)")
+            GuiUtils.lLabel("(hPa)"),
+            GuiUtils.rLabel("Consecutive Profiles:"), pairProfilesBox, GuiUtils.filler()
         }, 3,              //3 columns
            GuiUtils.WT_N,  //Don't expand the grid horizontally
            GuiUtils.WT_N   //Don't expand the grid  vertically
                );
 
-        Container checkBoxes = GuiUtils.vbox(trajBox, virtTempBox, showBox,
-                                             allProfilesBox);
+        Container checkBoxes = GuiUtils.vbox(trajBox, virtTempBox, showBox);
 
         /*
          * Do not fill the widgets in the gridbag.
@@ -1335,9 +1335,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        JComponent  left   = (specificWidget != null)
-                             ? GuiUtils.centerBottom(sp, specificWidget)
-                             : sp;
+        JComponent left = (specificWidget != null)
+                          ? GuiUtils.centerBottom(sp, specificWidget)
+                          : sp;
         JScrollPane leftSP =
             new JScrollPane(
                 left, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

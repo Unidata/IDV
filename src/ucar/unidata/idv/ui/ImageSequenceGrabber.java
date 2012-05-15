@@ -1535,6 +1535,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
             defSuffix = imageGenerator.applyMacros(scriptingNode,
                     ATTR_IMAGESUFFIX, defSuffix);
+            if (!defSuffix.startsWith(".")) {
+                defSuffix = "."+defSuffix;
+            }
         }
         if ((backgroundTransparentBtn != null)
                 && backgroundTransparentBtn.isSelected()) {
