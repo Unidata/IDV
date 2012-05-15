@@ -727,7 +727,7 @@ public class DateUtil {
         if (wmoDate.length() > 6) {
             return baseDate;
         } else {
-            wmoDate = StringUtil2.padLeft(wmoDate, 6, "0");
+            wmoDate = StringUtil.padLeft(wmoDate, 6, "0");
         }
         Calendar cal = Calendar.getInstance(TIMEZONE_GMT);
         cal.setTimeInMillis(baseDate.getTime());

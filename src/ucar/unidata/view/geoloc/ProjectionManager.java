@@ -25,7 +25,7 @@ package ucar.unidata.view.geoloc;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
-
+import ucar.unidata.geoloc.ProjectionImpl;
 
 import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.ui.PersistentDataDialog;
@@ -680,7 +680,7 @@ public class ProjectionManager implements ActionListener {
         //setVisible(true);  how to make this work? seperate Thread ?
 
         // force new name
-        ProjectionImpl newProj = (ProjectionImpl) proj.clone();
+        ProjectionImpl newProj = (ProjectionImpl) proj.constructCopy();
         newProj.setName("");
         setWorkingProjection(newProj);
 
@@ -733,7 +733,7 @@ public class ProjectionManager implements ActionListener {
         if (debug) {
             System.out.println("ProjManager.setWorkingProjection " + proj);
         }
-        current = (ProjectionImpl) proj.clone();
+        current = (ProjectionImpl) proj.constructCopy();
         if (debug) {
             System.out.println("ProjManager.setWorkingProjection map area = "
                                + current.getDefaultMapArea());
@@ -1075,7 +1075,7 @@ public class ProjectionManager implements ActionListener {
                 System.out.println("Projection Manager accept bb ="
                                    + editProjection.getDefaultMapArea());
             }
-            ProjectionImpl newProj = (ProjectionImpl) editProjection.clone();  // use a copy
+            ProjectionImpl newProj = (ProjectionImpl) editProjection.constructCopy();  // use a copy
 
             if (viewDialog != null) {
                 //                if ( !viewDialog.checkSaveOK(startingName,
@@ -1131,7 +1131,7 @@ public class ProjectionManager implements ActionListener {
             }
 
             setFieldsWithClassParams(pc);
-            editProjection = (ProjectionImpl) proj.clone();
+            editProjection = (ProjectionImpl) proj.constructCopy();
             putProjInDialog(pc, editProjection);
 
             if (debug) {

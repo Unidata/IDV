@@ -26,7 +26,6 @@ package ucar.unidata.view.geoloc;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 
 import visad.*;
 
@@ -278,7 +277,7 @@ public class NavigatedDisplayCursorReadout extends JPanel {
      * @return padded string
      */
     private String pad(String s) {
-        s = StringUtil2.padRight(s, 7);
+        s = StringUtil.padRight(s, 7);
         return s;
     }
 

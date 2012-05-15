@@ -41,7 +41,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.*;
 import java.util.regex.*;
-import ucar.unidata.util.StringUtil2.*;
+
 
 /**
  * String utilities
@@ -224,6 +224,277 @@ public class StringUtil {
     return true;
   }
 
+  /**
+   * Replace special characters with entities for HTML content.
+   * special: '&', '"', '\'', '<', '>', '\n'
+   *
+   * @param x string to quote
+   * @return equivilent string using entities for any special chars
+   */
+  static public String quoteHtmlContent(String x) {
+    return replace(x, htmlIn, htmlOut);
+  }
+
+  /**
+   * these chars must get replaced
+   */
+  private static char[] htmlIn = {
+          '&', '"', '\'', '<', '>', '\n'
+  };
+
+  /**
+   * replacement strings
+   */
+  private static String[] htmlOut = {
+          "&amp;", "&quot;", "&#39;", "&lt;", "&gt;", "\n<p>"
+  };
+
+
+  /**
+   * Replace special characters with entities for XML attributes.
+   * special: '&', '<', '>', '\'', '"', '\r', '\n'
+   *
+   * @param x string to quote
+   * @return equivilent string using entities for any special chars
+   */
+  static public String quoteXmlContent(String x) {
+    return replace(x, xmlInC, xmlOutC);
+  }
+
+  /**
+   * Reverse XML quoting to recover the original string.
+   *
+   * @param x string to quote
+   * @return equivilent string
+   */
+  static public String unquoteXmlContent(String x) {
+    return unreplace(x, xmlOutC, xmlInC);
+  }
+
+  /**
+   * these chars must get replaced in XML
+   */
+  private static char[] xmlInC = {'&', '<', '>'};
+
+  /**
+   * replacement strings
+   */
+  private static String[] xmlOutC = {"&amp;", "&lt;", "&gt;"};
+
+
+  /**
+   * Replace special characters with entities for XML attributes.
+   * special: '&', '<', '>', '\'', '"', '\r', '\n'
+   *
+   * @param x string to quote
+   * @return equivilent string using entities for any special chars
+   */
+  static public String quoteXmlAttribute(String x) {
+    return replace(x, xmlIn, xmlOut);
+  }
+
+  /**
+   * Reverse XML quoting to recover the original string.
+   *
+   * @param x string to quote
+   * @return equivilent string
+   */
+  static public String unquoteXmlAttribute(String x) {
+    return unreplace(x, xmlOut, xmlIn);
+  }
+
+  /**
+   * these chars must get replaced
+   */
+  private static char[] xmlIn = {
+          '&', '"', '\'', '<', '>', '\r', '\n'
+  };
+
+  /**
+   * replacement strings
+   */
+  private static String[] xmlOut = {
+          "&amp;", "&quot;", "&apos;", "&lt;", "&gt;", "&#13;", "&#10;"
+  };
+
+  static public String makeValidCdmObjectName(String name) {
+    // common case no change
+    boolean ok = true;
+    for (int i = 0; i < name.length(); i++) {
+      int c = name.charAt(i);
+      if (c < 0x20) ok = false;
+      if (c == '/') ok = false;
+      if (!ok) break;
+    }
+    if (ok) return name.trim();
+
+    name = name.trim();
+    StringBuilder sbuff = new StringBuilder(name.length());
+    for (int i = 0, len = name.length(); i < len; i++) {
+      int c = name.charAt(i);
+      if (c == 0x2f)
+        sbuff.append('_');
+      else if (c >= 0x20)
+        sbuff.append((char) c);
+    }
+    return sbuff.toString();
+  }
+
+  /**
+   * Replace all occurences of replaceChar with replaceWith
+   *
+   * @param x           operate on this string
+   * @param replaceChar get rid of these
+   * @param replaceWith replace with these
+   * @return resulting string
+   */
+  static public String replace(String x, char[] replaceChar,
+                               String[] replaceWith) {
+    // common case no replacement
+    boolean ok = true;
+    for (int i = 0; i < replaceChar.length; i++) {
+      int pos = x.indexOf(replaceChar[i]);
+      ok = (pos < 0);
+      if (!ok) break;
+    }
+    if (ok) return x;
+
+    // gotta do it
+    StringBuffer sb = new StringBuffer(x);
+    for (int i = 0; i < replaceChar.length; i++) {
+      int pos = x.indexOf(replaceChar[i]);
+      if (pos >= 0) {
+        replace(sb, replaceChar[i], replaceWith[i]);
+      }
+    }
+
+    return sb.toString();
+  }
+
+
+  /**
+   * Replace all occurences of orgReplace with orgChar; inverse of replace().
+   *
+   * @param x          operate on this string
+   * @param orgReplace get rid of these
+   * @param orgChar    replace with these
+   * @return resulting string
+   */
+  static public String unreplace(String x, String[] orgReplace,
+                                 char[] orgChar) {
+    // common case no replacement
+    boolean ok = true;
+    for (int i = 0; i < orgReplace.length; i++) {
+      int pos = x.indexOf(orgReplace[i]);
+      ok = (pos < 0);
+      if (!ok) {
+        break;
+      }
+    }
+    if (ok) {
+      return x;
+    }
+
+    // gotta do it
+    StringBuffer result = new StringBuffer(x);
+    for (int i = 0; i < orgReplace.length; i++) {
+      int pos = result.indexOf(orgReplace[i]);
+      if (pos >= 0) {
+        unreplace(result, orgReplace[i], orgChar[i]);
+      }
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Count number of chars that match in two strings, starting from front.
+   *
+   * @param s1 compare this string
+   * @param s2 compare this string
+   * @return number of matching chars, starting from first char
+   */
+  static public int match(String s1, String s2) {
+    int i = 0;
+    while ((i < s1.length()) && (i < s2.length())) {
+      if (s1.charAt(i) != s2.charAt(i)) {
+        break;
+      }
+      i++;
+    }
+    return i;
+  }
+
+  /**
+   * Replace any char "out" in sb with "in".
+   *
+   * @param sb  StringBuffer to replace
+   * @param out repalce this character
+   * @param in  with this string
+   */
+  static public void replace(StringBuffer sb, char out, String in) {
+    for (int i = 0; i < sb.length(); i++) {
+      if (sb.charAt(i) == out) {
+        sb.replace(i, i + 1, in);
+        i += in.length() - 1;
+      }
+    }
+  }
+
+  /**
+   * Replace any String "out" in sb with char "in".
+   *
+   * @param sb  StringBuffer to replace
+   * @param out repalce this String
+   * @param in  with this char
+   */
+  static public void unreplace(StringBuffer sb, String out, char in) {
+    int pos;
+    while (0 <= (pos = sb.indexOf(out))) {
+      sb.setCharAt(pos, in);
+      sb.delete(pos + 1, pos + out.length());
+    }
+  }
+
+  /**
+   * Replace any char "out" in s with "in".
+   *
+   * @param s   string to replace
+   * @param out repalce this character
+   * @param in  with this string
+   * @return modified string if needed
+   */
+  static public String replace(String s, char out, String in) {
+    if (s.indexOf(out) < 0) {
+      return s;
+    }
+
+    // gotta do it
+    StringBuffer sb = new StringBuffer(s);
+    replace(sb, out, in);
+    return sb.toString();
+  }
+
+  /**
+   * Escape any char not alphanumeric or in okChars.
+   * Escape by replacing char with %xx (hex).
+   *
+   * @param x       escape this string
+   * @param okChars these are ok.
+   * @return equivilent escaped string.
+   */
+  static public String escape(String x, String okChars) {
+    String newname = "";
+    for (char c : x.toCharArray()) {
+      if (c == '%') {
+        newname = newname + "%%";
+      } else if (!Character.isLetterOrDigit(c) && okChars.indexOf(c) < 0) {
+        newname = newname + '%' + Integer.toHexString((0xFF & (int) c));
+      } else
+        newname = newname + c;
+    }
+    return newname;
+  }
 
   static public String ignoreescape(String x, String okChars) {
     boolean ok = true;
@@ -263,9 +534,9 @@ public class StringUtil {
    * @return hex represenation
    */
   public static String toHexString(java.awt.Color c) {
-    return "#" + StringUtil2.padRight(Integer.toHexString(c.getRed()), 2, "0")
-            + StringUtil2.padRight(Integer.toHexString(c.getGreen()), 2, "0")
-            + StringUtil2.padRight(Integer.toHexString(c.getBlue()), 2, "0");
+    return "#" + StringUtil.padRight(Integer.toHexString(c.getRed()), 2, "0")
+            + StringUtil.padRight(Integer.toHexString(c.getGreen()), 2, "0")
+            + StringUtil.padRight(Integer.toHexString(c.getBlue()), 2, "0");
   }
 
 
@@ -536,6 +807,69 @@ public class StringUtil {
 
 
   /**
+   * Convert the given text to html by adding &lt;br&gt;.
+   * If there are new lines then we replace them with a space.
+   * Then we break the lines into 50
+   * character (or so) chunks, adding br tags.
+   *
+   * @param text     The text to convert
+   * @param insert   string to insert
+   * @param lineSize line size to insert at
+   * @return The text with added br tags.
+   */
+  public static String breakText(String text, String insert, int lineSize) {
+    text = StringUtil.replace(text, "\n", " ");
+    StringBuffer buff = new StringBuffer();
+    while (text.length() > 0) {
+      int len = text.length();
+      if (len < lineSize) {
+        buff.append(text);
+        break;
+      }
+      int idx = lineSize;
+      while ((idx < len) && (text.charAt(idx) != ' ')) {
+        idx++;
+      }
+      if (idx == len) {
+        buff.append(text);
+        break;
+      }
+      buff.append(text.substring(0, idx));
+      buff.append(insert);
+      text = text.substring(idx);
+    }
+    return buff.toString();
+  }
+
+  /**
+   * Break the given text into lines, respecting word boundaries (blank space).
+   *
+   * @param text     The text to convert
+   * @param insert   break to insert
+   * @param lineSize line size to insert at
+   * @return The text with added br tags.
+   */
+  public static String breakTextAtWords(String text, String insert,
+                                        int lineSize) {
+    StringBuffer buff = new StringBuffer();
+    StringTokenizer stoker = new StringTokenizer(text);
+    int lineCount = 0;
+    while (stoker.hasMoreTokens()) {
+      String tok = stoker.nextToken();
+      if (tok.length() + lineCount >= lineSize) {
+        buff.append(insert);
+        lineCount = 0;
+      }
+      buff.append(tok);
+      buff.append(" ");
+      lineCount += tok.length() + 1;
+    }
+
+    return buff.toString();
+  }
+
+
+  /**
    * Remove any beginning or ending &lt;html&gt; tags
    *
    * @param html the html
@@ -580,7 +914,7 @@ public class StringUtil {
       html = html.substring(idx2 + 1);
     }
 
-    stripped = new StringBuffer(StringUtil2.replace(stripped.toString(), "&nbsp;",
+    stripped = new StringBuffer(replace(stripped.toString(), "&nbsp;",
             ""));
     return stripped.toString();
   }
@@ -623,6 +957,26 @@ public class StringUtil {
 
 
   /**
+   * Remove any whitespace (ie., Character.isWhitespace) from the input string.
+   *
+   * @param inputString The string to remove the whitespace.
+   * @return The whitespaceless result.
+   */
+  public static String removeWhitespace(String inputString) {
+    StringBuffer sb = new StringBuffer();
+    char[] chars = inputString.toCharArray();
+    for (int i = 0; i < chars.length; i++) {
+      char c = chars[i];
+      if (Character.isWhitespace(c)) {
+        continue;
+      }
+      sb.append(c);
+    }
+    return sb.toString();
+  }
+
+
+  /**
    * If the given value is less than 10 than pad the String return
    * with a leading "0".
    *
@@ -631,9 +985,79 @@ public class StringUtil {
    *         leading "0" if value &lt; 10
    */
   public static String zeroString(int value) {
-    return StringUtil2.padZero(value, 2);
+    return padZero(value, 2);
   }
 
+
+  /**
+   * Left pad the given value with zeros up to the number of digits
+   *
+   * @param value     The value.
+   * @param numDigits number of digits
+   * @return The String  represenation of the value, padded with
+   *         leading "0"-s if value &lt; 10E(numDigits-1)
+   */
+  public static String padZero(int value, int numDigits) {
+    return padLeft(String.valueOf(value), numDigits, "0");
+  }
+
+
+  /**
+   * Pad the given string with spaces on the left up to the given length.
+   *
+   * @param s             String to pad
+   * @param desiredLength ending length
+   * @return padded String
+   */
+  public static String padLeft(String s, int desiredLength) {
+    return padLeft(s, desiredLength, " ");
+  }
+
+
+  /**
+   * Pad the given string with padString on the left up to the given length.
+   *
+   * @param s             String to pad
+   * @param desiredLength ending length
+   * @param padString     String to pad with (e.g, " ")
+   * @return padded String
+   */
+  public static String padLeft(String s, int desiredLength,
+                               String padString) {
+    while (s.length() < desiredLength) {
+      s = padString + s;
+    }
+    return s;
+  }
+
+
+  /**
+   * Pad the given string with spaces on the right up to the given length.
+   *
+   * @param s             String to pad
+   * @param desiredLength ending length
+   * @return padded String
+   */
+  public static String padRight(String s, int desiredLength) {
+    return padRight(s, desiredLength, " ");
+  }
+
+
+  /**
+   * Pad the given string with padString on the right up to the given length.
+   *
+   * @param s             String to pad
+   * @param desiredLength ending length
+   * @param padString     String to pad with (e.g, " ")
+   * @return padded String
+   */
+  public static String padRight(String s, int desiredLength,
+                                String padString) {
+    while (s.length() < desiredLength) {
+      s = s + padString;
+    }
+    return s;
+  }
 
 
   /**
@@ -872,6 +1296,17 @@ public class StringUtil {
       result.add(words);
     }
     return result;
+  }
+
+  /**
+   * Split a string on one or more whitespace.
+   * Cover for STring.split, because who can remember regexp?
+   *
+   * @param source split this string
+   * @return space-seperated tokens
+   */
+  public static String[] splitString(String source) {
+    return source.trim().split("\\s+"); // Separated by "whitespace"
   }
 
 
@@ -1209,6 +1644,36 @@ public class StringUtil {
 
 
   /**
+   * Replaces all occurrences of "pattern" in "string" with "value"
+   *
+   * @param string  string to munge
+   * @param pattern pattern to replace
+   * @param value   replacement value
+   * @return munged string
+   */
+  public static String replace(String string, String pattern,
+                               String value) {
+    if (pattern.length() == 0) {
+      return string;
+    }
+    StringBuffer returnValue = new StringBuffer();
+    int patternLength = pattern.length();
+    while (true) {
+      int idx = string.indexOf(pattern);
+      if (idx < 0) {
+        break;
+      }
+      returnValue.append(string.substring(0, idx));
+      if (value != null) {
+        returnValue.append(value);
+      }
+      string = string.substring(idx + patternLength);
+    }
+    returnValue.append(string);
+    return returnValue.toString();
+  }
+
+  /**
    * Replaces all occurrences of "patterns" in "v" with "values"
    *
    * @param v        original String
@@ -1263,7 +1728,7 @@ public class StringUtil {
       for (int patternIdx = 0; patternIdx < patterns.length;
            patternIdx++) {
         if (patterns[patternIdx] != null) {
-          str = replace(str, patterns[patternIdx],
+          str = StringUtil.replace(str, patterns[patternIdx],
                   values[patternIdx]);
         }
       }
@@ -1595,7 +2060,6 @@ public class StringUtil {
   }
 
 
-
   /**
    * Camel case a string (eg howard -&gt; Howard)
    *
@@ -1831,9 +2295,9 @@ public class StringUtil {
     byte[] b = new byte[] {10};
     //String s = new String(b);
     String s = "\n";
-    System.out.printf("quoteXmlAttribute(%s) == %s%n", s, StringUtil2.quoteXmlAttribute(s));
-    String s2 = StringUtil2.quoteXmlAttribute(s);
-    System.out.printf("unquoteXmlAttribute(%s) == '%s'%n", s2, StringUtil2.unquoteXmlAttribute(s2));
+    System.out.printf("quoteXmlAttribute(%s) == %s%n", s, StringUtil.quoteXmlAttribute(s));
+    String s2 = StringUtil.quoteXmlAttribute(s);
+    System.out.printf("unquoteXmlAttribute(%s) == '%s'%n", s2, StringUtil.unquoteXmlAttribute(s2));
   }
 
   /**
@@ -1869,6 +2333,13 @@ public class StringUtil {
     */
   }
 
+  /**
+   * usage for test code
+   */
+  private static void showUsage() {
+    System.out.println(" StringUtil escape <string> [okChars]");
+    System.out.println(" StringUtil unescape <string>");
+  }
 
   /**
    * Method for debugging.
@@ -1978,16 +2449,16 @@ public class StringUtil {
    * @return coords
    */
   public static double[][] parseCoordinates(String coords) {
-    coords = replace(coords, "\n", " ");
+    coords = StringUtil.replace(coords, "\n", " ");
     while (true) {
-      String newCoords = replace(coords, " ,", ",");
+      String newCoords = StringUtil.replace(coords, " ,", ",");
       if (newCoords.equals(coords)) {
         break;
       }
       coords = newCoords;
     }
     while (true) {
-      String newCoords = replace(coords, ", ", ",");
+      String newCoords = StringUtil.replace(coords, ", ", ",");
       if (newCoords.equals(coords)) {
         break;
       }
@@ -2033,6 +2504,7 @@ public class StringUtil {
     return result;
   }
 
+
   /**
    * Get "a" or "an" for prefixing to a string based on the first
    * character
@@ -2050,37 +2522,5 @@ public class StringUtil {
   }
 
 
-  ////////////////////////////////////
-  /**
-   * Replaces all occurrences of "pattern" in "string" with "value"
-   *
-   * @param string  string to munge
-   * @param pattern pattern to replace
-   * @param value   replacement value
-   * @return munged string
-   */
-  public static String replace(String string, String pattern, String value) {
-    if (pattern.length() == 0)
-      return string;
-
-    StringBuilder returnValue = new StringBuilder();
-    int patternLength = pattern.length();
-    while (true) {
-      int idx = string.indexOf(pattern);
-      if (idx < 0) {
-        break;
-      }
-      returnValue.append(string.substring(0, idx));
-      if (value != null) {
-        returnValue.append(value);
-      }
-      string = string.substring(idx + patternLength);
-    }
-    returnValue.append(string);
-    return returnValue.toString();
-  }
-
-
 }
-
 

@@ -52,7 +52,6 @@ import ucar.unidata.util.PatternFileFilter;
 
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.GlobeDisplay;
@@ -395,7 +394,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         String       desc = wmsInfo.getDescription();
         if (desc != null) {
             sb.append("<p>Abstract:<br>\n");
-            sb.append(StringUtil2.breakText(desc, "<br>", 50));
+            sb.append(StringUtil.breakText(desc, "<br>", 50));
         }
         return sb.toString();
     }

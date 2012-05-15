@@ -1084,11 +1084,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 lineMagSlider.setToolTipText(
                     "Slide to set line magnification factor");
                 lineMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
+                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 elementMagSlider.setToolTipText(
                     "Slide to set element magnification factor");
                 elementMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
+                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 amSettingProperties = oldAmSettingProperties;
 
 
@@ -1223,7 +1223,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     public void changePlace(String newPlace) {
         this.place = newPlace;
         String s = translatePlace(place) + "=";
-        placeLbl.setText(StringUtil2.padRight(s, 12));
+        placeLbl.setText(StringUtil.padRight(s, 12));
     }
 
 
@@ -1244,7 +1244,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             }
         }
         //System.out.println(" changelistener: linesToElements = " + linesToElements);
-        elementMagLbl.setText(StringUtil2.padLeft("" + value, 3));
+        elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
         if ( !getLockButton().isSelected()) {
             if (value > 0) {
                 numElementsFld.setText("" + (int) (baseNumElements * value));
@@ -1264,7 +1264,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     private void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
-            lineMagLbl.setText(StringUtil2.padLeft("" + value, 3));
+            lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
             if (autoSetSize) {
                 if (value > 0) {
                     numLinesFld.setText("" + (int) (baseNumLines * value));
@@ -2724,8 +2724,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
             lineMagSlider.setValue(lineValue);
             elementMagSlider.setValue(elementValue);
-            lineMagLbl.setText(StringUtil2.padLeft("" + getLineMagValue(), 3));
-            elementMagLbl.setText(StringUtil2.padLeft(""
+            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 3));
+            elementMagLbl.setText(StringUtil.padLeft(""
                     + getElementMagValue(), 3));
             linesToElements = Math.abs(lineValue / (double) elementValue);
             if (Double.isNaN(linesToElements)) {
@@ -3309,7 +3309,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if (megs > SIZE_THRESHOLD) {
             final JCheckBox maintainSize =
                 new JCheckBox("Maintain spatial extent", false);
-            final JLabel sizeLbl = new JLabel(StringUtil2.padRight("  "
+            final JLabel sizeLbl = new JLabel(StringUtil.padRight("  "
                                        + (int) (((double) ((int) megs * 100))
                                            / 100.0) + " MB", 14));
             GuiUtils.setFixedWidthFont(sizeLbl);
@@ -3352,7 +3352,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                                         * listHolder[0].size();
                     int nmegs = (int) ((bytesPerPixel * numPixels)
                                        / (double) 1000000);
-                    sizeLbl.setText(StringUtil2.padRight("  " + nmegs + " MB",
+                    sizeLbl.setText(StringUtil.padRight("  " + nmegs + " MB",
                             14));
                 }
             };

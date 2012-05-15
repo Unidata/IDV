@@ -31,6 +31,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
+import ucar.nc2.constants.CF;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 
@@ -5675,7 +5676,7 @@ public class GridUtil {
             if ( !haveEmpirical) {
                 for (Iterator it = keys.iterator(); it.hasNext(); ) {
                     Variable v = (Variable) it.next();
-                    if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
+                    if (v.findAttribute(CF.GRID_MAPPING_NAME) != null) {
                         projVar = v;
                         break;
                     }
@@ -6062,7 +6063,7 @@ public class GridUtil {
             } else if (proj instanceof McIDASAreaProjection) {
                 grid_name = McIDASAreaProjection.GRID_MAPPING_NAME;
             }
-            attributes.add(new Attribute(ProjectionImpl.ATTR_NAME,
+            attributes.add(new Attribute(CF.GRID_MAPPING_NAME,
                                          grid_name));
             for (Parameter param : params) {
                 if (param.isString()) {

@@ -53,7 +53,6 @@ import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
@@ -1313,7 +1312,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                 continue;
             }
             if (macroValues[i].length() > 0) {
-                path = StringUtil2.replace(path, "%" + macroNames[i] + "%",
+                path = StringUtil.replace(path, "%" + macroNames[i] + "%",
                         macroValues[i]);
             }
         }
@@ -1411,7 +1410,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         }
         Class  idvClass = getIdv().getClass();
         String path     = idvClass.getName();
-        path = StringUtil2.replace(path, ".", "/");
+        path = StringUtil.replace(path, ".", "/");
         path = "/" + IOUtil.getFileRoot(path);
         return path;
     }

@@ -46,7 +46,6 @@ import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.util.StringUtil2;
 
 import ucar.visad.Util;
 
@@ -2245,7 +2244,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         int length = result.length();
-        return StringUtil2.padLeft(result, 5 * (20 - length), "&nbsp;");
+        return StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
     }
 
 

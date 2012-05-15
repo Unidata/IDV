@@ -1123,7 +1123,7 @@ public class LogUtil {
         StringBuffer sb    = new StringBuffer();
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
-            line = StringUtil2.breakText(line, "\n", 50);
+            line = StringUtil.breakText(line, "\n", 50);
             sb.append(line + "\n");
         }
 

@@ -40,7 +40,6 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 
 import ucar.unidata.util.TwoFacedObject;
 
@@ -303,7 +302,7 @@ public class XmlTree extends JTree {
                     String text = XmlUtil.getChildText(child);
                     if ((text != null) && (text.length() > 50)) {
                         text = "<html>"
-                               + StringUtil2.breakText(text, "<br>", 50)
+                               + StringUtil.breakText(text, "<br>", 50)
                                + "</html>";
                     }
                     return text;

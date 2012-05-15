@@ -59,7 +59,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.ViewpointInfo;
@@ -3671,11 +3670,11 @@ public class ImageGenerator extends IdvManager {
 
         putIndex(props, PROP_LOOPINDEX, currentLoopIndex);
         props.put(PROP_LOOPINDEX_PAD2,
-                  StringUtil2.padLeft("" + currentLoopIndex, 2, "0"));
+                  StringUtil.padLeft("" + currentLoopIndex, 2, "0"));
         props.put(PROP_LOOPINDEX_PAD3,
-                  StringUtil2.padLeft("" + currentLoopIndex, 3, "0"));
+                  StringUtil.padLeft("" + currentLoopIndex, 3, "0"));
         props.put(PROP_LOOPINDEX_PAD4,
-                  StringUtil2.padLeft("" + currentLoopIndex, 4, "0"));
+                  StringUtil.padLeft("" + currentLoopIndex, 4, "0"));
 
         Date now = new Date(Misc.getCurrentTime());
 

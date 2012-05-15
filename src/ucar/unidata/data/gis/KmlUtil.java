@@ -26,7 +26,6 @@ import org.w3c.dom.*;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.StringUtil;
 
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.Color;
@@ -1007,11 +1006,11 @@ public class KmlUtil {
      */
     public static String toBGRHexString(java.awt.Color c) {
         return "#"
-               + StringUtil2.padRight(
+               + StringUtil.padRight(
                 Integer.toHexString(c.getBlue()), 2,
-                "0") + StringUtil2.padRight(
+                "0") + StringUtil.padRight(
                        Integer.toHexString(c.getGreen()), 2,
-                       "0") + StringUtil2.padRight(
+                       "0") + StringUtil.padRight(
                            Integer.toHexString(c.getRed()), 2, "0");
     }
 

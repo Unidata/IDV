@@ -43,7 +43,7 @@ import ucar.unidata.util.ObjectListener;
 
 import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
+
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.*;
 
@@ -449,7 +449,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
 
         String hour = "" + cal.get(Calendar.HOUR_OF_DAY);
         String day  = "" + cal.get(Calendar.DAY_OF_MONTH);
-        String month = StringUtil2.padLeft("" + (cal.get(Calendar.MONTH) + 1),
+        String month = StringUtil.padLeft("" + (cal.get(Calendar.MONTH) + 1),
                                           2, "0");
         String         year = "" + cal.get(Calendar.YEAR);
 

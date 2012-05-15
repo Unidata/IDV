@@ -28,7 +28,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.display.CrossSectionSelector;
@@ -164,7 +163,7 @@ public class DataTransectControl extends CrossSectionControl {
      */
     private Component doMakeWidthSlider() {
         final JLabel lineWidthLbl =
-            GuiUtils.getFixedWidthLabel(StringUtil2.padLeft(""
+            GuiUtils.getFixedWidthLabel(StringUtil.padLeft(""
                     + getLineWidth(), 3));
         ChangeListener listener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -173,7 +172,7 @@ public class DataTransectControl extends CrossSectionControl {
                     return;
                 }
                 setLineWidth(slide.getValue());
-                lineWidthLbl.setText(StringUtil2.padLeft("" + getLineWidth(),
+                lineWidthLbl.setText(StringUtil.padLeft("" + getLineWidth(),
                         3));
             }
         };

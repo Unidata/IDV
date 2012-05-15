@@ -12,7 +12,7 @@ import ucar.unidata.util.Format;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
+
 import ucar.unidata.util.TwoFacedObject;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -420,7 +420,7 @@ public class AddeImageSelection extends DataSelectionComponent {
 
         String s = translatePlace(place) + "=";
 
-        placeLbl.setText(StringUtil2.padRight(s, 12));
+        placeLbl.setText(StringUtil.padRight(s, 12));
     }
 
     /**
@@ -517,7 +517,7 @@ public class AddeImageSelection extends DataSelectionComponent {
 
         // System.out.println(" changelistener: linesToElements = " +
         // linesToElements);
-        elementMagLbl.setText(StringUtil2.padLeft("" + value, 3));
+        elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
 
         if (!getLockButton().isSelected()) {
             if (value > 0) {
@@ -537,7 +537,7 @@ public class AddeImageSelection extends DataSelectionComponent {
         try {
             int value = getLineMagValue();
 
-            lineMagLbl.setText(StringUtil2.padLeft("" + value, 3));
+            lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
 
             if (autoSetSize) {
                 if (value > 0) {
@@ -599,8 +599,8 @@ public class AddeImageSelection extends DataSelectionComponent {
 
             lineMagSlider.setValue(lineValue);
             elementMagSlider.setValue(elementValue);
-            lineMagLbl.setText(StringUtil2.padLeft("" + getLineMagValue(), 3));
-            elementMagLbl.setText(StringUtil2.padLeft("" + getElementMagValue(), 3));
+            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 3));
+            elementMagLbl.setText(StringUtil.padLeft("" + getElementMagValue(), 3));
             linesToElements = Math.abs(lineValue / (double) elementValue);
 
             if (Double.isNaN(linesToElements)) {
@@ -1485,9 +1485,9 @@ public class AddeImageSelection extends DataSelectionComponent {
                 elementMagSlider.setSnapToTicks(true);
                 elementMagComps[0].setToolTipText("Change the element magnification");
                 lineMagSlider.setToolTipText("Slide to set line magnification factor");
-                lineMagLbl = GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
+                lineMagLbl = GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 elementMagSlider.setToolTipText("Slide to set element magnification factor");
-                elementMagLbl       = GuiUtils.getFixedWidthLabel(StringUtil2.padLeft("1", 3));
+                elementMagLbl       = GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 amSettingProperties = oldAmSettingProperties;
                 GuiUtils.tmpInsets  = new Insets(0, 0, 0, 0);
 

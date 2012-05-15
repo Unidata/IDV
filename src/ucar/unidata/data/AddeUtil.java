@@ -25,7 +25,6 @@ package ucar.unidata.data;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil2;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -168,7 +167,7 @@ public final class AddeUtil {
             int    newHour  = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
             int    newDay   = utcCalendar.get(utcCalendar.DAY_OF_YEAR);
             int    newYear  = utcCalendar.get(utcCalendar.YEAR);
-            String thisDate = "" + newYear + StringUtil2.padZero(newDay, 3);
+            String thisDate = "" + newYear + StringUtil.padZero(newDay, 3);
             //Do we have a new day
             if ( !Misc.equals(currentDate, thisDate)) {
                 if (currentDate != null) {
@@ -183,7 +182,7 @@ public final class AddeUtil {
             if (times.length() > 0) {
                 times = times + ",";
             }
-            times = times + newHour + ":" + StringUtil2.padZero(newMin, 2);
+            times = times + newHour + ":" + StringUtil.padZero(newMin, 2);
         }
 
         //add the last one to the list

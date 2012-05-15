@@ -30,7 +30,6 @@ import javax.swing.SwingConstants;
 
 import java.text.DecimalFormat;
 
-import ucar.unidata.util.StringUtil2;
 import ucar.unidata.view.sounding.RealReadout;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -279,11 +278,11 @@ public class RangeAndBearingReadout extends JPanel {
         buf.append(" ");
         buf.append(getRangeName());
         buf.append(": ");
-        buf.append(StringUtil2.padLeft(rangeReadout.getNumericString(), 6));
+        buf.append(StringUtil.padLeft(rangeReadout.getNumericString(), 6));
         buf.append(" ");
         buf.append(getBearingName());
         buf.append(": ");
-        buf.append(StringUtil2.padLeft(bearingReadout.getNumericString(), 6));
+        buf.append(StringUtil.padLeft(bearingReadout.getNumericString(), 6));
         String text = buf.toString();
         valueDisplay.setText(text);
         if (myOwnLabel) {

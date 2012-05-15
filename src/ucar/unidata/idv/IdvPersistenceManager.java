@@ -66,7 +66,6 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.*;
 
 import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.util.StringUtil2;
 import visad.util.ThreadManager;
 
 
@@ -1265,7 +1264,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         jnlp = StringUtil.replace(jnlp, "%CODEBASE%", codeBase);
         jnlp = StringUtil.replace(jnlp, "%TITLE%", title);
         jnlp = StringUtil.replace(jnlp, "%ARGS%", args.toString());
-        jnlp = StringUtil2.replace(jnlp, "%IDVCLASS%",
+        jnlp = StringUtil.replace(jnlp, "%IDVCLASS%",
                                   getIdv().getClass().getName());
         jnlp = StringUtil.replace(jnlp, "%DESCRIPTION%", "");
 
