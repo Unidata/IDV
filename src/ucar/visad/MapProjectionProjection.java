@@ -72,7 +72,7 @@ public class MapProjectionProjection extends ProjectionImpl {
      * @param mapProjection   the VisAD MapProjection to wrap
      */
     public MapProjectionProjection(MapProjection mapProjection) {
-        super(" ", false);
+        super(" ", mapProjection instanceof TrivialMapProjection);
         if (mapProjection == null) {
             try {
                 mapProjection = new TrivialMapProjection();
@@ -96,7 +96,7 @@ public class MapProjectionProjection extends ProjectionImpl {
      * @return Clone of this
      */
     public Object clone() {
-        MapProjectionProjection cl = (MapProjectionProjection) super.clone();
+        MapProjectionProjection cl = (MapProjectionProjection) constructCopy();;
         return cl;
     }
 
