@@ -148,7 +148,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -5750,7 +5749,7 @@ public class ViewManager extends SharableImpl
 
                     List<BufferedImage> images = makeBufferedImages(views, whichComponent);
                     BufferedImage       image  = (BufferedImage) ImageUtils.gridImages2(images, 3, Color.GRAY,
-                                              getColumnCountFromComp(views));
+                                              ImageUtils.getColumnCountFromComps(views));
 
                     if (KmlDataSource.isKmlFile(filename)) {
                         if (!checkForKmlImageCapture()) {
@@ -5821,23 +5820,7 @@ public class ViewManager extends SharableImpl
             l.add(v.getComponent());
         }
 
-        return getColumnCountFromComp(l);
-    }
-
-    /**
-     * Gets the column count from the components.
-     *
-     * @param views the views
-     * @return the column from comp
-     */
-    private static int getColumnCountFromComp(List<? extends Component> views) {
-        java.util.Set<Integer> s = new HashSet<Integer>();
-
-        for (Component component : views) {
-            s.add(component.getLocationOnScreen().x);
-        }
-
-        return s.size();
+        return ImageUtils.getColumnCountFromComps(l);
     }
 
     /**
