@@ -152,12 +152,17 @@ index.html
 >>>datadisplays/profiler/DoingMoreProfiler.html
 
 >>datadisplays/wrf/index.html
->>>datadisplays/wrf/JythonForWRFBasics.html
->>>datadisplays/wrf/JythonForWRFUnits.html
->>>datadisplays/wrf/JythonForWRFContours.html
->>>datadisplays/wrf/JythonForWRFLabAndScale.html
->>>datadisplays/wrf/JythonForWRFTwoDisplays.html
-
+>>>title: Jython
+>>>>datadisplays/wrf/JythonForWRFBasics.html
+>>>>datadisplays/wrf/JythonForWRFUnits.html
+>>>>datadisplays/wrf/JythonForWRFContours.html
+>>>>datadisplays/wrf/JythonForWRFLabAndScale.html
+>>>>datadisplays/wrf/JythonForWRFTwoDisplays.html
+#>>>>datadisplays/wrf/JythonForWRFAnalysis.html
+>>>title: Interactive
+>>>>datadisplays/wrf/InteractiveWRFLoadOutput.html
+>>>>datadisplays/wrf/InteractiveWRFGridDisplays.html
+>>>>datadisplays/wrf/InteractiveWRFAnalysis.html
 |Conventions.html
 
 

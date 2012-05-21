@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>WRF Analysis</title>
+</head>
+<body>
+
+<div class="overview">
+Formulas and derived data
+</div>
+
+<div class="pagetitle">Built-in Forumlas</div>
+
+<p>
+The IDV is not only a data visualization package, but it is also a powerful analysis package. The IDV has several built-in functions that range from very simple operations, such as negating a field (that is, changing the sign of all of the values on the grid), to more complex operations, such as computing the horizontal flux divergence field. These built-in operations can be access through the Field Selector tab by clicking on "Forumlas" in the Data Sources side panel of the Field Selector tab on the Dashboard. Please see the [ht::popup "../../formulas/SimpleFormulas.html" "Basics of IDV Formulas"] for more information.
+</p>
+
+<div class="pagetitle">Adding Custom Functions</div>
+
+<p>
+Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!). An example of adding a Jython routine to compute wind speed can be found [ht::popup "../../formulas/JythonMethods.html" "here"]; a more complex example demonstrating how to compute the agostrophic wind can be found [ht::popup "../../formulas/DoingMoreFormulas.html" "here"].
+</p>
+
+
+<div class="pagetitle">Derived Data</div>
+<p>
+The IDV has the ability to make the quantities computed from formulas available under the loaded datasource rather than going through the steps to use a formula, as outlined in the [ht::popup "../../formulas/SimpleFormulas.html" "Basics of IDV Formulas"] section. For example, one could create flow vectors using the formulas directly - simply load a Data Source, then from the Field Selector click Formulas, Grids, Make Flow Vectors from u and v data, and click create display. Finally, choose the fields for u and v and you're done. Wouldn't it be nice if the IDV could recognize the u and v fields in your dataset and automatically present you with the choice to display Flow Vectors from u and v? Well, this is exactly the issue [ht::popup "../../formulas/DerivedData.html" "Derived Products"] in the IDV solves.
+</p>
+
+</body>
+</html>
