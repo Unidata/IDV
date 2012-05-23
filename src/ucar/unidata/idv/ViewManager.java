@@ -34,6 +34,8 @@ import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.publish.PublishManager;
 import ucar.unidata.idv.ui.BottomLegend;
+import ucar.unidata.idv.ui.IdvComponentGroup;
+import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvLegend;
 import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.idv.ui.IdvWindow;
@@ -5736,13 +5738,19 @@ public class ViewManager extends SharableImpl
                     } else if (mainDisplayBtn.isSelected()) {    // Current Active View
                         views.add(getMaster().getComponent());
                         whichComponent = "main display";
-                    } else if (allViewsBtn.isSelected()) {       // All Views
-                        for (Object o : getDisplayWindow().getViewManagers()) {
-                            views.add(((MapViewManager) o).getComponent());
+                    } else if (allViewsBtn.isSelected()) {
+                    	List<ViewManager> viewManagers = new ArrayList<ViewManager>();
+                        viewManagers.addAll(getDisplayWindow().getViewManagers());
+                        for (IdvComponentGroup icg : getDisplayWindow().getComponentGroups()) {
+                            for (IdvComponentHolder idh : (List<IdvComponentHolder>)icg.getDisplayComponents()) {
+                                viewManagers.addAll(idh.getViewManagers());
+                            }
                         }
-
+                        for (ViewManager v : viewManagers) {
+                            views.add(v.getComponent());
+                        }
                         whichComponent = "all displays";
-                    } else {                                     // View & Legend
+                    } else {    // View & Legend
                         views.add(getContents());
                         whichComponent = "contents";
                     }
