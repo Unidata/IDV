@@ -115,6 +115,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+
 /**
  * Provides a navigated VisAD DisplayImpl for displaying data.
  * The Projection or MapProjection provides the transformation from
@@ -431,22 +432,130 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private void makeLatScales() throws VisADException, RemoteException {
         setDisplayInactive();
 
-        double[] xRange = xMap.getRange();
-        double[] yRange = yMap.getRange();
-        double[] zRange = (zMap != null)
-                          ? zMap.getRange()
-                          : new double[] { 0, 0 };
-
         if (latScale != null) {
             latScale.setVisible(getLatScaleInfo().visible);
 
-            EarthLocation bottom = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-            EarthLocation top    = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
-
-            updateLatScale(latScale, bottom, top);
+            updateLatScale(latScale);
         }
 
         setDisplayActive();
+    }
+    
+    /**
+     * Calculate minimum latitude according to VisAD. 
+     * 
+     * @return the lat base
+     */
+    private double calcLatBase() {
+        double[]      xRange = xMap.getRange();
+        double[]      yRange = yMap.getRange();
+        double[]      zRange = (zMap != null)
+                               ? zMap.getRange()
+                               : new double[] { 0, 0 };
+        EarthLocation el    = getEarthLocation(xRange[0], yRange[0], zRange[0]);
+        double        base   = el.getLatitude().getValue();
+        
+        final double DELTA = (xRange[1] - xRange[0])/100;
+		if (Double.isNaN(base)) {
+			outerloop: for (double y = yRange[0]; y < yRange[1]; y = y + DELTA) {
+				for (double x = xRange[0]; x < xRange[1]; x = x + DELTA) {
+					el = getEarthLocation(x, y, zRange[0]);
+					base = el.getLatitude().getValue();
+					if (!Double.isNaN(base)) {
+						break outerloop;
+					}
+				}
+			}
+		}
+        return base;
+    }
+            
+    /**
+     * Calculate maximum latitude according to VisAD. 
+     * 
+     * @return the lat top
+     */
+    private double calcLatTop() {
+        double[]      xRange = xMap.getRange();
+        double[]      yRange = yMap.getRange();
+        double[]      zRange = (zMap != null)
+                               ? zMap.getRange()
+                               : new double[] { 0, 0 };
+        EarthLocation el    = getEarthLocation(xRange[0], yRange[1], zRange[0]);
+        double        top   = el.getLatitude().getValue();
+        
+        final double DELTA = (xRange[1] - xRange[0])/100;
+		if (Double.isNaN(top)) {
+			outerloop: for (double y = yRange[1]; y > yRange[0]; y = y - DELTA) {
+				for (double x = xRange[0]; x < xRange[1]; x = x + DELTA) {
+					el = getEarthLocation(x, y, zRange[0]);
+					top = el.getLatitude().getValue();
+					if (!Double.isNaN(top)) {
+						break outerloop;
+					}
+				}
+			}
+		}
+        return top;
+    }
+    
+    /**
+     * Calculate minimum longitude according to VisAD. 
+     * 
+     * @return the lon base
+     */
+    private double calcLonBase() {
+        double[]      xRange = xMap.getRange();
+        double[]      yRange = yMap.getRange();
+        double[]      zRange = (zMap != null)
+                               ? zMap.getRange()
+                               : new double[] { 0, 0 };
+        EarthLocation el    = getEarthLocation(xRange[0], yRange[0], zRange[0]);
+        double        base   = el.getLongitude().getValue();
+        
+        final double DELTA = (xRange[1] - xRange[0])/100;
+		if (Double.isNaN(base)) {
+			outerloop: for (double x = xRange[0]; x < xRange[1]; x = x + DELTA) {
+				for (double y = yRange[0]; y < yRange[1]; y = y + DELTA) {				
+					el = getEarthLocation(x, y, zRange[0]);
+					base = el.getLongitude().getValue();
+					if (!Double.isNaN(base)) {
+						break outerloop;
+					}
+				}
+			}
+		}
+        return base;
+    }
+
+        
+    /**
+     * Calculate maximum longitude according to VisAD. 
+     * 
+     * @return the lon top
+     */
+    private double calcLonTop() {
+        double[]      xRange = xMap.getRange();
+        double[]      yRange = yMap.getRange();
+        double[]      zRange = (zMap != null)
+                               ? zMap.getRange()
+                               : new double[] { 0, 0 };
+        EarthLocation el    = getEarthLocation(xRange[1], yRange[1], zRange[0]);
+        double        top   = el.getLongitude().getValue();
+        
+        final double DELTA = (xRange[1] - xRange[0])/100;
+		if (Double.isNaN(top)) {
+			outerloop: for (double x = xRange[1]; x > xRange[0]; x = x - DELTA) {
+				for (double y = yRange[1]; y > yRange[0]; y = y - DELTA) {
+					el = getEarthLocation(x, y, zRange[0]);
+					top = el.getLongitude().getValue();
+					if (!Double.isNaN(top)) {
+						break outerloop;
+					}
+				}
+			}
+		}
+        return top;
     }
 
     /**
@@ -457,23 +566,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private void makeLonScales() throws VisADException, RemoteException {
         setDisplayInactive();
-
-        double[] xRange = xMap.getRange();
-        double[] yRange = yMap.getRange();
-        double[] zRange = (zMap != null)
-                          ? zMap.getRange()
-                          : new double[] { 0, 0 };
-
+        
         if (lonScale != null) {
             lonScale.setVisible(getLonScaleInfo().visible);
 
-            EarthLocation ll = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-            EarthLocation lr = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
-
             if (isSouthPole()) {
-                updateSouthPoleLonScale(lonScale, ll, lr);
+                updateSouthPoleLonScale(lonScale);
             } else {
-                updateLonScale(lonScale, ll, lr);
+                updateLonScale(lonScale);
             }
         }
 
@@ -491,10 +591,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double[]      zRange = (zMap != null)
                                ? zMap.getRange()
                                : new double[] { 0, 0 };
-        EarthLocation ll     = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-        EarthLocation lr     = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
-        EarthLocation ur     = getEarthLocation(new double[] { xRange[1], yRange[1], zRange[0] });
-        EarthLocation ul     = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
+        EarthLocation ll     = getEarthLocation(xRange[0], yRange[0], zRange[0]);
+        EarthLocation lr     = getEarthLocation(xRange[1], yRange[0], zRange[0]);
+        EarthLocation ur     = getEarthLocation(xRange[1], yRange[1], zRange[0]);
+        EarthLocation ul     = getEarthLocation(xRange[0], yRange[1], zRange[0]);
 
         return ((ll.getLongitude().getValue() < ul.getLongitude().getValue())
                 && (ul.getLongitude().getValue() < ur.getLongitude().getValue())
@@ -505,18 +605,16 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * Method to update lat scale.
      *
      * @param scale    AxisScale to update
-     * @param bottom the bottom earth location
-     * @param top the top earth location
      * @throws VisADException   problem creating some VisAD object
      * @throws RemoteException   problem creating remote object
      */
-    private void updateLatScale(AxisScale scale, EarthLocation bottom, EarthLocation top)
+    private void updateLatScale(AxisScale scale)
             throws VisADException, RemoteException {
         final int                 LAT_MIN      = -90;
         final int                 LAT_MAX      = 90;
         final double              DELTA        = 0.0001;
-        double                    bottomLat    = bottom.getLatitude().getValue();
-        double                    topLat       = top.getLatitude().getValue();
+        double                    bottomLat    = calcLatBase();
+        double                    topLat       = calcLatTop();
         Hashtable<Double, String> labelTable   = new Hashtable<Double, String>();
         double                    base         = Misc.parseNumber(getLatScaleInfo().baseLabel);
         List<Double>              majorTicks   = new ArrayList<Double>();
@@ -529,13 +627,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             base = bottomLat;
         }
 
-        for (double i = base; i < topLat; i += inc / minorTickInc) {
+        outerloop: for (double i = base; i < topLat; i += inc / minorTickInc) {
             if (i < bottomLat) {                           // Latitudes that are not in this range are not visible.
                 continue;
             }
 
-            EarthLocationTuple elt    = new EarthLocationTuple(i, bottom.getLongitude().getValue(), 0);
+            EarthLocationTuple elt    = new EarthLocationTuple(i, calcLonBase(), 0);
             double[]           values = newtonLat(elt, 0);
+            for (int j = 0; j < values.length; j++) {
+            	if (Double.isNaN(values[j])){
+            		continue outerloop;
+            	}
+			}
             Double             d      = round(values[1], 3, BigDecimal.ROUND_HALF_UP);
             double             mm     = (i - base) % inc;
 
@@ -563,19 +666,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * Method to update lon scale.
      *
      * @param scale    AxisScale to update
-     * @param left the left earth location
-     * @param right the right earth location
      * @throws VisADException   problem creating some VisAD object
      * @throws RemoteException   problem creating remote object
      */
-    private void updateLonScale(AxisScale scale, EarthLocation left, EarthLocation right)
+    private void updateLonScale(AxisScale scale)
             throws VisADException, RemoteException {
         final int                 MAX_LON         = 360;
         final int                 MID_LON         = 180;
         final int                 MIN_LON         = 0;
         final int                 MIN_LON2        = -180;
-        double                    leftLon         = left.getLongitude().getValue();
-        double                    rightLon        = right.getLongitude().getValue();
+        double                    leftLon         = calcLonBase();
+        double                    rightLon        = calcLonTop();
+        double                    latBottom       = calcLatBase();
         boolean                   isMeridianCross = leftLon > rightLon;
         Hashtable<Double, String> labelTable      = new Hashtable<Double, String>();
         double                    base            = Misc.parseNumber(getLonScaleInfo().baseLabel);
@@ -585,8 +687,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    inc             = Misc.parseNumber(getLonScaleInfo().increment);
         int                       cnt             = 0;
         List<Double>              increment       = new LinkedList<Double>();
+        
+        if (latBottom >= 0) {
+        	base += 360;
+        }
 
-        // Northen hemisphere meridian cross
+        // Northern hemisphere meridian cross
         leftLon = isMeridianCross
                   ? leftLon - MAX_LON
                   : leftLon;
@@ -604,9 +710,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             increment.add(i);
         }
 
-        for (Double i : increment) {
-            EarthLocationTuple elt    = new EarthLocationTuple(right.getLatitude().getValue(), i, 0);
+        outerloop: for (Double i : increment) {
+            EarthLocationTuple elt    = new EarthLocationTuple(calcLatBase(), i, 0);
             double[]           values = newtonLon(elt, 0);
+            for (int j = 0; j < values.length; j++) {
+            	if (Double.isNaN(values[j])) {
+            		continue outerloop;
+            	}				
+			}
             Double             d      = round(values[0], 3, BigDecimal.ROUND_HALF_UP);
 
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
@@ -637,19 +748,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * Update south pole lon scale.
      *
      * @param scale the scale
-     * @param left the left
-     * @param right the right
      * @throws VisADException the vis ad exception
      * @throws RemoteException the remote exception
      */
-    private void updateSouthPoleLonScale(AxisScale scale, EarthLocation left, EarthLocation right)
+    private void updateSouthPoleLonScale(AxisScale scale)
             throws VisADException, RemoteException {
         final int                 MAX_LON      = 360;
         final int                 MID_LON      = 180;
         final int                 MIN_LON      = 0;
         final int                 MIN_LON2     = -180;
-        double                    leftLon      = left.getLongitude().getValue();
-        double                    rightLon     = right.getLongitude().getValue() - MAX_LON;
+        double                    leftLon      = calcLonBase();
+        double                    rightLon     = calcLonTop() - MAX_LON;
+        double                    bottomLat    = calcLatBase();
         Hashtable<Double, String> labelTable   = new Hashtable<Double, String>();
         double                    base         = Misc.parseNumber(getLonScaleInfo().baseLabel);
         List<Double>              majorTicks   = new ArrayList<Double>();
@@ -673,7 +783,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         for (Double i : increment) {
-            EarthLocationTuple elt    = new EarthLocationTuple(left.getLatitude().getValue(), i, 0);
+            EarthLocationTuple elt    = new EarthLocationTuple(bottomLat, i, 0);
             double[]           values = newtonLon(elt, 0);
             Double             d      = new Double(values[0]);
 
@@ -748,14 +858,24 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private double[] newtonLat(EarthLocationTuple elt, int cnt) throws RemoteException, VisADException {
         final double DELTA   = 0.02;
+        final double DELTA2  = 0.001;
         final int    MAX_CNT = 10;
         double[]     values  = getSpatialCoordinates(elt).getValues();
 
         values[0] = -1;
 
         EarthLocation el   = getEarthLocation(values);
+        
+        // We are in no man's land so must adjust until we find Earth.
+        while (Double.isNaN(el.getLatitude().getValue())) {
+        	values[0] = values[0] + DELTA2;
+        	el   = getEarthLocation(values);
+        	if (values[0] > 1) 
+        		return new double[]{Double.NaN,Double.NaN,Double.NaN};
+        }
+                
         double        diff = elt.getLatitude().getValue() - el.getLatitude().getValue();
-
+        
         if ((Math.abs(diff) < DELTA) || (cnt > MAX_CNT)) {    // cnt > 10 in case solution does not converge. Safety valve.
             return getSpatialCoordinates(el).getValues();
         } else {
@@ -778,12 +898,22 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     private double[] newtonLon(EarthLocationTuple elt, int cnt) throws RemoteException, VisADException {
         final double DELTA   = 0.02;
+        final double DELTA2  = 0.001;
         final int    MAX_CNT = 10;
         double[]     values  = getSpatialCoordinates(elt).getValues();
 
         values[1] = -1;
 
         EarthLocation el   = getEarthLocation(values);
+        
+        // We are in no man's land so must adjust until we find Earth.
+        while (Double.isNaN(el.getLatitude().getValue())) {
+        	values[1] = values[1] + DELTA2;
+        	el   = getEarthLocation(values);
+        	if (values[1] > 1) 
+        		return new double[]{Double.NaN,Double.NaN,Double.NaN};
+        }
+
         double        diff = el.getLongitude().getValue() - elt.getLongitude().getValue();
 
         if ((Math.abs(diff) < DELTA) || (cnt > MAX_CNT)) {    // cnt > 10 in case solution does not converge. Safety valve.
@@ -795,7 +925,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             return newtonLon(t, ++cnt);
         }
     }
-
     /**
      * Method to update the properties of an AxisScale
      *
@@ -1070,10 +1199,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             double[]      zRange = (zMap != null)
                                    ? zMap.getRange()
                                    : new double[] { 0, 0 };
-            EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-            double        base   = el1.getLatitude().getValue();
-            EarthLocation el2    = getEarthLocation(new double[] { xRange[0], yRange[1], zRange[0] });
-            double        end    = el2.getLatitude().getValue();
+            EarthLocation el1    = getEarthLocation(xRange[0], yRange[0], zRange[0]);
+            double        base   = calcLatBase();
+            EarthLocation el2    = getEarthLocation(xRange[0], yRange[1], zRange[0]);
+            double        end    = calcLatTop();
             int           inc    = (int) round(Math.abs(end - base) / 5d, 0, BigDecimal.ROUND_HALF_UP);
 
             lsi.increment          = ((inc == 0)
@@ -1111,10 +1240,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             double[]      zRange = (zMap != null)
                                    ? zMap.getRange()
                                    : new double[] { 0, 0 };
-            EarthLocation el1    = getEarthLocation(new double[] { xRange[0], yRange[0], zRange[0] });
-            double        base   = el1.getLongitude().getValue();
-            EarthLocation el2    = getEarthLocation(new double[] { xRange[1], yRange[0], zRange[0] });
-            double        end    = el2.getLongitude().getValue();
+            EarthLocation el1    = getEarthLocation(xRange[0], yRange[0], zRange[0]);
+            double        base   = calcLonBase();
+            EarthLocation el2    = getEarthLocation(xRange[1], yRange[0], zRange[0]);
+            double        end    = calcLonTop();
             int           inc;
 
             if (isSouthPole()) {
@@ -1329,7 +1458,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         this.lonScaleInfo = null;
         resetMapParameters();
 
-        EarthLocation el = getEarthLocation(new double[] { 0, 0, 0 });
+        EarthLocation el = getEarthLocation(0, 0, 0);
 
         centerLLP.set(el.getLatitude().getValue(CommonUnit.degree), el.getLongitude().getValue(CommonUnit.degree));
     }
@@ -1771,7 +1900,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // TODO: java2d
         // if(true) return;
         VisADRay      ray = getRay(x, y);
-        EarthLocation el  = getEarthLocation(new double[] { ray.position[0], ray.position[1], ray.position[2] });
+        EarthLocation el  = getEarthLocation(ray.position[0], ray.position[1], ray.position[2]);
 
         updateLocation(el);
     }
