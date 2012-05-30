@@ -9,7 +9,7 @@ Getting your WRF post-processed data into the IDV environment.
 </div>
 
 <p>
-The IDV GUI has two main windows: the [ht::popup "../../installandstart/basics/GettingStarted.html" "Dashboard and the View Window"]. The View Window is where you will see and manipulate displays that you create. The Dashboard is where you will be able to load your data and  easily access all controls for manipulating the properties of variables you wish to display (like setting contour properties, adding color scales, changing color tables, etc). In order to get your WRF output into the IDV from the GUI interface, you will need to start the IDV and begin work with the Dashboard:
+The IDV GUI has two main windows: the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/quickstart/index.html" "Dashboard and the View Window"]. The View Window is where you will see and manipulate displays that you create. The Dashboard is where you will be able to load your data and  easily access all controls for manipulating the properties of variables you wish to display (like setting contour properties, adding color scales, changing color tables, etc). In order to get your WRF output into the IDV from the GUI interface, you will need to start the IDV and begin work with the Dashboard:
 </p>
 
 [ht::cimg images/Dashboard.png]
@@ -25,11 +25,11 @@ The display above shows the Dashboard window of the IDV. The Data Choosers tab h
 </ol>
 
 <p>
-Once you click "Add Source", the IDV will switch you from the Data Choosers tab to the [ht::popup "../selection/FieldSelector.html" "Field Selector"] tab:
+Once you click "Add Source", the IDV will switch you from the Data Choosers tab to the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] tab:
 </p>
 [ht::cimg images/FieldSelector.png]
 <p>
-The [ht::popup "../selection/FieldSelector.html" "Field Selector"] tab is where you will select the variables and types of images to generate. In the screenshot above, the 2D variable "Pressure_reduced_to_MSL @ msl" (left side of the Field Selector tab) has been selected, and a display type "Plan Views" -> "Contour Plan View"  (top right side of the Field Selector tab) has been chosen. Note that this is the same view that was generated in the previous Jython examples. For now, we will leave spatial and temporal subsetting as default (i.e. no subsetting) and load the entire grid (bottom right panel in the Field Selector tab). For more information on subsetting, see the [ht::popup "../selection/FieldSelector.html" "Field Selector"] page. The final step is to push the "Create Display" button. Note - up until this point, very little information has been loaded off of your disk into memory. Once you press the "create display" button, data for the variable you selected will be read off of disk - depending on the size of your data set, this may take quite some time!
+The Field Selector tab is where you will select the variables and types of images to generate. In the screenshot above, the 2D variable [ht::param Pressure_reduced_to_MSL @ msl] (left side of the Field Selector tab) has been selected, and a display type [ht::menu {Plan Views} {Contour Plan View}]  (top right side of the [ht::command Field Selector] tab) has been chosen. Note that this is the same view that was generated in the previous Jython examples. For now, we will leave spatial and temporal subsetting as default (i.e. no subsetting) and load the entire grid (bottom right panel in the Field Selector tab). For more information on subsetting, see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] page. The final step is to push the [ht::command Create Display] button. Note - up until this point, very little information has been loaded off of your disk into memory. Once you press the [ht::command Create Display] button, data for the variable you selected will be read off of disk - depending on the size of your data set, this may take quite some time!
 </p>
 
 <p>
@@ -37,8 +37,5 @@ Once the data has been loaded, the IDV will generate an image in the View Window
 </p>
 
 [ht::cimg images/Interactive_WRF_Contour2D_1.png]
-<p>
-Figure properties, like contour intervals, colors, etc., can be accessed through the Display Control menu on the dashboard. Please visit the [ht::popup "../selection/DisplayControl.html" "Display Control"] page for more information.
-</p>
 </body>
 </html>

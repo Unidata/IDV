@@ -8,47 +8,278 @@
 Displays for WRF post-processed data.
 </div>
 
-The following are examples of the different kids of displays available in the IDV. For more information how the display was created, simply click the image; the pages that pop-up use different data sources, but the instructions for creating the displays are the same.
+<p>
+The following are examples of the different kids of displays available in the IDV. For more information how to manipulate the display, simply click the image. <!--the pages that pop-up use different data sources, but the instructions for creating the displays are the same.-->
+</p>
 
-Note: Many of the example images used below take advatage of the NASA blue marble background image. If you wish to use blue marble, simply click Display -> Maps and Brounds -> Add Background Image and select Blue Marble.
-
+<p>
+Note: Many of the example images used below take advatage of the NASA blue marble background image. If you wish to use blue marble, simply click [ht::menu {Display} {Maps and Bounds} {Add Background Image}] and select [ht::param Blue Marble]. A second way to add the blue marble background is to click the globe icon found just below the Main Menu Bar on either the Dashboard or the Main Window.
+</p>
 <div class="pagetitle">Plan Views</div>
 
-[ht::popup "../grid/PlanViews.html" [ht::cimg ../grid/images/SlpAndPrecip.gif]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_PlanView.png]]
 
-In the previous section, we looked at producing a contour image plan view display for "Pressure_reduced_to_MSL @ msl". More detail regarding plan views can be found [ht::popup "../grid/PlanViews.html" "here"]. However, the IDV is capable of producing many more display types, both two and three dimensional time animations.
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Select
+    [ht::param Temperature_height_above_ground] and the
+    [ht::display Color-Shaded Plan View] display, then click
+    the [ht::command Create Display] button.  </li>
+<li>In the [ht::command Displays] panel, Select
+    [ht::param Temperature_height_above_ground], and click
+    [ht::menu {Edit} {Properties}], then select the [ht::param Color Scale Tab]
+    and check the box next to [ht::param visible].
+    Other properties of the color scale can be accessed
+    from this tab, such as position and font properties. Click OK to apply
+    the changes.</li>
+<li>Return to the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab, select
+    [ht::param Pressure_reduced_to_MSL @ msl] and the
+    [ht::display Contour Plan View] display, then click
+    the [ht::command Create Display] button.  </li>
+<li>In the [ht::command Displays] panel, Select
+    [ht::param Pressure_reduced_to_MSL]. Click the "Change" box next to Contour
+    to change the contour properties. Other properties of contours can be
+    accessed from this tab, such as contour color and field smoothing. Change
+    the contour color to black by clicking the box next to Color Table and
+    select [ht::menu {Solid} {Black}].</li>
+<li>Animate your display by clicking the "play" button, located just above
+    and to the right of your display on the Main View Window</li>
+</ul>
+
+<p>
+Just as we did in the previous section with Jython, we've produced a 2D contour image plan view display for Pressure reduced to mean sea-level and Temperature at 2m above the ground. However, the IDV is capable of producing many more display types, both two and three dimensional, including time animations.
+</p>
 
 <div class="pagetitle">Wind Barb and Vector Displays</div>
 
-[ht::popup "../grid/VectorDisplays.html" [ht::cimg ./images/WRF_BarbView.png]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/FlowPlanViewControl.html" [ht::cimg ./images/WRF_BarbView.png]]
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param True Wind Vectors] and the
+    [ht::display Wind Barb Plan View] display, then click
+    the [ht::command Create Display] button.  </li>
+</ul>
+
+<p>
+The initial display of the wind barbs will be quite crowded, so we will need
+to clean things up a bit.
+</p>
+
+<ul class="step">
+<li>In the [ht::command Displays] panel, select
+    [ht::param truewindvectors], and set the Skip: XY: factor to 10</li>
+<li>Change the color of the barbs to white by selecting "white" from
+    the dropdown box next to Color.</li>
+</ul>
+
+<p>
+Note that you can also change from a Wind Barb view to a Streamline view from
+the display tabs by clicking the button next to Show: Streamlines. Also, if you
+would rather see a vector plot (as opposed to a barb plot), simply select
+[ht::display Vector Plan View] from the [ht::dialog Field Selector] when
+creating the display.
+</p>
 
 <div class="pagetitle">Hovm&ouml;ller Diagrams</div>
 
-[ht::popup "../grid/Hovmoller.html" [ht::cimg ../grid/images/Hovmoller.gif]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/HovmollerControl.html" [ht::cimg ./images/WRF_Hov_detached.png]]
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Select
+    [ht::param Pressure Reduced to MSL @ msl]</li>
+</ul>
+
+<p>
+In order to clearly see the Hurricane path, we will subset the dataset before
+we create the Hovm&ouml;ller diagram.
+</p>
+
+<ul class="step">
+<li>After selecting [ht::param Pressure Reduced to MSL @ msl], click
+    the "Region" tab located in the bottom left panel, uncheck "Use Default"
+    and select the region of interest.</li>
+<li>Selet the [ht::menu {Hovmoller} {Time-Latitude (Color Shaded)}] display,
+    then click the [ht::command Create Display] button.</li>
+<li>In the [ht::command Displays] panel, select the view for the Hovm&ouml;ller
+    diagram. Click [ht::menu {View} {Undock from Dashboard}] to view the diagram
+    in its own window.</li>
+</ul>
+
+<p>
+The Time-Latitude Hovm&ouml;ller display will represent Pressure Reduced to Mean Sea-Level as a
+function of time and latitude. In this case, mean sea-level pressure will be
+averaged over longitude for each time-step.
+</p>
 
 <div class="pagetitle">Isosurfaces</div>
 
-[ht::popup "../grid/Isosurfaces.html" [ht::cimg ../grid/images/IsoByAnother.gif]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ThreeDSurfaceControl.html" [ht::cimg ./images/WRF_iso_by_param.png]]
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param Speed (from u_wind & v_wind)] and the
+    [ht::menu {3D Surface} {Isosurface Colored by another parameter}] display,
+    then click the [ht::command Create Display] button.</li>
+<li>A pop-up box will prompt you to select which parameter you would like to color
+    the wind speed isosurface. Select [ht::menu {3D grid} {Temperature @ isobaric}]</li>
+<li>In the [ht::command Displays] panel, set the Isosuface value to 20 m/s.<li>
+<li>Right-click the color table and select [ht::param Edit Color Table]. This will bring up
+    the color table editor.</li>
+<li>From the editor window, place your cursor over the color table and right click. Select [ht::param Invert Color Table], and then click "OK" to exit the editor.</li>
+<li>In the [ht::command Displays] panel, Select
+    [ht::param windspeed - Isosurface], and click [ht::menu {Edit} {Properties}],
+    then select the [ht::param Color Scale] Tab and check the box
+    next to [ht::param visible].</li>
+</ul>
+
+[ht::cimg ./images/WRF_iso_by_param_ani.gif]
+
+<div class="pagetitle">Parameter as Topography</div>
+
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ThreeDSurfaceControl.html" [ht::cimg ./images/WRF_ParamAsTopo.png]]
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param Relative Vorticity (from u_wind & v_wind)] and the
+    [ht::menu {3D Surface} {Color-Filled Contoured Parameter as Topography}] display</li>
+<li>Select the "Level" tab from the subset panel and select 500 hPa,
+    then click the [ht::command Create Display] button.</li>
+<li>Right click the color scale in the legend (right panel in the Main View
+    Window), select [ht::param Change Range...], click the [ht::param Use Predefined] box and
+    select [ht::param From All Data], and click "OK"</li>
+</ul>
 
 <div class="pagetitle">Cross Sections</div>
 
-[ht::popup "../grid/CrossSections.html" [ht::cimg images/WRF_WindSpeedVectorX.png]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/CrossSectionControl.html" [ht::cimg images/WRF_WindSpeedVectorX.png]]
+
+<p>
+The image above is focused on velocity data. A 2D color shaded plan view of
+speed at 2m is displayed along with two cross sections - one of wind speed and
+the other of horizontal wind vectors. Both cross sections are set to coninside,
+although this is not the default behavior. To produce the cross sections shown
+above, do the following:
+</p>
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param Speed (from u_wind & v_wind)] and the
+    [ht::menu {Cross sections} {Color-Filled Contour Cross Section}] display,
+    then click the [ht::command Create Display] button.</li>
+<li>Return to the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param True Wind Vectors (from u_wind & v_wind)] and the
+    [ht::menu {Flow Displays} {Vector Cross Section}],
+    then click the [ht::command Create Display] button.</li>
+</ul>
+
+<p>
+Notice that at this point, each cross section has its own control in the view window. To link the cross sections such that they coninside, do the following:
+</p>
+
+<ul class="step">
+<li>In the [ht::command Display] panel,
+    select [ht::display windspeed - Color-Filled Contour Cross Section],
+    then click [ht::menu {Edit} {Sharing} {Sharing on}]</li>
+<li>Repeat the above step for the
+    [ht::display truewindvectors - Vector Cross Section] display.</li>
+<li>Use your mouse to move one of the cross section indicators on the Main
+    View Window to 'snap' the two separate cross sections together.</li>
+</ul>
 
 <div class="pagetitle">2D and 3D Data Probes</div>
 
-[ht::popup "../grid/Probes.html" [ht::cimg images/WRF_2D_Data_Probe.png]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ProbeControl.html" [ht::cimg images/WRF_2D_Data_Probe.png]]
 
-<div class="pagetitle">Time-Height and Skew-T Displays</div>
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Select the
+    [ht::param Pressure_Reduced_to_MSL @ msl]. Then, hold
+    control (or Command, if on a Mac) and select the
+    [ht::menu Plan Views} {Contour Plan View}] and [ht::display Data Probe/Time Series]
+    displays, and then click the [ht::command Create Display] button.</li>
+</ul>
 
-[ht::popup "../grid/Probes2.html" "Time-Height Display"]:
+<p>
+In the Main View Window, you will see the contours of Pressure reduced to Mean Sea-Level, as well as a Probe marker (in the example above, the marker is a yellow rectangle). You may click on the probe to move it to a location of your choice. The corresponding time series plot will show up in the Dashboard under the Display tab (shown above the Main View Window in our example image). Note that the Data Probe will also work with three-dimensional data.
+</p>
 
-[ht::popup "../grid/Probes2.html" [ht::cimg images/WRF_Time_Height.png]]
+<div class="pagetitle">Time-Height Display</div>
 
-[ht::popup "../grid/Probes2.html" "Skew-T Diagram"]:
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/TimeHeightControl.html" [ht::cimg images/WRF_Time_Height.png]]
 
-[ht::popup "../upperair/UsingSoundingDisplays.html" [ht::cimg images/WRF_SkewT.png]]
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Select the
+    [ht::param Relative Humidity @ isobaric]. Then, hold
+    control (or Command, if on a Mac) and select the
+    [ht::menu 3D Surface} {Isosurface}] and [ht::menu Probes} {Time/Height Display (Contours)}] displays, and then click the
+    [ht::command Create Display] button.</li>
+<li>In the [ht::command Display] panel,
+    select [ht::display Relative_humidity - Isosurface],
+    and set the isosurface value to 90%</li>
+</ul>
 
-Note: To update the sounding parameters, use the middle click on your mouse. If you are using a Mac Trackpad, you will need to select a point on the skew-T diagram with Command+Click, then use Option+Click to update the parameters.
+<p>
+In the Main View Window, you will see the 90% RH isosurface, as well as a time-height marker (in the example above, the marker is red vertical line with a rectangle on top). You may click on the probe to move it to a location of your choice.
+</p>
 
+<div class="pagetitle">Skew-T Displays</div>
+
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/AerologicalSoundingControl.html" [ht::cimg images/WRF_SkewT.png]]
+
+<ul class="step">
+<li>Clear out any existing displays.</li>
+<li>Make sure your WRF ouput is loaded.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down to the
+    [ht::param Derived] tab and expand that. Select the
+    [ht::param Sounding Data (with true winds)] and the
+    [ht::display Soundings] ->
+    [ht::display Grid Skew-T].</li>
+<li> Before creating the display, look below the display panel for the subset
+    panel and select the "Times" tab. Select [ht::param Use Selected] from the drop-down
+    box and select the first three time steps (hold control or command to select
+    multiple times),then click the [ht::command Create Display] button.</li>
+<li>Add a Color-Shaded Plan View of the 2D variable
+    [ht::param Pressure_reduced_to_MSL @ msl] to
+    more easily navigate the skew-T location marker through the dataset (similar
+    to the time-height marker from the previous example).</li>
+<li>Place the skew-T location marker in a region of interest and return to
+    the Dashboard [ht::command Displays] tab. Undock the display (View ->
+    Undock from Dashboard)</li>
+</ul>
+
+<p>
+A feature of the skew-T display is that one can animate skew-T's in time. However, sometimes it is nice to see consecutive skew-T's (data from two different times) on the same chart. Underneath the Skew-T diagram are controls, including the ability to see Consecutive Profiles (simply check the box to enable this feature). To update the sounding parameters, use the middle click on your mouse. If you are using a Mac Trackpad, you will need to select a point on the skew-T diagram with Command+Click, then use Option+Click to update the parameters.
+</p>
 </body>
 </html>
