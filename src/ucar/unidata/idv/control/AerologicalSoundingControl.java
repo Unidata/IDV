@@ -874,7 +874,6 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 if (haveWinds) {
                     hodoDisplay.setProfileVisible(index, true);
                 }
-                soundingTable.setCurrentSounding(currIndex);
 
                 try {
                     aeroDisplay.setActiveSounding(index);
@@ -902,6 +901,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
                     throw ex;
                 }
+
+                soundingTable.setCurrentSounding(currIndex);
+
             } catch (VisADException ex) {
                 // need to get the actual data for manipulation
                 Sounding s = aeroDisplay.getActiveSounding();

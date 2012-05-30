@@ -54,6 +54,9 @@ public class SoundingTable extends JTable {
     /** The table model to use */
     private AbstractTableModel model = null;
 
+    /** misc **/
+    private TableSorter sorter = null;
+
     /** The flat field we are displaying */
     private Field[] soundings;
 
@@ -186,7 +189,7 @@ public class SoundingTable extends JTable {
                 rangeData[3] = newVals[1];
             }
         }
-        model.fireTableStructureChanged();
+        sorter.setTableModel(model);
     }
 
     /**
@@ -256,12 +259,11 @@ public class SoundingTable extends JTable {
         }
         if (model == null) {
             model = new SoundingTableModel();
-            TableSorter sorter = new TableSorter(model);
-            model = sorter;
+            sorter = new TableSorter(model);
             JTableHeader header = getTableHeader();
             header.setToolTipText("Click to sort");
             sorter.setTableHeader(getTableHeader());
-            setModel(model);
+            setModel(sorter);
             setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
             setPreferredScrollableViewportSize(new Dimension(400, 200));
             getTableHeader().setReorderingAllowed(false);
@@ -342,11 +344,15 @@ public class SoundingTable extends JTable {
          * @return the value
          */
         public Object getValueAt(int row, int col) {
+          try {
             if (col < numDomainCols) {
                 return new Float(domainData[col][row]);
             } else {
                 return new Float(rangeData[col - numDomainCols][row]);
             }
+          } catch (Exception enr) {
+            return Float.NaN;
+          }
         }
 
         /**

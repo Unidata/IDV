@@ -1450,9 +1450,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     private List getDescriptors(DataChoice dataChoice, DataSelection subset) {
 
-        List    times = getTimesFromDataSelection(subset, dataChoice);
-        boolean usingTimeDriver = 
-            (subset != null && subset.getTimeDriverTimes() != null);
+        List times = getTimesFromDataSelection(subset, dataChoice);
+        boolean usingTimeDriver = ((subset != null)
+                                   && (subset.getTimeDriverTimes() != null));
         if (usingTimeDriver) {
             times = subset.getTimeDriverTimes();
         }
@@ -1503,8 +1503,16 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 .secondsSinceTheEpoch) * 1000)));
                         // make the request for the times (AreaDirectoryList)
                         aii.setRequestType(aii.REQ_IMAGEDIR);
-                        AreaDirectoryList ad =
-                            new AreaDirectoryList(aii.getURLString());
+                        AreaDirectoryList ad;
+                        try {  // we may be asking for a date that doesn't exist
+                            ad = new AreaDirectoryList(aii.getURLString());
+                        } catch (AreaFileException afe) {
+                            if (afe.getMessage().indexOf("No images") >= 0) {
+                                continue;
+                            } else {
+                                throw afe;
+                            }
+                        }
                         AreaDirectory[][] dirs = ad.getSortedDirs();
                         for (int d = 0; d < dirs.length; d++) {
                             AreaDirectory dir = dirs[d][0];

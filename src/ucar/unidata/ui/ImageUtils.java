@@ -1,5 +1,4 @@
-/**
- *
+/*
  * Copyright  1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -66,9 +65,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -1402,6 +1403,22 @@ public class ImageUtils {
         } else {
             return Toolkit.getDefaultToolkit().createImage(file);
         }
+    }
+
+    /**
+     * Gets the column count from the components.
+     *
+     * @param views the views
+     * @return the column from comp
+     */
+    public static int getColumnCountFromComps(List<? extends Component> views) {
+        Set<Integer> s = new HashSet<Integer>();
+
+        for (Component component : views) {
+            s.add(component.getLocationOnScreen().x);
+        }
+
+        return s.size();
     }
 
     /**

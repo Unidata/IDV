@@ -34,6 +34,8 @@ import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.publish.PublishManager;
 import ucar.unidata.idv.ui.BottomLegend;
+import ucar.unidata.idv.ui.IdvComponentGroup;
+import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvLegend;
 import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.idv.ui.IdvWindow;
@@ -148,7 +150,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -5737,20 +5738,26 @@ public class ViewManager extends SharableImpl
                     } else if (mainDisplayBtn.isSelected()) {    // Current Active View
                         views.add(getMaster().getComponent());
                         whichComponent = "main display";
-                    } else if (allViewsBtn.isSelected()) {       // All Views
-                        for (Object o : getDisplayWindow().getViewManagers()) {
-                            views.add(((MapViewManager) o).getComponent());
+                    } else if (allViewsBtn.isSelected()) {
+                    	List<ViewManager> viewManagers = new ArrayList<ViewManager>();
+                        viewManagers.addAll(getDisplayWindow().getViewManagers());
+                        for (IdvComponentGroup icg : getDisplayWindow().getComponentGroups()) {
+                            for (IdvComponentHolder idh : (List<IdvComponentHolder>)icg.getDisplayComponents()) {
+                                viewManagers.addAll(idh.getViewManagers());
+                            }
                         }
-
+                        for (ViewManager v : viewManagers) {
+                            views.add(v.getComponent());
+                        }
                         whichComponent = "all displays";
-                    } else {                                     // View & Legend
+                    } else {    // View & Legend
                         views.add(getContents());
                         whichComponent = "contents";
                     }
 
                     List<BufferedImage> images = makeBufferedImages(views, whichComponent);
                     BufferedImage       image  = (BufferedImage) ImageUtils.gridImages2(images, 3, Color.GRAY,
-                                              getColumnCountFromComp(views));
+                                              ImageUtils.getColumnCountFromComps(views));
 
                     if (KmlDataSource.isKmlFile(filename)) {
                         if (!checkForKmlImageCapture()) {
@@ -5821,23 +5828,7 @@ public class ViewManager extends SharableImpl
             l.add(v.getComponent());
         }
 
-        return getColumnCountFromComp(l);
-    }
-
-    /**
-     * Gets the column count from the components.
-     *
-     * @param views the views
-     * @return the column from comp
-     */
-    private static int getColumnCountFromComp(List<? extends Component> views) {
-        java.util.Set<Integer> s = new HashSet<Integer>();
-
-        for (Component component : views) {
-            s.add(component.getLocationOnScreen().x);
-        }
-
-        return s.size();
+        return ImageUtils.getColumnCountFromComps(l);
     }
 
     /**
