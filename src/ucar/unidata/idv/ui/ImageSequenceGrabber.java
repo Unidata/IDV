@@ -1719,8 +1719,26 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         Misc.sleep(100);
                     }
 
-                    if (imageGenerator != null) {
-                        BufferedImage image = viewManager.getMaster().getImage(false);
+                    if (imageGenerator != null) { //I guess we are in scripting mode.
+                    	BufferedImage image;
+                        boolean combine = XmlUtil.getAttribute(scriptingNode, ImageGenerator.ATTR_COMBINE,
+                                false);
+                    	if (combine) {
+                          List<Image> images = new LinkedList<Image>();
+                          
+                          for (Object o :    viewManager.getVMManager().getViewManagers()) {
+                        	  ViewManager vm = (ViewManager)o;
+                              vm.getAnimation().setAniValue(time);
+                        	  images.add(vm.getMaster().getImage(false));
+                          }
+                          int cols = 2;
+                              cols = XmlUtil.getAttribute(scriptingNode, imageGenerator.ATTR_COLUMNS,
+                                                          cols);
+                          image = (BufferedImage)ImageUtils.gridImages2(images,0,Color.BLACK,cols);
+
+                    	} else {
+                            image = viewManager.getMaster().getImage(false);
+                    	}
                         Hashtable     props = new Hashtable();
 
                         props.put(ImageGenerator.PROP_IMAGEPATH, path);
@@ -1745,7 +1763,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                             components.add(viewManager.getContents());
                         }
 
-                        Image image = captureImages(components);
+                        Image image = captureImages(components,ImageUtils.getColumnCountFromComps(components));
 
                         if (allViewsBtn.isSelected()) {
 
@@ -1783,17 +1801,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Capture images.
      *
      * @param components the components
+     * @param cols number of columns
      * @return the image
      * @throws AWTException the aWT exception
      */
-    public Image captureImages(List<? extends Component> components) throws AWTException {
+    public Image captureImages(List<? extends Component> components, int cols) throws AWTException {
         List<Image> images = new LinkedList<Image>();
 
         for (Component c : components) {
             images.add(captureImage(c));
         }
 
-        return ImageUtils.gridImages2(images, 0, Color.GRAY, ImageUtils.getColumnCountFromComps(components));
+        return ImageUtils.gridImages2(images, 0, Color.GRAY, cols);
     }
 
     /**
