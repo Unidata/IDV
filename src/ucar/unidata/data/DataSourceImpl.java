@@ -2127,6 +2127,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if(ud != null){
                 useTDT = ((Boolean)ud).booleanValue();
             }
+            if(useTDT && timeDriverTimes == null){
+                //check view manager
+                ViewManager vm = getIdv().getViewManager();
+                List tdt = null;
+                try{
+                    tdt = vm.getTimeDriverTimes() ;
+                } catch (Exception ee) {  }
+
+                if(tdt != null)
+                    timeDriverTimes = tdt;
+            }
           //  if (useTDT && (timeDriverTimes != null)) {
             if (timeDriverTimes != null && useTDT == true) {
                 try {
