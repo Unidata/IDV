@@ -1793,7 +1793,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             images.add(captureImage(c));
         }
 
-        return ImageUtils.gridImages2(images, 3, Color.GRAY, ImageUtils.getColumnCountFromComps(components));
+        return ImageUtils.gridImages2(images, 0, Color.GRAY, ImageUtils.getColumnCountFromComps(components));
     }
 
     /**

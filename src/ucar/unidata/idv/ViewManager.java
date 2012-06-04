@@ -5756,7 +5756,7 @@ public class ViewManager extends SharableImpl
                     }
 
                     List<BufferedImage> images = makeBufferedImages(views, whichComponent);
-                    BufferedImage       image  = (BufferedImage) ImageUtils.gridImages2(images, 3, Color.GRAY,
+                    BufferedImage       image  = (BufferedImage) ImageUtils.gridImages2(images, 0, Color.GRAY,
                                               ImageUtils.getColumnCountFromComps(views));
 
                     if (KmlDataSource.isKmlFile(filename)) {
