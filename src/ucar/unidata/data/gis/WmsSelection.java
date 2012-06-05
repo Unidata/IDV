@@ -228,6 +228,7 @@ public class WmsSelection {
                        + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
                        + bbox + "&width=" + imageWidth + "&height=" + imageHeight
                        + "&reaspect=false";
+        // may need to add service=WMS
         if (opaque == 0) {
         	url += "&transparent=TRUE";
         } else {
