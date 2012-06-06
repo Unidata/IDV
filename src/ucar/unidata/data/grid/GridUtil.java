@@ -21,7 +21,7 @@
 package ucar.unidata.data.grid;
 
 
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.*;
 
 import ucar.ma2.*;
 
@@ -5485,10 +5485,10 @@ public class GridUtil {
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to xls", true);
         try {
-            XSSFWorkbook    wb = new XSSFWorkbook();
-            XSSFRow         row;
+            HSSFWorkbook    wb = new HSSFWorkbook();
+            HSSFRow         row;
             int             sheetIdx = -1;
-            List<XSSFSheet> sheets   = new ArrayList<XSSFSheet>();
+            List<HSSFSheet> sheets   = new ArrayList<HSSFSheet>();
             OutputStream    fileOut  =
                 new BufferedOutputStream(new FileOutputStream(filename),
                                          1000000);
@@ -5501,7 +5501,7 @@ public class GridUtil {
             int             colOffset  = 2;
             int             rowCnt;
             int             sheetCnt;
-            XSSFSheet       sheet = null;
+            HSSFSheet       sheet = null;
 
             if (isTimeSequence(grid)) {
                 SampledSet timeSet    = (SampledSet) getTimeSet(grid);
@@ -5584,7 +5584,7 @@ public class GridUtil {
                     if ((rowCnt == -1) || (rowCnt >= MAXROWS)) {
                         rowCnt = 0;
                         sheetCnt++;
-                        sheet = (XSSFSheet) sheets.get(sheetCnt);
+                        sheet = (HSSFSheet) sheets.get(sheetCnt);
                         row   = sheet.getRow(0);
                         if (dt != null) {
                             row.createCell((short) (colOffset
