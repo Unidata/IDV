@@ -114,6 +114,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/poi.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/poi-ooxml.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jai_codec.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/ij.jar" dest="${tmpjardir}"/>
