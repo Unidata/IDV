@@ -629,7 +629,7 @@ public class ImageUtils {
     public static Image gridImages2(List<? extends Image> images, int space, Color bg, int columns) {
         List<Image> griddedImages = new LinkedList<Image>();
 
-        for (int i = 0; i < Math.round(1.0 * images.size() / columns); i++) {
+        for (int i = 0; i < Math.ceil(1.0 * images.size() / columns); i++) {
             List<Image> row = new LinkedList<Image>();
 
             for (int j = 0; j < columns; j++) {
