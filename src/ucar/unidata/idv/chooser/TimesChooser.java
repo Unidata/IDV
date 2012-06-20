@@ -665,7 +665,7 @@ public class TimesChooser extends IdvChooser {
                     centerPopupBtn }), 2, 1));
                 timesTab.add("Absolute",
                              GuiUtils.centerBottom(splitter,
-                                 GuiUtils.leftRight(absTimesLbl, tDriver)));
+                                 GuiUtils.leftCenterRight(absTimesLbl,absoluteExtra, tDriver)));
             } else {
 
                 timesTab.add("Absolute",
