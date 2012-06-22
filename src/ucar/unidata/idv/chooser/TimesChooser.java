@@ -512,7 +512,7 @@ public class TimesChooser extends IdvChooser {
             } else {
 
                 selectedDriver = null;
-                driverLbl.setText("Click to Select Time Matching");
+                driverLbl.setText("Match Times:");
             }
         } else {
             absTimesLbl.setText(" ");

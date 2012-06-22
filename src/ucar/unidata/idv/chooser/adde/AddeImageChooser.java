@@ -729,7 +729,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 String cmd = ae.getActionCommand();
                 if (cmd.equals(GuiUtils.CMD_REMOVE)) {
                     archiveDay = null;
-                    archiveDayLabel.setText("");
+                    archiveDayLabel.setText("Select Day:");
                     setDoAbsoluteTimes(true);
                     descriptorChanged();
                 }
@@ -782,7 +782,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         setDescriptors(null);
         archiveDay = null;
         if (archiveDayLabel != null) {
-            archiveDayLabel.setText("");
+            archiveDayLabel.setText("Select Day:");
         }
         // set to relative times
         setDoAbsoluteTimes(false);
@@ -1396,7 +1396,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             GuiUtils.makeImageButton("/auxdata/ui/icons/Archive.gif", this,
                                      "getArchiveDay", null, true);
         archiveDayBtn.setToolTipText("Select a day for archive datasets");
-        archiveDayLabel     = new JLabel("");
+        archiveDayLabel     = new JLabel("Select Day:");
         archiveDayComponent = GuiUtils.hbox(archiveDayLabel, archiveDayBtn);
         return GuiUtils.right(archiveDayComponent);
     }
