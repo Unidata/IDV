@@ -9,11 +9,11 @@ Getting your WRF post-processed data into the IDV environment.
 </div>
 
 <p>
-If you have participated in the WRF tutorial, then you are likely familiar with the output from Hurricane Gustav simulation which is what we will use in this tutorial. These data are on the thumb drive you received as part of the workshop, although any WRF post-processed output should do fine. While the IDV can handel the staggered grids produced by WRF, it's <b>highly</b> recommended that you post process (i.e. de-staggered) your WRF output, as it's a large performance hit to let the IDV do this for you on the fly.
+If you have participated in the WRF tutorial, then you are likely familiar with the output from the Hurricane Gustav simulation, which is what we will use in this tutorial. These data are on the thumb drive you received as part of the workshop, although any WRF post-processed output should do fine. While the IDV can handel the staggered grids produced by WRF, it's <b>highly</b> recommended that you post process the raw output to get your data on a non-staggered grid, as it's a large performance hit to let the IDV do this for you on the fly.
 </p>
 
 <p>
-The first step in using the IDV for visualization and analysis is to get your data in the the IDV environment, which is the focus of the first section of this tutorial.
+The first step in using the IDV for visualization and analysis is to get your data into the the IDV environment, which is the focus of the first section of this tutorial.
 </p>
 
 <p>
@@ -26,11 +26,11 @@ The IDV GUI has two main windows: the [ht::popup "http://www.unidata.ucar.edu/so
 The display above shows the Dashboard window of the IDV. The [ht::command Data Choosers] tab has been selected, and we are going to directly load files off of our computer (note [ht::param Files] under [ht::param General] is selected on the left hand side of the Dashboard). Follow these steps to begin the process of loading your data into the IDV.
 </p>
 
-<ul class="step">
+<ol class="step">
   <li>Locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files)</li>
   <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time]</li>
   <li>Click [ht::command Add Source]</li>
-</ul>
+</ol>
 
 <p>
 Once you click [ht::command Add Source], the IDV will switch you from the [ht::command Data Choosers] tab to the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] tab.
@@ -39,7 +39,11 @@ Once you click [ht::command Add Source], the IDV will switch you from the [ht::c
 [ht::cimg images/FieldSelector.png]
 
 <p>
-The [ht::command Field Selector] tab is where you will select the fields and types of images to generate. In the screenshot above, the 2D field [ht::param Pressure_reduced_to_MSL @ msl] (list on left side of the Field Selector tab) has been selected, and a display type [ht::menu {Plan Views} {Contour Plan View}]  (list on top right side of the [ht::command Field Selector] tab) has been chosen. For now, we will leave spatial and temporal subsetting as default (i.e. no subsetting) and load the entire grid. For more information on subsetting, see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] page. The final step is to push the [ht::command Create Display] button. Note - up until this point, very little information has been loaded off of your disk into memory. Once you press the [ht::command Create Display] button, data for the field you selected will be read off of disk - depending on the size of your data set, this may take quite some time!
+The [ht::command Field Selector] tab is where you will select the fields to analyze and types of images to generate. In the screenshot above, the 2D field [ht::param Pressure_reduced_to_MSL @ msl] (list on left side of the Field Selector tab) has been selected, and a display type [ht::menu {Plan Views} {Contour Plan View}]  (list on top right side of the [ht::command Field Selector] tab) has been chosen. For now, we will leave spatial and temporal subsetting as default (i.e. no subsetting) and load the entire grid. For more information on subsetting, see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] page. The final step is to push the [ht::command Create Display] button.
+</p>
+
+<p>
+<b>Note:</b> up until this point, very little information has been loaded off of your disk into memory. Once you press the [ht::command Create Display] button, data for the field you selected will be read off of disk - depending on the size of your data set, this may take quite some time!
 </p>
 
 <p>

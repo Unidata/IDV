@@ -19,25 +19,28 @@ As an example, let's use a formula to compute the 500 mb - 850 mb wind speed she
 </p>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/Formulas.html" [ht::cimg ./images/WRF_SpeedShear.png]]
-<ul class="step">
-<li>Clear out any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF output is loaded.</li>
+<ol class="step">
+<li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
 <li>In the [ht::command Field Selector] panel, select [ht::param Formulas] from the Data
     Sources panel and click [ht::menu {Grids} {Layer Wind Shear}], then select
     [ht::display Color Filled Contour Plan View] as the display and click
     [ht::command Create Display].</li>
-
+</ol>
+<p>
 The IDV will prompt you for which levels you would like to calculate the shear between (top and bottom), and the fields (u, v, and z) needed to compute the layer shear.
-
+</p>
+<ol class="step">
 <li>For field [ht::param u], expand the data source for your WRF output and select the [ht::menu {3D grid} {u_wind @ isobaric}] field.</li>
 <li>For field [ht::param v], expand the data source for your WRF output and select the [ht::menu {3D grid} {v_wind @ isobaric}] field.</li>
 <li>For field [ht::param z], expand the data source for your WRF output and select the [ht::menu {3D grid} {Geopotential_height @ isobaric}] field.</li>
 <li>Click the [ht::command Create Display] button.</li>
-</ul>
+</ol>
+
 <div class="pagetitle">Adding Custom Functions</div>
 
 <p>
-Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!). As an example, let's add a Jython formula to compute wind speed (although one already exists, it's still a good exercise to go through):
+Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!) As an example, let's add a Jython formula to compute wind speed (although one already exists, it's still a good exercise to go through):
 </p>
 
 <ul class="step">
@@ -45,7 +48,7 @@ Formulas in the IDV are defined using Jython, which means extending the analysis
 <li>From the main menu, click on
 [ht::menu {Edit} {Formulas} {Create Formula}].
 The [ht::dialog Formula Editor] window should appear.</li>
-<li>Enter the [ht::command Name] of your forumla - [ht::param windspeed]
+<li>Enter the [ht::command Name] of your forumla: [ht::param windspeed]
 (one word - no space).</li>
 <li>
 Enter the mathematical formula definition in the
@@ -54,8 +57,7 @@ Enter the mathematical formula definition in the
 </li>
 
 <li>Open the [ht::command Advanced] panel in the Formula Editor.</li>
-<li>Enter a [ht::command Description] for the forumula -
-[ht::param wind speed from u and v].</li>
+<li>Enter a [ht::command Description] for the forumula: [ht::param wind speed from u and v].</li>
 <li>For  [ht::command Group] enter [ht::param Workshop].</li>
 
 <li>Now we will tell the IDV which display types our formula can use:</li>
