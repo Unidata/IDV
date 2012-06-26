@@ -512,7 +512,7 @@ public class TimesChooser extends IdvChooser {
             } else {
 
                 selectedDriver = null;
-                driverLbl.setText("Click to Select Time Matching");
+                driverLbl.setText("Match Times:");
             }
         } else {
             absTimesLbl.setText(" ");
@@ -665,7 +665,7 @@ public class TimesChooser extends IdvChooser {
                     centerPopupBtn }), 2, 1));
                 timesTab.add("Absolute",
                              GuiUtils.centerBottom(splitter,
-                                 GuiUtils.leftRight(absTimesLbl, tDriver)));
+                                 GuiUtils.leftCenterRight(absTimesLbl,absoluteExtra, tDriver)));
             } else {
 
                 timesTab.add("Absolute",

@@ -5,61 +5,63 @@
 <body>
 
 <div class="overview">
-Formulas
+Formulas in the IDV
 </div>
 
 <div class="pagetitle">Built-in Forumlas</div>
 
 <p>
-The IDV is not only a data visualization package, but it is also a powerful analysis package. The IDV has several built-in functions that range from very simple operations, such as negating a field (that is, changing the sign of all of the values on the grid), to more complex operations, such as computing the horizontal flux divergence field. These built-in operations can be access through the [ht::command Field Selector] tab by clicking on [ht::param Forumlas] in the Data Sources side panel of the [ht::command Field Selector] tab on the Dashboard.
+The IDV is not only a data visualization package, but it is also a powerful analysis package. The IDV has several built-in functions that range from very simple operations, such as negating a field (that is, changing the sign of all of the values on the grid), to more complex operations, such as computing the horizontal flux divergence field. These built-in operations can be accessed through the [ht::command Field Selector] tab by clicking on [ht::param Forumlas] in the Data Sources side panel.
 </p>
 
 <p>
-As an example, let's use a formula compute the 500 mb - 850 mb wind speed shear:
+As an example, let's use a formula to compute the 500 mb - 850 mb wind speed shear:
 </p>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/Formulas.html" [ht::cimg ./images/WRF_SpeedShear.png]]
-<ul class="step">
-<li>Clear out any existing displays.</li>
-<li>Make sure your WRF output is loaded.</li>
+<ol class="step">
+<li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
 <li>In the [ht::command Field Selector] panel, select [ht::param Formulas] from the Data
     Sources panel and click [ht::menu {Grids} {Layer Wind Shear}], then select
     [ht::display Color Filled Contour Plan View] as the display and click
     [ht::command Create Display].</li>
-
+</ol>
+<p>
 The IDV will prompt you for which levels you would like to calculate the shear between (top and bottom), and the fields (u, v, and z) needed to compute the layer shear.
-
-<li>For field [ht::param u], expand the data source for your WRF output and select [ht::menu {3D grid} {u_wind @ isobaric}]</li>
-<li>For field [ht::param v], expand the data source for your WRF output and select [ht::menu {3D grid} {v_wind @ isobaric}]</li>
-<li>For field [ht::param z], expand the data source for your WRF output and select [ht::menu {3D grid} {Geopotential_height @ isobaric}]</li>
+</p>
+<ol class="step">
+<li>For field [ht::param u], expand the data source for your WRF output and select the [ht::menu {3D grid} {u_wind @ isobaric}] field.</li>
+<li>For field [ht::param v], expand the data source for your WRF output and select the [ht::menu {3D grid} {v_wind @ isobaric}] field.</li>
+<li>For field [ht::param z], expand the data source for your WRF output and select the [ht::menu {3D grid} {Geopotential_height @ isobaric}] field.</li>
 <li>Click the [ht::command Create Display] button.</li>
-</ul>
+</ol>
+
 <div class="pagetitle">Adding Custom Functions</div>
 
 <p>
-Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!). As an example, let's add a Jython routine to compute wind speed (although
-one already exists, it's still a good example):
+Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!) As an example, let's add a Jython formula to compute wind speed (although one already exists, it's still a good exercise to go through):
 </p>
 
 <ul class="step">
 <li>Remove all displays.</li>
 <li>From the main menu, click on
 [ht::menu {Edit} {Formulas} {Create Formula}].
-The [ht::dialog Formula Editor] window appears.</li>
-<li>Enter the [ht::command Name] [ht::param windspeed]
+The [ht::dialog Formula Editor] window should appear.</li>
+<li>Enter the [ht::command Name] of your forumla: [ht::param windspeed]
 (one word - no space).</li>
 <li>
 Enter the mathematical formula definition in the
-[ht::command Formula] entry field. The formula is
+[ht::command Formula] entry field using the [ht::popup "https://www.unidata.ucar.edu/software/idv/docs/userguide/tools/JythonLib.html" Jython] syntax. The formula is
 <ul><pre>sqrt(u**2 + v**2)</pre></ul>
 </li>
 
-<li> Open the [ht::command Advanced] panel.</li>
-<li>Enter the [ht::command Description]
-[ht::param wind speed from u and v].</li>
-
+<li>Open the [ht::command Advanced] panel in the Formula Editor.</li>
+<li>Enter a [ht::command Description] for the forumula: [ht::param wind speed from u and v].</li>
 <li>For  [ht::command Group] enter [ht::param Workshop].</li>
 
+<li>Now we will tell the IDV which display types our formula can use:</li>
+<ul>
 <li>In the [ht::command Displays] section, click the
 [ht::command Use selected] radio button, then click
 the [ht::button All off] button.</li>
@@ -67,17 +69,12 @@ the [ht::button All off] button.</li>
 check the [ht::display Contour Plan View] option.  Also, expand
 the [ht::command 3D Surface] category and check the
 [ht::display Isosurface]  option.</li>
-
+</ul>
 <li>Click on [ht::button Add Formula].</li>
-
-<li>A new item [ht::param wind speed from u and v]
-should appear in the
-[ht::dialog Field Selector] window's [ht::command Fields] panel, under
-[ht::param Workshop].</li>
 </ul>
 
 <p>
-We've only touched on the basics of the use of formulas in the IDV - please see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/Formulas.html" "IDV Formulas"] for more details.
+A new item [ht::param wind speed from u and v] should appear in the [ht::dialog Field Selector] window's [ht::command Fields] panel, under [ht::param Workshop]. We've only touched on the basics of the use of formulas in the IDV - please see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/Formulas.html" "IDV Formulas"] for more details.
 </p>
 
 </body>
