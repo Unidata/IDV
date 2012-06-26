@@ -499,6 +499,9 @@ public class ShapeFileDataSource extends FilesDataSource {
                 /*throw new IllegalArgumentException("DBfile size:"
                         + values.size() + " != number of map lines:"
                         + sets.length);  */
+                System.err.println(" WARNING:" + "DBfile size:"
+                        + values.size() + " != number of map lines:"
+                        + sets.length);
                 return;
             }
             for (int i = 0; i < sets.length; i++) {
