@@ -439,8 +439,7 @@ public class KmlDataSource extends FilesDataSource {
                     Trace.call2("readBytes", " size=" + xml.length());
                     String newName = IOUtil.getFileTail(name);
                     if(IOUtil.getFileRoot(name).length() == 1){
-                        String path = IOUtil.getFileRoot(kmlUrl);
-                        newName = IOUtil.joinDir(path, newName);
+                        newName = IOUtil.joinDir(getDataContext().getObjectStore().getUserTmpDirectory(), newName);
                     }
 
                     xml = cleanupXml(xml);
