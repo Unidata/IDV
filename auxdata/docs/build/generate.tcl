@@ -66,7 +66,8 @@ proc ht::pre {c} {
 }
 
 proc ht::menu {args} {
-    set sep "-&gt;"
+    #set sep "-&gt;"
+    set sep "&rarr;"
     return "<code class=\"menu\">[join $args $sep]</code>"
 }
 

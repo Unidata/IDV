@@ -1,23 +1,23 @@
 <html>
 <head>
-<title>WRF Analysis: Derived Products</title>
+<title>WRF Analysis: Derived Products and Advanced Features</title>
 </head>
 <body>
 
 <div class="overview">
-Derived data
+Derived data products and advanced features.
 </div>
 
 <div class="pagetitle">Derived Data</div>
 <p>
-The IDV has the ability to make the quantities computed from formulas available under the loaded data source rather than going through the steps to use a formula, as outlined in the previous section. For example, one could compute wind speed using the formula directly - simply load a Data Source, then from the Field Selector click [ht::menu {Formulas} {Workshop} {Windspeed from u and v data}] and then click [ht::command Create Display]. Finally, choose the fields for [ht::param u] and [ht::param v] and you're done. Wouldn't it be nice if the IDV could recognize the [ht::param u] and [ht::param v] fields in your dataset and automatically present you with the choice to display [ht::param Flow Vectors] from [ht::param u] and [ht::param v]? Well, this is exactly the issue Derived Quantities in the IDV solves.
+The IDV has the ability to make quantities computed through the use of formulas available under the loaded data source rather than going through the steps to use a formula, as outlined in the previous section. For example, you could compute wind speed using the formula directly &mdash; simply load a Data Source, then from the Field Selector click [ht::menu {Formulas} {Workshop} {Windspeed from u and v data}], then click [ht::command Create Display], then choose the fields for [ht::param u] and [ht::param v] and THEN you're done. Wouldn't it be nice if the IDV could recognize the [ht::param u] and [ht::param v] fields in your dataset and automatically present you with the choice to display [ht::param Flow Vectors] from [ht::param u] and [ht::param v] next to the available fields listed in your dataset? Well, this is exactly what Derived Quantities in the IDV accomplish.
 </p>
 
 <p>
-Derived quantities can be created using the following steps:
+Derived quantities can be created by doing the following:
 </p>
 
-<ul class="step">
+<ol class="step">
 <li> Defining an IDV formula by name, description, and
 mathematical formula.
 <li> Using special operators (D1, D2, ... DN) for the variable
@@ -25,43 +25,46 @@ names.
 <li> Specifying the binding  between the special operators and
 the parameters names or system aliases.
 <li>Saving the formula and loading or reloading a data source.
-</ul>
+</ol>
 
 <p>
-In the last section we discussed creating a new Jython formula for wind speed, so the first step is complete. Let's examine how to turn our wind speed formula into a derived quantity.
-Let's open our wind speed function in the Forumla Editor by selecting the [ht::menu {Edit} {Formulas} {Edit Formulas} {Workshop} {wind speed from u and v}] menu item. This brings  up the [ht::command Formula Editor] dialog box used to edit a formula. In this box, click the [ht::param Derived] tab to begin the process of enhancing the wind speed formula to produce derived quantities:
+In the last section we discussed how to create a new Jython formula for wind speed, so the first step is complete. Now, let's examine how to turn our wind speed formula into a derived quantity.
+Let's open our wind speed function in the Forumla Editor by selecting the [ht::menu {Edit} {Formulas} {Edit Formulas} {Workshop} {wind speed from u and v}] menu item. This brings  up the [ht::command Formula Editor] dialog box we previously used to edit a formula. In this box, click the [ht::param Derived] tab to begin the process of enhancing the wind speed formula to produce derived quantities:
 </p>
 
 [ht::cimg ./images/WRF_DerivedQuantity.png]
 
-<ul class="step">
-<li>Change u and v to D1 and D2, respectively. Note that the order of the parameters listed in the Parameters box is the same as the order used in the formula (i.e. D1 is U, D2 is V).</li>
-<li>In the Parameters box, select drop down list on right side and choose [ht::menu {Aliases} {Group #1} {U component of wind (U)}] and [ht::menu {Aliases} {Group #2} {V component of wind (V)}]. Note that Group #1 and Group #2 do not correspond to the 1 and 2 in [ht::param D1] and [ht::param D2] - the 1 in 2 and the [ht::param D#] variables are associated with the order of the parameters listed in the Parameter box.</li>
+<ol class="step">
+<li>Click the [ht::param Derived] tab.
+<li>In the [ht::param Formula], change u and v to D1 and D2, respectively. Note that the order of the parameters listed in the Parameters box is the same as the order used in the formula (i.e. D1 is U, D2 is V).</li>
+<li>In the Parameters box, select the drop down list on right side and choose [ht::menu {Aliases} {Group #1} {U component of wind (U)}] and [ht::menu {Aliases} {Group #2} {V component of wind (V)}]. Note that Group #1 and Group #2 do not correspond to the 1 and 2 in [ht::param D1] and [ht::param D2]. The "1" and "2" in the [ht::param D#] variables are associated with the order of the parameters listed in the Parameter box; using groups in the alias list helps keep the list from becoming too long to display in the GUI.</li>
 <li>click [ht::command Change Formula]</li>
-</ul>
+</ol>
 
 <p>
-If we reload our data sources (right click on the data source in the Filed Selector and click reload), we will see a new category of data listed in the fileds panel called "Workshop", which when expanded contains our wind speed function.
+If we reload our data sources (right click on the data source in the Filed Selector and click reload), we will see a new category of data listed in the fields panel called [ht::param Workshop], which when expanded contains our wind speed function.
 </p>
 
 <p>
 There are other properties you can assign to your derived quantity, but this is the minimum effort needed to get things working (for more information, see [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/DerivedData.html" "Derived Products"] in the Users Guide).
 </p>
 
+<div class="pagetitle">Aliases</div>
+
 <p>
-Sometimes the IDV will not recognize the variables in your file, and thus will not be able to associated D1 with U because it does not know what the u component of velocity is in your data set. In order to get the IDV to recognize the variables in your dataset, you may need to edit the Parameter Aliases. Click [ht::menu {Tools} {Parameter Alias Editor}], then select [ht::param System Aliases]. Here you will find a list of Names (which are those used in the Parameters box in the formula editor), descriptions, and variable names associated with each Name.
+Sometimes the IDV will not recognize the variables in your file, and thus will not be able to associate D1 with U because it does not know the name of the u component of velocity in your data set. In order to get the IDV to recognize the variables in your dataset, you may need to edit the [ht::param Parameter Aliases]. Click [ht::menu {Tools} {Parameter Alias Editor}], then select [ht::param System Aliases]. Here you will find a list of Names (which are those used in the [ht::param Parameters] box in the Formula Editor), descriptions, and variable names associated with each Name.
 <p/>
 
-<p>For example, let's say you have a dataset in which the u component of velocity is called 'UCOMPWIND'. If we double click on the "U" name, the Alias Editor will automatically add a copy of the "U" alias to our [ht::param Users Aliases] list and prompt us to add a new name to the alias list.
+<p>For example, let's say you have a dataset in which the u component of velocity is called 'UCOMPWIND'. If we double click on the "U" name, the Alias Editor will automatically add a copy of the "U" alias to our [ht::param User Aliases] list and prompt us to add a new name to the alias list.
 </p>
 
 [ht::cimg ./images/WRF_AliasEditor.png]
 
 <p>
-Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPWIND with U in derived quantities. While this includes our wind speed function, it also applies to the system derived quantities:
+Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPWIND with the U variable used in derived quantities. Changes to the alias list also apply to the system derived quantities, such as:
 </p>
 
-<ul class="step">
+<ol class="step">
 <li>Dewpoint</li>
 <li>Mixing ratio</li>
 <li>Relative Humidity</li>
@@ -79,62 +82,64 @@ Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPW
 <li>True Wind Vectors</li>
 <li>Ocean Flow Vectors</li>
 <li>Sounding Data (with and without winds)</li>
-</ul>
+</ol>
 
 <div class="pagetitle">Parameter colored by another</div>
 
-<p>The IDV allows for one parameter to be colored by another parameters value. For example, lets view wind vectors colored by temperature:
+<p>The IDV allows for one parameter to be colored by another parameter's value through the use of a formula. For example, let's view wind vectors colored by temperature:
 </p>
 
 [ht::cimg ./images/WRF_ParamColoredByAnother.png]
 
-<ul class="step">
-<li>Clear out any existing displays.</li>
-<li>Make sure your WRF ouput is loaded.</li>
-<li>In the [ht::command Field Selector] panel, select "Formulas" as the
+<ol class="step">
+<li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>In the [ht::command Field Selector] panel, select [ht::param Formulas] as the
     Data source and expand the [ht::param Grids] tab. Then, select the
-    [ht::param One value colored by another] formula, choose the [ht::menu Flow Displays} {Vector Plan View}] display, and click [ht::command Create Display]</li>
+    [ht::param One value colored by another] formula, choose the [ht::menu {Flow Displays} {Vector Plan View}] display, and click [ht::command Create Display]</li>
 <li>For the [ht::param data field] choice, click on your WRF output and select [ht::menu {3D} {Derived} {True Wind Vectors (from u_wind & v_wind)}]</li>
-<li>For the [ht::param Color field], select [ht::menu {3D} {Temperature @ isobaric}] and click "OK"</li>
-<li>From the [ht::command Displays] tab, select [ht::param coloredByAnother - Vector Plan View] and set the Skip: XY: factor to 5</li>
-<li>Click the button next to [ht::param Color Table] and select [ht::param Change Range]. Click the [ht::param Use Predefined] button and select [ht::param From Displayed Data] and click "OK".</li>
-</ul>
+<li>For the [ht::param Color field], select [ht::menu {3D} {Temperature @ isobaric}] and click [ht::command OK]</li>
+<li>From the [ht::command Displays] tab, select [ht::param coloredByAnother - Vector Plan View] and set the [ht::param Skip: XY:] factor to 5</li>
+<li>Click the button next to [ht::param Color Table] and select [ht::param Change Range]. Click the [ht::param Use Predefined] button and select [ht::param From Displayed Data] and click [ht::command OK].</li>
+</ol>
 
 <p>You can change the level at which the colored vectors are displayed directly from the [ht::command Displays] tab using the [ht::param Levels] drop-down box.</p>
 
 <div class="pagetitle">2D and 3D Trajectories</div>
 
 <p>
-The IDV now has the capability to generate 2D and 3D trajectories. To access the trajectory features:
+The IDV can generate 2D and 3D trajectories. To access the trajectory features:
 </p>
 
-<ul class="step">
-<li>Load your WRF data</li>
+<ol class="step">
+<li>[ht::popup "InteractiveWRFLoadOutput.html" Load] your WRF data</li>
 <li>In the [ht::command Field Selector], select the [ht::param Formulas] data source and click [ht::menu {Grids} {Create 3D Flow Trajectory}]</li>
-<li>Next, you will be prompted to select grids for u, v, s, and s0) (as well as w, if 3D)</li>
-</ul>
+<li>Next, you will be prompted to select grids for u, v, w, s, and s0)</li>
+</ol>
 
 <p>
-The fields of [ht::param u], [ht::param v], and [ht::param w] are the individual components of the wind. The field [ht::param s] is the field you would like to use to color the trajectory. The field [ht::param s0] is special - the field itself isn't actually used, but the spatial subset defined in its Region tab *is* used. As the resources used to hold the data for trajectory computation is quite large, it's useful to spatially subset where you would like the trajectories to initiate. A good way to go about this is to use the same field for S and S0, but use the Region tab to subset S0 over the area of interest. Note that this is a new feature in the IDV and the user interface is likely to change!
+The fields of [ht::param u], [ht::param v], and [ht::param w] are the individual components of the wind. The field [ht::param s] is the field you would like to use to color the trajectory. The field [ht::param s0] is special &mdash; the field itself isn't actually used, but the spatial subset defined in its Region tab <b>is</b> used. As the resources used to hold the data for trajectory computation are quite large, it's useful to spatially subset where you would like the trajectories to initiate. A good way to go about this is to use the same field for S and S0, but use the Region tab to subset S0 over the area of interest. Note that this is a new feature in the IDV and the user interface is likely to change!
 </p>
 
 <p>
 That said, <b>loading the data and computing the trajectories can be quite time consuming</b>, so we've created an IDV bundle that will allow you to explore the trajectory capabilities of the IDV. The bundle can be found on the thumb drive given to you as part of this course. However, it can also be found on our [ht::popup {http://motherlode.ucar.edu/repository/entry/show/RAMADDA/IDV+Community+Resources/Bundles/Yuan%27s+Bundles/Hurricane+Gustav+%28smaller%29} {RAMADDA}] server if you are working through this tutorial at home.
 </p>
 
+<div class="pagetitle">Bundles</div>
+
 <p>
-IDV [ht::popup {http://www.unidata.ucar.edu/software/idv/docs/userguide/Bundles.html} {Bundles}] are a way to save the state the of the IDV, like the list of data sources, displays types, jython formulas, view angle, etc., as well as the actual data being used to create the displays. If you just want to save the state of the IDV and download the data from a remote server as needed, then the bundle will have the extension .xidv. This is useful if you would like to create a view of the current data from your favorite model, but the actual data source changes (i.e. you like the RAP 13 km forecast model and you always want to see the latest data). However, for your own WRF output (which may live only on your machine), it's nice to attach the actual data to the display environment you've created - these bundels have the extension .zidv.
+IDV [ht::popup {http://www.unidata.ucar.edu/software/idv/docs/userguide/Bundles.html} {Bundles}] are a way to save the state the of the IDV, like the list of data sources, displays types, jython formulas, view angle, etc., as well as the actual data being used to create the displays. If you just want to save the state of the IDV and download the data from a remote server as needed, then the bundle will have the extension .xidv. This is useful if you would like to create a view of the current data from your favorite model, but the actual data source changes (i.e. you like the RAP 13 km forecast model and you always want to see the latest data). However, for your own WRF output (which may live only on your machine), it's nice to attach the actual data to the display environment you've created to aid in the ability to share your analysis &mdash; these bundels have the extension .zidv.
 </p>
 
 <p>
 Loading a .zidv or .xidv bundle is simple.
 </p>
 
-<ul class="step">
-<li>In the [ht::command Data Choosers] panel, select [ht::menu {General} {Files}] in the left panel and then navigate your file system in the right panel to find the bundle. Select the bundel and click "Add Source"</li>
-<li>An [ht::command Open Bundel] dialog box will pop-up - make sure [ht::param Remove all displays and data] and [ht::param Try to add displays to current windows] are the only options checked, and click "OK".</li>
-<li>If the file is a .zidv file (that is, data are included), the IDV will ask where you would like to store the data. Select [ht::param Write to temporary directory], and then click "OK".</li>
-</ul>
+<ol class="step">
+<li>In the [ht::command Data Choosers] panel, select [ht::menu {General} {Files}] in the left panel and then navigate your file system in the right panel to find the bundle. Select the bundel and click [ht::command Add Source]</li>
+<li>An [ht::command Open Bundle] dialog box will pop-up - make sure [ht::param Remove all displays and data] and [ht::param Try to add displays to current windows] are the only options checked, and click [ht::command OK].</li>
+<li>If the file is a .zidv file (that is, the data are included), the IDV will ask where you would like to store the data. Select [ht::param Write to temporary directory], and then click [ht::command OK].</li>
+</ol>
 
 <p>
 Use the IDV to load the traj0.zidv bundle and explore the trajectory facility of the IDV. Note that it takes about 3 minutes on a high-end machine to create the display, so please be patient!
@@ -152,7 +157,7 @@ The IDV contains many functions designed for analysis of ensemble model data. Th
 Current ensemble functions include:
 </p>
 
-<ul class="step">
+<ol class="step">
 <li>Average over members</li>
 <li>Maximum over members</li>
 <li>Minimum over members</li>
@@ -161,7 +166,7 @@ Current ensemble functions include:
 <li>Percentile calculation</li>
 <li>Range of values</li>
 <li>Univariate probability</li>
-</ul>
+</ol>
 
 <p>
 The subsetting feature of the IDV can also be used to include/exclude specific members from these calculations.
