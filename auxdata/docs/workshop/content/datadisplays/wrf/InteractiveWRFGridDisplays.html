@@ -9,11 +9,53 @@ Displays for WRF post-processed data.
 </div>
 
 <p>
-The following are examples of some of the different kinds of displays available in the IDV. For more information how to manipulate the display, simply click the image to see the User Guide section for that particular display type. The general format of this section will be an image, followed by the steps needed to reproduce the image. Please note that some displays (particularly the three dimensional ones) will take quite some time to render &mdash; consider using only one time step when producing these views. <!--the pages that pop-up use different data sources, but the instructions for creating the displays are the same.-->
+The following are examples of some of the different kinds of displays available in the IDV. For more information how to manipulate the display, simply click the image to see the User Guide section for that particular display type. The general format of this section will be an image, followed by the steps needed to reproduce the image. However, before diving into creating different displays in the IDV, let's take a moment to address performance issues you may encounter.
+</p>
+
+<div class="pagetitle">A note on performance</div>
+
+<p>
+As you may have experienced, it can take quite some time to get the data into the IDV and render the displays. One way to speed this up is to spatially subset the data over an area of interest. For our case, the Gulf of Mexico is where the 'action' is, so let's subest for that particular region:
+</p>
+
+<ol class="step">
+<li>Clear any existing data sources and displays by clicking the scissors symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Reload your WRF output using the following steps:</li>
+<ol class="step">
+  <li>From the [ht::command Data Choosers] tab in the Dashboard, locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files)</li>
+  <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time]</li>
+  <li>Click [ht::command Add Source]</li>
+  <li>In the [ht::command Field Selector] panel, <b>right-click</b> your WRF output under [ht::param Data Sources] and click [ht::command Properties].</li>
+  <li>From the Properties box, select the [ht::command Spatial Subset] tab and use your mouse to click-and-drag a rectangular box on the [ht::param Bounding Box] map display.</li>
+  <li>After selecting your spatial subset region, click [ht::command OK].
+</ol>
+</ol>
+
+[ht::cimg ./images/InteractiveWRFSpatialSubset.png]
+
+<p>
+<b>Note:</b> Even with spatial subsetting in place, some displays (particularly the three dimensional ones) will take quite some time to render &mdash; consider using only one time step when producing these views.
 </p>
 
 <p>
-<b>Note:</b> Many of the example images used below take advatage of the NASA blue marble background image. If you wish to use blue marble, simply click [ht::menu {Displays} {Maps and Bounds} {Add Background Image}] and select [ht::param Blue Marble]. A second way to add the blue marble background is to click the globe icon found just below the Main Menu Bar. Both of these methods can be used from either the Dashboard or the Main Window.
+Many of the example images used below take advantage of the NASA blue marble background image. If you wish to use blue marble, simply click [ht::menu {Displays} {Maps and Bounds} {Add Background Image}] and select [ht::param Blue Marble]. A second way to add the blue marble background is to click the globe icon found just below the Main Menu Bar. Both of these methods can be used from either the Dashboard or the Main Window.
+</p>
+
+<p>
+It may seem like we've done a lot of work to setup our environment (loading data, subsetting, adding a background, etc.). In order to aid in quickly restoring our environment, we will use the <b>bundle</b> feature of the IDV. A bundle is a way of saving the state of the IDV (current data sources, loaded maps, etc.). You can create a bundle that points to local or remote data (an .xidv), or you can create a bundle that actually contains the data (a .zidv), the latter of which is useful when sharing displays of data you've generated yourself. For our purposes, let's create a bundle that points to the WRF output on our memory stick:
+</p>
+
+<ol class="step">
+<li>From the main menu bar, select [ht::menu {File} {Save As}] to bring up the [ht::command Save] dialog box.</li>
+<li>Make sure [ht::param Views], [ht::param Displays], and [ht::param Data Sources] are checked, as well as [ht::param Save with relative paths].</li>
+<li>Make sure the [ht::param File Format:] is set to [ht::param IDV Bundles (*.xidv)], and name the bundle [ht::param basicSetup.xidv].</li>
+<li>Save your bundle in the same directory as the WRF output on the memory stick</li>
+</ol>
+
+[ht::cimg ./images/InteractiveWRFSaveBundle.png]
+
+<p>
+To test the bundle, click the scissors symbol, found just below the main menu bar, to clear out all of the data and displays. Then, from the main menu bar, click [ht::menu {File} {Open}], use the file dialog box to navigate to your bundle, and select your bundle. An [ht::command Open bundle] dialog box will appear &mdash; make sure [ht::param Remove and displays & data] is checked and click [ht::command OK]. That's it &mdash; you should be good to go!
 </p>
 
 <div class="pagetitle">Plan Views</div>
@@ -22,14 +64,14 @@ The following are examples of some of the different kinds of displays available 
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 2D grid] tab. Select
-    [ht::param Temperature_height_above_ground] and the
+    [ht::param Temperature @ Surface] and the
     [ht::display Color-Shaded Plan View] display, then click
     the [ht::command Create Display] button.  </li>
 <li>In the [ht::command Displays] panel, Select
-    [ht::param Temperature_height_above_ground], and click
+    [ht::param Temperature @ Surface], and click
     [ht::menu {Edit} {Properties}], then select the [ht::param Color Scale Tab]
     and check the box next to [ht::param visible].
     Other properties of the color scale can be accessed
@@ -40,12 +82,10 @@ The following are examples of some of the different kinds of displays available 
     [ht::param Pressure_reduced_to_MSL @ msl] and the
     [ht::display Contour Plan View] display, then click
     the [ht::command Create Display] button.  </li>
-<li>In the [ht::command Displays] panel, Select
-    [ht::param Pressure_reduced_to_MSL]. Click the [ht::command Change] box next to Contour
-    to change the contour properties. Contour properties, such as contour color and field smoothing, can be
-    accessed from this tab. Change
-    the contour color to black by clicking the box next to Color Table and
-    select [ht::menu {Solid} {Black}].</li>
+<li>In the [ht::command Displays] panel, select the
+    [ht::param Pressure_reduced_to_MSL] field. Click the [ht::command Change] box next to Contour
+    to change the contour properties, such as base contour, interval, and label properties.</li>
+<li>In the [ht::command Displays] panel, change the contour color to black by clicking the box next to Color Table (likely labeled [ht::param PressureMSL]) and selecting [ht::menu {Solid} {Black}].</li>
 <li>Animate your display by clicking the <b>"play"</b> button, located just above
     and to the right of your display on the Main View Window</li>
 </ol>
@@ -56,7 +96,7 @@ The following are examples of some of the different kinds of displays available 
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 2D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
@@ -91,7 +131,7 @@ creating the display.
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 2D grid] tab. Select
     [ht::param Pressure Reduced to MSL @ msl]</li>
@@ -104,7 +144,7 @@ we create the Hovm&ouml;ller diagram.
 
 <ol class="step">
 <li>After selecting [ht::param Pressure Reduced to MSL @ msl], click
-    the [ht::param Region] tab located in the bottom left panel, uncheck [ht::param Use Default]
+    the [ht::param Region] tab located in the bottom right panel, uncheck [ht::param Use Default]
     and select the region of interest by using your mouse to click and drag a rectangular selection on the map.</li>
 <li>Selet the [ht::menu {Hovmoller} {Time-Latitude (Color Shaded)}] display,
     then click the [ht::command Create Display] button.</li>
@@ -126,7 +166,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
@@ -152,7 +192,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
@@ -180,7 +220,7 @@ above, do the following:
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
@@ -215,7 +255,7 @@ Notice that at this point, each cross section has its own control in the view wi
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 2D grid] tab and select the
     [ht::param Pressure_Reduced_to_MSL @ msl] field. Then, hold
@@ -234,7 +274,7 @@ In the Main View Window, you will see contours of [ht::param Pressure_Reduced_to
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab, and select the
     [ht::param Relative Humidity @ isobaric] field. Then, hold
@@ -256,7 +296,7 @@ In the Main View Window, you will see the 90% RH isosurface, as well as a time-h
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded].</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
