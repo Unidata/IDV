@@ -9,10 +9,10 @@ Displays for WRF post-processed data.
 </div>
 
 <p>
-The following are examples of some of the different kinds of displays available in the IDV. For more information how to manipulate the display, simply click the image to see the User Guide section for that particular display type. The general format of this section will be an image, followed by the steps needed to reproduce the image. However, before diving into creating different displays in the IDV, let's take a moment to address performance issues you may encounter.
+The following are examples of some of the different kinds of displays available in the IDV. For more information how to manipulate the display, simply click the image to see the User Guide section for that particular display type. The general format of this section will be an image, followed by the steps needed to reproduce the image. However, before diving into creating different displays in the IDV, let's take a moment to discuss how to handle large data sets.
 </p>
 
-<div class="pagetitle">A note on performance</div>
+<div class="pagetitle">Preparation: Dealing with Large Data</div>
 
 <p>
 As you may have experienced, it can take quite some time to get the data into the IDV and render the displays. One way to speed this up is to spatially subset the data over an area of interest. For our case, the Gulf of Mexico is where the 'action' is, so let's subest for that particular region:
@@ -42,12 +42,12 @@ Many of the example images used below take advantage of the NASA blue marble bac
 </p>
 
 <p>
-It may seem like we've done a lot of work to setup our environment (loading data, subsetting, adding a background, etc.). In order to aid in quickly restoring our environment, we will use the <b>bundle</b> feature of the IDV. A bundle is a way of saving the state of the IDV (current data sources, loaded maps, etc.). You can create a bundle that points to local or remote data (an .xidv), or you can create a bundle that actually contains the data (a .zidv), the latter of which is useful when sharing displays of data you've generated yourself. For our purposes, let's create a bundle that points to the WRF output on our memory stick:
+It may seem like we've done a lot of work to setup our environment (loading data, subsetting, adding a background, etc.). To aid in quickly restoring our environment, we will use the [ht::popup {http://www.unidata.ucar.edu/software/idv/docs/userguide/Bundles.html} {bundle}] feature of the IDV. A bundle is a way of saving the state of the IDV (current data sources, loaded maps, etc.). You can create a bundle that points to local or remote data (an .xidv), or you can create a bundle that actually contains the data (a .zidv), the latter of which is useful when sharing displays of data you've generated yourself, as it ensures your colleagues have the data needed to view the display. For our purposes, let's create a bundle that points to the WRF output on our memory stick:
 </p>
 
 <ol class="step">
 <li>From the main menu bar, select [ht::menu {File} {Save As}] to bring up the [ht::command Save] dialog box.</li>
-<li>Make sure [ht::param Views], [ht::param Displays], and [ht::param Data Sources] are checked, as well as [ht::param Save with relative paths].</li>
+<li>Make sure [ht::param Views], [ht::param Displays], and [ht::param Data Sources] are checked.</li>
 <li>Make sure the [ht::param File Format:] is set to [ht::param IDV Bundles (*.xidv)], and name the bundle [ht::param basicSetup.xidv].</li>
 <li>Save your bundle in the same directory as the WRF output on the memory stick</li>
 </ol>
@@ -55,8 +55,14 @@ It may seem like we've done a lot of work to setup our environment (loading data
 [ht::cimg ./images/InteractiveWRFSaveBundle.png]
 
 <p>
-To test the bundle, click the scissors symbol, found just below the main menu bar, to clear out all of the data and displays. Then, from the main menu bar, click [ht::menu {File} {Open}], use the file dialog box to navigate to your bundle, and select your bundle. An [ht::command Open bundle] dialog box will appear &mdash; make sure [ht::param Remove and displays & data] is checked and click [ht::command OK]. That's it &mdash; you should be good to go!
+To test the bundle, click the scissors symbol, found just below the main menu bar, to clear out all of the data and displays. Then:
 </p>
+
+<ul class="step">
+<li>From the main menu bar, click [ht::menu {File} {Open}].</li>
+<li>Use the file dialog box to navigate to your bundle, and select your bundle.</li>
+<li>An [ht::command Open bundle] dialog box will appear &mdash; make sure [ht::param Remove and displays & data] and [ht::param Try to add displays to current windows] are checked and click [ht::command OK].
+</ul>
 
 <div class="pagetitle">Plan Views</div>
 
@@ -87,7 +93,7 @@ To test the bundle, click the scissors symbol, found just below the main menu ba
     to change the contour properties, such as base contour, interval, and label properties.</li>
 <li>In the [ht::command Displays] panel, change the contour color to black by clicking the box next to Color Table (likely labeled [ht::param PressureMSL]) and selecting [ht::menu {Solid} {Black}].</li>
 <li>Animate your display by clicking the <b>"play"</b> button, located just above
-    and to the right of your display on the Main View Window</li>
+    and to the right of your display on the Main View Window.</li>
 </ol>
 
 <div class="pagetitle">Wind Barb and Vector Displays</div>
@@ -112,7 +118,7 @@ to clean things up a bit.
 
 <ul class="step">
 <li>In the [ht::command Displays] panel, select
-    [ht::param truewindvectors] under [ht::param View1], and set the [ht::param Skip: XY:] factor to 10</li>
+    [ht::param truewindvectors] under [ht::param View1], and set the [ht::param Skip: XY:] factor to 10.</li>
 <li>Change the color of the barbs to white by selecting "white" from
     the dropdown box next to Color.</li>
 </ul>
@@ -134,7 +140,7 @@ creating the display.
 <li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
     expand the [ht::param 2D grid] tab. Select
-    [ht::param Pressure Reduced to MSL @ msl]</li>
+    [ht::param Pressure Reduced to MSL @ msl].</li>
 </ol>
 
 <p>
@@ -174,7 +180,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
     [ht::menu {3D Surface} {Isosurface Colored by another parameter}] display,
     and then click the [ht::command Create Display] button.</li>
 <li>A pop-up box will prompt you to select which parameter you would like to color
-    the wind speed isosurface. Select [ht::menu {3D grid} {Temperature @ isobaric}]</li>
+    the wind speed isosurface. Select [ht::menu {3D grid} {Temperature @ isobaric}].</li>
 <li>In the [ht::command Displays] panel, set the Isosuface value to 20 m/s.</li>
 <li>In the Main View window under the Legend List (right edge of the window), right-click the color table and select [ht::param Edit Color Table]. This will bring up the color table editor.</li>
 <li>From the editor window, place your cursor over the color table and right click. Select [ht::param Invert Color Table], and then click [ht::command OK] to exit the editor.</li>
@@ -197,13 +203,19 @@ averaged over longitude for each time-step. To average over latitude instead, re
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
     [ht::param Relative Vorticity (from u_wind & v_wind)] field and the
-    [ht::menu {3D Surface} {Color-Filled Contoured Parameter as Topography}] display</li>
+    [ht::menu {3D Surface} {Color-Filled Contoured Parameter as Topography}] display.</li>
 <li>Select the "Level" tab from the subset panel and select 500 hPa,
     and then click the [ht::command Create Display] button.</li>
 <li>Right click the color scale in the legend (right panel in the Main View
-    Window), select [ht::param Change Range...].</li>
+    Window) and change the color scale by selecting [ht::menu {Basic} {Bright38}].</li>
+<li>Again, right click the color scale in the legend (right panel in the Main View
+    Window), but this time select [ht::param Change Range...]</li>
 <li>Click the [ht::param Use Predefined] box,
     select [ht::param From All Data], and then click [ht::command OK].</li>
+<li>In the [ht::command Displays] panel, select [ht::param relvort - Color-Filled...].
+    Click [ht::menu {Edit} {Properties}], select the [ht::param Color Scale Tab]
+    and check the box next to [ht::param visible]. Click [ht::command OK] to apply
+    the changes.</li>
 </ol>
 
 <div class="pagetitle">Cross Sections</div>
@@ -222,6 +234,12 @@ above, do the following:
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
 <li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
 <li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Scroll down and expand the
+    [ht::param Derived] tab. Select the
+    [ht::param Speed (from u_wind & v_wind)] field and the
+    [ht::menu {Cross sections} {Color-Shaded Plan View}] display,
+    and then click the [ht::command Create Display] button.</li>
+<li>Return to the [ht::command Field Selector] panel,
     expand the [ht::param 3D grid] tab. Scroll down and expand the
     [ht::param Derived] tab. Select the
     [ht::param Speed (from u_wind & v_wind)] field and the
@@ -242,12 +260,47 @@ Notice that at this point, each cross section has its own control in the view wi
 <ol class="step">
 <li>In the [ht::command Display] panel,
     select [ht::display windspeed - Color-Filled Contour Cross Section],
-    then click [ht::menu {Edit} {Sharing} {Sharing on}]</li>
+    then click [ht::menu {Edit} {Sharing} {Sharing on}].</li>
 <li>Repeat the above step for the
     [ht::display truewindvectors - Vector Cross Section] display.</li>
 <li>Use your mouse to move one of the cross section indicators in the Main
     View Window to 'snap' the two separate cross sections together.</li>
 </ol>
+
+<p>
+Now that the two cross sections are linked, let's clean up the vector plot as it's pretty cluttered:
+</p>
+
+<ol class="step">
+<li>In the [ht::command Displays] panel, select
+    [ht::param truewindvectors] under [ht::param View1], and click the [ht::command Settings] tab.</li>
+<li>Change the color of the barbs to white by selecting "white" from
+    the dropdown box next to Color.</li>
+<li>Reduce the number of vectors being plotted by clicking [ht::menu {Edit} {Properties}], select the [ht::command Spatial Subset] tab in the Properties box that appears, and set [ht::param X Stride:] and [ht::param Y Stride:] to [ht::param Every twentieth point].</li>
+</ol>
+
+<p>
+As a final step, make sure the color scale used in both speed displays (plan view and cross section) have the same range, and display one of the scales. For each color scale in the legend (right panel in the Main View Window):
+</p>
+<ol class="step">
+<li>Right click the color scale in the legend (right panel in the Main View
+    Window), select [ht::param Change Range...]</li>
+<li>Click the [ht::param Use Predefined] box,
+    select [ht::param From All Data], and then click [ht::command OK].</li>
+</ol>
+
+<p>
+Then,
+</p>
+
+<ol class="step">
+<li>In the [ht::command Displays] panel, select either
+    [ht::param windspeed - ] listed under [ht::param View1], and set the [ht::command Settings] tab.</li>
+<li>Click [ht::menu {Edit} {Properties}], select the [ht::param Color Scale Tab]
+    and check the box next to [ht::param visible]. Click [ht::command OK] to apply
+    the changes.</li>
+</ol>
+
 
 <div class="pagetitle">2D and 3D Data Probes</div>
 
@@ -279,11 +332,11 @@ In the Main View Window, you will see contours of [ht::param Pressure_Reduced_to
     expand the [ht::param 3D grid] tab, and select the
     [ht::param Relative Humidity @ isobaric] field. Then, hold
     control (or Command, if on a Mac) and select the
-    [ht::menu 3D Surface} {Isosurface}] and [ht::menu Probes} {Time/Height Display (Contours)}] displays, and then click the
+    [ht::menu {3D Surface} {Isosurface}] and [ht::menu {Probes} {Time/Height Display (Contours)}] displays, and then click the
     [ht::command Create Display] button.</li>
 <li>In the [ht::command Display] panel,
     select [ht::display Relative_humidity - Isosurface],
-    and set the isosurface value to 90%</li>
+    and set the isosurface value to 90%.</li>
 </ol>
 
 <p>
@@ -303,17 +356,18 @@ In the Main View Window, you will see the 90% RH isosurface, as well as a time-h
     [ht::param Sounding Data (with true winds)] field and the
     [ht::display Soundings] ->
     [ht::display Grid Skew-T].</li>
-<li> Before creating the display, look below the display panel for the subset
+<li>Before creating the display, look below the display panel for the subset
     panel and select the [ht::param Times] tab. Select [ht::param Use Selected] from the drop-down
     box and select the first three time steps (hold control or command to select
     multiple times),then click the [ht::command Create Display] button.</li>
+<li>Next, select the [ht::param Region] tab and click-and-drag a rectangular region around Cuba - we're subsetting spatially to focus on the hurricane.</li>
 <li>Add a Color-Shaded Plan View of the 2D variable
     [ht::param Pressure_reduced_to_MSL @ msl] to
     more easily navigate the skew-T location marker through the dataset (similar
     to the time-height marker from the previous example).</li>
 <li>Place the skew-T location marker in a region of interest and return to
     the Dashboard [ht::command Displays] tab. Undock the display
-    ([ht::menu {View} {Undock from Dashboard}])</li>
+    ([ht::menu {View} {Undock from Dashboard}]).</li>
 </ol>
 
 <p>

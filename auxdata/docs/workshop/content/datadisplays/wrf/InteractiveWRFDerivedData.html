@@ -64,7 +64,7 @@ Sometimes the IDV will not recognize the variables in your file, and thus will n
 Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPWIND with the U variable used in derived quantities. Changes to the alias list also apply to the system derived quantities, such as:
 </p>
 
-<ol class="step">
+<ul class="step">
 <li>Dewpoint</li>
 <li>Mixing ratio</li>
 <li>Relative Humidity</li>
@@ -82,7 +82,7 @@ Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPW
 <li>True Wind Vectors</li>
 <li>Ocean Flow Vectors</li>
 <li>Sounding Data (with and without winds)</li>
-</ol>
+</ul>
 
 <div class="pagetitle">Parameter colored by another</div>
 
@@ -105,7 +105,7 @@ Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPW
 
 <p>You can change the level at which the colored vectors are displayed directly from the [ht::command Displays] tab using the [ht::param Levels] drop-down box.</p>
 
-<div class="pagetitle">2D and 3D Trajectories</div>
+<div class="pagetitle">2D and 3D Trajectories (and more about bundles)</div>
 
 <p>
 The IDV can generate 2D and 3D trajectories. To access the trajectory features:
@@ -122,42 +122,32 @@ The fields of [ht::param u], [ht::param v], and [ht::param w] are the individual
 </p>
 
 <p>
-That said, <b>loading the data and computing the trajectories can be quite time consuming</b>, so we've created an IDV bundle that will allow you to explore the trajectory capabilities of the IDV. The bundle can be found on the thumb drive given to you as part of this course. However, it can also be found on our [ht::popup {http://motherlode.ucar.edu/repository/entry/show/RAMADDA/IDV+Community+Resources/Bundles/Yuan%27s+Bundles/Hurricane+Gustav+%28smaller%29} {RAMADDA}] server if you are working through this tutorial at home.
-</p>
-
-<div class="pagetitle">Bundles</div>
-
-<p>
-IDV [ht::popup {http://www.unidata.ucar.edu/software/idv/docs/userguide/Bundles.html} {Bundles}] are a way to save the state the of the IDV, like the list of data sources, displays types, jython formulas, view angle, etc., as well as the actual data being used to create the displays. If you just want to save the state of the IDV and download the data from a remote server as needed, then the bundle will have the extension .xidv. This is useful if you would like to create a view of the current data from your favorite model, but the actual data source changes (i.e. you like the RAP 13 km forecast model and you always want to see the latest data). However, for your own WRF output (which may live only on your machine), it's nice to attach the actual data to the display environment you've created to aid in the ability to share your analysis &mdash; these bundels have the extension .zidv.
+That said, <b>loading the data and computing the trajectories can be quite time consuming</b>, so we've created an IDV bundle that will allow you to explore the trajectory capabilities of the IDV. The bundle can be found on the memory stick given to you as part of this course. However, it can also be found on our [ht::popup {http://motherlode.ucar.edu/repository/entry/show/RAMADDA/IDV+Community+Resources/Bundles/Yuan%27s+Bundles/Hurricane+Gustav+%28smaller%29} {RAMADDA}] server if you are working through this tutorial at home.
 </p>
 
 <p>
-Loading a .zidv or .xidv bundle is simple.
+Use the IDV to load the GustavTrajectory.zidv bundle (located under the [ht::param bundles] folder on your memory stick) and explore the trajectory facility of the IDV. Note that it takes about 3 minutes on a high-end machine to create the display, so please be patient!
 </p>
 
-<ol class="step">
-<li>In the [ht::command Data Choosers] panel, select [ht::menu {General} {Files}] in the left panel and then navigate your file system in the right panel to find the bundle. Select the bundel and click [ht::command Add Source]</li>
-<li>An [ht::command Open Bundle] dialog box will pop-up - make sure [ht::param Remove all displays and data] and [ht::param Try to add displays to current windows] are the only options checked, and click [ht::command OK].</li>
-<li>If the file is a .zidv file (that is, the data are included), the IDV will ask where you would like to store the data. Select [ht::param Write to temporary directory], and then click [ht::command OK].</li>
-</ol>
-
-<p>
-Use the IDV to load the traj0.zidv bundle and explore the trajectory facility of the IDV. Note that it takes about 3 minutes on a high-end machine to create the display, so please be patient!
-</p>
+<ul class="step">
+<li>From the main menu bar, click [ht::menu {File} {Open}].</li>
+<li>Use the file dialog box to navigate to your bundle, and select your bundle.</li>
+<li>An [ht::command Open bundle] dialog box will appear &mdash; make sure [ht::param Remove and displays & data] and [ht::param Try to add displays to current windows] are checked and click [ht::command OK].
+</ul>
 
 [ht::cimg ./images/WRF_TrajByPotenTemp.gif]
 
 <div class="pagetitle">Ensemble data</div>
 
 <p>
-The IDV contains many functions designed for analysis of ensemble model data. These functions can be utilized if the data you are using contains an ensemble dimension (alongside temporal and spatial dimensions). The ensemble functions can be accessed in the [ht::command Field Selector] panel by choosing "Formulas" as the Data source and expanding the [ht::param Grids] tab; The ensemble functions will be listed under the Ensemble tab</li>
+The IDV contains many functions designed for analysis of ensemble model data. These functions can be utilized if the data you are using contains an ensemble dimension (alongside temporal and spatial dimensions). The ensemble functions can be accessed in the [ht::command Field Selector] panel by choosing "Formulas" as the Data source and expanding the [ht::param Grids] tab; The ensemble functions will be listed under the Ensemble tab.</li>
 </p>
 
 <p>
 Current ensemble functions include:
 </p>
 
-<ol class="step">
+<ul class="step">
 <li>Average over members</li>
 <li>Maximum over members</li>
 <li>Minimum over members</li>
@@ -166,7 +156,7 @@ Current ensemble functions include:
 <li>Percentile calculation</li>
 <li>Range of values</li>
 <li>Univariate probability</li>
-</ol>
+</ul>
 
 <p>
 The subsetting feature of the IDV can also be used to include/exclude specific members from these calculations.

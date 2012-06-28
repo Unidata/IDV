@@ -9,7 +9,16 @@ Getting your WRF post-processed data into the IDV environment.
 </div>
 
 <p>
-If you have participated in the WRF tutorial, then you are likely familiar with the output from the Hurricane Gustav simulation, which is what we will use in this tutorial. These data are on the thumb drive you received as part of the workshop, although any WRF post-processed output should do fine. While the IDV can handel the staggered grids produced by WRF, it's <b>highly</b> recommended that you post process the raw output to get your data on a non-staggered grid, as it's a large performance hit to let the IDV do this for you on the fly.
+If you have participated in the WRF tutorial, then you are likely familiar with the output from the Hurricane Gustav simulation, which is what we will use in this tutorial. These data are on the thumb drive you received as part of the workshop, although any WRF post-processed output should do fine. While the IDV can handel the staggered grids produced by WRF, it's <b>highly</b> recommended that you:
+</p>
+
+<ul class="step">
+  <li>post process the raw output to get your data on a non-staggered grid.</li>
+  <li>use netCDF or grib output.</li>
+</ul>
+
+<p>
+While the IDV can handle staggered grids, it's a large performance hit to let the IDV de-stagger themfor you on the fly when performing calculations.
 </p>
 
 <p>
@@ -27,9 +36,9 @@ The display above shows the Dashboard window of the IDV. The [ht::command Data C
 </p>
 
 <ol class="step">
-  <li>Locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files)</li>
-  <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time]</li>
-  <li>Click [ht::command Add Source]</li>
+  <li>Locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files).</li>
+  <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time].</li>
+  <li>Click [ht::command Add Source].</li>
 </ol>
 
 <p>
