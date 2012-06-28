@@ -192,9 +192,34 @@ averaged over longitude for each time-step. To average over latitude instead, re
 
 [ht::cimg ./images/WRF_iso_by_param_ani.gif]
 
+<div class="pagetitle">Parameter over Topography</div>
+
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_ParamOverTopo.png]]
+
+<ol class="step">
+<li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab and select the
+    [ht::param Temperature @ surface] field and the
+    [ht::menu {3D Surface} {Color-Filled Contoured Parameter Over Topography}] display.</li>
+<li>A [ht::param Field Selector] dialog box will appear and ask you to select the [ht::param Topography] field. From your WRF output, select the [ht::param 2D grid] tab and select the
+    [ht::param Geopotential_height @ surface] field and click [ht::param OK].</li>
+<li>Right click the color scale in the legend (right panel in the Main View
+    Window) and change the color scale by selecting [ht::menu {Basic} {Bright38}].</li>
+<li>Again, right click the color scale in the legend (right panel in the Main View
+    Window), but this time select [ht::param Change Range...]</li>
+<li>Click the [ht::param Use Predefined] box,
+    select [ht::param From All Data], and then click [ht::command OK].</li>
+<li>In the [ht::command Displays] panel, select [ht::param Temperature_surface -...].
+    Click [ht::menu {Edit} {Properties}], select the [ht::param Color Scale Tab]
+    and check the box next to [ht::param visible]. Click [ht::command OK] to apply
+    the changes.</li>
+</ol>
+
 <div class="pagetitle">Parameter as Topography</div>
 
-[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ThreeDSurfaceControl.html" [ht::cimg ./images/WRF_ParamAsTopo.png]]
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_ParamAsTopo.png]]
 
 <ol class="step">
 <li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
