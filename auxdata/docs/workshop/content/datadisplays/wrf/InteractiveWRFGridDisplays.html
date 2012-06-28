@@ -20,15 +20,19 @@ As you may have experienced, it can take quite some time to get the data into th
 
 <ol class="step">
 <li>Clear any existing data sources and displays by clicking the scissors symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
-<li>Reload your WRF output using the following steps:</li>
-<ol class="step">
+</ol>
+
+<p>
+Reload your WRF output using the following steps:
+</p>
+
+<ol class="step" start="2">
   <li>From the [ht::command Data Choosers] tab in the Dashboard, locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files)</li>
   <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time]</li>
   <li>Click [ht::command Add Source]</li>
   <li>In the [ht::command Field Selector] panel, <b>right-click</b> your WRF output under [ht::param Data Sources] and click [ht::command Properties].</li>
   <li>From the Properties box, select the [ht::command Spatial Subset] tab and use your mouse to click-and-drag a rectangular box on the [ht::param Bounding Box] map display.</li>
   <li>After selecting your spatial subset region, click [ht::command OK].
-</ol>
 </ol>
 
 [ht::cimg ./images/InteractiveWRFSpatialSubset.png]
@@ -148,7 +152,7 @@ In order to clearly see the Hurricane path, we will subset the dataset before
 we create the Hovm&ouml;ller diagram.
 </p>
 
-<ol class="step">
+<ol class="step" start="4">
 <li>After selecting [ht::param Pressure Reduced to MSL @ msl], click
     the [ht::param Region] tab located in the bottom right panel, uncheck [ht::param Use Default]
     and select the region of interest by using your mouse to click and drag a rectangular selection on the map.</li>
@@ -282,7 +286,7 @@ above, do the following:
 Notice that at this point, each cross section has its own control in the view window. To link the cross sections such that they coincide, do the following:
 </p>
 
-<ol class="step">
+<ol class="step" start="6">
 <li>In the [ht::command Display] panel,
     select [ht::display windspeed - Color-Filled Contour Cross Section],
     then click [ht::menu {Edit} {Sharing} {Sharing on}].</li>
@@ -296,7 +300,7 @@ Notice that at this point, each cross section has its own control in the view wi
 Now that the two cross sections are linked, let's clean up the vector plot as it's pretty cluttered:
 </p>
 
-<ol class="step">
+<ol class="step" start="9">
 <li>In the [ht::command Displays] panel, select
     [ht::param truewindvectors] under [ht::param View1], and click the [ht::command Settings] tab.</li>
 <li>Change the color of the barbs to white by selecting "white" from
@@ -307,7 +311,7 @@ Now that the two cross sections are linked, let's clean up the vector plot as it
 <p>
 As a final step, make sure the color scale used in both speed displays (plan view and cross section) have the same range, and display one of the scales. For each color scale in the legend (right panel in the Main View Window):
 </p>
-<ol class="step">
+<ol class="step"start="12">
 <li>Right click the color scale in the legend (right panel in the Main View
     Window), select [ht::param Change Range...]</li>
 <li>Click the [ht::param Use Predefined] box,
@@ -315,10 +319,10 @@ As a final step, make sure the color scale used in both speed displays (plan vie
 </ol>
 
 <p>
-Then,
+Then, add the color scale to the display:
 </p>
 
-<ol class="step">
+<ol class="step" start="14">
 <li>In the [ht::command Displays] panel, select either
     [ht::param windspeed - ] listed under [ht::param View1], and set the [ht::command Settings] tab.</li>
 <li>Click [ht::menu {Edit} {Properties}], select the [ht::param Color Scale Tab]
