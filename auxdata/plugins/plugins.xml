@@ -10,7 +10,10 @@
 <plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
 
 <plugin name="Example Globe IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/globeidv.jar" description="An example showing a stripped down version of the IDV" category="Customized IDVs"/>
+
 <plugin version="2.9u4" name="GEON IDV (nightly)" url="http://www.unidata.ucar.edu/software/idv/plugins/unavcoidv.jar" description="UNAVCO's IDV plugin for the latest nightly build" category="Customized IDVs"/>
+
+<plugin version="3.0u2" category="Customized IDVs" name="NOAA-ESRL-PSD IDV" description="NOAA/ESRL/PSD's IDV plugin"  url="http://www.esrl.noaa.gov/psd/repository/entry/get/noaapsd.jar?entryid=be105b2f-ff5a-4f38-af36-3fb5fd3b5359"/>
 
 <!-- Displays -->
 <plugin name="User Interface Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
