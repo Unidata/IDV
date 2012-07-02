@@ -490,6 +490,28 @@ public class ShapeFileDataSource extends FilesDataSource {
         }
         int  numFields     = dbFile.getNumFields();
         List propertyNames = new ArrayList();
+
+        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+            String    fieldName = dbFile.getFieldName(fieldIdx);
+            DbaseData dbData    = dbFile.getField(fieldIdx);
+            List      values    = dbData.asList();
+            if (values.size() != sets.length) {
+                /*throw new IllegalArgumentException("DBfile size:"
+                        + values.size() + " != number of map lines:"
+                        + sets.length);  */
+
+                System.err.println(" WARNING:" + "DBfile size:"
+                        + values.size() + " != number of map lines:"
+                        + sets.length);
+                return;
+            }
+            for (int i = 0; i < sets.length; i++) {
+                if (sets[i] instanceof MapSet) {
+                    MapSet mapSet = (MapSet) sets[i];
+                    mapSet.setProperty(fieldName, values.get(i));
+                }
+            }
+        }
         for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
             String fieldName = dbFile.getFieldName(fieldIdx);
             propertyNames.add(fieldName);
@@ -503,22 +525,7 @@ public class ShapeFileDataSource extends FilesDataSource {
             }
         }
 
-        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
-            String    fieldName = dbFile.getFieldName(fieldIdx);
-            DbaseData dbData    = dbFile.getField(fieldIdx);
-            List      values    = dbData.asList();
-            if (values.size() != sets.length) {
-                throw new IllegalArgumentException("DBfile size:"
-                        + values.size() + " != number of map lines:"
-                        + sets.length);
-            }
-            for (int i = 0; i < sets.length; i++) {
-                if (sets[i] instanceof MapSet) {
-                    MapSet mapSet = (MapSet) sets[i];
-                    mapSet.setProperty(fieldName, values.get(i));
-                }
-            }
-        }
+
 
 
     }

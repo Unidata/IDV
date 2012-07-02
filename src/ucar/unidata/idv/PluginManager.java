@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2075,8 +2075,15 @@ public class PluginManager extends IdvManager {
                 Plugin plugin = new Plugin(name, desc, url, category);
                 plugin.size = size;
                 if (XmlUtil.hasAttribute(pluginNode, ATTR_VERSION)) {
-                    plugin.version = XmlUtil.getAttribute(pluginNode,
-                            ATTR_VERSION, version);
+                    // Some idiot (like me) might put a version that is not 
+                    // decimal number (e.g. 3.0u2) instead of 3.0.  Fail gracefully
+                    String versionStr = XmlUtil.getAttribute(pluginNode,
+                                            ATTR_VERSION, "" + version);
+                    try {
+                        plugin.version = new Double(versionStr).doubleValue();
+                    } catch (NumberFormatException nfe) {
+                        plugin.version = version;
+                    }
                     plugin.versionOk = plugin.version <= version;
 
                 }
