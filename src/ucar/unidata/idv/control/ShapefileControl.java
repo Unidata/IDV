@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -35,10 +35,7 @@ import ucar.unidata.ui.PropertyFilter;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TwoListPanel;
 
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
+import ucar.unidata.util.*;
 
 import ucar.visad.data.MapSet;
 
@@ -168,6 +165,8 @@ public class ShapefileControl extends DisplayControlImpl {
     /** The sorting table model */
     private TableSorter sorter;
 
+    /** Where we put the shapefile guis */
+    private JPanel contents;
 
     /**
      * Create a new ShapefileControl; set the attributes
@@ -217,11 +216,24 @@ public class ShapefileControl extends DisplayControlImpl {
         if ( !hasProperties) {
             return GuiUtils.left(GuiUtils.top(mainContents));
         }
+        contents = new JPanel(new BorderLayout());
+        JScrollPane sp =
+            new JScrollPane(
+                contents, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        sp.setBorder(null);
+        sp.getVerticalScrollBar().setUnitIncrement(10);
+
+        JViewport vp = sp.getViewport();
+        vp.setViewSize(new Dimension(600, 200));
+        sp.setPreferredSize(new Dimension(600, 200));
+
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Display", GuiUtils.topLeft(mainContents));
+        tabbedPane.add("Display", GuiUtils.topCenter(mainContents, sp));
         tabbedPane.add("Filters", makeFilterGui());
         tabbedPane.add("Table", doMakeTable());
-        return GuiUtils.left(GuiUtils.top(tabbedPane));
+        return tabbedPane;
     }
 
     /**
@@ -645,8 +657,8 @@ public class ShapefileControl extends DisplayControlImpl {
             try {
                 FieldImpl fi = (FieldImpl) data;
                 if (GridUtil.isSequence(fi)) {  // 1D domain
-                    Set domainSet = fi.getDomainSet();
-                    FieldImpl newFI =
+                    Set       domainSet = fi.getDomainSet();
+                    FieldImpl newFI     =
                         new FieldImpl((FunctionType) fi.getType(), domainSet);
                     for (int i = 0; i < domainSet.getLength(); i++) {
                         SampledSet s =
@@ -666,6 +678,7 @@ public class ShapefileControl extends DisplayControlImpl {
         } else if (data instanceof SampledSet) {
             d = (Data) applyFilters((SampledSet) data);
         }
+
         return d;
     }
 
@@ -731,7 +744,8 @@ public class ShapefileControl extends DisplayControlImpl {
                 logException("Applying flters", exc);
             }
         }
-        //TODO: What do we return here?
+        LogUtil.userErrorMessage("The filter returned zero results");
+
         return null;
     }
 
@@ -749,7 +763,9 @@ public class ShapefileControl extends DisplayControlImpl {
         }
         Data theData = applyFilters(mainData);
         populateTable();
-        myDisplay.setData(theData);
+        if (theData != null) {
+            myDisplay.setData(theData);
+        }
     }
 
 
@@ -781,7 +797,7 @@ public class ShapefileControl extends DisplayControlImpl {
                 List names = ((MapSet) mapSets.get(0)).getPropertyNames();
                 if ((names != null) && (names.size() > 0)) {
                     hasProperties = true;
-                    fieldNames =
+                    fieldNames    =
                         (String[]) names.toArray(new String[names.size()]);
                     passTheFilter = new boolean[mapSets.size()];
                     Arrays.fill(passTheFilter, true);
