@@ -1,0 +1,606 @@
+<object class="java.util.ArrayList">
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[BlueRed]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[BlueRed]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAD8PcjIyT3Y2Nk94ODhPfDw8T34+Pk+BISFPgiIiT4QkJE+FJSVPhycnT4goKE+KKipPiysrT40tLU+OLi5PkDAwT5ExMU+TMzNPlTU1T5Y2Nk+YODhPmTk5T5s7O0+cPDxPnj4+T58/P0+goKDPoSEhT6IiIk+ioqLPo6Ojz6QkJE+lJSVPpaWlz6amps+np6fPqCgoT6kpKU+pqanPqqqqz6srK0+sLCxPrKysz62trc+uLi5Pry8vT6+vr8+wsLDPsTExT7IyMk+zMzNPs7Ozz7S0tM+1NTVPtjY2T7a2ts+3t7fPuDg4T7k5OU+5ubnPurq6z7s7O0+8PDxPvLy8z729vc++Pj5Pvz8/T8AgIE/AYGCPwODhD8EhIU/BoaHPweHiD8JiYo/CoqLPwyMjT8NjY4/D4+QPxCQkT8SkpM/E5OUPxWVlj8Wlpc/GJiZPxqamz8bm5w/HZ2ePx6enz8goKE/IaGiPyOjpD8kpKU/JqanPyenqD8pqao/KqqrPyysrT8tra4/L6+wPzCwsT8ysrM/NLS1PzW1tj83t7g/OLi5Pzq6uz87u7w/Pb2+Pz6+vz9AwME/QcHCP0PDxD9ExMU/RsbHP0fHyD9Jyco/SsrLP0zMzT9Ozs8/T8/QP1HR0j9S0tM/VNTVP1XV1j+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAD8PqSkpT6oqKk+qqqrPqysrT6urq8+sLCxPrKysz60tLU+uLi5Prq6uz68vL0+vr6/PsDAwT7CwsM+xMTFPsjIyT7Kyss+zMzNPs7Ozz7Q0NE+0tLTPtTU1T7Y2Nk+2trbPtzc3T7e3t8+4ODhPuLi4z7m5uc+6OjpPurq6z7s7O0+7u7vPvDw8T7y8vM+9vb3Pvj4+T76+vs+/Pz9Pv7+/z8AgIE/AYGCPwODhD8EhIU/BYWGPwaGhz8Hh4g/CIiJPwmJij8Li4w/DIyNPw2Njj8Ojo8/D4+QPxCQkT8RkZI/E5OUPxSUlT8VlZY/FpaXPxeXmD8YmJk/GpqbPxubnD8cnJ0/HZ2ePx6enz8fn6A/IKChPyKioz8jo6Q/JKSlPyWlpj8mpqc/J6eoPyioqT8qqqs/K6usPyysrT8tra4/Lq6vPy+vsD8wsLE/MrKzPzOztD80tLU/NbW2Pza2tz83t7g/Obm6Pzq6uz87u7w/PLy9Pz29vj8+vr8/P7/AP0HBwj9CwsM/Q8PEP0TExT9FxcY/RsbHP0fHyD9Jyco/SsrLP0vLzD9MzM0/Tc3OP07Ozz9Pz9A/UdHSP1LS0z9T09Q/VNTVP1XV1j9W1tc/V9fYP1nZ2j9a2ts/W9vcP1zc3T9d3d4/Xt7fP2Dg4T+AAAA/gAAAP4AAAD9X19g/VdXWP1TU1T9S0tM/UdHSP0/P0D9Ozs8/TMzNP0rKyz9Jyco/R8fIP0bGxz9ExMU/Q8PEP0HBwj9AwME/Pr6/Pz29vj87u7w/Orq7Pzi4uT83t7g/NbW2PzS0tT8ysrM/MLCxPy+vsD8tra4/LKytPyqqqz8pqao/J6eoPyampz8kpKU/I6OkPyGhoj8goKE/Hp6fPx2dnj8bm5w/GpqbPxiYmT8Wlpc/FZWWPxOTlD8SkpM/EJCRPw+PkD8NjY4/DIyNPwqKiz8JiYo/B4eIPwaGhz8EhIU/A4OEPwGBgj8AgIE+/Pz9Pvj4+T729vc+8vLzPvDw8T7s7O0+6urrPubm5z7k5OU+4ODhPt7e3z7a2ts+2NjZPtTU1T7S0tM+zs7PPsrKyz7IyMk+xMTFPsLCwz6+vr8+vLy9Pri4uT62trc+srKzPrCwsT6srK0+qqqrPqampz6kpKU+oKChPp6enz6amps+lpaXPpSUlT6QkJE+jo6PPoqKiz6IiIk+hISFPoKCgz58/P0+ePj5PnDw8T5s7O0+ZOTlPmDg4T5Y2Nk+VNTVPkzMzT5ExMU+QMDBPji4uT40tLU+LKytPiioqT4goKE+HJydPhSUlT4QkJE+CIiJPgSEhT34+Pk98PDxPeDg4T3Y2Nk9yMjJ</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAD8P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD9X19g/VdXWP1TU1T9S0tM/UdHSP0/P0D9Ozs8/TMzNP0rKyz9Jyco/R8fIP0bGxz9ExMU/Q8PEP0HBwj9AwME/Pr6/Pz29vj87u7w/Orq7Pzi4uT83t7g/NbW2PzS0tT8ysrM/MLCxPy+vsD8tra4/LKytPyqqqz8pqao/J6eoPyampz8kpKU/I6OkPyGhoj8goKE/Hp6fPx2dnj8bm5w/GpqbPxiYmT8Wlpc/FZWWPxOTlD8SkpM/EJCRPw+PkD8NjY4/DIyNPwqKiz8JiYo/B4eIPwaGhz8EhIU/A4OEPwGBgj8AgIE+/Pz9Pvj4+T729vc+8vLzPvDw8T7s7O0+6urrPubm5z7k5OU+4ODhPt7e3z7a2ts+2NjZPtTU1T7S0tM+zs7PPsrKyz7IyMk+xMTFPsLCwz6+vr8+vLy9Pri4uT62trc+srKzPrCwsT6srK0+qqqrPqampz6kpKU+oKChPp6enz6amps+lpaXPpSUlT6QkJE+jo6PPoqKiz6IiIk+hISFPoKCgz58/P0+ePj5PnDw8T5s7O0+ZOTlPmDg4T5Y2Nk+VNTVPkzMzT5ExMU+QMDBPji4uT40tLU+LKytPiioqT4goKE+HJydPhSUlT4QkJE+CIiJPgSEhT34+Pk98PDxPeDg4T3Y2Nk9yMjJ</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAD8P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-1.2</double>
+          </property>
+          <property name="Max">
+            <double>1.2</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5</double>
+              </property>
+              <property name="Locked">
+                <boolean>true</boolean>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAD8P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[SST Anomaly]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[SST Anomaly]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="17">0.0,0.0,0.0,0.09803922,0.29803923,0.5019608,0.69803923,0.8,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8,0.6</parray>
+          <parray class="float" length="17">0.0,0.0,0.0,0.09803922,0.29803923,0.5019608,0.69803923,0.8,1.0,1.0,0.8,0.69803923,0.5019608,0.29803923,0.09803922,0.0,0.0</parray>
+          <parray class="float" length="17">0.5019608,0.6509804,0.8,1.0,1.0,1.0,1.0,1.0,1.0,0.09803922,0.09803922,0.09803922,0.09803922,0.09803922,0.09803922,0.0,0.0</parray>
+          <parray class="float" length="17">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-5.0</double>
+          </property>
+          <property name="Max">
+            <double>5.0</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="17">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[SST Anomaly2]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[SST Anomaly2]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="11">0.0,0.16470589,0.33333334,0.49803922,0.6666667,0.98039216,1.0,1.0,0.99607843,0.99607843,0.99215686</parray>
+          <parray class="float" length="11">0.0,0.16470589,0.33333334,0.49803922,0.6666667,1.0,1.0,0.8,0.6,0.4,0.2</parray>
+          <parray class="float" length="11">1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0</parray>
+          <parray class="float" length="11">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-4.0</double>
+          </property>
+          <property name="Max">
+            <double>4.0</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5473515248796148</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="11">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[PercentPrecip]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[PercentPrecip]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="14">0.99607843,0.99607843,0.99607843,0.99607843,0.99607843,0.99607843,0.9968797,1.0,0.49803922,0.41568628,0.33333334,0.2509804,0.16862746,0.08627451</parray>
+          <parray class="float" length="14">0.0,0.16078432,0.3254902,0.4862745,0.6509804,0.8117647,0.9968797,1.0,1.0,0.9019608,0.8,0.69803923,0.59607846,0.49411765</parray>
+          <parray class="float" length="14">0.0,0.0,0.0,0.0,0.0,0.0,0.9968797,1.0,0.83137256,0.69411767,0.5568628,0.41960785,0.2784314,0.14117648</parray>
+          <parray class="float" length="14">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-35.0</double>
+          </property>
+          <property name="Max">
+            <double>35.0</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5890850722311396</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.39325842696629215</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="14">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[IRLONG Transparent]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[IRLONG Transparent]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8QMDBPICAgTzAwME84ODhPRCQkT0goKE9QMDBPVDQ0T1w8PE9gICBPYiIiT2YmJk9oKChPbCwsT24uLk9yMjJPdDQ0T3g4OE96OjpPfj4+T4AgIE+BISFPgyMjT4QkJE+GJiZPhycnT4kpKU+KKipPjCwsT40tLU+PLy9PkDAwT5ExMU+TMzNPlDQ0T5Y2Nk+XNzdPmTk5T5o6Ok+cPDxPnT09T58/P0+gICBPoKCgz6Ghoc+iIiJPoyMjT6Ojo8+kpKTPpSUlT6YmJk+mpqbPpycnT6goKE+oqKjPqampz6oqKk+rKytPq6urz6ysrM+tLS1Pri4uT66urs+vLy9PsDAwT7CwsM+xsbHPsjIyT7MzM0+zs7PPtLS0z7U1NU+2NjZPtra2z7c3N0+4ODhPuLi4z7m5uc+6OjpPuzs7T7u7u8+8vLzPvT09T74+Pk++vr7Pvz8/T8AgIE/AYGCPwODhD8EhIU/BoaHPweHiD8JiYo/CoqLPwyMjT8NjY4/Do6PPxCQkT8RkZI/E5OUPxSUlT8Wlpc/F5eYPxmZmj8amps/HJydPx2dnj8enp8/IKChPyGhoj8jo6Q/JKSlPyampz8np6g/KamqPyqqqz8srK0/La2uPy6urz8wsLE/MbGyPzOztD80tLU/Nra3Pze3uD85ubo/Orq7Pzy8vT89vb4/Pr6/P0DAwT9BwcI/Q8PEP0TExT9Gxsc/R8fIP0nJyj9Kyss/S8vMP03Nzj9Ozs8/UNDRP1HR0j9T09Q/VNTVP1bW1z9X19g/WdnaP1ra2z9b29w/Xd3eP17e3z9g4OE/YeHiP2Pj5D9k5OU/ZubnP2fn6D9p6eo/aurrP2vr7D9t7e4/bu7vP3Dw8T9x8fI/c/P0P3T09T929vc/d/f4P3n5+j96+vs/ePj5P2rq6z9c3N0/Ts7PP0DAwT8ysrM/JaWmPxeXmD8JiYo+9vb3Ptra2z6+vr8/EJCRPxqamz8lpaY/L6+wPzm5uj9ExMU/Ts7PP1jY2T9j4+Q/be3uP3Ly8z9n5+g/W9vcP1DQ0T9FxcY/Obm6Py6urz8jo6Q/F5eYPwyMjQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPUDAwT0wsLE9IKChPQCAgTzg4OE8wMDBPKCgoTyAgIE8AICBO4CAgQAAAAA8wMDBPhCQkT6EhIU+wMDBPvz8/T8cnJ0/Orq7P1jY2TuAgIE7gICBO4CAgTuAgIE7gICBAAAAAAAAAAAAAAAAAAAAAAAAAAA/ePj5P2Li4z9Ly8w/NbW2Px+foD8JiYo+5OTlPri4uT6MjI0+PLy9PcjIyQ==</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8QMDBPICAgTzAwME84ODhPRCQkT0goKE9QMDBPVDQ0T1w8PE9gICBPYiIiT2YmJk9oKChPbCwsT24uLk9yMjJPdDQ0T3g4OE96OjpPfj4+T4AgIE+BISFPgyMjT4QkJE+GJiZPhycnT4kpKU+KKipPjCwsT40tLU+PLy9PkDAwT5ExMU+TMzNPlDQ0T5Y2Nk+XNzdPmTk5T5o6Ok+cPDxPnT09T58/P0+gICBPoKCgz6Ghoc+iIiJPoyMjT6Ojo8+kpKTPpSUlT6YmJk+mpqbPpycnT6goKE+oqKjPqampz6oqKk+rKytPq6urz6ysrM+tLS1Pri4uT66urs+vLy9PsDAwT7CwsM+xsbHPsjIyT7MzM0+zs7PPtLS0z7U1NU+2NjZPtra2z7c3N0+4ODhPuLi4z7m5uc+6OjpPuzs7T7u7u8+8vLzPvT09T74+Pk++vr7Pvz8/T8AgIE/AYGCPwODhD8EhIU/BoaHPweHiD8JiYo/CoqLPwyMjT8NjY4/Do6PPxCQkT8RkZI/E5OUPxSUlT8Wlpc/F5eYPxmZmj8amps/HJydPx2dnj8enp8/IKChPyGhoj8jo6Q/JKSlPyampz8np6g/KamqPyqqqz8srK0/La2uPy6urz8wsLE/MbGyPzOztD80tLU/Nra3Pze3uD85ubo/Orq7Pzy8vT89vb4/Pr6/P0DAwT9BwcI/Q8PEP0TExT9Gxsc/R8fIP0nJyj9Kyss/S8vMP03Nzj9Ozs8/UNDRP1HR0j9T09Q/VNTVP1bW1z9X19g/WdnaP1ra2z9b29w/Xd3eP17e3z9g4OE/YeHiP2Pj5D9k5OU/ZubnP2fn6D9p6eo/aurrP2vr7D9t7e4/bu7vP3Dw8T9x8fI/c/P0P3T09T929vc/d/f4P3n5+j96+vs/cvLzP2Tk5T9X19g/ScnKPzu7vD8tra4/IKChPxKSkz8EhIU+7OztPtLS0z62trcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD6+vr8+0tLTPujo6T78/P0/CYmKPxOTlD8dnZ4/KKipPzKysz89vb4/R8fIP3j4+T9q6us/Xd3eP0/P0D9BwcI/NLS1Pyampz8YmJk/CoqLPvr6+z7e3t8AAAAAPfj4+T54+Pk+urq7Pvb29z8amps/Obm6P1jY2QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8QMDBPICAgTzAwME84ODhPRCQkT0goKE9QMDBPVDQ0T1w8PE9gICBPYiIiT2YmJk9oKChPbCwsT24uLk9yMjJPdDQ0T3g4OE96OjpPfj4+T4AgIE+BISFPgyMjT4QkJE+GJiZPhycnT4kpKU+KKipPjCwsT40tLU+PLy9PkDAwT5ExMU+TMzNPlDQ0T5Y2Nk+XNzdPmTk5T5o6Ok+cPDxPnT09T58/P0+gICBPoKCgz6Ghoc+iIiJPoyMjT6Ojo8+kpKTPpSUlT6YmJk+mpqbPpycnT6goKE+oqKjPqampz6oqKk+rKytPq6urz6ysrM+tLS1Pri4uT66urs+vLy9PsDAwT7CwsM+xsbHPsjIyT7MzM0+zs7PPtLS0z7U1NU+2NjZPtra2z7c3N0+4ODhPuLi4z7m5uc+6OjpPuzs7T7u7u8+8vLzPvT09T74+Pk++vr7Pvz8/T8AgIE/AYGCPwODhD8EhIU/BoaHPweHiD8JiYo/CoqLPwyMjT8NjY4/Do6PPxCQkT8RkZI/E5OUPxSUlT8Wlpc/F5eYPxmZmj8amps/HJydPx2dnj8enp8/IKChPyGhoj8jo6Q/JKSlPyampz8np6g/KamqPyqqqz8srK0/La2uPy6urz8wsLE/MbGyPzOztD80tLU/Nra3Pze3uD85ubo/Orq7Pzy8vT89vb4/Pr6/P0DAwT9BwcI/Q8PEP0TExT9Gxsc/R8fIP0nJyj9Kyss/S8vMP03Nzj9Ozs8/UNDRP1HR0j9T09Q/VNTVP1bW1z9X19g/WdnaP1ra2z9b29w/Xd3eP17e3z9g4OE/YeHiP2Pj5D9k5OU/ZubnP2fn6D9p6eo/aurrP2vr7D9t7e4/bu7vP3Dw8T9x8fI/c/P0P3T09T929vc/d/f4P3n5+j96+vsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP3j4+T9s7O0/YODhP1TU1T9IyMk/Pb2+PzGxsj8lpaY/GZmaPw2Njj8QkJE/FpaXPx2dnj8jo6Q/KqqrPzCwsT82trc/Pb2+P0PDxD9Kyss/UNDRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPfj4+T54+Pk+urq7Pvb29z8amps/Obm6P1jY2T94+Pk/aOjpP1jY2T9Hx8g/N7e4PyenqD8Xl5g/BoaHPuzs7T7MzM0+7u7vPtjY2T7CwsM+rKytPpaWlz6CgoM+WNjZPiysrT4AgIE9qKipPSCgoQ==</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPkzMzT5Q0NE+VNTVPljY2T5c3N0+YODhPmjo6T5s7O0+cPDxPnT09T54+Pk+fPz9PoKCgz6EhIU+hoaHPoiIiT6Kios+jIyNPpCQkT6SkpM+lJSVPpaWlz6YmJk+mpqbPp6enz6goKE+oqKjPqSkpT6mpqc+qqqrPqysrT6urq8+sLCxPrKysz60tLU+uLi5Prq6uz68vL0+vr6/PsDAwT7CwsM+xsbHPsjIyT7Kyss+zMzNPs7Ozz7Q0NE+1NTVPtbW1z7Y2Nk+2trbPtzc3T7e3t8+4uLjPuTk5T7m5uc+6OjpPurq6z7u7u8+8PDxPvLy8z709PU+9vb3Pvj4+T78/P0+/v7/PwCAgT8BgYI/AoKDPwODhD8FhYY/BoaHPweHiD8IiIk/CYmKPwqKiz8MjI0/DY2OPw6Ojz8Pj5A/EJCRPxGRkj8Tk5Q/FJSVPxWVlj8Wlpc/F5eYPxiYmT8amps/G5ucPxycnT8dnZ4/Hp6fPyCgoT8hoaI/IqKjPyOjpD8kpKU/JaWmPyenqD8oqKk/KamqPyqqqz8rq6w/LKytPy6urz8vr7A/MLCxPzGxsj8ysrM/M7O0PzW1tj82trc/N7e4Pzi4uT85ubo/O7u8Pzy8vT89vb4/Pr6/Pz+/wD9AwME/QsLDP0PDxD9ExMU/RcXGP0bGxz9Hx8g/ScnKP0rKyz9Ly8w/TMzNP03Nzj9Ozs8/UNDRP1HR0j9S0tM/U9PUP1TU1T9V1dY/V9fYP1jY2T9Z2do/WtrbP1vb3D9c3N0/Xt7fP1/f4D9g4OE/YeHiP2Li4z9k5OU/ZeXmP2bm5z9n5+g/aOjpP2np6j9r6+w/bOztP23t7j9u7u8/b+/wP3Dw8T9y8vM/c/P0P3T09T919fY/dvb3P3f3+D95+fo/evr7P3v7/D98/P0/ff3+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Max">
+            <double>255.0</double>
+          </property>
+          <field name="min">
+            <java.lang.Double>0.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.6790352504638218</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[SST]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[SST]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="17">0.0,0.0,0.0,0.0,0.0,0.0,0.14117648,0.0,0.3019608,0.4,0.9490196,1.0,1.0,1.0,1.0,1.0,0.7019608</parray>
+          <parray class="float" length="17">0.0,0.0,0.2,0.34901962,0.6,0.8509804,0.56078434,0.6313726,0.8,1.0,1.0,1.0,0.7019608,0.32156864,0.14901961,0.4117647,0.18039216</parray>
+          <parray class="float" length="17">0.6313726,1.0,1.0,1.0,1.0,1.0,0.14117648,0.0,0.3019608,0.4,0.5019608,0.0,0.0,0.0,0.0,0.5686275,0.38039216</parray>
+          <parray class="float" length="17">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Max">
+            <double>32.0</double>
+          </property>
+          <field name="min">
+            <java.lang.Double>0.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="17">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[BlueWhiteRed]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[BlueWhiteRed]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="14">0.09803922,0.22352941,0.3529412,0.48235294,0.6117647,0.7411765,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+          <parray class="float" length="14">0.32156864,0.41568628,0.5137255,0.6117647,0.7058824,0.8039216,1.0,1.0,0.8745098,0.74509805,0.61960787,0.49019608,0.3647059,0.23529412</parray>
+          <parray class="float" length="14">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8745098,0.74509805,0.61960787,0.49019608,0.3647059,0.23529412</parray>
+          <parray class="float" length="14">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-0.06</double>
+          </property>
+          <property name="Max">
+            <double>0.06</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.42857142857142855</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.5714285714285714</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="14">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[OLR Anomaly]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[OLR Anomaly]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="10">0.99607843,0.99607843,0.6431373,0.39607844,0.74509805,1.0,1.0,0.94509804,0.62352943,0.29411766</parray>
+          <parray class="float" length="10">0.0,0.0,0.23529412,0.39607844,0.74509805,1.0,0.84313726,0.54509807,0.42352942,0.29411766</parray>
+          <parray class="float" length="10">0.0,1.0,1.0,1.0,1.0,1.0,0.29411766,0.24313726,0.42352942,0.29411766</parray>
+          <parray class="float" length="10">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Min">
+            <double>-110.0</double>
+          </property>
+          <property name="Max">
+            <double>90.0</double>
+          </property>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="10">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[OLR Anomaly (CPC)]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[OLR Anomaly (CPC)]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float" length="10">0.078431375,0.15686275,0.3137255,0.5882353,0.5882353,1.0,1.0,1.0,1.0,0.64705884</parray>
+          <parray class="float" length="10">0.39215687,0.50980395,0.64705884,0.8235294,0.9411765,0.98039216,0.9098039,0.627451,0.19607843,0.0</parray>
+          <parray class="float" length="10">0.8235294,0.9411765,0.9607843,0.98039216,0.98039216,0.6666667,0.47058824,0.0,0.0,0.0</parray>
+          <parray class="float" length="10">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Max">
+            <double>0.0</double>
+          </property>
+          <field name="min">
+            <java.lang.Double>0.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float" length="10">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+      <property name="Name">
+        <string><![CDATA[Precipitable H2O Transparent]]></string>
+      </property>
+      <property name="Id">
+        <string><![CDATA[Precipitable H2O Transparent]]></string>
+      </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+      <property name="Description">
+        <string stringvalue=""/>
+      </property>
+      <property name="Table">
+        <array class="[F" length="4">
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP3r6+z9z8/Q/bOztP2Xl5j9e3t8/V9fYP1DQ0T9IyMk/QcHCPzq6uz8zs7Q/LKytPyWlpj8enp8/FpaXPw+PkD8IiIk/AYGCPvT09T7m5uc+2NjZPsjIyT66urs+rKytPp6enz6QkJE+goKDPmjo6T5IyMk+LKytPhCQkT3o6Ok9sLCxPXDw8T0AgIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD24uLk+OLi5PoiIiT62trc+5OTlPwmJij8fn6A/Nra3P03Nzj+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPEDAwTzAwME9AICBPTCwsT1g4OE9iIiJPaCgoT2wsLE9yMjJPeDg4T34+Pk+CIiJPhSUlT4cnJ0+KKipPjS0tT5AwME+TMzNPlTU1T5g4OE+bOztPnj4+T6CgoM+hoaHPoyMjT6SkpM+mJiZPp6enz6ioqM+qKipPq6urz60tLU+urq7PsDAwT7ExMU+ysrLPtDQ0T7W1tc+3NzdPuDg4T7m5uc+7OztPvLy8z74+Pk+/Pz9PwGBgj8EhIU/B4eIPwqKiz8MjI0/D4+QPxKSkz8VlZY/GJiZPxqamz8dnZ4/IKChPyOjpD8mpqc/KamqPyurrD8urq8/MbGyPzS0tT83t7g/Obm6Pzy8vT8/v8A/QsLDP0XFxj9Hx8g/SsrLP03Nzj9Q0NE/U9PUP1XV1j9Y2Nk/W9vcP17e3z9h4eI/ZOTlP2bm5z9p6eo/bOztP2/v8D9y8vM/dPT1P3f3+D+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/ePj5P3Dw8T9p6eo/YeHiP1ra2z9S0tM/S8vMP0PDxD88vL0/NLS1Py2trj8lpaY/Hp6fPxaWlz8Pj5A/B4eIPwCAgT7w8PE+4uLjPtLS0z7ExMU+tLS1Pqampz6Wlpc+iIiJPnDw8T5U1NU+NLS1PhiYmT3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3o6Ok94ODhPdjY2T3IyMk9wMDBPbi4uT2wsLE9oKChPZiYmT2QkJE9iIiJPXDw8T1g4OE9UNDRPUDAwT0goKE9EJCRPQCAgTzg4OE8oKChPICAgTxAwME8AICB</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP3f3+D939/g/d/f4P3f3+D939/g/d/f4P3f3+D939/g/d/f4P3f3+D939/g/d/f4P3j4+T94+Pk/ePj5P3j4+T94+Pk/ePj5P3j4+T94+Pk/ePj5P3j4+T94+Pk/ePj5P3n5+j95+fo/efn6P3n5+j95+fo/efn6P3n5+j95+fo/efn6P3n5+j95+fo/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z+AAAA/TMzNPxmZmj7Kyss+SMjJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0goKE9oKChPfDw8T4goKE+SMjJPnDw8T6MjI0+oqKjPra2tz7Kyss+3t7fPvLy8z8Dg4Q/DY2OPxeXmD8ioqM/LKytPza2tz9AwME/SsrLP1TU1T9e3t8/aOjp</parray>
+          <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSAAAAADxAwME8wMDBPRCQkT1AwME9gICBPZiYmT2wsLE9yMjJPejo6T4AgIE+DIyNPhiYmT4kpKU+NLS1PkDAwT5MzM0+WNjZPmjo6T509PU+gICBPoaGhz6Ojo8+lJSVPpqamz6goKE+pqanPq6urz60tLU+urq7PsDAwT7IyMk+zs7PPtTU1T7a2ts+4ODhPujo6T7u7u8+9PT1Pvr6+z8BgYI/BISFPweHiD8Kios/Do6PPxGRkj8UlJU/F5eYPxqamz8enp8/IaGiPySkpT8np6g/K6usPy6urz8xsbI/NLS1Pze3uD87u7w/Pr6/P0HBwj9ExMU/SMjJP0vLzD9Ozs8/UdHSP1XV1j9Y2Nk/W9vcP17e3z9h4eI/ZeXmP2jo6T9r6+w/bu7vP3Ly8z919fY/ePj5P3v7/D+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+        </array>
+      </property>
+      <property name="Range">
+        <object class="ucar.unidata.util.Range">
+          <property name="Max">
+            <double>80.0</double>
+          </property>
+          <field name="min">
+            <java.lang.Double>0.0</java.lang.Double>
+          </field>
+        </object>
+      </property>
+      <property name="Breakpoints">
+        <object class="java.util.ArrayList">
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>0.3756019261637239</double>
+              </property>
+            </object>
+          </method>
+          <method name="add">
+            <object class="ucar.unidata.util.ColorTable$Breakpoint">
+              <property name="Value">
+                <double>1.0</double>
+              </property>
+            </object>
+          </method>
+        </object>
+      </property>
+      <property name="ScaleFactor">
+        <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.util.ColorTable">
+        <property name="Name">
+            <string><![CDATA[Integrated Water Vapor]]></string>
+        </property>
+        <property name="Id">
+          <string><![CDATA[Integrated Water Vapor]]></string>
+        </property>
+      <property name="Category">
+        <string><![CDATA[NOAA]]></string>
+      </property>
+        <property name="Table">
+            <array class="[F" length="4">
+                <parray class="float" length="18">0.0,0.0,0.0,0.0,0.0,0.0,0.5882353,0.78431374,1.0,1.0,1.0,1.0,0.5882353,0.78431374,1.0,0.5882353,0.78431374,1.0</parray>
+                <parray class="float" length="18">0.32941177,0.4392157,0.48235294,0.5882353,0.78431374,1.0,0.5882353,0.78431374,1.0,0.33333334,0.49019608,0.627451,0.0,0.0,0.0,0.0,0.0,0.0</parray>
+                <parray class="float" length="18">0.49019608,0.6862745,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.5882353,0.78431374,1.0</parray>
+                <parray class="float" length="18">0.0,0.24705882,0.49803922,0.7490196,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+            </array>
+        </property>
+        <property name="Range">
+            <object class="ucar.unidata.util.Range">
+                <property name="Min">
+                    <double>1.0</double>
+                </property>
+                <property name="Max">
+                    <double>7.0</double>
+                </property>
+            </object>
+        </property>
+        <property name="Breakpoints">
+            <object class="java.util.ArrayList">
+                <method name="add">
+                    <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                </method>
+                <method name="add">
+                    <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                        <property name="Value">
+                            <double>1.0</double>
+                        </property>
+                    </object>
+                </method>
+                <method name="add">
+                    <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                        <property name="Value">
+                            <double>0.16666666666666666</double>
+                        </property>
+                    </object>
+                </method>
+            </object>
+        </property>
+        <property name="ScaleFactor">
+            <parray class="float" length="18">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+        </property>
+    </object>
+  </method>
+</object>
