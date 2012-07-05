@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<params>
+
+    <param
+     ci_base="0.0"
+     ci_interval="0.5"
+     ci_max="10.0"
+     ci_min="-10.0"
+     ci_width="1"
+     name="Monthly Anomaly"
+     range_max="5.0"
+     range_min="-5.0"
+     table="SST Anomaly"
+     unit="K"/>
+
+</params>
