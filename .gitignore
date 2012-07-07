@@ -16,6 +16,7 @@ auxdata/docs/userguide/processed
 auxdata/docs/userguide/content/isl/tags.index
 auxdata/docs/userguide/content/JavaHelpSearch
 src/ucar/unidata/idv/resources/build.properites
+docs/javadoc
 
 #############
 # IDE files #
