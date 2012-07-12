@@ -28,25 +28,42 @@ def clmMon(grid):
   return climo
 
 def calcMonAnom(monthly, ltm, normalize=0):
-  """ Calculate the monthly anomaly from a long term mean. 
-      The number of timesteps in ltm must be 12 and the monthly
-      data must start in January.
+  """ Calculate the monthly anomaly from a long term mean.
+      The number of timesteps in ltm must be 12
   """
+  from visad import VisADException
   monAnom = monthly.clone()
   months = len(ltm)
+  if (not months == 12):
+    raise VisADException("Number of months in ltm must be a 12")
   years = int(len(monthly)/months) +1
+  startMonth = getStartMonth(GridUtil.getTimeSet(monthly))-1
+  #print "Start month = " , startMonth
+  index = 0
   for year in range(years):
-    for month in range(months):
-       index = year*months+month
-       if index > len(monthly) - 1:
-           break
-       diff = sub(monthly[index],ltm[month])
-       if normalize != 0:
-           diff = sub(diff,xav(diff))
-           diff = GridUtil.setParamType(diff, GridUtil.getParamType(monAnom))
-       monAnom[index] = diff
+    for month in range(12):
+      if index > len(monthly) - 1:
+        break
+      thisMonth = (startMonth+month)%12
+      #print thisMonth
+      diff = sub(monthly[index],ltm[thisMonth])
+      if normalize != 0:
+        diff = sub(diff,xav(diff))
+        diff = GridUtil.setParamType(diff, GridUtil.getParamType(monAnom))
+      monAnom[index] = diff
+      index = index + 1
   return monAnom
-  
+
+def getStartMonth(timeSet):
+  """ Get the starting month number (1-12) from a timeset.
+  """
+  from visad.util import DataUtility as du
+  from visad import DateTime
+  r = du.getSample(timeSet, 0).getComponent(0)
+  dt = DateTime(r)
+  month = dt.formattedString("MM",DateTime.getFormatTimeZone())
+  return int(month)
+
 def stdMon(grid):
   """ Create monthly standard deviations from a grid of monthly data over 
       a period of years. The number of timesteps must be a multiple of 12.
@@ -69,7 +86,6 @@ def stdMon(grid):
      a = GridMath.applyFunctionOverTime(grid, GridMath.FUNC_STDEV, month, 12, 0)
      stdev.setSample(month, a, 0)
   return stdev
-
 
 def clmDay(grid, use366=1):
   """ Create a daily climatology from a grid of daily data over a period
