@@ -540,7 +540,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         updateDisplayList();
         if (andDoShare) {
             doShareExternal(SHARE_SURFACEVALUE, new Double(lastRawLevel));
-          }
+        }
     }
 
 
