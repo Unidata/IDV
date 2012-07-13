@@ -3235,9 +3235,8 @@ public final class Util {
             double lon = Double.parseDouble(toks.get(1));
             EarthLocation earthLocation = ucar.visad.Util.makeEarthLocation(lat,lon);
             argument  = earthLocation;
-        } else if(paramType.equals(EarthLocation.class)) {
-
         }
+
         if (argument != null) {
             method.invoke(object, new Object[] { argument });
             return true;
