@@ -30,7 +30,7 @@ As an example, let's use a formula to compute the 500 mb - 850 mb wind speed she
 <p>
 The IDV will prompt you for which levels you would like to calculate the shear between (top and bottom), and the fields (u, v, and z) needed to compute the layer shear.
 </p>
-<ol class="step">
+<ol class="step" start="4">
 <li>For field [ht::param u], expand the data source for your WRF output and select the [ht::menu {3D grid} {u_wind @ isobaric}] field.</li>
 <li>For field [ht::param v], expand the data source for your WRF output and select the [ht::menu {3D grid} {v_wind @ isobaric}] field.</li>
 <li>For field [ht::param z], expand the data source for your WRF output and select the [ht::menu {3D grid} {Geopotential_height @ isobaric}] field.</li>
@@ -43,7 +43,7 @@ The IDV will prompt you for which levels you would like to calculate the shear b
 Formulas in the IDV are defined using Jython, which means extending the analysis capabilities of the IDV can be done by adding new Jython functions (much easier than editing the IDV Java code!) As an example, let's add a Jython formula to compute wind speed (although one already exists, it's still a good exercise to go through):
 </p>
 
-<ul class="step">
+<ol class="step">
 <li>Remove all displays.</li>
 <li>From the main menu, click on
 [ht::menu {Edit} {Formulas} {Create Formula}].
@@ -71,7 +71,7 @@ the [ht::command 3D Surface] category and check the
 [ht::display Isosurface]  option.</li>
 </ul>
 <li>Click on [ht::button Add Formula].</li>
-</ul>
+</ol>
 
 <p>
 A new item [ht::param wind speed from u and v] should appear in the [ht::dialog Field Selector] window's [ht::command Fields] panel, under [ht::param Workshop]. We've only touched on the basics of the use of formulas in the IDV - please see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/Formulas.html" "IDV Formulas"] for more details.

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,7 +21,6 @@
 package ucar.unidata.idv;
 
 
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,28 +28,18 @@ import org.w3c.dom.Node;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
-
 import ucar.unidata.data.grid.GridDataSource;
-
-
-import ucar.unidata.idv.chooser.*;
+import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.IslDialog;
 import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.QuicklinkPanel;
-import ucar.unidata.idv.ui.WindowInfo;
-import ucar.unidata.ui.RovingProgress;
-
-
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectPair;
@@ -59,35 +48,48 @@ import ucar.unidata.util.PrototypeManager;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-
 import ucar.unidata.util.TwoFacedObject;
-
-
-import ucar.unidata.xml.*;
-
+import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import visad.util.ThreadManager;
 
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.io.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.lang.reflect.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
 import java.util.Vector;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
-import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 
 
@@ -135,10 +137,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** The type to specify the data */
     public static final int BUNDLES_DATA = SavedBundle.TYPE_DATA;
 
-
+    // Note - if you change this, then change the XML version
     /** The separator to use when displaying categories */
     public static final String CATEGORY_SEPARATOR = ">";
 
+    /** The separator used in XML */
+    public static final String CATEGORY_SEPARATOR_XML = "&gt;";
 
 
     /** List of OjbectPairs that define a name->list of files mapping */
@@ -539,6 +543,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return List of (String) categories
      */
     public static List stringToCategories(String category) {
+        category = category.replaceAll(CATEGORY_SEPARATOR_XML,
+                                       CATEGORY_SEPARATOR);
         return StringUtil.split(category, CATEGORY_SEPARATOR, true, true);
     }
 

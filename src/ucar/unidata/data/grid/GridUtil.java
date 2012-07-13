@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,26 +21,28 @@
 package ucar.unidata.data.grid;
 
 
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import ucar.ma2.*;
+import ucar.ma2.Array;
+import ucar.ma2.DataType;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
-
-import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 
 import ucar.unidata.data.DataUtil;
-
 import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.ProjectionImpl;
-import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.geoloc.projection.LambertConformal;
+import ucar.unidata.geoloc.projection.Mercator;
+import ucar.unidata.geoloc.projection.Stereographic;
+import ucar.unidata.geoloc.projection.VerticalPerspectiveView;
 import ucar.unidata.util.FileManager;
-
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -49,25 +51,61 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.ProjectionCoordinateSystem;
-
 import ucar.visad.Util;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 
-import visad.*;
+import visad.CachingCoordinateSystem;
+import visad.CartesianProductCoordinateSystem;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.EarthVectorType;
+import visad.EmpiricalCoordinateSystem;
+import visad.ErrorEstimate;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded1DSet;
+import visad.Gridded2DSet;
+import visad.Gridded3DSet;
+import visad.GriddedSet;
+import visad.IdentityCoordinateSystem;
+import visad.Integer1DSet;
+import visad.Linear1DSet;
+import visad.Linear2DSet;
+import visad.Linear3DSet;
+import visad.LinearLatLonSet;
+import visad.LinearSet;
+import visad.MathType;
+import visad.QuickSort;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.RealVectorType;
+import visad.SampledSet;
+import visad.ScalarType;
+import visad.Set;
+import visad.SetException;
+import visad.SetType;
+import visad.SingletonSet;
+import visad.Tuple;
+import visad.TupleType;
+import visad.UnionSet;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
 
 import visad.data.CachedFlatField;
 import visad.data.DataRange;
-
-import visad.data.mcidas.AREACoordinateSystem
-;
+import visad.data.mcidas.AREACoordinateSystem;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
-import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
 import visad.georef.MapProjection;
@@ -76,11 +114,16 @@ import visad.georef.TrivialMapProjection;
 
 import visad.util.DataUtility;
 
-import java.awt.Rectangle;
 
 import java.awt.geom.Rectangle2D;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 import java.rmi.RemoteException;
 
@@ -90,8 +133,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 
 /**
@@ -1503,18 +1544,6 @@ public class GridUtil {
                 return true;
             }
             if (Misc.isNaN(values)) {
-            /* moved to Misc.isMissing
-            // if first data value is NaN, check if all are.
-            if (Float.isNaN(values[0][0])) {
-                for (int i = 0; i < values.length; i++) {
-                    for (int j = 0; j < values[i].length; j++) {
-                        float value = values[i][j];
-                        if (value == value) {
-                            return false;
-                        }
-                    }
-                }
-                */
                 if (popupErrorMessage) {
                     String msg =
                         new String("All " + values.length * values[0].length
@@ -5546,16 +5575,19 @@ public class GridUtil {
                     }
 
                     domainVals = latLonSet.getSamples(false);
-                    int numRows = domainVals[0].length;
+                    boolean latFirst = isLatLonOrder(latLonSet);
+                    int     numRows  = domainVals[0].length;
                     rowCnt = -1;
                     for (int rowIdx = 0; rowIdx < numRows; rowIdx++) {
                         if ((rowCnt >= MAXROWS) || (rowCnt == -1)) {
                             sheets.add(sheet = wb.createSheet());
                             row = sheet.createRow(0);
-                            row.createCell((short) 0).setCellValue(
-                                "Latitude");
-                            row.createCell((short) 1).setCellValue(
-                                "Longitude");
+                            row.createCell((short) 0).setCellValue(latFirst
+                                    ? "Latitude"
+                                    : "Longitude");
+                            row.createCell((short) 1).setCellValue(latFirst
+                                    ? "Longitude"
+                                    : "Latitude");
                             if (domainVals.length > 2) {
                                 row.createCell((short) 2).setCellValue(
                                     "Altitude");
