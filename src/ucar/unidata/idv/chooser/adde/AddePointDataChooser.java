@@ -232,9 +232,9 @@ public class AddePointDataChooser extends AddeChooser {
                 ht.put(AddeUtil.RELATIVE_TIME_INCREMENT,
                        new Float(getRelativeTimeIncrement()));
             }
-            if (getDoAbsoluteTimes()) {
-                ht.put(AddeUtil.ABSOLUTE_TIMES, getSelectedAbsoluteTimes());
-            }
+//            if (getDoAbsoluteTimes()) {
+//                ht.put(AddeUtil.ABSOLUTE_TIMES, getSelectedAbsoluteTimes());
+//            }
             if (source.indexOf(AddeUtil.LEVEL) >= 0) {
                 ht.put(LEVELS, getLevels());
                 ht.put(SELECTED_LEVEL, getSelectedLevel());
