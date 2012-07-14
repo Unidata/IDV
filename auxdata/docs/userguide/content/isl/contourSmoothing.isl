@@ -1,13 +1,14 @@
 <isl debug="ture" offscreen="false">
-      <procedure name="mkContourCrossSection">
+      <procedure name="mkSmoothedContour">
           <bundle clear="true" file="${islpath}/RUC.xidv"/>
           <pause/>
-          <displayproperties display="class:ucar.unidata.idv.control.ContourCrossSectionControl">
-            <property name="StartPoint"  value="${startLocation}"/>
-            <property name="EndPoint"  value="${endLocation}"/>
+          <displayproperties display="class:ucar.unidata.idv.control.ContourPlanViewControl">
+            <property name="SmoothingType"  value="${stype}"/>
+            <property name="SmoothingFactor"  value="${sfactor}"/>
           </displayproperties>
           <pause/>
-          <image file="${islpath}/contourCS${idx}.png" display="class:ucar.unidata.idv.control.ContourCrossSectionControl"/>
+          <image file="${islpath}/contourImage${idx}.png"/>
       </procedure>
-      <mkContourCrossSection idx="11" startLocation="34.0, -140.0" endLocation="40.0, -55.0"/>
+
+      <mkSmoothedContour idx="11" sfactor="11" stype="GWFS"/>
 </isl>
