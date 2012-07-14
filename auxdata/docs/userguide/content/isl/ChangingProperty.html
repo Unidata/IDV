@@ -18,5 +18,22 @@ the IDV uses the property name and new value to replace the existing property, a
 
 [isl::importxml probeTimeSeries.isl]
 
+<p>
+In the next example, we use the displayproperties tag to change two existing properties: the smoothing type and the smoothing factor,
+in the bundle RUC.xidv. First, the IDV needs to identify the display to search for existing properties, which is the ContourPlanViewControl.
+After we identify the display, the IDV uses the property name and new value to replace the existing property, and the new smoothing type
+and factor being applied to contours.
+<p>
+
+[isl::importxml contourSmoothing.isl]
+
+<p>
+In the third example, we use the displayproperties tag to change two end points of a cross section in the bundle RUC.xidv.
+First, the IDV needs to identify the display to search for existing properties, which is the ContourCrossSectionControl.
+After we identify the display, the IDV uses the property name and new value to replace the existing property, and the new
+end points being applied to the cross section.
+<p>
+
+[isl::importxml contourCrossSection.isl]
 
 </body>
