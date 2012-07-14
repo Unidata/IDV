@@ -2312,6 +2312,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public void setStartPoint(RealTuple p) {
         initStartPoint = p;
+        if(csSelector != null )  {
+            try{
+            csSelector.setStartPoint(initStartPoint);
+            } catch (Exception e) {}
+        }
     }
 
     /**
@@ -2335,6 +2340,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public void setEndPoint(RealTuple p) {
         initEndPoint = p;
+        if(csSelector != null )  {
+            try{
+                csSelector.setEndPoint(initEndPoint);
+            } catch (Exception e) {}
+        }
     }
 
     /**
