@@ -9,6 +9,5 @@
           <pause/>
           <image file="${islpath}/contourImage${idx}.png"/>
       </procedure>
-
       <mkSmoothedContour idx="11" sfactor="11" stype="GWFS"/>
 </isl>
