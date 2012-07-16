@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -578,7 +578,7 @@ public class DataUtil {
      * Convert excel to csv
      *
      * @param filename excel file
-     * @param skipToFirstNumeric _more_
+     * @param skipToFirstNumeric if true, skip to first numeric
      * @param sdf If non null then use this to format any date cells
      *
      * @return csv
@@ -666,11 +666,11 @@ public class DataUtil {
      *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      *
      *
-     * @param pts _more_
-     * @param x _more_
-     * @param y _more_
+     * @param pts the xy outline points
+     * @param x  x value
+     * @param y  y value
      *
-     * @return _more_
+     * @return true if inside
      */
     public static boolean pointInside(float[][] pts, float x, float y) {
         int     i, j;
@@ -689,18 +689,25 @@ public class DataUtil {
     }
 
     /**
-     * _more_
+     * Select the dates from sourceTimes that most closely match
+     * the selectionTimes;
      *
-     * @param sourceTimes _more_
-     * @param driverTimes _more_
+     * @param sourceTimes set of available times
+     * @param driverTimes     times we want to match
      *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * @return the matching times as Dates
+     * @throws Exception  problem creating times
      */
     public static List<Date> selectDatesFromList(List sourceTimes,
             List<DateTime> driverTimes)
             throws Exception {
+        List<DateTime> dts   = selectTimesFromList(sourceTimes, driverTimes);
+        List<Date>     dates = new ArrayList<Date>();
+        for (DateTime dt : dts) {
+            dates.add(new Date((long) dt.getValue() * 1000));
+        }
+        return dates;
+        /*
         List<Date> results = new ArrayList<Date>();
         List<Date> dtimes  = new ArrayList<Date>();
         //First convert the source times to a list of Date objects
@@ -750,18 +757,20 @@ public class DataUtil {
             }
         }
         return results;
+        */
     }
 
 
     /**
-     * _more_
+     * Select the times from sourceTimes that most closely match
+     * the selectionTimes;
      *
-     * @param sourceTimes _more_
-     * @param selectionTimes _more_
+     * @param sourceTimes set of available times
+     * @param selectionTimes  times we want to match
      *
-     * @return _more_
+     * @return the matching times
      *
-     * @throws Exception _more_
+     * @throws Exception  problem creating times
      */
     public static List<DateTime> selectTimesFromList(List sourceTimes,
             List<DateTime> selectionTimes)
@@ -775,7 +784,7 @@ public class DataUtil {
                 sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
             } else if (object instanceof Date) {
                 sourceDates.add((Date) object);
-            }else if (object instanceof DatedObject) {
+            } else if (object instanceof DatedObject) {
                 sourceDates.add(((DatedObject) object).getDate());
             } else if (object instanceof TwoFacedObject) {  //relative time
                 return null;
@@ -796,7 +805,7 @@ public class DataUtil {
             Date minDate     = null;
             for (int i = 0; i < sourceDates.size(); i++) {
                 Date sourceDate = sourceDates.get(i);
-                long timeDiff = Math.abs(sourceDate.getTime()
+                long timeDiff   = Math.abs(sourceDate.getTime()
                                          - dttm.getTime());
                 if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
                     minTimeDiff = timeDiff;
