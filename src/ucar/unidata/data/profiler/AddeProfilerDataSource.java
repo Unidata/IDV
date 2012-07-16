@@ -399,7 +399,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
         // make request String to send to remote adde server
         // to gets the data
         String           url   = buildUrl(stationsToUse, paramsToUse);
-        List             urls  = AddeUtil.generateTimeUrls(this, url);
+        List             urls  = AddeUtil.generateTimeUrls(this, url, subset);
 
         FieldImpl        data  = null;
         Vector           datas = new Vector();
