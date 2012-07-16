@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,50 +23,38 @@ package ucar.unidata.data.point;
 
 import edu.wisc.ssec.mcidas.adde.AddePointURL;
 
-import ucar.unidata.data.*;
+import ucar.unidata.data.AddeUtil;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.geoloc.LatLonPoint;
-
 import ucar.unidata.geoloc.LatLonRect;
-
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
-import visad.*;
+import visad.Data;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealType;
+import visad.Tuple;
+import visad.VisADException;
 
 import visad.data.mcidas.PointDataAdapter;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-
-import java.io.File;
-
-
-import java.io.IOException;
-
-import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TimeZone;
-
-import javax.swing.*;
 
 
 /**
  * A data source for ADDE point data
  *
- * @author Don Murray
- * @version $Revision: 1.76 $ $Date: 2007/07/05 18:46:10 $
+ * @author IDV Development Team
  */
 public class AddePointDataSource extends PointDataSource {
 
@@ -190,7 +178,7 @@ public class AddePointDataSource extends PointDataSource {
             throws Exception {
         String source = sources.get(0).toString();
         source = processUrl(source, null, null, null, false);
-        List addeUrls = AddeUtil.generateTimeUrls(this, source);
+        List addeUrls = AddeUtil.generateTimeUrls(this, source, null);
         List urls     = new ArrayList();
         for (int i = 0; i < addeUrls.size(); i++) {
             String sourceUrl = (String) addeUrls.get(i);
@@ -242,9 +230,9 @@ public class AddePointDataSource extends PointDataSource {
             if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
                 String llb = "";
                 if (bbox != null) {
-                    LatLonPoint ll = bbox.getLowerLeftPoint();
-                    LatLonPoint ur = bbox.getUpperRightPoint();
-                    double latMin = Math.min(ll.getLatitude(),
+                    LatLonPoint ll     = bbox.getLowerLeftPoint();
+                    LatLonPoint ur     = bbox.getUpperRightPoint();
+                    double      latMin = Math.min(ll.getLatitude(),
                                              ur.getLatitude());
                     double latMax = Math.max(ll.getLatitude(),
                                              ur.getLatitude());
@@ -386,12 +374,10 @@ public class AddePointDataSource extends PointDataSource {
         List realUrls;
         Trace.call1("AddePointDataSource.makeObs");
         String source = getSource(dataChoice);
-        if (canSaveDataToLocalDisk()) {
-            //Pointing to an adde server
+        if (canSaveDataToLocalDisk()) { // Pointing to an adde server
             source   = processUrl(source, dataChoice, subset, bbox, sampleIt);
-            realUrls = AddeUtil.generateTimeUrls(this, source);
-        } else {
-            //Pointing to a file
+            realUrls = AddeUtil.generateTimeUrls(this, source, subset);
+        } else { // Pointing to a file
             realUrls = new ArrayList();
             for (int i = 0; i < sources.size(); i++) {
                 String sourceUrl = (String) sources.get(i);
@@ -555,7 +541,7 @@ public class AddePointDataSource extends PointDataSource {
             Misc.gc();
             for (int i = 0; i < args.length; i++) {
                 Trace.call1("AddePointDataSource.pda ctor");
-                long t1 = System.currentTimeMillis();
+                long             t1  = System.currentTimeMillis();
                 PointDataAdapter pda = new PointDataAdapter(args[i], false,
                                            true);
                 Trace.call2("AddePointDataSource.pda ctor", (newWay
@@ -614,14 +600,51 @@ public class AddePointDataSource extends PointDataSource {
      * @return list of levels (may be empty)
      */
     protected List getDefaultLevels() {
-        List retList = new ArrayList();
-        Object level =
+        List   retList = new ArrayList();
+        Object level   =
             getProperty(ucar.unidata.idv.chooser.adde.AddePointDataChooser
                 .SELECTED_LEVEL);
         if (level != null) {
             retList.add(level);
         }
         return retList;
+    }
+
+    /**
+     * Get the list of times for this datasource
+     *
+     * @return  empty list from this class
+     */
+    protected List doMakeDateTimes() {
+    	List timesList = new ArrayList();
+    	String source = (String) sources.get(0);
+    	if (getProperty(AddeUtil.ABSOLUTE_TIMES, (Object) null) != null) {
+    		timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
+        } else if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
+            Object tmp = getProperty(AddeUtil.NUM_RELATIVE_TIMES,
+                             new Integer(0));
+            int[] timeIndices;
+            if (tmp instanceof Integer) {
+                int numTimes = ((Integer) tmp).intValue();
+                timeIndices = new int[numTimes];
+                for (int i = 0; i < numTimes; i++) {
+                    timeIndices[i] = i;
+                }
+            } else {
+                timeIndices = (int[]) tmp;
+            }
+            for (int i = 0; i < timeIndices.length; i++) {
+                String name = timeIndices[i] + "th most recent";
+                if (i == 0) {
+                    name = "Most recent";
+                }
+                if ((i > 0) && (i < DataSource.ordinalNames.length)) {
+                    name = DataSource.ordinalNames[timeIndices[i]] + " most recent";
+                }
+                timesList.add(new TwoFacedObject(name, i));
+            }
+    	}
+    	return timesList;
     }
 
 }
