@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -232,6 +232,9 @@ public class AddePointDataChooser extends AddeChooser {
                 ht.put(AddeUtil.RELATIVE_TIME_INCREMENT,
                        new Float(getRelativeTimeIncrement()));
             }
+//            if (getDoAbsoluteTimes()) {
+//                ht.put(AddeUtil.ABSOLUTE_TIMES, getSelectedAbsoluteTimes());
+//            }
             if (source.indexOf(AddeUtil.LEVEL) >= 0) {
                 ht.put(LEVELS, getLevels());
                 ht.put(SELECTED_LEVEL, getSelectedLevel());

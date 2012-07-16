@@ -3235,7 +3235,16 @@ public final class Util {
             double lon = Double.parseDouble(toks.get(1));
             EarthLocation earthLocation = ucar.visad.Util.makeEarthLocation(lat,lon);
             argument  = earthLocation;
+        } else if(paramType.equals(RealTuple.class) && (name.endsWith("StartPoint") || name.endsWith("EndPoint"))) {
+            List<String> toks = ucar.unidata.util.StringUtil.split(value.toString(), ",",true, true);
+            if(toks.size()!=2) throw new IllegalArgumentException("Bad EarthLocation value:" + value);
+            double lat = Double.parseDouble(toks.get(0));
+            double lon = Double.parseDouble(toks.get(1));
+            argument = new RealTuple(
+                    RealTupleType.SpatialEarth3DTuple,
+                    new double[] {lon,lat,0.0 });
         }
+
         if (argument != null) {
             method.invoke(object, new Object[] { argument });
             return true;

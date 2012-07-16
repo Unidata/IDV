@@ -1,5 +1,5 @@
 <derived_parameters>
-  <derived description="Calculate Monthly Anomalies" formula="calcMonAnom(monthly, ltm)" id="Monthly Anomaly" isdefault="false" isenduser="true">
+  <derived description="Calculate Monthly Anomaly" formula="calcMonAnom(monthly, ltm)" id="Monthly Anomaly" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Climatology"/>
       <category value="display:topography"/>
