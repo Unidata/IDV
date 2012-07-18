@@ -40,14 +40,7 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IntegratedDataViewer;
 
 
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
+import ucar.unidata.util.*;
 
 
 import ucar.unidata.xml.XmlUtil;
@@ -489,7 +482,7 @@ public class JythonControl extends GridDisplayControl {
 
         label = label.trim();
         String id = "jythoncontrol_"
-                    + StringUtil.removeWhitespace(label.toLowerCase());
+                    + StringUtil2.removeWhitespace(label.toLowerCase());
         String props = prop("displayName", label)
                        + prop("windowVisible", "true")
                        + prop("probeType", probeType)

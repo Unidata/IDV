@@ -32,16 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 
 import ucar.unidata.xml.XmlNodeList;
 import ucar.unidata.xml.XmlObjectStore;
@@ -302,7 +293,7 @@ public class XmlTree extends JTree {
                     String text = XmlUtil.getChildText(child);
                     if ((text != null) && (text.length() > 50)) {
                         text = "<html>"
-                               + StringUtil.breakText(text, "<br>", 50)
+                               + StringUtil2.breakTextAtWords(text, "<br>", 50)
                                + "</html>";
                     }
                     return text;

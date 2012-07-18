@@ -36,23 +36,8 @@ import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.IdvResourceManager;
 
-import ucar.unidata.util.CacheManager;
+import ucar.unidata.util.*;
 
-import ucar.unidata.util.ColorTable;
-
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.IOUtil;
-
-
-import ucar.unidata.util.JobManager;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-
-import ucar.unidata.util.Range;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
@@ -394,7 +379,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         String       desc = wmsInfo.getDescription();
         if (desc != null) {
             sb.append("<p>Abstract:<br>\n");
-            sb.append(StringUtil.breakText(desc, "<br>", 50));
+            sb.append(StringUtil2.breakTextAtWords(desc, "<br>", 50));
         }
         return sb.toString();
     }

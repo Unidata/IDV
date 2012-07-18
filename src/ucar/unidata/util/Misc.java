@@ -3509,7 +3509,7 @@ public class Misc {
      * @return The text with added br tags.
      */
     public static String breakText(String text, String insert, int lineSize) {
-        return StringUtil.breakText(text, insert, lineSize);
+        return StringUtil2.breakTextAtWords(text, insert, lineSize);
     }
 
 
@@ -3530,7 +3530,7 @@ public class Misc {
      *  @return The whitespaceless result.
      */
     public static String removeWhitespace(String inputString) {
-        return StringUtil.removeWhitespace(inputString);
+        return StringUtil2.removeWhitespace(inputString);
     }
 
 

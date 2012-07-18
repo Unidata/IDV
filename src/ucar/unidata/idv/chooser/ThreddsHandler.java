@@ -38,17 +38,9 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.XmlTree;
-import ucar.unidata.util.CatalogUtil;
+import ucar.unidata.util.*;
 
 
-import ucar.unidata.util.FileManager;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlNodeList;
 
 
@@ -189,7 +181,7 @@ public class ThreddsHandler extends XmlHandler {
         }
 
         return "<html><b>" + title + "</b><hr>"
-               + StringUtil.breakText(text, "<br>", 50) + "</html>";
+               + StringUtil2.breakTextAtWords(text, "<br>", 50) + "</html>";
     }
 
 
@@ -741,7 +733,7 @@ public class ThreddsHandler extends XmlHandler {
             title = "Documentation";
         }
         if (doc.indexOf("<html") < 0) {
-            doc = StringUtil.breakText(doc, "<br>", 50);
+            doc = StringUtil2.breakTextAtWords(doc, "<br>", 50);
         }
         try {
             //Some html docs have a head tag which seems to screw up the html rendering
