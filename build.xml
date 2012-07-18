@@ -75,10 +75,11 @@ argument -Dfoo=bar) -->
 
 
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
+        <property name="netcdf.jar" value="netcdfAll-4.3.jar" />
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/ncIdv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/${netcdf.jar}:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
 
 
 
@@ -111,7 +112,7 @@ argument -Dfoo=bar) -->
 
         <copy  file="${libsrc}/jythonlib.jar" todir="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <!-- unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/ -->
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/poi.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
@@ -712,7 +713,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ${netcdf.jar} external.jar"/>
             </manifest>
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
@@ -751,7 +752,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
-              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ${netcdf.jar} external.jar"/>
             </manifest>
             <include name="ucar/**/README*"/>
         </jar>
@@ -805,7 +806,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
     <target name="unidatautil" depends="init,clean" >
         <delete dir="${tmpjardir}"/>
         <mkdir dir="${tmpjardir}"/>
-        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <!-- unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/ -->
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <javac
             classpath="${classpath}"
