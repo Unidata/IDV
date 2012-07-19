@@ -75,7 +75,7 @@ argument -Dfoo=bar) -->
 
 
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="netcdf.jar" value="netcdfAll-4.3.jar" />
+        <property name="netcdf.jar" value="ncIdv-4.3.12.jar" />
 
 
 
