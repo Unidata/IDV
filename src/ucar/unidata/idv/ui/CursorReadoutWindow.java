@@ -160,8 +160,11 @@ public class CursorReadoutWindow {
      * _more_
      *
      * @param e _more_
+     * @throws VisADException
+     * @throws RemoteException
      */
-    public void handleMousePressedOrDragged(MouseEvent e) {
+    public void handleMousePressedOrDragged(MouseEvent e) 
+           throws RemoteException, VisADException {
         if (window == null) {
             JComponent contents = (JComponent) vm.getContents();
             Window     parent   = GuiUtils.getWindow(contents);
@@ -175,6 +178,17 @@ public class CursorReadoutWindow {
                 e.getX(), e.getY());
         lastEarthLocation = vm.getNavigatedDisplay().getEarthLocation(box[0],
                 box[1], box[2], true);
+
+        if ((lastEarthLocation.getLongitude().getValue() < -180.0) ||
+        		(lastEarthLocation.getLongitude().getValue() > 180.0)) {
+        	// re-create the EarthLocationTuple, 
+        	// ensuring a longitude between -180 and 180
+        	lastEarthLocation = new EarthLocationTuple(
+        			lastEarthLocation.getLatitude().getValue(),
+        			Misc.normalizeLongitude(
+        					lastEarthLocation.getLongitude().getValue()),
+        					lastEarthLocation.getAltitude().getValue());
+        }
 
         updateReadout();
     }
