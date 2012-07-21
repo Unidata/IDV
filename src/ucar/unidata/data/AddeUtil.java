@@ -264,7 +264,7 @@ public final class AddeUtil {
             for (int i = 0; i < numTimes; i++) {
                 float  hours      = i * timeInc;
                 int    hour       = (int) hours;
-                int    minutes    = (int) (hours - hour) * 60;
+                int    minutes    = (int) ((hours - hour) * 60);
                 String dateString = today + " " + StringUtil.padZero(hour, 2)
                                     + ":" + StringUtil.padZero(minutes, 2)
                                     + ":00";
