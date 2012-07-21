@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,61 +21,45 @@
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.data.profiler.*;
-import ucar.unidata.idv.ControlContext;
-
-
-
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.Range;
 
-import ucar.visad.display.Displayable;
-import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
-import ucar.visad.display.LineProbe;
-import ucar.visad.display.SelectorPoint;
 import ucar.visad.display.WindBarbDisplayable;
 
-import visad.*;
-
-import visad.data.units.Parser;
+import visad.Data;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FlowControl;
+import visad.FunctionType;
+import visad.Gridded3DSet;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.VisADException;
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
-import visad.util.DataUtility;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
-
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 
 /**
@@ -173,8 +157,8 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         displayIs3D = isDisplay3D();
 
         // check and set data level
-        while ( !checkDataLevelValue(levelValue) ) {
-            levelValue         = levelValue *0.9f;
+        while ( !checkDataLevelValue(levelValue)) {
+            levelValue         = levelValue * 0.9f;
             currentVerticalInt = new Real(levelValue / 25.0);
         }
 
@@ -204,12 +188,12 @@ public class ProfilerMultiStationControl extends ProfilerControl {
     /**
      * check the input zlevel is not too high for the obs data point
      *
-     * @param zlevel _more_
+     * @param zlevel The level
      *
-     * @return _more_
+     * @return  true if we have the level
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException  Problem creating data
      */
     public boolean checkDataLevelValue(float zlevel)
             throws VisADException, RemoteException {
@@ -233,8 +217,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             // for each ob in this time's collection
             for (int j = 0; j < oneTimeFF.getLength(); j++) {
 
-                Gridded3DSet tds     =
-                    (Gridded3DSet) oneTimeFF.getDomainSet();
+                Gridded3DSet tds     = (Gridded3DSet) oneTimeFF.getDomainSet();
                 float[][]    latlonz = tds.getSamples(false);
                 // test if this z altitude value matches either spacings
                 // for 3D plot; or single level value for Plan View.
@@ -297,7 +280,8 @@ public class ProfilerMultiStationControl extends ProfilerControl {
      */
     protected DataInstance doMakeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
-        return new GridDataInstance(dataChoice, null, getRequestProperties());
+        return new GridDataInstance(dataChoice, this.dataSelection,
+                                    getRequestProperties());
     }
 
 
@@ -669,7 +653,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             try {
                 width  = 2.0f;  // units geographic degrees
                 height = 2.0f;
-                mp = new TrivialMapProjection(
+                mp     = new TrivialMapProjection(
                     RealTupleType.SpatialEarth2DTuple,
                     new Rectangle2D.Float(
                         xx - 1.0f, yy - 1.0f, width, height));
