@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -261,6 +261,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** list of levels */
     private List levelsList;
 
+    /** old smoothing type */
+    private String OldSmoothingType = LABEL_NONE;
+
+    /** old smoothing factor */
+    private int OldSmoothingFactor = 0;
 
     /**
      * Default constructor.  Sets the appropriate attribute flags.
@@ -1681,9 +1686,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws VisADException  VisAD problem
      */
     protected void applySmoothing() throws VisADException, RemoteException {
-        if (checkFlag(FLAG_SMOOTHING)
-                && !getSmoothingType().equals(LABEL_NONE)) {
-            loadDataFromLine();
+        if (checkFlag(FLAG_SMOOTHING)) {
+            if ( !getSmoothingType().equals(OldSmoothingType)
+                    || (getSmoothingFactor() != OldSmoothingFactor)) {
+                OldSmoothingType   = getSmoothingType();
+                OldSmoothingFactor = getSmoothingFactor();
+                loadDataFromLine();
+            }
         }
     }
 
@@ -2312,9 +2321,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public void setStartPoint(RealTuple p) {
         initStartPoint = p;
-        if(csSelector != null )  {
-            try{
-            csSelector.setStartPoint(initStartPoint);
+        if (csSelector != null) {
+            try {
+                csSelector.setStartPoint(initStartPoint);
             } catch (Exception e) {}
         }
     }
@@ -2340,8 +2349,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public void setEndPoint(RealTuple p) {
         initEndPoint = p;
-        if(csSelector != null )  {
-            try{
+        if (csSelector != null) {
+            try {
                 csSelector.setEndPoint(initEndPoint);
             } catch (Exception e) {}
         }
