@@ -5510,6 +5510,7 @@ public class ImageGenerator extends IdvManager {
      */
     public synchronized void captureMovie(String filename,
                                           Element scriptingNode) {
+
         if ((filename == null) && (scriptingNode != null)) {
             filename = XmlUtil.getAttribute(scriptingNode, ATTR_FILE);
         }
@@ -5569,23 +5570,25 @@ public class ImageGenerator extends IdvManager {
         }
 
 
-        int viewSize = 0;
-        boolean combine = XmlUtil.getAttribute(scriptingNode, ImageGenerator.ATTR_COMBINE,
-                false);
-        if(combine){
+        int     viewSize = 0;
+        boolean combine  = XmlUtil.getAttribute(scriptingNode,
+                              ImageGenerator.ATTR_COMBINE, false);
+        if (combine) {
             viewSize = 1;
-        } else if(filename.contains(PROP_VIEWINDEX)) { 
-            viewSize = viewManagers.size();          
+        } else if (filename.contains(PROP_VIEWINDEX)) {
+            viewSize = viewManagers.size();
         } else {
             viewSize = 1;
         }
 
         for (int i = 0; i < viewSize; i++) {
             ViewManager viewManager = null;
-            if( viewSize > 1)
+            if (viewSize > 1) {
                 viewManager = (ViewManager) viewManagers.get(i);
-            else
-                viewManager = getIdv().getVMManager().getLastActiveViewManager();
+            } else {
+                viewManager =
+                    getIdv().getVMManager().getLastActiveViewManager();
+            }
 
             getProperties().put(PROP_VIEWINDEX, new Integer(i));
             String name = viewManager.getName();
@@ -5616,7 +5619,8 @@ public class ImageGenerator extends IdvManager {
             }
             debug("Done making movie:" + loopFilename);
         }
-         
+
+
     }
 
 

@@ -2,27 +2,24 @@
  * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import ij.ImagePlus;
 
@@ -52,8 +49,6 @@ import ucar.visad.display.AnimationWidget;
 
 import visad.DateTime;
 import visad.Real;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -105,6 +100,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 /**
  * Class ImageSequenceGrabber. Manages the movie capture dialog,
@@ -198,17 +194,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     public static final String CMD_PUBLISH = "publish";
 
     /** Property for the image file template */
-    public static final String PROP_IMAGEALTDIR = "imagesequencegrabber.altdir";
+    public static final String PROP_IMAGEALTDIR =
+        "imagesequencegrabber.altdir";
 
     /** Property for the image file template */
-    public static final String PROP_IMAGETEMPLATE = "imagesequencegrabber.template";
+    public static final String PROP_IMAGETEMPLATE =
+        "imagesequencegrabber.template";
 
     /** How much we pause between animation captures */
     private static int SLEEP_TIME = 500;
 
     /** Filter for HTML files */
-    public static final PatternFileFilter FILTER_ANIS = new PatternFileFilter(".+\\.html|.+\\.htm",
-                                                            "AniS or FlAniS HTML File (*.html)", ".html");
+    public static final PatternFileFilter FILTER_ANIS =
+        new PatternFileFilter(".+\\.html|.+\\.htm",
+                              "AniS or FlAniS HTML File (*.html)", ".html");
 
     /** xml tag or attr name */
     public static final String TAG_DESCRIPTION = "description";
@@ -289,7 +288,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private boolean justCaptureAnimation = false;
 
     /** capture flythrough */
-    private JCheckBox grabFlythroughCbx = new JCheckBox("Capture Flythrough", false);
+    private JCheckBox grabFlythroughCbx = new JCheckBox("Capture Flythrough",
+                                              false);
 
     /** widget */
     JCheckBox animationResetCbx = new JCheckBox("Reset to start time", true);
@@ -457,7 +457,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * the source of the image
      *
      */
-    public ImageSequenceGrabber(ViewManager viewManager, JComponent alternateComponent) {
+    public ImageSequenceGrabber(ViewManager viewManager,
+                                JComponent alternateComponent) {
         this(viewManager, alternateComponent, false);
     }
 
@@ -468,7 +469,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param alternateComponent   alternate component
      * @param justCaptureAnimation true to just capture the animation
      */
-    public ImageSequenceGrabber(ViewManager viewManager, JComponent alternateComponent, boolean justCaptureAnimation) {
+    public ImageSequenceGrabber(ViewManager viewManager,
+                                JComponent alternateComponent,
+                                boolean justCaptureAnimation) {
         this.alternateComponent   = alternateComponent;
         this.viewManager          = viewManager;
         this.idv                  = viewManager.getIdv();
@@ -488,7 +491,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param filename The file we are writing to
      * @param idv The IDV
      */
-    public ImageSequenceGrabber(ViewManager viewManager, String filename, IntegratedDataViewer idv) {
+    public ImageSequenceGrabber(ViewManager viewManager, String filename,
+                                IntegratedDataViewer idv) {
         this(viewManager, filename, idv, null, null);
     }
 
@@ -502,15 +506,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param scriptingNode The igml node
      * @param imageGenerator  imageGenerator
      */
-    public ImageSequenceGrabber(ViewManager viewManager, String filename, IntegratedDataViewer idv,
-                                ImageGenerator imageGenerator, Element scriptingNode) {
+    public ImageSequenceGrabber(ViewManager viewManager, String filename,
+                                IntegratedDataViewer idv,
+                                ImageGenerator imageGenerator,
+                                Element scriptingNode) {
         this.viewManager    = viewManager;
         this.imageGenerator = imageGenerator;
         this.scriptingNode  = scriptingNode;
         movieFileName       = filename;
 
         if (scriptingNode != null) {
-            movieFileName = imageGenerator.applyMacros(scriptingNode, ATTR_FILENAME, movieFileName);
+            movieFileName = imageGenerator.applyMacros(scriptingNode,
+                    ATTR_FILENAME, movieFileName);
         }
 
         this.idv = idv;
@@ -530,10 +537,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param size Size of image
      * @param displayRate Display rate
      */
-    public ImageSequenceGrabber(String filename, IntegratedDataViewer idv, ImageGenerator imageGenerator,
-                                Element scriptingNode, List<ImageWrapper> imageFiles, Dimension size,
-                                double displayRate) {
-        this(filename, idv, imageGenerator, scriptingNode, imageFiles, size, displayRate, -1);
+    public ImageSequenceGrabber(String filename, IntegratedDataViewer idv,
+                                ImageGenerator imageGenerator,
+                                Element scriptingNode,
+                                List<ImageWrapper> imageFiles,
+                                Dimension size, double displayRate) {
+        this(filename, idv, imageGenerator, scriptingNode, imageFiles, size,
+             displayRate, -1);
     }
 
     /**
@@ -549,16 +559,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param displayRate Display rate
      * @param endPause  end pause (seconds)
      */
-    public ImageSequenceGrabber(String filename, IntegratedDataViewer idv, ImageGenerator imageGenerator,
-                                Element scriptingNode, List<ImageWrapper> imageFiles, Dimension size,
-                                double displayRate, double endPause) {
+    public ImageSequenceGrabber(String filename, IntegratedDataViewer idv,
+                                ImageGenerator imageGenerator,
+                                Element scriptingNode,
+                                List<ImageWrapper> imageFiles,
+                                Dimension size, double displayRate,
+                                double endPause) {
         this.idv            = idv;
         this.imageGenerator = imageGenerator;
         this.scriptingNode  = scriptingNode;
         this.images         = ImageWrapper.makeImageWrappers(imageFiles);
         this.idv            = idv;
         movieFileName       = filename;
-        createMovie(movieFileName, images, size, displayRate, scriptingNode, endPause);
+        createMovie(movieFileName, images, size, displayRate, scriptingNode,
+                    endPause);
     }
 
     /**
@@ -622,8 +636,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return the animation widget
      */
     private AnimationWidget getAnimationWidget() {
-        if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected() && (viewManager instanceof MapViewManager)) {
-            Flythrough flythrough = ((MapViewManager) viewManager).getFlythrough();
+        if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected()
+                && (viewManager instanceof MapViewManager)) {
+            Flythrough flythrough =
+                ((MapViewManager) viewManager).getFlythrough();
 
             if (flythrough != null) {
                 return flythrough.getAnimationWidget();
@@ -645,8 +661,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return the Animation
      */
     private Animation getAnimation() {
-        if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected() && (viewManager instanceof MapViewManager)) {
-            Flythrough flythrough = ((MapViewManager) viewManager).getFlythrough();
+        if ((grabFlythroughCbx != null) && grabFlythroughCbx.isSelected()
+                && (viewManager instanceof MapViewManager)) {
+            Flythrough flythrough =
+                ((MapViewManager) viewManager).getFlythrough();
 
             if (flythrough != null) {
                 return flythrough.getAnimation();
@@ -668,8 +686,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void init() {
 
         // Store the images in a unique (by current time) subdir of the user's tmp  dir
-        directory = IOUtil.joinDir(viewManager.getStore().getUserTmpDirectory(),
-                                   "images_" + System.currentTimeMillis());
+        directory =
+            IOUtil.joinDir(viewManager.getStore().getUserTmpDirectory(),
+                           "images_" + System.currentTimeMillis());
 
         // Make sure the dir exists
         IOUtil.makeDir(directory);
@@ -677,7 +696,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         frameLbl       = GuiUtils.cLabel("No frames");
         displayRateFld = new JTextField("2", 3);
         endPauseFld    = new JTextField("2", 3);
-        endPauseFld.setToolTipText("Number of seconds to pause on last frame of animated GIF");
+        endPauseFld.setToolTipText(
+            "Number of seconds to pause on last frame of animated GIF");
         captureRateFld = new JTextField("2", 3);
 
         String imgp = "/auxdata/ui/icons/";
@@ -696,7 +716,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         beepCbx.setToolTipText("Beep when an image is captured");
 
         List btns = Misc.newList(new Object[] {
-            new JLabel("What to capture:"), mainDisplayBtn, allViewsBtn, contentsBtn, fullWindowBtn, fullScreenBtn
+            new JLabel("What to capture:"), mainDisplayBtn, allViewsBtn,
+            contentsBtn, fullWindowBtn, fullScreenBtn
         });
 
         btns.add(beepCbx);
@@ -714,12 +735,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         GuiUtils.setupDirectoryChooser(alternateDirBtn, alternateDirFld);
 
         if (dfltTemplate == null) {
-            dfltTemplate = idv.getStore().get(PROP_IMAGETEMPLATE, "image_%count%_%time%");
+            dfltTemplate = idv.getStore().get(PROP_IMAGETEMPLATE,
+                    "image_%count%_%time%");
         }
 
         fileTemplateFld = new JTextField(dfltTemplate, 30);
         fileTemplateFld.setToolTipText(
-            "<html>Enter the file name template to use.<br>" + "<b>%count%</b> is the image counter<br>"
+            "<html>Enter the file name template to use.<br>"
+            + "<b>%count%</b> is the image counter<br>"
             + "<b>%count:decimal format%</b> allows you to format the count. Google 'java decimalformat' for more information.<br>"
             + "<b>%time%</b> is the  animation time in the default format<br>"
             + "<b>%time:some time format string%</b> a macro that begins with &quot;time:&quot;,contains a time format string using the:<br>"
@@ -729,7 +752,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         alternateDirCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 for (int i = 0; i < alternateComps.size(); i++) {
-                    GuiUtils.enableTree((JComponent) alternateComps.get(i), alternateDirCbx.isSelected());
+                    GuiUtils.enableTree((JComponent) alternateComps.get(i),
+                                        alternateDirCbx.isSelected());
                 }
             }
         });
@@ -744,15 +768,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         boolean hasFlythrough = false;
 
-        if ((viewManager instanceof MapViewManager) && ((MapViewManager) viewManager).getFlythrough() != null) {
-            hasFlythrough = ((MapViewManager) viewManager).getFlythrough().hasPoints();
+        if ((viewManager instanceof MapViewManager)
+                && ((MapViewManager) viewManager).getFlythrough() != null) {
+            hasFlythrough =
+                ((MapViewManager) viewManager).getFlythrough().hasPoints();
         }
 
         List frameButtons = new ArrayList();
 
-        frameButtons.add(previewButton = makeButton("Preview", CMD_PREVIEW_SHOW));
+        frameButtons.add(previewButton = makeButton("Preview",
+                CMD_PREVIEW_SHOW));
         frameButtons.add(clearButton = makeButton("Delete All", CMD_CLEAR));
-        frameButtons.add(createButton = makeButton("Save Movie", GuiUtils.CMD_OK));
+        frameButtons.add(createButton = makeButton("Save Movie",
+                GuiUtils.CMD_OK));
 
         JComponent publishButton;
 
@@ -767,55 +795,70 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         closeButton = makeButton("Close", GuiUtils.CMD_CLOSE);
 
-        JLabel titleLbl   = GuiUtils.cLabel("Note: Make sure the view window is not obscured");
+        JLabel titleLbl =
+            GuiUtils.cLabel(
+                "Note: Make sure the view window is not obscured");
         JPanel titlePanel = GuiUtils.inset(titleLbl, 8);
-        JPanel runPanel   = GuiUtils.hflow(Misc.newList(GuiUtils.rLabel(" Rate: "), captureRateFld,
-                              new JLabel(" seconds")));
-        int maxBtnWidth = Math.max(grabAnimationBtn.getPreferredSize().width,
-                                   Math.max(grabBtn.getPreferredSize().width, grabAutoBtn.getPreferredSize().width));
+        JPanel runPanel   =
+            GuiUtils.hflow(Misc.newList(GuiUtils.rLabel(" Rate: "),
+                                        captureRateFld,
+                                        new JLabel(" seconds")));
+        int maxBtnWidth =
+            Math.max(grabAnimationBtn.getPreferredSize().width,
+                     Math.max(grabBtn.getPreferredSize().width,
+                              grabAutoBtn.getPreferredSize().width));
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
         JPanel capturePanel = GuiUtils.doLayout(new Component[] {
             grabBtn, GuiUtils.filler(), GuiUtils.top(grabAnimationBtn),
             GuiUtils.vbox(animationResetCbx, (hasFlythrough
-                                              ? (JComponent) grabFlythroughCbx
-                                              : GuiUtils.filler())), grabAutoBtn, runPanel,
+                    ? (JComponent) grabFlythroughCbx
+                    : GuiUtils.filler())), grabAutoBtn, runPanel,
             GuiUtils.filler(maxBtnWidth + 10, 1), GuiUtils.filler(),
         }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
 
         backgroundTransparentBtn = new JCheckBox("Background Transparent");
         backgroundTransparentBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                if (backgroundTransparentBtn.isSelected() &&!notifiedForTransparent) {
-                    LogUtil.userMessage("Note: Only KMZ files can be saved with background transparency on");
+                if (backgroundTransparentBtn.isSelected()
+                        && !notifiedForTransparent) {
+                    LogUtil.userMessage(
+                        "Note: Only KMZ files can be saved with background transparency on");
                 }
 
                 notifiedForTransparent = true;
             }
         });
-        capturePanel = GuiUtils.hbox(GuiUtils.top(capturePanel),
-                                     GuiUtils.top(GuiUtils.inset(GuiUtils.vbox(whatPanel, backgroundTransparentBtn),
-                                         new Insets(0, 10, 0, 0))));
+        capturePanel = GuiUtils.hbox(
+            GuiUtils.top(capturePanel),
+            GuiUtils.top(
+                GuiUtils.inset(
+                    GuiUtils.vbox(whatPanel, backgroundTransparentBtn),
+                    new Insets(0, 10, 0, 0))));
         capturePanel = GuiUtils.inset(GuiUtils.left(capturePanel), 5);
         capturePanel.setBorder(BorderFactory.createTitledBorder("Capture"));
         GuiUtils.setHFill();
 
         JPanel filePanel = GuiUtils.doLayout(null, new Component[] {
-            GuiUtils.rLabel("Image Quality:"), GuiUtils.left(GuiUtils.hbox(hiBtn, medBtn, lowBtn)), GuiUtils.filler(),
-            GuiUtils.right(alternateDirCbx),
-
+            GuiUtils.rLabel("Image Quality:"),
+            GuiUtils.left(GuiUtils.hbox(hiBtn, medBtn, lowBtn)),
+            GuiUtils.filler(), GuiUtils.right(alternateDirCbx),
             // GuiUtils.filler(),
             // GuiUtils.filler(),
             // addAltComp(GuiUtils.rLabel("Directory:")),
-            addAltComp(alternateDirFld), addAltComp(alternateDirBtn), addAltComp(GuiUtils.rLabel("Filename Template:")),
+            addAltComp(alternateDirFld), addAltComp(alternateDirBtn),
+            addAltComp(GuiUtils.rLabel("Filename Template:")),
             addAltComp(fileTemplateFld), addAltComp(overwriteCbx)
-        }, 3, GuiUtils.WT_NYN, GuiUtils.WT_N, null, null, new Insets(0, 5, 0, 0));
+        }, 3, GuiUtils.WT_NYN, GuiUtils.WT_N, null, null,
+           new Insets(0, 5, 0, 0));
 
         filePanel = GuiUtils.inset(filePanel, 5);
         filePanel.setBorder(BorderFactory.createTitledBorder("Image Files"));
 
-        JPanel framesPanel = GuiUtils.vbox(GuiUtils.left(frameLbl), GuiUtils.hflow(frameButtons, 4, 0));
+        JPanel framesPanel = GuiUtils.vbox(GuiUtils.left(frameLbl),
+                                           GuiUtils.hflow(frameButtons, 4,
+                                               0));
 
         framesPanel = GuiUtils.inset(framesPanel, 5);
         framesPanel.setBorder(BorderFactory.createTitledBorder("Frames"));
@@ -833,9 +876,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         checkEnabled();
 
         // Only show the window if init filename is null
-        if (!justCaptureAnimation && (movieFileName == null) && (scriptingNode == null)) {
+        if ( !justCaptureAnimation && (movieFileName == null)
+                && (scriptingNode == null)) {
             GuiUtils.packDialog(mainDialog,
-                                GuiUtils.centerBottom(contents, GuiUtils.wrap(GuiUtils.inset(closeButton, 4))));
+                                GuiUtils.centerBottom(contents,
+                                    GuiUtils.wrap(GuiUtils.inset(closeButton,
+                                        4))));
             mainDialog.setVisible(true);
         }
     }
@@ -869,7 +915,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             if (haveImages) {
                 String current = images.get(previewIndex).getPath();
 
-                if (!Misc.equals(current, lastPreview)) {
+                if ( !Misc.equals(current, lastPreview)) {
                     previewPanel.loadFile(current);
 
                     /*
@@ -886,7 +932,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     lastPreview = current;
                 }
 
-                previewLbl.setText("  Frame: " + (previewIndex + 1) + "/" + images.size());
+                previewLbl.setText("  Frame: " + (previewIndex + 1) + "/"
+                                   + images.size());
             } else {
                 previewLbl.setText("   No images   ");
                 previewPanel.setImage(null);
@@ -928,17 +975,22 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     previewRateFld.setText("" + value);
                 }
             };
-            JComponent[] comps     = GuiUtils.makeSliderPopup(1, 20, 4, rateListener);
-            JComponent   sliderBtn = comps[0];
+            JComponent[] comps = GuiUtils.makeSliderPopup(1, 20, 4,
+                                     rateListener);
+            JComponent sliderBtn = comps[0];
 
             playButton = makeButton(playIcon, CMD_PREVIEW_PLAY, "Play/Stop");
-            nextButton = makeButton(GuiUtils.getImageIcon(imgp + "StepForward16.gif"), CMD_PREVIEW_NEXT,
-                                    "Go to next frame");
-            prevButton = makeButton(GuiUtils.getImageIcon(imgp + "StepBack16.gif"), CMD_PREVIEW_PREV,
-                                    "Go to previous frame");
-            deleteFrameButton = makeButton("Delete this frame", CMD_PREVIEW_DELETE);
+            nextButton = makeButton(GuiUtils.getImageIcon(imgp
+                    + "StepForward16.gif"), CMD_PREVIEW_NEXT,
+                                            "Go to next frame");
+            prevButton = makeButton(GuiUtils.getImageIcon(imgp
+                    + "StepBack16.gif"), CMD_PREVIEW_PREV,
+                                         "Go to previous frame");
+            deleteFrameButton = makeButton("Delete this frame",
+                                           CMD_PREVIEW_DELETE);
 
-            List buttonList = Misc.newList(prevButton, playButton, nextButton);
+            List buttonList = Misc.newList(prevButton, playButton,
+                                           nextButton);
 
             buttonList.add(GuiUtils.filler(20, 5));
             buttonList.add(new JLabel(" Delay: "));
@@ -961,9 +1013,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             // previewImage.setBorder(BorderFactory.createEtchedBorder());
             previewPanel.setBorder(BorderFactory.createEtchedBorder());
 
-            JComponent topComp  = GuiUtils.leftRight(buttons, GuiUtils.hbox(deleteFrameButton, previewLbl));
-            JPanel     contents = GuiUtils.topCenterBottom(topComp, previewPanel,
-                                  GuiUtils.wrap(makeButton("Close", CMD_PREVIEW_CLOSE)));
+            JComponent topComp = GuiUtils.leftRight(buttons,
+                                     GuiUtils.hbox(deleteFrameButton,
+                                         previewLbl));
+            JPanel contents = GuiUtils.topCenterBottom(topComp, previewPanel,
+                                  GuiUtils.wrap(makeButton("Close",
+                                      CMD_PREVIEW_CLOSE)));
 
             GuiUtils.packDialog(previewDialog, contents);
         }
@@ -982,8 +1037,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         // else {
         // grabAutoBtn.setIcon (startIcon);
         // }
-        grabAnimationBtn.setEnabled(!capturingAuto);
-        grabBtn.setEnabled(!capturingAuto &&!capturingAnim);
+        grabAnimationBtn.setEnabled( !capturingAuto);
+        grabBtn.setEnabled( !capturingAuto && !capturingAnim);
     }
 
     /**
@@ -1007,7 +1062,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void stopCapturingAuto() {
         grabAutoBtn.setText("Automatically");
 
-        if (!capturingAuto) {
+        if ( !capturingAuto) {
             return;
         }
 
@@ -1046,7 +1101,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return keep running
      */
     private boolean keepRunning(int timestamp) {
-        if (!capturingAnim || (timestamp != captureTimeStamp)) {
+        if ( !capturingAnim || (timestamp != captureTimeStamp)) {
             return false;
         }
 
@@ -1061,18 +1116,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param timestamp Used to know which thread should be running
      */
     private void runAnimationCapture(int timestamp) {
+
         try {
             getAnimation().setAnimating(false);
 
-            if ((animationResetCbx != null) && animationResetCbx.isSelected()) {
+            if ((animationResetCbx != null)
+                    && animationResetCbx.isSelected()) {
                 getAnimationWidget().gotoBeginning();
             }
 
-            int sleepTime = idv.getStateManager().getProperty("idv.capture.sleep", SLEEP_TIME);
+            int sleepTime =
+                idv.getStateManager().getProperty("idv.capture.sleep",
+                    SLEEP_TIME);
 
-            if ((scriptingNode != null) && XmlUtil.hasAttribute(scriptingNode, ATTR_STEPS)) {
-                String stepsString = imageGenerator.applyMacros(scriptingNode, ATTR_STEPS);
-                int[]  steps       = Misc.parseInts(stepsString, ",");
+            if ((scriptingNode != null)
+                    && XmlUtil.hasAttribute(scriptingNode, ATTR_STEPS)) {
+                String stepsString =
+                    imageGenerator.applyMacros(scriptingNode, ATTR_STEPS);
+                int[] steps = Misc.parseInts(stepsString, ",");
 
                 for (int i = 0; i < steps.length; i++) {
                     if (steps[i] > getAnimation().getNumSteps()) {
@@ -1087,7 +1148,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     } catch (Exception exc) {}
 
                     // Has the user pressed Stop?
-                    if (!keepRunning(timestamp)) {
+                    if ( !keepRunning(timestamp)) {
                         break;
                     }
 
@@ -1095,9 +1156,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else if ((scriptingNode != null) && (viewManager != null)
-                       && XmlUtil.hasAttribute(scriptingNode, ATTR_VIEWPOINTFILE)) {
-                String viewpointFile = imageGenerator.applyMacros(scriptingNode, ATTR_VIEWPOINTFILE);
-                List   viewpoints    = (List) idv.decodeObject(IOUtil.readContents(viewpointFile, getClass()));
+                       && XmlUtil.hasAttribute(scriptingNode,
+                           ATTR_VIEWPOINTFILE)) {
+                String viewpointFile =
+                    imageGenerator.applyMacros(scriptingNode,
+                        ATTR_VIEWPOINTFILE);
+                List viewpoints = (List) idv.decodeObject(
+                                      IOUtil.readContents(
+                                          viewpointFile, getClass()));
 
                 for (int i = 0; i < viewpoints.size(); i++) {
                     double[] matrix = (double[]) viewpoints.get(i);
@@ -1110,7 +1176,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     } catch (Exception exc) {}
 
                     // Has the user pressed Stop?
-                    if (!keepRunning(timestamp)) {
+                    if ( !keepRunning(timestamp)) {
                         break;
                     }
 
@@ -1130,7 +1196,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     } catch (Exception exc) {}
 
                     // Has the user pressed Stop?
-                    if ((getAnimation() == null) ||!keepRunning(timestamp)) {
+                    if ((getAnimation() == null) || !keepRunning(timestamp)) {
                         break;
                     }
 
@@ -1151,7 +1217,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
             }
 
-            if (!keepRunning(timestamp)) {
+            if ( !keepRunning(timestamp)) {
                 return;
             }
 
@@ -1159,6 +1225,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } catch (Exception exc) {
             LogUtil.logException("Creating movie", exc);
         }
+
     }
 
     /**
@@ -1168,7 +1235,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void stopAnimationCapture(boolean andWrite) {
         if (viewManager != null) {
-            viewManager.useImages(ImageWrapper.makeFileList(images), justCaptureAnimation);
+            viewManager.useImages(ImageWrapper.makeFileList(images),
+                                  justCaptureAnimation);
 
             if (justCaptureAnimation) {
                 return;
@@ -1246,7 +1314,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 double sleepTime = 1;
 
                 try {
-                    sleepTime = new Double(previewRateFld.getText().trim()).doubleValue();
+                    sleepTime = new Double(
+                        previewRateFld.getText().trim()).doubleValue();
                 } catch (Exception noop) {}
 
                 Misc.sleep((long) (sleepTime * 1000));
@@ -1257,7 +1326,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
         }
 
-        if (!isPlaying) {
+        if ( !isPlaying) {
             previewStopPlaying();
         }
     }
@@ -1284,7 +1353,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         String cmd = ae.getActionCommand();
 
         if (cmd.equals(GuiUtils.CMD_START)) {
-            if (!capturingAuto) {
+            if ( !capturingAuto) {
                 startCapturingAuto();
             } else {
                 stopCapturingAuto();
@@ -1317,7 +1386,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
             setPreviewImage();
         } else if (cmd.equals(CMD_PREVIEW_DELETE)) {
-            if ((images.size() > 0) && (previewIndex >= 0) && (previewIndex < images.size())) {
+            if ((images.size() > 0) && (previewIndex >= 0)
+                    && (previewIndex < images.size())) {
                 String filename = images.get(previewIndex).getPath();
 
                 images.remove(previewIndex);
@@ -1369,14 +1439,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         String filename = null;
 
         if (isInteractive() && (movieFileName == null)) {
-            JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints", writePositions);
+            JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints",
+                                              writePositions);
 
-            writePositionsCbx.setToolTipText("Also save the viewpoint matrices as an 'xidv' file");
+            writePositionsCbx.setToolTipText(
+                "Also save the viewpoint matrices as an 'xidv' file");
 
             List accessoryComps = new ArrayList();
 
-            accessoryComps.add(GuiUtils.leftRight(GuiUtils.rLabel(" Frames per second: "), displayRateFld));
-            accessoryComps.add(GuiUtils.leftRight(GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
+            accessoryComps.add(
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" Frames per second: "), displayRateFld));
+            accessoryComps.add(
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
             accessoryComps.add(writePositionsCbx);
 
             if (publishCbx == null) {
@@ -1387,11 +1463,15 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 accessoryComps.add(publishCbx);
             }
 
-            JComponent extra = GuiUtils.topCenter(GuiUtils.vbox(accessoryComps), GuiUtils.filler());
+            JComponent extra =
+                GuiUtils.topCenter(GuiUtils.vbox(accessoryComps),
+                                   GuiUtils.filler());
 
-            filename = FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV, FileManager.FILTER_AVI,
-                    FileManager.FILTER_ANIMATEDGIF, FileManager.FILTER_KMZ, FILTER_ANIS), FileManager.SUFFIX_MOV,
-                        extra);
+            filename =
+                FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
+                    FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
+                    FileManager.FILTER_KMZ,
+                    FILTER_ANIS), FileManager.SUFFIX_MOV, extra);
             writePositions = writePositionsCbx.isSelected();
         } else {
             filename = movieFileName;
@@ -1436,7 +1516,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         mainDialog.dispose();
 
         try {
-            if (!alternateDirCbx.isSelected()) {
+            if ( !alternateDirCbx.isSelected()) {
                 deleteFiles();
                 (new File(directory)).delete();
             }
@@ -1458,7 +1538,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         if (viewManager != null) {
 
             // TODO:
-            viewManager.useImages(ImageWrapper.makeFileList(images), justCaptureAnimation);
+            viewManager.useImages(ImageWrapper.makeFileList(images),
+                                  justCaptureAnimation);
         }
     }
 
@@ -1471,17 +1552,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         while (capturingAuto) {
             grabImageAndBlock();
 
-            if (!capturingAuto) {
+            if ( !capturingAuto) {
                 return;
             }
 
             double captureRate = 2.0;
 
             try {
-                captureRate = (new Double(captureRateFld.getText().trim())).doubleValue();
+                captureRate = (new Double(
+                    captureRateFld.getText().trim())).doubleValue();
             } catch (NumberFormatException nfe) {
                 stopCapturingAuto();
-                LogUtil.userErrorMessage("Bad number format for capture rate: " + captureRateFld.getText());
+                LogUtil.userErrorMessage(
+                    "Bad number format for capture rate: "
+                    + captureRateFld.getText());
 
                 return;
             }
@@ -1511,17 +1595,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     defSuffix = FileManager.SUFFIX_PNG;
                 } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
                     defSuffix = FileManager.SUFFIX_JPG;
-                }    // TODO: GIF, AVI?
+                }  // TODO: GIF, AVI?
             }
 
-            defSuffix = imageGenerator.applyMacros(scriptingNode, ATTR_IMAGESUFFIX, defSuffix);
+            defSuffix = imageGenerator.applyMacros(scriptingNode,
+                    ATTR_IMAGESUFFIX, defSuffix);
 
-            if (!defSuffix.startsWith(".")) {
+            if ( !defSuffix.startsWith(".")) {
                 defSuffix = "." + defSuffix;
             }
         }
 
-        if ((backgroundTransparentBtn != null) && backgroundTransparentBtn.isSelected()) {
+        if ((backgroundTransparentBtn != null)
+                && backgroundTransparentBtn.isSelected()) {
             defSuffix = FileManager.SUFFIX_PNG;
         }
 
@@ -1541,13 +1627,16 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         boolean usingDefault = true;
 
         if (scriptingNode != null) {
-            if (!XmlUtil.hasAttribute(scriptingNode, ATTR_IMAGEPREFIX)) {
-                template = imageGenerator.applyMacros(scriptingNode, ATTR_IMAGETEMPLATE, template);
+            if ( !XmlUtil.hasAttribute(scriptingNode, ATTR_IMAGEPREFIX)) {
+                template = imageGenerator.applyMacros(scriptingNode,
+                        ATTR_IMAGETEMPLATE, template);
             } else {
-                template = imageGenerator.applyMacros(scriptingNode, ATTR_IMAGEPREFIX, "image");
+                template = imageGenerator.applyMacros(scriptingNode,
+                        ATTR_IMAGEPREFIX, "image");
                 template = template + "_%count%";
 
-                if (imageGenerator.applyMacros(scriptingNode, ATTR_APPENDTIME, false)) {
+                if (imageGenerator.applyMacros(scriptingNode,
+                        ATTR_APPENDTIME, false)) {
                     template     = template + "_%time%";
                     usingDefault = false;
                 }
@@ -1556,7 +1645,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             if (alternateDirCbx.isSelected()) {
                 template = fileTemplateFld.getText().trim();
 
-                if (!template.equals(dfltTemplate)) {
+                if ( !template.equals(dfltTemplate)) {
                     dfltTemplate = template;
                     idv.getStore().put(PROP_IMAGETEMPLATE, dfltTemplate);
                     idv.getStore().save();
@@ -1566,7 +1655,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         }
 
         while (true) {
-            String formatString = StringUtil.findFormatString("count", "%", template);
+            String formatString = StringUtil.findFormatString("count", "%",
+                                      template);
 
             if (formatString == null) {
                 break;
@@ -1576,7 +1666,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
             DecimalFormat format         = new DecimalFormat(formatString);
             String        formattedValue = format.format(cnt);
-            String        tmp            = StringUtil.replace(template, "%count:" + formatString + "%", formattedValue);
+            String        tmp            = StringUtil.replace(template,
+                                            "%count:" + formatString + "%",
+                                            formattedValue);
 
             if (tmp.equals(template)) {
                 throw new IllegalStateException("Bad formatting:" + tmp);
@@ -1597,7 +1689,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 timeString = StringUtil.replace(timeString, ":", "_");
                 timeString = StringUtil.replace(timeString, "-", "_");
                 timeString = StringUtil.replace(timeString, " ", "_");
-                template   = StringUtil.replace(template, "%time%", timeString);
+                template = StringUtil.replace(template, "%time%", timeString);
                 template   = ucar.visad.UtcDate.applyTimeMacro(template, dttm);
             } else {
                 String stub = usingDefault
@@ -1623,12 +1715,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         String filename = "";
 
         if (scriptingNode != null) {
-            filename = imageGenerator.applyMacros(scriptingNode, ATTR_IMAGEDIR, filename);
+            filename = imageGenerator.applyMacros(scriptingNode,
+                    ATTR_IMAGEDIR, filename);
         } else {
             if (alternateDirCbx.isSelected()) {
                 filename = alternateDirFld.getText().trim();
 
-                if (!Misc.equals(filename, dfltAltDir)) {
+                if ( !Misc.equals(filename, dfltAltDir)) {
                     dfltAltDir = filename;
                     idv.getStore().put(PROP_IMAGEALTDIR, dfltAltDir);
                     idv.getStore().save();
@@ -1657,6 +1750,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
+
         if ((beepCbx != null) && beepCbx.isSelected()) {
             Toolkit.getDefaultToolkit().beep();
         }
@@ -1677,16 +1771,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 String filename = getFilePrefix(images.size());
                 String tmp      = filename.toLowerCase();
 
-                if (!(tmp.endsWith(".gif") || tmp.endsWith(".png") || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
+                if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
+                        || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
                     filename = filename + getFileSuffix();
                 }
 
                 String path = IOUtil.joinDir(getFileDirectory(), filename);
 
-                if (isInteractive() &&!overwriteCbx.isSelected() && alternateDirCbx.isSelected()
+                if (isInteractive() && !overwriteCbx.isSelected()
+                        && alternateDirCbx.isSelected()
                         && new File(path).exists()) {
-                    if (JOptionPane.showConfirmDialog(null, "File:" + path + " exists. Do you want to overwrite?",
-                                                      "File exists", JOptionPane.YES_NO_OPTION) == 1) {
+                    if (JOptionPane
+                            .showConfirmDialog(null, "File:" + path
+                                + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                    .YES_NO_OPTION) == 1) {
                         stopCapturingAuto();
                         stopAnimationCapture(false);
 
@@ -1699,7 +1797,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 // System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
                 DateTime time = null;
 
-                time = (((getAnimation() != null) && (getAnimation().getAniValue() != null))
+                time = (((getAnimation() != null)
+                         && (getAnimation().getAniValue() != null))
                         ? new DateTime(getAnimation().getAniValue())
                         : null);
 
@@ -1714,75 +1813,99 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     Misc.sleep(50);
                     ImageUtils.writeImageToFile(alternateComponent, path);
                 } else {
-                    if (!idv.getArgsManager().getIsOffScreen()) {
+                    if ( !idv.getArgsManager().getIsOffScreen()) {
                         viewManager.toFront();
                         Misc.sleep(100);
                     }
 
-                    if (imageGenerator != null) { //I guess we are in scripting mode.
-                    	BufferedImage image;
-                        boolean combine = XmlUtil.getAttribute(scriptingNode, ImageGenerator.ATTR_COMBINE,
-                                false);
-                    	if (combine) {
-                          List<Image> images = new LinkedList<Image>();
-                          
-                          for (Object o :    viewManager.getVMManager().getViewManagers()) {
-                        	  ViewManager vm = (ViewManager)o;
-                              vm.getAnimation().setAniValue(time);
-                        	  images.add(vm.getMaster().getImage(false));
-                          }
-                          int cols = 2;
-                              cols = XmlUtil.getAttribute(scriptingNode, imageGenerator.ATTR_COLUMNS,
-                                                          cols);
-                          image = (BufferedImage)ImageUtils.gridImages2(images,0,Color.BLACK,cols);
+                    if (imageGenerator != null) {  //I guess we are in scripting mode.
+                        BufferedImage image;
+                        boolean combine = XmlUtil.getAttribute(scriptingNode,
+                                              ImageGenerator.ATTR_COMBINE,
+                                              false);
+                        if (combine) {
+                            List<Image> images = new LinkedList<Image>();
 
-                    	} else {
+                            for (Object o :
+                                    viewManager.getVMManager()
+                                        .getViewManagers()) {
+                                ViewManager vm = (ViewManager) o;
+                                vm.getAnimation().setAniValue(time);
+                                images.add(vm.getMaster().getImage(false));
+                            }
+                            int cols = 2;
+                            cols = XmlUtil.getAttribute(scriptingNode,
+                                    imageGenerator.ATTR_COLUMNS, cols);
+                            image = (BufferedImage) ImageUtils.gridImages2(
+                                images, 0, Color.BLACK, cols);
+
+                        } else {
                             image = viewManager.getMaster().getImage(false);
-                    	}
-                        Hashtable     props = new Hashtable();
+                        }
+                        Hashtable props = new Hashtable();
 
                         props.put(ImageGenerator.PROP_IMAGEPATH, path);
-                        props.put(ImageGenerator.PROP_IMAGEFILE, IOUtil.getFileTail(path));
-                        imageGenerator.putIndex(props, ImageGenerator.PROP_IMAGEINDEX, images.size());
-                        imageGenerator.processImage(image, path, scriptingNode, props, viewManager, imageProperties);
+                        props.put(ImageGenerator.PROP_IMAGEFILE,
+                                  IOUtil.getFileTail(path));
+                        imageGenerator.putIndex(props,
+                                ImageGenerator.PROP_IMAGEINDEX,
+                                images.size());
+                        imageGenerator.processImage(image, path,
+                                scriptingNode, props, viewManager,
+                                imageProperties);
                         subsetBounds(bounds, imageProperties);
                     } else {
-                        List<Component> components = new LinkedList<Component>();
+                        List<Component> components =
+                            new LinkedList<Component>();
 
-                        if (fullWindowBtn.isSelected()) {            // Full Window
-                            components.add(viewManager.getDisplayWindow().getComponent());
-                        } else if (mainDisplayBtn.isSelected()) {    // View
-                            components.add(viewManager.getMaster().getComponent());
-                        } else if (fullScreenBtn.isSelected()) {     // Full Screen
-                            components.add(viewManager.getMaster().getComponent());
-                        } else if (allViewsBtn.isSelected()) {       // All Views
-                            for (Object o : viewManager.getDisplayWindow().getViewManagers()) {
-                                components.add(((MapViewManager) o).getComponent());
+                        if (fullWindowBtn.isSelected()) {  // Full Window
+                            components
+                                .add(viewManager.getDisplayWindow()
+                                    .getComponent());
+                        } else if (mainDisplayBtn.isSelected()) {  // View
+                            components.add(
+                                viewManager.getMaster().getComponent());
+                        } else if (fullScreenBtn.isSelected()) {  // Full Screen
+                            components.add(
+                                viewManager.getMaster().getComponent());
+                        } else if (allViewsBtn.isSelected()) {  // All Views
+                            for (Object o :
+                                    viewManager.getDisplayWindow()
+                                        .getViewManagers()) {
+                                components.add(
+                                    ((MapViewManager) o).getComponent());
                             }
-                        } else {                                     // View & Legend
+                        } else {  // View & Legend
                             components.add(viewManager.getContents());
                         }
 
-                        Image image = captureImages(components,ImageUtils.getColumnCountFromComps(components));
+                        Image image = captureImages(
+                                          components,
+                                          ImageUtils.getColumnCountFromComps(
+                                              components));
 
                         if (allViewsBtn.isSelected()) {
 
                             // Otherwise, this gets set in the captureImage method.
-                            imageSize = new Dimension(image.getWidth(null), image.getHeight(null));
+                            imageSize = new Dimension(image.getWidth(null),
+                                    image.getHeight(null));
                         }
 
                         if (backgroundTransparentBtn.isSelected()) {
-                            image = ImageUtils.makeColorTransparent(image, viewManager.getBackground());
+                            image = ImageUtils.makeColorTransparent(image,
+                                    viewManager.getBackground());
                         }
 
-                        ImageUtils.writeImageToFile(image, path, getImageQuality());
+                        ImageUtils.writeImageToFile(image, path,
+                                getImageQuality());
                     }
                 }
 
                 ImageWrapper imageWrapper;
 
                 if (viewManager != null) {
-                    imageWrapper = new ImageWrapper(path, time, bounds, viewManager.getDisplayMatrix());
+                    imageWrapper = new ImageWrapper(path, time, bounds,
+                            viewManager.getDisplayMatrix());
                 } else {
                     imageWrapper = new ImageWrapper(path, time);
                 }
@@ -1795,6 +1918,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             stopAnimationCapture(false);
             LogUtil.logException("Error capturing image", exc);
         }
+
     }
 
     /**
@@ -1805,7 +1929,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return the image
      * @throws AWTException the aWT exception
      */
-    public Image captureImages(List<? extends Component> components, int cols) throws AWTException {
+    public Image captureImages(List<? extends Component> components, int cols)
+            throws AWTException {
         List<Image> images = new LinkedList<Image>();
 
         for (Component c : components) {
@@ -1826,7 +1951,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         Dimension dim;
         Point     loc;
 
-        if (fullScreenBtn.isSelected()) {    // Full Screen
+        if (fullScreenBtn.isSelected()) {  // Full Screen
             dim = Toolkit.getDefaultToolkit().getScreenSize();
             loc = new Point(0, 0);
         } else {
@@ -1838,7 +1963,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         Robot                 robot = new Robot(gc.getDevice());
 
         if ((gc.getBounds().x > 0) || (gc.getBounds().y > 0)) {
-            System.err.println("Offsetting location:" + loc + " by gc bounds: " + gc.getBounds().x + " "
+            System.err.println("Offsetting location:" + loc
+                               + " by gc bounds: " + gc.getBounds().x + " "
                                + gc.getBounds().y);
             loc.x -= gc.getBounds().x;
             loc.y -= gc.getBounds().y;
@@ -1847,7 +1973,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         imageSize = new Dimension(dim.width, dim.height);
 
-        return robot.createScreenCapture(new Rectangle(loc.x, loc.y, dim.width, dim.height));
+        return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                dim.width, dim.height));
     }
 
     /**
@@ -1856,26 +1983,31 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param bounds the bounds
      * @param returnProps  the return properties
      */
-    public static void subsetBounds(GeoLocationInfo bounds, Hashtable returnProps) {
+    public static void subsetBounds(GeoLocationInfo bounds,
+                                    Hashtable returnProps) {
         if (bounds == null) {
             return;
         }
 
         Double d;
 
-        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_NORTH)) != null) {
+        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_NORTH))
+                != null) {
             bounds.setMaxLat(d.doubleValue());
         }
 
-        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_SOUTH)) != null) {
+        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_SOUTH))
+                != null) {
             bounds.setMinLat(d.doubleValue());
         }
 
-        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_WEST)) != null) {
+        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_WEST))
+                != null) {
             bounds.setMinLon(d.doubleValue());
         }
 
-        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_EAST)) != null) {
+        if ((d = (Double) returnProps.get(ImageGenerator.ATTR_EAST))
+                != null) {
             bounds.setMaxLon(d.doubleValue());
         }
     }
@@ -1923,15 +2055,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             size = new Dimension(600, 400);
         }
 
-        double displayRate = (new Double(displayRateFld.getText())).doubleValue();
-        double endPause    = (new Double(endPauseFld.getText())).doubleValue();
+        double displayRate =
+            (new Double(displayRateFld.getText())).doubleValue();
+        double endPause = (new Double(endPauseFld.getText())).doubleValue();
 
         if (scriptingNode != null) {
-            displayRate = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_FRAMERATE, displayRate);
-            endPause    = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_ENDFRAMEPAUSE, -1);
+            displayRate = imageGenerator.applyMacros(scriptingNode,
+                    imageGenerator.ATTR_FRAMERATE, displayRate);
+            endPause = imageGenerator.applyMacros(scriptingNode,
+                    imageGenerator.ATTR_ENDFRAMEPAUSE, -1);
         }
 
-        createMovie(movieFile, images, size, displayRate, scriptingNode, endPause);
+        createMovie(movieFile, images, size, displayRate, scriptingNode,
+                    endPause);
     }
 
     /**
@@ -1941,26 +2077,34 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param images list of images
      * @param scriptingNode scripting node
      */
-    private void createPanel(String file, List<ImageWrapper> images, Element scriptingNode) {
+    private void createPanel(String file, List<ImageWrapper> images,
+                             Element scriptingNode) {
         try {
             imageGenerator.debug("Making image panel:" + file);
 
-            int   width       = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_WIDTH, 100);
-            int   columns     = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_COLUMNS, 1);
-            int   space       = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_SPACE, 0);
-            Color background  = imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_BACKGROUND, (Color) null);
-            List  sizedImages = new ArrayList();
+            int width = imageGenerator.applyMacros(scriptingNode,
+                            imageGenerator.ATTR_WIDTH, 100);
+            int columns = imageGenerator.applyMacros(scriptingNode,
+                              imageGenerator.ATTR_COLUMNS, 1);
+            int space = imageGenerator.applyMacros(scriptingNode,
+                            imageGenerator.ATTR_SPACE, 0);
+            Color background = imageGenerator.applyMacros(scriptingNode,
+                                   imageGenerator.ATTR_BACKGROUND,
+                                   (Color) null);
+            List sizedImages = new ArrayList();
 
             for (ImageWrapper imageWrapper : images) {
                 String        imageFile     = imageWrapper.getPath();
                 Image         image         = ImageUtils.readImage(imageFile);
-                BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
+                BufferedImage bufferedImage =
+                    ImageUtils.toBufferedImage(image);
 
                 image = imageGenerator.resize(bufferedImage, scriptingNode);
                 sizedImages.add(image);
             }
 
-            Image image = ImageUtils.gridImages(sizedImages, space, background, columns);
+            Image image = ImageUtils.gridImages(sizedImages, space,
+                              background, columns);
 
             ImageUtils.writeImageToFile(image, file);
         } catch (Exception exc) {
@@ -1978,9 +2122,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param displayRate display rate
      * @param scriptingNode isl node. May be null
      */
-    private void createMovie(String commaSeparatedFiles, List<ImageWrapper> images, Dimension size, double displayRate,
-                             Element scriptingNode) {
-        createMovie(commaSeparatedFiles, images, size, displayRate, scriptingNode, -1);
+    private void createMovie(String commaSeparatedFiles,
+                             List<ImageWrapper> images, Dimension size,
+                             double displayRate, Element scriptingNode) {
+        createMovie(commaSeparatedFiles, images, size, displayRate,
+                    scriptingNode, -1);
     }
 
     /**
@@ -1994,25 +2140,31 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param scriptingNode isl node. May be null
      * @param endPause end pause value
      */
-    private void createMovie(String commaSeparatedFiles, List<ImageWrapper> images, Dimension size, double displayRate,
-                             Element scriptingNode, double endPause) {
-        List    fileToks   = StringUtil.split(commaSeparatedFiles, ",", true, true);
+    private void createMovie(String commaSeparatedFiles,
+                             List<ImageWrapper> images, Dimension size,
+                             double displayRate, Element scriptingNode,
+                             double endPause) {
+        List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
+                                         true);
         boolean doingPanel = false;
 
-        if ((scriptingNode != null) && scriptingNode.getTagName().equals("panel")) {
+        if ((scriptingNode != null)
+                && scriptingNode.getTagName().equals("panel")) {
             doingPanel = true;
         }
 
         if (writePositions && (fileToks.size() > 0)) {
             try {
-                String         positionFilename = IOUtil.stripExtension((String) fileToks.get(0)) + ".xidv";
-                List<double[]> positions        = new ArrayList<double[]>();
+                String positionFilename =
+                    IOUtil.stripExtension((String) fileToks.get(0)) + ".xidv";
+                List<double[]> positions = new ArrayList<double[]>();
 
                 for (ImageWrapper imageWrapper : images) {
                     positions.add(imageWrapper.getPosition());
                 }
 
-                IOUtil.writeFile(positionFilename, idv.encodeObject(positions, true));
+                IOUtil.writeFile(positionFilename,
+                                 idv.encodeObject(positions, true));
             } catch (IOException ioe) {
                 LogUtil.userErrorMessage("Error writing positions:" + ioe);
 
@@ -2032,22 +2184,31 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
 
                 // System.err.println("createMovie:" + movieFile);
-                if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_GIF)) {
+                if (movieFile.toLowerCase().endsWith(
+                        FileManager.SUFFIX_GIF)) {
                     double  rate   = 1.0 / displayRate;
-                    boolean useGCT = idv.getStateManager().getProperty("idv.capture.gif.useGlobalTable", false);
+                    boolean useGCT = idv.getStateManager().getProperty(
+                                         "idv.capture.gif.useGlobalTable",
+                                         false);
 
-                    AnimatedGifEncoder.createGif(movieFile, ImageWrapper.makeFileList(images),
-                                                 AnimatedGifEncoder.REPEAT_FOREVER, (int) (rate * 1000),
-                                                 (int) ((endPause == -1)
+                    AnimatedGifEncoder.createGif(movieFile,
+                            ImageWrapper.makeFileList(images),
+                            AnimatedGifEncoder.REPEAT_FOREVER,
+                            (int) (rate * 1000), (int) ((endPause == -1)
                             ? -1
                             : endPause * 1000), useGCT);
-                } else if (movieFile.toLowerCase().endsWith(".htm") || movieFile.toLowerCase().endsWith(".html")) {
-                    createAnisHtml(movieFile, images, size, displayRate, scriptingNode);
-                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_KMZ)
-                           || movieFile.toLowerCase().endsWith(FileManager.SUFFIX_KMZ)) {
+                } else if (movieFile.toLowerCase().endsWith(".htm")
+                           || movieFile.toLowerCase().endsWith(".html")) {
+                    createAnisHtml(movieFile, images, size, displayRate,
+                                   scriptingNode);
+                } else if (movieFile.toLowerCase()
+                        .endsWith(FileManager.SUFFIX_KMZ) || movieFile
+                        .toLowerCase().endsWith(FileManager.SUFFIX_KMZ)) {
                     createKmz(movieFile, images, scriptingNode);
-                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_AVI)) {
-                    ImageUtils.writeAvi(ImageWrapper.makeFileList(images), displayRate, new File(movieFile));
+                } else if (movieFile.toLowerCase().endsWith(
+                        FileManager.SUFFIX_AVI)) {
+                    ImageUtils.writeAvi(ImageWrapper.makeFileList(images),
+                                        displayRate, new File(movieFile));
                 } else {
 
                     // System.err.println("mov:" + movieFile);
@@ -2059,8 +2220,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         size = new Dimension(600, 400);
                     }
 
-                    JpegImagesToMovie.createMovie(movieFile, size.width, size.height, (int) displayRate,
-                                                  new Vector(ImageWrapper.makeFileList(images)));
+                    JpegImagesToMovie.createMovie(movieFile, size.width,
+                            size.height, (int) displayRate,
+                            new Vector(ImageWrapper.makeFileList(images)));
                     System.setSecurityManager(backup);
                 }
             } catch (NumberFormatException nfe) {
@@ -2073,7 +2235,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 return;
             }
 
-            idv.getPublishManager().publishContent(movieFile, viewManager, publishCbx);
+            idv.getPublishManager().publishContent(movieFile, viewManager,
+                    publishCbx);
         }
     }
 
@@ -2084,7 +2247,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param images list of images
      * @param scriptingNode isl node
      */
-    public void createKmz(String movieFile, List<ImageWrapper> images, Element scriptingNode) {
+    public void createKmz(String movieFile, List<ImageWrapper> images,
+                          Element scriptingNode) {
+
         try {
             ZipOutputStream zos = null;
 
@@ -2092,7 +2257,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 zos = new ZipOutputStream(new FileOutputStream(movieFile));
             }
 
-            StringBuffer sb = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            StringBuffer sb =
+                new StringBuffer(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
             sb.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\n");
 
@@ -2100,8 +2267,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             String visibility = "1";
 
             if (scriptingNode != null) {
-                visibility = imageGenerator.applyMacros(scriptingNode, ATTR_KML_VISIBILITY, visibility);
-                open       = imageGenerator.applyMacros(scriptingNode, ATTR_KML_OPEN, open);
+                visibility = imageGenerator.applyMacros(scriptingNode,
+                        ATTR_KML_VISIBILITY, visibility);
+                open = imageGenerator.applyMacros(scriptingNode,
+                        ATTR_KML_OPEN, open);
             }
 
             sb.append("<Folder>\n");
@@ -2109,16 +2278,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             sb.append(XmlUtil.tag(TAG_VISIBILITY, "", visibility));
 
             if (scriptingNode != null) {
-                String folderName = imageGenerator.applyMacros(scriptingNode, ATTR_KML_NAME, (String) null);
+                String folderName = imageGenerator.applyMacros(scriptingNode,
+                                        ATTR_KML_NAME, (String) null);
 
                 if (folderName != null) {
                     sb.append("<name>" + folderName + "</name>\n");
                 }
 
-                String desc = imageGenerator.applyMacros(scriptingNode, ATTR_KML_DESC, (String) null);
+                String desc = imageGenerator.applyMacros(scriptingNode,
+                                  ATTR_KML_DESC, (String) null);
 
                 if (desc == null) {
-                    desc = imageGenerator.applyMacros(XmlUtil.getChildText(scriptingNode));
+                    desc = imageGenerator.applyMacros(
+                        XmlUtil.getChildText(scriptingNode));
 
                     if (desc != null) {
                         desc = desc.trim();
@@ -2131,22 +2303,28 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
 
             if (scriptingNode != null) {
-                Element kmlElement = XmlUtil.findChild(scriptingNode, ImageGenerator.TAG_KML);
+                Element kmlElement = XmlUtil.findChild(scriptingNode,
+                                         ImageGenerator.TAG_KML);
 
                 if (kmlElement != null) {
-                    sb.append(imageGenerator.applyMacros(XmlUtil.getChildText(kmlElement)));
+                    sb.append(
+                        imageGenerator.applyMacros(
+                            XmlUtil.getChildText(kmlElement)));
                 }
 
-                List nodes = XmlUtil.findChildren(scriptingNode, ImageGenerator.TAG_KMZFILE);
+                List nodes = XmlUtil.findChildren(scriptingNode,
+                                 ImageGenerator.TAG_KMZFILE);
 
                 for (int i = 0; i < nodes.size(); i++) {
                     Element child = (Element) nodes.get(i);
                     String  file  = XmlUtil.getAttribute(child, ATTR_FILENAME);
 
                     if (zos != null) {
-                        zos.putNextEntry(new ZipEntry(IOUtil.getFileTail(file)));
+                        zos.putNextEntry(
+                            new ZipEntry(IOUtil.getFileTail(file)));
 
-                        byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(file));
+                        byte[] bytes =
+                            IOUtil.readBytes(IOUtil.getInputStream(file));
 
                         zos.write(bytes, 0, bytes.length);
                     }
@@ -2160,7 +2338,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             for (ImageWrapper imageWrapper : images) {
                 List kmlFiles = (List) imageWrapper.getProperty("kmlfiles");
 
-                if (!didKmlFiles && (kmlFiles != null)) {
+                if ( !didKmlFiles && (kmlFiles != null)) {
                     didKmlFiles = true;
 
                     for (String kmlFile : (List<String>) kmlFiles) {
@@ -2169,7 +2347,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         if (zos != null) {
                             zos.putNextEntry(new ZipEntry(tail));
 
-                            byte[] imageBytes = IOUtil.readBytes(new FileInputStream(kmlFile));
+                            byte[] imageBytes = IOUtil.readBytes(
+                                                    new FileInputStream(
+                                                        kmlFile));
 
                             zos.write(imageBytes, 0, imageBytes.length);
                         }
@@ -2184,7 +2364,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 if (zos != null) {
                     zos.putNextEntry(new ZipEntry(tail));
 
-                    byte[] imageBytes = IOUtil.readBytes(new FileInputStream(image));
+                    byte[] imageBytes =
+                        IOUtil.readBytes(new FileInputStream(image));
 
                     zos.write(imageBytes, 0, imageBytes.length);
                 }
@@ -2208,10 +2389,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
 
                 if (dttm != null) {
-                    String when = dttm.formattedString("yyyy-MM-dd", tz) + "T" + dttm.formattedString("HH:mm:ss", tz)
+                    String when = dttm.formattedString("yyyy-MM-dd", tz)
+                                  + "T"
+                                  + dttm.formattedString("HH:mm:ss", tz)
                                   + "Z";
 
-                    sb.append("<TimeStamp><when>" + when + "</when></TimeStamp>\n");
+                    sb.append("<TimeStamp><when>" + when
+                              + "</when></TimeStamp>\n");
                 }
 
                 sb.append("</GroundOverlay>\n");
@@ -2220,8 +2404,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             sb.append("</Folder></kml>\n");
 
             if (zos != null) {
-                zos.putNextEntry(new ZipEntry(IOUtil.stripExtension(IOUtil.getFileTail(movieFile))
-                                              + FileManager.SUFFIX_KML));
+                zos.putNextEntry(
+                    new ZipEntry(
+                        IOUtil.stripExtension(IOUtil.getFileTail(movieFile))
+                        + FileManager.SUFFIX_KML));
 
                 byte[] kmlBytes = sb.toString().getBytes();
 
@@ -2234,6 +2420,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } catch (Exception exc) {
             LogUtil.logException("Saving kmz file", exc);
         }
+
     }
 
     /**
@@ -2245,8 +2432,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param displayRate rate
      * @param scriptingNode isl node
      */
-    private void createAnisHtml(String movieFile, List<ImageWrapper> images, Dimension size, double displayRate,
+    private void createAnisHtml(String movieFile, List<ImageWrapper> images,
+                                Dimension size, double displayRate,
                                 Element scriptingNode) {
+
         try {
             boolean copyFiles = false;
             boolean doFlanis  = false;
@@ -2279,13 +2468,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
                 JPanel contents = GuiUtils.doLayout(new Component[] {
-                    GuiUtils.rLabel("Dimension:"), GuiUtils.left(GuiUtils.hbox(widthFld, new JLabel(" X "), heightFld)),
-                    GuiUtils.top(GuiUtils.rLabel("Top HTML:")), GuiUtils.makeScrollPane(preFld, 200, 100),
-                    GuiUtils.top(GuiUtils.rLabel("Bottom HTML:")), GuiUtils.makeScrollPane(postFld, 200, 100),
+                    GuiUtils.rLabel("Dimension:"),
+                    GuiUtils.left(GuiUtils.hbox(widthFld, new JLabel(" X "),
+                        heightFld)),
+                    GuiUtils.top(GuiUtils.rLabel("Top HTML:")),
+                    GuiUtils.makeScrollPane(preFld, 200, 100),
+                    GuiUtils.top(GuiUtils.rLabel("Bottom HTML:")),
+                    GuiUtils.makeScrollPane(postFld, 200, 100),
                     GuiUtils.rLabel(""), typeCbx, GuiUtils.rLabel(""), copyCbx
                 }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
-                if (!GuiUtils.showOkCancelDialog(null, "ANIS Applet Information", contents, null)) {
+                if ( !GuiUtils.showOkCancelDialog(null,
+                        "ANIS Applet Information", contents, null)) {
                     return;
                 }
 
@@ -2296,11 +2490,16 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 width     = widthFld.getText().trim();
                 height    = heightFld.getText().trim();
             } else {
-                width    = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_WIDTH, width);
-                height   = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_HEIGHT, height);
-                preText  = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_PREHTML, preText);
-                postText = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_POSTHTML, postText);
-                type     = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_TYPE, type);
+                width = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_WIDTH,
+                                             width);
+                height = XmlUtil.getAttribute(scriptingNode,
+                        ATTR_ANIS_HEIGHT, height);
+                preText = XmlUtil.getAttribute(scriptingNode,
+                        ATTR_ANIS_PREHTML, preText);
+                postText = XmlUtil.getAttribute(scriptingNode,
+                        ATTR_ANIS_POSTHTML, postText);
+                type = XmlUtil.getAttribute(scriptingNode, ATTR_ANIS_TYPE,
+                                            type);
                 doFlanis = type.toLowerCase().equals("anis")
                            ? false
                            : true;
@@ -2328,18 +2527,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             sb.append("\n");
 
             if (doFlanis) {
-                sb.append("<OBJECT type=\"application/x-shockwave-flash\" data=\"./flanis.swf\" width=\"" + width
-                          + "\" height=\"" + height + "\" id=\"FlAniS\"> \n");
+                sb.append(
+                    "<OBJECT type=\"application/x-shockwave-flash\" data=\"./flanis.swf\" width=\""
+                    + width + "\" height=\"" + height
+                    + "\" id=\"FlAniS\"> \n");
                 sb.append("<PARAM NAME=\"movie\" VALUE=\"./flanis.swf\"> \n");
                 sb.append("<PARAM NAME=\"quality\" VALUE=\"high\"> \n");
                 sb.append("<PARAM NAME=\"menu\" value=\"false\"> \n");
-                sb.append("<PARAM NAME=\"FlashVars\" value=\"controls=startstop,step,speed,toggle,zoom&filenames="
-                          + files + "\"> \n");
+                sb.append(
+                    "<PARAM NAME=\"FlashVars\" value=\"controls=startstop,step,speed,toggle,zoom&filenames="
+                    + files + "\"> \n");
                 sb.append("</OBJECT>\n");
             } else {
-                sb.append("<APPLET code=\"AniS.class\" width=" + width + " height=" + height + ">\n");
-                sb.append("<PARAM name=\"controls\" value=\"startstop,step, speed, toggle, zoom\">\n");
-                sb.append("<PARAM name=\"filenames\" value=\"" + files + "\">\n");
+                sb.append("<APPLET code=\"AniS.class\" width=" + width
+                          + " height=" + height + ">\n");
+                sb.append(
+                    "<PARAM name=\"controls\" value=\"startstop,step, speed, toggle, zoom\">\n");
+                sb.append("<PARAM name=\"filenames\" value=\"" + files
+                          + "\">\n");
                 sb.append("</APPLET>\n");
             }
 
@@ -2349,6 +2554,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } catch (Exception exc) {
             LogUtil.logException("Saving html file", exc);
         }
+
     }
 
     /**
