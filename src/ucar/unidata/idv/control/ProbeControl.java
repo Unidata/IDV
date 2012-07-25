@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -293,7 +293,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                     }
                     theMethod = ((Integer) method).intValue();
                 }
-                Unit unit = (Unit) Misc.safeGet(_units, i);
+                Unit           unit  = (Unit) Misc.safeGet(_units, i);
                 MidiProperties sound = (MidiProperties) Misc.safeGet(_sounds,
                                            i);
                 infos.add(new ProbeRowInfo(level, alt, theMethod, unit,
@@ -330,7 +330,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             RealType[] components = { RealType.XAxis, RealType.YAxis,
                                       RealType.ZAxis };
             globePositionType = new RealTupleType(components, null, null);
-            probe = new PointProbe(new RealTuple(globePositionType,
+            probe             = new PointProbe(new RealTuple(globePositionType,
                     new double[] { 0,
                                    0, 0 }));
             probe.getSelectorPoint().setDragAdapter(this);
@@ -1652,7 +1652,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         //                                           0.75);
         //        split.setOneTouchExpandable(true);
         //        return split;
-        return GuiUtils.centerBottom(getChart().getContents(), bottom);
+        JScrollPane chartScrollPane =
+            new JScrollPane(getChart().getContents());
+        chartScrollPane.setPreferredSize(new Dimension(450, 300));
+
+        return GuiUtils.centerBottom(chartScrollPane, bottom);
 
         //        return GuiUtils.centerBottom(getChart().getContents(), bottom);
     }  // end domakecontents
@@ -1737,8 +1741,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 Object value, boolean isSelected, int rowIndex,
                 int vColIndex) {
             JComboBox box    = (JComboBox) getComponent();
-            Object[]  levels =
-                formatLevels((Real[]) getLevelsAtRow(rowIndex));
+            Object[]  levels = formatLevels((Real[]) getLevelsAtRow(rowIndex));
             List      ll     = Misc.toList(levels);
             ll.add(0, "Probe's");
             GuiUtils.setListData(box, ll.toArray());
@@ -1973,8 +1976,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     private void updatePositionInSwingThread(RealTuple position)
             throws VisADException, RemoteException {
         updatePending = false;
-        double[] positionValues = position.getValues();
-        EarthLocationTuple elt =
+        double[]           positionValues = position.getValues();
+        EarthLocationTuple elt            =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
                 positionValues[1], positionValues[2] }, false);
         LatLonPoint llp = elt.getLatLonPoint();
@@ -2300,9 +2303,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     private EarthLocationTuple getProbeLocation()
             throws VisADException, RemoteException {
-        RealTuple position       = probe.getPosition();
-        double[]  positionValues = position.getValues();
-        EarthLocationTuple elt =
+        RealTuple          position       = probe.getPosition();
+        double[]           positionValues = position.getValues();
+        EarthLocationTuple elt            =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
                 positionValues[1], positionValues[2] }, false);
         return elt;
@@ -2365,8 +2368,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             double  minDistance = 0;
 
             for (int i = 0; i < numObs; i++) {
-                PointOb ob = (PointOb) pointObs.getSample(i);
-                double distance =
+                PointOb ob       = (PointOb) pointObs.getSample(i);
+                double  distance =
                     ucar.visad.Util.bearingDistance(ob.getEarthLocation(),
                         elt).getValue();
                 if ((closest == null) || (distance < minDistance)) {
@@ -3049,12 +3052,15 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /**
      * Set the chart Name
      *
+     *
+     * @param newName _more_
      * @return The chart_
      */
     public void setChartName(String newName) {
         timeSeries.setChartName(newName);
         updateDisplayList();
     }
+
     /**
      * Set the ShowThumbNail property.
      *
