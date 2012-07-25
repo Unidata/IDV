@@ -267,6 +267,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** old smoothing factor */
     private int OldSmoothingFactor = 0;
 
+    /** horizontal skip value */
+    int skipValue = 0;
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -1638,6 +1640,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                 && !getSmoothingType().equals(LABEL_NONE)) {
             slice = GridUtil.smooth(slice, getSmoothingType(),
                                     getSmoothingFactor());
+        }
+        // apply skip factor
+        if (getSkipValue() > 0) {
+            slice = GridUtil.subset(slice, getSkipValue() + 1, 1);
         }
         loadData(slice);
     }
