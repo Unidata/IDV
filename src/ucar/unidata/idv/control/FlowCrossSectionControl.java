@@ -34,6 +34,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
+import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
@@ -81,6 +82,9 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     /** Widget to set barb size */
     ValueSliderWidget barbSizeWidget;
 
+    /** a component to change the skip */
+    ValueSliderWidget skipFactorWidget;
+
     /**
      * Create a new FlowCrossSectionControl; set attribute flags
      */
@@ -96,7 +100,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         super.initDone();
         setFlowScale(flowScaleValue);
         ((FlowDisplayable) getXSDisplay()).setAdjustFlow(
-            getIsThreeComponents());
+                getIsThreeComponents());
     }
 
     /**
@@ -138,10 +142,9 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
                              "Scale", SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
                              SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Integer(getSkipValue()), "skipValue",
+                             "Skip Factor", SETTINGS_GROUP_DISPLAY);
     }
-
-
-
 
     /**
      * Called to initialize this control from the given dataChoice;
@@ -245,6 +248,11 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
                 "Scale: ");
         addRemovable(barbSizeWidget);
+
+        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
+                getSkipWidgetLabel());
+        addRemovable(skipFactorWidget);
+
         JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
                                      barbSizeWidget.getContents(false));
         if ( !getWindbarbs()) {
@@ -255,6 +263,14 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel(getSizeLabel()),
                                              GuiUtils.left(extra)));
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Skip:"),
+                GuiUtils.left(
+                    GuiUtils.hbox(
+                        GuiUtils.rLabel("Horizontal:  "),
+                        skipFactorWidget.getContents(false)))));
+
         super.getControlWidgets(controlWidgets);
 
     }
@@ -346,6 +362,23 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      */
     public boolean getWindbarbs() {
         return isWindBarbs;
+    }
+
+
+    /**
+     * Set the  skip value
+     *
+     * @param value skip value
+     **/
+
+    public void setSkipValue(int value) {
+        super.setSkipValue(value);
+        if (skipFactorWidget != null) {
+            skipFactorWidget.setValue(value);
+        }
+        if (getCrossSectionSelector() != null) {
+            crossSectionChanged();
+        }
     }
 
 

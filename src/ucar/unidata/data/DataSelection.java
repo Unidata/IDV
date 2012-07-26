@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,12 +21,11 @@
 package ucar.unidata.data;
 
 
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import visad.DateTime;
 
-import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -34,7 +33,6 @@ import java.util.List;
 /**
  * A class that represents some selection of data.
  * @author IDV Development Team
- * @version $Revision: 1.43 $
  */
 public class DataSelection {
 
@@ -47,10 +45,11 @@ public class DataSelection {
     /** Flag to use any times set elsewhere */
     public final static String PROP_DATESELECTION = "date_selection";
 
-       /** status template */
+    /** status template */
     public static final String PROP_USESTIMEDRIVER =
         "Use_Display_Driver_Times";
 
+    /** chooser time matching property */
     public static final String PROP_CHOOSERTIMEMATCHING =
         "Chooser_Do_Time_Matching";
 
@@ -71,7 +70,7 @@ public class DataSelection {
     /** list of times */
     private List times;
 
-    /** _more_          */
+    /** time driver times */
     private List<DateTime> timeDriverTimes;
 
 
@@ -430,7 +429,8 @@ public class DataSelection {
     public String toString() {
         //        return super.toString() + " " + times;
         //        return "data selection:" + fromLevel;
-        return "data selection:" + geoSelection;
+        return "bounds:" + geoSelection + ", has TimeDriver times: "
+               + (getTimeDriverTimes() != null);
 
     }
 
