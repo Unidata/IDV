@@ -643,7 +643,7 @@ public class TimesChooser extends IdvChooser {
             "Select a time driver display to do the time matching");
         centerPopupBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                Misc.run(TimesChooser.this, "readDrivers");
+                 readDrivers();
             }
         });
 
