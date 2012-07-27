@@ -78,6 +78,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -263,6 +264,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /** The MapProjection */
     private MapProjection mapProjection;
+
+    /** The Axis Font */
+	private Font axisFont;
 
     /**
      * Constructs an instance with the specified MapProjection
@@ -872,6 +876,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setTicksVisible(true);
         scale.setMajorTickSpacing(0);
         scale.setMinorTickSpacing(0);
+        scale.setFont(axisFont);
     }
 
     /**
@@ -2801,4 +2806,13 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             return this.mapProjection;
         }
     }
+
+    /**
+     * Set the font for the axis labels
+     * 
+     * @param axisFont
+     */
+	public void setAxisFont(Font axisFont) {
+		this.axisFont = axisFont;
+	}
 }

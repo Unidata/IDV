@@ -387,8 +387,9 @@ public abstract class NavigatedViewManager extends ViewManager {
         boolean b;
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
-            b = (latLonScaleWidget.isLatVisible()
-                 || latLonScaleWidget.isLonVisible()
+                MapProjectionDisplay d = (MapProjectionDisplay)getNavigatedDisplay();
+                d.setAxisFont(getDisplayListFont());
+            b = (latLonScaleWidget.isLatVisible() || latLonScaleWidget.isLonVisible()
                  || vertRangeWidget.isAxisVisible());
         } else {
             b = vertRangeWidget.isAxisVisible();
@@ -411,9 +412,8 @@ public abstract class NavigatedViewManager extends ViewManager {
         tabbedPane.add("Vertical Range", GuiUtils.topLeft(vertRangeWidget));
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
-            MapProjectionDisplay mpDisplay =
-                (MapProjectionDisplay) getNavigatedDisplay();
-
+            MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
+            mpDisplay.setAxisFont(this.getDisplayListFont());
             mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
             vertRangeWidget.getVertScaleInfo().visible =
                 getBp(PREF_SHOWSCALES);
