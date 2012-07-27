@@ -1,29 +1,25 @@
 /*
- *
- * Copyright  1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -34,7 +30,6 @@ import ucar.visad.Util;
 import visad.CommonUnit;
 import visad.Unit;
 
-//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -49,11 +44,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
 /**
- * A widget to get vertical range or scaling info from the user
+ * A widget to get vertical range or scaling info from the user.  NB: this should be
+ * called VertRangeDialog, but history trumps practicality
  *
  * @author   IDV Development Team
- * @version  $Revision: 1.24 $
  */
 public class VertScaleDialog extends JPanel implements ActionListener {
 
@@ -98,9 +94,10 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      * @param control The control
      * @param vertScaleInfo The info to use
      */
-    public VertScaleDialog(JFrame parent, ViewpointControl control, VertScaleInfo vertScaleInfo) {
-        this.control  = control;
-        this.parent   = parent;
+    public VertScaleDialog(JFrame parent, ViewpointControl control,
+                           VertScaleInfo vertScaleInfo) {
+        this.control       = control;
+        this.parent        = parent;
         this.vertScaleInfo = vertScaleInfo;
         doMakeContents();
     }
@@ -113,9 +110,12 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
         JPanel p1 = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Min value: "), min = new JTextField(""), GuiUtils.rLabel("Max value: "),
-            max = new JTextField(""), GuiUtils.rLabel("Units: "),
-            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] { "meters", "km", "feet", "fathoms" }), null),
+            GuiUtils.rLabel("Min value: "), min = new JTextField(""),
+            GuiUtils.rLabel("Max value: "), max = new JTextField(""),
+            GuiUtils.rLabel("Units: "),
+            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] {
+                "meters",
+                "km", "feet", "fathoms" }), null),
             GuiUtils.rLabel("Visible: "), visible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
@@ -126,8 +126,8 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         this.add("Center", GuiUtils.inset(p1, 5));
 
         if (vertScaleInfo != null) {
-            min.setText(Misc.format(vertScaleInfo.minVertScale));
-            max.setText(Misc.format(vertScaleInfo.maxVertScale));
+            min.setText(Misc.format(vertScaleInfo.minVertRange));
+            max.setText(Misc.format(vertScaleInfo.maxVertRange));
 
             if (vertScaleInfo.unit != null) {
                 unitCombo.setSelectedItem(vertScaleInfo.unit.toString());
@@ -147,7 +147,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         String cmd = evt.getActionCommand();
 
         if (cmd.equals(GuiUtils.CMD_OK)) {
-            if (!doApply()) {
+            if ( !doApply()) {
                 return;
             }
 
@@ -180,16 +180,17 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             JPanel buttons = GuiUtils.makeApplyOkCancelButtons(this);
 
             this.add("South", buttons);
-            dialog = new JDialog(parent, "Vertical Scale", false /* non-modal */);
+            dialog = new JDialog(parent, "Vertical Range",
+                                 false /* non-modal */);
             dialog.getContentPane().add("Center", this);
-            dialog.setSize(240, 100);    // size of dialog box is X byY pixels
+            dialog.setSize(240, 100);  // size of dialog box is X byY pixels
             dialog.pack();
             dialog.setLocation(100, 100);
         }
 
         this.vertScaleInfo = transfer;
-        min.setText(Misc.format(transfer.minVertScale));
-        max.setText(Misc.format(transfer.maxVertScale));
+        min.setText(Misc.format(transfer.minVertRange));
+        max.setText(Misc.format(transfer.maxVertRange));
         unitCombo.setSelectedItem(transfer.unit.toString());
         visible.setSelected(transfer.visible);
         dialog.setVisible(true);
@@ -218,20 +219,22 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         try {
             newUnit = Util.parseUnit((String) unitCombo.getSelectedItem());
 
-            if (!Unit.canConvert(newUnit, CommonUnit.meter)) {
+            if ( !Unit.canConvert(newUnit, CommonUnit.meter)) {
                 throw new Exception();
             }
         } catch (Exception e) {
-            LogUtil.userMessage("Unknown or incompatible unit " + unitCombo.getSelectedItem());
+            LogUtil.userMessage("Unknown or incompatible unit "
+                                + unitCombo.getSelectedItem());
 
             return false;
         }
 
-        VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue, newUnit);
+        VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue,
+                                        newUnit);
 
         newTransfer.visible = visible.isSelected();
 
-        if (!Misc.equals(newTransfer, vertScaleInfo)) {
+        if ( !Misc.equals(newTransfer, vertScaleInfo)) {
             vertScaleInfo = newTransfer;
 
             try {
@@ -252,15 +255,15 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      * @return true, if is axis visible
      */
     public boolean isAxisVisible() {
-    	return visible.isSelected();
+        return visible.isSelected();
     }
 
-	/**
-	 * Gets the vert scale info.
-	 *
-	 * @return the vert scale info
-	 */
-	public VertScaleInfo getVertScaleInfo() {
-		return this.vertScaleInfo;
-	}
+    /**
+     * Gets the vert scale info.
+     *
+     * @return the vert scale info
+     */
+    public VertScaleInfo getVertScaleInfo() {
+        return this.vertScaleInfo;
+    }
 }

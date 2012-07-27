@@ -1,48 +1,45 @@
 /*
- *
- * Copyright  1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import visad.CommonUnit;
 import visad.Unit;
 
+
 /**
- * A class to hold vertical scale settings for a VisAD display from the
+ * A class to hold vertical range settings for a VisAD display from the
  * dialog box VertScaleDialog class. They are public member
- * data to simply access.
+ * data to simply access.  NB:  this should be VertRangeInfo, but history
+ * trumps practicality
  *
  * @author   IDV Development Team
- * @version  $Revision: 1.6 $
  */
 public class VertScaleInfo {
 
     /** maximum range of the vertical scale */
-    public double maxVertScale;
+    public double maxVertRange;
 
     /** minimum range of the vertical scale */
-    public double minVertScale;
+    public double minVertRange;
 
     /** Units of the range values */
     public Unit unit;
@@ -69,11 +66,16 @@ public class VertScaleInfo {
      * @param unit unit of range values
      */
     public VertScaleInfo(double min, double max, Unit unit) {
-        this.minVertScale = min;
-        this.maxVertScale = max;
+        this.minVertRange = min;
+        this.maxVertRange = max;
         this.unit         = unit;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     @Override
 
     /**
@@ -84,9 +86,9 @@ public class VertScaleInfo {
         int       result = 1;
         long      temp;
 
-        temp   = Double.doubleToLongBits(maxVertScale);
+        temp   = Double.doubleToLongBits(maxVertRange);
         result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp   = Double.doubleToLongBits(minVertScale);
+        temp   = Double.doubleToLongBits(minVertRange);
         result = prime * result + (int) (temp ^ (temp >>> 32));
         result = prime * result + ((unit == null)
                                    ? 0
@@ -98,6 +100,13 @@ public class VertScaleInfo {
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     *
+     * @return _more_
+     */
     @Override
 
     /**
@@ -118,11 +127,13 @@ public class VertScaleInfo {
 
         VertScaleInfo other = (VertScaleInfo) obj;
 
-        if (Double.doubleToLongBits(maxVertScale) != Double.doubleToLongBits(other.maxVertScale)) {
+        if (Double.doubleToLongBits(maxVertRange)
+                != Double.doubleToLongBits(other.maxVertRange)) {
             return false;
         }
 
-        if (Double.doubleToLongBits(minVertScale) != Double.doubleToLongBits(other.minVertScale)) {
+        if (Double.doubleToLongBits(minVertRange)
+                != Double.doubleToLongBits(other.minVertRange)) {
             return false;
         }
 
@@ -130,7 +141,7 @@ public class VertScaleInfo {
             if (other.unit != null) {
                 return false;
             }
-        } else if (!unit.equals(other.unit)) {
+        } else if ( !unit.equals(other.unit)) {
             return false;
         }
 
