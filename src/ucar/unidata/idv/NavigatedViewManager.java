@@ -384,7 +384,20 @@ public abstract class NavigatedViewManager extends ViewManager {
             return false;
         }
 
-        boolean b;
+        return applyAxisVisibility();
+    }
+
+    /**
+     * Apply axis visibility choices.
+     * 
+     * @return
+     */
+	private boolean applyAxisVisibility() {
+		boolean b;
+		
+		if (latLonScaleWidget == null || vertRangeWidget == null) {
+			return false;
+		}
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
                 MapProjectionDisplay d = (MapProjectionDisplay)getNavigatedDisplay();
@@ -398,7 +411,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         setBp(PREF_SHOWSCALES, b);
 
         return vertRangeWidget.doApply() && latLonScaleWidget.doApply();
-    }
+	}
 
     /**
      * Add components to the properties dialog
@@ -751,6 +764,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     public void applyPreferences() {
         super.applyPreferences();
+        applyAxisVisibility();
         setReadoutFormat();
     }
 
