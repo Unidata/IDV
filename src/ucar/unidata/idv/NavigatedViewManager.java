@@ -415,6 +415,7 @@ public abstract class NavigatedViewManager extends ViewManager {
             MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
             mpDisplay.setAxisFont(this.getDisplayListFont());
             mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
             vertRangeWidget.getVertScaleInfo().visible =
                 getBp(PREF_SHOWSCALES);
             latLonScaleWidget = new LatLonScalePanel(mpDisplay);
