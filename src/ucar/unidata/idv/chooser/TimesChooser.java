@@ -94,6 +94,9 @@ public class TimesChooser extends IdvChooser {
     /** Time matching widget label */
     private static final String TIME_MATCHING_LABEL = "Match Times";
 
+    /** Time matching widget label */
+    private static final String TIME_MATCHING_LABEL_INIT = "Select a Matching Display";
+
     /** flag for relative times range */
     private static final int TIMES_RELATIVERANGE = 0;
 
@@ -838,8 +841,15 @@ public class TimesChooser extends IdvChooser {
 
         int size = drivers.size();
         driverMenuList = new ArrayList();
-        JMenuItem menuItem = new JMenuItem("Select a Matching Display");
-        driverMenuList.add(menuItem);
+
+        if(size > 0){
+            List atime = getAbsoluteTimes();
+            TwoFacedObject twoObj = new TwoFacedObject(TIME_MATCHING_LABEL_INIT,
+                    atime);
+            JMenuItem ji = GuiUtils.makeMenuItem((String) twoObj.getLabel(),
+                    TimesChooser.this, "updatetimeline", twoObj);
+            driverMenuList.add(ji);
+        }
         for (int i = 0; i < size; i++) {
             TwoFacedObject driver = (TwoFacedObject) drivers.get(i);
 
@@ -858,6 +868,14 @@ public class TimesChooser extends IdvChooser {
     public void updatetimeline(TwoFacedObject id) {
         doTimeDrivers  = true;
         selectedDriver = id;
+
+        if(id.getLabel().toString().contains(TIME_MATCHING_LABEL_INIT)){
+            doTimeDrivers  = false;
+            List tt = (List)id.getId();
+            absoluteTimes = null;
+            setAbsoluteTimes(tt);
+            return;
+        }
 
         DateTime[]     driverTimes = (DateTime[]) id.getId();
         List<DateTime> dtimes      = new ArrayList<DateTime>();
