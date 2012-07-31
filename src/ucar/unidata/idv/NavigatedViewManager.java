@@ -2,17 +2,17 @@
  * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -28,6 +28,7 @@ import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.view.geoloc.AxisScaleInfo;
 import ucar.unidata.view.geoloc.LatLonScalePanel;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
@@ -45,6 +46,7 @@ import visad.DisplayEvent;
 import visad.MouseHelper;
 import visad.Unit;
 import visad.VisADException;
+
 
 import java.awt.Component;
 import java.awt.Point;
@@ -189,6 +191,12 @@ public abstract class NavigatedViewManager extends ViewManager {
 
     /** User to control the viewpoint */
     private ViewpointControl viewpointControl;
+
+    /** Lat axis scale info for unpersistence */
+    private AxisScaleInfo latAxisScaleInfo;
+
+    /** Lon axis scale info for unpersistence */
+    private AxisScaleInfo lonAxisScaleInfo;
 
     /**
      *  Default constructor
@@ -357,6 +365,18 @@ public abstract class NavigatedViewManager extends ViewManager {
             if (verticalRange != null) {
                 setVerticalRange(verticalRange);
             }
+
+            AxisScaleInfo latAxisScaleInfo = nvm.getLatAxisScaleInfo();
+
+            if (latAxisScaleInfo != null) {
+                setLatAxisScaleInfo(latAxisScaleInfo);
+            }
+            
+            AxisScaleInfo lonAxisScaleInfo = nvm.getLonAxisScaleInfo();
+
+            if (lonAxisScaleInfo != null) {
+                setLonAxisScaleInfo(lonAxisScaleInfo);
+            }
         }
     }
 
@@ -389,20 +409,22 @@ public abstract class NavigatedViewManager extends ViewManager {
 
     /**
      * Apply axis visibility choices.
-     * 
+     *
      * @return
      */
-	private boolean applyAxisVisibility() {
-		boolean b;
-		
-		if (latLonScaleWidget == null || vertRangeWidget == null) {
-			return false;
-		}
+    private boolean applyAxisVisibility() {
+        boolean b;
+
+        if ((latLonScaleWidget == null) || (vertRangeWidget == null)) {
+            return false;
+        }
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
-                MapProjectionDisplay d = (MapProjectionDisplay)getNavigatedDisplay();
-                d.setAxisFont(getDisplayListFont());
-            b = (latLonScaleWidget.isLatVisible() || latLonScaleWidget.isLonVisible()
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            d.setAxisFont(getDisplayListFont());
+            b = (latLonScaleWidget.isLatVisible()
+                 || latLonScaleWidget.isLonVisible()
                  || vertRangeWidget.isAxisVisible());
         } else {
             b = vertRangeWidget.isAxisVisible();
@@ -411,7 +433,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         setBp(PREF_SHOWSCALES, b);
 
         return vertRangeWidget.doApply() && latLonScaleWidget.doApply();
-	}
+    }
 
     /**
      * Add components to the properties dialog
@@ -425,7 +447,8 @@ public abstract class NavigatedViewManager extends ViewManager {
         tabbedPane.add("Vertical Range", GuiUtils.topLeft(vertRangeWidget));
 
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
-            MapProjectionDisplay mpDisplay = (MapProjectionDisplay) getNavigatedDisplay();
+            MapProjectionDisplay mpDisplay =
+                (MapProjectionDisplay) getNavigatedDisplay();
             mpDisplay.setAxisFont(this.getDisplayListFont());
             mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
             mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
@@ -1087,6 +1110,98 @@ public abstract class NavigatedViewManager extends ViewManager {
             getNavigatedDisplay().setVerticalRange(r[0], r[1]);
         } catch (Exception exc) {}
     }
+
+
+    /**
+     * Gets the lat axis scale info.
+     *
+     * @return the lat axis scale info
+     */
+    public AxisScaleInfo getLatAxisScaleInfo() {
+        if ( !hasDisplayMaster()) {
+            return latAxisScaleInfo;
+        }
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            return d.getLatScaleInfo();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the lat axis scale info.
+     *
+     * @param axisScaleInfo
+     *            the new lat axis scale info
+     * @throws RemoteException
+     *             the remote exception
+     * @throws VisADException
+     *             the VisAD exception
+     */
+    public void setLatAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+            throws RemoteException, VisADException {
+
+        this.latAxisScaleInfo = axisScaleInfo;
+
+        if ( !hasDisplayMaster()) {
+            return;
+        }
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            d.setLatScaleInfo(axisScaleInfo);
+        }
+    }
+
+    /**
+     * Gets the lon axis scale info.
+     *
+     * @return the lon axis scale info
+     */
+    public AxisScaleInfo getLonAxisScaleInfo() {
+        if ( !hasDisplayMaster()) {
+            return lonAxisScaleInfo;
+        }
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            return d.getLonScaleInfo();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the lon axis scale info.
+     *
+     * @param axisScaleInfo
+     *            the new lon axis scale info
+     * @throws RemoteException
+     *             the remote exception
+     * @throws VisADException
+     *             the vis ad exception
+     */
+    public void setLonAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+            throws RemoteException, VisADException {
+
+        this.lonAxisScaleInfo = axisScaleInfo;
+
+        if ( !hasDisplayMaster()) {
+            return;
+        }
+
+        if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            d.setLonScaleInfo(axisScaleInfo);
+        }
+    }
+
 
     /**
      * Set the vertical range unit from the preference
