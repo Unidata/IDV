@@ -48,6 +48,7 @@ import visad.Gridded1DDoubleSet;
 import visad.Gridded1DSet;
 import visad.Gridded3DSet;
 import visad.Integer1DSet;
+import visad.QuickSort;
 import visad.Real;
 import visad.RealTuple;
 import visad.RealTupleType;
@@ -826,15 +827,23 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
             // make timeSet the domain of the final FieldImpl; 
             // one for each  height-obs group
-            double[][] timesetdoubles = new double[1][obFFsList.size()];
-            for (int j = 0; j < obFFsList.size(); j++) {
-                timesetdoubles[0][j] =
+            int numFields = obFFsList.size();
+            if (numFields == 0) {
+                throw new IllegalStateException("No fields were found");
+            }
+            double[][] timesetdoubles = new double[1][];
+            double[]   timevals       = new double[numFields];
+            for (int j = 0; j < numFields; j++) {
+                //timesetdoubles[0][j] =
+                timevals[j] =
                     ((DateTime) timesList.get(j)).getReal().getValue();
             }
+            int[] sortIdx = QuickSort.sort(timevals);
+            timesetdoubles[0] = timevals;
 
             Gridded1DDoubleSet timeset =
                 new Gridded1DDoubleSet(RealType.Time, timesetdoubles,
-                                       obFFsList.size());
+                                       numFields);
 
             retField = new FieldImpl(
                 new FunctionType(
@@ -843,9 +852,9 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
             // put all the Profiler obs in the FieldImpl using
             // FieldImpl.setSamples(Data[] range, boolean copy) 
-            Data[] obs = new FlatField[obFFsList.size()];
-            for (int j = 0; j < obFFsList.size(); j++) {
-                obs[j] = (FlatField) obFFsList.get(j);
+            Data[] obs = new FlatField[numFields];
+            for (int j = 0; j < numFields; j++) {
+                obs[j] = (FlatField) obFFsList.get(sortIdx[j]);
             }
             retField.setSamples(obs, false);
 
@@ -1290,18 +1299,18 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
         // make timeSet the domain of the final FieldImpl; 
         // one for each  height-obs group
-        int        numFields      = obFFsList.size();
-
-        double[][] timesetdoubles = new double[1][numFields];
-        for (int j = 0; j < numFields; j++) {
-            timesetdoubles[0][j] =
-                ((DateTime) timesList.get(j)).getReal().getValue();
-        }
-
+        int numFields = obFFsList.size();
         if (numFields == 0) {
             throw new IllegalStateException("No fields were found");
         }
 
+        double[][] timesetdoubles = new double[1][];
+        double[]   timevals       = new double[numFields];
+        for (int j = 0; j < numFields; j++) {
+            timevals[j] = ((DateTime) timesList.get(j)).getReal().getValue();
+        }
+        int[] sortIdx = QuickSort.sort(timevals);
+        timesetdoubles[0] = timevals;
 
         Gridded1DDoubleSet timeset = new Gridded1DDoubleSet(RealType.Time,
                                          timesetdoubles, numFields);
@@ -1319,7 +1328,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
         // FieldImpl.setSamples(Data[] range, boolean copy) 
         Data[] obs = new FlatField[numFields];
         for (int j = 0; j < numFields; j++) {
-            obs[j] = (FlatField) obFFsList.get(j);
+            obs[j] = (FlatField) obFFsList.get(sortIdx[j]);
         }
         retField.setSamples(obs, false);
 
