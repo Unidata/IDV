@@ -179,13 +179,16 @@ public class CursorReadoutWindow {
         lastEarthLocation = vm.getNavigatedDisplay().getEarthLocation(box[0],
                 box[1], box[2], true);
 
-        // re-create the EarthLocationTuple, 
-        // ensuring a longitude between -180 and 180
-        lastEarthLocation = new EarthLocationTuple(
-            lastEarthLocation.getLatitude().getValue(),
-            Misc.normalizeLongitude(
-                lastEarthLocation.getLongitude().getValue()),
-            lastEarthLocation.getAltitude().getValue());
+        if ((lastEarthLocation.getLongitude().getValue() < -180.0) ||
+        		(lastEarthLocation.getLongitude().getValue() > 180.0)) {
+        	// re-create the EarthLocationTuple, 
+        	// ensuring a longitude between -180 and 180
+        	lastEarthLocation = new EarthLocationTuple(
+        			lastEarthLocation.getLatitude().getValue(),
+        			Misc.normalizeLongitude(
+        					lastEarthLocation.getLongitude().getValue()),
+        					lastEarthLocation.getAltitude().getValue());
+        }
 
         updateReadout();
     }
