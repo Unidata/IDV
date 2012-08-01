@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,40 +21,40 @@
 package ucar.unidata.idv.ui;
 
 
-import ucar.unidata.geoloc.*;
-
-import ucar.unidata.idv.*;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.NavigatedViewManager;
 import ucar.unidata.idv.control.ReadoutInfo;
-
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.view.geoloc.*;
 
-import ucar.visad.GeoUtils;
-import ucar.visad.display.*;
+import ucar.visad.display.Animation;
 
-import visad.*;
+import visad.Real;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
 
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.border.BevelBorder;
 
 
 
@@ -65,7 +65,7 @@ import javax.swing.event.*;
 
 public class CursorReadoutWindow {
 
-    /** _more_          */
+    /** _more_ */
     NavigatedViewManager vm;
 
     /** _more_ */
@@ -77,10 +77,10 @@ public class CursorReadoutWindow {
     /** _more_ */
     protected int windowWidth = 0;
 
-    /** _more_          */
+    /** _more_ */
     private EarthLocation lastEarthLocation;
 
-    /** _more_          */
+    /** _more_ */
     private boolean ignoreMissing = true;
 
 
@@ -157,14 +157,14 @@ public class CursorReadoutWindow {
     }
 
     /**
-     * _more_
+     * Handle mouse pressed or dragged.
      *
-     * @param e _more_
-     * @throws VisADException
-     * @throws RemoteException
+     * @param e the e
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
-    public void handleMousePressedOrDragged(MouseEvent e) 
-           throws RemoteException, VisADException {
+    public void handleMousePressedOrDragged(MouseEvent e)
+            throws RemoteException, VisADException {
         if (window == null) {
             JComponent contents = (JComponent) vm.getContents();
             Window     parent   = GuiUtils.getWindow(contents);
@@ -179,15 +179,16 @@ public class CursorReadoutWindow {
         lastEarthLocation = vm.getNavigatedDisplay().getEarthLocation(box[0],
                 box[1], box[2], true);
 
-        if ((lastEarthLocation.getLongitude().getValue() < -180.0) ||
-        		(lastEarthLocation.getLongitude().getValue() > 180.0)) {
-        	// re-create the EarthLocationTuple, 
-        	// ensuring a longitude between -180 and 180
-        	lastEarthLocation = new EarthLocationTuple(
-        			lastEarthLocation.getLatitude().getValue(),
-        			Misc.normalizeLongitude(
-        					lastEarthLocation.getLongitude().getValue()),
-        					lastEarthLocation.getAltitude().getValue());
+        if ((lastEarthLocation.getLongitude().getValue() < -180.0)
+                || (lastEarthLocation.getLongitude().getValue() > 180.0)) {
+            // re-create the EarthLocationTuple, 
+            // ensuring a longitude between -180 and 180
+            lastEarthLocation =
+                new EarthLocationTuple(lastEarthLocation.getLatitude()
+                    .getValue(), Misc
+                    .normalizeLongitude(lastEarthLocation.getLongitude()
+                        .getValue()), lastEarthLocation.getAltitude()
+                            .getValue());
         }
 
         updateReadout();
