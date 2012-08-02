@@ -265,9 +265,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     /** The MapProjection */
     private MapProjection mapProjection;
 
-    /** The Axis Font */
-	private Font axisFont;
-
     /**
      * Constructs an instance with the specified MapProjection
      */
@@ -679,7 +676,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLatScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLatScaleInfo().font);
     }
 
     /**
@@ -767,7 +764,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLonScaleInfo().font);
     }
 
     /**
@@ -838,7 +835,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLonScaleInfo().font);
     }
 
     /**
@@ -849,12 +846,13 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @param labelTable the label table
      * @param majorTicks the major ticks
      * @param minorTicks the minor ticks
+     * @param axisFont the axis font
      * @throws VisADException the vis ad exception
      */
     private void finalizeAxis(
             AxisScale scale, String title,
             Hashtable<? extends Double, ? extends String> labelTable,
-            List<Double> majorTicks, List<Double> minorTicks)
+            List<Double> majorTicks, List<Double> minorTicks, Font axisFont)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
@@ -2806,13 +2804,4 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             return this.mapProjection;
         }
     }
-
-    /**
-     * Set the font for the axis labels
-     * 
-     * @param axisFont
-     */
-	public void setAxisFont(Font axisFont) {
-		this.axisFont = axisFont;
-	}
 }

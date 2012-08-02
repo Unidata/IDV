@@ -371,7 +371,7 @@ public abstract class NavigatedViewManager extends ViewManager {
             if (latAxisScaleInfo != null) {
                 setLatAxisScaleInfo(latAxisScaleInfo);
             }
-            
+
             AxisScaleInfo lonAxisScaleInfo = nvm.getLonAxisScaleInfo();
 
             if (lonAxisScaleInfo != null) {
@@ -422,7 +422,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
             MapProjectionDisplay d =
                 (MapProjectionDisplay) getNavigatedDisplay();
-            d.setAxisFont(getDisplayListFont());
             b = (latLonScaleWidget.isLatVisible()
                  || latLonScaleWidget.isLonVisible()
                  || vertRangeWidget.isAxisVisible());
@@ -449,7 +448,6 @@ public abstract class NavigatedViewManager extends ViewManager {
         if (getNavigatedDisplay() instanceof MapProjectionDisplay) {
             MapProjectionDisplay mpDisplay =
                 (MapProjectionDisplay) getNavigatedDisplay();
-            mpDisplay.setAxisFont(this.getDisplayListFont());
             mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
             mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
             vertRangeWidget.getVertScaleInfo().visible =
