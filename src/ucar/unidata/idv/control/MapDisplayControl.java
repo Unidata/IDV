@@ -66,6 +66,7 @@ import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -267,11 +268,13 @@ public class MapDisplayControl extends DisplayControlImpl {
     public MapDisplayControl(MapViewManager mapViewManager, MapInfo mapInfo) {
         super(mapViewManager.getIdv());
         setLockVisibilityToggle(true);
-        defaultViewManager  = mapViewManager;
-        this.mapPosition    = getInitialZPosition();
-        this.defaultMapData = mapInfo.getMapDataList();
-        this.defaultLatData = mapInfo.getLatData();
-        this.defaultLonData = mapInfo.getLonData();
+        defaultViewManager       = mapViewManager;
+        this.mapPosition         = getInitialZPosition();
+        this.defaultMapData      = mapInfo.getMapDataList();
+        this.defaultLatData      = mapInfo.getLatData();
+        this.defaultLonData      = mapInfo.getLonData();
+        this.defaultLatLabelData = mapInfo.getLatLabelData();
+        this.defaultLonLabelData = mapInfo.getLonLabelData();
         if (mapInfo.getJustLoadedLocalMaps()) {
             ignoreNonVisibleMaps = false;
         }
@@ -369,24 +372,6 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
         }
     }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    private LatLonLabels getLatLonLabels()
-            throws VisADException, RemoteException {
-        LatLonLabels labels = new LatLonLabels("mapcontrol");
-        labels.setSphere(inGlobeDisplay());
-        return labels;
-    }
-
-
-
 
     /**
      * Clear the current state and copy the state held by the given newMap
@@ -509,9 +494,11 @@ public class MapDisplayControl extends DisplayControlImpl {
             if (mapInfo.getJustLoadedLocalMaps()) {
                 ignoreNonVisibleMaps = false;
             }
-            defaultMapData = mapInfo.getMapDataList();
-            defaultLatData = mapInfo.getLatData();
-            defaultLonData = mapInfo.getLonData();
+            defaultMapData      = mapInfo.getMapDataList();
+            defaultLatData      = mapInfo.getLatData();
+            defaultLonData      = mapInfo.getLonData();
+            defaultLatLabelData = mapInfo.getLatLabelData();
+            defaultLonLabelData = mapInfo.getLonLabelData();
             //            mapPosition    = mapInfo.getMapPosition();
 
             //MapViewManager mvm = getMapViewManager();
@@ -1072,13 +1059,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         JPanel displayPanel = GuiUtils.topCenter(
                                   GuiUtils.vbox(
                                       GuiUtils.left(applyToAllLatLonBtn),
-                                      llPanel, lllPanel), ( !useZPosition()
-                ? GuiUtils.filler()
-                : GuiUtils.top(
-                    GuiUtils.leftCenter(
-                        new JLabel("Map Position:  "),
-                        makePositionSlider()))));
-
+                                      llPanel, lllPanel), GuiUtils.filler());
 
         applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
@@ -1098,7 +1079,17 @@ public class MapDisplayControl extends DisplayControlImpl {
         tabbedPane.add("Maps",
                        GuiUtils.topCenter(GuiUtils.left(applyToAllMapsBtn),
                                           sp));
-        tabbedPane.add("Settings", displayPanel);
+        tabbedPane.add("Lat/Lon Lines", displayPanel);
+        if (useZPosition()) {
+        	
+            JPanel settingsPanel = 
+                    GuiUtils.top(
+                        GuiUtils.leftCenter(
+                            new JLabel("Map Position:  "),
+                            makePositionSlider()));
+    
+            tabbedPane.add("Settings", settingsPanel);
+        }
 
         /**
          *
@@ -1865,6 +1856,23 @@ public class MapDisplayControl extends DisplayControlImpl {
             if (shouldShare) {
                 other.okToShare = false;
                 other.setFastRendering(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the label lines of the lines
+         *
+         * @param values  the label lines
+         */
+        public void setLabelLines(float[] values) {
+            boolean shouldShare = shouldShare()
+                                  && ( !Arrays.equals(values,
+                                      getLabelLines()));
+            super.setLabelLines(values);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setLabelLines(values);
                 other.stateWasShared();
             }
         }

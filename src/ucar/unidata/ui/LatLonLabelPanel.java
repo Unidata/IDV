@@ -182,6 +182,7 @@ public class LatLonLabelPanel extends JPanel {
             onOffCbx.setSelected(lld.getVisible());
             spacingField.setText("" + lld.getIncrement());
             baseField.setText("" + lld.getBaseValue());
+            labelLinesField.setText("" + formatLabelLines(lld.getLabelLines()));
             colorButton.setBackground(lld.getColor());
             fastRenderCbx.setSelected(lld.getFastRendering());
             ignoreEvents = false;
@@ -201,8 +202,8 @@ public class LatLonLabelPanel extends JPanel {
     public static JPanel layoutPanels(LatLonLabelPanel latPanel,
                                       LatLonLabelPanel lonPanel) {
         Component[] comps = {
-        	GuiUtils.filler(), GuiUtils.cLabel("<b>Labels</b>"),
-            GuiUtils.cLabel("Increment"), GuiUtils.cLabel("Base"),
+        	GuiUtils.rLabel("<html><b>Labels</b></html>"),GuiUtils.filler(),
+            GuiUtils.cLabel("Increment"), GuiUtils.cLabel("Relative to"),
             GuiUtils.filler(),GuiUtils.filler(), GuiUtils.cLabel("Color"),
             latPanel.onOffCbx, GuiUtils.rLabel("Latitude:"), 
             latPanel.spacingField, latPanel.baseField,

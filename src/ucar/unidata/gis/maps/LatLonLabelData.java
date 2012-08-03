@@ -97,7 +97,7 @@ public class LatLonLabelData {
                                      ? -90
                                      : -180), (isLatitude
                 ? 90
-                : 180), 0, new float[] { 0 }, 0, null, Color.white, true);
+                : 179), 0, new float[] { 0 }, 0, null, Color.white, true);
     }
 
     /**
@@ -177,6 +177,7 @@ public class LatLonLabelData {
         this.labelFont     = that.labelFont;
         this.color         = that.color;
         this.fastRendering = that.fastRendering;
+        this.visible       = that.visible;
     }
 
 
@@ -202,7 +203,7 @@ public class LatLonLabelData {
                                           ? "LatLabels"
                                           : "LonLabels")), isLatitude,
                                           increment, minValue, maxValue,
-                                          increment, labelLines);
+                                          baseValue, labelLines);
 
         }
         if (color != null) {
@@ -210,9 +211,10 @@ public class LatLonLabelData {
         }
         myLatLonLabels.setVisible(getRealVisibility());
         myLatLonLabels.setIncrement(increment);
-        myLatLonLabels.setBase(baseValue);
-        myLatLonLabels.setMax(maxValue);
         myLatLonLabels.setMin(minValue);
+        myLatLonLabels.setMax(maxValue);
+        myLatLonLabels.setBase(baseValue);
+        myLatLonLabels.setLabelLines(labelLines);
         myLatLonLabels.setFont(labelFont);
         myLatLonLabels.setUseFastRendering(fastRendering);
         return myLatLonLabels;
@@ -333,6 +335,7 @@ public class LatLonLabelData {
      */
     public void setMinValue(float value) {
         minValue = value;
+        stateChanged();
     }
 
     /**
@@ -351,6 +354,7 @@ public class LatLonLabelData {
      */
     public void setMaxValue(float value) {
         maxValue = value;
+        stateChanged();
     }
 
     /**
@@ -369,6 +373,7 @@ public class LatLonLabelData {
      */
     public void setLabelLines(float[] value) {
         labelLines = value;
+        stateChanged();
     }
 
     /**

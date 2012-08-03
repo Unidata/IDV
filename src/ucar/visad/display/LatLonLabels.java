@@ -17,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.visad.display;
 
 
@@ -33,13 +34,15 @@ import visad.VisADException;
 
 import java.rmi.RemoteException;
 
+import java.util.Arrays;
+
 
 /**
  * Class description
  *
  *
  * @version        Enter version here..., Thu, Aug 2, '12
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class LatLonLabels extends TextDisplayable {
 
@@ -136,7 +139,7 @@ public class LatLonLabels extends TextDisplayable {
         this.max        = max;
         this.base       = base;
         this.labelLines = labelLines;
-        generateLabelField();
+        createLabels();
     }
 
     /**
@@ -174,7 +177,7 @@ public class LatLonLabels extends TextDisplayable {
         this.max        = max;
         this.base       = base;
         this.labelLines = labelLines;
-        generateLabelField();
+        createLabels();
     }
 
     /**
@@ -183,7 +186,7 @@ public class LatLonLabels extends TextDisplayable {
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   Unable to create VisAD object
      */
-    protected void generateLabelField()
+    protected void createLabels()
             throws VisADException, RemoteException {
         RealTupleType labelType =
             new RealTupleType(RealType.Latitude, RealType.Longitude,
@@ -222,9 +225,17 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param isLatitude the isLatitude to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setLatitude(boolean isLatitude) {
+    public void setLatitude(boolean isLatitude)
+            throws VisADException, RemoteException {
+        if (this.isLatitude == isLatitude) {
+            return;
+        }
         this.isLatitude = isLatitude;
+        createLabels();
     }
 
     /**
@@ -236,9 +247,16 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param base the base to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setBase(float base) {
+    public void setBase(float base) throws VisADException, RemoteException {
+        if (this.base == base) {
+            return;
+        }
         this.base = base;
+        createLabels();
     }
 
     /**
@@ -250,9 +268,16 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param max the max to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setMax(float max) {
+    public void setMax(float max) throws VisADException, RemoteException {
+        if (this.max == max) {
+            return;
+        }
         this.max = max;
+        createLabels();
     }
 
     /**
@@ -264,9 +289,16 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param min the min to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setMin(float min) {
+    public void setMin(float min) throws VisADException, RemoteException {
+        if (this.min == min) {
+            return;
+        }
         this.min = min;
+        createLabels();
     }
 
     /**
@@ -278,9 +310,17 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param increment the increment to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setIncrement(float increment) {
+    public void setIncrement(float increment)
+            throws VisADException, RemoteException {
+        if (this.increment == increment) {
+            return;
+        }
         this.increment = increment;
+        createLabels();
     }
 
     /**
@@ -292,9 +332,17 @@ public class LatLonLabels extends TextDisplayable {
 
     /**
      * @param labelLines the labelLines to set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void setLabelLines(float[] labelLines) {
+    public void setLabelLines(float[] labelLines)
+            throws VisADException, RemoteException {
+        if (Arrays.equals(this.labelLines, labelLines)) {
+            return;
+        }
         this.labelLines = labelLines;
+        createLabels();
     }
 
 
