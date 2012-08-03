@@ -47,7 +47,9 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.AxisScaleInfo;
 import ucar.unidata.view.geoloc.GlobeDisplay;
+import ucar.unidata.view.geoloc.LatLonScalePanel;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.ViewpointInfo;
@@ -315,6 +317,15 @@ public class MapViewManager extends NavigatedViewManager {
 
     /** do not set projection flag */
     private boolean doNotSetProjection = false;
+
+    /** lat/lon scale widget */
+    private LatLonScalePanel latLonScaleWidget;
+
+    /** Lat axis scale info for unpersistence */
+    private AxisScaleInfo latAxisScaleInfo;
+
+    /** Lon axis scale info for unpersistence */
+    private AxisScaleInfo lonAxisScaleInfo;
 
     /**
      *  Default constructor
@@ -1074,6 +1085,7 @@ public class MapViewManager extends NavigatedViewManager {
         if (aspect != null) {
             this.setAspectRatio(aspect);
         }
+
         super.initWith(viewState);
     }
 
@@ -1204,6 +1216,20 @@ public class MapViewManager extends NavigatedViewManager {
         } catch (Exception exc) {
             logException("Initializing with MapViewManager", exc);
         }
+
+        AxisScaleInfo latAxisScaleInfo = mvm.getLatAxisScaleInfo();
+
+        if (latAxisScaleInfo != null) {
+            setLatAxisScaleInfo(latAxisScaleInfo);
+        }
+
+        AxisScaleInfo lonAxisScaleInfo = mvm.getLonAxisScaleInfo();
+
+        if (lonAxisScaleInfo != null) {
+            setLonAxisScaleInfo(lonAxisScaleInfo);
+        }
+
+
     }
 
 
@@ -2349,7 +2375,27 @@ public class MapViewManager extends NavigatedViewManager {
             globeBackgroundLevel = globeBackgroundLevelSlider.getValue();
             setGlobeBackground((GlobeDisplay) getMapDisplay());
         }
-        return true;
+        return applyAxisVisibility();
+    }
+
+    /**
+     * Apply axis visibility choices.
+     *
+     * @return
+     */
+    private boolean applyAxisVisibility() {
+
+        if (latLonScaleWidget == null) {
+            return false;
+        }
+
+        boolean b = !useGlobeDisplay
+                    && (latLonScaleWidget.isLatVisible()
+                        || latLonScaleWidget.isLonVisible());
+
+        setBp(PREF_SHOWSCALES, b);
+
+        return latLonScaleWidget.doApply();
     }
 
 
@@ -2361,12 +2407,18 @@ public class MapViewManager extends NavigatedViewManager {
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
+        if ( !useGlobeDisplay) {
+            MapProjectionDisplay mpDisplay =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            latLonScaleWidget = new LatLonScalePanel(mpDisplay);
+            tabbedPane.add("Horizontal Scale",
+                           GuiUtils.topLeft(latLonScaleWidget));
+        }
         if (globeBackgroundDisplayable == null) {
             return;
         }
-
-
-
 
 
         globeBackgroundLevelSlider = new ZSlider(globeBackgroundLevel);
@@ -3195,6 +3247,14 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
     /**
+     * Apply preferences
+     */
+    public void applyPreferences() {
+        super.applyPreferences();
+        applyAxisVisibility();
+    }
+
+    /**
      * Create the set of {@link ucar.unidata.util.BooleanProperty}s.
      * These hold all of the different flag based display state.
      *
@@ -3655,6 +3715,95 @@ public class MapViewManager extends NavigatedViewManager {
         return this.initLatLonBounds;
     }
 
+    /**
+     * Gets the lat axis scale info.
+     *
+     * @return the lat axis scale info
+     */
+    public AxisScaleInfo getLatAxisScaleInfo() {
+        if ( !hasDisplayMaster()) {
+            return latAxisScaleInfo;
+        }
+
+        if ( !useGlobeDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            return d.getLatScaleInfo();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the lat axis scale info.
+     *
+     * @param axisScaleInfo
+     *            the new lat axis scale info
+     * @throws RemoteException
+     *             the remote exception
+     * @throws VisADException
+     *             the VisAD exception
+     */
+    public void setLatAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+            throws RemoteException, VisADException {
+
+        this.latAxisScaleInfo = axisScaleInfo;
+
+        if ( !hasDisplayMaster()) {
+            return;
+        }
+
+        if ( !useGlobeDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            d.setLatScaleInfo(axisScaleInfo);
+        }
+    }
+
+    /**
+     * Gets the lon axis scale info.
+     *
+     * @return the lon axis scale info
+     */
+    public AxisScaleInfo getLonAxisScaleInfo() {
+        if ( !hasDisplayMaster()) {
+            return lonAxisScaleInfo;
+        }
+
+        if ( !useGlobeDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            return d.getLonScaleInfo();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the lon axis scale info.
+     *
+     * @param axisScaleInfo
+     *            the new lon axis scale info
+     * @throws RemoteException
+     *             the remote exception
+     * @throws VisADException
+     *             the vis ad exception
+     */
+    public void setLonAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+            throws RemoteException, VisADException {
+
+        this.lonAxisScaleInfo = axisScaleInfo;
+
+        if ( !hasDisplayMaster()) {
+            return;
+        }
+
+        if ( !useGlobeDisplay) {
+            MapProjectionDisplay d =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            d.setLonScaleInfo(axisScaleInfo);
+        }
+    }
 
 
 
