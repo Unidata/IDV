@@ -20,6 +20,22 @@
          linestyle="1"
          />
 
+  <latitudelabel
+        minvalue="-90"
+        maxvalue="90"
+        spacing="15"
+        color="gray"
+        visible="false"
+        />
+
+  <longitudelabel
+         minvalue="-180"
+         maxvalue="180"
+         spacing="15"
+         color="gray"
+         visible="false"
+         />
+
   <map
        source="/auxdata/maps/OUTVHRES"
        description="World Coastlines"
