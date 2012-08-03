@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,51 +21,47 @@
 package ucar.unidata.idv.control;
 
 
-import org.w3c.dom.Element;
-
 import ucar.unidata.data.DataChoice;
-
-import ucar.unidata.gis.maps.*;
-import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.gis.maps.LatLonData;
+import ucar.unidata.gis.maps.LatLonLabelData;
+import ucar.unidata.gis.maps.MapData;
+import ucar.unidata.gis.maps.MapInfo;
 import ucar.unidata.idv.MapViewManager;
-
 import ucar.unidata.idv.PluginManager;
-
-
+import ucar.unidata.ui.LatLonLabelPanel;
 import ucar.unidata.ui.LatLonPanel;
 import ucar.unidata.ui.MapPanel;
-
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-
-
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.Resource;
 import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-import ucar.unidata.xml.*;
+
+import ucar.visad.display.CompositeDisplayable;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.LatLonLabels;
+import ucar.visad.display.MapLines;
+
+import visad.SampledSet;
+import visad.VisADException;
+
+import visad.georef.EarthLocation;
 
 
-
-import ucar.visad.display.*;
-
-
-import visad.*;
-
-import visad.georef.*;
-
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.*;
-
-import java.net.URL;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.rmi.RemoteException;
 
@@ -73,8 +69,23 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.JViewport;
+import javax.swing.ScrollPaneConstants;
 
 
 
@@ -88,7 +99,7 @@ import javax.swing.event.*;
 public class MapDisplayControl extends DisplayControlImpl {
 
 
-    /** _more_ */
+    /** default map color */
     public static final Color DEFAULT_MAP_COLOR = new Color(0, 204, 0);
 
 
@@ -113,6 +124,12 @@ public class MapDisplayControl extends DisplayControlImpl {
 
     /** Holds the longitude display info */
     private LatLonState lonState = null;
+
+    /** Holds the latitude label info */
+    private LatLonLabelState latLabelState = null;
+
+    /** Holds the longitude label info */
+    private LatLonLabelState lonLabelState = null;
 
 
     /**
@@ -175,6 +192,18 @@ public class MapDisplayControl extends DisplayControlImpl {
     private LatLonData defaultLonData;
 
     /**
+     * This holds the default lat. data  when this display control
+     *  is used as the default map in a map view.
+     */
+    private LatLonLabelData defaultLatLabelData;
+
+    /**
+     * This holds the default long. data  when this display control
+     *  is used as the default map in a map view.
+     */
+    private LatLonLabelData defaultLonLabelData;
+
+    /**
      * Have this around when we are initializing.
      * It tells us whether to not include maps in the map list
      * that are not visible
@@ -206,7 +235,7 @@ public class MapDisplayControl extends DisplayControlImpl {
     /** The link button */
     private JToggleButton applyToAllMapsBtn;
 
-    /** _more_          */
+    /** apply to all lat/lon button */
     private JToggleButton applyToAllLatLonBtn;
 
     /** Do we apply the changes to all the maps */
@@ -238,8 +267,8 @@ public class MapDisplayControl extends DisplayControlImpl {
     public MapDisplayControl(MapViewManager mapViewManager, MapInfo mapInfo) {
         super(mapViewManager.getIdv());
         setLockVisibilityToggle(true);
-        defaultViewManager = mapViewManager;
-        this.mapPosition = getInitialZPosition();
+        defaultViewManager  = mapViewManager;
+        this.mapPosition    = getInitialZPosition();
         this.defaultMapData = mapInfo.getMapDataList();
         this.defaultLatData = mapInfo.getLatData();
         this.defaultLonData = mapInfo.getLonData();
@@ -267,19 +296,19 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Should we add a control listener
      *
-     * @return _more_
+     * @return  true if we should
      */
     protected boolean xxxshouldAddControlListener() {
         return true;
     }
 
-    /** _more_          */
+    /** last width in degrees */
     double lastWidthDegrees = -1;
 
     /**
-     * _more_
+     * Handle the viewpoint changed
      */
     public void xxxviewpointChanged() {
         super.viewpointChanged();
@@ -295,7 +324,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
             EarthLocation p1           = screenToEarth(0, 0);
             EarthLocation p2           = screenToEarth(screenBounds.width, 0);
-            double diff = Math.abs(p1.getLongitude().getValue()
+            double        diff = Math.abs(p1.getLongitude().getValue()
                                    - p2.getLongitude().getValue());
 
             if (diff != lastWidthDegrees) {
@@ -341,6 +370,21 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private LatLonLabels getLatLonLabels()
+            throws VisADException, RemoteException {
+        LatLonLabels labels = new LatLonLabels("mapcontrol");
+        labels.setSphere(inGlobeDisplay());
+        return labels;
+    }
+
 
 
 
@@ -364,6 +408,8 @@ public class MapDisplayControl extends DisplayControlImpl {
             deactivateDisplays();
             this.latState.initWith(newMap.latState);
             this.lonState.initWith(newMap.lonState);
+            this.latLabelState.initWith(newMap.latLabelState);
+            this.lonLabelState.initWith(newMap.lonLabelState);
             if (getDisplayVisibility() != newMap.getDisplayVisibility()) {
                 setDisplayVisibility(newMap.getDisplayVisibility());
             }
@@ -384,6 +430,8 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
             latLonHolder.addDisplayable(latState.getLatLonLines());
             latLonHolder.addDisplayable(lonState.getLatLonLines());
+            latLonHolder.addDisplayable(latLabelState.getLatLonLabels());
+            latLonHolder.addDisplayable(lonLabelState.getLatLonLabels());
 
 
             this.mapStates = new ArrayList<MapState>();
@@ -504,13 +552,29 @@ public class MapDisplayControl extends DisplayControlImpl {
             lonState.init(this);
         }
 
-        if(latState!=null) {
+        if (latState != null) {
             latLonHolder.addDisplayable(latState.getLatLonLines());
         }
-        if(lonState!=null) {
+        if (lonState != null) {
             latLonHolder.addDisplayable(lonState.getLatLonLines());
         }
 
+        if (defaultLatLabelData != null) {
+            latLabelState = new LatLonLabelState(defaultLatLabelData);
+            latLabelState.init(this);
+        }
+
+        if (defaultLonLabelData != null) {
+            lonLabelState = new LatLonLabelState(defaultLonLabelData);
+            lonLabelState.init(this);
+        }
+
+        if (latLabelState != null) {
+            latLonHolder.addDisplayable(latLabelState.getLatLonLabels());
+        }
+        if (lonLabelState != null) {
+            latLonHolder.addDisplayable(lonLabelState.getLatLonLabels());
+        }
 
         if (((initialMap != null) && (initialMap.trim().length() > 0))
                 && !isDefaultMap) {
@@ -563,6 +627,26 @@ public class MapDisplayControl extends DisplayControlImpl {
         return lls;
     }
 
+    /**
+     * _more_
+     *
+     * @param latitude _more_
+     * @param min _more_
+     * @param max _more_
+     * @param spacing _more_
+     *
+     * @return _more_
+     */
+    private LatLonLabelState createLatLonLabelState(boolean latitude,
+            float min, float max, float spacing) {
+        LatLonLabelState lls = new LatLonLabelState(latitude, spacing);
+        lls.init(this);
+        lls.setVisible(false);
+        lls.setFastRendering(getDefaultFastRendering());
+        lls.setMinValue(min);
+        lls.setMaxValue(max);
+        return lls;
+    }
 
     /**
      * Merge the maps contained by that into this
@@ -588,6 +672,10 @@ public class MapDisplayControl extends DisplayControlImpl {
             if (latState != null) {
                 latState.checkVisibility();
                 lonState.checkVisibility();
+            }
+            if (latLabelState != null) {
+                latLabelState.checkVisibility();
+                lonLabelState.checkVisibility();
             }
         } catch (Exception exc) {
             logException("Setting visibility", exc);
@@ -628,9 +716,9 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @param visible
      */
     public void setVisible(boolean visible) {
-        if(mapStates != null && mapStates.size() > 0) {
+        if ((mapStates != null) && (mapStates.size() > 0)) {
             int len = mapStates.size();
-            for(int i = 0; i < len; i=i+1) {
+            for (int i = 0; i < len; i = i + 1) {
                 MapState ms = mapStates.get(i);
                 ms.setVisible(visible);
             }
@@ -649,8 +737,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         GuiUtils.setIcon(mapsMenu, "/auxdata/ui/icons/map.png");
         items.add(mapsMenu);
         for (int i = 0; i < mapStates.size(); i++) {
-            final MapState mapState = (MapState) mapStates.get(i);
-            JCheckBoxMenuItem cbx =
+            final MapState    mapState = (MapState) mapStates.get(i);
+            JCheckBoxMenuItem cbx      =
                 new JCheckBoxMenuItem(mapState.getDescription(),
                                       mapState.getVisible());
             cbx.addItemListener(new ItemListener() {
@@ -916,6 +1004,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @return  UI container
      */
     public Container doMakeContents() {
+
         contents = new JPanel(new BorderLayout());
         if (latState == null) {
             latState = createLatLonState(true, -90.f, 90.f, 30.f);
@@ -926,16 +1015,34 @@ public class MapDisplayControl extends DisplayControlImpl {
         latState.other = lonState;
         lonState.other = latState;
 
+        if (latLabelState == null) {
+            latLabelState = createLatLonLabelState(true, -90.f, 90.f, 30.f);
+        }
+        if (lonLabelState == null) {
+            lonLabelState = createLatLonLabelState(false, -180.f, 180.f,
+                    45.f);
+        }
+        latLabelState.other = lonLabelState;
+        lonLabelState.other = latLabelState;
+
         LatLonPanel latPanel = new LatLonPanel(latState);
         latState.myLatLonPanel = latPanel;
         LatLonPanel lonPanel = new LatLonPanel(lonState);
         lonState.myLatLonPanel = lonPanel;
         JPanel llPanel = LatLonPanel.layoutPanels(latPanel, lonPanel);
 
+        LatLonLabelPanel latLabelPanel = new LatLonLabelPanel(latLabelState);
+        latLabelState.myLatLonLabelPanel = latLabelPanel;
+        LatLonLabelPanel lonLabelPanel = new LatLonLabelPanel(lonLabelState);
+        lonLabelState.myLatLonLabelPanel = lonLabelPanel;
+        JPanel lllPanel = LatLonLabelPanel.layoutPanels(latLabelPanel,
+                              lonLabelPanel);
         try {
             if (latLonHolder.displayableCount() == 0) {
                 latLonHolder.addDisplayable(latState.getLatLonLines());
                 latLonHolder.addDisplayable(lonState.getLatLonLines());
+                latLonHolder.addDisplayable(latLabelState.getLatLonLabels());
+                latLonHolder.addDisplayable(lonLabelState.getLatLonLabels());
             }
         } catch (Exception exc) {
             logException("Initializing latlon lines", exc);
@@ -965,7 +1072,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         JPanel displayPanel = GuiUtils.topCenter(
                                   GuiUtils.vbox(
                                       GuiUtils.left(applyToAllLatLonBtn),
-                                      llPanel), ( !useZPosition()
+                                      llPanel, lllPanel), ( !useZPosition()
                 ? GuiUtils.filler()
                 : GuiUtils.top(
                     GuiUtils.leftCenter(
@@ -1007,6 +1114,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         return tabbedPane;
 
         //        return outerPanel;
+
     }
 
 
@@ -1357,10 +1465,10 @@ public class MapDisplayControl extends DisplayControlImpl {
         /** Flag to keep from infinite looping */
         private boolean ignoreStateChange = false;
 
-        /** _more_          */
+        /** share flag */
         private boolean okToShare = true;
 
-        /** _more_          */
+        /** the other state to share with */
         private LatLonState other;
 
         /**
@@ -1423,7 +1531,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * _more_
+         * State was shared
          */
         private void stateWasShared() {
             ignoreStateChange = true;
@@ -1436,9 +1544,9 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
         /**
-         * _more_
+         * Should we share?
          *
-         * @return _more_
+         * @return true if we should share
          */
         private boolean shouldShare() {
             if ((mapDisplayControl != null)
@@ -1450,9 +1558,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * _more_
+         * Set the color
          *
-         * @param value _more_
+         * @param value  the new Color
          */
         public void setColor(Color value) {
             boolean shouldShare = shouldShare()
@@ -1466,9 +1574,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * _more_
+         * Set the visibility
          *
-         * @param value _more_
+         * @param value  true to be visible
          */
         public void setVisible(boolean value) {
             boolean shouldShare = shouldShare() && (value != getVisible());
@@ -1482,9 +1590,9 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
         /**
-         * _more_
+         * Set the fast rendering flag
          *
-         * @param value _more_
+         * @param value  true to turn on fast rendering
          */
         public void setFastRendering(boolean value) {
             boolean shouldShare = shouldShare()
@@ -1498,9 +1606,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * _more_
+         * Set the line style
          *
-         * @param value _more_
+         * @param value  the line style flag
          */
         public void setLineStyle(int value) {
             boolean shouldShare = shouldShare() && (value != getLineStyle());
@@ -1513,9 +1621,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * _more_
+         * Set the spacing of the lines
          *
-         * @param value _more_
+         * @param value  the line spacing
          */
         public void setSpacing(float value) {
             boolean shouldShare = shouldShare() && (value != getSpacing());
@@ -1529,9 +1637,9 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
         /**
-         * _more_
+         * Set the line width
          *
-         * @param value _more_
+         * @param value  the line width
          */
         public void setLineWidth(float value) {
             boolean shouldShare = shouldShare() && (value != getLineWidth());
@@ -1610,6 +1718,254 @@ public class MapDisplayControl extends DisplayControlImpl {
 
     }
 
+
+    /**
+     * This class holds the state associated with a given lat/lon
+     */
+    public static class LatLonLabelState extends LatLonLabelData {
+
+        /** This display control I am part of */
+        private MapDisplayControl mapDisplayControl;
+
+        /** The panel that represents me */
+        LatLonLabelPanel myLatLonLabelPanel;
+
+        /** Flag to keep from infinite looping */
+        private boolean ignoreStateChange = false;
+
+        /** share flag */
+        private boolean okToShare = true;
+
+        /** the other state to share with */
+        private LatLonLabelState other;
+
+        /**
+         * Parameterless ctor
+         */
+        public LatLonLabelState() {}
+
+
+        /**
+         * Ctor for creating from a LatLonData
+         *
+         * @param that The object to copy from
+         */
+        public LatLonLabelState(LatLonLabelData that) {
+            super(that);
+        }
+
+        /**
+         * The ctor
+         *
+         * @param isLatitude Is this latitude or longitude
+         * @param spacing Line spacing
+         */
+        public LatLonLabelState(boolean isLatitude, float spacing) {
+            super(isLatitude, spacing);
+        }
+
+
+        /**
+         * Set the MapDisplayControl
+         *
+         * @param mapDisplayControl The display I am part of
+         */
+        protected void init(MapDisplayControl mapDisplayControl) {
+            this.mapDisplayControl = mapDisplayControl;
+        }
+
+
+        /**
+         * Copy the state from the given LatLonData
+         *
+         * @param that The LatLonData to copy from
+         */
+        public void initWith(LatLonLabelData that) {
+            try {
+                super.initWith(that);
+
+                if (myLatLonLabelPanel != null) {
+                    myLatLonLabelPanel.setLatLonLabelData(this);
+                }
+                //This applies my state to the latlonlines
+                getLatLonLabels();
+            } catch (Exception exc) {
+                mapDisplayControl.logException("initWith", exc);
+            }
+        }
+
+        /**
+         * State was shared
+         */
+        private void stateWasShared() {
+            ignoreStateChange = true;
+            if (myLatLonLabelPanel != null) {
+                myLatLonLabelPanel.setLatLonLabelData(this);
+            }
+            ignoreStateChange = false;
+            okToShare         = true;
+        }
+
+
+        /**
+         * Should we share?
+         *
+         * @return true if we should share
+         */
+        private boolean shouldShare() {
+            if ((mapDisplayControl != null)
+                    && mapDisplayControl.getApplyChangesToAllLatLon()
+                    && (other != null) && okToShare && !ignoreStateChange) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Set the color
+         *
+         * @param value  the new Color
+         */
+        public void setColor(Color value) {
+            boolean shouldShare = shouldShare()
+                                  && !Misc.equals(value, getColor());
+            super.setColor(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setColor(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the visibility
+         *
+         * @param value  true to be visible
+         */
+        public void setVisible(boolean value) {
+            boolean shouldShare = shouldShare() && (value != getVisible());
+            super.setVisible(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setVisible(value);
+                other.stateWasShared();
+            }
+        }
+
+
+        /**
+         * Set the fast rendering flag
+         *
+         * @param value  true to turn on fast rendering
+         */
+        public void setFastRendering(boolean value) {
+            boolean shouldShare = shouldShare()
+                                  && (value != getFastRendering());
+            super.setFastRendering(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setFastRendering(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the spacing of the lines
+         *
+         * @param value  the line spacing
+         */
+        public void setIncrement(float value) {
+            boolean shouldShare = shouldShare() && (value != getIncrement());
+            super.setIncrement(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setIncrement(value);
+                other.stateWasShared();
+            }
+        }
+
+
+        /**
+         * Set the base
+         *
+         * @param value  the line width
+         */
+        public void setBaseValue(float value) {
+            boolean shouldShare = shouldShare() && (value != getBaseValue());
+            super.setBaseValue(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setBaseValue(value);
+                other.stateWasShared();
+            }
+        }
+
+
+
+        /**
+         * Apply the visibility to the myLatLon
+         */
+        protected void checkVisibility() {
+            if ((myLatLonLabels == null) || (myLatLonLabelPanel == null)) {
+                return;
+            }
+            try {
+                myLatLonLabels.setVisible(getRealVisibility());
+            } catch (Exception exc) {
+                mapDisplayControl.logException("Setting visibility", exc);
+            }
+        }
+
+        /**
+         * Overwrite the base class method to take into account the
+         * display's visibility
+         *
+         * @return THe actual visibility to use
+         */
+        protected boolean getRealVisibility() {
+            if (mapDisplayControl == null) {
+                return super.getRealVisibility();
+            }
+            return super.getRealVisibility()
+                   && mapDisplayControl.getDisplayVisibility();
+        }
+
+
+        /**
+         * Called by the base class when one of the latlon values have changed.
+         */
+        public void stateChanged() {
+            if (ignoreStateChange || (myLatLonLabels == null)
+                    || (myLatLonLabelPanel == null)) {
+                return;
+            }
+
+            ignoreStateChange = true;
+            try {
+                if (okToShare) {
+                    myLatLonLabelPanel.applyStateToData();
+                }
+                //This triggers the application of the state to the myLatLon
+                getLatLonLabels();
+            } catch (Exception exc) {
+                logException("State change", exc);
+            }
+            ignoreStateChange = false;
+        }
+
+        /**
+         * to string
+         *
+         * @return to string
+         */
+        public String toString() {
+            return (getIsLatitude()
+                    ? "map label state:latitude "
+                    : "map label state:longitude ");
+        }
+
+
+    }
 
     /**
      * This method can be overwritten by the derived classes that do not want the

@@ -21,7 +21,7 @@
 package ucar.unidata.gis.maps;
 
 
-import ucar.visad.display.LatLonLines;
+import ucar.visad.display.LatLonLabels;
 
 import visad.RealType;
 import visad.VisADException;
@@ -34,41 +34,47 @@ import java.rmi.RemoteException;
 
 
 /**
- * A data structure to hold display attributes for  lat/lon lines
+ * A data structure to hold display attributes for lat/lon labels
  */
 
 
-public class LatLonData {
+public class LatLonLabelData {
 
-    /** The lat lon lines. We create this when asked. */
-    protected LatLonLines myLatLon;
+    /** The lat lon labels. We create this when asked. */
+    protected LatLonLabels myLatLonLabels;
 
     /** Is the lat/lon visible */
     private boolean visible = true;
 
     /** The color */
-    private Color color = Color.blue;
+    private Color color = Color.white;
 
-    /** The line spacing */
-    private float spacing;
+    /** The alignment point */
+    private int alignment;
 
-    /** The line width */
-    private float lineWidth;
+    /** The label font */
+    private Object labelFont;
 
-    /** The line style */
-    private int lineStyle;
+    /** The label size */
+    private float labelSize;
 
     /** Is this data representing latitude or longitude */
     private boolean isLatitude = true;
 
+    /** The labels increment */
+    private float increment;
 
     /** The lat/lon min value */
     private float minValue;
 
-
     /** The lat/lon max value */
     private float maxValue;
 
+    /** The lat/lon base value */
+    private float baseValue;
+
+    /** The label lines */
+    private float[] labelLines;
 
     /** fast rendering flag */
     protected boolean fastRendering = false;
@@ -76,42 +82,68 @@ public class LatLonData {
     /**
      * Default ctor
      */
-    public LatLonData() {}
+    public LatLonLabelData() {}
 
 
     /**
-     * The ctro
+     * The ctor
      *
      * @param isLatitude Is it lat or lon
-     * @param color The color
-     * @param defaultSpacing The spacing
-     * @param lineWidth The line width
-     * @param lineStyle The line style
+     * @param increment The increment
      *
      */
-    public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
-                      float lineWidth, int lineStyle) {
-        this(isLatitude, color, defaultSpacing, lineWidth, lineStyle, false);
+    public LatLonLabelData(boolean isLatitude, float increment) {
+        this(isLatitude, increment, (isLatitude
+                                     ? -90
+                                     : -180), (isLatitude
+                ? 90
+                : 180), 0, new float[] { 0 }, 0, null, Color.white, true);
     }
 
     /**
-     * The constructor
+     * The ctor
      *
      * @param isLatitude Is it lat or lon
+     * @param increment The increment
+     * @param min _more_
+     * @param max _more_
+     * @param base _more_
+     *
+     */
+    public LatLonLabelData(boolean isLatitude, float increment, float min,
+                           float max, float base) {
+        this(isLatitude, increment, min, max, base, new float[] { 0 }, 0,
+             null, Color.white, true);
+    }
+
+    /**
+     * The ctor
+     *
+     * @param isLatitude Is it lat or lon
+     * @param increment The increment
+     * @param minValue  The min value
+     * @param maxValue  The max value
+     * @param baseValue The base value
+     * @param labelLines the label lines
+     * @param alignment  the alignment
+     * @param labelFont       the font (Font or HersheyFont)
      * @param color The color
-     * @param defaultSpacing The spacing
-     * @param lineWidth The line width
-     * @param lineStyle The line style
      * @param fastRendering true to use fast rendering
      *
      */
-    public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
-                      float lineWidth, int lineStyle, boolean fastRendering) {
+    public LatLonLabelData(boolean isLatitude, float increment,
+                           float minValue, float maxValue, float baseValue,
+                           float[] labelLines, int alignment,
+                           Object labelFont, Color color,
+                           boolean fastRendering) {
         this.isLatitude    = isLatitude;
+        this.increment     = increment;
+        this.maxValue      = maxValue;
+        this.minValue      = minValue;
+        this.labelLines    = labelLines;
+        this.alignment     = alignment;
+        this.labelFont     = labelFont;
         this.color         = color;
-        this.spacing       = defaultSpacing;
-        this.lineWidth     = lineWidth;
-        this.lineStyle     = lineStyle;
         this.fastRendering = fastRendering;
     }
 
@@ -121,28 +153,29 @@ public class LatLonData {
      *
      * @param that the other latlondata object
      */
-    protected LatLonData(LatLonData that) {
+    protected LatLonLabelData(LatLonLabelData that) {
         initWith(that);
     }
 
 
     /**
-     * Initialize this object with the state from the given LatLonData
+     * Initialize this object with the state from the given LatLonLabelData
      *
      * @param that The other object
      */
-    public void initWith(LatLonData that) {
+    public void initWith(LatLonLabelData that) {
         if (that == null) {
             return;
         }
         this.isLatitude    = that.isLatitude;
-        this.color         = that.color;
-        this.spacing       = that.spacing;
-        this.lineWidth     = that.lineWidth;
-        this.lineStyle     = that.lineStyle;
+        this.increment     = that.increment;
+        this.baseValue     = that.baseValue;
         this.maxValue      = that.maxValue;
         this.minValue      = that.minValue;
-        this.visible       = that.visible;
+        this.labelLines    = that.labelLines;
+        this.alignment     = that.alignment;
+        this.labelFont     = that.labelFont;
+        this.color         = that.color;
         this.fastRendering = that.fastRendering;
     }
 
@@ -156,30 +189,33 @@ public class LatLonData {
 
     /**
      * Create, if needed, initialize and return the latlonlines object
-     * @return The {@link ucar.visad.display.LatLonLines} object
+     * @return The {@link ucar.visad.display.LatLonLabels} object
      *
      * @throws RemoteException
      * @throws VisADException
      */
-    public LatLonLines getLatLonLines()
+    public LatLonLabels getLatLonLabels()
             throws VisADException, RemoteException {
-        if (myLatLon == null) {
-            myLatLon = new LatLonLines((isLatitude
-                                        ? RealType.Latitude
-                                        : RealType.Longitude), minValue,
-                                        maxValue, spacing,
-                                        getRealVisibility());
+        if (myLatLonLabels == null) {
+            myLatLonLabels = new LatLonLabels("LatLonLabels",
+                    RealType.getRealType((isLatitude
+                                          ? "LatLabels"
+                                          : "LonLabels")), isLatitude,
+                                          increment, minValue, maxValue,
+                                          increment, labelLines);
 
         }
         if (color != null) {
-            myLatLon.setColor(color);
+            myLatLonLabels.setColor(color);
         }
-        myLatLon.setVisible(getRealVisibility());
-        myLatLon.setLineStyle(lineStyle);
-        myLatLon.setLineWidth(lineWidth);
-        myLatLon.setSpacing(spacing);
-        myLatLon.setUseFastRendering(fastRendering);
-        return myLatLon;
+        myLatLonLabels.setVisible(getRealVisibility());
+        myLatLonLabels.setIncrement(increment);
+        myLatLonLabels.setBase(baseValue);
+        myLatLonLabels.setMax(maxValue);
+        myLatLonLabels.setMin(minValue);
+        myLatLonLabels.setFont(labelFont);
+        myLatLonLabels.setUseFastRendering(fastRendering);
+        return myLatLonLabels;
     }
 
     /**
@@ -214,60 +250,60 @@ public class LatLonData {
     }
 
     /**
-     *  Set the Spacing property.
+     *  Set the Increment property.
      *
-     *  @param value The new value for Spacing
+     *  @param value The new value for Increment
      */
-    public void setSpacing(float value) {
-        spacing = value;
+    public void setIncrement(float value) {
+        increment = value;
         stateChanged();
     }
 
     /**
-     *  Get the Spacing property.
+     *  Get the Increment property.
      *
-     *  @return The Spacing
+     *  @return The Increment
      */
-    public float getSpacing() {
-        return spacing;
+    public float getIncrement() {
+        return increment;
     }
 
     /**
-     *  Set the LineWidth property.
+     *  Set the BaseValue property.
      *
-     *  @param value The new value for LineWidth
+     *  @param value The new value for BaseValue
      */
-    public void setLineWidth(float value) {
-        lineWidth = value;
+    public void setBaseValue(float value) {
+        baseValue = value;
         stateChanged();
     }
 
     /**
-     *  Get the LineWidth property.
+     *  Get the BaseValue property.
      *
-     *  @return The LineWidth
+     *  @return The BaseValue
      */
-    public float getLineWidth() {
-        return lineWidth;
+    public float getBaseValue() {
+        return baseValue;
     }
 
     /**
-     *  Set the LineStyle property.
+     *  Set the LabelSize property.
      *
-     *  @param value The new value for LineStyle
+     *  @param value The new value for LabelSize
      */
-    public void setLineStyle(int value) {
-        lineStyle = value;
+    public void setLabelSize(float value) {
+        labelSize = value;
         stateChanged();
     }
 
     /**
-     *  Get the LineStyle property.
+     *  Get the LabelSize property.
      *
-     *  @return The LineStyle
+     *  @return The LabelSize
      */
-    public int getLineStyle() {
-        return lineStyle;
+    public float getLabelSize() {
+        return labelSize;
     }
 
 
@@ -324,6 +360,24 @@ public class LatLonData {
      */
     public float getMaxValue() {
         return maxValue;
+    }
+
+    /**
+     *  Set the LabelLines property.
+     *
+     *  @param value The new value for LabelLines
+     */
+    public void setLabelLines(float[] value) {
+        labelLines = value;
+    }
+
+    /**
+     *  Get the LabelLines property.
+     *
+     *  @return The LabelLines
+     */
+    public float[] getLabelLines() {
+        return labelLines;
     }
 
     /**
