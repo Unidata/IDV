@@ -27,6 +27,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionPoint;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.geoloc.projection.LatLonProjection;
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -874,7 +875,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setTicksVisible(true);
         scale.setMajorTickSpacing(0);
         scale.setMinorTickSpacing(0);
-        scale.setFont(axisFont);
+        scale.setFont((axisFont == null)
+                      ? FontSelector.DEFAULT_FONT
+                      : axisFont);
     }
 
     /**
