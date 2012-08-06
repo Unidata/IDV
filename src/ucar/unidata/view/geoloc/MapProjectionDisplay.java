@@ -27,6 +27,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionPoint;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.geoloc.projection.LatLonProjection;
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -264,9 +265,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /** The MapProjection */
     private MapProjection mapProjection;
-
-    /** The Axis Font */
-	private Font axisFont;
 
     /**
      * Constructs an instance with the specified MapProjection
@@ -679,7 +677,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLatScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLatScaleInfo().font);
     }
 
     /**
@@ -767,7 +765,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLonScaleInfo().font);
     }
 
     /**
@@ -838,7 +836,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks);
+                     minorTicks, getLonScaleInfo().font);
     }
 
     /**
@@ -849,12 +847,13 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @param labelTable the label table
      * @param majorTicks the major ticks
      * @param minorTicks the minor ticks
+     * @param axisFont the axis font
      * @throws VisADException the vis ad exception
      */
     private void finalizeAxis(
             AxisScale scale, String title,
             Hashtable<? extends Double, ? extends String> labelTable,
-            List<Double> majorTicks, List<Double> minorTicks)
+            List<Double> majorTicks, List<Double> minorTicks, Font axisFont)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
@@ -876,7 +875,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setTicksVisible(true);
         scale.setMajorTickSpacing(0);
         scale.setMinorTickSpacing(0);
-        scale.setFont(axisFont);
+        scale.setFont((axisFont == null)
+                      ? FontSelector.DEFAULT_FONT
+                      : axisFont);
     }
 
     /**
@@ -2806,13 +2807,4 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             return this.mapProjection;
         }
     }
-
-    /**
-     * Set the font for the axis labels
-     * 
-     * @param axisFont
-     */
-	public void setAxisFont(Font axisFont) {
-		this.axisFont = axisFont;
-	}
 }
