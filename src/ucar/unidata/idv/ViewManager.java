@@ -2,27 +2,24 @@
  * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -102,8 +99,6 @@ import visad.bom.annotations.ScreenAnnotatorJ3D;
 
 import visad.java3d.DisplayImplJ3D;
 import visad.java3d.DisplayRendererJ3D;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
@@ -191,6 +186,7 @@ import javax.swing.event.ChangeListener;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
+
 //import org.apache.batik.svggen.SVGGraphics2D;
 
 /**
@@ -199,8 +195,8 @@ import javax.vecmath.Vector3f;
  *
  * @author IDV development team
  */
-public class ViewManager extends SharableImpl
-        implements ActionListener, ItemListener, ControlListener, DisplayListener {
+public class ViewManager extends SharableImpl implements ActionListener,
+        ItemListener, ControlListener, DisplayListener {
 
     /** Preference for clipping at 3d box_ */
     public static final String PREF_3DCLIP = "View.3Dclip";
@@ -215,19 +211,23 @@ public class ViewManager extends SharableImpl
     public static final String PREF_BORDERCOLOR = "View.BorderHighlightColor";
 
     /** for the contour label Font */
-    public static final String PREF_CONTOUR_LABELALIGN = "idv.contour.alignlabel";
+    public static final String PREF_CONTOUR_LABELALIGN =
+        "idv.contour.alignlabel";
 
     /** for the contour label Font */
-    public static final String PREF_CONTOUR_LABELFONT = "idv.contour.labelfont";
+    public static final String PREF_CONTOUR_LABELFONT =
+        "idv.contour.labelfont";
 
     /** for the contour label size */
-    public static final String PREF_CONTOUR_LABELSIZE = "idv.contour.labelsize";
+    public static final String PREF_CONTOUR_LABELSIZE =
+        "idv.contour.labelsize";
 
     /** Preference for  3d or 2d _ */
     public static final String PREF_DIMENSION = "View.Dimension";
 
     /** For the display list color */
-    public static final String PREF_DISPLAYLISTCOLOR = "View.DisplayListColor";
+    public static final String PREF_DISPLAYLISTCOLOR =
+        "View.DisplayListColor";
 
     /** For the display list font */
     public static final String PREF_DISPLAYLISTFONT = "View.DisplayListFont";
@@ -239,13 +239,15 @@ public class ViewManager extends SharableImpl
     public static final String PREF_LOGO = "idv.viewmanager.logo";
 
     /** for the logo position */
-    public static final String PREF_LOGO_POSITION_OFFSET = "idv.viewmanager.logo.position";
+    public static final String PREF_LOGO_POSITION_OFFSET =
+        "idv.viewmanager.logo.position";
 
     /** for the logo scale */
     public static final String PREF_LOGO_SCALE = "idv.viewmanager.logo.scale";
 
     /** for the logo visibility */
-    public static final String PREF_LOGO_VISIBILITY = "idv.viewmanager.logo.visible";
+    public static final String PREF_LOGO_VISIBILITY =
+        "idv.viewmanager.logo.visible";
 
     /** Prefix used for preference String ids */
     public static final String PREF_PREFIX = "View.";
@@ -254,10 +256,12 @@ public class ViewManager extends SharableImpl
     public static final String PREF_SHAREVIEWS = "View.ShareViews";
 
     /** Show the bottom legend */
-    public static final String PREF_SHOWANIMATIONBOXES = "View.ShowAnimationBoxes";
+    public static final String PREF_SHOWANIMATIONBOXES =
+        "View.ShowAnimationBoxes";
 
     /** Show the bottom legend */
-    public static final String PREF_SHOWBOTTOMLEGEND = "View.ShowBottomLegend";
+    public static final String PREF_SHOWBOTTOMLEGEND =
+        "View.ShowBottomLegend";
 
     /** Preference for showing cursor readout */
     public static final String PREF_SHOWCURSOR = "View.ShowCursor";
@@ -275,10 +279,12 @@ public class ViewManager extends SharableImpl
     public static final String PREF_SHOWTOOLBAR = "View.ShowToolBar";
 
     /** Preference for  showing the wireframe box */
-    public static final String PREF_SHOWTRANSECTSCALES = "View.ShowTransectScales";
+    public static final String PREF_SHOWTRANSECTSCALES =
+        "View.ShowTransectScales";
 
     /** are the toolbars floatable */
-    public static final String PREF_TOOLBARSFLOATABLE = "idv.viewmanager.toolbars.floatable";
+    public static final String PREF_TOOLBARSFLOATABLE =
+        "idv.viewmanager.toolbars.floatable";
 
     /** For the visibility of the top compenent */
     public static final String PREF_TOPBAR_VISIBLE = "View.TopBarVisible";
@@ -290,7 +296,8 @@ public class ViewManager extends SharableImpl
     public static final String PREF_WIREFRAME = "View.Wireframe";
 
     /** Property id for component resizing */
-    public static final String PROP_COMPONENT_RESIZED = "View.ComponentResized";
+    public static final String PROP_COMPONENT_RESIZED =
+        "View.ComponentResized";
 
     /** Xml tag for the color pair */
     public static final String TAG_COLORPAIR = "colorpair";
@@ -309,7 +316,8 @@ public class ViewManager extends SharableImpl
         ucar.unidata.util.LogUtil.getLogInstance(ViewManager.class.getName());
 
     /** line border */
-    private static final Border lineBorder = BorderFactory.createLineBorder(Color.gray);
+    private static final Border lineBorder =
+        BorderFactory.createLineBorder(Color.gray);
 
     /** default display list font */
     private static final Font defaultFont = FontSelector.DEFAULT_FONT;
@@ -321,9 +329,12 @@ public class ViewManager extends SharableImpl
     public static Color borderHighlightColor = Color.blue;
 
     /** logo positions */
-    protected static TwoFacedObject[] logoPoses = { new TwoFacedObject("Lower Left", "ll"),
-            new TwoFacedObject("Upper Left", "ul"), new TwoFacedObject("Upper Right", "ur"),
-            new TwoFacedObject("Lower Right", "lr"), new TwoFacedObject("Center", "mm"), };
+    protected static TwoFacedObject[] logoPoses = { new TwoFacedObject(
+                                                      "Lower Left", "ll"),
+            new TwoFacedObject("Upper Left", "ul"),
+            new TwoFacedObject("Upper Right", "ur"),
+            new TwoFacedObject("Lower Right", "lr"),
+            new TwoFacedObject("Center", "mm"), };
 
     /** xxx */
     static int xxx = 0;
@@ -824,7 +835,8 @@ public class ViewManager extends SharableImpl
      * @param viewDescriptor  the view descriptor
      * @param properties a list of semi-colon separated properties
      */
-    public ViewManager(ViewContext viewContext, ViewDescriptor viewDescriptor, String properties) {
+    public ViewManager(ViewContext viewContext,
+                       ViewDescriptor viewDescriptor, String properties) {
         this(viewContext, viewDescriptor, properties, null);
     }
 
@@ -844,7 +856,8 @@ public class ViewManager extends SharableImpl
      * @throws VisADException
      *
      */
-    public ViewManager(ViewContext viewContext, DisplayMaster master, ViewDescriptor viewDescriptor, String properties)
+    public ViewManager(ViewContext viewContext, DisplayMaster master,
+                       ViewDescriptor viewDescriptor, String properties)
             throws VisADException, RemoteException {
         this(viewContext, viewDescriptor, properties, null);
         setDisplayMaster(master);
@@ -858,14 +871,17 @@ public class ViewManager extends SharableImpl
      * @param properties a list of semi-colon separated properties
      * @param info The initial animation info
      */
-    public ViewManager(ViewContext viewContext, ViewDescriptor viewDescriptor, String properties, AnimationInfo info) {
+    public ViewManager(ViewContext viewContext,
+                       ViewDescriptor viewDescriptor, String properties,
+                       AnimationInfo info) {
         this(viewContext);
 
         // if(this instanceof MapViewManager)
         this.animationInfo  = info;
         this.initProperties = properties;
 
-        if ((viewDescriptor == null) || viewDescriptor.nameEquals(ViewDescriptor.LASTACTIVE)) {
+        if ((viewDescriptor == null)
+                || viewDescriptor.nameEquals(ViewDescriptor.LASTACTIVE)) {
             viewDescriptor = new ViewDescriptor();
         }
 
@@ -890,7 +906,8 @@ public class ViewManager extends SharableImpl
         Trace.call1("ViewManager.init getMaster()");
         getMaster();
         Trace.call2("ViewManager.init getMaster()");
-        getMaster().addKeyboardBehavior(keyboardBehavior = new IdvKeyboardBehavior(this));
+        getMaster().addKeyboardBehavior(keyboardBehavior =
+            new IdvKeyboardBehavior(this));
         addRemovable(keyboardBehavior);
         Trace.call1("ViewManager.init setBooleanProperties()");
         setBooleanProperties(this);
@@ -932,7 +949,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
-    public List<DateTime> getTimeDriverTimes() throws VisADException, RemoteException {
+    public List<DateTime> getTimeDriverTimes()
+            throws VisADException, RemoteException {
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if (control.getIsTimeDriver()) {
                 Set        timeSet = control.getTimeSet();
@@ -976,7 +994,7 @@ public class ViewManager extends SharableImpl
             String  name  = XmlUtil.getAttribute(child, "name");
             String  value = XmlUtil.getAttribute(child, "value");
 
-            if (!setProperty(name, value, true)) {
+            if ( !setProperty(name, value, true)) {
                 if (skinProperties == null) {
                     skinProperties = new Hashtable();
                 }
@@ -1006,6 +1024,7 @@ public class ViewManager extends SharableImpl
      * Create the ui
      */
     protected void initUI() {
+
         try {
             init();
 
@@ -1053,13 +1072,18 @@ public class ViewManager extends SharableImpl
         if (animationWidget == null) {
             topRight = GuiUtils.filler();
         } else {
-            topRight = animationHolder = GuiUtils.inset(animationWidget.getContents(), new Insets(0, 0, 0, 4));
+            topRight = animationHolder =
+                GuiUtils.inset(animationWidget.getContents(),
+                               new Insets(0, 0, 0, 4));
         }
 
-        JPanel leftNav = GuiUtils.topCenter(GuiUtils.doLayout(toolbars, 1, GuiUtils.WT_N, GuiUtils.WT_N), null);
+        JPanel leftNav = GuiUtils.topCenter(GuiUtils.doLayout(toolbars, 1,
+                             GuiUtils.WT_N, GuiUtils.WT_N), null);
 
         // Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
-        topBar      = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar), GuiUtils.bottom(nameLabel), topRight);
+        topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
+                                          GuiUtils.bottom(nameLabel),
+                                          topRight);
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         topBar.setVisible(getTopBarVisible());
 
@@ -1108,7 +1132,8 @@ public class ViewManager extends SharableImpl
                                 ? centerPanel
                                 : sideLegendContainer);
 
-        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComp, rightComp);
+        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComp,
+                                       rightComp);
 
         if (legendOnLeft) {
             mainSplitPane.setResizeWeight(0.20);
@@ -1131,6 +1156,7 @@ public class ViewManager extends SharableImpl
         fullContents.setBorder(getContentsBorder());
         insertSideLegend();
         fillLegends();
+
     }
 
     /**
@@ -1167,7 +1193,8 @@ public class ViewManager extends SharableImpl
             if (legendOnLeft) {
                 mainSplitPane.setDividerLocation(0);
             } else {
-                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
+                mainSplitPane.setDividerLocation(
+                    mainSplitPane.getBounds().width);
             }
         } else if (legendState.equals(IdvLegend.STATE_HIDDEN)) {
             lastDividerLoc = mainSplitPane.getDividerLocation();
@@ -1179,7 +1206,8 @@ public class ViewManager extends SharableImpl
             if (legendOnLeft) {
                 mainSplitPane.setDividerLocation(0);
             } else {
-                mainSplitPane.setDividerLocation(mainSplitPane.getBounds().width);
+                mainSplitPane.setDividerLocation(
+                    mainSplitPane.getBounds().width);
             }
         }
     }
@@ -1198,7 +1226,7 @@ public class ViewManager extends SharableImpl
                 Misc.run(ViewManager.this, "doDrop", object);
             }
             public boolean okToDrop(Object object) {
-                if (!(object instanceof DisplayControl)) {
+                if ( !(object instanceof DisplayControl)) {
                     return false;
                 }
 
@@ -1219,7 +1247,8 @@ public class ViewManager extends SharableImpl
     public boolean okToImportDisplay(DisplayControl control) {
         ViewManager vm = control.getViewManager();
 
-        if ((vm == null) || (vm == ViewManager.this) ||!vm.getClass().equals(ViewManager.this.getClass())) {
+        if ((vm == null) || (vm == ViewManager.this)
+                || !vm.getClass().equals(ViewManager.this.getClass())) {
             return false;
         }
 
@@ -1257,15 +1286,17 @@ public class ViewManager extends SharableImpl
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
 
-                if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_APPLY)) {
-                    if (!applyProperties()) {
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_APPLY)) {
+                    if ( !applyProperties()) {
                         return;
                     }
 
                     getIdvUIManager().viewManagerChanged(ViewManager.this);
                 }
 
-                if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
                     propertiesDialog.dispose();
                     propertiesDialogShown = false;
 
@@ -1273,9 +1304,11 @@ public class ViewManager extends SharableImpl
                 }
             }
         };
-        JComponent buttons                = GuiUtils.makeApplyOkCancelButtons(listener);
-        JComponent comp                   = GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(), buttons), 5);
-        boolean    newOne                 = false;
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        JComponent comp =
+            GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(),
+                buttons), 5);
+        boolean newOne = false;
 
         if (propertiesDialog == null) {
             IdvWindow myWindow = getDisplayWindow();
@@ -1285,8 +1318,9 @@ public class ViewManager extends SharableImpl
                 window = myWindow.getWindow();
             }
 
-            propertiesDialog = GuiUtils.createDialog(window, "Properties", false);
-            newOne           = true;
+            propertiesDialog = GuiUtils.createDialog(window, "Properties",
+                    false);
+            newOne = true;
         }
 
         propertiesDialog.getContentPane().removeAll();
@@ -1324,6 +1358,7 @@ public class ViewManager extends SharableImpl
      * @return the component
      */
     protected JComponent getMainPropertiesComponent() {
+
         nameFld       = new JTextField(((name != null)
                                         ? name
                                         : ""), 20);
@@ -1341,10 +1376,13 @@ public class ViewManager extends SharableImpl
 
         GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
 
-        JComponent propsComp = GuiUtils.doLayout(props, 2, GuiUtils.WT_N, GuiUtils.WT_N);
+        JComponent propsComp = GuiUtils.doLayout(props, 2, GuiUtils.WT_N,
+                                   GuiUtils.WT_N);
 
-        bgPropertiesSwatch = new GuiUtils.ColorSwatch(getBackground(), "Set Background Color");
-        fgPropertiesSwatch = new GuiUtils.ColorSwatch(getForeground(), "Set Foreground Color");
+        bgPropertiesSwatch = new GuiUtils.ColorSwatch(getBackground(),
+                "Set Background Color");
+        fgPropertiesSwatch = new GuiUtils.ColorSwatch(getForeground(),
+                "Set Foreground Color");
 
         List colorProps = new ArrayList();
 
@@ -1354,18 +1392,29 @@ public class ViewManager extends SharableImpl
         colorProps.add(bgPropertiesSwatch);
         GuiUtils.tmpInsets = new Insets(2, 2, 2, 2);
 
-        JComponent colorPanel = GuiUtils.doLayout(colorProps, 4, GuiUtils.WT_N, GuiUtils.WT_N);
+        JComponent colorPanel = GuiUtils.doLayout(colorProps, 4,
+                                    GuiUtils.WT_N, GuiUtils.WT_N);
 
         colorPanel.setBorder(BorderFactory.createTitledBorder("Colors"));
-        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false, false);
+        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
+                                        false);
         fontSelector.setFont(getDisplayListFont());
-        dlPropertiesSwatch = new GuiUtils.ColorSwatch(getDisplayListColor(), "Set Display List Color");
+        dlPropertiesSwatch = new GuiUtils.ColorSwatch(getDisplayListColor(),
+                "Set Display List Color");
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
 
-        JComponent fontPanel = GuiUtils.doLayout(new Component[] { GuiUtils.rLabel("   Font: "),
-                GuiUtils.left(fontSelector.getComponent()), GuiUtils.rLabel("  Color: "),
-                GuiUtils.left(GuiUtils.hbox(dlPropertiesSwatch, dlPropertiesSwatch.getClearButton(), 5)) }, 2,
-                    GuiUtils.WT_N, GuiUtils.WT_N);
+        JComponent fontPanel = GuiUtils.doLayout(new Component[] {
+                                   GuiUtils.rLabel("   Font: "),
+                                   GuiUtils
+                                       .left(fontSelector
+                                           .getComponent()), GuiUtils
+                                               .rLabel("  Color: "),
+                                   GuiUtils.left(
+                                       GuiUtils.hbox(
+                                           dlPropertiesSwatch,
+                                           dlPropertiesSwatch.getClearButton(),
+                                           5)) }, 2, GuiUtils.WT_N,
+                                               GuiUtils.WT_N);
 
         fontPanel.setBorder(BorderFactory.createTitledBorder("Display List"));
         fullScreenWidthFld  = new JTextField(((fullScreenWidth > 0)
@@ -1375,12 +1424,17 @@ public class ViewManager extends SharableImpl
                 ? "" + fullScreenHeight
                 : ""), 5);
         fullScreenWidthFld.setToolTipText("Leave blank or 0 for full screen");
-        fullScreenHeightFld.setToolTipText("Leave blank or 0 for full screen");
+        fullScreenHeightFld.setToolTipText(
+            "Leave blank or 0 for full screen");
 
-        JPanel fullScreenPanel = GuiUtils.left(GuiUtils.hbox(new JLabel("Width: "), fullScreenWidthFld,
-                                     new JLabel("  Height: "), fullScreenHeightFld));
+        JPanel fullScreenPanel =
+            GuiUtils.left(GuiUtils.hbox(new JLabel("Width: "),
+                                        fullScreenWidthFld,
+                                        new JLabel("  Height: "),
+                                        fullScreenHeightFld));
 
-        fullScreenPanel.setBorder(BorderFactory.createTitledBorder("Full Screen Dimensions"));
+        fullScreenPanel.setBorder(
+            BorderFactory.createTitledBorder("Full Screen Dimensions"));
 
         // logoVisCbx = new JCheckBox("", getLogoVisibility());
         logoFileField = new JTextField(getLogoFile());
@@ -1392,7 +1446,8 @@ public class ViewManager extends SharableImpl
         browseButton.setToolTipText("Choose a logo from disk");
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String filename = FileManager.getReadFile(FileManager.FILTER_IMAGE);
+                String filename =
+                    FileManager.getReadFile(FileManager.FILTER_IMAGE);
 
                 if (filename == null) {
                     return;
@@ -1408,7 +1463,8 @@ public class ViewManager extends SharableImpl
         logoPositionBox.setToolTipText("Set the logo position on the screen");
         logoPositionBox.setSelectedItem(findLoc(logos[0]));
         logoOffsetTextField = new JTextField(logos[1]);
-        logoOffsetTextField.setToolTipText("Set an offset from the position (x,y)");
+        logoOffsetTextField.setToolTipText(
+            "Set an offset from the position (x,y)");
         logoSizeLabel = new JLabel("" + getLogoScale());
 
         ChangeListener listener = new ChangeListener() {
@@ -1416,27 +1472,33 @@ public class ViewManager extends SharableImpl
                 logoSizeLabel.setText("" + logoSizer.getValue() / 10.f);
             }
         };
-        JComponent[] sliderComps = GuiUtils.makeSliderPopup(0, 20, (int) (getLogoScale() * 10), listener);
+        JComponent[] sliderComps = GuiUtils.makeSliderPopup(0, 20,
+                                       (int) (getLogoScale() * 10), listener);
 
         logoSizer = (JSlider) sliderComps[1];
         sliderComps[0].setToolTipText("Change Logo Scale Value");
 
         JPanel logoPanel = GuiUtils.vbox(
-
         // GuiUtils.leftCenter(GuiUtils.rLabel("Visible: "), GuiUtils.leftCenter(logoVisCbx, GuiUtils.filler())),
-        GuiUtils.centerRight(logoFileField,
-                             browseButton), GuiUtils.hbox(GuiUtils.leftCenter(GuiUtils.rLabel("Screen Position: "),
-                                 logoPositionBox), GuiUtils.leftCenter(GuiUtils.rLabel("Offset: "),
-                                     logoOffsetTextField), GuiUtils.leftCenter(GuiUtils.rLabel("Scale: "),
-                                         GuiUtils.leftRight(logoSizeLabel, sliderComps[0]))));
+        GuiUtils.centerRight(logoFileField, browseButton), GuiUtils.hbox(
+            GuiUtils.leftCenter(
+                GuiUtils.rLabel("Screen Position: "),
+                logoPositionBox), GuiUtils.leftCenter(
+                    GuiUtils.rLabel("Offset: "),
+                    logoOffsetTextField), GuiUtils.leftCenter(
+                        GuiUtils.rLabel("Scale: "),
+                        GuiUtils.leftRight(logoSizeLabel, sliderComps[0]))));
 
         logoPanel.setBorder(BorderFactory.createTitledBorder("Logo"));
-        propsComp = GuiUtils.vbox(new Component[] { propsComp, GuiUtils.inset(colorPanel, new Insets(10, 5, 5, 5)),
+        propsComp = GuiUtils.vbox(new Component[] { propsComp,
+                GuiUtils.inset(colorPanel, new Insets(10, 5, 5, 5)),
                 GuiUtils.inset(fontPanel, new Insets(10, 5, 5, 5)),
                 GuiUtils.inset(fullScreenPanel, new Insets(10, 5, 5, 5)),
                 GuiUtils.inset(logoPanel, new Insets(10, 5, 5, 5)) });
 
-        return GuiUtils.vbox(GuiUtils.left(GuiUtils.label("Name:  ", nameFld)), propsComp);
+        return GuiUtils.vbox(GuiUtils.left(GuiUtils.label("Name:  ",
+                nameFld)), propsComp);
+
     }
 
     /**
@@ -1522,18 +1584,27 @@ public class ViewManager extends SharableImpl
      * @param tabbedPane  the pane to add
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
-        tabbedPane.add("Main", GuiUtils.inset(GuiUtils.top(getMainPropertiesComponent()), 5));
-        tabbedPane.add("Aspect Ratio", GuiUtils.inset(GuiUtils.top(getAspectPropertiesComponent()), 5));
+        tabbedPane.add(
+            "Main",
+            GuiUtils.inset(GuiUtils.top(getMainPropertiesComponent()), 5));
+        tabbedPane.add(
+            "Aspect Ratio",
+            GuiUtils.inset(GuiUtils.top(getAspectPropertiesComponent()), 5));
 
         if (lights != null) {
             try {
                 if (lockLightsBtn == null) {
-                    lockLightsBtn = GuiUtils.getToggleButton("/auxdata/ui/icons/link_break.png", 0, 0);
+                    lockLightsBtn = GuiUtils.getToggleButton(
+                        "/auxdata/ui/icons/link_break.png", 0, 0);
                     lockLightsBtn.setContentAreaFilled(false);
-                    lockLightsBtn.setSelectedIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/link.png", getClass()));
+                    lockLightsBtn.setSelectedIcon(
+                        GuiUtils.getImageIcon(
+                            "/auxdata/ui/icons/link.png", getClass()));
                     lockLightsBtn.setSelected(false);
-                    lockLightsBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-                    lockLightsBtn.setToolTipText("Link stride changes between x & y");
+                    lockLightsBtn.setBorder(
+                        BorderFactory.createEmptyBorder(0, 0, 0, 0));
+                    lockLightsBtn.setToolTipText(
+                        "Link stride changes between x & y");
                 }
 
                 List comps = new ArrayList();
@@ -1556,7 +1627,8 @@ public class ViewManager extends SharableImpl
                                         continue;
                                     }
 
-                                    light.setVisible(theLight.getVisible(), true);
+                                    light.setVisible(theLight.getVisible(),
+                                            true);
                                     light.updateLight();
                                 }
                             }
@@ -1566,7 +1638,8 @@ public class ViewManager extends SharableImpl
                         public void stateChanged(ChangeEvent e) {
                             JSlider slider = (JSlider) e.getSource();
 
-                            if (ignoreLightChanges || slider.getValueIsAdjusting()) {
+                            if (ignoreLightChanges
+                                    || slider.getValueIsAdjusting()) {
                                 return;
                             }
 
@@ -1595,9 +1668,13 @@ public class ViewManager extends SharableImpl
 
                 JComponent lightsComp = GuiUtils.formLayout(comps);
 
-                tabbedPane.add("Lighting",
-                               GuiUtils.inset(GuiUtils.top(GuiUtils.vbox(lightsComp, GuiUtils.left(lockLightsBtn))),
-                                              5));
+                tabbedPane.add(
+                    "Lighting",
+                    GuiUtils.inset(
+                        GuiUtils.top(
+                            GuiUtils.vbox(
+                                lightsComp,
+                                GuiUtils.left(lockLightsBtn))), 5));
             } catch (Exception exc) {
                 logException("", exc);
             }
@@ -1674,12 +1751,14 @@ public class ViewManager extends SharableImpl
      */
     private void createInitialLights() {
         Point3d[] locations = new Point3d[] {
-            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0),
-            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0)
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0),
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0),
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0)
         };
         Vector3f[] directions = new Vector3f[] {
-            new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, -1.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(-1.0f, 0.0f, 0.0f)
+            new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, 0.0f, -1.0f),
+            new Vector3f(0.0f, -1.0f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f),
+            new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(-1.0f, 0.0f, 0.0f)
         };
         String[] names = {
             "Over", "Under", "Top", "Bottom", "Right", "Left"
@@ -1697,31 +1776,40 @@ public class ViewManager extends SharableImpl
      */
     protected JComponent getAspectPropertiesComponent() {
         try {
-            DisplayMaster master   = getMaster();
-            JButton       resetBtn = GuiUtils.makeButton("Reset", this, "resetAspectSliders");
-            List          comps    = new ArrayList();
+            DisplayMaster master = getMaster();
+            JButton resetBtn = GuiUtils.makeButton("Reset", this,
+                                   "resetAspectSliders");
+            List comps = new ArrayList();
 
             comps.add(resetBtn);
             comps.add(GuiUtils.filler());
 
             for (int i = 0; i < 3; i++) {
-                aspectSliders[i] = GuiUtils.makeSlider(0, 100, 0, this, "aspectSliderChanged", true);
-                aspectLbls[i]    = new JLabel(" ");
+                aspectSliders[i] = GuiUtils.makeSlider(0, 100, 0, this,
+                        "aspectSliderChanged", true);
+                aspectLbls[i] = new JLabel(" ");
                 comps.add(GuiUtils.rLabel(aspectText[i]));
-                comps.add(GuiUtils.centerRight(aspectSliders[i], aspectLbls[i]));
+                comps.add(GuiUtils.centerRight(aspectSliders[i],
+                        aspectLbls[i]));
             }
 
             resetAspectSliders();
-            originalAspectSliderValues = new double[] { aspectSliders[0].getValue() / 10.0,
-                    aspectSliders[1].getValue() / 10.0, aspectSliders[2].getValue() / 10.0 };
+            originalAspectSliderValues = new double[] {
+                aspectSliders[0].getValue() / 10.0,
+                aspectSliders[1].getValue() / 10.0,
+                aspectSliders[2].getValue() / 10.0 };
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
-            JComponent contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+            JComponent contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
+                                      GuiUtils.WT_N);
 
             matrixLabel = new JLabel("<html></html>");
-            matrixLabel.setBorder(BorderFactory.createTitledBorder("Display Matrix Settings"));
+            matrixLabel.setBorder(
+                BorderFactory.createTitledBorder("Display Matrix Settings"));
             setMatrixLabel(true);
-            contents = GuiUtils.centerBottom(contents, GuiUtils.inset(matrixLabel, new Insets(20, 0, 0, 0)));
+            contents = GuiUtils.centerBottom(contents,
+                                             GuiUtils.inset(matrixLabel,
+                                                 new Insets(20, 0, 0, 0)));
 
             return contents;
         } catch (Exception exc) {
@@ -1742,11 +1830,11 @@ public class ViewManager extends SharableImpl
                 return;
             }
 
-            if (!force &&!propertiesDialogShown) {
+            if ( !force && !propertiesDialogShown) {
                 return;
             }
 
-            if (!force) {
+            if ( !force) {
                 try {
                     matrixLabel.getLocationOnScreen();
                 } catch (Exception exc) {
@@ -1755,18 +1843,19 @@ public class ViewManager extends SharableImpl
             }
 
             double[]             currentMatrix = getDisplayMatrix();
-            boolean              changed       = !Misc.equals(lastMatrix, currentMatrix);
+            boolean changed = !Misc.equals(lastMatrix, currentMatrix);
             List<TwoFacedObject> coords        = null;
 
             if (getMaster() instanceof NavigatedDisplay) {
-                coords = ((NavigatedDisplay) getMaster()).getScreenCoordinates();
+                coords =
+                    ((NavigatedDisplay) getMaster()).getScreenCoordinates();
 
-                if (!Misc.equals(coords, lastCoords)) {
+                if ( !Misc.equals(coords, lastCoords)) {
                     changed = true;
                 }
             }
 
-            if (!changed) {
+            if ( !changed) {
                 return;
             }
 
@@ -1776,7 +1865,8 @@ public class ViewManager extends SharableImpl
             double[] rot   = { 0.0, 0.0, 0.0 };
             double[] scale = { 0.0, 0.0, 0.0 };
 
-            getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale, trans, currentMatrix);
+            getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale,
+                    trans, currentMatrix);
 
             StringBuffer sb = new StringBuffer();
 
@@ -1847,16 +1937,20 @@ public class ViewManager extends SharableImpl
         int width  = 0;
         int height = 0;
 
-        if (fullScreenWidthFld.getText().trim().equals("") || fullScreenWidthFld.getText().trim().equals("0")) {
+        if (fullScreenWidthFld.getText().trim().equals("")
+                || fullScreenWidthFld.getText().trim().equals("0")) {
             width = 0;
         } else {
-            width = new Integer(fullScreenWidthFld.getText().trim()).intValue();
+            width =
+                new Integer(fullScreenWidthFld.getText().trim()).intValue();
         }
 
-        if (fullScreenHeightFld.getText().trim().equals("") || fullScreenHeightFld.getText().trim().equals("0")) {
+        if (fullScreenHeightFld.getText().trim().equals("")
+                || fullScreenHeightFld.getText().trim().equals("0")) {
             height = 0;
         } else {
-            height = new Integer(fullScreenHeightFld.getText().trim()).intValue();
+            height =
+                new Integer(fullScreenHeightFld.getText().trim()).intValue();
         }
 
         if ((width != fullScreenWidth) || (height != fullScreenHeight)) {
@@ -1877,14 +1971,17 @@ public class ViewManager extends SharableImpl
         try {
             setName(nameFld.getText());
 
-            for (Enumeration keys = propertiesMap.keys(); keys.hasMoreElements(); ) {
+            for (Enumeration keys = propertiesMap.keys();
+                    keys.hasMoreElements(); ) {
                 JCheckBox       cbx = (JCheckBox) keys.nextElement();
-                BooleanProperty bp  = (BooleanProperty) propertiesMap.get(cbx);
+                BooleanProperty bp  =
+                    (BooleanProperty) propertiesMap.get(cbx);
 
                 bp.setValue(cbx.isSelected());
             }
 
-            setColors(fgPropertiesSwatch.getSwatchColor(), bgPropertiesSwatch.getSwatchColor());
+            setColors(fgPropertiesSwatch.getSwatchColor(),
+                      bgPropertiesSwatch.getSwatchColor());
 
             Font f = fontSelector.getFont();
 
@@ -1892,10 +1989,13 @@ public class ViewManager extends SharableImpl
             setDisplayListColor(dlPropertiesSwatch.getSwatchColor());
             updateDisplayList();
 
-            double[] newAspectRatio = new double[] { aspectSliders[0].getValue() / 10.0,
-                    aspectSliders[1].getValue() / 10.0, aspectSliders[2].getValue() / 10.0 };
+            double[] newAspectRatio = new double[] {
+                                          aspectSliders[0].getValue() / 10.0,
+                                          aspectSliders[1].getValue() / 10.0,
+                                          aspectSliders[2].getValue()
+                                          / 10.0 };
 
-            if (!Arrays.equals(newAspectRatio, originalAspectSliderValues)) {
+            if ( !Arrays.equals(newAspectRatio, originalAspectSliderValues)) {
 
                 // System.err.println("aspect ratios differ:");
                 // Misc.printArray("old:" , originalAspectSliderValues);
@@ -1908,7 +2008,9 @@ public class ViewManager extends SharableImpl
             logoFile = logoFileField.getText().trim();
 
             // setLogoAnchor(((TwoFacedObject) logoAnchorBox.getSelectedItem()).getId().toString());
-            String logoPos = ((TwoFacedObject) logoPositionBox.getSelectedItem()).getId().toString();
+            String logoPos =
+                ((TwoFacedObject) logoPositionBox.getSelectedItem()).getId()
+                    .toString();
             String logoOff = logoOffsetTextField.getText().trim();
 
             setLogoPosition(makeLogoPosition(logoPos, logoOff));
@@ -1946,8 +2048,9 @@ public class ViewManager extends SharableImpl
                 Rectangle bounds = comp.getBounds();
 
                 // System.out.println("window bounds: " + bounds);
-                if ((bounds.width == 0) || (bounds.height == 0) || (logoFile == null) || logoFile.isEmpty()
-                        ||!getLogoVisibility()) {
+                if ((bounds.width == 0) || (bounds.height == 0)
+                        || (logoFile == null) || logoFile.isEmpty()
+                        || !getLogoVisibility()) {
                     annotator.draw();
 
                     return;
@@ -1958,7 +2061,8 @@ public class ViewManager extends SharableImpl
                 if (logo == null) {
 
                     // throw new VisADException("Logo file: " + logoFile + " does not exist.");
-                    System.err.println("Logo file: " + logoFile + " does not exist.");
+                    System.err.println("Logo file: " + logoFile
+                                       + " does not exist.");
 
                     return;
                 }
@@ -1966,15 +2070,16 @@ public class ViewManager extends SharableImpl
                 Point ap = ImageUtils.parsePoint(getLogoPosition(), bounds);
 
                 // System.out.println("screen point = " + ap);
-                int      baseX   = ap.x;
-                int      baseY   = ap.y;
-                float    zval    = getPerspectiveView()
-                                   ? 1
-                                   : display.getDisplayRenderer().getMode2D()
-                                     ? 1.5f
-                                     : 2;
-                ImageJ3D logoJ3D = new ImageJ3D(logo, getImageAnchor(getLogoPosition()), baseX, baseY, zval,
-                                                getLogoScale());
+                int   baseX = ap.x;
+                int   baseY = ap.y;
+                float zval  = getPerspectiveView()
+                              ? 1
+                              : display.getDisplayRenderer().getMode2D()
+                                ? 1.5f
+                                : 2;
+                ImageJ3D logoJ3D = new ImageJ3D(logo,
+                                       getImageAnchor(getLogoPosition()),
+                                       baseX, baseY, zval, getLogoScale());
 
                 annotator.add(logoJ3D);
                 annotator.draw();
@@ -2021,7 +2126,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI exception
      * @throws VisADException   Couldn't create the VisAD display
      */
-    public void initAfterUnPersistence(IntegratedDataViewer idv) throws VisADException, RemoteException {
+    public void initAfterUnPersistence(IntegratedDataViewer idv)
+            throws VisADException, RemoteException {
         setIdv(idv);
         setHighlightBorder(getStore().get(PREF_BORDERCOLOR, Color.blue));
         initBooleanProperties();
@@ -2081,7 +2187,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI exception
      * @throws VisADException   Couldn't create the VisAD display
      */
-    protected void initWithInner(ViewManager that, boolean ignoreWindow) throws VisADException, RemoteException {
+    protected void initWithInner(ViewManager that, boolean ignoreWindow)
+            throws VisADException, RemoteException {
         if (that != this) {
             this.aspectRatio = that.aspectRatio;
 
@@ -2109,7 +2216,7 @@ public class ViewManager extends SharableImpl
             setName(that.name);
         }
 
-        if (!ignoreWindow) {
+        if ( !ignoreWindow) {
             Rectangle bounds = that.windowBounds;
 
             if (bounds != null) {
@@ -2195,14 +2302,17 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException
      * @throws VisADException
      */
-    protected void setBooleanProperties(ViewManager vm) throws VisADException, RemoteException {
+    protected void setBooleanProperties(ViewManager vm)
+            throws VisADException, RemoteException {
         if (booleanPropertyMap.size() == 0) {
             initBooleanProperties();
         }
 
         for (int i = 0; i < booleanProperties.size(); i++) {
-            BooleanProperty myProperty  = (BooleanProperty) booleanProperties.get(i);
-            BooleanProperty hisProperty = vm.getBooleanProperty(myProperty.getId());
+            BooleanProperty myProperty =
+                (BooleanProperty) booleanProperties.get(i);
+            BooleanProperty hisProperty =
+                vm.getBooleanProperty(myProperty.getId());
 
             if (hisProperty != null) {
                 myProperty.setValue(hisProperty.getValue());
@@ -2219,7 +2329,8 @@ public class ViewManager extends SharableImpl
      *
      * @throws Exception problem handeling the change
      */
-    protected void handleBooleanPropertyChange(String id, boolean value) throws Exception {
+    protected void handleBooleanPropertyChange(String id, boolean value)
+            throws Exception {
         if (id.equals(PREF_SHAREVIEWS)) {
             setSharing(value);
         } else if (id.equals(PREF_WIREFRAME)) {
@@ -2258,7 +2369,8 @@ public class ViewManager extends SharableImpl
                 public void actionPerformed(ActionEvent ae) {
                     String cmd = ae.getActionCommand();
 
-                    if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                    if (cmd.equals(GuiUtils.CMD_OK)
+                            || cmd.equals(GuiUtils.CMD_CANCEL)) {
                         timelineDialog.dispose();
 
                         // timelineDialog = null;
@@ -2270,9 +2382,13 @@ public class ViewManager extends SharableImpl
                 }
             };
 
-            timelineDialog = GuiUtils.createDialog("Animation Timeline", false);
-            timelineDialog.getContentPane().add(GuiUtils.centerBottom(getTimelineComponent(),
-                    GuiUtils.makeButtons(listener, new String[] { GuiUtils.CMD_UPDATE,
+            timelineDialog = GuiUtils.createDialog("Animation Timeline",
+                    false);
+            timelineDialog.getContentPane().add(
+                GuiUtils.centerBottom(
+                    getTimelineComponent(),
+                    GuiUtils.makeButtons(
+                        listener, new String[] { GuiUtils.CMD_UPDATE,
                     GuiUtils.CMD_CANCEL })));
             updateTimelines(true);
             timelineDialog.pack();
@@ -2338,6 +2454,7 @@ public class ViewManager extends SharableImpl
      * @return timeline
      */
     public JComponent getTimelineComponent() {
+
         try {
             synchronized (TIMELINES_MUTEX) {
                 Insets lblInsets    = new Insets(5, 0, 0, 0);
@@ -2349,16 +2466,22 @@ public class ViewManager extends SharableImpl
                 timelines = new ArrayList();
 
                 if (animationWidget != null) {
-                    List datedThings = DatedObject.wrap(Util.makeDates(animationWidget.getTimes()));
+                    List datedThings = DatedObject.wrap(
+                                           Util.makeDates(
+                                               animationWidget.getTimes()));
 
                     if (animationTimeline == null) {
-                        animationTimeline = new MyTimeline(datedThings, 300, 100);
+                        animationTimeline = new MyTimeline(datedThings, 300,
+                                100);
                     }
 
                     if (datedThings.size() > 0) {
                         allTimes.addAll(datedThings);
                         timelines.add(animationTimeline);
-                        comps.add(GuiUtils.inset(GuiUtils.lLabel("Animation Times"), lblInsets));
+                        comps.add(
+                            GuiUtils.inset(
+                                GuiUtils.lLabel("Animation Times"),
+                                lblInsets));
                         comps.add(animationTimeline.getContents(false));
                     }
                 }
@@ -2371,8 +2494,9 @@ public class ViewManager extends SharableImpl
                         continue;
                     }
 
-                    DateTime[] times        = Animation.getDateTimeArray(timeSet);
-                    List       datedObjects = DatedObject.wrap(ucar.visad.Util.makeDates(times));
+                    DateTime[] times = Animation.getDateTimeArray(timeSet);
+                    List datedObjects =
+                        DatedObject.wrap(ucar.visad.Util.makeDates(times));
 
                     if (datedObjects.size() == 0) {
                         continue;
@@ -2383,7 +2507,8 @@ public class ViewManager extends SharableImpl
                     MyTimeline timeline = null;
 
                     for (int j = 0; j < oldTimelines.size(); j++) {
-                        MyTimeline oldTimeline = (MyTimeline) oldTimelines.get(j);
+                        MyTimeline oldTimeline =
+                            (MyTimeline) oldTimelines.get(j);
 
                         if (oldTimeline.control == control) {
                             timeline = oldTimeline;
@@ -2396,7 +2521,8 @@ public class ViewManager extends SharableImpl
                     if (timeline == null) {
 
                         // System.err.println ("new timeline");
-                        timeline = new MyTimeline(timeSet, datedObjects, 300, control);
+                        timeline = new MyTimeline(timeSet, datedObjects, 300,
+                                control);
                     }
 
                     if (timelines.size() > 0) {
@@ -2404,7 +2530,11 @@ public class ViewManager extends SharableImpl
                     }
 
                     timelines.add(timeline);
-                    comps.add(GuiUtils.inset(GuiUtils.leftRight(timeline.label, timeline.rightComp), lblInsets));
+                    comps.add(
+                        GuiUtils.inset(
+                            GuiUtils.leftRight(
+                                timeline.label,
+                                timeline.rightComp), lblInsets));
                     comps.add(timeline.getContents(false));
                 }
 
@@ -2412,7 +2542,8 @@ public class ViewManager extends SharableImpl
 
                 if (allTimes.size() > 1) {
                     Date startDate = ((DatedThing) allTimes.get(0)).getDate();
-                    Date endDate   = ((DatedThing) allTimes.get(allTimes.size() - 1)).getDate();
+                    Date endDate = ((DatedThing) allTimes.get(allTimes.size()
+                                       - 1)).getDate();
 
                     for (int i = 0; i < timelines.size(); i++) {
                         MyTimeline timeline = (MyTimeline) timelines.get(i);
@@ -2431,10 +2562,13 @@ public class ViewManager extends SharableImpl
 
                 GuiUtils.tmpInsets = new Insets(1, 1, 1, 1);
 
-                JComponent  comp = GuiUtils.doLayout(comps, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
-                JScrollPane sp   = new JScrollPane(GuiUtils.top(GuiUtils.inset(comp, 5)),
-                                                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JComponent comp = GuiUtils.doLayout(comps, 1, GuiUtils.WT_Y,
+                                      GuiUtils.WT_N);
+                JScrollPane sp =
+                    new JScrollPane(
+                        GuiUtils.top(GuiUtils.inset(comp, 5)),
+                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
                 sp.setPreferredSize(new Dimension(300, 400));
 
@@ -2456,15 +2590,17 @@ public class ViewManager extends SharableImpl
         }
 
         return new JPanel();
+
     }
 
     /**
      * Populate the display list
      */
     public void updateDisplayList() {
+
         try {
             synchronized (MUTEX_DISPLAYLIST) {
-                if (!hasDisplayMaster()) {
+                if ( !hasDisplayMaster()) {
                     return;
                 }
 
@@ -2476,14 +2612,16 @@ public class ViewManager extends SharableImpl
                     displayListDisplayables.clearDisplayables();
                 }
 
-                if (!getShowDisplayList()) {
+                if ( !getShowDisplayList()) {
                     return;
                 }
 
-                List                                     controls         = getControls();
-                Hashtable<String, List<TextDisplayable>> catMap           = new Hashtable<String, List<TextDisplayable>>();
-                List<String>                             cats             = new ArrayList<String>();
-                List<TextDisplayable>                    textDisplayables = new ArrayList<TextDisplayable>();
+                List controls = getControls();
+                Hashtable<String, List<TextDisplayable>> catMap =
+                    new Hashtable<String, List<TextDisplayable>>();
+                List<String> cats = new ArrayList<String>();
+                List<TextDisplayable> textDisplayables =
+                    new ArrayList<TextDisplayable>();
 
                 // Seed the list first so we get the right order
                 if (sideLegend != null) {
@@ -2496,11 +2634,14 @@ public class ViewManager extends SharableImpl
                 for (int i = controls.size() - 1; i >= 0; i--) {
                     DisplayControl control = (DisplayControl) controls.get(i);
 
-                    if (!control.getShowInDisplayList() ||!control.getDisplayVisibility()) {
+                    if ( !control.getShowInDisplayList()
+                            || !control.getDisplayVisibility()) {
                         continue;
                     }
 
-                    TextDisplayable d = (TextDisplayable) control.getDisplayListDisplayable(this);
+                    TextDisplayable d =
+                        (TextDisplayable) control.getDisplayListDisplayable(
+                            this);
 
                     if (d == null) {
                         continue;
@@ -2524,7 +2665,9 @@ public class ViewManager extends SharableImpl
                     textDisplayables.add(d);
                 }
 
-                boolean grouped = getStateManager().getPreferenceOrProperty(IdvConstants.PROP_DISPLAYLIST_GROUP, false);
+                boolean grouped = getStateManager().getPreferenceOrProperty(
+                                      IdvConstants.PROP_DISPLAYLIST_GROUP,
+                                      false);
 
                 if (grouped) {
                     int count = 0;
@@ -2544,7 +2687,8 @@ public class ViewManager extends SharableImpl
                         }
                     }
                 } else {
-                    for (int count = 0; count < textDisplayables.size(); count++) {
+                    for (int count = 0; count < textDisplayables.size();
+                            count++) {
                         TextDisplayable d = textDisplayables.get(count);
 
                         if (setDisplayablePosition(d, count + 1)) {
@@ -2560,6 +2704,7 @@ public class ViewManager extends SharableImpl
         } catch (Exception exp) {
             logException("Setting display list", exp);
         }
+
     }
 
     /**
@@ -2577,12 +2722,14 @@ public class ViewManager extends SharableImpl
             Rectangle     r       = master.getScreenBounds();
             double[]      xyz     = new double[3];
 
-            if (!r.isEmpty()) {
+            if ( !r.isEmpty()) {
 
                 // System.out.println("screen bounds = " + r);
                 float scale = getDisplayListFont().getSize() / 12.f;
                 int   x     = r.x + (int) (.5f * r.width);
-                int   y     = r.y + (int) ((1.f - ((.025 * scale) * number)) * r.height);
+                int y = r.y
+                        + (int) ((1.f - ((.025 * scale) * number))
+                                 * r.height);
 
                 xyz = Util.getVWorldCoords(display, x, y, xyz);
 
@@ -2590,11 +2737,11 @@ public class ViewManager extends SharableImpl
                               ? xyz[2]
                               : 2.0;
 
-                d.addConstantMaps(new ConstantMap[] { new ConstantMap(xyz[0], Display.XAxis),
-                        new ConstantMap(xyz[1], Display.YAxis),
-
+                d.addConstantMaps(new ConstantMap[] {
+                    new ConstantMap(xyz[0], Display.XAxis),
+                    new ConstantMap(xyz[1], Display.YAxis),
                 // new ConstantMap(2.0, Display.ZAxis) });  // set at top of box
-                new ConstantMap(zval, Display.ZAxis) });    // set at top of box
+                new ConstantMap(zval, Display.ZAxis) });  // set at top of box
 
                 return true;
             }
@@ -2620,16 +2767,25 @@ public class ViewManager extends SharableImpl
      * @param props  the properties
      */
     protected void getInitialBooleanProperties(List props) {
-        props.add(new BooleanProperty(PREF_WIREFRAME, "Show Wireframe Box", "", true));
-        props.add(new BooleanProperty(PREF_SHAREVIEWS, "Share Views", "", getSharing()));
-        props.add(new BooleanProperty(PREF_ANIREADOUT, "Show Times In View", "Toggle animation readout in display",
+        props.add(new BooleanProperty(PREF_WIREFRAME, "Show Wireframe Box",
+                                      "", true));
+        props.add(new BooleanProperty(PREF_SHAREVIEWS, "Share Views", "",
+                                      getSharing()));
+        props.add(new BooleanProperty(PREF_ANIREADOUT, "Show Times In View",
+                                      "Toggle animation readout in display",
                                       false));
-        props.add(new BooleanProperty(PREF_WAITMSG, "Show \"Please Wait\" Message",
-                                      "Toggle \"Please Wait\" message in display", true));
-        props.add(new BooleanProperty(PREF_SHOWDISPLAYLIST, "Show Display List", "Show display labels in the display",
+        props.add(
+            new BooleanProperty(
+                PREF_WAITMSG, "Show \"Please Wait\" Message",
+                "Toggle \"Please Wait\" message in display", true));
+        props.add(new BooleanProperty(PREF_SHOWDISPLAYLIST,
+                                      "Show Display List",
+                                      "Show display labels in the display",
                                       true));
-        props.add(new BooleanProperty(PREF_LOGO_VISIBILITY, "Show Logo", "Toggle logo in display", false));
-        props.add(new BooleanProperty(PREF_TOPBAR_VISIBLE, "Show Top Bar", "Toggle top bar", true));
+        props.add(new BooleanProperty(PREF_LOGO_VISIBILITY, "Show Logo",
+                                      "Toggle logo in display", false));
+        props.add(new BooleanProperty(PREF_TOPBAR_VISIBLE, "Show Top Bar",
+                                      "Toggle top bar", true));
     }
 
     /**
@@ -2662,7 +2818,9 @@ public class ViewManager extends SharableImpl
         XmlObjectStore store        = getStore();
 
         if (booleanPropertiesForPersistence != null) {
-            booleanPropertiesForPersistence = stateManager.processPropertyTable(booleanPropertiesForPersistence);
+            booleanPropertiesForPersistence =
+                stateManager.processPropertyTable(
+                    booleanPropertiesForPersistence);
         }
 
         for (int i = 0; i < props.size(); i++) {
@@ -2683,7 +2841,8 @@ public class ViewManager extends SharableImpl
         boolean        defaultValue = bp.getDefault();
 
         if (stateManager != null) {
-            defaultValue = getStateManager().getProperty(bp.getId(), defaultValue);
+            defaultValue = getStateManager().getProperty(bp.getId(),
+                    defaultValue);
         }
 
         if (store != null) {
@@ -2691,7 +2850,8 @@ public class ViewManager extends SharableImpl
         }
 
         if (booleanPropertiesForPersistence != null) {
-            Boolean b = (Boolean) booleanPropertiesForPersistence.get(bp.getId());
+            Boolean b =
+                (Boolean) booleanPropertiesForPersistence.get(bp.getId());
 
             // System.err.println("has for persistence: " + b);
             if (b != null) {
@@ -2700,9 +2860,11 @@ public class ViewManager extends SharableImpl
         }
 
         // debug("\tbp: " + bp);
-        BooleanProperty existingBp = (BooleanProperty) booleanPropertyMap.get(bp.getId());
+        BooleanProperty existingBp =
+            (BooleanProperty) booleanPropertyMap.get(bp.getId());
 
-        if ((existingBp != null) && (booleanPropertiesForPersistence == null)) {
+        if ((existingBp != null)
+                && (booleanPropertiesForPersistence == null)) {
 
             // debug("\thave existing " + existingBp);
             bp.setValue(existingBp.getValue());
@@ -2751,15 +2913,18 @@ public class ViewManager extends SharableImpl
      *
      * @return the property
      */
-    protected BooleanProperty getBooleanProperty(String propertyId, boolean dflt) {
+    protected BooleanProperty getBooleanProperty(String propertyId,
+            boolean dflt) {
         if (booleanPropertyMap.size() == 0) {
             initBooleanProperties();
         }
 
-        BooleanProperty bp = (BooleanProperty) booleanPropertyMap.get(propertyId);
+        BooleanProperty bp =
+            (BooleanProperty) booleanPropertyMap.get(propertyId);
 
         if (bp == null) {
-            bp = new BooleanProperty(propertyId, propertyId, propertyId, dflt);
+            bp = new BooleanProperty(propertyId, propertyId, propertyId,
+                                     dflt);
             booleanPropertyMap.put(bp.getId(), bp);
             initializeBooleanProperty(bp);
         }
@@ -2858,7 +3023,8 @@ public class ViewManager extends SharableImpl
         synchronized (booleanPropertyMap) {
             if (booleanPropertyMap.get(bp.getId()) != null) {
                 for (int i = 0; i < booleanProperties.size(); i++) {
-                    BooleanProperty other = (BooleanProperty) booleanProperties.get(i);
+                    BooleanProperty other =
+                        (BooleanProperty) booleanProperties.get(i);
 
                     if (other.getId().equals(bp.getId())) {
                         booleanProperties.remove(other);
@@ -2890,7 +3056,8 @@ public class ViewManager extends SharableImpl
     public Hashtable getBooleanPropertiesForPersistence() {
         Hashtable tmp = new Hashtable();
 
-        for (Iterator iter = booleanPropertyMap.values().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = booleanPropertyMap.values().iterator();
+                iter.hasNext(); ) {
             BooleanProperty bp = (BooleanProperty) iter.next();
 
             if (bp.hasValue()) {
@@ -3006,16 +3173,19 @@ public class ViewManager extends SharableImpl
      * Some user preferences have changed.
      */
     public void applyPreferences() {
-        for (Iterator iter = booleanPropertyMap.values().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = booleanPropertyMap.values().iterator();
+                iter.hasNext(); ) {
             BooleanProperty bp = (BooleanProperty) iter.next();
 
             bp.setValue(getStore().get(bp.getId(), bp.getValue()));
         }
 
         checkToolBarVisibility();
-        setColors(getStore().get(PREF_FGCOLOR, Color.white), getStore().get(PREF_BGCOLOR, Color.black));
+        setColors(getStore().get(PREF_FGCOLOR, Color.white),
+                  getStore().get(PREF_BGCOLOR, Color.black));
         setDisplayListFont(getStore().get(PREF_DISPLAYLISTFONT, defaultFont));
-        setDisplayListColor(getStore().get(PREF_DISPLAYLISTCOLOR, (Color) null));
+        setDisplayListColor(getStore().get(PREF_DISPLAYLISTCOLOR,
+                                           (Color) null));
 
         if (animationOk()) {
             animationInfo.setBoxesVisible(getShowAnimationBoxes());
@@ -3025,7 +3195,8 @@ public class ViewManager extends SharableImpl
         setLogoFile(getStore().get(PREF_LOGO, ""));
         setLogoVisibility(getStore().get(PREF_LOGO_VISIBILITY, false));
         setLogoScale(getStore().get(PREF_LOGO_SCALE, 1.0f));
-        setLogoPosition(getStore().get(PREF_LOGO_POSITION_OFFSET, "ll,10,-10"));
+        setLogoPosition(getStore().get(PREF_LOGO_POSITION_OFFSET,
+                                       "ll,10,-10"));
         updateDisplayList();
         updateAnnotations();
     }
@@ -3035,7 +3206,8 @@ public class ViewManager extends SharableImpl
      */
     public void checkToolBarVisibility() {
         for (int i = 0; i < toolbars.size(); i++) {
-            ((Component) toolbars.get(i)).setVisible(getStore().get(PREF_SHOWTOOLBAR + toolbarIds.get(i), true));
+            ((Component) toolbars.get(i)).setVisible(
+                getStore().get(PREF_SHOWTOOLBAR + toolbarIds.get(i), true));
         }
     }
 
@@ -3327,7 +3499,8 @@ public class ViewManager extends SharableImpl
      *
      * @return true if successful
      */
-    public boolean setProperty(String name, String value, boolean ignoreError) {
+    public boolean setProperty(String name, String value,
+                               boolean ignoreError) {
         try {
             return Misc.propertySet(this, name, value, ignoreError);
         } catch (Exception exc) {
@@ -3480,7 +3653,7 @@ public class ViewManager extends SharableImpl
             getIdv().doSaveAs();
 
             return;
-        } else if (!Character.isDigit(c)) {
+        } else if ( !Character.isDigit(c)) {
             return;
         } else {
 
@@ -3514,7 +3687,8 @@ public class ViewManager extends SharableImpl
                         return;
                     }
 
-                    while (runVisibilityAnimation &&!getIsDestroyed() &&!getDisplayInfos().isEmpty()) {
+                    while (runVisibilityAnimation && !getIsDestroyed()
+                            && !getDisplayInfos().isEmpty()) {
                         int sleepTime = stepVisibilityToggle();
 
                         try {
@@ -3554,7 +3728,7 @@ public class ViewManager extends SharableImpl
         for (int i = controls.size() - 1; i >= 0; i--) {
             DisplayControl control = (DisplayControl) controls.get(i);
 
-            if (!control.getLockVisibilityToggle()) {
+            if ( !control.getLockVisibilityToggle()) {
                 control.setDisplayVisibility(on);
             }
         }
@@ -3598,10 +3772,12 @@ public class ViewManager extends SharableImpl
                 currentVisibilityIdx = 0;
             }
 
-            DisplayControl control = (DisplayControl) controls.get(currentVisibilityIdx);
+            DisplayControl control =
+                (DisplayControl) controls.get(currentVisibilityIdx);
 
-            if (!control.getLockVisibilityToggle()) {
-                visbilityAnimationPause = control.getVisbilityAnimationPause();
+            if ( !control.getLockVisibilityToggle()) {
+                visbilityAnimationPause =
+                    control.getVisbilityAnimationPause();
 
                 break;
             }
@@ -3615,7 +3791,7 @@ public class ViewManager extends SharableImpl
         for (int i = 0; i < controls.size(); i++) {
             DisplayControl control = (DisplayControl) controls.get(i);
 
-            if (!control.getLockVisibilityToggle()) {
+            if ( !control.getLockVisibilityToggle()) {
                 unlockedControls.add(control);
             }
         }
@@ -3629,7 +3805,8 @@ public class ViewManager extends SharableImpl
 
             // Special case for when we only have we. We just flip-flop its visibility
             if (unlockedControls.size() == 1) {
-                control.setDisplayVisibility(!control.getDisplayVisibility());
+                control.setDisplayVisibility(
+                     !control.getDisplayVisibility());
             } else {
                 control.setDisplayVisibility(i == currentVisibilityIdx);
             }
@@ -3660,7 +3837,7 @@ public class ViewManager extends SharableImpl
 
             if (cnt == idx) {
                 control.setDisplayVisibility(true);
-            } else if (!control.getLockVisibilityToggle()) {
+            } else if ( !control.getLockVisibilityToggle()) {
                 control.setDisplayVisibility(false);
             }
 
@@ -3794,7 +3971,8 @@ public class ViewManager extends SharableImpl
         Hashtable seen              = new Hashtable();
 
         for (int i = 0; i < localDisplayInfos.size(); i++) {
-            DisplayControl control = ((DisplayInfo) localDisplayInfos.get(i)).getDisplayControl();
+            DisplayControl control =
+                ((DisplayInfo) localDisplayInfos.get(i)).getDisplayControl();
 
             if (seen.get(control) == null) {
                 seen.put(control, control);
@@ -3812,12 +3990,17 @@ public class ViewManager extends SharableImpl
      */
     public void displayDataChanged(DisplayControl displayControl) {
         if (idv.getUseTimeDriver() && displayControl.getIsTimeDriver()) {
-            for (DisplayControl control : (List<DisplayControl>) getControls()) {
-                if (!control.equals(displayControl) && ((DisplayControlImpl) control).getUsesTimeDriver()) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) getControls()) {
+                if ( !control.equals(displayControl)
+                        && ((DisplayControlImpl) control)
+                            .getUsesTimeDriver()) {
                     try {
-                        ((DisplayControlImpl) control).reloadDataSourceInThread();
+                        ((DisplayControlImpl) control)
+                            .reloadDataSourceInThread();
                     } catch (Exception e) {
-                        logException("Error reloading data source for " + displayControl.getLabel(), e);
+                        logException("Error reloading data source for "
+                                     + displayControl.getLabel(), e);
                     }
                 }
             }
@@ -3867,7 +4050,7 @@ public class ViewManager extends SharableImpl
 
         this.background = background;
 
-        if (!hasDisplayMaster()) {
+        if ( !hasDisplayMaster()) {
             return;
         }
 
@@ -3924,7 +4107,8 @@ public class ViewManager extends SharableImpl
      *
      * @param displayControl display control
      */
-    public void displayControlVisibilityChanged(DisplayControl displayControl) {
+    public void displayControlVisibilityChanged(
+            DisplayControl displayControl) {
         if (timelineDialog != null) {
             timelineDialog.repaint();
         }
@@ -3951,14 +4135,15 @@ public class ViewManager extends SharableImpl
     protected void reallyFillLegends() {
 
         // If we are not loading a bundle then fill the legends right now
-        if (!getStateManager().isLoadingXml() ||!shouldDoThingsRightAway()) {
+        if ( !getStateManager().isLoadingXml()
+                || !shouldDoThingsRightAway()) {
             fillLegendsInner();
         } else {
 
             // else fill them in about 1 second
             fillLegendsTime = System.currentTimeMillis() + 1000;
 
-            if (!fillLegendsPending) {
+            if ( !fillLegendsPending) {
 
                 // If none pending then start the thread
                 fillLegendsPending = true;
@@ -4017,19 +4202,19 @@ public class ViewManager extends SharableImpl
         int       cnt      = 0;
 
         if (getShowSideLegend()) {
-            if (!legendState.equals(IdvLegend.STATE_HIDDEN)) {
-                displayMenu.add(GuiUtils.makeMenuItem("Hide Legend", this, "setSideLegendPosition",
-                        IdvLegend.STATE_HIDDEN));
+            if ( !legendState.equals(IdvLegend.STATE_HIDDEN)) {
+                displayMenu.add(GuiUtils.makeMenuItem("Hide Legend", this,
+                        "setSideLegendPosition", IdvLegend.STATE_HIDDEN));
             }
 
-            if (!legendState.equals(IdvLegend.STATE_DOCKED)) {
-                displayMenu.add(GuiUtils.makeMenuItem("Embed Legend", this, "setSideLegendPosition",
-                        IdvLegend.STATE_DOCKED));
+            if ( !legendState.equals(IdvLegend.STATE_DOCKED)) {
+                displayMenu.add(GuiUtils.makeMenuItem("Embed Legend", this,
+                        "setSideLegendPosition", IdvLegend.STATE_DOCKED));
             }
 
-            if (!legendState.equals(IdvLegend.STATE_FLOAT)) {
-                displayMenu.add(GuiUtils.makeMenuItem("Float Legend", this, "setSideLegendPosition",
-                        IdvLegend.STATE_FLOAT));
+            if ( !legendState.equals(IdvLegend.STATE_FLOAT)) {
+                displayMenu.add(GuiUtils.makeMenuItem("Float Legend", this,
+                        "setSideLegendPosition", IdvLegend.STATE_FLOAT));
             }
 
             displayMenu.addSeparator();
@@ -4038,16 +4223,18 @@ public class ViewManager extends SharableImpl
         for (int i = controls.size() - 1; i >= 0; i--) {
             DisplayControl control = (DisplayControl) controls.get(i);
 
-            if (!didone) {
+            if ( !didone) {
                 didone = true;
-                displayMenu.add(GuiUtils.makeMenuItem("Remove All Displays", this, "clearDisplays"));
+                displayMenu.add(GuiUtils.makeMenuItem("Remove All Displays",
+                        this, "clearDisplays"));
 
                 if (animationMenu == null) {
                     animationMenu = new JMenu("Visibility Animation");
                     animationCB   = new JCheckBoxMenuItem("On");
                     animationCB.addActionListener(new ObjectListener(null) {
                         public void actionPerformed(ActionEvent event) {
-                            setAnimatedVisibility(((JCheckBoxMenuItem) event.getSource()).isSelected());
+                            setAnimatedVisibility(((JCheckBoxMenuItem) event
+                                .getSource()).isSelected());
                         }
                     });
                     animationMenu.add(animationCB);
@@ -4076,10 +4263,11 @@ public class ViewManager extends SharableImpl
             String legendOrder = " #" + (++cnt) + "  ";
             String label       = legendOrder + " " + control.getMenuLabel();
 
-            displayMenu.add(GuiUtils.makeMenu(label, control.getControlMenus(displayMenu)));
+            displayMenu.add(GuiUtils.makeMenu(label,
+                    control.getControlMenus(displayMenu)));
         }
 
-        if (!didone) {
+        if ( !didone) {
             displayMenu.add(new JLabel("No displays"));
         }
     }
@@ -4113,7 +4301,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException
      * @throws VisADException
      */
-    public void removeDisplayInfo(DisplayInfo displayInfo) throws RemoteException, VisADException {
+    public void removeDisplayInfo(DisplayInfo displayInfo)
+            throws RemoteException, VisADException {
         if (getIsDestroyed()) {
             return;
         }
@@ -4153,7 +4342,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI Exception
      * @throws VisADException   VisAD Exception
      */
-    public void addDisplayInfos(List<DisplayInfo> displayInfos) throws RemoteException, VisADException {
+    public void addDisplayInfos(List<DisplayInfo> displayInfos)
+            throws RemoteException, VisADException {
         if (getIsDestroyed()) {
             return;
         }
@@ -4171,7 +4361,7 @@ public class ViewManager extends SharableImpl
                 fillLegends();
                 updateTimelines(true);
 
-                if (!getStateManager().isLoadingXml()) {
+                if ( !getStateManager().isLoadingXml()) {
                     toFront();
                 }
             } else {
@@ -4195,7 +4385,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException
      * @throws VisADException
      */
-    public boolean addDisplayInfo(DisplayInfo displayInfo) throws RemoteException, VisADException {
+    public boolean addDisplayInfo(DisplayInfo displayInfo)
+            throws RemoteException, VisADException {
         if (getIsDestroyed()) {
             return false;
         }
@@ -4225,8 +4416,9 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException
      * @throws VisADException
      */
-    public void updateDisplayIfNeeded() throws VisADException, RemoteException {
-        if (!dirty || (master == null)) {
+    public void updateDisplayIfNeeded()
+            throws VisADException, RemoteException {
+        if ( !dirty || (master == null)) {
             return;
         }
 
@@ -4277,7 +4469,8 @@ public class ViewManager extends SharableImpl
             List tmpList = getDisplayInfos();
 
             for (int i = 0; i < tmpList.size(); i++) {
-                DisplayControl dc = ((DisplayInfo) tmpList.get(i)).getDisplayControl();
+                DisplayControl dc =
+                    ((DisplayInfo) tmpList.get(i)).getDisplayControl();
 
                 if (dc.getCanDoRemoveAll()) {
                     dc.doRemove();
@@ -4324,7 +4517,8 @@ public class ViewManager extends SharableImpl
      * @return The View menu
      */
     public JMenu makeViewMenu() {
-        JMenu viewMenu = GuiUtils.makeDynamicMenu("View", this, "firstInitializeViewMenu");
+        JMenu viewMenu = GuiUtils.makeDynamicMenu("View", this,
+                             "firstInitializeViewMenu");
 
         viewMenu.setMnemonic(GuiUtils.charToKeyCode("V"));
 
@@ -4364,7 +4558,8 @@ public class ViewManager extends SharableImpl
      */
     public void initializeViewMenu(JMenu viewMenu) {
         if (showControlMenu) {
-            JMenu displayMenu = GuiUtils.makeDynamicMenu("Displays", this, "initDisplayMenu");
+            JMenu displayMenu = GuiUtils.makeDynamicMenu("Displays", this,
+                                    "initDisplayMenu");
 
             viewMenu.add(displayMenu);
             viewMenu.addSeparator();
@@ -4372,12 +4567,15 @@ public class ViewManager extends SharableImpl
 
         List renderItems = new ArrayList();
 
-        renderItems.add(GuiUtils.makeMenuItem("Make Frames", this, "makeFrames"));
+        renderItems.add(GuiUtils.makeMenuItem("Make Frames", this,
+                "makeFrames"));
 
         if (usingImagePanel) {
-            renderItems.add(GuiUtils.makeMenuItem("Reset to display", this, "useDisplay"));
+            renderItems.add(GuiUtils.makeMenuItem("Reset to display", this,
+                    "useDisplay"));
         } else if (imagePanel != null) {
-            renderItems.add(GuiUtils.makeMenuItem("Reset to images", this, "useImages"));
+            renderItems.add(GuiUtils.makeMenuItem("Reset to images", this,
+                    "useImages"));
         }
 
         // viewMenu.add(GuiUtils.makeMenu("Rendering", renderItems));
@@ -4387,16 +4585,23 @@ public class ViewManager extends SharableImpl
 
         JMenuItem mi;
 
-        captureMenu.add(mi = (JMenuItem) GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...  Ctrl+I", this,
-                "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
+        captureMenu.add(
+            mi = (JMenuItem) GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Image...  Ctrl+I", this,
+                    "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
 
         // mi.setMnemonic(GuiUtils.charToKeyCode("C"));
-        captureMenu.add(mi = (JMenuItem) GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...  Ctrl+M", this,
-                "startImageCapture"), "/auxdata/ui/icons/film.png"));
+        captureMenu.add(
+            mi = (JMenuItem) GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Movie...  Ctrl+M", this,
+                    "startImageCapture"), "/auxdata/ui/icons/film.png"));
 
         // mi.setMnemonic(GuiUtils.charToKeyCode("M"));
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...", this, "doPrintImage", null, true),
-                                         "/auxdata/ui/icons/printer.png"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
+                this, "doPrintImage", null,
+                true), "/auxdata/ui/icons/printer.png"));
         viewMenu.add(makeShowMenu());
 
         if (this.viewMenu == null) {
@@ -4410,7 +4615,8 @@ public class ViewManager extends SharableImpl
      * @return saved views menu
      */
     protected JMenu makeSavedViewsMenu() {
-        return GuiUtils.makeDynamicMenu("Viewpoints", this, "initViewStateMenu");
+        return GuiUtils.makeDynamicMenu("Viewpoints", this,
+                                        "initViewStateMenu");
     }
 
     /**
@@ -4419,7 +4625,8 @@ public class ViewManager extends SharableImpl
      * @param viewStateMenu the menu to init
      */
     public void initViewStateMenu(JMenu viewStateMenu) {
-        viewStateMenu.add(GuiUtils.makeMenuItem("Save Current Viewpoint", getViewManager(), "doSaveState"));
+        viewStateMenu.add(GuiUtils.makeMenuItem("Save Current Viewpoint",
+                getViewManager(), "doSaveState"));
         viewStateMenu.addSeparator();
         makeViewStateMenu(viewStateMenu);
     }
@@ -4440,7 +4647,9 @@ public class ViewManager extends SharableImpl
             // And we only want to be compatible with it if we are in the default window
             String skin = thisWindow.getSkinPath();
 
-            if ((skin != null) &&!Misc.equals("/ucar/unidata/idv/resources/skins/skin.xml", skin)) {
+            if ((skin != null)
+                    && !Misc.equals(
+                        "/ucar/unidata/idv/resources/skins/skin.xml", skin)) {
                 return false;
             }
         }
@@ -4456,7 +4665,8 @@ public class ViewManager extends SharableImpl
      * @return  true if compatible
      */
     public boolean isCompatibleWith(ViewState viewState) {
-        return getClass().getName().toString().equals(viewState.getViewClassName().trim());
+        return getClass().getName().toString().equals(
+            viewState.getViewClassName().trim());
     }
 
     /**
@@ -4484,7 +4694,8 @@ public class ViewManager extends SharableImpl
      * @param value The new value for ExternalAnimation
      * @param widget the animation widget to update
      */
-    public void setExternalAnimation(Animation value, AnimationWidget widget) {
+    public void setExternalAnimation(Animation value,
+                                     AnimationWidget widget) {
         externalAnimation       = value;
         externalAnimationWidget = widget;
     }
@@ -4521,11 +4732,14 @@ public class ViewManager extends SharableImpl
         if ((animation == null) && animationOk()) {
             try {
                 if (animationInfo == null) {
-                    animationInfo = (AnimationInfo) getIdv().getPersistenceManager().getPrototype(AnimationInfo.class);
+                    animationInfo =
+                        (AnimationInfo) getIdv().getPersistenceManager()
+                            .getPrototype(AnimationInfo.class);
 
                     if (animationInfo == null) {
                         animationInfo = new AnimationInfo();
-                        animationInfo.setBoxesVisible(getShowAnimationBoxes());
+                        animationInfo.setBoxesVisible(
+                            getShowAnimationBoxes());
                     }
                 }
 
@@ -4533,20 +4747,27 @@ public class ViewManager extends SharableImpl
                 animationWidget.setUniqueId(getUniqueId() + "_anim");
                 animation = new Animation();
                 animationWidget.setAnimation(animation);
-                animation.addPropertyChangeListener(new PropertyChangeListener() {
+                animation.addPropertyChangeListener(
+                    new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
                         try {
-                            if (evt.getPropertyName().equals(Animation.ANI_VALUE)) {
+                            if (evt.getPropertyName().equals(
+                                    Animation.ANI_VALUE)) {
                                 animationTimeChanged();
                                 updateTimelines(false);
 
                                 if (imagePanel != null) {
-                                    imagePanel.setSelectedFile(animation.getCurrent());
+                                    imagePanel.setSelectedFile(
+                                        animation.getCurrent());
                                 }
-                            } else if (evt.getPropertyName().equals(Animation.ANI_SET) && (animationTimeline != null)) {
+                            } else if (evt.getPropertyName().equals(
+                                    Animation.ANI_SET) && (animationTimeline
+                                        != null)) {
                                 if (animationTimeline != null) {
                                     animationTimeline.setDatedThings(
-                                        DatedObject.wrap(Util.makeDates(animationWidget.getTimes())));
+                                        DatedObject.wrap(
+                                            Util.makeDates(
+                                                animationWidget.getTimes())));
                                 }
                             }
                         } catch (Exception exp) {
@@ -4622,6 +4843,7 @@ public class ViewManager extends SharableImpl
      * (so we don't get dangling reference/memory leaks).
      */
     public void destroy() {
+
         if (isDestroyed) {
             return;
         }
@@ -4645,7 +4867,8 @@ public class ViewManager extends SharableImpl
 
             for (int i = 0; i < tmpList.size(); i++) {
                 try {
-                    ((DisplayInfo) tmpList.get(i)).getDisplayControl().viewManagerDestroyed(this);
+                    ((DisplayInfo) tmpList.get(
+                        i)).getDisplayControl().viewManagerDestroyed(this);
                 } catch (Exception exc) {}
             }
         }
@@ -4686,7 +4909,9 @@ public class ViewManager extends SharableImpl
                 // Ignore  any errors when we destroy the DisplayMaster
                 Throwable wrappedExc = LogUtil.getInnerException(exp);
 
-                LogUtil.consoleMessage("Had an error destroying the DisplayMaster:" + wrappedExc);
+                LogUtil.consoleMessage(
+                    "Had an error destroying the DisplayMaster:"
+                    + wrappedExc);
 
                 // logException("Destroying the View Manager", exp);
             } finally {}
@@ -4727,6 +4952,7 @@ public class ViewManager extends SharableImpl
         fullContents            = null;
         idv                     = null;
         displayInfos.clear();
+
     }
 
     /**
@@ -4795,8 +5021,8 @@ public class ViewManager extends SharableImpl
      */
     public void addViewDescriptor(ViewDescriptor vd) {
         if (vd != null) {
-            if (!vd.nameEquals(ViewDescriptor.LASTACTIVE)) {
-                if (!aliases.contains(vd)) {
+            if ( !vd.nameEquals(ViewDescriptor.LASTACTIVE)) {
+                if ( !aliases.contains(vd)) {
                     aliases.add(vd);
                 }
             }
@@ -4811,7 +5037,7 @@ public class ViewManager extends SharableImpl
      * @return defined by the view descriptor
      */
     public boolean isDefinedBy(ViewDescriptor vd) {
-        if (!isClassOk(vd)) {
+        if ( !isClassOk(vd)) {
             return false;
         }
 
@@ -4990,21 +5216,26 @@ public class ViewManager extends SharableImpl
                         return null;
                     }
 
-                    DisplayRenderer renderer = tmpMaster.getDisplay().getDisplayRenderer();
+                    DisplayRenderer renderer =
+                        tmpMaster.getDisplay().getDisplayRenderer();
 
                     if (renderer instanceof DisplayRendererJ3D) {
                         initLights((DisplayRendererJ3D) renderer);
                     }
 
-                    if (!shouldDoThingsRightAway()) {
+                    if ( !shouldDoThingsRightAway()) {
                         tmpMaster.setDisplayInactive();
                     } else {
-                        tmpMaster.setMouseFunctions(getIdv().getPreferenceManager().getMouseMap());
-                        tmpMaster.setKeyboardEventMap(getIdv().getPreferenceManager().getKeyboardMap());
-                        tmpMaster.setWheelEventMap(getIdv().getPreferenceManager().getWheelMap());
+                        tmpMaster.setMouseFunctions(
+                            getIdv().getPreferenceManager().getMouseMap());
+                        tmpMaster.setKeyboardEventMap(
+                            getIdv().getPreferenceManager().getKeyboardMap());
+                        tmpMaster.setWheelEventMap(
+                            getIdv().getPreferenceManager().getWheelMap());
                     }
 
-                    GraphicsModeControl gmc = tmpMaster.getDisplay().getGraphicsModeControl();
+                    GraphicsModeControl gmc =
+                        tmpMaster.getDisplay().getGraphicsModeControl();
 
                     gmc.setCacheAppearances(true);
                     gmc.setMergeGeometries(true);
@@ -5014,9 +5245,11 @@ public class ViewManager extends SharableImpl
                         Trace.call1("ViewManager.getMaster master.draw");
                         tmpMaster.draw();
                         Trace.call2("ViewManager.getMaster master.draw");
-                        Trace.call1("ViewManager.getMaster updateDisplayList");
+                        Trace.call1(
+                            "ViewManager.getMaster updateDisplayList");
                         updateDisplayList();
-                        Trace.call2("ViewManager.getMaster updateDisplayList");
+                        Trace.call2(
+                            "ViewManager.getMaster updateDisplayList");
                     }
 
                     master = tmpMaster;
@@ -5057,7 +5290,8 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
-    protected DisplayMaster doMakeDisplayMaster() throws VisADException, RemoteException {
+    protected DisplayMaster doMakeDisplayMaster()
+            throws VisADException, RemoteException {
         return null;
     }
 
@@ -5137,7 +5371,7 @@ public class ViewManager extends SharableImpl
      * @param e The <code>ControlEvent</code>
      */
     public final void controlChanged(ControlEvent e) {
-        if (!initDone || getIsDestroyed()) {
+        if ( !initDone || getIsDestroyed()) {
             return;
         }
 
@@ -5167,7 +5401,9 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException
      * @throws VisADException
      */
-    public void displayChanged(DisplayEvent de) throws VisADException, RemoteException {
+    public void displayChanged(DisplayEvent de)
+            throws VisADException, RemoteException {
+
         int        eventId    = de.getId();
         InputEvent inputEvent = de.getInputEvent();
 
@@ -5180,10 +5416,11 @@ public class ViewManager extends SharableImpl
             // System.err.println (" mouse pressed");
         }
 
-        if (getIsShared() &&!lastActive) {
+        if (getIsShared() && !lastActive) {
             if (eventId == DisplayEvent.MOUSE_PRESSED) {
                 getVMManager().setLastActiveViewManager(this);
-            } else if (!clickToFocus && (eventId == DisplayEvent.MOUSE_MOVED)) {
+            } else if ( !clickToFocus
+                        && (eventId == DisplayEvent.MOUSE_MOVED)) {
                 getVMManager().setLastActiveViewManager(this);
             }
         }
@@ -5235,13 +5472,15 @@ public class ViewManager extends SharableImpl
 
             double[] currentMatrix = getMaster().getProjectionMatrix();
 
-            if ((mousePressedMatrix != null) &&!Arrays.equals(currentMatrix, mousePressedMatrix)) {
-                addCommand(new MatrixCommand(this, mousePressedMatrix, currentMatrix));
+            if ((mousePressedMatrix != null)
+                    && !Arrays.equals(currentMatrix, mousePressedMatrix)) {
+                addCommand(new MatrixCommand(this, mousePressedMatrix,
+                                             currentMatrix));
             }
 
             mousePressedMatrix = null;
         } else if (eventId == DisplayEvent.FRAME_DONE) {
-            if (!receivedFirstFrameDone) {
+            if ( !receivedFirstFrameDone) {
                 doneFirstFrame();
             }
 
@@ -5268,6 +5507,7 @@ public class ViewManager extends SharableImpl
 
             // System.err.println ("??? id:" + eventId);
         }
+
     }
 
     /**
@@ -5357,7 +5597,7 @@ public class ViewManager extends SharableImpl
      * @return true if we do
      */
     public boolean useDisplay() {
-        if (!usingImagePanel) {
+        if ( !usingImagePanel) {
             return false;
         }
 
@@ -5573,9 +5813,10 @@ public class ViewManager extends SharableImpl
 
             PrinterJob printJob = PrinterJob.getPrinterJob();
 
-            printJob.setPrintable(((DisplayImpl) getMaster().getDisplay()).getPrintable());
+            printJob.setPrintable(
+                ((DisplayImpl) getMaster().getDisplay()).getPrintable());
 
-            if (!printJob.printDialog()) {
+            if ( !printJob.printDialog()) {
                 return;
             }
 
@@ -5624,8 +5865,10 @@ public class ViewManager extends SharableImpl
      * @return  true if it has the right extension
      */
     public static boolean isVectorGraphicsFile(String filename) {
-        return filename.toLowerCase().endsWith(".pdf") || filename.toLowerCase().endsWith(".ps")
-               || filename.toLowerCase().endsWith(".eps") || filename.toLowerCase().endsWith(".svg");
+        return filename.toLowerCase().endsWith(".pdf")
+               || filename.toLowerCase().endsWith(".ps")
+               || filename.toLowerCase().endsWith(".eps")
+               || filename.toLowerCase().endsWith(".svg");
     }
 
     /**
@@ -5634,6 +5877,7 @@ public class ViewManager extends SharableImpl
      * @param andSaveBundle true to save the bundle also
      */
     public void doSaveImage(boolean andSaveBundle) {
+
         SecurityManager backup = System.getSecurityManager();
 
         System.setSecurityManager(null);
@@ -5645,12 +5889,15 @@ public class ViewManager extends SharableImpl
                 lowBtn = new JRadioButton("Low", false);
                 GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
                 backgroundTransparentBtn = new JCheckBox("BG Transparent");
-                backgroundTransparentBtn.setToolTipText("Set the background color to be transparent");
+                backgroundTransparentBtn.setToolTipText(
+                    "Set the background color to be transparent");
                 mainDisplayBtn = new JRadioButton("Current View", true);
                 allViewsBtn    = new JRadioButton("All Views", false);
-                contentsBtn    = new JRadioButton("Current View & Legend", false);
-                fullWindowBtn  = new JRadioButton("Full Window", false);
-                GuiUtils.buttonGroup(mainDisplayBtn, allViewsBtn, fullWindowBtn).add(contentsBtn);
+                contentsBtn = new JRadioButton("Current View & Legend",
+                        false);
+                fullWindowBtn = new JRadioButton("Full Window", false);
+                GuiUtils.buttonGroup(mainDisplayBtn, allViewsBtn,
+                                     fullWindowBtn).add(contentsBtn);
             }
 
             if (publishCbx == null) {
@@ -5668,20 +5915,24 @@ public class ViewManager extends SharableImpl
             List comps = new ArrayList();
 
             comps.add(new JLabel("Capture What:"));
-            comps.add(GuiUtils.inset(GuiUtils.vbox(mainDisplayBtn, contentsBtn, allViewsBtn, fullWindowBtn),
-                                     new Insets(2, 8, 10, 0)));
+            comps.add(GuiUtils.inset(GuiUtils.vbox(mainDisplayBtn,
+                    contentsBtn, allViewsBtn, fullWindowBtn), new Insets(2,
+                        8, 10, 0)));
             comps.add(new JLabel("Quality:"));
-            comps.add(GuiUtils.inset(GuiUtils.hbox(hiBtn, medBtn, lowBtn), new Insets(3, 0, 1, 0)));
+            comps.add(GuiUtils.inset(GuiUtils.hbox(hiBtn, medBtn, lowBtn),
+                                     new Insets(3, 0, 1, 0)));
             comps.add(backgroundTransparentBtn);
 
             if (publishCbx != null) {
-                comps.add(GuiUtils.inset(publishCbx, new Insets(10, 0, 0, 0)));
+                comps.add(GuiUtils.inset(publishCbx,
+                                         new Insets(10, 0, 0, 0)));
             }
 
-            JComponent        accessory     = GuiUtils.vbox(comps);
+            JComponent accessory = GuiUtils.vbox(comps);
             PatternFileFilter captureFilter =
-                new PatternFileFilter(".+\\.jpg|.+\\.gif|.+\\.jpeg|.+\\.png|.+\\.pdf|.+\\.ps|.+\\.svg",
-                                      "Image files (*.jpg,*.gif,*.png,*.pdf,*.ps,*.svg)");
+                new PatternFileFilter(
+                    ".+\\.jpg|.+\\.gif|.+\\.jpeg|.+\\.png|.+\\.pdf|.+\\.ps|.+\\.svg",
+                    "Image files (*.jpg,*.gif,*.png,*.pdf,*.ps,*.svg)");
             List            filters = Misc.newList(captureFilter);
             GeoLocationInfo bounds  = getVisibleGeoBounds();
 
@@ -5689,26 +5940,31 @@ public class ViewManager extends SharableImpl
                 filters.add(KmlDataSource.FILTER_KML);
             }
 
-            String filename = FileManager.getWriteFile(filters, FileManager.SUFFIX_JPG,
+            String filename = FileManager.getWriteFile(filters,
+                                  FileManager.SUFFIX_JPG,
                                   GuiUtils.top(GuiUtils.inset(accessory, 5)));
 
             if (filename != null) {
                 if (isVectorGraphicsFile(filename)) {
                     List<ViewManager> l = new ArrayList<ViewManager>();
 
-                    if (allViewsBtn.isSelected()) {    // All Views
-                        for (Object o : getDisplayWindow().getViewManagers()) {
+                    if (allViewsBtn.isSelected()) {  // All Views
+                        for (Object o :
+                                getDisplayWindow().getViewManagers()) {
                             l.add((ViewManager) o);
                         }
                     } else {
                         l.add(this);
                     }
 
-                    VectorGraphicsRenderer vectorRenderer = new VectorGraphicsRenderer(l, getColumnCountFromVM(l));
+                    VectorGraphicsRenderer vectorRenderer =
+                        new VectorGraphicsRenderer(l,
+                            getColumnCountFromVM(l));
 
                     if (vectorRenderer.showConfigDialog()) {
                         vectorRenderer.renderTo(filename);
-                        getIdv().getPublishManager().publishContent(filename, this, publishCbx);
+                        getIdv().getPublishManager().publishContent(filename,
+                                this, publishCbx);
                     }
 
                     System.setSecurityManager(backup);
@@ -5732,17 +5988,22 @@ public class ViewManager extends SharableImpl
                     List<Component> views = new ArrayList<Component>();
                     String          whichComponent;
 
-                    if (fullWindowBtn.isSelected()) {            // Full Window
+                    if (fullWindowBtn.isSelected()) {          // Full Window
                         views.add(getDisplayWindow().getComponent());
                         whichComponent = "full window";
-                    } else if (mainDisplayBtn.isSelected()) {    // Current Active View
+                    } else if (mainDisplayBtn.isSelected()) {  // Current Active View
                         views.add(getMaster().getComponent());
                         whichComponent = "main display";
                     } else if (allViewsBtn.isSelected()) {
-                    	List<ViewManager> viewManagers = new ArrayList<ViewManager>();
-                        viewManagers.addAll(getDisplayWindow().getViewManagers());
-                        for (IdvComponentGroup icg : getDisplayWindow().getComponentGroups()) {
-                            for (IdvComponentHolder idh : (List<IdvComponentHolder>)icg.getDisplayComponents()) {
+                        List<ViewManager> viewManagers =
+                            new ArrayList<ViewManager>();
+                        viewManagers.addAll(
+                            getDisplayWindow().getViewManagers());
+                        for (IdvComponentGroup icg :
+                                getDisplayWindow().getComponentGroups()) {
+                            for (IdvComponentHolder idh :
+                                    (List<IdvComponentHolder>) icg
+                                        .getDisplayComponents()) {
                                 viewManagers.addAll(idh.getViewManagers());
                             }
                         }
@@ -5750,17 +6011,20 @@ public class ViewManager extends SharableImpl
                             views.add(v.getComponent());
                         }
                         whichComponent = "all displays";
-                    } else {    // View & Legend
+                    } else {  // View & Legend
                         views.add(getContents());
                         whichComponent = "contents";
                     }
 
-                    List<BufferedImage> images = makeBufferedImages(views, whichComponent);
-                    BufferedImage       image  = (BufferedImage) ImageUtils.gridImages2(images, 0, Color.GRAY,
-                                              ImageUtils.getColumnCountFromComps(views));
+                    List<BufferedImage> images = makeBufferedImages(views,
+                                                     whichComponent);
+                    BufferedImage image =
+                        (BufferedImage) ImageUtils.gridImages2(images, 0,
+                            Color.GRAY,
+                            ImageUtils.getColumnCountFromComps(views));
 
                     if (KmlDataSource.isKmlFile(filename)) {
-                        if (!checkForKmlImageCapture()) {
+                        if ( !checkForKmlImageCapture()) {
                             return;
                         }
 
@@ -5770,35 +6034,49 @@ public class ViewManager extends SharableImpl
                         filename = IOUtil.stripExtension(filename) + suffix;
 
                         if (kmlFilename.endsWith(".kml")) {
-                            KmlDataSource.writeToFile(kmlFilename, bounds, filename);
+                            KmlDataSource.writeToFile(kmlFilename, bounds,
+                                    filename);
                         } else {
-                            String          tail = IOUtil.stripExtension(IOUtil.getFileTail(kmlFilename));
-                            ZipOutputStream zos  = new ZipOutputStream(new FileOutputStream(kmlFilename));
+                            String tail = IOUtil.stripExtension(
+                                              IOUtil.getFileTail(
+                                                  kmlFilename));
+                            ZipOutputStream zos = new ZipOutputStream(
+                                                      new FileOutputStream(
+                                                          kmlFilename));
 
                             zos.putNextEntry(new ZipEntry(tail + ".kml"));
 
-                            byte[] kmlBytes = KmlDataSource.createKml(bounds, tail + suffix).getBytes();
+                            byte[] kmlBytes = KmlDataSource.createKml(bounds,
+                                                  tail + suffix).getBytes();
 
                             zos.write(kmlBytes, 0, kmlBytes.length);
 
-                            String tmpFile = IOUtil.joinDir(getIdv().getObjectStore().getUserTmpDirectory(),
-                                                            Math.random() + "" + System.currentTimeMillis() + suffix);
+                            String tmpFile =
+                                IOUtil.joinDir(getIdv().getObjectStore()
+                                    .getUserTmpDirectory(), Math.random()
+                                        + "" + System.currentTimeMillis()
+                                        + suffix);
 
-                            ImageUtils.writeImageToFile(image, tmpFile, quality);
+                            ImageUtils.writeImageToFile(image, tmpFile,
+                                    quality);
 
-                            byte[] imageBytes = IOUtil.readBytes(new FileInputStream(tmpFile));
+                            byte[] imageBytes = IOUtil.readBytes(
+                                                    new FileInputStream(
+                                                        tmpFile));
 
                             zos.putNextEntry(new ZipEntry(tail + suffix));
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
-                            getIdv().getPublishManager().publishContent(kmlFilename, this, publishCbx);
+                            getIdv().getPublishManager().publishContent(
+                                kmlFilename, this, publishCbx);
 
                             return;
                         }
                     }
 
                     ImageUtils.writeImageToFile(image, filename, quality);
-                    getIdv().getPublishManager().publishContent(filename, this, publishCbx);
+                    getIdv().getPublishManager().publishContent(filename,
+                            this, publishCbx);
                 }
 
                 if (andSaveBundle) {
@@ -5812,6 +6090,7 @@ public class ViewManager extends SharableImpl
 
         // for webstart
         System.setSecurityManager(backup);
+
     }
 
     /**
@@ -5821,7 +6100,8 @@ public class ViewManager extends SharableImpl
      *
      * @return the column count from vm
      */
-    private static int getColumnCountFromVM(List<? extends ViewManager> viewManagers) {
+    private static int getColumnCountFromVM(
+            List<? extends ViewManager> viewManagers) {
         List<Component> l = new LinkedList<Component>();
 
         for (ViewManager v : viewManagers) {
@@ -5839,7 +6119,9 @@ public class ViewManager extends SharableImpl
      * @return the list of buffered images
      * @throws AWTException the awt exception
      */
-    private List<BufferedImage> makeBufferedImages(List<Component> views, String whichComponent) throws AWTException {
+    private List<BufferedImage> makeBufferedImages(List<Component> views,
+            String whichComponent)
+            throws AWTException {
         List<BufferedImage> bis = new LinkedList<BufferedImage>();
 
         for (Component c : views) {
@@ -5857,14 +6139,17 @@ public class ViewManager extends SharableImpl
      * @return the buffered image
      * @throws AWTException the AWT exception
      */
-    private BufferedImage makeBufferedImage(Component comp, String whichComponent) throws AWTException {
+    private BufferedImage makeBufferedImage(Component comp,
+                                            String whichComponent)
+            throws AWTException {
         Dimension             dim   = comp.getSize();
         Point                 loc   = comp.getLocationOnScreen();
         GraphicsConfiguration gc    = comp.getGraphicsConfiguration();
         Robot                 robot = new Robot(gc.getDevice());
 
         if ((gc.getBounds().x > 0) || (gc.getBounds().y > 0)) {
-            System.err.println("Offsetting location:" + loc + " by gc bounds: " + gc.getBounds().x + " "
+            System.err.println("Offsetting location:" + loc
+                               + " by gc bounds: " + gc.getBounds().x + " "
                                + gc.getBounds().y);
             loc.x -= gc.getBounds().x;
             loc.y -= gc.getBounds().y;
@@ -5872,7 +6157,9 @@ public class ViewManager extends SharableImpl
         }
 
         if ((dim.width <= 0) || (dim.height <= 0)) {
-            throw new IllegalStateException("Bad component size:" + dim.width + " X " + dim.height + " for component:"
+            throw new IllegalStateException("Bad component size:" + dim.width
+                                            + " X " + dim.height
+                                            + " for component:"
                                             + whichComponent);
         }
 
@@ -5882,10 +6169,13 @@ public class ViewManager extends SharableImpl
         BufferedImage image = null;
 
         try {
-            image = robot.createScreenCapture(new Rectangle(loc.x, loc.y, dim.width, dim.height));
+            image = robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                    dim.width, dim.height));
         } catch (Exception exc) {
-            logException("Error capturing image for component:" + whichComponent + " location:" + loc.x + "x" + loc.y
-                         + " dimension:" + dim.width + "x" + dim.height, exc);
+            logException("Error capturing image for component:"
+                         + whichComponent + " location:" + loc.x + "x"
+                         + loc.y + " dimension:" + dim.width + "x"
+                         + dim.height, exc);
         }
 
         if ((image != null) && backgroundTransparentBtn.isSelected()) {
@@ -5920,8 +6210,10 @@ public class ViewManager extends SharableImpl
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   problem with VisAD data
      */
-    public int paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls, int width, int height,
-                                boolean bottom, Color color, Font font)
+    public int paintDisplayList(Graphics2D graphics,
+                                List<DisplayControl> displayControls,
+                                int width, int height, boolean bottom,
+                                Color color, Font font)
             throws VisADException, RemoteException {
         if (displayControls == null) {
             displayControls = getControls();
@@ -5951,7 +6243,7 @@ public class ViewManager extends SharableImpl
         }
 
         for (DisplayControl control : displayControls) {
-            if (!control.getShowInDisplayList()) {
+            if ( !control.getShowInDisplayList()) {
                 continue;
             }
 
@@ -5972,10 +6264,13 @@ public class ViewManager extends SharableImpl
                     Real now = anime.getCurrentAnimationValue();
 
                     if (now != null) {
-                        FieldImpl fi         = (FieldImpl) data;
-                        Data      rangeValue = fi.evaluate(now, Data.NEAREST_NEIGHBOR, Data.NO_ERRORS);
+                        FieldImpl fi = (FieldImpl) data;
+                        Data rangeValue = fi.evaluate(now,
+                                              Data.NEAREST_NEIGHBOR,
+                                              Data.NO_ERRORS);
 
-                        if ((rangeValue != null) && (rangeValue instanceof visad.Text)) {
+                        if ((rangeValue != null)
+                                && (rangeValue instanceof visad.Text)) {
                             text = ((visad.Text) rangeValue).getValue();
                         }
                     }
@@ -5991,14 +6286,16 @@ public class ViewManager extends SharableImpl
                        : getDisplayListColor());
 
             if (c == null) {
-                c = ((ucar.unidata.idv.control.DisplayControlImpl) control).getDisplayListColor();
+                c = ((ucar.unidata.idv.control.DisplayControlImpl) control)
+                    .getDisplayListColor();
             }
 
             graphics.setColor(c);
 
             int lineWidth = fm.stringWidth(text);
 
-            graphics.drawString(text, width / 2 - lineWidth / 2, startY + offsetY * cnt);
+            graphics.drawString(text, width / 2 - lineWidth / 2,
+                                startY + offsetY * cnt);
             totalHeight += Math.abs(offsetY);
             cnt++;
         }
@@ -6032,10 +6329,13 @@ public class ViewManager extends SharableImpl
                 public void run() {
                     String uid  = Misc.getUniqueId();
                     String tail = uid + ".png";
-                    String file = IOUtil.joinDir(getStore().getUserTmpDirectory(), tail);
+                    String file =
+                        IOUtil.joinDir(getStore().getUserTmpDirectory(),
+                                       tail);
 
                     writeImage(file, true);
-                    getPublishManager().doPublish("Publish JPEG file", file, props);
+                    getPublishManager().doPublish("Publish JPEG file", file,
+                            props);
                 }
             });
         } catch (Exception exp) {
@@ -6071,19 +6371,22 @@ public class ViewManager extends SharableImpl
      * @param colorMenu The Color menu to initialize
      */
     public void initColorMenu(JMenu colorMenu) {
-        colorMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Set Colors...", this, "showColorPairDialog"),
-                                       "/auxdata/ui/icons/color_swatch.png"));
+        colorMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Set Colors...",
+                this,
+                "showColorPairDialog"), "/auxdata/ui/icons/color_swatch.png"));
 
         JMenu deleteMenu = new JMenu("Delete");
 
         colorMenu.add(deleteMenu);
         colorMenu.addSeparator();
 
-        boolean               addedToDelete = false;
-        XmlResourceCollection colors        = getResourceManager().getXmlResources(IdvResourceManager.RSC_COLORPAIRS);
-        boolean               didone        = false;
+        boolean addedToDelete = false;
+        XmlResourceCollection colors = getResourceManager().getXmlResources(
+                                           IdvResourceManager.RSC_COLORPAIRS);
+        boolean didone = false;
 
-        for (int colorResourceIdx = 0; colorResourceIdx < colors.size(); colorResourceIdx++) {
+        for (int colorResourceIdx = 0; colorResourceIdx < colors.size();
+                colorResourceIdx++) {
             Element root = colors.getRoot(colorResourceIdx, false);
 
             if (root == null) {
@@ -6093,11 +6396,14 @@ public class ViewManager extends SharableImpl
             List nodes = XmlUtil.findChildren(root, TAG_COLORPAIR);
 
             for (int colorIdx = 0; colorIdx < nodes.size(); colorIdx++) {
-                Element      node  = (Element) nodes.get(colorIdx);
-                final Color  fg    = XmlUtil.getAttribute(node, "foreground", (Color) Color.black);
-                final Color  bg    = XmlUtil.getAttribute(node, "background", (Color) Color.white);
+                Element node = (Element) nodes.get(colorIdx);
+                final Color fg = XmlUtil.getAttribute(node, "foreground",
+                                     (Color) Color.black);
+                final Color bg = XmlUtil.getAttribute(node, "background",
+                                     (Color) Color.white);
                 final String label = XmlUtil.getAttribute(node, "label");
-                JMenuItem    mi    = new JMenuItem(GuiUtils.getLocalName(label, (colorResourceIdx == 0)));
+                JMenuItem mi = new JMenuItem(GuiUtils.getLocalName(label,
+                                   (colorResourceIdx == 0)));
 
                 try {
                     JLabel lbl = new JLabel("  T  ");
@@ -6126,12 +6432,13 @@ public class ViewManager extends SharableImpl
 
                 if (colorResourceIdx == 0) {
                     addedToDelete = true;
-                    deleteMenu.add(GuiUtils.makeMenuItem(label, this, "removeColorPair", label));
+                    deleteMenu.add(GuiUtils.makeMenuItem(label, this,
+                            "removeColorPair", label));
                 }
             }
         }
 
-        if (!addedToDelete) {
+        if ( !addedToDelete) {
             deleteMenu.setEnabled(false);
             deleteMenu.setToolTipText("No user defined colors");
         }
@@ -6145,9 +6452,11 @@ public class ViewManager extends SharableImpl
      * @param name The name of the color pair to remove
      */
     public void removeColorPair(String name) {
-        XmlResourceCollection colors    = getResourceManager().getXmlResources(IdvResourceManager.RSC_COLORPAIRS);
-        Element               root      = colors.getWritableRoot("<colorpairs></colorpairs>");
-        Element               colorNode = XmlUtil.findElement(root, TAG_COLORPAIR, "label", name);
+        XmlResourceCollection colors = getResourceManager().getXmlResources(
+                                           IdvResourceManager.RSC_COLORPAIRS);
+        Element root = colors.getWritableRoot("<colorpairs></colorpairs>");
+        Element colorNode = XmlUtil.findElement(root, TAG_COLORPAIR, "label",
+                                name);
 
         try {
             if (colorNode != null) {
@@ -6165,11 +6474,17 @@ public class ViewManager extends SharableImpl
     public void showColorPairDialog() {
 
         // TODO
-        final JDialog      dialog  = new JDialog((JFrame) null, "Background/Foreground Color", true);
-        JLabel             bgLbl   = GuiUtils.rLabel("Background:");
-        JLabel             fgLbl   = GuiUtils.rLabel("Foreground:");
-        final JComponent[] bgComps = GuiUtils.makeColorSwatchWidget(getBackground(), "Set Background Color");
-        final JComponent[] fgComps = GuiUtils.makeColorSwatchWidget(getForeground(), "Set Foreground Color");
+        final JDialog dialog = new JDialog((JFrame) null,
+                                           "Background/Foreground Color",
+                                           true);
+        JLabel bgLbl = GuiUtils.rLabel("Background:");
+        JLabel fgLbl = GuiUtils.rLabel("Foreground:");
+        final JComponent[] bgComps =
+            GuiUtils.makeColorSwatchWidget(getBackground(),
+                                           "Set Background Color");
+        final JComponent[] fgComps =
+            GuiUtils.makeColorSwatchWidget(getForeground(),
+                                           "Set Foreground Color");
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
@@ -6181,21 +6496,28 @@ public class ViewManager extends SharableImpl
                 String cmd = ae.getActionCommand();
 
                 if (cmd.equals(GuiUtils.CMD_SAVEAS)) {
-                    saveColors(fgComps[0].getBackground(), bgComps[0].getBackground());
+                    saveColors(fgComps[0].getBackground(),
+                               bgComps[0].getBackground());
 
                     return;
                 }
 
-                if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_APPLY)) {
-                    setColors(fgComps[0].getBackground(), bgComps[0].getBackground());
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_APPLY)) {
+                    setColors(fgComps[0].getBackground(),
+                              bgComps[0].getBackground());
                 }
 
-                if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
                     dialog.dispose();
                 }
             }
         };
-        JPanel contents = GuiUtils.vbox(top, GuiUtils.makeButtons(listener, new String[] { GuiUtils.CMD_SAVEAS,
+        JPanel contents = GuiUtils.vbox(top,
+                                        GuiUtils.makeButtons(listener,
+                                            new String[] {
+                                                GuiUtils.CMD_SAVEAS,
                 GuiUtils.CMD_APPLY, GuiUtils.CMD_OK, GuiUtils.CMD_CANCEL }));
 
         dialog.getContentPane().add(GuiUtils.inset(contents, 5));
@@ -6212,13 +6534,17 @@ public class ViewManager extends SharableImpl
      * @param bg Background color
      */
     private void saveColors(Color fg, Color bg) {
-        String                name     = "";
-        XmlResourceCollection colors   = getResourceManager().getXmlResources(IdvResourceManager.RSC_COLORPAIRS);
-        Document              colorDoc = colors.getWritableDocument("<colorpairs></colorpairs>");
-        Element               root     = colors.getWritableRoot("<colorpairs></colorpairs>");
+        String name = "";
+        XmlResourceCollection colors = getResourceManager().getXmlResources(
+                                           IdvResourceManager.RSC_COLORPAIRS);
+        Document colorDoc =
+            colors.getWritableDocument("<colorpairs></colorpairs>");
+        Element root = colors.getWritableRoot("<colorpairs></colorpairs>");
 
         while (true) {
-            name = GuiUtils.getInput("Please provide a name to save the colors as", "Color name: ", name);
+            name = GuiUtils.getInput(
+                "Please provide a name to save the colors as",
+                "Color name: ", name);
 
             if (name == null) {
                 return;
@@ -6227,7 +6553,8 @@ public class ViewManager extends SharableImpl
             name = name.trim();
 
             if (name.length() == 0) {
-                LogUtil.userMessage("Please enter a name for the new color pair");
+                LogUtil.userMessage(
+                    "Please enter a name for the new color pair");
 
                 continue;
             }
@@ -6240,9 +6567,12 @@ public class ViewManager extends SharableImpl
                 Element node = (Element) nodes.get(colorIdx);
 
                 if (XmlUtil.getAttribute(node, "label", "").equals(name)) {
-                    int result = GuiUtils.showYesNoCancelDialog(GuiUtils.getFrame(fullContents),
-                                     "A color pair with the name: " + name + " already exists."
-                                     + "Do you want to overwrite it?", "Color name exists");
+                    int result =
+                        GuiUtils.showYesNoCancelDialog(
+                            GuiUtils.getFrame(fullContents),
+                            "A color pair with the name: " + name
+                            + " already exists."
+                            + "Do you want to overwrite it?", "Color name exists");
 
                     if (result == 2) {
                         return;
@@ -6258,7 +6588,7 @@ public class ViewManager extends SharableImpl
                 }
             }
 
-            if (!nameOk) {
+            if ( !nameOk) {
                 continue;
             }
 
@@ -6397,7 +6727,7 @@ public class ViewManager extends SharableImpl
      * @param b Is active
      */
     public void setLastActive(boolean b) {
-        if (!getIsShared()) {
+        if ( !getIsShared()) {
             return;
         }
 
@@ -6439,7 +6769,8 @@ public class ViewManager extends SharableImpl
             int    bw    = borderWidth;
             Border outer = BorderFactory.createEmptyBorder(bw, bw, bw, bw);
 
-            normalBorder = BorderFactory.createCompoundBorder(outer, lineBorder);
+            normalBorder = BorderFactory.createCompoundBorder(outer,
+                    lineBorder);
         }
 
         return normalBorder;
@@ -6452,10 +6783,12 @@ public class ViewManager extends SharableImpl
      */
     public static Border getHighlightBorder() {
         if (highlightBorder == null) {
-            int    bw    = borderWidth;
-            Border outer = new MatteBorder(new Insets(bw, bw, bw, bw), borderHighlightColor);
+            int bw = borderWidth;
+            Border outer = new MatteBorder(new Insets(bw, bw, bw, bw),
+                                           borderHighlightColor);
 
-            highlightBorder = BorderFactory.createCompoundBorder(outer, lineBorder);
+            highlightBorder = BorderFactory.createCompoundBorder(outer,
+                    lineBorder);
         }
 
         return highlightBorder;
@@ -6608,9 +6941,13 @@ public class ViewManager extends SharableImpl
             rightPanel = animationWidget.getContents();
         }
 
-        JComponent menuBar    = doMakeMenuBar();
-        JComponent cancelBtn1 = GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this, "resetFullScreen");
-        JComponent cancelBtn2 = GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this, "resetFullScreen");
+        JComponent menuBar = doMakeMenuBar();
+        JComponent cancelBtn1 =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this,
+                                     "resetFullScreen");
+        JComponent cancelBtn2 =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this,
+                                     "resetFullScreen");
 
         // If they set the width to be smallish then don't include the
         // animation and the menu bar
@@ -6619,8 +6956,11 @@ public class ViewManager extends SharableImpl
             menuBar    = new JPanel();
         }
 
-        JPanel top      = GuiUtils.leftRight(GuiUtils.hbox(GuiUtils.bottom(cancelBtn1), menuBar), rightPanel);
-        JPanel bottom   = GuiUtils.left(GuiUtils.hbox(cancelBtn2, new JLabel(" ")));
+        JPanel top =
+            GuiUtils.leftRight(GuiUtils.hbox(GuiUtils.bottom(cancelBtn1),
+                                             menuBar), rightPanel);
+        JPanel bottom = GuiUtils.left(GuiUtils.hbox(cancelBtn2,
+                            new JLabel(" ")));
         JPanel contents = GuiUtils.topCenterBottom(top, navComponent, bottom);
 
         fullScreenWindow = new JFrame();
@@ -6632,7 +6972,8 @@ public class ViewManager extends SharableImpl
         fullScreenWindow.getContentPane().add(contents);
 
         if (fixedSize == null) {
-            fullScreenWindow.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+            fullScreenWindow.setSize(
+                Toolkit.getDefaultToolkit().getScreenSize());
         } else {}
 
         fullScreenWindow.pack();
@@ -6706,10 +7047,11 @@ public class ViewManager extends SharableImpl
      * @throws VisADException  problem in VisAD display
      * @throws RemoteException  problem in remote VisAD display
      */
-    public void setDisplayMatrix(double[] newMatrix) throws VisADException, RemoteException {
+    public void setDisplayMatrix(double[] newMatrix)
+            throws VisADException, RemoteException {
         initMatrix = newMatrix;
 
-        if ((newMatrix == null) ||!hasDisplayMaster()) {
+        if ((newMatrix == null) || !hasDisplayMaster()) {
             return;
         }
 
@@ -6842,7 +7184,8 @@ public class ViewManager extends SharableImpl
         if (aspectRatio == null) {
             System.err.println(xmycnt + " " + msg + " aspect is null");
         } else {
-            System.err.println(xmycnt + " " + msg + " aspect: " + aspectRatio[0] + " " + aspectRatio[1] + " "
+            System.err.println(xmycnt + " " + msg + " aspect: "
+                               + aspectRatio[0] + " " + aspectRatio[1] + " "
                                + aspectRatio[2]);
         }
     }
@@ -6947,7 +7290,8 @@ public class ViewManager extends SharableImpl
      */
     public Font getDisplayListFont() {
         if (displayListFont == null) {
-            displayListFont = getStore().get(PREF_DISPLAYLISTFONT, defaultFont);
+            displayListFont = getStore().get(PREF_DISPLAYLISTFONT,
+                                             defaultFont);
         }
 
         return displayListFont;
@@ -6969,7 +7313,8 @@ public class ViewManager extends SharableImpl
      */
     public Color getDisplayListColor() {
         if (displayListColor == null) {
-            displayListColor = getStore().get(PREF_DISPLAYLISTCOLOR, (Color) null);
+            displayListColor = getStore().get(PREF_DISPLAYLISTCOLOR,
+                    (Color) null);
         }
 
         return displayListColor;
@@ -7146,9 +7491,11 @@ public class ViewManager extends SharableImpl
      *
      * @return  the logo file or URL
      */
-    public String getLogoFile() {
+    protected String getLogoFile() {
         if (logoFile == null) {
-            logoFile = getIdv().getStateManager().getPreferenceOrProperty(PREF_LOGO, "");
+            logoFile =
+                getIdv().getStateManager().getPreferenceOrProperty(PREF_LOGO,
+                    "");
         }
 
         return logoFile;
@@ -7170,7 +7517,8 @@ public class ViewManager extends SharableImpl
      */
     public String getLogoPosition() {
         if (logoPosition == null) {
-            logoPosition = getIdv().getStateManager().getPreferenceOrProperty(PREF_LOGO_POSITION_OFFSET, "");
+            logoPosition = getIdv().getStateManager().getPreferenceOrProperty(
+                PREF_LOGO_POSITION_OFFSET, "");
         }
 
         return logoPosition;
@@ -7192,7 +7540,9 @@ public class ViewManager extends SharableImpl
      */
     public float getLogoScale() {
         if (logoScale < 0) {
-            logoScale = (float) getIdv().getStateManager().getPreferenceOrProperty(PREF_LOGO_SCALE, 1f);
+            logoScale =
+                (float) getIdv().getStateManager().getPreferenceOrProperty(
+                    PREF_LOGO_SCALE, 1f);
         }
 
         return logoScale;
@@ -7234,7 +7584,8 @@ public class ViewManager extends SharableImpl
      */
     public void ensureOnlyOneTimeDriver(DisplayControl displayControl) {
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
-            if (!control.equals(displayControl) && control.getIsTimeDriver()) {
+            if ( !control.equals(displayControl)
+                    && control.getIsTimeDriver()) {
                 ((DisplayControlImpl) control).setIsTimeDriver(false);
             }
         }
@@ -7247,7 +7598,8 @@ public class ViewManager extends SharableImpl
      *
      * @author IDV development team
      */
-    private static class IdvKeyboardBehavior implements KeyboardBehavior, Removable {
+    private static class IdvKeyboardBehavior implements KeyboardBehavior,
+            Removable {
 
         /** The ViewManager */
         ViewManager viewManager;
@@ -7275,7 +7627,8 @@ public class ViewManager extends SharableImpl
          * @param keycode keycode
          * @param modifiers modifiers
          */
-        public void mapKeyToFunction(int function, int keycode, int modifiers) {}
+        public void mapKeyToFunction(int function, int keycode,
+                                     int modifiers) {}
 
         /**
          * Route the key pressed event to the ViewManager
@@ -7320,7 +7673,8 @@ public class ViewManager extends SharableImpl
          * @param oldMatrix  The old matrix
          * @param newMatrix  The new matrix
          */
-        public MatrixCommand(ViewManager viewManager, double[] oldMatrix, double[] newMatrix) {
+        public MatrixCommand(ViewManager viewManager, double[] oldMatrix,
+                             double[] newMatrix) {
             this.viewManager = viewManager;
             this.oldMatrix   = oldMatrix;
             this.newMatrix   = newMatrix;
@@ -7395,7 +7749,8 @@ public class ViewManager extends SharableImpl
          * @param w width
          * @param control the display control
          */
-        public MyTimeline(Set timeSet, List dates, int w, DisplayControl control) {
+        public MyTimeline(Set timeSet, List dates, int w,
+                          DisplayControl control) {
             super(dates, w);
             this.timeSet = timeSet;
             this.control = control;
@@ -7403,8 +7758,8 @@ public class ViewManager extends SharableImpl
 
             if (idv.getUseTimeDriver()) {
                 this.rightComp = GuiUtils.rLabel(control.getIsTimeDriver()
-                                                 ? "Time Driver"
-                                                 : "");
+                        ? "Time Driver"
+                        : "");
             } else {
                 this.rightComp = GuiUtils.rLabel("");
             }
@@ -7453,14 +7808,16 @@ public class ViewManager extends SharableImpl
          * @throws RemoteException on badness
          * @throws VisADException on badness
          */
-        public void update(Real value) throws VisADException, RemoteException {
+        public void update(Real value)
+                throws VisADException, RemoteException {
             if (control != null) {
                 timeSet = control.getTimeSet();
 
                 if (timeSet != null) {
                     DateTime[] times = Animation.getDateTimeArray(timeSet);
 
-                    setDatedThings(DatedObject.wrap(ucar.visad.Util.makeDates(times)));
+                    setDatedThings(
+                        DatedObject.wrap(ucar.visad.Util.makeDates(times)));
                 }
             }
 
@@ -7475,7 +7832,8 @@ public class ViewManager extends SharableImpl
          * @throws RemoteException On badness
          * @throws VisADException On badness
          */
-        public void setAnimationValue(Real value) throws VisADException, RemoteException {
+        public void setAnimationValue(Real value)
+                throws VisADException, RemoteException {
             this.animationValue = value;
 
             if ((timeSet != null) && (value != null)) {
@@ -7506,15 +7864,16 @@ public class ViewManager extends SharableImpl
 
             Dimension d = getSize();
 
-            if ((control != null) &&!control.getDisplayVisibility()) {
+            if ((control != null) && !control.getDisplayVisibility()) {
                 g.setColor(Color.lightGray);
                 g.fillRect(0, 0, d.width, d.height);
             }
 
             if (animationValue instanceof DateTime) {
                 try {
-                    Date date = ucar.visad.Util.makeDate((DateTime) animationValue);
-                    int  x    = toLocation(date);
+                    Date date =
+                        ucar.visad.Util.makeDate((DateTime) animationValue);
+                    int x = toLocation(date);
 
                     g.setColor(Color.gray);
                     g.fillRect(x - 1, 0, 2, d.height);
