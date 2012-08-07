@@ -1,20 +1,18 @@
 /*
- * $Id: ProjectionManager.java,v 1.57 2007/05/04 14:17:36 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,7 +23,7 @@ package ucar.unidata.view.geoloc;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
-import ucar.unidata.geoloc.ProjectionImpl;
+
 
 import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.ui.PersistentDataDialog;
@@ -329,7 +327,7 @@ public class ProjectionManager implements ActionListener {
 
 
 
-        JComponent buttons =
+        JComponent buttons      =
             GuiUtils.hbox(GuiUtils.makeButton("Edit", this, "doEdit"),
                           GuiUtils.makeButton("New", this, "doNew"),
                           GuiUtils.makeButton("Export", this, "doExport"),
@@ -369,7 +367,8 @@ public class ProjectionManager implements ActionListener {
         if (makeDialog) {
             Container buttPanel = GuiUtils.makeApplyOkHelpCancelButtons(this);
             contents   = GuiUtils.centerBottom(contents, buttPanel);
-            viewDialog = GuiUtils.createDialog(GuiUtils.getApplicationTitle() +"Projection Manager", false);
+            viewDialog = GuiUtils.createDialog(GuiUtils.getApplicationTitle()
+                    + "Projection Manager", false);
             viewDialog.getContentPane().add(contents);
             viewDialog.pack();
             ucar.unidata.util.Msg.translateTree(viewDialog);
@@ -418,7 +417,7 @@ public class ProjectionManager implements ActionListener {
             //            v.add(tfo);
         }
 
-        JList jlist = new JList(v);
+        JList  jlist    = new JList(v);
         JPanel contents =
             GuiUtils
                 .topCenter(GuiUtils
@@ -439,7 +438,7 @@ public class ProjectionManager implements ActionListener {
             selected.add(items[i]);
         }
 
-        String xml = (new XmlEncoder()).toXml(selected);
+        String xml      = (new XmlEncoder()).toXml(selected);
         String filename = FileManager.getWriteFile(FileManager.FILTER_XML,
                               FileManager.SUFFIX_XML);
         if (filename == null) {
@@ -518,7 +517,7 @@ public class ProjectionManager implements ActionListener {
      * @return manager name
      */
     public String getManagerName() {
-        return GuiUtils.getApplicationTitle() +"Projection Manager";
+        return GuiUtils.getApplicationTitle() + "Projection Manager";
     }
 
     /**
@@ -873,7 +872,7 @@ public class ProjectionManager implements ActionListener {
             menuHolder.add(mapMenu);
             toolbar.add(menuHolder);
             for (int mapIdx = 0; mapIdx < localMaps.size(); mapIdx++) {
-                final MapData mapData = (MapData) localMaps.get(mapIdx);
+                final MapData mapData       = (MapData) localMaps.get(mapIdx);
                 final JCheckBoxMenuItem cbx =
                     new JCheckBoxMenuItem(mapData.getDescription(),
                                           mapData.getVisible());
@@ -887,7 +886,7 @@ public class ProjectionManager implements ActionListener {
                     }
                 });
             }
-	    GuiUtils.limitMenuSize(mapMenu, "Maps ", 20);
+            GuiUtils.limitMenuSize(mapMenu, "Maps ", 20);
 
             toolbar.add(navToolbar);
             toolbar.add(moveToolbar);
@@ -1075,7 +1074,8 @@ public class ProjectionManager implements ActionListener {
                 System.out.println("Projection Manager accept bb ="
                                    + editProjection.getDefaultMapArea());
             }
-            ProjectionImpl newProj = (ProjectionImpl) editProjection.constructCopy();  // use a copy
+            ProjectionImpl newProj =
+                (ProjectionImpl) editProjection.constructCopy();  // use a copy
 
             if (viewDialog != null) {
                 //                if ( !viewDialog.checkSaveOK(startingName,
@@ -1538,4 +1538,3 @@ public class ProjectionManager implements ActionListener {
     }
 
 }
-
