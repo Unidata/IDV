@@ -24,7 +24,6 @@ package ucar.unidata.data.point;
 import edu.wisc.ssec.mcidas.McIDASUtil;
 
 import ucar.nc2.dt.point.CFPointObWriter;
-import ucar.nc2.ft.point.writer.CFPointWriter;
 
 import ucar.unidata.data.*;
 
