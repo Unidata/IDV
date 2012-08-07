@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -22,6 +22,7 @@ package ucar.visad;
 
 
 import ucar.nc2.constants.CF;
+
 import ucar.unidata.geoloc.*;
 
 import visad.VisADException;
@@ -72,7 +73,7 @@ public class MapProjectionProjection extends ProjectionImpl {
      * @param mapProjection   the VisAD MapProjection to wrap
      */
     public MapProjectionProjection(MapProjection mapProjection) {
-        super(" ", mapProjection instanceof TrivialMapProjection);
+        super("", false);
         if (mapProjection == null) {
             try {
                 mapProjection = new TrivialMapProjection();
@@ -96,8 +97,8 @@ public class MapProjectionProjection extends ProjectionImpl {
      * @return Clone of this
      */
     public Object clone() {
-        MapProjectionProjection cl = (MapProjectionProjection) constructCopy();;
-        return cl;
+        // MapProjectionProjection cl = (MapProjectionProjection) super.clone();
+        return constructCopy();
     }
 
 
