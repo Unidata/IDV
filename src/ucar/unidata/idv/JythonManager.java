@@ -43,20 +43,8 @@ import ucar.unidata.ui.Help;
 import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.ui.TreePanel;
-import ucar.unidata.util.FileManager;
+import ucar.unidata.util.*;
 
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Msg;
-
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.ResourceCollection;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlPersistable;
@@ -1433,7 +1421,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return Does the code  just call into idv or datamanager methods.
      */
     protected static boolean checkUntrustedJython(String jython) {
-        jython = StringUtil.removeWhitespace(jython);
+        jython = StringUtil2.removeWhitespace(jython);
         String argPattern  = "([^()',]+|'[^']*')";
         String argsPattern = "((" + argPattern + ",)*" + argPattern + "?)";
         String pattern = "^((idv|datamanager).[^\\s(]+\\(" + argsPattern

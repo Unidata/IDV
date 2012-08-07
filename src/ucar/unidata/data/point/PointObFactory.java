@@ -41,8 +41,8 @@ import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
-import ucar.nc2.ft.point.writer.CFPointObWriter;
-import ucar.nc2.ft.point.writer.PointObVar;
+import ucar.nc2.dt.point.CFPointObWriter;
+import ucar.nc2.dt.point.PointObVar;
 import ucar.nc2.units.DateRange;
 
 import ucar.unidata.data.DataChoice;

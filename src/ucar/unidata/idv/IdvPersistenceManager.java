@@ -36,19 +36,7 @@ import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.IslDialog;
 import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.QuicklinkPanel;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectPair;
-import ucar.unidata.util.Prototypable;
-import ucar.unidata.util.PrototypeManager;
-import ucar.unidata.util.ResourceCollection;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
@@ -2909,7 +2897,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if (true) {
             return xml;
         }
-        StringBuffer sb        = new StringBuffer(xml);
+        StringBuilder sb        = new StringBuilder(xml);
         Hashtable    map       = getResourceManager().getMacroMap();
 
         List         argNames  = getArgsManager().argPropertyNames;
@@ -2921,7 +2909,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (Enumeration keys = map.keys(); keys.hasMoreElements(); ) {
             String key   = (String) keys.nextElement();
             String value = (String) map.get(key);
-            StringUtil.substitute(sb, "${" + key + "}", value);
+            StringUtil2.substitute(sb, "${" + key + "}", value);
         }
 
 
@@ -2979,11 +2967,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if ( !GuiUtils.askOkCancel("Bundle Macros", panel)) {
                 return null;
             }
-            sb = new StringBuffer(xml);
+            sb = new StringBuilder(xml);
             for (int i = 0; i < unknowns.size(); i++) {
                 String     macro = (String) unknowns.get(i);
                 JTextField fld   = (JTextField) fields.get(i);
-                StringUtil.substitute(sb, "${" + macro + "}",
+                StringUtil2.substitute(sb, "${" + macro + "}",
                                       fld.getText().trim());
             }
             xml = sb.toString();
