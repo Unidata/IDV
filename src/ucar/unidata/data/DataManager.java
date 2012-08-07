@@ -521,9 +521,13 @@ public class DataManager {
                 IdvResourceManager.RSC_GRIB1LOOKUPTABLES);
         for (int i = 0; i < grib1Resources.size(); i++) {
             try {
-                ucar.nc2.grib.grib1.tables.Grib1ParamTables.addParameterTableLookup(grib1Resources.get(i).toString());
-               // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
-               //     grib1Resources.get(i).toString());
+                String grib1TableName = grib1Resources.get(i).toString();
+                File grib1TableFile = new File(grib1TableName);
+                if(grib1TableFile.exists()) {
+                    ucar.nc2.grib.grib1.tables.Grib1ParamTables.addParameterTableLookup(grib1TableName);
+                }
+                // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
+                //     grib1Resources.get(i).toString());
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
@@ -533,8 +537,11 @@ public class DataManager {
                 IdvResourceManager.RSC_GRIB2LOOKUPTABLES);
         for (int i = 0; i < grib2Resources.size(); i++) {
             try {
-                ucar.grib.grib2.ParameterTable.addParametersUser(
-                    grib2Resources.get(i).toString());
+                String grib2TableName = grib2Resources.get(i).toString();
+                File grib2TableFile = new File(grib2TableName);
+                if(grib2TableFile.exists()) {
+                    ucar.grib.grib2.ParameterTable.addParametersUser(grib2TableName);
+                }
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
