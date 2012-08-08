@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,54 +23,79 @@ package ucar.unidata.idv.chooser;
 
 import org.w3c.dom.Element;
 
-import ucar.nc2.units.DateUnit;
-
-import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.DataSource;
-
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
-
-
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.ui.IdvTimeline;
 import ucar.unidata.ui.ChooserList;
-import ucar.unidata.ui.ChooserPanel;
 import ucar.unidata.ui.Timeline;
-
-import ucar.unidata.util.*;
+import ucar.unidata.util.DateSelection;
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.DatedThing;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.DateTime;
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.beans.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.*;
-
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 
 
 /**
+ * A chooser that allows for selecting times
  *
  * @author Unidata IDV Development Team
- * @version $Revision: 1.12 $
  */
 public class TimesChooser extends IdvChooser {
+
+    /** Time matching widget label */
+    private static final String TIME_MATCHING_LABEL = "Match Times";
+
+    /** Time matching widget label */
+    private static final String TIME_MATCHING_LABEL_INIT = "Select a Matching Display";
 
     /** flag for relative times range */
     private static final int TIMES_RELATIVERANGE = 0;
@@ -89,18 +114,20 @@ public class TimesChooser extends IdvChooser {
     /** Label for times */
     protected static final String LABEL_TIMES = "Times:";
 
+    /** Selected driver */
+    protected TwoFacedObject selectedDriver = null;
 
     /** flag for ignoring combobox changes */
     private boolean ignoreTimeChangedEvents = false;
 
-    /** _more_ */
+    /** count of those ignored */
     private int ignoreCnt = 0;
 
 
     /** relative times list */
     private ChooserList relTimesList;
 
-    /** _more_ */
+    /** using timeline flag */
     private boolean usingTimeline = false;
 
     /** The timeline we popup */
@@ -109,16 +136,16 @@ public class TimesChooser extends IdvChooser {
     /** The in gui timeline */
     private IdvTimeline timeline;
 
-    /** _more_ */
+    /** the times tab */
     private JTabbedPane timesTab;
 
-    /** _more_ */
+    /** times card panel */
     private GuiUtils.CardLayoutPanel timesCardPanel;
 
     /** times container */
     protected JComponent timesContainer;
 
-    /** _more_ */
+    /** absolute times label */
     private JLabel absTimesLbl = new JLabel("  ");
 
     /** times list */
@@ -127,7 +154,7 @@ public class TimesChooser extends IdvChooser {
     /** List of current absolute times */
     private List absoluteTimes = new ArrayList();
 
-    /** _more_ */
+    /** current selected absolute times */
     private int[] currentSelectedAbsoluteTimes;
 
     /** Keep track of when are are doing absolute times */
@@ -137,28 +164,28 @@ public class TimesChooser extends IdvChooser {
     private int timesMode = TIMES_RELATIVE;
 
 
-    /** _more_ */
+    /** times components */
     protected List timesComponents = new ArrayList();
 
-    /** _more_ */
+    /** driver menu list */
     private List driverMenuList = new ArrayList();
 
-    /** _more_ */
+    /** list of time drivers */
     private List timeDrivers = new ArrayList();
 
-    /** _more_ */
+    /** do time drivers flag */
     private boolean doTimeDrivers = false;
 
-    /** _more_          */
+    /** center popup */
     JComponent centerPopup;
 
-    /** _more_          */
+    /** driver popup menu */
     JPopupMenu driverPopupMenu;
 
-    /** _more_          */
-    JLabel driverLbl = new JLabel("Click to Select Time Matching  ");
+    /** the time driver label */
+    JLabel driverLbl = new JLabel(TIME_MATCHING_LABEL);
 
-    /** _more_ */
+    /** true if reading time drivers */
     private boolean readingDrivers = false;
 
     /**
@@ -188,9 +215,9 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Check to ignore events
      *
-     * @return _more_
+     * @return  true if we are ignoring events
      */
     private boolean checkIgnore() {
         if (ignoreTimeChangedEvents) {
@@ -202,7 +229,7 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Push the ignoring
      */
     private void pushIgnore() {
         ignoreCnt++;
@@ -210,7 +237,7 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * pop the ignoring
      */
     private void popIgnore() {
         ignoreCnt--;
@@ -234,9 +261,9 @@ public class TimesChooser extends IdvChooser {
             timesList.addMouseListener(new MouseAdapter() {
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        doTimeDrivers = false;
+                        doTimeDrivers  = false;
                         selectedDriver = null;
-                        driverLbl.setText("Click to Select Time Matching");
+                        driverLbl.setText(TIME_MATCHING_LABEL);
 
                     }
                 }
@@ -303,9 +330,9 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Get the time driver popup menu
      *
-     * @return _more_
+     * @return  the menu
      */
     public JPopupMenu getTimeDriverPopupMenu() {
 
@@ -393,7 +420,7 @@ public class TimesChooser extends IdvChooser {
     public void readTimes() {}
 
     /**
-     * _more_
+     * Read the time drives
      */
     public void readDrivers() {
         if (readingDrivers) {
@@ -426,9 +453,9 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Update the time driver list
      *
-     * @return _more_
+     * @return  the list of time drivers
      */
     protected List updateTimeDriver() {
         //GuiUtils.enableTree(timesPanel, !getTimeDriverEnabled());
@@ -491,7 +518,7 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * Update the status label
      */
     protected void updateStatus() {
         super.updateStatus();
@@ -507,12 +534,12 @@ public class TimesChooser extends IdvChooser {
             }
 
             if (doTimeDrivers) {
-                driverLbl.setText("Time Matching to "
+                driverLbl.setText("Matching Times to "
                                   + selectedDriver.getLabel());
             } else {
 
                 selectedDriver = null;
-                driverLbl.setText("Click to Select Time Matching");
+                driverLbl.setText(TIME_MATCHING_LABEL);
             }
         } else {
             absTimesLbl.setText(" ");
@@ -520,29 +547,30 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     *  _more_
+     *  Make the times panel
      *
-     *  @param includeExtra _more_
-     *  @param useTimeLine _more_
+     *  @param includeExtra true to include the extra stuff
+     *  @param useTimeLine  true to include the time line
      *
-     *  @return _more_
+     *  @return the times panel
      */
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine) {
-        if(getIdv().getUseTimeDriver())
+        if (getIdv().getUseTimeDriver()) {
             return makeTimesPanel(includeExtra, useTimeLine, true);
-        else
+        } else {
             return makeTimesPanel(includeExtra, useTimeLine, false);
+        }
     }
 
     /**
-     * _more_
+     *  Make the times panel
      *
-     * @param includeExtra _more_
-     * @param useTimeLine _more_
-     * @param doDriverTab _more_
+     *  @param includeExtra true to include the extra stuff
+     *  @param useTimeLine  true to include the time line
+     *  @param doDriverTab  add in a time driver tab
      *
-     * @return _more_
+     *  @return the times panel
      */
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine,
@@ -575,7 +603,7 @@ public class TimesChooser extends IdvChooser {
         timeline.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                   doTimeDrivers = false;
+                    doTimeDrivers = false;
                 }
             }
         });
@@ -618,7 +646,7 @@ public class TimesChooser extends IdvChooser {
             "Select a time driver display to do the time matching");
         centerPopupBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                Misc.run(TimesChooser.this, "readDrivers");
+                 readDrivers();
             }
         });
 
@@ -659,13 +687,15 @@ public class TimesChooser extends IdvChooser {
 
 
             if (doDriverTab) {
-                JPanel tDriver =
-                GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
-                    driverLbl,
-                    centerPopupBtn }), 2, 1));
+                JPanel tDriver = GuiUtils.left(
+                                     GuiUtils.hflow(
+                                         Misc.newList(
+                                             new Component[] { driverLbl,
+                        centerPopupBtn }), 2, 1));
                 timesTab.add("Absolute",
                              GuiUtils.centerBottom(splitter,
-                                 GuiUtils.leftRight(absTimesLbl, tDriver)));
+                                 GuiUtils.leftCenterRight(absTimesLbl,
+                                     absoluteExtra, tDriver)));
             } else {
 
                 timesTab.add("Absolute",
@@ -802,17 +832,24 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * Set the time drivers in the list
      *
-     * @param drivers _more_
+     * @param drivers  the List of time drivers
      */
 
     protected void setTimeDrivers(List drivers) {
 
         int size = drivers.size();
         driverMenuList = new ArrayList();
-        JMenuItem menuItem = new JMenuItem("Select a Matching Display");
-        driverMenuList.add(menuItem);
+
+        if(size > 0){
+            List atime = getAbsoluteTimes();
+            TwoFacedObject twoObj = new TwoFacedObject(TIME_MATCHING_LABEL_INIT,
+                    atime);
+            JMenuItem ji = GuiUtils.makeMenuItem((String) twoObj.getLabel(),
+                    TimesChooser.this, "updatetimeline", twoObj);
+            driverMenuList.add(ji);
+        }
         for (int i = 0; i < size; i++) {
             TwoFacedObject driver = (TwoFacedObject) drivers.get(i);
 
@@ -823,59 +860,64 @@ public class TimesChooser extends IdvChooser {
 
     }
 
-    /** _more_          */
-    protected TwoFacedObject selectedDriver = null;
-
     /**
-     * _more_
+     * Update the timeline
      *
-     * @param id _more_
+     * @param id  the timeline object id
      */
     public void updatetimeline(TwoFacedObject id) {
         doTimeDrivers  = true;
         selectedDriver = id;
 
-        DateTime[] driverTimes = (DateTime[]) id.getId();
-        List<DateTime> dtimes = new ArrayList<DateTime>();
+        if(id.getLabel().toString().contains(TIME_MATCHING_LABEL_INIT)){
+            doTimeDrivers  = false;
+            List tt = (List)id.getId();
+            absoluteTimes = null;
+            setAbsoluteTimes(tt);
+            return;
+        }
+
+        DateTime[]     driverTimes = (DateTime[]) id.getId();
+        List<DateTime> dtimes      = new ArrayList<DateTime>();
 
         for (int i = 0; i < driverTimes.length; i++) {
             dtimes.add(driverTimes[i]);
         }
         Collections.sort(dtimes);
-        int n = driverTimes.length;
+        int  n             = driverTimes.length;
 
 
-        List absTimes = null;
-        List allTimes = new ArrayList();
-        List selectedTimes   = null;
+        List absTimes      = null;
+        List allTimes      = new ArrayList();
+        List selectedTimes = null;
 
         try {
             absTimes = makeDatedObjects(getAbsoluteTimes());
 
-            for(Object od : absTimes){
-                Date de = ((DatedObject)od).getDate();
-                 allTimes.add(new DateTime(de));
+            for (Object od : absTimes) {
+                Date de = ((DatedObject) od).getDate();
+                allTimes.add(new DateTime(de));
             }
-            selectedTimes = DataUtil.selectTimesFromList(allTimes,
-                    dtimes);
+            selectedTimes = DataUtil.selectTimesFromList(allTimes, dtimes);
 
             List newAbsoluteTimes = makeDatedObjects(selectedTimes);
 
-            int size = newAbsoluteTimes.size();
+            int  size             = newAbsoluteTimes.size();
             Date endDate, startDate;
-            if(size >= 1) {
-                endDate =
-                        ((DatedThing) newAbsoluteTimes.get(size-1)).getDate();
-                int index = Math.max(0, size
-                                     - getNumTimesToSelect());
+            if (size >= 1) {
+                endDate = ((DatedThing) newAbsoluteTimes.get(size
+                        - 1)).getDate();
+                int index = Math.max(0, size - getNumTimesToSelect());
                 startDate =
                     ((DatedThing) newAbsoluteTimes.get(index)).getDate();
-                getTimeLine().setDateSelection(new Date[]{startDate, endDate});
+                getTimeLine().setDateSelection(new Date[] { startDate,
+                        endDate });
 
             }
-            int[] indices  = new int[selectedTimes.size()];
+            int[] indices = new int[selectedTimes.size()];
             for (int i = 0; i < selectedTimes.size(); i++) {
-                if(newAbsoluteTimes.get(i) instanceof DatedThing && allTimes.get(i) instanceof DatedThing ){
+                if ((newAbsoluteTimes.get(i) instanceof DatedThing)
+                        && (allTimes.get(i) instanceof DatedThing)) {
                     System.out.println("dd");
                 }
                 indices[i] = allTimes.indexOf(selectedTimes.get(i));
@@ -890,9 +932,9 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Get the number of times to select
      *
-     * @return _more_
+     * @return the number
      */
     protected int getNumTimesToSelect() {
         return 5;
@@ -912,9 +954,9 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * Get the timeline
      *
-     * @return _more_
+     * @return  the timeline
      */
     protected Timeline getTimeLine() {
 
@@ -933,9 +975,9 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * Get the list of timedrivers
      *
-     * @return _more_
+     * @return  the list
      */
     protected List getTimeDrivers() {
         return timeDrivers;
@@ -1015,12 +1057,12 @@ public class TimesChooser extends IdvChooser {
         }
 
         if (doTimeDrivers) {
-            driverLbl.setText("Time Matching to "
+            driverLbl.setText("Matching Times to "
                               + selectedDriver.getLabel());
         } else {
 
             selectedDriver = null;
-            driverLbl.setText("Click to Select Time Matching");
+            driverLbl.setText(TIME_MATCHING_LABEL);
         }
         popIgnore();
     }
@@ -1174,18 +1216,18 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Get the extra absolute time component
      *
-     * @return _more_
+     * @return  the component
      */
     protected JComponent getExtraAbsoluteTimeComponent() {
         return new JPanel();
     }
 
     /**
-     * _more_
+     * Get the extra relative time component
      *
-     * @return _more_
+     * @return  the component
      */
     protected JComponent getExtraRelativeTimeComponent() {
         return new JPanel();
@@ -1260,9 +1302,9 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * Get the default time driver index
      *
-     * @return _more_
+     * @return  the index
      */
     protected int getDefaultTimeDriverIndex() {
         return 0;
@@ -1324,18 +1366,18 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * _more_
+     * See if we should be doing timedrivers
      *
-     * @return _more_
+     * @return true if doing time driving
      */
     protected boolean getDoTimeDrivers() {
         return doTimeDrivers;
     }
 
     /**
-     * _more_
+     * Set the time driver property
      *
-     * @param value _more_
+     * @param value  the property
      */
     protected void setDoTimeDrivers(boolean value) {
         doTimeDrivers = value;
@@ -1399,7 +1441,7 @@ public class TimesChooser extends IdvChooser {
      * click that allos for the selection of different strides.
      *
      * @param list list to popup on
-     * @param timeline _more_
+     * @param timeline  the timeline
      */
     public static void addTimeSelectionListener(final JList list,
             final Timeline timeline) {
@@ -1422,7 +1464,7 @@ public class TimesChooser extends IdvChooser {
      *
      * @param e mouse click
      * @param list JList
-     * @param timeline _more_
+     * @param timeline  the timeline
      */
     private static void popupTimeSelection(MouseEvent e, final JList list,
                                            final Timeline timeline) {
@@ -1452,10 +1494,10 @@ public class TimesChooser extends IdvChooser {
 
 
     /**
-     * _more_
+     * Show the timeline dialog
      *
-     * @param list _more_
-     * @param timeline _more_
+     * @param list   the list
+     * @param timeline  the timeline
      */
     private static void showTimelineDialog(JList list, Timeline timeline) {
         try {

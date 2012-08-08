@@ -1,47 +1,49 @@
 /*
- * Copyright  1997-2009 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.view.geoloc;
-
 
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.visad.Util;
-
 import visad.CommonUnit;
-import visad.Unit;
-
 import visad.VisADException;
 
-import java.awt.*;
 
-import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 
@@ -131,10 +133,11 @@ public class GlobeScaleDialog extends VertScaleDialog {
         this.add("Center", GuiUtils.inset(p1, 5));
         this.vertScaleInfo = vertScaleInfo;
         if (vertScaleInfo != null) {
-            double radius = Math.abs(vertScaleInfo.minVertScale);
+            double radius = Math.abs(vertScaleInfo.minVertRange);
             if (vertScaleInfo.unit != null) {
                 try {
-                    radius = CommonUnit.meter.toThis(radius, vertScaleInfo.unit);
+                    radius = CommonUnit.meter.toThis(radius,
+                            vertScaleInfo.unit);
                 } catch (VisADException ve) {
                     LogUtil.userMessage("Incompatible units for range "
                                         + vertScaleInfo.unit);
@@ -164,6 +167,8 @@ public class GlobeScaleDialog extends VertScaleDialog {
      * @param radius  the earth radius
      *
      * @param vex the vertical exaggeration
+     *
+     * @return the ratio
      */
     private double vexToRadius(int vex) {
         if (vex <= 1) {
@@ -189,7 +194,7 @@ public class GlobeScaleDialog extends VertScaleDialog {
             dialog.setLocation(100, 100);
         }
         this.vertScaleInfo = vertScaleInfo;
-        setWidgetValues(radiusToVex(Math.abs(vertScaleInfo.maxVertScale)));
+        setWidgetValues(radiusToVex(Math.abs(vertScaleInfo.maxVertRange)));
         dialog.setVisible(true);
     }
 
@@ -207,8 +212,8 @@ public class GlobeScaleDialog extends VertScaleDialog {
             return false;
         }
 
-        double maxValue = vexToRadius(exagg);
-        double minValue = -maxValue;
+        double        maxValue    = vexToRadius(exagg);
+        double        minValue    = -maxValue;
 
         VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue,
                                         CommonUnit.meter);
@@ -246,4 +251,3 @@ public class GlobeScaleDialog extends VertScaleDialog {
         adjustSliderLabel(vex);
     }
 }
-

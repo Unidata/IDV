@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2011 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,55 +21,55 @@
 package ucar.unidata.idv.chooser.adde;
 
 
-import edu.wisc.ssec.mcidas.*;
-import edu.wisc.ssec.mcidas.adde.*;
+import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.AreaDirectoryList;
+import edu.wisc.ssec.mcidas.AreaFileException;
+import edu.wisc.ssec.mcidas.McIDASException;
+import edu.wisc.ssec.mcidas.adde.AddeSatBands;
+import edu.wisc.ssec.mcidas.adde.AddeURL;
+import edu.wisc.ssec.mcidas.adde.DataSetInfo;
 
 import org.w3c.dom.Element;
 
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.AddeImageInfo;
 import ucar.unidata.data.imagery.BandInfo;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.imagery.ImageDataset;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataUtil;
-import ucar.unidata.data.radar.RadarQuery;
-
 import ucar.unidata.idv.IdvResourceManager;
-import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
-
-import ucar.unidata.idv.ui.IdvUIManager;
-
-
-import ucar.unidata.ui.ChooserList;
-import ucar.unidata.ui.ChooserPanel;
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.LatLonWidget;
-
-import ucar.unidata.util.*;
+import ucar.unidata.util.Format;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.PreferenceList;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlNodeList;
-
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
-import ucar.nc2.units.DateUnit;
+
+import visad.DateTime;
+import visad.Gridded1DSet;
+import visad.VisADException;
 
 
-import visad.*;
-
-import visad.georef.EarthLocation;
-
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.IllegalComponentStateException;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.text.SimpleDateFormat;
 
@@ -84,9 +84,20 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -102,6 +113,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** size threshold */
     private static final int SIZE_THRESHOLD = 30;
 
+    /** archive day label */
+    private static final String ARCHIVE_TIME_LABEL = "Select Day";
 
     /** monospaced font */
     private Font monoFont = null;
@@ -725,7 +738,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 String cmd = ae.getActionCommand();
                 if (cmd.equals(GuiUtils.CMD_REMOVE)) {
                     archiveDay = null;
-                    archiveDayLabel.setText("");
+                    archiveDayLabel.setText(ARCHIVE_TIME_LABEL);
                     setDoAbsoluteTimes(true);
                     descriptorChanged();
                 }
@@ -778,7 +791,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         setDescriptors(null);
         archiveDay = null;
         if (archiveDayLabel != null) {
-            archiveDayLabel.setText("");
+            archiveDayLabel.setText(ARCHIVE_TIME_LABEL);
         }
         // set to relative times
         setDoAbsoluteTimes(false);
@@ -1392,7 +1405,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             GuiUtils.makeImageButton("/auxdata/ui/icons/Archive.gif", this,
                                      "getArchiveDay", null, true);
         archiveDayBtn.setToolTipText("Select a day for archive datasets");
-        archiveDayLabel     = new JLabel("");
+        archiveDayLabel     = new JLabel(ARCHIVE_TIME_LABEL);
         archiveDayComponent = GuiUtils.hbox(archiveDayLabel, archiveDayBtn);
         return GuiUtils.right(archiveDayComponent);
     }

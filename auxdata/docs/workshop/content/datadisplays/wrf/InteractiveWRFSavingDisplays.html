@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>Saving WRF Displays</title>
+</head>
+<body>
+
+<div class="overview">
+Saving the displays created in the IDV.
+</div>
+
+<p>
+In the previous section, we loaded some WRF output and created a very simple contour display. In this section, we will explore how to save images and animations of our displays. However, before proceeding, let's create a [ht::param multipanel display] which extends our previous display of [ht::param Pressure_reduced_to_MSL @ msl].</p>
+
+<ol class="step">
+<li>From the [ht::command Dashboard], click [ht::menu {File} {New} {View Window} {Map View} {Two Panes}].</li>
+<li>Go to the [ht::command View Window] and click on the left display (look for border around the window to turn blue).</li>
+<li>Go back to the [ht::command Field Selector] in the Dashboard and create a [ht::display Color-filled Contour Plan View] of [ht::param Pressure_reduced_to_MSL @ msl].</li>
+<li>Go to the [ht::command View Window] and click on the right display (again, look for border around the window to turn blue).</li>
+<li>Go back to the [ht::command Field Selector] in the Dashboard and create a [ht::display Color-filled Contour Plan View] of [ht::param Temperature @ Surface].</li>
+</ol>
+
+<p>
+Now, let's save both images:
+</p>
+
+<ol class="step">
+<li>From the [ht::command View Window], click [ht::menu {View} {Capture} {Image}]. Note that since we are going to capture both images, it does not matter from which display we click [ht::command View]. If you wish to capture a single display, make sure to use the [ht::command View] menu from that display.</li>
+<li>An image save dialog box will appear. Give the image a name (TwoDisplays.png), select [ht::param Capture What : All Views], and set the quality to [ht::param High].</li>
+</ol>
+[ht::cimg images/InteractiveWRFImageDialog.png]
+<ol class="step" start="3">
+<li>Click [ht::command Save]. Note that the size of the image will match the size (pixel dimensions) of the window on your display.</li>
+</ol>
+[ht::cimg images/InteractiveWRFTwoDisplays.png]
+
+<p>
+A similar procedure is used to capture an animation of your displays:
+</p>
+
+<ol class="step">
+<li>From the [ht::command View Window], click [ht::menu {View} {Capture} {Movie}]. This will cause the [ht::command Movie Capture] dialog box to appear.</li>
+</ol>
+[ht::cimg images/InteractiveWRFMovieDialog1.png]
+<ol class="step" start="2">
+<li>Make sure [ht::param What to capture] is set to [ht::param All Views], and click the [ht::command Time Animation] button. The view window will come to the front of you desktop display and animate. Then, a Save dialog box will appear.</li>
+</ol>
+[ht::cimg images/InteractiveWRFMovieDialog2.png]
+<ol class="step" start="3">
+<li>Set the [ht::param Frames per second] to 1, and [ht::param End Frame Pause] to 1.</li>
+<li>Select the file format (.gif, .mov, .avi, etc.) and name your file.</li>
+<li>Click [ht::command Save].</li>
+</ol>
+[ht::cimg images/InteractiveWRFTwoDisplays.gif]
+
+<p>
+To add axis labels to your images. To display the axis labels:
+</p>
+
+<ol class="step">
+<li>Select the display to which you wish to add labels and click [ht::menu {View} {Properties}].</li>
+<li>Click on the [ht::command Horizontal Scale] tab and turn on the [ht::param Latitude] and [ht::param Longitude] scales by clicking the [ht::command Visible] box under each section, and then click [ht::command Apply].</li>
+</ol>
+[ht::cimg images/InteractiveWRFViewProperties.png]
+<ol class="step" start="3">
+<li>Finally, save your display (either image or movie), and breathe a sigh of relief.</li>
+</ol>
+[ht::cimg images/InteractiveWRFTwoDisplaysLabs.gif]
+
+
+</body>
+</html>

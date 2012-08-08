@@ -534,6 +534,15 @@ public class DerivedDataChoice extends ListDataChoice {
             if (boundChoice == null) {
                 unboundOperands.add(op);
                 continue;
+            }  else {
+
+                DataSelection ds0 = boundChoice.getDataSelection();
+                if(ds0 != null) {
+                    Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if(ud != null ){
+                        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean)ud).booleanValue());
+                    }
+                }
             }
             setData(boundChoice, op, dataChoiceToData, dataSelection,
                     requestProperties);

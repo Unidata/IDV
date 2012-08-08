@@ -1,0 +1,317 @@
+<derived_parameters>
+  <derived description="Calculate Monthly Anomaly" formula="calcMonAnom(monthly, ltm)" id="Monthly Anomaly" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:topography"/>
+      <category value="display:dataxs"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:timelatshade"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:isosurface"/>
+      <category value="display:contourxs"/>
+      <category value="display:flowxs"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:timeheight"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:probe"/>
+      <category value="display:flowoverz"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:vprofile"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:planviewflow"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:timelonshade"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:colorxs"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:streamlines"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Calculate Daily Anomaly" formula="calcDayAnom(daily, ltm)" id="Daily Anomaly" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:flowoverz"/>
+      <category value="display:vprofile"/>
+      <category value="display:streamlines"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:planviewflow"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:topography"/>
+      <category value="display:timelatshade"/>
+      <category value="display:colorxs"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:probe"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:dataxs"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:isosurface"/>
+      <category value="display:timelonshade"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:flowxs"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:timeheight"/>
+      <category value="display:contourxs"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:planviewcontourfilled"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Calculate Daily Anomaly as Percentage" formula="calcDayAnom(daily, ltm, 1)" id="Daily Anomaly as Percentage" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:timeheight"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:probe"/>
+      <category value="display:flowoverz"/>
+      <category value="display:topography"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:timelonshade"/>
+      <category value="display:dataxs"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:planviewflow"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:contourxs"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:timelatshade"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:flowxs"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:vprofile"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:colorxs"/>
+      <category value="display:streamlines"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:isosurface"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:flowxs3d"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Create Monthly Climatology" formula="clmMon(monthly)" id="Create Monthly Climatology" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:planviewflow"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:vprofile"/>
+      <category value="display:flowoverz"/>
+      <category value="display:timeheight"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:isosurface"/>
+      <category value="display:colorxs"/>
+      <category value="display:timelatshade"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:flowxs"/>
+      <category value="display:topography"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:dataxs"/>
+      <category value="display:timelonshade"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:contourxs"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:streamlines"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:probe"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:isosurfacebyanother"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Create Daily Climatology (365 days)" formula="clmDay(daily, use366=0)" id="Create Daily Climatology (365 day)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:probe"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:isosurface"/>
+      <category value="display:topography"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:planviewflow"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:timelonshade"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:dataxs"/>
+      <category value="display:vprofile"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:timeheight"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:colorxs"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:streamlines"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:flowxs"/>
+      <category value="display:timelatshade"/>
+      <category value="display:flowoverz"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:contourxs"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:barbsoverz"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Create Daily Climatology (366 days)" formula="clmDay(daily, use366=1)" id="Create Daily Climatology (366 day)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:contourxs"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:timeheight"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:planviewflow"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:dataxs"/>
+      <category value="display:streamlines"/>
+      <category value="display:flowxs"/>
+      <category value="display:timelatshade"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:topography"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:timelonshade"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:flowoverz"/>
+      <category value="display:colorxs"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:vprofile"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:probe"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:isosurface"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:timeheightbarb"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Create Monthly Standard Deviation" formula="stdMon(monthly)" id="Create Monthly Standard Deviation" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Climatology"/>
+      <category value="display:probe"/>
+      <category value="display:planviewcontouroverz"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:streamlinesoverz"/>
+      <category value="display:radarsweepastopo"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:colorxs"/>
+      <category value="display:barbsoverz"/>
+      <category value="display:flowoverz"/>
+      <category value="display:flowxs"/>
+      <category value="display:planviewcontourfilledoverz"/>
+      <category value="display:vprofile"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:timeheightshade"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:timelatcontour"/>
+      <category value="display:timeheight"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:contourxs"/>
+      <category value="display:gridtablecontrol"/>
+      <category value="display:timelatshade"/>
+      <category value="display:timeloncontour"/>
+      <category value="display:planviewcoloroverz"/>
+      <category value="display:timelonshade"/>
+      <category value="display:planviewcontourfilledastopo"/>
+      <category value="display:isosurfacebyanother"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:planviewcolorastopo"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:isosurface"/>
+      <category value="display:timeheightflow"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:dataxs"/>
+      <category value="display:planviewflow"/>
+      <category value="display:topography"/>
+      <category value="display:streamlines"/>
+      <category value="display:planviewcontourastopo"/>
+      <category value="display:timeheightbarb"/>
+      <category value="display:windbarbplan"/>
+    </categories>
+    <operands/>
+  </derived>
+</derived_parameters>

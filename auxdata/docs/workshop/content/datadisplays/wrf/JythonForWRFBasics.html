@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Analysis and Visualization of WRF output with the IDV and Jython: The Basics</title>
+<title>The Basics</title>
 </head>
 <body>
 
@@ -9,11 +9,11 @@ Creating basic WRF displays with Jython and the IDV
 </div>
 
 <p>
-The IDV and associated Jython scripting environment is capable of reading <b>post-processed</b> WRF output. Specifically, the output need to be de-staggered for optimal performance.
+The IDV and associated Jython scripting environment is capable of reading <b>post-processed</b> WRF output. Specifically, the output need to be on a non-staggered for optimal performance. Also, please understand that the Jython API for the IDV is under active development and calls using Java code must be used to temporarily fill in the gaps. Also, a fair amount of the documentation, such as lists of valid input for functions, can be found in either the IDV java source code or .xml documents; links to these files (hosted on the [ht::popup "https://github.com/unidata/idv" {Unidata github site}] are provided throughout this part of the tutorial. That said, several analysis functions and basic I/O routines are exposed via Jython and are [ht::popup "https://www.unidata.ucar.edu/software/idv/docs/userguide/tools/JythonLib.html" documented].
 </p>
 
 <p>
-If you have participated in the WRF tutorial, then you are likely familiar with the output from Hurricane Gustav simulation which is what we will use in our example (although any WRF post-processed output should do fine).
+If you have participated in the WRF tutorial, then you are likely familiar with the output from the Hurricane Gustav simulation, which is what we will use in our example (although any WRF post-processed output should do fine).
 </p>
 
 <p>
@@ -42,7 +42,7 @@ file_opener = 'file.grid'</b>
 <br>
 
 <p>
-The lines in the above code snippet hold the basic information needed to open a file. The variable <code>filename</code> is the name of the WRF to be opened; <code>file_opener</code> must point to the <code>id</code> of the datasource types the IDV knows - a list of these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/datasource.xml} {datasource.xml}] (note that the "label" properties in datasource.xml may look familiar, as these names are used in the IDV data chooser). In our example, a GRIB file is what we wish to open, which coresponds to the <code>id</code> "file.grid" (the <code>label</code> is "Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)"). Now that the basic information about the file has been defined, we can create a dataSource using the Jython method <code>makeDataSource</code>.
+The lines in the above code snippet hold the basic information needed to open a file. The variable <code>filename</code> is the name of the WRF file to be opened; <code>file_opener</code> must point to the <code>id</code> of one of the datasource types the IDV knows &mdash; a list of these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/datasource.xml} {datasource.xml}] (note that the "label" properties in datasource.xml may look familiar, as these names are used in the IDV data chooser). In our example, a GRIB file is what we wish to open, which coresponds to the <code>id</code> "file.grid" (the <code>label</code> is "Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)"). Now that the basic information about the file has been defined, we can create a dataSource using the Jython method <code>makeDataSource</code>.
 </p>
 
 [ht::codetable {
@@ -56,7 +56,7 @@ Note that <code>makeDataSource</code> returns a [ht::classpopup {https://www.uni
 </p>
 
 <p>
-Now we need to make some decisions regarding which data and display types we would like to utilize. As in our first step, let's create a few helper variables to hold this information:
+Now we need to make some decisions regarding which data and display types we would like to use. As in our first step, let's create a few helper variables to hold this information:
 </p>
 
 [ht::codetable {
@@ -100,7 +100,7 @@ output_name = 'contour2D.png'</b>
 <br>
 
 <p>
-<code>display_type</code> must be one of the types that the IDV knows - these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/controls.xml} {controls.xml}]. controls.xml contains a listing of the display controls available in the IDV. Each control has various properties, some of which you may be familiar with if you've used the IDV (for example, the <code>label</code> property); however, for the purposes of Jython scripting, we need to use the <code>id</code> property. In our example, we are going to create a "Contour Plan View" display (the <code>label</code> property) which has the <code>id</code> 'planviewcontour'.
+<code>display_type</code> must be one of the types that the IDV knows &mdash; these can be found in [ht::popup {https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/resources/controls.xml} {controls.xml}]. controls.xml contains a listing of the display controls available in the IDV. Each control has various properties, some of which you may be familiar with if you've used the IDV (for example, the <code>label</code> property); however, for the purposes of Jython scripting, we need to use the <code>id</code> property. In our example, we are going to create a "Contour Plan View" display (the <code>label</code> property) which has the <code>id</code> 'planviewcontour'.
 </p>
 
 <p>
@@ -128,7 +128,7 @@ writeImage(output_name)</b>}
 The resulting image will look something like this:
 </p>
 <br>
-[ht::img images/WRF_Contour2D_1.png]
+[ht::cimg images/WRF_Contour2D_1.png]
 <br>
 <p>It's not the prettiest, but it does show the data. However...</p>
 <!-- numbered list -->

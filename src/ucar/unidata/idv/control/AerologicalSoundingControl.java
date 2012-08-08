@@ -874,7 +874,6 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 if (haveWinds) {
                     hodoDisplay.setProfileVisible(index, true);
                 }
-                soundingTable.setCurrentSounding(currIndex);
 
                 try {
                     aeroDisplay.setActiveSounding(index);
@@ -902,6 +901,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
                     throw ex;
                 }
+
+                soundingTable.setCurrentSounding(currIndex);
+
             } catch (VisADException ex) {
                 // need to get the actual data for manipulation
                 Sounding s = aeroDisplay.getActiveSounding();
@@ -1850,5 +1852,31 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     }
 
+    /**
+     * @param what To capture hodo view or the skewt view
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     *
+     */
+    public ViewManager getViewManagerForCapture(String what)
+            throws Exception {
 
+        setMainPanelDimensions();
+
+        if( what!= null  && what.toLowerCase().contains("hodo")) {
+            if ( !getIdv().getArgsManager().getIsOffScreen()) {
+                GuiUtils.showComponentInTabs(hodoView.getComponent());
+            }
+            return getHodographView();
+        }
+        else {
+            if ( !getIdv().getArgsManager().getIsOffScreen()) {
+                GuiUtils.showComponentInTabs(getMainPanel());
+            }
+            return getSoundingView();
+        }
+
+    }
 }

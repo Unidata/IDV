@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,39 +23,49 @@ package ucar.unidata.data.profiler;
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
 
-import ucar.unidata.data.*;
-import ucar.unidata.data.point.AddePointDataSource;
+import ucar.unidata.data.AddeUtil;
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.point.PointObFactory;
-
 import ucar.unidata.metdata.NamedStation;
-
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
-import visad.*;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded1DDoubleSet;
+import visad.Gridded1DSet;
+import visad.Gridded3DSet;
+import visad.Integer1DSet;
+import visad.QuickSort;
 import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SetType;
+import visad.Tuple;
+import visad.TupleType;
+import visad.VisADException;
 
 import visad.data.mcidas.PointDataAdapter;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-
-import java.lang.Double;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-
-
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -265,8 +275,8 @@ public class AddeProfilerDataSource extends DataSourceImpl {
         //  comes from unidata/data/DataCategory.java; see alos controls.xml -
         // connections which "controls" (displays) each parameter can use.
 
-        DataChoice choice = null;
-        List singleDC = DataCategory.parseCategories(
+        DataChoice choice   = null;
+        List       singleDC = DataCategory.parseCategories(
                             DataCategory.CATEGORY_PROFILER_ONESTA, false);
         List compositeDC = DataCategory.parseCategories(
                                DataCategory.CATEGORY_PROFILER_PLAN + ";"
@@ -386,8 +396,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
         FieldImpl obs           = null;
 
-        boolean   singleStation = !(dataChoice
-                                    instanceof CompositeDataChoice);
+        boolean   singleStation = !(dataChoice instanceof CompositeDataChoice);
 
         List      stationsToUse = (singleStation
                                    ? Misc.newList(dataChoice.getId())
@@ -399,7 +408,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
         // make request String to send to remote adde server
         // to gets the data
         String           url   = buildUrl(stationsToUse, paramsToUse);
-        List             urls  = AddeUtil.generateTimeUrls(this, url);
+        List             urls  = AddeUtil.generateTimeUrls(this, url, subset);
 
         FieldImpl        data  = null;
         Vector           datas = new Vector();
@@ -467,8 +476,8 @@ public class AddeProfilerDataSource extends DataSourceImpl {
      *
      * @throws VisADException
      */
-    protected static FieldImpl recastProfilerSingleStationData(FieldImpl input,
-            int obInt)
+    protected static FieldImpl recastProfilerSingleStationData(
+            FieldImpl input, int obInt)
             throws VisADException {
 
         //long millis = System.currentTimeMillis();
@@ -780,7 +789,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                     Object[]  zobjarray = (sortedlist.keySet()).toArray();
                     for (int j = 0; j < sortedlist.size(); j++) {
                         sortedZ[0][j] = ((Float) zobjarray[j]).floatValue();
-                        sortedDS[j] =
+                        sortedDS[j]   =
                             (Data) sortedlist.get((Float) zobjarray[j]);
                     }
 
@@ -818,15 +827,23 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
             // make timeSet the domain of the final FieldImpl; 
             // one for each  height-obs group
-            double[][] timesetdoubles = new double[1][obFFsList.size()];
-            for (int j = 0; j < obFFsList.size(); j++) {
-                timesetdoubles[0][j] =
+            int numFields = obFFsList.size();
+            if (numFields == 0) {
+                throw new IllegalStateException("No fields were found");
+            }
+            double[][] timesetdoubles = new double[1][];
+            double[]   timevals       = new double[numFields];
+            for (int j = 0; j < numFields; j++) {
+                //timesetdoubles[0][j] =
+                timevals[j] =
                     ((DateTime) timesList.get(j)).getReal().getValue();
             }
+            int[] sortIdx = QuickSort.sort(timevals);
+            timesetdoubles[0] = timevals;
 
             Gridded1DDoubleSet timeset =
                 new Gridded1DDoubleSet(RealType.Time, timesetdoubles,
-                                       obFFsList.size());
+                                       numFields);
 
             retField = new FieldImpl(
                 new FunctionType(
@@ -835,9 +852,9 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
             // put all the Profiler obs in the FieldImpl using
             // FieldImpl.setSamples(Data[] range, boolean copy) 
-            Data[] obs = new FlatField[obFFsList.size()];
-            for (int j = 0; j < obFFsList.size(); j++) {
-                obs[j] = (FlatField) obFFsList.get(j);
+            Data[] obs = new FlatField[numFields];
+            for (int j = 0; j < numFields; j++) {
+                obs[j] = (FlatField) obFFsList.get(sortIdx[j]);
             }
             retField.setSamples(obs, false);
 
@@ -879,8 +896,8 @@ public class AddeProfilerDataSource extends DataSourceImpl {
      * @throws RemoteException
      * @throws VisADException
      */
-    protected static FieldImpl recastProfilerMultiStationData(FieldImpl input,
-            int obInt)
+    protected static FieldImpl recastProfilerMultiStationData(
+            FieldImpl input, int obInt)
             throws VisADException, RemoteException {
 
         //long millis = System.currentTimeMillis(); //mmm
@@ -1282,18 +1299,18 @@ public class AddeProfilerDataSource extends DataSourceImpl {
 
         // make timeSet the domain of the final FieldImpl; 
         // one for each  height-obs group
-        int        numFields      = obFFsList.size();
-
-        double[][] timesetdoubles = new double[1][numFields];
-        for (int j = 0; j < numFields; j++) {
-            timesetdoubles[0][j] =
-                ((DateTime) timesList.get(j)).getReal().getValue();
-        }
-
+        int numFields = obFFsList.size();
         if (numFields == 0) {
             throw new IllegalStateException("No fields were found");
         }
 
+        double[][] timesetdoubles = new double[1][];
+        double[]   timevals       = new double[numFields];
+        for (int j = 0; j < numFields; j++) {
+            timevals[j] = ((DateTime) timesList.get(j)).getReal().getValue();
+        }
+        int[] sortIdx = QuickSort.sort(timevals);
+        timesetdoubles[0] = timevals;
 
         Gridded1DDoubleSet timeset = new Gridded1DDoubleSet(RealType.Time,
                                          timesetdoubles, numFields);
@@ -1311,7 +1328,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
         // FieldImpl.setSamples(Data[] range, boolean copy) 
         Data[] obs = new FlatField[numFields];
         for (int j = 0; j < numFields; j++) {
-            obs[j] = (FlatField) obFFsList.get(j);
+            obs[j] = (FlatField) obFFsList.get(sortIdx[j]);
         }
         retField.setSamples(obs, false);
 
@@ -1369,6 +1386,43 @@ public class AddeProfilerDataSource extends DataSourceImpl {
      */
     public int hashCode() {
         return Misc.hashcode(selectedStations) ^ super.hashCode();
+    }
+
+    /**
+     * Get the list of times for this datasource
+     *
+     * @return  empty list from this class
+     */
+    protected List doMakeDateTimes() {
+        List timesList = new ArrayList();
+        if (getProperty(AddeUtil.ABSOLUTE_TIMES, (Object) null) != null) {
+            timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
+        } else {
+            Object tmp = getProperty(AddeUtil.NUM_RELATIVE_TIMES,
+                                     new Integer(0));
+            int[] timeIndices;
+            if (tmp instanceof Integer) {
+                int numTimes = ((Integer) tmp).intValue();
+                timeIndices = new int[numTimes];
+                for (int i = 0; i < numTimes; i++) {
+                    timeIndices[i] = i;
+                }
+            } else {
+                timeIndices = (int[]) tmp;
+            }
+            for (int i = 0; i < timeIndices.length; i++) {
+                String name = timeIndices[i] + "th most recent";
+                if (i == 0) {
+                    name = "Most recent";
+                }
+                if ((i > 0) && (i < DataSource.ordinalNames.length)) {
+                    name = DataSource.ordinalNames[timeIndices[i]]
+                           + " most recent";
+                }
+                timesList.add(new TwoFacedObject(name, i));
+            }
+        }
+        return timesList;
     }
 
 }

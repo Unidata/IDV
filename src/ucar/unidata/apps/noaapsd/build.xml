@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../../" default="plugin" name="NoaaPSD">
+
+    <import file="../../../../../build.xml"/>
+
+    <target name="noaapsdjar" depends="init">
+        <jar 
+            basedir="${sourcedir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/noaapsd.jar">
+            <include name="ucar/unidata/apps/noaapsd/**"/>
+            <exclude name="ucar/unidata/apps/noaapsd/build.xml"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="noaapsdjar">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="lib/noaapsd.jar"/>
+        </copy>
+    </target>
+
+
+</project>

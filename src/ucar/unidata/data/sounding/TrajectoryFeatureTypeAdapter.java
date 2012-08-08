@@ -60,7 +60,7 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
     //        super(filename);
     //    }
     private boolean isCosmic = false;
-
+    private boolean isProfile = false;
     /**
      * Construct a new track from the filename
      *
@@ -85,6 +85,13 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
         FeatureDatasetPoint dataset =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
                 FeatureType.TRAJECTORY, filename, null, log);
+        if(dataset == null){
+            dataset =
+                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                            FeatureType.PROFILE, filename, null, log);
+            if(dataset != null)
+                isProfile = true;
+        }
         String imp = dataset.getImplementationName();
         if (dataset == null) {
             throw new BadDataException("Could not open trajectory file:"
@@ -93,18 +100,29 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
         List<FeatureCollection> fcList =
             dataset.getPointFeatureCollectionList();
         FeatureCollection           fc  = fcList.get(0);
-        TrajectoryFeatureCollection pfc = (TrajectoryFeatureCollection) fc;
-        pfc.resetIteration();
+        TrajectoryFeatureCollection tfc = null;
+        ProfileFeatureCollection pfc = null;
+
+        if(!isProfile) {
+            tfc = (TrajectoryFeatureCollection) fc;
+            tfc.resetIteration();
+        } else {
+            pfc = (ProfileFeatureCollection) fc;
+            pfc.resetIteration();
+        }
 
 
         // we can add difference trajFeatureTypeInfos here from difference data source
         if (imp.equalsIgnoreCase("cosmic")) {
             isCosmic = true;
             addTrackInfo(new CosmicTrajectoryFeatureTypeInfo(this, dataset,
+                    tfc));
+        } /*else if (isProfile){
+            addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
                     pfc));
-        } else {
+        } */ else {
             addTrackInfo(new CDMTrajectoryFeatureTypeInfo(this, dataset,
-                    pfc));
+                    tfc));
         }
         dataset.close();
 

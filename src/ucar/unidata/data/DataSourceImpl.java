@@ -2058,6 +2058,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public List<DateTime> selectTimesFromList(DataSelection dataSelection,
             List sourceTimes, List<DateTime> selectionTimes)
             throws Exception {
+    	return DataUtil.selectTimesFromList(sourceTimes, selectionTimes);
+    	/*
         List<DateTime> results = new ArrayList<DateTime>();
         //First convert the source times to a list of Date objects
         List<Date> sourceDates = new ArrayList<Date>();
@@ -2099,6 +2101,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
         }
         return results;
+        */
     }
 
 
@@ -2126,6 +2129,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             boolean useTDT = false;
             if(ud != null){
                 useTDT = ((Boolean)ud).booleanValue();
+            }
+            if(useTDT && timeDriverTimes == null){
+                //check view manager
+                ViewManager vm = getIdv().getViewManager();
+                List tdt = null;
+                try{
+                    tdt = vm.getTimeDriverTimes() ;
+                } catch (Exception ee) {  }
+
+                if(tdt != null)
+                    timeDriverTimes = tdt;
             }
           //  if (useTDT && (timeDriverTimes != null)) {
             if (timeDriverTimes != null && useTDT == true) {

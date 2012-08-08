@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,70 +23,39 @@ package ucar.unidata.idv.chooser.adde;
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
 import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
-import edu.wisc.ssec.mcidas.adde.AddeURLException;
 
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.AddeUtil;
 import ucar.unidata.data.profiler.AddeProfilerDataSource;
-
-import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.geoloc.projection.*;
-
-
 import ucar.unidata.idv.chooser.IdvChooserManager;
-import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
-
-import ucar.unidata.metdata.Station;
-
-
-
-import ucar.unidata.ui.ChooserList;
-import ucar.unidata.ui.ChooserPanel;
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.station.StationLocationMap;
-import ucar.unidata.view.station.StationLocationRenderer;
-
 import ucar.unidata.xml.XmlResourceCollection;
 
 import ucar.visad.UtcDate;
 
 import visad.DateTime;
 
-import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.*;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Vector;
 
-import javax.swing.*;
-
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.ListSelectionModel;
 
 
 /**
@@ -258,7 +227,7 @@ public class AddeProfilerDataChooser extends AddeChooser {
 
             //   Select the last n hours 
             int selectedIndex = getAbsoluteTimes().size() - 1;
-            int firstIndex = Math.max(0, selectedIndex
+            int firstIndex    = Math.max(0, selectedIndex
                                       - getDefaultRelativeTimeIndex());
             setSelectedAbsoluteTime(selectedIndex, firstIndex);
             /*
@@ -568,6 +537,10 @@ public class AddeProfilerDataChooser extends AddeChooser {
                                  getRelativeTimeIndices());
             profilersourceHT.put(AddeUtil.RELATIVE_TIME_INCREMENT,
                                  new Float(getRelativeTimeIncrement()));
+            if (getDoAbsoluteTimes()) {
+                profilersourceHT.put(AddeUtil.ABSOLUTE_TIMES,
+                                     getSelectedAbsoluteTimes());
+            }
             profilersourceHT.put(AddeUtil.MISC_KEYWORDS, getMiscKeywords());
 
 

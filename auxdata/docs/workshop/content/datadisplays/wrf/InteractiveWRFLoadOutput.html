@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>Loading WRF Output</title>
+</head>
+<body>
+
+<div class="overview">
+Getting your WRF post-processed data into the IDV environment.
+</div>
+
+<p>
+If you have participated in the WRF tutorial, then you are likely familiar with the output from the Hurricane Gustav simulation, which is what we will use in this tutorial. These data are on the thumb drive you received as part of the workshop, although any WRF post-processed output should do fine. While the IDV can handel the staggered grids produced by WRF, it's <b>highly</b> recommended that you:
+</p>
+
+<ul class="step">
+  <li>post process the raw output to get your data on a non-staggered grid.</li>
+  <li>use netCDF or grib output.</li>
+</ul>
+
+<p>
+While the IDV can handle staggered grids, it's a large performance hit to let the IDV de-stagger themfor you on the fly when performing calculations.
+</p>
+
+<p>
+The first step in using the IDV for visualization and analysis is to get your data into the the IDV environment, which is the focus of the first section of this tutorial.
+</p>
+
+<p>
+The IDV GUI has two main windows: the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/quickstart/index.html" "Dashboard and the View Window"]. The View Window is where you will see and manipulate displays you create. The Dashboard is where you will be able to load your data and  easily access all controls for manipulating the properties of variables you wish to display (like setting contour properties, adding color scales, changing color tables, etc). In order to get your WRF output into the IDV from the GUI interface, you will need to start the IDV and go to the Dashboard.
+</p>
+
+[ht::cimg images/Dashboard.png]
+
+<p>
+The display above shows the Dashboard window of the IDV. The [ht::command Data Choosers] tab has been selected, and we are going to directly load files off of our computer (note [ht::param Files] under [ht::param General] is selected on the left hand side of the Dashboard). Follow these steps to begin the process of loading your data into the IDV.
+</p>
+
+<ol class="step">
+  <li>Locate your WRF output in the file browser and select the files you wish to load (hold shift to select multiple files).</li>
+  <li>Make sure that [ht::param Data Source Type] is set to [ht::param Aggregate Grids by Time].</li>
+  <li>Click [ht::command Add Source].</li>
+</ol>
+
+<p>
+Once you click [ht::command Add Source], the IDV will switch you from the [ht::command Data Choosers] tab to the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] tab.
+</p>
+
+[ht::cimg images/FieldSelector.png]
+
+<p>
+The [ht::command Field Selector] tab is where you will select the fields to analyze and types of images to generate. In the screenshot above, the 2D field [ht::param Pressure_reduced_to_MSL @ msl] (list on left side of the Field Selector tab) has been selected, and a display type [ht::menu {Plan Views} {Contour Plan View}]  (list on top right side of the [ht::command Field Selector] tab) has been chosen. For now, we will leave spatial and temporal subsetting as default (i.e. no subsetting) and load the entire grid. For more information on subsetting, see the [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/data/FieldSelector.html" "Field Selector"] page. The final step is to push the [ht::command Create Display] button.
+</p>
+
+<p>
+<b>Note:</b> up until this point, very little information has been loaded off of your disk into memory. Once you press the [ht::command Create Display] button, data for the field you selected will be read off of disk - depending on the size of your data set, this may take quite some time!
+</p>
+
+<p>
+Once the data has been loaded, the IDV will generate an image in the View Window. Congratulations, you've just loaded your WRF data into the IDV! Next, let's explore how to save images and generate animations using the IDV.
+</p>
+
+[ht::cimg images/Interactive_WRF_Contour2D_1.png]
+</body>
+</html>

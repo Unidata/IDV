@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -259,8 +259,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @return data paths
      */
     public List getDataPaths() {
-        List paths = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("_"
+        List             paths = new ArrayList();
+        SimpleDateFormat sdf   = new SimpleDateFormat("_"
                                    + DATAPATH_DATE_FORMAT);
         try {
             for (int i = 0; i < imageList.size(); i++) {
@@ -363,9 +363,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
-        List urls     = new ArrayList();
-        List suffixes = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("_"
+        List             urls     = new ArrayList();
+        List             suffixes = new ArrayList();
+        SimpleDateFormat sdf      = new SimpleDateFormat("_"
                                    + DATAPATH_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         for (int i = 0; i < imageList.size(); i++) {
@@ -724,9 +724,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
             */
             for (Iterator<BandInfo> i = bandInfos.iterator(); i.hasNext(); ) {
-                BandInfo bi      = i.next();
-                String   name    = makeBandParam(bi);
-                String   catName = bi.getBandDescription();
+                BandInfo bi          = i.next();
+                String   name        = makeBandParam(bi);
+                String   catName     = bi.getBandDescription();
                 List biSubCategories = Misc.newList(new DataCategory(catName,
                                            true));
                 biSubCategories.addAll(biCategories);
@@ -783,7 +783,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         imageTimes = new ArrayList();
         List timeChoices = new ArrayList();
         myDataChoices = new ArrayList();
-        String type = (String) getProperty(PROP_IMAGETYPE, TYPE_SATELLITE);
+        String    type  = (String) getProperty(PROP_IMAGETYPE, TYPE_SATELLITE);
         Hashtable props = Misc.newHashtable(DataChoice.PROP_ICON,
                                             (type.equals(TYPE_RADAR)
                                              ? "/auxdata/ui/icons/clock.gif"
@@ -1086,8 +1086,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             try {
                 if (aii != null) {
                     if (currentDirs != null) {
-                        int    pos        =
-                            Math.abs(aii.getDatasetPosition());
+                        int    pos        = Math.abs(aii.getDatasetPosition());
                         int    band       = 0;
                         String bandString = aii.getBand();
                         if ((bandString != null)
@@ -1095,7 +1094,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                             band = new Integer(bandString).intValue();
                         }
                         //TODO: even though the band is non-zero we might only get back one band
-                        band = 0;
+                        band    = 0;
                         areaDir =
                             currentDirs[currentDirs.length - pos - 1][band];
                     } else {
@@ -1207,7 +1206,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                    dataChoice });
                 for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
                     DataChoice          subChoice = (DataChoice) iter.next();
-                    AddeImageDescriptor aid =
+                    AddeImageDescriptor aid       =
                         getDescriptor(subChoice.getId());
                     if (aid == null) {
                         continue;
@@ -1288,8 +1287,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
             //threadManager.debug = true;
             final ImageSequenceManager sequenceManager =
                 new ImageSequenceManager();
-            int        cnt    = 1;
-            DataChoice parent = dataChoice.getParent();
+            int                           cnt    = 1;
+            DataChoice                    parent = dataChoice.getParent();
             final List<SingleBandedImage> images =
                 new ArrayList<SingleBandedImage>();
             rangeType = null;
@@ -1451,8 +1450,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private List getDescriptors(DataChoice dataChoice, DataSelection subset) {
 
         List    times = getTimesFromDataSelection(subset, dataChoice);
-        boolean usingTimeDriver = 
-            (subset != null && subset.getTimeDriverTimes() != null);
+        boolean usingTimeDriver = ((subset != null)
+                                   && (subset.getTimeDriverTimes() != null));
         if (usingTimeDriver) {
             times = subset.getTimeDriverTimes();
         }
@@ -1491,7 +1490,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     for (String day : days) {
                         startDay = day + " 00:00:00";
                         endDay   = day + " 23:59:59";
-                        start = DateTime.createDateTime(startDay,
+                        start    = DateTime.createDateTime(startDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
                         end = DateTime.createDateTime(endDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
@@ -1503,12 +1502,24 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 .secondsSinceTheEpoch) * 1000)));
                         // make the request for the times (AreaDirectoryList)
                         aii.setRequestType(aii.REQ_IMAGEDIR);
-                        AreaDirectoryList ad =
-                            new AreaDirectoryList(aii.getURLString());
+                        AreaDirectoryList ad;
+                        try {  // we may be asking for a date that doesn't exist
+                            ad = new AreaDirectoryList(aii.getURLString());
+                        } catch (AreaFileException afe) {
+                            // TODO: This is a hack because different servers return different
+                            // messages.  AREA and GINI servers seem to have "no images" in the
+                            // exception message when there are no images.
+                            if (afe.getMessage().toLowerCase().indexOf(
+                                    "no images") >= 0) {
+                                continue;
+                            } else {
+                                throw afe;
+                            }
+                        }
                         AreaDirectory[][] dirs = ad.getSortedDirs();
                         for (int d = 0; d < dirs.length; d++) {
-                            AreaDirectory dir = dirs[d][0];
-                            DateTime dirTime =
+                            AreaDirectory dir     = dirs[d][0];
+                            DateTime      dirTime =
                                 new DateTime(dir.getNominalTime());
                             dateDir.put(dirTime, dir);
                             dirTimes.add(dirTime);
@@ -1642,7 +1653,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @param aii _more_
      */
     private void setBandInfo(DataChoice dataChoice, AddeImageInfo aii) {
-        BandInfo bi = (BandInfo) dataChoice.getId();
+        BandInfo       bi        = (BandInfo) dataChoice.getId();
         List<BandInfo> bandInfos =
             (List<BandInfo>) getProperty(PROP_BANDINFO, (Object) null);
         boolean hasBand = true;

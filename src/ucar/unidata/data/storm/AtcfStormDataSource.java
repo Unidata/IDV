@@ -273,6 +273,7 @@ public class AtcfStormDataSource extends StormDataSource {
             incrOutstandingGetDataCalls();
             stormInfos = new ArrayList<StormInfo>();
             if (path.toLowerCase().endsWith(".atcf")
+                    || IOUtil.getFileTail(path.toLowerCase()).startsWith("track")
                     || path.toLowerCase().endsWith(".gz")
                     || path.toLowerCase().endsWith(".dat")) {
                 String name  =
