@@ -69,7 +69,7 @@ public final class RaobDataSource extends DataSourceImpl {
     public boolean useDriverTime = false;
 
     /** _more_ */
-    List<Date> initTimes = null;
+    List<DateTime> initTimes = null;
 
     /**
      * Constructs from nothing.  This is necessary for use of this class as a
@@ -405,12 +405,16 @@ public final class RaobDataSource extends DataSourceImpl {
         }
 
         if (useDriverTime) {
-            getAllTimesForTimeDriver(dataChoice, subset,
-                                     subset.getTimeDriverTimes());
+            //getAllTimesForTimeDriver(dataChoice, subset,
+            //                         subset.getTimeDriverTimes());
+            if(initTimes == null) {
+                initTimes = subset.getTimeDriverTimes();
+            }
+
             if (initTimes != null) {  //reset the time for data choice if useDriverTime
                 List<SoundingOb> soundingObs =
                     getTimeMatchingSoundingObs(initTimes);
-                choices = getTimeMatchingDataChoices(initTimes, soundingObs);
+                choices = getTimeMatchingDataChoices(soundingObs);
             }
         }
 
@@ -433,7 +437,7 @@ public final class RaobDataSource extends DataSourceImpl {
      *
      * @return _more_
      */
-    protected List<SoundingOb> getTimeMatchingSoundingObs(List<Date> dTimes) {
+    protected List<SoundingOb> getTimeMatchingSoundingObs(List<DateTime> dTimes) {
         List            soundingObs    = getRDS().getSoundingObs();
         List            newSoundingObs = new ArrayList<SoundingOb>();
         SoundingAdapter adapter        = getRDS().adapter;
@@ -442,11 +446,11 @@ public final class RaobDataSource extends DataSourceImpl {
             SoundingOb ob = (SoundingOb) iter.next();
 
             for (Iterator itr = dTimes.iterator(); itr.hasNext(); ) {
-                Date       d      = (Date) itr.next();
-                DateTime   obTime = null;
+               // Date       d      = (Date) itr.next();
+                DateTime   obTime = (DateTime) itr.next();
                 SoundingOb ob1    = null;
                 try {
-                    obTime = new DateTime(d);
+                    //obTime = new DateTime(d);
                     ob1    = new SoundingOb(ob.getStation(), obTime);
                     newSoundingObs.add(ob1);
                 } catch (Exception e) {}
@@ -463,12 +467,11 @@ public final class RaobDataSource extends DataSourceImpl {
     /**
      * _more_
      *
-     * @param dTimes _more_
      * @param soundingObs _more_
      *
      * @return _more_
      */
-    protected List<DataChoice> getTimeMatchingDataChoices(List<Date> dTimes,
+    protected List<DataChoice> getTimeMatchingDataChoices(
             List<SoundingOb> soundingObs) {
         List<DataChoice> newChoices = new ArrayList<DataChoice>();
         List             categories = new ArrayList();
@@ -489,24 +492,22 @@ public final class RaobDataSource extends DataSourceImpl {
         for (Iterator iter = soundingObs.iterator(); iter.hasNext(); ) {
             SoundingOb    ob         = (SoundingOb) iter.next();
             String        name       = ob.getLabel();
+            DateTime obTime = ob.getTimestamp();
             DataSelection timeSelect = null;
-            for (Iterator itr = dTimes.iterator(); itr.hasNext(); ) {
-                Date     d      = (Date) itr.next();
-                DateTime obTime = ob.getTimestamp();
-
-                if (obTime != null) {
-                    ArrayList times = new ArrayList(1);
-                    times.add(obTime);
-                    timeSelect = new DataSelection(times);
-                }
-
-                DataChoice choice = new DirectDataChoice(this, ob, getName(),
-                                        name, categories, timeSelect, props);
-                newChoices.add(choice);
+            if (obTime != null) {
+                ArrayList times = new ArrayList(1);
+                times.add(obTime);
+                timeSelect = new DataSelection(times);
             }
+
+            DataChoice choice = new DirectDataChoice(this, ob, getName(),
+                                    name, categories, timeSelect, props);
+            newChoices.add(choice);
+
         }
 
         return newChoices;
+
     }
 
     /**
