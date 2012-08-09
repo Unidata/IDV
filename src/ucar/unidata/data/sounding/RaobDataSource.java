@@ -1,43 +1,30 @@
 /*
- * $Id: RaobDataSource.java,v 1.27 2007/04/16 20:34:57 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.sounding;
 
 
-import ucar.unidata.data.CompositeDataChoice;
-import ucar.unidata.data.DataCategory;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
 
 import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.util.ContourInfo;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
+import ucar.unidata.util.*;
 import ucar.unidata.xml.XmlEncoder;
 
 import visad.Data;
@@ -61,13 +48,7 @@ import java.io.IOException;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 
 /**
@@ -81,9 +62,14 @@ public final class RaobDataSource extends DataSourceImpl {
     /** the associated raob data set */
     private RaobDataSet raobDataSet;
 
-    /** the file or url   */
+    /** the file or url */
     private String file;
 
+    /** _more_          */
+    public boolean useDriverTime = false;
+
+    /** _more_ */
+    List<DateTime> initTimes = null;
 
     /**
      * Constructs from nothing.  This is necessary for use of this class as a
@@ -137,10 +123,9 @@ public final class RaobDataSource extends DataSourceImpl {
         SoundingAdapter adapter = null;
         try {
             adapter = new NetcdfSoundingAdapter(file);
-        } catch (Exception ill) {
-        }
+        } catch (Exception ill) {}
 
-        if(adapter == null) {
+        if (adapter == null) {
             try {
                 adapter = new CMASoundingAdapter(file);
             } catch (Exception exc) {
@@ -149,8 +134,9 @@ public final class RaobDataSource extends DataSourceImpl {
             }
         }
 
-        if(adapter == null) {
-            throw new IllegalArgumentException("Could not open sounding file:" + file);
+        if (adapter == null) {
+            throw new IllegalArgumentException(
+                "Could not open sounding file:" + file);
         }
 
 
@@ -187,8 +173,8 @@ public final class RaobDataSource extends DataSourceImpl {
      * @return List of urls
      */
     public List getDataPaths() {
-        List paths = new ArrayList();
-        AddeSoundingAdapter asa =
+        List                paths = new ArrayList();
+        AddeSoundingAdapter asa   =
             (AddeSoundingAdapter) getRDS().getSoundingAdapter();
         List obs = getRDS().getSoundingObs();
         for (int i = 0; i < obs.size(); i++) {
@@ -215,7 +201,7 @@ public final class RaobDataSource extends DataSourceImpl {
         super.initAfterUnpersistence();
         List tmp = getTmpPaths();
         if (tmp != null) {
-            List obs = getRDS().getSoundingObs();
+            List                obs = getRDS().getSoundingObs();
             AddeSoundingAdapter asa =
                 (AddeSoundingAdapter) getRDS().getSoundingAdapter();
             for (int i = 0; i < tmp.size(); i += 2) {
@@ -240,9 +226,9 @@ public final class RaobDataSource extends DataSourceImpl {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
-        List urls = new ArrayList();
-        List obs  = getRDS().getSoundingObs();
-        AddeSoundingAdapter asa =
+        List                urls = new ArrayList();
+        List                obs  = getRDS().getSoundingObs();
+        AddeSoundingAdapter asa  =
             (AddeSoundingAdapter) getRDS().getSoundingAdapter();
         for (int i = 0; i < obs.size(); i++) {
             SoundingOb ob = (SoundingOb) obs.get(i);
@@ -283,11 +269,11 @@ public final class RaobDataSource extends DataSourceImpl {
      * input data via {@link #addDataChoice(DataChoice)}.
      */
     protected void doMakeDataChoices() {
-        int  i           = 0;
-        List soundingObs = getRDS().getSoundingObs();
-        List categories  = new ArrayList();
+        int          i           = 0;
+        List         soundingObs = getRDS().getSoundingObs();
+        List         categories  = new ArrayList();
 
-        DataCategory cat =
+        DataCategory cat         =
             new DataCategory(DataCategory.CATEGORY_RAOBSOUNDING);
         cat.setForDisplay(false);
         categories.add(cat);
@@ -341,6 +327,10 @@ public final class RaobDataSource extends DataSourceImpl {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
+        List times = null;
+        if (dataSelection != null) {
+            times = getTimesFromDataSelection(dataSelection, dataChoice);
+        }
         return getSoundingObs(dataChoice, dataSelection);
     }
 
@@ -351,7 +341,12 @@ public final class RaobDataSource extends DataSourceImpl {
      * @return DateTimes as a list.
      */
     protected List doMakeDateTimes() {
-        return null;  // Arrays.asList (
+        List timesList = new ArrayList();
+
+        if (getProperty(AddeUtil.ABSOLUTE_TIMES, (Object) null) != null) {
+            timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
+        }
+        return timesList;  // Arrays.asList (
         //  new DateTime[] { traceAdapter.getBaseTime() });
     }
 
@@ -407,8 +402,29 @@ public final class RaobDataSource extends DataSourceImpl {
         List   choices = (dataChoice instanceof CompositeDataChoice)
                          ? ((CompositeDataChoice) dataChoice).getDataChoices()
                          : Arrays.asList(new DataChoice[] { dataChoice });
+
+        Object t       = subset.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        if ((t instanceof Boolean) && (useDriverTime == false)) {
+            useDriverTime = ((Boolean) t).booleanValue();
+        }
+
+        if (useDriverTime) {
+            //getAllTimesForTimeDriver(dataChoice, subset,
+            //                         subset.getTimeDriverTimes());
+            if(initTimes == null) {
+                initTimes = subset.getTimeDriverTimes();
+            }
+
+            if (initTimes != null) {  //reset the time for data choice if useDriverTime
+                List<SoundingOb> soundingObs =
+                    getTimeMatchingSoundingObs(initTimes);
+                choices = getTimeMatchingDataChoices(soundingObs);
+            }
+        }
+
         for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
-            Data ob = makeSoundingOb((DataChoice) iter.next(), subset);
+            DataChoice dc = (DataChoice) iter.next();
+            Data       ob = makeSoundingOb(dc, subset);
             if (ob != null) {
                 v.add(ob);
             }
@@ -418,8 +434,112 @@ public final class RaobDataSource extends DataSourceImpl {
                : new Tuple((Data[]) v.toArray(new Data[v.size()]), false);
     }
 
+    /**
+     * _more_
+     *
+     * @param dTimes _more_
+     *
+     * @return _more_
+     */
+    protected List<SoundingOb> getTimeMatchingSoundingObs(List<DateTime> dTimes) {
+        List            soundingObs    = getRDS().getSoundingObs();
+        List            newSoundingObs = new ArrayList<SoundingOb>();
+        SoundingAdapter adapter        = getRDS().adapter;
 
+        for (Iterator iter = soundingObs.iterator(); iter.hasNext(); ) {
+            SoundingOb ob = (SoundingOb) iter.next();
 
+            for (Iterator itr = dTimes.iterator(); itr.hasNext(); ) {
+               // Date       d      = (Date) itr.next();
+                DateTime   obTime = (DateTime) itr.next();
+                SoundingOb ob1    = null;
+                try {
+                    //obTime = new DateTime(d);
+                    ob1    = new SoundingOb(ob.getStation(), obTime);
+                    newSoundingObs.add(ob1);
+                } catch (Exception e) {}
+
+            }
+        }
+
+        raobDataSet = new RaobDataSet(adapter, newSoundingObs);
+
+        return newSoundingObs;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param soundingObs _more_
+     *
+     * @return _more_
+     */
+    protected List<DataChoice> getTimeMatchingDataChoices(
+            List<SoundingOb> soundingObs) {
+        List<DataChoice> newChoices = new ArrayList<DataChoice>();
+        List             categories = new ArrayList();
+
+        DataCategory     cat        =
+            new DataCategory(DataCategory.CATEGORY_RAOBSOUNDING);
+        cat.setForDisplay(false);
+        categories.add(cat);
+
+        List         compCategories = new ArrayList();
+        DataCategory compCat        = new DataCategory("None");
+        compCat.setForDisplay(false);
+        compCategories.add(compCat);
+
+        Hashtable props = Misc.newHashtable(DataChoice.PROP_ICON,
+                                            "/auxdata/ui/icons/Balloon.gif");
+
+        for (Iterator iter = soundingObs.iterator(); iter.hasNext(); ) {
+            SoundingOb    ob         = (SoundingOb) iter.next();
+            String        name       = ob.getLabel();
+            DateTime obTime = ob.getTimestamp();
+            DataSelection timeSelect = null;
+            if (obTime != null) {
+                ArrayList times = new ArrayList(1);
+                times.add(obTime);
+                timeSelect = new DataSelection(times);
+            }
+
+            DataChoice choice = new DirectDataChoice(this, ob, getName(),
+                                    name, categories, timeSelect, props);
+            newChoices.add(choice);
+
+        }
+
+        return newChoices;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param selection _more_
+     * @param timeDriverTimes _more_
+     *
+     * @return _more_
+     */
+    public List getAllTimesForTimeDriver(DataChoice dataChoice,
+                                         DataSelection selection,
+                                         List<DateTime> timeDriverTimes) {
+        List           results         = null;
+        List<DateTime> collectionTimes = new ArrayList();
+        DateTime[]     soundingTimes   =
+            raobDataSet.getSoundingAdapter().getSoundingTimes();
+        for (int i = 0; i < soundingTimes.length; i++) {
+            collectionTimes.add(soundingTimes[i]);
+        }
+        try {
+            results = DataUtil.selectTimesFromList(collectionTimes,
+                    timeDriverTimes);
+        } catch (Exception e) {}
+        initTimes = results;
+        return results;
+    }
 
 
     /**
@@ -476,4 +596,3 @@ public final class RaobDataSource extends DataSourceImpl {
 
 
 }
-
