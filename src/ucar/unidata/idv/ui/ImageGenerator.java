@@ -5552,6 +5552,9 @@ public class ImageGenerator extends IdvManager {
             ViewManager viewManager = null;
             try {
                 viewManager = display.getViewManagerForCapture(what);
+                if (viewManager != null) {
+                    viewManager.updateDisplayIfNeeded();
+                }
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
@@ -5570,30 +5573,19 @@ public class ImageGenerator extends IdvManager {
         }
 
 
-        int     viewSize = 0;
-        boolean combine  = XmlUtil.getAttribute(scriptingNode,
+
+        boolean combine = XmlUtil.getAttribute(scriptingNode,
                               ImageGenerator.ATTR_COMBINE, false);
+
+
         if (combine) {
-            viewSize = 1;
-        } else if (filename.contains(PROP_VIEWINDEX)) {
-            viewSize = viewManagers.size();
-        } else {
-            viewSize = 1;
-        }
+            ViewManager viewManager =
+                getIdv().getVMManager().getLastActiveViewManager();
 
-        for (int i = 0; i < viewSize; i++) {
-            ViewManager viewManager = null;
-            if (viewSize > 1) {
-                viewManager = (ViewManager) viewManagers.get(i);
-            } else {
-                viewManager =
-                    getIdv().getVMManager().getLastActiveViewManager();
-            }
-
-            getProperties().put(PROP_VIEWINDEX, new Integer(i));
+            getProperties().put(PROP_VIEWINDEX, new Integer(0));
             String name = viewManager.getName();
             if (name == null) {
-                name = "view" + i;
+                name = "view" + 0;
             }
             getProperties().put(PROP_VIEWNAME, name);
 
@@ -5618,8 +5610,43 @@ public class ImageGenerator extends IdvManager {
                 logException("Doing the captureMovie wait", exc);
             }
             debug("Done making movie:" + loopFilename);
-        }
 
+        } else {
+
+            for (int i = 0; i < viewManagers.size(); i++) {
+                ViewManager viewManager = viewManagers.get(i);
+
+                getProperties().put(PROP_VIEWINDEX, new Integer(i));
+                String name = viewManager.getName();
+                if (name == null) {
+                    name = "view" + i;
+                }
+                getProperties().put(PROP_VIEWNAME, name);
+
+                if ( !getIdv().getArgsManager().getIsOffScreen()) {
+                    JFrame frame =
+                        GuiUtils.getFrame(viewManager.getContents());
+                    if (frame != null) {
+                        LogUtil.registerWindow(frame);
+                        frame.show();
+                        GuiUtils.toFront(frame);
+                        frame.setLocation(50, 50);
+                        Misc.sleep(50);
+                    }
+                }
+                String loopFilename = applyMacros(filename);
+                debug("Making movie:" + loopFilename);
+                ImageSequenceGrabber isg =
+                    new ImageSequenceGrabber(viewManager, loopFilename,
+                                             getIdv(), this, scriptingNode);
+                try {
+                    wait();
+                } catch (Exception exc) {
+                    logException("Doing the captureMovie wait", exc);
+                }
+                debug("Done making movie:" + loopFilename);
+            }
+        }
 
     }
 
