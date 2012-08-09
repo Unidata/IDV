@@ -474,9 +474,10 @@ public class MapViewManager extends NavigatedViewManager {
                         new ProjectionCoordinateSystem(dfltProjection);
                 }
             }
-            if (isInteractive()) {
+            if (!idv.getArgsManager().isScriptingMode()) {
                 addProjectionToHistory(mainProjection, "Default");
             }
+
             Trace.call1("MapViewManager.new MPD");
             MapProjectionDisplay mapDisplay =
                 MapProjectionDisplay.getInstance(mainProjection, mode,
