@@ -1056,10 +1056,11 @@ public class MapDisplayControl extends DisplayControlImpl {
         applyToAllLatLonBtn.setToolTipText(
             "Apply changes to all lat/lon lines");
 
-        JPanel displayPanel = GuiUtils.topCenter(
+        JPanel latlonPanel = GuiUtils.topCenter(
                                   GuiUtils.vbox(
                                       GuiUtils.left(applyToAllLatLonBtn),
-                                      llPanel, lllPanel), GuiUtils.filler());
+                                      GuiUtils.left(llPanel), GuiUtils.left(lllPanel)), 
+                                      GuiUtils.filler());
 
         applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
@@ -1079,7 +1080,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         tabbedPane.add("Maps",
                        GuiUtils.topCenter(GuiUtils.left(applyToAllMapsBtn),
                                           sp));
-        tabbedPane.add("Lat/Lon Lines", displayPanel);
+        tabbedPane.add("Lat/Lon Lines", latlonPanel);
         if (useZPosition()) {
         	
             JPanel settingsPanel = 
@@ -1626,6 +1627,21 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
         }
 
+        /**
+         * Set the base of the lines
+         *
+         * @param value  the line base
+         */
+        public void setBase(float value) {
+            boolean shouldShare = shouldShare() && (value != getBase());
+            super.setBase(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setBase(value);
+                other.stateWasShared();
+            }
+        }
+
 
         /**
          * Set the line width
@@ -1882,12 +1898,12 @@ public class MapDisplayControl extends DisplayControlImpl {
          *
          * @param value  the line spacing
          */
-        public void setIncrement(float value) {
-            boolean shouldShare = shouldShare() && (value != getIncrement());
-            super.setIncrement(value);
+        public void setInterval(float value) {
+            boolean shouldShare = shouldShare() && (value != getInterval());
+            super.setInterval(value);
             if (shouldShare) {
                 other.okToShare = false;
-                other.setIncrement(value);
+                other.setInterval(value);
                 other.stateWasShared();
             }
         }
@@ -1904,6 +1920,22 @@ public class MapDisplayControl extends DisplayControlImpl {
             if (shouldShare) {
                 other.okToShare = false;
                 other.setBaseValue(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the base
+         *
+         * @param value  the line width
+         */
+        public void setFont(Object value) {
+            //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
+            boolean shouldShare = true && (!Misc.equals(value,getFont()));
+            super.setFont(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setFont(value);
                 other.stateWasShared();
             }
         }

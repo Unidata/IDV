@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.*;
 import java.awt.geom.*;
+import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -409,6 +410,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             Integer newSize = new Integer(si);
             int     size    = newSize.intValue();
             thisFont = new Font(f, st, size);
+            setFont(thisFont);
             repaint();
         }
 
@@ -432,5 +434,22 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             g2.drawString(change, w / 2 - width / 2, h / 2 - height / 2);
         }
     }
+    
+    /**
+     * Add a listener.
+     */
+    public synchronized void addPropertyChangeListener(PropertyChangeListener l) {
+    	sample.addPropertyChangeListener("font", l);
+    }
+
+    /**
+     * Remove a listener.
+     *
+     * @param l
+     */
+    public synchronized void removePropertyChangeListener(PropertyChangeListener l) {
+    	sample.removePropertyChangeListener(l);
+    }
+
 }
 

@@ -52,6 +52,9 @@ public class LatLonData {
     /** The line spacing */
     private float spacing;
 
+    /** The line base */
+    private float base;
+
     /** The line width */
     private float lineWidth;
 
@@ -107,9 +110,29 @@ public class LatLonData {
      */
     public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
                       float lineWidth, int lineStyle, boolean fastRendering) {
+        this(isLatitude, color, defaultSpacing, 0.f, lineWidth, lineStyle,
+             fastRendering);
+    }
+
+    /**
+     * The constructor
+     *
+     * @param isLatitude Is it lat or lon
+     * @param color The color
+     * @param defaultSpacing The spacing
+     * @param base The base
+     * @param lineWidth The line width
+     * @param lineStyle The line style
+     * @param fastRendering true to use fast rendering
+     *
+     */
+    public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
+                      float base, float lineWidth, int lineStyle,
+                      boolean fastRendering) {
         this.isLatitude    = isLatitude;
         this.color         = color;
         this.spacing       = defaultSpacing;
+        this.base          = base;
         this.lineWidth     = lineWidth;
         this.lineStyle     = lineStyle;
         this.fastRendering = fastRendering;
@@ -138,6 +161,7 @@ public class LatLonData {
         this.isLatitude    = that.isLatitude;
         this.color         = that.color;
         this.spacing       = that.spacing;
+        this.base          = that.base;
         this.lineWidth     = that.lineWidth;
         this.lineStyle     = that.lineStyle;
         this.maxValue      = that.maxValue;
@@ -167,7 +191,7 @@ public class LatLonData {
             myLatLon = new LatLonLines((isLatitude
                                         ? RealType.Latitude
                                         : RealType.Longitude), minValue,
-                                        maxValue, spacing,
+                                        maxValue, spacing, base,
                                         getRealVisibility());
 
         }
@@ -177,7 +201,6 @@ public class LatLonData {
         myLatLon.setVisible(getRealVisibility());
         myLatLon.setLineStyle(lineStyle);
         myLatLon.setLineWidth(lineWidth);
-        myLatLon.setSpacing(spacing);
         myLatLon.setUseFastRendering(fastRendering);
         return myLatLon;
     }
@@ -230,6 +253,25 @@ public class LatLonData {
      */
     public float getSpacing() {
         return spacing;
+    }
+
+    /**
+     *  Set the Base property.
+     *
+     *  @param value The new value for Base
+     */
+    public void setBase(float value) {
+        base = value;
+        stateChanged();
+    }
+
+    /**
+     *  Get the Base property.
+     *
+     *  @return The Base
+     */
+    public float getBase() {
+        return base;
     }
 
     /**

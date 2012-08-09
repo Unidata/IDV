@@ -226,8 +226,8 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param isLatitude the isLatitude to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
     public void setLatitude(boolean isLatitude)
             throws VisADException, RemoteException {
@@ -248,8 +248,8 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param base the base to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
     public void setBase(float base) throws VisADException, RemoteException {
         if (this.base == base) {
@@ -269,8 +269,8 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param max the max to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
     public void setMax(float max) throws VisADException, RemoteException {
         if (this.max == max) {
@@ -290,8 +290,8 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param min the min to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
     public void setMin(float min) throws VisADException, RemoteException {
         if (this.min == min) {
@@ -311,10 +311,10 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param increment the increment to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
-    public void setIncrement(float increment)
+    public void setInterval(float increment)
             throws VisADException, RemoteException {
         if (this.increment == increment) {
             return;
@@ -333,8 +333,8 @@ public class LatLonLabels extends TextDisplayable {
     /**
      * @param labelLines the labelLines to set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
      */
     public void setLabelLines(float[] labelLines)
             throws VisADException, RemoteException {

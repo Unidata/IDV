@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,10 +21,14 @@
 package ucar.visad.display;
 
 
+import ucar.unidata.util.Misc;
+import visad.Gridded2DSet;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.UnionSet;
+import visad.VisADException;
 
-import visad.*;
 
-import java.awt.Color;
 
 import java.rmi.RemoteException;
 
@@ -50,6 +54,9 @@ public class LatLonLines extends LineDrawing {
 
     /** spacing between lines */
     private float spacing;
+
+    /** base for lines */
+    private float base;
 
     /** flag for whether this is latitidue or longitude lines */
     private boolean isLat = false;
@@ -108,6 +115,26 @@ public class LatLonLines extends LineDrawing {
     public LatLonLines(RealType type, float minValue, float maxValue,
                        float spacing, boolean setData)
             throws VisADException, RemoteException {
+        this(type, minValue, maxValue, spacing, 0.f, true);
+    }
+
+    /**
+     * Construct a LatLonLine object of the given type.
+     *
+     * @param  type      lat lines when type = RealType.Latitude, lon lines
+     *                   when type = RealType.Longitude
+     * @param  minValue  starting line (degrees)
+     * @param  maxValue  ending line (degrees)
+     * @param  spacing   spacing between lines (degrees)
+     * @param  base      base for lines spacing
+     * @param  setData   if true, the data will be set on construction
+     *
+     * @throws VisADException  invalid type or can't create local VisAD object
+     * @throws RemoteException couldn't create remote VisAD object
+     */
+    public LatLonLines(RealType type, float minValue, float maxValue,
+                       float spacing, float base, boolean setData)
+            throws VisADException, RemoteException {
 
         super(makeName(type));
 
@@ -115,6 +142,7 @@ public class LatLonLines extends LineDrawing {
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.spacing  = spacing;
+        this.base     = base;
 
         createLines(setData);
     }
@@ -136,6 +164,7 @@ public class LatLonLines extends LineDrawing {
         minValue = that.minValue;  // immutable
         maxValue = that.maxValue;  // immutable
         spacing  = that.spacing;   // immutable
+        base     = that.base;      // immutable
         isLat    = that.isLat;
 
         createLines();
@@ -194,6 +223,34 @@ public class LatLonLines extends LineDrawing {
     }
 
     /**
+     * Change the line base
+     *
+     * @param  base           base for  lines (degrees)
+     *
+     * @throws VisADException    couldn't create local VisAD object
+     * @throws RemoteException   couldn't create remote VisAD object
+     */
+    public void setBase(float base) throws VisADException, RemoteException {
+
+        if (base == this.base) {
+            return;
+        }
+
+        this.base = base;
+
+        createLines();
+    }
+
+    /**
+     * Get the current line base.
+     *
+     * @return  base in degrees
+     */
+    public float getBase() {
+        return base;
+    }
+
+    /**
      * Change the starting and ending lines
      *
      * @param  minValue          starting line (degrees)
@@ -219,9 +276,27 @@ public class LatLonLines extends LineDrawing {
     public void setLimits(float minValue, float maxValue, float spacing)
             throws VisADException, RemoteException {
 
+        setLimits(minValue, maxValue, spacing, 0);
+    }
+
+    /**
+     * Set the limits and spacing of the lines.
+     *
+     * @param  minValue          starting line (degrees)
+     * @param  maxValue          ending line (degrees)
+     * @param  spacing           spacing between lines (degrees)
+     * @param  base              base for lines (degrees)
+     * @throws VisADException    couldn't create local VisAD object
+     * @throws RemoteException   couldn't create remote VisAD object
+     */
+    public void setLimits(float minValue, float maxValue, float spacing,
+                          float base)
+            throws VisADException, RemoteException {
+
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.spacing  = spacing;
+        this.base     = base;
 
         createLines();
     }
@@ -255,12 +330,12 @@ public class LatLonLines extends LineDrawing {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
-     */
     private void createLines(boolean andSetData)
             throws VisADException, RemoteException {
 
         Gridded2DSet lineSet;
         ArrayList    setList = new ArrayList();
+        
         float        value;
         float        other;
         float        lalo[][];
@@ -270,12 +345,72 @@ public class LatLonLines extends LineDrawing {
         float        first     = (isLat)
                                  ? -180.f
                                  : -90.f;
+        // TODO: use base in the calculations
         float start = (float) Math.max(spacing * (int) (minValue / spacing),
                                        minValue);
 
         for (value = start; value <= maxValue; value += spacing) {
             lalo  = new float[2][numpoints];
             other = first;
+
+            for (int j = 0; j < numpoints; j++) {
+                lalo[0][j] = (isLat)
+                             ? value
+                             : other;
+                lalo[1][j] = (isLat)
+                             ? other
+                             : value;
+                other      += 1.0f;
+            }
+
+            lineSet = new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
+                                       lalo, numpoints);
+
+            setList.add(lineSet);
+        }
+
+        Gridded2DSet[] latlons = new Gridded2DSet[setList.size()];
+
+        setList.toArray(latlons);
+
+        latLines = new UnionSet(RealTupleType.LatitudeLongitudeTuple,
+                                latlons);
+
+        if (andSetData) {
+            setData(latLines);
+        }
+    }
+     */
+
+    /**
+     * Create the lines from the supplied parameters
+     *
+     * @param andSetData   set data if true
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    private void createLines(boolean andSetData)
+            throws VisADException, RemoteException {
+
+        Gridded2DSet lineSet;
+        ArrayList<Gridded2DSet>    setList = new ArrayList<Gridded2DSet>();
+        float[]   lineVals  = Misc.computeTicks(maxValue, minValue, base, spacing);
+        
+        float        value;
+        float        other;
+        float        lalo[][];
+        int          numpoints = (isLat)
+                                 ? 361
+                                 : 181;
+        float        first     = (isLat)
+                                 ? -180.f
+                                 : -90.f;
+
+        for (int i = 0; i < lineVals.length; i ++) {
+            lalo  = new float[2][numpoints];
+            other = first;
+            value = lineVals[i];
 
             for (int j = 0; j < numpoints; j++) {
                 lalo[0][j] = (isLat)

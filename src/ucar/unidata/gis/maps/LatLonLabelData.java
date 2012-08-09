@@ -21,13 +21,16 @@
 package ucar.unidata.gis.maps;
 
 
+import ucar.unidata.ui.FontSelector;
 import ucar.visad.display.LatLonLabels;
+import ucar.visad.display.TextDisplayable;
 
 import visad.RealType;
 import visad.VisADException;
 
 
 import java.awt.Color;
+import java.awt.Font;
 
 import java.rmi.RemoteException;
 
@@ -55,14 +58,11 @@ public class LatLonLabelData {
     /** The label font */
     private Object labelFont;
 
-    /** The label size */
-    private float labelSize;
-
     /** Is this data representing latitude or longitude */
     private boolean isLatitude = true;
 
-    /** The labels increment */
-    private float increment;
+    /** The labels interval */
+    private float interval;
 
     /** The lat/lon min value */
     private float minValue;
@@ -89,11 +89,11 @@ public class LatLonLabelData {
      * The ctor
      *
      * @param isLatitude Is it lat or lon
-     * @param increment The increment
+     * @param interval The interval
      *
      */
-    public LatLonLabelData(boolean isLatitude, float increment) {
-        this(isLatitude, increment, (isLatitude
+    public LatLonLabelData(boolean isLatitude, float interval) {
+        this(isLatitude, interval, (isLatitude
                                      ? -90
                                      : -180), (isLatitude
                 ? 90
@@ -104,15 +104,15 @@ public class LatLonLabelData {
      * The ctor
      *
      * @param isLatitude Is it lat or lon
-     * @param increment The increment
+     * @param interval The interval
      * @param min _more_
      * @param max _more_
      * @param base _more_
      *
      */
-    public LatLonLabelData(boolean isLatitude, float increment, float min,
+    public LatLonLabelData(boolean isLatitude, float interval, float min,
                            float max, float base) {
-        this(isLatitude, increment, min, max, base, new float[] { 0 }, 0,
+        this(isLatitude, interval, min, max, base, new float[] { 0 }, 0,
              null, Color.white, true);
     }
 
@@ -120,24 +120,24 @@ public class LatLonLabelData {
      * The ctor
      *
      * @param isLatitude Is it lat or lon
-     * @param increment The increment
+     * @param interval The interval
      * @param minValue  The min value
      * @param maxValue  The max value
      * @param baseValue The base value
      * @param labelLines the label lines
      * @param alignment  the alignment
-     * @param labelFont       the font (Font or HersheyFont)
+     * @param labelFont  the font (Font or HersheyFont)
      * @param color The color
      * @param fastRendering true to use fast rendering
      *
      */
-    public LatLonLabelData(boolean isLatitude, float increment,
+    public LatLonLabelData(boolean isLatitude, float interval,
                            float minValue, float maxValue, float baseValue,
                            float[] labelLines, int alignment,
                            Object labelFont, Color color,
                            boolean fastRendering) {
         this.isLatitude    = isLatitude;
-        this.increment     = increment;
+        this.interval     = interval;
         this.maxValue      = maxValue;
         this.minValue      = minValue;
         this.labelLines    = labelLines;
@@ -168,7 +168,7 @@ public class LatLonLabelData {
             return;
         }
         this.isLatitude    = that.isLatitude;
-        this.increment     = that.increment;
+        this.interval     = that.interval;
         this.baseValue     = that.baseValue;
         this.maxValue      = that.maxValue;
         this.minValue      = that.minValue;
@@ -202,7 +202,7 @@ public class LatLonLabelData {
                     RealType.getRealType((isLatitude
                                           ? "LatLabels"
                                           : "LonLabels")), isLatitude,
-                                          increment, minValue, maxValue,
+                                          interval, minValue, maxValue,
                                           baseValue, labelLines);
 
         }
@@ -210,12 +210,20 @@ public class LatLonLabelData {
             myLatLonLabels.setColor(color);
         }
         myLatLonLabels.setVisible(getRealVisibility());
-        myLatLonLabels.setIncrement(increment);
+        myLatLonLabels.setInterval(interval);
         myLatLonLabels.setMin(minValue);
         myLatLonLabels.setMax(maxValue);
         myLatLonLabels.setBase(baseValue);
         myLatLonLabels.setLabelLines(labelLines);
-        myLatLonLabels.setFont(labelFont);
+        Font f = (Font) labelFont;
+        int  size = (f == null)
+                    ? 12
+                    : f.getSize();
+        if ((f != null) && f.getName().equals(FontSelector.DEFAULT_NAME)) {
+            f = null;
+        }
+        myLatLonLabels.setFont(f);
+        myLatLonLabels.setTextSize(size/12.f);
         myLatLonLabels.setUseFastRendering(fastRendering);
         return myLatLonLabels;
     }
@@ -252,22 +260,22 @@ public class LatLonLabelData {
     }
 
     /**
-     *  Set the Increment property.
+     *  Set the Interval property.
      *
-     *  @param value The new value for Increment
+     *  @param value The new value for Interval
      */
-    public void setIncrement(float value) {
-        increment = value;
+    public void setInterval(float value) {
+        interval = value;
         stateChanged();
     }
 
     /**
-     *  Get the Increment property.
+     *  Get the Interval property.
      *
-     *  @return The Increment
+     *  @return The Interval
      */
-    public float getIncrement() {
-        return increment;
+    public float getInterval() {
+        return interval;
     }
 
     /**
@@ -288,26 +296,6 @@ public class LatLonLabelData {
     public float getBaseValue() {
         return baseValue;
     }
-
-    /**
-     *  Set the LabelSize property.
-     *
-     *  @param value The new value for LabelSize
-     */
-    public void setLabelSize(float value) {
-        labelSize = value;
-        stateChanged();
-    }
-
-    /**
-     *  Get the LabelSize property.
-     *
-     *  @return The LabelSize
-     */
-    public float getLabelSize() {
-        return labelSize;
-    }
-
 
     /**
      *  Set the IsLatitude property.
@@ -424,6 +412,23 @@ public class LatLonLabelData {
         return fastRendering;
     }
 
+    /**
+     *  Set the Font property.
+     *
+     *  @param value The new value for Font
+     */
+    public void setFont(Object value) {
+        labelFont = value;
+        stateChanged();
+    }
 
+    /**
+     *  Get the Font property.
+     *
+     *  @return The Font
+     */
+    public Object getFont() {
+        return labelFont;
+    }
 
 }

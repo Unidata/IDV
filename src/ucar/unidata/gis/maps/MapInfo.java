@@ -107,6 +107,9 @@ public class MapInfo {
     /** Xml attribute for the spacing  property */
     public static final String ATTR_SPACING = "spacing";
 
+    /** Xml attribute for the spacing  property */
+    public static final String ATTR_BASE = "base";
+    
     /** Xml attribute for the  property */
     public static final String ATTR_VALID = "valid";
 
@@ -377,12 +380,13 @@ public class MapInfo {
                                            : TAG_LONGITUDE);
                 currentState.appendChild(newElement);
                 XmlUtil.setAttributes(newElement, new String[] {
-                    ATTR_SPACING, "" + lld.getSpacing(), ATTR_COLOR,
-                    "" + lld.getColor().getRGB(), ATTR_LINESTYLE,
-                    "" + lld.getLineStyle(), ATTR_LINEWIDTH,
-                    "" + lld.getLineWidth(), ATTR_VISIBLE,
-                    "" + lld.getVisible(), ATTR_FASTRENDER,
-                    "" + lld.getFastRendering()
+                    ATTR_SPACING, "" + lld.getSpacing(), 
+                    ATTR_BASE, "" + lld.getBase(), 
+                    ATTR_COLOR, "" + lld.getColor().getRGB(), 
+                    ATTR_LINESTYLE, "" + lld.getLineStyle(), 
+                    ATTR_LINEWIDTH, "" + lld.getLineWidth(), 
+                    ATTR_VISIBLE, "" + lld.getVisible(), 
+                    ATTR_FASTRENDER, "" + lld.getFastRendering()
                 });
             }
 
@@ -393,10 +397,11 @@ public class MapInfo {
                                            : TAG_LONGITUDELABEL);
                 currentState.appendChild(newElement);
                 XmlUtil.setAttributes(newElement, new String[] {
-                    ATTR_SPACING, "" + llld.getIncrement(), ATTR_COLOR,
-                    "" + llld.getColor().getRGB(), ATTR_VISIBLE,
-                    "" + llld.getVisible(), ATTR_FASTRENDER,
-                    "" + llld.getFastRendering()
+                    ATTR_SPACING, "" + llld.getInterval(), 
+                    ATTR_BASE, "" + llld.getBaseValue(), 
+                    ATTR_COLOR, "" + llld.getColor().getRGB(), 
+                    ATTR_VISIBLE, "" + llld.getVisible(), 
+                    ATTR_FASTRENDER, "" + llld.getFastRendering()
                 });
             }
 
@@ -530,15 +535,12 @@ public class MapInfo {
             throws VisADException, RemoteException {
         LatLonData lld =
             new LatLonData(latitude,
-                           XmlUtil.getAttribute(node, ATTR_COLOR,
-                               Color.white), XmlUtil.getAttribute(node,
-                                   ATTR_SPACING,
-                                   spacing), XmlUtil.getAttribute(node,
-                                       ATTR_LINEWIDTH,
-                                       1.0f), XmlUtil.getAttribute(node,
-                                           ATTR_LINESTYLE,
-                                           1), XmlUtil.getAttribute(node,
-                                               ATTR_FASTRENDER, false));
+                   XmlUtil.getAttribute(node, ATTR_COLOR, Color.white), 
+                   XmlUtil.getAttribute(node, ATTR_SPACING, spacing), 
+                   XmlUtil.getAttribute(node, ATTR_BASE, 0.f), 
+                   XmlUtil.getAttribute(node, ATTR_LINEWIDTH, 1.0f), 
+                   XmlUtil.getAttribute(node, ATTR_LINESTYLE, 1), 
+                   XmlUtil.getAttribute(node, ATTR_FASTRENDER, false));
 
         lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, true));
         lld.setMinValue(min);
