@@ -327,6 +327,10 @@ public final class RaobDataSource extends DataSourceImpl {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
+        List times = null;
+        if (dataSelection != null) {
+            times = getTimesFromDataSelection(dataSelection, dataChoice);
+        }
         return getSoundingObs(dataChoice, dataSelection);
     }
 
@@ -530,7 +534,7 @@ public final class RaobDataSource extends DataSourceImpl {
             collectionTimes.add(soundingTimes[i]);
         }
         try {
-            results = DataUtil.selectDatesFromList(collectionTimes,
+            results = DataUtil.selectTimesFromList(collectionTimes,
                     timeDriverTimes);
         } catch (Exception e) {}
         initTimes = results;
