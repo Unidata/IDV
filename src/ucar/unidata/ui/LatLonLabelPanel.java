@@ -86,6 +86,9 @@ public class LatLonLabelPanel extends JPanel {
     /** the alignment selector */
     JComboBox alignSelector;
 
+    /** the alignment selector */
+    JComboBox formatSelector;
+
     /** The alignment point names */
     private static final String[] RECTPOINTNAMES = {
         "Upper Left", "Top", "Upper Right", "Left", "Middle", "Right",
@@ -99,6 +102,7 @@ public class LatLonLabelPanel extends JPanel {
      *
      */
     public LatLonLabelPanel(LatLonLabelData lld) {
+
         this.latLonLabelData = lld;
         onOffCbx             = new JCheckBox("", latLonLabelData.getVisible());
         onOffCbx.addActionListener(new ActionListener() {
@@ -110,6 +114,8 @@ public class LatLonLabelPanel extends JPanel {
         });
         spacingField =
             new JTextField(String.valueOf(latLonLabelData.getInterval()), 6);
+        spacingField.setToolTipText(
+            "Set the interval (degrees) between labels");
         spacingField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
@@ -122,6 +128,7 @@ public class LatLonLabelPanel extends JPanel {
 
         baseField =
             new JTextField(String.valueOf(latLonLabelData.getBaseValue()), 6);
+        baseField.setToolTipText("Set the base value for the interval");
         baseField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
@@ -132,16 +139,18 @@ public class LatLonLabelPanel extends JPanel {
             }
         });
 
-        labelLinesField =
-            new JTextField(formatLabelLines(latLonLabelData.getLabelLines()),
-                           6);
+        labelLinesField = new JTextField(
+            LatLonLabelData.formatLabelLines(
+                latLonLabelData.getLabelLines()), 6);
+        labelLinesField.setToolTipText(
+            "Set the lines to place labels separated by a semicolon (;)");
         labelLinesField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
                     return;
                 }
-                latLonLabelData.setLabelLines(
-                    parseLabelLineString(labelLinesField.getText()));
+                latLonLabelData.setLabelsLineString(
+                    labelLinesField.getText());
             }
         });
 
@@ -149,7 +158,7 @@ public class LatLonLabelPanel extends JPanel {
                 "Set " + (latLonLabelData.getIsLatitude()
                           ? "Latitude"
                           : "Longitude") + " Color");
-        colorButton.setToolTipText("Set the line color");
+        colorButton.setToolTipText("Set the label color");
         colorButton.addPropertyChangeListener("background",
                 new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -195,37 +204,17 @@ public class LatLonLabelPanel extends JPanel {
         GuiUtils.setListData(alignSelector,
                              TwoFacedObject.createList(Glyph.RECTPOINTS,
                                  RECTPOINTNAMES));
-    }
-
-    /**
-     * Format the label lines as a string
-     *
-     * @param vals  the values
-     *
-     * @return  the string
-     */
-    private String formatLabelLines(float[] vals) {
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < vals.length; i++) {
-            buf.append(vals[i]);
-            if (i < vals.length - 1) {
-                buf.append(";");
+        formatSelector = new JComboBox();
+        formatSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if ( !ignoreEvents) {
+                    //latLonLabelData.setFormat(formatSelector.getSelectedItem());
+                }
             }
-        }
-        return buf.toString();
-    }
+        });
+        GuiUtils.setListData(formatSelector, Misc.newList("DD"));
 
-    /**
-     * Parse the label line string
-     *
-     * @param llString  the label line string
-     *
-     * @return the array of float values
-     */
-    private float[] parseLabelLineString(String llString) {
-        return Misc.parseFloats(llString, ";");
     }
-
 
     /**
      * Set the information that configures this.
@@ -240,7 +229,7 @@ public class LatLonLabelPanel extends JPanel {
             spacingField.setText("" + lld.getInterval());
             baseField.setText("" + lld.getBaseValue());
             labelLinesField.setText(
-                "" + formatLabelLines(lld.getLabelLines()));
+                "" + LatLonLabelData.formatLabelLines(lld.getLabelLines()));
             colorButton.setBackground(lld.getColor());
             fastRenderCbx.setSelected(lld.getFastRendering());
             ignoreEvents = false;
@@ -263,25 +252,27 @@ public class LatLonLabelPanel extends JPanel {
             GuiUtils.lLabel("<html><b>Labels</b></html>"), GuiUtils.filler(),
             GuiUtils.cLabel("Interval"), GuiUtils.cLabel("Relative to"),
             GuiUtils.filler(), GuiUtils.filler(), GuiUtils.cLabel("Color"),
-            latPanel.onOffCbx, GuiUtils.rLabel("Latitude:"),
-            latPanel.spacingField, latPanel.baseField,
-            GuiUtils.rLabel("At Longitudes:"), latPanel.labelLinesField,
-            latPanel.colorButton, lonPanel.onOffCbx,
+            GuiUtils.cLabel("Alignment"), latPanel.onOffCbx,
+            GuiUtils.rLabel("Latitude:"), latPanel.spacingField,
+            latPanel.baseField, GuiUtils.rLabel("At Longitudes:"),
+            latPanel.labelLinesField, latPanel.colorButton,
+            latPanel.alignSelector, lonPanel.onOffCbx,
             GuiUtils.rLabel("Longitude:"), lonPanel.spacingField,
             lonPanel.baseField, GuiUtils.rLabel("At Latitudes:"),
-            lonPanel.labelLinesField, lonPanel.colorButton
+            lonPanel.labelLinesField, lonPanel.colorButton,
+            lonPanel.alignSelector,
         };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
-        JPanel settings = GuiUtils.doLayout(comps, 7, GuiUtils.WT_N,
+        JPanel settings = GuiUtils.doLayout(comps, 8, GuiUtils.WT_N,
                                             GuiUtils.WT_N);
         Component[] extraComps = { GuiUtils.rLabel("Font:"),
                                    latPanel.fontSelector.getComponent(),
-                                   GuiUtils.rLabel("Alignment:"),
-                                   latPanel.alignSelector };
+                                   GuiUtils.rLabel("Format:"),
+                                   latPanel.formatSelector };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
         JPanel extra = GuiUtils.doLayout(extraComps, 4, GuiUtils.WT_N,
                                          GuiUtils.WT_N);
-        return GuiUtils.vbox(GuiUtils.left(settings), extra);
+        return GuiUtils.vbox(GuiUtils.left(settings), GuiUtils.left(extra));
     }
 
 
@@ -297,8 +288,7 @@ public class LatLonLabelPanel extends JPanel {
             new Float(spacingField.getText()).floatValue());
         latLonLabelData.setBaseValue(
             new Float(baseField.getText()).floatValue());
-        latLonLabelData.setLabelLines(
-            parseLabelLineString(labelLinesField.getText()));
+        latLonLabelData.setLabelsLineString(labelLinesField.getText());
     }
 
 

@@ -110,11 +110,17 @@ public class MapInfo {
     /** Xml attribute for the base  property */
     public static final String ATTR_BASE = "base";
 
+    /** Xml attribute for the base  property */
+    public static final String ATTR_LABELLINES = "labellines";
+
     /** Xml attribute for the sphere  property */
     public static final String ATTR_SPHERE = "sphere";
 
     /** Xml attribute for the alignment  property */
     public static final String ATTR_ALIGNMENT = "alignment";
+
+    /** Xml attribute for the alignment  property */
+    public static final String ATTR_LABELFORMAT = "labelformat";
 
     /** Xml attribute for the  property */
     public static final String ATTR_VALID = "valid";
@@ -404,12 +410,15 @@ public class MapInfo {
                 currentState.appendChild(newElement);
                 XmlUtil.setAttributes(newElement, new String[] {
                     ATTR_SPACING, "" + llld.getInterval(), ATTR_BASE,
-                    "" + llld.getBaseValue(), ATTR_COLOR,
-                    "" + llld.getColor().getRGB(), ATTR_VISIBLE,
-                    "" + llld.getVisible(), ATTR_FASTRENDER,
-                    "" + llld.getFastRendering(),
-                    ATTR_SPHERE, ""+llld.getSphere(),
-                    ATTR_ALIGNMENT, ""+llld.getAlignment()
+                    "" + llld.getBaseValue(), ATTR_LABELLINES,
+                    "" + LatLonLabelData.formatLabelLines(
+                        llld.getLabelLines()),
+                    ATTR_COLOR, "" + llld.getColor().getRGB(), ATTR_VISIBLE,
+                    "" + llld.getVisible(),
+                    //ATTR_FASTRENDER, "" + llld.getFastRendering(),
+                    ATTR_SPHERE, "" + llld.getSphere(), ATTR_ALIGNMENT,
+                    "" + llld.getAlignment(), ATTR_LABELFORMAT,
+                    "" + llld.getLabelFormat()
                 });
             }
 
@@ -577,13 +586,16 @@ public class MapInfo {
             boolean latitude, float spacing)
             throws VisADException, RemoteException {
         LatLonLabelData llld = new LatLonLabelData(latitude,
-                                  XmlUtil.getAttribute(node, ATTR_SPACING,
-                                      spacing));
+                                   XmlUtil.getAttribute(node, ATTR_SPACING,
+                                       spacing));
 
-        llld.setBaseValue(XmlUtil.getAttribute(node, ATTR_BASE, 0));
+        llld.setBaseValue(XmlUtil.getAttribute(node, ATTR_BASE, 0.f));
         llld.setColor(XmlUtil.getAttribute(node, ATTR_COLOR, Color.white));
         llld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, true));
+        llld.setLabelsLineString(XmlUtil.getAttribute(node, ATTR_LABELLINES,
+                "0"));
         llld.setAlignment(XmlUtil.getAttribute(node, ATTR_ALIGNMENT, "MM"));
+        llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_ALIGNMENT, "DD"));
         llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
         return llld;
     }

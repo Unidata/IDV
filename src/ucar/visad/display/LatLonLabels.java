@@ -23,12 +23,19 @@ package ucar.visad.display;
 
 import ucar.unidata.util.Misc;
 
-import visad.FlatField;
+import visad.CommonUnit;
+import visad.Data;
+import visad.FieldImpl;
 import visad.FunctionType;
 import visad.Integer1DSet;
-import visad.RealTupleType;
+import visad.MathType;
+import visad.Real;
 import visad.RealType;
 import visad.ScalarType;
+import visad.Text;
+import visad.TextType;
+import visad.Tuple;
+import visad.TupleType;
 import visad.VisADException;
 
 
@@ -38,18 +45,14 @@ import java.util.Arrays;
 
 
 /**
- * Class description
- *
- *
- * @version        Enter version here..., Thu, Aug 2, '12
- * @author         Enter your name here...
+ * Class for creating lat/lon labels
  */
 public class LatLonLabels extends TextDisplayable {
 
     /** is this for latitude labels? */
     private boolean isLatitude;
 
-    /** the base for labelling */
+    /** the base for labeling */
     private float base;
 
     /** the maximum value */
@@ -59,10 +62,22 @@ public class LatLonLabels extends TextDisplayable {
     private float min;
 
     /** the increment between labels */
-    private float increment;
+    private float interval;
 
     /** the lines where the labels go */
     private float[] labelLines;
+
+    /** the label format */
+    private String labelFormat = "##";
+
+    /** the label format */
+    private TupleType labelType;
+
+    /** proto real */
+    private Real latReal = new Real(RealType.Latitude, 0, CommonUnit.degree);
+
+    /** proto real */
+    private Real lonReal = new Real(RealType.Longitude, 0, CommonUnit.degree);
 
     /**
      * Default ctor
@@ -83,7 +98,7 @@ public class LatLonLabels extends TextDisplayable {
      * @throws VisADException   Unable to create VisAD object
      */
     public LatLonLabels(String name) throws VisADException, RemoteException {
-        this(name, RealType.getRealType(name));
+        this(name, TextType.getTextType(name));
     }
 
     /**
@@ -134,7 +149,7 @@ public class LatLonLabels extends TextDisplayable {
             throws VisADException, RemoteException {
         super(name, textType, false);
         this.isLatitude = isLatitude;
-        this.increment  = increment;
+        this.interval   = increment;
         this.min        = min;
         this.max        = max;
         this.base       = base;
@@ -153,7 +168,6 @@ public class LatLonLabels extends TextDisplayable {
     public LatLonLabels(LatLonLabels that)
             throws RemoteException, VisADException {
         super(that);
-        // TODO Auto-generated constructor stub
     }
 
 
@@ -172,12 +186,49 @@ public class LatLonLabels extends TextDisplayable {
     public void setValues(float increment, float min, float max, float base,
                           float[] labelLines)
             throws VisADException, RemoteException {
-        this.increment  = increment;
+        this.interval   = increment;
         this.min        = min;
         this.max        = max;
         this.base       = base;
         this.labelLines = labelLines;
         createLabels();
+    }
+
+    /**
+     * Return the currently used ScalarType for display.
+     * @return  the ScalarType
+     */
+    public ScalarType getTextType() {
+        if (super.getTextType() instanceof RealType) {
+            return TextType.getTextType(super.getTextType().getName());
+        }
+        return super.getTextType();
+    }
+
+    /**
+     * Set the text type to use.
+     * @param textType  RealType or TextType to map to Display.Text
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void setTextType(ScalarType textType)
+            throws RemoteException, VisADException {
+        super.setTextType(textType);
+        labelType = null;
+    }
+
+
+    /**
+     * Make the label type
+     *
+     * @return  the type for the label data
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   Unable to create VisAD object
+     */
+    private TupleType makeLabelType() throws VisADException, RemoteException {
+        return new TupleType(new MathType[] { RealType.Latitude,
+                RealType.Longitude, getTextType() });
     }
 
     /**
@@ -187,32 +238,44 @@ public class LatLonLabels extends TextDisplayable {
      * @throws VisADException   Unable to create VisAD object
      */
     protected void createLabels() throws VisADException, RemoteException {
-        RealTupleType labelType =
-            new RealTupleType(RealType.Latitude, RealType.Longitude,
-                              RealType.getRealType(getTextType().getName()));
-        float[]   labelVals  = Misc.computeTicks(max, min, base, increment);
+        if (labelType == null) {
+            labelType = makeLabelType();
+        }
+        float[]   labelVals  = Misc.computeTicks(max, min, base, interval);
         int       numLabels  = labelVals.length * labelLines.length;
-        FlatField labelField = new FlatField(
+        FieldImpl labelField = new FieldImpl(
                                    new FunctionType(
                                        RealType.getRealType("index"),
                                        labelType), new Integer1DSet(
                                            numLabels));
-        float[][] vals = new float[3][numLabels];
-        int       m    = 0;
+        //float[][] vals = new float[3][numLabels];
+        Tuple[] labelTuples = new Tuple[numLabels];
+        int     m           = 0;
         for (int i = 0; i < labelLines.length; i++) {
             for (int j = 0; j < labelVals.length; j++) {
-                vals[0][m] = isLatitude
-                             ? labelVals[j]
-                             : labelLines[i];
-                vals[1][m] = isLatitude
-                             ? labelLines[i]
-                             : labelVals[j];
-                vals[2][m] = labelVals[j];
-                m++;
+                Real lat   = isLatitude
+                             ? latReal.cloneButValue(labelVals[j])
+                             : latReal.cloneButValue(labelLines[i]);
+                Real lon   = isLatitude
+                             ? lonReal.cloneButValue(labelLines[i])
+                             : lonReal.cloneButValue(labelVals[j]);
+                Text label = new Text((TextType) getTextType(),
+                                      formatLabel(labelVals[j]));
+                labelTuples[m++] = new Tuple(labelType, new Data[] { lat, lon,
+                        label }, false, false);
             }
         }
-        labelField.setSamples(vals, false);
+        labelField.setSamples(labelTuples, false);
         setData(labelField);
+    }
+
+    /**
+     * Format the label
+     * @param value  the value to format
+     * @return formatted value
+     */
+    private String formatLabel(double value) {
+        return Misc.format(value);
     }
 
     /**
@@ -301,24 +364,51 @@ public class LatLonLabels extends TextDisplayable {
     }
 
     /**
+     * Get the interval between labels (degrees)
      * @return the increment
      */
-    public float getIncrement() {
-        return increment;
+    public float getInterval() {
+        return interval;
     }
 
     /**
-     * @param increment the increment to set
+     * Set the interval between labels (degrees)
+     * @param interval the interval to set
      *
      * @throws RemoteException Java RMI Exception
      * @throws VisADException problem creating labels
      */
-    public void setInterval(float increment)
+    public void setInterval(float interval)
             throws VisADException, RemoteException {
-        if (this.increment == increment) {
+        if (this.interval == interval) {
             return;
         }
-        this.increment = increment;
+        this.interval = interval;
+        createLabels();
+    }
+
+    /**
+     * Get the label format
+     * @return the increment
+     */
+    public String getLabelFormat() {
+        return labelFormat;
+    }
+
+    /**
+     * Set the interval between labels (degrees)
+     *
+     * @param labelFormat the label format
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
+     */
+    public void setLabelFormat(String labelFormat)
+            throws VisADException, RemoteException {
+        if ( !this.labelFormat.equals(labelFormat)) {
+            return;
+        }
+        this.labelFormat = labelFormat;
         createLabels();
     }
 

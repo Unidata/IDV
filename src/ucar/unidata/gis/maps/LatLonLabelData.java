@@ -23,12 +23,13 @@ package ucar.unidata.gis.maps;
 
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.drawing.Glyph;
+import ucar.unidata.util.Misc;
 
 import ucar.visad.display.LatLonLabels;
 import ucar.visad.display.TextDisplayable;
 
-import visad.RealType;
 import visad.TextControl;
+import visad.TextType;
 import visad.VisADException;
 
 
@@ -84,6 +85,9 @@ public class LatLonLabelData {
 
     /** sphere flag */
     private boolean useSphere;
+
+    /** format flag */
+    private String labelFormat;
 
 
     /**
@@ -187,6 +191,7 @@ public class LatLonLabelData {
         this.fastRendering = that.fastRendering;
         this.visible       = that.visible;
         this.useSphere     = that.useSphere;
+        this.labelFormat   = that.labelFormat;
     }
 
 
@@ -208,7 +213,7 @@ public class LatLonLabelData {
             throws VisADException, RemoteException {
         if (myLatLonLabels == null) {
             myLatLonLabels = new LatLonLabels("LatLonLabels",
-                    RealType.getRealType((isLatitude
+                    TextType.getTextType((isLatitude
                                           ? "LatLabels"
                                           : "LonLabels")), isLatitude,
                                           interval, minValue, maxValue,
@@ -228,6 +233,7 @@ public class LatLonLabelData {
         setAlignment(myLatLonLabels, alignment);
         myLatLonLabels.setUseFastRendering(fastRendering);
         myLatLonLabels.setSphere(useSphere);
+        myLatLonLabels.setLabelFormat(labelFormat);
         return myLatLonLabels;
     }
 
@@ -431,6 +437,49 @@ public class LatLonLabelData {
     }
 
     /**
+     *  Set the LabelLines from a string
+     *
+     *  @param value The new string for LabelLines
+     */
+    public void setLabelsLineString(String value) {
+        labelLines = parseLabelLineString(value);
+        stateChanged();
+    }
+
+    /**
+     * Parse the label line string
+     *
+     * @param llString  the label line string
+     *
+     * @return the array of float values
+     */
+    public static float[] parseLabelLineString(String llString) {
+    	if (llString.indexOf(";") > 0) {
+           return Misc.parseFloats(llString, ";");
+    	} else {
+           return Misc.parseFloats(llString, ",");
+    	}
+    }
+
+    /**
+     * Format the label lines as a string
+     *
+     * @param vals  the values
+     *
+     * @return  the string
+     */
+    public static String formatLabelLines(float[] vals) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < vals.length; i++) {
+            buf.append(vals[i]);
+            if (i < vals.length - 1) {
+                buf.append(";");
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
      *  Get the LabelLines property.
      *
      *  @return The LabelLines
@@ -531,6 +580,23 @@ public class LatLonLabelData {
      */
     public boolean getSphere() {
         return useSphere;
+    }
+
+    /**
+     * Set the label format
+     * @param format  the label format
+     */
+    public void setLabelFormat(String value) {
+        labelFormat = value;
+        stateChanged();
+    }
+
+    /**
+     * Get the label format property
+     * @return  the label format
+     */
+    public String getLabelFormat() {
+        return labelFormat;
     }
 
 }

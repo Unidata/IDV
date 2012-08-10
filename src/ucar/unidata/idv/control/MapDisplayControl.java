@@ -239,11 +239,17 @@ public class MapDisplayControl extends DisplayControlImpl {
     /** apply to all lat/lon button */
     private JToggleButton applyToAllLatLonBtn;
 
+    /** apply to all lat/lon labels button */
+    private JToggleButton applyToAllLabelsBtn;
+
     /** Do we apply the changes to all the maps */
     private boolean applyChangesToAllMaps = false;
 
-    /** Do we apply the changes to all the maps */
+    /** Do we apply the changes to all the lats and lons */
     private boolean applyChangesToAllLatLon = false;
+
+    /** Do we apply the changes to all the lat/lon labels */
+    private boolean applyChangesToAllLabels = false;
 
     /** Are we currently updating the other maps */
     private boolean updatingOtherMapStates = false;
@@ -938,6 +944,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     private void saveAsPreference() {
         String xml = new MapInfo(mapStates, latState, lonState,
+                                 latLabelState, lonLabelState,
                                  (float) mapPosition).getXml();
         getControlContext().getResourceManager().writeMapState(xml,
                 inGlobeDisplay());
@@ -1054,14 +1061,24 @@ public class MapDisplayControl extends DisplayControlImpl {
         sp.setPreferredSize(new Dimension(600, 200));
 
         applyToAllLatLonBtn =
-            GuiUtils.getToggleImageButton("/auxdata/ui/icons/link.png",
-                                          "/auxdata/ui/icons/link_break.png",
-                                          0, 0, true);
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
+                                          "/auxdata/ui/icons/link.png", 0, 0,
+                                          true);
         applyToAllLatLonBtn.setContentAreaFilled(false);
         applyToAllLatLonBtn.setSelected(applyChangesToAllLatLon);
         applyToAllLatLonBtn.setToolTipText(
             "Apply changes to all lat/lon lines");
 
+        applyToAllLabelsBtn =
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
+                                          "/auxdata/ui/icons/link.png", 0, 0,
+                                          true);
+        applyToAllLabelsBtn.setContentAreaFilled(false);
+        applyToAllLabelsBtn.setSelected(applyChangesToAllLabels);
+        applyToAllLabelsBtn.setToolTipText(
+            "Apply changes to all lat/lon labels");
+
+        /*
         JPanel latlonPanel = GuiUtils.topCenter(
                                  GuiUtils.vbox(
                                      GuiUtils.left(applyToAllLatLonBtn),
@@ -1069,6 +1086,19 @@ public class MapDisplayControl extends DisplayControlImpl {
                                      GuiUtils.filler(),
                                      GuiUtils.left(
                                          lllPanel)), GuiUtils.filler());
+                                         */
+        JPanel latlonPanel =
+            GuiUtils.topCenter(
+                GuiUtils.vbox(
+                    GuiUtils.left(
+                        GuiUtils.hbox(
+                            GuiUtils.top(applyToAllLatLonBtn),
+                            GuiUtils.left(llPanel))), GuiUtils.filler(),
+                                GuiUtils.left(
+                                    GuiUtils.hbox(
+                                        GuiUtils.top(applyToAllLabelsBtn),
+                                        GuiUtils.left(
+                                            lllPanel)))), GuiUtils.filler());
 
         applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
@@ -1831,11 +1861,13 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @return true if we should share
          */
         private boolean shouldShare() {
-            if ((mapDisplayControl != null)
-                    && mapDisplayControl.getApplyChangesToAllLatLon()
-                    && (other != null) && okToShare && !ignoreStateChange) {
-                return true;
-            }
+            /*
+        if ((mapDisplayControl != null)
+                && mapDisplayControl.getApplyChangesToAllLatLon()
+                && (other != null) && okToShare && !ignoreStateChange) {
+            return true;
+        }
+        */
             return false;
         }
 
@@ -1957,13 +1989,28 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @param value  the alignment point
          */
         public void setAlignment(String value) {
-            //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
-            boolean shouldShare = true
+            boolean shouldShare = shouldShare()
                                   && ( !Misc.equals(value, getAlignment()));
             super.setAlignment(value);
             if (shouldShare) {
                 other.okToShare = false;
                 other.setAlignment(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the label format
+         *
+         * @param value  the label format
+         */
+        public void setLabelFormat(String value) {
+            boolean shouldShare = shouldShare()
+                                  && ( !Misc.equals(value, getLabelFormat()));
+            super.setAlignment(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setLabelFormat(value);
                 other.stateWasShared();
             }
         }
