@@ -655,7 +655,8 @@ public class TimesChooser extends IdvChooser {
                 if (SwingUtilities.isLeftMouseButton(e)) {
 
                     JPopupMenu popup = GuiUtils.makePopupMenu(driverMenuList);
-                    popup.show(centerPopupBtn, e.getX(),
+                    if(popup != null )
+                        popup.show(centerPopupBtn, e.getX(),
                                (int) popup.getBounds().getHeight());
                 }
             }
