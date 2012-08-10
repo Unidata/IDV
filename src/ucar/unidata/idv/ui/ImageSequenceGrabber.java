@@ -2144,6 +2144,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                              List<ImageWrapper> images, Dimension size,
                              double displayRate, Element scriptingNode,
                              double endPause) {
+
         List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
                                          true);
         boolean doingPanel = false;
@@ -2181,6 +2182,21 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     createPanel(movieFile, images, scriptingNode);
 
                     continue;
+                }
+                // IDV in non-interactive mode does not properly get the size
+                // for n-panel views because ATTR_HEIGHT, ATTR_WIDTH are set
+                // for one panel in ImageGenerator.captureMovie.
+
+                if (( !isInteractive()) && (images.size() > 0)) {
+
+                    BufferedImage image = ImageUtils.toBufferedImage(
+                                              ImageUtils.readImage(
+                                                  images.get(0).getPath()));
+
+                    ImageUtils.waitOnImage(image);
+
+                    size = new Dimension(image.getWidth(null),
+                                         image.getHeight(null));
                 }
 
                 // System.err.println("createMovie:" + movieFile);
@@ -2238,6 +2254,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             idv.getPublishManager().publishContent(movieFile, viewManager,
                     publishCbx);
         }
+
     }
 
     /**
