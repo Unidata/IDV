@@ -278,6 +278,10 @@ public class MapDisplayControl extends DisplayControlImpl {
         if (mapInfo.getJustLoadedLocalMaps()) {
             ignoreNonVisibleMaps = false;
         }
+        if (mapViewManager.getUseGlobeDisplay()) {
+            defaultLatLabelData.setSphere(true);
+            defaultLonLabelData.setSphere(true);
+        }
     }
 
 
@@ -615,14 +619,14 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
     /**
-     * _more_
+     * Create a LatLonLabel State
      *
-     * @param latitude _more_
-     * @param min _more_
-     * @param max _more_
-     * @param spacing _more_
+     * @param latitude  true if this if for latitude labels
+     * @param min minimum value
+     * @param max maximum value
+     * @param spacing spacing between labels (degrees)
      *
-     * @return _more_
+     * @return LatLonLabelState
      */
     private LatLonLabelState createLatLonLabelState(boolean latitude,
             float min, float max, float spacing) {
@@ -632,6 +636,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         lls.setFastRendering(getDefaultFastRendering());
         lls.setMinValue(min);
         lls.setMaxValue(max);
+        lls.setSphere(
+            ((MapViewManager) getViewManager()).getUseGlobeDisplay());
         return lls;
     }
 
@@ -1057,10 +1063,12 @@ public class MapDisplayControl extends DisplayControlImpl {
             "Apply changes to all lat/lon lines");
 
         JPanel latlonPanel = GuiUtils.topCenter(
-                                  GuiUtils.vbox(
-                                      GuiUtils.left(applyToAllLatLonBtn),
-                                      GuiUtils.left(llPanel), GuiUtils.left(lllPanel)), 
-                                      GuiUtils.filler());
+                                 GuiUtils.vbox(
+                                     GuiUtils.left(applyToAllLatLonBtn),
+                                     GuiUtils.left(llPanel),
+                                     GuiUtils.filler(),
+                                     GuiUtils.left(
+                                         lllPanel)), GuiUtils.filler());
 
         applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
@@ -1082,13 +1090,12 @@ public class MapDisplayControl extends DisplayControlImpl {
                                           sp));
         tabbedPane.add("Lat/Lon Lines", latlonPanel);
         if (useZPosition()) {
-        	
-            JPanel settingsPanel = 
-                    GuiUtils.top(
-                        GuiUtils.leftCenter(
-                            new JLabel("Map Position:  "),
-                            makePositionSlider()));
-    
+
+            JPanel settingsPanel = GuiUtils.top(
+                                       GuiUtils.leftCenter(
+                                           new JLabel("Map Position:  "),
+                                           makePositionSlider()));
+
             tabbedPane.add("Settings", settingsPanel);
         }
 
@@ -1779,6 +1786,10 @@ public class MapDisplayControl extends DisplayControlImpl {
          */
         protected void init(MapDisplayControl mapDisplayControl) {
             this.mapDisplayControl = mapDisplayControl;
+            MapViewManager mvm = mapDisplayControl.getMapViewManager();
+            if (mvm != null) {
+                setSphere(mvm.getUseGlobeDisplay());
+            }
         }
 
 
@@ -1925,17 +1936,51 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
         /**
-         * Set the base
+         * Set the font
          *
-         * @param value  the line width
+         * @param value  the label font
          */
         public void setFont(Object value) {
             //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
-            boolean shouldShare = true && (!Misc.equals(value,getFont()));
+            boolean shouldShare = true && ( !Misc.equals(value, getFont()));
             super.setFont(value);
             if (shouldShare) {
                 other.okToShare = false;
                 other.setFont(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the alignment point
+         *
+         * @param value  the alignment point
+         */
+        public void setAlignment(String value) {
+            //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
+            boolean shouldShare = true
+                                  && ( !Misc.equals(value, getAlignment()));
+            super.setAlignment(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setAlignment(value);
+                other.stateWasShared();
+            }
+        }
+
+
+        /**
+         * Set the sphere flag
+         *
+         * @param value  the sphere flag
+         */
+        public void setSphere(boolean value) {
+            //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
+            boolean shouldShare = true && ( !Misc.equals(value, getSphere()));
+            super.setSphere(value);
+            if (shouldShare) {
+                other.okToShare = false;
+                other.setSphere(value);
                 other.stateWasShared();
             }
         }

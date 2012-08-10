@@ -22,10 +22,13 @@ package ucar.unidata.gis.maps;
 
 
 import ucar.unidata.ui.FontSelector;
+import ucar.unidata.ui.drawing.Glyph;
+
 import ucar.visad.display.LatLonLabels;
 import ucar.visad.display.TextDisplayable;
 
 import visad.RealType;
+import visad.TextControl;
 import visad.VisADException;
 
 
@@ -53,7 +56,7 @@ public class LatLonLabelData {
     private Color color = Color.white;
 
     /** The alignment point */
-    private int alignment;
+    private String alignment = Glyph.PT_MM;
 
     /** The label font */
     private Object labelFont;
@@ -79,6 +82,10 @@ public class LatLonLabelData {
     /** fast rendering flag */
     protected boolean fastRendering = false;
 
+    /** sphere flag */
+    private boolean useSphere;
+
+
     /**
      * Default ctor
      */
@@ -94,10 +101,11 @@ public class LatLonLabelData {
      */
     public LatLonLabelData(boolean isLatitude, float interval) {
         this(isLatitude, interval, (isLatitude
-                                     ? -90
-                                     : -180), (isLatitude
+                                    ? -90
+                                    : -180), (isLatitude
                 ? 90
-                : 179), 0, new float[] { 0 }, 0, null, Color.white, true);
+                : 179), 0, new float[] { 0 }, Glyph.PT_MM, null, Color.white,
+                        true);
     }
 
     /**
@@ -105,15 +113,15 @@ public class LatLonLabelData {
      *
      * @param isLatitude Is it lat or lon
      * @param interval The interval
-     * @param min _more_
-     * @param max _more_
-     * @param base _more_
+     * @param min minimum value
+     * @param max maximum value
+     * @param base base value
      *
      */
     public LatLonLabelData(boolean isLatitude, float interval, float min,
                            float max, float base) {
-        this(isLatitude, interval, min, max, base, new float[] { 0 }, 0,
-             null, Color.white, true);
+        this(isLatitude, interval, min, max, base, new float[] { 0 },
+             Glyph.PT_MM, null, Color.white, true);
     }
 
     /**
@@ -125,7 +133,7 @@ public class LatLonLabelData {
      * @param maxValue  The max value
      * @param baseValue The base value
      * @param labelLines the label lines
-     * @param alignment  the alignment
+     * @param alignment  the alignment #ucar.unidata.ui.drawing.Glyph
      * @param labelFont  the font (Font or HersheyFont)
      * @param color The color
      * @param fastRendering true to use fast rendering
@@ -133,11 +141,11 @@ public class LatLonLabelData {
      */
     public LatLonLabelData(boolean isLatitude, float interval,
                            float minValue, float maxValue, float baseValue,
-                           float[] labelLines, int alignment,
+                           float[] labelLines, String alignment,
                            Object labelFont, Color color,
                            boolean fastRendering) {
         this.isLatitude    = isLatitude;
-        this.interval     = interval;
+        this.interval      = interval;
         this.maxValue      = maxValue;
         this.minValue      = minValue;
         this.labelLines    = labelLines;
@@ -168,7 +176,7 @@ public class LatLonLabelData {
             return;
         }
         this.isLatitude    = that.isLatitude;
-        this.interval     = that.interval;
+        this.interval      = that.interval;
         this.baseValue     = that.baseValue;
         this.maxValue      = that.maxValue;
         this.minValue      = that.minValue;
@@ -178,6 +186,7 @@ public class LatLonLabelData {
         this.color         = that.color;
         this.fastRendering = that.fastRendering;
         this.visible       = that.visible;
+        this.useSphere     = that.useSphere;
     }
 
 
@@ -215,17 +224,74 @@ public class LatLonLabelData {
         myLatLonLabels.setMax(maxValue);
         myLatLonLabels.setBase(baseValue);
         myLatLonLabels.setLabelLines(labelLines);
-        Font f = (Font) labelFont;
+        setFont(myLatLonLabels, labelFont);
+        setAlignment(myLatLonLabels, alignment);
+        myLatLonLabels.setUseFastRendering(fastRendering);
+        myLatLonLabels.setSphere(useSphere);
+        return myLatLonLabels;
+    }
+
+    /**
+     * Set the font on the Displayable
+     *
+     * @param lll   the displayable
+     * @param labelFont  the font Object
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  problem setting value
+     */
+    private void setFont(LatLonLabels lll, Object labelFont)
+            throws VisADException, RemoteException {
+        Font f    = (Font) labelFont;
         int  size = (f == null)
                     ? 12
                     : f.getSize();
         if ((f != null) && f.getName().equals(FontSelector.DEFAULT_NAME)) {
             f = null;
         }
-        myLatLonLabels.setFont(f);
-        myLatLonLabels.setTextSize(size/12.f);
-        myLatLonLabels.setUseFastRendering(fastRendering);
-        return myLatLonLabels;
+        lll.setFont(f);
+        lll.setTextSize(size / 12.f);
+    }
+
+    /**
+     * Set the alignment point
+     *
+     * @param lll  the Displayble
+     * @param rectpoint  the alignment
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  problem setting value
+     */
+    private void setAlignment(LatLonLabels lll, String rectpoint)
+            throws VisADException, RemoteException {
+        if (rectpoint.equals(Glyph.PT_UL)) {
+            lll.setJustification(TextControl.Justification.RIGHT);
+            lll.setVerticalJustification(TextControl.Justification.BOTTOM);
+        } else if (rectpoint.equals(Glyph.PT_UM)) {
+            lll.setJustification(TextControl.Justification.CENTER);
+            lll.setVerticalJustification(TextControl.Justification.BOTTOM);
+        } else if (rectpoint.equals(Glyph.PT_UR)) {
+            lll.setJustification(TextControl.Justification.LEFT);
+            lll.setVerticalJustification(TextControl.Justification.BOTTOM);
+        } else if (rectpoint.equals(Glyph.PT_ML)) {
+            lll.setJustification(TextControl.Justification.RIGHT);
+            lll.setVerticalJustification(TextControl.Justification.CENTER);
+        } else if (rectpoint.equals(Glyph.PT_MM)) {
+            lll.setJustification(TextControl.Justification.CENTER);
+            lll.setVerticalJustification(TextControl.Justification.CENTER);
+        } else if (rectpoint.equals(Glyph.PT_MR)) {
+            lll.setJustification(TextControl.Justification.LEFT);
+            lll.setVerticalJustification(TextControl.Justification.CENTER);
+        } else if (rectpoint.equals(Glyph.PT_LL)) {
+            lll.setJustification(TextControl.Justification.RIGHT);
+            lll.setVerticalJustification(TextControl.Justification.TOP);
+        } else if (rectpoint.equals(Glyph.PT_LM)) {
+            lll.setJustification(TextControl.Justification.CENTER);
+            lll.setVerticalJustification(TextControl.Justification.TOP);
+        } else if (rectpoint.equals(Glyph.PT_LR)) {
+            lll.setJustification(TextControl.Justification.LEFT);
+            lll.setVerticalJustification(TextControl.Justification.TOP);
+        }
     }
 
     /**
@@ -429,6 +495,42 @@ public class LatLonLabelData {
      */
     public Object getFont() {
         return labelFont;
+    }
+
+    /**
+     *  Set the Alignment property.
+     *
+     *  @param value The new value for Alignment
+     */
+    public void setAlignment(String value) {
+        alignment = value;
+        stateChanged();
+    }
+
+    /**
+     *  Get the Alignment property.
+     *
+     *  @return The Alignment
+     */
+    public String getAlignment() {
+        return alignment;
+    }
+
+    /**
+     * Set the whether we're on a sphere
+     * @param sphere  true if sphere
+     */
+    public void setSphere(boolean sphere) {
+        useSphere = sphere;
+        stateChanged();
+    }
+
+    /**
+     * Get the sphere property
+     * @return true if sphere
+     */
+    public boolean getSphere() {
+        return useSphere;
     }
 
 }

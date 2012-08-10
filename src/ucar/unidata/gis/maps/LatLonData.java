@@ -199,6 +199,8 @@ public class LatLonData {
             myLatLon.setColor(color);
         }
         myLatLon.setVisible(getRealVisibility());
+        myLatLon.setSpacing(spacing);
+        myLatLon.setBase(base);
         myLatLon.setLineStyle(lineStyle);
         myLatLon.setLineWidth(lineWidth);
         myLatLon.setUseFastRendering(fastRendering);

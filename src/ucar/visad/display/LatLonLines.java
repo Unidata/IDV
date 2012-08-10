@@ -22,12 +22,12 @@ package ucar.visad.display;
 
 
 import ucar.unidata.util.Misc;
+
 import visad.Gridded2DSet;
 import visad.RealTupleType;
 import visad.RealType;
 import visad.UnionSet;
 import visad.VisADException;
-
 
 
 import java.rmi.RemoteException;
@@ -323,64 +323,6 @@ public class LatLonLines extends LineDrawing {
         createLines(true);
     }
 
-    /**
-     * Create the lines from the supplied parameters
-     *
-     * @param andSetData   set data if true
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   problem creating VisAD object
-    private void createLines(boolean andSetData)
-            throws VisADException, RemoteException {
-
-        Gridded2DSet lineSet;
-        ArrayList    setList = new ArrayList();
-        
-        float        value;
-        float        other;
-        float        lalo[][];
-        int          numpoints = (isLat)
-                                 ? 361
-                                 : 181;
-        float        first     = (isLat)
-                                 ? -180.f
-                                 : -90.f;
-        // TODO: use base in the calculations
-        float start = (float) Math.max(spacing * (int) (minValue / spacing),
-                                       minValue);
-
-        for (value = start; value <= maxValue; value += spacing) {
-            lalo  = new float[2][numpoints];
-            other = first;
-
-            for (int j = 0; j < numpoints; j++) {
-                lalo[0][j] = (isLat)
-                             ? value
-                             : other;
-                lalo[1][j] = (isLat)
-                             ? other
-                             : value;
-                other      += 1.0f;
-            }
-
-            lineSet = new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
-                                       lalo, numpoints);
-
-            setList.add(lineSet);
-        }
-
-        Gridded2DSet[] latlons = new Gridded2DSet[setList.size()];
-
-        setList.toArray(latlons);
-
-        latLines = new UnionSet(RealTupleType.LatitudeLongitudeTuple,
-                                latlons);
-
-        if (andSetData) {
-            setData(latLines);
-        }
-    }
-     */
 
     /**
      * Create the lines from the supplied parameters
@@ -393,21 +335,22 @@ public class LatLonLines extends LineDrawing {
     private void createLines(boolean andSetData)
             throws VisADException, RemoteException {
 
-        Gridded2DSet lineSet;
-        ArrayList<Gridded2DSet>    setList = new ArrayList<Gridded2DSet>();
-        float[]   lineVals  = Misc.computeTicks(maxValue, minValue, base, spacing);
-        
-        float        value;
-        float        other;
-        float        lalo[][];
-        int          numpoints = (isLat)
-                                 ? 361
-                                 : 181;
-        float        first     = (isLat)
-                                 ? -180.f
-                                 : -90.f;
+        Gridded2DSet            lineSet;
+        ArrayList<Gridded2DSet> setList = new ArrayList<Gridded2DSet>();
+        float[] lineVals = Misc.computeTicks(maxValue, minValue, base,
+                                             spacing);
 
-        for (int i = 0; i < lineVals.length; i ++) {
+        float value;
+        float other;
+        float lalo[][];
+        int   numpoints = (isLat)
+                          ? 361
+                          : 181;
+        float first     = (isLat)
+                          ? -180.f
+                          : -90.f;
+
+        for (int i = 0; i < lineVals.length; i++) {
             lalo  = new float[2][numpoints];
             other = first;
             value = lineVals[i];

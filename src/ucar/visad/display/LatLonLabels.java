@@ -26,11 +26,11 @@ import ucar.unidata.util.Misc;
 import visad.FlatField;
 import visad.FunctionType;
 import visad.Integer1DSet;
-import visad.RealTuple;
 import visad.RealTupleType;
 import visad.RealType;
 import visad.ScalarType;
 import visad.VisADException;
+
 
 import java.rmi.RemoteException;
 
@@ -186,8 +186,7 @@ public class LatLonLabels extends TextDisplayable {
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   Unable to create VisAD object
      */
-    protected void createLabels()
-            throws VisADException, RemoteException {
+    protected void createLabels() throws VisADException, RemoteException {
         RealTupleType labelType =
             new RealTupleType(RealType.Latitude, RealType.Longitude,
                               RealType.getRealType(getTextType().getName()));

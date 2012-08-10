@@ -211,8 +211,8 @@ public class LatLonPanel extends JPanel {
                                       LatLonPanel lonPanel) {
         Component[] comps = {
             GuiUtils.lLabel("<html><b>Lines</b></html"), GuiUtils.filler(),
-            GuiUtils.lLabel("Interval"), GuiUtils.lLabel("Relative to"),
-            GuiUtils.lLabel("Width"), GuiUtils.lLabel("Style"), 
+            GuiUtils.cLabel("Interval"), GuiUtils.cLabel("Relative to"),
+            GuiUtils.cLabel("Width"), GuiUtils.cLabel("Style"), 
             GuiUtils.cLabel("Color"), GuiUtils.cLabel("Fast Render"), 
             latPanel.onOffCbx, GuiUtils.rLabel("Latitude:"), 
             latPanel.spacingField, latPanel.baseField, 
