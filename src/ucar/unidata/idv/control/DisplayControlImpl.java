@@ -828,7 +828,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private boolean isTimeDriver = false;
 
     /** does this use the time driver? */
-    private boolean usesTimeDriver = true;
+    private boolean usesTimeDriver = false;
 
     /** color dimness flag */
     private float colorDimness = 1.0f;

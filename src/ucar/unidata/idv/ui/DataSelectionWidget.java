@@ -420,6 +420,9 @@ public class DataSelectionWidget {
                                 DataSelection.PROP_CHOOSERTIMEMATCHING);
                 if (cu != null) {
                     chooserDoTimeMatching = ((Boolean) cu).booleanValue();
+                    if(chooserDoTimeMatching)
+                        timeOptionLabelBox.setSelectedIndex(2);
+
                 }
             }
         }
@@ -1281,6 +1284,9 @@ public class DataSelectionWidget {
             public void itemStateChanged(ItemEvent e) {
                 Object selectedObj = timeOptionLabelBox.getSelectedItem();
                 setTimeOptions(selectedObj);
+                if(timeOptionLabelBox.getSelectedIndex() != 2) {
+                    chooserDoTimeMatching = false;
+                }
             }
 
         });

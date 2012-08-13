@@ -52,10 +52,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,20 +60,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -92,7 +76,7 @@ import javax.swing.event.ListSelectionListener;
 public class TimesChooser extends IdvChooser {
 
     /** Time matching widget label */
-    private static final String TIME_MATCHING_LABEL = "Match Times";
+    private static final String TIME_MATCHING_LABEL = "Use Driver Times";
 
     /** Time matching widget label */
     private static final String TIME_MATCHING_LABEL_INIT = "Select a Matching Display";
@@ -258,16 +242,6 @@ public class TimesChooser extends IdvChooser {
         if (timesList == null) {
             timesList = new ChooserList(getAbsoluteTimeSelectMode());
             timesComponents.add(timesList);
-            timesList.addMouseListener(new MouseAdapter() {
-                public void mouseReleased(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e)) {
-                        doTimeDrivers  = false;
-                        selectedDriver = null;
-                        driverLbl.setText(TIME_MATCHING_LABEL);
-
-                    }
-                }
-            });
             timesList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     if (checkIgnore()) {
@@ -275,9 +249,7 @@ public class TimesChooser extends IdvChooser {
                     }
                     List items =
                         Misc.toList(getTimesList().getSelectedValues());
-
                     setSelectedAbsoluteTimes(items);
-
                     absoluteTimesSelectionChanged();
                     if ((items.size() > 0) && usingTimeline) {
                         items = DatedObject.sort(items, true);
@@ -532,19 +504,9 @@ public class TimesChooser extends IdvChooser {
                 absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length
                                     + " times selected");
             }
-
-            if (doTimeDrivers) {
-                driverLbl.setText("Matching Times to "
-                                  + selectedDriver.getLabel());
-            } else {
-
-                selectedDriver = null;
-                driverLbl.setText(TIME_MATCHING_LABEL);
-            }
-        } else {
-            absTimesLbl.setText(" ");
         }
     }
+
 
     /**
      *  Make the times panel
@@ -572,6 +534,8 @@ public class TimesChooser extends IdvChooser {
      *
      *  @return the times panel
      */
+    JCheckBoxMenuItem drivercbx = null;
+    JPanel tDriver = null;
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine,
                                     boolean doDriverTab) {
@@ -638,7 +602,33 @@ public class TimesChooser extends IdvChooser {
                 enableWidgets();
             }
         };
+        drivercbx =
+                new JCheckBoxMenuItem( "",
+                        getDoTimeDrivers());
+        drivercbx.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent event) {
+                setDoTimeDrivers(drivercbx.getState());
+                if(!drivercbx.getState())
+                    enableWidgets();
+                else {
+                    readDrivers();
+                    if(driverMenuList == null || driverMenuList.size() == 0) {
+                        GuiUtils.showDialog("No time driver", new JLabel("select time driver first."));
+                        drivercbx.setState(false);
+                    }
+                    else
+                        disableWidgets();
 
+                }
+
+            }
+        });
+        tDriver = GuiUtils.left(
+                GuiUtils.hflow(
+                        Misc.newList(
+                                new Component[] { driverLbl,
+                                        drivercbx }), 2, 1));
+        /*
         final JButton centerPopupBtn =
             GuiUtils.getImageButton("/auxdata/ui/icons/MapIcon16.png",
                                     getClass());
@@ -661,7 +651,7 @@ public class TimesChooser extends IdvChooser {
                 }
             }
         });
-
+         */
         JComponent timesExtra    = getExtraTimeComponent();
         JComponent absoluteExtra = getExtraAbsoluteTimeComponent();
         JComponent relativeExtra = getExtraRelativeTimeComponent();
@@ -685,28 +675,9 @@ public class TimesChooser extends IdvChooser {
                 GuiUtils.hsplit(timeline.getContents(false),
                                 timesList.getScroller(), 0.75);
             splitter.setOneTouchExpandable(true);
-
-
-            if (doDriverTab) {
-                JPanel tDriver = GuiUtils.left(
-                                     GuiUtils.hflow(
-                                         Misc.newList(
-                                             new Component[] { driverLbl,
-                        centerPopupBtn }), 2, 1));
-                timesTab.add("Absolute",
-                             GuiUtils.centerBottom(splitter,
-                                 GuiUtils.leftCenterRight(absTimesLbl,
-                                     absoluteExtra, tDriver)));
-            } else {
-
-                timesTab.add("Absolute",
-                             GuiUtils.centerBottom(splitter,
-                                 GuiUtils.leftRight(absTimesLbl,
-                                     absoluteExtra)));
-            }
-            //  popup.show(driverPopupBtn, 0, 1);
-
-
+            timesTab.add("Absolute",
+                         GuiUtils.centerBottom(splitter,
+                             GuiUtils.leftRight(absTimesLbl, absoluteExtra)));
             timesTab.setPreferredSize(new Dimension(350, 150));
         } else {
             timesTab.add("Absolute",
@@ -718,17 +689,23 @@ public class TimesChooser extends IdvChooser {
 
         JPanel panel;
         if (includeExtra) {
-            panel = GuiUtils.centerBottom(timesTab,
-                                          GuiUtils.left(timesExtra));
+            if(doDriverTab)
+                panel = GuiUtils.centerBottom(timesTab,
+                                          GuiUtils.leftRight(tDriver, timesExtra));
+            else
+                panel = GuiUtils.centerBottom(timesTab,
+                        GuiUtils.left(timesExtra));
         } else {
-            panel = GuiUtils.center(timesTab);
+            if(doDriverTab)
+                panel = GuiUtils.centerBottom(timesTab, tDriver);
+            else
+                panel = GuiUtils.center(timesTab);
         }
 
         timesTab.addChangeListener(listener);
         popIgnore();
         return panel;
     }
-
 
 
     /**
@@ -924,7 +901,7 @@ public class TimesChooser extends IdvChooser {
                 indices[i] = allTimes.indexOf(selectedTimes.get(i));
             }
             setSelectedAbsoluteTimes(indices);
-            setDoTimeDrivers(true);
+            // setDoTimeDrivers(true);
             absoluteTimesSelectionChanged();
 
         } catch (Exception e) {}
@@ -1055,15 +1032,6 @@ public class TimesChooser extends IdvChooser {
         } else {
             absTimesLbl.setText(" " + currentSelectedAbsoluteTimes.length
                                 + " times selected");
-        }
-
-        if (doTimeDrivers) {
-            driverLbl.setText("Matching Times to "
-                              + selectedDriver.getLabel());
-        } else {
-
-            selectedDriver = null;
-            driverLbl.setText(TIME_MATCHING_LABEL);
         }
         popIgnore();
     }
@@ -1411,13 +1379,32 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     * Enable or disable the GUI widgets based on what has been
+     * Enable  the GUI widgets based on what has been
      * selected.
      */
     protected void enableWidgets() {
+        GuiUtils.enableTree(timesTab, true);
+        GuiUtils.enableTree(timeline, true);
+        drivercbx.setState(false);
         checkTimesLists();
+
     }
 
+    /**
+     *  Disable the GUI widgets
+     */
+    protected void disableWidgets() {
+        if (timesCardPanel == null) {
+            return;
+        }
+        enableAbsoluteTimesList(false);
+        getRelativeTimesChooser().setEnabled(false);
+        timesCardPanel.setEnabled(false);
+        GuiUtils.enableTree(timesTab, false);
+        GuiUtils.enableTree(timeline, false);
+        GuiUtils.enableTree(tDriver, true);
+
+    }
     /**
      * Check the times lists
      */
