@@ -1042,6 +1042,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if (ud != null) {
             this.usesTimeDriver = ((Boolean) ud).booleanValue();
+        } else if(choices.size() > 0) {
+            DirectDataChoice dc = (DirectDataChoice)choices.get(0);
+            DataSource ds = dc.getDataSource();
+            Object ud0 = ds.getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING) ;
+            if (ud0 != null) {
+                this.usesTimeDriver = ((Boolean) ud0).booleanValue();
+                this.dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean) ud0).booleanValue() );
+            }
         }
 
         if (properties != null) {
