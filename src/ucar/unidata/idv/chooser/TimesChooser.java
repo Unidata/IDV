@@ -534,7 +534,7 @@ public class TimesChooser extends IdvChooser {
      *
      *  @return the times panel
      */
-    JCheckBoxMenuItem drivercbx = null;
+    JCheckBox drivercbx = null;
     JPanel tDriver = null;
     protected JPanel makeTimesPanel(boolean includeExtra,
                                     boolean useTimeLine,
@@ -603,18 +603,19 @@ public class TimesChooser extends IdvChooser {
             }
         };
         drivercbx =
-                new JCheckBoxMenuItem( "",
+                new JCheckBox( "",
                         getDoTimeDrivers());
-        drivercbx.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent event) {
-                setDoTimeDrivers(drivercbx.getState());
-                if(!drivercbx.getState())
+        drivercbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDoTimeDrivers(((JCheckBox) e.getSource()).isSelected());
+                if(!((JCheckBox) e.getSource()).isSelected())
                     enableWidgets();
                 else {
                     readDrivers();
                     if(driverMenuList == null || driverMenuList.size() == 0) {
                         GuiUtils.showDialog("No time driver", new JLabel("select time driver first."));
-                        drivercbx.setState(false);
+                        ((JCheckBox) e.getSource()).setSelected(false);
+                       // drivercbx.setState(false);
                     }
                     else
                         disableWidgets();
@@ -1385,7 +1386,7 @@ public class TimesChooser extends IdvChooser {
     protected void enableWidgets() {
         GuiUtils.enableTree(timesTab, true);
         GuiUtils.enableTree(timeline, true);
-        drivercbx.setState(false);
+        drivercbx.setSelected(false);
         checkTimesLists();
 
     }
