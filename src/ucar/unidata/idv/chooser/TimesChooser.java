@@ -76,7 +76,7 @@ import javax.swing.event.ListSelectionListener;
 public class TimesChooser extends IdvChooser {
 
     /** Time matching widget label */
-    private static final String TIME_MATCHING_LABEL = "Use Driver Times";
+    private static final String TIME_MATCHING_LABEL = "Match Times";
 
     /** Time matching widget label */
     private static final String TIME_MATCHING_LABEL_INIT = "Select a Matching Display";
@@ -406,7 +406,7 @@ public class TimesChooser extends IdvChooser {
         try {
             showWaitCursor();
             setTimeDrivers(new ArrayList());
-            setStatus("Reading drivers ...");
+            //setStatus("Reading drivers ...");
             drivers = updateTimeDriver();
             showNormalCursor();
         } catch (Exception exc) {
@@ -599,7 +599,7 @@ public class TimesChooser extends IdvChooser {
                 }
 
                 updateStatus();
-                enableWidgets();
+                enableTimeWidgets();
             }
         };
         drivercbx =
@@ -609,7 +609,7 @@ public class TimesChooser extends IdvChooser {
             public void actionPerformed(ActionEvent e) {
                 setDoTimeDrivers(((JCheckBox) e.getSource()).isSelected());
                 if(!((JCheckBox) e.getSource()).isSelected())
-                    enableWidgets();
+                    enableTimeWidgets();
                 else {
                     readDrivers();
                     if(driverMenuList == null || driverMenuList.size() == 0) {
@@ -618,7 +618,7 @@ public class TimesChooser extends IdvChooser {
                        // drivercbx.setState(false);
                     }
                     else
-                        disableWidgets();
+                        disableTimeWidgets();
 
                 }
 
@@ -692,17 +692,18 @@ public class TimesChooser extends IdvChooser {
         if (includeExtra) {
             if(doDriverTab)
                 panel = GuiUtils.centerBottom(timesTab,
-                                          GuiUtils.leftRight(tDriver, timesExtra));
+                                          GuiUtils.leftRight(timesExtra, tDriver));
             else
                 panel = GuiUtils.centerBottom(timesTab,
                         GuiUtils.left(timesExtra));
         } else {
             if(doDriverTab)
-                panel = GuiUtils.centerBottom(timesTab, tDriver);
+                panel = GuiUtils.centerBottom(timesTab, GuiUtils.right(tDriver));
             else
                 panel = GuiUtils.center(timesTab);
         }
 
+        panel.setBorder(BorderFactory.createEtchedBorder() );
         timesTab.addChangeListener(listener);
         popIgnore();
         return panel;
@@ -1384,6 +1385,15 @@ public class TimesChooser extends IdvChooser {
      * selected.
      */
     protected void enableWidgets() {
+        checkTimesLists();
+    }
+    /**
+     * Enable  the GUI widgets based on what has been
+     * selected.
+     */
+    protected void enableTimeWidgets() {
+        if (timesCardPanel == null)
+            return;
         GuiUtils.enableTree(timesTab, true);
         GuiUtils.enableTree(timeline, true);
         drivercbx.setSelected(false);
@@ -1394,7 +1404,7 @@ public class TimesChooser extends IdvChooser {
     /**
      *  Disable the GUI widgets
      */
-    protected void disableWidgets() {
+    protected void disableTimeWidgets() {
         if (timesCardPanel == null) {
             return;
         }

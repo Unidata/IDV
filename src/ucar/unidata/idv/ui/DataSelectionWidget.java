@@ -209,10 +209,13 @@ public class DataSelectionWidget {
     /** use time driver times */
     public final static String USE_DRIVERTIMES = "Use Time Driver";
 
+    /** as time driver  */
+    public final static String AS_DRIVERTIMES = "As Time Driver";
+
     /** options for time selection type */
     private final static String[] timeSubsetOptionLabels =
-        new String[] { USE_DEFAULTTIMES,
-                       USE_SELECTEDTIMES, USE_DRIVERTIMES };
+        new String[] { USE_DEFAULTTIMES, USE_SELECTEDTIMES,
+                        USE_DRIVERTIMES, AS_DRIVERTIMES };
 
     /** timeline */
     private Timeline timeline;
@@ -753,6 +756,10 @@ public class DataSelectionWidget {
             dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
                                       timeOption.equals(USE_DRIVERTIMES));
         }
+
+        dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
+                timeOption.equals(AS_DRIVERTIMES));
+
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
             if (strideCbx.isSelected()) {
@@ -1357,6 +1364,15 @@ public class DataSelectionWidget {
             if (lastDataChoice != null) {
                 lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            true);
+            }
+        } else if (selectedObject.equals(AS_DRIVERTIMES)) {
+            //selectIdx = 1;
+            timesList.setVisible(true);
+            timesList.setEnabled(true);
+            chooserDoTimeMatching = false;
+            if (lastDataChoice != null) {
+                lastDataChoice.setProperty(DataSelection.PROP_ASTIMEDRIVER,
+                        true);
             }
         }
     }

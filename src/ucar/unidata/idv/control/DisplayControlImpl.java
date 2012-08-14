@@ -1051,6 +1051,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 this.dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean) ud0).booleanValue() );
             }
         }
+        Object udd =
+                this.dataSelection.getProperty(DataSelection.PROP_ASTIMEDRIVER);
+        if (udd != null) {
+            this.isTimeDriver = ((Boolean) udd).booleanValue();
+            if(this.isTimeDriver) {  // make sure only one driver per view manager
+                ViewManager vm = getViewManager();
+                vm.ensureOnlyOneTimeDriver(this);
+            }
+        }
 
         if (properties != null) {
             applyProperties(properties);
