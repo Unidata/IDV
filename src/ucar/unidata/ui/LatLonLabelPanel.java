@@ -94,6 +94,12 @@ public class LatLonLabelPanel extends JPanel {
         "Upper Left", "Top", "Upper Right", "Left", "Middle", "Right",
         "Lower Left", "Bottom", "Lower Right"
     };
+    
+    /** list of predefined formats */
+    private static final String[] LABEL_FORMATS = {
+    	"DD", "DD.d", "DD:MM", "DD:MM:SS", 
+    	"DDC", "DD.dC", "DD:MMC", "DD:MM:SSC" 
+    };
 
     /**
      * Create a LatLonLabelPanel
@@ -208,11 +214,11 @@ public class LatLonLabelPanel extends JPanel {
         formatSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if ( !ignoreEvents) {
-                    //latLonLabelData.setFormat(formatSelector.getSelectedItem());
+                    latLonLabelData.setLabelFormat(formatSelector.getSelectedItem().toString());
                 }
             }
         });
-        GuiUtils.setListData(formatSelector, Misc.newList("DD"));
+        GuiUtils.setListData(formatSelector, LABEL_FORMATS);
 
     }
 

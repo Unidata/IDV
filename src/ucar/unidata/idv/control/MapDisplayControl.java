@@ -1118,7 +1118,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         tabbedPane.add("Maps",
                        GuiUtils.topCenter(GuiUtils.left(applyToAllMapsBtn),
                                           sp));
-        tabbedPane.add("Lat/Lon Lines", latlonPanel);
+        tabbedPane.add("Lat/Lon", latlonPanel);
         if (useZPosition()) {
 
             JPanel settingsPanel = GuiUtils.top(
@@ -2005,9 +2005,9 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @param value  the label format
          */
         public void setLabelFormat(String value) {
-            boolean shouldShare = shouldShare()
+            boolean shouldShare = true 
                                   && ( !Misc.equals(value, getLabelFormat()));
-            super.setAlignment(value);
+            super.setLabelFormat(value);
             if (shouldShare) {
                 other.okToShare = false;
                 other.setLabelFormat(value);

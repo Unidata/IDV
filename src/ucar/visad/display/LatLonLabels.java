@@ -22,6 +22,7 @@ package ucar.visad.display;
 
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 import visad.CommonUnit;
 import visad.Data;
@@ -68,7 +69,7 @@ public class LatLonLabels extends TextDisplayable {
     private float[] labelLines;
 
     /** the label format */
-    private String labelFormat = "##";
+    private String labelFormat = "DD";
 
     /** the label format */
     private TupleType labelType;
@@ -275,7 +276,30 @@ public class LatLonLabels extends TextDisplayable {
      * @return formatted value
      */
     private String formatLabel(double value) {
-        return Misc.format(value);
+    	double pvalue = Math.abs(value);
+    	String formatted = labelFormat;
+    	int degrees = (int) pvalue;
+    	double ddminutes = (pvalue-degrees);
+    	double dminutes = ddminutes*60.;
+    	int minutes = (int) dminutes;
+    	double dseconds = dminutes-minutes;
+    	int seconds = (int) (dseconds*60);
+    	formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
+    	formatted = formatted.replaceAll("DD", String.valueOf(degrees));
+    	formatted = formatted.replaceAll("mm", StringUtil.padZero(minutes, 2));
+    	formatted = formatted.replaceAll("ss", StringUtil.padZero(seconds, 2));
+    	if (labelFormat.indexOf("C") >= 0) {
+    		if (value < 0) { // South/West
+    			formatted = formatted.replace("C", (isLatitude) ? "S" : "W");
+    		} else if (value > 0){  // North/East
+    			formatted = formatted.replace("C", (isLatitude) ? "N" : "E");
+    		} else { // 0 line
+    			formatted = formatted.replace("C", "");
+    		}
+    	} else if (value < 0) {
+    		formatted = "-"+formatted;
+    	}
+        return formatted;
     }
 
     /**
@@ -405,7 +429,7 @@ public class LatLonLabels extends TextDisplayable {
      */
     public void setLabelFormat(String labelFormat)
             throws VisADException, RemoteException {
-        if ( !this.labelFormat.equals(labelFormat)) {
+        if (this.labelFormat.equals(labelFormat)) {
             return;
         }
         this.labelFormat = labelFormat;
