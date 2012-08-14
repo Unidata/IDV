@@ -47,7 +47,7 @@ public class LatLonData {
     private boolean visible = true;
 
     /** The color */
-    private Color color = Color.blue;
+    private Color color = Color.gray;
 
     /** The line spacing */
     private float spacing;

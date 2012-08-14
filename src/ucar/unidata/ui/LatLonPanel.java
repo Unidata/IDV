@@ -85,6 +85,7 @@ public class LatLonPanel extends JPanel {
     public LatLonPanel(LatLonData lld) {
         this.latLonData = lld;
         onOffCbx        = new JCheckBox("", latLonData.getVisible());
+        onOffCbx.setToolTipText("Turn on/off lines");
         onOffCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {
@@ -94,6 +95,8 @@ public class LatLonPanel extends JPanel {
         });
         spacingField =
             new JTextField(String.valueOf(latLonData.getSpacing()), 6);
+        spacingField.setToolTipText(
+            "Set the interval (degrees) between lines");
         spacingField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
@@ -105,6 +108,7 @@ public class LatLonPanel extends JPanel {
         });
         baseField =
             new JTextField(String.valueOf(latLonData.getBase()), 6);
+        baseField.setToolTipText("Set the base value for the interval");
         baseField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
@@ -120,6 +124,7 @@ public class LatLonPanel extends JPanel {
         widthBox.setMaximumSize(new Dimension(30, 16));
         widthBox.setEditable(true);
         widthBox.setSelectedItem(String.valueOf(latLonData.getLineWidth()));
+        widthBox.setToolTipText("Set the width of the lines");
         widthBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ignoreEvents) {
@@ -135,6 +140,7 @@ public class LatLonPanel extends JPanel {
                 "_._._" });
         styleBox.setMaximumSize(new Dimension(30, 16));
         styleBox.setSelectedIndex(latLonData.getLineStyle());
+        styleBox.setToolTipText("Set the line style");
         Font f = Font.decode("monospaced-BOLD");
         if (f != null) {
             styleBox.setFont(f);
@@ -167,6 +173,7 @@ public class LatLonPanel extends JPanel {
             }
         });
         fastRenderCbx = new JCheckBox("", latLonData.getFastRendering());
+        fastRenderCbx.setToolTipText("Set if lines don't render correctly");
         fastRenderCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {

@@ -143,7 +143,7 @@ public class MapInfo {
     /**
      *  List of LatLonData objects.
      */
-    private List latLonData = new ArrayList();
+    private List<LatLonData> latLonData = new ArrayList<LatLonData>();
 
     /**
      *  List of LatLonLabelData objects.
@@ -322,30 +322,33 @@ public class MapInfo {
                 seenNodes.put(source, mapNode);
             }
 
+            // NB:  The || true is used because these methods didn't used
+            // to handle empty nodes.  They now do, but we can easily back
+            // out of this change if need be.
             Element latitudeNode = XmlUtil.findChild(root, TAG_LATITUDE);
-            if (latitudeNode != null) {
+            if ((latitudeNode != null) || true) {
                 latLonData.add(createLatLonData(latitudeNode, true, -90.f,
-                        90.f, 30.f));
+                        90.f, 15.f));
             }
 
             Element longitudeNode = XmlUtil.findChild(root, TAG_LONGITUDE);
-            if (longitudeNode != null) {
+            if ((longitudeNode != null) || true) {
                 latLonData.add(createLatLonData(longitudeNode, false, -180.f,
-                        180.f, 45.f));
+                        180.f, 15.f));
             }
 
             Element latitudeLabelNode = XmlUtil.findChild(root,
                                             TAG_LATITUDELABEL);
-            if (latitudeLabelNode != null) {
+            if ((latitudeLabelNode != null) || true) {
                 latLonLabelData.add(createLatLonLabelData(latitudeLabelNode,
-                        true, 30));
+                        true, 15.f));
             }
 
             Element longitudeLabelNode = XmlUtil.findChild(root,
                                              TAG_LONGITUDELABEL);
-            if (longitudeLabelNode != null) {
+            if ((longitudeLabelNode != null) || true) {
                 latLonLabelData.add(createLatLonLabelData(longitudeLabelNode,
-                        false, 30));
+                        false, 15.f));
             }
 
 
@@ -550,21 +553,27 @@ public class MapInfo {
     private LatLonData createLatLonData(Element node, boolean latitude,
                                         float min, float max, float spacing)
             throws VisADException, RemoteException {
-        LatLonData lld =
-            new LatLonData(latitude,
-                           XmlUtil.getAttribute(node, ATTR_COLOR,
-                               Color.white), XmlUtil.getAttribute(node,
-                                   ATTR_SPACING,
-                                   spacing), XmlUtil.getAttribute(node,
-                                       ATTR_BASE,
-                                       0.f), XmlUtil.getAttribute(node,
-                                           ATTR_LINEWIDTH,
-                                           1.0f), XmlUtil.getAttribute(node,
-                                               ATTR_LINESTYLE,
-                                               1), XmlUtil.getAttribute(node,
-                                                   ATTR_FASTRENDER, false));
+        LatLonData lld = (node != null)
+                         ? new LatLonData(latitude,
+                             XmlUtil.getAttribute(node, ATTR_COLOR,
+                                 Color.gray), XmlUtil.getAttribute(node,
+                                     ATTR_SPACING,
+                                     spacing), XmlUtil.getAttribute(node,
+                                         ATTR_BASE,
+                                         0.f), XmlUtil.getAttribute(node,
+                                             ATTR_LINEWIDTH,
+                                             1.0f), XmlUtil.getAttribute(node,
+                                                 ATTR_LINESTYLE,
+                                                 1), XmlUtil.getAttribute(node,
+                                                     ATTR_FASTRENDER, false))
+                         : new LatLonData(latitude, Color.gray, spacing,
+                                          0.f, 1.0f, 1, false);
 
-        lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, true));
+        if (node != null) {
+            lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, false));
+        } else {
+            lld.setVisible(false);
+        }
         lld.setMinValue(min);
         lld.setMaxValue(max);
 
@@ -585,18 +594,33 @@ public class MapInfo {
     private LatLonLabelData createLatLonLabelData(Element node,
             boolean latitude, float spacing)
             throws VisADException, RemoteException {
-        LatLonLabelData llld = new LatLonLabelData(latitude,
+        LatLonLabelData llld = (node != null)
+                               ? new LatLonLabelData(latitude,
                                    XmlUtil.getAttribute(node, ATTR_SPACING,
-                                       spacing));
+                                       spacing))
+                               : new LatLonLabelData(latitude, spacing);
 
-        llld.setBaseValue(XmlUtil.getAttribute(node, ATTR_BASE, 0.f));
-        llld.setColor(XmlUtil.getAttribute(node, ATTR_COLOR, Color.white));
-        llld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, true));
-        llld.setLabelsLineString(XmlUtil.getAttribute(node, ATTR_LABELLINES,
-                "0"));
-        llld.setAlignment(XmlUtil.getAttribute(node, ATTR_ALIGNMENT, "MM"));
-        llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_ALIGNMENT, "DD"));
-        llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
+        if (node != null) {
+            llld.setBaseValue(XmlUtil.getAttribute(node, ATTR_BASE, 0.f));
+            llld.setColor(XmlUtil.getAttribute(node, ATTR_COLOR,
+                    Color.white));
+            llld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, false));
+            llld.setLabelsLineString(XmlUtil.getAttribute(node,
+                    ATTR_LABELLINES, "0"));
+            llld.setAlignment(XmlUtil.getAttribute(node, ATTR_ALIGNMENT,
+                    "MM"));
+            llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_ALIGNMENT,
+                    "DD"));
+            llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
+        } else {
+            llld.setBaseValue(0.f);
+            llld.setColor(Color.white);
+            llld.setVisible(false);
+            llld.setLabelsLineString("0");
+            llld.setAlignment("MM");
+            llld.setLabelFormat("DD");
+            llld.setSphere(false);
+        }
         return llld;
     }
 

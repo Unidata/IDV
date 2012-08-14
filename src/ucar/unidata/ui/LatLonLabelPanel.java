@@ -95,11 +95,11 @@ public class LatLonLabelPanel extends JPanel {
         "Upper Left", "Top", "Upper Right", "Left", "Middle", "Right",
         "Lower Left", "Bottom", "Lower Right"
     };
-    
+
     /** list of predefined formats */
     private static final String[] LABEL_FORMATS = {
-    	"DD", "DD.d", "DD:MM", "DD:MM:SS", 
-    	"DDH", "DD.dH", "DD:MMH", "DD:MM:SSH" 
+        "DD", "DD.d", "DD:MM", "DD:MM:SS", "DDH", "DD.dH", "DD:MMH",
+        "DD:MM:SSH"
     };
 
     /**
@@ -112,6 +112,7 @@ public class LatLonLabelPanel extends JPanel {
 
         this.latLonLabelData = lld;
         onOffCbx             = new JCheckBox("", latLonLabelData.getVisible());
+        onOffCbx.setToolTipText("Turn on/off labels");
         onOffCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {
@@ -157,10 +158,10 @@ public class LatLonLabelPanel extends JPanel {
                     return;
                 }
                 try {
-                latLonLabelData.setLabelsLineString(
-                    labelLinesField.getText());
+                    latLonLabelData.setLabelsLineString(
+                        labelLinesField.getText());
                 } catch (NumberFormatException nfe) {
-                	LogUtil.userErrorMessage("Bad format for label lines");
+                    LogUtil.userErrorMessage("Bad format for label lines");
                 }
             }
         });
@@ -184,6 +185,7 @@ public class LatLonLabelPanel extends JPanel {
             }
         });
         fastRenderCbx = new JCheckBox("", latLonLabelData.getFastRendering());
+        fastRenderCbx.setToolTipText("Set if labels don't render correctly");
         fastRenderCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {
@@ -203,6 +205,8 @@ public class LatLonLabelPanel extends JPanel {
         });
         //fontSelector.setFont((Font)latLonLabelData.getFont());
         alignSelector = new JComboBox();
+        alignSelector.setToolTipText(
+            "Set the positioning of the label relative to the location");
         alignSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if ( !ignoreEvents) {
@@ -216,14 +220,17 @@ public class LatLonLabelPanel extends JPanel {
                              TwoFacedObject.createList(Glyph.RECTPOINTS,
                                  RECTPOINTNAMES));
         formatSelector = new JComboBox();
+        formatSelector.setToolTipText("Set the label format");
         formatSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if ( !ignoreEvents) {
-                    latLonLabelData.setLabelFormat(formatSelector.getSelectedItem().toString());
+                    latLonLabelData.setLabelFormat(
+                        formatSelector.getSelectedItem().toString());
                 }
             }
         });
         GuiUtils.setListData(formatSelector, LABEL_FORMATS);
+        formatSelector.setSelectedItem(latLonLabelData.getLabelFormat());
 
     }
 

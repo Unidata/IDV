@@ -24,7 +24,7 @@
         minvalue="-90"
         maxvalue="90"
         spacing="15"
-        color="gray"
+        color="white"
         visible="false"
         />
 
@@ -32,10 +32,10 @@
          minvalue="-180"
          maxvalue="179"
          spacing="15"
-         color="gray"
+         color="white"
          visible="false"
          />
-
+         
   <map
        source="/auxdata/maps/OUTVHRES"
        description="World Coastlines"
