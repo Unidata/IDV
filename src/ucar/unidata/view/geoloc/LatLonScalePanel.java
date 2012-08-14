@@ -22,9 +22,9 @@ package ucar.unidata.view.geoloc;
 
 
 import ucar.unidata.ui.FontSelector;
+import ucar.unidata.ui.NumericTextField;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.NumericTextField;
 import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 
 import java.awt.BorderLayout;
