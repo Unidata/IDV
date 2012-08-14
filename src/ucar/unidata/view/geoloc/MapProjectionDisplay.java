@@ -21,6 +21,37 @@
 package ucar.unidata.view.geoloc;
 
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -34,14 +65,12 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
-
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.MapLines;
 import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
-
 import visad.AxisScale;
 import visad.CachingCoordinateSystem;
 import visad.CommonUnit;
@@ -66,51 +95,12 @@ import visad.Unit;
 import visad.UnitException;
 import visad.VisADException;
 import visad.VisADRay;
-
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.BaseMapAdapter;
-
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.math.BigDecimal;
-
-import java.net.URL;
-
-import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
 
 
 /**
@@ -485,15 +475,17 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lat top
      */
     private double calcLatTop() {
-        double[]      xRange = xMap.getRange();
-        double[]      yRange = yMap.getRange();
-        double[]      zRange = (zMap != null)
-                               ? zMap.getRange()
-                               : new double[] { 0, 0 };
-        EarthLocation el = getEarthLocation(xRange[0], yRange[1], zRange[0]);
-        double        top    = el.getLatitude().getValue();
+        final double  LAT_MAX = 90;
 
-        final double  DELTA  = (xRange[1] - xRange[0]) / 100;
+        double[]      xRange  = xMap.getRange();
+        double[]      yRange  = yMap.getRange();
+        double[]      zRange  = (zMap != null)
+                                ? zMap.getRange()
+                                : new double[] { 0, 0 };
+        EarthLocation el = getEarthLocation(xRange[0], yRange[1], zRange[0]);
+        double        top     = el.getLatitude().getValue();
+
+        final double  DELTA   = (xRange[1] - xRange[0]) / 100;
         if (Double.isNaN(top)) {
             outerloop:
             for (double y = yRange[1]; y > yRange[0]; y = y - DELTA) {
@@ -506,7 +498,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 }
             }
         }
-        return top;
+        return (top > LAT_MAX)
+               ? LAT_MAX
+               : top;
     }
 
     /**
