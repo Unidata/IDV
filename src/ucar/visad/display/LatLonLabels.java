@@ -276,29 +276,35 @@ public class LatLonLabels extends TextDisplayable {
      * @return formatted value
      */
     private String formatLabel(double value) {
-    	double pvalue = Math.abs(value);
-    	String formatted = labelFormat;
-    	int degrees = (int) pvalue;
-    	double ddminutes = (pvalue-degrees);
-    	double dminutes = ddminutes*60.;
-    	int minutes = (int) dminutes;
-    	double dseconds = dminutes-minutes;
-    	int seconds = (int) (dseconds*60);
-    	formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
-    	formatted = formatted.replaceAll("DD", String.valueOf(degrees));
-    	formatted = formatted.replaceAll("mm", StringUtil.padZero(minutes, 2));
-    	formatted = formatted.replaceAll("ss", StringUtil.padZero(seconds, 2));
-    	if (labelFormat.indexOf("C") >= 0) {
-    		if (value < 0) { // South/West
-    			formatted = formatted.replace("C", (isLatitude) ? "S" : "W");
-    		} else if (value > 0){  // North/East
-    			formatted = formatted.replace("C", (isLatitude) ? "N" : "E");
-    		} else { // 0 line
-    			formatted = formatted.replace("C", "");
-    		}
-    	} else if (value < 0) {
-    		formatted = "-"+formatted;
-    	}
+        double pvalue    = Math.abs(value);
+        String formatted = labelFormat;
+        int    degrees   = (int) pvalue;
+        double ddminutes = (pvalue - degrees);
+        double dminutes  = ddminutes * 60.;
+        int    minutes   = (int) dminutes;
+        double dseconds  = dminutes - minutes;
+        int    seconds   = (int) (dseconds * 60);
+        formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
+        formatted = formatted.replaceAll("DD", String.valueOf(degrees));
+        formatted = formatted.replaceAll("MM",
+                                         StringUtil.padZero(minutes, 2));
+        formatted = formatted.replaceAll("SS",
+                                         StringUtil.padZero(seconds, 2));
+        if (labelFormat.indexOf("H") >= 0) {
+            if (value < 0) {         // South/West
+                formatted = formatted.replace("H", (isLatitude)
+                        ? "S"
+                        : "W");
+            } else if (value > 0) {  // North/East
+                formatted = formatted.replace("H", (isLatitude)
+                        ? "N"
+                        : "E");
+            } else {                 // 0 line
+                formatted = formatted.replace("H", "");
+            }
+        } else if (value < 0) {
+            formatted = "-" + formatted;
+        }
         return formatted;
     }
 

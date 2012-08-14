@@ -24,6 +24,7 @@ package ucar.unidata.ui;
 import ucar.unidata.gis.maps.LatLonLabelData;
 import ucar.unidata.ui.drawing.Glyph;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -98,7 +99,7 @@ public class LatLonLabelPanel extends JPanel {
     /** list of predefined formats */
     private static final String[] LABEL_FORMATS = {
     	"DD", "DD.d", "DD:MM", "DD:MM:SS", 
-    	"DDC", "DD.dC", "DD:MMC", "DD:MM:SSC" 
+    	"DDH", "DD.dH", "DD:MMH", "DD:MM:SSH" 
     };
 
     /**
@@ -155,8 +156,12 @@ public class LatLonLabelPanel extends JPanel {
                 if (ignoreEvents) {
                     return;
                 }
+                try {
                 latLonLabelData.setLabelsLineString(
                     labelLinesField.getText());
+                } catch (NumberFormatException nfe) {
+                	LogUtil.userErrorMessage("Bad format for label lines");
+                }
             }
         });
 

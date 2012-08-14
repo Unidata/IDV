@@ -454,11 +454,11 @@ public class LatLonLabelData {
      * @return the array of float values
      */
     public static float[] parseLabelLineString(String llString) {
-    	if (llString.indexOf(";") > 0) {
-           return Misc.parseFloats(llString, ";");
-    	} else {
-           return Misc.parseFloats(llString, ",");
-    	}
+        if (llString.indexOf(";") > 0) {
+            return Misc.parseFloats(llString, ";");
+        } else {
+            return Misc.parseFloats(llString, ",");
+        }
     }
 
     /**
@@ -583,11 +583,11 @@ public class LatLonLabelData {
     }
 
     /**
-     * Set the label format
+     * Set the label format (DD, DD:MM, etc)
      * @param format  the label format
      */
-    public void setLabelFormat(String value) {
-        labelFormat = value;
+    public void setLabelFormat(String format) {
+        labelFormat = format;
         stateChanged();
     }
 

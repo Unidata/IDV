@@ -2005,7 +2005,7 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @param value  the label format
          */
         public void setLabelFormat(String value) {
-            boolean shouldShare = true 
+            boolean shouldShare = true
                                   && ( !Misc.equals(value, getLabelFormat()));
             super.setLabelFormat(value);
             if (shouldShare) {
