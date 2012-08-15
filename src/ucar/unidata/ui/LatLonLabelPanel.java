@@ -250,6 +250,11 @@ public class LatLonLabelPanel extends JPanel {
                 "" + LatLonLabelData.formatLabelLines(lld.getLabelLines()));
             colorButton.setBackground(lld.getColor());
             fastRenderCbx.setSelected(lld.getFastRendering());
+            alignSelector.setSelectedItem(lld.getAlignment());
+            if (lld.getFont() != null) {
+                fontSelector.setFont((Font) lld.getFont());
+            }
+            formatSelector.setSelectedItem(lld.getLabelFormat());
             ignoreEvents = false;
         }
 

@@ -1869,13 +1869,11 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @return true if we should share
          */
         private boolean shouldShare() {
-            /*
-        if ((mapDisplayControl != null)
-                && mapDisplayControl.getApplyChangesToAllLatLon()
-                && (other != null) && okToShare && !ignoreStateChange) {
-            return true;
-        }
-        */
+            if ((mapDisplayControl != null)
+                    && mapDisplayControl.getApplyChangesToAllLabels()
+                    && (other != null) && okToShare && !ignoreStateChange) {
+                return true;
+            }
             return false;
         }
 
@@ -1933,7 +1931,7 @@ public class MapDisplayControl extends DisplayControlImpl {
          * @param values  the label lines
          */
         public void setLabelLines(float[] values) {
-            boolean shouldShare = shouldShare()
+            boolean shouldShare = false
                                   && ( !Arrays.equals(values,
                                       getLabelLines()));
             super.setLabelLines(values);
@@ -2612,6 +2610,27 @@ public class MapDisplayControl extends DisplayControlImpl {
             return applyToAllLatLonBtn.isSelected();
         }
         return applyChangesToAllLatLon;
+    }
+
+    /**
+     *  Set the ApplyChangesToAllLatLon property.
+     *
+     *  @param value The new value for ApplyChangesToAllLatLon
+     */
+    public void setApplyChangesToAllLabels(boolean value) {
+        applyChangesToAllLabels = value;
+    }
+
+    /**
+     *  Get the ApplyChangesToAllLatLon property.
+     *
+     *  @return The ApplyChangesToAllLatLon
+     */
+    public boolean getApplyChangesToAllLabels() {
+        if (applyToAllLabelsBtn != null) {
+            return applyToAllLabelsBtn.isSelected();
+        }
+        return applyChangesToAllLabels;
     }
 
     /**
