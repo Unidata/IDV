@@ -621,6 +621,7 @@ public class TimesChooser extends IdvChooser {
                             "No Time Driver",
                             new JLabel("Please set a time driver first."));
                         ((JCheckBox) e.getSource()).setSelected(false);
+                        setDoTimeDrivers(((JCheckBox) e.getSource()).isSelected());
                         // drivercbx.setState(false);
                     } else {
                         disableTimeWidgets();
