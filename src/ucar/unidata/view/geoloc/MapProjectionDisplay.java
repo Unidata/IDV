@@ -1263,16 +1263,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             lsi.setVisible(true);
             lsi.setCoordFormat(CoordSys.A);
 
-            double[]      xRange = xMap.getRange();
-            double[]      yRange = yMap.getRange();
-            double[]      zRange = (zMap != null)
-                                   ? zMap.getRange()
-                                   : new double[] { 0, 0 };
-            EarthLocation el1    = getEarthLocation(xRange[0], yRange[0],
-                                    zRange[0]);
             double        base = calcLatBase();
-            EarthLocation el2  = getEarthLocation(xRange[0], yRange[1],
-                                    zRange[0]);
             double end = calcLatTop();
             int    inc = (int) round(Math.abs(end - base) / 5d, 0,
                                   BigDecimal.ROUND_HALF_UP);
