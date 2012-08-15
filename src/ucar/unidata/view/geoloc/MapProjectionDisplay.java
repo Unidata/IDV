@@ -637,7 +637,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                                    String>();
         double       base = Misc.parseNumber(getLatScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLatScaleInfo().getMinorIncrement();
+        int          minorTickInc = getLatScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
         double       inc = Misc.parseNumber(getLatScaleInfo().getIncrement());
 
@@ -707,7 +707,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                                    String>();
         double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().getMinorIncrement();
+        int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
         double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
         int          cnt          = 0;
@@ -795,7 +795,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                                    String>();
         double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().getMinorIncrement();
+        int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
         double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
         int          cnt          = 0;
@@ -1259,7 +1259,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             latScaleInfo = lsi;
             lsi.setLabel("Latitude");
             lsi.setIncrement(10 + "");
-            lsi.setMinorIncrement(1);
+            lsi.setMinorDivision(1);
             lsi.setVisible(true);
             lsi.setCoordFormat(CoordSys.A);
 
@@ -1304,7 +1304,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             lonScaleInfo = lsi;
             lsi.setLabel("Longitude");
-            lsi.setMinorIncrement(1);
+            lsi.setMinorDivision(1);
             lsi.setVisible(true);
             lsi.setCoordFormat(CoordSys.A);
 

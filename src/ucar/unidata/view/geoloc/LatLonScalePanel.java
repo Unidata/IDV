@@ -217,7 +217,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         latLabel.setText(latScaleInfo.getLabel());
         latBaseLabel.setText(latScaleInfo.getBaseLabel());
         latIncrement.setText(latScaleInfo.getIncrement());
-        latMinorSpinner.setValue(latScaleInfo.getMinorIncrement());
+        latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
         yVisible.setSelected(latScaleInfo.getVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
         fontSelector.setFont(latScaleInfo.getFont());
@@ -230,7 +230,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         lonLabel.setText(lonScaleInfo.getLabel());
         lonBaseLabel.setText(lonScaleInfo.getBaseLabel());
         lonIncrement.setText(lonScaleInfo.getIncrement());
-        lonMinorSpinner.setValue(lonScaleInfo.getMinorIncrement());
+        lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
         xVisible.setSelected(lonScaleInfo.getVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
         fontSelector.setFont(lonScaleInfo.getFont());
@@ -247,7 +247,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLatInfo.setLabel(latLabel.getText());
         newLatInfo.setBaseLabel(latBaseLabel.getText());
         newLatInfo.setIncrement(latIncrement.getText());
-        newLatInfo.setMinorIncrement(
+        newLatInfo.setMinorDivision(
             Integer.valueOf(latMinorSpinner.getValue().toString()));
         newLatInfo.setVisible(yVisible.isSelected());
         newLatInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
@@ -262,7 +262,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLonInfo.setLabel(lonLabel.getText());
         newLonInfo.setBaseLabel(lonBaseLabel.getText());
         newLonInfo.setIncrement(lonIncrement.getText());
-        newLonInfo.setMinorIncrement(
+        newLonInfo.setMinorDivision(
             Integer.valueOf(lonMinorSpinner.getValue().toString()));
         newLonInfo.setVisible(xVisible.isSelected());
         newLonInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());

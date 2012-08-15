@@ -50,8 +50,8 @@ public class AxisScaleInfo {
     /** The  increment. */
     private String increment;
 
-    /** Minor increment. */
-    private int minorIncrement;
+    /** Minor division. */
+    private int minorDivision;
 
     /** Is axis visible. */
     private boolean visible;
@@ -87,7 +87,7 @@ public class AxisScaleInfo {
         result = prime * result + ((label == null)
                                    ? 0
                                    : label.hashCode());
-        result = prime * result + minorIncrement;
+        result = prime * result + minorDivision;
         result = prime * result + (visible
                                    ? 1231
                                    : 1237);
@@ -140,7 +140,7 @@ public class AxisScaleInfo {
         } else if ( !label.equals(other.label)) {
             return false;
         }
-        if (minorIncrement != other.minorIncrement) {
+        if (minorDivision != other.minorDivision) {
             return false;
         }
         if (visible != other.visible) {
@@ -222,21 +222,21 @@ public class AxisScaleInfo {
     }
 
     /**
-     * Gets the minor increment.
+     * Gets the minor division.
      *
-     * @return the minor increment
+     * @return the minor division
      */
-    public int getMinorIncrement() {
-        return minorIncrement;
+    public int getMinorDivision() {
+        return minorDivision;
     }
 
     /**
-     * Sets the minor increment.
+     * Sets the minor division.
      *
-     * @param minorIncrement the new minor increment
+     * @param minorDivision the new minor division
      */
-    public void setMinorIncrement(int minorIncrement) {
-        this.minorIncrement = minorIncrement;
+    public void setMinorDivision(int minorDivision) {
+        this.minorDivision = minorDivision;
     }
 
     /**
