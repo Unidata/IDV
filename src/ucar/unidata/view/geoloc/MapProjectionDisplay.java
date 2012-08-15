@@ -861,7 +861,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private void finalizeAxis(
             AxisScale scale, String title,
             Hashtable<? extends Double, ? extends String> labelTable,
-            List<Double> majorTicks, List<Double> minorTicks, Font axisFont)
+            List<? extends Double> majorTicks, List<? extends Double> minorTicks, Font axisFont)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
