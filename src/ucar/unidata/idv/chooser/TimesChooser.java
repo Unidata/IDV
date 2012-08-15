@@ -76,7 +76,7 @@ import javax.swing.event.ListSelectionListener;
 public class TimesChooser extends IdvChooser {
 
     /** Time matching widget label */
-    private static final String TIME_MATCHING_LABEL = "Match Display Times";
+    private static final String TIME_MATCHING_LABEL = "Match Time Driver";
 
     /** Time matching widget label */
     private static final String TIME_MATCHING_LABEL_INIT =
@@ -714,13 +714,59 @@ public class TimesChooser extends IdvChooser {
             }
         }
 
-        panel.setBorder(BorderFactory.createEtchedBorder());
+        //panel.setBorder(BorderFactory.createEtchedBorder());
         timesTab.addChangeListener(listener);
         popIgnore();
         return panel;
     }
 
+    /**
+     *  Check the current active view window and make sure it does 
+     *  has a time driver, otherwise, reset the active view window
+     */
+    protected boolean checkActiveViewWithDriver() {
+        List<ViewManager>    vms = getIdv().getVMManager().getViewManagers();
+        
+        int size = vms.size();
+        ViewManager vm0 ;
 
+        if(  size == 1)
+            return true; // only one view window and we already check there is driver
+        else {
+            vm0 = getIdv().getVMManager().getLastActiveViewManager();
+            List tdt = null;
+            try{
+                tdt = vm0.getTimeDriverTimes();
+            } catch (Exception e) {}
+
+            if(tdt != null)
+                return true;
+            else {
+                LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
+                        "the view window with time driver! \n");
+
+                return false;
+            }
+
+        }
+
+    }
+
+    /**
+     * Gets called by doLoad in a thread when the user presses the
+     * load button. Should be overwritten by a derived class.
+     */
+    public void doLoad() {
+        if(!drivercbx.isSelected() || !autoCreateDisplayCbx.isSelected()) {
+            super.doLoad();
+        } else {
+            if(!checkActiveViewWithDriver())
+                return;
+            else
+                super.doLoad();
+        }
+
+    }
     /**
      * Enable the absolute times list
      *

@@ -32,6 +32,7 @@ import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.TimesChooser;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.util.GuiUtils;
@@ -207,10 +208,10 @@ public class DataSelectionWidget {
     public final static String USE_SELECTEDTIMES = "Use Selected";
 
     /** use time driver times */
-    public final static String USE_DRIVERTIMES = "Use Time Driver";
+    public final static String USE_DRIVERTIMES = "Match Time Driver";
 
     /** as time driver  */
-    public final static String AS_DRIVERTIMES = "As Time Driver";
+    public final static String AS_DRIVERTIMES = "Set As Time Driver";
 
     /** options for time selection type */
     private final static String[] timeSubsetOptionLabels =
@@ -1293,6 +1294,12 @@ public class DataSelectionWidget {
                 setTimeOptions(selectedObj);
                 if(timeOptionLabelBox.getSelectedIndex() != 2) {
                     chooserDoTimeMatching = false;
+                } else {
+                    if(!checkActiveViewWithDriver()) {
+                        timeOptionLabelBox.setSelectedIndex(0);
+                        selectedObj = timeOptionLabelBox.getSelectedItem();
+                        setTimeOptions(selectedObj);
+                    }
                 }
             }
 
@@ -1375,6 +1382,31 @@ public class DataSelectionWidget {
                         true);
             }
         }
+    }
+
+    /**
+     *  Check the current active view window and make sure it does
+     *  has a time driver, otherwise, reset the active view window
+     */
+    protected boolean checkActiveViewWithDriver() {
+        List<ViewManager>    vms = this.idv.getVMManager().getViewManagers();
+        int size = vms.size();
+        ViewManager vm0 ;
+
+        vm0 = this.idv.getVMManager().getLastActiveViewManager();
+        List tdt = null;
+        try{
+            tdt = vm0.getTimeDriverTimes();
+        } catch (Exception e) {}
+
+        if(tdt != null)
+            return true;
+        else {
+            LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
+                    "the view window with time driver! \n");
+            return false;
+        }
+
     }
 
     /**
