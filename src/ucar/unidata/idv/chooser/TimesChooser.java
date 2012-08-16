@@ -758,7 +758,9 @@ public class TimesChooser extends IdvChooser {
      * load button. Should be overwritten by a derived class.
      */
     public void doLoad() {
-        if(!drivercbx.isSelected() || !autoCreateDisplayCbx.isSelected()) {
+        if(autoCreateDisplayCbx == null)  {
+            super.doLoad();
+        } else if(!drivercbx.isSelected() || !autoCreateDisplayCbx.isSelected()) {
             super.doLoad();
         } else {
             if(!checkActiveViewWithDriver())
