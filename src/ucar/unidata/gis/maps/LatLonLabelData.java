@@ -87,7 +87,7 @@ public class LatLonLabelData {
     private boolean useSphere;
 
     /** format flag */
-    private String labelFormat;
+    private String labelFormat = "DD";
 
 
     /**

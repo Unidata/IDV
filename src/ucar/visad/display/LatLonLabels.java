@@ -435,7 +435,8 @@ public class LatLonLabels extends TextDisplayable {
      */
     public void setLabelFormat(String labelFormat)
             throws VisADException, RemoteException {
-        if (this.labelFormat.equals(labelFormat)) {
+        if ((labelFormat == null)
+                || Misc.equals(this.labelFormat, labelFormat)) {
             return;
         }
         this.labelFormat = labelFormat;
