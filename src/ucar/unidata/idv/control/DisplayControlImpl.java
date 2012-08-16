@@ -1122,10 +1122,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     List dtimes = ds.getTimeDriverTimes();
                     Object ud1 =
                         ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if ((dtimes != null) && (dtimes.size() > 0)
-                            && (ud1 != null)) {
+                    //if ((dtimes != null) && (dtimes.size() > 0)
+                    //        && (ud1 != null)) {
+                    if(ud1 != null )
                         this.usesTimeDriver = ((Boolean) ud1).booleanValue();
-                    }
+                    //}
                 }
             }
         }
