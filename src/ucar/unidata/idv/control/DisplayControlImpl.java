@@ -1043,7 +1043,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (ud != null) {
             this.usesTimeDriver = ((Boolean) ud).booleanValue();
         } else if(choices.size() > 0) {
-            
             DataChoice dc = (DataChoice)choices.get(0);
             if(dc instanceof  DirectDataChoice) {
                 DirectDataChoice dc0 = (DirectDataChoice)dc;
@@ -1057,7 +1056,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         Object udd =
                 this.dataSelection.getProperty(DataSelection.PROP_ASTIMEDRIVER);
-        if (udd != null) {
+        if (udd != null && !this.isTimeDriver) {
+        //if (udd != null ) {
             this.isTimeDriver = ((Boolean) udd).booleanValue();
             if(this.isTimeDriver) {  // make sure only one driver per view manager
                 ViewManager vm = getViewManager();
