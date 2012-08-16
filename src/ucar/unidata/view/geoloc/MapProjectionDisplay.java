@@ -1253,7 +1253,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lat scale info
      */
     public AxisScaleInfo getLatScaleInfo() {
-        if (latScaleInfo == null) {
+    	// The 2nd null check is kludgy, but sometimes AxisScaleInfo
+    	//deserialization will have problems in which case all fields 
+    	//are null. 
+        if (latScaleInfo == null || latScaleInfo.getBaseLabel() == null) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
             latScaleInfo = lsi;
@@ -1290,7 +1293,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lon scale info
      */
     public AxisScaleInfo getLonScaleInfo() {
-        if (this.lonScaleInfo == null) {
+    	// The 2nd null check is kludgy, but sometimes AxisScaleInfo
+    	//deserialization will have problems in which case all fields 
+    	//are null. 
+        if (lonScaleInfo == null || lonScaleInfo.getBaseLabel() == null) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
             lonScaleInfo = lsi;
