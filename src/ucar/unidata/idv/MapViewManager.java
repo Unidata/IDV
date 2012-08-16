@@ -2411,8 +2411,8 @@ public class MapViewManager extends NavigatedViewManager {
         if ( !useGlobeDisplay) {
             MapProjectionDisplay mpDisplay =
                 (MapProjectionDisplay) getNavigatedDisplay();
-            mpDisplay.getLatScaleInfo().visible = getBp(PREF_SHOWSCALES);
-            mpDisplay.getLonScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            mpDisplay.getLatScaleInfo().setVisible(getBp(PREF_SHOWSCALES));
+            mpDisplay.getLonScaleInfo().setVisible(getBp(PREF_SHOWSCALES));
             latLonScaleWidget = new LatLonScalePanel(mpDisplay);
             tabbedPane.add("Horizontal Scale",
                            GuiUtils.topLeft(latLonScaleWidget));

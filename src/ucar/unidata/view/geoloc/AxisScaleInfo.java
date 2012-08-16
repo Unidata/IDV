@@ -32,30 +32,32 @@ import java.awt.Font;
 
 
 /**
- * Struct containing axis scale information.
+ * Almost a JavaBean, but not quite. Note that the IDV does not follow JavaBean
+ * conventions for booleans. Booleans require get and set methods instead of is and
+ * set methods.
  */
 public class AxisScaleInfo {
 
     /** The axis label. */
-    public String label;
+    private String label;
 
     /** The coord format. */
-    public AxisScaleInfo.CoordSys coordFormat;
+    private AxisScaleInfo.CoordSys coordFormat;
 
     /** The base label. */
-    public String baseLabel;
+    private String baseLabel;
 
     /** The  increment. */
-    public String increment;
+    private String increment;
 
-    /** Minor increment. */
-    public int minorIncrement;
+    /** Minor division. */
+    private int minorDivision;
 
     /** Is axis visible. */
-    public boolean visible;
+    private boolean visible;
 
     /** The axis font. */
-    public Font font;
+    private Font font;
 
     /**
      * Instantiates a new lat lon scale info.
@@ -64,121 +66,7 @@ public class AxisScaleInfo {
 
 
     /**
-     * The Enum CoordSys.
-     */
-    public enum CoordSys {
-
-        /** The A. */
-        A("dd D"),
-
-        /** The B. */
-        B("dd mm'D"),
-
-        /** The C. */
-        C("dd mm.mmm'D"),
-
-        /** The D. */
-        D("dd mm'ss\"D"),
-
-        /** The E. */
-        E("dd:mmD"),
-
-        /** The F. */
-        F("dd:mm:ssD"),
-
-        /** The G. */
-        G("dd:mm:ss.sssssD"),
-
-        /** The H. */
-        H("dd.dddddD");
-
-        /** The coord sys. */
-        private final String coordSys;
-
-        /**
-         * Instantiates a new coord sys.
-         *
-         * @param coordSys the coord sys
-         */
-        private CoordSys(final String coordSys) {
-            this.coordSys = coordSys;
-        }
-
-        /**
-         * Format.
-         *
-         * @param i the i
-         * @param card the card
-         * @return the string
-         */
-        public String format(double i, Cardinality card) {
-            switch (this) {
-
-              case A :
-                  return CoordinateFormat.convert(i,
-                          new DecimalCoordFormat(0, DegMinSec.NONE),
-                          EMPTY_FORMAT, EMPTY_FORMAT, card);
-
-              case B :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.DEGREE),
-                          new DecimalCoordFormat(0, DegMinSec.MINUTE),
-                          EMPTY_FORMAT, card);
-
-              case C :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.DEGREE),
-                          new DecimalCoordFormat(3, DegMinSec.MINUTE),
-                          EMPTY_FORMAT, card);
-
-              case D :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new DecimalCoordFormat(0, DegMinSec.NONE),
-                          EMPTY_FORMAT, card);
-
-              case E :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new DecimalCoordFormat(0, DegMinSec.NONE),
-                          EMPTY_FORMAT, card);
-
-              case F :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new DecimalCoordFormat(0, DegMinSec.NONE), card);
-
-              case G :
-                  return CoordinateFormat.convert(i,
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new FloorCoordFormat(DegMinSec.COLON),
-                          new DecimalCoordFormat(5, DegMinSec.NONE), card);
-
-              case H :
-                  return CoordinateFormat.convert(i,
-                          new DecimalCoordFormat(5, DegMinSec.NONE),
-                          EMPTY_FORMAT, EMPTY_FORMAT, card);
-
-              default :
-                  return CoordinateFormat.convert(i,
-                          new DecimalCoordFormat(0, DegMinSec.NONE),
-                          EMPTY_FORMAT, EMPTY_FORMAT, card);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return coordSys;
-        }
-    }
-
-    /**
      * {@inheritDoc}
-     *
      */
     @Override
     public int hashCode() {
@@ -199,7 +87,7 @@ public class AxisScaleInfo {
         result = prime * result + ((label == null)
                                    ? 0
                                    : label.hashCode());
-        result = prime * result + minorIncrement;
+        result = prime * result + minorDivision;
         result = prime * result + (visible
                                    ? 1231
                                    : 1237);
@@ -252,7 +140,7 @@ public class AxisScaleInfo {
         } else if ( !label.equals(other.label)) {
             return false;
         }
-        if (minorIncrement != other.minorIncrement) {
+        if (minorDivision != other.minorDivision) {
             return false;
         }
         if (visible != other.visible) {
@@ -260,4 +148,244 @@ public class AxisScaleInfo {
         }
         return true;
     }
+
+    /**
+     * Gets the label.
+     *
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * Sets the label.
+     *
+     * @param label the new label
+     */
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    /**
+     * Gets the coord format.
+     *
+     * @return the coord format
+     */
+    public AxisScaleInfo.CoordSys getCoordFormat() {
+        return coordFormat;
+    }
+
+    /**
+     * Sets the coord format.
+     *
+     * @param coordFormat the new coord format
+     */
+    public void setCoordFormat(AxisScaleInfo.CoordSys coordFormat) {
+        this.coordFormat = coordFormat;
+    }
+
+    /**
+     * Gets the base label.
+     *
+     * @return the base label
+     */
+    public String getBaseLabel() {
+        return baseLabel;
+    }
+
+    /**
+     * Sets the base label.
+     *
+     * @param baseLabel the new base label
+     */
+    public void setBaseLabel(String baseLabel) {
+        this.baseLabel = baseLabel;
+    }
+
+    /**
+     * Gets the increment.
+     *
+     * @return the increment
+     */
+    public String getIncrement() {
+        return increment;
+    }
+
+    /**
+     * Sets the increment.
+     *
+     * @param increment the new increment
+     */
+    public void setIncrement(String increment) {
+        this.increment = increment;
+    }
+
+    /**
+     * Gets the minor division.
+     *
+     * @return the minor division
+     */
+    public int getMinorDivision() {
+        return minorDivision;
+    }
+
+    /**
+     * Sets the minor division.
+     *
+     * @param minorDivision the new minor division
+     */
+    public void setMinorDivision(int minorDivision) {
+        this.minorDivision = minorDivision;
+    }
+
+    /**
+     * Gets the font.
+     *
+     * @return the font
+     */
+    public Font getFont() {
+        return font;
+    }
+
+    /**
+     * Sets the font.
+     *
+     * @param font the new font
+     */
+    public void setFont(Font font) {
+        this.font = font;
+    }
+
+    /**
+     * Gets the visible.
+     *
+     * @return the visible
+     */
+    public boolean getVisible() {
+        return visible;
+    }
+
+    /**
+     * Sets the visible.
+     *
+     * @param visible the new visible
+     */
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+	/**
+	 * The Enum CoordSys.
+	 */
+	public enum CoordSys {
+	
+	    /** The A. */
+	    A("dd D"),
+	
+	    /** The B. */
+	    B("dd mm'D"),
+	
+	    /** The C. */
+	    C("dd mm.mmm'D"),
+	
+	    /** The D. */
+	    D("dd mm'ss\"D"),
+	
+	    /** The E. */
+	    E("dd:mmD"),
+	
+	    /** The F. */
+	    F("dd:mm:ssD"),
+	
+	    /** The G. */
+	    G("dd:mm:ss.sssssD"),
+	
+	    /** The H. */
+	    H("dd.dddddD");
+	
+	    /** The coord sys. */
+	    private final String coordSys;
+	
+	    /**
+	     * Instantiates a new coord sys.
+	     *
+	     * @param coordSys the coord sys
+	     */
+	    private CoordSys(final String coordSys) {
+	        this.coordSys = coordSys;
+	    }
+	
+	    /**
+	     * Format.
+	     *
+	     * @param i the i
+	     * @param card the card
+	     * @return the string
+	     */
+	    public String format(double i, Cardinality card) {
+	        switch (this) {
+	
+	          case A :
+	              return CoordinateFormat.convert(i,
+	                      new DecimalCoordFormat(0, DegMinSec.NONE),
+	                      EMPTY_FORMAT, EMPTY_FORMAT, card);
+	
+	          case B :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.DEGREE),
+	                      new DecimalCoordFormat(0, DegMinSec.MINUTE),
+	                      EMPTY_FORMAT, card);
+	
+	          case C :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.DEGREE),
+	                      new DecimalCoordFormat(3, DegMinSec.MINUTE),
+	                      EMPTY_FORMAT, card);
+	
+	          case D :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new DecimalCoordFormat(0, DegMinSec.NONE),
+	                      EMPTY_FORMAT, card);
+	
+	          case E :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new DecimalCoordFormat(0, DegMinSec.NONE),
+	                      EMPTY_FORMAT, card);
+	
+	          case F :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new DecimalCoordFormat(0, DegMinSec.NONE), card);
+	
+	          case G :
+	              return CoordinateFormat.convert(i,
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new FloorCoordFormat(DegMinSec.COLON),
+	                      new DecimalCoordFormat(5, DegMinSec.NONE), card);
+	
+	          case H :
+	              return CoordinateFormat.convert(i,
+	                      new DecimalCoordFormat(5, DegMinSec.NONE),
+	                      EMPTY_FORMAT, EMPTY_FORMAT, card);
+	
+	          default :
+	              return CoordinateFormat.convert(i,
+	                      new DecimalCoordFormat(0, DegMinSec.NONE),
+	                      EMPTY_FORMAT, EMPTY_FORMAT, card);
+	        }
+	    }
+	
+	    /**
+	     * {@inheritDoc}
+	     *
+	     */
+	    @Override
+	    public String toString() {
+	        return coordSys;
+	    }
+	}
 }

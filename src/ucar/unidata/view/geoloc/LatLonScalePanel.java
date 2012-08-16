@@ -20,18 +20,13 @@
 
 package ucar.unidata.view.geoloc;
 
-
-import ucar.unidata.ui.FontSelector;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.NumericTextField;
-import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -42,6 +37,12 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+
+import ucar.unidata.ui.FontSelector;
+import ucar.unidata.ui.NumericTextField;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 
 
 /**
@@ -127,7 +128,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         fontSelector       = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
 
-        JPanel p1 = GuiUtils.doLayout(new Component[] {
+        JPanel latPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), latLabel = new JTextField(),
             GuiUtils.rLabel("Base (-90 90): "),
             latBaseLabel = new NumericTextField(),
@@ -138,7 +139,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
                 1)),
             GuiUtils.rLabel("Visible: "), yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
-        JPanel p2 = GuiUtils.doLayout(new Component[] {
+        JPanel lonPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), lonLabel = new JTextField(),
             GuiUtils.rLabel("Base (-180 180): "),
             lonBaseLabel = new NumericTextField(),
@@ -150,24 +151,33 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
             GuiUtils.rLabel("Visible: "), xVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
-        p1.setBorder(BorderFactory.createTitledBorder("Latitude"));
-        p2.setBorder(BorderFactory.createTitledBorder("Longitude"));
+        latPanel.setBorder(BorderFactory.createTitledBorder("Latitude"));
+        lonPanel.setBorder(BorderFactory.createTitledBorder("Longitude"));
 
-        JComponent p3 = GuiUtils.doLayout(new Component[] {
-                            GuiUtils.left(fontSelector.getComponent()) }, 1,
-                                GuiUtils.WT_N, GuiUtils.WT_N);
-        p3.setBorder(BorderFactory.createTitledBorder("Font"));
+        JComponent fontPanel =
+            GuiUtils.doLayout(new Component[] {
+                GuiUtils.left(fontSelector.getComponent()) }, 1,
+                    GuiUtils.WT_N, GuiUtils.WT_N);
+        fontPanel.setBorder(BorderFactory.createTitledBorder("Font"));
 
-        JPanel p4 = GuiUtils.doLayout(new Component[] {
-                        GuiUtils.rLabel("Format: "),
-                        coordFormat = new JComboBox(
-                            AxisScaleInfo.CoordSys.values()) }, 2,
-                                GuiUtils.WT_NY, GuiUtils.WT_N);
+        JPanel formatPanel = GuiUtils.doLayout(new Component[] {
+                                 GuiUtils.rLabel("Format: "),
+                                 coordFormat = new JComboBox(
+                                     AxisScaleInfo.CoordSys.values()) }, 2,
+                                         GuiUtils.WT_NY, GuiUtils.WT_N);
 
-        JPanel p = GuiUtils.doLayout(new Component[] { p1, p2, p3, p4 }, 1,
-                                     GuiUtils.WT_NY, GuiUtils.WT_N);
+        JPanel latLonPanel = GuiUtils.doLayout(new Component[] { latPanel,
+                lonPanel }, 1, GuiUtils.WT_NY, GuiUtils.WT_N);
 
-        this.add("Center", p);
+
+        JPanel pnl = GuiUtils.doLayout(new Component[] { latLonPanel,
+                GuiUtils.filler() }, 2, GuiUtils.WT_YY, GuiUtils.WT_N);
+
+        List<?> pnls = Arrays.asList(new Component[] { GuiUtils.left(pnl),
+                GuiUtils.left(formatPanel), GuiUtils.left(fontPanel) });
+
+        this.add("Center", GuiUtils.doLayout(pnls, 1, 5, 5));
+
 
         if (latScaleInfo != null) {
             populateLatScaleInfo();
@@ -204,26 +214,26 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      * Populate lat scale info.
      */
     private void populateLatScaleInfo() {
-        latLabel.setText(latScaleInfo.label);
-        latBaseLabel.setText(latScaleInfo.baseLabel);
-        latIncrement.setText(latScaleInfo.increment);
-        latMinorSpinner.setValue(latScaleInfo.minorIncrement);
-        yVisible.setSelected(latScaleInfo.visible);
-        coordFormat.setSelectedItem(latScaleInfo.coordFormat);
-        fontSelector.setFont(latScaleInfo.font);
+        latLabel.setText(latScaleInfo.getLabel());
+        latBaseLabel.setText(latScaleInfo.getBaseLabel());
+        latIncrement.setText(latScaleInfo.getIncrement());
+        latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
+        yVisible.setSelected(latScaleInfo.getVisible());
+        coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
+        fontSelector.setFont(latScaleInfo.getFont());
     }
 
     /**
      * Populate lon scale info.
      */
     private void populateLonScaleInfo() {
-        lonLabel.setText(lonScaleInfo.label);
-        lonBaseLabel.setText(lonScaleInfo.baseLabel);
-        lonIncrement.setText(lonScaleInfo.increment);
-        lonMinorSpinner.setValue(lonScaleInfo.minorIncrement);
-        xVisible.setSelected(lonScaleInfo.visible);
-        coordFormat.setSelectedItem(lonScaleInfo.coordFormat);
-        fontSelector.setFont(lonScaleInfo.font);
+        lonLabel.setText(lonScaleInfo.getLabel());
+        lonBaseLabel.setText(lonScaleInfo.getBaseLabel());
+        lonIncrement.setText(lonScaleInfo.getIncrement());
+        lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
+        xVisible.setSelected(lonScaleInfo.getVisible());
+        coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
+        fontSelector.setFont(lonScaleInfo.getFont());
     }
 
     /**
@@ -234,14 +244,14 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     public boolean doApply() {
         AxisScaleInfo newLatInfo = new AxisScaleInfo();
 
-        newLatInfo.label          = latLabel.getText();
-        newLatInfo.baseLabel      = latBaseLabel.getText();
-        newLatInfo.increment      = latIncrement.getText();
-        newLatInfo.minorIncrement =
-            Integer.valueOf(latMinorSpinner.getValue().toString());
-        newLatInfo.visible     = yVisible.isSelected();
-        newLatInfo.coordFormat = (CoordSys) coordFormat.getSelectedItem();
-        newLatInfo.font        = fontSelector.getFont();
+        newLatInfo.setLabel(latLabel.getText());
+        newLatInfo.setBaseLabel(latBaseLabel.getText());
+        newLatInfo.setIncrement(latIncrement.getText());
+        newLatInfo.setMinorDivision(
+            Integer.valueOf(latMinorSpinner.getValue().toString()));
+        newLatInfo.setVisible(yVisible.isSelected());
+        newLatInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLatInfo.setFont(fontSelector.getFont());
 
         if ( !newLatInfo.equals(latScaleInfo)) {
             latScaleInfo = newLatInfo;
@@ -249,14 +259,14 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
 
         AxisScaleInfo newLonInfo = new AxisScaleInfo();
 
-        newLonInfo.label          = lonLabel.getText();
-        newLonInfo.baseLabel      = lonBaseLabel.getText();
-        newLonInfo.increment      = lonIncrement.getText();
-        newLonInfo.minorIncrement =
-            Integer.valueOf(lonMinorSpinner.getValue().toString());
-        newLonInfo.visible     = xVisible.isSelected();
-        newLonInfo.coordFormat = (CoordSys) coordFormat.getSelectedItem();
-        newLonInfo.font        = fontSelector.getFont();
+        newLonInfo.setLabel(lonLabel.getText());
+        newLonInfo.setBaseLabel(lonBaseLabel.getText());
+        newLonInfo.setIncrement(lonIncrement.getText());
+        newLonInfo.setMinorDivision(
+            Integer.valueOf(lonMinorSpinner.getValue().toString()));
+        newLonInfo.setVisible(xVisible.isSelected());
+        newLonInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLonInfo.setFont(fontSelector.getFont());
 
         if ( !newLonInfo.equals(lonScaleInfo)) {
             lonScaleInfo = newLonInfo;

@@ -240,11 +240,13 @@ argument -Dfoo=bar) -->
 
     <target name="jaridv" depends="init">
         <antcall target="idv"/>
+        <!--  Moved to idv target
         <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
             <filterset>
                 <filter token="DATE" value="${date}"/>
             </filterset>
         </copy>
+        -->
 
         <antcall target="jarmf">
             <param name="jarfile" value="idv"/>
@@ -318,6 +320,11 @@ argument -Dfoo=bar) -->
             <exclude name="ucar/ma2/**"/>
             <exclude name="ucar/grib/**"/>
         </javac>
+        <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+            </filterset>
+        </copy>
     </target>
 
 

@@ -27,6 +27,7 @@ import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.AddeUtil;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.profiler.AddeProfilerDataSource;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.idv.chooser.IdvChooserManager;
@@ -543,7 +544,7 @@ public class AddeProfilerDataChooser extends AddeChooser {
             }
             profilersourceHT.put(AddeUtil.MISC_KEYWORDS, getMiscKeywords());
 
-
+            profilersourceHT.put(DataSelection.PROP_CHOOSERTIMEMATCHING, getDoTimeDrivers());
             //System.out.println("   pc time list "+getSelectedTimes());
             //System.out.println
             // ("   pc data display interval "+getSelectedDataInterval());

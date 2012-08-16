@@ -75,6 +75,7 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -441,7 +442,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         if (latScale != null) {
-            latScale.setVisible(getLatScaleInfo().visible);
+            latScale.setVisible(getLatScaleInfo().getVisible());
 
             updateLatScale(latScale);
         }
@@ -485,15 +486,17 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lat top
      */
     private double calcLatTop() {
-        double[]      xRange = xMap.getRange();
-        double[]      yRange = yMap.getRange();
-        double[]      zRange = (zMap != null)
-                               ? zMap.getRange()
-                               : new double[] { 0, 0 };
-        EarthLocation el = getEarthLocation(xRange[0], yRange[1], zRange[0]);
-        double        top    = el.getLatitude().getValue();
+        final double  LAT_MAX = 90;
 
-        final double  DELTA  = (xRange[1] - xRange[0]) / 100;
+        double[]      xRange  = xMap.getRange();
+        double[]      yRange  = yMap.getRange();
+        double[]      zRange  = (zMap != null)
+                                ? zMap.getRange()
+                                : new double[] { 0, 0 };
+        EarthLocation el = getEarthLocation(xRange[0], yRange[1], zRange[0]);
+        double        top     = el.getLatitude().getValue();
+
+        final double  DELTA   = (xRange[1] - xRange[0]) / 100;
         if (Double.isNaN(top)) {
             outerloop:
             for (double y = yRange[1]; y > yRange[0]; y = y - DELTA) {
@@ -506,7 +509,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 }
             }
         }
-        return top;
+        return (top > LAT_MAX)
+               ? LAT_MAX
+               : top;
     }
 
     /**
@@ -580,7 +585,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         if (lonScale != null) {
-            lonScale.setVisible(getLonScaleInfo().visible);
+            lonScale.setVisible(getLonScaleInfo().getVisible());
 
             if (isSouthPole()) {
                 updateSouthPoleLonScale(lonScale);
@@ -630,11 +635,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    topLat     = calcLatTop();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLatScaleInfo().baseLabel);
+        double       base = Misc.parseNumber(getLatScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLatScaleInfo().minorIncrement;
+        int          minorTickInc = getLatScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLatScaleInfo().increment);
+        double       inc = Misc.parseNumber(getLatScaleInfo().getIncrement());
 
         // In case user inputs something bogus.
         if ((base < LAT_MIN) || (base > LAT_MAX)) {
@@ -661,7 +666,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             if ((mm < DELTA) || (mm > (inc - DELTA))) {  // Must account for numerical leeway.
                 majorTicks.add(d);
 
-                AxisScaleInfo.CoordSys coordSys = latScaleInfo.coordFormat;
+                AxisScaleInfo.CoordSys coordSys =
+                    latScaleInfo.getCoordFormat();
 
                 if (i > 0) {
                     labelTable.put(d, coordSys.format(i, Cardinality.NORTH));
@@ -676,8 +682,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             }
         }
 
-        finalizeAxis(scale, getLatScaleInfo().label, labelTable, majorTicks,
-                     minorTicks, getLatScaleInfo().font);
+        finalizeAxis(scale, getLatScaleInfo().getLabel(), labelTable,
+                     majorTicks, minorTicks, getLatScaleInfo().getFont());
     }
 
     /**
@@ -699,11 +705,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         boolean                   isMeridianCross = leftLon > rightLon;
         Hashtable<Double, String> labelTable      = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().baseLabel);
+        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().minorIncrement;
+        int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLonScaleInfo().increment);
+        double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
         int          cnt          = 0;
         List<Double> increment    = new LinkedList<Double>();
 
@@ -744,7 +750,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
 
-                AxisScaleInfo.CoordSys coordSys = lonScaleInfo.coordFormat;
+                AxisScaleInfo.CoordSys coordSys =
+                    lonScaleInfo.getCoordFormat();
 
                 if ((i > MIN_LON) && (i <= MID_LON)) {
                     labelTable.put(d, coordSys.format(i, Cardinality.EAST));
@@ -764,8 +771,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             cnt++;
         }
 
-        finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks, getLonScaleInfo().font);
+        finalizeAxis(scale, getLonScaleInfo().getLabel(), labelTable,
+                     majorTicks, minorTicks, getLonScaleInfo().getFont());
     }
 
     /**
@@ -786,11 +793,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    bottomLat  = calcLatBase();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().baseLabel);
+        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
-        int          minorTickInc = getLonScaleInfo().minorIncrement;
+        int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLonScaleInfo().increment);
+        double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
         int          cnt          = 0;
         List<Double> increment    = new LinkedList<Double>();
 
@@ -815,7 +822,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
 
-                AxisScaleInfo.CoordSys coordSys = lonScaleInfo.coordFormat;
+                AxisScaleInfo.CoordSys coordSys =
+                    lonScaleInfo.getCoordFormat();
 
                 if ((i > MIN_LON) && (i <= MID_LON)) {
                     labelTable.put(d, coordSys.format(i, Cardinality.EAST));
@@ -835,8 +843,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             cnt++;
         }
 
-        finalizeAxis(scale, getLonScaleInfo().label, labelTable, majorTicks,
-                     minorTicks, getLonScaleInfo().font);
+        finalizeAxis(scale, getLonScaleInfo().getLabel(), labelTable,
+                     majorTicks, minorTicks, getLonScaleInfo().getFont());
     }
 
     /**
@@ -853,7 +861,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private void finalizeAxis(
             AxisScale scale, String title,
             Hashtable<? extends Double, ? extends String> labelTable,
-            List<Double> majorTicks, List<Double> minorTicks, Font axisFont)
+            List<? extends Double> majorTicks, List<? extends Double> minorTicks, Font axisFont)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
@@ -1248,38 +1256,29 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         if (latScaleInfo == null) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
-            latScaleInfo       = lsi;
-            lsi.label          = "Latitude";
-            lsi.increment      = 10 + "";
-            lsi.minorIncrement = 1;
-            lsi.visible        = true;
-            lsi.coordFormat    = CoordSys.A;
+            latScaleInfo = lsi;
+            lsi.setLabel("Latitude");
+            lsi.setIncrement(10 + "");
+            lsi.setMinorDivision(1);
+            lsi.setVisible(true);
+            lsi.setCoordFormat(CoordSys.A);
 
-            double[]      xRange = xMap.getRange();
-            double[]      yRange = yMap.getRange();
-            double[]      zRange = (zMap != null)
-                                   ? zMap.getRange()
-                                   : new double[] { 0, 0 };
-            EarthLocation el1    = getEarthLocation(xRange[0], yRange[0],
-                                    zRange[0]);
             double        base = calcLatBase();
-            EarthLocation el2  = getEarthLocation(xRange[0], yRange[1],
-                                    zRange[0]);
             double end = calcLatTop();
             int    inc = (int) round(Math.abs(end - base) / 5d, 0,
                                   BigDecimal.ROUND_HALF_UP);
 
-            lsi.increment          = ((inc == 0)
-                                      ? 10
-                                      : inc) + "";  // Keep the number reasonable
-            base                   = (base < -90)
-                                     ? -90
-                                     : base;
-            base                   = (base > 90)
-                                     ? 90
-                                     : base;
-            latScaleInfo.baseLabel = round(base, 0, BigDecimal.ROUND_HALF_UP)
-                                     + "";
+            lsi.setIncrement(((inc == 0)
+                              ? 10
+                              : inc) + "");  // Keep the number reasonable
+            base = (base < -90)
+                   ? -90
+                   : base;
+            base = (base > 90)
+                   ? 90
+                   : base;
+            latScaleInfo.setBaseLabel(round(base, 0,
+                                            BigDecimal.ROUND_HALF_UP) + "");
         }
 
         return latScaleInfo;
@@ -1294,11 +1293,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         if (this.lonScaleInfo == null) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
-            lonScaleInfo       = lsi;
-            lsi.label          = "Longitude";
-            lsi.minorIncrement = 1;
-            lsi.visible        = true;
-            lsi.coordFormat    = CoordSys.A;
+            lonScaleInfo = lsi;
+            lsi.setLabel("Longitude");
+            lsi.setMinorDivision(1);
+            lsi.setVisible(true);
+            lsi.setCoordFormat(CoordSys.A);
 
             double[]      xRange = xMap.getRange();
             double[]      yRange = yMap.getRange();
@@ -1323,15 +1322,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             }
 
             // Must deal with meridian
-            lsi.increment          = ((inc == 0)
-                                      ? 10
-                                      : inc) + "";  // Keep the number reasonable
-            base                   = (base > 180)
-                                     ? (base - 360)
-                                     : base;
-            lonScaleInfo.baseLabel = (isSouthPole()
-                                      ? Math.floor(base)
-                                      : Math.ceil(base)) + "";
+            lsi.setIncrement(((inc == 0)
+                              ? 10
+                              : inc) + "");  // Keep the number reasonable
+            base = (base > 180)
+                   ? (base - 360)
+                   : base;
+            lonScaleInfo.setBaseLabel((isSouthPole()
+                                       ? Math.floor(base)
+                                       : Math.ceil(base)) + "");
         }
 
         return lonScaleInfo;

@@ -828,7 +828,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private boolean isTimeDriver = false;
 
     /** does this use the time driver? */
-    private boolean usesTimeDriver = true;
+    private boolean usesTimeDriver = false;
 
     /** color dimness flag */
     private float colorDimness = 1.0f;
@@ -1042,6 +1042,23 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if (ud != null) {
             this.usesTimeDriver = ((Boolean) ud).booleanValue();
+        } else if(choices.size() > 0) {
+            DirectDataChoice dc = (DirectDataChoice)choices.get(0);
+            DataSource ds = dc.getDataSource();
+            Object ud0 = ds.getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING) ;
+            if (ud0 != null) {
+                this.usesTimeDriver = ((Boolean) ud0).booleanValue();
+                this.dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean) ud0).booleanValue() );
+            }
+        }
+        Object udd =
+                this.dataSelection.getProperty(DataSelection.PROP_ASTIMEDRIVER);
+        if (udd != null) {
+            this.isTimeDriver = ((Boolean) udd).booleanValue();
+            if(this.isTimeDriver) {  // make sure only one driver per view manager
+                ViewManager vm = getViewManager();
+                vm.ensureOnlyOneTimeDriver(this);
+            }
         }
 
         if (properties != null) {

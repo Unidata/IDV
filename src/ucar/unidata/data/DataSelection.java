@@ -49,6 +49,10 @@ public class DataSelection {
     public static final String PROP_USESTIMEDRIVER =
         "Use_Display_Driver_Times";
 
+    /** status template */
+    public static final String PROP_ASTIMEDRIVER =
+            "As_Display_Driver_Times";
+
     /** chooser time matching property */
     public static final String PROP_CHOOSERTIMEMATCHING =
         "Chooser_Do_Time_Matching";

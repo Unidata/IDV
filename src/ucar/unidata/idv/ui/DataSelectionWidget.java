@@ -32,6 +32,7 @@ import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.TimesChooser;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.util.GuiUtils;
@@ -207,12 +208,15 @@ public class DataSelectionWidget {
     public final static String USE_SELECTEDTIMES = "Use Selected";
 
     /** use time driver times */
-    public final static String USE_DRIVERTIMES = "Use Time Driver";
+    public final static String USE_DRIVERTIMES = "Match Time Driver";
+
+    /** as time driver  */
+    public final static String AS_DRIVERTIMES = "Set As Time Driver";
 
     /** options for time selection type */
     private final static String[] timeSubsetOptionLabels =
-        new String[] { USE_DEFAULTTIMES,
-                       USE_SELECTEDTIMES, USE_DRIVERTIMES };
+        new String[] { USE_DEFAULTTIMES, USE_SELECTEDTIMES,
+                        USE_DRIVERTIMES, AS_DRIVERTIMES };
 
     /** timeline */
     private Timeline timeline;
@@ -420,6 +424,9 @@ public class DataSelectionWidget {
                                 DataSelection.PROP_CHOOSERTIMEMATCHING);
                 if (cu != null) {
                     chooserDoTimeMatching = ((Boolean) cu).booleanValue();
+                    if(chooserDoTimeMatching)
+                        timeOptionLabelBox.setSelectedIndex(2);
+
                 }
             }
         }
@@ -750,6 +757,10 @@ public class DataSelectionWidget {
             dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
                                       timeOption.equals(USE_DRIVERTIMES));
         }
+
+        dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
+                timeOption.equals(AS_DRIVERTIMES));
+
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
             if (strideCbx.isSelected()) {
@@ -1281,6 +1292,15 @@ public class DataSelectionWidget {
             public void itemStateChanged(ItemEvent e) {
                 Object selectedObj = timeOptionLabelBox.getSelectedItem();
                 setTimeOptions(selectedObj);
+                if(timeOptionLabelBox.getSelectedIndex() != 2) {
+                    chooserDoTimeMatching = false;
+                } else {
+                    if(!checkActiveViewWithDriver()) {
+                        timeOptionLabelBox.setSelectedIndex(0);
+                        selectedObj = timeOptionLabelBox.getSelectedItem();
+                        setTimeOptions(selectedObj);
+                    }
+                }
             }
 
         });
@@ -1352,7 +1372,41 @@ public class DataSelectionWidget {
                 lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            true);
             }
+        } else if (selectedObject.equals(AS_DRIVERTIMES)) {
+            //selectIdx = 1;
+            timesList.setVisible(true);
+            timesList.setEnabled(true);
+            chooserDoTimeMatching = false;
+            if (lastDataChoice != null) {
+                lastDataChoice.setProperty(DataSelection.PROP_ASTIMEDRIVER,
+                        true);
+            }
         }
+    }
+
+    /**
+     *  Check the current active view window and make sure it does
+     *  has a time driver, otherwise, reset the active view window
+     */
+    protected boolean checkActiveViewWithDriver() {
+        List<ViewManager>    vms = this.idv.getVMManager().getViewManagers();
+        int size = vms.size();
+        ViewManager vm0 ;
+
+        vm0 = this.idv.getVMManager().getLastActiveViewManager();
+        List tdt = null;
+        try{
+            tdt = vm0.getTimeDriverTimes();
+        } catch (Exception e) {}
+
+        if(tdt != null)
+            return true;
+        else {
+            LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
+                    "the view window with time driver! \n");
+            return false;
+        }
+
     }
 
     /**
