@@ -1121,36 +1121,19 @@ public class MapDisplayControl extends DisplayControlImpl {
         tabbedPane.add("Lat/Lon", latlonPanel);
         JComponent retComp = tabbedPane;
         if (useZPosition()) {
-
-            retComp = GuiUtils.centerBottom(
-                tabbedPane,
-                GuiUtils.leftCenter(
-                    new JLabel("Position:  "), makePositionSlider()));
-            /*
-        JPanel settingsPanel = GuiUtils.top(
-                                   GuiUtils.leftCenter(
-                                       new JLabel("Map Position:  "),
-                                       makePositionSlider()));
-
-        tabbedPane.add("Settings", settingsPanel);
-        */
+            GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
+            JComponent sliderPanel = GuiUtils.doLayout(new Component[] {
+                                         GuiUtils.rLabel("Position: "),
+                                         makePositionSlider() }, 2,
+                                             GuiUtils.WT_N, GuiUtils.WT_N);
+            /* Alternate to span entire width
+            JComponent sliderPanel = GuiUtils.leftCenter(
+                    GuiUtils.rLabel("Position: "), makePositionSlider());
+            */
+            retComp = GuiUtils.centerBottom(tabbedPane, sliderPanel);
         }
-
-        /**
-         *
-         * JPanel outerPanel = GuiUtils.topCenter(
-         *                       llPanel, GuiUtils.topCenter(
-         *                           GuiUtils.vbox(
-         *                               makePositionSlider(), new JLabel(
-         *                                   " Maps:")), sp));
-         */
         fillContents();
-
-
-        //return tabbedPane;
         return retComp;
-
-        //        return outerPanel;
 
     }
 
@@ -1161,8 +1144,6 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     private void applyMapPosition() {
         try {
-            //Misc.printStack("");
-            //System.out.println("pos = " + mapPosition + "," + getVerticalValue(mapPosition));
             if (Double.isNaN(mapPosition)) {
                 mapPosition = getInitialZPosition();
             }
