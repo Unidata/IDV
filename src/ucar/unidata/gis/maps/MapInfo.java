@@ -566,8 +566,8 @@ public class MapInfo {
                                                  ATTR_LINESTYLE,
                                                  1), XmlUtil.getAttribute(node,
                                                      ATTR_FASTRENDER, false))
-                         : new LatLonData(latitude, Color.gray, spacing,
-                                          0.f, 1.0f, 1, false);
+                         : new LatLonData(latitude, Color.gray, spacing, 0.f,
+                                          1.0f, 1, false);
 
         if (node != null) {
             lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, false));
@@ -609,7 +609,7 @@ public class MapInfo {
                     ATTR_LABELLINES, "0"));
             llld.setAlignment(XmlUtil.getAttribute(node, ATTR_ALIGNMENT,
                     "MM"));
-            llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_ALIGNMENT,
+            llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_LABELFORMAT,
                     "DD"));
             llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
         } else {

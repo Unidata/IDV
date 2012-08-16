@@ -90,10 +90,13 @@ public class LatLonLabelPanel extends JPanel {
     /** the alignment selector */
     JComboBox formatSelector;
 
+    /** the alignment point list */
+    private List<TwoFacedObject> alignPoints;
+
     /** The alignment point names */
     private static final String[] RECTPOINTNAMES = {
-        "Upper Left", "Top", "Upper Right", "Left", "Middle", "Right",
-        "Lower Left", "Bottom", "Lower Right"
+        "Top Left", "Top Center", "Top Right", "Left", "Center", "Right",
+        "Bottom Left", "Bottom Center", "Bottom Right"
     };
 
     /** list of predefined formats */
@@ -111,6 +114,7 @@ public class LatLonLabelPanel extends JPanel {
     public LatLonLabelPanel(LatLonLabelData lld) {
 
         this.latLonLabelData = lld;
+        ignoreEvents         = true;
         onOffCbx             = new JCheckBox("", latLonLabelData.getVisible());
         onOffCbx.setToolTipText("Turn on/off labels");
         onOffCbx.addActionListener(new ActionListener() {
@@ -184,6 +188,7 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
+
         fastRenderCbx = new JCheckBox("", latLonLabelData.getFastRendering());
         fastRenderCbx.setToolTipText("Set if labels don't render correctly");
         fastRenderCbx.addActionListener(new ActionListener() {
@@ -194,6 +199,7 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
+
         fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
         fontSelector.addPropertyChangeListener(new PropertyChangeListener() {
@@ -203,7 +209,8 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
-        //fontSelector.setFont((Font)latLonLabelData.getFont());
+        fontSelector.setFont((Font) latLonLabelData.getFont());
+
         alignSelector = new JComboBox();
         alignSelector.setToolTipText(
             "Set the positioning of the label relative to the location");
@@ -217,8 +224,12 @@ public class LatLonLabelPanel extends JPanel {
             }
         });
         GuiUtils.setListData(alignSelector,
-                             TwoFacedObject.createList(Glyph.RECTPOINTS,
-                                 RECTPOINTNAMES));
+                             alignPoints =
+                                 TwoFacedObject.createList(Glyph.RECTPOINTS,
+                                     Glyph.RECTPOINTNAMES));
+        alignSelector.setSelectedItem(
+            getAlignSelectorItem(latLonLabelData.getAlignment()));
+
         formatSelector = new JComboBox();
         formatSelector.setToolTipText("Set the label format");
         formatSelector.addActionListener(new ActionListener() {
@@ -231,6 +242,7 @@ public class LatLonLabelPanel extends JPanel {
         });
         GuiUtils.setListData(formatSelector, LABEL_FORMATS);
         formatSelector.setSelectedItem(latLonLabelData.getLabelFormat());
+        ignoreEvents = false;
 
     }
 
@@ -250,7 +262,8 @@ public class LatLonLabelPanel extends JPanel {
                 "" + LatLonLabelData.formatLabelLines(lld.getLabelLines()));
             colorButton.setBackground(lld.getColor());
             fastRenderCbx.setSelected(lld.getFastRendering());
-            alignSelector.setSelectedItem(lld.getAlignment());
+            alignSelector.setSelectedItem(
+                getAlignSelectorItem(lld.getAlignment()));
             if (lld.getFont() != null) {
                 fontSelector.setFont((Font) lld.getFont());
             }
@@ -324,5 +337,18 @@ public class LatLonLabelPanel extends JPanel {
         return latLonLabelData;
     }
 
+    /**
+     * Get the TwoFacedObject associated with the alignment id
+     *
+     * @param id  the id
+     *
+     * @return  the corresponding TFO or null
+     */
+    private TwoFacedObject getAlignSelectorItem(String id) {
+        if (alignPoints == null) {
+            return null;
+        }
+        return TwoFacedObject.findId(id, alignPoints);
+    }
 
 }

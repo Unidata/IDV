@@ -1935,7 +1935,7 @@ public class MapDisplayControl extends DisplayControlImpl {
                                   && ( !Arrays.equals(values,
                                       getLabelLines()));
             super.setLabelLines(values);
-            if (shouldShare) {
+            if (shouldShare && (other != null)) {
                 other.okToShare = false;
                 other.setLabelLines(values);
                 other.stateWasShared();
@@ -1982,7 +1982,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
             boolean shouldShare = true && ( !Misc.equals(value, getFont()));
             super.setFont(value);
-            if (shouldShare) {
+            if (shouldShare && (other != null)) {
                 other.okToShare = false;
                 other.setFont(value);
                 other.stateWasShared();
@@ -2014,7 +2014,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             boolean shouldShare = true
                                   && ( !Misc.equals(value, getLabelFormat()));
             super.setLabelFormat(value);
-            if (shouldShare) {
+            if (shouldShare && (other != null)) {
                 other.okToShare = false;
                 other.setLabelFormat(value);
                 other.stateWasShared();
@@ -2031,7 +2031,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             //boolean shouldShare = shouldShare() && (!Misc.equals(value,getFont()));
             boolean shouldShare = true && ( !Misc.equals(value, getSphere()));
             super.setSphere(value);
-            if (shouldShare) {
+            if (shouldShare && (other != null)) {
                 other.okToShare = false;
                 other.setSphere(value);
                 other.stateWasShared();
