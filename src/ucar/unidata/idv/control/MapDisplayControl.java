@@ -1178,8 +1178,9 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
         };
         JComponent slider = levelSlider.getContents();
-        slider.setPreferredSize(new Dimension(500,
-                slider.getPreferredSize().height));
+        Dimension  size = new Dimension(500, slider.getPreferredSize().height);
+        slider.setPreferredSize(size);
+        slider.setMinimumSize(size);
         return slider;
     }
 
@@ -2467,17 +2468,42 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
     /**
-     * Set the IsDefaultMap property.
+     * Get the object that holds the latitude label state
      *
-     * @param value The new value for IsDefaultMap
+     * @return The latitude label state
      */
-    public void setIsDefaultMap(boolean value) {
-        isDefaultMap = value;
-        if (isDefaultMap) {
-            setCanDoRemoveAll(false);
-        }
+    public LatLonLabelState getLatLabelState() {
+        return latLabelState;
     }
 
+    /**
+     * Set the object that holds the latitude label state
+     *
+     *
+     * @param value The new latitude label state
+     */
+    public void setLatLabelState(LatLonLabelState value) {
+        latLabelState = value;
+    }
+
+
+    /**
+     * Get the object that holds the longitude label state
+     *
+     * @return The long. label state
+     */
+    public LatLonLabelState getLonLabelState() {
+        return lonLabelState;
+    }
+
+    /**
+     * Set the object that holds the longitude label state
+     *
+     * @param value The new long. label state
+     */
+    public void setLonLabelState(LatLonLabelState value) {
+        lonLabelState = value;
+    }
 
 
     /**
@@ -2519,6 +2545,18 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     public boolean getIsDefaultMap() {
         return isDefaultMap;
+    }
+
+    /**
+     * Set the IsDefaultMap property.
+     *
+     * @param value The new value for IsDefaultMap
+     */
+    public void setIsDefaultMap(boolean value) {
+        isDefaultMap = value;
+        if (isDefaultMap) {
+            setCanDoRemoveAll(false);
+        }
     }
 
     /**

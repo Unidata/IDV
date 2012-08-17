@@ -231,6 +231,7 @@ public class LatLonLabelPanel extends JPanel {
             getAlignSelectorItem(latLonLabelData.getAlignment()));
 
         formatSelector = new JComboBox();
+        formatSelector.setEditable(true);
         formatSelector.setToolTipText("Set the label format");
         formatSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
