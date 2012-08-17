@@ -442,7 +442,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         if (latScale != null) {
-            latScale.setVisible(getLatScaleInfo().getVisible());
+            latScale.setVisible(getLatScaleInfo().isVisible());
 
             updateLatScale(latScale);
         }
@@ -586,7 +586,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         if (lonScale != null) {
-            lonScale.setVisible(getLonScaleInfo().getVisible());
+            lonScale.setVisible(getLonScaleInfo().isVisible());
 
             if (isSouthPole()) {
                 updateSouthPoleLonScale(lonScale);

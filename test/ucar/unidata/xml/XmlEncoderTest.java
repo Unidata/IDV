@@ -21,12 +21,11 @@
 package ucar.unidata.xml;
 
 
-import org.junit.Test;
-
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 
 /**
@@ -39,7 +38,7 @@ public class XmlEncoderTest {
      */
     @Test
     public void testEnum() {
-        TestClass c = new TestClass();
+        TestClass1 c = new TestClass1();
         c.setDay(Day.SUNDAY);
         XmlEncoder encoder = new XmlEncoder();
         String     xml     = encoder.toXml(c);
@@ -48,18 +47,29 @@ public class XmlEncoderTest {
         assertEquals(c, object);
     }
 
+
     /**
-     * The Class Foo.
+     * Testing list property methods
      */
-    public static class TestClass {
+    @Test
+    public void testListPropertyMethods() {
+        TestClass2 c = new TestClass2();
+        assertEquals(2, XmlEncoder.findPropertyMethods(c.getClass()).size());
+    }
+
+
+    /**
+     * Test class 1.
+     */
+    public static class TestClass1 {
 
         /** The day. */
         public Day day;
 
         /**
-         * Instantiates a new foo.
+         * Instantiates a new test class 1.
          */
-        public TestClass() {}
+        public TestClass1() {}
 
         /**
          * Gets the day.
@@ -109,7 +119,7 @@ public class XmlEncoderTest {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            TestClass other = (TestClass) obj;
+            TestClass1 other = (TestClass1) obj;
             if (day != other.day) {
                 return false;
             }
@@ -117,6 +127,62 @@ public class XmlEncoderTest {
         }
 
     }
+
+    /**
+     * Test class 2.
+     */
+    public static class TestClass2 {
+
+        /** The boolean b. */
+        private boolean b;
+
+        /** The i. */
+        private int i;
+
+
+
+        /**
+         * Instantiates a new test class 2.
+         */
+        public TestClass2() {}
+
+        /**
+         * Gets the b.
+         *
+         * @return the b
+         */
+        public boolean isB() {
+            return b;
+        }
+
+        /**
+         * Sets the b.
+         *
+         * @param b the new b
+         */
+        public void setB(boolean b) {
+            this.b = b;
+        }
+
+        /**
+         * Gets the i.
+         *
+         * @return the i
+         */
+        public int getI() {
+            return i;
+        }
+
+        /**
+         * Sets the i.
+         *
+         * @param i the new i
+         */
+        public void setI(int i) {
+            this.i = i;
+        }
+    }
+
 
     /**
      * The Enum Day.
