@@ -743,9 +743,12 @@ public class TimesChooser extends IdvChooser {
             if(tdt != null)
                 return true;
             else {
-                LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
-                        "the view window with time driver! \n");
-
+                //LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
+                //        "the view window with time driver! \n");
+                LogUtil.userErrorMessage(
+                        new JLabel(
+                                "<html>Error: there is no time driver in the current active view window, please select or set" +
+                                        " the view window with time driver! </html>"));
                 return false;
             }
 
@@ -760,15 +763,14 @@ public class TimesChooser extends IdvChooser {
     public void doLoad() {
         if(autoCreateDisplayCbx == null)  {
             super.doLoad();
-        } else if(!drivercbx.isSelected() || !autoCreateDisplayCbx.isSelected()) {
-            super.doLoad();
-        } else {
+        } else if( drivercbx.isSelected() && autoCreateDisplayCbx.isSelected()) {
             if(!checkActiveViewWithDriver())
                 return;
             else
                 super.doLoad();
+        } else {
+            super.doLoad();
         }
-
     }
     /**
      * Enable the absolute times list
