@@ -1311,6 +1311,7 @@ public class DataSelectionWidget {
         List timeOptionNames = Misc.toList(timeSubsetOptionLabels);
 
         if (idv.getUseTimeDriver() && !doUseDisplay) {
+            timeOptionNames.remove(3);
             timeOptionNames.remove(2);
         }
         GuiUtils.setListData(timeOptionLabelBox, timeOptionNames);
@@ -1402,8 +1403,9 @@ public class DataSelectionWidget {
         if(tdt != null)
             return true;
         else {
-            LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
-                    "the view window with time driver! \n");
+           /* LogUtil.userErrorMessage(new JLabel(
+                    "<html>Error: there is no time driver in the current active view window, please select or set" +
+                            " the view window with time driver! </html>"));    */
             return false;
         }
 
