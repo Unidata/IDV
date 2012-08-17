@@ -559,6 +559,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         EarthLocation el = getEarthLocation(xRange[1], yRange[1], zRange[0]);
         double        top    = el.getLongitude().getValue();
 
+        
         final double  DELTA  = (xRange[1] - xRange[0]) / 100;
         if (Double.isNaN(top)) {
             outerloop:
@@ -713,7 +714,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         int          cnt          = 0;
         List<Double> increment    = new LinkedList<Double>();
 
-        if (latBottom >= 0) {
+        //Need to normalize the base in some circumstances
+        if (rightLon - base > 360) {
             base += 360;
         }
 
