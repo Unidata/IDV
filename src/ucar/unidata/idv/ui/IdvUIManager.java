@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,26 +21,41 @@
 package ucar.unidata.idv.ui;
 
 
-import org.python.core.*;
-import org.python.util.*;
+import org.w3c.dom.Element;
 
-import org.w3c.dom.*;
-
-import ucar.unidata.collab.*;
-import ucar.unidata.data.*;
-
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataAlias;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataOperand;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataSourceResults;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.ListDataChoice;
+import ucar.unidata.data.UserOperandValue;
 import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.gis.maps.*;
-import ucar.unidata.idv.*;
-
-import ucar.unidata.idv.chooser.IdvChooserManager;
-import ucar.unidata.idv.collab.CollabManager;
+import ucar.unidata.gis.maps.MapData;
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.History;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IdvPersistenceManager;
+import ucar.unidata.idv.IdvPreferenceManager;
+import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.SavedBundle;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.ViewState;
 import ucar.unidata.idv.control.DisplayControlImpl;
-
 import ucar.unidata.idv.control.DisplaySettingsDialog;
 import ucar.unidata.idv.control.MapDisplayControl;
-import ucar.unidata.idv.publish.IdvPublisher;
-
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.FineLineBorder;
@@ -51,65 +66,49 @@ import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
-import ucar.unidata.ui.colortable.ColorTableEditor;
-import ucar.unidata.ui.symbol.StationModel;
-import ucar.unidata.ui.symbol.StationModelManager;
-
-import ucar.unidata.util.ColorTable;
-
-import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.MemoryMonitor;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.Msg;
-import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Removable;
-import ucar.unidata.util.Resource;
-import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-
-
-import ucar.visad.VisADPersistence;
-import ucar.visad.display.DisplayMaster;
-
-
-import visad.Data;
-import visad.Real;
-import visad.VisADException;
-
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 
-import visad.python.*;
 
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import java.lang.reflect.Method;
-
-import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,9 +121,36 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.text.JTextComponent;
 
 
@@ -231,17 +257,17 @@ public class IdvUIManager extends IdvManager {
     /** The identifier of the  data selector component */
     public static final String COMP_DATASELECTOR = "idv.dataselector";
 
-    /** _more_ */
+    /** The identifier of the group component */
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
 
-    /** _more_ */
+    /** The identifier of the choosers component */
     public static final String COMP_COMPONENT_CHOOSERS =
         "idv.component.choosers";
 
-    /** _more_ */
+    /** The identifier for skins */
     public static final String COMP_COMPONENT_SKIN = "idv.component.skin";
 
-    /** _more_ */
+    /** The identifier for html */
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
@@ -403,7 +429,7 @@ public class IdvUIManager extends IdvManager {
     /** The different menu ids */
     private Hashtable menuIds;
 
-    /** _more_ */
+    /** Hashtable of action icons */
     private Hashtable<String, ImageIcon> actionIcons;
 
 
@@ -1828,32 +1854,31 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * Class MyMenuListener _more_
-     *
+     * A menu listener class
      *
      * @author IDV Development Team
      */
     private static class MyMenuListener implements MenuListener, Removable {
 
-        /** _more_ */
+        /** the IdvUIManager */
         IdvUIManager idvUIManager;
 
-        /** _more_ */
+        /** the IdvWindow */
         IdvWindow idvWindow;
 
-        /** _more_ */
+        /** the menu */
         JMenu menu;
 
-        /** _more_ */
+        /** the menu id */
         String menuId;
 
         /**
-         * _more_
+         * Create a menu listener with extra stuff
          *
-         * @param idvUIManager _more_
-         * @param idvWindow _more_
-         * @param menu _more_
-         * @param menuId _more_
+         * @param idvUIManager  the IdvUIManager
+         * @param idvWindow     the IdvWindow
+         * @param menu          the menu
+         * @param menuId        the menu id
          */
         public MyMenuListener(IdvUIManager idvUIManager, IdvWindow idvWindow,
                               JMenu menu, String menuId) {
@@ -1864,32 +1889,32 @@ public class IdvUIManager extends IdvManager {
         }
 
         /**
-         * _more_
+         * Handle the menu canceled event
          *
-         * @param e _more_
+         * @param e  the event
          */
         public void menuCanceled(MenuEvent e) {}
 
         /**
-         * _more_
+         * Handle the menu deselected event
          *
-         * @param e _more_
+         * @param e  the event
          */
         public void menuDeselected(MenuEvent e) {
             idvUIManager.handleMenuDeSelected(menuId, menu, idvWindow);
         }
 
         /**
-         * _more_
+         * Handle the menu selected event
          *
-         * @param e _more_
+         * @param e  the event
          */
         public void menuSelected(MenuEvent e) {
             idvUIManager.handleMenuSelected(menuId, menu, idvWindow);
         }
 
         /**
-         * _more_
+         * Remove this listener
          */
         public void doRemove() {
             idvUIManager = null;
@@ -1997,13 +2022,13 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Make the skin menu items
      *
-     * @param listener _more_
-     * @param onlyUI _more_
-     * @param onlyEmbedded _more_
+     * @param listener  the listener for the menu
+     * @param onlyUI    true if only in the UI
+     * @param onlyEmbedded  true if only for embedded
      *
-     * @return _more_
+     * @return  the list of menus
      */
     public List makeSkinMenuItems(final ActionListener listener,
                                   boolean onlyUI, boolean onlyEmbedded) {
@@ -2162,10 +2187,10 @@ public class IdvUIManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * Make the window menu
      *
-     * @param window _more_
-     * @param menu _more_
+     * @param window  the window
+     * @param menu    the menu
      */
     protected void makeWindowMenu(IdvWindow window, JMenu menu) {
         Hashtable components = window.getPersistentComponents();
@@ -4215,15 +4240,15 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Create a new window
      *
-     * @param viewManagers _more_
-     * @param notifyCollab _more_
-     * @param title _more_
-     * @param skinPath _more_
-     * @param root _more_
+     * @param viewManagers  the ViewManagers for the window
+     * @param notifyCollab  true if we should notify collaborators
+     * @param title         the window title
+     * @param skinPath      the path tot he skin
+     * @param root          the skin root element
      *
-     * @return _more_
+     * @return  the window
      */
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String title, String skinPath,
@@ -4239,7 +4264,7 @@ public class IdvUIManager extends IdvManager {
      * @param viewManagers The view managers to put in the window.
      * @param skinPath The skin
      * @param  windowTitle title
-     * @param windowInfo _more_
+     * @param windowInfo   the WindowInfo
      *
      * @return The window
      */
@@ -4301,8 +4326,8 @@ public class IdvUIManager extends IdvManager {
      * @param title        The title
      * @param skinPath The skin. May be null.
      * @param skinRoot Root of the skin xml. May be null.
-     * @param show _more_
-     * @param windowInfo _more_
+     * @param show     true to show
+     * @param windowInfo  the WindowInfo
      *
      * @return The window.
      */

@@ -21,25 +21,27 @@
 package ucar.unidata.ui;
 
 
-import ij.*;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
+import ij.WindowManager;
 
-import ij.gui.*;
+import ij.gui.GenericDialog;
 
-import ij.io.*;
+import ij.io.SaveDialog;
 
 import ij.plugin.PlugIn;
 
-import ij.process.*;
+import ij.process.ByteProcessor;
+import ij.process.ImageProcessor;
 
-import java.awt.*;
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.image.*;
+import java.awt.Image;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 
-
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.OutputStream;
 
 import java.util.List;
@@ -335,7 +337,7 @@ public class AnimatedGifEncoder {
 
 
     /**
-     * Adds next GIF frame.  
+     * Adds next GIF frame.
      *
      * @param image  the image to add
      * @param theDelay delay in loop
@@ -1032,7 +1034,8 @@ public class AnimatedGifEncoder {
     public boolean start(String file) {
         boolean ok = true;
         try {
-            out         = new BufferedOutputStream(new FileOutputStream(file));
+            out         =
+                new BufferedOutputStream(new FileOutputStream(file));
             ok          = start(out);
             closeStream = true;
         } catch (IOException e) {
@@ -1440,7 +1443,7 @@ class Gif_Stack_Writer implements PlugIn {
 
 
 /**
- * Class LZWEncoder 
+ * Class LZWEncoder
  *
  */
 class LZWEncoder {
