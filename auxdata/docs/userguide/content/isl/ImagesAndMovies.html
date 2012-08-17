@@ -1,4 +1,4 @@
-<html><head> 
+<html><head>
   <title>ISL Images and Movies</title>
   <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
 </head>
@@ -7,11 +7,11 @@
 
 
 
-The [isl::tag image] and [isl::tag movie] tag are the ones used to create images and 
-movies. Both of these tags can contain subtags that allow you to manipulate 
+The [isl::tag image] and [isl::tag movie] tag are the ones used to create images and
+movies. Both of these tags can contain subtags that allow you to manipulate
 the  image or images.
 
-[isl::tagdef image {Generate and manipulate images} -attrs {file+ {image file, e.g., gif, png or jpg} quality {image quality, 0.0-1.0} view {view name or names to match} display {display id} what {what part of the display control should be captured} }]
+[isl::tagdef image {Generate and manipulate images} -attrs {file+ {image file, e.g., gif, png or jpg} quality {image quality, 0.0-1.0} view {view name or names to match} display {display id} what {what part of the display control should be captured} combine {true or false. If there are multiple images, they will all be captured} columns {If multiple images are being captured, optionally set the number of columns. This option is for offscreen mode only.}}]
 The [isl::tag image] tag   allows you to capture an image from a main display or from the GUI of a display control.
 
 <p>
@@ -39,7 +39,7 @@ what part of the display control gui should be captured. For now the IDV only su
 to capture the time series chart of the station model and data probe displays.
 
 
-[isl::tagdef movie {Create a Quicktime movie, animated GIF or Google Earth KMZ file} -attrs {file {movie file} view {view name or names to match} imagedir {The directory to place the images.} imagetemplate {The file name template to use} imagesuffix {Should be jpg if generating a QuickTime movie but can be gif or png as well}}]
+[isl::tagdef movie {Create a Quicktime movie, animated GIF or Google Earth KMZ file} -attrs {file {movie file} view {view name or names to match} imagedir {The directory to place the images.} imagetemplate {The file name template to use} imagesuffix {Should be jpg if generating a QuickTime movie but can be gif or png as well} combine {true or false. If there are multiple images, they will all be captured} columns {If multiple movies are being captured, optionally set the number of columns.}}]
 The [isl::tag movie] tag allows you to capture a time animation as a Quicktime movie, Google Earth KMZ file or
 as an animated gif.
 <p>
@@ -65,7 +65,7 @@ imagetemplate="image_%count%_%time:any date format%"  Include animation time in 
 imagetemplate="image_%count%_%time:yyyyMMddHHmm%"
 </pre>
 
-The generic date format can contain a specification that is used by the Java 
+The generic date format can contain a specification that is used by the Java
 <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
 and is described in <a href="BasicTags.html#simpledateformat">Basic Tags</a>.
 
@@ -160,7 +160,7 @@ You can modify this behavior in a variety of ways. For example, the ISL:
 }]
 will clip the original image but not alter it (the copy=&quot;true&quot;) and then will write
 out the clipped image to the given file. The original image will be passed to the [isl::tag matte]
-tag which will matte it. 
+tag which will matte it.
 <p>
 The image manipulation tags can be nested. e.g. the ISL:
 [isl::xml {
@@ -182,7 +182,7 @@ The original image is then matted and written out as test.png.
 [isl::tagdef clip {Clip an image} -attrs {north {latitude} south {latitude} east longitude west longitude top {pixels or %} bottom {pixels or %} left {pixels or %} right {pixels or %}  display {The id of a display which we use its data's map projection to clip with}  space {<pixels> when clipping at the box pad outwards this number of pixels}   hspace {<pixels>  when clipping at the box  pad horiz.} vspace {<pixels> when clipping at the box pad vertically} {space_left, space_right, space_top, space_bottom} padding } ]
 
 The [isl::tag clip] tag allows you to clip the image. The clipping can either be defined
-in lat/lon  coordinates, with x/y image coordinates or from the projection used from a display. 
+in lat/lon  coordinates, with x/y image coordinates or from the projection used from a display.
 The image coordinates can be specified as percentages.
 If no arguments are given then we clip the image at the box.
 
@@ -204,10 +204,10 @@ Clip at the 3D box with 10 pixel padding
 <clip space="10"/>
 
 Clip at the 3D box with horizontal spacing of 10 pixels and vertical spacing of 30
-	<clip hspace="10" vspace="30"/>
+        <clip hspace="10" vspace="30"/>
 
 Clip with left/right/bottom/right spacing
-	<clip space_left="5" space_right="40" space_bottom="10" space_top="-10"/>
+        <clip space_left="5" space_right="40" space_bottom="10" space_top="-10"/>
 
 
 }]
@@ -271,18 +271,18 @@ So for example, if you wanted the upper left corner of the image overlay to be d
 would do:
 <pre>
    place="UL,10,20" anchor="UL"
-</pre> 
+</pre>
 If you wanted some text overlay to be placed so that its bottom center was in the
 middle of the image, 30 pixels from the bottom of the image you do:
 <pre>
    place="LM,0,-30" anchor="LM"
-</pre> 
+</pre>
 
 If you wanted some  overlay to be placed so that its upper right was placed at the center
 of the image you do:
 <pre>
    place="M" anchor="UR"
-</pre> 
+</pre>
 [isl::xml {
 <image file="test.gif">
    ...
@@ -356,25 +356,25 @@ The [isl::tag write] tag allows you to write out an intermediate image file at a
 
 [isl::tagdef colorbar {Add a color bar to an image} -attrs {
                display {optional id of display to use. If not defined then this will use all colorbars found}
-               width {bar width} 
-               height {bar height} 
-               orientation {tick mark  location, 'right', 'left', 'bottom', 'top'} 
-               tickmarks {number of tick marks} 
-               interval {interval value} 
-               values {comma separated list of values} 
-               place {rectangle location on image} 
-               anchor {rectangle location on colorbar} 
-               showlines {'true' or 'false', draw tick lines} 
-               suffix {text to add to tick labels} 
-               suffixfrequency {'all', 'first', 'last' - frequeny of suffix plotting} 
-               showunit {'true' or 'false', use unit as suffix} 
+               width {bar width}
+               height {bar height}
+               orientation {tick mark  location, 'right', 'left', 'bottom', 'top'}
+               tickmarks {number of tick marks}
+               interval {interval value}
+               values {comma separated list of values}
+               place {rectangle location on image}
+               anchor {rectangle location on colorbar}
+               showlines {'true' or 'false', draw tick lines}
+               suffix {text to add to tick labels}
+               suffixfrequency {'all', 'first', 'last' - frequeny of suffix plotting}
+               showunit {'true' or 'false', use unit as suffix}
                linecolor {line color} }]
 The [isl::tag colorbar] tag allows you to add a color bar from  the color tables in the display controls.
 Currently, it does not do a perfect job when there are more than one color tables present.
 <p>
 The [isl::attr orientation] attribute specifies where the tick marks are drawn, e.g., to the left, right, top
-or bottom of the color bar. This also implicitly specifies the horizontal (top, bottom) 
-or vertical (right, left) orientation of the color bar. Note, placing a vertical color bar 
+or bottom of the color bar. This also implicitly specifies the horizontal (top, bottom)
+or vertical (right, left) orientation of the color bar. Note, placing a vertical color bar
 is a bit tricky.
 <p>
 You can specify how ticks are drawn. You can give a number of tickmarks, a value interval or
@@ -397,7 +397,7 @@ That makes:
 
 [isl::tagdef kmlcolorbar {Write a colorbar into the kmz file} -attrs {
         width {width of color bar image} height {height of color bar image}
-        file {file to write color bar image to} 
+        file {file to write color bar image to}
         space {extra padding around image} suffix {label suffix - can include  &quot;%unit%&quot}
         kml.name {Name used in kml for this image}
         kml.overlayXY.x {see below} kml.overlayXY.y {see below} kml.overlayXY.xunits {see below} kml.overlayXY.yunits {see below}
@@ -443,7 +443,7 @@ The file attribute should contain properties for each image: ${row}, ${column}  
 
 
 
- 
+
 
 
 

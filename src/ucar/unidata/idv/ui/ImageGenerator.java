@@ -572,31 +572,31 @@ public class ImageGenerator extends IdvManager {
     /** linewidth tag */
     public static final String ATTR_LINEWIDTH = "linewidth";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_LINEOFFSET_RIGHT = "lineoffsetright";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_LINEOFFSET_LEFT = "lineoffsetleft";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_LINEOFFSET_TOP = "lineoffsettop";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_LINEOFFSET_BOTTOM = "lineoffsetbottom";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_LABELBACKGROUND = "labelbackground";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_SHOWTOP = "showtop";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_SHOWBOTTOM = "showbottom";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_SHOWLEFT = "showleft";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_SHOWRIGHT = "showright";
 
     /** isl tag */
@@ -666,7 +666,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_MESSAGE = "message";
 
-    /** _more_ */
+    /** isl tag */
     public static final String ATTR_MATTEBG = "mattebg";
 
     /** isl tag */
@@ -3145,12 +3145,11 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Process geo selection tags.
      *
-     * @param node _more_
-     * @param dataSelection _more_
-     *
-     * @return _more_
+     * @param node the node
+     * @param dataSelection the data selection
+     * @return true, if successful
      */
     private boolean processGeoSelectionTags(Element node,
                                             DataSelection dataSelection) {

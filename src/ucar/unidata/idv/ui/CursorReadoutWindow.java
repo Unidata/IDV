@@ -65,29 +65,42 @@ import javax.swing.border.BevelBorder;
 
 public class CursorReadoutWindow {
 
-    /** _more_ */
+    /**
+     * The navigated view manager
+     */
     NavigatedViewManager vm;
 
-    /** _more_ */
+
+    /**
+     * The window
+     */
     protected JWindow window;
 
-    /** _more_ */
+    /**
+     * The label
+     */
     protected JLabel label;
 
-    /** _more_ */
+    /**
+     * The window width
+     */
     protected int windowWidth = 0;
 
-    /** _more_ */
+    /**
+     * The last earth location
+     */
     private EarthLocation lastEarthLocation;
 
-    /** _more_ */
+    /**
+     * Ignore missing
+     */
     private boolean ignoreMissing = true;
 
 
     /**
-     * _more_
+     * Instantiates a new cursor readout window.
      *
-     * @param vm _more_
+     * @param vm the vm
      */
     public CursorReadoutWindow(NavigatedViewManager vm) {
         this(vm, true);
@@ -95,10 +108,10 @@ public class CursorReadoutWindow {
 
 
     /**
-     * _more_
+     * Instantiates a new cursor readout window.
      *
-     * @param vm _more_
-     * @param ignoreMissing _more_
+     * @param vm the vm
+     * @param ignoreMissing the ignore missing
      */
     public CursorReadoutWindow(NavigatedViewManager vm,
                                boolean ignoreMissing) {
@@ -110,9 +123,9 @@ public class CursorReadoutWindow {
 
 
     /**
-     * _more_
+     * Handle mouse released.
      *
-     * @param e _more_
+     * @param e the e
      */
     public void handleMouseReleased(MouseEvent e) {
         if (window != null) {
@@ -125,7 +138,7 @@ public class CursorReadoutWindow {
 
 
     /**
-     * _more_
+     * Sets the window location.
      */
     private void setWindowLocation() {
         JComponent contents   = (JComponent) vm.getContents();
@@ -196,7 +209,7 @@ public class CursorReadoutWindow {
 
 
     /**
-     * _more_
+     * Update readout.
      */
     public void updateReadout() {
         if ((lastEarthLocation == null) || (window == null)) {
@@ -229,14 +242,13 @@ public class CursorReadoutWindow {
 
 
     /**
-     * _more_
+     * Gets the readout.
      *
-     * @param earthLocation _more_
-     * @param showDisplays _more_
-     * @param showAlt _more_
-     * @param samples _more_
-     *
-     * @return _more_
+     * @param earthLocation the earth location
+     * @param showDisplays the show displays
+     * @param showAlt the show alt
+     * @param samples the samples
+     * @return the readout
      */
     public String getReadout(EarthLocation earthLocation,
                              boolean showDisplays, boolean showAlt,
