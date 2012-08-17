@@ -319,12 +319,12 @@ public class XmlEncoder extends XmlUtil {
                                                             Class>();
 
 
-    /** _more_ */
+    /** The new class names hashtable. */
     private Hashtable<String, String> newClassNames = new Hashtable<String,
                                                           String>();
 
 
-    /** _more_ */
+    /** The patterns list */
     private List<String[]> patterns = new ArrayList<String[]>();
 
     /**
@@ -506,18 +506,18 @@ public class XmlEncoder extends XmlUtil {
 
 
     /**
-     * _more_
+     * Get the exceptions
      *
-     * @return _more_
+     * @return the list of exceptions
      */
     public List getExceptions() {
         return exceptions;
     }
 
     /**
-     * _more_
+     * The the error messages
      *
-     * @return _more_
+     * @return the list of error messages
      */
     public List getErrorMessages() {
         return errorMessages;
@@ -537,26 +537,22 @@ public class XmlEncoder extends XmlUtil {
 
 
     /**
-     * _more_
+     * Decode the XML
      *
-     * @param xml _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * @param xml
+     * @return the decoded XML
+     * @throws Exception
      */
     public static Object decodeXml(String xml) throws Exception {
         return new XmlEncoder().toObject(xml);
     }
 
     /**
-     * _more_
+     * XML encode the object
      *
-     * @param object _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * @param object
+     * @return
+     * @throws Exception
      */
     public static String encodeObject(Object object) throws Exception {
         String s = new XmlEncoder().toXml(object, false);
@@ -578,14 +574,12 @@ public class XmlEncoder extends XmlUtil {
 
 
     /**
-     * _more_
+     * XML string to object
      *
-     * @param xml _more_
-     * @param catchAndLogError _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * @param xml
+     * @param catchAndLogError
+     * @return the object
+     * @throws Exception
      */
     public Object toObject(String xml, boolean catchAndLogError)
             throws Exception {
@@ -626,15 +620,13 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
-
     /**
      *  Create an object from the given dom subtree.
      *
-     *  @param node The xml.
-     * @param catchAndLogError _more_
-     *  @return the newly created object.
-     *
-     * @throws Exception _more_
+     * @param node the xml
+     * @param catchAndLogError
+     * @return the newly cread object
+     * @throws Exception
      */
     private Object toObjectInner(Element node, boolean catchAndLogError)
             throws Exception {
@@ -1138,22 +1130,21 @@ public class XmlEncoder extends XmlUtil {
 
 
     /**
-     * _more_
-     *
-     * @param oldName _more_
-     * @param newName _more_
+     * Register new class name
+     * @param oldName the old name
+     * @param newName the new name
      */
     public void registerNewClassName(String oldName, String newName) {
         newClassNames.put(oldName, newName);
     }
 
 
-
-
-
     /**
      * This allows on to change package  paths of classes that are in bundles
      * with a new path
+     *
+     * @param pattern the pattern
+     * @param replace the replace pattern
      */
 
     public void addClassPatternReplacement(String pattern, String replace) {
@@ -1613,12 +1604,11 @@ public class XmlEncoder extends XmlUtil {
     }
 
     /**
-     * _more_
+     * Find the property methods
      *
-     * @param c _more_
-     * @param returnGetters _more_
-     *
-     * @return _more_
+     * @param c the class
+     * @param returnGetters return the getters
+     * @return list of property methods
      */
     public static List findPropertyMethods(Class c, boolean returnGetters) {
         Method[]  methods = c.getMethods();
