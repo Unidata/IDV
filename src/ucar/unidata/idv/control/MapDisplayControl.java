@@ -1057,8 +1057,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         sp.getVerticalScrollBar().setUnitIncrement(10);
 
         JViewport vp = sp.getViewport();
-        vp.setViewSize(new Dimension(600, 200));
-        sp.setPreferredSize(new Dimension(600, 200));
+        vp.setViewSize(new Dimension(600, 220));
+        sp.setPreferredSize(new Dimension(600, 220));
 
         applyToAllLatLonBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
@@ -1100,6 +1100,19 @@ public class MapDisplayControl extends DisplayControlImpl {
                                         GuiUtils.left(
                                             lllPanel)))), GuiUtils.filler());
 
+        JScrollPane sp2 =
+            new JScrollPane(
+                latlonPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        sp2.setBorder(null);
+        sp2.getVerticalScrollBar().setUnitIncrement(10);
+
+        JViewport vp2 = sp.getViewport();
+        vp2.setViewSize(new Dimension(600, 220));
+        sp2.setPreferredSize(new Dimension(600, 220));
+
         applyToAllMapsBtn =
             GuiUtils.getToggleImageButton("/auxdata/ui/icons/link_break.png",
                                           "/auxdata/ui/icons/link.png", 0, 0,
@@ -1109,16 +1122,11 @@ public class MapDisplayControl extends DisplayControlImpl {
         applyToAllMapsBtn.setToolTipText("Apply changes to all visible maps");
 
 
-
-
-
-
-
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Maps",
                        GuiUtils.topCenter(GuiUtils.left(applyToAllMapsBtn),
                                           sp));
-        tabbedPane.add("Lat/Lon", latlonPanel);
+        tabbedPane.add("Lat/Lon", sp2);
         JComponent retComp = tabbedPane;
         if (useZPosition()) {
             GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
@@ -1169,7 +1177,10 @@ public class MapDisplayControl extends DisplayControlImpl {
                 applyMapPosition();
             }
         };
-        return levelSlider.getContents();
+        JComponent slider = levelSlider.getContents();
+        slider.setPreferredSize(new Dimension(500,
+                slider.getPreferredSize().height));
+        return slider;
     }
 
 
