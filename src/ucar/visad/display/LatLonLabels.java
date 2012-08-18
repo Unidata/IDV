@@ -74,6 +74,10 @@ public class LatLonLabels extends TextDisplayable {
     /** the label format */
     private TupleType labelType;
 
+    /** the label format */
+    private boolean use360 = false;
+
+
     /** proto real */
     private Real latReal = new Real(RealType.Latitude, 0, CommonUnit.degree);
 
@@ -278,6 +282,14 @@ public class LatLonLabels extends TextDisplayable {
     private String formatLabel(double value) {
         double pvalue    = Math.abs(value);
         String formatted = labelFormat;
+        // NB: not tested yet
+        if ( !isLatitude && use360 && (value <= 180)) {
+            double tval = value;
+            while (tval < 0) {
+                tval += 360;
+            }
+            pvalue = tval;
+        }
         int    degrees   = (int) pvalue;
         double ddminutes = (pvalue - degrees);
         double dminutes  = ddminutes * 60.;
@@ -291,7 +303,9 @@ public class LatLonLabels extends TextDisplayable {
         formatted = formatted.replaceAll("SS",
                                          StringUtil.padZero(seconds, 2));
         if (labelFormat.indexOf("H") >= 0) {
-            if (value < 0) {         // South/West
+            if (use360) {            // should we ignore?
+                formatted = formatted.replace("H", "");
+            } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
                         ? "S"
                         : "W");
@@ -299,13 +313,13 @@ public class LatLonLabels extends TextDisplayable {
                 formatted = formatted.replace("H", (isLatitude)
                         ? "N"
                         : "E");
-            } else {                 // 0 line
+            } else {                 // 0 line - subject to debate
                 formatted = formatted.replace("H", "");
             }
-        } else if (value < 0) {
+        } else if ((value < 0) && !use360) {
             formatted = "-" + formatted;
         }
-        return formatted;
+        return formatted.trim();
     }
 
     /**
@@ -414,6 +428,30 @@ public class LatLonLabels extends TextDisplayable {
             return;
         }
         this.interval = interval;
+        createLabels();
+    }
+
+    /**
+     * Get whether to use 0-360 labels for longitude
+     * @return true if using 0-360
+     */
+    public boolean getUse360() {
+        return use360;
+    }
+
+    /**
+     * Set whether to use 0-360 labels for longitude
+     * @param yesorno  true to use 0-360 labels for longitude
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException problem creating labels
+     */
+    public void setUse360(boolean yesorno)
+            throws VisADException, RemoteException {
+        if (this.use360 == yesorno) {
+            return;
+        }
+        this.use360 = yesorno;
         createLabels();
     }
 

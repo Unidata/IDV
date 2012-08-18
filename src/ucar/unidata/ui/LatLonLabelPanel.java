@@ -93,6 +93,9 @@ public class LatLonLabelPanel extends JPanel {
     /** the alignment point list */
     private List<TwoFacedObject> alignPoints;
 
+    /** the use360 checkbox */
+    private JCheckBox use360Cbx;
+
     /** The alignment point names */
     private static final String[] RECTPOINTNAMES = {
         "Top Left", "Top Center", "Top Right", "Left", "Center", "Right",
@@ -124,6 +127,7 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
+
         spacingField =
             new JTextField(String.valueOf(latLonLabelData.getInterval()), 6);
         spacingField.setToolTipText(
@@ -211,6 +215,8 @@ public class LatLonLabelPanel extends JPanel {
         });
         fontSelector.setFont((Font) latLonLabelData.getFont());
 
+        alignPoints = TwoFacedObject.createList(Glyph.RECTPOINTS,
+                Glyph.RECTPOINTNAMES);
         alignSelector = new JComboBox();
         alignSelector.setToolTipText(
             "Set the positioning of the label relative to the location");
@@ -223,14 +229,11 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
-        GuiUtils.setListData(alignSelector,
-                             alignPoints =
-                                 TwoFacedObject.createList(Glyph.RECTPOINTS,
-                                     Glyph.RECTPOINTNAMES));
+        GuiUtils.setListData(alignSelector, alignPoints);
         alignSelector.setSelectedItem(
             getAlignSelectorItem(latLonLabelData.getAlignment()));
 
-        formatSelector = new JComboBox();
+        formatSelector = new JComboBox(LABEL_FORMATS);
         formatSelector.setEditable(true);
         formatSelector.setToolTipText("Set the label format");
         formatSelector.addActionListener(new ActionListener() {
@@ -241,10 +244,19 @@ public class LatLonLabelPanel extends JPanel {
                 }
             }
         });
-        GuiUtils.setListData(formatSelector, LABEL_FORMATS);
+        //GuiUtils.setListData(formatSelector, LABEL_FORMATS);
         formatSelector.setSelectedItem(latLonLabelData.getLabelFormat());
         ignoreEvents = false;
 
+        use360Cbx    = new JCheckBox("0-360", latLonLabelData.getUse360());
+        use360Cbx.setToolTipText("Use 0-360 for longitude labels");
+        use360Cbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if ( !ignoreEvents) {
+                    latLonLabelData.setUse360(use360Cbx.isSelected());
+                }
+            }
+        });
     }
 
     /**
@@ -269,6 +281,7 @@ public class LatLonLabelPanel extends JPanel {
                 fontSelector.setFont((Font) lld.getFont());
             }
             formatSelector.setSelectedItem(lld.getLabelFormat());
+            use360Cbx.setSelected(lld.getUse360());
             ignoreEvents = false;
         }
 
@@ -293,11 +306,11 @@ public class LatLonLabelPanel extends JPanel {
             GuiUtils.rLabel("Latitude:"), latPanel.spacingField,
             latPanel.baseField, GuiUtils.rLabel("At Longitudes:"),
             latPanel.labelLinesField, latPanel.colorButton,
-            latPanel.alignSelector, lonPanel.onOffCbx,
-            GuiUtils.rLabel("Longitude:"), lonPanel.spacingField,
-            lonPanel.baseField, GuiUtils.rLabel("At Latitudes:"),
-            lonPanel.labelLinesField, lonPanel.colorButton,
-            lonPanel.alignSelector,
+            latPanel.alignSelector, 
+            lonPanel.onOffCbx, GuiUtils.rLabel("Longitude:"), 
+            lonPanel.spacingField, lonPanel.baseField, 
+            GuiUtils.rLabel("At Latitudes:"), lonPanel.labelLinesField, 
+            lonPanel.colorButton, lonPanel.alignSelector,
         };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
         JPanel settings = GuiUtils.doLayout(comps, 8, GuiUtils.WT_N,
@@ -305,9 +318,10 @@ public class LatLonLabelPanel extends JPanel {
         Component[] extraComps = { GuiUtils.rLabel("Font:"),
                                    latPanel.fontSelector.getComponent(),
                                    GuiUtils.rLabel("Format:"),
-                                   latPanel.formatSelector };
+                                   latPanel.formatSelector,
+                                   lonPanel.use360Cbx, GuiUtils.filler()};
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
-        JPanel extra = GuiUtils.doLayout(extraComps, 4, GuiUtils.WT_N,
+        JPanel extra = GuiUtils.doLayout(extraComps, 5, GuiUtils.WT_N,
                                          GuiUtils.WT_N);
         return GuiUtils.vbox(GuiUtils.left(settings), GuiUtils.left(extra));
     }

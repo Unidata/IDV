@@ -24,6 +24,7 @@ package ucar.unidata.gis.maps;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.xml.XmlResourceCollection;
@@ -36,6 +37,7 @@ import visad.VisADException;
 
 
 import java.awt.Color;
+import java.awt.Font;
 
 import java.net.URL;
 
@@ -76,6 +78,9 @@ public class MapInfo {
 
     /** Xml attribute for the color property */
     public static final String ATTR_COLOR = "color";
+
+    /** Xml attribute for the font property */
+    public static final String ATTR_FONT = "font";
 
     /** Xml attribute for the category property */
     public static final String ATTR_CATEGORY = "category";
@@ -121,6 +126,9 @@ public class MapInfo {
 
     /** Xml attribute for the alignment  property */
     public static final String ATTR_LABELFORMAT = "labelformat";
+
+    /** Xml attribute for the alignment  property */
+    public static final String ATTR_USE360 = "use360";
 
     /** Xml attribute for the  property */
     public static final String ATTR_VALID = "valid";
@@ -419,9 +427,13 @@ public class MapInfo {
                     ATTR_COLOR, "" + llld.getColor().getRGB(), ATTR_VISIBLE,
                     "" + llld.getVisible(),
                     //ATTR_FASTRENDER, "" + llld.getFastRendering(),
+                    //ATTR_FONT, ((llld.getFont() == null)
+                    //            ? FontSelector.DEFAULT_FONT.toString()
+                    //            : llld.getFont().toString()), 
                     ATTR_SPHERE, "" + llld.getSphere(), ATTR_ALIGNMENT,
                     "" + llld.getAlignment(), ATTR_LABELFORMAT,
-                    "" + llld.getLabelFormat()
+                    "" + llld.getLabelFormat(), ATTR_USE360,
+                    "" + llld.getUse360()
                 });
             }
 
@@ -612,6 +624,9 @@ public class MapInfo {
             llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_LABELFORMAT,
                     "DD"));
             llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
+            //llld.setFont(Font.decode(XmlUtil.getAttribute(node, ATTR_FONT,
+            //        (String) null)));
+            llld.setUse360(XmlUtil.getAttribute(node, ATTR_USE360, false));
         } else {
             llld.setBaseValue(0.f);
             llld.setColor(Color.white);

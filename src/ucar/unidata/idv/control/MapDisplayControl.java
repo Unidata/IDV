@@ -246,10 +246,10 @@ public class MapDisplayControl extends DisplayControlImpl {
     private boolean applyChangesToAllMaps = false;
 
     /** Do we apply the changes to all the lats and lons */
-    private boolean applyChangesToAllLatLon = false;
+    private boolean applyChangesToAllLatLon = true;
 
     /** Do we apply the changes to all the lat/lon labels */
-    private boolean applyChangesToAllLabels = false;
+    private boolean applyChangesToAllLabels = true;
 
     /** Are we currently updating the other maps */
     private boolean updatingOtherMapStates = false;
@@ -2027,6 +2027,21 @@ public class MapDisplayControl extends DisplayControlImpl {
             if (shouldShare && (other != null)) {
                 other.okToShare = false;
                 other.setSphere(value);
+                other.stateWasShared();
+            }
+        }
+
+        /**
+         * Set the use360 property
+         *
+         * @param value  true to use 0-360 for longitudes
+         */
+        public void setUse360(boolean value) {
+            boolean shouldShare = false && (value != getVisible());
+            super.setUse360(value);
+            if (shouldShare && (other != null)) {
+                other.okToShare = false;
+                other.setUse360(value);
                 other.stateWasShared();
             }
         }

@@ -89,6 +89,9 @@ public class LatLonLabelData {
     /** format flag */
     private String labelFormat = "DD";
 
+    /** use360 flag */
+    private boolean use360 = false;
+
 
     /**
      * Default ctor
@@ -192,6 +195,7 @@ public class LatLonLabelData {
         this.visible       = that.visible;
         this.useSphere     = that.useSphere;
         this.labelFormat   = that.labelFormat;
+        this.use360        = that.use360;
     }
 
 
@@ -234,6 +238,7 @@ public class LatLonLabelData {
         myLatLonLabels.setUseFastRendering(fastRendering);
         myLatLonLabels.setSphere(useSphere);
         myLatLonLabels.setLabelFormat(labelFormat);
+        myLatLonLabels.setUse360(use360);
         return myLatLonLabels;
     }
 
@@ -597,6 +602,25 @@ public class LatLonLabelData {
      */
     public String getLabelFormat() {
         return labelFormat;
+    }
+
+    /**
+     *  Set the use360 property.
+     *
+     *  @param value The new value for use360
+     */
+    public void setUse360(boolean value) {
+        use360 = value;
+        stateChanged();
+    }
+
+    /**
+     *  Get the Use360 property.
+     *
+     *  @return The Use360
+     */
+    public boolean getUse360() {
+        return use360;
     }
 
 }

@@ -84,6 +84,7 @@ public class LatLonPanel extends JPanel {
      */
     public LatLonPanel(LatLonData lld) {
         this.latLonData = lld;
+        ignoreEvents    = true;
         onOffCbx        = new JCheckBox("", latLonData.getVisible());
         onOffCbx.setToolTipText("Turn on/off lines");
         onOffCbx.addActionListener(new ActionListener() {
@@ -106,8 +107,7 @@ public class LatLonPanel extends JPanel {
                     new Float(spacingField.getText()).floatValue());
             }
         });
-        baseField =
-            new JTextField(String.valueOf(latLonData.getBase()), 6);
+        baseField = new JTextField(String.valueOf(latLonData.getBase()), 6);
         baseField.setToolTipText("Set the base value for the interval");
         baseField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -181,6 +181,7 @@ public class LatLonPanel extends JPanel {
                 }
             }
         });
+        ignoreEvents = false;
     }
 
 
@@ -219,16 +220,14 @@ public class LatLonPanel extends JPanel {
         Component[] comps = {
             GuiUtils.lLabel("<html><b>Lines</b></html"), GuiUtils.filler(),
             GuiUtils.cLabel("Interval"), GuiUtils.cLabel("Relative to"),
-            GuiUtils.cLabel("Width"), GuiUtils.cLabel("Style"), 
-            GuiUtils.cLabel("Color"), GuiUtils.cLabel("Fast Render"), 
-            latPanel.onOffCbx, GuiUtils.rLabel("Latitude:"), 
-            latPanel.spacingField, latPanel.baseField, 
-            latPanel.widthBox, latPanel.styleBox, 
-            latPanel.colorButton, latPanel.fastRenderCbx,
-            lonPanel.onOffCbx, GuiUtils.rLabel("Longitude:"), 
-            lonPanel.spacingField, lonPanel.baseField, 
-            lonPanel.widthBox, lonPanel.styleBox, 
-            lonPanel.colorButton, lonPanel.fastRenderCbx
+            GuiUtils.cLabel("Width"), GuiUtils.cLabel("Style"),
+            GuiUtils.cLabel("Color"), GuiUtils.cLabel("Fast Render"),
+            latPanel.onOffCbx, GuiUtils.rLabel("Latitude:"),
+            latPanel.spacingField, latPanel.baseField, latPanel.widthBox,
+            latPanel.styleBox, latPanel.colorButton, latPanel.fastRenderCbx,
+            lonPanel.onOffCbx, GuiUtils.rLabel("Longitude:"),
+            lonPanel.spacingField, lonPanel.baseField, lonPanel.widthBox,
+            lonPanel.styleBox, lonPanel.colorButton, lonPanel.fastRenderCbx
         };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
         return GuiUtils.doLayout(comps, 8, GuiUtils.WT_N, GuiUtils.WT_N);
