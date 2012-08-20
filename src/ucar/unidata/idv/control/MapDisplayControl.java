@@ -1129,7 +1129,7 @@ public class MapDisplayControl extends DisplayControlImpl {
         tabbedPane.add("Lat/Lon", sp2);
         JComponent retComp = tabbedPane;
         if (useZPosition()) {
-            GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
+            //GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
             JComponent sliderPanel = GuiUtils.doLayout(new Component[] {
                                          GuiUtils.rLabel("Position: "),
                                          makePositionSlider() }, 2,
@@ -1138,7 +1138,9 @@ public class MapDisplayControl extends DisplayControlImpl {
             JComponent sliderPanel = GuiUtils.leftCenter(
                     GuiUtils.rLabel("Position: "), makePositionSlider());
             */
-            retComp = GuiUtils.centerBottom(tabbedPane, sliderPanel);
+            retComp = GuiUtils.centerBottom(tabbedPane,
+                                            GuiUtils.inset(sliderPanel,
+                                                new Insets(10, 0, 0, 0)));
         }
         fillContents();
         return retComp;
