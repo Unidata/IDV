@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -176,7 +176,10 @@ public abstract class PointDataSource extends FilesDataSource {
     private float gridGain = 1.0f;
 
     /** Scale length */
-    private float gridSearchRadius = 10.0f;
+    private static float DEFAULT_RADIUS = 10.0f;
+
+    /** Scale length */
+    private float gridSearchRadius = DEFAULT_RADIUS;
 
     /** Do we make grid fields */
     private boolean makeGridFields = true;
@@ -471,7 +474,7 @@ public abstract class PointDataSource extends FilesDataSource {
          */
         private void enableAutoComps(boolean enable) {
             GuiUtils.enableTree(sizeComp, enable);
-            searchComp.setEnabled(enable);
+            //searchComp.setEnabled(enable);
         }
 
         /**
@@ -601,8 +604,8 @@ public abstract class PointDataSource extends FilesDataSource {
          *
          * @return search radius
          */
-        public int getGridSearchRadius() {
-            return (int) searchComp.getValue();
+        public float getGridSearchRadius() {
+            return (float) searchComp.getValue();
         }
 
         /**
@@ -1214,6 +1217,9 @@ public abstract class PointDataSource extends FilesDataSource {
                     || (spacingY <= 0)) {
                 degreesX = PointObFactory.OA_GRID_DEFAULT;
                 degreesY = PointObFactory.OA_GRID_DEFAULT;
+                if (searchRadius == DEFAULT_RADIUS) {
+                    searchRadius = PointObFactory.OA_GRID_DEFAULT;
+                }
             } else if (theUnit.equals(SPACING_POINTS)) {
                 double[] bbox  = PointObFactory.getBoundingBox(pointObs);
                 float    spanX = (float) Math.abs(bbox[1] - bbox[3]);

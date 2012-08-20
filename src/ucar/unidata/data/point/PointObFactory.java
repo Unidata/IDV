@@ -2486,7 +2486,9 @@ public class PointObFactory {
                 });
                 faGridX     = ap.getGridXArray();
                 faGridY     = ap.getGridYArray();
-                scaleLength = (float) ap.getScaleLengthGU();
+                if (scaleLength == OA_GRID_DEFAULT) {
+                    scaleLength = (float) ap.getScaleLengthGU();
+                }
                 log_.debug("random data spacing = "
                            + ap.getRandomDataSpacing());
             } else {
