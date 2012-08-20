@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -214,7 +214,7 @@ public class PointObFactory {
                     ((RealTuple) ob.getEarthLocation()).getValues();
                 double[] dataVals = ((RealTuple) ob.getData()).getValues();
                 if (timeStep == null) {  // first time through
-                    timeStep = new FlatField(cloudType, indexSet);
+                    timeStep     = new FlatField(cloudType, indexSet);
                     timeStepVals =
                         new float[elVals.length + dataVals.length][timeStep.getLength()];
                     Unit[] elUnits =
@@ -232,7 +232,7 @@ public class PointObFactory {
                     for (int k = 0; k < valUnits.length; k++) {
                         dataUnits[k + elUnits.length] = valUnits[k];
                     }
-                    rangeUnits = Util.getDefaultRangeUnits(timeStep);
+                    rangeUnits    = Util.getDefaultRangeUnits(timeStep);
                     needToConvert = !java.util.Arrays.equals(dataUnits,
                             rangeUnits);
                 }
@@ -379,9 +379,9 @@ public class PointObFactory {
         DateTime[] times = (DateTime[]) uniqueTimes.toArray(
                                new DateTime[uniqueTimes.size()]);
         Arrays.sort(times);
-        RealType     index      = RealType.getRealType("index");
+        RealType     index            = RealType.getRealType("index");
 
-        FunctionType sampleType = new FunctionType(index, obType);
+        FunctionType sampleType       = new FunctionType(index, obType);
         FunctionType timeSequenceType = new FunctionType(RealType.Time,
                                             ((componentIndex < 0)
                                              ? (MathType) sampleType
@@ -544,7 +544,7 @@ public class PointObFactory {
         }
         List<Attribute>  attrs    = new ArrayList<Attribute>();
         List<PointObVar> dataVars = new ArrayList<PointObVar>();
-        DataOutputStream dos =
+        DataOutputStream dos      =
             new DataOutputStream(new FileOutputStream(file));
         CFPointObWriter writer    = null;
         int             numFloat  = 0;
@@ -797,7 +797,7 @@ public class PointObFactory {
         Set       domainSet = pointObs.getDomainSet();
         int       numObs    = domainSet.getLength();
         Unit[]    units     = bounds.getSetUnits();
-        int latIndex =
+        int       latIndex  =
             (((RealType) ((SetType) bounds.getType()).getDomain()
                 .getComponent(0)).equals(RealType.Latitude) == true)
             ? 0
@@ -930,10 +930,10 @@ public class PointObFactory {
             }
 
             // Check for METAR cloud cover groups
-            int cc1Index = type.getIndex("CC1");
-            int cc2Index = type.getIndex("CC2");
-            int cigIndex = type.getIndex("CIGC");
-            int caIndex  = type.getIndex("CA");
+            int     cc1Index    = type.getIndex("CC1");
+            int     cc2Index    = type.getIndex("CC2");
+            int     cigIndex    = type.getIndex("CIGC");
+            int     caIndex     = type.getIndex("CA");
             boolean mergeClouds = ((cc1Index >= 0) && (cc2Index >= 0)
                                    && (cigIndex >= 0) && (caIndex < 0));
 
@@ -1821,19 +1821,19 @@ public class PointObFactory {
             (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
 
 
-        int               listSize = (sample)
-                                     ? 1
-                                     : 100000;
-        Real              lat      = new Real(RealType.Latitude, 40);
-        Real              lon      = new Real(RealType.Longitude, -100);
-        Real              alt      = new Real(RealType.Altitude, 0);
-        DateTime          dateTime = null;
-        EarthLocationLite elt;
-        TupleType         finalTT = null;
-        PointObTuple      pot     = null;
-        List<Tuple>       tuples  = new ArrayList<Tuple>(listSize);
-        List<DateTime>    times   = new ArrayList<DateTime>(listSize);
-        List<EarthLocationLite> elts =
+        int                     listSize = (sample)
+                                           ? 1
+                                           : 100000;
+        Real                    lat      = new Real(RealType.Latitude, 40);
+        Real                    lon      = new Real(RealType.Longitude, -100);
+        Real                    alt      = new Real(RealType.Altitude, 0);
+        DateTime                dateTime = null;
+        EarthLocationLite       elt;
+        TupleType               finalTT = null;
+        PointObTuple            pot     = null;
+        List<Tuple>             tuples  = new ArrayList<Tuple>(listSize);
+        List<DateTime>          times   = new ArrayList<DateTime>(listSize);
+        List<EarthLocationLite> elts    =
             new ArrayList<EarthLocationLite>(listSize);
 
         StructureMembers.Member member;
@@ -2152,7 +2152,7 @@ public class PointObFactory {
     public static FieldImpl makePointObs(PointOb po)
             throws VisADException, RemoteException {
 
-        RealType index = RealType.getRealType("index");
+        RealType  index        = RealType.getRealType("index");
         FieldImpl stationField = new FieldImpl(new FunctionType(index,
                                      po.getType()), new Integer1DSet(index,
                                          1));
@@ -2250,7 +2250,7 @@ public class PointObFactory {
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
-        boolean haveGuess = firstGuessField != null;
+        boolean haveGuess   = firstGuessField != null;
         boolean guessIsTime = (firstGuessField != null)
                               && GridUtil.isTimeSequence(firstGuessField);
         if (haveGuess && guessIsTime && GridUtil.isTimeSequence(pointObs)) {
@@ -2484,9 +2484,11 @@ public class PointObFactory {
                         latMax, new float[][] {
                     obVals[0], obVals[1]
                 });
-                faGridX     = ap.getGridXArray();
-                faGridY     = ap.getGridYArray();
-                scaleLength = (float) ap.getScaleLengthGU();
+                faGridX = ap.getGridXArray();
+                faGridY = ap.getGridYArray();
+                if (scaleLength == OA_GRID_DEFAULT) {
+                    scaleLength = (float) ap.getScaleLengthGU();
+                }
                 log_.debug("random data spacing = "
                            + ap.getRandomDataSpacing());
             } else {
@@ -2682,10 +2684,10 @@ public class PointObFactory {
                 throw new VisADException("Parameter does not exist in obs");
             }
             for (int i = 0; i < indexSet.getLength(); i++) {
-                PointOb sample = (PointOb) obs.getSample(i);
-                Tuple   data   = (Tuple) sample.getData();
-                Real    parm   = (Real) data.getComponent(paramIndex);
-                PointObTuple newPO =
+                PointOb      sample = (PointOb) obs.getSample(i);
+                Tuple        data   = (Tuple) sample.getData();
+                Real         parm   = (Real) data.getComponent(paramIndex);
+                PointObTuple newPO  =
                     new PointObTuple(sample.getEarthLocation(),
                                      sample.getDateTime(),
                                      new RealTuple(new Real[] { parm }));

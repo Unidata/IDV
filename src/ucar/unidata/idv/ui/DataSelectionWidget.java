@@ -34,6 +34,7 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.TimesChooser;
+import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -1396,6 +1397,12 @@ public class DataSelectionWidget {
 
         vm0 = this.idv.getVMManager().getLastActiveViewManager();
         List tdt = null;
+        // return true when there is only background map in the view
+        List<DisplayControl>  dcList = (List<DisplayControl>) vm0.getControls();
+        for (DisplayControl control :dcList) {
+            if(control instanceof MapDisplayControl && dcList.size() == 1)
+                return true ;
+        }
         try{
             tdt = vm0.getTimeDriverTimes();
         } catch (Exception e) {}
@@ -1403,9 +1410,9 @@ public class DataSelectionWidget {
         if(tdt != null)
             return true;
         else {
-           /* LogUtil.userErrorMessage(new JLabel(
+            LogUtil.userErrorMessage(new JLabel(
                     "<html>Error: there is no time driver in the current active view window, please select or set" +
-                            " the view window with time driver! </html>"));    */
+                            " the view window with time driver! </html>"));
             return false;
         }
 
