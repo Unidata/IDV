@@ -1718,18 +1718,18 @@ public class XmlEncoder extends XmlUtil {
         return null;
     }
 
+    
     /**
      * Creates the enum.
      *
-     * @param <E> the enum element type
      * @param element the element
      * @return the enum
      */
-    public <E extends Enum<E>> E createEnumObject(Element element) {
+    public ObjectClass createEnumObject(Element element) {
         try {
-            Class<E> enumType = getClass(element.getAttribute(ATTR_CLASS));
+            Class enumType = getClass(element.getAttribute(ATTR_CLASS));
             String   value    = element.getAttribute(ATTR_VALUE);
-            return Enum.valueOf(enumType, value);
+            return new ObjectClass(Enum.valueOf(enumType, value));
         } catch (Exception exc) {
             logException("Error creating enum", exc);
         }
@@ -2054,7 +2054,7 @@ public class XmlEncoder extends XmlUtil {
 
         //Check if it's an enum.
         if (tagName.equals(TAG_ENUM)) {
-            return new ObjectClass(createEnumObject(element));
+            return createEnumObject(element);
         }
 
         //Check if it's an primitive array.
