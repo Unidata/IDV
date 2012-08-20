@@ -459,7 +459,7 @@ public class MapInfo {
         } catch (Exception e) {
             LogUtil.printException(log_, "Couldn't create map state", e);
         }
-        return XmlUtil.toString(currentState);
+        return XmlUtil.toStringWithHeader(currentState);
     }
 
 
