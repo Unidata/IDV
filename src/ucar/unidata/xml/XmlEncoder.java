@@ -132,6 +132,11 @@ public class XmlEncoder extends XmlUtil {
     public static final String TAG_ARRAY = "array";
 
     /**
+     *  The tag name used for enums.
+     */
+    public static final String TAG_ENUM = "enum";
+
+    /**
      *  The tag name used for primitive arrays.
      */
     public static final String TAG_PARRAY = "parray";
@@ -1258,6 +1263,20 @@ public class XmlEncoder extends XmlUtil {
     }
 
     /**
+     * Creates the element based on the enum.
+     *
+     * @param <E> the enum element type
+     * @param e the e
+     * @return the element
+     */
+    public <E extends Enum<E>> Element createEnumElement(E e) {
+        Element enumElement = newElement(TAG_ENUM);
+        enumElement.setAttribute(ATTR_CLASS, getClassName(e.getClass()));
+        enumElement.setAttribute(ATTR_VALUE, e.name());
+        return enumElement;
+    }
+
+    /**
      *  Create an Xml Element that represents the given array of primitives.
      *
      *  @param primitiveArray The array of primitives.
@@ -1699,7 +1718,23 @@ public class XmlEncoder extends XmlUtil {
         return null;
     }
 
-
+    /**
+     * Creates the enum.
+     *
+     * @param <E> the enum element type
+     * @param element the element
+     * @return the enum
+     */
+    public <E extends Enum<E>> E createEnumObject(Element element) {
+        try {
+            Class<E> enumType = getClass(element.getAttribute(ATTR_CLASS));
+            String   value    = element.getAttribute(ATTR_VALUE);
+            return Enum.valueOf(enumType, value);
+        } catch (Exception exc) {
+            logException("Error creating enum", exc);
+        }
+        return null;
+    }
 
 
     /**
@@ -2015,6 +2050,11 @@ public class XmlEncoder extends XmlUtil {
         //Check if it's an array.
         if (tagName.equals(TAG_ARRAY)) {
             return createArrayObject(element);
+        }
+
+        //Check if it's an enum.
+        if (tagName.equals(TAG_ENUM)) {
+            return new ObjectClass(createEnumObject(element));
         }
 
         //Check if it's an primitive array.
@@ -2368,6 +2408,10 @@ public class XmlEncoder extends XmlUtil {
         //then output a special Element  (e.g., <c_int value=...>, <int value=...>, ...)
         if (primitiveName != null) {
             return createPrimitiveElement(primitiveName, object);
+        }
+
+        if (theClass.isEnum()) {
+            return createEnumElement((Enum) object);
         }
 
         //Now check if this object is an array
