@@ -426,7 +426,7 @@ public class DataSelectionWidget {
                 if (cu != null) {
                     chooserDoTimeMatching = ((Boolean) cu).booleanValue();
                     if(chooserDoTimeMatching)
-                        timeOptionLabelBox.setSelectedIndex(2);
+                        timeOptionLabelBox.setSelectedItem(USE_DRIVERTIMES);
 
                 }
             }
@@ -1022,7 +1022,7 @@ public class DataSelectionWidget {
             if (timeOptionLabelBox == null) {
                 return true;
             }
-            return timeOptionLabelBox.getSelectedIndex() == 0;
+            return timeOptionLabelBox.getSelectedItem().equals(USE_DEFAULTTIMES);
         } else {
             if (allTimesButton == null) {
                 return true;
@@ -1050,9 +1050,9 @@ public class DataSelectionWidget {
             if (all != null) {
                 allDateTimes = new ArrayList(all);
             }
-            int idx = timeOptionLabelBox.getSelectedIndex();
+            String idx = (String) timeOptionLabelBox.getSelectedItem();
 
-            if (idx == 1) {
+            if (idx.equals(USE_SELECTEDTIMES)) {
                 timesList.setEnabled(true);
             } else {
                 timesList.setEnabled(false);
@@ -1081,10 +1081,10 @@ public class DataSelectionWidget {
         if (idv.getUseTimeDriver()) {
             if (timeOptionLabelBox != null) {
                 if (useAllTimes) {
-                    timeOptionLabelBox.setSelectedIndex(0);
+                    timeOptionLabelBox.setSelectedItem(USE_DEFAULTTIMES);
                     timesList.setEnabled(false);
                 } else {
-                    timeOptionLabelBox.setSelectedIndex(1);
+                    timeOptionLabelBox.setSelectedItem(USE_SELECTEDTIMES);
                     timesList.setEnabled(true);
                 }
             } else if (allTimesButton != null) {
@@ -1256,8 +1256,8 @@ public class DataSelectionWidget {
 
         //Don't automatically toggle the checkbox
         //OLD
-        int idx = timeOptionLabelBox.getSelectedIndex();
-        timesList.setEnabled(idx == 0);
+        String idx = (String) timeOptionLabelBox.getSelectedItem();
+        timesList.setEnabled(idx.equals(USE_DEFAULTTIMES));
         //        allTimesButton.setSelected(allSelected);
     }
 
@@ -1291,15 +1291,13 @@ public class DataSelectionWidget {
         //added
         timeOptionLabelBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                Object selectedObj = timeOptionLabelBox.getSelectedItem();
+                String selectedObj = (String) timeOptionLabelBox.getSelectedItem();
                 setTimeOptions(selectedObj);
-                if(timeOptionLabelBox.getSelectedIndex() != 2) {
+                if(!selectedObj.equals(USE_DRIVERTIMES)) {
                     chooserDoTimeMatching = false;
                 } else {
                     if(!checkActiveViewWithDriver()) {
-                        timeOptionLabelBox.setSelectedIndex(0);
-                        selectedObj = timeOptionLabelBox.getSelectedItem();
-                        setTimeOptions(selectedObj);
+                        timeOptionLabelBox.setSelectedItem(USE_DEFAULTTIMES);
                     }
                 }
             }
@@ -1352,7 +1350,7 @@ public class DataSelectionWidget {
      *
      * @param selectedObject  the selected time mode
      */
-    public void setTimeOptions(Object selectedObject) {
+    public void setTimeOptions(String selectedObject) {
         if (timesList == null) {
             return;
         }
@@ -1393,16 +1391,24 @@ public class DataSelectionWidget {
     protected boolean checkActiveViewWithDriver() {
         List<ViewManager>    vms = this.idv.getVMManager().getViewManagers();
         int size = vms.size();
+        if(size == 0)
+            return true;
+
+        boolean isBundle = this.idv.getStateManager().isLoadingXml();
+
+        if(isBundle)
+            return true;
+
         ViewManager vm0 ;
 
         vm0 = this.idv.getVMManager().getLastActiveViewManager();
         List tdt = null;
         // return true when there is only background map in the view
-        List<DisplayControl>  dcList = (List<DisplayControl>) vm0.getControls();
+       /* List<DisplayControl>  dcList = (List<DisplayControl>) vm0.getStateManager().getControls();
         for (DisplayControl control :dcList) {
             if(control instanceof MapDisplayControl && dcList.size() == 1)
                 return true ;
-        }
+        }  */
         try{
             tdt = vm0.getTimeDriverTimes();
         } catch (Exception e) {}
