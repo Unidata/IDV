@@ -249,7 +249,7 @@ public class LatLonLabelPanel extends JPanel {
         ignoreEvents = false;
 
         use360Cbx    = new JCheckBox("0-360", latLonLabelData.getUse360());
-        use360Cbx.setToolTipText("Use 0-360 for longitude labels");
+        use360Cbx.setToolTipText("Use 0 to 360 vs. -180 to 180 convention for longitude labels");
         use360Cbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {
