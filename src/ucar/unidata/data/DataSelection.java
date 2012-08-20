@@ -50,8 +50,7 @@ public class DataSelection {
         "Use_Display_Driver_Times";
 
     /** status template */
-    public static final String PROP_ASTIMEDRIVER =
-            "As_Display_Driver_Times";
+    public static final String PROP_ASTIMEDRIVER = "As_Display_Driver_Times";
 
     /** chooser time matching property */
     public static final String PROP_CHOOSERTIMEMATCHING =
@@ -570,6 +569,22 @@ public class DataSelection {
      */
     public void removeProperty(Object key) {
         properties.remove(key);
+    }
+
+    /**
+     * Get the named boolean property
+     *
+     * @param name   name of property
+     * @param dflt   default value
+     *
+     * @return  the value of the property or the default
+     */
+    public boolean getProperty(String name, boolean dflt) {
+        Object o = getProperty(name);
+        if (o == null) {
+            return dflt;
+        }
+        return new Boolean(o.toString()).booleanValue();
     }
 
     /**

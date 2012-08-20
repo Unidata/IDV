@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,7 +23,19 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.data.*;
+import ucar.unidata.data.DataCancelException;
+import ucar.unidata.data.DataChangeListener;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataOperand;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataTimeRange;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.GeoSelection;
+import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ControlContext;
@@ -1038,6 +1050,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Set the myDataChoices member and add this object as a DataChangeListener
         setDataChoices(choices);
+        /*
         Object ud =
             this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if (ud != null) {
@@ -1051,19 +1064,31 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 if (ud0 != null) {
                     this.usesTimeDriver = ((Boolean) ud0).booleanValue();
                     this.dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean) ud0).booleanValue() );
-                } 
+                }
             }
         }
         Object udd =
                 this.dataSelection.getProperty(DataSelection.PROP_ASTIMEDRIVER);
         if (udd != null && !this.isTimeDriver) {
-        //if (udd != null ) {
             this.isTimeDriver = ((Boolean) udd).booleanValue();
             if(this.isTimeDriver) {  // make sure only one driver per view manager
                 ViewManager vm = getViewManager();
                 vm.ensureOnlyOneTimeDriver(this);
             }
         }
+        */
+        this.usesTimeDriver =
+            this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                           false);
+        if ( !this.isTimeDriver) {
+            this.isTimeDriver = this.dataSelection.getProperty(
+                DataSelection.PROP_ASTIMEDRIVER, false);
+            if (this.isTimeDriver) {  // make sure only one driver per view manager
+                ViewManager vm = getViewManager();
+                vm.ensureOnlyOneTimeDriver(this);
+            }
+        }
+
 
         if (properties != null) {
             applyProperties(properties);
@@ -1119,13 +1144,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 DataChoice    dc = (DataChoice) cdcs.get(0);
                 DataSelection ds = dc.getDataSelection();
                 if (ds != null) {
-                    List dtimes = ds.getTimeDriverTimes();
-                    Object ud1 =
+                    List   dtimes = ds.getTimeDriverTimes();
+                    Object ud1    =
                         ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
                     //if ((dtimes != null) && (dtimes.size() > 0)
                     //        && (ud1 != null)) {
-                    if(ud1 != null )
+                    if (ud1 != null) {
                         this.usesTimeDriver = ((Boolean) ud1).booleanValue();
+                    }
                     //}
                 }
             }
@@ -5519,8 +5545,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window     f       = GuiUtils.getWindow(contents);
-        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        Window     f            = GuiUtils.getWindow(contents);
+        JComponent buttons      = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
         Msg.translateTree(jtp, true);
@@ -5995,7 +6021,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
-                List selectedTimes =
+                List selectedTimes    =
                     dataSelectionWidget.getSelectedDateTimes();
                 if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
@@ -6056,10 +6082,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             for (Enumeration keys = methodNameToSettingsMap.keys();
                     keys.hasMoreElements(); ) {
-                String    key  = (String) keys.nextElement();
+                String    key       = (String) keys.nextElement();
                 JCheckBox cbx = (JCheckBox) methodNameToSettingsMap.get(key);
-                boolean   flag = cbx.isSelected();
-                Method theMethod = Misc.findMethod(getClass(), key,
+                boolean   flag      = cbx.isSelected();
+                Method    theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
                 theMethod.invoke(this, new Object[] { new Boolean(flag) });
@@ -6665,7 +6691,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
-            boolean addOk = true;
+            boolean                                   addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
@@ -7776,7 +7802,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param macro  the macro to check for
      */
     private void updateListOrLegendWithMacro(String macro) {
-        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean listUpdate   = getDisplayListTemplate().indexOf(macro) >= 0;
         boolean legendUpdate =
             ((getLegendLabelTemplate().indexOf(macro) >= 0)
              || (getExtraLabelTemplate().indexOf(macro) >= 0));
@@ -8251,7 +8277,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     })[0];
                     if (index >= 0) {
                         RealTuple rt = DataUtility.getSample(timeSet, index);
-                        DateTime dataTime =
+                        DateTime  dataTime =
                             new DateTime((Real) rt.getComponent(0));
 
                         currentTime = dataTime;
@@ -8682,7 +8708,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
         for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String colorName = iter.next().toString();
+            String      colorName = iter.next().toString();
             final Color menuColor =
                 getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,

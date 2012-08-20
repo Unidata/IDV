@@ -1584,10 +1584,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (displayType != null) {
             List choices = getDataChoices();
             for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
-                DataChoice dataChoice = (DataChoice) choices.get(cIdx);
+                DataChoice    dataChoice      = (DataChoice) choices.get(cIdx);
+                DataSelection driverSelection = null;
+                boolean       useTimeDriver   =
+                    getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING,
+                                false);
+                if (useTimeDriver) {
+                    driverSelection = new DataSelection();
+                    driverSelection.getProperties().put(
+                        DataSelection.PROP_USESTIMEDRIVER, true);
+                }
                 getIdv().doMakeControl(
                     dataChoice, getIdv().getControlDescriptor(displayType),
-                    (String) null);
+                    (String) null, driverSelection);
                 //For now break after the first one
                 //so we don't keep adding displays
                 break;
