@@ -218,7 +218,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         latBaseLabel.setText(latScaleInfo.getBaseLabel());
         latIncrement.setText(latScaleInfo.getIncrement());
         latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
-        yVisible.setSelected(latScaleInfo.getVisible());
+        yVisible.setSelected(latScaleInfo.isVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
         fontSelector.setFont(latScaleInfo.getFont());
     }
@@ -231,7 +231,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         lonBaseLabel.setText(lonScaleInfo.getBaseLabel());
         lonIncrement.setText(lonScaleInfo.getIncrement());
         lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
-        xVisible.setSelected(lonScaleInfo.getVisible());
+        xVisible.setSelected(lonScaleInfo.isVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
         fontSelector.setFont(lonScaleInfo.getFont());
     }

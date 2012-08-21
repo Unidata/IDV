@@ -32,9 +32,7 @@ import java.awt.Font;
 
 
 /**
- * Almost a JavaBean, but not quite. Note that the IDV does not follow JavaBean
- * conventions for booleans. Booleans require get and set methods instead of is and
- * set methods.
+ * AxisScaleInfo JavaBean
  */
 public class AxisScaleInfo {
 
@@ -258,11 +256,11 @@ public class AxisScaleInfo {
     }
 
     /**
-     * Gets the visible.
+     * Checks if is visible.
      *
-     * @return the visible
+     * @return true, if is visible
      */
-    public boolean getVisible() {
+    public boolean isVisible() {
         return visible;
     }
 

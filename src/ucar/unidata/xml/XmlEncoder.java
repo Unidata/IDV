@@ -60,9 +60,7 @@ import java.util.List;
 
 /**
  * See the package.html This class is in part responsible for (de)serializing
- * bundles. It follows the JavaBean specification partially, but not completely.
- * In particular for booleans, get and set methods are required instead of the
- * conventional is and set methods.
+ * bundles.
  */
 public class XmlEncoder extends XmlUtil {
 
@@ -1633,22 +1631,22 @@ public class XmlEncoder extends XmlUtil {
         Method[]  methods = c.getMethods();
         ArrayList v       = new ArrayList();
         for (int i = 0; i < methods.length; i++) {
-            Method getter = methods[i];
-            String name   = getter.getName();
-            if ( !name.startsWith("get")) {
+            Method propMethod = methods[i];
+            String name   = propMethod.getName();
+            if ( !name.startsWith("get") && !name.startsWith("is")) {
                 continue;
             }
-            String  propertyName = name.substring(3);
-            Class[] getterParams = getter.getParameterTypes();
+            String  propertyName = getPropString(propMethod);
+            Class[] getterParams = propMethod.getParameterTypes();
             if (getterParams.length != 0) {
                 continue;
             }
-            Class[] setterParams = { getter.getReturnType() };
+            Class[] setterParams = { propMethod.getReturnType() };
             Method  setter       = null;
             try {
                 setter = c.getMethod("set" + propertyName, setterParams);
                 if (returnGetters) {
-                    v.add(getter);
+                    v.add(propMethod);
                 } else {
                     v.add(setter);
                 }
@@ -1718,7 +1716,7 @@ public class XmlEncoder extends XmlUtil {
         return null;
     }
 
-    
+
     /**
      * Creates the enum.
      *
@@ -1727,8 +1725,8 @@ public class XmlEncoder extends XmlUtil {
      */
     public ObjectClass createEnumObject(Element element) {
         try {
-            Class enumType = getClass(element.getAttribute(ATTR_CLASS));
-            String   value    = element.getAttribute(ATTR_VALUE);
+            Class  enumType = getClass(element.getAttribute(ATTR_CLASS));
+            String value    = element.getAttribute(ATTR_VALUE);
             return new ObjectClass(Enum.valueOf(enumType, value));
         } catch (Exception exc) {
             logException("Error creating enum", exc);
@@ -2613,14 +2611,14 @@ public class XmlEncoder extends XmlUtil {
         //      prototype = null;
         List methods = findPropertyMethods(theClass);
         for (int i = 0; i < methods.size(); i++) {
-            Method getter = (Method) methods.get(i);
+            Method propMethod = (Method) methods.get(i);
             try {
-                Object value = getter.invoke(object, new Object[] {});
+                Object value = propMethod.invoke(object, new Object[] {});
                 //See if we have a prototype
                 if (prototype != null) {
                     try {
                         //If the value is the same as the prototype's then skip this
-                        Object protoTypeValue = getter.invoke(prototype,
+                        Object protoTypeValue = propMethod.invoke(prototype,
                                                     new Object[] {});
                         if (Misc.equals(value, protoTypeValue)) {
                             //System.err.println ("skipping: " +getter);
@@ -2628,9 +2626,9 @@ public class XmlEncoder extends XmlUtil {
                         }
                     } catch (Exception protoExc) {}
                 }
-                Class  returnType    = getter.getReturnType();
+                Class  returnType    = propMethod.getReturnType();
                 String primitiveName = getPrimitiveName(returnType);
-                String methodName    = getter.getName();
+                String methodName    = propMethod.getName();
                 //              System.err.println ("   " + methodName);
                 Element valueElement;
                 if (primitiveName != null) {
@@ -2644,7 +2642,7 @@ public class XmlEncoder extends XmlUtil {
                     }
                 }
                 if (valueElement != null) {
-                    String propertyName = methodName.substring(3);
+                    String propertyName = getPropString(propMethod);
                     if (propertyNames != null) {
                         propertyNames.put(propertyName.toLowerCase(),
                                           propertyName);
@@ -2653,12 +2651,30 @@ public class XmlEncoder extends XmlUtil {
                             valueElement));
                 }
             } catch (Exception exc) {
-                logException("Error evaluating method: " + getter.getName()
+                logException("Error evaluating method: " + propMethod.getName()
                              + "\n", exc);
 
             }
         }
         return elements;
+    }
+
+    /**
+     * Gets the prop string from method.
+     *
+     * @param method the method
+     * @return the prop string
+     */
+    private static String getPropString(Method method) {
+        String methodName = method.getName();
+        if (methodName.startsWith("get")) {
+            return methodName.substring(3);
+        } else if (methodName.startsWith("is")
+                   && method.getReturnType().equals(boolean.class)) {
+            return methodName.substring(2);
+        } else {
+            return null;
+        }
     }
 
 
