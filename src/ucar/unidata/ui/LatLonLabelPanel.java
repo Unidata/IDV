@@ -118,7 +118,8 @@ public class LatLonLabelPanel extends JPanel {
 
         this.latLonLabelData = lld;
         ignoreEvents         = true;
-        onOffCbx             = new JCheckBox("", latLonLabelData.getVisible());
+        onOffCbx             = new JCheckBox("",
+                                             latLonLabelData.getVisible());
         onOffCbx.setToolTipText("Turn on/off labels");
         onOffCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -249,7 +250,8 @@ public class LatLonLabelPanel extends JPanel {
         ignoreEvents = false;
 
         use360Cbx    = new JCheckBox("0-360", latLonLabelData.getUse360());
-        use360Cbx.setToolTipText("Use 0 to 360 vs. -180 to 180 convention for longitude labels");
+        use360Cbx.setToolTipText(
+            "Use 0 to 360 vs. -180 to 180 convention for longitude labels");
         use360Cbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreEvents) {
@@ -306,20 +308,20 @@ public class LatLonLabelPanel extends JPanel {
             GuiUtils.rLabel("Latitude:"), latPanel.spacingField,
             latPanel.baseField, GuiUtils.rLabel("At Longitudes:"),
             latPanel.labelLinesField, latPanel.colorButton,
-            latPanel.alignSelector, 
-            lonPanel.onOffCbx, GuiUtils.rLabel("Longitude:"), 
-            lonPanel.spacingField, lonPanel.baseField, 
-            GuiUtils.rLabel("At Latitudes:"), lonPanel.labelLinesField, 
-            lonPanel.colorButton, lonPanel.alignSelector,
+            latPanel.alignSelector, lonPanel.onOffCbx,
+            GuiUtils.rLabel("Longitude:"), lonPanel.spacingField,
+            lonPanel.baseField, GuiUtils.rLabel("At Latitudes:"),
+            lonPanel.labelLinesField, lonPanel.colorButton,
+            lonPanel.alignSelector,
         };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
         JPanel settings = GuiUtils.doLayout(comps, 8, GuiUtils.WT_N,
                                             GuiUtils.WT_N);
-        Component[] extraComps = { GuiUtils.rLabel("Font:"),
-                                   latPanel.fontSelector.getComponent(),
-                                   GuiUtils.rLabel("Format:"),
-                                   latPanel.formatSelector,
-                                   lonPanel.use360Cbx, GuiUtils.filler()};
+        Component[] extraComps = {
+            GuiUtils.rLabel("Font:"), latPanel.fontSelector.getComponent(),
+            GuiUtils.rLabel("Format:"), latPanel.formatSelector,
+            lonPanel.use360Cbx, GuiUtils.filler()
+        };
         GuiUtils.tmpInsets = new Insets(2, 4, 2, 4);
         JPanel extra = GuiUtils.doLayout(extraComps, 5, GuiUtils.WT_N,
                                          GuiUtils.WT_N);

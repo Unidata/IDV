@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,14 +23,30 @@ package ucar.unidata.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
-
 import java.awt.geom.Rectangle2D;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -49,8 +65,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
-import java.util.regex.*;
 
 
 
@@ -156,15 +170,84 @@ public class Misc {
         return Double.parseDouble(o.toString());
     }
 
+    /**
+     * Format a latitude or longitude value to the given format.  Formats use
+     * DD for degrees, MM for minutes, SS for seconds and d, m, s for decimal
+     * fractions of degrees, minutes, seconds.  H designates the hemisphere
+     * (N,S,E,W).
+     * <pre>
+     * Examples for value -34.496 degrees
+     *
+     *     DD:MM:SS      ===>  -34:29:45
+     *       (if longitude and use360 ===> 326:29:45)
+     *     DDH           ===>   34W     (or 34S if longitude)
+     *     DD.d          ===>  -34.5
+     *     DD.dddH       ===>   34.496W (or 34.496S if longitude)
+     *     DD MM" SS.s'  ===>  -34 29" 45.6'
+     *
+     * </pre>
+     *
+     * @param value  the value to format 
+     * @param format the format
+     * @param isLatitude  true if latitude, false if longitude
+     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
+     *
+     * @return formatted value
+     */
+    public static String formatLatLon(double value, String format,
+                                      boolean isLatitude, boolean use360) {
+        if (Double.isNaN(value)) {
+            return "NaN";
+        }
+        double pvalue    = Math.abs(value);
+        String formatted = format;
+        if ( !isLatitude && use360 && (value <= 180)) {
+            double tval = value;
+            while (tval < 0) {
+                tval += 360;
+            }
+            pvalue = tval;
+        }
+        int    degrees   = (int) pvalue;
+        double ddminutes = (pvalue - degrees);
+        double dminutes  = ddminutes * 60.;
+        int    minutes   = (int) dminutes;
+        double dseconds  = dminutes - minutes;
+        int    seconds   = (int) (dseconds * 60);
+        formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
+        formatted = formatted.replaceAll("DD", String.valueOf(degrees));
+        formatted = formatted.replaceAll("MM",
+                                         StringUtil.padZero(minutes, 2));
+        formatted = formatted.replaceAll("SS",
+                                         StringUtil.padZero(seconds, 2));
+        if (format.indexOf("H") >= 0) {
+            if (use360) {            // should we ignore?
+                formatted = formatted.replace("H", "");
+            } else if (value < 0) {  // South/West
+                formatted = formatted.replace("H", (isLatitude)
+                        ? "S"
+                        : "W");
+            } else if (value > 0) {  // North/East
+                formatted = formatted.replace("H", (isLatitude)
+                        ? "N"
+                        : "E");
+            } else {                 // 0 line - subject to debate
+                formatted = formatted.replace("H", "");
+            }
+        } else if ((value < 0) && !use360) {
+            formatted = "-" + formatted;
+        }
+        return formatted.trim();
+    }
 
 
     /**
      * Decodes a string representation of a latitude or longitude and
-     * returns a double version (in degrees).  Acceptible formats are:
+     * returns a double version (in degrees).  Acceptable formats are:
      * <pre>
-     * +/-  ddd:mm, ddd:mm:, ddd:mm:ss, ddd::ss, ddd.fffff ===>   [+/-] ddd.fffff
-     * +/-  ddd, ddd:, ddd::                               ===>   [+/-] ddd
-     * +/-  :mm, :mm:, :mm:ss, ::ss, .fffff                ===>   [+/-] .fffff
+     * +/-  DDD:MM, DDD:MM:, DDD:MM:SS, DDD::SS, DDD.ddddd ===>   [+/-] DDD.ddddd
+     * +/-  DDD, DDD:, DDD::                               ===>   [+/-] DDD
+     * +/-  :MM, :MM:, :MM:SS, ::SS, .ddddd                ===>   [+/-] .ddddd
      * +/-  :, ::                                          ===>       0.0
      * Any of the above with N,S,E,W appended
      * </pre>

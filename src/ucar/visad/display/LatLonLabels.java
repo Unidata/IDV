@@ -246,8 +246,8 @@ public class LatLonLabels extends TextDisplayable {
         if (labelType == null) {
             labelType = makeLabelType();
         }
-        float[]   labelVals  = Misc.computeTicks(max, min, base, interval);
-        int       numLabels  = labelVals.length * labelLines.length;
+        float[] labelVals = Misc.computeTicks(max, min, base, interval);
+        int     numLabels = labelVals.length * labelLines.length;
         FieldImpl labelField = new FieldImpl(
                                    new FunctionType(
                                        RealType.getRealType("index"),
@@ -258,12 +258,12 @@ public class LatLonLabels extends TextDisplayable {
         int     m           = 0;
         for (int i = 0; i < labelLines.length; i++) {
             for (int j = 0; j < labelVals.length; j++) {
-                Real lat   = isLatitude
-                             ? latReal.cloneButValue(labelVals[j])
-                             : latReal.cloneButValue(labelLines[i]);
-                Real lon   = isLatitude
-                             ? lonReal.cloneButValue(labelLines[i])
-                             : lonReal.cloneButValue(labelVals[j]);
+                Real lat = isLatitude
+                           ? latReal.cloneButValue(labelVals[j])
+                           : latReal.cloneButValue(labelLines[i]);
+                Real lon = isLatitude
+                           ? lonReal.cloneButValue(labelLines[i])
+                           : lonReal.cloneButValue(labelVals[j]);
                 Text label = new Text((TextType) getTextType(),
                                       formatLabel(labelVals[j]));
                 labelTuples[m++] = new Tuple(labelType, new Data[] { lat, lon,
@@ -280,46 +280,7 @@ public class LatLonLabels extends TextDisplayable {
      * @return formatted value
      */
     private String formatLabel(double value) {
-        double pvalue    = Math.abs(value);
-        String formatted = labelFormat;
-        // NB: not tested yet
-        if ( !isLatitude && use360 && (value <= 180)) {
-            double tval = value;
-            while (tval < 0) {
-                tval += 360;
-            }
-            pvalue = tval;
-        }
-        int    degrees   = (int) pvalue;
-        double ddminutes = (pvalue - degrees);
-        double dminutes  = ddminutes * 60.;
-        int    minutes   = (int) dminutes;
-        double dseconds  = dminutes - minutes;
-        int    seconds   = (int) (dseconds * 60);
-        formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
-        formatted = formatted.replaceAll("DD", String.valueOf(degrees));
-        formatted = formatted.replaceAll("MM",
-                                         StringUtil.padZero(minutes, 2));
-        formatted = formatted.replaceAll("SS",
-                                         StringUtil.padZero(seconds, 2));
-        if (labelFormat.indexOf("H") >= 0) {
-            if (use360) {            // should we ignore?
-                formatted = formatted.replace("H", "");
-            } else if (value < 0) {  // South/West
-                formatted = formatted.replace("H", (isLatitude)
-                        ? "S"
-                        : "W");
-            } else if (value > 0) {  // North/East
-                formatted = formatted.replace("H", (isLatitude)
-                        ? "N"
-                        : "E");
-            } else {                 // 0 line - subject to debate
-                formatted = formatted.replace("H", "");
-            }
-        } else if ((value < 0) && !use360) {
-            formatted = "-" + formatted;
-        }
-        return formatted.trim();
+        return Misc.formatLatLon(value, labelFormat, isLatitude, use360);
     }
 
     /**
