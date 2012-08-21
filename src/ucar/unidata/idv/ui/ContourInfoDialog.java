@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -305,6 +305,7 @@ public class ContourInfoDialog implements ActionListener {
      * @return Was this successful
      */
     public boolean doApply() {
+
         try {
             String intoStr = intervalFld.getText();
             float  into    = Float.NaN;
@@ -327,20 +328,80 @@ public class ContourInfoDialog implements ActionListener {
                 maxo = mino + into;
             }
 
+            boolean any_changed      = false;
+            float   cur_interval     = myInfo.getInterval();
+            String  cur_lev_string   = myInfo.getLevelsString();
+            float   cur_base         = myInfo.getBase();
+            float   cur_min          = myInfo.getMin();
+            float   cur_max          = myInfo.getMax();
+            boolean cur_dash_on      = myInfo.getDashOn();
+            boolean cur_isLabelled   = myInfo.getIsLabeled();
+            int     cur_line_width   = myInfo.getLineWidth();
+            int     cur_dash_style   = myInfo.getDashedStyle();
+            Object  cur_font         = myInfo.getFont();
+            int     cur_font_size    = myInfo.getLabelSize();
+            boolean cur_align_labels = myInfo.getAlignLabels();
+
+
+            String new_lev_string =
+                ContourInfo.cleanupUserLevelString(intoStr);
+            boolean new_dash_on    = dashBtn.isSelected();
+            boolean new_isLabelled = toggleBtn.isSelected();
+            int new_line_width =
+                new Integer(widthBox.getSelectedItem().toString()).intValue();
+            int new_dash_style = styleBox.getSelectedIndex() + 1;
+            Object new_font =
+                ((TwoFacedObject) fontBox.getSelectedItem()).getId();
+            int new_font_size =
+                ((Integer) fontSizeBox.getSelectedItem()).intValue();
+            boolean new_align_labels =
+                ((Boolean) ((TwoFacedObject) alignBox.getSelectedItem())
+                    .getId()).booleanValue();
+
             // permit mino == maxo the case of one contour line
             // now set the data of the ContourInfo
-            myInfo.setInterval(into);
-            myInfo.setLevelsString(
-                ContourInfo.cleanupUserLevelString(intoStr));
-            myInfo.setBase(baso);
-            myInfo.setMin(mino);
-            myInfo.setMax(maxo);
-            myInfo.setDashOn(dashBtn.isSelected());
-            myInfo.setIsLabeled(toggleBtn.isSelected());
-            myInfo.setLineWidth(
-                new Integer(
-                    widthBox.getSelectedItem().toString()).intValue());
-            myInfo.setDashedStyle(styleBox.getSelectedIndex() + 1);
+            if (0 != Float.compare(cur_interval, into)) {
+                myInfo.setInterval(into);
+                any_changed = true;
+            }
+            /*myInfo.setLevelsString(
+                ContourInfo.cleanupUserLevelString(intoStr));*/
+            if ( !Misc.equals(cur_lev_string, new_lev_string)) {
+                myInfo.setLevelsString(new_lev_string);
+                any_changed = true;
+            }
+            if (0 != Float.compare(cur_base, baso)) {
+                myInfo.setBase(baso);
+                any_changed = true;
+            }
+            if (0 != Float.compare(cur_min, mino)) {
+                myInfo.setMin(mino);
+                any_changed = true;
+            }
+            if (0 != Float.compare(cur_max, maxo)) {
+                myInfo.setMax(maxo);
+                any_changed = true;
+            }
+            //myInfo.setDashOn(dashBtn.isSelected());
+            if (cur_dash_on != new_dash_on) {
+                myInfo.setDashOn(new_dash_on);
+                any_changed = true;
+            }
+            //myInfo.setIsLabeled(toggleBtn.isSelected());
+            if (cur_isLabelled != new_isLabelled) {
+                myInfo.setIsLabeled(new_isLabelled);
+                any_changed = true;
+            }
+            //myInfo.setLineWidth(new Integer(widthBox.getSelectedItem().toString()).intValue());
+            if (cur_line_width != new_line_width) {
+                myInfo.setLineWidth(new_line_width);
+                any_changed = true;
+            }
+            //myInfo.setDashedStyle(styleBox.getSelectedIndex() + 1);
+            if (cur_dash_style != new_dash_style) {
+                myInfo.setDashedStyle(new_dash_style);
+                any_changed = true;
+            }
             // sanity check
             float[] levels = myInfo.getContourLevels();
             if (levels.length > MAX_LEVELS) {
@@ -348,13 +409,29 @@ public class ContourInfoDialog implements ActionListener {
                     "Contour interval too small for range");
                 return false;
             }
-            myInfo.setFont(
+            if ( !Misc.equals(cur_font, new_font)) {
+                myInfo.setFont(new_font);
+                any_changed = true;
+            }
+            if (cur_font_size != new_font_size) {
+                myInfo.setLabelSize(new_font_size);
+                any_changed = true;
+            }
+            if (cur_align_labels != new_align_labels) {
+                myInfo.setAlignLabels(new_align_labels);
+                any_changed = true;
+            }
+            /*myInfo.setFont(
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId());
             myInfo.setLabelSize(
                 ((Integer) fontSizeBox.getSelectedItem()).intValue());
             myInfo.setAlignLabels(((Boolean) ((TwoFacedObject) alignBox
                 .getSelectedItem()).getId()).booleanValue());
-            return true;
+            return true;*/
+            if ( !any_changed) {
+                dialog.setVisible(false);
+            }
+            return any_changed;
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Incorrect number format");
             return false;
@@ -362,6 +439,7 @@ public class ContourInfoDialog implements ActionListener {
             LogUtil.logException("Setting contours", exc);
             return false;
         }
+
     }
 
     /**
