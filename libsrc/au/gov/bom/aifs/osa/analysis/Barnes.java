@@ -83,9 +83,7 @@ public class Barnes {
     public synchronized static float[][] point2grid(float[] lon,
             float[] lat, float[][] data3D, float scaleLength, float gain,
             int iNumPasses) {
-        return point2grid(lon, lat, data3D, null, scaleLength, gain, iNumPasses);
-    }
-        /*
+
         int numLon = lon.length;
         int numLat = lat.length;
         int numData = data3D[0].length;
@@ -164,7 +162,6 @@ public class Barnes {
 
         return (faaGrid);
     }
-        */
 
     /**
      * Performs the same task as point2grid, but instead of the first step, it
@@ -206,14 +203,9 @@ public class Barnes {
 
 
         float[][] faaGrid;
-        if (firstGuess != null) {
-            float gridMean = (float) Barnes.mean(faValues);
-            faaGrid = filterNaN(firstGuess, gridMean);
+        float gridMean = (float) Barnes.mean(faValues);
+        faaGrid = filterNaN(firstGuess, gridMean);
  
-        } else {
-            faaGrid = passOne(lon, lat, data3D, scaleLength);
-        }
-
         // now, based on the gridded values, obtain interpolated values
         // for each data point.
         // these interpolates will then be compared to each data
