@@ -65,6 +65,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
@@ -170,6 +172,7 @@ public class Misc {
         return Double.parseDouble(o.toString());
     }
 
+
     /**
      * Format a latitude or longitude value to the given format.  Formats use
      * DD for degrees, MM for minutes, SS for seconds and d, m, s for decimal
@@ -187,7 +190,7 @@ public class Misc {
      *
      * </pre>
      *
-     * @param value  the value to format 
+     * @param value  the value to format
      * @param format the format
      * @param isLatitude  true if latitude, false if longitude
      * @param use360      if true use 0-360 notation instead of -180 to 180 notation
@@ -208,18 +211,29 @@ public class Misc {
             }
             pvalue = tval;
         }
-        int    degrees   = (int) pvalue;
-        double ddminutes = (pvalue - degrees);
-        double dminutes  = ddminutes * 60.;
-        int    minutes   = (int) dminutes;
-        double dseconds  = dminutes - minutes;
-        int    seconds   = (int) (dseconds * 60);
-        formatted = formatted.replaceAll("DD.d", Misc.format(pvalue));
-        formatted = formatted.replaceAll("DD", String.valueOf(degrees));
+        // convert to seconds then get the integer deg, min, seconds
+        int j        = (int) (3600.0 * pvalue + 0.5);
+        int idegrees = j / 3600;
+        int iminutes = (j / 60) % 60;
+        int iseconds = j % 60;
+        // calculate the remainders;
+        double decidegrees = (pvalue - (int) pvalue);
+        double dminutes    = decidegrees * 60.;
+        int    minutes     = (int) dminutes;
+        double deciminutes = dminutes - minutes;
+        double dseconds    = deciminutes * 60.;
+        int    seconds     = (int) dseconds;
+        double deciseconds = dseconds - seconds;
+        int    millis      = (int) (1000 * deciseconds);
+
+        formatted = replaceDecimalPortion(formatted, "d", decidegrees);
+        formatted = replaceDecimalPortion(formatted, "m", deciminutes);
+        formatted = replaceDecimalPortion(formatted, "s", deciseconds);
+        formatted = formatted.replaceAll("DD", String.valueOf(idegrees));
         formatted = formatted.replaceAll("MM",
-                                         StringUtil.padZero(minutes, 2));
+                                         StringUtil.padZero(iminutes, 2));
         formatted = formatted.replaceAll("SS",
-                                         StringUtil.padZero(seconds, 2));
+                                         StringUtil.padZero(iseconds, 2));
         if (format.indexOf("H") >= 0) {
             if (use360) {            // should we ignore?
                 formatted = formatted.replace("H", "");
@@ -238,6 +252,32 @@ public class Misc {
             formatted = "-" + formatted;
         }
         return formatted.trim();
+    }
+
+    /**
+     * Replace the decimal portion of a format string with the value
+     *
+     * @param format  the format
+     * @param letter  the letter to replace (1 or more instances)
+     * @param decimalValue  the value to replace it with
+     *
+     * @return  the format with the appropriate value filled in
+     */
+    private static String replaceDecimalPortion(String format, String letter,
+            double decimalValue) {
+        Matcher matcher = Pattern.compile(letter + "+").matcher(format);
+        while (matcher.find()) {
+            // matcher.end() is always last index + 1
+            int numChars = matcher.end() - matcher.start();
+            // TODO:  Is this the right way to do it?
+            String valueStr = String.valueOf(Math.round(decimalValue
+                                  * Math.pow(10, numChars)));
+            // account for zero;
+            valueStr = StringUtil.padRight(valueStr, numChars, "0");
+            format   = matcher.replaceFirst(valueStr);
+            break;
+        }
+        return format;
     }
 
 
