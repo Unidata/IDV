@@ -246,8 +246,20 @@ public class LatLonLabels extends TextDisplayable {
         if (labelType == null) {
             labelType = makeLabelType();
         }
+        // Handle overlapping -180/180 and 0/360 labels
+        // if the max and min are the same modulo 360, shave a little off the max
+        if ( !isLatitude) {
+            if (0 == Float.compare(min + 360, max)) {
+                max -= 0.01;
+            }
+        }
         float[] labelVals = Misc.computeTicks(max, min, base, interval);
-        int     numLabels = labelVals.length * labelLines.length;
+        /*
+        Misc.printArray(isLatitude
+                        ? "lats"
+                        : "lons", labelVals);
+        */
+        int       numLabels  = labelVals.length * labelLines.length;
         FieldImpl labelField = new FieldImpl(
                                    new FunctionType(
                                        RealType.getRealType("index"),
@@ -258,12 +270,12 @@ public class LatLonLabels extends TextDisplayable {
         int     m           = 0;
         for (int i = 0; i < labelLines.length; i++) {
             for (int j = 0; j < labelVals.length; j++) {
-                Real lat = isLatitude
-                           ? latReal.cloneButValue(labelVals[j])
-                           : latReal.cloneButValue(labelLines[i]);
-                Real lon = isLatitude
-                           ? lonReal.cloneButValue(labelLines[i])
-                           : lonReal.cloneButValue(labelVals[j]);
+                Real lat   = isLatitude
+                             ? latReal.cloneButValue(labelVals[j])
+                             : latReal.cloneButValue(labelLines[i]);
+                Real lon   = isLatitude
+                             ? lonReal.cloneButValue(labelLines[i])
+                             : lonReal.cloneButValue(labelVals[j]);
                 Text label = new Text((TextType) getTextType(),
                                       formatLabel(labelVals[j]));
                 labelTuples[m++] = new Tuple(labelType, new Data[] { lat, lon,

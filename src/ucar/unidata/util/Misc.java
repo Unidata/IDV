@@ -228,17 +228,24 @@ public class Misc {
     public static String formatLatOrLon(double value, String format,
                                         boolean isLatitude, boolean use360) {
         if (Double.isNaN(value)) {
-            return "NaN";
+            return NaN;
         }
-        double pvalue    = Math.abs(value);
         String formatted = format;
-        if ( !isLatitude && use360 && (value <= 180)) {
+        // handle 0-360 vs. -180 to 180 for longitudes
+        if ( !isLatitude) {
             double tval = value;
-            while (tval < 0) {
-                tval += 360;
+            if (use360) {
+                // taken from ucar.visad.GeoUtils.normalizeLongitude360
+                // not sure why it's 361 instead of 360
+                while ((tval < 0.) || (tval > 361.)) {
+                    tval = 180. + Math.IEEEremainder(tval - 180., 360.0);
+                }
+            } else if ( !use360) {
+                tval = normalizeLongitude(tval);
             }
-            pvalue = tval;
+            value = tval;
         }
+        double pvalue = Math.abs(value);
         // convert to seconds then get the integer deg, min, seconds
         int j        = (int) (3600.0 * pvalue + 0.5);
         int idegrees = j / 3600;
@@ -263,7 +270,7 @@ public class Misc {
         formatted = formatted.replaceAll("SS",
                                          StringUtil.padZero(iseconds, 2));
         if (format.indexOf("H") >= 0) {
-            if (use360) {            // should we ignore?
+            if (use360) {            // should we ignore or add E?
                 formatted = formatted.replace("H", "");
             } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
