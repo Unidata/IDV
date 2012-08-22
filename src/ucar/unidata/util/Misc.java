@@ -188,11 +188,16 @@ public class Misc {
 
     /**
      * Format a longitude to the given format.
+     *
      * @see #formatLatOrLon(double, String, boolean, boolean)
      *
-     * @param value  the value to format
-     * @param format the format
-     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
+     * @param value
+     *            the value to format
+     * @param format
+     *            the format
+     * @param use360
+     *            if true use 0-360 notation instead of -180 to 180 notation. H
+     *            format is ignored, when true.
      *
      * @return formatted value
      */
