@@ -1140,7 +1140,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             */
             retComp = GuiUtils.centerBottom(tabbedPane,
                                             GuiUtils.inset(sliderPanel,
-                                                new Insets(10, 0, 0, 0)));
+                                                new Insets(10, 0, 5, 0)));
         }
         fillContents();
         return retComp;
