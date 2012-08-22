@@ -428,7 +428,7 @@ public class ContourInfoDialog implements ActionListener {
             myInfo.setAlignLabels(((Boolean) ((TwoFacedObject) alignBox
                 .getSelectedItem()).getId()).booleanValue());
             return true;*/
-            if ( !any_changed) {
+            if ( !any_changed && dialog != null) {
                 dialog.setVisible(false);
             }
             return any_changed;
