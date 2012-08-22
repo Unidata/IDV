@@ -174,6 +174,34 @@ public class Misc {
 
 
     /**
+     * Format a latitude to the given format.
+     * @see #formatLatOrLon(double, String, boolean, boolean)
+     *
+     * @param value  the value to format
+     * @param format the format
+     *
+     * @return formatted value
+     */
+    public static String formatLatitude(double value, String format) {
+        return formatLatOrLon(value, format, true, false);
+    }
+
+    /**
+     * Format a longitude to the given format.
+     * @see #formatLatOrLon(double, String, boolean, boolean)
+     *
+     * @param value  the value to format
+     * @param format the format
+     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
+     *
+     * @return formatted value
+     */
+    public static String formatLongitude(double value, String format,
+                                         boolean use360) {
+        return formatLatOrLon(value, format, false, use360);
+    }
+
+    /**
      * Format a latitude or longitude value to the given format.  Formats use
      * DD for degrees, MM for minutes, SS for seconds and d, m, s for decimal
      * fractions of degrees, minutes, seconds.  H designates the hemisphere
@@ -197,8 +225,8 @@ public class Misc {
      *
      * @return formatted value
      */
-    public static String formatLatLon(double value, String format,
-                                      boolean isLatitude, boolean use360) {
+    public static String formatLatOrLon(double value, String format,
+                                        boolean isLatitude, boolean use360) {
         if (Double.isNaN(value)) {
             return "NaN";
         }

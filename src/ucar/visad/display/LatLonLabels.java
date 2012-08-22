@@ -280,7 +280,7 @@ public class LatLonLabels extends TextDisplayable {
      * @return formatted value
      */
     private String formatLabel(double value) {
-        return Misc.formatLatLon(value, labelFormat, isLatitude, use360);
+        return Misc.formatLatOrLon(value, labelFormat, isLatitude, use360);
     }
 
     /**

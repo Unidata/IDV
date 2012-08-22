@@ -77,46 +77,46 @@ public class MiscTest {
 
 
     /**
-     * Test the Misc.formatLatLon method.
+     * Test the Misc.formatLatOrLon method.
      */
     @Test
-    public void formatLatLon() {
+    public void formatLatOrLon() {
         String errorMsg = "Could not properly format lat / lon";
 
-        assertEquals(errorMsg, "12", Misc.formatLatLon(12, "DD", true, true));
+        assertEquals(errorMsg, "12", Misc.formatLatOrLon(12, "DD", true, true));
 
         assertEquals(errorMsg, "12:00",
-                     Misc.formatLatLon(12, "DD:MM", true, true));
+                     Misc.formatLatOrLon(12, "DD:MM", true, true));
 
         assertEquals(errorMsg, "12:00:00",
-                     Misc.formatLatLon(12, "DD:MM:SS", true, true));
+                     Misc.formatLatOrLon(12, "DD:MM:SS", true, true));
 
         assertEquals(errorMsg, "12.0",
-                     Misc.formatLatLon(12, "DD.d", true, true));
+                     Misc.formatLatOrLon(12, "DD.d", true, true));
 
         assertEquals(errorMsg, "12.0:00",
-                     Misc.formatLatLon(12, "DD.d:MM", true, true));
+                     Misc.formatLatOrLon(12, "DD.d:MM", true, true));
 
         assertEquals(errorMsg, "12N",
-                Misc.formatLatLon(12, "DDH", true, true));
+                Misc.formatLatOrLon(12, "DDH", true, true));
 
         assertEquals(errorMsg, "12S",
-                Misc.formatLatLon(-12, "DDH", true, true));
+                Misc.formatLatOrLon(-12, "DDH", true, true));
 
         assertEquals(errorMsg, "12E",
-                Misc.formatLatLon(12, "DDH", false, true));
+                Misc.formatLatOrLon(12, "DDH", false, true));
 
         assertEquals(errorMsg, "12W",
-                Misc.formatLatLon(-12, "DDH", false, true));
+                Misc.formatLatOrLon(-12, "DDH", false, true));
 
 
         // lat > 360 should result in exception or normalization
         assertEquals(errorMsg, "10",
-                     Misc.formatLatLon(370, "DD.d", true, true));
+                     Misc.formatLatOrLon(370, "DD.d", true, true));
 
         //Should result in no change or exception.
         assertEquals(errorMsg, "12",
-                     Misc.formatLatLon(12, "blah", true, true));
+                     Misc.formatLatOrLon(12, "blah", true, true));
     }
 
 }
