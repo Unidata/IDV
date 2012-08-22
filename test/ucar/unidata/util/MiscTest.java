@@ -64,7 +64,7 @@ public class MiscTest {
                          Misc.decodeLatLon(e.getKey()), e.getValue(), DELTA);
         }
     }
-    
+
     /**
      *     DD:MM:SS      ===>  -34:29:45
      *       (if longitude and use360 ===> 326:29:45)
@@ -77,46 +77,54 @@ public class MiscTest {
 
 
     /**
-     * Test the Misc.formatLatOrLon method.
+     * Test the Misc.formatLatitude method.
      */
     @Test
-    public void formatLatOrLon() {
-        String errorMsg = "Could not properly format lat / lon";
+    public void formatLat() {
+        String errorMsg = "Could not properly format lat";
 
-        assertEquals(errorMsg, "12", Misc.formatLatOrLon(12, "DD", true, true));
+        //Trivial test
+        assertEquals(errorMsg, "12", Misc.formatLatitude(12, "DD"));
 
-        assertEquals(errorMsg, "12:00",
-                     Misc.formatLatOrLon(12, "DD:MM", true, true));
+        //Testing various formats
+        assertEquals(errorMsg, "12:00", Misc.formatLatitude(12, "DD:MM"));
 
         assertEquals(errorMsg, "12:00:00",
-                     Misc.formatLatOrLon(12, "DD:MM:SS", true, true));
+                     Misc.formatLatitude(12, "DD:MM:SS"));
 
-        assertEquals(errorMsg, "12.0",
-                     Misc.formatLatOrLon(12, "DD.d", true, true));
+        assertEquals(errorMsg, "12.0", Misc.formatLatitude(12, "DD.d"));
 
-        assertEquals(errorMsg, "12.0:00",
-                     Misc.formatLatOrLon(12, "DD.d:MM", true, true));
+        assertEquals(errorMsg, "12.0:00", Misc.formatLatitude(12, "DD.d:MM"));
 
-        assertEquals(errorMsg, "12N",
-                Misc.formatLatOrLon(12, "DDH", true, true));
-
-        assertEquals(errorMsg, "12S",
-                Misc.formatLatOrLon(-12, "DDH", true, true));
-
-        assertEquals(errorMsg, "12E",
-                Misc.formatLatOrLon(12, "DDH", false, true));
-
-        assertEquals(errorMsg, "12W",
-                Misc.formatLatOrLon(-12, "DDH", false, true));
+        assertEquals(errorMsg, "12 30'", Misc.formatLatitude(12.5, "DD MM'"));
+        assertEquals(errorMsg, "12 33' 18\"", Misc.formatLatitude(12.555, "DD MM' SS\""));
 
 
-        // lat > 360 should result in exception or normalization
-        assertEquals(errorMsg, "10",
-                     Misc.formatLatOrLon(370, "DD.d", true, true));
+        //Testing cardinalities
+        assertEquals(errorMsg, "12N", Misc.formatLatitude(12, "DDH"));
 
-        //Should result in no change or exception.
-        assertEquals(errorMsg, "12",
-                     Misc.formatLatOrLon(12, "blah", true, true));
+        assertEquals(errorMsg, "12S", Misc.formatLatitude(-12, "DDH"));
+
+        //Testing negative
+        assertEquals(errorMsg, "-12", Misc.formatLatitude(-12, "DD"));
+
     }
+
+    /**
+     * Test the Misc.formatLongitude method.
+     */
+    @Test
+    public void formatLongitude() {
+        String errorMsg = "Could not properly format lon";
+
+
+        //Testing cardinalities
+        assertEquals(errorMsg, "12E", Misc.formatLongitude(12, "DDH", true));
+
+        assertEquals(errorMsg, "12W", Misc.formatLongitude(-12, "DDH", true));
+
+        assertEquals(errorMsg, "-12", Misc.formatLongitude(-12, "DDH", true));
+    }
+
 
 }
