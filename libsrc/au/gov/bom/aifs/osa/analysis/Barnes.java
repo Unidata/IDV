@@ -170,7 +170,6 @@ public class Barnes {
     public synchronized static float[][] point2grid(float[] lon,
             float[] lat, float[][] data3D, float[][] firstGuess,
             float scaleLength, float gain, int iNumPasses) {
-        System.out.println("using single method" + scaleLength);
         int numLon = lon.length;
         int numLat = lat.length;
         int numData = data3D[0].length;

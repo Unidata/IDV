@@ -1235,7 +1235,8 @@ public abstract class PointDataSource extends FilesDataSource {
                     || (spacingY <= 0)) {
                 degreesX = PointObFactory.OA_GRID_DEFAULT;
                 degreesY = PointObFactory.OA_GRID_DEFAULT;
-                if (searchRadius == DEFAULT_RADIUS) {
+                if ((searchRadius == DEFAULT_RADIUS)
+                        && (firstGuessData == null)) {
                     searchRadius = PointObFactory.OA_GRID_DEFAULT;
                 }
             } else if (theUnit.equals(SPACING_POINTS)) {
