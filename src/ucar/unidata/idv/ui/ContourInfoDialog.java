@@ -114,6 +114,9 @@ public class ContourInfoDialog implements ActionListener {
                                         new TwoFacedObject("Horizontal",
                                             new Boolean(false)) };
 
+    /** _more_ */
+    private String current_action_command = null;
+
     /**
      * Construct the widget.
      * with interval, min, max entry boxes
@@ -343,14 +346,14 @@ public class ContourInfoDialog implements ActionListener {
             boolean cur_align_labels = myInfo.getAlignLabels();
 
 
-            String new_lev_string =
+            String  new_lev_string   =
                 ContourInfo.cleanupUserLevelString(intoStr);
             boolean new_dash_on    = dashBtn.isSelected();
             boolean new_isLabelled = toggleBtn.isSelected();
-            int new_line_width =
+            int     new_line_width =
                 new Integer(widthBox.getSelectedItem().toString()).intValue();
-            int new_dash_style = styleBox.getSelectedIndex() + 1;
-            Object new_font =
+            int    new_dash_style = styleBox.getSelectedIndex() + 1;
+            Object new_font       =
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId();
             int new_font_size =
                 ((Integer) fontSizeBox.getSelectedItem()).intValue();
@@ -428,9 +431,11 @@ public class ContourInfoDialog implements ActionListener {
             myInfo.setAlignLabels(((Boolean) ((TwoFacedObject) alignBox
                 .getSelectedItem()).getId()).booleanValue());
             return true;*/
-            if ( !any_changed && dialog != null) {
+            if ((current_action_command != null) && (dialog != null)
+                    && current_action_command.equals(GuiUtils.CMD_OK)) {
                 dialog.setVisible(false);
             }
+
             return any_changed;
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Incorrect number format");
@@ -449,6 +454,7 @@ public class ContourInfoDialog implements ActionListener {
      */
     public void actionPerformed(ActionEvent evt) {
         String cmd = evt.getActionCommand();
+        current_action_command = cmd;
         if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_APPLY)) {
             if ( !doApply()) {
                 return;
