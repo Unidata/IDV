@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2010 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -37,8 +37,6 @@ import ucar.unidata.util.Removable;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-
-import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -168,14 +166,7 @@ public class IdvWindow extends MultiFrame {
         if (uniqueId == null) {
             uniqueId = Misc.getUniqueId();
         }
-
-        // if macosx, try to add the OSX full screen mode widget
-        if (isMacOSX()) {
-            enableFullScreenMode(this.getWindow());
-        }
-
         allWindows.add(this);
-
         if (isAMainWindow) {
             //            Misc.printStack("new window", 5,null);
             mainWindows.add(this);
@@ -413,7 +404,7 @@ public class IdvWindow extends MultiFrame {
      */
     public static ImageIcon getNormalIcon() {
         if (normalIcon == null) {
-            Image         waitImage = getWaitIcon().getImage();
+            Image waitImage = getWaitIcon().getImage();
             BufferedImage image = new BufferedImage(waitImage.getWidth(null),
                                       waitImage.getHeight(null),
                                       BufferedImage.TYPE_INT_ARGB);
@@ -966,40 +957,6 @@ public class IdvWindow extends MultiFrame {
         return persistentComponents;
     }
 
-    /**
-     * Enable full screen mode in the context of mac osx (>=10.7)
-     * Special thanks to
-     *
-     * http://saipullabhotla.blogspot.com/2012/05/enabling-full-screen-mode-for-java.html
-     *
-     * @param window The window to which you wish to add the full screen option
-     */
-    public static void enableFullScreenMode(Window window) {
-        String className  = "com.apple.eawt.FullScreenUtilities";
-        String methodName = "setWindowCanFullScreen";
 
-        try {
-            Class<?> clazz  = Class.forName(className);
-            Method   method = clazz.getMethod(methodName,
-                                            new Class<?>[] { Window.class,
-                    boolean.class });
-            method.invoke(null, window, true);
-        } catch (Throwable t) {
-            LogUtil.printMessage("Full screen mode is not supported");
-        }
-    }
-
-    /**
-     * Check to see if we are on Mac OSX
-     *
-     * Special thanks to
-     *
-     * http://saipullabhotla.blogspot.com/2012/05/enabling-full-screen-mode-for-java.html
-     *
-     * @return bool
-     */
-    private static boolean isMacOSX() {
-        return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
-    }
 
 }
