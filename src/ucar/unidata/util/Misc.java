@@ -260,7 +260,6 @@ public class Misc {
         double dseconds    = deciminutes * 60.;
         int    seconds     = (int) dseconds;
         double deciseconds = dseconds - seconds;
-        int    millis      = (int) (1000 * deciseconds);
 
         formatted = replaceDecimalPortion(formatted, "d", decidegrees);
         formatted = replaceDecimalPortion(formatted, "m", deciminutes);
@@ -268,8 +267,10 @@ public class Misc {
         formatted = formatted.replaceAll("DD", String.valueOf(idegrees));
         formatted = formatted.replaceAll("MM",
                                          StringUtil.padZero(minutes, 2));
-        formatted = formatted.replaceAll("SS",
-                                         StringUtil.padZero(seconds, 2));
+        formatted =
+            formatted.replaceAll("SS", StringUtil.padZero(format.contains("s")
+                ? seconds
+                : (int)Math.round(dseconds), 2));
         if (format.indexOf("H") >= 0) {
             if (use360) {            // should we ignore or add E?
                 formatted = formatted.replace("H", "");
