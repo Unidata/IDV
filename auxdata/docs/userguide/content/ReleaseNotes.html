@@ -1,7 +1,7 @@
 <html><head>
 <title>Release Notes</title>
 <link rel="stylesheet" type="text/css" href="idv.css" title="Style">
-</head>                  
+</head>
 <body>
 
 <div class="pagesubtitle">
@@ -18,8 +18,8 @@ The items below reflect changes since the 3.0u2 release.
 <faqitem cat="System Changes"></faqitem>
 
 <faqitem q="IDV PermGen Memory Allocation" id="idvmemory">
-Upon IDV start up, "PermGen" memory allocation is done automatically according to the 
-user's machine specifications.  The default PermGen memory allocation can be changed 
+Upon IDV start up, "PermGen" memory allocation is done automatically according to the
+user's machine specifications.  The default PermGen memory allocation can be changed
 through the <a href="tools/Preferences.html">User Preferences</a> (
 [ug::menu Edit Preferences] menu) under the System tab.
 </faqitem>
@@ -28,18 +28,30 @@ through the <a href="tools/Preferences.html">User Preferences</a> (
 A new version of the netCDF-Java library (4.2.34) is included in this release.
 See the
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">
-netCDF-Java change log</a> for a complete list of changes. 
+netCDF-Java change log</a> for a complete list of changes.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
 
 <faqitem q="Lat/Lon Labeling" id="latlonlabel">
-There are two new ways to provide latitude and longitude labels on each view.  
-First, you can place labels along the edges of the box axes through the
-<a href="ui/Menus.html#viewmenu">[ug::menu View Properties]</a> menu under
-the [ug::button {Horizontal Scale}] tab.  The second option allows you to
-place labels directly in the view through the <a href="controls/MapDisplayControl.html">Map Display Control</a>.
+In the area of publication quality graphics, there are two new ways to
+provide latitude and longitude labels on each view.  First, you can
+place labels along the edges of the box axes through the
+<a href="ui/Menus.html#viewmenu">[ug::menu View Properties]</a> menu
+under the [ug::button {Horizontal Scale}] tab.  The second option
+allows you to place labels directly in the view through
+the <a href="controls/MapDisplayControl.html">Map Display Control</a>.
 </faqitem>
+
+<faqitem q="All Views Capture" id="axislabel">
+Also, in the area of publication quality graphics, the IDV has new
+multi-view image and movie capture. There is now
+an <a href="tools/ImageCaptures.html">All Views</a> option availble
+both movie and image capture
+via <code class="menu">View-&gt;Capture</code>. These options are also
+available in the <a href="isl/ImagesAndMovies.html">ISL</a>.
+</faqitem>
+
 
 <faqitem cat="Data Changes"></faqitem>
 
@@ -55,7 +67,7 @@ Several bug fixes were made in this release, including:
 </faqitem>
 
 <faqitem q="Known Problems" id="problems">
-For a list of outstanding known problems, see the 
+For a list of outstanding known problems, see the
 <a href="Bugs.html">Known Problems</a> page.
 </faqitem>
 
