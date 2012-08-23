@@ -234,23 +234,24 @@ public class Misc {
         // handle 0-360 vs. -180 to 180 for longitudes
         if ( !isLatitude) {
             double tval = value;
-        	if (use360) {
-        		// taken from ucar.visad.GeoUtils.normalizeLongitude360
-        		// not sure why it's 361 instead of 360
+            if (use360) {
+                // taken from ucar.visad.GeoUtils.normalizeLongitude360
+                // not sure why it's 361 instead of 360
                 while ((tval < 0.) || (tval > 361.)) {
                     tval = 180. + Math.IEEEremainder(tval - 180., 360.0);
                 }
-        	} else if (!use360) {
-        		tval = normalizeLongitude(tval);
-        	}
+            } else if ( !use360) {
+                tval = normalizeLongitude(tval);
+            }
             value = tval;
         }
-        double pvalue    = Math.abs(value);
+        double pvalue = Math.abs(value);
+        // TODO:  Simplify this
         // convert to seconds then get the integer deg, min, seconds
-        int j        = (int) (3600.0 * pvalue + 0.5);
+        int j        = (int) (3600.0 * pvalue);
         int idegrees = j / 3600;
-        int iminutes = (j / 60) % 60;
-        int iseconds = j % 60;
+        //int iminutes = (j / 60) % 60;
+        //int iseconds = j % 60;
         // calculate the remainders;
         double decidegrees = (pvalue - (int) pvalue);
         double dminutes    = decidegrees * 60.;
@@ -266,11 +267,11 @@ public class Misc {
         formatted = replaceDecimalPortion(formatted, "s", deciseconds);
         formatted = formatted.replaceAll("DD", String.valueOf(idegrees));
         formatted = formatted.replaceAll("MM",
-                                         StringUtil.padZero(iminutes, 2));
+                                         StringUtil.padZero(minutes, 2));
         formatted = formatted.replaceAll("SS",
-                                         StringUtil.padZero(iseconds, 2));
+                                         StringUtil.padZero(seconds, 2));
         if (format.indexOf("H") >= 0) {
-            if (use360) {  // should we ignore or add E?
+            if (use360) {            // should we ignore or add E?
                 formatted = formatted.replace("H", "");
             } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
