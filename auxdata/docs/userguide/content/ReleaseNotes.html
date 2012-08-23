@@ -17,7 +17,6 @@ The items below reflect changes since the 3.0u2 release.
 
 <faqitem cat="System Changes"></faqitem>
 
-
 <faqitem q="IDV PermGen Memory Allocation" id="idvmemory">
 Upon IDV start up, "PermGen" memory allocation is done automatically according to the 
 user's machine specifications.  The default PermGen memory allocation can be changed 
@@ -26,7 +25,7 @@ through the <a href="tools/Preferences.html">User Preferences</a> (
 </faqitem>
 
 <faqitem q="Latest netCDF-Java Version" id="nj42">
-A new version of the netCDF-Java library (4.2.30) is included in this release.
+A new version of the netCDF-Java library (4.2.34) is included in this release.
 See the
 <a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">
 netCDF-Java change log</a> for a complete list of changes. 
@@ -34,16 +33,12 @@ netCDF-Java change log</a> for a complete list of changes.
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Rotation Option" id="rotationOpt">
-Add clockwise and counterclockwise rotation options so you can
-rotate about the north and south poles in globe view (or others).
-</faqitem>
-
-<faqitem q="Changes Probe Location" id="probeLocation">
-Added APIs to allow the ISL script to change probing location and time series chart name.
-</faqitem>
-
 <faqitem q="Lat/Lon Labeling" id="latlonlabel">
+There are two new ways to provide latitude and longitude labels on each view.  
+First, you can place labels along the edges of the box axes through the
+<a href="ui/Menus.html#viewmenu">[ug::menu View Properties]</a> menu under
+the [ug::button {Horizontal Scale}] tab.  The second option allows you to
+place labels directly in the view through the <a href="controls/MapDisplayControl.html">Map Display Control</a>.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
@@ -56,22 +51,6 @@ Added APIs to allow the ISL script to change probing location and time series ch
 <faqitem q="Bug Fixes" id="bugfix">
 Several bug fixes were made in this release, including:
 <ul>
-<li>Automatic memory allocation for Window XP 32 bit machines has been adjusted
-to fix a problem where some systems would not start with version 3.0.
-<li>the new netCDF-Java library fixed several bugs related to grids.
-<li>Fixed a bug when there is no animation time and the 
-default template is being used.
-<li>Fixed a problem when the value in a point observation is missing (NaN).
-<li>Fixed a problem that was creating timeouts when accessing an OPeNDAP server.
-<li>Fixed a problem when generating a track image.
-<li>Fixed several bugs in the storm track display.
-<li>Fixed wind barb issue.
-<li>Fixed hurricane track color control issue.
-<li>Fixed CAP profile display bug.
-<li>Fixed the file extension issue in the writeMovie api.
-<li>Fixed a null point exception when using formula merge time sequences.
-<li>Fixed the problem of auto-detection of the file type when selecting multiple files.
-<li>Fixed a bug in the  extractLongitudeFromNWPGrid api.
 </ul>
 </faqitem>
 
