@@ -111,7 +111,7 @@ public class LatLonLabelData {
                                     ? -90
                                     : -180), (isLatitude
                 ? 90
-                : 179), 0, new float[] { 0 }, Glyph.PT_MM, null, Color.white,
+                : 180), 0, new float[] { 0 }, Glyph.PT_MM, null, Color.white,
                         true);
     }
 
