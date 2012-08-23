@@ -17,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.view.geoloc;
 
 
@@ -96,6 +97,18 @@ public class CoordinateFormatTest {
                         new FloorCoordFormat(DegMinSec.COLON),
                         new DecimalCoordFormat(5, DegMinSec.NONE),
                         Cardinality.NORTH));
+                put("-12:33:19.8N",
+                    CoordinateFormat.convert(
+                        -12.5555, new FloorCoordFormat(DegMinSec.COLON),
+                        new FloorCoordFormat(DegMinSec.COLON),
+                        new DecimalCoordFormat(5, DegMinSec.NONE),
+                        Cardinality.NORTH));
+                put("-00:06:00",
+                    CoordinateFormat.convert(
+                        -0.1, new FloorCoordFormat(DegMinSec.COLON),
+                        new FloorCoordFormat(DegMinSec.COLON),
+                        new DecimalCoordFormat(5, DegMinSec.NONE),
+                        Cardinality.NONE));
                 put("51.46059",
                     CoordinateFormat.convert(
                         51.4605876,

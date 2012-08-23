@@ -1,9 +1,28 @@
+/*
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ * 
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package ucar.unidata.view.geoloc;
 
-//~--- JDK imports ------------------------------------------------------------
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
 
 /**
  * The CoordinateFormat class to format geo coordinates.
@@ -60,7 +79,7 @@ public class CoordinateFormat {
     public enum DegMinSec {
 
         /** Degrees. */
-        DEGREE(" "), //Just a space for now since VisAD does not support degree symbol.
+        DEGREE(" "),  //Just a space for now since VisAD does not support degree symbol.
 
         /** Minutes. */
         MINUTE("''"),
@@ -88,6 +107,7 @@ public class CoordinateFormat {
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public String toString() {
@@ -125,11 +145,16 @@ public class CoordinateFormat {
      * @param card the cardinality
      * @return the formatted coordinate string
      */
-    public static String convert(double coord, Format degF, Format minF, Format secF, Cardinality card) {
-        double minutes = ((coord - (int) coord) * 60.0d);
-        double seconds = ((minutes - (int) minutes) * 60.0d);
+    public static String convert(double coord, Format degF, Format minF,
+                                 Format secF, Cardinality card) {
+        double coordAbs = Math.abs(coord);
+        double minutes  = ((coordAbs - (int) coordAbs) * 60.0d);
+        double seconds  = ((minutes - (int) minutes) * 60.0d);
 
-        return degF.format(coord) + minF.format(minutes) + secF.format(seconds) + card;
+        return ((coord < 0)
+                ? "-"
+                : "") + degF.format(coordAbs) + minF.format(minutes)
+                      + secF.format(seconds) + card;
     }
 
     /**
@@ -164,7 +189,8 @@ public class CoordinateFormat {
          * @param accuracy the decimal accuracy
          * @param degminsec the degminsec
          */
-        public DecimalCoordFormat(final int accuracy, final DegMinSec degminsec) {
+        public DecimalCoordFormat(final int accuracy,
+                                  final DegMinSec degminsec) {
             this.accuracy  = accuracy;
             this.degminsec = degminsec;
         }
@@ -173,7 +199,8 @@ public class CoordinateFormat {
          * {@inheritDoc}
          */
         public String format(double number) {
-            NumberFormat formatter = new DecimalFormat(accuracy(accuracy) + degminsec);
+            NumberFormat formatter = new DecimalFormat(accuracy(accuracy)
+                                         + degminsec);
 
             return formatter.format(number);
         }
@@ -216,7 +243,8 @@ public class CoordinateFormat {
          * {@inheritDoc}
          */
         public String format(double number) {
-            NumberFormat formatter = new DecimalFormat(accuracy(0) + degminsec);
+            NumberFormat formatter = new DecimalFormat(accuracy(0)
+                                         + degminsec);
 
             return formatter.format((int) number);
         }

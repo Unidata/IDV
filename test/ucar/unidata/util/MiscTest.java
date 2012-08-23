@@ -90,8 +90,14 @@ public class MiscTest {
         assertEquals(errorMsg, "12 33' 18\"",
                      Misc.formatLatitude(12.555, "DD MM' SS\""));
 
-        assertEquals(errorMsg, "12 33' 19.80\"",
-                     Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
+        assertEquals(errorMsg, "12 33' 19.8\"",
+                Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
+
+        assertEquals(errorMsg, "-12 33' 19.8\"",
+                Misc.formatLatitude(-12.5555, "DD MM' SS.s\""));
+
+        assertEquals(errorMsg, "-0 06' 00.0\"",
+                Misc.formatLatitude(-0.1, "DD MM' SS.s\""));
 
         //Testing cardinalities
         assertEquals(errorMsg, "12N", Misc.formatLatitude(12, "DDH"));
