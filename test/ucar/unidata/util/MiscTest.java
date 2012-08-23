@@ -90,7 +90,6 @@ public class MiscTest {
         assertEquals(errorMsg, "12 33' 18\"",
                      Misc.formatLatitude(12.555, "DD MM' SS\""));
 
-        // Currently fails
         assertEquals(errorMsg, "12 33' 19.80\"",
                      Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
 
