@@ -65,16 +65,6 @@ public class MiscTest {
         }
     }
 
-    /**
-     *     DD:MM:SS      ===>  -34:29:45
-     *       (if longitude and use360 ===> 326:29:45)
-     *     DDH           ===>   34W     (or 34S if longitude)
-     *     DD.d          ===>  -34.5
-     *     DD.dddH       ===>   34.496W (or 34.496S if longitude)
-     *     DD MM" SS.s'  ===>  -34 29" 45.6'
-     *
-     */
-
 
     /**
      * Test the Misc.formatLatitude method.
@@ -83,7 +73,6 @@ public class MiscTest {
     public void formatLat() {
         String errorMsg = "Could not properly format lat";
 
-        //Trivial test
         assertEquals(errorMsg, "12", Misc.formatLatitude(12, "DD"));
 
         //Testing various formats
@@ -97,17 +86,28 @@ public class MiscTest {
         assertEquals(errorMsg, "12.0:00", Misc.formatLatitude(12, "DD.d:MM"));
 
         assertEquals(errorMsg, "12 30'", Misc.formatLatitude(12.5, "DD MM'"));
-        assertEquals(errorMsg, "12 33' 18\"", Misc.formatLatitude(12.555, "DD MM' SS\""));
 
+        assertEquals(errorMsg, "12 33' 18\"",
+                     Misc.formatLatitude(12.555, "DD MM' SS\""));
+
+        // Currently fails
+        assertEquals(errorMsg, "12 33' 19.80\"",
+                     Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
 
         //Testing cardinalities
         assertEquals(errorMsg, "12N", Misc.formatLatitude(12, "DDH"));
 
+        assertEquals(errorMsg, "12", Misc.formatLatitude(12, "DD"));
+
         assertEquals(errorMsg, "12S", Misc.formatLatitude(-12, "DDH"));
 
-        //Testing negative
         assertEquals(errorMsg, "-12", Misc.formatLatitude(-12, "DD"));
 
+        //Boundary case testing
+        assertEquals(errorMsg, "0", Misc.formatLatitude(0, "DD"));
+
+        assertEquals(errorMsg, "0 00' 00.0\"",
+                     Misc.formatLatitude(0, "DDH MM' SS.s\""));
     }
 
     /**
@@ -117,14 +117,51 @@ public class MiscTest {
     public void formatLongitude() {
         String errorMsg = "Could not properly format lon";
 
+        //Testing cardinalities        
+        assertEquals(errorMsg, "12E", Misc.formatLongitude(12, "DDH", false));
 
-        //Testing cardinalities
-        assertEquals(errorMsg, "12E", Misc.formatLongitude(12, "DDH", true));
+        assertEquals(errorMsg, "12", Misc.formatLongitude(12, "DD", false));
 
-        assertEquals(errorMsg, "12W", Misc.formatLongitude(-12, "DDH", true));
+        assertEquals(errorMsg, "12W",
+                     Misc.formatLongitude(-12, "DDH", false));
 
-        assertEquals(errorMsg, "-12", Misc.formatLongitude(-12, "DDH", true));
+        assertEquals(errorMsg, "-12", Misc.formatLongitude(-12, "DD", false));
+
+        //testing 0-360
+        assertEquals(errorMsg, "348", Misc.formatLongitude(-12, "DDH", true));
+
+        assertEquals(errorMsg, "12", Misc.formatLongitude(12, "DDH", true));
+
+        assertEquals(errorMsg, "348", Misc.formatLongitude(-12, "DD", true));
+
+        assertEquals(errorMsg, "12", Misc.formatLongitude(12, "DD", true));
+
+        //Boundary case testing
+
+        assertEquals(errorMsg, "180E",
+                     Misc.formatLongitude(180, "DDH", false));
+
+        assertEquals(errorMsg, "180", Misc.formatLongitude(180, "DD", false));
+
+        assertEquals(errorMsg, "180W",
+                     Misc.formatLongitude(-180, "DDH", false));
+
+        assertEquals(errorMsg, "-180",
+                     Misc.formatLongitude(-180, "DD", false));
+
+        //testing 0-360
+        assertEquals(errorMsg, "180",
+                     Misc.formatLongitude(-180, "DDH", true));
+
+        assertEquals(errorMsg, "180", Misc.formatLongitude(180, "DDH", true));
+
+        assertEquals(errorMsg, "0", Misc.formatLongitude(0, "DDH", false));
+
+        assertEquals(errorMsg, "0", Misc.formatLongitude(0, "DD", false));
+
+        //testing 0-360
+        assertEquals(errorMsg, "0", Misc.formatLongitude(0, "DDH", true));
+
+
     }
-
-
 }
