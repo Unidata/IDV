@@ -247,10 +247,10 @@ public class LatLonLabels extends TextDisplayable {
             labelType = makeLabelType();
         }
         // Handle overlapping -180/180 and 0/360 labels
-        // if the max and min are the same modulo 360, shave a little off the max
+        // if the max and min are the same modulo 360, shave a little off the min
         if ( !isLatitude) {
             if (0 == Float.compare(min + 360, max)) {
-                max -= 0.01;
+                min += 0.01;
             }
         }
         float[] labelVals = Misc.computeTicks(max, min, base, interval);

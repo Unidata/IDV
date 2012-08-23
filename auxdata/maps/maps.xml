@@ -30,7 +30,7 @@
 
   <longitudelabel
          minvalue="-180"
-         maxvalue="179"
+         maxvalue="180"
          spacing="15"
          color="white"
          visible="false"
