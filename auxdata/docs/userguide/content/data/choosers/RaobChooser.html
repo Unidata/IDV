@@ -19,22 +19,21 @@ the source of data. You either select an ADDE server and press
 
 To select RAOB data you:
 <ol>
-<li> Choose the server or the local file. The list of times will be 
+[ug::step {Choose the server or the local file. The list of times will be
 displayed. In this chooser you select particular stations at particular
-times.
+times.}]
 
-<li> Select a set of dates and times that you want to use.
-To select more than one time use Control-Click or Shift-Click.
+[ug::step {Select a set of dates and times that you want to use.
+To select more than one time use Control-Click or Shift-Click.}]
 
-<li> Select one or more stations for the given time using the map.
+[ug::step {Select one or more stations for the given time using the map.
 See <a href="#stationmap">below</a> for more information on
-how to use the station map.
+how to use the station map.}]
 
-<li> Once selected the station/time combination will be shown in the
-<b>Selected Stations</b>.
+[ug::step {Once selected the station/time combination will be shown in the
+<b>Selected Stations</b>.}]
 
-<li> When done, load the selected RAOB data with the [ug::button Add Source] button.
-
+[ug::step {When done, load the selected RAOB data with the [ug::button Add Source] button.}]
 
 </ol>
 
@@ -50,23 +49,33 @@ This data can then be displayed as a station model.
 
 To select single level RAOB data you:
 <ol>
-<li> Select an ADDE server and data type and press [ug::button Connect].
+[ug::step {Select an ADDE server and data type and press [ug::button Connect].}]
 
-<li> Either, choose a relative set of times steps (e.g., Last 5 times).
 
-<li> Or, choose a set of absolute times (e.g., 12Z, 1Z); When choosing 
-absolute times for the first time the IDV needs to query the ADDE server 
-for the times. This may take some time.  
+[ug::step {You may choose a relative set of times steps (e.g., Last 5 times):} images/ImageStep4.gif]
+
+[ug::step {Or, choose a set of absolute times (e.g., 12Z, 1Z):} images/ImageStep5.gif {
+When choosing
+absolute times for the first time the IDV needs to query the ADDE server
+for the times. This may take some time.
 Times can be selected in the list or the time line
 (use control/click or shift/click in the list to select multiple times).
 See the <a href="../../tools/Timeline.html">Timeline section</a> for details on its use.
+}]
+
+[ug::step {Or, match the times of the current active display window:} images/MatchTimeDriver.gif {
+This assumes the current active display window has a display with the time driver set. A
+display can be set as a time driver in the <a href="../FieldSelector.html#TimeMatchingFS">Time Subset panel</a>
+in the Field Selector tab or the <a href="../../controls/index.html#DisplayControlViewMenu">
+View</a> menu in the Dashbaord's Displays tab.
+}]
 
 
-<li> Select the level you want to view.
+[ug::step {Select the level you want to view.}]
 
-<li> Optionally select the station model to be used for displaying this data.
+[ug::step {Optionally select the station model to be used for displaying this data.}]
 
-<li> When done, load the selected RAOB  data  with the [ug::button Add Source] button.
+[ug::step {When done, load the selected RAOB  data  with the [ug::button Add Source] button.}]
 
 
 </ol>
