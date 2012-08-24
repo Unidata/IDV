@@ -474,7 +474,7 @@ public class MapViewManager extends NavigatedViewManager {
                         new ProjectionCoordinateSystem(dfltProjection);
                 }
             }
-            if (!idv.getArgsManager().isScriptingMode()) {
+            if ( !idv.getArgsManager().isScriptingMode()) {
                 addProjectionToHistory(mainProjection, "Default");
             }
 
@@ -2391,7 +2391,8 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         boolean b = !useGlobeDisplay
-                    && (latLonScaleWidget.isLatVisible()
+                    && (getBp(PREF_SHOWSCALES)
+                        || latLonScaleWidget.isLatVisible()
                         || latLonScaleWidget.isLonVisible());
 
         setBp(PREF_SHOWSCALES, b);
