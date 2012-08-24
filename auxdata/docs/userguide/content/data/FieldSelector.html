@@ -28,19 +28,12 @@ creating a display is just a couple of steps away:
 
 [ug::step {Select the field you want to display:}  images/SelectorStep2.gif]
 
-
 [ug::step {Select the display type:}  images/SelectorStep3.gif]
 
-[ug::step {Optionally subset the times by choosing the [ug::button Use Selected] menu item in the drop down menu and
-    selecting the times. Other options to choose are [ug::button Match Time Driver] and [ug::button Set As Time Driver].
-    If a user selects the [ug::button Match Time Driver] menu item, the IDV will check the current active view
-    window to make sure there is a time driver available. Otherwise, an error message will appear to remind the user
-    a driver is needed. When the IDV confirms that a time driver is available, the time list of this dataset will be removed
-    in the subset panel, and the actual times used in the display will be matched by the times of the time driver.
-    If a user selects the [ug::button Set As Time Driver] menu item, the selected times of this dataset will be used as
-    the driver times for this view window. Only one time driver is allowed in each view window, and the final setting of
-    of the time driver will be used in the display.}  images/SelectorStep4.gif]
-
+<a name="TimeMatchingFS">
+[ug::step {Optionally subset the times by choosing an option in the 
+drop down menu. See <a href="#TimeSubsetting">Subsetting</a>
+for more details.}  images/SelectorStep4.gif]
 
 [ug::step {For grids, optionally subset the levels and/or spatial area:} images/SelectorStep5.gif]
 
@@ -98,6 +91,17 @@ itself through the <a href="DataSourceProperties.html">Data Source Properties</a
 dialog or the defaults can be overwritten through the Field
 Selector window.
 
+<p>
+<a name="TimeSubsetting">
+You can subset the times manually by choosing the [ug::button Use Selected] menu item in the drop down menu and
+selecting the times. Other options are [ug::button Match Time Driver] and [ug::button Set As Time Driver].
+If a user selects the [ug::button Match Time Driver] menu item, the IDV will check the current active view
+window to make sure there is a time driver available. Otherwise, an error message will appear to remind the user
+a driver is needed first. When the IDV confirms that a time driver is available, the time list of this dataset will 
+be removed in the subset panel, and the times used by the time driver in the current active display will be used.
+If a user selects the [ug::button Set As Time Driver] menu item, the selected times of this dataset will be used as
+the driver times for this view window. Only one time driver is allowed in each view window, and the most recent display
+set as the time driver will be used.
 
 <subhead intoc="false" id="displays">Creating Displays</subhead>
 
