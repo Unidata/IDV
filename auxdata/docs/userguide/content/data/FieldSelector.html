@@ -31,10 +31,15 @@ creating a display is just a couple of steps away:
 
 [ug::step {Select the display type:}  images/SelectorStep3.gif]
 
-[ug::step {Optionally subset the times by choosing the Use Selected menu item in the drop down menu and
-    selecting the times. Other options to choose are the Match Time Driver and Set As Time Driver.
-    If the user select the Match Time Driver menu item, make sure that there is a time driver in
-    the active view window. Only one time driver is allowed in each view window.}  images/SelectorStep4.gif]
+[ug::step {Optionally subset the times by choosing the [ug::button Use Selected] menu item in the drop down menu and
+    selecting the times. Other options to choose are [ug::button Match Time Driver] and [ug::button Set As Time Driver].
+    If a user selects the [ug::button Match Time Driver] menu item, the IDV will check the current active view
+    window to make sure there is a time driver available. Otherwise, an error message will appear to remind the user
+    a driver is needed. When the IDV confirms that a time driver is available, the time list of this dataset will be removed
+    in the subset panel, and the actual times used in the display will be matched by the times of the time driver.
+    If a user selects the [ug::button Set As Time Driver] menu item, the selected times of this dataset will be used as
+    the driver times for this view window. Only one time driver is allowed in each view window, and the final setting of
+    of the time driver will be used in the display.}  images/SelectorStep4.gif]
 
 
 [ug::step {For grids, optionally subset the levels and/or spatial area:} images/SelectorStep5.gif]
