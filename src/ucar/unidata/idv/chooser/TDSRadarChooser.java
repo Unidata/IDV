@@ -653,6 +653,8 @@ public class TDSRadarChooser extends TimesChooser {
     public void stationOrProductChanged() {
         setHaveData(false);
         setDoTimeDrivers(false);
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
         readTimes();
         readDrivers();
         updateStatus();

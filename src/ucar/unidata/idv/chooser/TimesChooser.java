@@ -174,7 +174,7 @@ public class TimesChooser extends IdvChooser {
     private boolean readingDrivers = false;
 
     /** the time driver checkbox */
-    JCheckBox drivercbx = null;
+    public JCheckBox drivercbx = null;
 
     /** the time driver component */
     JComponent timeDriverComp = null;
