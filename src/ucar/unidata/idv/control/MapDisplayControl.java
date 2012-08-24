@@ -1133,14 +1133,15 @@ public class MapDisplayControl extends DisplayControlImpl {
             JComponent sliderPanel = GuiUtils.doLayout(new Component[] {
                                          GuiUtils.rLabel("Position: "),
                                          makePositionSlider() }, 2,
-                                             GuiUtils.WT_N, GuiUtils.WT_N);
+                                             GuiUtils.WT_YN, GuiUtils.WT_N);
             /* Alternate to span entire width
             JComponent sliderPanel = GuiUtils.leftCenter(
                     GuiUtils.rLabel("Position: "), makePositionSlider());
             */
-            retComp = GuiUtils.centerBottom(tabbedPane,
-                                            GuiUtils.inset(sliderPanel,
-                                                new Insets(10, 0, 5, 0)));
+            retComp = GuiUtils.centerBottom(
+                tabbedPane,
+                GuiUtils.inset(
+                    GuiUtils.left(sliderPanel), new Insets(10, 30, 5, 0)));
         }
         fillContents();
         return retComp;
