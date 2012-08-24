@@ -561,6 +561,10 @@ public class AddeProfilerDataChooser extends AddeChooser {
             logException("Unable to open Profiler dataset", excp);
         }
         showNormalCursor();
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 
 
