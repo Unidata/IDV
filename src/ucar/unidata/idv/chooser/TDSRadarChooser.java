@@ -929,5 +929,9 @@ public class TDSRadarChooser extends TimesChooser {
         } catch (Exception exc) {
             logException("Loading radar data", exc);
         }
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 }

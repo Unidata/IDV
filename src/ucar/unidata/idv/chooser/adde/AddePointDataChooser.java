@@ -249,6 +249,10 @@ public class AddePointDataChooser extends AddeChooser {
             logException("Unable to open ADDE point dataset", excp);
         }
         showNormalCursor();
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 
 

@@ -3403,7 +3403,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
         makeDataSource(ids, "ADDE.IMAGE", ht);
         saveServerState();
-
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 
 
