@@ -1,0 +1,84 @@
+<html><head>
+  <title>View Properties</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+
+
+Each display (View) has a [ug::menu View Properties] menu.  This allows you
+to set properties specific to that View.
+
+<%childlist%>
+
+<subhead intoc="false" id="main">Main</subhead>
+
+This tab allows you to set a variety of options concerning the
+display, colors, logos, etc.
+
+[ht::cimg images/ViewPropertiesMain.gif]
+
+<ul>
+[ug::menuDesc {Name} {
+Set the name of the view.  The name will be displayed above the view and can also
+be used in an ISL script to identify this view.
+}]
+
+[ug::menuDesc {Properties} {
+The checkboxes can be used to set properties on this view.  
+}]
+
+[ug::menuDesc {Colors} {
+Change the background and foreground colors
+of the view (not the map lines) to predefined colors.
+}]
+
+[ug::menuDesc {Display List} {
+Allows you to set the font, font style and size and color of the display list 
+labels for this view.
+}]
+
+[ug::menuDesc {Full Screen Dimensions} {
+Set the dimensions for the size of the full screen mode.
+}]
+
+[ug::menuDesc {Logo} {
+Set a logo that will be overlain on the View.  You can enter a file path or a 
+URL for the logo image. You can set the position and offsets
+from that position.  The image can be scaled depending on the size of the view window.
+}]
+</ul>
+
+
+<subhead intoc="false" id="aspect">Apect Ratio</subhead>
+
+In this tab you can configure the aspect ratio of the scene.
+
+[ht::cimg images/ViewPropertiesAspect.gif]
+
+<subhead intoc="false" id="lighting">Lighting</subhead>
+
+This tab lets the user configure the lighting of the scene.
+
+[ht::cimg images/ViewPropertiesLighting.gif]
+
+<subhead intoc="false" id="vertrange">Vertical Range</subhead>
+
+In this tab you can set the vertical range, as well as set the
+units, and toggle the visibility of the axis.
+
+[ht::cimg images/ViewPropertiesVerticalRange.gif]
+
+<subhead intoc="false" id="hscale">Horizontal Scale</subhead>
+
+Here, you can set horizontal axis visibility and labeling, axis label
+font, and also specify a variety of latitude and longitude formats. In
+addition, you can specify major increment spacing and minor increment
+divisions as well as the position of the "base label".
+
+[ht::cimg images/ViewPropertiesHorizontalScale.gif]
+
+
+</body>
+</html>
