@@ -207,7 +207,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /**
      * Vertical range visible
      */
-    private boolean verticalRangeVisible = false;
+    private boolean verticalRangeVisible = true;
 
     /** flag for the visibility of the VisAD box */
     private boolean box;
