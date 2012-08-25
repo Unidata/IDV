@@ -234,17 +234,23 @@ public class VertScaleDialog extends JPanel implements ActionListener {
 
         newTransfer.visible = visible.isSelected();
 
-        if ( !Misc.equals(newTransfer, vertScaleInfo)) {
-            vertScaleInfo = newTransfer;
+        // Force redraw each time rather than checking equality between
+        // newTransfer and vertScaleInfo. This is necessary to ensure the
+        // vertical axis visibility is correct, when the horizontal axes are
+        // manipulated. If this is too brute force we can check to see if the
+        // view point control has  a MapProjectionDisplay.
 
-            try {
-                control.applyVerticalScale(vertScaleInfo);
-            } catch (Exception exc) {
-                LogUtil.userMessage("An error has occurred:" + exc);
+        //        if ( !Misc.equals(newTransfer, vertScaleInfo)) {
+        vertScaleInfo = newTransfer;
 
-                return false;
-            }
+        try {
+            control.applyVerticalRange(vertScaleInfo);
+        } catch (Exception exc) {
+            LogUtil.userMessage("An error has occurred:" + exc);
+
+            return false;
         }
+        //        }
 
         return true;
     }
