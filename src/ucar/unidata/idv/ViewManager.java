@@ -1081,7 +1081,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                              GuiUtils.WT_N, GuiUtils.WT_N), null);
 
         // Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
-        topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
+        topBar = GuiUtils.leftRight(
                                           GuiUtils.bottom(nameLabel),
                                           topRight);
         centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
