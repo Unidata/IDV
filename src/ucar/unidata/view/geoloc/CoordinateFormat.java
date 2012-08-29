@@ -17,11 +17,22 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.view.geoloc;
 
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 
 /**
@@ -31,6 +42,27 @@ public class CoordinateFormat {
 
     /** Empty format. */
     public static final Format EMPTY_FORMAT = new EmptyFormat();
+
+    /** Pattern for degrees */
+    private static final Pattern DEGREE_PATTERN =
+        Pattern.compile("DD(\\.d+)?(:|\\s*)");
+
+    /** Pattern for minutes */
+    private static final Pattern MINUTE_PATTERN =
+        Pattern.compile("MM(\\.m+)?('|:|\\s*)");
+
+    /** Pattern for seconds */
+    private static final Pattern SECOND_PATTERN =
+        Pattern.compile("SS(\\.s+)?(\"|:|\\s*)");
+
+    /** Pattern for cardinality */
+    private static final Pattern CARDINALITY_PATTERN =
+        Pattern.compile("H\\s*$");
+
+    /** Map from enum string to enum symbol */
+    private static final Map<String, DegMinSec> DMS_ENUM_MAP =
+        enumMapifer(DegMinSec.class);
+
 
     /**
      * The Cardinality enum.
@@ -66,6 +98,8 @@ public class CoordinateFormat {
 
         /**
          * {@inheritDoc}
+         *
+         * @return _more_
          */
         @Override
         public String toString() {
@@ -82,7 +116,7 @@ public class CoordinateFormat {
         DEGREE(" "),  //Just a space for now since VisAD does not support degree symbol.
 
         /** Minutes. */
-        MINUTE("''"),
+        MINUTE("'"),
 
         /** Seconds. */
         SECOND("\""),
@@ -91,7 +125,10 @@ public class CoordinateFormat {
         COLON(":"),
 
         /** None. */
-        NONE("");
+        NONE(""),
+
+        /** Empty. */
+        EMPTY(" ");
 
         /** The dms. */
         private final String dms;
@@ -108,6 +145,8 @@ public class CoordinateFormat {
         /**
          * {@inheritDoc}
          *
+         *
+         * @return _more_
          */
         @Override
         public String toString() {
@@ -128,7 +167,7 @@ public class CoordinateFormat {
             final StringBuffer sb = new StringBuffer();
 
             for (int i = 0; i < accuracy; i++) {
-                sb.append("#");
+                sb.append("0");
             }
 
             return "00." + sb.toString();
@@ -155,6 +194,153 @@ public class CoordinateFormat {
                 ? "-"
                 : "") + degF.format(coordAbs) + minF.format(minutes)
                       + secF.format(seconds) + card;
+    }
+
+    /**
+     * Format a longitude to the given format.
+     * @see #formatLongitude(double, String, boolean)
+     *
+     * @param value  the value to format
+     * @param format the format
+     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
+     *
+     * @return formatted latitude
+     */
+    public static String formatLatitude(double value, String format) {
+        Matcher     matcherCardinality = CARDINALITY_PATTERN.matcher(format);
+
+        Cardinality c;
+
+        if (value == 0) {
+            c = Cardinality.NONE;
+        } else if (matcherCardinality.find()) {
+            c     = (value > 0)
+                    ? Cardinality.NORTH
+                    : Cardinality.SOUTH;
+            value = Math.abs(value);
+        } else {
+            c = Cardinality.NONE;
+        }
+
+        Iterator<Format> i = tokenize(format).iterator();
+        return CoordinateFormat.convert(value, i.next(), i.next(), i.next(),
+                                        c);
+    }
+
+    /**
+     * Format a latitude or longitude value to the given format.  Formats use
+     * DD for degrees, MM for minutes, SS for seconds and d, m, s for decimal
+     * fractions of degrees, minutes, seconds.  H designates the hemisphere
+     * (N,S,E,W).
+     * <pre>
+     * Examples for value -34.496 degrees
+     *
+     *     DD:MM:SS      ===>  -34:29:45
+     *       (if longitude and use360 ===> 326:29:45)
+     *     DDH           ===>   34W     (or 34S if longitude)
+     *     DD.d          ===>  -34.5
+     *     DD.dddH       ===>   34.496W (or 34.496S if longitude)
+     *     DD MM'SS.s"   ===>  -34 29'45.6"
+     *
+     * </pre>
+     *
+     * @param value  the value to format
+     * @param format the format
+     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
+     *
+     * @return formatted longitude
+     */
+    public static String formatLongitude(double value, String format,
+                                         boolean use360) {
+
+        Matcher     matcherCardinality = CARDINALITY_PATTERN.matcher(format);
+
+        Cardinality c;
+        if (value == 0) {
+            c = Cardinality.NONE;
+        } else if (use360) {
+            value = (value < 0)
+                    ? value + 360
+                    : value;
+            c     = Cardinality.NONE;
+        } else if (matcherCardinality.find()) {
+            value = (value > 180)
+                    ? (value - 360)
+                    : value;
+            c     = (value > 0)
+                    ? Cardinality.EAST
+                    : Cardinality.WEST;
+            value = Math.abs(value);
+        } else {
+            c = Cardinality.NONE;
+        }
+
+        Iterator<Format> i = tokenize(format).iterator();
+        return CoordinateFormat.convert(value, i.next(), i.next(), i.next(),
+                                        c);
+
+    }
+
+    /**
+     * Takes a string containing tokens and cuts it apart into individual tokens.
+     *
+     * @param tokens the token string that will be cut apart into individual tokens
+     * @return the list of three tokens
+     */
+    private static List<Format> tokenize(String tokens) {
+        List<Format> l              = new LinkedList<Format>();
+
+        Matcher      degreeMathcher = DEGREE_PATTERN.matcher(tokens);
+        Matcher      matcherMinute  = MINUTE_PATTERN.matcher(tokens);
+        Matcher      matcherSecond  = SECOND_PATTERN.matcher(tokens);
+
+        boolean      hasMinute      = matcherMinute.find();
+        boolean      hasSecond      = matcherSecond.find();
+
+        if (degreeMathcher.find()) {
+            String group    = degreeMathcher.group().trim();
+            int    accuracy = group.length()
+                           - group.replaceAll("d", "").length();
+            DegMinSec dms = DMS_ENUM_MAP.get(group.replaceAll("DD(\\.d+)?",
+                                ""));
+            dms = (dms.equals(DegMinSec.NONE) && hasMinute)
+                  ? DegMinSec.EMPTY
+                  : dms;
+            l.add(((accuracy == 0) && hasMinute)
+                  ? new FloorCoordFormat(dms)
+                  : new DecimalCoordFormat(accuracy, dms));
+        } else {
+            l.add(EMPTY_FORMAT);
+        }
+
+        if (hasMinute) {
+            String group    = matcherMinute.group().trim();
+            int    accuracy = group.length()
+                           - group.replaceAll("m", "").length();
+            DegMinSec dms = DMS_ENUM_MAP.get(group.replaceAll("MM(\\.m+)?",
+                                ""));
+            dms = (dms.equals(DegMinSec.NONE) && hasSecond)
+                  ? DegMinSec.EMPTY
+                  : dms;
+            l.add(((accuracy == 0) && hasSecond)
+                  ? new FloorCoordFormat(dms)
+                  : new DecimalCoordFormat(accuracy, dms));
+        } else {
+            l.add(EMPTY_FORMAT);
+        }
+
+        if (hasSecond) {
+            String group     = matcherSecond.group().trim();
+            int    charCount = group.length()
+                            - group.replaceAll("s", "").length();
+            DegMinSec dms = DMS_ENUM_MAP.get(group.replaceAll("SS(\\.s+)?",
+                                ""));
+            l.add(new DecimalCoordFormat(charCount, dms));
+        } else {
+            l.add(EMPTY_FORMAT);
+        }
+
+        return l;
     }
 
     /**
@@ -197,10 +383,18 @@ public class CoordinateFormat {
 
         /**
          * {@inheritDoc}
+         *
+         * @param number _more_
+         *
+         * @return _more_
          */
         public String format(double number) {
+            //Strangely ' needs to be adjust to '' to make DecimalFormat happy.
+            String       d         = (degminsec.equals(DegMinSec.MINUTE))
+                                     ? (degminsec + "'")
+                                     : degminsec + "";
             NumberFormat formatter = new DecimalFormat(accuracy(accuracy)
-                                         + degminsec);
+                                         + d);
 
             return formatter.format(number);
         }
@@ -214,6 +408,10 @@ public class CoordinateFormat {
 
         /**
          * {@inheritDoc}
+         *
+         * @param number _more_
+         *
+         * @return _more_
          */
         @Override
         public String format(double number) {
@@ -241,12 +439,34 @@ public class CoordinateFormat {
 
         /**
          * {@inheritDoc}
+         *
+         * @param number _more_
+         *
+         * @return _more_
          */
         public String format(double number) {
-            NumberFormat formatter = new DecimalFormat(accuracy(0)
-                                         + degminsec);
-
+            //Strangely ' needs to be adjust to '' to make DecimalFormat happy.
+            String       d         = (degminsec.equals(DegMinSec.MINUTE))
+                                     ? (degminsec + "'")
+                                     : degminsec + "";
+            NumberFormat formatter = new DecimalFormat(accuracy(0) + d);
             return formatter.format((int) number);
         }
+    }
+
+    /**
+     * Enum mapifer. Create a map from enum string mapped to enum
+     *
+     * @param <E> the element type
+     * @param clazz the class of the enum
+     * @return the string enum map
+     */
+    private static <E extends Enum<E>> Map<String,
+                                           E> enumMapifer(Class<E> clazz) {
+        Map<String, E> map = new HashMap<String, E>();
+        for (E e : clazz.getEnumConstants()) {
+            map.put(e.toString(), e);
+        }
+        return Collections.unmodifiableMap(map);
     }
 }

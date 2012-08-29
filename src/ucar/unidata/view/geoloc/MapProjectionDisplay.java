@@ -32,8 +32,6 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
-import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
-import ucar.unidata.view.geoloc.CoordinateFormat.Cardinality;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
@@ -559,7 +557,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         EarthLocation el = getEarthLocation(xRange[1], yRange[1], zRange[0]);
         double        top    = el.getLongitude().getValue();
 
-        
+
         final double  DELTA  = (xRange[1] - xRange[0]) / 100;
         if (Double.isNaN(top)) {
             outerloop:
@@ -667,17 +665,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             if ((mm < DELTA) || (mm > (inc - DELTA))) {  // Must account for numerical leeway.
                 majorTicks.add(d);
 
-                AxisScaleInfo.CoordSys coordSys =
-                    latScaleInfo.getCoordFormat();
+                labelTable.put(d, CoordinateFormat.formatLatitude(i,
+                        latScaleInfo.getCoordFormat()));
 
-                if (i > 0) {
-                    labelTable.put(d, coordSys.format(i, Cardinality.NORTH));
-                } else if (i < 0) {
-                    labelTable.put(d, coordSys.format(Math.abs(i),
-                            Cardinality.SOUTH));
-                } else {
-                    labelTable.put(d, coordSys.format(i, Cardinality.NONE));
-                }
             } else {
                 minorTicks.add(d);
             }
@@ -751,21 +741,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
-
-                AxisScaleInfo.CoordSys coordSys =
-                    lonScaleInfo.getCoordFormat();
-
-                if ((i > MIN_LON) && (i <= MID_LON)) {
-                    labelTable.put(d, coordSys.format(i, Cardinality.EAST));
-                } else if ((i > MID_LON) && (i < MAX_LON)) {
-                    labelTable.put(d, coordSys.format(MAX_LON - i,
-                            Cardinality.WEST));
-                } else if ((i < MIN_LON)) {
-                    labelTable.put(d, coordSys.format(Math.abs(i),
-                            Cardinality.WEST));
-                } else {
-                    labelTable.put(d, coordSys.format(i, Cardinality.NONE));
-                }
+                
+                labelTable.put(d, CoordinateFormat.formatLongitude(i,
+                        lonScaleInfo.getCoordFormat(), lonScaleInfo.isUse360()));
             } else {
                 minorTicks.add(d);
             }
@@ -824,20 +802,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
 
-                AxisScaleInfo.CoordSys coordSys =
-                    lonScaleInfo.getCoordFormat();
-
-                if ((i > MIN_LON) && (i <= MID_LON)) {
-                    labelTable.put(d, coordSys.format(i, Cardinality.EAST));
-                } else if ((i > MID_LON) && (i < MAX_LON)) {
-                    labelTable.put(d, coordSys.format(MAX_LON - i,
-                            Cardinality.WEST));
-                } else if ((i < MIN_LON)) {
-                    labelTable.put(d, coordSys.format(Math.abs(i),
-                            Cardinality.WEST));
-                } else {
-                    labelTable.put(d, coordSys.format(i, Cardinality.NONE));
-                }
+                labelTable.put(d, CoordinateFormat.formatLongitude(i,
+                        lonScaleInfo.getCoordFormat(), lonScaleInfo.isUse360()));
             } else {
                 minorTicks.add(d);
             }
@@ -863,7 +829,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private void finalizeAxis(
             AxisScale scale, String title,
             Hashtable<? extends Double, ? extends String> labelTable,
-            List<? extends Double> majorTicks, List<? extends Double> minorTicks, Font axisFont)
+            List<? extends Double> majorTicks,
+            List<? extends Double> minorTicks, Font axisFont)
             throws VisADException {
         double[] mjt = new double[majorTicks.size()];
         double[] mnt = new double[minorTicks.size()];
@@ -1255,10 +1222,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lat scale info
      */
     public AxisScaleInfo getLatScaleInfo() {
-    	// The 2nd null check is kludgy, but sometimes AxisScaleInfo
-    	//deserialization will have problems in which case all fields 
-    	//are null. 
-        if (latScaleInfo == null || latScaleInfo.getBaseLabel() == null) {
+        // The 2nd null check is kludgy, but sometimes AxisScaleInfo
+        //deserialization will have problems in which case all fields 
+        //are null. 
+        if ((latScaleInfo == null) || (latScaleInfo.getBaseLabel() == null)) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
             latScaleInfo = lsi;
@@ -1266,11 +1233,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             lsi.setIncrement(10 + "");
             lsi.setMinorDivision(1);
             lsi.setVisible(true);
-            lsi.setCoordFormat(CoordSys.A);
+            lsi.setCoordFormat(AxisScaleInfo.COORD_FORMATS[0]);
+            lsi.setUse360(latScaleInfo.isUse360());
 
-            double        base = calcLatBase();
-            double end = calcLatTop();
-            int    inc = (int) round(Math.abs(end - base) / 5d, 0,
+            double base = calcLatBase();
+            double end  = calcLatTop();
+            int    inc  = (int) round(Math.abs(end - base) / 5d, 0,
                                   BigDecimal.ROUND_HALF_UP);
 
             lsi.setIncrement(((inc == 0)
@@ -1295,17 +1263,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @return the lon scale info
      */
     public AxisScaleInfo getLonScaleInfo() {
-    	// The 2nd null check is kludgy, but sometimes AxisScaleInfo
-    	//deserialization will have problems in which case all fields 
-    	//are null. 
-        if (lonScaleInfo == null || lonScaleInfo.getBaseLabel() == null) {
+        // The 2nd null check is kludgy, but sometimes AxisScaleInfo
+        //deserialization will have problems in which case all fields 
+        //are null. 
+        if ((lonScaleInfo == null) || (lonScaleInfo.getBaseLabel() == null)) {
             AxisScaleInfo lsi = new AxisScaleInfo();
 
             lonScaleInfo = lsi;
             lsi.setLabel("Longitude");
             lsi.setMinorDivision(1);
             lsi.setVisible(true);
-            lsi.setCoordFormat(CoordSys.A);
+            lsi.setCoordFormat(AxisScaleInfo.COORD_FORMATS[0]);
+            lsi.setUse360(false);
 
             double[]      xRange = xMap.getRange();
             double[]      yRange = yMap.getRange();

@@ -2,23 +2,24 @@
  * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
 package ucar.unidata.view.geoloc;
+
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -41,7 +42,6 @@ import javax.swing.SpinnerNumberModel;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
 
 
 /**
@@ -49,6 +49,7 @@ import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
  *
  * @author   IDV Development Team
  */
+@SuppressWarnings("serial")
 public class LatLonScalePanel extends JPanel implements ActionListener {
 
     /** The coord format. */
@@ -98,6 +99,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
 
     /** y axis visible */
     private JCheckBox yVisible;
+
+    /** Use 360 */
+    private JCheckBox use360;
 
     /**
      * Axis font selector
@@ -162,8 +166,12 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         JPanel formatPanel = GuiUtils.doLayout(new Component[] {
                                  GuiUtils.rLabel("Format: "),
                                  coordFormat = new JComboBox(
-                                     AxisScaleInfo.CoordSys.values()) }, 2,
-                                         GuiUtils.WT_NY, GuiUtils.WT_N);
+                                     AxisScaleInfo.COORD_FORMATS),
+                                 GuiUtils.rLabel(" 0-360 Longitude"),
+                                 use360 = new JCheckBox("", false) }, 4,
+                                     GuiUtils.WT_NY, GuiUtils.WT_N);
+        coordFormat.setEditable(true);
+        coordFormat.setEnabled(true);
 
         JPanel latLonPanel = GuiUtils.doLayout(new Component[] { latPanel,
                 lonPanel }, 1, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -219,6 +227,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
         yVisible.setSelected(latScaleInfo.isVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
+        use360.setSelected(latScaleInfo.isUse360());
         fontSelector.setFont(latScaleInfo.getFont());
     }
 
@@ -232,6 +241,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
         xVisible.setSelected(lonScaleInfo.isVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
+        use360.setSelected(lonScaleInfo.isUse360());
         fontSelector.setFont(lonScaleInfo.getFont());
     }
 
@@ -249,8 +259,10 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLatInfo.setMinorDivision(
             Integer.valueOf(latMinorSpinner.getValue().toString()));
         newLatInfo.setVisible(yVisible.isSelected());
-        newLatInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLatInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLatInfo.setFont(fontSelector.getFont());
+        newLatInfo.setUse360(use360.isSelected());
+
 
         if ( !newLatInfo.equals(latScaleInfo)) {
             latScaleInfo = newLatInfo;
@@ -264,8 +276,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLonInfo.setMinorDivision(
             Integer.valueOf(lonMinorSpinner.getValue().toString()));
         newLonInfo.setVisible(xVisible.isSelected());
-        newLonInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLonInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLonInfo.setFont(fontSelector.getFont());
+        newLonInfo.setUse360(use360.isSelected());
 
         if ( !newLonInfo.equals(lonScaleInfo)) {
             lonScaleInfo = newLonInfo;
