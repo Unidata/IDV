@@ -423,8 +423,8 @@ public abstract class NavigatedViewManager extends ViewManager {
         JToolBar undoToolbar = new JToolBar(JToolBar.VERTICAL);
 
         undoToolbar.setFloatable(getToolbarsFloatable());
-        undoToolbar.add(backButton);
-        undoToolbar.add(forwardButton);
+  //      undoToolbar.add(backButton);
+   //     undoToolbar.add(forwardButton);
         addToolBar(GuiUtils.top(undoToolbar), "undoredo",
                    "Undo/Redo toolbar");
 

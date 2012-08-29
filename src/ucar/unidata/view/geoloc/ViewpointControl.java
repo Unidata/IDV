@@ -349,10 +349,10 @@ public class ViewpointControl implements ActionListener {
         toolbar.setFloatable(floatable);
 
         for (int i = 0; i < perspectiveCmds.length; i++) {
-            toolbar.add(makeButton(perspectiveIcons[i], perspectiveCmds[i],
+          /*  toolbar.add(makeButton(perspectiveIcons[i], perspectiveCmds[i],
                                    "Rotate to "
                                    + perspectiveNames[i].toLowerCase()
-                                   + " viewpoint"));
+                                   + " viewpoint"));    */
         }
 
         pButton = GuiUtils.getToggleImageButton(
@@ -371,9 +371,9 @@ public class ViewpointControl implements ActionListener {
                 changePerspectiveView(value);
             }
         });
-        toolbar.add(pButton);
-        toolbar.add(makeButton(ICON_USERVIEW, CMD_ROTATEDIALOG,
-                               "Rotate to user specified view"));
+      //  toolbar.add(pButton);
+     //   toolbar.add(makeButton(ICON_USERVIEW, CMD_ROTATEDIALOG,
+        //                       "Rotate to user specified view"));
 
         JButton vertRangeButton =
             makeButton(
@@ -413,7 +413,7 @@ public class ViewpointControl implements ActionListener {
                 }
             }
         });
-        toolbar.add(vertRangeButton);
+//        toolbar.add(vertRangeButton);
         rotateButton =
             GuiUtils.getToggleImageButton(
                 GuiUtils.getScaledImageIcon(
