@@ -134,7 +134,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
     private void makeToolBar() {
         JButton button;
 
-        button = makeButton("/auxdata/ui/icons/magnifier_zoom_in.png", "Zoom in");
+        button = makeButton("/auxdata/ui/icons/magnifier_zoom_in.jpg", "Zoom in");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 navDisplay.zoom(ZOOM_FACTOR);
@@ -142,7 +142,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
         });
 
         // zoom out button
-        button = makeButton("/auxdata/ui/icons/magnifier_zoom_out.png", "Zoom out");
+        button = makeButton("/auxdata/ui/icons/magnifier_zoom_out.jpg", "Zoom out");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 navDisplay.zoom(1.0 / (double) ZOOM_FACTOR);
@@ -167,6 +167,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
         //        addSeparator();
 
         // translate left
+        /*
         button = makeButton("/auxdata/ui/icons/arrow_left.png", "Translate left");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +201,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
                 navDisplay.translate(0.0, TRANSLATE_FACTOR);
             }
         });
-
+          */
         //        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
 
