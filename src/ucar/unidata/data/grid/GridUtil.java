@@ -7356,10 +7356,6 @@ public class GridUtil {
         GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
         int[]      lengths = domain.getLengths();
         njx = lengths[0];
-        // Band aid to  fix ArrayIndexOutOfBounds exception
-		if (lengths.length == 1) {
-			lengths = new int[] { lengths[0], 0 };
-		}
         niy = lengths[1];
         float[]   highs     = domain.getHi();
         float[]   lows      = domain.getLow();
