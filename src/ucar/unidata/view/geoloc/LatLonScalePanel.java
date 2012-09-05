@@ -39,7 +39,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import ucar.unidata.ui.FontSelector;
-import ucar.unidata.ui.NumericTextField;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
@@ -56,10 +55,10 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private JComboBox coordFormat;
 
     /** Latitude base label */
-    private NumericTextField latBaseLabel;
+    private JTextField latBaseLabel;
 
     /** Latitude increment */
-    private NumericTextField latIncrement;
+    private JTextField latIncrement;
 
     /** Lat (y-axis) Label */
     private JTextField latLabel;
@@ -71,10 +70,10 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private AxisScaleInfo latScaleInfo;
 
     /** Longitude base label */
-    private NumericTextField lonBaseLabel;
+    private JTextField lonBaseLabel;
 
     /** Longitude increment */
-    private NumericTextField lonIncrement;
+    private JTextField lonIncrement;
 
     /** Lon (x-axis) Label */
     private JTextField lonLabel;
@@ -131,9 +130,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         JPanel latPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), latLabel = new JTextField(),
             GuiUtils.rLabel("Base (-90 90): "),
-            latBaseLabel = new NumericTextField(),
+            latBaseLabel = new JTextField(),
             GuiUtils.rLabel("Major Increment: "),
-            latIncrement = new NumericTextField(),
+            latIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
             latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
                 1)),
@@ -142,9 +141,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         JPanel lonPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), lonLabel = new JTextField(),
             GuiUtils.rLabel("Base (-180 180): "),
-            lonBaseLabel = new NumericTextField(),
+            lonBaseLabel = new JTextField(),
             GuiUtils.rLabel("Major Increment: "),
-            lonIncrement = new NumericTextField(),
+            lonIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
             lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
                 1)),
