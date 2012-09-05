@@ -88,9 +88,6 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     /** Map projection display */
     private MapProjectionDisplay mpDisplay;
 
-    /** flag for whether the user hit cancel or not */
-    private boolean ok;
-
     /** The frame parent */
     JFrame parent;
 
