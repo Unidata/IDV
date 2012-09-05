@@ -101,6 +101,12 @@ public class AxisScaleInfo {
         this.coordFormat = coordFormat;
     }
 
+    @Deprecated //9-5-2012
+    public void setCoordFormat(CoordSys coordFormat) {
+    	this.coordFormat = COORD_FORMATS[0];
+    }
+
+
     /**
      * Gets the base label.
      *
@@ -277,5 +283,11 @@ public class AxisScaleInfo {
 		if (visible != other.visible)
 			return false;
 		return true;
+	}
+	
+
+	@Deprecated //9-5-2012
+	public enum CoordSys {
+	    A,B,C,D,E,F,G,H;
 	}
 }
