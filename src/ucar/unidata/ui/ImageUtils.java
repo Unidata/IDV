@@ -617,15 +617,21 @@ public class ImageUtils {
         return bImage;
     }
 
-    /**
-     * Merge Images. The heuristic is not the same as {@link gridImages} so the results can be different.
-     *
-     * @param images the images that will be gridded
-     * @param space the space padding around each image.
-     * @param bg the background color "behind" the image.
-     * @param columns how many columns in the grid
-     * @return the image that has been gridded
-     */
+	/**
+	 * Merge Images. The heuristic is not the same as
+	 * {@link #gridImages(List, int, Color, int)} so the results can be
+	 * different.
+	 * 
+	 * @param images
+	 *            the images that will be gridded
+	 * @param space
+	 *            the space padding around each image.
+	 * @param bg
+	 *            the background color "behind" the image.
+	 * @param columns
+	 *            how many columns in the grid
+	 * @return the image that has been gridded
+	 */
     public static Image gridImages2(List<? extends Image> images, int space, Color bg, int columns) {
     	if (images.size() == 1) {
     		return images.get(0);

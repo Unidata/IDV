@@ -554,7 +554,7 @@ public class XmlEncoder extends XmlUtil {
      * XML encode the object
      *
      * @param object
-     * @return
+     * @return encoded object as XML string
      * @throws Exception
      */
     public static String encodeObject(Object object) throws Exception {

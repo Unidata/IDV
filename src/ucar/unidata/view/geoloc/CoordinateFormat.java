@@ -198,11 +198,10 @@ public class CoordinateFormat {
 
     /**
      * Format a longitude to the given format.
-     * @see #formatLongitude(double, String, boolean)
+     * {@link #formatLongitude(double, String, boolean)}
      *
      * @param value  the value to format
      * @param format the format
-     * @param use360      if true use 0-360 notation instead of -180 to 180 notation
      *
      * @return formatted latitude
      */
