@@ -639,14 +639,14 @@ public class ImageUtils {
 
                 // Make sure we are not going out of bounds in case grid is not complete in the last row.
                 if (i * columns + j < images.size()) {
-                    row.add(padImage(images.get(i * columns + j), space));
+                    row.add(padImage(images.get(i * columns + j), space, bg));
                 }
             }
 
             griddedImages.add(mergeHorizontal(row));
         }
 
-        return mergeVertical(griddedImages, bg);
+        return mergeVertical(griddedImages);
     }
 
     /**
@@ -654,13 +654,15 @@ public class ImageUtils {
      *
      * @param image the image
      * @param space the space
+     * @param color the color
      * @return the image
      */
-    public static Image padImage(Image image, int space) {
+    public static Image padImage(Image image, int space, Color color) {
         BufferedImage newImage = new BufferedImage(image.getWidth(null) + 2 * space, image.getHeight(null) + 2 * space,
                                      BufferedImage.TYPE_INT_RGB);
         Graphics g = newImage.getGraphics();
 
+        g.setColor(color);
         g.fillRect(0, 0, newImage.getWidth(null), newImage.getHeight(null));
         g.drawImage(image, space, space, null);
 
@@ -705,10 +707,9 @@ public class ImageUtils {
      * Merge the images vertically.
      *
      * @param images the images
-     * @param bg the background color
      * @return the image
      */
-    public static Image mergeVertical(List<? extends Image> images, Color bg) {
+    public static Image mergeVertical(List<? extends Image> images) {
         int w    = Integer.MIN_VALUE;
         int h    = 0;
         int hs[] = new int[images.size()];
@@ -732,7 +733,6 @@ public class ImageUtils {
 
             g.drawImage(im, 0, hs[i], null);
         }
-        g.setColor(bg);
 
         return bi;
     }
