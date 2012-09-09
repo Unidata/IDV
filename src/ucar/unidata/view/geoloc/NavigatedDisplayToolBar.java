@@ -156,6 +156,9 @@ public class NavigatedDisplayToolBar extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 try {
                     navDisplay.resetScaleTranslate();
+                    if (navDisplay instanceof GlobeDisplay) {
+                        navDisplay.setView(navDisplay.NORTH_VIEW);
+                    }
                 } catch (VisADException ve) {
                     ve.printStackTrace();
                 } catch (RemoteException re) {
