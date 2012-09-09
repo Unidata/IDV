@@ -455,8 +455,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             { "One frame back", CMD_BACKWARD, getIcon("StepBack") },
             { "Run/Stop", CMD_STARTSTOP, getIcon("Play") },
             { "One frame forward", CMD_FORWARD, getIcon("StepForward") },
-            { "Go to last frame", CMD_END, getIcon("FastForward") },
-            { "Properties", CMD_PROPS, getIcon("Information") }
+            { "Go to last frame", CMD_END, getIcon("FastForward") }
         };
 
         for (int i = 0; i < buttonInfo.length; i++) {
