@@ -178,7 +178,7 @@ public class TimesChooser extends IdvChooser {
 
     /** the time driver component */
     JComponent timeDriverComp = null;
-    
+
     /**
      * Create me.
      *
@@ -447,13 +447,13 @@ public class TimesChooser extends IdvChooser {
                     (List<DisplayControl>) vm.getControls()) {
                 if (control.getIsTimeDriver()) {
                     try {
-                        visad.Set  timeSet     = control.getTimeSet();
+                        visad.Set timeSet = control.getTimeSet();
                         DateTime[] driverTimes =
                             Animation.getDateTimeArray(timeSet);
                         List dslist = new ArrayList();
                         control.getDataChoice().getDataSources(dslist);
-                        DataSource     ds     = (DataSource) dslist.get(0);
-                        String         lable  = ds.getName();
+                        DataSource ds    = (DataSource) dslist.get(0);
+                        String     lable = ds.getName();
                         TwoFacedObject twoObj = new TwoFacedObject(lable,
                                                     driverTimes);
                         //   control.getDataChoice().getId());
@@ -542,7 +542,8 @@ public class TimesChooser extends IdvChooser {
      *  @return the times panel
      */
     protected JPanel makeTimesPanel(boolean includeExtra,
-                                    boolean useTimeLine, boolean includeTimeDriver) {
+                                    boolean useTimeLine,
+                                    boolean includeTimeDriver) {
 
         pushIgnore();
         JButton timelineBtn =
@@ -607,7 +608,8 @@ public class TimesChooser extends IdvChooser {
             }
         };
         drivercbx = new JCheckBox(TIME_MATCHING_LABEL, getDoTimeDrivers());
-        drivercbx.setToolTipText("Use the times from the time driver in the view");
+        drivercbx.setToolTipText(
+            "Use the times from the time driver in the view");
         drivercbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setDoTimeDrivers(((JCheckBox) e.getSource()).isSelected());
@@ -621,7 +623,8 @@ public class TimesChooser extends IdvChooser {
                             "No Time Driver",
                             new JLabel("Please set a time driver first."));
                         ((JCheckBox) e.getSource()).setSelected(false);
-                        setDoTimeDrivers(((JCheckBox) e.getSource()).isSelected());
+                        setDoTimeDrivers(
+                            ((JCheckBox) e.getSource()).isSelected());
                         // drivercbx.setState(false);
                     } else {
                         disableTimeWidgets();
@@ -722,33 +725,35 @@ public class TimesChooser extends IdvChooser {
     }
 
     /**
-     *  Check the current active view window and make sure it does 
+     *  Check the current active view window and make sure it does
      *  has a time driver, otherwise, reset the active view window
+     *
+     * @return true if active view has a time driver
      */
     protected boolean checkActiveViewWithDriver() {
-        List<ViewManager>    vms = getIdv().getVMManager().getViewManagers();
-        
-        int size = vms.size();
-        ViewManager vm0 ;
+        List<ViewManager> vms  = getIdv().getVMManager().getViewManagers();
 
-        if(  size == 1)
-            return true; // only one view window and we already check there is driver
-        else {
+        int               size = vms.size();
+        ViewManager       vm0;
+
+        if (size == 1) {
+            return true;  // only one view window and we already check there is driver
+        } else {
             vm0 = getIdv().getVMManager().getLastActiveViewManager();
             List tdt = null;
-            try{
+            try {
                 tdt = vm0.getTimeDriverTimes();
             } catch (Exception e) {}
 
-            if(tdt != null)
+            if (tdt != null) {
                 return true;
-            else {
+            } else {
                 //LogUtil.userErrorMessage("Error: there is no time driver in the current active view window, please select or set " +
                 //        "the view window with time driver! \n");
                 LogUtil.userErrorMessage(
-                        new JLabel(
-                                "<html>Error: there is no time driver in the current active view window, please select or set" +
-                                        " the view window with time driver! </html>"));
+                    new JLabel(
+                        "<html>Error: there is no time driver in the current active view window, please select or set"
+                        + " the view window with time driver! </html>"));
                 return false;
             }
 
@@ -761,17 +766,20 @@ public class TimesChooser extends IdvChooser {
      * load button. Should be overwritten by a derived class.
      */
     public void doLoad() {
-        if(autoCreateDisplayCbx == null)  {
+        if (autoCreateDisplayCbx == null) {
             super.doLoad();
-        } else if( drivercbx.isSelected() && autoCreateDisplayCbx.isSelected()) {
-            if(!checkActiveViewWithDriver())
+        } else if (drivercbx.isSelected()
+                   && autoCreateDisplayCbx.isSelected()) {
+            if ( !checkActiveViewWithDriver()) {
                 return;
-            else
+            } else {
                 super.doLoad();
+            }
         } else {
             super.doLoad();
         }
     }
+
     /**
      * Enable the absolute times list
      *
@@ -885,7 +893,7 @@ public class TimesChooser extends IdvChooser {
         driverMenuList = new ArrayList();
 
         if (size > 0) {
-            List           atime  = getAbsoluteTimes();
+            List atime = getAbsoluteTimes();
             TwoFacedObject twoObj =
                 new TwoFacedObject(TIME_MATCHING_LABEL_INIT, atime);
             JMenuItem ji = GuiUtils.makeMenuItem((String) twoObj.getLabel(),
@@ -1509,6 +1517,13 @@ public class TimesChooser extends IdvChooser {
      */
     public static void addTimeSelectionListener(final JList list,
             final Timeline timeline) {
+        list.addMouseListener(
+            new ucar.unidata.ui.event.PopupTriggerListener() {
+            public void showPopup(MouseEvent e) {
+                popupTimeSelection(e, list, timeline);
+            }
+        });
+        /*
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -1516,9 +1531,10 @@ public class TimesChooser extends IdvChooser {
                 }
             }
         });
+        */
         if (list.getToolTipText() == null) {
             list.setToolTipText(
-                "Right mouse to show range select popup menu");
+                "Use right mouse to show range selection popup menu");
         }
 
     }
