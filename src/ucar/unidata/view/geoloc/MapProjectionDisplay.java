@@ -738,7 +738,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             Double d  = round(values[0], 3, BigDecimal.ROUND_HALF_UP);
 
             double mm = (i - base) % inc;
-            
+
             if ((mm < DELTA) || (mm > (inc - DELTA))) {  // Must account for numerical leeway.
                 majorTicks.add(d);
 
@@ -797,7 +797,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             Double             d      = new Double(values[0]);
 
             double             mm     = (base - i) % inc;
-            
+
             if ((mm < DELTA) || (mm > (inc - DELTA))) {  // Must account for numerical leeway.
                 majorTicks.add(d);
                 labelTable.put(d, CoordinateFormat.formatLongitude(i,
@@ -849,10 +849,15 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setTicksVisible(true);
         scale.setMajorTickSpacing(0);
         scale.setMinorTickSpacing(0);
-        scale.setFont(((axisFont != null)
-                       && axisFont.equals(FontSelector.DEFAULT_FONT))
-                      ? (Font) null
-                      : axisFont);
+
+        if ((axisFont != null)
+                && axisFont.getName().equals(
+                    FontSelector.DEFAULT_FONT.getName())) {
+            scale.setFont((Font) null);
+            scale.setLabelSize(axisFont.getSize());
+        } else {
+            scale.setFont(axisFont);
+        }
     }
 
     /**
