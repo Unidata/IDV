@@ -135,7 +135,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
             GuiUtils.rLabel("Major Increment: "),
             latIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
-            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
+            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10,
                 1)),
             GuiUtils.rLabel("Visible: "), yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -146,7 +146,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
             GuiUtils.rLabel("Major Increment: "),
             lonIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
-            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
+            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10,
                 1)),
             GuiUtils.rLabel("Visible: "), xVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
