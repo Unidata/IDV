@@ -21,6 +21,7 @@
 package ucar.unidata.view.geoloc;
 
 
+
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -32,14 +33,12 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
-
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.MapLines;
 import ucar.visad.display.ScalarMapSet;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
-
 import visad.AxisScale;
 import visad.CachingCoordinateSystem;
 import visad.CommonUnit;
@@ -64,10 +63,8 @@ import visad.Unit;
 import visad.UnitException;
 import visad.VisADException;
 import visad.VisADRay;
-
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.BaseMapAdapter;
-
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
@@ -110,8 +107,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-
-
 /**
  * Provides a navigated VisAD DisplayImpl for displaying data.
  * The Projection or MapProjection provides the transformation from
@@ -741,9 +736,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             if ((minorTickInc == 1) || (cnt % minorTickInc) == 0) {
                 majorTicks.add(d);
-                
+
                 labelTable.put(d, CoordinateFormat.formatLongitude(i,
-                        lonScaleInfo.getCoordFormat(), lonScaleInfo.isUse360()));
+                        lonScaleInfo.getCoordFormat(),
+                        lonScaleInfo.isUse360()));
             } else {
                 minorTicks.add(d);
             }
@@ -803,7 +799,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 majorTicks.add(d);
 
                 labelTable.put(d, CoordinateFormat.formatLongitude(i,
-                        lonScaleInfo.getCoordFormat(), lonScaleInfo.isUse360()));
+                        lonScaleInfo.getCoordFormat(),
+                        lonScaleInfo.isUse360()));
             } else {
                 minorTicks.add(d);
             }
@@ -852,8 +849,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         scale.setTicksVisible(true);
         scale.setMajorTickSpacing(0);
         scale.setMinorTickSpacing(0);
-        scale.setFont((axisFont == null)
-                      ? FontSelector.DEFAULT_FONT
+        scale.setFont(((axisFont != null)
+                       && axisFont.equals(FontSelector.DEFAULT_FONT))
+                      ? (Font) null
                       : axisFont);
     }
 
