@@ -75,7 +75,7 @@ Then (see below):
 
   Update the index.html page (see below).
 
-  branch the SVN repository
+  branch the git repository
 
   change the /content/software/idv/current to point to the new release.
 
@@ -145,16 +145,14 @@ Open http://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
 Test all the links to the docs.  Fix any broken links.
 
 ***********************************************************************
-Branch the SVN repository:
+Branch the git repository:
 
-After the release of a version, you should make a brand in the SVN repository
-in case changes are needed later.  To branch the SVN repository,
+After the release of a version, you should make a branch in the git repository
+in case changes are needed later.  To branch the git repository,
 run:
 
-svn copy https://sub.unidata.ucar.edu/idv/trunk https://sub.unidata.ucar.edu/idv/branches/IDV_<version>  -m "some info"
-
-where <version> is the version (e.g., 2.8).  "some info" is needed, otherwise the svn copy would
-require some EDITOR env. setting.
+git checkout -b IDV_<version>
+git push origin IDV_<version>
 
 ***********************************************************************
 Update the current and stable links:
@@ -267,8 +265,8 @@ http://www.ej-technologies.com/products/install4j/overview.html.  The
 Unidata Admin staff has the license information.  The license server
 runs on abbott as of October 2011.
 
-The configuration file is in svn:
-/ucar/unidata/idv/release/installer/idv.install4j.  This file is used
+The configuration file is in git:
+/src/ucar/unidata/idv/release/installer/idv.install4j.  This file is used
 as a template for the installer and copied to /share/idv/installers
 during the build process.  At that point, the version number is filled
 in.
