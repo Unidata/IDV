@@ -40,6 +40,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import ucar.unidata.ui.FontSelector;
+import ucar.unidata.util.AxisScaleInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 
