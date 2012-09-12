@@ -1241,23 +1241,40 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             double base = calcLatBase();
             double end  = calcLatTop();
-            int    inc  = (int) round(Math.abs(end - base) / 5d, 0,
-                                  BigDecimal.ROUND_HALF_UP);
-
-            lsi.setIncrement(((inc == 0)
-                              ? 10
-                              : inc) + "");  // Keep the number reasonable
+            double inc  = Math.abs(end - base) / 10d;
+            lsi.setIncrement(makeIncrementNice(inc) + "");
+            base = (Math.floor(base / 10)) * 10;  // Make base nice (i.e. multiple of 10)            
             base = (base < -90)
                    ? -90
                    : base;
             base = (base > 90)
                    ? 90
                    : base;
-            latScaleInfo.setBaseLabel(round(base, 0,
-                                            BigDecimal.ROUND_HALF_UP) + "");
+            latScaleInfo.setBaseLabel(base + "");
         }
 
         return latScaleInfo;
+    }
+
+    /**
+     * Make increment nice for the user.
+     *
+     * @param inc the not nice inc
+     * @return the nice increment
+     */
+    private double makeIncrementNice(double inc) {
+        //Somewhat arbitrary
+        double[] niceNums = {
+            0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 20, 25, 30, 40,
+            50, 60, 70, 80
+        };
+
+        for (int i = 0; i < niceNums.length; i++) {
+            if (inc < niceNums[i]) {
+                return niceNums[i];
+            }
+        }
+        return 10;
     }
 
     /**
@@ -1281,21 +1298,23 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             double base = calcLonBase();
             double end  = calcLonTop();
-            int    inc;
+            double inc;
 
             if (isSouthPole()) {
-                inc = (int) round(Math.abs((end - 360) - base) / 5d, 0,
-                                  BigDecimal.ROUND_HALF_UP);
+                inc = Math.abs((end - 360) - base) / 10d;
             } else {
-                inc = (int) round(Math.abs(end - ((base > end)
-                        ? base - 360
-                        : base)) / 5d, 0, BigDecimal.ROUND_HALF_UP);
+                inc = Math.abs(end - ((base > end)
+                                      ? base - 360
+                                      : base)) / 10d;
             }
 
             // Must deal with meridian
-            lsi.setIncrement(((inc == 0)
-                              ? 10
-                              : inc) + "");  // Keep the number reasonable
+            lsi.setIncrement(makeIncrementNice(inc) + "");
+            //
+            base = (Math.floor(base / 10)) * 10;  // Make base nice (i.e. multiple of 10)
+            base = (base < -180)
+                   ? -180
+                   : base;
             base = (base > 180)
                    ? (base - 360)
                    : base;
