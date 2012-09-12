@@ -1279,17 +1279,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             lsi.setCoordFormat(AxisScaleInfo.COORD_FORMATS[0]);
             lsi.setUse360(false);
 
-            double[]      xRange = xMap.getRange();
-            double[]      yRange = yMap.getRange();
-            double[]      zRange = (zMap != null)
-                                   ? zMap.getRange()
-                                   : new double[] { 0, 0 };
-            EarthLocation el1    = getEarthLocation(xRange[0], yRange[0],
-                                    zRange[0]);
-            double        base = calcLonBase();
-            EarthLocation el2  = getEarthLocation(xRange[1], yRange[0],
-                                    zRange[0]);
-            double end = calcLonTop();
+            double base = calcLonBase();
+            double end  = calcLonTop();
             int    inc;
 
             if (isSouthPole()) {
