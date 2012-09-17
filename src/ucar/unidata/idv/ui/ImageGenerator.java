@@ -1102,7 +1102,7 @@ public class ImageGenerator extends IdvManager {
         String server      = applyMacros(node, ATTR_SERVER);
         String destination = applyMacros(node, ATTR_DESTINATION);
         String user        = applyMacros(node, ATTR_USER, "anonymous");
-        String password    = applyMacros(node, ATTR_PASSWORD,
+        String password = applyMacros(node, ATTR_PASSWORD,
                                       "idvuser@unidata.ucar.edu");
         byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(file));
         ftpPut(server, user, password, destination, bytes);
@@ -1847,7 +1847,7 @@ public class ImageGenerator extends IdvManager {
             } else {
                 try {
                     String bundleXml = IOUtil.readContents(bundle);
-                    Object obj       =
+                    Object obj =
                         getIdv().getEncoderForRead().toObject(bundleXml);
                     if ( !(obj instanceof DataSource)) {
                         return error("datasource bundle is not a DataSource:"
@@ -1976,7 +1976,8 @@ public class ImageGenerator extends IdvManager {
 
         if (vms.size() == 0) {
             StringBuffer properties = new StringBuffer();
-            List         nodes      = XmlUtil.findChildren(node, TAG_PROPERTY);
+            List         nodes      = XmlUtil.findChildren(node,
+                                          TAG_PROPERTY);
             for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
                 Element child = (Element) nodes.get(childIdx);
                 properties.append(applyMacros(child, ATTR_NAME) + "="
@@ -2100,9 +2101,9 @@ public class ImageGenerator extends IdvManager {
                 mb.instance_unmake_matrix(rot, scale, trans, currentMatrix);
                 double scaleValue = applyMacros(node, ATTR_SCALE, 0.0);
                 if (scaleValue != 0) {
-                    double   scaleX      = scaleValue * a[0];
-                    double   scaleY      = scaleValue * a[1];
-                    double   scaleZ      = scaleValue * a[2];
+                    double scaleX = scaleValue * a[0];
+                    double scaleY = scaleValue * a[1];
+                    double scaleZ = scaleValue * a[2];
                     double[] scaleMatrix = mb.make_matrix(0.0, 0.0, 0.0,
                                                scaleX / scale[0],
                                                scaleY / scale[1],
@@ -2352,8 +2353,8 @@ public class ImageGenerator extends IdvManager {
         List fileList = new ArrayList();
         getPersistenceManager().clearFileMapping();
         for (int i = 0; i < nodes.size(); i++) {
-            Element child        = (Element) nodes.get(i);
-            String  dataSourceId = XmlUtil.getAttribute(child,
+            Element child       = (Element) nodes.get(i);
+            String dataSourceId = XmlUtil.getAttribute(child,
                                       ATTR_DATASOURCE);
             ids.add(dataSourceId);
             List files = new ArrayList();
@@ -3093,6 +3094,13 @@ public class ImageGenerator extends IdvManager {
                 }
                 dataSelection.setTimes(times);
             }
+            if (XmlUtil.hasAttribute(node, ATTR_ENSEMBLES)) {
+                List ensList =
+                    StringUtil.parseIntegerListString(applyMacros(node,
+                        ATTR_ENSEMBLES, (String) null));
+                dataSelection.putProperty(
+                    GridDataSource.PROP_ENSEMBLEMEMBERS, ensList);
+            }
             dataChoice.setDataSelection(dataSelection);
             dataChoices.add(dataChoice);
         }
@@ -3300,7 +3308,7 @@ public class ImageGenerator extends IdvManager {
                     files.add(new File(filename));
                     continue;
                 }
-                File   dir     = new File(applyMacros(node, ATTR_DIR, "."));
+                File dir = new File(applyMacros(node, ATTR_DIR, "."));
                 String pattern = applyMacros(applyMacros(node, ATTR_PATTERN,
                                      (String) null));
                 File[] allFiles = ((pattern == null)
@@ -3321,7 +3329,7 @@ public class ImageGenerator extends IdvManager {
                     }
                 }
 
-                String sort    = applyMacros(node, ATTR_SORT, (String) null);
+                String sort = applyMacros(node, ATTR_SORT, (String) null);
                 String sortDir = applyMacros(node, ATTR_SORTDIR,
                                              VALUE_ASCENDING);
                 if (sort != null) {
@@ -4144,7 +4152,7 @@ public class ImageGenerator extends IdvManager {
                         + XmlUtil.toString(scriptingNode));
             }
             String loopFilename = applyMacros(filename);
-            String what         = applyMacros(scriptingNode, ATTR_WHAT,
+            String what = applyMacros(scriptingNode, ATTR_WHAT,
                                       (String) null);
 
             ViewManager viewManager = display.getViewManagerForCapture(what);
@@ -4203,7 +4211,7 @@ public class ImageGenerator extends IdvManager {
                     getIdv().getIdvUIManager(), 0);
                 lastImage       = viewManager.getMaster().getImage(false);
                 imageProperties = new Hashtable();
-                lastImage       = processImage((BufferedImage) lastImage,
+                lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
                                          getAllProperties(), viewManager,
                                          imageProperties);
@@ -4385,8 +4393,8 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_DISPLAYLIST)) {
                 if (viewManager != null) {
                     newImage = ImageUtils.toBufferedImage(image, true);
-                    Graphics g      = newImage.getGraphics();
-                    String   valign = applyMacros(child, ATTR_VALIGN,
+                    Graphics g = newImage.getGraphics();
+                    String valign = applyMacros(child, ATTR_VALIGN,
                                         VALUE_BOTTOM);
                     Font font = getFont(child);
                     if (XmlUtil.hasAttribute(child, ATTR_MATTEBG)) {
@@ -4442,15 +4450,15 @@ public class ImageGenerator extends IdvManager {
                     controls = Misc.newList(display);
                 }
 
-                int    width     = applyMacros(child, ATTR_WIDTH, 150);
-                int    height    = applyMacros(child, ATTR_HEIGHT, 20);
-                int    ticks     = applyMacros(child, ATTR_TICKMARKS, 0);
-                double interval  = applyMacros(child, ATTR_INTERVAL, -1.0);
+                int    width    = applyMacros(child, ATTR_WIDTH, 150);
+                int    height   = applyMacros(child, ATTR_HEIGHT, 20);
+                int    ticks    = applyMacros(child, ATTR_TICKMARKS, 0);
+                double interval = applyMacros(child, ATTR_INTERVAL, -1.0);
                 String valuesStr = applyMacros(child, ATTR_VALUES,
                                        (String) null);
-                Color     c = applyMacros(child, ATTR_COLOR, Color.black);
+                Color c = applyMacros(child, ATTR_COLOR, Color.black);
 
-                Color     lineColor = applyMacros(child, ATTR_LINECOLOR, c);
+                Color lineColor = applyMacros(child, ATTR_LINECOLOR, c);
 
                 Rectangle imageRect = new Rectangle(0, 0, imageWidth,
                                           imageHeight);
@@ -4580,9 +4588,9 @@ public class ImageGenerator extends IdvManager {
                                 : 0));
                     }
                     setFont(g, child);
-                    FontMetrics fm              = g.getFontMetrics();
-                    List        values          = new ArrayList();
-                    String      suffixFrequency = XmlUtil.getAttribute(child,
+                    FontMetrics fm     = g.getFontMetrics();
+                    List        values = new ArrayList();
+                    String suffixFrequency = XmlUtil.getAttribute(child,
                                                  ATTR_SUFFIXFREQUENCY,
                                                  XmlUtil.getAttribute(child,
                                                      ATTR_SHOWUNIT,
@@ -4810,7 +4818,7 @@ public class ImageGenerator extends IdvManager {
                         greenRange, blueRange);
             } else if (tagName.equals(TAG_SHOW)) {
                 JComponent contents = new JLabel(new ImageIcon(image));
-                String     message  = applyMacros(child, ATTR_MESSAGE,
+                String message = applyMacros(child, ATTR_MESSAGE,
                                              (String) null);
                 if (message != null) {
                     contents = GuiUtils.topCenter(new JLabel(message),
@@ -4844,7 +4852,7 @@ public class ImageGenerator extends IdvManager {
                     }
                     NavigatedDisplay display =
                         (NavigatedDisplay) viewManager.getMaster();
-                    MapProjection mapProjection    = dc.getDataProjection();
+                    MapProjection mapProjection = dc.getDataProjection();
                     java.awt.geom.Rectangle2D rect =
                         mapProjection.getDefaultMapArea();
                     LatLonPoint llplr =
@@ -4972,8 +4980,8 @@ public class ImageGenerator extends IdvManager {
                         putProperty("row", new Integer(row));
                         putProperty("column", new Integer(col));
                         putProperty("count", new Integer(++cnt));
-                        String realFile   = applyMacros(file, myprops);
-                        Image  splitImage = image.getSubimage(hSpace * col,
+                        String realFile = applyMacros(file, myprops);
+                        Image splitImage = image.getSubimage(hSpace * col,
                                                vSpace * row, hSpace, vSpace);
                         processImage(ImageUtils.toBufferedImage(splitImage),
                                      realFile, child, myprops, viewManager,
@@ -5000,8 +5008,8 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_OVERLAY)) {
                 double transparency = applyMacros(child, ATTR_TRANSPARENCY,
                                           0.0);
-                Graphics2D g         = (Graphics2D) image.getGraphics();
-                String     imagePath = applyMacros(child, ATTR_IMAGE,
+                Graphics2D g = (Graphics2D) image.getGraphics();
+                String imagePath = applyMacros(child, ATTR_IMAGE,
                                        (String) null);
 
                 Rectangle imageRect = new Rectangle(0, 0, imageWidth,
@@ -5032,7 +5040,7 @@ public class ImageGenerator extends IdvManager {
                     int         width  = (int) rect.getWidth();
                     int         height = (int) (rect.getHeight());
 
-                    Point       ap = ImageUtils.parsePoint(applyMacros(child,
+                    Point ap = ImageUtils.parsePoint(applyMacros(child,
                                    ATTR_ANCHOR,
                                    "lr,-10,-10"), new Rectangle(0, 0, width,
                                        height));
@@ -5055,9 +5063,9 @@ public class ImageGenerator extends IdvManager {
                             overlay = ImageUtils.setAlpha(overlay,
                                     transparency);
                         }
-                        int   width  = overlay.getWidth(null);
-                        int   height = overlay.getHeight(null);
-                        Point ap     = ImageUtils.parsePoint(applyMacros(child,
+                        int width  = overlay.getWidth(null);
+                        int height = overlay.getHeight(null);
+                        Point ap = ImageUtils.parsePoint(applyMacros(child,
                                        ATTR_ANCHOR,
                                        "lr,-10,-10"), new Rectangle(0, 0,
                                            width, height));
@@ -5100,7 +5108,7 @@ public class ImageGenerator extends IdvManager {
                     if (viewManager != null) {
                         bounds = viewManager.getVisibleGeoBounds();
                         ImageSequenceGrabber.subsetBounds(bounds, imageProps);
-                        String tail         = IOUtil.getFileTail(file);
+                        String tail = IOUtil.getFileTail(file);
                         String tmpImageFile =
                             getIdv().getStore().getTmpFile(tail + ".png");
                         ImageUtils.writeImageToFile(image, tmpImageFile,
@@ -5171,11 +5179,11 @@ public class ImageGenerator extends IdvManager {
         }
         MapViewManager   mvm     = (MapViewManager) viewManager;
         NavigatedDisplay display = (NavigatedDisplay) viewManager.getMaster();
-        DecimalFormat    format  = new DecimalFormat(applyMacros(child,
+        DecimalFormat format = new DecimalFormat(applyMacros(child,
                                    ATTR_FORMAT, "##0.0"));
-        Color    color     = applyMacros(child, ATTR_COLOR, Color.red);
-        Color    lineColor = applyMacros(child, ATTR_LINECOLOR, color);
-        Color    bg = applyMacros(child, ATTR_LABELBACKGROUND, (Color) null);
+        Color color     = applyMacros(child, ATTR_COLOR, Color.red);
+        Color lineColor = applyMacros(child, ATTR_LINECOLOR, color);
+        Color bg = applyMacros(child, ATTR_LABELBACKGROUND, (Color) null);
 
         double[] latValues = Misc.parseDoubles(applyMacros(child,
                                  ATTR_LAT_VALUES, ""));
@@ -5241,7 +5249,8 @@ public class ImageGenerator extends IdvManager {
 
         int lineOffsetRight = applyMacros(child, ATTR_LINEOFFSET_RIGHT, 0);
         int lineOffsetLeft = applyMacros(child, ATTR_LINEOFFSET_LEFT, 0);
-        int         lineOffsetTop = applyMacros(child, ATTR_LINEOFFSET_TOP, 0);
+        int         lineOffsetTop = applyMacros(child, ATTR_LINEOFFSET_TOP,
+                                        0);
         int lineOffsetBottom = applyMacros(child, ATTR_LINEOFFSET_BOTTOM, 0);
 
 
@@ -5322,7 +5331,7 @@ public class ImageGenerator extends IdvManager {
 
 
         for (int i = 0; i < latValues.length; i++) {
-            double lat     = latValues[i];
+            double lat = latValues[i];
             double percent = 1.0
                              - (lat - se.getLatitude().getValue())
                                / heightDegrees;
@@ -5457,8 +5466,8 @@ public class ImageGenerator extends IdvManager {
      * @param node Node to get font info from
      */
     private void setFont(Graphics g, Element node) {
-        int  fontSize = applyMacros(node, ATTR_FONTSIZE, 12);
-        Font f        = new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
+        int fontSize = applyMacros(node, ATTR_FONTSIZE, 12);
+        Font f = new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
                           Font.PLAIN, fontSize);
         g.setFont(f);
     }
@@ -5757,7 +5766,7 @@ public class ImageGenerator extends IdvManager {
             StringBuffer sb       = (StringBuffer) buffers.get(where);
             String       template = (String) templates.get(where);
             if (sb == null) {
-                sb       = new StringBuffer();
+                sb = new StringBuffer();
                 template = XmlUtil.getAttribute(outputNode,
                         ATTR_TEMPLATE + ":" + where, "${text}");
                 if (template.startsWith("file:")) {
@@ -5806,7 +5815,7 @@ public class ImageGenerator extends IdvManager {
          */
         public void write() throws Throwable {
             String outputFile = applyMacros(outputNode, ATTR_FILE);
-            String template   = applyMacros(outputNode, ATTR_TEMPLATE,
+            String template = applyMacros(outputNode, ATTR_TEMPLATE,
                                           (String) null);
             if (template == null) {
                 template = "${contents}";
