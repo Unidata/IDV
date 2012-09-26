@@ -258,10 +258,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private DisplayTupleType displayTupleType;
 
     /** The lat scale info */
-    private AxisScaleInfo latScaleInfo;
+    private LatLonAxisScaleInfo latScaleInfo;
 
     /** The lon scale info */
-    private AxisScaleInfo lonScaleInfo;
+    private LatLonAxisScaleInfo lonScaleInfo;
 
     /** The MapProjection */
     private MapProjection mapProjection;
@@ -635,7 +635,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    topLat     = calcLatTop();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLatScaleInfo().getBaseLabel());
+        double       base =
+            Misc.parseNumber(getLatScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLatScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -693,9 +694,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    leftLon         = calcLonBase();
         double                    rightLon        = calcLonTop();
         boolean                   isMeridianCross = leftLon > rightLon;
-        Hashtable<Double, String> labelTable      = new Hashtable<Double,
+        Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base =
+            Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -771,7 +773,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    bottomLat  = calcLatBase();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base =
+            Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -993,7 +996,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         double[] zRange = zMap.getRange();
-        String   title  = verticalParameter.getName() + "("
+        String title = verticalParameter.getName() + "("
                        + verticalRangeUnit.getIdentifier() + ")";
 
         updateVertScale(verticalScale, title, zRange, minVerticalRange,
@@ -1196,26 +1199,26 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     /**
      * Sets the lat scale info.
      *
-     * @param latScaleInfo the new lat scale info
+     * @param axisScaleInfo the new lat scale info
      * @throws RemoteException the remote exception
      * @throws VisADException the vis ad exception
      */
-    public void setLatScaleInfo(AxisScaleInfo latScaleInfo)
+    public void setLatScaleInfo(LatLonAxisScaleInfo axisScaleInfo)
             throws RemoteException, VisADException {
-        this.latScaleInfo = latScaleInfo;
+        this.latScaleInfo = axisScaleInfo;
         makeLatScales();
     }
 
     /**
      * Sets the lon scale info.
      *
-     * @param lonScaleInfo the new lon scale info
+     * @param axisScaleInfo the new lon scale info
      * @throws RemoteException the remote exception
      * @throws VisADException the vis ad exception
      */
-    public void setLonScaleInfo(AxisScaleInfo lonScaleInfo)
+    public void setLonScaleInfo(LatLonAxisScaleInfo axisScaleInfo)
             throws RemoteException, VisADException {
-        this.lonScaleInfo = lonScaleInfo;
+        this.lonScaleInfo = axisScaleInfo;
         makeLonScales();
     }
 
@@ -1224,19 +1227,19 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @return the lat scale info
      */
-    public AxisScaleInfo getLatScaleInfo() {
-        // The 2nd null check is kludgy, but sometimes AxisScaleInfo
+    public LatLonAxisScaleInfo getLatScaleInfo() {
+        // The 2nd null check is kludgy, but sometimes LatLonAxisScaleInfo
         //deserialization will have problems in which case all fields 
         //are null. 
         if ((latScaleInfo == null) || (latScaleInfo.getBaseLabel() == null)) {
-            AxisScaleInfo lsi = new AxisScaleInfo();
+            LatLonAxisScaleInfo lsi = new LatLonAxisScaleInfo();
 
             latScaleInfo = lsi;
             lsi.setLabel("Latitude");
             lsi.setIncrement(10 + "");
             lsi.setMinorDivision(1);
             lsi.setVisible(true);
-            lsi.setCoordFormat(AxisScaleInfo.COORD_FORMATS[0]);
+            lsi.setCoordFormat(LatLonAxisScaleInfo.COORD_FORMATS[0]);
             lsi.setUse360(latScaleInfo.isUse360());
 
             double base = calcLatBase();
@@ -1282,18 +1285,18 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @return the lon scale info
      */
-    public AxisScaleInfo getLonScaleInfo() {
-        // The 2nd null check is kludgy, but sometimes AxisScaleInfo
+    public LatLonAxisScaleInfo getLonScaleInfo() {
+        // The 2nd null check is kludgy, but sometimes LatLonAxisScaleInfo
         //deserialization will have problems in which case all fields 
         //are null. 
         if ((lonScaleInfo == null) || (lonScaleInfo.getBaseLabel() == null)) {
-            AxisScaleInfo lsi = new AxisScaleInfo();
+            LatLonAxisScaleInfo lsi = new LatLonAxisScaleInfo();
 
             lonScaleInfo = lsi;
             lsi.setLabel("Longitude");
             lsi.setMinorDivision(1);
             lsi.setVisible(true);
-            lsi.setCoordFormat(AxisScaleInfo.COORD_FORMATS[0]);
+            lsi.setCoordFormat(LatLonAxisScaleInfo.COORD_FORMATS[0]);
             lsi.setUse360(false);
 
             double base = calcLonBase();
@@ -1623,7 +1626,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             xy        = coordinateSystem.toReference(xy);
             values[0] = xy[0];
             values[1] = xy[1];
-            xyRegion  =
+            xyRegion =
                 new Gridded2DSet(RealTupleType.SpatialCartesian2DTuple,
                                  values, 2);
         } else {
@@ -1841,10 +1844,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             // to be equal to the range of the projection if the
             // X coordinate is approximately equal to Longitude.
             // For now, this is only LatLonProjections and TrivalMP's
-            double        minLon    = -360;
-            double        maxLon    = 360.;
-            double        centerLon = 0;
-            MapProjection mp        =
+            double minLon    = -360;
+            double maxLon    = 360.;
+            double centerLon = 0;
+            MapProjection mp =
                 ((MapProjection3DAdapter) coordinateSystem)
                     .getMapProjection();
             boolean isLatLon = false;
@@ -1998,8 +2001,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         // TODO: java2d
         // if(true) return;
-        VisADRay      ray = getRay(x, y);
-        EarthLocation el  = getEarthLocation(ray.position[0], ray.position[1],
+        VisADRay ray = getRay(x, y);
+        EarthLocation el = getEarthLocation(ray.position[0], ray.position[1],
                                             ray.position[2]);
 
         updateLocation(el);
@@ -2430,7 +2433,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             super(Display.DisplaySpatialCartesianTuple,
                   new Unit[] { CommonUnit.degree,
                                CommonUnit.degree, null });
-            this.mapProjection       = mapProjection;
+            this.mapProjection = mapProjection;
             this.theCoordinateSystem =
                 new CachingCoordinateSystem(this.mapProjection);
             latIndex = mapProjection.getLatitudeIndex();

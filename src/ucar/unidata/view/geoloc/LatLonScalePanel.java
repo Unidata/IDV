@@ -2,17 +2,17 @@
  * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -21,11 +21,17 @@
 package ucar.unidata.view.geoloc;
 
 
+import ucar.unidata.ui.FontSelector;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,10 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-
-import ucar.unidata.ui.FontSelector;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 
 
 /**
@@ -68,7 +70,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private JSpinner latMinorSpinner;
 
     /** Lat scale info */
-    private AxisScaleInfo latScaleInfo;
+    private LatLonAxisScaleInfo latScaleInfo;
 
     /** Longitude base label */
     private JTextField lonBaseLabel;
@@ -83,7 +85,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private JSpinner lonMinorSpinner;
 
     /** Lon scale info */
-    private AxisScaleInfo lonScaleInfo;
+    private LatLonAxisScaleInfo lonScaleInfo;
 
     /** Map projection display */
     private MapProjectionDisplay mpDisplay;
@@ -125,7 +127,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
-        fontSelector       = new FontSelector(FontSelector.COMBOBOX_UI, false,
+        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
 
         JPanel latPanel = GuiUtils.doLayout(new Component[] {
@@ -163,7 +165,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         JPanel formatPanel = GuiUtils.doLayout(new Component[] {
                                  GuiUtils.rLabel("Format: "),
                                  coordFormat = new JComboBox(
-                                     AxisScaleInfo.COORD_FORMATS),
+                                     LatLonAxisScaleInfo.COORD_FORMATS),
                                  GuiUtils.rLabel(" 0-360 Longitude"),
                                  use360 = new JCheckBox("", false) }, 4,
                                      GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -248,7 +250,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      * @return Was it successful
      */
     public boolean doApply() {
-        AxisScaleInfo newLatInfo = new AxisScaleInfo();
+        LatLonAxisScaleInfo newLatInfo = new LatLonAxisScaleInfo();
 
         newLatInfo.setLabel(latLabel.getText());
         newLatInfo.setBaseLabel(latBaseLabel.getText());
@@ -265,7 +267,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
             latScaleInfo = newLatInfo;
         }
 
-        AxisScaleInfo newLonInfo = new AxisScaleInfo();
+        LatLonAxisScaleInfo newLonInfo = new LatLonAxisScaleInfo();
 
         newLonInfo.setLabel(lonLabel.getText());
         newLonInfo.setBaseLabel(lonBaseLabel.getText());
@@ -301,7 +303,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      *
      * @param latScaleInfo the new lat scale info
      */
-    public void setLatScaleInfo(AxisScaleInfo latScaleInfo) {
+    public void setLatScaleInfo(LatLonAxisScaleInfo latScaleInfo) {
         this.latScaleInfo = latScaleInfo;
     }
 
@@ -310,7 +312,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      *
      * @param lonScaleInfo the new lon scale info
      */
-    public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) {
+    public void setLonScaleInfo(LatLonAxisScaleInfo lonScaleInfo) {
         this.lonScaleInfo = lonScaleInfo;
     }
 
