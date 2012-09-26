@@ -271,6 +271,9 @@ public class CoordinateFormat {
                     : Cardinality.WEST;
             value = Math.abs(value);
         } else {
+            value = (value > 180)
+                    ? (value - 360)
+                    : value;
             c = Cardinality.NONE;
         }
 
