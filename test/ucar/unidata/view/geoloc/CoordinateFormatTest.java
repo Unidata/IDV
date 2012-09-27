@@ -28,6 +28,7 @@ import ucar.unidata.view.geoloc.CoordinateFormat.DecimalCoordFormat;
 import ucar.unidata.view.geoloc.CoordinateFormat.DegMinSec;
 import ucar.unidata.view.geoloc.CoordinateFormat.FloorCoordFormat;
 
+
 import static org.junit.Assert.assertEquals;
 
 import static ucar.unidata.view.geoloc.CoordinateFormat.EMPTY_FORMAT;
@@ -45,7 +46,7 @@ public class CoordinateFormatTest {
      * Test CoordinateFormat.convert
      */
     @Test
-    public void testDecodeLatLonsString() {
+    public void testConvert() {
         @SuppressWarnings("serial") final Map<String, String> map =
             new HashMap<String, String>() {
             {
@@ -91,23 +92,23 @@ public class CoordinateFormatTest {
                         new FloorCoordFormat(DegMinSec.COLON),
                         new DecimalCoordFormat(5, DegMinSec.NONE),
                         Cardinality.NORTH));
-                put("12:33:19.8N",
+                put("12:33:19.80N",
                     CoordinateFormat.convert(
                         12.5555, new FloorCoordFormat(DegMinSec.COLON),
                         new FloorCoordFormat(DegMinSec.COLON),
-                        new DecimalCoordFormat(5, DegMinSec.NONE),
+                        new DecimalCoordFormat(2, DegMinSec.NONE),
                         Cardinality.NORTH));
-                put("-12:33:19.8N",
+                put("-12:33:19.80N",
                     CoordinateFormat.convert(
                         -12.5555, new FloorCoordFormat(DegMinSec.COLON),
                         new FloorCoordFormat(DegMinSec.COLON),
-                        new DecimalCoordFormat(5, DegMinSec.NONE),
+                        new DecimalCoordFormat(2, DegMinSec.NONE),
                         Cardinality.NORTH));
                 put("-00:06:00",
                     CoordinateFormat.convert(
                         -0.1, new FloorCoordFormat(DegMinSec.COLON),
                         new FloorCoordFormat(DegMinSec.COLON),
-                        new DecimalCoordFormat(5, DegMinSec.NONE),
+                        new DecimalCoordFormat(0, DegMinSec.NONE),
                         Cardinality.NONE));
                 put("51.46059",
                     CoordinateFormat.convert(
@@ -122,4 +123,134 @@ public class CoordinateFormatTest {
                          e.getValue());
         }
     }
+
+    /**
+     * Test the CoordinateFormat.formatLatitude method.
+     */
+    @Test
+    public void testFormatLat() {
+        String errorMsg = "Could not properly format lat";
+
+        assertEquals(errorMsg, "12",
+                     CoordinateFormat.formatLatitude(12, "DD"));
+
+        //Testing various formats
+        assertEquals(errorMsg, "12:00",
+                     CoordinateFormat.formatLatitude(12, "DD:MM"));
+
+        assertEquals(errorMsg, "12:00:00",
+                     CoordinateFormat.formatLatitude(12, "DD:MM:SS"));
+
+        assertEquals(errorMsg, "12.0",
+                     CoordinateFormat.formatLatitude(12, "DD.d"));
+
+        assertEquals(errorMsg, "12 30'",
+                     CoordinateFormat.formatLatitude(12.5, "DD MM'"));
+
+        assertEquals(errorMsg, "12 33'18\"",
+                     CoordinateFormat.formatLatitude(12.555, "DD MM'SS\""));
+
+        assertEquals(errorMsg, "12 33'19.8\"",
+                     CoordinateFormat.formatLatitude(12.5555,
+                         "DD MM' SS.s\""));
+
+        assertEquals(errorMsg, "-12 33'19.8\"",
+                     CoordinateFormat.formatLatitude(-12.5555,
+                         "DD MM'SS.s\""));
+
+        assertEquals(errorMsg, "-00 06'00.0\"",
+                     CoordinateFormat.formatLatitude(-0.1, "DD MM' SS.s\""));
+
+        //Testing cardinalities
+        assertEquals(errorMsg, "12N",
+                     CoordinateFormat.formatLatitude(12, "DDH"));
+
+        assertEquals(errorMsg, "12",
+                     CoordinateFormat.formatLatitude(12, "DD"));
+
+        assertEquals(errorMsg, "12S",
+                     CoordinateFormat.formatLatitude(-12, "DDH"));
+
+        assertEquals(errorMsg, "-12",
+                     CoordinateFormat.formatLatitude(-12, "DD"));
+
+        //Boundary case testing
+        assertEquals(errorMsg, "00",
+                     CoordinateFormat.formatLatitude(0, "DD"));
+
+        assertEquals(errorMsg, "00 00'00.0\"",
+                     CoordinateFormat.formatLatitude(0, "DDH MM' SS.s\""));
+    }
+
+    /**
+     * Test the CoordinateFormat.formatLongitude method.
+     */
+    @Test
+    public void testFormatLongitude() {
+        String errorMsg = "Could not properly format lon";
+
+        //Testing cardinalities        
+        assertEquals(errorMsg, "12E",
+                     CoordinateFormat.formatLongitude(12, "DDH", false));
+
+        assertEquals(errorMsg, "12",
+                     CoordinateFormat.formatLongitude(12, "DD", false));
+
+        assertEquals(errorMsg, "12W",
+                     CoordinateFormat.formatLongitude(-12, "DDH", false));
+
+        assertEquals(errorMsg, "-12",
+                     CoordinateFormat.formatLongitude(-12, "DD", false));
+
+        //testing 0-360
+        assertEquals(errorMsg, "348",
+                     CoordinateFormat.formatLongitude(-12, "DDH", true));
+
+        assertEquals(errorMsg, "12",
+                     CoordinateFormat.formatLongitude(12, "DDH", true));
+
+        assertEquals(errorMsg, "348",
+                     CoordinateFormat.formatLongitude(-12, "DD", true));
+
+        assertEquals(errorMsg, "12",
+                     CoordinateFormat.formatLongitude(12, "DD", true));
+
+        //Boundary case testing
+
+        assertEquals(errorMsg, "180E",
+                     CoordinateFormat.formatLongitude(180, "DDH", false));
+
+        assertEquals(errorMsg, "180",
+                     CoordinateFormat.formatLongitude(180, "DD", false));
+
+        assertEquals(errorMsg, "180W",
+                     CoordinateFormat.formatLongitude(-180, "DDH", false));
+
+        assertEquals(errorMsg, "-180",
+                     CoordinateFormat.formatLongitude(-180, "DD", false));
+
+        //testing 0-360
+        assertEquals(errorMsg, "180",
+                     CoordinateFormat.formatLongitude(-180, "DDH", true));
+
+        assertEquals(errorMsg, "180",
+                     CoordinateFormat.formatLongitude(180, "DDH", true));
+
+        assertEquals(errorMsg, "00",
+                     CoordinateFormat.formatLongitude(0, "DDH", false));
+
+        assertEquals(errorMsg, "00",
+                     CoordinateFormat.formatLongitude(0, "DD", false));
+
+        assertEquals(errorMsg, "00",
+                     CoordinateFormat.formatLongitude(0, "DDH", true));
+
+        assertEquals(errorMsg, "160W",
+                CoordinateFormat.formatLongitude(200, "DDH", false));
+        
+        assertEquals(errorMsg, "200",
+                CoordinateFormat.formatLongitude(200, "DDH", true));
+
+    }
+
 }

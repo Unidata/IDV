@@ -20,11 +20,18 @@
 
 package ucar.unidata.view.geoloc;
 
+
+import ucar.unidata.ui.FontSelector;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,28 +45,23 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import ucar.unidata.ui.FontSelector;
-import ucar.unidata.ui.NumericTextField;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.view.geoloc.AxisScaleInfo.CoordSys;
-
 
 /**
  * A widget to get lat/lon range info from the user
  *
  * @author   IDV Development Team
  */
+@SuppressWarnings("serial")
 public class LatLonScalePanel extends JPanel implements ActionListener {
 
     /** The coord format. */
     private JComboBox coordFormat;
 
     /** Latitude base label */
-    private NumericTextField latBaseLabel;
+    private JTextField latBaseLabel;
 
     /** Latitude increment */
-    private NumericTextField latIncrement;
+    private JTextField latIncrement;
 
     /** Lat (y-axis) Label */
     private JTextField latLabel;
@@ -68,13 +70,13 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private JSpinner latMinorSpinner;
 
     /** Lat scale info */
-    private AxisScaleInfo latScaleInfo;
+    private LatLonAxisScaleInfo latScaleInfo;
 
     /** Longitude base label */
-    private NumericTextField lonBaseLabel;
+    private JTextField lonBaseLabel;
 
     /** Longitude increment */
-    private NumericTextField lonIncrement;
+    private JTextField lonIncrement;
 
     /** Lon (x-axis) Label */
     private JTextField lonLabel;
@@ -83,13 +85,10 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
     private JSpinner lonMinorSpinner;
 
     /** Lon scale info */
-    private AxisScaleInfo lonScaleInfo;
+    private LatLonAxisScaleInfo lonScaleInfo;
 
     /** Map projection display */
     private MapProjectionDisplay mpDisplay;
-
-    /** flag for whether the user hit cancel or not */
-    private boolean ok;
 
     /** The frame parent */
     JFrame parent;
@@ -99,6 +98,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
 
     /** y axis visible */
     private JCheckBox yVisible;
+
+    /** Use 360 */
+    private JCheckBox use360;
 
     /**
      * Axis font selector
@@ -125,28 +127,28 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
-        fontSelector       = new FontSelector(FontSelector.COMBOBOX_UI, false,
+        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
 
         JPanel latPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), latLabel = new JTextField(),
             GuiUtils.rLabel("Base (-90 90): "),
-            latBaseLabel = new NumericTextField(),
+            latBaseLabel = new JTextField(),
             GuiUtils.rLabel("Major Increment: "),
-            latIncrement = new NumericTextField(),
+            latIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
-            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
+            latMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10,
                 1)),
             GuiUtils.rLabel("Visible: "), yVisible = new JCheckBox("", true)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         JPanel lonPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Label: "), lonLabel = new JTextField(),
             GuiUtils.rLabel("Base (-180 180): "),
-            lonBaseLabel = new NumericTextField(),
+            lonBaseLabel = new JTextField(),
             GuiUtils.rLabel("Major Increment: "),
-            lonIncrement = new NumericTextField(),
+            lonIncrement = new JTextField(),
             GuiUtils.rLabel("Minor Division: "),
-            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4,
+            lonMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10,
                 1)),
             GuiUtils.rLabel("Visible: "), xVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -163,8 +165,12 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         JPanel formatPanel = GuiUtils.doLayout(new Component[] {
                                  GuiUtils.rLabel("Format: "),
                                  coordFormat = new JComboBox(
-                                     AxisScaleInfo.CoordSys.values()) }, 2,
-                                         GuiUtils.WT_NY, GuiUtils.WT_N);
+                                     LatLonAxisScaleInfo.COORD_FORMATS),
+                                 GuiUtils.rLabel(" 0-360 Longitude"),
+                                 use360 = new JCheckBox("", false) }, 4,
+                                     GuiUtils.WT_NY, GuiUtils.WT_N);
+        coordFormat.setEditable(true);
+        coordFormat.setEnabled(true);
 
         JPanel latLonPanel = GuiUtils.doLayout(new Component[] { latPanel,
                 lonPanel }, 1, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -220,6 +226,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
         yVisible.setSelected(latScaleInfo.isVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
+        use360.setSelected(latScaleInfo.isUse360());
         fontSelector.setFont(latScaleInfo.getFont());
     }
 
@@ -233,6 +240,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
         xVisible.setSelected(lonScaleInfo.isVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
+        use360.setSelected(lonScaleInfo.isUse360());
         fontSelector.setFont(lonScaleInfo.getFont());
     }
 
@@ -242,7 +250,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      * @return Was it successful
      */
     public boolean doApply() {
-        AxisScaleInfo newLatInfo = new AxisScaleInfo();
+        LatLonAxisScaleInfo newLatInfo = new LatLonAxisScaleInfo();
 
         newLatInfo.setLabel(latLabel.getText());
         newLatInfo.setBaseLabel(latBaseLabel.getText());
@@ -250,14 +258,16 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLatInfo.setMinorDivision(
             Integer.valueOf(latMinorSpinner.getValue().toString()));
         newLatInfo.setVisible(yVisible.isSelected());
-        newLatInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLatInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLatInfo.setFont(fontSelector.getFont());
+        newLatInfo.setUse360(use360.isSelected());
+
 
         if ( !newLatInfo.equals(latScaleInfo)) {
             latScaleInfo = newLatInfo;
         }
 
-        AxisScaleInfo newLonInfo = new AxisScaleInfo();
+        LatLonAxisScaleInfo newLonInfo = new LatLonAxisScaleInfo();
 
         newLonInfo.setLabel(lonLabel.getText());
         newLonInfo.setBaseLabel(lonBaseLabel.getText());
@@ -265,8 +275,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLonInfo.setMinorDivision(
             Integer.valueOf(lonMinorSpinner.getValue().toString()));
         newLonInfo.setVisible(xVisible.isSelected());
-        newLonInfo.setCoordFormat((CoordSys) coordFormat.getSelectedItem());
+        newLonInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLonInfo.setFont(fontSelector.getFont());
+        newLonInfo.setUse360(use360.isSelected());
 
         if ( !newLonInfo.equals(lonScaleInfo)) {
             lonScaleInfo = newLonInfo;
@@ -292,7 +303,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      *
      * @param latScaleInfo the new lat scale info
      */
-    public void setLatScaleInfo(AxisScaleInfo latScaleInfo) {
+    public void setLatScaleInfo(LatLonAxisScaleInfo latScaleInfo) {
         this.latScaleInfo = latScaleInfo;
     }
 
@@ -301,7 +312,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      *
      * @param lonScaleInfo the new lon scale info
      */
-    public void setLonScaleInfo(AxisScaleInfo lonScaleInfo) {
+    public void setLonScaleInfo(LatLonAxisScaleInfo lonScaleInfo) {
         this.lonScaleInfo = lonScaleInfo;
     }
 

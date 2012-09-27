@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,37 +21,20 @@
 package ucar.unidata.idv;
 
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 
 import ucar.unidata.data.DataGroup;
 import ucar.unidata.data.DerivedDataDescriptor;
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.idv.IdvResourceManager;
-
-
-import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.geoloc.Projection;
+import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.control.DisplaySetting;
-import ucar.unidata.idv.ui.IdvUIManager;
-import ucar.unidata.idv.ui.IdvWindow;
-import ucar.unidata.idv.ui.ImageGenerator;
-import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.ParamInfo;
-import ucar.unidata.idv.ui.WindowInfo;
-import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.colortable.ColorTableManager;
 import ucar.unidata.ui.symbol.StationModel;
-
-
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
@@ -59,48 +42,60 @@ import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PluginClassLoader;
-import ucar.unidata.util.Prototypable;
-import ucar.unidata.util.PrototypeManager;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-
 import ucar.unidata.util.TwoFacedObject;
-
-
-import ucar.unidata.util.WrapperException;
-
-import ucar.unidata.xml.*;
-
+import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-import java.lang.reflect.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import java.net.*;
+import java.lang.reflect.Modifier;
 
-import java.security.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
 import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import java.util.jar.*;
-
-
-import java.util.regex.*;
-
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 
 
@@ -321,7 +316,7 @@ public class PluginManager extends IdvManager {
                 if (name.toLowerCase().endsWith("manifest.mf")) {
                     continue;
                 }
-                JLabel label = new JLabel(name);
+                JLabel     label   = new JLabel(name);
                 JComponent viewBtn = GuiUtils.makeImageButton(
                                          "/auxdata/ui/icons/FindAgain16.gif",
                                          this, "viewPluginFile",
@@ -335,8 +330,8 @@ public class PluginManager extends IdvManager {
                         entry, new Boolean(true) });
                 exportBtn.setToolTipText("Export this file");
 
-                Insets btnInsets = new Insets(1, 1, 1, 5);
-                JComponent rowComp = GuiUtils.doLayout(new Component[] {
+                Insets     btnInsets = new Insets(1, 1, 1, 5);
+                JComponent rowComp   = GuiUtils.doLayout(new Component[] {
                                          GuiUtils.inset(exportBtn, btnInsets),
                                          GuiUtils.inset(viewBtn, btnInsets),
                                          label }, 3, GuiUtils.WT_NNY,
@@ -1201,7 +1196,7 @@ public class PluginManager extends IdvManager {
                     pi.widget = new JCheckBox("", text.equals("true"));
                 } else if (pi.delimiter != null) {
                     pi.delimiter = pi.delimiter.trim();
-                    pi.widget = new JTextArea(StringUtil.join("\n",
+                    pi.widget    = new JTextArea(StringUtil.join("\n",
                             StringUtil.split(text, pi.delimiter, true,
                                              true)), 4, 20);
                     pi.value = StringUtil.join(
@@ -1250,7 +1245,7 @@ public class PluginManager extends IdvManager {
             }
             List compsToDisplay = new ArrayList();
             for (int catIdx = 0; catIdx < cats.size(); catIdx++) {
-                String name = (String) catNames.get(catIdx);
+                String name     = (String) catNames.get(catIdx);
                 JLabel catLabel =
                     new JLabel("<html><h2 style=\"margin-bottom:2pt;\">"
                                + name + "</h2></html>");
@@ -1736,9 +1731,9 @@ public class PluginManager extends IdvManager {
                 IOUtil.writeBytes(newFile, bytes);
                 jarFilePath = newFile.toString();
             }
-            String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
-            String prefix   = jarFilePath + "!/";
-            PluginClassLoader cl = new PluginClassLoader(jarFilePath,
+            String jarLabel          = IOUtil.getFileTail(decode(jarFilePath));
+            String            prefix = jarFilePath + "!/";
+            PluginClassLoader cl     = new PluginClassLoader(jarFilePath,
                                        getClass().getClassLoader()) {
 
                 protected void handleError(String msg, Throwable exc) {
@@ -1748,7 +1743,9 @@ public class PluginManager extends IdvManager {
                 protected void checkClass(Class c) throws Exception {
                     //                    System.out.println ("loaded class:" + c.getName() + " from:" + toString());
                     IdvBase.addPluginClass(c);
-                    if (java.text.DateFormat.class.isAssignableFrom(c)) {
+                    //Also need to check if the class is accessible. It could be a private inner class.
+                    if (java.text.DateFormat.class.isAssignableFrom(c)
+                            && !Modifier.isPrivate(c.getModifiers())) {
                         visad.DateTime.setDateFormatClass(c);
                     } else if (ucar.nc2.iosp.IOServiceProvider.class
                             .isAssignableFrom(c)) {
@@ -1927,8 +1924,8 @@ public class PluginManager extends IdvManager {
                 }
 
                 if (bundlesPattern.matcher(name).find()) {
-                    Element root = XmlUtil.getRoot(tmpFile, getClass());
-                    List bundles = SavedBundle.processBundleXml(root, dir,
+                    Element root    = XmlUtil.getRoot(tmpFile, getClass());
+                    List    bundles = SavedBundle.processBundleXml(root, dir,
                                        getResourceManager(), true);
                     addObjects(bundles);
                     continue;
@@ -2062,7 +2059,7 @@ public class PluginManager extends IdvManager {
                     pluginIdx++) {
                 Element pluginNode = (Element) children.get(pluginIdx);
                 String  name = XmlUtil.getAttribute(pluginNode, ATTR_NAME);
-                String desc = XmlUtil.getAttribute(pluginNode, ATTR_DESC,
+                String  desc = XmlUtil.getAttribute(pluginNode, ATTR_DESC,
                                   name);
                 String size = XmlUtil.getAttribute(pluginNode, ATTR_SIZE,
                                   (String) null);
@@ -2199,12 +2196,12 @@ public class PluginManager extends IdvManager {
             throws Exception {
         String filename    = encode(plugin);
         String tmpFilename = ".tmp." + filename;
-        String extDir =
+        String extDir      =
             IOUtil.joinDir(getStore().getUserDirectory().toString(),
                            "plugins");
-        File newTmpFile = new File(IOUtil.joinDir(extDir, tmpFilename));
-        File newFile    = new File(IOUtil.joinDir(extDir, filename));
-        Object loadId =
+        File   newTmpFile = new File(IOUtil.joinDir(extDir, tmpFilename));
+        File   newFile    = new File(IOUtil.joinDir(extDir, filename));
+        Object loadId     =
             JobManager.getManager().startLoad("Installing plugin", true);
         byte[] bytes = null;
         try {
@@ -2400,7 +2397,7 @@ public class PluginManager extends IdvManager {
         List      cats        = new ArrayList();
         Hashtable catBuffs    = new Hashtable();
         for (int i = 0; i < Plugin.plugins.size(); i++) {
-            Plugin plugin = (Plugin) Plugin.plugins.get(i);
+            Plugin       plugin  = (Plugin) Plugin.plugins.get(i);
             StringBuffer catBuff =
                 (StringBuffer) catBuffs.get(plugin.category);
             if (catBuff == null) {
@@ -2413,7 +2410,7 @@ public class PluginManager extends IdvManager {
             String encodedPath;
             if (plugin.file != null) {
                 encodedPath = encode(plugin.file.toString());
-                prefix =
+                prefix      =
                     "&nbsp;<a href=\"jython:idv.getPluginManager().listPlugin('"
                     + encodedPath
                     + "');\"><img src=\"idvresource:/auxdata/ui/icons/FindAgain16.gif\" border=\"0\"></a>";
@@ -2433,8 +2430,8 @@ public class PluginManager extends IdvManager {
                 sizeString = "&nbsp;" + HtmlUtil.b((s / 1000) + "KB");
             }
 
-            StringBuffer addDelete = new StringBuffer();
-            String installHtml =
+            StringBuffer addDelete   = new StringBuffer();
+            String       installHtml =
                 "<a href=\"jython:idv.getPluginManager().installPlugin('"
                 + plugin.url + "')\">";
 

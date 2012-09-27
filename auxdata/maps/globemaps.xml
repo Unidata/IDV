@@ -39,6 +39,15 @@
          />
 
   <map
+        source="/auxdata/maps/OUTVHPOL"
+        description="World Country Outlines"
+        visible="false"
+        color="cyan"
+        linewidth="1.0"
+        linestyle="0"
+  />
+
+  <map
        source="/auxdata/maps/OUTVHRES"
        description="World Coastlines"
        visible="true"
@@ -57,6 +66,7 @@
        linestyle="3"
        />
 
+<!--
   <map
        source="/auxdata/maps/Countries.zip"
        description="World Country Outlines"
@@ -65,6 +75,7 @@
        linewidth="1.0"
        linestyle="0"
        />
+       -->
 
   <map
        source="/auxdata/maps/OUTLUSAM"

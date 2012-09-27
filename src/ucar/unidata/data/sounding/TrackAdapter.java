@@ -218,7 +218,7 @@ public abstract class TrackAdapter {
         for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
             TrackInfo trackInfo = (TrackInfo) trackInfos.get(trackIdx);
             if ((name == null) || name.equals(trackInfo.getTrackName()) ||
-                    name.startsWith(trackInfo.getTrackName())) {
+                    name.startsWith(trackInfo.getTrackName().substring(0, 20))) {
                 return trackInfo;
             }
         }

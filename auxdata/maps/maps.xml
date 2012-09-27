@@ -37,6 +37,15 @@
          />
          
   <map
+        source="/auxdata/maps/OUTVHPOL"
+        description="World Country Outlines"
+        visible="false"
+        color="cyan"
+        linewidth="1.0"
+        linestyle="0"
+  />
+
+  <map
        source="/auxdata/maps/OUTVHRES"
        description="World Coastlines"
        visible="true"
@@ -53,15 +62,6 @@
        color="0xFF0000"
        linewidth="1.0"
        linestyle="3"
-       />
-
-  <map
-       source="/auxdata/maps/Countries.zip"
-       description="World Country Outlines"
-       visible="false"
-       color="0x0000FF"
-       linewidth="1.0"
-       linestyle="0"
        />
 
   <map
@@ -92,6 +92,7 @@
        fastrender="true"
        />
 
+<!--
   <map
        source="/auxdata/maps/awips_counties.zip"
        description="U.S. County Outlines (AWIPS)"
@@ -102,6 +103,7 @@
        fastrender="true"
        valid="false"
        />
+-->
 
   <map
        source="/auxdata/maps/OUTUSINT"

@@ -3053,8 +3053,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Set the chart Name
      *
      *
-     * @param newName _more_
-     * @return The chart_
+     * @param newName the new chart name
      */
     public void setChartName(String newName) {
         timeSeries.setChartName(newName);

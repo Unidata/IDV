@@ -217,7 +217,8 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             // for each ob in this time's collection
             for (int j = 0; j < oneTimeFF.getLength(); j++) {
 
-                Gridded3DSet tds     = (Gridded3DSet) oneTimeFF.getDomainSet();
+                Gridded3DSet tds     =
+                    (Gridded3DSet) oneTimeFF.getDomainSet();
                 float[][]    latlonz = tds.getSamples(false);
                 // test if this z altitude value matches either spacings
                 // for 3D plot; or single level value for Plan View.
@@ -241,11 +242,11 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         // put the data to display in the displayable;
         // if 3D plot, put all the data at all levels in the display;
         // if plan view, set initial level at 3000 m above MSL
-        if (getIsPlanView()) {
+        if (getIsPlanView() && (workingFI != null)) {
             //System.out.println (" resetDataVerticalLocation to level 3000");
             resetDataVerticalLocation(new Real(0), initLevelValue, false);
             mappedDisplayable.loadData(workingFI);
-        } else {
+        } else if (fieldImpl != null) {
             //System.out.println (" make full 3d view");
             mappedDisplayable.loadData(fieldImpl);
         }
@@ -301,6 +302,10 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             return false;
         }
         fieldImpl = getGridDataInstance().getGrid();
+        // On a reload, it might get through super.setData, so put a check here.
+        if (fieldImpl == null) {
+            return false;
+        }
         if (mappedDisplayable != null) {
             loadData();
         }
@@ -653,7 +658,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
             try {
                 width  = 2.0f;  // units geographic degrees
                 height = 2.0f;
-                mp     = new TrivialMapProjection(
+                mp = new TrivialMapProjection(
                     RealTupleType.SpatialEarth2DTuple,
                     new Rectangle2D.Float(
                         xx - 1.0f, yy - 1.0f, width, height));
