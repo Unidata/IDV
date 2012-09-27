@@ -75,16 +75,6 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         this.coordFormat = coordFormat;
     }
 
-    /**
-     * Set the format
-     *
-     * @param coordFormat  the format
-     */
-    @Deprecated  //9-5-2012
-    public void setCoordFormat(CoordSys coordFormat) {
-        this.coordFormat = COORD_FORMATS[0];
-    }
-
 
     /**
      * Gets the base label.
@@ -162,6 +152,8 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * {@inheritDoc}
+     *
+     * @return _more_
      */
     @Override
     public int hashCode() {
@@ -195,6 +187,10 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * {@inheritDoc}
+     *
+     * @param obj _more_
+     *
+     * @return _more_
      */
     @Override
     public boolean equals(Object obj) {
@@ -255,9 +251,4 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         return true;
     }
 
-
-    @Deprecated  //9-5-2012
-    public enum CoordSys {
-        A, B, C, D, E, F, G, H;
-    }
 }

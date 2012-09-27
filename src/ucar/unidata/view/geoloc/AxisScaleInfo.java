@@ -31,6 +31,23 @@ public class AxisScaleInfo extends LatLonAxisScaleInfo {
     /**
      * Instantiates a new lat lon scale info.
      */
-    public AxisScaleInfo() {}
+    public AxisScaleInfo() {
+        super();
+    }
+
+    /**
+     * Set the format
+     *
+     * @param coordFormat  the format
+     */
+    @Deprecated  //9-5-2012
+    public void setCoordFormat(CoordSys coordFormat) {
+        super.setCoordFormat(COORD_FORMATS[0]);
+    }
+
+    @Deprecated  //9-5-2012
+    public enum CoordSys {
+        A, B, C, D, E, F, G, H;
+    }
 
 }
