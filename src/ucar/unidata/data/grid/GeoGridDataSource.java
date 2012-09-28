@@ -2216,13 +2216,9 @@ public class GeoGridDataSource extends GridDataSource {
 
         String mlodeUrl =
             "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
-        String atmUrl =
-            "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
         String   url  = ((args.length == 0)
                          ? leadUrl
-                         : ((args.length == 1)
-                            ? mlodeUrl
-                            : atmUrl));
+                         : mlodeUrl);
 
         String[] urls = { url };
         testMode = true;
