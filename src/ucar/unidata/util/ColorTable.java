@@ -1,28 +1,22 @@
 /*
- * $Id: ColorTable.java,v 1.30 2006/12/18 22:55:00 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
-
 
 package ucar.unidata.util;
 
@@ -30,10 +24,7 @@ package ucar.unidata.util;
 import java.awt.Color;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-
-import java.util.Vector;
 
 
 /**
@@ -43,16 +34,16 @@ import java.util.Vector;
  */
 public class ColorTable implements NamedObject {
 
-    /** _more_ */
+    /** Red index */
     public static final int IDX_RED = 0;
 
-    /** _more_ */
+    /** Green index */
     public static final int IDX_GREEN = 1;
 
-    /** _more_ */
+    /** Blue index */
     public static final int IDX_BLUE = 2;
 
-    /** _more_ */
+    /** Alpha index */
     public static final int IDX_ALPHA = 3;
 
     /** The ColorTable id */
@@ -214,7 +205,7 @@ public class ColorTable implements NamedObject {
      * @param name         name of the table
      * @param category     category of the table
      * @param colors       table colors
-     * @param scales _more_
+     * @param scales       scale factors
      * @param breakpoints  breakpoints
      * @param r            Range of values
      *
@@ -387,7 +378,7 @@ public class ColorTable implements NamedObject {
 
 
     /**
-     * Set the color table pallette
+     * Set the color table palette
      * Note: this is around for legacy purposes and we will move to
      * a new setTableArray/getTableArray method
      *
@@ -399,11 +390,11 @@ public class ColorTable implements NamedObject {
 
 
     /**
-     * Set the color table pallette
+     * Get the color table palette
      * Note: this is around for legacy purposes and we will move to
      * a new setTableArray/getTableArray method
      *
-     * @return _more_
+     * @return get the color table as a float array
      */
     public float[][] getTable() {
         return tableArray;
@@ -411,9 +402,9 @@ public class ColorTable implements NamedObject {
 
 
     /**
-     * _more_
+     * Set the table array
      *
-     * @param table _more_
+     * @param table  the table as a float array
      */
     public void setTableArray(float[][] table) {
         tableArray = table;
@@ -647,9 +638,9 @@ public class ColorTable implements NamedObject {
 
 
     /**
-     * _more_
+     * Set the transparency
      *
-     * @param alpha _more_
+     * @param alpha  the alpha value
      */
     public void setTransparency(float alpha) {
         tableArray = changeTransparency(tableArray, alpha);
@@ -713,40 +704,38 @@ public class ColorTable implements NamedObject {
 
 
     /**
-     * Class Breakpoint _more_
-     *
+     * A class to hold color table breakpoint information
      *
      * @author IDV Development Team
-     * @version $Revision: 1.30 $
      */
     public static class Breakpoint {
 
-        /** _more_ */
+        /** value */
         private double value = 0.0;
 
-        /** _more_ */
+        /** locked or unlocked */
         private boolean locked = false;
 
         /**
-         * _more_
+         * Default constructor
          */
         public Breakpoint() {}
 
 
         /**
-         * _more_
+         * Create a breakpoint at the value
          *
-         * @param v _more_
+         * @param v  the value
          */
         public Breakpoint(double v) {
             this(v, false);
         }
 
         /**
-         * _more_
+         * Create a breakpoint at the value
          *
-         * @param v _more_
-         * @param locked _more_
+         * @param v       the value
+         * @param locked  true if locked
          */
         public Breakpoint(double v, boolean locked) {
             this.value  = v;
@@ -754,9 +743,9 @@ public class ColorTable implements NamedObject {
         }
 
         /**
-         * _more_
+         * Copy constructor
          *
-         * @param that _more_
+         * @param that  the one to copy
          */
         public Breakpoint(Breakpoint that) {
             if (that != null) {
@@ -803,11 +792,11 @@ public class ColorTable implements NamedObject {
 
 
         /**
-         * _more_
+         * Clone the list of colors
          *
-         * @param l _more_
+         * @param l  the list
          *
-         * @return _more_
+         * @return  a clone
          */
         public static ArrayList cloneList(List l) {
             if ((l == null) || (l.size() == 0)) {
@@ -826,14 +815,12 @@ public class ColorTable implements NamedObject {
                 }
             }
             return new ArrayList(l);
-
-
         }
 
         /**
-         * _more_
+         * Get a String representation of this object
          *
-         * @return _more_
+         * @return  the String representation of the object
          */
         public String toString() {
             return "" + value + " " + locked;
@@ -841,7 +828,4 @@ public class ColorTable implements NamedObject {
 
     }
 
-
-
 }
-
