@@ -232,13 +232,12 @@ argument -Dfoo=bar) -->
 
 
 
-    <target name="idvjar" depends="init">
+    <target name="idvjar" depends="init" description="Performs a clean before calling jaridv target.">
         <antcall target="clean"/>
         <antcall target="jaridv"/>
     </target>
 
-
-    <target name="jaridv" depends="init">
+    <target name="jaridv" depends="init" description="Builds a new idv.jar.">
         <antcall target="idv"/>
         <!--  Moved to idv target
         <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
