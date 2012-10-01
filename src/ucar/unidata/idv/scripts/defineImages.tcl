@@ -33,7 +33,7 @@ defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.
 
 defineImage {http://www-das.uwyo.edu/weathercam/weathercam.jpg} {Laramie, WY} -ll {41.316,-105.578} -dz -7
 defineImage http://www2.tetoncam.com/tetonl.jpg {Grand Tetons, WY} -ll {43.74111,-110.80167} -dz -7
-defineImage {http://vmserver.net/webcams/bozeman/bozeman.jpg} {Bridger Mountains, MT} -ll {45.71,-111.07} -dz -7
+defineImage {http://bridgerbowl.com/bridgerCams/cam3.jpg} {Bridger Bowl, MT} -ll {45.819727,-110.917782} -dz -7
 
 
 
@@ -57,9 +57,9 @@ defineImage {http://www.yosemiteconservancystore.com/DSN/wwwyosemiteassociationo
 defineImage {http://www.nature.nps.gov/air/webcams/parks/jotrcam/jotr.jpg}  {Joshua Tree National Park} -ll {35.12861,-116.03667}  -dz -8
 defineImage {http://www.nature.nps.gov/air/WebCams/parks/nacccam/wash.jpg}  {Washington, D.C.} -ll {38.3,-77.0}  -dz -8
 
-defineImage {http://www.hazecam.net/images/photos-main/BALTIMORE_1.JPG} {Baltimore,MD}  -ll {39.290555,-76.609604}
+defineImage {http://wwc.instacam.com/instacamimg/KDMH/KDMH_l.jpg} {Baltimore,MD}  -ll {39.285848,-76.61311}  -dz -8
 
-defineImage {http://www.hazecam.net/images/photos-main/FROSTBURG.JPG} {Frostburg,MD}  -ll {39.656902,-78.927609}
+defineImage {http://wwc.instacam.com/instacamimg/FRSTB/FRSTB_l.jpg} {Frostburg,MD}  -ll {39.658142,-78.928357}  -dz -8
 
 
 
@@ -97,8 +97,8 @@ defineImage http://www.gbuapcd.org/dustcam/keelerv1.jpg {Owens Lake} -ll {36.501
 
 defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {Mount St. Helens, WA} -ll {46.272,-122.152} -dz -8
 defineImage http://webcam.uoregon.edu/jpg/image.jpg {Eugene, OR} -ll {44.04,-123.07} -dz -8
-defineImage http://bimedia.ftp.clickability.com/fishwebftp/KATU/ABANK.JPG {Portland, OR} -ll {45.59,-122.6} -dz -8
-defineImage http://centralmediaserver.com/koin/weathercams/koinsw.jpg {Portland, OR} -ll {45.59,-122.6} -dz -8
+defineImage http://belo.bimedia.net/KGW/weather/stills/wellsfargo.jpg {Portland, OR} -ll {45.516905,-122.659244} -dz -8
+defineImage http://belo.bimedia.net/KGW/weather/stills/pdx.jpg {PDX International Airport, OR} -ll {45.588267,-122.594398} -dz -8
 defineImage http://images.ibsys.com/sea/images/weather/auto/queenannecam_640x480.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
 defineImage http://134.121.11.63/images/bryan/bryan_00001.jpg {Pullman,WA} -ll {46.73193,-117.165365} -dz -8
 
