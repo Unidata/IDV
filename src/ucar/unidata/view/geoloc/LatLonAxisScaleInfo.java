@@ -152,8 +152,6 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * {@inheritDoc}
-     *
-     * @return _more_
      */
     @Override
     public int hashCode() {
@@ -187,10 +185,6 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * {@inheritDoc}
-     *
-     * @param obj _more_
-     *
-     * @return _more_
      */
     @Override
     public boolean equals(Object obj) {
