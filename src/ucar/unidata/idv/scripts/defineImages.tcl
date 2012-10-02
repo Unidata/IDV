@@ -124,21 +124,17 @@ defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.96
 
 defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
 
-defineImage http://www.bradlight.com/cam1.jpg {Carlsbad,NM}  -ll {32.418595,-104.229019}
-
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque,NM}  -ll {35.1029697, -106.6703963}
 
-defineImage http://belo.bimedia.net/WFAA/weather/stills/wfaahuge.jpg {Dallas,TX} -ll {32.775,-96.79667} -dz -6
+defineImage http://www.wxnation.com/livecam/ccam.jpg {Fort Worth, TX} -ll {32.725409, -97.3208496} -dz -6
 defineImage http://www.atmo.ttu.edu/includes/Photo_N.jpg {Lubbock,TX} -ll {33.5777778, -101.8547222} -dz -6
 
 defineImage http://www.nps.gov/webcams-glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
 defineImage http://www.nps.gov/webcams-glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
 defineImage http://www.neng.usu.edu/webcam/latest/latest_bldcam2.jpg {Logan, UT} -ll {41.73444,-111.85361} -dz -7
-###Cannot find URL for latest Castle Dale image.
-###defineImage http://www.ewcd.org/webcams/images/Castle_Dale_N_View/800.jpg {Castle Dale,UT} -ll {39.222,-111.02} -dz -7
 defineImage http://155.98.55.200/image.jpg {University of Utah at Salt Lake City, UT} -dz -7 -ll {40.76623,-111.84755}
 defineImage http://instacam.com/instacamimg/ZPRNG/ZPRNG_S.jpg {Zion National Park, UT} -dz -7 -ll {37,-113}
-defineImage http://www.cnha.org/webcam/image.jpg {Moab, UT} -dz -7 -ll {38.59,-109.55}
+defineImage http://www.redcliffslodge.com/webcam/show-image.php {Moab, UT} -dz -7 -ll {38.573316,-109.549839}
 
 defineImage {http://www.wrh.noaa.gov/boi/images/BOI2-CAM.jpg} {Boise,ID}  -ll {43.60698,-116.193409}
 
@@ -154,7 +150,7 @@ defineImage http://www.soils.wisc.edu/asig/webcam/halfsize.jpg  {Madison,WI} -ll
 defineImage http://images.ibsys.com/det/images/weather/auto/windsorcam_320x240.jpg {Detroit,MI} -dz -5 -ll {42.2,-83.1}
 defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6 -ll {41.8,-87.7}
 
-defineImage {http://www.glerl.noaa.gov/metdata/tol2/tol2-1.jpg} {Toledo, OH}  -ll {41.65381,-83.536259}
+defineImage {http://www.glerl.noaa.gov/metdata/tol2/tol2-1.jpg} {Toledo, OH}  -ll {41.931508,-83.264611}
 defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  -ll {43.23424,-86.245929}
 
 #defineImage {ftp://ftp.glerl.noaa.gov/realtime/alpmet/alp2.jpg} {Alpena,MI}  -ll {45.061565,-83.445154}
