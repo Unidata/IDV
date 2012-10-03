@@ -150,6 +150,7 @@ defineImage http://www.soils.wisc.edu/asig/webcam/halfsize.jpg  {Madison,WI} -ll
 defineImage http://images.ibsys.com/det/images/weather/auto/windsorcam_320x240.jpg {Detroit,MI} -dz -5 -ll {42.2,-83.1}
 defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6 -ll {41.8,-87.7}
 
+# These are valid, but mysteriously this script cannot grab them. Are they blocking our web request, somehow?
 defineImage {http://www.glerl.noaa.gov/metdata/tol2/tol2-1.jpg} {Toledo, OH}  -ll {41.931508,-83.264611}
 defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  -ll {43.23424,-86.245929}
 
@@ -167,14 +168,14 @@ defineImage http://66.231.15.194/Weather/Files_Forecast/cam4.jpg {Watertown,SD} 
 
 
 defineGroup "Northeast"
-defineImage http://www.hazecam.net/images/photos-main/newark.jpg {Newark,NJ} -dz  -5 -ll {40.71,-74}
+defineImage http://www.hazecam.net/images/main/newark.jpg {Newark,NJ} -dz  -5 -ll {40.71,-74}
 defineImage http://www.hazecam.net/images/photos-main/BLUEHILL.JPG {Boston,MA} -dz -5 -ll {42,-71}
 defineImage http://www.dotdata.ct.gov/trafficcameras/images/image87.jpg {Hartford,CT} -dz -5 -ll {41.74,-72.65}
-defineImage http://www.hazecam.net/images/photos-main/MTWASH.JPG {Mount Washington, NH} -dz -5 -ll {44,-71}
-defineImage http://www.hazecam.net/images/photos-main/BURLINGTON.JPG {Burlington, VT} -dz -5 -ll {44,-73}
+defineImage http://hazecam.net/images/main/mtwash.jpg {Mount Washington, NH} -dz -5 -ll {44,-71}
+defineImage http://hazecam.net/images/main/burlington_right.jpg {Burlington, VT} -dz -5 -ll {44,-73}
 defineImage http://apollo.lsc.vsc.edu/webcam/LSCimage.jpg {Lyndon State College, VT} -ll {44.53528,-72.02611} -dz -5
 
-defineImage http://wwc.instacam.com/instacamimg/mllru/MLLRU_l.jpg {Millersville University of Pennsylvania} -ll {40,-76.35} -dz -5
+defineImage http://wwc.instacam.com/instacamimg/MLLRU/MLLRU_l.jpg {Millersville University of Pennsylvania} -ll {40,-76.35} -dz -5
 defineImage http://www.instacam.com/instacamimg/CALIF/CALIF_s.jpg {California University of Pennylvania} -ll {40.066,-79.892} -dz -5
 
 
@@ -189,7 +190,7 @@ defineImage http://vortex.plymouth.edu/webcam/2/latest.jpeg {Plymouth State Univ
 
 
 defineGroup {Southeast}
-defineImage http://images.ibsys.com/atl/images/weather/auto/towercam1_640x480.jpg {Atlanta,GA} -ll {33.74889,-84.38806} -dz -5
+defineImage http://wwc.instacam.com/instacamimg/ATLGM/ATLGM_l.jpg {Atlanta,GA} -ll {33.74889,-84.38806} -dz -5
 defineImage http://files.wtoc.com/camera/misc/misc.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
 
 
