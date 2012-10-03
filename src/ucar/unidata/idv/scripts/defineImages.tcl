@@ -198,17 +198,17 @@ defineImage http://www.mymiamiview.com/images/webcam.jpg {Miami,FL} -ll {25.7,-8
 defineImage http://doppler.tbo.com/webcam/towercam.jpg {Tampa,FL} -ll {27.84806,-82.26333} -dz -5
 ###defineImage http://www.news-journalonline.com/webcam/dbcam.jpg {Daytona Beach,FL} -ll {29.2,-81.0} -dz -5
 
-defineImage http://instacam.com/instacamimg/NPLES/NPLES_S.jpg?14831739 {Naples,FL} -dz -5 -ll {26.145,-81.795}
+defineImage http://wwc.instacam.com/instacamimg/NPLHH/NPLHH_l.jpg {Naples,FL} -dz -5 -ll {26.145,-81.795}
 defineImage http://www.erh.noaa.gov/rah/weathercam/wxcam.image.jpg {Raleigh, NC} -dz -5 -ll {35,-78}
 
 
 
 defineImage http://www.spadre.com/southpadrebeachcam.jpg {South Padre Island,TX} -dz -5 -ll {26.1,-97.2}
-defineImage http://webcams.galveston.com/docs/commodore2006/commodoremp.jpg {Galveston,TX} -dz -5 -ll {29.29,-94.79}
+defineImage http://webcams.galveston.com/docs/casadelmar2006/casadelmarmp.jpg {Galveston,TX} -dz -5 -ll {29.29,-94.79}
 
 defineImage http://downburst.geos.ulm.edu:8080/image.jpg {University of Louisiana, Monroe, LA} -dz -6 -ll {32.538,-92.074}
 
-defineImage http://images.ibsys.com/kan/images/weather/auto/kci_640x480.jpg {Kansas City,MO}  -ll {39.10296,-94.583062}
+defineImage http://www.dnr.mo.gov/env/esp/aqm/photos/kccam/lat001.jpg {Kansas City,MO}  -ll {39.10296,-94.583062}
 
 
 
