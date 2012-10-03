@@ -641,8 +641,24 @@
       </property>
     </object>
   </method>
-
-
-
-
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-72.73917499882322</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>East>Connecticut]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-73.9983649557829</double>
+            <double>40.740451744359746</double>
+            <double>-71.47998504186353</double>
+            <double>42.312434111010056</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
 </object>
