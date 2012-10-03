@@ -75,11 +75,10 @@ argument -Dfoo=bar) -->
 
 
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="netcdf.jar" value="ncIdv-4.3.14.jar" />
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/${netcdf.jar}:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/ncIdv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
 
 
 
@@ -112,7 +111,7 @@ argument -Dfoo=bar) -->
 
         <copy  file="${libsrc}/jythonlib.jar" todir="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
-        <!-- unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/ -->
+        <!--unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/-->
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/poi.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
@@ -233,19 +232,20 @@ argument -Dfoo=bar) -->
 
 
 
-    <target name="idvjar" depends="init">
+    <target name="idvjar" depends="init" description="Performs a clean before calling jaridv target.">
         <antcall target="clean"/>
         <antcall target="jaridv"/>
     </target>
 
-
-    <target name="jaridv" depends="init">
+    <target name="jaridv" depends="init" description="Builds a new idv.jar.">
         <antcall target="idv"/>
+        <!--  Moved to idv target
         <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
             <filterset>
                 <filter token="DATE" value="${date}"/>
             </filterset>
         </copy>
+        -->
 
         <antcall target="jarmf">
             <param name="jarfile" value="idv"/>
@@ -319,6 +319,11 @@ argument -Dfoo=bar) -->
             <exclude name="ucar/ma2/**"/>
             <exclude name="ucar/grib/**"/>
         </javac>
+        <copy overwrite="true" file="${sourcedir}/ucar/unidata/idv/resources/version.properties" tofile="${sourcedir}/ucar/unidata/idv/resources/build.properties">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+            </filterset>
+        </copy>
     </target>
 
 
@@ -713,7 +718,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ${netcdf.jar} external.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
             </manifest>
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
@@ -752,7 +757,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
-              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ${netcdf.jar} external.jar"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
             </manifest>
             <include name="ucar/**/README*"/>
         </jar>
@@ -806,7 +811,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
     <target name="unidatautil" depends="init,clean" >
         <delete dir="${tmpjardir}"/>
         <mkdir dir="${tmpjardir}"/>
-        <!-- unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/ -->
+        <!--unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/-->
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <javac
             classpath="${classpath}"

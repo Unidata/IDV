@@ -25,20 +25,6 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
-  <server name="adde.cise-nsf.gov">
-    <group
-       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINCOMP,NEXRCOMP,TOPO"
-       type="image"/>
-    <group
-       names="RTGRIDS"
-       type="grid"/>
-    <group
-       names="RTNEXRAD"
-       type="radar"/>
-    <group
-       names="RTWXTEXT"
-       type="wxtext"/>
-  </server>
   <server name="stratus.al.noaa.gov">
     <group
        names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINCOMP,TOPO"

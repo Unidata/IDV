@@ -2484,9 +2484,11 @@ public class PointObFactory {
                         latMax, new float[][] {
                     obVals[0], obVals[1]
                 });
-                faGridX     = ap.getGridXArray();
-                faGridY     = ap.getGridYArray();
-                scaleLength = (float) ap.getScaleLengthGU();
+                faGridX = ap.getGridXArray();
+                faGridY = ap.getGridYArray();
+                if (scaleLength == OA_GRID_DEFAULT) {
+                    scaleLength = (float) ap.getScaleLengthGU();
+                }
                 log_.debug("random data spacing = "
                            + ap.getRandomDataSpacing());
             } else {

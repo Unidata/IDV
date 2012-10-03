@@ -12,21 +12,33 @@ access  NOAA National Profiler Network data on ADDE servers.
 
 To select Profiler data you:
 <ol>
-<li> Select an ADDE server and data interval and press [ug::button Connect].
-The data interval sets the time intervals in the display; NOAA profiler data is available in 6 minute or one hour intervals.
+[ug::step {Select an ADDE server and data interval and press [ug::button Connect].
+The data interval sets the time intervals in the display; NOAA profiler data is available in 6 minute or one hour intervals.}]
 
-<li> Once connected the  available times will be shown. By default the last
-12 times will be selected. 
+[ug::step {You may choose a relative set of times steps (e.g., Last 5 times):} images/ImageStep4.gif]
+
+[ug::step {Or, choose a set of absolute times (e.g., 12Z, 1Z):} images/ImageStep5.gif {
+When choosing
+absolute times for the first time the IDV needs to query the ADDE server
+for the times. This may take some time.
 Times can be selected in the list or the time line
 (use control/click or shift/click in the list to select multiple times).
 See the <a href="../../tools/Timeline.html">Timeline section</a> for details on its use.
+}]
 
-<li> Select one or more profiler stations. 
+[ug::step {Or, match the times of the current active display window:} images/MatchTimeDriver.gif {
+This assumes the current active display window has a display with the time driver set. A
+display can be set as a time driver in the <a href="../FieldSelector.html#TimeMatchingFS">Time Subset panel</a>
+in the Field Selector tab or the <a href="../../controls/index.html#DisplayControlViewMenu">
+    View</a> menu in the Dashbaord's Displays tab.
+}]
+
+[ug::step {Select one or more profiler stations.
 See  the <a href="index.html#stationmap">station map section</a> for more information on
-how to use the station map.
+how to use the station map.}]
 
-<li> When done, load the selected profiler  data  with the 
-[ug::button Add Source] button.
+[ug::step {When done, load the selected profiler  data  with the
+[ug::button Add Source] button.}]
 
 </ol>
 

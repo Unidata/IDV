@@ -106,7 +106,7 @@ idv.3d = true
 idv.data.adde.servers.proplabel = ADDE Servers
 idv.data.adde.servers.propdesc=List of ADDE servers. One per row.
 idv.data.adde.servers.propdelimiter=;
-idv.data.adde.servers = adde.cise-nsf.gov;adde.ucar.edu;stratus.al.noaa.gov;weather3.admin.niu.edu;twister.millersville.edu;pscwx.plymouth.edu;papagayo.unl.edu
+idv.data.adde.servers = adde.ucar.edu;stratus.al.noaa.gov;weather3.admin.niu.edu;twister.millersville.edu;pscwx.plymouth.edu;papagayo.unl.edu
 
 ##Semicolon separated list of adde servers
 

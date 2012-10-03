@@ -172,7 +172,7 @@ public class WayDisplayState {
         this.stormDisplayState = stormDisplayState;
         this.way               = way;
         wayState               = new DisplayState(this, "Show/Hide All",
-                true);
+                false);
         trackState = new DisplayState(this, "Show/Hide Track", true);
         coneState = new DisplayState(this, "Show/Hide Cone", false);
         ringsState = new DisplayState(this, "Show/Hide Rings", false);

@@ -1,52 +1,33 @@
 /*
- * $Id: LatLonData.java,v 1.6 2006/10/26 19:30:50 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.gis.maps;
 
 
-import ucar.unidata.util.GuiUtils;
+import ucar.visad.display.LatLonLines;
 
-
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.LogUtil;
-
-import ucar.unidata.util.Resource;
-
-import ucar.visad.MapFamily;
-
-import ucar.visad.display.*;
-
-import visad.*;
-
-
+import visad.RealType;
+import visad.VisADException;
 
 
 import java.awt.Color;
-
-import java.net.URL;
 
 import java.rmi.RemoteException;
 
@@ -66,10 +47,13 @@ public class LatLonData {
     private boolean visible = true;
 
     /** The color */
-    private Color color = Color.blue;
+    private Color color = Color.gray;
 
     /** The line spacing */
     private float spacing;
+
+    /** The line base */
+    private float base;
 
     /** The line width */
     private float lineWidth;
@@ -114,7 +98,7 @@ public class LatLonData {
     }
 
     /**
-     * The ctro
+     * The constructor
      *
      * @param isLatitude Is it lat or lon
      * @param color The color
@@ -126,9 +110,29 @@ public class LatLonData {
      */
     public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
                       float lineWidth, int lineStyle, boolean fastRendering) {
+        this(isLatitude, color, defaultSpacing, 0.f, lineWidth, lineStyle,
+             fastRendering);
+    }
+
+    /**
+     * The constructor
+     *
+     * @param isLatitude Is it lat or lon
+     * @param color The color
+     * @param defaultSpacing The spacing
+     * @param base The base
+     * @param lineWidth The line width
+     * @param lineStyle The line style
+     * @param fastRendering true to use fast rendering
+     *
+     */
+    public LatLonData(boolean isLatitude, Color color, float defaultSpacing,
+                      float base, float lineWidth, int lineStyle,
+                      boolean fastRendering) {
         this.isLatitude    = isLatitude;
         this.color         = color;
         this.spacing       = defaultSpacing;
+        this.base          = base;
         this.lineWidth     = lineWidth;
         this.lineStyle     = lineStyle;
         this.fastRendering = fastRendering;
@@ -157,6 +161,7 @@ public class LatLonData {
         this.isLatitude    = that.isLatitude;
         this.color         = that.color;
         this.spacing       = that.spacing;
+        this.base          = that.base;
         this.lineWidth     = that.lineWidth;
         this.lineStyle     = that.lineStyle;
         this.maxValue      = that.maxValue;
@@ -186,7 +191,7 @@ public class LatLonData {
             myLatLon = new LatLonLines((isLatitude
                                         ? RealType.Latitude
                                         : RealType.Longitude), minValue,
-                                        maxValue, spacing,
+                                        maxValue, spacing, base,
                                         getRealVisibility());
 
         }
@@ -194,9 +199,10 @@ public class LatLonData {
             myLatLon.setColor(color);
         }
         myLatLon.setVisible(getRealVisibility());
+        myLatLon.setSpacing(spacing);
+        myLatLon.setBase(base);
         myLatLon.setLineStyle(lineStyle);
         myLatLon.setLineWidth(lineWidth);
-        myLatLon.setSpacing(spacing);
         myLatLon.setUseFastRendering(fastRendering);
         return myLatLon;
     }
@@ -249,6 +255,25 @@ public class LatLonData {
      */
     public float getSpacing() {
         return spacing;
+    }
+
+    /**
+     *  Set the Base property.
+     *
+     *  @param value The new value for Base
+     */
+    public void setBase(float value) {
+        base = value;
+        stateChanged();
+    }
+
+    /**
+     *  Get the Base property.
+     *
+     *  @return The Base
+     */
+    public float getBase() {
+        return base;
     }
 
     /**
@@ -387,4 +412,3 @@ public class LatLonData {
 
 
 }
-

@@ -24,7 +24,7 @@ package ucar.unidata.idv.chooser;
 import org.w3c.dom.Element;
 
 
-
+import ucar.unidata.data.AddeUtil;
 import ucar.unidata.data.sounding.RaobDataSet;
 
 import ucar.unidata.idv.*;
@@ -39,6 +39,7 @@ import ucar.unidata.view.sounding.SoundingSelector;
 
 
 import ucar.unidata.xml.XmlUtil;
+import visad.DateTime;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -150,7 +151,9 @@ public class RaobChooser extends IdvChooser {
         }
         Hashtable ht = new Hashtable();
         getDataSourceProperties(ht);
-
+        List dtime = soundingChooser.getSelectedTimes();
+        //JList t = soundingChooser.getSoundingAdapter().getTimesList();
+        ht.put(AddeUtil.ABSOLUTE_TIMES,  dtime);
         makeDataSource(new RaobDataSet(soundingChooser.getSoundingAdapter(),
                                        soundings), DATASOURCE_RAOB, ht);
         soundingChooser.getAddeChooser().saveServerState();

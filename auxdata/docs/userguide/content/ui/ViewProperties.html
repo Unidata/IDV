@@ -1,0 +1,116 @@
+<html><head>
+  <title>View Properties</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+
+
+Each display (View) has a [ug::menu View Properties] menu.  This allows you
+to set properties specific to that View.
+
+<%childlist%>
+
+<subhead intoc="false" id="main">Main</subhead>
+
+This tab allows you to set a variety of options concerning the
+display, colors, logos, etc.
+
+[ht::cimg images/ViewPropertiesMain.gif]
+
+<ul>
+[ug::menuDesc {Name} {
+Set the name of the view.  The name will be displayed above the view and can also
+be used in an ISL script to identify this view.
+}]
+
+[ug::menuDesc {Properties} {
+The checkboxes can be used to set properties on this view.
+}]
+
+[ug::menuDesc {Colors} {
+Change the background and foreground colors
+of the view (not the map lines) to predefined colors.
+}]
+
+[ug::menuDesc {Display List} {
+Allows you to set the font, font style and size and color of the display list
+labels for this view.
+}]
+
+[ug::menuDesc {Full Screen Dimensions} {
+Set the dimensions for the size of the full screen mode.
+}]
+
+[ug::menuDesc {Logo} {
+Set a logo that will be overlain on the View.  You can enter a file path or a
+URL for the logo image. You can set the position and offsets
+from that position.  The image can be scaled depending on the size of the view window.
+}]
+</ul>
+
+
+<subhead intoc="false" id="aspect">Apect Ratio</subhead>
+
+In this tab you can configure the aspect ratio of the scene.
+
+[ht::cimg images/ViewPropertiesAspect.gif]
+
+<subhead intoc="false" id="lighting">Lighting</subhead>
+
+This tab lets the user configure the lighting of the scene.
+
+[ht::cimg images/ViewPropertiesLighting.gif]
+
+<subhead intoc="false" id="vertrange">Vertical Range</subhead>
+
+In this tab you can set the vertical range, as well as set the
+units, and toggle the visibility of the axis.
+
+[ht::cimg images/ViewPropertiesVerticalRange.gif]
+
+<subhead intoc="false" id="hscale">Horizontal Scale</subhead>
+
+This tab allows you to set a variety of options concerning the
+horizontal axis labels. Note that there are separate sections for the
+latitude axis label and the longitude axis label.
+
+[ht::cimg images/ViewPropertiesHorizontalScale.gif]
+
+<ul>
+[ug::menuDesc {Label} { The label that will be displayed along the
+latitude or longitude axis.  }]
+
+[ug::menuDesc {Base} { This is the base degree where the tick mark
+increments start. For latitude the base must be between -90 and
+90. For longitude, it must be between -180 and 180. Note that the base
+can be "below" the displayable latitudes and longitudes on the
+screen. The increment will simply start from that number, and display
+the tick mark increments that are visible on the display.  }]
+
+[ug::menuDesc {Major Increment} { The major tick mark increment
+starting from the base expressed in degrees.  }]
+
+[ug::menuDesc {Minor Division} { The minor tick mark division between
+major tick mark increments. For example, if 2 is chosen, the space
+between the major divisions will be divided in 2 giving a small tick
+mark half way between each tick major mark. The default is 1 which
+means no minor tick mark.  }]
+
+[ug::menuDesc {Visible} { The visibilty of the axis label. If checked,
+the axis will be visible. If it is unchecked, the axis will be hidden.
+}]
+
+[ug::menuDesc {Format} { The format of the degrees, minutes and
+seconds of the latitude and longitude from a predefined list of
+options. This option controls latitude and longitude formats for both
+axes.  }]
+
+[ug::menuDesc {Font} { The style, weight and size of the font that
+will be displayed along the axes. The option controls fonts for both
+axes. }]
+</ul>
+
+</body>
+</html>

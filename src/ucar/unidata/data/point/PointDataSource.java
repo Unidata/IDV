@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,14 +23,22 @@ package ucar.unidata.data.point;
 
 import au.gov.bom.aifs.osa.analysis.Barnes;
 
-import ucar.unidata.data.*;
-import ucar.unidata.data.grid.GridDataSource;
-
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataAlias;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataOperand;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.FilesDataSource;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.ui.PlotModelComponent;
 import ucar.unidata.idv.ui.ValueSliderComponent;
-
-
 import ucar.unidata.ui.TimeLengthField;
 import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.util.GuiUtils;
@@ -41,22 +49,32 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 
-import visad.*;
+import visad.Data;
+import visad.FieldImpl;
+import visad.MathType;
+import visad.Real;
+import visad.RealType;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
-
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 
 /**
@@ -176,7 +194,10 @@ public abstract class PointDataSource extends FilesDataSource {
     private float gridGain = 1.0f;
 
     /** Scale length */
-    private float gridSearchRadius = 10.0f;
+    private static float DEFAULT_RADIUS = 10.0f;
+
+    /** Scale length */
+    private float gridSearchRadius = DEFAULT_RADIUS;
 
     /** Do we make grid fields */
     private boolean makeGridFields = true;
@@ -471,7 +492,7 @@ public abstract class PointDataSource extends FilesDataSource {
          */
         private void enableAutoComps(boolean enable) {
             GuiUtils.enableTree(sizeComp, enable);
-            searchComp.setEnabled(enable);
+            //searchComp.setEnabled(enable);
         }
 
         /**
@@ -601,8 +622,8 @@ public abstract class PointDataSource extends FilesDataSource {
          *
          * @return search radius
          */
-        public int getGridSearchRadius() {
-            return (int) searchComp.getValue();
+        public float getGridSearchRadius() {
+            return (float) searchComp.getValue();
         }
 
         /**
@@ -1214,6 +1235,10 @@ public abstract class PointDataSource extends FilesDataSource {
                     || (spacingY <= 0)) {
                 degreesX = PointObFactory.OA_GRID_DEFAULT;
                 degreesY = PointObFactory.OA_GRID_DEFAULT;
+                if ((searchRadius == DEFAULT_RADIUS)
+                        && (firstGuessData == null)) {
+                    searchRadius = PointObFactory.OA_GRID_DEFAULT;
+                }
             } else if (theUnit.equals(SPACING_POINTS)) {
                 double[] bbox  = PointObFactory.getBoundingBox(pointObs);
                 float    spanX = (float) Math.abs(bbox[1] - bbox[3]);

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,29 +21,14 @@
 package ucar.unidata.data;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-
-//import opendap.dap.http.HTTPSession;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.nc2.util.net.HTTPSession;
+
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
-import ucar.unidata.idv.StateManager;
 import ucar.unidata.util.AccountManager;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
@@ -58,14 +43,33 @@ import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-import ucar.nc2.util.net.HTTPSession;
+
 import visad.DateTime;
 import visad.Real;
 import visad.RealType;
 import visad.SampledSet;
 import visad.Unit;
 import visad.VisADException;
+
 import visad.data.text.TextAdapter;
+
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.lang.reflect.Constructor;
+
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
 
 
 
@@ -123,7 +127,7 @@ public class DataManager {
     /** The show in tree property */
     public static final String PROP_SHOW_IN_TREE = "show_in_tree";
 
-    /** _more_ */
+    /** The cache percent property */
     public static final String PROP_CACHE_PERCENT = "idv.data.cache.percent";
 
     /** bbox property */
@@ -361,23 +365,26 @@ public class DataManager {
             AccountManager provider = accountManager;
             HTTPSession.setGlobalCredentialsProvider(provider);
             // Get the current version
-            String version =  dataContext.getIdv().getStateManager().getVersion();
-            if(version == null) version = "xxx";
-            HTTPSession.setGlobalUserAgent("IDV "+version);
+            String version =
+                dataContext.getIdv().getStateManager().getVersion();
+            if (version == null) {
+                version = "xxx";
+            }
+            HTTPSession.setGlobalUserAgent("IDV " + version);
             // Force long timeouts
-            HTTPSession.setGlobalSoTimeout(5*60*1000);
-            HTTPSession.setGlobalConnectionTimeout(5*60*1000);
+            HTTPSession.setGlobalSoTimeout(5 * 60 * 1000);
+            HTTPSession.setGlobalConnectionTimeout(5 * 60 * 1000);
 
-//            try {
-//                HttpWrap client = new HttpWrap();
-//                client.setGlobalCredentialsProvider(provider);
-//                // fix opendap.dap.DConnect2.setHttpClient(client);
-//                ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(
-//                    client);
-//            } catch (Exception exc) {
-//                LogUtil.printException(log_, "Cannot create http client",
-//                                       exc);
-//            }
+            //            try {
+            //                HttpWrap client = new HttpWrap();
+            //                client.setGlobalCredentialsProvider(provider);
+            //                // fix opendap.dap.DConnect2.setHttpClient(client);
+            //                ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(
+            //                    client);
+            //            } catch (Exception exc) {
+            //                LogUtil.printException(log_, "Cannot create http client",
+            //                                       exc);
+            //            }
         }
 
 
@@ -707,8 +714,8 @@ public class DataManager {
         if (properties != null) {
             for (java.util.Enumeration keys = properties.keys();
                     keys.hasMoreElements(); ) {
-                String key   = (String) keys.nextElement();
-                String value = (String) properties.get(key);
+                String  key      = (String) keys.nextElement();
+                String  value    = (String) properties.get(key);
                 Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
                                        value, new String[] { ATTR_NAME,
                         key });
@@ -731,10 +738,8 @@ public class DataManager {
 </datasources>
         */
 
-        return XmlUtil.getHeader() + XmlUtil.toString(root);
+        return XmlUtil.toStringWithHeader(root);
     }
-
-
 
 
     /**
@@ -809,7 +814,7 @@ public class DataManager {
 
 
                 Hashtable properties = new Hashtable();
-                NodeList props = XmlUtil.getElements(datasourceNode,
+                NodeList  props      = XmlUtil.getElements(datasourceNode,
                                      TAG_PROPERTY);
                 for (int propIdx = 0; propIdx < props.getLength();
                         propIdx++) {
@@ -1477,7 +1482,8 @@ public class DataManager {
                                      properties);
         }
         DataSourceResults results = new DataSourceResults();
-        if ((dataTypes == null) || (dataTypes.size() == 0) || (definingObject instanceof ArrayList)) {
+        if ((dataTypes == null) || (dataTypes.size() == 0)
+                || (definingObject instanceof ArrayList)) {
             //If it is a string then let's just try the VisadDataSource
             if (definingObject instanceof String) {
                 String overrideDataType =
@@ -1489,18 +1495,20 @@ public class DataManager {
                     return results;
                     // dataTypes = Misc.newList("FILE.ANY");
                 }
-            /* If it is an ArrayList (multiple files selected), then
-              we need to crack into each member to try the string test
-              from above (if string then try the as a VisadDataSource) */
+                /* If it is an ArrayList (multiple files selected), then
+                  we need to crack into each member to try the string test
+                  from above (if string then try the as a VisadDataSource) */
             } else if (definingObject instanceof ArrayList) {
                 if (((ArrayList) definingObject).size() > 1) {
                     if (dataTypes.get(0).toString().contains("null")) {
                         String overrideDataType =
-                            dataContext.selectDataType(((ArrayList) definingObject).get(0));
+                            dataContext.selectDataType(
+                                ((ArrayList) definingObject).get(0));
                         if (overrideDataType != null) {
                             for (int i = 0; i < dataTypes.size(); i++) {
-                                dataTypes.set(i,new DataType(overrideDataType,
-                                definingObject));
+                                dataTypes.set(i,
+                                        new DataType(overrideDataType,
+                                            definingObject));
                             }
                         }
                     }

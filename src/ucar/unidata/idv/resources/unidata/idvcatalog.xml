@@ -5,7 +5,6 @@
 
 <dataset name="Unidata IDD Model Data">
 <catalogRef xlink:title="UCAR (motherlode)" xlink:href="http://motherlode.ucar.edu/thredds/idv/models.xml"/>
-<catalogRef xlink:title="NSF-ATM" xlink:href="http://thredds.cise-nsf.gov:8080/thredds/idv/models.xml"/>
 </dataset>
 <!--
 <catalogRef xlink:title="Unidata IDD Model Data (netCDF)" xlink:href="http://motherlode.ucar.edu/thredds/idv/rt-models.1.0.xml"/>
@@ -20,7 +19,7 @@
 <catalogRef xlink:title="Example Bundles from the Unidata RAMADDA Server" xlink:href="http://motherlode.ucar.edu/repository/entry/show/Top/IDV+Resources/Bundles?entryid=196cb40d-6cc9-4726-8285-3a7eea8bcb92&amp;output=thredds.catalog&amp;orderby=name"/>
 <catalogRef xlink:title="Community Data Servers" xlink:href="http://motherlode.ucar.edu/repository/entry/show?entryid=23dec561-b869-4e20-8b1b-f38e4659ebab&amp;output=thredds.catalog"/>
 
-<catalogRef xlink:title="Topography/Bathymetry" xlink:href="http://coast-enviro.er.usgs.gov/thredds/bathy_catalog.xml" xlink:type="simple"/>
+<catalogRef xlink:title="Topography/Bathymetry" xlink:href="http://geoport.whoi.edu/thredds/bathy_catalog.xml" xlink:type="simple"/>
 
 <catalogRef xlink:title="Tiger Shapefiles" xlink:href="http://www.unidata.ucar.edu/georesources/shapefiles/shapefiles.xml" xlink:type="simple"/>
 
@@ -199,4 +198,3 @@
 
 
 </catalog>
-

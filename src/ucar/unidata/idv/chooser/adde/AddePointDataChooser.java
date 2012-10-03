@@ -27,6 +27,7 @@ import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.AddeUtil;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.point.AddePointDataSource;
 
 import ucar.unidata.idv.chooser.IdvChooser;
@@ -223,6 +224,7 @@ public class AddePointDataChooser extends AddeChooser {
             // to the AddeProfilerDataSource
             Hashtable ht = new Hashtable();
             getDataSourceProperties(ht);
+            ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING, getDoTimeDrivers());
             ht.put(AddePointDataSource.PROP_STATIONMODELNAME,
                    selectedStationModel.getName());
             ht.put(DATASET_NAME_KEY, getDatasetName());
@@ -247,6 +249,10 @@ public class AddePointDataChooser extends AddeChooser {
             logException("Unable to open ADDE point dataset", excp);
         }
         showNormalCursor();
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 
 

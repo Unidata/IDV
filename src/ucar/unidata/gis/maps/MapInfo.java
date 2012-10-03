@@ -1,73 +1,51 @@
 /*
- * $Id: MapInfo.java,v 1.16 2007/07/06 20:47:24 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.gis.maps;
 
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-
-
-
 import org.w3c.dom.Element;
 
-
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.Resource;
 import ucar.unidata.xml.XmlResourceCollection;
-
-
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.MapFamily;
 
-import ucar.visad.display.*;
+import visad.SampledSet;
+import visad.VisADException;
 
 
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.io.*;
+import java.awt.Color;
+import java.awt.Font;
 
 import java.net.URL;
 
 import java.rmi.RemoteException;
 
-
-import java.util.*;
-
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.*;
-
-import javax.swing.event.*;
 
 
 /**
@@ -86,6 +64,12 @@ public class MapInfo {
     /** Xml tag for the longitude entry */
     public static final String TAG_LONGITUDE = "longitude";
 
+    /** Xml tag for the latitude label entry */
+    public static final String TAG_LATITUDELABEL = "latitudelabel";
+
+    /** Xml tag for the longitude entry */
+    public static final String TAG_LONGITUDELABEL = "longitudelabel";
+
     /** Xml tag for the maps entry */
     public static final String TAG_MAPS = "maps";
 
@@ -94,6 +78,9 @@ public class MapInfo {
 
     /** Xml attribute for the color property */
     public static final String ATTR_COLOR = "color";
+
+    /** Xml attribute for the font property */
+    public static final String ATTR_FONT = "font";
 
     /** Xml attribute for the category property */
     public static final String ATTR_CATEGORY = "category";
@@ -125,6 +112,24 @@ public class MapInfo {
     /** Xml attribute for the spacing  property */
     public static final String ATTR_SPACING = "spacing";
 
+    /** Xml attribute for the base  property */
+    public static final String ATTR_BASE = "base";
+
+    /** Xml attribute for the base  property */
+    public static final String ATTR_LABELLINES = "labellines";
+
+    /** Xml attribute for the sphere  property */
+    public static final String ATTR_SPHERE = "sphere";
+
+    /** Xml attribute for the alignment  property */
+    public static final String ATTR_ALIGNMENT = "alignment";
+
+    /** Xml attribute for the alignment  property */
+    public static final String ATTR_LABELFORMAT = "labelformat";
+
+    /** Xml attribute for the alignment  property */
+    public static final String ATTR_USE360 = "use360";
+
     /** Xml attribute for the  property */
     public static final String ATTR_VALID = "valid";
 
@@ -132,7 +137,8 @@ public class MapInfo {
     public static final String ATTR_VISIBLE = "visible";
 
     /** Static cache of the maps we have read in */
-    private static Hashtable<String,SampledSet> mapCache = new Hashtable<String,SampledSet>();
+    private static Hashtable<String, SampledSet> mapCache =
+        new Hashtable<String, SampledSet>();
 
 
     /**
@@ -145,7 +151,13 @@ public class MapInfo {
     /**
      *  List of LatLonData objects.
      */
-    private List latLonData = new ArrayList();
+    private List<LatLonData> latLonData = new ArrayList<LatLonData>();
+
+    /**
+     *  List of LatLonLabelData objects.
+     */
+    private List<LatLonLabelData> latLonLabelData =
+        new ArrayList<LatLonLabelData>();
 
     /**
      *  List of mapData objects, one for each map in the gui
@@ -184,7 +196,6 @@ public class MapInfo {
         this(mapDataList, null, null, Float.NaN);
     }
 
-
     /**
      * Create the MapInfo object with the given MapData list, LatLonData and map position
      *
@@ -195,12 +206,35 @@ public class MapInfo {
      */
     public MapInfo(List mapDataList, LatLonData latData, LatLonData lonData,
                    float mapPosition) {
+
+        this(mapDataList, latData, lonData, null, null, mapPosition);
+    }
+
+    /**
+     * Create the MapInfo object with the given MapData list, LatLonData and map position
+     *
+     * @param mapDataList List of MapData
+     * @param latData The lat data
+     * @param lonData The lon data
+     * @param latLabelData The lat label data
+     * @param lonLabelData The lon label data
+     * @param mapPosition The map position
+     */
+    public MapInfo(List mapDataList, LatLonData latData, LatLonData lonData,
+                   LatLonLabelData latLabelData,
+                   LatLonLabelData lonLabelData, float mapPosition) {
         this.mapDataList = mapDataList;
-        if(latData!=null) {
+        if (latData != null) {
             this.latLonData.add(latData);
         }
-        if(lonData!=null) {
+        if (lonData != null) {
             this.latLonData.add(lonData);
+        }
+        if (latLabelData != null) {
+            this.latLonLabelData.add(latLabelData);
+        }
+        if (lonLabelData != null) {
+            this.latLonLabelData.add(lonLabelData);
         }
         this.mapPosition = mapPosition;
     }
@@ -296,16 +330,33 @@ public class MapInfo {
                 seenNodes.put(source, mapNode);
             }
 
+            // NB:  The || true is used because these methods didn't used
+            // to handle empty nodes.  They now do, but we can easily back
+            // out of this change if need be.
             Element latitudeNode = XmlUtil.findChild(root, TAG_LATITUDE);
-            if (latitudeNode != null) {
+            if ((latitudeNode != null) || true) {
                 latLonData.add(createLatLonData(latitudeNode, true, -90.f,
-                        90.f, 30.f));
+                        90.f, 15.f));
             }
 
             Element longitudeNode = XmlUtil.findChild(root, TAG_LONGITUDE);
-            if (longitudeNode != null) {
+            if ((longitudeNode != null) || true) {
                 latLonData.add(createLatLonData(longitudeNode, false, -180.f,
-                        180.f, 45.f));
+                        180.f, 15.f));
+            }
+
+            Element latitudeLabelNode = XmlUtil.findChild(root,
+                                            TAG_LATITUDELABEL);
+            if ((latitudeLabelNode != null) || true) {
+                latLonLabelData.add(createLatLonLabelData(latitudeLabelNode,
+                        true, 15.f));
+            }
+
+            Element longitudeLabelNode = XmlUtil.findChild(root,
+                                             TAG_LONGITUDELABEL);
+            if ((longitudeLabelNode != null) || true) {
+                latLonLabelData.add(createLatLonLabelData(longitudeLabelNode,
+                        false, 15.f));
             }
 
 
@@ -330,27 +381,59 @@ public class MapInfo {
         return getXml(true);
     }
 
+    /**
+     * Get the XML
+     *
+     * @param useFullSourcePath  true to use the full source path
+     *
+     * @return  the Xml
+     */
     public String getXml(boolean useFullSourcePath) {
         Document document     = XmlUtil.makeDocument();
         Element  currentState = document.createElement(TAG_MAPS);
-        if(mapPosition == mapPosition) {
+        if (mapPosition == mapPosition) {
             currentState.setAttribute(ATTR_POSITION, "" + mapPosition);
         }
         try {
             for (int i = 0; i < latLonData.size(); i++) {
-                LatLonData lld = (LatLonData) latLonData.get(i);
-                Element newElement =
+                LatLonData lld        = (LatLonData) latLonData.get(i);
+                Element    newElement =
                     document.createElement(lld.getIsLatitude()
                                            ? TAG_LATITUDE
                                            : TAG_LONGITUDE);
                 currentState.appendChild(newElement);
                 XmlUtil.setAttributes(newElement, new String[] {
-                    ATTR_SPACING, "" + lld.getSpacing(), ATTR_COLOR,
+                    ATTR_SPACING, "" + lld.getSpacing(), ATTR_BASE,
+                    "" + lld.getBase(), ATTR_COLOR,
                     "" + lld.getColor().getRGB(), ATTR_LINESTYLE,
                     "" + lld.getLineStyle(), ATTR_LINEWIDTH,
                     "" + lld.getLineWidth(), ATTR_VISIBLE,
                     "" + lld.getVisible(), ATTR_FASTRENDER,
                     "" + lld.getFastRendering()
+                });
+            }
+
+            for (LatLonLabelData llld : latLonLabelData) {
+                Element newElement =
+                    document.createElement(llld.getIsLatitude()
+                                           ? TAG_LATITUDELABEL
+                                           : TAG_LONGITUDELABEL);
+                currentState.appendChild(newElement);
+                XmlUtil.setAttributes(newElement, new String[] {
+                    ATTR_SPACING, "" + llld.getInterval(), ATTR_BASE,
+                    "" + llld.getBaseValue(), ATTR_LABELLINES,
+                    "" + LatLonLabelData.formatLabelLines(
+                        llld.getLabelLines()),
+                    ATTR_COLOR, "" + llld.getColor().getRGB(), ATTR_VISIBLE,
+                    "" + llld.getVisible(),
+                    //ATTR_FASTRENDER, "" + llld.getFastRendering(),
+                    //ATTR_FONT, ((llld.getFont() == null)
+                    //            ? FontSelector.DEFAULT_FONT.toString()
+                    //            : llld.getFont().toString()), 
+                    ATTR_SPHERE, "" + llld.getSphere(), ATTR_ALIGNMENT,
+                    "" + llld.getAlignment(), ATTR_LABELFORMAT,
+                    "" + llld.getLabelFormat(), ATTR_USE360,
+                    "" + llld.getUse360()
                 });
             }
 
@@ -360,13 +443,14 @@ public class MapInfo {
                 Element newElement = document.createElement(TAG_MAP);
                 currentState.appendChild(newElement);
                 String source = mapData.getSource();
-                if(!useFullSourcePath) source = "/"+IOUtil.getFileTail(source);
+                if ( !useFullSourcePath) {
+                    source = "/" + IOUtil.getFileTail(source);
+                }
                 XmlUtil.setAttributes(newElement, new String[] {
-                    ATTR_SOURCE, source, 
-                    ATTR_CATEGORY, mapData.getCategory(),
-                    ATTR_COLOR, "" + mapData.getColor().getRGB(), 
-                    ATTR_LINEWIDTH, "" + mapData.getLineWidth(), ATTR_LINESTYLE,
-                    "" + mapData.getLineStyle(), ATTR_VISIBLE,
+                    ATTR_SOURCE, source, ATTR_CATEGORY, mapData.getCategory(),
+                    ATTR_COLOR, "" + mapData.getColor().getRGB(),
+                    ATTR_LINEWIDTH, "" + mapData.getLineWidth(),
+                    ATTR_LINESTYLE, "" + mapData.getLineStyle(), ATTR_VISIBLE,
                     "" + mapData.getVisible(), ATTR_DESCRIPTION,
                     "" + mapData.getDescription(), ATTR_FASTRENDER,
                     "" + mapData.getFastRendering()
@@ -375,7 +459,7 @@ public class MapInfo {
         } catch (Exception e) {
             LogUtil.printException(log_, "Couldn't create map state", e);
         }
-        return XmlUtil.toString(currentState);
+        return XmlUtil.toStringWithHeader(currentState);
     }
 
 
@@ -413,9 +497,9 @@ public class MapInfo {
     public static SampledSet createMapData(String source) {
 
         //        System.err.println ("CreateMap:" + source);
-        SampledSet mapSet =  mapCache.get(source);
+        SampledSet mapSet = mapCache.get(source);
         if (mapSet != null) {
-            return (SampledSet)mapSet.clone();
+            return (SampledSet) mapSet.clone();
         }
 
         ucar.unidata.util.Trace.call1("create map", source);
@@ -461,7 +545,7 @@ public class MapInfo {
             mapCache.put(source, mapSet);
         }
         ucar.unidata.util.Trace.call2("create map");
-        return (SampledSet)mapSet.clone();
+        return (SampledSet) mapSet.clone();
     }
 
 
@@ -481,23 +565,78 @@ public class MapInfo {
     private LatLonData createLatLonData(Element node, boolean latitude,
                                         float min, float max, float spacing)
             throws VisADException, RemoteException {
-        LatLonData lld =
-            new LatLonData(latitude,
-                           XmlUtil.getAttribute(node, ATTR_COLOR,
-                               Color.white), XmlUtil.getAttribute(node,
-                                   ATTR_SPACING,
-                                   spacing), XmlUtil.getAttribute(node,
-                                       ATTR_LINEWIDTH,
-                                       1.0f), XmlUtil.getAttribute(node,
-                                           ATTR_LINESTYLE,
-                                           1), XmlUtil.getAttribute(node,
-                                               ATTR_FASTRENDER, false));
+        LatLonData lld = (node != null)
+                         ? new LatLonData(latitude,
+                             XmlUtil.getAttribute(node, ATTR_COLOR,
+                                 Color.gray), XmlUtil.getAttribute(node,
+                                     ATTR_SPACING,
+                                     spacing), XmlUtil.getAttribute(node,
+                                         ATTR_BASE,
+                                         0.f), XmlUtil.getAttribute(node,
+                                             ATTR_LINEWIDTH,
+                                             1.0f), XmlUtil.getAttribute(node,
+                                                 ATTR_LINESTYLE,
+                                                 1), XmlUtil.getAttribute(node,
+                                                     ATTR_FASTRENDER, false))
+                         : new LatLonData(latitude, Color.gray, spacing, 0.f,
+                                          1.0f, 1, false);
 
-        lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, true));
+        if (node != null) {
+            lld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, false));
+        } else {
+            lld.setVisible(false);
+        }
         lld.setMinValue(min);
         lld.setMaxValue(max);
 
         return lld;
+    }
+
+    /**
+     * Create the {@link LatLonLabelData}
+     *
+     * @param node The xml node
+     * @param latitude Is this for lat or lon
+     * @param spacing The spacing
+     * @return The new LatLonLabelData
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    private LatLonLabelData createLatLonLabelData(Element node,
+            boolean latitude, float spacing)
+            throws VisADException, RemoteException {
+        LatLonLabelData llld = (node != null)
+                               ? new LatLonLabelData(latitude,
+                                   XmlUtil.getAttribute(node, ATTR_SPACING,
+                                       spacing))
+                               : new LatLonLabelData(latitude, spacing);
+
+        if (node != null) {
+            llld.setBaseValue(XmlUtil.getAttribute(node, ATTR_BASE, 0.f));
+            llld.setColor(XmlUtil.getAttribute(node, ATTR_COLOR,
+                    Color.white));
+            llld.setVisible(XmlUtil.getAttribute(node, ATTR_VISIBLE, false));
+            llld.setLabelsLineString(XmlUtil.getAttribute(node,
+                    ATTR_LABELLINES, "0"));
+            llld.setAlignment(XmlUtil.getAttribute(node, ATTR_ALIGNMENT,
+                    "MM"));
+            llld.setLabelFormat(XmlUtil.getAttribute(node, ATTR_LABELFORMAT,
+                    "DD"));
+            llld.setSphere(XmlUtil.getAttribute(node, ATTR_SPHERE, false));
+            //llld.setFont(Font.decode(XmlUtil.getAttribute(node, ATTR_FONT,
+            //        (String) null)));
+            llld.setUse360(XmlUtil.getAttribute(node, ATTR_USE360, false));
+        } else {
+            llld.setBaseValue(0.f);
+            llld.setColor(Color.white);
+            llld.setVisible(false);
+            llld.setLabelsLineString("0");
+            llld.setAlignment("MM");
+            llld.setLabelFormat("DD");
+            llld.setSphere(false);
+        }
+        return llld;
     }
 
 
@@ -520,6 +659,25 @@ public class MapInfo {
         return latLonData;
     }
 
+    /**
+     * Set the LatLonLabelData property.
+     *
+     * @param value The new value for LatLonData
+     */
+    public void setLatLonLabelData(List<LatLonLabelData> value) {
+        latLonLabelData = value;
+    }
+
+
+    /**
+     * Get the LatLonLabelData property.
+     *
+     * @return The LatLonLabelData
+     */
+    public List<LatLonLabelData> getLatLonLabelData() {
+        return latLonLabelData;
+    }
+
 
     /**
      * Set the MapData property.
@@ -536,7 +694,7 @@ public class MapInfo {
      * @return The MapData
      */
     public List<MapData> getMapDataList() {
-        return (List<MapData>)mapDataList;
+        return (List<MapData>) mapDataList;
     }
 
 
@@ -572,6 +730,37 @@ public class MapInfo {
     }
 
     /**
+     * Find and return the LatLonData object that represents the lat state
+     *
+     * @return The lat state
+     */
+    public LatLonLabelData getLatLabelData() {
+        for (int i = 0; i < latLonLabelData.size(); i++) {
+            LatLonLabelData lld = (LatLonLabelData) latLonLabelData.get(i);
+            if (lld.getIsLatitude()) {
+                return lld;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Find and return the LatLonData object that represents the lon state
+     *
+     * @return The lon state
+     */
+    public LatLonLabelData getLonLabelData() {
+        for (int i = 0; i < latLonLabelData.size(); i++) {
+            LatLonLabelData lld = (LatLonLabelData) latLonLabelData.get(i);
+            if ( !lld.getIsLatitude()) {
+                return lld;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the Flag for just loading local maps
      *
      * @return the flag
@@ -590,4 +779,3 @@ public class MapInfo {
     }
 
 }
-

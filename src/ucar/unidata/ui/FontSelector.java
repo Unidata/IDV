@@ -1,20 +1,18 @@
 /*
- * $Id: FontSelector.java,v 1.5 2007/07/06 20:45:30 jeffmc Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,17 +23,34 @@ package ucar.unidata.ui;
 
 import ucar.unidata.util.GuiUtils;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.*;
-import java.awt.geom.*;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 
 /**
@@ -409,6 +424,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             Integer newSize = new Integer(si);
             int     size    = newSize.intValue();
             thisFont = new Font(f, st, size);
+            setFont(thisFont);
             repaint();
         }
 
@@ -432,5 +448,25 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             g2.drawString(change, w / 2 - width / 2, h / 2 - height / 2);
         }
     }
-}
 
+    /**
+     * Add a listener.
+     *
+     * @param l  the listener
+     */
+    public synchronized void addPropertyChangeListener(
+            PropertyChangeListener l) {
+        sample.addPropertyChangeListener("font", l);
+    }
+
+    /**
+     * Remove a listener.
+     *
+     * @param l
+     */
+    public synchronized void removePropertyChangeListener(
+            PropertyChangeListener l) {
+        sample.removePropertyChangeListener(l);
+    }
+
+}

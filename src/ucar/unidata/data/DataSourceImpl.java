@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -25,24 +25,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-
 import ucar.unidata.collab.SharableImpl;
-
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
-
-
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ViewManager;
-
-import ucar.unidata.idv.chooser.*;
-
-import ucar.unidata.idv.ui.DataControlDialog;
+import ucar.unidata.idv.chooser.IdvChooser;
+import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.ui.DataSelectionWidget;
-import ucar.unidata.idv.ui.IdvUIManager;
-
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.FilePoller;
@@ -51,7 +41,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Poller;
 import ucar.unidata.util.PollingInfo;
@@ -59,35 +48,44 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
-
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlUtil;
 
 import visad.Data;
-import visad.DataReference;
-import visad.DataReferenceImpl;
 import visad.DateTime;
 import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import java.io.*;
+import java.io.File;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
 
 import java.rmi.RemoteException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 
@@ -489,8 +487,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JCheckBox allCbx =
             new JCheckBox("Use this mask for all data sources of this type",
                           false);
-        JCheckBox  installCbx         = new JCheckBox("Install Plugin",
-                                            false);
+        JCheckBox  installCbx         = new JCheckBox("Install Plugin", false);
         JTextField labelFld           = new JTextField(id);
         JTextField idFld              = new JTextField(id);
         List       choices            = getDataChoices();
@@ -578,7 +575,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JTabbedPane tab      = new JTabbedPane();
         List        catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
-            List comps = (List) catMap.get(categories.get(i));
+            List   comps      = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_YY,
                                     GuiUtils.WT_N);
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
@@ -1587,10 +1584,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (displayType != null) {
             List choices = getDataChoices();
             for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
-                DataChoice dataChoice = (DataChoice) choices.get(cIdx);
+                DataChoice    dataChoice      = (DataChoice) choices.get(cIdx);
+                DataSelection driverSelection = null;
+                boolean       useTimeDriver   =
+                    getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING,
+                                false);
+                if (useTimeDriver) {
+                    driverSelection = new DataSelection();
+                    driverSelection.getProperties().put(
+                        DataSelection.PROP_USESTIMEDRIVER, true);
+                }
                 getIdv().doMakeControl(
                     dataChoice, getIdv().getControlDescriptor(displayType),
-                    (String) null);
+                    (String) null, driverSelection);
                 //For now break after the first one
                 //so we don't keep adding displays
                 break;
@@ -2058,8 +2064,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public List<DateTime> selectTimesFromList(DataSelection dataSelection,
             List sourceTimes, List<DateTime> selectionTimes)
             throws Exception {
-    	return DataUtil.selectTimesFromList(sourceTimes, selectionTimes);
-    	/*
+        return DataUtil.selectTimesFromList(sourceTimes, selectionTimes);
+        /*
         List<DateTime> results = new ArrayList<DateTime>();
         //First convert the source times to a list of Date objects
         List<Date> sourceDates = new ArrayList<Date>();
@@ -2125,27 +2131,28 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (givenDataSelection != null) {
             List<DateTime> timeDriverTimes =
                 givenDataSelection.getTimeDriverTimes();
-            Object ud = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+            Object ud = givenDataSelection.getProperty(
+                            DataSelection.PROP_USESTIMEDRIVER);
             boolean useTDT = false;
-            if(ud != null){
-                useTDT = ((Boolean)ud).booleanValue();
+            if (ud != null) {
+                useTDT = ((Boolean) ud).booleanValue();
             }
-            if(useTDT && timeDriverTimes == null){
+            if (useTDT && (timeDriverTimes == null)) {
                 //check view manager
-                ViewManager vm = getIdv().getViewManager();
-                List tdt = null;
-                try{
-                    tdt = vm.getTimeDriverTimes() ;
-                } catch (Exception ee) {  }
-
-                if(tdt != null)
-                    timeDriverTimes = tdt;
-            }
-          //  if (useTDT && (timeDriverTimes != null)) {
-            if (timeDriverTimes != null && useTDT == true) {
+                ViewManager vm  = getIdv().getViewManager();
+                List        tdt = null;
                 try {
-                    System.err.println("time driver times:"
-                                       + timeDriverTimes);
+                    tdt = vm.getTimeDriverTimes();
+                } catch (Exception ee) {}
+
+                if (tdt != null) {
+                    timeDriverTimes = tdt;
+                }
+            }
+            //  if (useTDT && (timeDriverTimes != null)) {
+            if ((timeDriverTimes != null) && (useTDT == true)) {
+                try {
+                    log_.debug("time driver times:" + timeDriverTimes);
                     List<DateTime> dataSourceTimes =
                         getAllTimesForTimeDriver(dataChoice,
                             givenDataSelection, timeDriverTimes);
@@ -2802,7 +2809,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         changeDataPathsCbx.setToolTipText(
             "Should this data source also be changed");
         JTextField nameFld = new JTextField(prefix, 10);
-        File dir = FileManager.getDirectory(
+        File       dir     = FileManager.getDirectory(
                        null, label,
                        GuiUtils.top(
                            GuiUtils.inset(
@@ -3091,10 +3098,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            if(getIdv().getUseTimeDriver())
+            if (getIdv().getUseTimeDriver()) {
                 dsw = new DataSelectionWidget(getIdv(), true, false);
-            else
-                dsw = new DataSelectionWidget(getIdv()); 
+            } else {
+                dsw = new DataSelectionWidget(getIdv());
+            }
             dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
             dsw.setUseAllTimes(getDateTimeSelection() == null);
             JComponent extraTimesComp = getExtraTimesComponent();
@@ -3153,7 +3161,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if (chooserClassName != null) {
                 IdvChooser chooser  = null;
                 Class      theClass = Misc.findClass(chooserClassName);
-                Class[] paramTypes = new Class[] { IdvChooserManager.class,
+                Class[] paramTypes  = new Class[] { IdvChooserManager.class,
                         Element.class };
                 Object[] args = new Object[] {
                                     getIdv().getIdvChooserManager(),
@@ -3903,7 +3911,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if (dataCachePath == null) {
 
                 String uniqueName = "data_" + Misc.getUniqueId();
-                String tmp =
+                String tmp        =
                     IOUtil.joinDir(
                         getIdv().getDataManager().getDataCacheDirectory(),
                         uniqueName);

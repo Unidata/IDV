@@ -2,58 +2,139 @@
 {Map  Control}
 
 {
-Maps in the IDV are shown using the Map display control. There are  two ways this 
-control is used: as  the default  background maps and as a user created map display.
-The control window is composed of two tabs. The first lists the set of
-available maps:
+
+Maps in the IDV are shown using the Map display control. There are
+two ways this control is used: as  the default  background maps and
+as a user created map display.  The control window is composed of
+two tabs. The first lists the set of available maps:
 
 [ht::cimg images/MapDisplayControlGui1.gif]
 
-The second allows the user to control the display of the latitude/longitude lines
-and control the Z level of the maps:
+The second allows the user to control the display of the
+latitude/longitude lines and labels:
+
 [ht::cimg images/MapDisplayControlGui2.gif]
 
+New maps may be added through the [ug::menu Edit] menu. You can
+choose to add any of the predefined maps available to the IDV or
+you can select a map file (e.g., a shape file)  from the file system.
 
-New maps may be added through the [ug::menu Edit] menu. You can choose to add any of the predefined
-maps available to the IDV or you can select a map file (e.g., a shape file)  from the
-file system.
 <p>
-The  [ug::menu File {Default Maps} {Save  as the Default Map Preference}] menu item  allows you to save the current
-set of maps in a display as the default maps. When a new view window is created the maps that
-are saved as the default are used as the background maps. 
-<p><b>Note:</b> Once you save a set of maps as the default maps then every time your create a new display those maps and those maps only will be used.
-If you were to add a set of new maps using a plugin then those maps will not show up by default in your display.
+
+The  [ug::menu File {Default Maps} {Save  as the Default Map Preference}] 
+menu item  allows you to save the current set of maps
+in a display as the default maps. When a new view window is created
+the maps that are saved as the default are used as the background
+maps.
+
+<p><b>Note:</b> Once you save a set of maps as the default maps
+then every time your create a new display those maps and those maps
+only will be used.  If you were to add a set of new maps using a
+plugin then those maps will not show up by default in your display.
+
 <p>
-To clear the default maps choose the menu item [ug::menu File {Default Maps} {Remove Local Map Defaults}] menu item  allows you to save the current
+
+To clear the default maps, choose the menu item 
+[ug::menu File {Default Maps} {Remove Local Map Defaults}].
 
 }
 
 
 {{Maps} {
-This list shows the set of currently loaded maps. In this list you can remove a map, change
-its visibility, line width, style and color. The [ug::button Fast Rendering] button, when on,
-can save on rendering time by not checking for projection seam crossings. Note: some maps
-will display incorrectly when fast rendering is turned on.
-The &quot;plus&quot; icon on the right allows you to add the given map as a Map Data Source. This allows you to do
-display the given map in 3D draped over topography and/or do spatial analysis using the map (e.g., grid averages within a map).
+
+This list shows the set of currently loaded maps. In this list you
+can remove a map, change its visibility, line width, style and
+color. The [ug::button Fast Rendering] button, when on, can save
+on rendering time by not checking for projection seam crossings.
+Note: some maps will display incorrectly when fast rendering is
+turned on.  The &quot;plus&quot; icon on the right allows you to
+add the given map as a Map Data Source. This allows you to do display
+the given map in 3D draped over topography and/or do spatial analysis
+using the map (e.g., grid averages within a map).
+
 <p>
-The link button, when on, will apply any change to a particular map (e.g., color, line width) to all visible maps.
+
+The link button, when set to linked, will apply any change to a particular map
+(e.g., color, line width) to all visible maps.
+
 }}
 
 
-{ {Latitude/Longitude lines} {
-These controls allow you to display latitude and longitude lines. You can set the visibility,
-spacing, line width, line style and color.
+{ {Latitude/Longitude Lines} {
+
+These controls allow you to display latitude and longitude lines.
+You can set the visibility, interval, base value, line width, line 
+style and color.
+
 <p>
-The link button, when on, will apply any changes to a Lat or Lon line to the other line.
+
+The link button, when set to linked, will apply any changes to a
+latitude or longitude line to the other line.
+
+}}
+
+{ {Latitude/Longitude Labels} {
+
+These controls allow you to display latitude and longitude labels.
+You can set the visibility, interval, base value, label locations, 
+color, alignment, font and format.
+
+<p>
+
+The labels will be spaced out based on the interval and relative
+to (base) values.  For example, if you have an interval of 15 and
+a base of 0, the labels will be
+...-30,&nbsp;-15,&nbsp;0,&nbsp;15,&nbsp;30...  If the base it 5,
+the labels will be
+...-25,&nbsp;-10,&nbsp;5,&nbsp;20,&nbsp;35...
+
+<p>
+
+The [ug::button {At XXX}] options let the user select which lines the labels
+are placed at.  The [ug::button Alignment] option lets the user select the 
+positioning of the label relative to the point being labeled.  It is based
+on a compass notation where NW would be positioned up and to the left of
+the point, N would be above the point, etc:
+
+<pre>
+                    NW     N     NE
+
+                     W   Middle  E
+
+                    SW     S     SE
+</pre>
+        
+<p>
+The [ug::button Font] selector allows you to set the Font name, style and size 
+of the labels.
+
+<p>
+
+The [ug::button Format] selector allows you to set the format for the labels.
+The acceptable characters are DD (degrees), MM (minutes), SS
+(seconds), H (hemisphere - N,S,E,W), and one or more of d (decimal
+degrees), m (decimal minutes), s (decimal seconds).  The [ug::button {0-360}]
+checkbox will format longitude labels using 0-360 notation instead
+of -180 to 180.  Examples:
+
+<pre>
+                    DDH          -&gt;    34N, 43S
+                    DD:MM:SS     -&gt;    -67:45:33
+                    DD.dd        -&gt;    45.05, -117.34
+                    DD MM" SS'H  -&gt;    67 45" 33'W
+</pre>
+
+<p>
+The link button, when set to linked, will apply any changes to one set of
+latitude or longitude labels to the other labels.
+
 }}
 
 
-{ {Map position} {
-This slider  allows you to  set the vertical position of the maps.
+{ {Position} {
+
+This slider  allows you to  set the vertical position of the maps
+and latitude/longitude lines and labels.
+
 }}
-
-
-
-
 

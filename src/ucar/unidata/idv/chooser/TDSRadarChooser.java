@@ -653,6 +653,8 @@ public class TDSRadarChooser extends TimesChooser {
     public void stationOrProductChanged() {
         setHaveData(false);
         setDoTimeDrivers(false);
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
         readTimes();
         readDrivers();
         updateStatus();
@@ -927,5 +929,9 @@ public class TDSRadarChooser extends TimesChooser {
         } catch (Exception exc) {
             logException("Loading radar data", exc);
         }
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 }

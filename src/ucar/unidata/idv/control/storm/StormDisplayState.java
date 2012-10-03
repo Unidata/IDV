@@ -300,7 +300,7 @@ public class StormDisplayState {
     public StormDisplayState(StormInfo stormInfo) throws Exception {
         this.stormInfo = stormInfo;
         forecastState  = new WayDisplayState(this, new Way("forecaststate"));
-        forecastState.getWayState().setVisible(false);
+        forecastState.getWayState().setVisible(true);
         forecastState.getConeState().setVisible(true);
         forecastState.getTrackState().setVisible(true);
         forecastState.getRingsState().setVisible(true);
@@ -1296,8 +1296,13 @@ public class StormDisplayState {
             if ( !okToShowWay(wds.getWay())) {
                 continue;
             }
+            JCheckBox jbc = wds.getWayState().getCheckBox();
+            if(way.isObservation()) {
+                jbc.setSelected(true);
+                wds.getWayState().setVisible(true);
+            }
             JComponent labelComp =
-                GuiUtils.hbox(wds.getWayState().getCheckBox(),
+                GuiUtils.hbox(jbc,
                               new JLabel(" " + way.toString()));
 
             JComponent swatch = GuiUtils.wrap(wds.getColorSwatch());

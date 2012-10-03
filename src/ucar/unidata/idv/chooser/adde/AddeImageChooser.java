@@ -1502,7 +1502,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     protected void enableWidgets() {
         boolean descriptorState = ((getState() == STATE_CONNECTED)
                                    && canReadTimes());
-
+        if(drivercbx != null){
+            drivercbx.setSelected(false);
+            enableTimeWidgets();
+        }
         for (int i = 0; i < compsThatNeedDescriptor.size(); i++) {
             JComponent comp = (JComponent) compsThatNeedDescriptor.get(i);
             GuiUtils.enableTree(comp, descriptorState);
@@ -3400,7 +3403,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
         makeDataSource(ids, "ADDE.IMAGE", ht);
         saveServerState();
-
+        // uncheck the check box every time click the add source button
+        drivercbx.setSelected(false);
+        enableTimeWidgets();
+        setDoTimeDrivers(false);
     }
 
 

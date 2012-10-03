@@ -1625,6 +1625,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         startLocation = elArray[0];
         endLocation   = elArray[1];
+        if (startLocation.equals(endLocation)) return;
         LatLonPoint      latLon1 = startLocation.getLatLonPoint();
         LatLonPoint      latLon2 = endLocation.getLatLonPoint();
 

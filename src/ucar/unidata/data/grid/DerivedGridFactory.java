@@ -114,9 +114,6 @@ public class DerivedGridFactory {
     /** anomaly percentage type */
     private static final RealType ANOM_PERCENT_TYPE;
 
-    /** _more_ */
-    private static Object PI_MUTEX = new Object();
-
     static {
         try {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);

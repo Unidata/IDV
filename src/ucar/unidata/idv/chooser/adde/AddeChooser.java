@@ -580,6 +580,7 @@ public class AddeChooser extends TimesChooser {
      */
     public void handleConnect() throws Exception {
         handleUpdate();
+        drivercbx.setSelected(false);
     }
 
     /**
@@ -1371,6 +1372,10 @@ public class AddeChooser extends TimesChooser {
      */
     protected void enableWidgets() {
         super.enableWidgets();
+        if(drivercbx != null){
+            drivercbx.setSelected(false);
+            enableTimeWidgets();
+        }
         boolean connected = (getState() == STATE_CONNECTED);
         GuiUtils.enableTree(timesContainer, connected);
         //JDM        absTimesPanel.setEnabled(getDoAbsoluteTimes() && connected);

@@ -105,7 +105,7 @@ public final class AddeUtil {
         List<DateTime> absTimes    = null;
 
         // figure out the time indices
-        int[]  timeIndices;
+        int[] timeIndices;
         Object tmp = datasource.getProperty(NUM_RELATIVE_TIMES,
                                             new Integer(0));
         if (tmp instanceof Integer) {
@@ -222,7 +222,7 @@ public final class AddeUtil {
         if (url.indexOf(RELATIVE_TIME) >= 0) {
             url = url.replaceAll(RELATIVE_TIME, newTime);
         } else {
-            url = url.replaceAll("time.*;", newTime + ";");
+            url = url.replaceAll("time [^;]*;", newTime + ";");
         }
         //System.err.println("url:" + url);
         return url;
@@ -264,9 +264,9 @@ public final class AddeUtil {
         List<DateTime> alltimes = new ArrayList<DateTime>();
         for (String today : uniqueDays) {
             for (int i = 0; i < numTimes; i++) {
-                float  hours      = i * timeInc;
-                int    hour       = (int) hours;
-                int    minutes    = (int) ((hours - hour) * 60);
+                float hours   = i * timeInc;
+                int   hour    = (int) hours;
+                int   minutes = (int) ((hours - hour) * 60);
                 String dateString = today + " " + StringUtil.padZero(hour, 2)
                                     + ":" + StringUtil.padZero(minutes, 2)
                                     + ":00";

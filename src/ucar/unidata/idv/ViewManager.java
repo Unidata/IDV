@@ -6022,6 +6022,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         (BufferedImage) ImageUtils.gridImages2(images, 0,
                             Color.GRAY,
                             ImageUtils.getColumnCountFromComps(views));
+                    
+                    if ((image != null) && backgroundTransparentBtn.isSelected()) {
+                        image = ImageUtils.makeColorTransparent(image, getBackground());
+                    }
 
                     if (KmlDataSource.isKmlFile(filename)) {
                         if ( !checkForKmlImageCapture()) {
@@ -6176,10 +6180,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                          + whichComponent + " location:" + loc.x + "x"
                          + loc.y + " dimension:" + dim.width + "x"
                          + dim.height, exc);
-        }
-
-        if ((image != null) && backgroundTransparentBtn.isSelected()) {
-            image = ImageUtils.makeColorTransparent(image, getBackground());
         }
 
         return image;

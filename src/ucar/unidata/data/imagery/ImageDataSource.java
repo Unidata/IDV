@@ -1647,10 +1647,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Set the band information on the data choice
      *
-     * @param dataChoice _more_
-     * @param aii _more_
+     * @param dataChoice  the data choice
+     * @param aii  the AddeImageInfo with the image stuff
      */
     private void setBandInfo(DataChoice dataChoice, AddeImageInfo aii) {
         BandInfo       bi        = (BandInfo) dataChoice.getId();

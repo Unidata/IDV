@@ -6,9 +6,9 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir="../../../../" default="plugin" name="StiIdv">
+<project basedir="../../../../../" default="plugin" name="StiIdv">
 
-    <import file="../../../build.xml"/>
+    <import file="../../../../../build.xml"/>
 
 
     <target name="sti" depends="init">
@@ -20,7 +20,7 @@ argument -Dfoo=bar) -->
             destdir="${compiledir}"
             failonerror="${failonerror}" 
             nowarn="true"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
         >
         <include name="ucar/unidata/apps/sti/**"/>
         <include name="ucar/unidata/data/storm/*ADOT*.java"/>
@@ -35,7 +35,7 @@ argument -Dfoo=bar) -->
 
     <target name="stijar" depends="sti">
         <jar 
-            basedir="${srcdir}"
+            basedir="${compiledir}"
             compress="true"
             update="false"
             jarfile="${jars_dest}/tcidv.jar"

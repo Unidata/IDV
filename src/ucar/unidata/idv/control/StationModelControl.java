@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -20,54 +20,6 @@
 
 package ucar.unidata.idv.control;
 
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.AbstractTableModel;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataTimeRange;
@@ -102,11 +54,13 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.LineDrawing;
 import ucar.visad.display.StationModelDisplayable;
+
 import visad.CommonUnit;
 import visad.Data;
 import visad.DisplayEvent;
@@ -126,9 +80,63 @@ import visad.Tuple;
 import visad.TupleType;
 import visad.Unit;
 import visad.VisADException;
+
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
+
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import java.io.File;
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 
 
 
@@ -374,6 +382,18 @@ public class StationModelControl extends ObsDisplayControl {
     /** the range color preview for the legend */
     private RangeColorPreview rangeColorPreview = null;
 
+    /** the GE KMZ width field */
+    JTextField kmzWidthFld;
+
+    /** the GE KMZ height field */
+    JTextField kmzHeightFld;
+
+    /** the GE KMZ name field */
+    JTextField kmzNameFld;
+
+    /** the GE KMZ color swatch field */
+    GuiUtils.ColorSwatch kmzColorSwatch;
+
     /**
      * Default constructor.
      */
@@ -525,7 +545,9 @@ public class StationModelControl extends ObsDisplayControl {
                 chartParams = new ArrayList();
             }
         }
-        loadDataInAWhile();
+        // This screws up if display is the time driver
+        //loadDataInAWhile();
+        loadData();
     }
 
 
@@ -910,9 +932,11 @@ public class StationModelControl extends ObsDisplayControl {
                 if (isIdParam(name)) {
                     idFieldName = StringUtil.replace(name, "(Text)", "");
                     idIndex     = typeIdx;
-                    String putativeId = tuple.getComponent(typeIdx).toString().trim();
-                    if (!putativeId.isEmpty())
-                      return tuple.getComponent(typeIdx).toString();
+                    String putativeId =
+                        tuple.getComponent(typeIdx).toString().trim();
+                    if ( !putativeId.isEmpty()) {
+                        return tuple.getComponent(typeIdx).toString();
+                    }
                 }
             }
         }
@@ -1511,7 +1535,7 @@ public class StationModelControl extends ObsDisplayControl {
                                    ? anime.getAniValue()
                                    : null);
 
-            Real[] startEnd = getDataTimeRange().getTimeRange(startReal,
+            Real[]    startEnd  = getDataTimeRange().getTimeRange(startReal,
                                   endReal, aniValue);
             //System.out.println("start = " + startEnd[0]);
             //System.out.println("end = " + startEnd[1]);
@@ -1760,7 +1784,7 @@ public class StationModelControl extends ObsDisplayControl {
             }
             ;
         };
-        ButtonGroup bg = new ButtonGroup();
+        ButtonGroup  bg     = new ButtonGroup();
         JRadioButton single = new JRadioButton(TIMES_TO_USE[0],
                                   getUseDataTimes());
         bg.add(single);
@@ -1779,7 +1803,7 @@ public class StationModelControl extends ObsDisplayControl {
      */
     private Component doMakeTimeDeclutterWidget() {
         JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-        JPanel timeDeclutter =
+        JPanel       timeDeclutter      =
             GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
                 addTimeDeclutterComp(new JLabel("Use every:  ")),
                 addTimeDeclutterComp(timeDeclutterComps[1]),
@@ -2567,7 +2591,7 @@ public class StationModelControl extends ObsDisplayControl {
                 }
                 PointParam pointParam = getPointParam(paramName);
                 JPopupMenu popupMenu  = new JPopupMenu();
-                String paramName = (String) tableModel.getValueAt(row, 0,
+                String     paramName  = (String) tableModel.getValueAt(row, 0,
                                        false);
                 boolean isShowing =
                     ((pointParam != null)
@@ -2841,8 +2865,8 @@ public class StationModelControl extends ObsDisplayControl {
                     tmp.add(cp);
                 }
             }
-            String label = StringUtil.join(",", tmp);
-            TwoFacedObject tfo = new TwoFacedObject(label,
+            String         label = StringUtil.join(",", tmp);
+            TwoFacedObject tfo   = new TwoFacedObject(label,
                                      new Object[] { clonedTimeSeries,
                     tmp });
             dsd.addPropertyValue(tfo, "chartSettings", "Chart Settings",
@@ -2922,27 +2946,15 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
-    /** _more_ */
-    JTextField kmzWidthFld;
-
-    /** _more_ */
-    JTextField kmzHeightFld;
-
-    /** _more_ */
-    JTextField kmzNameFld;
-
-    /** _more_ */
-    GuiUtils.ColorSwatch kmzColorSwatch;
-
     /**
-     * _more_
+     * Export the data as KMZ
      */
     public void exportAsKmz() {
         try {
             if (kmzWidthFld == null) {
-                kmzWidthFld  = new JTextField("80", 5);
-                kmzHeightFld = new JTextField("80", 5);
-                kmzNameFld   = new JTextField("Point Observations");
+                kmzWidthFld    = new JTextField("80", 5);
+                kmzHeightFld   = new JTextField("80", 5);
+                kmzNameFld     = new JTextField("Point Observations");
                 kmzColorSwatch = new GuiUtils.ColorSwatch(Color.white,
                         "KMZ Icon Color", true);
             }
@@ -2959,7 +2971,7 @@ public class StationModelControl extends ObsDisplayControl {
             JComponent accessory = ((publishCbx != null)
                                     ? GuiUtils.topBottom(widgets, publishCbx)
                                     : widgets);
-            String filename =
+            String     filename  =
                 FileManager.getWriteFile(FileManager.FILTER_KMZ,
                                          FileManager.SUFFIX_KMZ,
                                          GuiUtils.top(accessory));
@@ -3177,7 +3189,7 @@ public class StationModelControl extends ObsDisplayControl {
      * to handle the case where there is a time sequence of observations.
      *
      * @param  obs initial field of observations.
-     * @param timestamp _more_
+     * @param timestamp  the timestamp
      *
      * @return a decluttered version of obs
      *
@@ -3218,7 +3230,7 @@ public class StationModelControl extends ObsDisplayControl {
      * a     * Declutters a single timestep of observations.
      *
      * @param pointObs  point observations for one timestep.
-     * @param timestamp _more_
+     * @param timestamp  the timestamp
      *
      * @return a decluttered version of pointObs
      *
@@ -3231,15 +3243,15 @@ public class StationModelControl extends ObsDisplayControl {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
         }
-        FieldImpl retField    = null;
-        Set       domainSet   = pointObs.getDomainSet();
-        int       numObs      = domainSet.getLength();
-        Vector    v           = new Vector();
+        FieldImpl   retField          = null;
+        Set         domainSet         = pointObs.getDomainSet();
+        int         numObs            = domainSet.getLength();
+        Vector      v                 = new Vector();
 
-        long      t1          = System.currentTimeMillis();
-        Rectangle glyphBounds = getStationModel().getBounds();
+        long        t1                = System.currentTimeMillis();
+        Rectangle   glyphBounds       = getStationModel().getBounds();
 
-        float     myScale = getScale() * .0025f * getDeclutterFilter();
+        float       myScale = getScale() * .0025f * getDeclutterFilter();
 
         Rectangle2D scaledGlyphBounds =
             new Rectangle2D.Double(glyphBounds.getX() * myScale,

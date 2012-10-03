@@ -421,6 +421,11 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         try {
             List times = null;
+            Object cu = subset.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+            if (cu != null) {
+                useDriverTime = ((Boolean) cu).booleanValue();
+            }
+
             if (subset != null) {
                 times = getTimesFromDataSelection(subset, dataChoice);
             }
