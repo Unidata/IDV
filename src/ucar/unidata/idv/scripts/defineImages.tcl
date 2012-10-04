@@ -122,7 +122,7 @@ defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ
 
 defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359}
 
-defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
+defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces, NM} -ll {32.3,-106.7}
 defineImage http://www.cloudcroftwebcam.com/camera2.jpg {Cloudcroft, NM} -ll {32.957313,-105.742485}
 
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque,NM}  -ll {35.1029697, -106.6703963}
@@ -148,7 +148,7 @@ defineImage http://165.134.236.34/-wvhttp-01-/GetStillImage?p=-15&t=-5&z=3&b=off
 defineImage http://www.soils.wisc.edu/asig/webcam/halfsize.jpg  {Madison,WI} -ll {43.07980,-89.38751} -dz -6
 
 
-defineImage http://images.ibsys.com/det/images/weather/auto/windsorcam_320x240.jpg {Detroit,MI} -dz -5 -ll {42.2,-83.1}
+defineImage http://www.cbc.ca/windsor/webcam/windsor_webcam.jpg {Windsor, Canada} -dz -5 -ll {38.547133,-122.81638}
 defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6 -ll {41.8,-87.7}
 
 # These are valid, but mysteriously this script cannot grab them. Are they blocking our web request, somehow?
@@ -193,7 +193,7 @@ defineImage http://vortex.plymouth.edu/webcam/2/latest.jpeg {Plymouth State Univ
 
 defineGroup {Southeast}
 defineImage http://wwc.instacam.com/instacamimg/ATLGM/ATLGM_l.jpg {Atlanta,GA} -ll {33.74889,-84.38806} -dz -5
-defineImage http://files.wtoc.com/camera/misc/misc.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
+defineImage http://images.webcams.travel/webcam/1170512061.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
 
 
 defineImage http://www.mymiamiview.com/images/webcam.jpg {Miami,FL} -ll {25.7,-80.1} -dz -5
@@ -234,4 +234,4 @@ defineImage http://www.knmi.nl/webcam/images/ispy.jpg {KNMI, Netherlands}  -dz +
 
 
 defineGroup {Asia}
-defineImage http://www.discoverhongkong.com/eng/interactive/webcam/images/ig_webc_vict1.jpg {Hong Kong, China}  -dz +8 -ll {22.3, 114.18}
+defineImage http://www.weather.gov.hk/wxinfo/aws/hko_mica/cp1/latest_CP1.jpg {Hong Kong, China}  -dz +8 -ll {22.3, 114.18}
