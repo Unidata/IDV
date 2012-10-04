@@ -20,10 +20,10 @@
 
 package ucar.unidata.util;
 
-
 import java.util.List;
 import java.util.StringTokenizer;
 
+import visad.ContourControl;
 
 /**
  * A class to hold and transfer contour level settings, as to and from the
@@ -74,6 +74,9 @@ public class ContourInfo {
     /** Maximum contour value */
     private float max;
 
+    /** label frequency (number per line) */
+    private int labelFreq = ContourControl.LABEL_FREQ_LO;
+    
     /** label (font) size */
     private int labelSize = DEFAULT_LABEL_SIZE;
 
@@ -180,7 +183,8 @@ public class ContourInfo {
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle) {
         this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
-             width, DEFAULT_DASHED_STYLE, DEFAULT_LABEL_SIZE, null,
+             width, DEFAULT_DASHED_STYLE, 
+             ContourControl.LABEL_FREQ_LO, DEFAULT_LABEL_SIZE, null,
              DEFAULT_LABEL_ALIGNMENT);
     }
 
@@ -204,6 +208,7 @@ public class ContourInfo {
     public ContourInfo(String levelsString, float base, float min, float max,
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle,
+                       int labelFreq,
                        int labelSize, Object font, boolean align) {
 
         if (isIrregularInterval(levelsString)) {
@@ -221,6 +226,7 @@ public class ContourInfo {
         this.isColorFilled = isColorFilled;
         this.lineWidth     = width;
         this.dashedStyle   = dashedStyle;
+        this.labelFreq     = labelFreq;
         this.labelSize     = labelSize;
         this.font          = font;
         this.alignLabels   = align;
@@ -387,6 +393,8 @@ public class ContourInfo {
                     isLabeled = new Boolean(value).booleanValue();
                 } else if (name.equals("labelsize")) {
                     labelSize = new Integer(value).intValue();
+                } else if (name.equals("labelfreq")) {
+                    labelFreq = new Integer(value).intValue();
                 } else if (name.equals("font")) {
                     //TODO: what should go here?
                 } else if (name.equals("align")) {
@@ -597,6 +605,7 @@ public class ContourInfo {
         this.isColorFilled = that.isColorFilled;
         this.lineWidth     = that.lineWidth;
         this.dashedStyle   = that.dashedStyle;
+        this.labelFreq     = that.labelFreq;
         this.labelSize     = that.labelSize;
         this.font          = that.font;
         this.alignLabels   = that.alignLabels;
@@ -632,6 +641,7 @@ public class ContourInfo {
         this.lineWidth   = that.lineWidth;
         this.dashedStyle = that.dashedStyle;
         this.labelSize   = that.labelSize;
+        this.labelFreq   = that.labelFreq;
         this.font        = that.font;
         this.alignLabels = that.alignLabels;
     }
@@ -801,6 +811,24 @@ public class ContourInfo {
     }
 
     /**
+     * Get the label frequency.
+     *
+     * @return the label frequency
+     */
+    public int getLabelFreq() {
+        return labelFreq;
+    }
+
+    /**
+     * Get the label frequency
+     *
+     * @param size the label frequency
+     */
+    public void setLabelFreq(int freq) {
+        this.labelFreq = freq;
+    }
+    
+    /**
      * Get the label (font) size.
      *
      * @return the label (font) size
@@ -871,14 +899,12 @@ public class ContourInfo {
         StringBuffer sb     = new StringBuffer();
         for (int i = 0; i < tokens.size(); i++) {
             String tok = (String) tokens.get(i);
-            //            System.err.println("tok:" + tok +":");
             List subTokens = StringUtil.split(tok, "/", true, true);
             if (i > 0) {
                 sb.append(";");
             }
             for (int j = 0; j < subTokens.size(); j++) {
                 String subTok = (String) subTokens.get(j);
-                //        System.err.println("subtok:" + tok +":");
                 if (j > 0) {
                     sb.append("/");
                 }
@@ -888,9 +914,6 @@ public class ContourInfo {
         }
         return sb.toString();
     }
-
-
-
 
 
     /**
