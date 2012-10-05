@@ -36,6 +36,7 @@ import ucar.nc2.Variable;
 import ucar.nc2.dataset.*;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.*;
+import ucar.nc2.time.CalendarDate;
 import ucar.nc2.util.NamedAnything;
 
 
@@ -66,6 +67,7 @@ import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
 
+import ucar.visad.UtcDate;
 import ucar.visad.Util;
 
 
@@ -2148,12 +2150,8 @@ public class GeoGridDataSource extends GridDataSource {
         if (times != null) {
             return times;
         }
-        java.util.Date[] dates = timeAxis.getTimeDates();
-        times = new ArrayList(dates.length);
         try {
-            for (int i = 0; i < dates.length; i++) {
-                times.add(new DateTime(dates[i]));
-            }
+            times = DataUtil.makeDateTimes(timeAxis);
             gcsVsTime.put(timeAxis, times);
         } catch (Exception e) {
             System.out.println("getGeoGridTimes() " + e);

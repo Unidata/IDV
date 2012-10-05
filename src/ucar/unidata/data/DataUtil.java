@@ -29,6 +29,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import ucar.ma2.Array;
 
+import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.time.CalendarDate;
 import ucar.nc2.units.DateUnit;
 
 import ucar.unidata.util.*;
@@ -818,6 +820,47 @@ public class DataUtil {
             }
         }
         return results;
+    }
+    
+    /**
+     * Make a DateTime object corresponding the the calendar date
+     * 
+     * @param cdate   the CalendarDate
+     * @return the corresponding DateTime
+     * @throws VisADException  problem parsing cdate
+     */
+    public static DateTime makeDateTime(CalendarDate cdate) throws VisADException {
+        DateTime d = DateTime.createDateTime(cdate.toString(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        return d;
+    }
+    
+    /**
+     * Make a List of DateTime objects from the times in the timeAxis
+     * 
+     * @param timeAxis  the time axis
+     * @return List of DateTimes
+     * @throws VisADException  problem parsing timeAxis calendar dates
+     */
+    public static List<DateTime> makeDateTimes(CoordinateAxis1DTime timeAxis) throws VisADException {
+        List<CalendarDate> cdates = timeAxis.getCalendarDates();
+        //java.util.Date[] dates = timeAxis.getTimeDates();
+        List<DateTime>times = new ArrayList<DateTime>(cdates.size());
+        for (CalendarDate cdate : cdates) {
+            times.add(makeDateTime(cdate));
+        }
+        return times;
+    }
+    
+    /**
+     * Make a date object corresponding the the calendar date
+     * 
+     * @param cdate   the CalendarDate
+     * @return the corresponding Date
+     * @throws VisADException  problem parsing cdate
+     */
+    public static Date makeDate(CalendarDate cdate) throws VisADException {
+        DateTime dt = makeDateTime(cdate);
+        return new Date((long) dt.getValue()*1000);
     }
 
 }

@@ -107,7 +107,6 @@ import java.util.TreeMap;
  * for parameter names and time(s) desired.
  *
  * @author Don Murray
- * @version $Revision: 1.112 $ $Date: 2007/08/20 22:33:38 $
  */
 public class GeoGridAdapter {
 
@@ -1378,9 +1377,9 @@ public class GeoGridAdapter {
             CoordinateAxis1DTime timeAxis = geoSys.getTimeAxis1D();
             int[]                times;
 
-            java.util.Date[]     dates = null;
+            List<DateTime> datetimes = null;
             if (timeAxis != null) {
-                dates = timeAxis.getTimeDates();
+                datetimes = DataUtil.makeDateTimes(timeAxis);
             }
 
             if (timeAxis == null) {
@@ -1409,7 +1408,7 @@ public class GeoGridAdapter {
                 DateTime time;
                 if (times[i] >= 0) {
                     if (timeAxis != null) {
-                        time = new DateTime(dates[times[i]]);
+                        time = datetimes.get(times[i]);
                     } else {
                         time = getBaseTime();  // will be null if not found
                         if (time == null) {
