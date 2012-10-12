@@ -66,17 +66,30 @@ We will now go through each of steps in detail.
 
 <li>Open Windows Explorer and go to <code>C:\\Program Files\\Apache Software Foundation</code></li>
 
-<li>Right click on Tomcat 7.0 folder</li>
+<li>Right click on Tomcat 7.0 folder and select "Properties", Security Tab</li>
 
-<li>Go to properties</li>
+<li>Select Users, Click on Edit, Select Users, Check Full control, OK, OK</li>
 
 </ol>
 
 <p><b>RAMADDA Installation</b></p>
 
 <ol class="step">
-<li><a href="http://sourceforge.net/projects/ramadda/files/">Download</a> the RAMADDA WAR (web application archive) file and save it to <code>C:\\Program Files\\Apache Software Foundation\\Tomcat7.0\\webapps</code></li>
-<li>Start the task manager by pressing CTRL+ALT+DELETE, and then click Task Manager</li>
+
+<li><a href="http://sourceforge.net/projects/ramadda/files/">Download</a> the RAMADDA WAR (web application archive) file.</li>
+
+<li>Save the RAMADDA WAR file to <code>C:\\Progam Files\\Apache Software Foundation\\Tomcat7.0\\webapps</code></li>
+
+<li>Start your Windows Task Manager(CTRL+ALT+DELETE, and then click Task Manager).</li>
+
+<li>Select the "Services" tab, choose "Apache Tomcat 7", click "Properties" icon</li>
+
+<li>Logon tab, Local System account, Do NOT check Allow service to interact with desktop.</li>
+
+<li>Click Start the service.</li>
+
+<li>In your browser, navigate to <a href="http://localhost:8080/repository">http://localhost:8080/repository</a> If you see the following screen, you have successfuly installed RAMADDA.</li>
+<div class="cimg"><img src="images/ramadda.gif" ></div>
 </ol>
 
 <p>You are now ready to <a href="admin.html">to set up the admin account</a> in RAMADDA.</p>
