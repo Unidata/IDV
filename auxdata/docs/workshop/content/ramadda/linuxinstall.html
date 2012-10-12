@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Linux Installation</title>
+<title>RAMADDA Linux Installation</title>
 </head>
 
 <body>
@@ -8,6 +8,20 @@
 <div class="overview">
 Installing RAMADDA on Linux
 </div>
+
+<p>Every flavor of Linux has its own favorite way of installing software packages. These instructions uses Yellowdog Updater, Modified (YUM) package-management utility for RPM-compatible Linux operating systems. In addition, as a prerequisite, you must have Java installed.</p>
+
+
+<ol class="step">
+<li><code>sudo yum install tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps</code></li>
+<li><code>cd /usr/share/tomcat7/webapps</code></li>
+<li><code>wget http://downloads.sourceforge.net/project/ramadda/ramadda1.4/repository.war</code></li>
+<li><code>sudo service tomcat7 start</code></li>
+<li>In your browser, navigate to <a href="http://localhost:8080/repository">http://localhost:8080/repository</a> If you see the following screen, you have successfuly installed RAMADDA.</li>
+<div class="cimg"><img src="images/ramadda.gif" ></div>
+</ol>
+
+<p>You are now ready to <a href="admin.html">to set up the admin account</a> in RAMADDA.</p>
 
 </body>
 </html>
