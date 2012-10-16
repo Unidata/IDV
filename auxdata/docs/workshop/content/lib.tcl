@@ -629,3 +629,24 @@ proc ug::foot {} {
     return "</body></html>"
 }
 
+namespace eval wiki {}
+
+proc wiki::tagdef {t {attrs {}}} {
+    if {$attrs==""} {
+        return "<a name=\"$t\"></a>{{$t}}"
+    } else {
+        return "<a name=\"$t\"></a>{{$t <i>$attrs</i>}}"
+    }
+}
+
+proc wiki::tag {t {attrs {}}} {
+    if {$attrs==""} {
+        return "{{$t}}"
+    } else {
+        return "{{$t <i>$attrs</i>}}"
+    }
+}
+
+proc wiki::text {t} {
+    return "<blockquote><pre>$t</pre></blockquote>"
+}
