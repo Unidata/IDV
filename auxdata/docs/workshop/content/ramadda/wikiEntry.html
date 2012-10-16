@@ -20,14 +20,15 @@ to define the style used for a whole collection of entries.
         <ul>
             <li> Enter "Earthquake Point Data" in the title box
             <li> In the wiki text panel, enter
-            <pre>
-            "A link to the earthquake data entry"
-            [[entryId | Earthquake Data]]
-            {{import entryId data.point.map}}
-            </pre>
-                The entryId can be obtained by clicking on the "Add entry id" button on the
-                upper right conner and go through the tree structure to get to the earthquake
-                data.
+
+            [wiki::text {A link to the earthquake data entry}]
+
+            [wiki::text {[[ entry="entryId" | Earthquake Data]]}]
+            [wiki::text {{{ import entry="entryId" data.point.map}}}]
+
+            The entryId can be obtained by clicking on the "Add entry id" button on the
+            upper right corner and go through the tree structure to get to the earthquake
+            data.
 
         </ul>
 </ul>
@@ -35,9 +36,8 @@ See the help on <a href="wikitext.html">Wiki Text</a> for more information
 on how to use wiki text markup.
 <p>
     The result HTML view of a Wiki Page entry  looks like:
-    [ht::cimg images/earthquake.gif {Wiki Page} {border=0 width=600}]
-
-    The &quot;Details&quot; link in the upper right will show the default html view of this page.
+    <div class="cimg"><img src="images/earthquake.gif" ></div>
+    The &quot;Details&quot; link in the upper right will show the default HTML view of this page.
 <p>
     The &quot;Wiki History&quot; link in the top tabs will take you to the history page for the entry.
     This shows the history of past edits and allows you to view and compare versions and to revert
