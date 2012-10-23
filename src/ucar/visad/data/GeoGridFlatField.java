@@ -290,7 +290,12 @@ public class GeoGridFlatField extends CachedFlatField {
         float[][] fieldArray = new float[1][];
         //fieldArray[0] = DataUtil.toFloatArray(arr);
         float[] values = DataUtil.toFloatArray(arr);
-        values = geoGrid.setMissingToNaN(values);
+        Class dataClass = arr.getElementType();
+        if (! (dataClass.equals(float.class) || 
+                      dataClass.equals(double.class) ) ) {
+          values = geoGrid.setMissingToNaN(values);
+        }
+
         Trace.call2("toFloatArray", " length:" + values.length);
         // if we have extended the longitudes, we need to add more points.
         try {
