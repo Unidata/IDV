@@ -143,9 +143,9 @@ will look at subsetting by time and level.
 
 Each data choice may or may not have times associated with it
 which are displayed in the [ht::command Times]
-panel. If there is a set of times, you can select all or just a subset
-of times to be displayed.  There are two ways you can select
-a subset of times.
+panel. If there is a set of times, you can select one of the four
+menu items in the drop down menu: [ht::menu {Use Default}], [ht::menu {Use Selected}],
+    [ht::menu {Match Time Driver}], and [ht::menu {Set As Time Driver}].
 
 <ul class="step">
 
@@ -153,14 +153,14 @@ a subset of times.
 
     <ol class="substep">
       <li>Double click (or right click and select the 
-          [ht::menu Properties] menu) on the dataset name in the 
+          [ht::menu Properties] menu) on the dataset name in the
           [ht::command Data Sources] panel to bring up the 
           [ht::dialog Data Source Properties] editor.</li>
 
       <li>This dataset has ten time steps. In the 
           [ht::tab Times] tab,
-          uncheck the [ht::command Use Default]
-          checkbox.  You can now select the subset of times.  Select
+          select the [ht::menu {Use Selected}] menu item
+          in the drop down menu.  You can now select the subset of times.  Select
           the first five (5) times in the list
           ([ht::param 1998-06-29 12:00:00Z]
            to [ht::param 1998-06-30 12:00:00Z]). 
@@ -182,14 +182,31 @@ a subset of times.
     <ol class="substep">
 
       <li>In the [ht::tab Times] tab of the [ht::command Data Subset]
-          panel, uncheck the [ht::command Use Default]
-          checkbox.
+          panel, select [ht::menu {Use Selected}] menu item.
       <li>In the list of times in that panel, 
           select the last four (4) times in the list
           ([ht::param 1998-06-30 18:00:00Z] 
           to [ht::param 1998-07-01 12:00:00Z]).</li>
     </ol>
      
+  </li>
+  <li>You can set the time subset to match display driver times
+      <ol class="substep">
+          <li>If a user selects the [ht::menu {Match Time Driver}] menu item, the IDV will check
+          the current active view window to make sure there is a time driver available.
+          Otherwise, an error message will appear to remind the user a driver is needed first.
+          When the IDV confirms that a time driver is available, the time list of this
+          dataset will be removed in the subset panel, and the times used by the time
+          driver in the current active display will be used. </li>
+      </ol>
+  </li>
+  <li>You can set the time subset to be the display time driver
+      <ol class="substep">
+          <li>If a user selects the [ht::menu {Set As Time Driver}] menu item, the selected times of this
+          dataset will be used as the driver times for this view window. Only one time
+          driver is allowed in each view window, and the most recent display set as the
+          time driver will be used.  </li>
+      </ol>
   </li>
 
 </ul>
