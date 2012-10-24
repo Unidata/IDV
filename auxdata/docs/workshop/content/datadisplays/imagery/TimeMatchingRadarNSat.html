@@ -25,16 +25,13 @@
         and select [ht::display Image Sequence Display]
         in the [ht::command Displays] panel.</li>
 
-    <li>In the [ht::command Times] panel, uncheck
-        the [ht::command Use Default] checkbox and
+    <li>In the [ht::command Times] panel, select
+        the [ht::command Set As Time Driver] menu item and
         select the 1998-06-29 21:15:00Z and
         1998-06-29 22:15:00Z entries in the list. [ht::listSelect]
 
     <li>Click the [ht::button Create Display] button
         to load in those two images.</li>
-
-    <li>From the [ht::dialog Displays] window, select the satellite data source, and check
-        the [ht::menu View Times {Drive Times with this Display}] menu item. </li>
 
 </ol>
 
@@ -73,11 +70,19 @@ Next, let's select some radar imagery using the driver times from the satellite 
     <li>Let's check the time matching result by bring up the animation timeline:
         click on [ht::menu View {Animation Timeline}], and compare the time selection from two difference
         data source. </li>
-    <li>Remove all displays.
+    <li>Remove all displays and data.
 </ol>
 
+Try the following time matching exercises on your own using the real time satellite and radar data.
 
-
+<ol>
+    <li>First, load in the latest 5 GOES East/West IR Composite and set the Satellite imagery as time driver.
+    <li>Second, find the location of interesting weather.
+    <li>Then, load in the a few level II radar stations which are close to the area identified in the second step,
+        and check on the [ht::button {Match Time Driver}] button.
+    <li>Check the [ht::menu View {Animation Timeline}] for the matching result. </li>
+    <li>Remove all displays and data.
+</ol>
 
 </body>
 </html>
