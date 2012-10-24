@@ -234,8 +234,8 @@ proc ht::createBasicDisplay {args} {
 } 
 
 proc ht::openDataSourceChooser {} {
-    return "Open the [ht::dialog Data Source Chooser]. <popup label=\"\">
-            Open the [ht::dialog Data Source Chooser] by either:<ul>
+    return "Open the [ht::dialog Data Choosers]. <popup label=\"\">
+            Open the [ht::dialog Data Choosers] by either:<ul>
             <li> Select the [ht::command Data Chooser] tab in the 
                  [ht::dialog Dashboard]
             <li> Choose one of the menus under the 
