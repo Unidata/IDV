@@ -98,6 +98,7 @@ public class AxisScaleInfo {
         this.visible = visible;
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -105,6 +106,9 @@ public class AxisScaleInfo {
     public int hashCode() {
         final int prime  = 31;
         int       result = 1;
+        result = prime * result + ((font == null)
+                                   ? 0
+                                   : font.hashCode());
         result = prime * result + ((label == null)
                                    ? 0
                                    : label.hashCode());
