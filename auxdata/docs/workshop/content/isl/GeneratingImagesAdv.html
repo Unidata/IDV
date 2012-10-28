@@ -13,9 +13,10 @@
 <ol class="step">
 
     <li> First of all save this <a href="isl2.xidv">isl2.xidv</a> file to your isl directory. This is a bundle with
-    two view windows. You can load this bundle into the IDV and see what this bundle doing.
+    two view panes. You can load this bundle into the IDV and see what this bundle doing. One pane displays the
+    temperature field and the other displays the geopotential height.
 
-    <li> Run this file:
+    <li> Review this ISL file and find out the role of the <i>viewindex</i>:
         [gen::isl image7.isl]
 
     <li> Now, change directory  to the home directory (cd) and run:
@@ -25,14 +26,14 @@ runIDV <%workshop.homedir%>/isl/image7.isl
 
     <li> What happened?
 
-    <li> Note, two images were created.  If we want to generate a single image which combines these two images,
-    we'll use the <i>combine</i> property:
+    <li> Note, two images are created.  If we want to generate a single image which combines these two images,
+    we'll use the <i>combine</i> property in the next ISL file:
     [gen::isl image8.isl]
 
     <li> The IDV gives you an easy way to generate a publication quality combined image.
 
 
-    <li> The next two isl examples will provide some details of more advance isl scripts.
+    <li> The next two ISL examples will provide some details of more advance isl scripts.
         <ul>
             <li> How to define an ISL procedure to generate image.
                 [gen::isl procedure.isl]
