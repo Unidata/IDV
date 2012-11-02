@@ -3,7 +3,7 @@
 
 
 <div class="overview">
-We're going to look at how to create IDV plugins. 
+We're going to look at how to create IDV plugins.
 </div>
 
 <ol class="step">
@@ -11,14 +11,14 @@ We're going to look at how to create IDV plugins.
     <li> Add in all of the resources you've created.
     <ul>
         <li> Go to the [ht::menu File {Add File}] menu.
-        <li> This shows the [ht::filename <%workshop.homedir%>/.unidata/idv/DefaultIdv] directory. 
-        <li> Shift-click or control-click to add the resource files, e.g., [ht::filename stationmodels.xml], 
+        <li> This shows the [ht::filename <%workshop.homedir%>/.unidata/idv/DefaultIdv] directory.
+        <li> Shift-click or control-click to add the resource files, e.g., [ht::filename stationmodels.xml],
 [ht::filename colortables.xml],
 [ht::filename derived.xml], etc.
     </ul>
     <li> Add some items to the menu bar
     <ul>
-      <li> Bring up the [ht::command Toolbar] tab in the user preferences ([ht::menu Edit Preferences]). 
+      <li> Bring up the [ht::command Toolbar] tab in the user preferences ([ht::menu Edit Preferences]).
       <li> Select some items on
       the right and do [ht::button Export to Menu Plugin]. Enter some menu name.
     </ul>
@@ -27,7 +27,7 @@ We're going to look at how to create IDV plugins.
     <li> Enter [ht::filename myplugin.jar] in the file browser and click on [ht::button Write Plugin].
     <li> Let's see the results.
     <ul>
-    <li> Shutdown  the IDV. 
+    <li> Shutdown  the IDV.
     <li> Bring up a terminal window and do:<pre>
 runIdv -userpath ~/otheridv -plugin <%workshop.homedir%>/myplugin.jar
 </pre>
@@ -41,7 +41,7 @@ jar -tvf myplugin.jar
 </pre>
 
 </ul>
-<li> Lets create another plugin that is something that might be used in a classroom setting
+<li> Let's create another plugin that is something that might be used in a classroom setting
 
 <ul>
     <li> Add a page for the quicklinks. Bring up a text editor and create a descriptive html page.
@@ -58,17 +58,14 @@ jar -tvf myplugin.jar
 <a href="action:exit">Exit the IDV</a>
 }]
        <li> Save this file as [ht::filename workshop.qhtml]
-	   <li> From the Plugin Creator [ht::menu File {Add File}] menu select this qhtml file.
-                
+           <li> From the Plugin Creator [ht::menu File {Add File}] menu select this qhtml file.
+
        <li> Add in some of the favorite bundles you've created.
        <ul>
            <li> From the Favorites Manager select multiple favorite bundles (Control-Click).
            <li> Choose [ht::menu File {Export to Plugin}]
-        </ul>    
-        <li> Write out the  plugin, selecting the [ht::button Install] checkbox. 
+        </ul>
+        <li> Write out the  plugin, selecting the [ht::button Install] checkbox.
         <li> Exit and restart the IDV
-    </ul>    
+    </ul>
 </ol>
-
-
-

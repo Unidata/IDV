@@ -1161,7 +1161,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
 
-
         //Check if we have been removed
         if (hasBeenRemoved) {
             return;

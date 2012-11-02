@@ -7,7 +7,7 @@ We're going to look at how skins work in the IDV now.
 <li> From a terminal window cd to:<br>
 [ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/idv/resources/skins}]
 
-<li> View the directory listing. 
+<li> View the directory listing.
 
 <li> View the skin.xml
 [ht::cmdline {java ucar.unidata.ui.XmlUi skin.xml<br>
@@ -28,7 +28,7 @@ defined in the idv.rbi.
 <li> Look at the &quot;idv.resource.skin&quot; resources entry in the main RBI file:
 [ht::cmdline {less <%workshop.installdir%>/ucar/unidata/idv/resources/idv.rbi}]
 
-<li> Now, lets see how the IDV puts this all together
+<li> Now, let's see how the IDV puts this all together
 <ul>
 <li> Bring up the IdvUIManager.java source code in an editor:
 [ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/idv/ui<br>&lt;your favorite editor&gt; IdvUIManager.java}]
@@ -57,6 +57,3 @@ This is the method that the XmlUI class calls to create the components.
 
 
 </ul>
-
-
-

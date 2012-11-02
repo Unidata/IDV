@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>Windows Installation</title>
+</head>
+
+<body>
+
+<div class="overview">
+Installing on Windows
+</div>
+
+<p>Installing RAMADDA involves the installation of these three software packages:
+
+<ul>
+<li>IDV</li>
+<li>Apache Tomcat</li>
+<li>RAMADDA</li>
+</ul>
+
+We will now go through each of steps in detail.
+
+<p><b>IDV Installation</b></p>
+
+<ol class="step">
+<li><a href="http://www.unidata.ucar.edu/downloads/idv/latest/index.jsp">Install the latest version of the IDV</a></li>
+</ol>
+
+<p><b>Tomcat Installation</b></p>
+
+<ol class="step">
+
+<li><a href="http://tomcat.apache.org/download-70.cgi">Download</a> the Windows Service Installer of the Apache Tomcat core module to your Desktop.</li>
+<div class="cimg"><img src="images/tomcatwin.gif" ></div>
+
+<li>Double click on the apache-tomcat-x.y.z icon. (x.y.z stands for the particular version of Apache Tomcat you downloaded)</li>
+
+<li>Allow the Tomcat installer to run  on your computer.</li>
+
+<li>Click Next</li>
+
+<div class="cimg"><img src="images/tomcatwin1.gif" ></div>
+
+<li>Accept License Agreement</li>
+
+<div class="cimg"><img src="images/tomcatwin2.gif" ></div>
+
+<li>Accept the default components. Click Next</li>
+
+<div class="cimg"><img src="images/tomcatwin3.gif" ></div>
+
+<li>Accept default configuration options. Click Next</li>
+
+<div class="cimg"><img src="images/tomcatwin4.gif" ></div>
+
+<li>Choose the Java Virtual Machine in the IDV directory <code>(e.g. C:\\Program Files\\IDV_3.0\\jre)</code></li>
+
+<div class="cimg"><img src="images/tomcatwin5.gif" ></div>
+
+<li>Accept default installation location. Click Install</li>
+
+<div class="cimg"><img src="images/tomcatwin6.gif" ></div>
+
+<li>Unclick "Run Apache Tomcat" and "Show Readme", and Finish.</li>
+
+<div class="cimg"><img src="images/tomcatwin7.gif" ></div>
+
+<li>Open Windows Explorer and go to <code>C:\\Program Files\\Apache Software Foundation</code></li>
+
+<li>Right click on Tomcat 7.0 folder and select "Properties", "Security" tab, select "Users", click "Edit"</li>
+
+<div class="cimg"><img src="images/tomcatwin8.gif" ></div>
+
+<li>Select "Users", check "Full control", click OK, click OK again</li>
+
+<div class="cimg"><img src="images/tomcatwin9.gif" ></div>
+
+
+</ol>
+
+<p><b>RAMADDA Installation</b></p>
+
+<ol class="step">
+
+<li><a href="http://sourceforge.net/projects/ramadda/files/">Download</a> the RAMADDA WAR (web application archive) file.</li>
+
+<li>Save the RAMADDA WAR file to <code>C:\\Program Files\\Apache Software Foundation\\Tomcat7.0\\webapps</code></li>
+
+<li>Start your Windows Task Manager(CTRL+ALT+DELETE, and then click Task Manager).</li>
+
+<li>Select the "Services" tab, and click on the "Services" button.</li>
+
+<div class="cimg"><img src="images/tomcatwin10.gif" ></div>
+
+<li>Select the "Apache Tomcat 7", right click and select "Properties".</li>
+
+<div class="cimg"><img src="images/tomcatwin11.gif" ></div>
+
+<li>Go to "Logon" tab, "Local System account", do NOT check "Allow service to interact with desktop".</li>
+
+<div class="cimg"><img src="images/tomcatwin12.gif" ></div>
+
+<li>Go to the "General" tab and click "Start" the service.</li>
+
+<div class="cimg"><img src="images/tomcatwin13.gif" ></div>
+
+<li>In your browser, navigate to <a href="http://localhost:8080/repository">http://localhost:8080/repository</a> If you see the following screen, you have successfully installed RAMADDA.</li>
+<div class="cimg"><img src="images/ramadda.gif" ></div>
+</ol>
+
+<p>You are now ready to <a href="admin.html">to set up the admin account</a> in RAMADDA.</p>
+
+</body>
+</html>

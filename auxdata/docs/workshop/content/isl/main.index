@@ -1,6 +1,7 @@
 index.html
 >Basic.html
 >GeneratingImages.html
+>GeneratingImagesAdv.html
 >ManipulatingImages.html
 #>BigExample.html
 >Exercises.html
@@ -8,3 +9,4 @@ index.html
 >JythonBatching.html
 -goeswest.jnlp
 -isl.xidv
+-isl2.xidv

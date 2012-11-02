@@ -234,8 +234,8 @@ proc ht::createBasicDisplay {args} {
 } 
 
 proc ht::openDataSourceChooser {} {
-    return "Open the [ht::dialog Data Source Chooser]. <popup label=\"\">
-            Open the [ht::dialog Data Source Chooser] by either:<ul>
+    return "Open the [ht::dialog Data Choosers]. <popup label=\"\">
+            Open the [ht::dialog Data Choosers] by either:<ul>
             <li> Select the [ht::command Data Chooser] tab in the 
                  [ht::dialog Dashboard]
             <li> Choose one of the menus under the 
@@ -629,3 +629,24 @@ proc ug::foot {} {
     return "</body></html>"
 }
 
+namespace eval wiki {}
+
+proc wiki::tagdef {t {attrs {}}} {
+    if {$attrs==""} {
+        return "<a name=\"$t\"></a>{{$t}}"
+    } else {
+        return "<a name=\"$t\"></a>{{$t <i>$attrs</i>}}"
+    }
+}
+
+proc wiki::tag {t {attrs {}}} {
+    if {$attrs==""} {
+        return "{{$t}}"
+    } else {
+        return "{{$t <i>$attrs</i>}}"
+    }
+}
+
+proc wiki::text {t} {
+    return "<blockquote><pre>$t</pre></blockquote>"
+}

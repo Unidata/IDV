@@ -24,8 +24,8 @@ for the super cell area that we loaded in the previous exercise.
   </li>
 
   <li>[ht::openDataSourceChooser]. 
-      Click on the [ht::command Radar] under [ht::command Sat & Radar],
-      then the [ht::command ADDE Level III] under.</li>
+      Click on the [ht::command Radar] node under [ht::command Sat & Radar] branch,
+      then select the [ht::command ADDE Level III] tab.</li>
 
   <li>We'll load in Level III Data from the Bow Echo Case Study.
       In the [ht::command Server:] selector, choose
@@ -45,18 +45,22 @@ for the super cell area that we loaded in the previous exercise.
   <li>Using the [ht::command Radar Data Type:] selector, choose
       the [ht::param Base Reflectivity Tilt 1] type.</li>
 
-  <li>For this exercise, we want to select a subset of all available times, 
-      so click on the [ht::command Absolute times] radio 
-      button.  With this option selected, the server is queried for a set of
-      available times for that type and these are listed in the
-      [ht::command Times:] panel. Select
-      the 11 images from [ht::param 1998-06-29 21:00:00Z]
-      through [ht::param 1998-06-29 21:59:00Z].
-      Be sure the [ht::command Data Type:]
-      is set to [ht::param Reflectivity].  Make sure
-      the [ht::command Create display] option is checked, and then
-      click the [ht::command Add Source] button.</li>
-
+  <li>For this exercise, we want to select a subset of all available times: </li>
+            
+      <ul class="substep">
+        <li>Click on the [ht::command Absolute times] radio button.  
+            <p>With this option selected, the server is queried for a set of
+            available times for that type and these are listed in the
+            [ht::command Times:] panel.</li>
+        
+        <li>Select the 11 images from [ht::param 1998-06-29 21:00:00Z]
+            through [ht::param 1998-06-29 21:59:00Z].</li>
+        
+        <li>Be sure the [ht::command Data Type:]
+            is set to [ht::param Reflectivity].  Make sure
+            the [ht::command Create display] option is checked, and then
+            click the [ht::command Add Source] button.</li>
+      </ul>
 <!--
   <li>In the [ht::dialog Field Selector] window, 
       you should see [ht::dataset {DVN (Base Reflectivity Tilt 1)}] 
