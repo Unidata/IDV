@@ -228,6 +228,9 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     /** timeline */
     private Timeline timeline;
 
+    /** time driver selection */
+    private JCheckBox timeDriverCbx;
+
 
     /**
      * Constuctor with input string naming for what data
@@ -612,6 +615,11 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                                            GuiUtils.lLabel(" minutes") });
         comps.add(addTo(GuiUtils.rLabel("Refresh Rate:"), pollList));
         comps.add(GuiUtils.left(addTo(pollIntervalPanel, pollList)));
+        
+        timeDriverCbx = new JCheckBox("", animationWidget.getAnimationSetInfo().getIsTimeDriver());
+        comps.add(GuiUtils.rLabel("Set as Time Driver?"));
+        comps.add(timeDriverCbx);
+        
         GuiUtils.tmpInsets = new Insets(10, 5, 5, 5);
         setContents = GuiUtils.top(GuiUtils.doLayout(comps, 2,
                 GuiUtils.WT_NN, GuiUtils.WT_N));
@@ -824,6 +832,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     protected boolean applyAnimationSetProperties() {
         AnimationSetInfo aniSet = myInfo.getAnimationSetInfo();
         aniSet.setActive(animationSetActiveBtn.isSelected());
+        aniSet.setIsTimeDriver(timeDriverCbx.isSelected());
         int startMode = GuiUtils.getValueFromBox(startTimeBox);
         int endMode   = GuiUtils.getValueFromBox(endTimeBox);
         if ((startMode == endMode)

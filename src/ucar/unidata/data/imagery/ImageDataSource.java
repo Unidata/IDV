@@ -1555,6 +1555,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     System.out.println("Got an exception: "
                                        + excp.getMessage());
                 }
+                // we do this so save data local will work.  However, if
+                // this then gets set to be the time driver, it would not
+                // necessarily be correct
+                imageList = descriptors;
                 return descriptors;
             }
         }
