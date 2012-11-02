@@ -222,7 +222,7 @@ public class WmsSelection {
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();
-        url = url + "version=" + version + "&request=GetMap" +
+        url = url + "version=" + version + "&request=GetMap" + "&service=WMS" +
             //          "&Exceptions=se_xml" +
             "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
                        + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
