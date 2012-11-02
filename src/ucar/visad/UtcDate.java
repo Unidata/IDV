@@ -22,11 +22,13 @@ package ucar.visad;
 
 
 import ucar.nc2.time.Calendar;
+import ucar.nc2.time.CalendarDate;
 
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.data.CalendarDateTime;
 
+import visad.CommonUnit;
 import visad.DateTime;
 import visad.Gridded1DSet;
 import visad.RealTupleType;
@@ -435,8 +437,13 @@ public final class UtcDate {
     public static DateTime createDateTime(String dateString, String pattern,
                                           TimeZone tz, Calendar cal)
             throws VisADException {
-        return CalendarDateTime.createDateTime(dateString, pattern,
-                DateTime.DEFAULT_TIMEZONE, cal);
+        // DateTime has better parsing support for timezones
+        DateTime dt = DateTime.createDateTime(dateString, pattern, tz);
+        CalendarDate cd = CalendarDate.of(
+                              cal,
+                              (long) (dt.getValue(
+                                  CommonUnit.secondsSinceTheEpoch) * 1000l));
+        return new CalendarDateTime(cd);
     }
 
 }

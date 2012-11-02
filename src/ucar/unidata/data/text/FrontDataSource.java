@@ -442,9 +442,7 @@ public class FrontDataSource extends FilesDataSource {
                     //529 PM EST WED DEC 27 2006                                                       
                     if (timeToks.size() == 7) {
                         try {
-                        	// CalendarDate does not handle timezone formats, so
-                        	// we use DateTime
-                            baseTime = DateTime.createDateTime(ts,
+                            baseTime = UtcDate.createDateTime(ts,
                                     "hmm a z EEE MMM dd yyyy");
                         } catch (Exception exc) {
                             errors.add("Could not parse base time:" + ts);
@@ -532,7 +530,7 @@ public class FrontDataSource extends FilesDataSource {
                              + ts;
                     }
                 }
-                DateTime dttm = DateTime.createDateTime(ts, format);
+                DateTime dttm = UtcDate.createDateTime(ts, format);
                 validTime = new Date(1000 * (long) dttm.getValue());
                 //              System.err.println("Time:" +validTime);
             } catch (Exception exc) {
