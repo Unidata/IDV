@@ -2155,18 +2155,18 @@ public class DerivedGridFactory {
         TupleType    rangeType = null;
         FunctionType innerType = null;
         FlatField    press     = null;
-        if (ensble) {
-            FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
-            press =
-                createPressureGridFromDomain((FlatField) sample1.getSample(0,
-                    false));
-        } else {
-            press = createPressureGridFromDomain(
-                (FlatField) temperFI.getSample(0));
-        }
 
 
         if (isSequence) {
+            if (ensble) {
+                FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
+                press =
+                    createPressureGridFromDomain((FlatField) sample1.getSample(0,
+                        false));
+            } else {
+                press = createPressureGridFromDomain(
+                    (FlatField) temperFI.getSample(0));
+            }
 
             // Implementation:  have to take the raw time series of data FieldImpls
             // apart, make the ept FlatField by FlatField (for each time step),
