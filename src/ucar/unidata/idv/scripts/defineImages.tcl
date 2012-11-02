@@ -122,7 +122,8 @@ defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ
 
 defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359}
 
-defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces,  NM} -ll {32.3,-106.7}
+defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces, NM} -ll {32.3,-106.7}
+defineImage http://www.cloudcroftwebcam.com/camera2.jpg {Cloudcroft, NM} -ll {32.957313,-105.742485}
 
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque,NM}  -ll {35.1029697, -106.6703963}
 
@@ -147,12 +148,13 @@ defineImage http://165.134.236.34/-wvhttp-01-/GetStillImage?p=-15&t=-5&z=3&b=off
 defineImage http://www.soils.wisc.edu/asig/webcam/halfsize.jpg  {Madison,WI} -ll {43.07980,-89.38751} -dz -6
 
 
-defineImage http://images.ibsys.com/det/images/weather/auto/windsorcam_320x240.jpg {Detroit,MI} -dz -5 -ll {42.2,-83.1}
+defineImage http://www.cbc.ca/windsor/webcam/windsor_webcam.jpg {Windsor, Canada} -dz -5 -ll {38.547133,-122.81638}
 defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6 -ll {41.8,-87.7}
 
 # These are valid, but mysteriously this script cannot grab them. Are they blocking our web request, somehow?
-defineImage {http://www.glerl.noaa.gov/metdata/tol2/tol2-1.jpg} {Toledo, OH}  -ll {41.931508,-83.264611}
-defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  -ll {43.23424,-86.245929}
+# Turning them off for now, but will hopefully revive them, later.
+# defineImage {http://www.glerl.noaa.gov/metdata/tol2/tol2-1.jpg} {Toledo, OH}  -ll {41.931508,-83.264611}
+# defineImage {http://www.glerl.noaa.gov/webcams/images/lmfs1.jpg} {Muskegon,MI}  -ll {43.23424,-86.245929}
 
 #defineImage {ftp://ftp.glerl.noaa.gov/realtime/alpmet/alp2.jpg} {Alpena,MI}  -ll {45.061565,-83.445154}
 #defineImage {ftp://ftp.glerl.noaa.gov/realtime/mil/mil1.jpg} {Milwaukee,WI}  -ll {43.04181,-87.906844}
@@ -191,24 +193,25 @@ defineImage http://vortex.plymouth.edu/webcam/2/latest.jpeg {Plymouth State Univ
 
 defineGroup {Southeast}
 defineImage http://wwc.instacam.com/instacamimg/ATLGM/ATLGM_l.jpg {Atlanta,GA} -ll {33.74889,-84.38806} -dz -5
-defineImage http://files.wtoc.com/camera/misc/misc.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
+defineImage http://images.webcams.travel/webcam/1170512061.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
 
 
 defineImage http://www.mymiamiview.com/images/webcam.jpg {Miami,FL} -ll {25.7,-80.1} -dz -5
 defineImage http://doppler.tbo.com/webcam/towercam.jpg {Tampa,FL} -ll {27.84806,-82.26333} -dz -5
 ###defineImage http://www.news-journalonline.com/webcam/dbcam.jpg {Daytona Beach,FL} -ll {29.2,-81.0} -dz -5
 
-defineImage http://instacam.com/instacamimg/NPLES/NPLES_S.jpg?14831739 {Naples,FL} -dz -5 -ll {26.145,-81.795}
+defineImage http://wwc.instacam.com/instacamimg/NPLHH/NPLHH_l.jpg {Naples,FL} -dz -5 -ll {26.145,-81.795}
 defineImage http://www.erh.noaa.gov/rah/weathercam/wxcam.image.jpg {Raleigh, NC} -dz -5 -ll {35,-78}
 
 
 
 defineImage http://www.spadre.com/southpadrebeachcam.jpg {South Padre Island,TX} -dz -5 -ll {26.1,-97.2}
-defineImage http://webcams.galveston.com/docs/commodore2006/commodoremp.jpg {Galveston,TX} -dz -5 -ll {29.29,-94.79}
+defineImage http://webcams.galveston.com/docs/casadelmar2006/casadelmarmp.jpg {Galveston,TX} -dz -5 -ll {29.29,-94.79}
 
-defineImage http://downburst.geos.ulm.edu:8080/image.jpg {University of Louisiana, Monroe, LA} -dz -6 -ll {32.538,-92.074}
+defineImage http://wwc.instacam.com/instacamimg/NORLS/NORLS_l.jpg {La Nouvelle-Orleans, LA} -dz -6 -ll {29.951066,-90.071532}
+defineImage http://209.209.196.98/ {Monroe, LA} -dz -6 -ll {32.509311,-92.119301}
 
-defineImage http://images.ibsys.com/kan/images/weather/auto/kci_640x480.jpg {Kansas City,MO}  -ll {39.10296,-94.583062}
+defineImage http://www.dnr.mo.gov/env/esp/aqm/photos/kccam/lat001.jpg {Kansas City,MO}  -ll {39.10296,-94.583062}
 
 
 
@@ -218,19 +221,9 @@ defineImage {http://www.rwic.und.edu/webcam/webcam32.jpg} {Grand Forks,ND}  -ll 
 defineImage http://www.scottcountyiowa.com/webcams/images/live/112/cam112_00051.jpg {Scott County, IA}  -ll {41.61293,-90.606277}
 
 
-
-
-
-
-defineImage http://ksbi.bimedia.net/mcc.jpg {Moore,OK} -dz -5 -ll {35.48,-97.54}
-
+defineImage http://wwc.instacam.com/instacamimg/STLLW/STLLW_l.jpg {Stillwater, OK} -dz -5 -ll {36.115607,-97.058368}
 
 defineImage http://webcam.icorp.net/ar1.jpg {Metairie,LA} -dz -5 -ll {29.98,-90.15}
-
-
-
-
-
 
 defineGroup {Antarctica}
 defineImage http://www.esrl.noaa.gov/gmd/webdata/spo/webcam/cmdlfullsize.jpg {South Pole}   -ll {-90, -105}
@@ -241,4 +234,4 @@ defineImage http://www.knmi.nl/webcam/images/ispy.jpg {KNMI, Netherlands}  -dz +
 
 
 defineGroup {Asia}
-defineImage http://www.discoverhongkong.com/eng/interactive/webcam/images/ig_webc_vict1.jpg {Hong Kong, China}  -dz +8 -ll {22.3, 114.18}
+defineImage http://www.weather.gov.hk/wxinfo/aws/hko_mica/cp1/latest_CP1.jpg {Hong Kong, China}  -dz +8 -ll {22.3, 114.18}

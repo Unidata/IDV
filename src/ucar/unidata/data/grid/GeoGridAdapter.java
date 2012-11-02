@@ -1284,6 +1284,11 @@ public class GeoGridAdapter {
             final float[][] fieldArray = new float[1][];
             //fieldArray[0] = DataUtil.toFloatArray(arr);
             float[] values = DataUtil.toFloatArray(arr);
+            Class dataClass = arr.getElementType();
+            if (! (dataClass.equals(float.class) || 
+                          dataClass.equals(double.class) ) ) {
+              values = geoGrid.setMissingToNaN(values);
+            }
             if (values.length < domainSet.getLength()) {  // need to extend array
                 float[] newValues = new float[domainSet.getLength()];
                 int[]   lengths   = domainSet.getLengths();

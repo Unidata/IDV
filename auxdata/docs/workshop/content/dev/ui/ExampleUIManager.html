@@ -7,7 +7,7 @@ We're going to look at how to extend the Example user interfaces.
 <li> From a terminal window cd to the example apps directory:<br>
 [ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/apps/example}]
 
-<li> View the idv.rbi file: 
+<li> View the idv.rbi file:
 [ht::cmdline {less idv.rbi}]
 
 and note the skin entry:
@@ -53,7 +53,7 @@ To:
 
 </ul>
 
-<li> Note  that this skin is not the default. 
+<li> Note  that this skin is not the default.
 <ul>
 <li> Go up a level to the <i>example</i> directory.
 <li> Edit the <i>idv.rbi</i> file and add the property line to the skin entry:
@@ -83,7 +83,7 @@ e.g.:
 </ul>
 
 
-<li> Now, one more thing. Lets write a little Java code. 
+<li> Now, one more thing. Let's write a little Java code.
 <ul>
 <li> Go to the example skin.rbi and change the label tag you added to
 be <i>example.label</i>:
@@ -95,7 +95,7 @@ be <i>example.label</i>:
 <li> Look for the <i>doMakeIdvXmlUi</i> method. Notice we create our own IdvXmlUi
 object. So far it does nothing.
 
-<li> Lets add some code that can handle this tag. e.g.:
+<li> Let's add some code that can handle this tag. e.g.:
 <pre>
 public Component createComponent(Element node, String id) {
     String tagName = node.getTagName();
@@ -114,7 +114,7 @@ public Component createComponent(Element node, String id) {
 </ul>
 
 
-<li> Clean up our changes. Remove the loadmore=&quot;false&quot; attribute 
+<li> Clean up our changes. Remove the loadmore=&quot;false&quot; attribute
 and the <i>default</i> property from the idv.rbi
 
 <li> One more thing, let's look at the ExampleUIManager again and see how we can skip this whole
@@ -139,6 +139,3 @@ skin thing if needed.
 
 
 </ul>
-
-
-

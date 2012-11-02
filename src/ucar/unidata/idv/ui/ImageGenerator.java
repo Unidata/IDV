@@ -1176,7 +1176,7 @@ public class ImageGenerator extends IdvManager {
             return true;
         }
         debug("Removing all displays");
-        getIdv().removeAllDisplays(false);
+        getIdv().removeAllDisplays(true);
         return true;
     }
 
