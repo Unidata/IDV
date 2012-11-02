@@ -14,8 +14,8 @@ Let's find out why there isn't anything displayed.
       
   <ul class="substep">
     
-    <li>From the [ht::display Point Data Plot] display control window
-       click on the edit image: [ht::img %dotpath%images/edit.gif].</li>
+    <li>Open up the [ht::dialog Layout Model Editor] from the [
+        ht::menu Tools {Layout Model Editor}]  menu.</li>
     
     <li>Bring up the [ht::dialog Properties] dialog for the
         symbol by right clicking on it and selecting the
@@ -31,11 +31,7 @@ Let's find out why there isn't anything displayed.
   
   <ul class="substep">
     
-    <li>Normally we would do the following but the current version of the IDV does not support  it. Select the [ht::menu Help {Details...}] menu item to bring up the
-        [ht::dialog Display Control Details] window. This lists the
-        fields available in the data set.</li>
-    
-    <li> So instead, we will look at [ht::command Details] tab in the [ht::command Properties Dialog] for the Point Data Source.
+    <li> Look at the [ht::command Details] tab in the [ht::command Properties Dialog] for the Point Data Source (accessed via the [ht::command Field Selector] tab on the Dashboard).
 
     <li>Note there is no [ht::param IDN] field. However, there is an
         [ht::param   ID]  field in the data.</li>
@@ -74,7 +70,7 @@ in the [ht::command Properties] dialog for the data source.
 we have lots of layout models for data that 
 has &quot;ID&quot; like fields and then we encounter data with some other
 field name, e.g., &quot;the_station_id&quot;? Do we go and change each and 
-every model?
+every model? The answer is thankfully no! See the <a href=../../config/ParameterAliasEditor.html>Alias Editor</a> for more information.
 
   </ul>
 
