@@ -51,6 +51,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.visad.ShapeUtility;
 
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.DisplayableDataRef;
@@ -590,7 +591,7 @@ public class TrackControl extends GridDisplayControl {
         }
         // end merge
 
-        FieldImpl fi0 = new FieldImpl(fiType, DateTime.makeTimeSet(times));
+        FieldImpl fi0 = new FieldImpl(fiType, CalendarDateTime.makeTimeSet(times));
         fi0.setSample(0, retField, false);
 
         return fi0;
@@ -1292,7 +1293,7 @@ public class TrackControl extends GridDisplayControl {
     protected Set getDataTimeSet() throws RemoteException, VisADException {
         return (lastIndicatorTime == null)
                ? null
-               : DateTime.makeTimeSet(new DateTime[] { lastIndicatorTime });
+               : CalendarDateTime.makeTimeSet(new DateTime[] { lastIndicatorTime });
     }
 
     /**

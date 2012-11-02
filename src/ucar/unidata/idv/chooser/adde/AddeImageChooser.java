@@ -53,6 +53,7 @@ import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
+import ucar.visad.data.CalendarDateTime;
 
 import visad.DateTime;
 import visad.Gridded1DSet;
@@ -1810,7 +1811,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         }
         if (imageTimes.length > 0) {
             try {
-                Gridded1DSet imageSet    = DateTime.makeTimeSet(imageTimes);
+                Gridded1DSet imageSet    = CalendarDateTime.makeTimeSet(imageTimes);
                 int          numTimes    = times.length;
                 double[][]   timesValues = new double[1][numTimes];
                 for (int i = 0; i < times.length; i++) {

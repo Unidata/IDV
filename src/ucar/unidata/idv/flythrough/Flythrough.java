@@ -89,6 +89,7 @@ import ucar.visad.ShapeUtility;
 
 import ucar.visad.Util;
 
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.display.*;
 
 import ucar.visad.quantities.CommonUnits;
@@ -731,7 +732,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     }
                     timeArray[i] = dttm;
                 }
-                set = DateTime.makeTimeSet(timeArray);
+                set = CalendarDateTime.makeTimeSet(timeArray);
             }
             if (showTimesCbx != null) {
                 showTimesCbx.setEnabled(hasTimes);

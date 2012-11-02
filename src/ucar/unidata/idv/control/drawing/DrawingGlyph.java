@@ -506,7 +506,7 @@ public abstract class DrawingGlyph {
 
                             }
                         } else {
-                            timeValues.add(DateTime.createDateTime(s));
+                            timeValues.add(UtcDate.createDateTime(s));
                         }
                     }
                 }

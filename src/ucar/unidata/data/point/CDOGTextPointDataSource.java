@@ -32,6 +32,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
+import ucar.visad.UtcDate;
 import ucar.visad.Util;
 
 import visad.DateTime;
@@ -210,7 +211,7 @@ public class CDOGTextPointDataSource extends TextPointDataSource {
         DateTime startTime = null;
         try {
             TimeZone zone = TimeZone.getTimeZone(timeZone);
-            startTime = DateTime.createDateTime(timePart, timeFormat, zone);
+            startTime = UtcDate.createDateTime(timePart, timeFormat, zone);
             String startTimeString =  startTime.formattedString(DateTime.DEFAULT_TIME_FORMAT
                                              + " Z", zone);
             return startTimeString;

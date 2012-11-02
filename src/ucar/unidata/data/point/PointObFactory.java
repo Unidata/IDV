@@ -58,6 +58,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.CommonUnit;
@@ -387,7 +388,7 @@ public class PointObFactory {
                                              ? (MathType) sampleType
                                              : obType));
         SampledSet timeSet = (times.length > 1)
-                             ? DateTime.makeTimeSet(times)
+                             ? CalendarDateTime.makeTimeSet(times)
                              : (SampledSet) new SingletonSet(
                                  new RealTuple(new Real[] { times[0] }));
 

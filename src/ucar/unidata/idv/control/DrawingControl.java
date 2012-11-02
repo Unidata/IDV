@@ -55,6 +55,7 @@ import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlUtil;
 
 
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.display.*;
 
 
@@ -2205,7 +2206,7 @@ public class DrawingControl extends DisplayControlImpl {
             return times;
         }
         if (timeSet instanceof Gridded1DSet) {
-            return DateTime.timeSetToArray((Gridded1DSet) timeSet);
+            return CalendarDateTime.timeSetToArray((Gridded1DSet) timeSet);
         }
         return new DateTime[] {
             new DateTime(

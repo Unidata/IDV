@@ -33,6 +33,7 @@ import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 
 import visad.*;
 
@@ -226,10 +227,10 @@ public class GridDataInstance extends DataInstance {
 
             SampledSet timeSet = (SampledSet) Util.getDomainSet(gridData);
             if (timeSet instanceof Gridded1DSet) {
-                dateTimes = DateTime.timeSetToArray((Gridded1DSet) timeSet);
+                dateTimes = CalendarDateTime.timeSetToArray((Gridded1DSet) timeSet);
             } else {
-                dateTimes = DateTime.timeSetToArray(
-                    DateTime.makeTimeSet(timeSet.getDoubles()[0]));
+                dateTimes = CalendarDateTime.timeSetToArray(
+                    CalendarDateTime.makeTimeSet(timeSet.getDoubles()[0]));
             }
             //for (int b=0; b<dateTimes.length; b++) {
             //  System.out.println ("     GridDataInstance.init data time "+dateTimes[b]);

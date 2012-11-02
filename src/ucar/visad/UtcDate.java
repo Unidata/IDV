@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,13 +21,18 @@
 package ucar.visad;
 
 
+import ucar.nc2.time.Calendar;
+
 import ucar.unidata.util.StringUtil;
+
+import ucar.visad.data.CalendarDateTime;
 
 import visad.DateTime;
 import visad.Gridded1DSet;
 import visad.RealTupleType;
 import visad.SetType;
 import visad.VisADException;
+
 
 import java.util.TimeZone;
 
@@ -36,7 +41,6 @@ import java.util.TimeZone;
  * A set of utility functions for UTC DateTimes
  *
  * @author Unidata Development Team
- * @version $Revision: 1.6 $ $Date: 2007/05/22 13:52:35 $
  */
 public final class UtcDate {
 
@@ -327,11 +331,14 @@ public final class UtcDate {
         if (dt == null) {
             return "null";
         }
-        if (pattern == null) {
-            return dt.toString();
-        }
         try {
-            return dt.formattedString(pattern, tz);
+            CalendarDateTime cdt = (dt instanceof CalendarDateTime)
+                                   ? (CalendarDateTime) dt
+                                   : new CalendarDateTime(dt);
+            if (pattern == null) {
+                return cdt.toString();
+            }
+            return cdt.formattedString(pattern, tz);
         } catch (Exception e) {
             return "";
         }
@@ -365,8 +372,71 @@ public final class UtcDate {
                 RealTupleType.Time1DTuple)) {
             throw new VisADException("Set must have type of RealType.Time");
         }
-        DateTime[] dates = DateTime.timeSetToArray(timeSet);
+        DateTime[] dates = CalendarDateTime.timeSetToArray(timeSet);
         return convertDateTimeToJulianDay(dates);
+    }
+
+    /**
+     * Create a DateTime object.
+     *
+     * @param dateString the string specifying the date
+     *
+     * @return the DateTime object
+     * @throws VisADException problem decoding string or creating Data object
+     */
+    public static DateTime createDateTime(String dateString)
+            throws VisADException {
+        return createDateTime(dateString, DateTime.DEFAULT_TIME_FORMAT,
+                              DateTime.DEFAULT_TIMEZONE);
+    }
+
+    /**
+     * Create a DateTime object.
+     *
+     * @param dateString the string specifying the date
+     * @param tz  the associated time zone
+     * @param pattern the format pattern
+     *
+     * @return the DateTime object
+     * @throws VisADException problem decoding string or creating Data object
+     */
+    public static DateTime createDateTime(String dateString, String pattern)
+            throws VisADException {
+        return createDateTime(dateString, pattern, DateTime.DEFAULT_TIMEZONE);
+    }
+
+    /**
+     * Create a DateTime object.
+     *
+     * @param dateString the string specifying the date
+     * @param pattern the format pattern
+     * @param tz  the associated time zone
+     *
+     * @return the DateTime object
+     * @throws VisADException problem decoding string or creating Data object
+     */
+    public static DateTime createDateTime(String dateString, String pattern,
+                                          TimeZone tz)
+            throws VisADException {
+        return createDateTime(dateString, pattern, tz, null);
+    }
+
+    /**
+     * Create a DateTime object.
+     *
+     * @param dateString the string specifying the date
+     * @param pattern the format pattern
+     * @param tz  the associated time zone
+     * @param cal the associated Calendar
+     *
+     * @return the DateTime object
+     * @throws VisADException problem decoding string or creating Data object
+     */
+    public static DateTime createDateTime(String dateString, String pattern,
+                                          TimeZone tz, Calendar cal)
+            throws VisADException {
+        return CalendarDateTime.createDateTime(dateString, pattern,
+                DateTime.DEFAULT_TIMEZONE, cal);
     }
 
 }

@@ -62,6 +62,7 @@ import ucar.unidata.view.station.StationLocationMap;
 import ucar.unidata.xml.*;
 
 import ucar.visad.GeoUtils;
+import ucar.visad.UtcDate;
 import ucar.visad.Util;
 
 import ucar.visad.display.*;
@@ -1318,7 +1319,7 @@ public class ImageMovieControl extends DisplayControlImpl {
         for (int i = 0; i < children.getLength(); i++) {
             Element  child    = (Element) children.item(i);
             String   time     = XmlUtil.getAttribute(child, ATTR_TIME);
-            DateTime dateTime = DateTime.createDateTime(time, format);
+            DateTime dateTime = UtcDate.createDateTime(time, format);
             if ((i == 0) || (dateTime.getValue() > latestTime)) {
                 latestTime  = dateTime.getValue();
                 latestChild = child;
@@ -1440,7 +1441,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                         url = base + url;
                     }
                 }
-                DateTime dateTime = DateTime.createDateTime(time, format);
+                DateTime dateTime = UtcDate.createDateTime(time, format);
                 fileDates.add(new FileDate(url, dateTime));
             }
 
@@ -1523,7 +1524,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                         url = base + url;
                     }
                 }
-                DateTime dateTime = DateTime.createDateTime(time, format);
+                DateTime dateTime = UtcDate.createDateTime(time, format);
                 fileDates.add(new FileDate(url, dateTime));
             }
 
@@ -1624,7 +1625,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                         break;
                     }
                     name = matcher.group(1);
-                    DateTime dttm = DateTime.createDateTime(name,
+                    DateTime dttm = UtcDate.createDateTime(name,
                                         getDateFormat());
                     files.add(f);
                     times.add(dttm);

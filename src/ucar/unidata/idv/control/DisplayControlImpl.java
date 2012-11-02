@@ -21,6 +21,8 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.nc2.time.Calendar;
+
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 import ucar.unidata.data.DataCancelException;
@@ -82,6 +84,8 @@ import ucar.unidata.xml.XmlObjectStore;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.CalendarDateTimeSet;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationInfo;
 import ucar.visad.display.AnimationWidget;
@@ -1144,8 +1148,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 DataChoice    dc = (DataChoice) cdcs.get(0);
                 DataSelection ds = dc.getDataSelection();
                 if (ds != null) {
-                    List   dtimes = ds.getTimeDriverTimes();
-                    Object ud1    =
+                    List dtimes = ds.getTimeDriverTimes();
+                    Object ud1 =
                         ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
                     //if ((dtimes != null) && (dtimes.size() > 0)
                     //        && (ud1 != null)) {
@@ -3812,16 +3816,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //if(this instanceof PlanViewControl) 
             //    System.err.println("Using:" + template);
 
-            Set      s  = getDataTimeSet();
+            Set      s   = getDataTimeSet();
+            Calendar cal = null;
+            if (s instanceof CalendarDateTimeSet) {
+                cal = ((CalendarDateTimeSet) s).getCalendar();
+            }
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
             if (s != null) {
                 FunctionType ft =
                     new FunctionType(((SetType) s.getType()).getDomain(), tt);
                 FieldImpl  fi      = new FieldImpl(ft, s);
                 double[][] samples = s.getDoubles();
+                samples =
+                    Unit.convertTuple(samples, s.getSetUnits(),
+                                      new Unit[] {
+                                          CommonUnit.secondsSinceTheEpoch });
                 for (int i = 0; i < s.getLength(); i++) {
-                    DateTime dt = new DateTime(samples[0][i],
-                                      s.getSetUnits()[0]);
+                    CalendarDateTime dt = new CalendarDateTime(samples[0][i],
+                                              cal);
                     String label =
                         UtcDate.applyTimeMacro(template, dt,
                             getIdv().getPreferenceManager()
@@ -5545,8 +5557,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window     f            = GuiUtils.getWindow(contents);
-        JComponent buttons      = GuiUtils.makeApplyOkCancelButtons(listener);
+        Window     f       = GuiUtils.getWindow(contents);
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
         Msg.translateTree(jtp, true);
@@ -6021,7 +6033,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
-                List selectedTimes    =
+                List selectedTimes =
                     dataSelectionWidget.getSelectedDateTimes();
                 if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
@@ -6082,10 +6094,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             for (Enumeration keys = methodNameToSettingsMap.keys();
                     keys.hasMoreElements(); ) {
-                String    key       = (String) keys.nextElement();
+                String    key  = (String) keys.nextElement();
                 JCheckBox cbx = (JCheckBox) methodNameToSettingsMap.get(key);
-                boolean   flag      = cbx.isSelected();
-                Method    theMethod = Misc.findMethod(getClass(), key,
+                boolean   flag = cbx.isSelected();
+                Method theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
                 theMethod.invoke(this, new Object[] { new Boolean(flag) });
@@ -6691,7 +6703,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
-            boolean                                   addOk = true;
+            boolean addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
@@ -7802,7 +7814,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param macro  the macro to check for
      */
     private void updateListOrLegendWithMacro(String macro) {
-        boolean listUpdate   = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
         boolean legendUpdate =
             ((getLegendLabelTemplate().indexOf(macro) >= 0)
              || (getExtraLabelTemplate().indexOf(macro) >= 0));
@@ -8277,7 +8289,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     })[0];
                     if (index >= 0) {
                         RealTuple rt = DataUtility.getSample(timeSet, index);
-                        DateTime  dataTime =
+                        DateTime dataTime =
                             new DateTime((Real) rt.getComponent(0));
 
                         currentTime = dataTime;
@@ -8708,7 +8720,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
         for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String      colorName = iter.next().toString();
+            String colorName = iter.next().toString();
             final Color menuColor =
                 getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,
@@ -11352,7 +11364,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             for (int i = 0; i < timeArray.length; i++) {
                 timeArray[i] = (DateTime) dateTimes.get(i);
             }
-            set = DateTime.makeTimeSet(timeArray);
+            set = CalendarDateTime.makeTimeSet(timeArray);
         }
         getAnimationWidget().setBaseTimes(set);
     }

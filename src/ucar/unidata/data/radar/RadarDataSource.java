@@ -23,6 +23,7 @@ package ucar.unidata.data.radar;
 
 import ucar.unidata.data.*;
 import ucar.unidata.util.*;
+import ucar.visad.data.CalendarDateTime;
 
 import visad.*;
 
@@ -556,7 +557,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             SampledSet   domainSet = (dateTimes.length == 1)
                                      ? (SampledSet) new SingletonSet(
                                          new RealTuple(dateTimes))
-                                     : (SampledSet) DateTime.makeTimeSet(
+                                     : (SampledSet) CalendarDateTime.makeTimeSet(
                                          dateTimes);
             FieldImpl fi = new FieldImpl(ft, domainSet);
             fi.setSamples(datas, false);

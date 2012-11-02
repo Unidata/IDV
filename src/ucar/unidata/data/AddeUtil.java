@@ -1,7 +1,5 @@
 /*
- * $Id: AddeUtil.java,v 1.5 2007/05/26 13:31:06 dmurray Exp $
- *
- * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -271,7 +269,7 @@ public final class AddeUtil {
                                     + ":" + StringUtil.padZero(minutes, 2)
                                     + ":00";
                 try {
-                    DateTime dt = DateTime.createDateTime(dateString,
+                    DateTime dt = UtcDate.createDateTime(dateString,
                                       "yyyy-MM-dd HH:mm:ss");
                     alltimes.add(dt);
                 } catch (VisADException ve) {

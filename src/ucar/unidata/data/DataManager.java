@@ -44,6 +44,8 @@ import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.UtcDate;
+
 import visad.DateTime;
 import visad.Real;
 import visad.RealType;
@@ -417,8 +419,7 @@ public class DataManager {
                     format = format.replace("dh" + len, "HH:mm");
                     String newValue = value.trim().substring(0, idx + 1) + HH
                                       + ":" + mm;
-                    return visad.DateTime.createDateTime(newValue, format,
-                            timezone);
+                    return UtcDate.createDateTime(newValue, format, timezone);
                 }
 
                 return null;
@@ -529,9 +530,10 @@ public class DataManager {
         for (int i = 0; i < grib1Resources.size(); i++) {
             try {
                 String grib1TableName = grib1Resources.get(i).toString();
-                File grib1TableFile = new File(grib1TableName);
-                if(grib1TableFile.exists()) {
-                    ucar.nc2.grib.grib1.tables.Grib1ParamTables.addParameterTableLookup(grib1TableName);
+                File   grib1TableFile = new File(grib1TableName);
+                if (grib1TableFile.exists()) {
+                    ucar.nc2.grib.grib1.tables.Grib1ParamTables
+                        .addParameterTableLookup(grib1TableName);
                 }
                 // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
                 //     grib1Resources.get(i).toString());
@@ -545,9 +547,10 @@ public class DataManager {
         for (int i = 0; i < grib2Resources.size(); i++) {
             try {
                 String grib2TableName = grib2Resources.get(i).toString();
-                File grib2TableFile = new File(grib2TableName);
-                if(grib2TableFile.exists()) {
-                    ucar.grib.grib2.ParameterTable.addParametersUser(grib2TableName);
+                File   grib2TableFile = new File(grib2TableName);
+                if (grib2TableFile.exists()) {
+                    ucar.grib.grib2.ParameterTable.addParametersUser(
+                        grib2TableName);
                 }
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
@@ -714,8 +717,8 @@ public class DataManager {
         if (properties != null) {
             for (java.util.Enumeration keys = properties.keys();
                     keys.hasMoreElements(); ) {
-                String  key      = (String) keys.nextElement();
-                String  value    = (String) properties.get(key);
+                String key   = (String) keys.nextElement();
+                String value = (String) properties.get(key);
                 Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
                                        value, new String[] { ATTR_NAME,
                         key });
@@ -814,7 +817,7 @@ public class DataManager {
 
 
                 Hashtable properties = new Hashtable();
-                NodeList  props      = XmlUtil.getElements(datasourceNode,
+                NodeList props = XmlUtil.getElements(datasourceNode,
                                      TAG_PROPERTY);
                 for (int propIdx = 0; propIdx < props.getLength();
                         propIdx++) {

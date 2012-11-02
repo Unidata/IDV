@@ -31,13 +31,28 @@ import ucar.ma2.Array;
 
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.time.CalendarDate;
-import ucar.nc2.units.DateUnit;
 
-import ucar.unidata.util.*;
+import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 
-import visad.*;
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.Real;
+import visad.RealType;
+import visad.TextType;
+import visad.Tuple;
+import visad.Unit;
+import visad.VisADException;
 
 
 import java.io.FileOutputStream;
@@ -48,7 +63,6 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -709,57 +723,6 @@ public class DataUtil {
             dates.add(new Date((long) dt.getValue() * 1000));
         }
         return dates;
-        /*
-        List<Date> results = new ArrayList<Date>();
-        List<Date> dtimes  = new ArrayList<Date>();
-        //First convert the source times to a list of Date objects
-        List<Date> sourceDates = new ArrayList<Date>();
-        for (int i = 0; i < sourceTimes.size(); i++) {
-            Object object = sourceTimes.get(i);
-            if (object instanceof DateTime) {
-                sourceDates.add(ucar.visad.Util.makeDate((DateTime) object));
-            } else if (object instanceof Date) {
-                sourceDates.add((Date) object);
-            } else if (object instanceof TwoFacedObject) {  //relative time
-                return null;
-            } else {
-                System.err.println("Unknown time type: "
-                                   + object.getClass().getName());
-                return null;
-            }
-        }
-
-        for (int i = 0; i < driverTimes.size(); i++) {
-            dtimes.add(
-                DateUnit.getStandardOrISO(
-                    driverTimes.get(i).dateString() + "T"
-                    + driverTimes.get(i).timeString()));
-        }
-        //This keeps track of what times in the source list we have used so far
-        HashSet seenTimes = new HashSet();
-
-        //Now look at each selection time and find the closest source time
-        //We need to have logic for when a selection time is outside the range of the source times
-        for (Date date : dtimes) {
-            // Date dttm1        = ucar.visad.Util.makeDate(dateTime);
-            long minTimeDiff = -1;
-            Date minDate     = null;
-            for (int i = 0; i < sourceDates.size(); i++) {
-                Date sourceDate = sourceDates.get(i);
-                long timeDiff = Math.abs(sourceDate.getTime()
-                                         - date.getTime());
-                if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
-                    minTimeDiff = timeDiff;
-                    minDate     = sourceDate;
-                }
-            }
-            if ((minDate != null) && !seenTimes.contains(minDate)) {
-                results.add(minDate);
-                seenTimes.add(minDate);
-            }
-        }
-        return results;
-        */
     }
 
 
@@ -807,7 +770,7 @@ public class DataUtil {
             Date minDate     = null;
             for (int i = 0; i < sourceDates.size(); i++) {
                 Date sourceDate = sourceDates.get(i);
-                long timeDiff   = Math.abs(sourceDate.getTime()
+                long timeDiff = Math.abs(sourceDate.getTime()
                                          - dttm.getTime());
                 if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
                     minTimeDiff = timeDiff;
@@ -821,46 +784,50 @@ public class DataUtil {
         }
         return results;
     }
-    
+
     /**
-     * Make a DateTime object corresponding the the calendar date
-     * 
+     * Make a CalendarDateTime object corresponding the the calendar date
+     *
      * @param cdate   the CalendarDate
      * @return the corresponding DateTime
      * @throws VisADException  problem parsing cdate
      */
-    public static DateTime makeDateTime(CalendarDate cdate) throws VisADException {
-        DateTime d = DateTime.createDateTime(cdate.toString(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static CalendarDateTime makeDateTime(CalendarDate cdate)
+            throws VisADException {
+        CalendarDateTime d = new CalendarDateTime(cdate);
         return d;
     }
-    
+
     /**
-     * Make a List of DateTime objects from the times in the timeAxis
-     * 
+     * Make a List of CalendarDateTime objects from the times in the timeAxis
+     *
      * @param timeAxis  the time axis
      * @return List of DateTimes
      * @throws VisADException  problem parsing timeAxis calendar dates
      */
-    public static List<DateTime> makeDateTimes(CoordinateAxis1DTime timeAxis) throws VisADException {
+    public static List<CalendarDateTime> makeDateTimes(
+            CoordinateAxis1DTime timeAxis)
+            throws VisADException {
         List<CalendarDate> cdates = timeAxis.getCalendarDates();
         //java.util.Date[] dates = timeAxis.getTimeDates();
-        List<DateTime>times = new ArrayList<DateTime>(cdates.size());
+        List<CalendarDateTime> times =
+            new ArrayList<CalendarDateTime>(cdates.size());
         for (CalendarDate cdate : cdates) {
             times.add(makeDateTime(cdate));
         }
         return times;
     }
-    
+
     /**
      * Make a date object corresponding the the calendar date
-     * 
+     *
      * @param cdate   the CalendarDate
      * @return the corresponding Date
      * @throws VisADException  problem parsing cdate
      */
     public static Date makeDate(CalendarDate cdate) throws VisADException {
-        DateTime dt = makeDateTime(cdate);
-        return new Date((long) dt.getValue()*1000);
+        CalendarDateTime dt = makeDateTime(cdate);
+        return new Date((long) dt.getValue() * 1000);
     }
 
 }

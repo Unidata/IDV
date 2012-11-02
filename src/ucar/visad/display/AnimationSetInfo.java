@@ -24,6 +24,7 @@ package ucar.visad.display;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.visad.data.CalendarDateTime;
 
 import visad.DateTime;
 import visad.Set;
@@ -325,7 +326,7 @@ public class AnimationSetInfo {
         for (int i = 0; i < dateTimes.size(); i++) {
             dateTimeArray[i] = (DateTime) dateTimes.get(i);
         }
-        return DateTime.makeTimeSet(dateTimeArray);
+        return CalendarDateTime.makeTimeSet(dateTimeArray);
     }
 
     /**
