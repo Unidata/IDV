@@ -21,38 +21,24 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.collab.*;
-
-import ucar.unidata.ui.XmlUi;
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Resource;
-import ucar.unidata.xml.XmlUtil;
-
-
-
-import ucar.visad.display.*;
-
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
-
-import java.beans.*;
-
-import java.rmi.RemoteException;
-
-
-import java.util.ArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import visad.DateTime;
 
 
 
@@ -61,7 +47,6 @@ import javax.swing.*;
  * A widget to graphically display animation times
  *
  * @author IDV Development Team
- * @version $Revision: 1.18 $
  */
 public class AnimationBoxPanel extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener {

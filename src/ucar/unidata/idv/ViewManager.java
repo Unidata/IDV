@@ -21,6 +21,85 @@
 package ucar.unidata.idv;
 
 
+import java.awt.AWTException;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.awt.print.PrinterJob;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.rmi.RemoteException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.Group;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3f;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -65,16 +144,15 @@ import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.AnimationSetInfo;
 import ucar.visad.display.AnimationWidget;
 import ucar.visad.display.CompositeDisplayable;
 import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.TextDisplayable;
-
 import visad.ConstantMap;
 import visad.ControlEvent;
 import visad.ControlListener;
@@ -93,98 +171,10 @@ import visad.ProjectionControl;
 import visad.Real;
 import visad.Set;
 import visad.VisADException;
-
 import visad.bom.annotations.ImageJ3D;
 import visad.bom.annotations.ScreenAnnotatorJ3D;
-
 import visad.java3d.DisplayImplJ3D;
 import visad.java3d.DisplayRendererJ3D;
-
-import java.awt.AWTException;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.awt.print.PrinterJob;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-
-import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.media.j3d.BranchGroup;
-import javax.media.j3d.Group;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.border.MatteBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import javax.vecmath.Point3d;
-import javax.vecmath.Vector3f;
 
 
 //import org.apache.batik.svggen.SVGGraphics2D;
@@ -951,6 +941,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public List<DateTime> getTimeDriverTimes()
             throws VisADException, RemoteException {
+        if (animationInfo != null) {
+            AnimationSetInfo asi = animationInfo.getAnimationSetInfo();
+            if (asi.getActive() && asi.getIsTimeDriver()) {
+                DateTime[] times = getAnimationTimes();
+                return (List<DateTime>) Misc.toList(times);
+            }
+        }
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if (control.getIsTimeDriver()) {
                 Set        timeSet = control.getTimeSet();
@@ -4006,6 +4003,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
         }
     }
+    
+    /**
+     * Handle the display data changing
+     *
+     * @param displayControl  the control
+     */
+    public void animationDriverChanged() {
+        for (DisplayControl control : (List<DisplayControl>) getControls()) {
+            try {
+                ((DisplayControlImpl) control)
+                    .reloadDataSourceInThread();
+            } catch (Exception e) {
+                logException("Error reloading data source for "
+                             + control.getLabel(), e);
+            }
+        }
+    }
 
     /**
      * Return the  list of {@link DisplayControl}s displayed in this ViewManager
@@ -4761,13 +4775,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                         animation.getCurrent());
                                 }
                             } else if (evt.getPropertyName().equals(
-                                    Animation.ANI_SET) && (animationTimeline
-                                        != null)) {
+                                    Animation.ANI_SET)) {
                                 if (animationTimeline != null) {
                                     animationTimeline.setDatedThings(
                                         DatedObject.wrap(
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
+                                }
+                                if (animationInfo.getAnimationSetInfo().getActive() &&
+                                        animationInfo.getAnimationSetInfo().getIsTimeDriver()) {
+                                    animationDriverChanged();
                                 }
                             }
                         } catch (Exception exp) {
@@ -7583,6 +7600,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param displayControl  the time driver control
      */
     public void ensureOnlyOneTimeDriver(DisplayControl displayControl) {
+        if (animationInfo != null & animationInfo.getAnimationSetInfo().getActive()) {
+           AnimationSetInfo asi = animationInfo.getAnimationSetInfo();
+           asi.setIsTimeDriver(false);
+        }
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if ( !control.equals(displayControl)
                     && control.getIsTimeDriver()) {

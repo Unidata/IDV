@@ -42,6 +42,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationSetInfo;
 
 import visad.CommonUnit;
 import visad.DateTime;
@@ -443,6 +444,12 @@ public class TimesChooser extends IdvChooser {
         List<TwoFacedObject> driverNames = new ArrayList<TwoFacedObject>();
 
         for (ViewManager vm : vms) {
+            try {
+                if (vm.getTimeDriverTimes() != null) {
+                    driverNames.add(new TwoFacedObject(vm.getName(), vm.getTimeDriverTimes()));
+                }
+            } catch (Exception e) {}
+            /*  we don't really need this anymore
             for (DisplayControl control :
                     (List<DisplayControl>) vm.getControls()) {
                 if (control.getIsTimeDriver()) {
@@ -462,6 +469,7 @@ public class TimesChooser extends IdvChooser {
 
                 }
             }
+            */
         }
         return driverNames;
 
