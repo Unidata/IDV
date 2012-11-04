@@ -1527,6 +1527,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
                     List<DateTime> matchedTimes = selectTimesFromList(subset,
                                                       dirTimes, times);
+                    imageList  = new ArrayList();
                     for (DateTime dirTime : matchedTimes) {
                         AreaDirectory dir = dateDir.get(dirTime);
                         // shouldn't happen, but what the hey
@@ -1544,6 +1545,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 newaii.getURLString(), newaii);
                         newaid.setIsRelative(false);
                         descriptors.add(newaid);
+                        imageList.add(newaid);
                     }
                 } catch (CloneNotSupportedException cnse) {
                     System.out.println("unable to clone aii");
@@ -1556,6 +1558,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                        + excp.getMessage());
                 }
                 return descriptors;
+            } else if (imageList != null) {
+                return imageList;
             }
         }
         for (Iterator iter = times.iterator(); iter.hasNext(); ) {
