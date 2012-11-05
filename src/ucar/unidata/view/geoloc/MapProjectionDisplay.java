@@ -1499,7 +1499,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      */
     public void setMapProjection(ProjectionImpl projection)
             throws VisADException, RemoteException {
-        setMapProjection(new ProjectionCoordinateSystem(projection));
+        setMapProjection(new ProjectionCoordinateSystem(projection), true);
     }
 
     /**
@@ -1510,7 +1510,23 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws  VisADException         Couldn't create necessary VisAD object
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public void setMapProjection(MapProjection mapProjection)
+    public void setMapProjection(MapProjection mapProjection) 
+            throws VisADException, RemoteException {
+        setMapProjection(mapProjection, true);
+    }
+
+    /**
+     * Define the map projection using a MapProjection type CoordinateSystem
+     *
+     * @param  mapProjection   map projection coordinate system
+     *
+     * @param  resetDisplayProjMatrix  yes/no change the current VisAD Display projection matrix 
+     *                                 when the map projection is changed.
+     *
+     * @throws  VisADException         Couldn't create necessary VisAD object
+     * @throws  RemoteException        Couldn't create a remote object
+     */
+    public void setMapProjection(MapProjection mapProjection, boolean resetDisplayProjMatrix)
             throws VisADException, RemoteException {
         if (mapProjection.equals(this.mapProjection)) {
             return;
@@ -1522,7 +1538,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // Need to reset these for new projection.
         this.latScaleInfo = null;
         this.lonScaleInfo = null;
-        resetMapParameters();
+        resetMapParameters(resetDisplayProjMatrix);
 
         EarthLocation el = getEarthLocation(0, 0, 0);
 
@@ -2143,6 +2159,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         return xyz;
     }
 
+
     /**
      * Method called to reset all the map parameters after a change.
      *
@@ -2150,10 +2167,26 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws VisADException     VisAD problem
      */
     private void resetMapParameters() throws VisADException, RemoteException {
+       resetMapParameters(true);
+    }
+
+
+    /**
+     * Method called to reset all the map parameters after a change.
+     *
+     * @param resetDisplayProjMatrix   yes/no change the current VisAD Display projection matrix 
+     *                                 when the map projection is changed.
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    private void resetMapParameters(boolean resetDisplayProjMatrix) throws VisADException, RemoteException {
         setDisplayInactive();
         setDisplayTypes();
-        resetProjection();  // make it the right size
-        setAspect();
+        if (resetDisplayProjMatrix) {
+           resetProjection();  // make it the right size
+           setAspect();
+        }
         makeLatScales();
         makeLonScales();
         setDisplayActive();
