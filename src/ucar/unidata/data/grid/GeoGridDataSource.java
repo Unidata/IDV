@@ -36,6 +36,7 @@ import ucar.nc2.Variable;
 import ucar.nc2.dataset.*;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.*;
+import ucar.nc2.units.DateRange;
 import ucar.nc2.util.NamedAnything;
 
 
@@ -89,15 +90,7 @@ import java.net.URL;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -191,6 +184,8 @@ public class GeoGridDataSource extends GridDataSource {
     /** for properties_ */
     private JCheckBox reverseTimesCheckbox;
 
+    /** for zidv **/
+    private DateRange dateRange = null;
 
 
     /**
@@ -849,7 +844,7 @@ public class GeoGridDataSource extends GridDataSource {
         loadId = JobManager.getManager().startLoad("Copying data", true,
                 true);
         try {
-            writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
+            writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ dateRange,
                             includeLatLon, hStride, zStride, timeStride);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
@@ -1809,7 +1804,20 @@ public class GeoGridDataSource extends GridDataSource {
             //            System.err.println ("allTimes:" + allTimes);
             //            Misc.printArray("timeIndices", timeIndices);
         }
-
+        boolean  useDriverTime = false;
+        Object cu = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        if (cu != null) {
+            useDriverTime = ((Boolean) cu).booleanValue();
+        }
+        if ((givenDataSelection != null) && useDriverTime && (givenDataSelection.getTimeDriverTimes() != null)) {
+            DateTime t0 = (DateTime)times.get(0);
+            Date dt0 = new Date((long) t0.getValue() * 1000);
+            DateTime t1 = (DateTime)times.get(times.size()-1);
+            Date dt1 = new Date((long) t1.getValue() * 1000);
+            dateRange = new DateRange( dt0, dt1);
+        } else {
+            dateRange = null;
+        }
 
         Trace.call2("GeoGridDataSource.getSequence");
 
