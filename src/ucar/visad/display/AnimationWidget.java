@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,6 +21,20 @@
 package ucar.visad.display;
 
 
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.collab.SharableImpl;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.Resource;
+import ucar.unidata.xml.XmlUtil;
+
+import visad.DateTime;
+import visad.Real;
+import visad.Set;
+import visad.VisADException;
+
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -32,9 +46,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,18 +65,6 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
-
-import ucar.unidata.collab.Sharable;
-import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Resource;
-import ucar.unidata.xml.XmlUtil;
-import visad.DateTime;
-import visad.Real;
-import visad.Set;
-import visad.VisADException;
 
 
 
@@ -1152,23 +1157,19 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         return (timesArray != null) && (timesArray.length > 0);
     }
 
+    /** counter */
+    int xcnt = 0;
+
     /**
      * Actually does the work of updating the indicator.
      * This will also turn off animation if there are no times
+     *
      * @param timeSet  animation set
      * @param timeSetChange Was this do to just a change in the time set.
      * If so then we will automatically stop running if there are no times
      * We have this check here so we can disambiguate when this is called
      * from when we just have a new Animation at initialization time (timeSetChange=false)
      * from when the times have changed in the display.
-     */
-    int xcnt = 0;
-
-    /**
-     * _more_
-     *
-     * @param timeSet _more_
-     * @param timeSetChange _more_
      */
     private void updateIndicatorInner(Set timeSet, boolean timeSetChange) {
         //      timeSet  = checkAnimationSet(timeSet);
@@ -1193,7 +1194,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
 
     /**
-     * _more_
+     * Set the times in the times box
      */
     private void setTimesInTimesBox() {
         DateTime[] theTimesArray = this.timesArray;

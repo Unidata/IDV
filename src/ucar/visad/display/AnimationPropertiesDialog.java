@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -615,11 +615,12 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                                            GuiUtils.lLabel(" minutes") });
         comps.add(addTo(GuiUtils.rLabel("Refresh Rate:"), pollList));
         comps.add(GuiUtils.left(addTo(pollIntervalPanel, pollList)));
-        
-        timeDriverCbx = new JCheckBox("", animationWidget.getAnimationSetInfo().getIsTimeDriver());
+
+        timeDriverCbx = new JCheckBox(
+            "", animationWidget.getAnimationSetInfo().getIsTimeDriver());
         comps.add(GuiUtils.rLabel("Set as Time Driver?"));
         comps.add(timeDriverCbx);
-        
+
         GuiUtils.tmpInsets = new Insets(10, 5, 5, 5);
         setContents = GuiUtils.top(GuiUtils.doLayout(comps, 2,
                 GuiUtils.WT_NN, GuiUtils.WT_N));
@@ -957,6 +958,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         pollIntervalFld.setText("" + aniSet.getPollMinutes());
         startTimePicker.setDate(aniSet.getStartFixedDate());
         endTimePicker.setDate(aniSet.getEndFixedDate());
+        timeDriverCbx.setSelected(aniSet.getIsTimeDriver());
         checkEnabled();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,6 +21,9 @@
 package ucar.visad.display;
 
 
+import visad.DateTime;
+
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -32,13 +35,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
-import visad.DateTime;
 
 
 
@@ -80,7 +82,7 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
     private AnimationWidget widget;
 
 
-    /** _more_ */
+    /** mutex */
     private Object BOXES_MUTEX = new Object();
 
     /** List of boxes to draw */
@@ -190,9 +192,9 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
     }
 
     /**
-     * _more_
+     * Get the tool tip text
      *
-     * @return _more_
+     * @return the text
      */
     public String getToolTipText() {
         if (widget == null) {

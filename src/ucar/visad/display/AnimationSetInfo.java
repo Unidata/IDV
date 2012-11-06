@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,14 +21,16 @@
 package ucar.visad.display;
 
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import visad.DateTime;
 import visad.Set;
 import visad.VisADException;
+
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -563,10 +565,10 @@ public class AnimationSetInfo {
         return endFixedTime;
     }
 
-    
+
     /**
      * Is this the ViewManager time driver?
-     * 
+     *
      * @return true if it is the time driver
      */
     public boolean getIsTimeDriver() {
@@ -575,7 +577,7 @@ public class AnimationSetInfo {
 
     /**
      * Set whether this the ViewManager time driver
-     * 
+     *
      * @param yesorno  true to be the time driver
      */
     public void setIsTimeDriver(boolean yesorno) {

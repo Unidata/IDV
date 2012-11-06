@@ -446,7 +446,8 @@ public class TimesChooser extends IdvChooser {
         for (ViewManager vm : vms) {
             try {
                 if (vm.getTimeDriverTimes() != null) {
-                    driverNames.add(new TwoFacedObject(vm.getName(), vm.getTimeDriverTimes()));
+                    driverNames.add(new TwoFacedObject(vm.getName(),
+                            vm.getTimeDriverTimes()));
                 }
             } catch (Exception e) {}
             /*  we don't really need this anymore
