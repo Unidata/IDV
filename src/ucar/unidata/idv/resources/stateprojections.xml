@@ -1,6 +1,1045 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <object class="java.util.ArrayList">
-
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-86.76430560000003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Alabama]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-89.62479360000003</double>
+            <double>29.673993599999974</double>
+            <double>-83.90381760000002</double>
+            <double>35.69607359999998</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-154.54471368960006</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Alaska]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-181.76953121280005</double>
+            <double>49.43897625599999</double>
+            <double>-127.31989616640006</double>
+            <double>74.2100548608</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-111.98016000000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Arizona]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-115.23598848</double>
+            <double>31.054924799999995</double>
+            <double>-108.72433152</double>
+            <double>37.566581760000005</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-92.24174592000003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Arkansas]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-94.98737664000004</double>
+            <double>32.02421760000003</double>
+            <double>-89.49611520000003</double>
+            <double>37.51547904000003</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-119.35005695999997</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>California]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-125.24212223999997</double>
+            <double>31.43987712000002</double>
+            <double>-113.45799167999998</double>
+            <double>43.224007680000014</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-105.712128</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Colorado]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-109.70726400000001</double>
+            <double>35.05190399999999</double>
+            <double>-101.716992</double>
+            <double>43.04217599999999</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-72.60987884939189</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Connecticut]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-74.1560312365547</double>
+            <double>40.72454645729572</double>
+            <double>-71.06372646222908</double>
+            <double>42.3148746269489</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-75.40213423926642</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Delaware]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-76.17222644856658</double>
+            <double>38.02440008097878</double>
+            <double>-74.63204202996626</double>
+            <double>40.16430232629073</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-82.96704000000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Florida]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-88.46208000000001</double>
+            <double>23.00544</double>
+            <double>-77.47200000000001</double>
+            <double>33.99552</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-83.35584</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Georgia]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-86.56992</double>
+            <double>29.56391999999998</double>
+            <double>-80.14175999999999</double>
+            <double>35.81351999999998</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-157.414464</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Hawaii]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-161.35534080000002</double>
+            <double>17.653679999999998</double>
+            <double>-153.47358720000003</double>
+            <double>24.0113376</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-114.30379008</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Idaho]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-117.91793664</double>
+            <double>41.85156096000001</double>
+            <double>-110.68964351999999</double>
+            <double>49.07985408000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-88.83816431616</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Illinois]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-92.50704949248001</double>
+            <double>36.20040855552</double>
+            <double>-85.16927913984001</double>
+            <double>43.53817890816</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-86.00832000000003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Indiana]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-88.35840000000002</double>
+            <double>37.43999999999998</double>
+            <double>-83.65824000000002</double>
+            <double>42.14015999999999</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-93.46586112</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Iowa]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-96.91453440000001</double>
+            <double>38.616606719999986</double>
+            <double>-90.01718784</double>
+            <double>45.51395327999999</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-98.37725184000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Kansas]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-102.32303616000002</double>
+            <double>34.487193600000005</double>
+            <double>-94.43146752000001</double>
+            <double>42.37876224000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-85.77319449599999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Kentucky]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-90.33255982079999</double>
+            <double>35.381240063999996</double>
+            <double>-81.21382917119999</double>
+            <double>40.044227328</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-91.65998592</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Louisiana]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-94.49044992</double>
+            <double>28.142599680000004</double>
+            <double>-88.82952192</double>
+            <double>33.80352768</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-69.13900799999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Maine]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-72.11946239999999</double>
+            <double>42.3978048</double>
+            <double>-66.15855359999999</double>
+            <double>48.2683968</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-77.40472163051521</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Maryland]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-80.13112045516802</double>
+            <double>37.629459795916844</double>
+            <double>-74.67832280586241</double>
+            <double>40.201534158796846</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-71.78266628628481</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Massachusetts]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-73.8994078162944</double>
+            <double>39.73880474910722</double>
+            <double>-69.6659247562752</double>
+            <double>43.97228780912642</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-85.664696832</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Michigan]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-90.545577984</double>
+            <double>39.055071744</double>
+            <double>-80.78381568</double>
+            <double>48.816834048000004</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-93.71031552000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Minnesota]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-98.51000832000001</double>
+            <double>41.19063551999997</double>
+            <double>-88.91062272</double>
+            <double>50.79002111999997</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-89.67225600000002</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Mississippi]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-92.31707520000002</double>
+            <double>29.506694399999986</double>
+            <double>-87.02743680000002</double>
+            <double>35.70209279999999</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-92.59997184</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Missouri]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-96.17955839999999</double>
+            <double>34.77811968</double>
+            <double>-89.02038527999999</double>
+            <double>41.9372928</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-110.03390207999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>A-M>Montana]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-116.64101375999999</double>
+            <double>40.28448383999999</double>
+            <double>-103.42679039999999</double>
+            <double>53.4987072</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-99.69539327999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Nebraska]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-104.48022527999998</double>
+            <double>36.68981760000001</double>
+            <double>-94.91056127999998</double>
+            <double>46.25948160000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-116.85961580544</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Nevada]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-121.09132652544</double>
+            <double>34.507859005440025</double>
+            <double>-112.62790508543999</double>
+            <double>42.97128044544002</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-71.63478904320002</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>New Hampshire]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-72.94038773760002</double>
+            <double>42.34968852479997</double>
+            <double>-70.32919034880003</double>
+            <double>45.66305663999997</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-74.7181142208</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>New Jersey]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-76.0274326656</double>
+            <double>38.54098673279999</double>
+            <double>-73.408795776</double>
+            <double>41.8069271232</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-106.18444800000003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>New Mexico]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-109.59068160000004</double>
+            <double>30.845952000000025</double>
+            <double>-102.77821440000004</double>
+            <double>37.658419200000026</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-76.24972800000003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>New York]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-80.01815040000002</double>
+            <double>39.313152</double>
+            <double>-72.48130560000003</double>
+            <double>46.84999680000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-79.69776645311998</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>North Carolina]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-85.03634814911999</double>
+            <double>31.447022389759974</double>
+            <double>-74.35918475711999</double>
+            <double>39.338202648319975</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-100.64987136</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>North Dakota]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-104.95816704</double>
+            <double>43.35570432000001</double>
+            <double>-96.34157568</double>
+            <double>51.97229568000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-82.656</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Ohio]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-85.46688</double>
+            <double>37.30176</double>
+            <double>-79.84512000000001</double>
+            <double>42.92352</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-98.77802840064003</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Oklahoma]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-103.46508269568002</double>
+            <double>30.673168773119997</double>
+            <double>-94.09097410560003</double>
+            <double>40.047277363199996</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-120.65057280000002</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Oregon]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-124.95744000000002</double>
+            <double>40.024396800000005</double>
+            <double>-116.34370560000002</double>
+            <double>48.638131200000004</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-77.740178688</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Pennsylvania]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-81.03750211584</double>
+            <double>37.55359475712001</double>
+            <double>-74.44285526016</double>
+            <double>44.14824161280001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-71.590449024</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Rhode Island]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-71.984173824</double>
+            <double>41.20438694400001</double>
+            <double>-71.196724224</double>
+            <double>42.17032512000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-80.88150239999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>South Carolina]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-84.23526239999998</double>
+            <double>31.271212800000015</double>
+            <double>-77.5277424</double>
+            <double>36.13416479999999</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-100.15857792000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>South Dakota]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-104.37937920000002</double>
+            <double>39.99332736000002</double>
+            <double>-95.93777664000001</double>
+            <double>48.43492992000002</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-85.91011200000001</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Tennessee]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-91.10292480000001</double>
+            <double>32.40393600000003</double>
+            <double>-80.71729920000001</double>
+            <double>39.62224640000003</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-100.08468864</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Texas]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-107.16751872</double>
+            <double>24.28215552000001</double>
+            <double>-93.00185856</double>
+            <double>38.447815680000005</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-111.59838719999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Utah]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-114.3562752</double>
+            <double>36.757324800000006</double>
+            <double>-108.8404992</double>
+            <double>42.2731008</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-72.53131973962758</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Vermont]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-73.8353584257639</double>
+            <double>42.36069051187201</double>
+            <double>-71.22728105349127</double>
+            <double>45.366610195169294</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-79.68514245119998</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Virginia]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-84.30672752639998</double>
+            <double>34.70935701760002</double>
+            <double>-75.06355737599998</double>
+            <double>41.200142515200015</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-120.59080703999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Washington]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-125.31612671999999</double>
+            <double>42.675701759999995</double>
+            <double>-115.86548735999999</double>
+            <double>52.12634112</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-120.59080703999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>West>Washington]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-125.31612671999999</double>
+            <double>42.675701759999995</double>
+            <double>-115.86548735999999</double>
+            <double>52.12634112</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-80.15621760000002</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>West Virginia]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-83.27896704000003</double>
+            <double>36.65361023999999</double>
+            <double>-77.03346816000003</double>
+            <double>41.12373888</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-89.94962303999999</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Wisconsin]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-93.21843455999999</double>
+            <double>41.56077312000001</double>
+            <double>-86.68081151999999</double>
+            <double>48.09839616000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-107.50892544</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>N-Z>Wyoming]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-111.47272704</double>
+            <double>38.94022656000001</double>
+            <double>-103.54512384</double>
+            <double>46.86782976000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+      <property name="CenterLon">
+        <double>-107.50892544</double>
+      </property>
+      <property name="Name">
+        <string><![CDATA[US>States>West>Wyoming]]></string>
+      </property>
+      <property name="DefaultMapArea">
+        <object class="ucar.unidata.geoloc.ProjectionRect">
+          <constructor>
+            <double>-111.47272704</double>
+            <double>38.94022656000001</double>
+            <double>-103.54512384</double>
+            <double>46.86782976000001</double>
+          </constructor>
+        </object>
+      </property>
+    </object>
+  </method>
   <method name="add">
     <object class="ucar.unidata.geoloc.projection.LatLonProjection">
       <property name="CenterLon">
@@ -596,46 +1635,6 @@
             <double>36.757324800000006</double>
             <double>-108.8404992</double>
             <double>42.2731008</double>
-          </constructor>
-        </object>
-      </property>
-    </object>
-  </method>
-  <method name="add">
-    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
-      <property name="CenterLon">
-        <double>-120.59080703999999</double>
-      </property>
-      <property name="Name">
-        <string><![CDATA[US>States>West>Washington]]></string>
-      </property>
-      <property name="DefaultMapArea">
-        <object class="ucar.unidata.geoloc.ProjectionRect">
-          <constructor>
-            <double>-125.31612671999999</double>
-            <double>42.675701759999995</double>
-            <double>-115.86548735999999</double>
-            <double>52.12634112</double>
-          </constructor>
-        </object>
-      </property>
-    </object>
-  </method>
-  <method name="add">
-    <object class="ucar.unidata.geoloc.projection.LatLonProjection">
-      <property name="CenterLon">
-        <double>-107.50892544</double>
-      </property>
-      <property name="Name">
-        <string><![CDATA[US>States>West>Wyoming]]></string>
-      </property>
-      <property name="DefaultMapArea">
-        <object class="ucar.unidata.geoloc.ProjectionRect">
-          <constructor>
-            <double>-111.47272704</double>
-            <double>38.94022656000001</double>
-            <double>-103.54512384</double>
-            <double>46.86782976000001</double>
           </constructor>
         </object>
       </property>
