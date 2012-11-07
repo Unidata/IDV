@@ -379,10 +379,12 @@ public class AddePointDataSource extends PointDataSource {
         List realUrls;
         Trace.call1("AddePointDataSource.makeObs");
         String source = getSource(dataChoice);
+        boolean usingTD = false;
         if (canSaveDataToLocalDisk()) {  // Pointing to an adde server
             source   = processUrl(source, dataChoice, subset, bbox, sampleIt);
             realUrls = AddeUtil.generateTimeUrls(this, source, subset);
             if ((subset != null) && (subset.getTimeDriverTimes() != null)) {
+                usingTD = true;
                 timeDriverSelection = subset;
             } else {
                 timeDriverSelection = null;
@@ -427,7 +429,10 @@ public class AddePointDataSource extends PointDataSource {
                     //putCache (source, obs);
                     //TODO: check to see that this is because of no data
                 } catch (VisADException ve) {
-                    logException("reading point data", ve);
+                   // only log exceptions when not using time driver.
+                   if (!usingTD) {
+                       logException("reading point data", ve);
+                   }
                 }  // no data available;
             }
         }
