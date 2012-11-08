@@ -32,6 +32,7 @@ ide/intellij/.idea/vcs.xml
 #
 .classpath
 .project
+.settings
 
 ######################
 # OS generated files #
