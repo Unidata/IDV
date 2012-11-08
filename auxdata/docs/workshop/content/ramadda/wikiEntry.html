@@ -1,0 +1,48 @@
+[ht::head {WikiEntry}]
+
+
+RAMADDA uses wiki text in a number of ways. You can create Wiki Page entries, you can style any entry
+using wiki text and you can also add in a Page Style metadata element that allows you
+to define the style used for a whole collection of entries.
+<p>
+
+    <subhead  id="wikipage"  intoc="false">Wiki Page Entries</subhead>
+
+    One of the entry types that RAMADDA provides is a Wiki Page entry.
+    You create a new Wiki Page just like you create any entry; in a folder
+    for which you have write privileges. Go to [ht::menu File {New Entry}].
+    In the form select &quot;Wiki Page&quot; to go to the Wiki Page create form:
+
+    <div class="cimg"><img src="images/wikicreate.gif" ></div>
+
+<ul>
+    <li> Create a new wiki entry for the earthquake data
+        <ul>
+            <li> Enter "Earthquake Point Data" in the title box
+            <li> In the wiki text panel, enter
+
+            [wiki::text {A link to the earthquake data entry}]
+
+            [wiki::text {[[ entryId | Earthquake Data]]}]
+            [wiki::text {{{ import entryId data.point.map}}}]
+
+            The entryId can be obtained by clicking on the "Add entry id" link in the
+            upper right corner of the text area. Navigate through the tree structure to get to the earthquake
+            data.
+
+        </ul>
+</ul>
+See the help on <a href="http://ramadda.org/repository/userguide/wikitext.html">Wiki Text</a> for more information
+on how to use wiki text markup.
+<p>
+    The result HTML view of a Wiki Page entry  looks like:
+    <div class="cimg"><img src="images/earthquake.gif" ></div>
+    The &quot;Details&quot; link in the upper right will show the default HTML view of this page.
+<p>
+    The &quot;Wiki History&quot; link in the top tabs will take you to the history page for the entry.
+    This shows the history of past edits and allows you to view and compare versions and to revert
+    back to past versions.
+
+
+
+    [ht::foot]

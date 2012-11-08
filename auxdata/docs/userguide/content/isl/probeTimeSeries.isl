@@ -1,4 +1,4 @@
-<isl debug="ture" offscreen="false">
+<isl debug="true" offscreen="false">
     <procedure name="mkCHART">
         <bundle clear="true" file="${islpath}/RUC.xidv"/>
         <pause/>

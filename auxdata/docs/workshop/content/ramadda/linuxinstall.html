@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Linux Installation</title>
+</head>
+
+<body>
+
+<div class="overview">
+Installing on Linux including Amazon EC2 Linux
+</div>
+
+<p>Every flavor of Linux has its own favorite way of installing software packages. These instructions use Yellowdog Updater, Modified (YUM) package-management utility for RPM-compatible Linux operating systems. In addition, as a prerequisite, you must have Java installed.</p>
+
+<p>It is in addition possible to install RAMADDA on <a href="http://aws.amazon.com/ec2/">Amazon Elastic Compute Cloud (Amazon EC2)</a>. This choice can be an attractive alternative for those of you who do not have access to a server or the ability to open and close ports (e.g. port 8080) at your local facility. The instructions below should be valid for an installation of RAMADDA on EC2. Note that you will have to study the Amazon pricing policies (although there are free options). See <a href="http://www.in4ray.com/2012/04/install-tomcat-7-on-amazon-linux.html">this link</a> for more information.</p>
+
+<ol class="step">
+<li><code>sudo yum install tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps</code></li>
+<li><code>cd /usr/share/tomcat7/webapps</code></li>
+<li><code>wget http://downloads.sourceforge.net/project/ramadda/ramadda1.4/repository.war</code></li>
+<li><code>sudo service tomcat7 start</code></li>
+<li>In your browser, navigate to <a href="http://localhost:8080/repository">http://localhost:8080/repository</a> If you see the following screen, you have successfully installed RAMADDA.</li>
+<div class="cimg"><img src="images/ramadda.gif" ></div>
+</ol>
+
+<p>You are now ready to <a href="admin.html">to set up the admin account</a> in RAMADDA.</p>
+
+</body>
+</html>

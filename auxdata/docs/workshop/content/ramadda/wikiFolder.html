@@ -1,0 +1,53 @@
+[ht::head {WikiFolder}]
+
+<subhead intoc="false" id="wikidesc">Wiki Text in Other Entries</subhead>
+You can use the wiki text display capabilities to customize the default
+HTML view of any other entry or folder types. If the description of the entry
+begins with &quot;&lt;wiki&gt;&quot; then we treat the description as wiki text
+and process it to create the default HTML view. This allows you to override the default HTML display and come up with your own display.
+
+
+<ul>
+    <li> Create a wiki text for the workshop data folder
+        <ul>
+            <li> Navigate to RAMADDA data folder, create a new folder named idvData
+            <li> In the idvData folder, create a folder named Pictures, and upload a few idv generated images.
+            <li> In the idvData folder, create a folder named Schedule, inside Schedule
+                create four subfolders with each of this workshop date assigned to the date range of the subfolder:
+                Monday, Tuesday, Wednesday, and Thursday.
+            <li> Back to idvData folder, Go to the [ht::menu Edit  {Edit Entry}] menu, and copy the follow text into the description box:
+
+
+            <pre>
+            &lt;wiki&gt;
+            &lt;center&gt;
+            &lt;h3&gt;
+            Welcome to the 2012 IDV/RAMADDA User's Training Workshop.
+            &lt;/h3&gt;
+            &lt;/center&gt;
+
+            &lt;table width="100%"&gt;&lt;tr valign="top"&gt;&lt;td&gt;
+
+            {{tree title="Links"}}
+            &lt;/td&gt;&lt;td&gt;
+            &lt;img src="http://www.unidata.ucar.edu/photos/2006userwkshp/collage.jpg" width="500"&gt;
+            &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+            Presentation Schedule:
+            {{import entry=entryId output="calendar.calendar" }}
+            </pre>
+
+                The entryId can be obtained by clicking on the "Add entry id" button on the
+                upper right corner and go through the tree structure to get to the Schedule folder.
+            <li> Click on the Save button.
+        </ul>
+</ul>
+
+The result HTML view of a Wiki Page entry  looks like:
+[ht::cimg images/workshopFolder.gif {Wiki Page} {border=0 width=600}]
+In this case we use HTML and the import tags to come up with the page layout.
+
+
+
+[ht::foot]
+

@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>Time Matching Radar and Satellite imagery</title>
+</head>
+
+<body>
+
+<div class="overview">
+    You can use time matching feature in the IDV to create a time synchronized display with both
+    radar and satellite imagery.
+</div>
+
+<p>First, load up a couple of satellite images.
+
+<ol class="step">
+
+    <li>If you haven't already done so, remove all displays.
+
+    <li>From the [ht::dialog Field Selector] window,
+        select the [ht::dataset 1 km GOES-8 Visible]
+        data source.  </li>
+
+    <li>Select the [ht::param 0.65 um Visible - Cloud Cover]
+        field in the [ht::command Fields] panel,
+        and select [ht::display Image Sequence Display]
+        in the [ht::command Displays] panel.</li>
+
+    <li>In the [ht::command Times] panel, select
+        the [ht::command Set As Time Driver] menu item and
+        select the 1998-06-29 21:15:00Z and
+        1998-06-29 22:15:00Z entries in the list. [ht::listSelect]
+
+    <li>Click the [ht::button Create Display] button
+        to load in those two images.</li>
+
+</ol>
+
+Next, let's select some radar imagery using the driver times from the satellite imagery.
+
+<ol>
+
+    <li>First, let's keep the satellite projection for now.  Uncheck
+        the [ht::menu Projections {Auto-set Projection}] menu item.
+
+    <li>Open the Level II Data Source Chooser</li>
+    <ul class="substep">
+        <li> [ht::openDataSourceChooser] </li>
+        <li> In the [ht::dialog Data Source Chooser] click on the
+            [ht::tab Radar] tab. Then click on the [ht::tab NEXRAD Remote] tab to see the
+            Level II radar data remote chooser panel. </li>
+        <li> In the catalog selector drop-down, select the motherlode
+            catalog that is included.
+            <ul>
+                <p>
+                    <b>http://motherlode.ucar.edu:8080/thredds/radarServer/catalog.xml</b>
+                <p>
+            </ul>
+            If it is not in the list, type it into the catalog selector area and press enter.
+            In the collections drop-down, select
+            [ht::tab Level II Radar for Case Study CCS039]
+            <ul class="substep">
+                <li>Zoom in the map and select the station KDVN. </li>
+                <li>Click on the [ht::button {Match Time Driver}] button on the bottom left.</li>
+                <li>Click the [ht::button {Add Source}] button. </li>
+            </ul>
+        </li>
+        <li>Select the [ht::param Reflectivity] field and create a
+        [ht::display {Radar Sweep View in 2D}] display.   </li>
+    </ul>
+    <li>Let's check the time matching result by bring up the animation timeline:
+        click on [ht::menu View {Animation Timeline}], and compare the time selection from two difference
+        data source. </li>
+    <li>Remove all displays and data.
+</ol>
+
+Try the following time matching exercises on your own using the real time satellite and radar data.
+
+<ol>
+    <li>First, load in the latest 5 GOES East/West IR Composite and set the Satellite imagery as time driver.
+    <li>Second, find the location of interesting weather.
+    <li>Then, load in the a few level II radar stations which are close to the area identified in the second step,
+        and check on the [ht::button {Match Time Driver}] button.
+    <li>Check the [ht::menu View {Animation Timeline}] for the matching result. </li>
+    <li>Remove all displays and data.
+</ol>
+
+</body>
+</html>

@@ -275,10 +275,25 @@ Use this checkbox menu item to toggle the visibility of the
 display in the <code class="dialog">View Window</code>.
 }]
 
-[menuDesc {Use Times in Animation} { 
+[menuDesc [ht::menu Times {Use Times in Animation}] {
 If this display has times associated with it, this option
 tells the IDV whether they should be used in setting the
 animation steps.
+}]
+
+[menuDesc [ht::menu Times {Drive Times with this Display}] {
+If this display has times associated with it, this option tells the
+IDV whether times of this display are used to drive the time selection of other displays.
+}]
+
+[menuDesc [ht::menu Times {Uses Time Driver Times}] {
+If this display has times associated with it, this option
+tells the IDV whether to use the time driver times to drive the time selection of this display.
+}]
+
+[menuDesc {Display List} {
+This will Allows you to set the visibility and the color of the
+label for this control in the display list.
 }]
 
 [menuDesc {Bring to Front} { 

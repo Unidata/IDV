@@ -161,7 +161,7 @@ public class AddePointDataChooser extends AddeChooser {
             public void actionPerformed(ActionEvent a) {
                 setState(STATE_UNCONNECTED);
                 String currentType = dataTypes.getSelectedItem().toString();
-                if (currentType.equals(SYNOPTIC)) {
+                if (currentType.indexOf(SYNOPTIC) >= 0) {
                     setRelativeTimeIncrement(3);
                 } else {
                     setRelativeTimeIncrement(1);
@@ -224,7 +224,8 @@ public class AddePointDataChooser extends AddeChooser {
             // to the AddeProfilerDataSource
             Hashtable ht = new Hashtable();
             getDataSourceProperties(ht);
-            ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING, getDoTimeDrivers());
+            ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING,
+                   getDoTimeDrivers());
             ht.put(AddePointDataSource.PROP_STATIONMODELNAME,
                    selectedStationModel.getName());
             ht.put(DATASET_NAME_KEY, getDatasetName());
@@ -646,7 +647,11 @@ public class AddePointDataChooser extends AddeChooser {
         return new TwoFacedObject[] {
             new TwoFacedObject(METAR, "RTPTSRC/SFCHOURLY"),
             new TwoFacedObject(SYNOPTIC, "RTPTSRC/SYNOPTIC"),
-            new TwoFacedObject(SHIPBUOY, "RTPTSRC/SHIPBUOY") };
+            new TwoFacedObject(SHIPBUOY, "RTPTSRC/SHIPBUOY"),
+            new TwoFacedObject("Archived " + METAR, "PTSRCALL/SFCHOURLY"),
+            new TwoFacedObject("Archived " + SYNOPTIC, "PTSRCALL/SYNOPTIC"),
+            new TwoFacedObject("Archived " + SHIPBUOY, "PTSRCALL/SHIPBUOY")
+        };
     }
 
 

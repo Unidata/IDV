@@ -785,6 +785,9 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_COMBINE = "combine";
 
     /** isl attribute */
+    public static final String ATTR_ANIMATION_INDEX = "animation_index";
+
+    /** isl attribute */
     private static final String ATTR_SUFFIXFREQUENCY = "suffixfrequency";
 
     /** Show debug messages */
@@ -1176,7 +1179,7 @@ public class ImageGenerator extends IdvManager {
             return true;
         }
         debug("Removing all displays");
-        getIdv().removeAllDisplays(false);
+        getIdv().removeAllDisplays(true);
         return true;
     }
 
@@ -4177,9 +4180,14 @@ public class ImageGenerator extends IdvManager {
             debug("No views to capture");
         }
         pushProperties();
+        
+        int animation_index = XmlUtil.getAttribute(scriptingNode, ATTR_ANIMATION_INDEX,
+                0);
+
         List<Image> images = new ArrayList<Image>();
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
+            viewManager.getAnimation().setCurrent(animation_index);
             putIndex(getProperties(), PROP_VIEWINDEX, i);
             String name = viewManager.getName();
             if (name == null) {

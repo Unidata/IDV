@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,16 +21,9 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
 import visad.DateTime;
 import visad.Set;
-
 import visad.VisADException;
-
-import java.awt.*;
 
 
 import java.rmi.RemoteException;
@@ -38,8 +31,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.swing.*;
 
 
 /**
@@ -107,9 +98,11 @@ public class AnimationSetInfo {
     /** Minutes to round to */
     private double roundTo = 1.0;
 
-    /** _more_          */
+    /** The set of base times */
     private Set baseTimes;
 
+    /** is this the time driver? */
+    private boolean isTimeDriver;
 
     /**
      * ctor
@@ -134,6 +127,7 @@ public class AnimationSetInfo {
         this.startFixedTime     = that.startFixedTime;
         this.endFixedTime       = that.endFixedTime;
         this.baseTimes          = that.baseTimes;
+        this.isTimeDriver       = that.isTimeDriver;
     }
 
 
@@ -152,8 +146,7 @@ public class AnimationSetInfo {
     /**
      * Utility to round the given seconds
      *
-     *
-     * @param roundTo _more_
+     * @param roundTo  the seconds to round to
      * @param seconds time to round
      *
      * @return Rounded value
@@ -168,23 +161,22 @@ public class AnimationSetInfo {
 
 
     /**
-     * _more_
+     * Set the base time
      *
-     * @param times _more_
+     * @param times the times
      */
     protected void setBaseTimes(Set times) {
         this.baseTimes = times;
     }
 
     /**
-     * _more_
+     * Get the base times
      *
-     * @return _more_
+     * @return  the base times
      */
     protected Set getBaseTimes() {
         return this.baseTimes;
     }
-
 
 
     /**
@@ -574,5 +566,22 @@ public class AnimationSetInfo {
     }
 
 
+    /**
+     * Is this the ViewManager time driver?
+     *
+     * @return true if it is the time driver
+     */
+    public boolean getIsTimeDriver() {
+        return isTimeDriver;
+    }
+
+    /**
+     * Set whether this the ViewManager time driver
+     *
+     * @param yesorno  true to be the time driver
+     */
+    public void setIsTimeDriver(boolean yesorno) {
+        isTimeDriver = yesorno;
+    }
 
 }

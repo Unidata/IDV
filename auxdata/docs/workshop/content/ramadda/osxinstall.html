@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>OS X Installation</title>
+</head>
+
+<body>
+
+<div class="overview">
+Installing on OS X
+</div>
+
+<p>Installing RAMADDA involves the installation of these three software packages:
+
+<ul>
+<li>Java</li>
+<li>Apache Tomcat</li>
+<li>RAMADDA</li>
+</ul>
+
+We will now go through each of steps in detail. You will need to know how to open the Terminal.app located in the Applications > Utilities folder and issue Unix shell commands. You also must have sudo privileges.</p>
+
+<p><b>Java Installation</b> <a href="http://helpx.adobe.com/x-productkb/global/install-java-jre-mac-os.html">(instructions borrowed from Adobe)</a></p>
+
+<ol class="step">
+<li>Go to Applications > Utilities > Java Preferences</li>
+<li>Open the Java Preferences</li>
+<li>If Java is not installed, you will receive the following message:</li>
+<div class="cimg"><img src="images/JavaInstall.gif" ></div>
+<li>Click Install and accept the license agreement. The Java runtime is downloaded and installed.</li>
+</ol>
+
+<p><b>Tomcat Installation</b> <a href="http://wolfpaulus.com/journal/mac/tomcat7">(instructions borrowed from Wolf Paulus)</a></p>
+
+<ol class="step">
+
+<li><a href="http://tomcat.apache.org/download-70.cgi">Download</a> a tar.gz binary distribution of the Apache Tomcat core module.</li>
+<div class="cimg"><img src="images/tomcatosx.gif" ></div>
+
+
+<li>Unarchive the tar.gz file. You can uncompress this file with the <a href="http://itunes.apple.com/us/app/the-unarchiver/id425424353">Unarchiver</a>. This action should result in a file called <code>apache-tomcat-x.y.z</code> in your Downloads folder. (x.y.z stands for the particular version of Apache Tomcat you downloaded)</li>
+
+<li>Start the Terminal.app and issue the following commands</li>
+
+<li><code>sudo mkdir /usr/local</code></li>
+<li><code>sudo mv ~/Downloads/apache-tomcat-x.y.z /usr/local</code></li>
+<li><code>sudo ln -s /usr/local/apache-tomcat-x.y.z /Library/Tomcat</code></li>
+<li><code>sudo chown -R your_username /Library/Tomcat</code></li>
+<li><code>sudo chmod +x /Library/Tomcat/bin/*.sh</code></li>
+</ol>
+
+<p><b>RAMADDA Installation</b></p>
+
+<ol class="step">
+<li><a href="http://sourceforge.net/projects/ramadda/files/">Download</a> the RAMADDA WAR (web application archive) file.</li>
+<li><code>mv ~/Downloads/repository.war /Library/Tomcat/webapps</code></li>
+<li><code>/Library/Tomcat/bin/startup.sh</code></li>
+<li>In your browser, navigate to <a href="http://localhost:8080/repository">http://localhost:8080/repository</a> If you see the following screen, you have successfully installed RAMADDA.</li>
+<div class="cimg"><img src="images/ramadda.gif" ></div>
+</ol>
+
+<p>You are now ready to <a href="admin.html">to set up the admin account</a> in RAMADDA.</p>
+
+</body>
+</html>

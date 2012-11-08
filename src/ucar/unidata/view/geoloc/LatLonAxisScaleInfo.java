@@ -156,22 +156,16 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
     @Override
     public int hashCode() {
         final int prime  = 31;
-        int       result = 1;
+        int       result = super.hashCode();
         result = prime * result + ((baseLabel == null)
                                    ? 0
                                    : baseLabel.hashCode());
         result = prime * result + ((coordFormat == null)
                                    ? 0
                                    : coordFormat.hashCode());
-        result = prime * result + ((getFont() == null)
-                                   ? 0
-                                   : getFont().hashCode());
         result = prime * result + ((increment == null)
                                    ? 0
                                    : increment.hashCode());
-        result = prime * result + ((getLabel() == null)
-                                   ? 0
-                                   : getLabel().hashCode());
         result = prime * result + minorDivision;
         result = prime * result + (use360
                                    ? 1231
@@ -182,7 +176,6 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         return result;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -191,7 +184,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if ( !super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
@@ -212,25 +205,11 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         } else if ( !coordFormat.equals(other.coordFormat)) {
             return false;
         }
-        if (getFont() == null) {
-            if (other.getFont() != null) {
-                return false;
-            }
-        } else if ( !getFont().equals(other.getFont())) {
-            return false;
-        }
         if (increment == null) {
             if (other.increment != null) {
                 return false;
             }
         } else if ( !increment.equals(other.increment)) {
-            return false;
-        }
-        if (getLabel() == null) {
-            if (other.getLabel() != null) {
-                return false;
-            }
-        } else if ( !getLabel().equals(other.getLabel())) {
             return false;
         }
         if (minorDivision != other.minorDivision) {
@@ -244,5 +223,4 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         }
         return true;
     }
-
 }

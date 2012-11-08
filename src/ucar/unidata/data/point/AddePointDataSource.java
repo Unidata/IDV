@@ -66,6 +66,9 @@ public class AddePointDataSource extends PointDataSource {
     /** does this have the Altitude parameter? */
     private boolean hasAltitude = true;
 
+    /** urls with time in them */
+    private DataSelection timeDriverSelection;
+
     /**
      * Default contstructor.
      *
@@ -176,10 +179,12 @@ public class AddePointDataSource extends PointDataSource {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
+
         String source = sources.get(0).toString();
         source = processUrl(source, null, null, null, false);
-        List addeUrls = AddeUtil.generateTimeUrls(this, source, null);
-        List urls     = new ArrayList();
+        List addeUrls = AddeUtil.generateTimeUrls(this, source,
+                            timeDriverSelection);
+        List<String> urls = new ArrayList<String>();
         for (int i = 0; i < addeUrls.size(); i++) {
             String sourceUrl = (String) addeUrls.get(i);
             urls.add(sourceUrl + "&rawstream=true");
@@ -230,9 +235,9 @@ public class AddePointDataSource extends PointDataSource {
             if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
                 String llb = "";
                 if (bbox != null) {
-                    LatLonPoint ll     = bbox.getLowerLeftPoint();
-                    LatLonPoint ur     = bbox.getUpperRightPoint();
-                    double      latMin = Math.min(ll.getLatitude(),
+                    LatLonPoint ll = bbox.getLowerLeftPoint();
+                    LatLonPoint ur = bbox.getUpperRightPoint();
+                    double latMin = Math.min(ll.getLatitude(),
                                              ur.getLatitude());
                     double latMax = Math.max(ll.getLatitude(),
                                              ur.getLatitude());
@@ -374,10 +379,17 @@ public class AddePointDataSource extends PointDataSource {
         List realUrls;
         Trace.call1("AddePointDataSource.makeObs");
         String source = getSource(dataChoice);
-        if (canSaveDataToLocalDisk()) { // Pointing to an adde server
+        boolean usingTD = false;
+        if (canSaveDataToLocalDisk()) {  // Pointing to an adde server
             source   = processUrl(source, dataChoice, subset, bbox, sampleIt);
             realUrls = AddeUtil.generateTimeUrls(this, source, subset);
-        } else { // Pointing to a file
+            if ((subset != null) && (subset.getTimeDriverTimes() != null)) {
+                usingTD = true;
+                timeDriverSelection = subset;
+            } else {
+                timeDriverSelection = null;
+            }
+        } else {                         // Pointing to a file
             realUrls = new ArrayList();
             for (int i = 0; i < sources.size(); i++) {
                 String sourceUrl = (String) sources.get(i);
@@ -417,7 +429,10 @@ public class AddePointDataSource extends PointDataSource {
                     //putCache (source, obs);
                     //TODO: check to see that this is because of no data
                 } catch (VisADException ve) {
-                    logException("reading point data", ve);
+                   // only log exceptions when not using time driver.
+                   if (!usingTD) {
+                       logException("reading point data", ve);
+                   }
                 }  // no data available;
             }
         }
@@ -541,7 +556,7 @@ public class AddePointDataSource extends PointDataSource {
             Misc.gc();
             for (int i = 0; i < args.length; i++) {
                 Trace.call1("AddePointDataSource.pda ctor");
-                long             t1  = System.currentTimeMillis();
+                long t1 = System.currentTimeMillis();
                 PointDataAdapter pda = new PointDataAdapter(args[i], false,
                                            true);
                 Trace.call2("AddePointDataSource.pda ctor", (newWay
@@ -600,8 +615,8 @@ public class AddePointDataSource extends PointDataSource {
      * @return list of levels (may be empty)
      */
     protected List getDefaultLevels() {
-        List   retList = new ArrayList();
-        Object level   =
+        List retList = new ArrayList();
+        Object level =
             getProperty(ucar.unidata.idv.chooser.adde.AddePointDataChooser
                 .SELECTED_LEVEL);
         if (level != null) {
@@ -616,13 +631,13 @@ public class AddePointDataSource extends PointDataSource {
      * @return  empty list from this class
      */
     protected List doMakeDateTimes() {
-    	List timesList = new ArrayList();
-    	String source = (String) sources.get(0);
-    	if (getProperty(AddeUtil.ABSOLUTE_TIMES, (Object) null) != null) {
-    		timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
+        List   timesList = new ArrayList();
+        String source    = (String) sources.get(0);
+        if (getProperty(AddeUtil.ABSOLUTE_TIMES, (Object) null) != null) {
+            timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
         } else if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
             Object tmp = getProperty(AddeUtil.NUM_RELATIVE_TIMES,
-                             new Integer(0));
+                                     new Integer(0));
             int[] timeIndices;
             if (tmp instanceof Integer) {
                 int numTimes = ((Integer) tmp).intValue();
@@ -639,12 +654,13 @@ public class AddePointDataSource extends PointDataSource {
                     name = "Most recent";
                 }
                 if ((i > 0) && (i < DataSource.ordinalNames.length)) {
-                    name = DataSource.ordinalNames[timeIndices[i]] + " most recent";
+                    name = DataSource.ordinalNames[timeIndices[i]]
+                           + " most recent";
                 }
                 timesList.add(new TwoFacedObject(name, i));
             }
-    	}
-    	return timesList;
+        }
+        return timesList;
     }
 
 }
