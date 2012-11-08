@@ -50,6 +50,9 @@
   </paramgroup>
   <paramgroup name="temp_and_pressure">
     <params
+       p1="Temperature_potential_vorticity_surface"
+       p2="Pressure"/>
+    <params
        p1="TEMP"
        p2="PRESSURE"/>
   </paramgroup>
