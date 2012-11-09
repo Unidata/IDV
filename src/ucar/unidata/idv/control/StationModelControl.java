@@ -2321,6 +2321,7 @@ public class StationModelControl extends ObsDisplayControl {
             setStationModel(sm);
         } else {
             tmpStationModelName = n;
+
         }
     }
 
