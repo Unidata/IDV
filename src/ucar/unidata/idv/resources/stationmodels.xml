@@ -2728,7 +2728,7 @@
             <method name="add">
                 <object class="ucar.unidata.ui.symbol.ShapeSymbol">
                     <property name="Shape">
-                        <string><![CDATA[HURRICANE]]></string>
+                        <string><![CDATA[TROPICALSTORM]]></string>
                     </property>
                     <property name="ShapeType">
                         <string><![CDATA[line]]></string>
