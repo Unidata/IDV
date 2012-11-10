@@ -11,7 +11,7 @@ The [isl::tag image] and [isl::tag movie] tag are the ones used to create images
 movies. Both of these tags can contain subtags that allow you to manipulate
 the  image or images.
 
-[isl::tagdef image {Generate and manipulate images} -attrs {file+ {image file, e.g., gif, png or jpg} quality {image quality, 0.0-1.0} view {view name or names to match} display {display id} what {what part of the display control should be captured} combine {true or false. If there are multiple images, they will all be captured} columns {If multiple images are being captured, optionally set the number of columns. This option is for offscreen mode only.}}]
+[isl::tagdef image {Generate and manipulate images} -attrs {file+ {image file, e.g., gif, png or jpg} quality {image quality, 0.0-1.0} view {view name or names to match} display {display id} what {what part of the display control should be captured} combine {true or false. If there are multiple images, they will all be captured} animation_index {list of animation indices. Can be specified in the same manner as the bundles times attribute} columns {If multiple images are being captured, optionally set the number of columns. This option is for offscreen mode only.}}]
 The [isl::tag image] tag   allows you to capture an image from a main display or from the GUI of a display control.
 
 <p>
