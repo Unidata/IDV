@@ -26,6 +26,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.SharableImpl;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -145,12 +147,15 @@ import java.text.DecimalFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -4000,6 +4005,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void displayDataChanged(DisplayControl displayControl) {
         if (idv.getUseTimeDriver() && displayControl.getIsTimeDriver()) {
+            // now, reload any that are using time drives
+            reloadTimeDriverDataSources(displayControl);
+        }
+        /*
             for (DisplayControl control :
                     (List<DisplayControl>) getControls()) {
                 if ( !control.equals(displayControl)
@@ -4015,6 +4024,46 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
             }
         }
+        */
+    }
+
+    /**
+     * Reload the data sources associated with controls using time drivers.
+     * @param displayControl the time driver control, or null if using the Animation
+     */
+    private void reloadTimeDriverDataSources(DisplayControl displayControl) {
+        List<DataSource> uniqueSources =
+            Collections.synchronizedList(new ArrayList<DataSource>());
+
+        if (idv.getUseTimeDriver()
+                && ((displayControl == null)
+                    || displayControl.getIsTimeDriver())) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) getControls()) {
+                if (((displayControl == null) || !control
+                        .equals(
+                            displayControl)) && ((DisplayControlImpl) control)
+                                .getUsesTimeDriver()) {
+                    List controlSources =
+                        ((DisplayControlImpl) control).getDataSources();
+                    for (int i = 0; i < controlSources.size(); i++) {
+                        DataSourceImpl ds =
+                            (DataSourceImpl) controlSources.get(i);
+                        if ( !uniqueSources.contains(ds)) {
+                            uniqueSources.add(ds);
+                        }
+                    }
+                }
+            }
+        }
+        for (DataSource source : uniqueSources) {
+            try {
+                Misc.run(source, "reloadData");
+            } catch (Exception e) {
+                logException("Error reloading data source for "
+                             + source.getName(), e);
+            }
+        }
     }
 
     /**
@@ -4028,6 +4077,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
         }
         // now, reload any that are using time drives
+        reloadTimeDriverDataSources(null);
+        /*
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             try {
                 if (((DisplayControlImpl) control).getUsesTimeDriver()) {
@@ -4038,6 +4089,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                              + control.getLabel(), e);
             }
         }
+        */
     }
 
     /**
@@ -4783,7 +4835,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 animation.addPropertyChangeListener(
                     new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        animationInfo = animation.getAnimationInfo();
+                        //animationInfo = animation.getAnimationInfo();
                         try {
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
