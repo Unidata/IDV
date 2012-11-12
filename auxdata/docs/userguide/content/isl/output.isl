@@ -6,7 +6,7 @@
 
         <output>Some more text</output>
         <output><![CDATA[
-Some text in a CDATA Section. Thi allows you to have " and < without 
+Some text in a CDATA Section. This allows you to have " and < without
 escaping the in the xml
         >]]></output>
    </output>
