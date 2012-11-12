@@ -23,7 +23,7 @@
   <method name="add">
     <object class="ucar.unidata.geoloc.projection.LatLonProjection">
       <property name="CenterLon">
-        <double>-154.54471368960006</double>
+        <double>-151.65973219153403</double>
       </property>
       <property name="Name">
         <string><![CDATA[US>States>A-M>Alaska]]></string>
@@ -31,10 +31,10 @@
       <property name="DefaultMapArea">
         <object class="ucar.unidata.geoloc.ProjectionRect">
           <constructor>
-            <double>-181.76953121280005</double>
-            <double>49.43897625599999</double>
-            <double>-127.31989616640006</double>
-            <double>74.2100548608</double>
+            <double>-183.98794659806464</double>
+            <double>41.45050003712886</double>
+            <double>-119.33151778500346</double>
+            <double>81.19830463532222</double>
           </constructor>
         </object>
       </property>
@@ -652,9 +652,9 @@
         <object class="ucar.unidata.geoloc.ProjectionRect">
           <constructor>
             <double>-85.03634814911999</double>
-            <double>31.447022389759974</double>
+            <double>31.447022389759965</double>
             <double>-74.35918475711999</double>
-            <double>39.338202648319975</double>
+            <double>39.33820264831998</double>
           </constructor>
         </object>
       </property>
@@ -1661,3 +1661,9 @@
     </object>
   </method>
 </object>
+
+
+
+
+
+
