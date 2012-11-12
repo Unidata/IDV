@@ -23,8 +23,6 @@ package ucar.unidata.util;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import visad.ContourControl;
-
 /**
  * A class to hold and transfer contour level settings, as to and from the
  * dialog box ContLevelDialog.
@@ -62,6 +60,9 @@ public class ContourInfo {
     /** Default label size */
     public final static int DEFAULT_LABEL_SIZE = 12;
 
+    /** Default label frequency (per qualifying contour line) */
+    public final static int DEFAULT_LABEL_FREQ = 1;
+
     /** contour interval */
     private float interval;
 
@@ -75,7 +76,7 @@ public class ContourInfo {
     private float max;
 
     /** label frequency (number per line) */
-    private int labelFreq = ContourControl.LABEL_FREQ_LO;
+    private int labelFreq = DEFAULT_LABEL_FREQ;
     
     /** label (font) size */
     private int labelSize = DEFAULT_LABEL_SIZE;
@@ -184,7 +185,7 @@ public class ContourInfo {
                        boolean isColorFilled, int width, int dashedStyle) {
         this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
              width, DEFAULT_DASHED_STYLE, 
-             ContourControl.LABEL_FREQ_LO, DEFAULT_LABEL_SIZE, null,
+             DEFAULT_LABEL_FREQ, DEFAULT_LABEL_SIZE, null,
              DEFAULT_LABEL_ALIGNMENT);
     }
 
