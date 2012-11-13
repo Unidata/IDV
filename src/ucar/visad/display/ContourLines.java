@@ -144,6 +144,9 @@ public abstract class ContourLines extends LineDrawing {
     /** label size factor */
     private volatile double labelFactor = 1.;
 
+    /** label frequency */
+    private volatile int labelFreq = 1;
+
     /** label font */
     private volatile Object labelFont = null;
 
@@ -400,6 +403,7 @@ public abstract class ContourLines extends LineDrawing {
                 contourInfo.getContourLevels(), contourInfo.getBase(),
                 contourInfo.getDashOn()));
         setLabeling(contourInfo.getIsLabeled());
+        setLabelFreq(contourInfo.getLabelFreq());
         setLineWidth(contourInfo.getLineWidth());
         setDashedStyle(contourInfo.getDashedStyle());
         setFont(contourInfo.getFont(), contourInfo.getLabelSize(),
@@ -503,6 +507,25 @@ public abstract class ContourLines extends LineDrawing {
     }
 
     /**
+     * Set the label frequency
+     * @param  freq	label frequency
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException Problem setting the dashed style
+     */
+
+    public void setLabelFreq(int freq)
+            throws RemoteException, VisADException {
+
+        if (freq != labelFreq) {
+            labelFreq = freq;
+            if (contourControl != null) {
+                contourControl.setLabelFreq(labelFreq);
+            }
+        }
+    }
+
+    /**
      * Set the dashed style.
      * @param  style  dashed line style
      *
@@ -583,6 +606,7 @@ public abstract class ContourLines extends LineDrawing {
                         contourControl.setDashedStyle(dashedStyle);
                         contourControl.setLabelFont(labelFont);
                         contourControl.setLabelSize(labelFactor);
+                        contourControl.setLabelFreq(labelFreq);
                         contourControl.setAlignLabels(alignLabels);
                     }
                 }
