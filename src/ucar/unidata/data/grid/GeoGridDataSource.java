@@ -1804,10 +1804,9 @@ public class GeoGridDataSource extends GridDataSource {
             //            System.err.println ("allTimes:" + allTimes);
             //            Misc.printArray("timeIndices", timeIndices);
         }
-        boolean  useDriverTime = false;
-        Object cu = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-        if (cu != null) {
-            useDriverTime = ((Boolean) cu).booleanValue();
+        boolean useDriverTime = false;
+        if (givenDataSelection != null) {
+            useDriverTime = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
         }
         if ((givenDataSelection != null) && useDriverTime && (givenDataSelection.getTimeDriverTimes() != null)) {
             DateTime t0 = (DateTime)times.get(0);
