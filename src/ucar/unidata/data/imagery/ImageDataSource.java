@@ -1491,7 +1491,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     for (String day : days) {
                         startDay = day + " 00:00:00";
                         endDay   = day + " 23:59:59";
-                        start = UtcDate.createDateTime(startDay,
+                        start = DateTime.createDateTime(startDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
                         end = UtcDate.createDateTime(endDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
@@ -1507,15 +1507,22 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         try {  // we may be asking for a date that doesn't exist
                             ad = new AreaDirectoryList(aii.getURLString());
                         } catch (AreaFileException afe) {
+                            // If there's an error, we just ignore it.  In the
+                            // end, the descriptor list will be empty if there is no
+                            // data for any of the days.
+                            continue;
+
                             // TODO: This is a hack because different servers return different
                             // messages.  AREA and GINI servers seem to have "no images" in the
                             // exception message when there are no images.
-                            if (afe.getMessage().toLowerCase().indexOf(
-                                    "no images") >= 0) {
-                                continue;
-                            } else {
-                                throw afe;
-                            }
+                            //String message = afe.getMessage().toLowerCase();
+                            //if (message.indexOf("no images") >= 0 || 
+                            //    message.indexOf("error generating list of files") >= 0) {
+                            //    continue;
+                            //} else {
+                            //    throw afe;
+                            //}
+
                         }
                         AreaDirectory[][] dirs = ad.getSortedDirs();
                         for (int d = 0; d < dirs.length; d++) {
@@ -1556,7 +1563,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     System.out.println("Got an exception: "
                                        + excp.getMessage());
                 }
+                // we do this so save data local will work.  However, if
+                // this then gets set to be the time driver, it would not
+                // necessarily be correct
+                imageList = descriptors;
                 return descriptors;
+            } else if (imageList != null) {
+                return imageList;
             }
         }
         for (Iterator iter = times.iterator(); iter.hasNext(); ) {

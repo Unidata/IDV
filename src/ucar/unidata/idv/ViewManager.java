@@ -26,6 +26,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.SharableImpl;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -69,6 +71,7 @@ import ucar.unidata.xml.XmlUtil;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.AnimationSetInfo;
 import ucar.visad.display.AnimationWidget;
 import ucar.visad.display.CompositeDisplayable;
 import ucar.visad.display.DisplayMaster;
@@ -99,6 +102,7 @@ import visad.bom.annotations.ScreenAnnotatorJ3D;
 
 import visad.java3d.DisplayImplJ3D;
 import visad.java3d.DisplayRendererJ3D;
+
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
@@ -143,12 +147,15 @@ import java.text.DecimalFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -951,6 +958,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public List<DateTime> getTimeDriverTimes()
             throws VisADException, RemoteException {
+        if (getAnimationInfo() != null) {
+            AnimationSetInfo asi = getAnimationInfo().getAnimationSetInfo();
+            if (asi.getActive() && asi.getIsTimeDriver()) {
+                DateTime[] times = getAnimationTimes();
+                return (List<DateTime>) Misc.toList(times);
+            }
+        }
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if (control.getIsTimeDriver()) {
                 Set        timeSet = control.getTimeSet();
@@ -2231,6 +2245,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         if ((that.animationInfo != null) && (this.animationWidget != null)) {
+            this.animationInfo = that.animationInfo;
             this.animationWidget.setProperties(that.animationInfo);
         }
 
@@ -3990,6 +4005,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void displayDataChanged(DisplayControl displayControl) {
         if (idv.getUseTimeDriver() && displayControl.getIsTimeDriver()) {
+            // now, reload any that are using time drives
+            reloadTimeDriverDataSources(displayControl);
+        }
+        /*
             for (DisplayControl control :
                     (List<DisplayControl>) getControls()) {
                 if ( !control.equals(displayControl)
@@ -4005,6 +4024,72 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
             }
         }
+        */
+    }
+
+    /**
+     * Reload the data sources associated with controls using time drivers.
+     * @param displayControl the time driver control, or null if using the Animation
+     */
+    private void reloadTimeDriverDataSources(DisplayControl displayControl) {
+        List<DataSource> uniqueSources =
+            Collections.synchronizedList(new ArrayList<DataSource>());
+
+        if (idv.getUseTimeDriver()
+                && ((displayControl == null)
+                    || displayControl.getIsTimeDriver())) {
+            for (DisplayControl control :
+                    (List<DisplayControl>) getControls()) {
+                if (((displayControl == null) || !control
+                        .equals(
+                            displayControl)) && ((DisplayControlImpl) control)
+                                .getUsesTimeDriver()) {
+                    List controlSources =
+                        ((DisplayControlImpl) control).getDataSources();
+                    for (int i = 0; i < controlSources.size(); i++) {
+                        DataSourceImpl ds =
+                            (DataSourceImpl) controlSources.get(i);
+                        if ( !uniqueSources.contains(ds)) {
+                            uniqueSources.add(ds);
+                        }
+                    }
+                }
+            }
+        }
+        for (DataSource source : uniqueSources) {
+            try {
+                Misc.run(source, "reloadData");
+            } catch (Exception e) {
+                logException("Error reloading data source for "
+                             + source.getName(), e);
+            }
+        }
+    }
+
+    /**
+     * Handle the time set from the animation widget changing
+     */
+    public void animationDriverChanged() {
+        // first, turn off any control time drivers
+        for (DisplayControl control : (List<DisplayControl>) getControls()) {
+            if (((DisplayControlImpl) control).getIsTimeDriver()) {
+                ((DisplayControlImpl) control).setIsTimeDriver(false);
+            }
+        }
+        // now, reload any that are using time drives
+        reloadTimeDriverDataSources(null);
+        /*
+        for (DisplayControl control : (List<DisplayControl>) getControls()) {
+            try {
+                if (((DisplayControlImpl) control).getUsesTimeDriver()) {
+                    ((DisplayControlImpl) control).reloadDataSourceInThread();
+                }
+            } catch (Exception e) {
+                logException("Error reloading data source for "
+                             + control.getLabel(), e);
+            }
+        }
+        */
     }
 
     /**
@@ -4750,6 +4835,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 animation.addPropertyChangeListener(
                     new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
+                        //animationInfo = animation.getAnimationInfo();
                         try {
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
@@ -4761,13 +4847,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                         animation.getCurrent());
                                 }
                             } else if (evt.getPropertyName().equals(
-                                    Animation.ANI_SET) && (animationTimeline
-                                        != null)) {
+                                    Animation.ANI_SET)) {
                                 if (animationTimeline != null) {
                                     animationTimeline.setDatedThings(
                                         DatedObject.wrap(
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
+                                }
+                                if ((animationInfo != null) && animationInfo
+                                        .getAnimationSetInfo()
+                                        .getActive() && animationInfo
+                                        .getAnimationSetInfo()
+                                        .getIsTimeDriver()) {
+                                    animationDriverChanged();
                                 }
                             }
                         } catch (Exception exp) {
@@ -6022,9 +6114,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         (BufferedImage) ImageUtils.gridImages2(images, 0,
                             Color.GRAY,
                             ImageUtils.getColumnCountFromComps(views));
-                    
-                    if ((image != null) && backgroundTransparentBtn.isSelected()) {
-                        image = ImageUtils.makeColorTransparent(image, getBackground());
+
+                    if ((image != null)
+                            && backgroundTransparentBtn.isSelected()) {
+                        image = ImageUtils.makeColorTransparent(image,
+                                getBackground());
                     }
 
                     if (KmlDataSource.isKmlFile(filename)) {
@@ -7583,6 +7677,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param displayControl  the time driver control
      */
     public void ensureOnlyOneTimeDriver(DisplayControl displayControl) {
+        if (getAnimationInfo() != null
+                & getAnimationInfo().getAnimationSetInfo().getActive()) {
+            AnimationInfo ai = getAnimationWidget().getAnimationInfo();
+            ai.getAnimationSetInfo().setIsTimeDriver(false);
+            getAnimationWidget().setProperties(ai);
+        }
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if ( !control.equals(displayControl)
                     && control.getIsTimeDriver()) {

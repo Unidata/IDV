@@ -68,7 +68,6 @@ import javax.swing.border.EtchedBorder;
 
 
 
-
 /**
  * A widget to control animation in a VisAD display. Allows user to
  * set loop position at first frame, step backward one step,
@@ -1158,23 +1157,19 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         return (timesArray != null) && (timesArray.length > 0);
     }
 
+    /** counter */
+    int xcnt = 0;
+
     /**
      * Actually does the work of updating the indicator.
      * This will also turn off animation if there are no times
+     *
      * @param timeSet  animation set
      * @param timeSetChange Was this do to just a change in the time set.
      * If so then we will automatically stop running if there are no times
      * We have this check here so we can disambiguate when this is called
      * from when we just have a new Animation at initialization time (timeSetChange=false)
      * from when the times have changed in the display.
-     */
-    int xcnt = 0;
-
-    /**
-     * _more_
-     *
-     * @param timeSet _more_
-     * @param timeSetChange _more_
      */
     private void updateIndicatorInner(Set timeSet, boolean timeSetChange) {
         //      timeSet  = checkAnimationSet(timeSet);
@@ -1199,7 +1194,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
 
     /**
-     * _more_
+     * Set the times in the times box
      */
     private void setTimesInTimesBox() {
         DateTime[] theTimesArray = this.timesArray;

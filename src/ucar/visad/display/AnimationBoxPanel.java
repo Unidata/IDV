@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,38 +21,26 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.collab.*;
-
-import ucar.unidata.ui.XmlUi;
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Resource;
-import ucar.unidata.xml.XmlUtil;
+import visad.DateTime;
 
 
-
-import ucar.visad.display.*;
-
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
-
-import java.beans.*;
-
-import java.rmi.RemoteException;
-
-
-import java.util.ArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 
@@ -61,7 +49,6 @@ import javax.swing.*;
  * A widget to graphically display animation times
  *
  * @author IDV Development Team
- * @version $Revision: 1.18 $
  */
 public class AnimationBoxPanel extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener {
@@ -95,7 +82,7 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
     private AnimationWidget widget;
 
 
-    /** _more_ */
+    /** mutex */
     private Object BOXES_MUTEX = new Object();
 
     /** List of boxes to draw */
@@ -205,9 +192,9 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
     }
 
     /**
-     * _more_
+     * Get the tool tip text
      *
-     * @return _more_
+     * @return the text
      */
     public String getToolTipText() {
         if (widget == null) {

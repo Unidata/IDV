@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -167,13 +167,13 @@ public class ShapeUtility {
     public static final int MISC_ID_PIN = 15;
 
     /** The identifier for a minus station location marker */
-    public static final int MISC_ID_MINUS = 16;
+    public static final int MISC_ID_MINUS = 15;
 
     /** Id for tropical storm */
-    public static final int MISC_ID_TROPICALSTORM = 17;
+    public static final int MISC_ID_TROPICALSTORM = 16;
 
-    /** The identifier for a minus station location marker */
-    public static final int MISC_ID_HURRICANE = 18;
+    /** The identifier for hurricane */
+    public static final int MISC_ID_HURRICANE = 17;
 
     /** shape name from WeatherSymbols */
     public static final String CIRCLE = "CIRCLE";

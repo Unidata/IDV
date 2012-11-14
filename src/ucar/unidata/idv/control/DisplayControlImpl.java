@@ -1140,23 +1140,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
 
-        if ((myDataChoices.size() > 0)
-                && (myDataChoices.get(0) instanceof DerivedDataChoice)) {
-            List cdcs =
-                ((DerivedDataChoice) myDataChoices.get(0)).getChoices();
-            if (cdcs.size() > 0) {
-                DataChoice    dc = (DataChoice) cdcs.get(0);
-                DataSelection ds = dc.getDataSelection();
-                if (ds != null) {
-                    List dtimes = ds.getTimeDriverTimes();
-                    Object ud1 =
-                        ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    //if ((dtimes != null) && (dtimes.size() > 0)
-                    //        && (ud1 != null)) {
-                    if (ud1 != null) {
-                        this.usesTimeDriver = ((Boolean) ud1).booleanValue();
+        if (myDataChoices != null) {
+            if ((myDataChoices.size() > 0)
+                    && (myDataChoices.get(0) instanceof DerivedDataChoice)) {
+                List cdcs =
+                    ((DerivedDataChoice) myDataChoices.get(0)).getChoices();
+                if (cdcs.size() > 0) {
+                    DataChoice    dc = (DataChoice) cdcs.get(0);
+                    DataSelection ds = dc.getDataSelection();
+                    if (ds != null) {
+                        List dtimes = ds.getTimeDriverTimes();
+                        Object ud1 =
+                            ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                        //if ((dtimes != null) && (dtimes.size() > 0)
+                        //        && (ud1 != null)) {
+                        if (ud1 != null) {
+                            this.usesTimeDriver =
+                                ((Boolean) ud1).booleanValue();
+                        }
+                        //}
                     }
-                    //}
                 }
             }
         }
@@ -3982,7 +3985,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return list of data sources
      */
-    protected List getDataSources() {
+    public List getDataSources() {
         List dataSources = new ArrayList();
         if (myDataChoices != null) {
             for (int i = 0; i < myDataChoices.size(); i++) {
