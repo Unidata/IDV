@@ -488,9 +488,12 @@ public interface DataSource {
      */
     public void setObjectProperties(Hashtable properties);
 
-
-
-
+    /**
+     * Whether this DataSource to do "All levels"
+     *
+     * @return boolean
+     */
+     public boolean canDoAllLevels();
 
     /**
      *  Set the DataIsEditable property.
