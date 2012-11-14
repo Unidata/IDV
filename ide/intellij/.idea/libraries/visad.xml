@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="visad">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../lib/visad.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
