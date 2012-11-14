@@ -391,7 +391,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /** 
+     * Can this handle "All levels"?
+     *
+     * @return true
+     */
 
+     public boolean canDoAllLevels() {
+       return true;
+     }
 
     /**
      * Get the IDV
