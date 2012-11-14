@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -30,29 +30,35 @@ import ucar.ma2.Range;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
-import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-
-import ucar.nc2.dataset.*;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dt.GridCoordSystem;
-import ucar.nc2.dt.grid.*;
+import ucar.nc2.dt.grid.GeoGrid;
+import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.units.DateRange;
 import ucar.nc2.util.NamedAnything;
 
-
-
-import ucar.unidata.data.*;
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-
+import ucar.unidata.data.BadDataException;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
-
-import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.CatalogUtil;
-import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -64,35 +70,50 @@ import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
-
-import ucar.unidata.xml.*;
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Util;
 
-
-import visad.*;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.Real;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
-import visad.util.DataUtility;
 
 import java.awt.Dimension;
 import java.awt.Font;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 
-import java.io.*;
-
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 
 import java.rmi.RemoteException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 
 
 
@@ -184,7 +205,7 @@ public class GeoGridDataSource extends GridDataSource {
     /** for properties_ */
     private JCheckBox reverseTimesCheckbox;
 
-    /** for zidv **/
+    /** for zidv */
     private DateRange dateRange = null;
 
 
@@ -844,8 +865,9 @@ public class GeoGridDataSource extends GridDataSource {
         loadId = JobManager.getManager().startLoad("Copying data", true,
                 true);
         try {
-            writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ dateRange,
-                            includeLatLon, hStride, zStride, timeStride);
+            writer.makeFile(path, dataset, varNames, llr,  /*dateRange*/
+                            dateRange, includeLatLon, hStride, zStride,
+                            timeStride);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
                          + getFilePath() + "\nVariables:" + varNames, exc);
@@ -1443,8 +1465,8 @@ public class GeoGridDataSource extends GridDataSource {
             return null;
         }
         Object  extraCacheKey = null;
+        GeoGrid geoGrid       = findGridForDataChoice(myDataset, dataChoice);
         String  paramName     = dataChoice.getStringId();
-        GeoGrid geoGrid       = myDataset.findGridByName(paramName);
         if (geoGrid == null) {
             return null;
         }
@@ -1712,14 +1734,14 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
-        String      paramName = dataChoice.getStringId();
         long        starttime = System.currentTimeMillis();
         FieldImpl   fieldImpl = null;
         GridDataset myDataset = getDataset();
         if (myDataset == null) {
             return null;
         }
-        GeoGrid geoGrid = myDataset.findGridByName(paramName);
+        GeoGrid geoGrid   = findGridForDataChoice(myDataset, dataChoice);
+        String  paramName = dataChoice.getStringId();
 
 
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
@@ -1804,17 +1826,19 @@ public class GeoGridDataSource extends GridDataSource {
             //            System.err.println ("allTimes:" + allTimes);
             //            Misc.printArray("timeIndices", timeIndices);
         }
-        boolean  useDriverTime = false;
-        Object cu = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        boolean useDriverTime = false;
+        Object cu =
+            givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
         if (cu != null) {
             useDriverTime = ((Boolean) cu).booleanValue();
         }
-        if ((givenDataSelection != null) && useDriverTime && (givenDataSelection.getTimeDriverTimes() != null)) {
-            DateTime t0 = (DateTime)times.get(0);
-            Date dt0 = new Date((long) t0.getValue() * 1000);
-            DateTime t1 = (DateTime)times.get(times.size()-1);
-            Date dt1 = new Date((long) t1.getValue() * 1000);
-            dateRange = new DateRange( dt0, dt1);
+        if ((givenDataSelection != null) && useDriverTime
+                && (givenDataSelection.getTimeDriverTimes() != null)) {
+            DateTime t0  = (DateTime) times.get(0);
+            Date     dt0 = new Date((long) t0.getValue() * 1000);
+            DateTime t1  = (DateTime) times.get(times.size() - 1);
+            Date     dt1 = new Date((long) t1.getValue() * 1000);
+            dateRange = new DateRange(dt0, dt1);
         } else {
             dateRange = null;
         }
@@ -1840,6 +1864,22 @@ public class GeoGridDataSource extends GridDataSource {
         return fieldImpl;
     }  // end makeField
 
+
+    /**
+     * Find the grid in the dataset from the DataChoice
+     *
+     * @param ds  the grid dataset
+     * @param dc  the data choice
+     * @return the GeoGrid or null dataset doesn't exist or if variable not found
+     */
+    public GeoGrid findGridForDataChoice(GridDataset ds, DataChoice dc) {
+        if (ds == null) {
+            return null;
+        }
+        String  name    = dc.getStringId();
+        GeoGrid geoGrid = ds.findGridByName(name);
+        return geoGrid;
+    }
 
     /**
      * Utility to check if we should ignore the given z axis
@@ -2249,7 +2289,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         /*
     GridDataset dataset    = GridDataset.open("elev.nc");
-    GeoGrid     geoGrid    = dataset.findGridByName("foo");
+    GeoGrid     geoGrid    = findGridForDataChoice(dataset, "foo");
     GeoGrid     geoGrid50  = geoGrid.subset(null, null, null, 0, 50, 50);
     GeoGrid     geoGrid100 = geoGrid.subset(null, null, null, 0, 100,
                                  100);
