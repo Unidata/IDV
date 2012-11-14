@@ -39,8 +39,7 @@ import ucar.nc2.dt.grid.*;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
-
-
+import ucar.nc2.grib.GribVariableRenamer;
 
 import ucar.unidata.data.*;
 
@@ -190,6 +189,8 @@ public class GeoGridDataSource extends GridDataSource {
     /** for zidv */
     private CalendarDateRange dateRange;
 
+    /** handles the grib variable renaming */
+    private GribVariableRenamer renamer = new GribVariableRenamer();
 
 
     /**
@@ -1720,14 +1721,32 @@ public class GeoGridDataSource extends GridDataSource {
         long        starttime = System.currentTimeMillis();
         FieldImpl   fieldImpl = null;
         GridDataset myDataset = getDataset();
+
         if (myDataset == null) {
             return null;
         }
-        GeoGrid geoGrid = myDataset.findGridByName(paramName);
 
+        /**
+         *
+         * Look for new name for parameter
+         * If name already exists in dataset, then the old name is returned
+         *
+         */
+        List<String> newParamName = renamer.matchNcepNames(myDataset,
+                paramName);
+        if (newParamName.size() == 0) {
+            // just temporary...
+            System.out.print("Variable Tables need to be updated in netCDF-Java");
+        }
+        paramName = newParamName.get(0);
+        dataChoice.setId(newParamName.get(0));
+        dataChoice.setName(newParamName.get(0));
+
+        GeoGrid geoGrid = myDataset.findGridByName(paramName);
 
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         //      System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
+
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
                                      fromLevelIndex, toLevelIndex, false);
