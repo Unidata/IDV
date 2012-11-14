@@ -1827,10 +1827,8 @@ public class GeoGridDataSource extends GridDataSource {
             //            Misc.printArray("timeIndices", timeIndices);
         }
         boolean useDriverTime = false;
-        Object cu =
-            givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-        if (cu != null) {
-            useDriverTime = ((Boolean) cu).booleanValue();
+        if (givenDataSelection != null) {
+            useDriverTime = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
         }
         if ((givenDataSelection != null) && useDriverTime
                 && (givenDataSelection.getTimeDriverTimes() != null)) {

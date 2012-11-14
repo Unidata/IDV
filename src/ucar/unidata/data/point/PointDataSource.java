@@ -1627,4 +1627,14 @@ public abstract class PointDataSource extends FilesDataSource {
         return makeGridFields;
     }
 
+    /**
+     * Cannot do all levels!
+     *
+     * @return false
+     *
+     */
+     public boolean canDoAllLevels() {
+       return false;
+     }
+
 }
