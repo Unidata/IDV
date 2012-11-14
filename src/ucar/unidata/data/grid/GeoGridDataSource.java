@@ -37,6 +37,7 @@ import ucar.nc2.dataset.*;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.*;
 import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
 
 
@@ -69,6 +70,7 @@ import ucar.unidata.xml.*;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 
 
 import visad.*;
@@ -190,8 +192,11 @@ public class GeoGridDataSource extends GridDataSource {
     /** Do we really reverse the time indices */
     private boolean reverseTimes = false;
 
-    /** for properties_ */
+    /** for properties */
     private JCheckBox reverseTimesCheckbox;
+
+    /** for zidv */
+    private CalendarDateRange dateRange;
 
 
 
@@ -851,7 +856,7 @@ public class GeoGridDataSource extends GridDataSource {
         loadId = JobManager.getManager().startLoad("Copying data", true,
                 true);
         try {
-            writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
+            writer.makeFile(path, dataset, varNames, llr, dateRange,
                             includeLatLon, hStride, zStride, timeStride);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
@@ -1811,6 +1816,20 @@ public class GeoGridDataSource extends GridDataSource {
             //            System.err.println ("allTimes:" + allTimes);
             //            Misc.printArray("timeIndices", timeIndices);
         }
+        boolean useDriverTime = false;
+        if (givenDataSelection != null) {
+            useDriverTime = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
+        }
+        if ((givenDataSelection != null) && useDriverTime && (givenDataSelection.getTimeDriverTimes() != null)) {
+            CalendarDateTime t0 = new CalendarDateTime((DateTime)times.get(0));
+            CalendarDate dt0 = t0.getCalendarDate();
+            CalendarDateTime t1 = new CalendarDateTime((DateTime)times.get(times.size()-1));
+            CalendarDate dt1 = t1.getCalendarDate();
+            dateRange = CalendarDateRange.of(dt0, dt1);
+        } else {
+            dateRange = null;
+        }
+
 
 
         Trace.call2("GeoGridDataSource.getSequence");

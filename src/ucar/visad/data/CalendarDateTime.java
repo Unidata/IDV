@@ -203,6 +203,15 @@ public class CalendarDateTime extends visad.DateTime {
     }
 
     /**
+     * Get the CalendarDate associated with this object
+     *
+     * @return  the calendar
+     */
+    public CalendarDate getCalendarDate() {
+        return calendarDate;
+    }
+
+    /**
      * Create a Gridded1DDoubleSet from an array of doubles of seconds
      * since the epoch.
      *
