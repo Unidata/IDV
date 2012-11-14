@@ -1736,12 +1736,12 @@ public class GeoGridDataSource extends GridDataSource {
 
         long        starttime = System.currentTimeMillis();
         FieldImpl   fieldImpl = null;
-        GridDataset myDataset = getDataset();
-        if (myDataset == null) {
-            return null;
-        }
-        GeoGrid geoGrid   = findGridForDataChoice(myDataset, dataChoice);
-        String  paramName = dataChoice.getStringId();
+        //GridDataset myDataset = getDataset();
+        //if (myDataset == null) {
+        //    return null;
+        //}
+        //GeoGrid geoGrid   = findGridForDataChoice(myDataset, dataChoice);
+        //String  paramName = dataChoice.getStringId();
 
 
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
@@ -1754,6 +1754,8 @@ public class GeoGridDataSource extends GridDataSource {
                                        + dataChoice.getStringId());
         }
         Trace.call2("GeoGridDataSource.make GeoGridAdapter");
+        GeoGrid geoGrid   = adapter.getGeoGrid();
+        String  paramName = dataChoice.getStringId();
 
         Trace.call1("GeoGridDataSource.make times");
         List times = getTimesFromDataSelection(givenDataSelection,

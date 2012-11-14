@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -87,6 +87,7 @@ import visad.data.in.ArithProg;
 import visad.data.in.LonArithProg;
 
 import visad.util.ThreadManager;
+
 
 import java.io.IOException;
 
@@ -321,6 +322,14 @@ public class GeoGridAdapter {
 
     }
 
+
+    /**
+     * Get the geogrid that this adapter uses
+     * @return the GeoGrid or null
+     */
+    protected GeoGrid getGeoGrid() {
+        return geoGrid;
+    }
 
 
 
@@ -1282,11 +1291,11 @@ public class GeoGridAdapter {
             //        Trace.call1("toFloatArray", " array:" + arr.getClass().getName());
             final float[][] fieldArray = new float[1][];
             //fieldArray[0] = DataUtil.toFloatArray(arr);
-            float[] values = DataUtil.toFloatArray(arr);
-            Class dataClass = arr.getElementType();
-            if (! (dataClass.equals(float.class) || 
-                          dataClass.equals(double.class) ) ) {
-              values = geoGrid.setMissingToNaN(values);
+            float[] values    = DataUtil.toFloatArray(arr);
+            Class   dataClass = arr.getElementType();
+            if ( !(dataClass.equals(float.class)
+                    || dataClass.equals(double.class))) {
+                values = geoGrid.setMissingToNaN(values);
             }
             if (values.length < domainSet.getLength()) {  // need to extend array
                 float[] newValues = new float[domainSet.getLength()];
