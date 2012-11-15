@@ -1734,33 +1734,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         long      starttime = System.currentTimeMillis();
         FieldImpl fieldImpl = null;
-        //GridDataset myDataset = getDataset();
-        //if (myDataset == null) {
-        //    return null;
-        //}
-        //GeoGrid geoGrid   = findGridForDataChoice(myDataset, dataChoice);
-        //String  paramName = dataChoice.getStringId();
 
-        /**
-         *
-         * Look for new name for parameter
-         * If name already exists in dataset, then the old name is returned
-         *
-         */
-        /**
-        List<String> newParamName = renamer.matchNcepNames(myDataset,
-                                        paramName);
-        if (newParamName.size() == 0) {
-            // just temporary...
-            System.out.print(
-                "Variable Tables need to be updated in netCDF-Java");
-        }
-        paramName = newParamName.get(0);
-        dataChoice.setId(newParamName.get(0));
-        dataChoice.setName(newParamName.get(0));
-
-        GeoGrid geoGrid = myDataset.findGridByName(paramName);
-        */
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         //      System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
 
@@ -1898,6 +1872,25 @@ public class GeoGridDataSource extends GridDataSource {
             return null;
         }
         String  name    = dc.getStringId();
+        /**
+         *
+         * Look for new name for parameter
+         * If name already exists in dataset, then the old name is returned
+         *
+         */
+        List<String> newName = renamer.matchNcepNames(ds,
+                name);
+        if (newName.size() == 0) {
+            // if interactive, popup data selector if grib file?
+            return null;
+        } else {
+            // add message if more than one possible new name.
+            // if interactive, popup data selector if grib file?
+            name = newName.get(0);
+        }
+        dc.setId(name);
+        dc.setName(name);
+
         GeoGrid geoGrid = ds.findGridByName(name);
         return geoGrid;
     }
