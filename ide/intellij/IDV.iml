@@ -6,10 +6,13 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="library" name="IDV" level="project" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="lib" level="project" />
-    <orderEntry type="library" name="libsrc" level="project" />
+    <orderEntry type="library" name="auxdata" level="project" />
+    <orderEntry type="library" name="local-visad" level="project" />
+    <orderEntry type="library" name="visad" level="project" />
+    <orderEntry type="library" name="jython" level="project" />
+    <orderEntry type="library" name="ncIdv" level="project" />
+    <orderEntry type="library" name="external" level="project" />
   </component>
 </module>
 
