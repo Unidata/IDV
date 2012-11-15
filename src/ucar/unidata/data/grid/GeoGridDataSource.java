@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -30,16 +30,18 @@ import ucar.ma2.Range;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
-import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-
-import ucar.nc2.dataset.*;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.*;
+import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
-import ucar.nc2.grib.GribVariableRenamer;
 
 import ucar.unidata.data.*;
 
@@ -49,10 +51,7 @@ import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
-
-import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.CatalogUtil;
-import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -66,35 +65,52 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 
-
-import visad.*;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.Real;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
-import visad.util.DataUtility;
 
 import java.awt.Dimension;
 import java.awt.Font;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 
-import java.io.*;
-
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 
 import java.rmi.RemoteException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 
 
 
@@ -191,7 +207,6 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** handles the grib variable renaming */
     private GribVariableRenamer renamer = new GribVariableRenamer();
-
 
     /**
      * Default constructor
@@ -1448,8 +1463,8 @@ public class GeoGridDataSource extends GridDataSource {
             return null;
         }
         Object  extraCacheKey = null;
+        GeoGrid geoGrid       = findGridForDataChoice(myDataset, dataChoice);
         String  paramName     = dataChoice.getStringId();
-        GeoGrid geoGrid       = myDataset.findGridByName(paramName);
         if (geoGrid == null) {
             return null;
         }
@@ -1717,14 +1732,14 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
-        String      paramName = dataChoice.getStringId();
-        long        starttime = System.currentTimeMillis();
-        FieldImpl   fieldImpl = null;
-        GridDataset myDataset = getDataset();
-
-        if (myDataset == null) {
-            return null;
-        }
+        long      starttime = System.currentTimeMillis();
+        FieldImpl fieldImpl = null;
+        //GridDataset myDataset = getDataset();
+        //if (myDataset == null) {
+        //    return null;
+        //}
+        //GeoGrid geoGrid   = findGridForDataChoice(myDataset, dataChoice);
+        //String  paramName = dataChoice.getStringId();
 
         /**
          *
@@ -1732,18 +1747,20 @@ public class GeoGridDataSource extends GridDataSource {
          * If name already exists in dataset, then the old name is returned
          *
          */
+        /**
         List<String> newParamName = renamer.matchNcepNames(myDataset,
-                paramName);
+                                        paramName);
         if (newParamName.size() == 0) {
             // just temporary...
-            System.out.print("Variable Tables need to be updated in netCDF-Java");
+            System.out.print(
+                "Variable Tables need to be updated in netCDF-Java");
         }
         paramName = newParamName.get(0);
         dataChoice.setId(newParamName.get(0));
         dataChoice.setName(newParamName.get(0));
 
         GeoGrid geoGrid = myDataset.findGridByName(paramName);
-
+        */
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         //      System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
 
@@ -1755,6 +1772,8 @@ public class GeoGridDataSource extends GridDataSource {
                                        + dataChoice.getStringId());
         }
         Trace.call2("GeoGridDataSource.make GeoGridAdapter");
+        GeoGrid geoGrid   = adapter.getGeoGrid();
+        String  paramName = dataChoice.getStringId();
 
         Trace.call1("GeoGridDataSource.make times");
         List times = getTimesFromDataSelection(givenDataSelection,
@@ -1829,19 +1848,21 @@ public class GeoGridDataSource extends GridDataSource {
         }
         boolean useDriverTime = false;
         if (givenDataSelection != null) {
-            useDriverTime = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
+            useDriverTime = givenDataSelection.getProperty(
+                DataSelection.PROP_USESTIMEDRIVER, false);
         }
-        if ((givenDataSelection != null) && useDriverTime && (givenDataSelection.getTimeDriverTimes() != null)) {
-            CalendarDateTime t0 = new CalendarDateTime((DateTime)times.get(0));
+        if ((givenDataSelection != null) && useDriverTime
+                && (givenDataSelection.getTimeDriverTimes() != null)) {
+            CalendarDateTime t0 =
+                new CalendarDateTime((DateTime) times.get(0));
             CalendarDate dt0 = t0.getCalendarDate();
-            CalendarDateTime t1 = new CalendarDateTime((DateTime)times.get(times.size()-1));
+            CalendarDateTime t1 =
+                new CalendarDateTime((DateTime) times.get(times.size() - 1));
             CalendarDate dt1 = t1.getCalendarDate();
             dateRange = CalendarDateRange.of(dt0, dt1);
         } else {
             dateRange = null;
         }
-
-
 
         Trace.call2("GeoGridDataSource.getSequence");
 
@@ -1864,6 +1885,22 @@ public class GeoGridDataSource extends GridDataSource {
         return fieldImpl;
     }  // end makeField
 
+
+    /**
+     * Find the grid in the dataset from the DataChoice
+     *
+     * @param ds  the grid dataset
+     * @param dc  the data choice
+     * @return the GeoGrid or null dataset doesn't exist or if variable not found
+     */
+    public GeoGrid findGridForDataChoice(GridDataset ds, DataChoice dc) {
+        if (ds == null) {
+            return null;
+        }
+        String  name    = dc.getStringId();
+        GeoGrid geoGrid = ds.findGridByName(name);
+        return geoGrid;
+    }
 
     /**
      * Utility to check if we should ignore the given z axis
@@ -2269,7 +2306,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         /*
     GridDataset dataset    = GridDataset.open("elev.nc");
-    GeoGrid     geoGrid    = dataset.findGridByName("foo");
+    GeoGrid     geoGrid    = findGridForDataChoice(dataset, "foo");
     GeoGrid     geoGrid50  = geoGrid.subset(null, null, null, 0, 50, 50);
     GeoGrid     geoGrid100 = geoGrid.subset(null, null, null, 0, 100,
                                  100);

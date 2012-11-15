@@ -326,7 +326,8 @@ public class DataSelectionWidget {
                     && (levelsFromDisplay == null))) {
             return NO_LEVELS;
         }
-        int indexOffset = ((levelsFromDisplay == null)
+        int indexOffset = ((levelsFromDisplay == null && 
+           (lastDataSource != null && lastDataSource.canDoAllLevels()) )
                            ? 1
                            : 0);
         if (selected.length == 1) {
@@ -585,7 +586,7 @@ public class DataSelectionWidget {
                 levelsTab = levelsScroller;
             }
             Vector levelsForGui = new Vector();
-            if (levelsFromDisplay == null) {
+            if (levelsFromDisplay == null && dataSource.canDoAllLevels() ) {
                 levelsForGui.add(new TwoFacedObject("All Levels", null));
             }
             for (int i = 0; i < levels.size(); i++) {
