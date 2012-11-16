@@ -67,13 +67,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-
-
+import java.util.*;
 
 
 /**
@@ -265,6 +259,9 @@ public class DataManager {
     /** Maps data source names */
     protected Hashtable dataSourceNameMap = new Hashtable();
 
+    /** Maps parameter name to parameter alias */
+    protected Hashtable<String, List> parameterAliases =
+        new Hashtable<String, List>();
 
     /**
      * Create a new DataManager with the given {@link DataContext}.
@@ -508,6 +505,7 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
+
         ucar.nc2.grib.GribResourceReader.setGribResourceReader(
             new ucar.nc2.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
@@ -583,6 +581,35 @@ public class DataManager {
                 //                System.err.println ("bad:"+ exc);
             }
         }
+
+        // Init GRIB variable aliases
+        // get the list of property files
+        ResourceCollection variableAliases =
+            resourceManager.getResources(
+                IdvResourceManager.RSC_VARIABLEALIASES);
+        for (int i = 0; i < variableAliases.size(); i++) {
+            try {
+                Properties newAliases = new Properties();
+                newAliases = Misc.readProperties(
+                    (String) variableAliases.get(i).toString(), newAliases,
+                    dataContext.getIdv().getClass());
+                //                System.err.println ("process: " +(String) propertyFiles.get(i));
+                for (Enumeration keys = newAliases.keys();
+                        keys.hasMoreElements(); ) {
+                    String key   = (String) keys.nextElement();
+                    String value = (String) newAliases.get(key);
+                    List<String> aliases = StringUtil.split(value, ",", true,
+                                               true);
+                    if ( !aliases.isEmpty()) {
+                        parameterAliases.put(key, aliases);
+                    }
+                }
+            } catch (IllegalArgumentException iae) {
+                // Ignore this - bad properties
+            }
+        }
+
+
 
     }
 
@@ -1741,6 +1768,14 @@ public class DataManager {
         return new Boolean(v).booleanValue();
     }
 
+    /**
+     * Get the aliases for a parameter name
+     * @param paramName  name of the parameter
+     * @return a list of aliases or null
+     */
+    public List<String> getParameterAliases(String paramName) {
+       return parameterAliases.get(paramName);
+    }
 
     /**
      *  Add in the AddeURLStreamHandler

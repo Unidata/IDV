@@ -1880,14 +1880,31 @@ public class GeoGridDataSource extends GridDataSource {
          */
         List<String> newName = renamer.matchNcepNames(ds,
                 name);
-        if (newName.size() == 0) {
-            // if interactive, popup data selector if grib file?
-            return null;
-        } else {
-            // add message if more than one possible new name.
-            // if interactive, popup data selector if grib file?
+
+        if (newName.size() == 1) {
+            // if unique name is returned from netCDF-Java, then use it.
             name = newName.get(0);
+        } else if (newName.size() == 0){
+            // if netCDF-Java does not find any name, then look in IDV tables
+            List<String> aliases =
+                    getIdv().getDataManager().getParameterAliases(name);
+            if ((aliases != null) && !aliases.isEmpty()) {
+                for (String alias : aliases) {
+                    GeoGrid tmpGeoGrid = ds.findGridByName(alias);
+                    if (tmpGeoGrid != null) {
+                        name = alias;
+                        break;
+                    }
+                }
+            }
+        } else if (newName.size() > 0) {
+            // netCDF-Java returned more than one match and no match was found in the
+            // IDV tables...ask user
+        } else {
+            // ok, no matches found anywhere...return null
+            return null;
         }
+
         dc.setId(name);
         dc.setName(name);
 
