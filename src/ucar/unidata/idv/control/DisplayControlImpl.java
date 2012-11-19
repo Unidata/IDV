@@ -936,6 +936,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** default type */
     private String smoothingType = LABEL_NONE;
 
+    /** flag for color scales added */
+    private boolean colorScalesAdded = false;
 
 
     /**
@@ -1798,12 +1800,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void applyColorScaleInfo()
             throws VisADException, RemoteException {
-        if ((colorScaleInfo == null) || (colorScales == null)) {
+        if (colorScaleInfo == null) {
             return;
         }
         ColorScaleInfo tmpColorScaleInfo = new ColorScaleInfo(colorScaleInfo);
         tmpColorScaleInfo.setIsVisible(tmpColorScaleInfo.getIsVisible()
                                        && getDisplayVisibility());
+        if (colorScales == null) {
+            if (tmpColorScaleInfo.getIsVisible()) {
+                doMakeColorScales();
+            }
+            return;
+        }
         for (int i = 0, n = colorScales.size(); i < n; i++) {
             ColorScale scale = (ColorScale) colorScales.get(i);
             scale.setColorScaleInfo(tmpColorScaleInfo);
@@ -3975,7 +3983,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return list of data sources
      */
-    protected List getDataSources() {
+    public List getDataSources() {
         List dataSources = new ArrayList();
         if (myDataChoices != null) {
             for (int i = 0; i < myDataChoices.size(); i++) {
@@ -6165,7 +6173,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws Exception  problem exporting
      */
     public void doExport(String what, String filename) throws Exception {
-        throw new IllegalArgumentException("doExport not implemented");
+        //Override if you want your display control to export to csv, etc.
     }
 
 
@@ -6543,7 +6551,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Call redisplay on any color scales
      */
     private void reDisplayColorScales() {
-        if ((colorScales != null) && !colorScales.isEmpty()) {
+        if ((colorScales != null) && !colorScales.isEmpty()
+                && colorScalesAdded) {
             for (int i = 0; i < colorScales.size(); i++) {
                 ((ColorScale) colorScales.get(i)).reDisplay();
             }
@@ -9076,6 +9085,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected boolean showColorScales(boolean show) {
         try {
             if (colorScales == null) {
+                if ( !show) {
+                    return false;
+                }
                 doMakeColorScales();
             }
             for (int i = 0; i < colorScales.size(); i++) {
@@ -9097,11 +9109,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void doMakeColorScales()
             throws VisADException, RemoteException {
-        colorScales = new ArrayList();
-        List v = getViewManagers();
         if (colorScaleInfo == null) {
             colorScaleInfo = getDefaultColorScaleInfo();
         }
+        if ( !colorScaleInfo.getIsVisible() || !getDisplayVisibility()) {
+            return;
+        }
+        Misc.printStack("adding color scales", 5);
+        colorScales = new ArrayList();
+        List v = getViewManagers();
         for (int i = 0; i < v.size(); i++) {
             ColorScale colorScale = new ColorScale(colorScaleInfo);
             addDisplayable(colorScale, (ViewManager) v.get(i),

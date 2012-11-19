@@ -2315,12 +2315,13 @@ public class StationModelControl extends ObsDisplayControl {
      * @param n  name of the <code>StationModel</code>
      */
     public void setStationModelName(String n) {
-        if(tmpStationModelName == null)
-            tmpStationModelName = n;
-        else{
+        if ( tmpStationModelName != null && getControlContext()!= null){
             tmpStationModelName = n;
             StationModel sm = createStationModel();
             setStationModel(sm);
+        } else {
+            tmpStationModelName = n;
+
         }
     }
 

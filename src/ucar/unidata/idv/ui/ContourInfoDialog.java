@@ -27,16 +27,32 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 
+import visad.ContourControl;
 import visad.Unit;
 
 import visad.util.HersheyFont;
 
-import java.awt.*;
-import java.awt.event.*;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
 
 
 /**
@@ -54,10 +70,8 @@ public class ContourInfoDialog implements ActionListener {
     /** max allowable levels */
     private static final int MAX_LEVELS = 1500;
 
-
     /** Was the setting successful */
     private boolean ok;
-
 
     /** The dialog we show in */
     private JDialog dialog;
@@ -99,6 +113,9 @@ public class ContourInfoDialog implements ActionListener {
     /** font size selector */
     private JComboBox fontSizeBox;
 
+    /** label frequency */
+    private JSlider labelFreqSlider;
+
     /** font size selector */
     private JComboBox alignBox;
 
@@ -114,7 +131,7 @@ public class ContourInfoDialog implements ActionListener {
                                         new TwoFacedObject("Horizontal",
                                             new Boolean(false)) };
 
-    /** _more_ */
+    /** current action command */
     private String current_action_command = null;
 
     /**
@@ -187,6 +204,7 @@ public class ContourInfoDialog implements ActionListener {
      */
     private void doMakeContents(boolean showApplyBtn, Unit unit,
                                 boolean doDialog) {
+
         String labelString = "";
         if (unit != null) {
             labelString = " " + unit.toString() + " ";
@@ -224,10 +242,30 @@ public class ContourInfoDialog implements ActionListener {
         alignBox = new JComboBox(aligns);
         alignBox.setToolTipText("Set the contour label alignment");
 
+        labelFreqSlider = new JSlider(JSlider.HORIZONTAL,
+                                      ContourControl.LABEL_FREQ_LO,
+                                      ContourControl.LABEL_FREQ_HI, 2);
+        labelFreqSlider.setMajorTickSpacing(2);
+        labelFreqSlider.setPaintTicks(true);
+        // Create the label table
+        Hashtable labelTable = new Hashtable();
+        labelTable.put(new Integer(ContourControl.LABEL_FREQ_LO),
+                       new JLabel("Lo"));
+        labelTable.put(new Integer(ContourControl.LABEL_FREQ_MED),
+                       new JLabel("Med"));
+        labelTable.put(new Integer(ContourControl.LABEL_FREQ_HI),
+                       new JLabel("Hi"));
+        labelFreqSlider.setLabelTable(labelTable);
+        labelFreqSlider.setPaintLabels(true);
+        labelFreqSlider.setSnapToTicks(true);
+        // initialize to min value
+        labelFreqSlider.setValue(ContourControl.LABEL_FREQ_LO);
+
         Component[] labelcomps = new Component[] {
             GuiUtils.rLabel("Font:"), GuiUtils.left(fontBox),
             GuiUtils.rLabel("Size:"), GuiUtils.left(fontSizeBox),
-            GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox)
+            GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox),
+            GuiUtils.rLabel("Frequency:"), GuiUtils.left(labelFreqSlider)
         };
         labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
                                        GuiUtils.WT_N);
@@ -257,8 +295,8 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.rLabel("Line Width:"),
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
-            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn),
-            labelPanel
+            GuiUtils.right(dashBtn), styleBox,
+            GuiUtils.top(GuiUtils.right(toggleBtn)), labelPanel
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -281,6 +319,7 @@ public class ContourInfoDialog implements ActionListener {
                     buttons));
             GuiUtils.packInCenter(dialog);
         }
+
     }
 
 
@@ -343,23 +382,25 @@ public class ContourInfoDialog implements ActionListener {
             int     cur_dash_style   = myInfo.getDashedStyle();
             Object  cur_font         = myInfo.getFont();
             int     cur_font_size    = myInfo.getLabelSize();
+            int     cur_label_freq   = myInfo.getLabelFreq();
             boolean cur_align_labels = myInfo.getAlignLabels();
 
 
-            String  new_lev_string   =
+            String new_lev_string =
                 ContourInfo.cleanupUserLevelString(intoStr);
             boolean new_dash_on    = dashBtn.isSelected();
             boolean new_isLabelled = toggleBtn.isSelected();
-            int     new_line_width =
+            int new_line_width =
                 new Integer(widthBox.getSelectedItem().toString()).intValue();
-            int    new_dash_style = styleBox.getSelectedIndex() + 1;
-            Object new_font       =
+            int new_dash_style = styleBox.getSelectedIndex() + 1;
+            Object new_font =
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId();
             int new_font_size =
                 ((Integer) fontSizeBox.getSelectedItem()).intValue();
             boolean new_align_labels =
                 ((Boolean) ((TwoFacedObject) alignBox.getSelectedItem())
                     .getId()).booleanValue();
+            int new_label_freq = labelFreqSlider.getValue();
 
             // permit mino == maxo the case of one contour line
             // now set the data of the ContourInfo
@@ -424,10 +465,15 @@ public class ContourInfoDialog implements ActionListener {
                 myInfo.setAlignLabels(new_align_labels);
                 any_changed = true;
             }
+            if (cur_label_freq != new_label_freq) {
+                myInfo.setLabelFreq(new_label_freq);
+                any_changed = true;
+            }
             /*myInfo.setFont(
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId());
             myInfo.setLabelSize(
                 ((Integer) fontSizeBox.getSelectedItem()).intValue());
+            myInfo.setLabelFreq(labelFreqSlider.getValue());
             myInfo.setAlignLabels(((Boolean) ((TwoFacedObject) alignBox
                 .getSelectedItem()).getId()).booleanValue());
             return true;*/
@@ -497,6 +543,7 @@ public class ContourInfoDialog implements ActionListener {
         //toggleBtn.setEnabled( !myInfo.getIsFilled());
         dashBtn.setSelected(myInfo.getDashOn());
         dashBtn.setEnabled( !myInfo.getIsFilled());
+        labelFreqSlider.setValue(transfer.getLabelFreq());
         widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
         styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
         styleBox.setEnabled(myInfo.getDashOn());
@@ -553,9 +600,6 @@ public class ContourInfoDialog implements ActionListener {
         }
         return font;
     }
-
-
-
 
     /**
      * Get the info
