@@ -277,6 +277,14 @@ example:
      displaycategory="Trajectory"
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
 
+    <!--control
+            id="gridtrajectorycontrol1"
+            categories="GRID-3D-*"
+            class="ucar.unidata.idv.control.GridTrajectoryControl"
+            canstandalone="false"
+            label="Trajectory Colored By ParameterPPPPP"
+            displaycategory="Trajectory"
+            properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/-->
   <control
      id="pointcloud"
      categories="pointcloud"
