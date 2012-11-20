@@ -1010,7 +1010,7 @@ public abstract class PointDataSource extends FilesDataSource {
                             }
                             DataChoice gridChoice =
                                 new DirectDataChoice(this, idList, name,
-                                    name, gridCategories, (Hashtable) null);
+                                    name, gridCategories, properties);
                             compositeDataChoice.addDataChoice(gridChoice);
                         }
                     }
