@@ -573,6 +573,28 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>
     </operands>
   </derived>
+    <!--
+  <derived
+     id="gridTrajectory"
+     description="Grid Trajectory (from %N1% &amp; %N2%  &amp; %N3%)"
+     label="Grid Trajectory"
+     isenduser="true"
+     isdefault="true"
+     formula="DerivedGridFactory.combineGrids ( DerivedGridFactory.combineGrids (D1[label=U Component], D2[label=V Component]), DerivedGridFactory.combineGrids (D3[label=W Component], scaler))">
+    <categories>
+        <category
+                value="inherit"
+                append="Derived"
+                childidx="0"/>
+        <category display="true" value="Trajectory"/>
+        <category value="GRID-3D-*"/>
+    </categories>
+        <operands>
+            <paramgroup categories="GRID-3D-*;" name="u_v_w"/>
+            <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
+        </operands>
+    </derived>
+    -->
   <derived
      id="fluxdivergence"
      description="Horizontal Flux Divergence (from %N1% &amp; %N2%)"

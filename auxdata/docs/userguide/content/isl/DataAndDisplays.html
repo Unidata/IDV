@@ -1,4 +1,4 @@
-<html><head> 
+<html><head>
   <title>ISL Data and Displays</title>
   <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
 </head>
@@ -41,11 +41,11 @@ For example, we have:
    times="0:10"                 -- 0 through 10
    times="0:10:2"               -- 0,2,4,6,8,10
    times="0:10:2, 20:30"        -- 0,2,4,6,8,10 20-30
-   times="1,2,3,5:11:2,20,30"   -- 1,2 3, 5,7,9,11, 20, 30 
+   times="1,2,3,5:11:2,20,30"   -- 1,2 3, 5,7,9,11, 20, 30
 </pre>
 
-The [isl::attr ensembles] attribute allows you to override the set of 
-ensemble indices that are used in the data sources in the bundle. Note: 
+The [isl::attr ensembles] attribute allows you to override the set of
+ensemble indices that are used in the data sources in the bundle. Note:
 this overrides the ensembles for all grid data sources in the bundle.
 The syntax is the same as for [isl::attr times].
 
@@ -115,7 +115,7 @@ If you have a data source with multiple files (e.g., radar) you can use an embed
 The [isl::tag datasource] tag lets you create a new data source and takes the form.
 The [isl::attr url] attribute is required and specifies the file or url to load.
 The [isl::attr type] attribute is optional and defines the data source type
-from the datasources.xml file in the source release. 
+from the datasources.xml file in the source release.
 For a text listing see <a href="Datasources.html">Datasources.html</a>.
 For now you can only specify a data source that takes
 a single url (or filename). This will change in the future.
@@ -124,7 +124,7 @@ The [isl::attr times] and [isl::attr ensembles] attributes work the same as in t
 
 [isl::importxml datasource.isl]
 
-One or more spatial subset attributes can be specified for data sources that 
+One or more spatial subset attributes can be specified for data sources that
 support them:<p>
 <pre>
 
@@ -138,12 +138,12 @@ For example:
 
 [isl::xml {
   <isl>
-  <datasource 
+  <datasource
        url="dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc" stridex="2" stridey="3" stridez="2" bbox="40,-113,20,-98"/>
   </isl>
 }]
 
-would select every other X gridpoint, every 3rd Y gridpoint, 
+would select every other X gridpoint, every 3rd Y gridpoint,
 every other level and data between 40N and 20N and 113W and 98W.
 
 
@@ -159,7 +159,7 @@ or as a child tag of the [isl::tagref datasource] tag:
 [isl::importxml display.isl]
 
 
-The [isl::attr type] attribute is one of the display control types defined in the controls.xml file 
+The [isl::attr type] attribute is one of the display control types defined in the controls.xml file
 from the source release and is required.  For a text listing see <a href="controls.txt">controls.txt</a>.
 <p>
 The [isl::attr param] attribute is not required. If specified it is the name of a parameter in either
@@ -175,7 +175,7 @@ The spatial subset attributes described in the [isl::tagref datasource] tag abov
 
 [isl::tagdef removedisplays {Remove all displays} -attrs {display  {display id to remove}}]
 This removes all current displays. If there is the [isl::attr display] attribute set
-then it removes that display. (<a href="#displayattr">See below</a>). 
+then it removes that display. (<a href="#displayattr">See below</a>).
 
 [isl::xml {
 <removedisplays/>
@@ -224,10 +224,18 @@ The [isl::tag viewpoint] tag comes in a number of  forms, depending on the attri
 
 [isl::importxml viewpoint.isl]
 
-The rot/trans/scale values can be viewed in the Aspect Ratio tab of the View Manager properties dialog. 
+The rot/trans/scale values can be viewed in the Aspect Ratio tab of the View Manager properties dialog.
 
+[isl::tagdef export {Export data to netCDF or CSV} -attrs {file {The file where the data will be exported. The correct file suffix will be added automatically} what {The choices are "csv" and/or "netcdf"} display {The display class or ID}}]
 
+[isl::importxml export.isl]
 
+Currently, the only [isl::attr display] attribute available for the [isl::tag export] tag is
 
+<pre>
+display="class:ucar.unidata.idv.control.ObsListControl"
+</pre>
+
+or an ID of a display control that refers to an instance of the ObsListControl (e.g. a Point Data List display for METAR data).
 
 </body>

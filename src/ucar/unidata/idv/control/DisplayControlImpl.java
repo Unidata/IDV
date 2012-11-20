@@ -1151,8 +1151,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     DataChoice    dc = (DataChoice) cdcs.get(0);
                     DataSelection ds = dc.getDataSelection();
                     if (ds != null) {
-                        List dtimes = ds.getTimeDriverTimes();
-                        Object ud1 =
+                        List   dtimes = ds.getTimeDriverTimes();
+                        Object ud1    =
                             ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
                         //if ((dtimes != null) && (dtimes.size() > 0)
                         //        && (ud1 != null)) {
@@ -1802,17 +1802,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void applyColorScaleInfo()
             throws VisADException, RemoteException {
-        if (colorScaleInfo == null)  {
+        if (colorScaleInfo == null) {
             return;
         }
         ColorScaleInfo tmpColorScaleInfo = new ColorScaleInfo(colorScaleInfo);
         tmpColorScaleInfo.setIsVisible(tmpColorScaleInfo.getIsVisible()
                                        && getDisplayVisibility());
         if (colorScales == null) {
-        	if (tmpColorScaleInfo.getIsVisible()) {
-        		doMakeColorScales();
-        	}
-        	return;
+            if (tmpColorScaleInfo.getIsVisible()) {
+                doMakeColorScales();
+            }
+            return;
         }
         for (int i = 0, n = colorScales.size(); i < n; i++) {
             ColorScale scale = (ColorScale) colorScales.get(i);
@@ -5567,8 +5567,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window     f       = GuiUtils.getWindow(contents);
-        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        Window     f            = GuiUtils.getWindow(contents);
+        JComponent buttons      = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
         Msg.translateTree(jtp, true);
@@ -6043,7 +6043,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
-                List selectedTimes =
+                List selectedTimes    =
                     dataSelectionWidget.getSelectedDateTimes();
                 if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
@@ -6104,10 +6104,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             for (Enumeration keys = methodNameToSettingsMap.keys();
                     keys.hasMoreElements(); ) {
-                String    key  = (String) keys.nextElement();
+                String    key       = (String) keys.nextElement();
                 JCheckBox cbx = (JCheckBox) methodNameToSettingsMap.get(key);
-                boolean   flag = cbx.isSelected();
-                Method theMethod = Misc.findMethod(getClass(), key,
+                boolean   flag      = cbx.isSelected();
+                Method    theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
                 theMethod.invoke(this, new Object[] { new Boolean(flag) });
@@ -6183,7 +6183,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws Exception  problem exporting
      */
     public void doExport(String what, String filename) throws Exception {
-        throw new IllegalArgumentException("doExport not implemented");
+        //Override if you want your display control to export to csv, etc.
     }
 
 
@@ -6561,7 +6561,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Call redisplay on any color scales
      */
     private void reDisplayColorScales() {
-        if ((colorScales != null) && !colorScales.isEmpty() && colorScalesAdded) {
+        if ((colorScales != null) && !colorScales.isEmpty()
+                && colorScalesAdded) {
             for (int i = 0; i < colorScales.size(); i++) {
                 ((ColorScale) colorScales.get(i)).reDisplay();
             }
@@ -6713,7 +6714,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
-            boolean addOk = true;
+            boolean                                   addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
@@ -7824,7 +7825,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param macro  the macro to check for
      */
     private void updateListOrLegendWithMacro(String macro) {
-        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean listUpdate   = getDisplayListTemplate().indexOf(macro) >= 0;
         boolean legendUpdate =
             ((getLegendLabelTemplate().indexOf(macro) >= 0)
              || (getExtraLabelTemplate().indexOf(macro) >= 0));
@@ -8299,7 +8300,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     })[0];
                     if (index >= 0) {
                         RealTuple rt = DataUtility.getSample(timeSet, index);
-                        DateTime dataTime =
+                        DateTime  dataTime =
                             new DateTime((Real) rt.getComponent(0));
 
                         currentTime = dataTime;
@@ -8730,7 +8731,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
         for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String colorName = iter.next().toString();
+            String      colorName = iter.next().toString();
             final Color menuColor =
                 getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,
@@ -9094,7 +9095,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected boolean showColorScales(boolean show) {
         try {
             if (colorScales == null) {
-            	if (!show) return false;
+                if ( !show) {
+                    return false;
+                }
                 doMakeColorScales();
             }
             for (int i = 0; i < colorScales.size(); i++) {
@@ -9119,8 +9122,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (colorScaleInfo == null) {
             colorScaleInfo = getDefaultColorScaleInfo();
         }
-        if (!colorScaleInfo.getIsVisible() || !getDisplayVisibility()) return;
-        Misc.printStack("adding color scales", 5);
+        if ( !colorScaleInfo.getIsVisible() || !getDisplayVisibility()) {
+            return;
+        }
+        //Misc.printStack("adding color scales", 5);
         colorScales = new ArrayList();
         List v = getViewManagers();
         for (int i = 0; i < v.size(); i++) {

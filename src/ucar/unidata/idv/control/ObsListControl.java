@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,47 +21,60 @@
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridUtil;
-
-
-import ucar.unidata.data.point.*;
-
-import ucar.unidata.gis.SpatialGrid;
-
+import ucar.unidata.data.point.PointDataInstance;
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.ui.TableSorter;
-import ucar.unidata.ui.symbol.*;
-
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.UtcDate;
-
 import ucar.visad.Util;
 
-import visad.*;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.MathType;
+import visad.Real;
+import visad.RealType;
+import visad.Scalar;
+import visad.ScalarType;
+import visad.Set;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.Container;
+import java.awt.Dimension;
 
 import java.rmi.RemoteException;
-
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 
 
@@ -526,8 +539,8 @@ public class ObsListControl extends ObsDisplayControl {
         sorter.setTableHeader(obsTable.getTableHeader());
 
 
-        int width  = 300;
-        int height = 400;
+        int         width    = 300;
+        int         height   = 400;
         JScrollPane scroller = GuiUtils.makeScrollPane(obsTable, width,
                                    height);
         scroller.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -540,7 +553,7 @@ public class ObsListControl extends ObsDisplayControl {
         tablePanel.add(scroller);
 
         JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-        JPanel timeDeclutterPanel =
+        JPanel       timeDeclutterPanel =
             GuiUtils.hbox(Misc.newList(timeDeclutterComps[0],
                                        GuiUtils.rLabel("Only show every: "),
                                        timeDeclutterComps[1],
@@ -815,4 +828,24 @@ public class ObsListControl extends ObsDisplayControl {
         }
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doExport(String what, String filename) throws Exception {
+        if (what.contains("csv")) {
+            colString = "*";
+            loadData();
+            exportingToCsv = true;
+            GuiUtils.exportAsCsv(makeFileHeader(sorter), sorter,
+                                 filename + ".csv");
+            exportingToCsv = false;
+        }
+        if (what.contains("netcdf")) {
+            PointDataInstance pdi = (PointDataInstance) getDataInstance();
+            PointObFactory.writeToNetcdf(new java.io.File(filename + ".nc"),
+                                         pdi.getTimeSequence());
+        }
+    }
 }

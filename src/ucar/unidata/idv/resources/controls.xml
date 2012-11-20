@@ -278,6 +278,14 @@ example:
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
 
   <control
+     id="gridtrajectorycontrol1"
+     categories="GRID-3D-*"
+     class="ucar.unidata.idv.control.GridTrajectoryControl"
+     canstandalone="false"
+     label="Trajectory Colored By Parameter"
+     displaycategory="Trajectory"
+     properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
+  <control
      id="pointcloud"
      categories="pointcloud"
      class="ucar.unidata.idv.control.PointCloudControl"

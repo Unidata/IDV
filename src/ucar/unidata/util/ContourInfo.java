@@ -823,7 +823,7 @@ public class ContourInfo {
     /**
      * Get the label frequency
      *
-     * @param size the label frequency
+     * @param freq the label frequency
      */
     public void setLabelFreq(int freq) {
         this.labelFreq = freq;

@@ -4164,6 +4164,9 @@ public class DerivedGridFactory {
                 domainSet = (GriddedSet) ff.getDomainSet();
                 numObs    += domainSet.getLength();
             }
+            // add end point at each
+            numObs = numObs + datas.size();
+
             FunctionType  retType = (FunctionType) ff.getType();
             RealTupleType rtt     = DataUtility.getFlatRangeType(ff);
             double[][] domainVals =
@@ -4179,11 +4182,13 @@ public class DerivedGridFactory {
                 for (int j = 0; j < samples.length; j++) {
                     System.arraycopy(samples[j], 0, domainVals[j], curPos,
                                      length);
+                    domainVals[j][length] = domainVals[j][length-1];
                 }
                 for (int j = 0; j < vals.length; j++) {
                     System.arraycopy(vals[j], 0, values[j], curPos, length);
+                    values[j][length] = Float.NaN;
                 }
-                curPos += length;
+                curPos += length + 1 ;
             }
             // now make the new data
             // First make the domain set
