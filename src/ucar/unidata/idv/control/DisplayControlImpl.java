@@ -9115,7 +9115,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !colorScaleInfo.getIsVisible() || !getDisplayVisibility()) {
             return;
         }
-        Misc.printStack("adding color scales", 5);
+        //Misc.printStack("adding color scales", 5);
         colorScales = new ArrayList();
         List v = getViewManagers();
         for (int i = 0; i < v.size(); i++) {
