@@ -4835,7 +4835,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 animation.addPropertyChangeListener(
                     new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        //animationInfo = animation.getAnimationInfo();
+                        AnimationInfo aniInfo = animation.getAnimationInfo();
                         try {
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
@@ -4854,9 +4854,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
                                 }
-                                if ((animationInfo != null) && animationInfo
+                                if ((aniInfo != null) && aniInfo
                                         .getAnimationSetInfo()
-                                        .getActive() && animationInfo
+                                        .getActive() && aniInfo
                                         .getAnimationSetInfo()
                                         .getIsTimeDriver()) {
                                     animationDriverChanged();
