@@ -321,15 +321,19 @@ public class DataSelectionWidget {
 
         int[] selected = levelsList.getSelectedIndices();
         //None selected or the 'All Levels'
+
         if ((selected.length == 0)
-                || ((selected.length == 1) && (selected[0] == 0)
-                    && (levelsFromDisplay == null))) {
+              || ((selected.length == 1) && (selected[0] == 0)
+                 && (levelsFromDisplay == null)
+                 && (lastDataSource != null && lastDataSource.canDoAllLevels()))) { 
             return NO_LEVELS;
         }
+
         int indexOffset = ((levelsFromDisplay == null && 
            (lastDataSource != null && lastDataSource.canDoAllLevels()) )
                            ? 1
                            : 0);
+
         if (selected.length == 1) {
             lastLevel = levels.get(selected[0] - indexOffset);
             //            idv.getStore().put("idv.dataselector.level", lastLevel);
