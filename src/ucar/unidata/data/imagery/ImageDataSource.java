@@ -1462,6 +1462,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
         List descriptors = new ArrayList();
         if (usingTimeDriver) {
+            if (imageList.isEmpty()) return imageList;
             AddeImageDescriptor aid = getDescriptor(imageList.get(0));
             if (aid.getImageInfo() != null) {
                 try {
