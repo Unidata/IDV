@@ -4,7 +4,7 @@
 <service name="nwswarnings" serviceType="http" base="http://www.weather.gov/regsci/gis/shapefiles/" />
 
 <dataset name="Unidata IDD Model Data">
-<catalogRef xlink:title="UCAR (motherlode)" xlink:href="http://motherlode.ucar.edu/thredds/idv/models.xml"/>
+<catalogRef xlink:title="UCAR (motherlode)" xlink:href="http://thredds.ucar.edu/thredds/idv/models.xml"/>
 </dataset>
 <!--
 <catalogRef xlink:title="Unidata IDD Model Data (netCDF)" xlink:href="http://motherlode.ucar.edu/thredds/idv/rt-models.1.0.xml"/>

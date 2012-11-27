@@ -2258,10 +2258,11 @@ public class GeoGridDataSource extends GridDataSource {
 
         */
 
-
+        // dead dataset...
         String leadUrl =
             "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
 
+        // dead dataset...
         String mlodeUrl =
             "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
         String   url  = ((args.length == 0)
