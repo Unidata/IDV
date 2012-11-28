@@ -936,10 +936,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** default type */
     private String smoothingType = LABEL_NONE;
 
-    /** flag for color scales added */
-    private boolean colorScalesAdded = false;
-
-
     /**
      * Default constructor. This is called when the control is
      * unpersisted through the {@link ucar.unidata.xml.XmlEncoder}
@@ -6518,8 +6514,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Call redisplay on any color scales
      */
     private void reDisplayColorScales() {
-        if ((colorScales != null) && !colorScales.isEmpty()
-                && colorScalesAdded) {
+        if ((colorScales != null) && !colorScales.isEmpty()) {
             for (int i = 0; i < colorScales.size(); i++) {
                 ((ColorScale) colorScales.get(i)).reDisplay();
             }
