@@ -1508,7 +1508,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (t == null) {
             return false;
         }
-        return UtcDate.containsTimeMacro(t) || (t.indexOf(MACRO_FHOUR) >= 0);
+        return UtcDate.containsTimeMacro(t) || hasForecastHourMacro(t);
 
     }
 
@@ -4054,8 +4054,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return modified string
      */
     private String applyForecastHourMacro(String t, DateTime currentTime) {
-        if (t.indexOf(MACRO_FHOUR) >= 0) {
+        if (hasForecastHourMacro(t)) {
             String v = "";
+            if (firstTime == null) {
+                checkTimestampLabel(null);
+            }
             if ((firstTime != null) && (currentTime != null)) {
                 try {
                     double diff =
@@ -4070,6 +4073,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return t.replace(MACRO_FHOUR, v);
         }
         return t;
+    }
+
+    /**
+     * Check if the label string has a forecast hour macro in it.
+     * @param t  the string to check
+     * @return true if it does
+     */
+    private boolean hasForecastHourMacro(String t) {
+        return t.contains(MACRO_FHOUR);
     }
 
 
