@@ -4180,17 +4180,19 @@ public class DerivedGridFactory {
             numObs = numObs + datas.size();
 
             FunctionType  retType    = (FunctionType) ff.getType();
+            Set[] rset  =   ff.getRangeSets();
+            Unit[][] uset = ff.getRangeUnits();
             RealTupleType rtt        = DataUtility.getFlatRangeType(ff);
             double[][]    domainVals =
                 new double[domainSet.getDimension()][numObs];
-            float[][] values = new float[rtt.getDimension()][numObs];
+            double[][] values = new double[rtt.getDimension()][numObs];
             int       curPos = 0;
             for (int i = 0; i < datas.size(); i++) {
                 FlatField  data    = (FlatField) datas.get(i);
                 GriddedSet dset    = (GriddedSet) data.getDomainSet();
                 double[][] samples = dset.getDoubles(false);
                 int        length  = dset.getLength();
-                float[][]  vals    = data.getFloats(false);
+                double[][]  vals    = data.getValues(false);
                 for (int j = 0; j < samples.length; j++) {
                     System.arraycopy(samples[j], 0, domainVals[j], curPos,
                                      length);
@@ -4198,7 +4200,7 @@ public class DerivedGridFactory {
                 }
                 for (int j = 0; j < vals.length; j++) {
                     System.arraycopy(vals[j], 0, values[j], curPos, length);
-                    values[j][length] = Float.NaN;
+                    values[j][length] = Double.NaN;
                 }
                 curPos += length + 1 ;
             }
@@ -4215,7 +4217,10 @@ public class DerivedGridFactory {
                         domainSet.getCoordinateSystem(),
                         domainSet.getSetUnits(), domainSet.getSetErrors());
             }
-            retField = new FlatField(retType, newDomain);
+           // retField = new FlatField(retType, newDomain);
+
+            retField = new FlatField(retType, newDomain, domainSet.getCoordinateSystem(), rset,
+                    new Unit[] {uset[0][0], uset[1][0]});
             retField.setSamples(values, false);
 
         } catch (RemoteException re) {

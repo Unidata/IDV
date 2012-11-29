@@ -1105,7 +1105,7 @@ public class GridTrajectoryControl extends DrawingControl {
                           gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
         gridTrackControl.setRange(range);
         Set[]         rset = mergedTracks.getRangeSets();
-        FloatSet      ds   = (FloatSet) rset[0];
+        DoubleSet      ds   = (DoubleSet) rset[0];
 
         SetType       st   = (SetType) ds.getType();
         RealTupleType rtt  = st.getDomain();
