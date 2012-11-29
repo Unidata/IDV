@@ -1242,6 +1242,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(DataUtil.VIS5D_VERTICALCS, v5d);
         GuiUtils.buttonGroup(sa, v5d);
 
+        JCheckBox largeRemoteDataRequestWarnCbx =
+                new JCheckBox(
+                        "Warn on Large Remote Data Requests (experimental)",
+                        getStore().get(PREF_LARGE_REMOTE_DATA_WARN, false));
+
+        widgets.put(PREF_LARGE_REMOTE_DATA_WARN, largeRemoteDataRequestWarnCbx);
+
+
         String formatString = getStore().get(PREF_LATLON_FORMAT, "##0.0");
         JComboBox formatBox = GuiUtils.getEditableBox(getDefaultFormatList(),
                                   formatString);
@@ -1338,6 +1346,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         formatComps.add(GuiUtils.left(GuiUtils.hbox(wa, nn)));
         formatComps.add(GuiUtils.rLabel("Pressure to Height:"));
         formatComps.add(GuiUtils.left(GuiUtils.hbox(sa, v5d)));
+
+        formatComps.add(GuiUtils.rLabel("Data Requests:"));
+        formatComps.add(GuiUtils.left(largeRemoteDataRequestWarnCbx));
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
