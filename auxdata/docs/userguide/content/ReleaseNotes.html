@@ -52,6 +52,18 @@ via <code class="menu">View-&gt;Capture</code>. These options are also
 available in the <a href="isl/ImagesAndMovies.html">ISL</a>.
 </faqitem>
 
+<faqitem q="More Lat/Lon Labeling for 3.1u1" id="latlonlabel2">
+Various minor bug fixes and improved handling of fonts and overall
+usability.
+</faqitem>
+
+<faqitem q="Webcams" id="webcam">
+Fixed broken webcam links available in the IDV.
+</faqitem>
+
+<faqitem q="Image Transparency" id="transparency">
+Fixed broken image transparency issues that emerged when we introduced multi-image capture in a previous IDV version.
+</faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
 
@@ -60,14 +72,30 @@ available in the <a href="isl/ImagesAndMovies.html">ISL</a>.
     a second display to 'Use Time Driver Times' or 'Match Time Driver'. A display can be set as the time driver or to
     use time driver times in the following locations:
     <ul>
-    <li>Data Choosers tab for <a href="./data/choosers/ImageChooser.html">Satellite Imagery</a>, 
-       Radar (<a href="./data/choosers/TDSRadarChooser.html">Remote</a> 
-       and <a href="./data/choosers/RadarChooser.html">ADDE Level III</a>), 
-       and Observations (<a href="./data/choosers/PointChooser.html">Point</a> 
+    <li>Data Choosers tab for <a href="./data/choosers/ImageChooser.html">Satellite Imagery</a>,
+       Radar (<a href="./data/choosers/TDSRadarChooser.html">Remote</a>
+       and <a href="./data/choosers/RadarChooser.html">ADDE Level III</a>),
+       and Observations (<a href="./data/choosers/PointChooser.html">Point</a>
        and <a href="./data/choosers/ProfilerChooser.html">Profiler</a>)</li>
     <li><a href="./data/FieldSelector.html#TimeMatchingFS">Field Selector</a> tab</li>
     <li>View menu of the <a href="./controls/index.html#DisplayControlViewMenu">Displays Control</a> tab</li>
     </ul>
+</faqitem>
+
+<faqitem cat="ISL Changes"></faqitem>
+
+<faqitem q="ISL Export Tag to Save Data to Comma Separated Value (CSV) and netCDF Formats" id="export">
+The IDV Scripting Language (ISL) has new capability to <a href="isl/DataAndDisplays.html#export">export</a> data available in ObsListControl (e.g. a Point Data List display for METAR data).
+</faqitem>
+
+<faqitem q="ISL Image Tag animation_index Attribute" id="animation">
+The IDV Scripting Language (ISL) <a href="isl/ImagesAndMovies.html#image">image</a> tag has a new animation_index attribute to specify multiple images in the animation.
+</faqitem>
+
+<faqitem cat="Documentation Changes"></faqitem>
+
+<faqitem q="RAMADDA Section in IDV Training Workshop" id="ramadda">
+There is a new major RAMADDA section in <a href="http://www.unidata.ucar.edu/software/idv/docs/workshop/ramadda/index.html">IDV training workshop</a>.
 </faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>

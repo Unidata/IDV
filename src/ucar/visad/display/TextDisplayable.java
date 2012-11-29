@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,21 +21,32 @@
 package ucar.visad.display;
 
 
+import visad.DataRenderer;
+import visad.Display;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.ScalarType;
+import visad.TextControl;
+import visad.Unit;
+import visad.VisADException;
 
-import visad.*;
+import visad.java2d.DefaultRendererJ2D;
+import visad.java2d.DisplayRendererJ2D;
 
-import visad.java2d.*;
-
-import visad.java3d.*;
+import visad.java3d.DefaultRendererJ3D;
 
 import visad.util.HersheyFont;
+
+
 
 import java.awt.Font;
 
 import java.rmi.RemoteException;
 
 import java.text.DecimalFormat;
-
 import java.text.NumberFormat;
 
 
@@ -205,6 +216,24 @@ public class TextDisplayable extends LineDrawing {
             textControl.setNumberFormat(format);
         }
         labelFormat = format;
+    }
+
+    /**
+     * Sets the visibility property.
+     *
+     * @param visible           Whether or not this instance should be
+     *                          displayed.
+     * @throws RemoteException  Java RMI failure.
+     * @throws VisADException   VisAD failure.
+     */
+    public void setVisible(boolean visible)
+            throws RemoteException, VisADException {
+        super.setVisible(visible);
+        //GHANSHAM: Override this method to have set Auto size off if visibility is off
+        //Advantage is it does not fire extra resize events
+        if (textControl != null) {
+            textControl.setAutoSize(visible);
+        }
     }
 
     /**
@@ -457,7 +486,8 @@ public class TextDisplayable extends LineDrawing {
                         textControl.setVerticalJustification(
                             verticalJustification);
                         textControl.setSize(textSize);
-                        textControl.setAutoSize( !screenLocked);
+                        textControl.setAutoSize( !screenLocked
+                                && getVisible());
                         textControl.setNumberFormat(labelFormat);
                         textControl.setRotation(rotation);
                         textControl.setCharacterRotation(characterRotation);

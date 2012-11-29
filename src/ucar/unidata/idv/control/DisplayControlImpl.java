@@ -936,10 +936,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** default type */
     private String smoothingType = LABEL_NONE;
 
-    /** flag for color scales added */
-    private boolean colorScalesAdded = false;
-
-
     /**
      * Default constructor. This is called when the control is
      * unpersisted through the {@link ucar.unidata.xml.XmlEncoder}
@@ -1052,33 +1048,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Set the myDataChoices member and add this object as a DataChangeListener
         setDataChoices(choices);
-        /*
-        Object ud =
-            this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-        if (ud != null) {
-            this.usesTimeDriver = ((Boolean) ud).booleanValue();
-        } else if(choices.size() > 0) {
-            DataChoice dc = (DataChoice)choices.get(0);
-            if(dc instanceof  DirectDataChoice) {
-                DirectDataChoice dc0 = (DirectDataChoice)dc;
-                DataSource ds = dc0.getDataSource();
-                Object ud0 = ds.getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING) ;
-                if (ud0 != null) {
-                    this.usesTimeDriver = ((Boolean) ud0).booleanValue();
-                    this.dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean) ud0).booleanValue() );
-                }
-            }
-        }
-        Object udd =
-                this.dataSelection.getProperty(DataSelection.PROP_ASTIMEDRIVER);
-        if (udd != null && !this.isTimeDriver) {
-            this.isTimeDriver = ((Boolean) udd).booleanValue();
-            if(this.isTimeDriver) {  // make sure only one driver per view manager
-                ViewManager vm = getViewManager();
-                vm.ensureOnlyOneTimeDriver(this);
-            }
-        }
-        */
         this.usesTimeDriver =
             this.dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            false);
@@ -1147,16 +1116,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     DataChoice    dc = (DataChoice) cdcs.get(0);
                     DataSelection ds = dc.getDataSelection();
                     if (ds != null) {
-                        List   dtimes = ds.getTimeDriverTimes();
-                        Object ud1    =
-                            ds.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                        //if ((dtimes != null) && (dtimes.size() > 0)
-                        //        && (ud1 != null)) {
-                        if (ud1 != null) {
-                            this.usesTimeDriver =
-                                ((Boolean) ud1).booleanValue();
-                        }
-                        //}
+                        List dtimes = ds.getTimeDriverTimes();
+                        this.usesTimeDriver =
+                            ds.getProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                           false);
                     }
                 }
             }
@@ -1545,7 +1508,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (t == null) {
             return false;
         }
-        return UtcDate.containsTimeMacro(t) || (t.indexOf(MACRO_FHOUR) >= 0);
+        return UtcDate.containsTimeMacro(t) || hasForecastHourMacro(t);
 
     }
 
@@ -1807,7 +1770,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         tmpColorScaleInfo.setIsVisible(tmpColorScaleInfo.getIsVisible()
                                        && getDisplayVisibility());
         if (colorScales == null) {
-            if (tmpColorScaleInfo.getIsVisible()) {
+            if (tmpColorScaleInfo.getIsVisible() && getHaveInitialized()) {
                 doMakeColorScales();
             }
             return;
@@ -4091,8 +4054,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return modified string
      */
     private String applyForecastHourMacro(String t, DateTime currentTime) {
-        if (t.indexOf(MACRO_FHOUR) >= 0) {
+        if (hasForecastHourMacro(t)) {
             String v = "";
+            if (firstTime == null) {
+                checkTimestampLabel(null);
+            }
             if ((firstTime != null) && (currentTime != null)) {
                 try {
                     double diff =
@@ -4107,6 +4073,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return t.replace(MACRO_FHOUR, v);
         }
         return t;
+    }
+
+    /**
+     * Check if the label string has a forecast hour macro in it.
+     * @param t  the string to check
+     * @return true if it does
+     */
+    private boolean hasForecastHourMacro(String t) {
+        return t.contains(MACRO_FHOUR);
     }
 
 
@@ -5557,8 +5532,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window     f            = GuiUtils.getWindow(contents);
-        JComponent buttons      = GuiUtils.makeApplyOkCancelButtons(listener);
+        Window     f       = GuiUtils.getWindow(contents);
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
         Msg.translateTree(jtp, true);
@@ -6033,7 +6008,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
-                List selectedTimes    =
+                List selectedTimes =
                     dataSelectionWidget.getSelectedDateTimes();
                 if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
@@ -6094,10 +6069,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             for (Enumeration keys = methodNameToSettingsMap.keys();
                     keys.hasMoreElements(); ) {
-                String    key       = (String) keys.nextElement();
+                String    key  = (String) keys.nextElement();
                 JCheckBox cbx = (JCheckBox) methodNameToSettingsMap.get(key);
-                boolean   flag      = cbx.isSelected();
-                Method    theMethod = Misc.findMethod(getClass(), key,
+                boolean   flag = cbx.isSelected();
+                Method theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
                 theMethod.invoke(this, new Object[] { new Boolean(flag) });
@@ -6551,8 +6526,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Call redisplay on any color scales
      */
     private void reDisplayColorScales() {
-        if ((colorScales != null) && !colorScales.isEmpty()
-                && colorScalesAdded) {
+        if ((colorScales != null) && !colorScales.isEmpty()) {
             for (int i = 0; i < colorScales.size(); i++) {
                 ((ColorScale) colorScales.get(i)).reDisplay();
             }
@@ -6704,7 +6678,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
-            boolean                                   addOk = true;
+            boolean addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
@@ -7815,7 +7789,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param macro  the macro to check for
      */
     private void updateListOrLegendWithMacro(String macro) {
-        boolean listUpdate   = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
         boolean legendUpdate =
             ((getLegendLabelTemplate().indexOf(macro) >= 0)
              || (getExtraLabelTemplate().indexOf(macro) >= 0));
@@ -8290,7 +8264,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     })[0];
                     if (index >= 0) {
                         RealTuple rt = DataUtility.getSample(timeSet, index);
-                        DateTime  dataTime =
+                        DateTime dataTime =
                             new DateTime((Real) rt.getComponent(0));
 
                         currentTime = dataTime;
@@ -8721,7 +8695,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
         for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String      colorName = iter.next().toString();
+            String colorName = iter.next().toString();
             final Color menuColor =
                 getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,
@@ -9115,7 +9089,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !colorScaleInfo.getIsVisible() || !getDisplayVisibility()) {
             return;
         }
-        Misc.printStack("adding color scales", 5);
+        //Misc.printStack("adding color scales", 5);
         colorScales = new ArrayList();
         List v = getViewManagers();
         for (int i = 0; i < v.size(); i++) {

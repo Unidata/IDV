@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,9 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
@@ -593,8 +591,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public void doRemove() throws RemoteException, VisADException {
         super.doRemove();
-        datachoice  = null;
-        workingGrid = null;
+        datachoice       = null;
+        workingGrid      = null;
         parameterTopoMap = null;
     }
 
@@ -1259,7 +1257,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
 
         setLevelReadoutLabel("Current level: " + formatLevel(level));
-        updateLegendAndList();
+        String dlTemplate = getDisplayListTemplate();
+        if (dlTemplate.contains(MACRO_LEVEL)) {
+            updateLegendAndList();
+        } else {
+            updateLegendLabel();
+        }
         Trace.call2("PlanView.loadData");
 
     }

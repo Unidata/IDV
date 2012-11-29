@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2011 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -211,13 +211,13 @@ public class DataSelectionWidget {
     /** use time driver times */
     public final static String USE_DRIVERTIMES = "Match Time Driver";
 
-    /** as time driver  */
+    /** as time driver */
     public final static String AS_DRIVERTIMES = "Set As Time Driver";
 
     /** options for time selection type */
     private final static String[] timeSubsetOptionLabels =
-        new String[] { USE_DEFAULTTIMES, USE_SELECTEDTIMES,
-                        USE_DRIVERTIMES, AS_DRIVERTIMES };
+        new String[] { USE_DEFAULTTIMES,
+                       USE_SELECTEDTIMES, USE_DRIVERTIMES, AS_DRIVERTIMES };
 
     /** timeline */
     private Timeline timeline;
@@ -321,15 +321,21 @@ public class DataSelectionWidget {
 
         int[] selected = levelsList.getSelectedIndices();
         //None selected or the 'All Levels'
+
         if ((selected.length == 0)
                 || ((selected.length == 1) && (selected[0] == 0)
-                    && (levelsFromDisplay == null))) {
+                    && (levelsFromDisplay == null)
+                    && ((lastDataSource != null)
+                        && lastDataSource.canDoAllLevels()))) {
             return NO_LEVELS;
         }
-        int indexOffset = ((levelsFromDisplay == null && 
-           (lastDataSource != null && lastDataSource.canDoAllLevels()) )
+
+        int indexOffset = (((levelsFromDisplay == null)
+                            && ((lastDataSource != null)
+                                && lastDataSource.canDoAllLevels()))
                            ? 1
                            : 0);
+
         if (selected.length == 1) {
             lastLevel = levels.get(selected[0] - indexOffset);
             //            idv.getStore().put("idv.dataselector.level", lastLevel);
@@ -426,8 +432,9 @@ public class DataSelectionWidget {
                                 DataSelection.PROP_CHOOSERTIMEMATCHING);
                 if (cu != null) {
                     chooserDoTimeMatching = ((Boolean) cu).booleanValue();
-                    if(chooserDoTimeMatching)
+                    if (chooserDoTimeMatching) {
                         timeOptionLabelBox.setSelectedItem(USE_DRIVERTIMES);
+                    }
 
                 }
             }
@@ -586,7 +593,7 @@ public class DataSelectionWidget {
                 levelsTab = levelsScroller;
             }
             Vector levelsForGui = new Vector();
-            if (levelsFromDisplay == null && dataSource.canDoAllLevels() ) {
+            if ((levelsFromDisplay == null) && dataSource.canDoAllLevels()) {
                 levelsForGui.add(new TwoFacedObject("All Levels", null));
             }
             for (int i = 0; i < levels.size(); i++) {
@@ -733,7 +740,9 @@ public class DataSelectionWidget {
      */
     public DataSelection createDataSelection(boolean addLevels) {
         DataSelection dataSelection = null;
-        if (getUseAllTimes()) {
+        //if (getUseAllTimes()) {
+        if (getUseAllTimes() || chooserDoTimeMatching
+                || timeOption.equals(USE_DRIVERTIMES)) {
             dataSelection = new DataSelection();
 
             /**
@@ -750,8 +759,14 @@ public class DataSelectionWidget {
             //                dataSelection.setTimesMode (dataSelection.TIMESMODE_USETHIS);
         } else {
             dataSelection = new DataSelection(getSelectedDateTimes());
+            dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
+                                      timeOption.equals(AS_DRIVERTIMES));
         }
+        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                  timeOption.equals(USE_DRIVERTIMES)
+                                  || chooserDoTimeMatching);
 
+        /*
         if (chooserDoTimeMatching) {
             dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
                                       true);
@@ -762,6 +777,7 @@ public class DataSelectionWidget {
 
         dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
                 timeOption.equals(AS_DRIVERTIMES));
+                */
 
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
@@ -1023,7 +1039,8 @@ public class DataSelectionWidget {
             if (timeOptionLabelBox == null) {
                 return true;
             }
-            return timeOptionLabelBox.getSelectedItem().equals(USE_DEFAULTTIMES);
+            return timeOptionLabelBox.getSelectedItem().equals(
+                USE_DEFAULTTIMES);
         } else {
             if (allTimesButton == null) {
                 return true;
@@ -1042,7 +1059,8 @@ public class DataSelectionWidget {
     public void setTimes(List all, List selected) {
         //if we are not using defaults and the new list is the same as the old list
         //then keep around the currently selected times
-        if ( !getUseAllTimes() && Misc.equals(allDateTimes, all)) {
+        if ( !getUseAllTimes() && !Misc.equals(timeOption, USE_DRIVERTIMES)
+                && Misc.equals(allDateTimes, all)) {
             selected = getSelectedDateTimesInList();
         }
 
@@ -1292,12 +1310,13 @@ public class DataSelectionWidget {
         //added
         timeOptionLabelBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                String selectedObj = (String) timeOptionLabelBox.getSelectedItem();
+                String selectedObj =
+                    (String) timeOptionLabelBox.getSelectedItem();
                 setTimeOptions(selectedObj);
-                if(!selectedObj.equals(USE_DRIVERTIMES)) {
+                if ( !selectedObj.equals(USE_DRIVERTIMES)) {
                     chooserDoTimeMatching = false;
                 } else {
-                    if(!checkActiveViewWithDriver()) {
+                    if ( !checkActiveViewWithDriver()) {
                         timeOptionLabelBox.setSelectedItem(USE_DEFAULTTIMES);
                     }
                 }
@@ -1380,7 +1399,7 @@ public class DataSelectionWidget {
             chooserDoTimeMatching = false;
             if (lastDataChoice != null) {
                 lastDataChoice.setProperty(DataSelection.PROP_ASTIMEDRIVER,
-                        true);
+                                           true);
             }
         }
     }
@@ -1388,38 +1407,43 @@ public class DataSelectionWidget {
     /**
      *  Check the current active view window and make sure it does
      *  has a time driver, otherwise, reset the active view window
+     *
+     * @return true if active view has time driver
      */
     protected boolean checkActiveViewWithDriver() {
-        List<ViewManager>    vms = this.idv.getVMManager().getViewManagers();
-        int size = vms.size();
-        if(size == 0)
+        List<ViewManager> vms  = this.idv.getVMManager().getViewManagers();
+        int               size = vms.size();
+        if (size == 0) {
             return true;
+        }
 
         boolean isBundle = this.idv.getStateManager().isLoadingXml();
 
-        if(isBundle)
+        if (isBundle) {
             return true;
+        }
 
-        ViewManager vm0 ;
+        ViewManager vm0;
 
         vm0 = this.idv.getVMManager().getLastActiveViewManager();
         List tdt = null;
         // return true when there is only background map in the view
-       /* List<DisplayControl>  dcList = (List<DisplayControl>) vm0.getStateManager().getControls();
-        for (DisplayControl control :dcList) {
-            if(control instanceof MapDisplayControl && dcList.size() == 1)
-                return true ;
-        }  */
-        try{
+        /* List<DisplayControl>  dcList = (List<DisplayControl>) vm0.getStateManager().getControls();
+         for (DisplayControl control :dcList) {
+             if(control instanceof MapDisplayControl && dcList.size() == 1)
+                 return true ;
+         }  */
+        try {
             tdt = vm0.getTimeDriverTimes();
         } catch (Exception e) {}
 
-        if(tdt != null)
+        if (tdt != null) {
             return true;
-        else {
-            LogUtil.userErrorMessage(new JLabel(
-                    "<html>Error: there is no time driver in the current active view window, please select or set" +
-                            " the view window with time driver! </html>"));
+        } else {
+            LogUtil.userErrorMessage(
+                new JLabel(
+                    "<html>Error: there is no time driver in the current active view window, please select or set"
+                    + " the view window with time driver! </html>"));
             return false;
         }
 

@@ -43,6 +43,7 @@ import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.units.DateRange;
 import ucar.nc2.util.NamedAnything;
 
+
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
@@ -96,15 +97,7 @@ import java.io.StringWriter;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -129,8 +122,10 @@ public class GeoGridDataSource extends GridDataSource {
     /** Used to synchronize the geogridadapter */
     protected final Object DOMAIN_SET_MUTEX = new Object();
 
-    /** Throw an error when loading a grid bigger than this */
-    private static final int SIZE_THRESHOLD = 500000000;
+    /** Throw an error when loading a grid bigger than this in megabytes */
+    //private static final int SIZE_THRESHOLD = 500000000;
+    //Note that 60 MB is twice the limit of image data from ADDE
+    private static final int SIZE_THRESHOLD = 60;
 
     /** The prefix we hack onto the u and v  variables */
     private static final String PREFIX_GRIDRELATIVE = "GridRelative_";
@@ -939,8 +934,6 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
-
-
     /**
      * Get the full description of the grid
      *
@@ -1406,7 +1399,8 @@ public class GeoGridDataSource extends GridDataSource {
             return myLevels;
         } catch (VisADException vae) {
             throw new ucar.unidata.util.WrapperException(vae);
-
+        } catch (HugeSizeException hse) {
+            return null;
         }
     }
 
@@ -1430,6 +1424,14 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Wed, Nov 28, '12
+     * @author         Enter your name here...    
+     */
+    public static class HugeSizeException extends Exception {}
 
 
     /**
@@ -1446,12 +1448,14 @@ public class GeoGridDataSource extends GridDataSource {
      *
      * @return The GeoGridAdapter
      *
+     *
+     * @throws HugeSizeException _more_
      * @throws VisADException On badness
      */
     private GeoGridAdapter makeGeoGridAdapter(DataChoice dataChoice,
             DataSelection givenDataSelection, Hashtable requestProperties,
             int fromLevelIndex, int toLevelIndex, boolean forMetaData)
-            throws VisADException {
+            throws VisADException, HugeSizeException {
 
         boolean readingFullGrid = !forMetaData;
         int     numLevels       = -1;
@@ -1499,7 +1503,7 @@ public class GeoGridDataSource extends GridDataSource {
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {
                 //TODO: We should determine the size of the subset grid and use that.
-                readingFullGrid = false;
+                //readingFullGrid = false;
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());
                 extraCacheKey = geoSelection;
                 if (levelRange != null) {
@@ -1554,26 +1558,50 @@ public class GeoGridDataSource extends GridDataSource {
             throw new IllegalArgumentException("Invalid range:" + ire);
         }
 
-
+        // just prior to loading data
         if (readingFullGrid) {
-            ThreeDSize size =
-                (ThreeDSize) dataChoice.getProperty(PROP_GRIDSIZE);
-            if (size != null) {
-                long total = size.getSizeY() * size.getSizeX();
-                if (size.getSizeZ() > 1) {
-                    if (numLevels > 0) {
-                        total *= numLevels;
-                    } else {
-                        total *= size.getSizeZ();
+            // check if interactive and if file being loaded is remote
+            if ((getIdv().getViewManager().isInteractive()) && (!isLocalFile())) {
+                long total = 1;
+                // get dimensions (note that the time dimension returned does not take into
+                // account subsetting!
+                List dims = geoGrid.getDimensions();
+                // grab spatial dimension indices.
+                List<Integer> geoDims =
+                    Arrays.asList(geoGrid.getXDimensionIndex(),
+                                  geoGrid.getYDimensionIndex(),
+                                  geoGrid.getZDimensionIndex());
+                for (int d = 0; d < geoDims.size(); d++) {
+                    if (geoDims.get(d) != -1) {
+                        ucar.nc2.Dimension dim =
+                            (ucar.nc2.Dimension) dims.get(geoDims.get(d));
+                        total *= dim.getLength();
                     }
                 }
-                if (total > SIZE_THRESHOLD) {
-                    double mb = (total * 4);
-                    mb = (mb / 1000000.0);
-                    throw new BadDataException(
-                        "You are requesting a grid with " + total
-                        + " points which is " + Misc.format(mb)
-                        + " (MB) of data.\nPlease subset the grid");
+                try {
+                    total *= givenDataSelection.getTimes().size();
+                } catch (NullPointerException npe) {
+                    // if use default is selected in field selector for time, then
+                    // the getTimes() on the given data source throws and NPE and we
+                    // need to go to geoGrid to get the number of times. Note that
+                    // that getTimes() on geoGrid does not reflect any temporal subsetting
+                    // which is why we check the givenDataSelection first...
+                    total *= geoGrid.getTimes().size();
+                }
+                // compute size in megabytes of request (minus overhead of network protocol)
+                double mb = (total * geoGrid.getDataType().getSize());
+                mb = (mb / 1048576.);
+                if (mb > SIZE_THRESHOLD) {
+                    JComponent msgContents =
+                        new JLabel(
+                            "<html>You are about to load " + ((int) mb)
+                            + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                            + "<br>Consider subsetting for better performance!<p></html>");
+
+                    if ( !GuiUtils.askOkCancel("Large Data Warning",
+                            msgContents)) {
+                        throw new HugeSizeException();
+                    }
                 }
             }
         }
@@ -1734,8 +1762,8 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
-        long        starttime = System.currentTimeMillis();
-        FieldImpl   fieldImpl = null;
+        long      starttime = System.currentTimeMillis();
+        FieldImpl fieldImpl = null;
         //GridDataset myDataset = getDataset();
         //if (myDataset == null) {
         //    return null;
@@ -1746,9 +1774,15 @@ public class GeoGridDataSource extends GridDataSource {
 
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         //      System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
-        GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
-                                     givenDataSelection, requestProperties,
-                                     fromLevelIndex, toLevelIndex, false);
+        GeoGridAdapter adapter = null;
+        try {
+            adapter = makeGeoGridAdapter(dataChoice, givenDataSelection,
+                                         requestProperties, fromLevelIndex,
+                                         toLevelIndex, false);
+        } catch (HugeSizeException hse) {
+            return null;
+        }
+
         if (adapter == null) {
             throw new BadDataException("Could not find field:"
                                        + dataChoice.getStringId());
@@ -1830,7 +1864,8 @@ public class GeoGridDataSource extends GridDataSource {
         }
         boolean useDriverTime = false;
         if (givenDataSelection != null) {
-            useDriverTime = givenDataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
+            useDriverTime = givenDataSelection.getProperty(
+                DataSelection.PROP_USESTIMEDRIVER, false);
         }
         if ((givenDataSelection != null) && useDriverTime
                 && (givenDataSelection.getTimeDriverTimes() != null)) {
@@ -2258,10 +2293,11 @@ public class GeoGridDataSource extends GridDataSource {
 
         */
 
-
+        // dead dataset...
         String leadUrl =
             "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
 
+        // dead dataset...
         String mlodeUrl =
             "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
         String   url  = ((args.length == 0)
