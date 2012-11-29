@@ -85,8 +85,7 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
 
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
@@ -98,6 +97,7 @@ import java.io.StringWriter;
 import java.rmi.RemoteException;
 
 import java.util.*;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -125,14 +125,16 @@ public class GeoGridDataSource extends GridDataSource {
     /** Throw an error when loading a grid bigger than this in megabytes */
     //private static final int SIZE_THRESHOLD = 500000000;
     //Note that 60 MB is twice the limit of image data from ADDE
-    private static final int SIZE_THRESHOLD = 60;
+    private static final int SIZE_THRESHOLD = 120;
 
     /** The prefix we hack onto the u and v  variables */
     private static final String PREFIX_GRIDRELATIVE = "GridRelative_";
 
-
     /** Preference */
     public static final String PREF_VERTICALCS = IdvConstants.PREF_VERTICALCS;
+
+    /** Preference - warn users for large remote data requests */
+    public static final String PREF_LARGE_REMOTE_DATA_WARN = IdvConstants.PREF_LARGE_REMOTE_DATA_WARN;
 
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
@@ -1558,8 +1560,10 @@ public class GeoGridDataSource extends GridDataSource {
             throw new IllegalArgumentException("Invalid range:" + ire);
         }
 
+        // check to see if user wants to be warned about download size
+        boolean warn   = getIdv().getStore().get(PREF_LARGE_REMOTE_DATA_WARN, false);
         // just prior to loading data
-        if (readingFullGrid) {
+        if ((readingFullGrid) && (warn)) {
             // check if interactive and if file being loaded is remote
             if ((getIdv().getViewManager().isInteractive()) && (!isLocalFile())) {
                 long total = 1;
@@ -1592,13 +1596,26 @@ public class GeoGridDataSource extends GridDataSource {
                 double mb = (total * geoGrid.getDataType().getSize());
                 mb = (mb / 1048576.);
                 if (mb > SIZE_THRESHOLD) {
+                    JCheckBox askCbx = new JCheckBox("Don't show this again",
+                            !warn);
                     JComponent msgContents =
-                        new JLabel(
-                            "<html>You are about to load " + ((int) mb)
-                            + " MB of data.<br>Are you sure you want to do this?<p><hr>"
-                            + "<br>Consider subsetting for better performance!<p></html>");
-
-                    if ( !GuiUtils.askOkCancel("Large Data Warning",
+                            GuiUtils.vbox(GuiUtils.inset(new JLabel(
+                                                   "<html>You are about to load " + ((int) mb)
+                                                    + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                                                    + "<br>Consider subsetting for better performance!<p></html>"),
+                                                    5),
+                                          GuiUtils.inset(askCbx, new Insets(5, 0, 0, 0)));
+                    /**
+                     JComponent msgContents =
+                     new JLabel(
+                     "<html>You are about to load " + ((int) mb)
+                     + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                     + "<br>Consider subsetting for better performance!<p></html>");
+                     */
+                    if (askCbx.isSelected()) {
+                        getIdv().getStore().put(PREF_LARGE_REMOTE_DATA_WARN, false);
+                    }
+                    if ( !GuiUtils.askOkCancel("Large Remote Data Request Warning",
                             msgContents)) {
                         throw new HugeSizeException();
                     }

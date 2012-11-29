@@ -657,4 +657,8 @@ public interface IdvConstants {
     public static final String INITIAL_PROBE_EARTHLOCATION =
         GridDisplayControl.INITIAL_PROBE_EARTHLOCATION;
 
+    /** The id of the preference for asking the user if they would like to be warned about a large remote data request */
+    public static final String PREF_LARGE_REMOTE_DATA_WARN = "idv.largeremoterequest.warn";
+
+
 }
