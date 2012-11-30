@@ -554,9 +554,18 @@ public class ColorTable implements NamedObject {
      * @return list of colors
      */
     public ArrayList<Color> getColorList() {
+        return getColorList(true);
+    }
+
+    /**
+     * Convert the colorTable into a list of Color-s
+     * @param includeAlpha  true to use alpha
+     * @return list of colors
+     */
+    public ArrayList<Color> getColorList(boolean includeAlpha) {
         if ((colorList == null) && (tableArray != null)) {
             colorList = new ArrayList<Color>();
-            boolean haveAlpha = (tableArray.length == 4);
+            boolean haveAlpha = (tableArray.length == 4) && includeAlpha;
             int     length    = tableArray[0].length;
             for (int i = 0; i < length; i++) {
                 colorList.add(new Color(tableArray[IDX_RED][i],
