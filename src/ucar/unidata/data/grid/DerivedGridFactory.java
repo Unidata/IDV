@@ -4184,7 +4184,7 @@ public class DerivedGridFactory {
             Unit[][] uset = ff.getRangeUnits();
             RealTupleType rtt        = DataUtility.getFlatRangeType(ff);
             double[][]    domainVals =
-                new double[domainSet.getDimension()][numObs];
+                    new double[domainSet.getDimension()][numObs];
             double[][] values = new double[rtt.getDimension()][numObs];
             int       curPos = 0;
             for (int i = 0; i < datas.size(); i++) {
@@ -4195,12 +4195,12 @@ public class DerivedGridFactory {
                 double[][]  vals    = data.getValues(false);
                 for (int j = 0; j < samples.length; j++) {
                     System.arraycopy(samples[j], 0, domainVals[j], curPos,
-                                     length);
-                    domainVals[j][length] = domainVals[j][length-1];
+                            length);
+                    domainVals[j][length+curPos] = Float.NaN; //domainVals[j][length+curPos-1];
                 }
                 for (int j = 0; j < vals.length; j++) {
                     System.arraycopy(vals[j], 0, values[j], curPos, length);
-                    values[j][length] = Double.NaN;
+                    values[j][length+curPos] = values[j][length+curPos-1]; //Double.NaN;
                 }
                 curPos += length + 1 ;
             }
@@ -4217,7 +4217,7 @@ public class DerivedGridFactory {
                         domainSet.getCoordinateSystem(),
                         domainSet.getSetUnits(), domainSet.getSetErrors());
             }
-           // retField = new FlatField(retType, newDomain);
+            // retField = new FlatField(retType, newDomain);
 
             retField = new FlatField(retType, newDomain, domainSet.getCoordinateSystem(), rset,
                     new Unit[] {uset[0][0], uset[1][0]});
@@ -4228,7 +4228,6 @@ public class DerivedGridFactory {
         }
         return retField;
     }
-
     /**
      * _more_
      *
