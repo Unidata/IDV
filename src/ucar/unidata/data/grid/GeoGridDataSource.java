@@ -1582,15 +1582,18 @@ public class GeoGridDataSource extends GridDataSource {
                         total *= dim.getLength();
                     }
                 }
-                try {
-                    total *= givenDataSelection.getTimes().size();
-                } catch (NullPointerException npe) {
-                    // if use default is selected in field selector for time, then
-                    // the getTimes() on the given data source throws and NPE and we
-                    // need to go to geoGrid to get the number of times. Note that
-                    // that getTimes() on geoGrid does not reflect any temporal subsetting
-                    // which is why we check the givenDataSelection first...
-                    total *= geoGrid.getTimes().size();
+                // check if there is a time dimension, and if so, take into account for number of points
+                if (geoGrid.getTimeDimension() != null) {
+                    try {
+                        total *= givenDataSelection.getTimes().size();
+                    } catch (NullPointerException npe) {
+                        // if use default is selected in field selector for time, then
+                        // the getTimes() on the given data source throws and NPE and we
+                        // need to go to geoGrid to get the number of times. Note that
+                        // that getTimes() on geoGrid does not reflect any temporal subsetting
+                        // which is why we check the givenDataSelection first...
+                        total *= geoGrid.getTimes().size();
+                    }
                 }
                 // compute size in megabytes of request (minus overhead of network protocol)
                 double mb = (total * geoGrid.getDataType().getSize());
