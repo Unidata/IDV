@@ -343,10 +343,6 @@ public class ImageGenerator extends IdvManager {
     /** index attribute */
     public static final String ATTR_INDEX = "index";
 
-    /** usealpha attribute for colorbars */
-    public static final String ATTR_USEALPHA = "usealpha";
-
-
     /** stride attribute */
     public static final String ATTR_STRIDE = "stride";
 
@@ -3801,6 +3797,7 @@ public class ImageGenerator extends IdvManager {
         props.put(name, new Integer(v));
         props.put(name + "_alpha", getLetter(v).toLowerCase());
         props.put(name + "_ALPHA", getLetter(v).toUpperCase());
+        
         props.put(name + "_ROMAN", getRoman(v).toUpperCase());
         props.put(name + "_roman", getRoman(v).toLowerCase());
 
@@ -4581,7 +4578,7 @@ public class ImageGenerator extends IdvManager {
                         preview.setSize(new Dimension(width, height));
                     }
                     Image previewImage = GuiUtils.getImage(preview);
-                    boolean includeAlpha = applyMacros(child, ATTR_USEALPHA,
+                    boolean includeAlpha = applyMacros(child, ATTR_TRANSPARENCY,
                                                true);
                     previewImage = ColorTableCanvas.getImage(colorTable,
                             (vertical
