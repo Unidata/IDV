@@ -3807,7 +3807,7 @@ public class GridUtil {
      *
      * @throws VisADException   problem accessing set
      */
-    private static Real normalizeLongitude(SampledSet domain, Real lon)
+    public static Real normalizeLongitude(SampledSet domain, Real lon)
             throws VisADException {
         double lonValue = normalizeLongitude(domain, lon.getValue(),
                                              lon.getUnit());
@@ -3828,7 +3828,7 @@ public class GridUtil {
      *
      * @throws VisADException   problem accessing set
      */
-    private static double normalizeLongitude(SampledSet domain, double lon)
+    public static double normalizeLongitude(SampledSet domain, double lon)
             throws VisADException {
         return normalizeLongitude(domain, lon, null);
     }
@@ -3847,7 +3847,7 @@ public class GridUtil {
      *
      * @throws VisADException   problem accessing set
      */
-    private static double normalizeLongitude(SampledSet domain, double lon,
+    public static double normalizeLongitude(SampledSet domain, double lon,
                                              Unit lonUnit)
             throws VisADException {
         int lonindex = isLatLonOrder(domain)

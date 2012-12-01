@@ -21,6 +21,7 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.nc2.units.SimpleUnit;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.*;
@@ -1027,7 +1028,7 @@ public class GridTrajectoryControl extends DrawingControl {
         FieldImpl v     = (FieldImpl) vdc.getData(null);
         FieldImpl pw    = (FieldImpl) wdc.getData(null);
         FieldImpl s     = (FieldImpl) sdc.getData(null);
-
+        zunit  = GridUtil.getVerticalUnit(s);
         Unit      dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
@@ -1042,8 +1043,7 @@ public class GridTrajectoryControl extends DrawingControl {
             w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
                 pw, hPI, null);
         }
-        float[][] geoVals   = getEarthLocationPoints();
-        int       numPoints = geoVals[0].length;
+        
         final Set timeSet   = s.getDomainSet();
         int       numTimes  = timeSet.getLength();
         Unit      timeUnit  = timeSet.getSetUnits()[0];
@@ -1068,6 +1068,8 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
+        float[][] geoVals   = getEarthLocationPoints(latIndex, lonIndex);
+        int       numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
             DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
@@ -1131,7 +1133,7 @@ public class GridTrajectoryControl extends DrawingControl {
      *
      * @throws Exception _more_
      */
-    public float[][] getEarthLocationPoints() throws Exception {
+    public float[][] getEarthLocationPoints(int latIndex, int lonIndex) throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
             clevel = ((Real) currentLevel).getValue();
@@ -1157,8 +1159,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
             for (int i = 0; i < pointNum; i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
-                points[0][i] = glyph.getLatLons()[0][0];
-                points[1][i] = (float) LatLonPointImpl.lonNormal(
+                points[latIndex][i] = glyph.getLatLons()[0][0];
+                points[lonIndex][i] = (float) LatLonPointImpl.lonNormal(
                     glyph.getLatLons()[1][0]);
                 points[2][i] = z;
             }
@@ -1168,17 +1170,25 @@ public class GridTrajectoryControl extends DrawingControl {
             if (glyphs.size() == 0) {
                 return null;
             }
-
+            Gridded3DSet domain =
+                    gridTrackControl.getGridDataInstance().getDomainSet3D();
+            Unit[] du = domain.getSetUnits();
             MapMaker mapMaker = new MapMaker();
             for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
-                float[][] lls = glyph.getLatLons();
-                for (int i = 0; i < lls[1].length; i++) {
-                    lls[1][i] = (float) LatLonPointImpl.lonNormal(lls[1][i]);
+                float[][] lls = glyph.getLatLons();                                
+                float[][] tmp = glyph.getLatLons();
+                if(du[lonIndex].isConvertible(CommonUnit.radian))
+                    for (int i = 0; i < lls[1].length; i++) {
+                        lls[0][i] =(float) GridUtil.normalizeLongitude( domain,  tmp[0][i], du[lonIndex] ) ;
+                    }
+                else if(du[lonIndex].isConvertible(CommonUnits.KILOMETER)) {
+                    for (int i = 0; i < lls[1].length; i++) {
+                        lls[1][i] = (float) LatLonPointImpl.lonNormal(lls[1][i]);
+                    }
                 }
                 mapMaker.addMap(lls);
             }
-            Gridded3DSet domain =
-                gridTrackControl.getGridDataInstance().getDomainSet3D();
+
             float[][][] latlons = GridUtil.findContainedLatLons(domain,
                                       mapMaker.getMaps());
             int       num    = latlons[0][0].length;
@@ -1186,8 +1196,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
             for (int i = 0; i < num; i++) {
 
-                points[0][i] = latlons[0][0][i];
-                points[1][i] =
+                points[latIndex][i] = latlons[0][0][i];
+                points[lonIndex][i] =
                     (float) LatLonPointImpl.lonNormal(latlons[0][1][i]);
                 points[2][i] = z;
             }
