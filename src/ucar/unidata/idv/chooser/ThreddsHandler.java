@@ -1261,7 +1261,7 @@ public class ThreddsHandler extends XmlHandler {
         LogUtil.configure();
         LogUtil.setTestMode(true);
         String catalog =
-            "http://motherlode.ucar.edu:8080/thredds/idv/rt-models.xml";
+            "http://thredds.ucar.edu/thredds/idv/rt-models.xml";
         String xml = IOUtil.readContents(catalog, (String) null);
         if (xml == null) {
             System.err.println("Unable to read: " + catalog);

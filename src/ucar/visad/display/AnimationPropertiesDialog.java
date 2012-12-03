@@ -24,34 +24,22 @@ package ucar.visad.display;
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.TimeLengthField;
 import ucar.unidata.ui.Timeline;
-
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import visad.CommonUnit;
 import visad.DateTime;
-import visad.Real;
 import visad.Set;
 import visad.VisADException;
 
 
-import java.*;
-
-import java.awt.*;
-
-import java.awt.event.*;
-
-import java.beans.*;
-
-import java.io.*;
-
-import java.lang.*;
-
-import java.net.*;
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
@@ -60,11 +48,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.BorderFactory;
-import javax.swing.border.*;
-
-import javax.swing.event.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -618,7 +615,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
         timeDriverCbx = new JCheckBox(
             "", animationWidget.getAnimationSetInfo().getIsTimeDriver());
-        comps.add(GuiUtils.rLabel("Set as Time Driver?"));
+        comps.add(GuiUtils.rLabel("Set as Time Driver:"));
         comps.add(timeDriverCbx);
 
         GuiUtils.tmpInsets = new Insets(10, 5, 5, 5);

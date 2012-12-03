@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -25,7 +25,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.Misc;
 
@@ -45,6 +47,11 @@ import java.util.List;
  * @version $Revision: 1.12 $
  */
 public class WmsSelection {
+
+    /** logging category */
+    static ucar.unidata.util.LogUtil.LogCategory log_ =
+        ucar.unidata.util.LogUtil.getLogInstance(
+            WmsSelection.class.getName());
 
 
     /** xml tag name */
@@ -72,7 +79,7 @@ public class WmsSelection {
     /** xml attribute name */
     public static final String ATTR_SRS = "srs";
 
-    /** _more_ */
+    /** crs attribute */
     public static final String ATTR_CRS = "crs";
 
     /** xml attribute name */
@@ -103,7 +110,7 @@ public class WmsSelection {
     /** Fixed width of image */
     private int fixedWidth = -1;
 
-    /** opaque attribute*/
+    /** opaque attribute */
     private int opaque = 0;
 
     /** The description */
@@ -131,7 +138,7 @@ public class WmsSelection {
     private String version;
 
 
-    /** _more_ */
+    /** the image file */
     private String imageFile;
 
     /**
@@ -141,11 +148,11 @@ public class WmsSelection {
 
 
     /**
-     * _more_
+     * Create a WmsSelection from the specification
      *
-     * @param layer _more_
-     * @param title _more_
-     * @param imageFile _more_
+     * @param layer   the layer
+     * @param title   the title
+     * @param imageFile  the image file
      */
     public WmsSelection(String layer, String title, String imageFile) {
         this.imageFile = imageFile;
@@ -192,9 +199,9 @@ public class WmsSelection {
     }
 
     /**
-     * _more_
+     * Is this a fixed image
      *
-     * @return _more_
+     * @return  true if fixed image
      */
     public boolean isFixedImage() {
         return imageFile != null;
@@ -222,18 +229,20 @@ public class WmsSelection {
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();
-        url = url + "version=" + version + "&request=GetMap" + "&service=WMS" +
-            //          "&Exceptions=se_xml" +
-            "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
-                       + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
-                       + bbox + "&width=" + imageWidth + "&height=" + imageHeight
-                       + "&reaspect=false";
+        url = url + "version=" + version + "&request=GetMap" + "&service=WMS"
+              +
+        //          "&Exceptions=se_xml" +
+        "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
+                   + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
+                   + bbox + "&width=" + imageWidth + "&height=" + imageHeight
+                   + "&reaspect=false";
         // may need to add service=WMS
         if (opaque == 0) {
-        	url += "&transparent=TRUE";
+            url += "&transparent=TRUE";
         } else {
-        	url += "&transparent=FALSE";
+            url += "&transparent=FALSE";
         }
+        log_.debug("WMS URL: " + url);
         return url;
     }
 
