@@ -50,6 +50,8 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.ui.TextSearcher;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.FileManager;
@@ -95,15 +97,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-
+import javax.swing.*;
 
 
 /**
@@ -130,7 +124,8 @@ public class GeoGridDataSource extends GridDataSource {
     public static final String PREF_VERTICALCS = IdvConstants.PREF_VERTICALCS;
 
     /** Preference - warn users for large remote data requests */
-    public static final String PREF_LARGE_REMOTE_DATA_WARN = IdvConstants.PREF_LARGE_REMOTE_DATA_WARN;
+    public static final String PREF_LARGE_REMOTE_DATA_WARN =
+        IdvConstants.PREF_LARGE_REMOTE_DATA_WARN;
 
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
@@ -929,7 +924,7 @@ public class GeoGridDataSource extends GridDataSource {
         changeDataPathsCbx.setToolTipText(
             "Should this data source also be changed");
         return FileManager.getWriteFile(FileManager.FILTER_NETCDF, null,
-                GuiUtils.top(changeDataPathsCbx));
+                                        GuiUtils.top(changeDataPathsCbx));
     }
 
 
@@ -1428,10 +1423,9 @@ public class GeoGridDataSource extends GridDataSource {
      *
      *
      * @version        Enter version here..., Wed, Nov 28, '12
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class HugeSizeException extends Exception {}
-
 
     /**
      * Utility to create a new GeoGridAdapter for the given choice and data selection and
@@ -1558,11 +1552,14 @@ public class GeoGridDataSource extends GridDataSource {
         }
 
         // check to see if user wants to be warned about download size
-        boolean warn   = getIdv().getStore().get(PREF_LARGE_REMOTE_DATA_WARN, false);
+        boolean warn = getIdv().getStore().get(PREF_LARGE_REMOTE_DATA_WARN,
+                           false);
+        boolean fromBundle = this.haveBeenUnPersisted;
         // just prior to loading data
-        if ((readingFullGrid) && (warn)) {
-            // check if interactive and if file being loaded is remote
-            if ((getIdv().getViewManager().isInteractive()) && (!isLocalFile())) {
+        if ((readingFullGrid) && ( !fromBundle) && (warn)) {
+            // check if interactive, if restoring from a bundle, and if file being loaded is remote
+            if ((getIdv().getViewManager().isInteractive())
+                    && ( !isLocalFile())) {
                 long total = 1;
                 // get dimensions (note that the time dimension returned does not take into
                 // account subsetting!
@@ -1597,25 +1594,30 @@ public class GeoGridDataSource extends GridDataSource {
                 mb = (mb / 1048576.);
                 if (mb > SIZE_THRESHOLD) {
                     JCheckBox askCbx = new JCheckBox("Don't show this again",
-                            !warn);
+                                           !warn);
                     JComponent msgContents =
-                            GuiUtils.vbox(GuiUtils.inset(new JLabel(
-                                                   "<html>You are about to load " + ((int) mb)
-                                                    + " MB of data.<br>Are you sure you want to do this?<p><hr>"
-                                                    + "<br>Consider subsetting for better performance!<p></html>"),
-                                                    5),
-                                          GuiUtils.inset(askCbx, new Insets(5, 0, 0, 0)));
+                        GuiUtils
+                            .vbox(GuiUtils
+                                .inset(new JLabel("<html>You are about to load "
+                                    + ((int) mb)
+                                    + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                                    + "<br>Consider subsetting for better performance!<p></html>"), 5), GuiUtils
+                                        .inset(askCbx,
+                                            new Insets(5, 0, 0, 0)));
+
                     /**
-                     JComponent msgContents =
-                     new JLabel(
-                     "<html>You are about to load " + ((int) mb)
-                     + " MB of data.<br>Are you sure you want to do this?<p><hr>"
-                     + "<br>Consider subsetting for better performance!<p></html>");
+                     * JComponent msgContents =
+                     * new JLabel(
+                     * "<html>You are about to load " + ((int) mb)
+                     * + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                     * + "<br>Consider subsetting for better performance!<p></html>");
                      */
                     if (askCbx.isSelected()) {
-                        getIdv().getStore().put(PREF_LARGE_REMOTE_DATA_WARN, false);
+                        getIdv().getStore().put(PREF_LARGE_REMOTE_DATA_WARN,
+                                false);
                     }
-                    if ( !GuiUtils.askOkCancel("Large Remote Data Request Warning",
+                    if ( !GuiUtils.askOkCancel(
+                            "Large Remote Data Request Warning",
                             msgContents)) {
                         throw new HugeSizeException();
                     }
@@ -1917,7 +1919,6 @@ public class GeoGridDataSource extends GridDataSource {
         return fieldImpl;
     }  // end makeField
 
-
     /**
      * Find the grid in the dataset from the DataChoice
      *
@@ -1929,23 +1930,23 @@ public class GeoGridDataSource extends GridDataSource {
         if (ds == null) {
             return null;
         }
-        String  name    = dc.getStringId();
+        String name = dc.getStringId();
+
         /**
          *
          * Look for new name for parameter
          * If name already exists in dataset, then the old name is returned
          *
          */
-        List<String> newName = renamer.matchNcepNames(ds,
-                name);
+        List<String> newName = renamer.matchNcepNames(ds, name);
 
         if (newName.size() == 1) {
             // if unique name is returned from netCDF-Java, then use it.
             name = newName.get(0);
-        } else if (newName.size() == 0){
+        } else if (newName.size() == 0) {
             // if netCDF-Java does not find any name, then look in IDV tables
             List<String> aliases =
-                    getIdv().getDataManager().getParameterAliases(name);
+                getIdv().getDataManager().getParameterAliases(name);
             if ((aliases != null) && !aliases.isEmpty()) {
                 for (String alias : aliases) {
                     GeoGrid tmpGeoGrid = ds.findGridByName(alias);
@@ -1958,6 +1959,42 @@ public class GeoGridDataSource extends GridDataSource {
         } else if (newName.size() > 0) {
             // netCDF-Java returned more than one match and no match was found in the
             // IDV tables...ask user
+            LogUtil.printMessage("Multiple Matches Found for " + name);
+            LogUtil.printMessage("Possible new variable names are:");
+            String matches = "";
+            for (String possibleNewName : newName) {
+                LogUtil.printMessage("    " + possibleNewName);
+                matches = matches + possibleNewName;
+            }
+            LogUtil.printMessage("Please update your bundle.");
+            if (getIdv().getViewManager().isInteractive()) {
+                Misc.printStack("findgrid", 10);
+
+                String msg1 =
+                    "Variable name has non-uniquely changed! <br><br>";
+                String msg2 = "Possible new names for the variable <i>"
+                              + name + "</i> are:<br>";
+                String msg3 = StringUtil.join("<br>", newName);
+                String label = "<html>" + msg1 + msg2 + "<i>" + msg3
+                               + "</i></html>";
+
+                DataOperand operand = new DataOperand(name, label,
+                                          dc.getCategories(), false);
+                DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
+                                                null, Misc.newList(operand),
+                                                Misc.newList(this),
+                                                Misc.newList(dc));
+                List choices = dataDialog.getSelected();
+                if ((choices != null) && (choices.size() > 0)) {
+                    DataChoice dc_new =
+                        (DataChoice) ((List) choices.get(0)).get(0);
+                    name = dc_new.getStringId();
+                    dc.setId(name);
+                    dc.setName(name);
+                    GeoGrid geoGrid = ds.findGridByName(name);
+                    return geoGrid;
+                }
+            }
         } else {
             // ok, no matches found anywhere...return null
             return null;
