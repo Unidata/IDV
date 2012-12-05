@@ -1971,16 +1971,26 @@ public class GeoGridDataSource extends GridDataSource {
             if (getIdv().getViewManager().isInteractive()) {
                 //Misc.printStack("findgrid", 10);
 
+
                 String msg1 =
-                    "Variable name has non-uniquely changed! <br><br>";
+                        "The variable name has changed.  Please select a new match.<br><br>";
                 String msg2 = "Possible new names for the variable <i>"
-                              + dc.getDescription() + "</i> are:<br><br>";
+                        + dc.getDescription() + "</i> are:<br><br>";
                 String msg3 = StringUtil.join("<br>", newDescription);
                 String label = "<html>" + msg1 + msg2 + "<i>" + msg3
-                               + "</i></html>";
+                        + "</i></html>";
+                StringBuilder paramCats = new StringBuilder();
+                for (String possibleNewName : newName) {
+                    paramCats.append("param:");
+                    paramCats.append(possibleNewName);
+                    paramCats.append(";");
+                }
+                List cats =
+                        DataCategory.parseCategories(paramCats.toString());
 
-                DataOperand operand = new DataOperand(name, label,
-                                          dc.getCategories(), false);
+                DataOperand operand = new DataOperand(name, label, cats,
+                        false);
+
                 DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
                                                 null, Misc.newList(operand),
                                                 Misc.newList(this),
