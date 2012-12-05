@@ -1598,11 +1598,11 @@ public class GeoGridDataSource extends GridDataSource {
                     JComponent msgContents =
                         GuiUtils
                             .vbox(GuiUtils
-                                .inset(new JLabel("<html>You are about to load "
-                                    + ((int) mb)
-                                    + " MB of data.<br>Are you sure you want to do this?<p><hr>"
-                                    + "<br>Consider subsetting for better performance!<p></html>"), 5), GuiUtils
-                                        .inset(askCbx,
+                                    .inset(new JLabel("<html>You are about to load "
+                                            + ((int) mb)
+                                            + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                                            + "<br>Consider subsetting for better performance!<p></html>"), 5), GuiUtils
+                                    .inset(askCbx,
                                             new Insets(5, 0, 0, 0)));
 
                     /**
@@ -1961,10 +1961,10 @@ public class GeoGridDataSource extends GridDataSource {
             // IDV tables...ask user
             LogUtil.printMessage("Multiple Matches Found for " + name);
             LogUtil.printMessage("Possible new variable names are:");
-            String matches = "";
+            List<String> newDescription = new ArrayList<String>();
             for (String possibleNewName : newName) {
                 LogUtil.printMessage("    " + possibleNewName);
-                matches = matches + possibleNewName;
+                newDescription.add(ds.getDataVariable(possibleNewName).getDescription());
             }
             LogUtil.printMessage("Please update your bundle.");
             if (getIdv().getViewManager().isInteractive()) {
@@ -1973,8 +1973,8 @@ public class GeoGridDataSource extends GridDataSource {
                 String msg1 =
                     "Variable name has non-uniquely changed! <br><br>";
                 String msg2 = "Possible new names for the variable <i>"
-                              + name + "</i> are:<br>";
-                String msg3 = StringUtil.join("<br>", newName);
+                              + dc.getDescription() + "</i> are:<br><br>";
+                String msg3 = StringUtil.join("<br>", newDescription);
                 String label = "<html>" + msg1 + msg2 + "<i>" + msg3
                                + "</i></html>";
 
