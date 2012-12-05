@@ -1968,7 +1968,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
             LogUtil.printMessage("Please update your bundle.");
             if (getIdv().getViewManager().isInteractive()) {
-                Misc.printStack("findgrid", 10);
+                //Misc.printStack("findgrid", 10);
 
                 String msg1 =
                     "Variable name has non-uniquely changed! <br><br>";
