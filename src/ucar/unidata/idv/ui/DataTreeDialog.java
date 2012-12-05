@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,41 +24,40 @@ package ucar.unidata.idv.ui;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataOperand;
 import ucar.unidata.data.DataSelection;
-
 import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceResults;
-import ucar.unidata.data.DerivedDataChoice;
-
-
-
-import ucar.unidata.idv.*;
-import ucar.unidata.idv.control.DisplayControlImpl;
-
-
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 
-import visad.VisADException;
 import visad.DateTime;
 
 
-import java.awt.*;
-import java.awt.event.*;
-
-
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.rmi.RemoteException;
 
-import javax.swing.*;
 import javax.swing.BoxLayout;
-import javax.swing.event.*;
-import javax.swing.table.JTableHeader;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 
 
@@ -99,6 +98,9 @@ public class DataTreeDialog implements ActionListener {
     /** The param names */
     private List fieldNames;
 
+    /** the include subset widget flage */
+    private boolean includeSubsetWidget;
+
 
 
     /** All of the data trees, one per label/param name */
@@ -138,14 +140,32 @@ public class DataTreeDialog implements ActionListener {
     public DataTreeDialog(IntegratedDataViewer idv, Component src,
                           List operands, List dataSources,
                           List selectedDataChoices) {
+        this(idv, src, operands, dataSources, selectedDataChoices, true);
+    }
+
+    /**
+     * Create the dialog
+     *
+     * @param idv Reference to the IDV
+     * @param src  Component to place ourselves near
+     * @param operands List of DataOperand-s
+     * @param dataSources List of data sources
+     * @param selectedDataChoices list of already selected data choices
+     * @param includeDataSubsetWidget true to include the data subset widget
+     */
+    public DataTreeDialog(IntegratedDataViewer idv, Component src,
+                          List operands, List dataSources,
+                          List selectedDataChoices,
+                          boolean includeDataSubsetWidget) {
 
 
         //        super(idv.getIdvUIManager().getFrame(), TITLE, true);
         dialog = GuiUtils.createDialog(null, TITLE, true);
         //        super(LogUtil.getCurrentWindow(), TITLE, true);
-        this.idv         = idv;
-        this.operands    = operands;
-        this.dataSources = dataSources;
+        this.idv                 = idv;
+        this.operands            = operands;
+        this.dataSources         = dataSources;
+        this.includeSubsetWidget = includeDataSubsetWidget;
         init(src, selectedDataChoices);
     }
 
@@ -353,8 +373,10 @@ public class DataTreeDialog implements ActionListener {
                     new Insets(10, 5, 0, 10)), treeContents));
             timeComponents.add(dsw.getContents());
         }
-        topComponents.addAll(timeComponents);
-        topComponents.addAll(multiComponents);
+        if (includeSubsetWidget) {
+            topComponents.addAll(timeComponents);
+            topComponents.addAll(multiComponents);
+        }
         GuiUtils.tmpInsets = new Insets(4, 6, 4, 6);
         Component trees = GuiUtils.doLayout(topComponents,
                                             topComponents.size() / 3,
@@ -409,15 +431,16 @@ public class DataTreeDialog implements ActionListener {
             List selectedFromTree = DataChoice.cloneDataChoices(
                                         dataTree.getSelectedDataChoices());
 
-            if(idv.getUseTimeDriver() && dsw.getTimeOption().equals(DataSelectionWidget.USE_DRIVERTIMES)) {
+            if (idv.getUseTimeDriver()
+                    && dsw.getTimeOption().equals(
+                        DataSelectionWidget.USE_DRIVERTIMES)) {
                 ViewManager vm = idv.getViewManager();
-                dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
-                try{
+                dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
+                                          true);
+                try {
                     List<DateTime> times = vm.getTimeDriverTimes();
                     dataSelection.setTheTimeDriverTimes(times);
-                } catch ( Exception e){
-
-                }
+                } catch (Exception e) {}
             }
 
             for (int dataChoiceIdx = 0;

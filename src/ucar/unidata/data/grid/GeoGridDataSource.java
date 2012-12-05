@@ -1598,11 +1598,11 @@ public class GeoGridDataSource extends GridDataSource {
                     JComponent msgContents =
                         GuiUtils
                             .vbox(GuiUtils
-                                    .inset(new JLabel("<html>You are about to load "
-                                            + ((int) mb)
-                                            + " MB of data.<br>Are you sure you want to do this?<p><hr>"
-                                            + "<br>Consider subsetting for better performance!<p></html>"), 5), GuiUtils
-                                    .inset(askCbx,
+                                .inset(new JLabel("<html>You are about to load "
+                                    + ((int) mb)
+                                    + " MB of data.<br>Are you sure you want to do this?<p><hr>"
+                                    + "<br>Consider subsetting for better performance!<p></html>"), 5), GuiUtils
+                                        .inset(askCbx,
                                             new Insets(5, 0, 0, 0)));
 
                     /**
@@ -1964,7 +1964,8 @@ public class GeoGridDataSource extends GridDataSource {
             List<String> newDescription = new ArrayList<String>();
             for (String possibleNewName : newName) {
                 LogUtil.printMessage("    " + possibleNewName);
-                newDescription.add(ds.getDataVariable(possibleNewName).getDescription());
+                newDescription.add(
+                    ds.getDataVariable(possibleNewName).getDescription());
             }
             LogUtil.printMessage("Please update your bundle.");
             if (getIdv().getViewManager().isInteractive()) {
@@ -1983,7 +1984,7 @@ public class GeoGridDataSource extends GridDataSource {
                 DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
                                                 null, Misc.newList(operand),
                                                 Misc.newList(this),
-                                                Misc.newList(dc));
+                                                Misc.newList(dc), false);
                 List choices = dataDialog.getSelected();
                 if ((choices != null) && (choices.size() > 0)) {
                     DataChoice dc_new =
