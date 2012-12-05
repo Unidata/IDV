@@ -184,7 +184,7 @@ public class GeoGridDataSource extends GridDataSource {
     private int max3D;
 
     /** category attributes */
-    private static String[] categoryAttributes = { "GRIB_param_category" };
+    private static String[] categoryAttributes = { "GRIB_param_category", "Grib2_Parameter_Category" };
 
 
     /** Do we really reverse the time indices */
