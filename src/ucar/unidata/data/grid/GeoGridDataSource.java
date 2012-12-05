@@ -184,7 +184,8 @@ public class GeoGridDataSource extends GridDataSource {
     private int max3D;
 
     /** category attributes */
-    private static String[] categoryAttributes = { "GRIB_param_category", "Grib2_Parameter_Category" };
+    private static String[] categoryAttributes = { "GRIB_param_category",
+            "Grib2_Parameter_Category" };
 
 
     /** Do we really reverse the time indices */
@@ -1973,12 +1974,12 @@ public class GeoGridDataSource extends GridDataSource {
 
 
                 String msg1 =
-                        "The variable name has changed.  Please select a new match.<br><br>";
+                    "The variable name has changed.  Please select a new match.<br><br>";
                 String msg2 = "Possible new names for the variable <i>"
-                        + dc.getDescription() + "</i> are:<br><br>";
+                              + dc.getDescription() + "</i> are:<br><br>";
                 String msg3 = StringUtil.join("<br>", newDescription);
                 String label = "<html>" + msg1 + msg2 + "<i>" + msg3
-                        + "</i></html>";
+                               + "</i></html>";
                 StringBuilder paramCats = new StringBuilder();
                 for (String possibleNewName : newName) {
                     paramCats.append("param:");
@@ -1986,10 +1987,10 @@ public class GeoGridDataSource extends GridDataSource {
                     paramCats.append(";");
                 }
                 List cats =
-                        DataCategory.parseCategories(paramCats.toString());
+                    DataCategory.parseCategories(paramCats.toString());
 
                 DataOperand operand = new DataOperand(name, label, cats,
-                        false);
+                                          false);
 
                 DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
                                                 null, Misc.newList(operand),
