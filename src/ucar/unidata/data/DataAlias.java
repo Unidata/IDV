@@ -27,6 +27,7 @@ package ucar.unidata.data;
 import org.w3c.dom.Element;
 
 
+import ucar.nc2.grib.GribVariableRenamer;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
@@ -35,6 +36,7 @@ import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -80,7 +82,6 @@ public class DataAlias implements Comparable {
     /** Xml attribute for label */
     public static final String ATTR_LABEL = "label";
 
-
     /** name of this alias */
     private String name;
 
@@ -90,6 +91,8 @@ public class DataAlias implements Comparable {
     /** list of aliases */
     private List aliases = new ArrayList();
 
+    /** handles the grib variable renaming for data aliases */
+    private GribVariableRenamer renamer = new GribVariableRenamer();
 
     /**
      * Construct a new DataAlias with the given name and label.
@@ -297,14 +300,41 @@ public class DataAlias implements Comparable {
      * @param root  root element of the XML
      */
     private static void readAliases(Element root) {
+        /** handles the grib variable renaming for data aliases */
+        GribVariableRenamer renamer = new GribVariableRenamer();
         List children = XmlUtil.findChildren(root, TAG_ALIAS);
         for (int i = 0; i < children.size(); i++) {
             Element child     = (Element) children.get(i);
             String  canonical = XmlUtil.getAttribute(child, ATTR_NAME);
             String  label = XmlUtil.getAttribute(child, ATTR_LABEL,
-                                canonical);
+                    canonical);
             List aliasList = StringUtil.split(XmlUtil.getAttribute(child,
                                  TAG_ALIASES));
+            // see if any of the variable names in the alias list match
+            // new grib variable names, and if so, include the new names.
+            for (int s=0; s<aliasList.size(); s++) {
+                List<String> newNames1 = renamer.matchNcepNames("grib1", aliasList.get(s).toString());
+                List<String> newNames2 = renamer.matchNcepNames("grib2", aliasList.get(s).toString());
+                List<String> newNames3 = renamer.getMappedNamesGrib1(aliasList.get(s).toString());
+                List<String> newNames4 = renamer.getMappedNamesGrib2(aliasList.get(s).toString());
+                List<String> newNames = new ArrayList<String>();
+                newNames.addAll(newNames1);
+                newNames.addAll(newNames2);
+                if (newNames3 != null){
+                    newNames.addAll(newNames3);
+                }
+                if (newNames4 != null){
+                    newNames.addAll(newNames4);
+                }
+                    if (newNames.size() != 0) {
+                    for (String newName : newNames) {
+                        if (!aliasList.contains(newName)){
+                            aliasList.add(newName);
+                        }
+                    }
+                }
+            }
+
             DataAlias dataAlias =
                 (DataAlias) canonicalToObject.get(canonical);
             //            if (dataAlias != null) {
@@ -317,6 +347,7 @@ public class DataAlias implements Comparable {
                 dataAlias = new DataAlias(canonical, label);
                 canonicalToObject.put(canonical, dataAlias);
                 dataAliasList.add(dataAlias);
+                //List<String> newName = renamer.matchNcepNames("grib1");
                 labelIdList.add(new TwoFacedObject(label + " (" + canonical
                         + ")", canonical));
             } else {
