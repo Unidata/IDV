@@ -780,11 +780,16 @@ public class DerivedDataChoice extends ListDataChoice {
                     //value of "result" from the interpreter
 
                     PyObject pyResult = interp.eval(constructedCode);
+                    Object resultObject = null;
+                    if(pyResult.getType().toString().contains("array.array"))
+                        resultObject = pyResult.__tojava__(visad.Data[].class);
+                    else
+                        resultObject = pyResult.__tojava__(visad.Data.class);
 
-                    Object resultObject =
-                        pyResult.__tojava__(visad.Data.class);
+                    if(pyResult.getType().toString().contains("array.array"))
+                        result = ((Data []) resultObject)[0];
                     //Make sure we got the right kind of return value
-                    if ((resultObject != null)
+                    else if ((resultObject != null)
                             && !(resultObject instanceof Data)) {
                         resultObject = pyResult.__tojava__(DataChoice.class);
                         //If we get back a data choice then we reset our expression to be
