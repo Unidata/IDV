@@ -24,6 +24,7 @@
 package ucar.unidata.data;
 
 
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.w3c.dom.Element;
 
 
@@ -310,26 +311,31 @@ public class DataAlias implements Comparable {
                     canonical);
             List aliasList = StringUtil.split(XmlUtil.getAttribute(child,
                                  TAG_ALIASES));
-            // see if any of the variable names in the alias list match
-            // new grib variable names, and if so, include the new names.
-            for (int s=0; s<aliasList.size(); s++) {
-                List<String> newNames1 = renamer.matchNcepNames("grib1", aliasList.get(s).toString());
-                List<String> newNames2 = renamer.matchNcepNames("grib2", aliasList.get(s).toString());
-                List<String> newNames3 = renamer.getMappedNamesGrib1(aliasList.get(s).toString());
-                List<String> newNames4 = renamer.getMappedNamesGrib2(aliasList.get(s).toString());
-                List<String> newNames = new ArrayList<String>();
-                newNames.addAll(newNames1);
-                newNames.addAll(newNames2);
-                if (newNames3 != null){
-                    newNames.addAll(newNames3);
-                }
-                if (newNames4 != null){
-                    newNames.addAll(newNames4);
-                }
-                    if (newNames.size() != 0) {
-                    for (String newName : newNames) {
-                        if (!aliasList.contains(newName)){
-                            aliasList.add(newName);
+
+            if (Boolean.FALSE) {
+                // turn on to see if any of the variable names in the alias list match
+                // new grib variable names, and if so, print the new names. Useful when
+                // checking to see if aliases.xml needs to be updated.
+                for (int s=0; s<aliasList.size(); s++) {
+                    List<String> newNames1 = renamer.matchNcepNames("grib1", aliasList.get(s).toString());
+                    List<String> newNames2 = renamer.matchNcepNames("grib2", aliasList.get(s).toString());
+                    List<String> newNames3 = renamer.getMappedNamesGrib1(aliasList.get(s).toString());
+                    List<String> newNames4 = renamer.getMappedNamesGrib2(aliasList.get(s).toString());
+                    List<String> newNames = new ArrayList<String>();
+                    newNames.addAll(newNames1);
+                    newNames.addAll(newNames2);
+                    if (newNames3 != null){
+                        newNames.addAll(newNames3);
+                    }
+                    if (newNames4 != null){
+                        newNames.addAll(newNames4);
+                    }
+                        if (newNames.size() != 0) {
+                        for (String newName : newNames) {
+                            if (!aliasList.contains(newName)){
+                                System.out.println(newName);
+                                aliasList.add(newName);
+                            }
                         }
                     }
                 }
