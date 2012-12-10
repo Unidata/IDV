@@ -165,6 +165,18 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     private MyTrackControl gridTrackControl;
 
+    /** _more_ */
+    FieldImpl u ;
+
+    /** _more_ */
+    FieldImpl v ;
+
+    /** _more_ */
+    FieldImpl pw ;
+
+    /** _more_ */
+    FieldImpl s ;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -707,6 +719,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
+
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
 
@@ -716,13 +729,30 @@ public class GridTrajectoryControl extends DrawingControl {
         this.dataChoice = dataChoice;
         DataInstance      di  = getDataInstance();
         DerivedDataChoice ddc = (DerivedDataChoice) dataChoice;
-        List              ds  = ddc.getChoices();
-        DirectDataChoice  gds = (DirectDataChoice) ds.get(3);
 
 
-        //DataChoice        sdc = (DataChoice) ds.get(3);
+        Hashtable         choices = ddc.getUserSelectedChoices();
+        DirectDataChoice udc =
+                (DirectDataChoice) choices.get(new String("D1"));
+        DirectDataChoice vdc =
+                (DirectDataChoice) choices.get(new String("D2"));
+        DirectDataChoice wdc =
+                (DirectDataChoice) choices.get(new String("D3"));
+        DirectDataChoice sdc =
+                (DirectDataChoice) choices.get(new String("scaler"));
+        addDataChoice(udc) ;
+        addDataChoice(vdc) ;
+        addDataChoice(wdc) ;
 
-        GridDataInstance gdi = new GridDataInstance(gds, getDataSelection(),
+
+        u     = (FieldImpl) udc.getData(null);
+        v     = (FieldImpl) vdc.getData(null);
+        pw    = (FieldImpl) wdc.getData(null);
+        s     = (FieldImpl) sdc.getData(null);
+        doMakeDataInstance(sdc);
+
+
+        GridDataInstance gdi = new GridDataInstance(sdc, getDataSelection(),
                                    getRequestProperties());
 
         gridTrackControl.controlContext = getControlContext();
@@ -774,11 +804,13 @@ public class GridTrajectoryControl extends DrawingControl {
         //tmpSelection.setFromLevel(null);
         //tmpSelection.setToLevel(null);
 
-        List     levelsList = gds.getAllLevels(tmpSelection);
+        List     levelsList = sdc.getAllLevels(tmpSelection);
         Object[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
             levels =
                 (Object[]) levelsList.toArray(new Object[levelsList.size()]);
+            SampledSet ss = GridUtil.getSpatialDomain(gdi.getGrid());
+            zunit  = ss.getSetUnits()[2] ;
         }
 
 
@@ -803,7 +835,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         if ( !gridTrackControl.trackDataOk()) {
             List dlist = new ArrayList();
-            dlist.add(gds);
+            dlist.add(sdc);
             gridTrackControl.appendDataChoices(dlist);
             if ( !gridTrackControl.trackDataOk()) {
                 return false;
@@ -1012,23 +1044,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
         //  FieldImpl u = this.dataChoice;
         //   super.init(dataChoice0);
-        DerivedDataChoice ddc     = (DerivedDataChoice) dataChoice;
-        Hashtable         choices = ddc.getUserSelectedChoices();
-        DirectDataChoice udc =
-            (DirectDataChoice) choices.get(new String("D1"));
-        DirectDataChoice vdc =
-            (DirectDataChoice) choices.get(new String("D2"));
-        DirectDataChoice wdc =
-            (DirectDataChoice) choices.get(new String("D3"));
-        DirectDataChoice sdc =
-            (DirectDataChoice) choices.get(new String("scaler"));
 
 
-        FieldImpl u     = (FieldImpl) udc.getData(null);
-        FieldImpl v     = (FieldImpl) vdc.getData(null);
-        FieldImpl pw    = (FieldImpl) wdc.getData(null);
-        FieldImpl s     = (FieldImpl) sdc.getData(null);
-        zunit  = GridUtil.getVerticalUnit(s);
         Unit      dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
