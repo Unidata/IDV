@@ -1288,7 +1288,7 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl[] combineGridsArray(FieldImpl grid1, FieldImpl grid2,
+    public static List<FieldImpl> combineGridsArray(FieldImpl grid1, FieldImpl grid2,
                                          FieldImpl grid3, FieldImpl grid4)
             throws VisADException, RemoteException, Exception {
 
@@ -1343,7 +1343,13 @@ public class DerivedGridFactory {
         }
 
         return wvFI;    */
-        return new FieldImpl[] { u, v, pw, s };
+        List flist = new ArrayList();
+        flist.add(u);
+        flist.add(v);
+        flist.add(pw);
+        flist.add(s);
+        return flist;
+        //return new FieldImpl[] { u, v, pw, s };
         //return combineGrids(new FieldImpl[] { u,v,pw,s });
     }
 
