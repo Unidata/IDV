@@ -22,6 +22,7 @@ package ucar.unidata.idv.control;
 
 
 import ucar.nc2.units.SimpleUnit;
+
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.*;
@@ -103,7 +104,7 @@ public class GridTrajectoryControl extends DrawingControl {
         new DrawingCommand("Remove graphic", "remove all shape graphics",
                            "/auxdata/ui/icons/Reshape16.gif");
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_SETLEVELS = "cmd.setlevels";
 
     /** _more_ */
@@ -166,16 +167,16 @@ public class GridTrajectoryControl extends DrawingControl {
     private MyTrackControl gridTrackControl;
 
     /** _more_ */
-    FieldImpl u ;
+    FieldImpl u;
 
     /** _more_ */
-    FieldImpl v ;
+    FieldImpl v;
 
     /** _more_ */
-    FieldImpl pw ;
+    FieldImpl pw;
 
     /** _more_ */
-    FieldImpl s ;
+    FieldImpl s;
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -727,28 +728,28 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl = new MyTrackControl();
         // super.init(dataChoice);
         this.dataChoice = dataChoice;
-        DataInstance      di  = getDataInstance();
-        DerivedDataChoice ddc = (DerivedDataChoice) dataChoice;
+        DataInstance      di      = getDataInstance();
+        DerivedDataChoice ddc     = (DerivedDataChoice) dataChoice;
 
 
         Hashtable         choices = ddc.getUserSelectedChoices();
         DirectDataChoice udc =
-                (DirectDataChoice) choices.get(new String("D1"));
+            (DirectDataChoice) choices.get(new String("D1"));
         DirectDataChoice vdc =
-                (DirectDataChoice) choices.get(new String("D2"));
+            (DirectDataChoice) choices.get(new String("D2"));
         DirectDataChoice wdc =
-                (DirectDataChoice) choices.get(new String("D3"));
+            (DirectDataChoice) choices.get(new String("D3"));
         DirectDataChoice sdc =
-                (DirectDataChoice) choices.get(new String("scaler"));
-        addDataChoice(udc) ;
-        addDataChoice(vdc) ;
-        addDataChoice(wdc) ;
+            (DirectDataChoice) choices.get(new String("scaler"));
+        addDataChoice(udc);
+        addDataChoice(vdc);
+        addDataChoice(wdc);
 
 
-        u     = (FieldImpl) udc.getData(null);
-        v     = (FieldImpl) vdc.getData(null);
-        pw    = (FieldImpl) wdc.getData(null);
-        s     = (FieldImpl) sdc.getData(null);
+        u  = (FieldImpl) udc.getData(null);
+        v  = (FieldImpl) vdc.getData(null);
+        pw = (FieldImpl) wdc.getData(null);
+        s  = (FieldImpl) sdc.getData(null);
         doMakeDataInstance(sdc);
 
 
@@ -810,7 +811,7 @@ public class GridTrajectoryControl extends DrawingControl {
             levels =
                 (Object[]) levelsList.toArray(new Object[levelsList.size()]);
             SampledSet ss = GridUtil.getSpatialDomain(gdi.getGrid());
-            zunit  = ss.getSetUnits()[2] ;
+            zunit = ss.getSetUnits()[2];
         }
 
 
@@ -1046,7 +1047,7 @@ public class GridTrajectoryControl extends DrawingControl {
         //   super.init(dataChoice0);
 
 
-        Unit      dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
+        Unit dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
             ((FlatField) pw.getSample(0)).getRangeUnits()[0][0];
@@ -1060,10 +1061,10 @@ public class GridTrajectoryControl extends DrawingControl {
             w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
                 pw, hPI, null);
         }
-        
-        final Set timeSet   = s.getDomainSet();
-        int       numTimes  = timeSet.getLength();
-        Unit      timeUnit  = timeSet.getSetUnits()[0];
+
+        final Set timeSet  = s.getDomainSet();
+        int       numTimes = timeSet.getLength();
+        Unit      timeUnit = timeSet.getSetUnits()[0];
         final Unit paramUnit =
             ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         FunctionType rt =
@@ -1085,8 +1086,8 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
-        float[][] geoVals   = getEarthLocationPoints(latIndex, lonIndex);
-        int       numPoints = geoVals[0].length;
+        float[][]  geoVals      = getEarthLocationPoints(latIndex, lonIndex);
+        int        numPoints    = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
             DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
@@ -1124,7 +1125,7 @@ public class GridTrajectoryControl extends DrawingControl {
                           gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
         gridTrackControl.setRange(range);
         Set[]         rset = mergedTracks.getRangeSets();
-        DoubleSet      ds   = (DoubleSet) rset[0];
+        DoubleSet     ds   = (DoubleSet) rset[0];
 
         SetType       st   = (SetType) ds.getType();
         RealTupleType rtt  = st.getDomain();
@@ -1146,11 +1147,15 @@ public class GridTrajectoryControl extends DrawingControl {
     /**
      * _more_
      *
+     *
+     * @param latIndex _more_
+     * @param lonIndex _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public float[][] getEarthLocationPoints(int latIndex, int lonIndex) throws Exception {
+    public float[][] getEarthLocationPoints(int latIndex, int lonIndex)
+            throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
             clevel = ((Real) currentLevel).getValue();
@@ -1188,19 +1193,23 @@ public class GridTrajectoryControl extends DrawingControl {
                 return null;
             }
             Gridded3DSet domain =
-                    gridTrackControl.getGridDataInstance().getDomainSet3D();
-            Unit[] du = domain.getSetUnits();
+                gridTrackControl.getGridDataInstance().getDomainSet3D();
+            Unit[]   du       = domain.getSetUnits();
             MapMaker mapMaker = new MapMaker();
             for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
-                float[][] lls = glyph.getLatLons();                                
+                float[][] lls = glyph.getLatLons();
                 float[][] tmp = glyph.getLatLons();
-                if(du[lonIndex].isConvertible(CommonUnit.radian))
+                if (du[lonIndex].isConvertible(CommonUnit.radian)) {
                     for (int i = 0; i < lls[1].length; i++) {
-                        lls[0][i] =(float) GridUtil.normalizeLongitude( domain,  tmp[0][i], du[lonIndex] ) ;
+                        lls[0][i] =
+                            (float) GridUtil.normalizeLongitude(domain,
+                                tmp[0][i], du[lonIndex]);
                     }
-                else if(du[lonIndex].isConvertible(CommonUnits.KILOMETER)) {
+                } else if (du[lonIndex].isConvertible(
+                        CommonUnits.KILOMETER)) {
                     for (int i = 0; i < lls[1].length; i++) {
-                        lls[1][i] = (float) LatLonPointImpl.lonNormal(lls[1][i]);
+                        lls[1][i] =
+                            (float) LatLonPointImpl.lonNormal(lls[1][i]);
                     }
                 }
                 mapMaker.addMap(lls);
