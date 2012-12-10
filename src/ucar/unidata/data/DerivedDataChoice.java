@@ -1,25 +1,22 @@
-/**
- * Copyright 1997-2009 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 package ucar.unidata.data;
 
@@ -534,13 +531,16 @@ public class DerivedDataChoice extends ListDataChoice {
             if (boundChoice == null) {
                 unboundOperands.add(op);
                 continue;
-            }  else {
+            } else {
 
                 DataSelection ds0 = boundChoice.getDataSelection();
-                if(ds0 != null) {
-                    Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if(ud != null ){
-                        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, ((Boolean)ud).booleanValue());
+                if (ds0 != null) {
+                    Object ud =
+                        ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if (ud != null) {
+                        dataSelection.putProperty(
+                            DataSelection.PROP_USESTIMEDRIVER,
+                            ((Boolean) ud).booleanValue());
                     }
                 }
             }
@@ -559,12 +559,14 @@ public class DerivedDataChoice extends ListDataChoice {
             if (selected == null) {
                 return null;
             } else {  //yuanho added time
-                DataChoice dc0 = (DataChoice)selected.get(0);
+                DataChoice    dc0 = (DataChoice) selected.get(0);
                 DataSelection ds0 = dc0.getDataSelection();
-                if(ds0 != null) {
-                    Object ud = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if(ud != null && ((Boolean)ud).booleanValue()){
-                        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
+                if (ds0 != null) {
+                    Object ud =
+                        ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if ((ud != null) && ((Boolean) ud).booleanValue()) {
+                        dataSelection.putProperty(
+                            DataSelection.PROP_USESTIMEDRIVER, true);
                     }
                 }
             }
@@ -779,13 +781,19 @@ public class DerivedDataChoice extends ListDataChoice {
                     //have a "result=" in it and then we retrieve the
                     //value of "result" from the interpreter
 
-                    PyObject pyResult = interp.eval(constructedCode);
+                    PyObject pyResult     = interp.eval(constructedCode);
+                    Object   resultObject = null;
+                    if (pyResult.getType().toString().contains("ArrayList")) {
+                        resultObject = pyResult.__tojava__(List.class);
+                    } else {
+                        resultObject = pyResult.__tojava__(visad.Data.class);
+                    }
 
-                    Object resultObject =
-                        pyResult.__tojava__(visad.Data.class);
-                    //Make sure we got the right kind of return value
-                    if ((resultObject != null)
-                            && !(resultObject instanceof Data)) {
+                    if (pyResult.getType().toString().contains("ArrayList")) {
+                        result = (Data) ((List) resultObject).get(0);
+                        //Make sure we got the right kind of return value
+                    } else if ((resultObject != null)
+                               && !(resultObject instanceof Data)) {
                         resultObject = pyResult.__tojava__(DataChoice.class);
                         //If we get back a data choice then we reset our expression to be
                         //"bounddatachoice" and we add the data choice to our selves
@@ -1201,4 +1209,3 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
 }
-
