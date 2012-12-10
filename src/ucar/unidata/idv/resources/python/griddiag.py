@@ -333,7 +333,7 @@ def thte(temp,rh):
   """ Equivalent Potential Temperature from Temperature and Relative
       humidity (requires pressure domain) 
   """
-  return DerivedGridFactory.createPotentialTemperature(temp,rh)
+  return DerivedGridFactory.createEquivalentPotentialTemperature(temp,rh)
 
 def un(V):
   """ North relative u component 
