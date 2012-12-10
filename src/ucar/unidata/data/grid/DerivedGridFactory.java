@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.util.Misc;
 import ucar.visad.UtcDate;
@@ -1273,6 +1274,79 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         return combineGrids(new FieldImpl[] { grid1, grid2, grid3 });
     }
+
+    /**
+     * Combine three Fields into one.  If the grids are on different
+     * time domains, the second is resampled to the domain of the first.
+     *
+     * @param grid1  first grid.  This will be used for the time/space domain
+     * @param grid2  second grid.
+     * @param grid3  third grid.
+     *
+     * @return combined grid.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl[] combineGridsArray(FieldImpl grid1, FieldImpl grid2,
+                                         FieldImpl grid3, FieldImpl grid4)
+            throws VisADException, RemoteException, Exception {
+
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+
+
+        Callable pt       = new Varbar(grid1);
+        Future<FieldImpl> future1   = executor.submit(pt);
+
+        Callable          pt1      = new Varbar(grid2);
+        Future<FieldImpl> future2  = executor.submit(pt1);
+
+        Callable          pt2      = new Varbar(grid3);
+        Future<FieldImpl> future3  = executor.submit(pt2);
+
+        Callable          pt3      = new Varbar(grid4);
+        Future<FieldImpl> future4  = executor.submit(pt3);
+
+        FieldImpl         u      = future1.get();
+        FieldImpl         v      = future2.get();
+        FieldImpl         pw     = future3.get();
+        FieldImpl         s      = future4.get();
+
+        /*
+        FieldImpl wvFI              = null;
+        Set     timeSet = u.getDomainSet();
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            FieldImpl funcFF = null;
+
+            FlatField wvFF =
+                    (FlatField) FieldImpl.combine(new Field[] {
+                            (FlatField) u.getSample(i),
+                            (FlatField) v.getSample(i),
+                            (FlatField) pw.getSample(i),
+                            (FlatField) s.getSample(i),
+                                        }, GridUtil.DEFAULT_SAMPLING_MODE,
+                            GridUtil.DEFAULT_ERROR_MODE, false, false);
+
+            if (i == 0) {  // first time through
+                FunctionType functionType =
+                        new FunctionType(
+                                ((FunctionType) grid1.getType()).getDomain(),
+                                wvFF.getType());
+
+                // make the new FieldImpl for dewpoint
+                // (but as yet empty of data)
+                wvFI = new FieldImpl(functionType, timeSet);
+            }
+
+            wvFI.setSample(i, wvFF, false);
+
+        }
+
+        return wvFI;    */
+        return new FieldImpl[] { u, v, pw, s };
+        //return combineGrids(new FieldImpl[] { u,v,pw,s });
+    }
+
 
     /**
      * Combine two Fields into one.  If the grids are on different
