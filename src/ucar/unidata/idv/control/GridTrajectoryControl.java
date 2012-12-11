@@ -1075,7 +1075,7 @@ public class GridTrajectoryControl extends DrawingControl {
         double[]   timeVals     = timeSet.getDoubles()[0];
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
-        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        SampledSet domain2D      = GridUtil.makeDomain2D((GriddedSet)domain0);
         double[]   ttts         = timeSet.getDoubles()[0];
         boolean    normalizeLon = true;
 
@@ -1086,9 +1086,8 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
-        float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                domain2D);
-        int numPoints = geoVals[0].length;
+        float[][]  geoVals      = getEarthLocationPoints(latIndex, lonIndex, domain2D);
+        int        numPoints    = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
             DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
@@ -1151,13 +1150,11 @@ public class GridTrajectoryControl extends DrawingControl {
      *
      * @param latIndex _more_
      * @param lonIndex _more_
-     * @param domain0 _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public float[][] getEarthLocationPoints(int latIndex, int lonIndex,
-                                            SampledSet domain0)
+    public float[][] getEarthLocationPoints(int latIndex, int lonIndex, SampledSet domain0)
             throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
@@ -1195,8 +1192,8 @@ public class GridTrajectoryControl extends DrawingControl {
             if (glyphs.size() == 0) {
                 return null;
             }
-            //  Gridded3DSet domain =
-            //      gridTrackControl.getGridDataInstance().getDomainSet3D();
+          //  Gridded3DSet domain =
+          //      gridTrackControl.getGridDataInstance().getDomainSet3D();
             Unit[]   du       = domain0.getSetUnits();
             MapMaker mapMaker = new MapMaker();
             for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
@@ -1218,9 +1215,8 @@ public class GridTrajectoryControl extends DrawingControl {
                 mapMaker.addMap(lls);
             }
 
-            float[][][] latlons =
-                GridUtil.findContainedLatLons((GriddedSet) domain0,
-                    mapMaker.getMaps());
+            float[][][] latlons = GridUtil.findContainedLatLons((GriddedSet)domain0,
+                                      mapMaker.getMaps());
             int       num    = latlons[0][0].length;
             float[][] points = new float[3][num];
 
