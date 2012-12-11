@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -25,44 +25,46 @@ import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataContext;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceFactory;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.DerivedDataDescriptor;
-import ucar.unidata.data.DescriptorDataSource;
-
-
-
-import ucar.unidata.idv.*;
-
-
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.ui.DndTree;
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
 
 
-import java.awt.*;
-import java.awt.event.*;
-
-
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-
-
-import javax.swing.tree.*;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 
 
@@ -123,7 +125,7 @@ public class DataTree extends DataSourceHolder {
     String initialSelectedFieldName;
 
     /** Should we sort the tree */
-    boolean doSort = true;
+    boolean doSort = false;
 
     /**
      * Create a DataTree with the given idv reference.
@@ -336,8 +338,9 @@ public class DataTree extends DataSourceHolder {
      */
     private void init(List sources) {
         //      this.tree = this;
-        showIcons = idv.getProperty("idv.ui.datatree.showicons", true);
-        this.tree = new MyTree(this);
+        showIcons   = idv.getProperty("idv.ui.datatree.showicons", true);
+        this.doSort = idv.getProperty("idv.ui.sortchoices", false);
+        this.tree   = new MyTree(this);
         this.tree.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 handleTreeMouseEvent(e);
@@ -996,7 +999,17 @@ public class DataTree extends DataSourceHolder {
             parentNode = treeRoot;
         }
 
-        List         choices                = dataSource.getDataChoices();
+        List choices = dataSource.getDataChoices();
+        if (doSort) {
+            Collections.sort(choices, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    String s1 = o1.toString().toLowerCase();
+                    String s2 = o2.toString().toLowerCase();
+                    return s1.compareTo(s2);
+                }
+            });
+        }
+
         List         nodesToExpand          = new ArrayList();
         List         initialSelectedChoices = null;
 
@@ -1034,7 +1047,7 @@ public class DataTree extends DataSourceHolder {
                 /*
                   System.err.println (choice + " - " +DataCategory.applicableTo(categories,
                   choice.getCategories()) +" choice:" + choice.getCategories());*/
-                if(!(choice instanceof CompositeDataChoice)){
+                if ( !(choice instanceof CompositeDataChoice)) {
                     if ( !DataCategory.applicableTo(categories,
                             choice.getCategories())) {
                         continue;
