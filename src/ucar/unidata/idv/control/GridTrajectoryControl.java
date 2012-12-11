@@ -1075,7 +1075,7 @@ public class GridTrajectoryControl extends DrawingControl {
         double[]   timeVals     = timeSet.getDoubles()[0];
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
-
+        SampledSet domain2D      = GridUtil.makeDomain2D((GriddedSet)domain0);
         double[]   ttts         = timeSet.getDoubles()[0];
         boolean    normalizeLon = true;
 
@@ -1086,7 +1086,7 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
-        float[][]  geoVals      = getEarthLocationPoints(latIndex, lonIndex);
+        float[][]  geoVals      = getEarthLocationPoints(latIndex, lonIndex, domain2D);
         int        numPoints    = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
@@ -1154,7 +1154,7 @@ public class GridTrajectoryControl extends DrawingControl {
      *
      * @throws Exception _more_
      */
-    public float[][] getEarthLocationPoints(int latIndex, int lonIndex)
+    public float[][] getEarthLocationPoints(int latIndex, int lonIndex, SampledSet domain0)
             throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
@@ -1192,9 +1192,9 @@ public class GridTrajectoryControl extends DrawingControl {
             if (glyphs.size() == 0) {
                 return null;
             }
-            Gridded3DSet domain =
-                gridTrackControl.getGridDataInstance().getDomainSet3D();
-            Unit[]   du       = domain.getSetUnits();
+          //  Gridded3DSet domain =
+          //      gridTrackControl.getGridDataInstance().getDomainSet3D();
+            Unit[]   du       = domain0.getSetUnits();
             MapMaker mapMaker = new MapMaker();
             for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
                 float[][] lls = glyph.getLatLons();
@@ -1202,7 +1202,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 if (du[lonIndex].isConvertible(CommonUnit.radian)) {
                     for (int i = 0; i < lls[1].length; i++) {
                         lls[0][i] =
-                            (float) GridUtil.normalizeLongitude(domain,
+                            (float) GridUtil.normalizeLongitude(domain0,
                                 tmp[0][i], du[lonIndex]);
                     }
                 } else if (du[lonIndex].isConvertible(
@@ -1215,7 +1215,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 mapMaker.addMap(lls);
             }
 
-            float[][][] latlons = GridUtil.findContainedLatLons(domain,
+            float[][][] latlons = GridUtil.findContainedLatLons((GriddedSet)domain0,
                                       mapMaker.getMaps());
             int       num    = latlons[0][0].length;
             float[][] points = new float[3][num];
