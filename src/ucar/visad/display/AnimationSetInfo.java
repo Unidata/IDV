@@ -21,9 +21,6 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 import ucar.visad.data.CalendarDateTime;
 
 import visad.DateTime;
@@ -78,10 +75,10 @@ public class AnimationSetInfo {
 
 
     /** Start offset */
-    private double startOffsetMinutes = 0.0;
+    private long startOffsetMinutes = 0l;
 
     /** End offset */
-    private double endOffsetMinutes = 0.0;
+    private long endOffsetMinutes = 0l;
 
     /** Interval time */
     private double intervalMinutes = 15.0;
@@ -157,11 +154,11 @@ public class AnimationSetInfo {
      * @return Rounded value
      */
     public static double roundTo(double roundTo, double seconds) {
-        int roundToSeconds = (int) (roundTo * 60);
+        int roundToSeconds = (int) ((long) roundTo * 60);
         if (roundToSeconds == 0) {
             return seconds;
         }
-        return seconds - ((int) seconds) % roundToSeconds;
+        return seconds - ((long) seconds) % roundToSeconds;
     }
 
 
@@ -199,10 +196,9 @@ public class AnimationSetInfo {
 
         List       dateTimes    = new ArrayList();
 
-        long       now          = (long) (System.currentTimeMillis()
-                                          / 1000.0);
-        double     startSeconds = 0.0;
-        double     endSeconds   = 0.0;
+        long       now          = (long) (System.currentTimeMillis() / 1000l);
+        long       startSeconds = 0l;
+        long       endSeconds   = 0l;
         double[][] dataTimeSet  = null;
 
         //        System.err.println ("makeTimeSet " + baseTimes + " " + displayMaster);
@@ -234,7 +230,7 @@ public class AnimationSetInfo {
                 for (int i = 1; i < dataTimeSet[0].length; i++) {
                     minValue = Math.min(minValue, dataTimeSet[0][i]);
                 }
-                startSeconds = minValue;
+                startSeconds = (long) minValue;
             } else {
                 startSeconds = now;
             }
@@ -250,7 +246,7 @@ public class AnimationSetInfo {
                 for (int i = 1; i < dataTimeSet[0].length; i++) {
                     maxValue = Math.max(maxValue, dataTimeSet[0][i]);
                 }
-                endSeconds = maxValue;
+                endSeconds = (long) maxValue;
             } else {
                 endSeconds = now;
             }
@@ -263,22 +259,22 @@ public class AnimationSetInfo {
 
         if (startMode != TIMEMODE_RELATIVE) {
             startSeconds += startOffsetMinutes * 60;
-            startSeconds = round(startSeconds);
+            startSeconds = (long) round(startSeconds);
         }
         if (endMode != TIMEMODE_RELATIVE) {
             endSeconds += endOffsetMinutes * 60;
             //      double foo = endSeconds;
-            endSeconds = round(endSeconds);
+            endSeconds = (long) round(endSeconds);
             //      System.err.println("before:" + ((int)foo) +" after:" + ((int)endSeconds));
         }
         if (startMode == TIMEMODE_RELATIVE) {
-            startSeconds = endSeconds + startOffsetMinutes * 60;
-            startSeconds = round(startSeconds);
+            startSeconds = endSeconds + (long) startOffsetMinutes * 60;
+            startSeconds = (long) round(startSeconds);
         }
 
         if (endMode == TIMEMODE_RELATIVE) {
-            endSeconds = startSeconds + endOffsetMinutes * 60;
-            endSeconds = round(endSeconds);
+            endSeconds = startSeconds + (long) endOffsetMinutes * 60;
+            endSeconds = (long) round(endSeconds);
         }
 
         //      System.err.println("start:" + startSeconds +" end:" + endSeconds);
@@ -441,7 +437,7 @@ public class AnimationSetInfo {
      * @param value The new value for StartOffsetMinutes
      */
     public void setStartOffsetMinutes(double value) {
-        startOffsetMinutes = value;
+        startOffsetMinutes = (long) value;
     }
 
     /**
@@ -459,7 +455,7 @@ public class AnimationSetInfo {
      * @param value The new value for EndOffsetMinutes
      */
     public void setEndOffsetMinutes(double value) {
-        endOffsetMinutes = value;
+        endOffsetMinutes = (long) value;
     }
 
     /**
