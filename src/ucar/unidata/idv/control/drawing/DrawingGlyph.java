@@ -2209,14 +2209,29 @@ public abstract class DrawingGlyph {
         float[][] rect2d = new float[2][];
         rect2d[IDX_X] = pts[IDX_X];
         rect2d[IDX_Y] = pts[IDX_Y];
-        Gridded2DSet tmp = new Gridded2DSet(mathType2D, rect2d,
-                                            rect2d[0].length);
+
         try {
-            return DelaunayCustom.fill(tmp);
+
+            int[][] tri = DelaunayCustom.fill(rect2d);
+            if (tri == null) return dflt;   // because it is too small
+
+            DelaunayCustom da = new DelaunayCustom(rect2d, tri);
+
+            MathType mathType3D = null;
+          if (isInXYSpace()) {
+              mathType3D = RealTupleType.SpatialCartesian3DTuple;
+          } else if (isInLatLonSpace()) {
+              mathType3D = RealTupleType.LatitudeLongitudeAltitude;
+          }
+
+          return new Irregular3DSet(mathType3D, pts, null, null, null, da);
+
         } catch (VisADException vexc) {
-            System.err.println("error:" + vexc);
+            //System.err.println("error:" + vexc);
             return dflt;
         }
+
+
     }
 
 
