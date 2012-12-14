@@ -234,7 +234,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** for saving favorites */
     private boolean catSelected;
 
-
+    /** ncIdv version **/
+    private String ncIdvVersion;
 
 
     /**
@@ -3114,6 +3115,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         loadDialog.clear();
     }
 
+
     /**
      * This method handles all fo the remapping issues for URL changes related
      * to the Unidata THREDDS server (formally known as motherlode)
@@ -3123,8 +3125,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return ht Contains unpersisted objects with remaped URLs, if needed.
      */
     private Hashtable remapDataSources(Hashtable ht) {
-
-        String ncIdvVersion = (String) ht.get(NCIDV_VERSION);
+        Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
+        ncIdvVersion = (String) ht.get(NCIDV_VERSION);
         ArrayList dataSources    = (ArrayList) ht.get("datasources");
         ArrayList newDataSources = new ArrayList();
         for (int i = 0; i < dataSources.size(); i++) {
@@ -3135,7 +3137,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             // remap urlPaths that point to old unidata TDS ( < 4.3)
             // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
             // and the path likely needs to be updated
-            if (ncIdvVersion == null) {
+            if ((ncIdvVersion == null) && (testTds)) {
                 remappedDataSource =
                 remapOldMotherlodeDatasetUrlPath(dataSource);
             }
@@ -3157,6 +3159,25 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private DataSource remapOldMotherlodeDatasetUrlPath(DataSource dataSource) {
         // this is where the fmrc -> grib magic will happen
+        UnidataTdsUrlRemapper remapper = new UnidataTdsUrlRemapper();
+        // grab dataSource URL
+        if (dataSource instanceof DodsGeoGridDataSource) {
+            ArrayList oldUrls = (ArrayList) dataSource.getDataPaths();
+            String oldUrl = (String) oldUrls.get(0);
+            String[] breakUrl = oldUrl.split("catalog/");
+            String oldUrlPath = breakUrl[1];
+            if (oldUrlPath.contains("latest.xml")) {
+                oldUrlPath = oldUrlPath.split("latest.xml")[0];
+            }
+
+            List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath);
+            if ((newUrlPaths != null) && (newUrlPaths.size() == 1)) {
+                String newUrlPath = newUrlPaths.get(0);
+                String newUrl = oldUrl.replace(oldUrlPath, newUrlPath);
+                dataSource = updatePropsWithRemapUrl(dataSource, newUrl);
+            }
+        }
+
         return dataSource;
     }
 
@@ -3172,9 +3193,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         String                  newPath     = null;
         HashMap<String, String> serverRemap = new HashMap<String, String>();
         String                  oldServer   = "motherlode.ucar.edu/";
-        serverRemap.put(oldServer, "thredds.ucar.edu/");
-        serverRemap.put(oldServer.replace("/", ":8080/"),
+        Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
+
+        if (testTds) {
+            serverRemap.put(oldServer, "thredds-test.ucar.edu/");
+            serverRemap.put(oldServer.replace("/", ":8080/"),
+                    "thredds-test.ucar.edu/");
+            serverRemap.put("thredds.ucar.edu/",
+                    "thredds-test.ucar.edu/");
+
+        } else {
+            serverRemap.put(oldServer, "thredds.ucar.edu/");
+            serverRemap.put(oldServer.replace("/", ":8080/"),
                         "thredds.ucar.edu/");
+        }
         serverRemap.put(oldServer.replace("/", ":8081/"),
                         "thredds-test.ucar.edu/");
         serverRemap.put(oldServer.replace("/", ":9080/"),
@@ -3210,15 +3242,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private DataSource updatePropsWithRemapUrl(DataSource dataSource,
             String newPath) {
-        if (newPath.contains("latest.xml")) {
-            String newHttpPath = CatalogUtil.resolveUrl(newPath,
-                                     null).replace("/dodsC/", "/fileServer/");
-            ((DodsGeoGridDataSource) dataSource).setProperty(
-                "prop.service.http", newHttpPath);
-
+        // if ncIdvVersion is not in bundle, then this will
+        // run again when the datasource UrlPath is checked
+        if  (ncIdvVersion == null) {
+            if ((newPath.contains("latest.xml")) && (!newPath.contains("/thredds/catalog/"))) {
+                String newHttpPath = CatalogUtil.resolveUrl(newPath,
+                                         null).replace("/dodsC/", "/fileServer/");
+                ((DodsGeoGridDataSource) dataSource).setProperty(
+                    "prop.service.http", newHttpPath);
+            }
+            ((DodsGeoGridDataSource) dataSource).setProperty("RESOLVERURL",
+                    newPath);
         }
-        ((DodsGeoGridDataSource) dataSource).setProperty("RESOLVERURL",
-                newPath);
         return dataSource;
     }
 
