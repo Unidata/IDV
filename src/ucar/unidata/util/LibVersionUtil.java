@@ -99,6 +99,19 @@ public class LibVersionUtil {
         return buildInfo;
     }
 
+    public static String getNcidvVersion() {
+        HashMap<String, String> myHash;
+        try {
+            myHash = getBuildInfo();
+            String ncIdvBuildInfo = myHash.get("version") + "-"
+                    + myHash.get("buildDate");
+            return ncIdvBuildInfo;
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
+    }
+
     /**
      * _more_
      *
