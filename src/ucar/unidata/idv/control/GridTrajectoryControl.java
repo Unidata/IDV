@@ -178,13 +178,16 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     FieldImpl s;
 
+    public boolean haveInitialized1 = false;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
     public GridTrajectoryControl() {
         setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        setAttributeFlags(FLAG_DISPLAYUNIT);
+        setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
+                | FLAG_DISPLAYUNIT | FLAG_TIMERANGE);
     }
 
 
@@ -221,6 +224,8 @@ public class GridTrajectoryControl extends DrawingControl {
         /** _more_ */
         private Range lastRange;
 
+        /** _more_ */
+        int trackWidth = 1;
         /**
          * _more_
          */
@@ -230,11 +235,24 @@ public class GridTrajectoryControl extends DrawingControl {
                               | FLAG_SELECTRANGE);
         }
 
+       // public boolean init(List choices)throws VisADException, RemoteException {
+       //     return super.init(choices);
+       // }
+        public boolean getHaveInitialized() {
+            return true;
+        }
         /**
          * _more_
          */
         protected void addToControlContext() {}
 
+        /**
+         * Get the track width property.  Used by persistence
+         * @return  width
+         */
+        protected int getTrackWidth() {
+            return trackWidth;
+        }
         /**
          * _more_
          *
@@ -860,6 +878,11 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl.timesHolder.setManipulable(false);
         gridTrackControl.timesHolder.setVisible(false);
         addDisplayable(gridTrackControl.timesHolder);
+        gridTrackControl.addDisplayable(gridTrackControl.trackDisplay, getAttributeFlags());
+        gridTrackControl.addDisplayable(gridTrackControl.selectRangeDisplay,
+                FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+        gridTrackControl.addDisplayable(gridTrackControl.indicator);
+        gridTrackControl.addDisplayable(gridTrackControl.timesHolder);
         // return setData(dataChoice);
 
         return true;
@@ -867,7 +890,9 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
-
+    public boolean getHaveInitialized() {
+        return true;
+    }
     /**
      * current level
      *
@@ -1120,6 +1145,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         //super.init(fi)
 
+        gridTrackControl.setLineWidth(gridTrackControl.getTrackWidth());
         gridTrackControl.setData(fi);
         Range range = gridTrackControl.getGridDataInstance().getRange(
                           gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
