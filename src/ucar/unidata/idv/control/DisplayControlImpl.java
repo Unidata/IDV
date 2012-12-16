@@ -21,6 +21,8 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.nc2.time.Calendar;
+
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 import ucar.unidata.data.DataCancelException;
@@ -82,6 +84,8 @@ import ucar.unidata.xml.XmlObjectStore;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.CalendarDateTimeSet;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationInfo;
 import ucar.visad.display.AnimationWidget;
@@ -1124,8 +1128,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         }
-
-
 
         //Check if we have been removed
         if (hasBeenRemoved) {
@@ -3787,16 +3789,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //if(this instanceof PlanViewControl) 
             //    System.err.println("Using:" + template);
 
-            Set      s  = getDataTimeSet();
+            Set      s   = getDataTimeSet();
+            Calendar cal = null;
+            if (s instanceof CalendarDateTimeSet) {
+                cal = ((CalendarDateTimeSet) s).getCalendar();
+            }
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
             if (s != null) {
                 FunctionType ft =
                     new FunctionType(((SetType) s.getType()).getDomain(), tt);
                 FieldImpl  fi      = new FieldImpl(ft, s);
                 double[][] samples = s.getDoubles();
+                samples =
+                    Unit.convertTuple(samples, s.getSetUnits(),
+                                      new Unit[] {
+                                          CommonUnit.secondsSinceTheEpoch });
                 for (int i = 0; i < s.getLength(); i++) {
-                    DateTime dt = new DateTime(samples[0][i],
-                                      s.getSetUnits()[0]);
+                    CalendarDateTime dt = new CalendarDateTime(samples[0][i],
+                                              cal);
                     String label =
                         UtcDate.applyTimeMacro(template, dt,
                             getIdv().getPreferenceManager()
@@ -11346,7 +11356,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             for (int i = 0; i < timeArray.length; i++) {
                 timeArray[i] = (DateTime) dateTimes.get(i);
             }
-            set = DateTime.makeTimeSet(timeArray);
+            set = CalendarDateTime.makeTimeSet(timeArray);
         }
         getAnimationWidget().setBaseTimes(set);
     }

@@ -1007,8 +1007,8 @@ public class KmlUtil {
     public static String toBGRHexString(java.awt.Color c) {
         return "#"
                + StringUtil.padRight(
-                   Integer.toHexString(c.getBlue()), 2,
-                   "0") + StringUtil.padRight(
+                Integer.toHexString(c.getBlue()), 2,
+                "0") + StringUtil.padRight(
                        Integer.toHexString(c.getGreen()), 2,
                        "0") + StringUtil.padRight(
                            Integer.toHexString(c.getRed()), 2, "0");

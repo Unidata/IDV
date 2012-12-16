@@ -44,6 +44,8 @@ import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.UtcDate;
+
 import visad.DateTime;
 import visad.Real;
 import visad.RealType;
@@ -65,13 +67,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-
-
+import java.util.*;
 
 
 /**
@@ -263,6 +259,9 @@ public class DataManager {
     /** Maps data source names */
     protected Hashtable dataSourceNameMap = new Hashtable();
 
+    /** Maps parameter name to parameter alias */
+    protected Hashtable<String, List> parameterAliases =
+        new Hashtable<String, List>();
 
     /**
      * Create a new DataManager with the given {@link DataContext}.
@@ -417,8 +416,7 @@ public class DataManager {
                     format = format.replace("dh" + len, "HH:mm");
                     String newValue = value.trim().substring(0, idx + 1) + HH
                                       + ":" + mm;
-                    return visad.DateTime.createDateTime(newValue, format,
-                            timezone);
+                    return UtcDate.createDateTime(newValue, format, timezone);
                 }
 
                 return null;
@@ -507,8 +505,9 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        ucar.grib.GribResourceReader.setGribResourceReader(
-            new ucar.grib.GribResourceReader() {
+
+        ucar.nc2.grib.GribResourceReader.setGribResourceReader(
+            new ucar.nc2.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
                     throws IOException {
                 try {
@@ -528,8 +527,14 @@ public class DataManager {
                 IdvResourceManager.RSC_GRIB1LOOKUPTABLES);
         for (int i = 0; i < grib1Resources.size(); i++) {
             try {
-                ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
-                    grib1Resources.get(i).toString());
+                String grib1TableName = grib1Resources.get(i).toString();
+                File   grib1TableFile = new File(grib1TableName);
+                if (grib1TableFile.exists()) {
+                    ucar.nc2.grib.grib1.tables.Grib1ParamTables
+                        .addParameterTableLookup(grib1TableName);
+                }
+                // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
+                //     grib1Resources.get(i).toString());
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
@@ -539,8 +544,12 @@ public class DataManager {
                 IdvResourceManager.RSC_GRIB2LOOKUPTABLES);
         for (int i = 0; i < grib2Resources.size(); i++) {
             try {
-                ucar.grib.grib2.ParameterTable.addParametersUser(
-                    grib2Resources.get(i).toString());
+                String grib2TableName = grib2Resources.get(i).toString();
+                File   grib2TableFile = new File(grib2TableName);
+                if (grib2TableFile.exists()) {
+                    ucar.grib.grib2.ParameterTable.addParametersUser(
+                        grib2TableName);
+                }
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
@@ -572,6 +581,35 @@ public class DataManager {
                 //                System.err.println ("bad:"+ exc);
             }
         }
+
+        // Init GRIB variable aliases
+        // get the list of property files
+        ResourceCollection variableAliases =
+            resourceManager.getResources(
+                IdvResourceManager.RSC_VARIABLEALIASES);
+        for (int i = 0; i < variableAliases.size(); i++) {
+            try {
+                Properties newAliases = new Properties();
+                newAliases = Misc.readProperties(
+                    (String) variableAliases.get(i).toString(), newAliases,
+                    dataContext.getIdv().getClass());
+                //                System.err.println ("process: " +(String) propertyFiles.get(i));
+                for (Enumeration keys = newAliases.keys();
+                        keys.hasMoreElements(); ) {
+                    String key   = (String) keys.nextElement();
+                    String value = (String) newAliases.get(key);
+                    List<String> aliases = StringUtil.split(value, ",", true,
+                                               true);
+                    if ( !aliases.isEmpty()) {
+                        parameterAliases.put(key, aliases);
+                    }
+                }
+            } catch (IllegalArgumentException iae) {
+                // Ignore this - bad properties
+            }
+        }
+
+
 
     }
 
@@ -706,8 +744,8 @@ public class DataManager {
         if (properties != null) {
             for (java.util.Enumeration keys = properties.keys();
                     keys.hasMoreElements(); ) {
-                String  key      = (String) keys.nextElement();
-                String  value    = (String) properties.get(key);
+                String key   = (String) keys.nextElement();
+                String value = (String) properties.get(key);
                 Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
                                        value, new String[] { ATTR_NAME,
                         key });
@@ -806,7 +844,7 @@ public class DataManager {
 
 
                 Hashtable properties = new Hashtable();
-                NodeList  props      = XmlUtil.getElements(datasourceNode,
+                NodeList props = XmlUtil.getElements(datasourceNode,
                                      TAG_PROPERTY);
                 for (int propIdx = 0; propIdx < props.getLength();
                         propIdx++) {
@@ -1730,6 +1768,14 @@ public class DataManager {
         return new Boolean(v).booleanValue();
     }
 
+    /**
+     * Get the aliases for a parameter name
+     * @param paramName  name of the parameter
+     * @return a list of aliases or null
+     */
+    public List<String> getParameterAliases(String paramName) {
+       return parameterAliases.get(paramName);
+    }
 
     /**
      *  Add in the AddeURLStreamHandler

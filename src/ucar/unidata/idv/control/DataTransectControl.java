@@ -164,7 +164,7 @@ public class DataTransectControl extends CrossSectionControl {
     private Component doMakeWidthSlider() {
         final JLabel lineWidthLbl =
             GuiUtils.getFixedWidthLabel(StringUtil.padLeft(""
-                + getLineWidth(), 3));
+                    + getLineWidth(), 3));
         ChangeListener listener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 JSlider slide = (JSlider) e.getSource();

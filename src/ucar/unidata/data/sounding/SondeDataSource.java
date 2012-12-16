@@ -34,6 +34,7 @@ import ucar.unidata.data.*;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
+import ucar.visad.data.CalendarDateTime;
 
 
 import visad.*;
@@ -148,7 +149,7 @@ public class SondeDataSource extends TrackDataSource {
             times[i] = adapter.getStartTime();
         }
 
-        FieldImpl fi = new FieldImpl(fiType, DateTime.makeTimeSet(times));
+        FieldImpl fi = new FieldImpl(fiType, CalendarDateTime.makeTimeSet(times));
         for (int i = 0; i < tracks.size(); i++) {
             FieldImpl data = (FieldImpl) tracks.get(i);
             fi.setSample(i, data, false);

@@ -695,4 +695,12 @@
     <resource location="%APPPATH%/gempakparamtable.tbl"/>
   </resources>
 
+<!-- Where to find grib variable name lookup tables -->
+  <resources name="idv.resource.variablealiases">
+    <resource location="%USERPATH%/varaliases.tbl"/>
+    <resource location="%SITEPATH%/varaliases.tbl"/>
+    <resource location="%APPPATH%/varaliases.tbl"/>
+    <resource location="%IDVPATH%/varaliases.tbl"/>
+  </resources>
+
 </resourcebundle>

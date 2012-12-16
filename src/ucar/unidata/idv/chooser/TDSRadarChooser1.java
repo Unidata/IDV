@@ -31,7 +31,8 @@ import thredds.catalog.XMLEntityResolver;
 
 import ucar.nc2.dt.StationImpl;
 
-import ucar.nc2.thredds.TDSRadarDatasetCollection;
+import ucar.unidata.data.radar.TDSRadarDatasetCollection;
+
 import ucar.nc2.units.DateUnit;
 
 import ucar.unidata.data.radar.RadarQuery;

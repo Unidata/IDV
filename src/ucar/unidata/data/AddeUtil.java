@@ -269,7 +269,7 @@ public final class AddeUtil {
                                     + ":" + StringUtil.padZero(minutes, 2)
                                     + ":00";
                 try {
-                    DateTime dt = DateTime.createDateTime(dateString,
+                    DateTime dt = UtcDate.createDateTime(dateString,
                                       "yyyy-MM-dd HH:mm:ss");
                     alltimes.add(dt);
                 } catch (VisADException ve) {

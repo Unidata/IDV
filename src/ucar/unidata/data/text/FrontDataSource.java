@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -28,55 +28,42 @@ import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DataSourceImpl;
-
 import ucar.unidata.data.DirectDataChoice;
-
-
 import ucar.unidata.data.FilesDataSource;
-
 import ucar.unidata.idv.control.DrawingControl;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.FrontGlyph;
 import ucar.unidata.idv.control.drawing.HighLowGlyph;
-
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.xml.XmlUtil;
 
-
+import ucar.visad.UtcDate;
 import ucar.visad.display.FrontDrawer;
 
-
-import visad.*;
-
+import visad.Data;
+import visad.DateTime;
+import visad.VisADException;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 
 import java.rmi.RemoteException;
 
 import java.text.SimpleDateFormat;
 
-
-
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 
 
@@ -85,7 +72,6 @@ import javax.swing.event.*;
  * A class for handling text (and HTML) classes
  *
  * @author IDV development team
- * @version $Revision: 1.15 $
  */
 public class FrontDataSource extends FilesDataSource {
 
@@ -456,7 +442,7 @@ public class FrontDataSource extends FilesDataSource {
                     //529 PM EST WED DEC 27 2006                                                       
                     if (timeToks.size() == 7) {
                         try {
-                            baseTime = DateTime.createDateTime(ts,
+                            baseTime = UtcDate.createDateTime(ts,
                                     "hmm a z EEE MMM dd yyyy");
                         } catch (Exception exc) {
                             errors.add("Could not parse base time:" + ts);
@@ -544,7 +530,7 @@ public class FrontDataSource extends FilesDataSource {
                              + ts;
                     }
                 }
-                DateTime dttm = DateTime.createDateTime(ts, format);
+                DateTime dttm = UtcDate.createDateTime(ts, format);
                 validTime = new Date(1000 * (long) dttm.getValue());
                 //              System.err.println("Time:" +validTime);
             } catch (Exception exc) {

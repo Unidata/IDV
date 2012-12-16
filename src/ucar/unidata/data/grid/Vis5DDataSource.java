@@ -44,6 +44,7 @@ import ucar.unidata.data.GeoSelection;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+import ucar.visad.data.CalendarDateTime;
 
 
 
@@ -227,7 +228,7 @@ public class Vis5DDataSource extends GridDataSource {
         FieldImpl grid     = getV5DData();
         try {
             if (GridUtil.isTimeSequence(grid)) {
-                DateTime[] times = DateTime.timeSetToArray(
+                DateTime[] times = CalendarDateTime.timeSetToArray(
                                        (Gridded1DSet) GridUtil.getTimeSet(
                                            grid));
                 timeList = Misc.toList(times);
@@ -311,7 +312,7 @@ public class Vis5DDataSource extends GridDataSource {
                     samplingSet = new SingletonSet(new RealTuple(new Real[] {
                         dateTimes[0] }));
                 } else {
-                    samplingSet = DateTime.makeTimeSet(dateTimes);
+                    samplingSet = CalendarDateTime.makeTimeSet(dateTimes);
                 }
                 FieldImpl newFI =
                 // Until this works, use W_A

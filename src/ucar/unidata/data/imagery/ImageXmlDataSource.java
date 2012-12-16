@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -25,52 +25,64 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import ucar.unidata.data.*;
-
+import ucar.unidata.data.BadDataException;
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.FilesDataSource;
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
-
-
-
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
-
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.ShapefileAdapter;
+import ucar.visad.data.CalendarDateTime;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded2DSet;
+import visad.Gridded3DSet;
+import visad.Integer1DSet;
+import visad.Linear2DSet;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SampledSet;
+import visad.SingletonSet;
+import visad.VisADException;
 
 import visad.data.DefaultFamily;
-//import visad.data.jai.JAIForm;
-import visad.data.gif.GIFForm;
-
-import visad.util.DataUtility;
 
 import visad.util.ImageHelper;
 
-import java.awt.*;
-import java.awt.image.*;
 
-import java.io.*;
+import java.awt.Image;
+import java.awt.Toolkit;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
-
-import javax.swing.*;
 
 
 /**
@@ -306,8 +318,9 @@ public class ImageXmlDataSource extends FilesDataSource {
             shapeCategories = DataCategory.parseCategories("GIS-SHAPEFILE",
                     false);
             Element root = XmlUtil.getRoot(xmlFile, getClass());
-            if(root == null) {
-                throw new IllegalArgumentException("Could not find image xml file:" + xmlFile);
+            if (root == null) {
+                throw new IllegalArgumentException(
+                    "Could not find image xml file:" + xmlFile);
             }
             String dataSourceName = XmlUtil.getAttribute(root, ATTR_NAME,
                                         (String) null);
@@ -389,7 +402,7 @@ public class ImageXmlDataSource extends FilesDataSource {
      * Process the xml ximg node
      *
      * @param child The node
-     * @param cdc The data choice to add to. May be null, 
+     * @param cdc The data choice to add to. May be null,
      *            if so add top level data choice
      *
      * @throws Exception On badness_
@@ -759,7 +772,8 @@ public class ImageXmlDataSource extends FilesDataSource {
                     domain = (timesArray.length == 1)
                              ? (SampledSet) new SingletonSet(
                                  new RealTuple(new Real[] { timesArray[0] }))
-                             : (SampledSet) DateTime.makeTimeSet(timesArray);
+                             : (SampledSet) CalendarDateTime.makeTimeSet(
+                                 timesArray);
                     domainType  = RealType.Time;
                     timeIndices = domain.doubleToIndex(new double[][] {
                         timeVals

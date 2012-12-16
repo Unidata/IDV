@@ -111,7 +111,7 @@ argument -Dfoo=bar) -->
 
         <copy  file="${libsrc}/jythonlib.jar" todir="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <!--unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/-->
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/poi.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
@@ -811,7 +811,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
     <target name="unidatautil" depends="init,clean" >
         <delete dir="${tmpjardir}"/>
         <mkdir dir="${tmpjardir}"/>
-        <unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/>
+        <!--unjar src="${libsdir}/unidatacommon.jar" dest="${tmpjardir}"/-->
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <javac
             classpath="${classpath}"

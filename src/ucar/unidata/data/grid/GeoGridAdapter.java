@@ -48,6 +48,7 @@ import ucar.unidata.util.WrapperException;
 
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
@@ -108,7 +109,6 @@ import java.util.TreeMap;
  * for parameter names and time(s) desired.
  *
  * @author Don Murray
- * @version $Revision: 1.112 $ $Date: 2007/08/20 22:33:38 $
  */
 public class GeoGridAdapter {
 
@@ -1387,14 +1387,14 @@ public class GeoGridAdapter {
 
         Trace.call1("GeoGridAdapter.makeSequence");
         try {
-            final TreeMap        gridMap  = new TreeMap();
-            GridCoordSystem      geoSys   = geoGrid.getCoordinateSystem();
-            CoordinateAxis1DTime timeAxis = geoSys.getTimeAxis1D();
-            int[]                times;
+            final TreeMap          gridMap  = new TreeMap();
+            GridCoordSystem        geoSys   = geoGrid.getCoordinateSystem();
+            CoordinateAxis1DTime   timeAxis = geoSys.getTimeAxis1D();
+            int[]                  times;
 
-            java.util.Date[]     dates = null;
+            List<CalendarDateTime> datetimes = null;
             if (timeAxis != null) {
-                dates = timeAxis.getTimeDates();
+                datetimes = DataUtil.makeDateTimes(timeAxis);
             }
 
             if (timeAxis == null) {
@@ -1420,10 +1420,10 @@ public class GeoGridAdapter {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                DateTime time;
+                CalendarDateTime time;
                 if (times[i] >= 0) {
                     if (timeAxis != null) {
-                        time = new DateTime(dates[times[i]]);
+                        time = datetimes.get(times[i]);
                     } else {
                         time = getBaseTime();  // will be null if not found
                         if (time == null) {
@@ -1432,7 +1432,7 @@ public class GeoGridAdapter {
                             } else {
                                 // return current time.
                                 // probably not good, but what the hey.
-                                time = new DateTime();
+                                time = new CalendarDateTime();
                             }
                         }
                     }
@@ -1447,9 +1447,9 @@ public class GeoGridAdapter {
                                              + dataSource.toString();
 
 
-                    final int      theTimeIndex     = times[i];
-                    final DateTime theTime          = time;
-                    final int[]    theMemberIndices = memberIndices;
+                    final int              theTimeIndex     = times[i];
+                    final CalendarDateTime theTime          = time;
+                    final int[]            theMemberIndices = memberIndices;
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             readTimeStep(theTimeIndex, theTime, readLabel,
@@ -1483,11 +1483,11 @@ public class GeoGridAdapter {
                                     ? (SampledSet) new SingletonSet(
                                         new RealTuple(
                                             new Real[] {
-                                                (DateTime) gridMap
+                                                (CalendarDateTime) gridMap
                                                     .firstKey() }))
-                                    : (SampledSet) DateTime.makeTimeSet(
-                                        (DateTime[]) keySet.toArray(
-                                            new DateTime[keySet.size()]));
+                                    : (SampledSet) CalendarDateTime.makeTimeSet(
+                                        (CalendarDateTime[]) keySet.toArray(
+                                            new CalendarDateTime[keySet.size()]));
                 int i = 0;
 
                 for (Iterator iter = keySet.iterator(); iter.hasNext(); ) {
@@ -1530,9 +1530,10 @@ public class GeoGridAdapter {
      *
      * @throws Exception On badness
      */
-    private void readTimeStep(int timeIndex, DateTime time, String readLabel,
-                              TreeMap gridMap, Range[][] sampleRanges,
-                              boolean lazyEvaluation, int[] memberIndices)
+    private void readTimeStep(int timeIndex, CalendarDateTime time,
+                              String readLabel, TreeMap gridMap,
+                              Range[][] sampleRanges, boolean lazyEvaluation,
+                              int[] memberIndices)
             throws Exception {
         Dimension    ensDim = geoGrid.getEnsembleDimension();
         Gridded1DSet ensSet = null;
@@ -1830,13 +1831,14 @@ public class GeoGridAdapter {
      *
      * @throws VisADException  problem creating VisAD object
      */
-    private DateTime getBaseTime() throws VisADException {
-        DateTime time = null;
+    private CalendarDateTime getBaseTime() throws VisADException {
+        CalendarDateTime time = null;
         if (ncFile != null) {
             Variable timeVar = ncFile.findVariable("base_time");
             if (timeVar != null) {  // found it
                 try {
-                    time = new DateTime(makeReal(timeVar, RealType.Time));
+                    time = new CalendarDateTime(
+                        new DateTime(makeReal(timeVar, RealType.Time)));
                 } catch (VisADException ve) {}
             }
         }

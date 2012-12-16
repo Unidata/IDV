@@ -1494,7 +1494,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         endDay   = day + " 23:59:59";
                         start = DateTime.createDateTime(startDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
-                        end = DateTime.createDateTime(endDay,
+                        end = UtcDate.createDateTime(endDay,
                                 DateTime.DEFAULT_TIME_FORMAT);
                         aii.setStartDate(new Date((long) (start
                             .getValue(CommonUnit
@@ -1607,30 +1607,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         AddeImageInfo aii =
                             (AddeImageInfo) desc.getImageInfo().clone();
                         setBandInfo(dataChoice, aii);
-                        /*
-                        BandInfo bi = (BandInfo) dataChoice.getId();
-                        List<BandInfo> bandInfos =
-                            (List<BandInfo>) getProperty(PROP_BANDINFO,
-                                (Object) null);
-                        boolean hasBand = true;
-                        //If this data source has been changed after we have create a display
-                        //then the possibility exists that the bandinfo contained by the incoming
-                        //data choice might not be valid. If it isn't then default to the first
-                        //one in the list
-                        if (bandInfos != null) {
-                            hasBand = bandInfos.contains(bi);
-                            if ( !hasBand) {
-                                //                                System.err.println("has band = " + bandInfos.contains(bi));
-                            }
-                            if ( !hasBand && (bandInfos.size() > 0)) {
-                                bi = bandInfos.get(0);
-                            } else {
-                                //Not sure what to do here.
-                            }
-                        }
-                        aii.setBand("" + bi.getBandNumber());
-                        aii.setUnit(bi.getPreferredUnit());
-                        */
                         desc.setImageInfo(aii);
                         desc.setSource(aii.getURLString());
                     }

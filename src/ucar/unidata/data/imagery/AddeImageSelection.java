@@ -12,6 +12,7 @@ import ucar.unidata.util.Format;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
 import ucar.unidata.util.TwoFacedObject;
 
 //~--- JDK imports ------------------------------------------------------------

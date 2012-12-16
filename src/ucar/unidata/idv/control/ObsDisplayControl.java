@@ -44,6 +44,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
 
 
 
@@ -401,7 +402,7 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         DateTime[] times =
             (DateTime[]) timeValues.toArray(new DateTime[timeValues.size()]);
         FieldImpl newField = new FieldImpl((FunctionType) obs.getType(),
-                                           DateTime.makeTimeSet(times));
+                                           CalendarDateTime.makeTimeSet(times));
         for (int i = 0; i < timeFields.size(); i++) {
             newField.setSample(i, (FieldImpl) timeFields.get(i), false);
         }

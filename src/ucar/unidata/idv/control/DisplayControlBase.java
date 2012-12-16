@@ -122,7 +122,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-
 /**
  * Some display control oriented utilities
  * @author IDV development team

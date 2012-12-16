@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,81 +23,106 @@ package ucar.visad;
 
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
-
-import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
-
-import ucar.visad.data.*;
 import ucar.visad.data.AreaImageFlatField;
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.display.ColorScaleInfo;
-
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
 
-
-import visad.*;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.Delaunay;
+import visad.DisplayImpl;
+import visad.DisplayRenderer;
+import visad.DoubleSet;
+import visad.ErrorEstimate;
+import visad.Field;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FloatSet;
+import visad.FunctionType;
+import visad.Gridded2DSet;
+import visad.Gridded3DSet;
+import visad.GriddedSet;
+import visad.Integer1DSet;
+import visad.IntegerNDSet;
+import visad.IntegerSet;
+import visad.Irregular1DSet;
+import visad.Irregular2DSet;
+import visad.Irregular3DSet;
+import visad.IrregularSet;
+import visad.Linear1DSet;
+import visad.Linear2DSet;
+import visad.LinearNDSet;
+import visad.LinearSet;
+import visad.MathType;
+import visad.MouseBehavior;
+import visad.ProjectionControl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SampledSet;
+import visad.Set;
+import visad.SetType;
+import visad.SingletonSet;
+import visad.Tuple;
+import visad.TupleType;
+import visad.TypeException;
+import visad.UnimplementedException;
+import visad.Unit;
+import visad.UnitException;
+import visad.VisADException;
+import visad.VisADRay;
 
 import visad.browser.Convert;
 
 import visad.data.CachedFlatField;
-import visad.data.DataRange;
-
 import visad.data.netcdf.Plain;
-
 import visad.data.units.NoSuchUnitException;
 
-import visad.georef.*;
-
-import visad.georef.EarthLocation;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
+import visad.georef.TrivialMapProjection;
 
-import visad.java2d.*;
-
-import visad.java3d.*;
+import visad.java3d.DisplayRendererJ3D;
+import visad.java3d.VisADCanvasJ3D;
 
 import visad.jmet.MetUnits;
 
-import visad.util.*;
-
 import visad.util.DataUtility;
-
-import java.awt.GraphicsConfigTemplate;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
+import visad.util.ImageHelper;
 
 
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.*;
+import java.awt.image.ColorModel;
+import java.awt.image.PixelGrabber;
 
 import java.io.IOException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
-
 import java.rmi.RemoteException;
-
-import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.media.j3d.*;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.View;
 
-import javax.vecmath.*;
+import javax.vecmath.Point3d;
 
 
 
@@ -123,7 +148,7 @@ public final class Util {
     private static int typeCnt = 0;
 
     /** RGBA names */
-    private static String[] rgbaNames = {"Red", "Green", "Blue", "Alpha"};
+    private static String[] rgbaNames = { "Red", "Green", "Blue", "Alpha" };
 
     /**
      * Default Constructor
@@ -2711,7 +2736,7 @@ public final class Util {
      * @return earth location
      *
      *
-     * @throws Exception problem creating earth location	
+     * @throws Exception problem creating earth location
      */
     public static EarthLocation makeEarthLocation(double lat, double lon)
             throws Exception {
@@ -2729,7 +2754,7 @@ public final class Util {
      * @return earth location
      *
      *
-     * @throws Exception problem creating earth location	
+     * @throws Exception problem creating earth location
      */
     public static EarthLocation makeEarthLocation(LatLonPoint llp)
             throws Exception {
@@ -2959,6 +2984,7 @@ public final class Util {
      * for any alhpa greater than the given threshold. Do nothing if threshold<0
      *   value and we turn the other values into nan-s
      * @param makeAlpha  if true, make an alpha channel as well
+     * @param incNames  if true, make new names
      * @return a FlatField representation of the image
      *
      * @throws IOException  problem reading the image
@@ -3054,15 +3080,15 @@ public final class Util {
         //        System.err.println(alphaThreshold +" hasAlpha:" + hasAlpha +" make alpha:" + makeAlpha +" cnt:" + alphaCnt);
 
         //System.out.println("opaque = " + opaque);
-        String [] rtNames;
+        String[] rtNames;
         if (incNames) {
-        	rtNames = new String[rgbaNames.length];
-        	int cnt = typeCnt++;
-        	for (int i = 0; i < rtNames.length; i++) {
-        		rtNames[i] = rgbaNames[i]+"_"+cnt;
-        	}
+            rtNames = new String[rgbaNames.length];
+            int cnt = typeCnt++;
+            for (int i = 0; i < rtNames.length; i++) {
+                rtNames[i] = rgbaNames[i] + "_" + cnt;
+            }
         } else {
-        	rtNames = rgbaNames;
+            rtNames = rgbaNames;
         }
 
         // build FlatField
@@ -3128,17 +3154,17 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * Make a map projection from the bounds
      *
-     * @param lat1 _more_
-     * @param lon1 _more_
-     * @param lat2 _more_
-     * @param lon2 _more_
-     * @param makeSquare _more_
+     * @param lat1  min latitude
+     * @param lon1  min longitude
+     * @param lat2  max latitude
+     * @param lon2  max longitude
+     * @param makeSquare  if true, normalize to a square
      *
-     * @return _more_
+     * @return  the MapProjection
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem making the projection or invalid input
      */
     public static MapProjection makeMapProjection(double lat1, double lon1,
             double lat2, double lon2, boolean makeSquare)
@@ -3228,21 +3254,34 @@ public final class Util {
             argument = parseUnit(value.toString());
         } else if (paramType.equals(ColorScaleInfo.class)) {
             argument = new ColorScaleInfo(value.toString(), true);
-        } else if(paramType.equals(EarthLocation.class)) {
-            List<String> toks = ucar.unidata.util.StringUtil.split(value.toString(), ",",true, true);
-            if(toks.size()!=2) throw new IllegalArgumentException("Bad EarthLocation value:" + value);
+        } else if (paramType.equals(EarthLocation.class)) {
+            List<String> toks =
+                ucar.unidata.util.StringUtil.split(value.toString(), ",",
+                    true, true);
+            if (toks.size() != 2) {
+                throw new IllegalArgumentException("Bad EarthLocation value:"
+                        + value);
+            }
             double lat = Double.parseDouble(toks.get(0));
             double lon = Double.parseDouble(toks.get(1));
-            EarthLocation earthLocation = ucar.visad.Util.makeEarthLocation(lat,lon);
-            argument  = earthLocation;
-        } else if(paramType.equals(RealTuple.class) && (name.endsWith("StartPoint") || name.endsWith("EndPoint"))) {
-            List<String> toks = ucar.unidata.util.StringUtil.split(value.toString(), ",",true, true);
-            if(toks.size()!=2) throw new IllegalArgumentException("Bad EarthLocation value:" + value);
+            EarthLocation earthLocation =
+                ucar.visad.Util.makeEarthLocation(lat, lon);
+            argument = earthLocation;
+        } else if (paramType.equals(RealTuple.class)
+                   && (name.endsWith("StartPoint")
+                       || name.endsWith("EndPoint"))) {
+            List<String> toks =
+                ucar.unidata.util.StringUtil.split(value.toString(), ",",
+                    true, true);
+            if (toks.size() != 2) {
+                throw new IllegalArgumentException("Bad EarthLocation value:"
+                        + value);
+            }
             double lat = Double.parseDouble(toks.get(0));
             double lon = Double.parseDouble(toks.get(1));
-            argument = new RealTuple(
-                    RealTupleType.SpatialEarth3DTuple,
-                    new double[] {lon,lat,0.0 });
+            argument = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                                     new double[] { lon,
+                    lat, 0.0 });
         }
 
         if (argument != null) {
@@ -3277,7 +3316,7 @@ public final class Util {
                 if (obj instanceof DateTime) {
                     dttm = (DateTime) obj;
                 } else if (obj instanceof Date) {
-                    dttm = new DateTime((Date) obj);
+                    dttm = new CalendarDateTime((Date) obj);
                 } else {
                     throw new IllegalArgumentException("Unknown date type:"
                             + obj);
@@ -3322,7 +3361,7 @@ public final class Util {
         if (obj instanceof DateTime) {
             dttm = (DateTime) obj;
         } else if (obj instanceof Date) {
-            dttm = new DateTime((Date) obj);
+            dttm = new CalendarDateTime((Date) obj);
         } else {
             throw new IllegalArgumentException("Unknown date type:" + obj);
         }
@@ -3464,7 +3503,7 @@ public final class Util {
      */
     public static Set makeTimeSet(List times)
             throws VisADException, RemoteException {
-        return DateTime.makeTimeSet(
+        return CalendarDateTime.makeTimeSet(
             (DateTime[]) times.toArray(new DateTime[times.size()]));
     }
 
@@ -3757,11 +3796,11 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * Check if these are earth coordinates
      *
-     * @param position _more_
+     * @param position  the position
      *
-     * @return _more_
+     * @return true if earth coordinates
      */
     public static boolean isEarthCoordinates(RealTuple position) {
         RealTupleType rttype = (RealTupleType) position.getType();
@@ -3777,10 +3816,10 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Set the globe radious based on the position
      *
-     * @param position _more_
-     * @param radius _more_
+     * @param position the position
+     * @param radius  the radius
      */
     public static void setGlobeRadius(float[] position, float radius) {
         float  x      = position[0];

@@ -436,6 +436,10 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         new XmlIdvResource("idv.resource.publishertypes", "Publisher Types",
                            "publishertypes\\.xml$");
 
+    /** Variable aliases */
+     public static final IdvResource RSC_VARIABLEALIASES =
+     new IdvResource("idv.resource.variablealiases", "Variable aliases",
+     ".*varaliases.\\.tbl$");
 
     /** Maps location table full name  to table */
     private Hashtable locationFullNameMap = new Hashtable();
@@ -1313,7 +1317,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
             }
             if (macroValues[i].length() > 0) {
                 path = StringUtil.replace(path, "%" + macroNames[i] + "%",
-                                          macroValues[i]);
+                        macroValues[i]);
             }
         }
         //if(printit)   System.err.println ("\tafter:" + path);

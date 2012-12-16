@@ -25,6 +25,7 @@ import ucar.unidata.beans.*;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.visad.data.CalendarDateTime;
 import ucar.visad.display.AnimationInfo;
 
 
@@ -1116,7 +1117,7 @@ public class Animation extends Displayable {
         }
         try {
             if (timeSet instanceof Gridded1DSet) {
-                return DateTime.timeSetToArray((Gridded1DSet) timeSet);
+                return CalendarDateTime.timeSetToArray((Gridded1DSet) timeSet);
             } else if (timeSet instanceof SingletonSet) {
                 return new DateTime[] { new DateTime(
                     (Real) ((SingletonSet) timeSet).getData().getComponent(

@@ -27,7 +27,6 @@ package ucar.unidata.view.geoloc;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
-
 import visad.*;
 
 import java.awt.*;

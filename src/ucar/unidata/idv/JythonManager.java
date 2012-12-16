@@ -103,7 +103,6 @@ import javax.swing.text.*;
 
 
 
-
 /**
  * Manages  jython related functionality:<ul>
  * <li> The set of jtyhon interpreters used in the app.

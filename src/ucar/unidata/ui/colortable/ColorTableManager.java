@@ -523,7 +523,7 @@ public class ColorTableManager extends ResourceManager {
                 v = table[ci][i] * 255.0f;
                 line = StringUtil.replace(line, names[ci],
                                           StringUtil.padLeft("" + (int) v,
-                                              3));
+                                                  3));
             }
             c.append(line);
             c.append("\n");
