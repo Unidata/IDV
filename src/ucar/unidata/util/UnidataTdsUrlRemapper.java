@@ -56,7 +56,6 @@ public class UnidataTdsUrlRemapper {
 
     private List<UrlRemapperBean> readUrlRemapFile(String path) {
         java.util.List<UrlRemapperBean> beans = new ArrayList<UrlRemapperBean>(1000);
-        System.out.printf("reading table %s%n", path);
         InputStream is = null;
 
         try {
