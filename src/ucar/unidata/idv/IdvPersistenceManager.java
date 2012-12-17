@@ -3194,6 +3194,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         HashMap<String, String> serverRemap = new HashMap<String, String>();
         String                  oldServer   = "motherlode.ucar.edu/";
         Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
+        if (testTds) {
+            LogUtil.printMessage("Forcing TDS 4.3 connections to get data.");
+        }
 
         if (testTds) {
             serverRemap.put(oldServer, "thredds-test.ucar.edu/");
@@ -3244,7 +3247,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             String newPath) {
         // if ncIdvVersion is not in bundle, then this will
         // run again when the datasource UrlPath is checked
-        if  (ncIdvVersion == null) {
+        Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
+        if  ((ncIdvVersion == null) || (testTds)) {
             if ((newPath.contains("latest.xml")) && (!newPath.contains("/thredds/catalog/"))) {
                 String newHttpPath = CatalogUtil.resolveUrl(newPath,
                                          null).replace("/dodsC/", "/fileServer/");
