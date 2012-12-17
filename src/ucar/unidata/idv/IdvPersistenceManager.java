@@ -21,12 +21,14 @@
 package ucar.unidata.idv;
 
 
+import org.apache.batik.dom.util.HashTable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceResults;
 import ucar.unidata.data.grid.DodsGeoGridDataSource;
 import ucar.unidata.data.grid.GridDataSource;
@@ -3134,51 +3136,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             // update motherlode references to thredds
             // this should happen regardless of version of ncIDV
             DataSource remappedDataSource = remapMotherlodeToThredds(dataSource);
-            // remap urlPaths that point to old unidata TDS ( < 4.3)
-            // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
-            // and the path likely needs to be updated
-            if ((ncIdvVersion == null) && (testTds)) {
-                remappedDataSource =
-                remapOldMotherlodeDatasetUrlPath(dataSource);
-            }
+
             newDataSources.add(remappedDataSource);
         }
         ht.put("datasources", newDataSources);
 
         return ht;
-    }
-
-    /**
-     * This method addresses changes to dataset urlPath changes between
-     * Unidata TDS 4.2 and 4.3. In particular, things like naming of the
-     * best datasets, frmc collections moving to grib collects, etc.
-     *
-     * @param dataSource DataSource object that may need to be updated
-     *
-     * @return updated DataSource
-     */
-    private DataSource remapOldMotherlodeDatasetUrlPath(DataSource dataSource) {
-        // this is where the fmrc -> grib magic will happen
-        UnidataTdsUrlRemapper remapper = new UnidataTdsUrlRemapper();
-        // grab dataSource URL
-        if (dataSource instanceof DodsGeoGridDataSource) {
-            ArrayList oldUrls = (ArrayList) dataSource.getDataPaths();
-            String oldUrl = (String) oldUrls.get(0);
-            String[] breakUrl = oldUrl.split("catalog/");
-            String oldUrlPath = breakUrl[1];
-            if (oldUrlPath.contains("latest.xml")) {
-                oldUrlPath = oldUrlPath.split("latest.xml")[0];
-            }
-
-            List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath);
-            if ((newUrlPaths != null) && (newUrlPaths.size() == 1)) {
-                String newUrlPath = newUrlPaths.get(0);
-                String newUrl = oldUrl.replace(oldUrlPath, newUrlPath);
-                dataSource = updatePropsWithRemapUrl(dataSource, newUrl);
-            }
-        }
-
-        return dataSource;
     }
 
     /**
@@ -3208,12 +3171,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         } else {
             serverRemap.put(oldServer, "thredds.ucar.edu/");
             serverRemap.put(oldServer.replace("/", ":8080/"),
-                        "thredds.ucar.edu/");
+                    "thredds.ucar.edu/");
         }
         serverRemap.put(oldServer.replace("/", ":8081/"),
-                        "thredds-test.ucar.edu/");
+                "thredds-test.ucar.edu/");
         serverRemap.put(oldServer.replace("/", ":9080/"),
-                        "thredds-dev.ucar.edu/");
+                "thredds-dev.ucar.edu/");
 
         if (dataSource instanceof DodsGeoGridDataSource) {
             ArrayList oldPaths = (ArrayList) dataSource.getDataPaths();
@@ -3224,7 +3187,16 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 if (oldPath.contains(oldServerName.getKey())) {
                     newPath = oldPath.replace(oldServerName.getKey(),
                             oldServerName.getValue());
-                    dataSource = updatePropsWithRemapUrl(dataSource, newPath);
+                    // remap urlPaths that point to old unidata TDS ( < 4.3)
+                    // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
+                    // and the path likely needs to be updated
+                    //if ((ncIdvVersion == null) && (testTds)) {
+                    if (testTds) {
+                        dataSource =
+                                remapOldMotherlodeDatasetUrlPath(dataSource, newPath);
+                    } else {
+                        dataSource = updatePropsWithRemapUrl(dataSource, newPath);
+                    }
                     break;
                 }
             }
@@ -3232,6 +3204,57 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         return dataSource;
     }
+
+    /**
+     * This method addresses changes to dataset urlPath changes between
+     * Unidata TDS 4.2 and 4.3. In particular, things like naming of the
+     * best datasets, frmc collections moving to grib collects, etc.
+     *
+     * @param dataSource DataSource object that may need to be updated
+     *
+     * @return updated DataSource
+     */
+    private DataSource remapOldMotherlodeDatasetUrlPath(DataSource dataSource, String newPath) {
+        // this is where the fmrc -> grib magic will happen
+        Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
+        UnidataTdsUrlRemapper remapper = new UnidataTdsUrlRemapper();
+        // grab dataSource URL
+        if (dataSource instanceof DodsGeoGridDataSource) {
+            ArrayList oldUrls = (ArrayList) dataSource.getDataPaths();
+            String oldUrl = newPath;
+            String [] breakUrl =  null;
+            if (oldUrl.contains("catalog/")) {
+                breakUrl = oldUrl.split("catalog/");
+            } else if (oldUrl.contains("dodsC/")) {
+                breakUrl = oldUrl.split("dodsC/");
+            }
+
+            String oldUrlPath;
+
+            if (breakUrl.length == 2) {
+                oldUrlPath = breakUrl[1];
+            } else {
+                return dataSource;
+            }
+            String map = null;
+            if (oldUrlPath.contains("latest.xml")) {
+                oldUrlPath = oldUrlPath.split("latest.xml")[0];
+                map = "latest";
+            } else if ((oldUrlPath.contains("best")) || (oldUrlPath.contains(".ncd"))) {
+                map = "best";
+            }
+
+            List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath,map);
+            if ((newUrlPaths != null) && (newUrlPaths.size() == 1)) {
+                String newUrlPath = newUrlPaths.get(0);
+                String newUrl = oldUrl.replace(oldUrlPath, newUrlPath);
+                dataSource = updatePropsWithRemapUrl(dataSource, newUrl);
+            }
+        }
+
+        return dataSource;
+    }
+
 
     /**
      * This methods updates the properties that I *think* matter when updating
@@ -3243,21 +3266,41 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return updated DataSource
      */
+
     private DataSource updatePropsWithRemapUrl(DataSource dataSource,
             String newPath) {
         // if ncIdvVersion is not in bundle, then this will
         // run again when the datasource UrlPath is checked
         Boolean testTds = getProperty("tds.update.test",Boolean.FALSE);
-        if  ((ncIdvVersion == null) || (testTds)) {
-            if ((newPath.contains("latest.xml")) && (!newPath.contains("/thredds/catalog/"))) {
+        // we will need to check if bundle has ncIdvVersion when the new TDS gets on 8080,
+        // but for now we will only remap dataset urlPaths if testTDS is enabled.
+        //if  ((ncIdvVersion == null) || (testTds)) {
+        //if ((newPath.contains("latest.xml")) && (!newPath.contains("/thredds/catalog/"))) {
+        if (newPath.contains("latest.xml")) {
+
+            Hashtable props = ((DodsGeoGridDataSource) dataSource).getProperties();
+            if (props.containsKey("prop.service.http")) {
                 String newHttpPath = CatalogUtil.resolveUrl(newPath,
-                                         null).replace("/dodsC/", "/fileServer/");
+                        null).replace("/dodsC/", "/fileServer/");
                 ((DodsGeoGridDataSource) dataSource).setProperty(
                     "prop.service.http", newHttpPath);
             }
-            ((DodsGeoGridDataSource) dataSource).setProperty("RESOLVERURL",
+
+            if (props.containsKey("RESOLVERURL")) {
+                ((DodsGeoGridDataSource) dataSource).setProperty("RESOLVERURL",
                     newPath);
+            }
+        } else {
+            Hashtable props = ((DodsGeoGridDataSource) dataSource).getProperties();
+            DataSourceDescriptor descript = ((DodsGeoGridDataSource) dataSource).getDescriptor();
+
+            try {
+                dataSource = new DodsGeoGridDataSource(descript,newPath,props);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        //}
         return dataSource;
     }
 
