@@ -999,7 +999,8 @@ public class DataTree extends DataSourceHolder {
             parentNode = treeRoot;
         }
 
-        List choices = dataSource.getDataChoices();
+        List choices = new ArrayList();
+        choices.addAll(dataSource.getDataChoices());
         if (doSort) {
             Collections.sort(choices, new Comparator() {
                 public int compare(Object o1, Object o2) {
