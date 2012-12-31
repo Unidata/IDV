@@ -62,7 +62,9 @@ public class ServerUrlRemapper {
     /**
      * Construct a ServerUrlRemapper 
      */
-    public ServerUrlRemapper() {}
+    public ServerUrlRemapper(IntegratedDataViewer idv) {
+        this.idv = idv;
+    }
 
     /**
      * main method to handle remapping urls
@@ -155,7 +157,9 @@ public class ServerUrlRemapper {
                     // remap urlPaths that point to old unidata TDS ( < 4.3)
                     // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
                     // and the path likely needs to be updated
-                    if ((ncIdvVersion == null) || (testTds)) {
+                    //uncomment next line once 8080 is running 4.3
+                    //if ((ncIdvVersion == null) || (testTds)) {
+                    if (testTds) {
                         dataSource =
                             remapOldMotherlodeDatasetUrlPath(dataSource,
                                 newPath);

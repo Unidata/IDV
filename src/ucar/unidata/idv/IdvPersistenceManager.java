@@ -238,7 +238,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     private boolean catSelected;
 
     /** remap datasources */
-    private ServerUrlRemapper serverUrlRemapper = new ServerUrlRemapper();
+    private ServerUrlRemapper serverUrlRemapper = null;
 
     /**
      * The ctor
@@ -249,7 +249,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         super(idv);
 
-
+        serverUrlRemapper = new ServerUrlRemapper(idv);
         cleanupOldSavedBundles();
 
 
