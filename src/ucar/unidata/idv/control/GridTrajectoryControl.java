@@ -578,7 +578,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     gtc.setTrjDataTimeRange(dataTimeRange);
                 }
                 GridDataInstance gridDataInstance = getGridDataInstance();
-                if (gridDataInstance == null) {
+                if (gridDataInstance == null || dataTimeRange == null) {
                     return;
                 }
                 Unit       dataTimeUnit;
