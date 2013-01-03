@@ -35,6 +35,7 @@ import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.control.drawing.*;
 import ucar.unidata.ui.FineLineBorder;
 
@@ -93,11 +94,6 @@ public class GridTrajectoryControl extends DrawingControl {
     /** The title we get from the xml */
     private String editorTitle = null;
 
-    /** Top level displayable */
-    CompositeDisplayable displayHolder0;
-
-    /** If we get our glyphs from a datachoice this is set to true */
-    private boolean displayOnly = true;
 
     /** command */
     public static final DrawingCommand CMD_REMOVE =
@@ -106,6 +102,9 @@ public class GridTrajectoryControl extends DrawingControl {
 
     /** _more_ */
     public static final String CMD_SETLEVELS = "cmd.setlevels";
+
+    /** _more_ */
+    public static final String CMD_createTrj = "cmd.createTrj";
 
     /** _more_ */
     DataChoice dataChoice;
@@ -138,8 +137,6 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     private Unit newZunit = CommonUnit.meter;
 
-    /** _more_ */
-    private Range lastRange;
 
     /** _more_ */
     private static final Data DUMMY_DATA = new Real(0);
@@ -161,6 +158,9 @@ public class GridTrajectoryControl extends DrawingControl {
     private JButton createTrjBtn;
 
     /** _more_ */
+    boolean createTrjBtnClicked = false;
+
+    /** _more_ */
     JPanel controlPane;
 
     /** _more_ */
@@ -178,7 +178,12 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     FieldImpl s;
 
-    public boolean haveInitialized1 = false;
+
+    /** _more_ */
+    int trackLineWidth = 1;
+
+    /** _more_ */
+    private DataTimeRange trjDataTimeRange;
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -187,7 +192,7 @@ public class GridTrajectoryControl extends DrawingControl {
         setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                | FLAG_DISPLAYUNIT | FLAG_TIMERANGE);
+                          | FLAG_DISPLAYUNIT | FLAG_TIMERANGE);
     }
 
 
@@ -225,9 +230,27 @@ public class GridTrajectoryControl extends DrawingControl {
         private Range lastRange;
 
         /** _more_ */
-        int trackWidth = 1;
+        int trackWidth;
+
+        /** _more_ */
+        GridTrajectoryControl gtc = null;
+
+
+
         /**
          * _more_
+         *
+         * @param gtc _more_
+         */
+        public MyTrackControl(GridTrajectoryControl gtc) {
+            setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
+                              | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
+                              | FLAG_SELECTRANGE);
+            this.gtc = gtc;
+        }
+
+        /**
+         * Construct a MyTrackControl
          */
         public MyTrackControl() {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
@@ -235,12 +258,17 @@ public class GridTrajectoryControl extends DrawingControl {
                               | FLAG_SELECTRANGE);
         }
 
-       // public boolean init(List choices)throws VisADException, RemoteException {
-       //     return super.init(choices);
-       // }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean getHaveInitialized() {
             return true;
         }
+
         /**
          * _more_
          */
@@ -251,8 +279,60 @@ public class GridTrajectoryControl extends DrawingControl {
          * @return  width
          */
         protected int getTrackWidth() {
-            return trackWidth;
+            if (gtc.createTrjBtnClicked) {
+                return gtc.getTrackLineWidth();  // trackWidth;
+            } else {
+                return trackWidth;
+            }
         }
+
+
+        /**
+         * _more_
+         *
+         * @param width _more_
+         */
+        public void setLineWidth(int width) {
+            super.setLineWidth(width);
+            if (gtc != null) {
+                gtc.setTrackLineWidth(width);
+            }
+        }
+
+
+
+        /**
+         * _more_
+         *
+         * @param range _more_
+         */
+        public void setDataTimeRange(DataTimeRange range) {
+            ///if(range == null && gtc!= null)
+            //    range = gtc.getTrjDataTimeRange();
+            super.setDataTimeRange(range);
+            if (gtc != null) {
+                range.setStartOffsetMinutes(range.getStartOffsetMinutes());
+                gtc.setTrjDataTimeRange(range);
+            }
+
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public DataTimeRange getDataTimeRange() {
+            if ((gtc != null) && (gtc.getTrjDataTimeRange() != null)) {
+                return gtc.getTrjDataTimeRange();
+            } else {
+                return super.getDataTimeRange();
+            }
+
+
+        }
+
+
         /**
          * _more_
          *
@@ -434,25 +514,7 @@ public class GridTrajectoryControl extends DrawingControl {
             return true;
         }
 
-        /**
-         * _more_
-         *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
-         */
-        /*  private void updateIndicator() {
-           if (indicator != null) {
-               try {
-                   lastIndicatorPosition = null;
-                   indicator.setStationModel( getMarkerLayout());
-                   indicator.setVisible( getMarkerVisible());
-                   setScaleOnMarker();
-                   applyTimeRange();
-               } catch (Exception exc) {
-                   logException("Updating indicator", exc);
-               }
-           }
-       } */
+
 
         /**
          * _more_
@@ -511,10 +573,16 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         public void applyTimeRange() {
             try {
-                DataTimeRange    dataTimeRange    = getDataTimeRange(true);
+                DataTimeRange dataTimeRange = getDataTimeRange();
+                if (gtc != null) {
+                    gtc.setTrjDataTimeRange(dataTimeRange);
+                }
                 GridDataInstance gridDataInstance = getGridDataInstance();
-                Unit             dataTimeUnit;
-                DateTime[]       dts = gridDataInstance.getDateTimes();
+                if (gridDataInstance == null) {
+                    return;
+                }
+                Unit       dataTimeUnit;
+                DateTime[] dts = gridDataInstance.getDateTimes();
                 dataTimeUnit = dts[0].getUnit();
                 int size = dts.length;
                 // Range    r                = getRangeForTimeSelect();
@@ -546,6 +614,8 @@ public class GridTrajectoryControl extends DrawingControl {
                                  ? ((Real) aniValue).getValue(dataTimeUnit)
                                  : endDate;
                 DataTimeRange dtr = getDataTimeRange();
+                dtr.setStartOffsetMinutes(
+                    getDataTimeRange().getStartOffsetMinutes());
                 if ((dtr != null) && (trackDisplay != null)
                         && useTrackTimes) {
                     dtr.setEndMode(dtr.MODE_ANIMATION);
@@ -558,84 +628,7 @@ public class GridTrajectoryControl extends DrawingControl {
             }
         }
 
-        /**
-         * _more_
-         */
-        public void applyTimeRange1() {
-            try {
-                DataTimeRange    dataTimeRange    = getDataTimeRange(true);
-                GridDataInstance gridDataInstance = getGridDataInstance();
-                Unit             dataTimeUnit;
-                Data             d = trackDisplay.getData();
-                FlatField        f;
-                try {
-                    if (d != null) {
-                        f = (FlatField) ((FieldImpl) d).getSample(0);
-                    } else {
-                        f = gridDataInstance.getFlatField();
-                    }
-                } catch (ClassCastException e) {
-                    f = (FlatField) d;
-                }
 
-                //System.out.println(f.getType());
-                double[][] samples  = f.getValues(false);
-                int        numTimes = samples[1].length;
-                DateTime   d0       = new DateTime(samples[1][0]);
-                DateTime   d1       = new DateTime(samples[1][numTimes - 1]);
-                //DateTime[]       dts = gridDataInstance.getDateTimes();
-                dataTimeUnit = d0.getUnit();
-                int size = numTimes;  //dts.length;
-                // Range    r                = getRangeForTimeSelect();
-                // RealType dataTimeRealType = Util.getRealType(dataTimeUnit);
-                Real      startReal = d0;  //dts[0].getReal();
-                Real      endReal   = d1;  //dts[size - 1].getReal();
-
-
-                Animation anime     = getViewAnimation();
-                Real      aniValue  = ((anime != null)
-                                       ? anime.getAniValue()
-                                       : null);
-
-                Real[] startEnd = getDataTimeRange().getTimeRange(startReal,
-                                      endReal, aniValue);
-
-
-                double startDate = startEnd[0].getValue(dataTimeUnit);
-                double endDate   = startEnd[1].getValue(dataTimeUnit);
-                if ( !Misc.equals(lastRange, new Range(startDate, endDate))) {
-                    lastRange = new Range(startDate, endDate);
-                    if (trackDisplay != null) {
-                        trackDisplay.setSelectedRange(startDate, endDate);
-                    }
-                }
-                // set the position of the marker at the animation time
-                double aniDate = ((aniValue != null)
-                                  && (aniValue instanceof Real))
-                                 ? ((Real) aniValue).getValue(dataTimeUnit)
-                                 : endDate;
-                DataTimeRange dtr = getDataTimeRange();
-                if ((dtr != null) && (trackDisplay != null)
-                        && useTrackTimes) {
-                    dtr.setEndMode(dtr.MODE_ANIMATION);
-                    trackDisplay.setSelectedRange(startDate, aniDate);
-                }
-
-
-            } catch (Exception e) {
-                logException("applyTimeRange", e);
-            }
-        }
-
-        /**
-         * Respond to a timeChange event
-         *
-         * @param time new time
-         */
-        protected void timeChanged(Real time) {
-
-            super.timeChanged(time);
-        }
 
         /**
          * _more_
@@ -728,6 +721,44 @@ public class GridTrajectoryControl extends DrawingControl {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getTrackLineWidth() {
+        return trackLineWidth;
+    }
+
+    /**
+     * _more_
+     *
+     * @param width _more_
+     */
+    public void setTrackLineWidth(int width) {
+        trackLineWidth = width;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public DataTimeRange getTrjDataTimeRange() {
+        return trjDataTimeRange;
+    }
+
+    /**
+     * _more_
+     *
+     * @param range _more_
+     */
+    public void setTrjDataTimeRange(DataTimeRange range) {
+        if (range != null) {
+            trjDataTimeRange = range;
+        }
+    }
+
+    /**
      * Call to help make this kind of Display Control; also calls code to
      * made the Displayable (empty of data thus far).
      * This method is called from inside DisplayControlImpl.init(several args).
@@ -743,7 +774,7 @@ public class GridTrajectoryControl extends DrawingControl {
             throws VisADException, RemoteException {
 
         super.init((DataChoice) null);
-        gridTrackControl = new MyTrackControl();
+        gridTrackControl = new MyTrackControl(this);
         // super.init(dataChoice);
         this.dataChoice = dataChoice;
         DataInstance      di      = getDataInstance();
@@ -773,7 +804,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         GridDataInstance gdi = new GridDataInstance(sdc, getDataSelection(),
                                    getRequestProperties());
-
+        setDataInstance(gdi);
         gridTrackControl.controlContext = getControlContext();
         gridTrackControl.updateGridDataInstance(gdi);
         setDisplayUnit(gdi.getRawUnit(0));
@@ -878,21 +909,78 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl.timesHolder.setManipulable(false);
         gridTrackControl.timesHolder.setVisible(false);
         addDisplayable(gridTrackControl.timesHolder);
-        gridTrackControl.addDisplayable(gridTrackControl.trackDisplay, getAttributeFlags());
+        gridTrackControl.addDisplayable(gridTrackControl.trackDisplay,
+                                        getAttributeFlags());
         gridTrackControl.addDisplayable(gridTrackControl.selectRangeDisplay,
-                FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+                                        FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
         gridTrackControl.addDisplayable(gridTrackControl.indicator);
         gridTrackControl.addDisplayable(gridTrackControl.timesHolder);
         // return setData(dataChoice);
+        createTrjBtn = new JButton("Create Trajectory");
+        createTrjBtn.addActionListener(this);
+        createTrjBtn.setActionCommand(CMD_createTrj);
+        createTrjBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                String cmd = actionEvent.getActionCommand();
+                if (cmd.equals(CMD_createTrj)) {
+                    try {
+                        createTrjBtnClicked = true;
+                        createTrajectoryControl();
+                    } catch (VisADException ee) {}
+                    catch (RemoteException er) {}
+                    catch (Exception exr) {}
+                }
+
+
+            }
+        });
+
+        controlPane = new JPanel();
+        controlPane.setPreferredSize(new Dimension(300, 180));
 
         return true;
 
 
     }
 
+    /**
+     * _more_
+     *
+     * @param vc _more_
+     * @param properties _more_
+     * @param preSelectedDataChoices _more_
+     */
+    public void initAfterUnPersistence(ControlContext vc,
+                                       Hashtable properties,
+                                       List preSelectedDataChoices) {
+
+        super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+
+        if (createTrjBtnClicked) {
+            if ((getGlyphs() != null) && (glyphs.size() > 0)) {
+                currentLevel = getCurrentLevel();
+                setLevel(currentLevel);
+
+                // msgLabel  = new JLabel();
+                // setCurrentCommand(getCurrentCmd());
+                createTrjBtn.doClick();
+                gridTrackControl.setLineWidth(getTrackLineWidth());
+                gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
+            }
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getHaveInitialized() {
         return true;
     }
+
     /**
      * current level
      *
@@ -917,7 +1005,13 @@ public class GridTrajectoryControl extends DrawingControl {
 
         GuiUtils.setListData(levelBox, formatLevels(levels));
         if (currentLevel != null) {
-            levelBox.setSelectedItem(currentLevel);
+            if (currentLevel instanceof Real) {
+                TwoFacedObject clevel =
+                    Util.labeledReal((Real) currentLevel);;
+                levelBox.setSelectedItem(clevel);
+            } else {
+                levelBox.setSelectedItem(currentLevel);
+            }
         }
 
         setOkToFireEvents(true);
@@ -929,7 +1023,9 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param r _more_
      */
     public void setLevel(Object r) {
-        currentLevel = r;
+        if ( !createTrjBtnClicked) {
+            currentLevel = r;
+        }
     }
 
     /**
@@ -1100,7 +1196,7 @@ public class GridTrajectoryControl extends DrawingControl {
         double[]   timeVals     = timeSet.getDoubles()[0];
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
-        SampledSet domain2D      = GridUtil.makeDomain2D((GriddedSet)domain0);
+        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
         double[]   ttts         = timeSet.getDoubles()[0];
         boolean    normalizeLon = true;
 
@@ -1111,8 +1207,9 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
-        float[][]  geoVals      = getEarthLocationPoints(latIndex, lonIndex, domain2D);
-        int        numPoints    = geoVals[0].length;
+        float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
+                                domain2D);
+        int numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
             DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
@@ -1145,7 +1242,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
         //super.init(fi)
 
-        gridTrackControl.setLineWidth(gridTrackControl.getTrackWidth());
+        // gridTrackControl.setLineWidth(gridTrackControl.getTrackWidth());
+        // gridTrackControl.setDataTimeRange(gridTrackControl.getDataTimeRange());
         gridTrackControl.setData(fi);
         Range range = gridTrackControl.getGridDataInstance().getRange(
                           gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
@@ -1176,11 +1274,13 @@ public class GridTrajectoryControl extends DrawingControl {
      *
      * @param latIndex _more_
      * @param lonIndex _more_
+     * @param domain0 _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public float[][] getEarthLocationPoints(int latIndex, int lonIndex, SampledSet domain0)
+    public float[][] getEarthLocationPoints(int latIndex, int lonIndex,
+                                            SampledSet domain0)
             throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
@@ -1218,8 +1318,8 @@ public class GridTrajectoryControl extends DrawingControl {
             if (glyphs.size() == 0) {
                 return null;
             }
-          //  Gridded3DSet domain =
-          //      gridTrackControl.getGridDataInstance().getDomainSet3D();
+            //  Gridded3DSet domain =
+            //      gridTrackControl.getGridDataInstance().getDomainSet3D();
             Unit[]   du       = domain0.getSetUnits();
             MapMaker mapMaker = new MapMaker();
             for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
@@ -1227,9 +1327,9 @@ public class GridTrajectoryControl extends DrawingControl {
                 float[][] tmp = glyph.getLatLons();
                 if (du[lonIndex].isConvertible(CommonUnit.radian)) {
                     for (int i = 0; i < lls[1].length; i++) {
-                        lls[0][i] =
+                        lls[1][i] =
                             (float) GridUtil.normalizeLongitude(domain0,
-                                tmp[0][i], du[lonIndex]);
+                                tmp[1][i], du[lonIndex]);
                     }
                 } else if (du[lonIndex].isConvertible(
                         CommonUnits.KILOMETER)) {
@@ -1241,8 +1341,9 @@ public class GridTrajectoryControl extends DrawingControl {
                 mapMaker.addMap(lls);
             }
 
-            float[][][] latlons = GridUtil.findContainedLatLons((GriddedSet)domain0,
-                                      mapMaker.getMaps());
+            float[][][] latlons =
+                GridUtil.findContainedLatLons((GriddedSet) domain0,
+                    mapMaker.getMaps());
             int       num    = latlons[0][0].length;
             float[][] points = new float[3][num];
 
@@ -1284,11 +1385,6 @@ public class GridTrajectoryControl extends DrawingControl {
      * @return Controls panel
      */
     protected JComponent doMakeControlsPanel() {
-        controlPane = new JPanel();
-        controlPane.setPreferredSize(new Dimension(300, 180));
-        JComponent controlHolder = GuiUtils.topCenter(new JLabel("Result:"),
-                                       controlPane);
-
 
         List widgets = new ArrayList();
         addControlWidgets(widgets);
@@ -1319,18 +1415,31 @@ public class GridTrajectoryControl extends DrawingControl {
                                      "removeAllGlyphs");
         unloadBtn.setToolTipText("Remove all glyphs");
 
-        msgLabel  = new JLabel();
-        pointsBtn = new JRadioButton("Points:", isPoints);
-        setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
+        msgLabel = new JLabel();
+        if (createTrjBtnClicked) {
+            isPoints = getIsPoints();
+            if (isPoints) {
+                setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
+            } else {
+                setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
+            }
+        } else {
+            setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
+        }
+
+        pointsBtn    = new JRadioButton("Points:", isPoints);
         rectangleBtn = new JRadioButton("Rectangle:", !isPoints);
+
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JRadioButton source = (JRadioButton) e.getSource();
                 if (source == pointsBtn) {
                     setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
+                    isPoints = true;
                     removeAllGlyphs();
                 } else {
                     setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
+                    isPoints = false;
                     removeAllGlyphs();
                 }
             }
@@ -1338,17 +1447,8 @@ public class GridTrajectoryControl extends DrawingControl {
         pointsBtn.addActionListener(listener);
         rectangleBtn.addActionListener(listener);
         GuiUtils.buttonGroup(pointsBtn, rectangleBtn);
-        createTrjBtn = new JButton("Create Trajectory");
-        createTrjBtn.addActionListener(new ActionListener() {
+        //
 
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    createTrajectoryControl();
-                } catch (VisADException ee) {}
-                catch (RemoteException er) {}
-                catch (Exception exr) {}
-            }
-        });
 
         JComponent rightComp = GuiUtils.vbox(GuiUtils.left(pointsBtn),
                                              GuiUtils.left(rectangleBtn),
@@ -1411,6 +1511,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     gridTrackControl.indicator.setVisible(false);
                     gridTrackControl.timesHolder.setData(DUMMY_DATA);
                 }
+                createTrjBtnClicked = false;
             }
         } catch (Exception exc) {
             logException("Removing drawings", exc);
@@ -1444,8 +1545,94 @@ public class GridTrajectoryControl extends DrawingControl {
     private void setCursor(Cursor c) {
         getViewManager().setCursorInDisplay(c);
     }
+    /*
+   public void setGridTrackControl(MyTrackControl mtc) {
+       gridTrackControl = mtc;
+   }
+
+   public MyTrackControl getGridTrackControl() {
+       return gridTrackControl;
+   }     */
+
+    /**
+     * _more_
+     *
+     * @param lvl _more_
+     */
+    public void setCurrentLevel(Object lvl) {
+        currentLevel = lvl;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Object getCurrentLevel() {
+        return currentLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public DrawingCommand getCurrentCmd() {
+        return currentCmd;
+    }
+
+    /**
+     * _more_
+     *
+     * @param command _more_
+     */
+    public void setCurrentCmd(String command) {
+        if (command.contains(
+                GlyphCreatorCommand.CMD_SMOOTHPOLYGON.getLabel())) {
+            currentCmd = GlyphCreatorCommand.CMD_SMOOTHPOLYGON;
+        } else if (command.contains(
+                GlyphCreatorCommand.CMD_SYMBOL.getLabel())) {
+            currentCmd = GlyphCreatorCommand.CMD_SYMBOL;
+        } else {
+            currentCmd = getCurrentCmd();
+        }
+    }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getCreateTrjBtnClicked() {
+        return createTrjBtnClicked;
+    }
 
+    /**
+     * _more_
+     *
+     * @param clicked _more_
+     */
+    public void setCreateTrjBtnClicked(boolean clicked) {
+        createTrjBtnClicked = clicked;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsPoints() {
+        return isPoints;
+    }
+
+    /**
+     * _more_
+     *
+     * @param point _more_
+     */
+    public void setIsPoints(boolean point) {
+        isPoints = point;
+    }
 }
