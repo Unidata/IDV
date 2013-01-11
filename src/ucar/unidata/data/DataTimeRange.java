@@ -228,7 +228,8 @@ public class DataTimeRange {
      * Set time mode text
      */
     private void setTimeModeLabel() {
-        timeModeLabel.setText(getLabelText());
+        if(timeModeLabel != null)
+            timeModeLabel.setText(getLabelText());
     }
 
 
