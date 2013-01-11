@@ -38,7 +38,6 @@ import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.point.PointObTuple;
-import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.projection.LambertConformal;
 import ucar.unidata.geoloc.projection.Mercator;
@@ -5452,10 +5451,10 @@ public class GridUtil {
             values[0] = values[1];
             values[1] = tmp;
         }
-        for (int i = 0; i < values[1].length; i++) {
-            values[1][i] =
-                    (float) LatLonPointImpl.lonNormal(values[1][i]);
-        }
+
+        //normalize lon
+        values[1]  =   ucar.visad.GeoUtils.normalizeLongitude(values[1]);
+
         return values;
     }
 
