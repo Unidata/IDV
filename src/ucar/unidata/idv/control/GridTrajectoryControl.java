@@ -708,6 +708,20 @@ public class GridTrajectoryControl extends DrawingControl {
             }
             return range;
         }
+
+        public void initAfterUnPersistence(ControlContext vc,
+                                           Hashtable properties,
+                                           List preSelectedDataChoices) {
+
+                DataTimeRange dtr = getDataTimeRange();
+                dtr.setEndMode(getUseTrackTimes()
+                        ? dtr.MODE_DATA
+                        : dtr.MODE_ANIMATION);
+                dtr.setStartMode(dtr.MODE_RELATIVE);
+                dtr.setStartOffsetMinutes(dtr.getStartOffsetMinutes());
+                setDataTimeRange(dtr);
+
+        }
     }
 
     /**
@@ -965,7 +979,8 @@ public class GridTrajectoryControl extends DrawingControl {
                 // setCurrentCommand(getCurrentCmd());
                 createTrjBtn.doClick();
                 gridTrackControl.setLineWidth(getTrackLineWidth());
-                gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
+               // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
+                gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
             }
         }
 
@@ -1326,11 +1341,8 @@ public class GridTrajectoryControl extends DrawingControl {
                 float[][] lls = glyph.getLatLons();
                 float[][] tmp = glyph.getLatLons();
                 if (du[lonIndex].isConvertible(CommonUnit.radian)) {
-                    for (int i = 0; i < lls[1].length; i++) {
-                        lls[1][i] =
-                            (float) GridUtil.normalizeLongitude(domain0,
-                                tmp[1][i], du[lonIndex]);
-                    }
+                    lls[1] = ucar.visad.GeoUtils.normalizeLongitude( lls[1]);
+
                 } else if (du[lonIndex].isConvertible(
                         CommonUnits.KILOMETER)) {
                     for (int i = 0; i < lls[1].length; i++) {
