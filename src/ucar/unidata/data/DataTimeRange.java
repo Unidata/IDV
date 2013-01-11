@@ -232,7 +232,12 @@ public class DataTimeRange {
             timeModeLabel.setText(getLabelText());
     }
 
-
+    /**
+     * Set time mode text
+     */
+    public void setTimeModeLabel(JLabel label) {
+            timeModeLabel = label;
+    }
 
 
     /**
